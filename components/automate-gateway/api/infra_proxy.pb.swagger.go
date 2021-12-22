@@ -257,6 +257,37 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/infraserverorgs": {
+      "get": {
+        "operationId": "InfraProxy_GetInfraServerOrgs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetInfraServerOrgs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Automate Infra Server ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
         "operationId": "InfraProxy_GetOrgs",
@@ -3936,6 +3967,18 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RunList"
           },
           "description": "List of the run list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.GetInfraServerOrgs": {
+      "type": "object",
+      "properties": {
+        "orgs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
+          },
+          "title": "Chef organization list from chef server"
         }
       }
     },
