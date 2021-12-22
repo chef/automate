@@ -87,7 +87,7 @@ describe('CreateChefServerSliderComponent', () => {
         expect(createForm.valid).toBeFalsy();
         expect(fqdnForm.valid).toBeFalsy();
         expect(ipForm.valid).toBeFalsy();
-        expect(webUIKeyForm).toBeFalsy();
+        expect(webUIKeyForm.valid).toBeFalsy();
       });
 
       it('when name is missing', () => {
