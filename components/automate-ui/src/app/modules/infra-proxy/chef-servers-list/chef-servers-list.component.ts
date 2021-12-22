@@ -68,9 +68,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       ]]
     });
     this.webUIKeyForm = this.fb.group({
-      webui_key: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK)
-      ]]
+      webui_key: ['', [Validators.required]]
     });
   }
 
