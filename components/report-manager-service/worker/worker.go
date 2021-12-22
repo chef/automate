@@ -6,8 +6,10 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -18,11 +20,14 @@ import (
 	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/chef/automate/components/report-manager-service/utils"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/pcmp"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -37,7 +42,7 @@ const (
 )
 
 func InitCerealManager(cerealManager *cereal.Manager, workerCount int, db *storage.DB, objStoreClient *minio.Client,
-	objBucket string) error {
+	objBucket string, complianceReportingClient reporting.ReportingServiceClient) error {
 	err := cerealManager.RegisterWorkflowExecutor(ReportWorkflowName, &ReportWorkflow{
 		DB: db,
 	})
@@ -49,7 +54,8 @@ func InitCerealManager(cerealManager *cereal.Manager, workerCount int, db *stora
 		ObjStoreClient: objstore.ReportManagerObjStore{
 			ObjStoreClient: objStoreClient,
 		},
-		ObjBucketName: objBucket,
+		ObjBucketName:             objBucket,
+		ComplianceReportingClient: complianceReportingClient,
 	}, cereal.TaskExecutorOpts{Workers: workerCount})
 }
 
@@ -195,8 +201,9 @@ func (s *ReportWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEve
 }
 
 type GenerateReportTask struct {
-	ObjStoreClient objstore.ObjectStore
-	ObjBucketName  string
+	ObjStoreClient            objstore.ObjectStore
+	ObjBucketName             string
+	ComplianceReportingClient reporting.ReportingServiceClient
 }
 
 type GenerateReportParameters struct {
@@ -221,7 +228,7 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 	startTime := time.Now().UTC().Round(time.Second)
 	job.StartTime = &startTime
 
-	finalData, err := t.prepareCustomReportData(ctx, job.RequestToProcess)
+	finalData, err := t.prepareCustomReportData(ctx, job.JobID, job.RequestToProcess)
 	if err != nil {
 		return nil, err
 	}
@@ -273,12 +280,49 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 	return &job, nil
 }
 
-func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, reqToProcess *report_manager.CustomReportRequest) ([]*reporting.Report, error) {
+func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, jobID string, reqToProcess *report_manager.CustomReportRequest) ([]*reporting.Report, error) {
 	finalData := []*reporting.Report{}
-	for _, report := range reqToProcess.Reports {
+
+	//Get the reports list from compliance service
+	listFilters := []*reporting.ListFilter{}
+	for _, filter := range reqToProcess.GetFilters() {
+		listFilters = append(listFilters, &reporting.ListFilter{
+			Type:   filter.GetType(),
+			Values: filter.GetValues(),
+		})
+	}
+	reportList, err := t.getReportsList(ctx, listFilters)
+	if err != nil {
+		return nil, err
+	}
+
+	logrus.Infof("fetched %d reports to process from compliance service %s", len(reportList.Reports), jobID)
+
+	for _, report := range reportList.GetReports() {
 		controlsMap := make(map[string]map[string]*inspec.Control)
 		profilesMap := make(map[string]*inspec.Profile)
 		objectName := utils.GetObjName(report.GetReportId())
+
+		//check the existence of object
+		_, err = t.ObjStoreClient.StatObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
+		if err != nil {
+			fmt.Println("Stat Object Error:", err.Error())
+			errResp := minio.ToErrorResponse(err)
+			// if the error code is `NoSuchKey`, we need to fetch the object from elastic search and store into object store
+			if errResp.Code == "NoSuchKey" {
+				err := t.fetchAndStoreObj(ctx, report.GetReportId(), listFilters)
+				if err != nil {
+					err = errors.Wrap(err, "not able to fetch and store the object")
+					logrus.WithError(err).Error()
+					return nil, err
+				}
+			} else {
+				err = errors.Wrap(err, "could not check the object existence in object store")
+				logrus.WithError(err).Error()
+				return nil, err
+			}
+		}
+
 		objReader, err := t.ObjStoreClient.GetObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
 		if err != nil {
 			err = errors.Wrap(err, "could not get the file from object store")
@@ -304,18 +348,20 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, reqToP
 			controlsMap[profile.Sha256] = controlMap
 		}
 		reportData := &reporting.Report{
-			Id:            cmpReport.ReportUuid,
-			NodeId:        cmpReport.NodeUuid,
-			NodeName:      cmpReport.NodeName,
-			Status:        cmpReport.Status,
-			Environment:   cmpReport.Environment,
-			Version:       cmpReport.Version,
-			JobId:         cmpReport.JobUuid,
-			Ipaddress:     cmpReport.Ipaddress,
-			Fqdn:          cmpReport.Fqdn,
-			Roles:         cmpReport.Roles,
-			ChefTags:      cmpReport.ChefTags,
-			StatusMessage: cmpReport.StatusMessage,
+			Id:               cmpReport.ReportUuid,
+			NodeId:           cmpReport.NodeUuid,
+			NodeName:         cmpReport.NodeName,
+			Status:           cmpReport.Status,
+			Environment:      cmpReport.Environment,
+			Version:          cmpReport.Version,
+			JobId:            cmpReport.JobUuid,
+			Ipaddress:        cmpReport.Ipaddress,
+			Fqdn:             cmpReport.Fqdn,
+			Roles:            cmpReport.Roles,
+			ChefTags:         cmpReport.ChefTags,
+			StatusMessage:    cmpReport.StatusMessage,
+			ChefServer:       cmpReport.SourceFqdn,
+			ChefOrganization: cmpReport.OrganizationName,
 		}
 		if cmpReport.Platform != nil && (cmpReport.Platform.Name != "" || cmpReport.Platform.Release != "") {
 			reportData.Platform = &reporting.Platform{
@@ -349,7 +395,6 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, reqToP
 			if !ok {
 				continue
 			}
-			//TODO:: Fix Profile status
 			profileData := &reporting.Profile{
 				Name:           compProfile.Name,
 				Title:          compProfile.Title,
@@ -385,14 +430,33 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, reqToP
 				if !ok {
 					continue
 				}
-				//TODO: Add Tags and waived_str at control level
+
 				controlData := &reporting.Control{
-					Id:     compControl.Id,
-					Code:   compControl.Code,
-					Desc:   compControl.Desc,
-					Impact: compControl.Impact,
-					Title:  compControl.Title,
+					Id:        compControl.Id,
+					Code:      compControl.Code,
+					Desc:      compControl.Desc,
+					Impact:    compControl.Impact,
+					Title:     compControl.Title,
+					WaivedStr: WaivedStr(compControl.WaiverData),
 				}
+
+				//process the tags
+				tags, err := getTags(compControl.GetTags().GetFields())
+				if err != nil {
+					err = errors.Wrap(err, "error in getting the tags")
+					logrus.WithError(err).Error()
+					return nil, err
+				}
+				controlData.Tags = tags
+
+				stringTags, err := getStringTags(compControl.GetTags().GetFields())
+				if err != nil {
+					err = errors.Wrap(err, "error in getting the stringTags")
+					logrus.WithError(err).Error()
+					return nil, err
+				}
+				controlData.StringTags = stringTags
+
 				if compControl.SourceLocation != nil && (compControl.SourceLocation.Ref != "" ||
 					compControl.SourceLocation.Line != 0) {
 					controlData.SourceLocation = &reporting.SourceLocation{
@@ -509,4 +573,149 @@ func (t *GenerateReportTask) csvExporter(ctx context.Context, finalData []*repor
 		return 0, "", err
 	}
 	return info.Size, objectName, nil
+}
+
+//fetchAndStoreObj fetches the object from elastic search and store into object store
+func (t *GenerateReportTask) fetchAndStoreObj(ctx context.Context, objectID string, filters []*reporting.ListFilter) error {
+	methodName := "fetchAndStoreObj"
+
+	req := reporting.ReportContentRequest{
+		Id:      objectID,
+		Filters: filters,
+	}
+
+	reportData, err := t.ComplianceReportingClient.GetReportContent(ctx, &req)
+	if err != nil {
+		return err
+	}
+
+	reader := bytes.NewReader(reportData.GetContent())
+
+	/*reportData := bytes.Buffer{}
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			//reached end of file
+			break
+		}
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("%s:error received from stream", methodName))
+		}
+		chunk := req.GetContent()
+		_, err = reportData.Write(chunk)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("%s:cannot write chunk data", methodName))
+		}
+	}*/
+
+	complianceReport := compliance.Report{}
+	err = json.Unmarshal(reportData.GetContent(), &complianceReport)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("%s:error in converting report bytes to compliance report struct", methodName))
+	}
+	objName := utils.GetObjName(objectID)
+	info, err := t.ObjStoreClient.PutObject(ctx, t.ObjBucketName, objName, reader, -1, minio.PutObjectOptions{})
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("%s:error in storing the report %s in object store", methodName, complianceReport.GetReportUuid()))
+	}
+	logrus.Infof("report with uuid %s of size %d stroed in object store with key:%s", objectID, info.Size, info.Key)
+	return nil
+}
+
+//getReportsList fetches the reports information for preparing the custom report from compliance service
+func (t *GenerateReportTask) getReportsList(ctx context.Context, listFilters []*reporting.ListFilter) (*reporting.ReportListForReportManagerResponse, error) {
+	var reportList reporting.ReportListForReportManagerResponse
+
+	stream, err := t.ComplianceReportingClient.GetReportListForReportManager(ctx, &reporting.ListFilters{
+		Filters: listFilters,
+	})
+	if err != nil {
+		err = errors.Wrap(err, "could not get the reports list from compliance service")
+		logrus.WithError(err).Error()
+		return nil, err
+	}
+
+	reportListData := bytes.Buffer{}
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			//reached end of file
+			break
+		}
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("%s:error received from stream", "methodName"))
+		}
+		chunk := req.GetContent()
+		_, err = reportListData.Write(chunk)
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("%s:cannot write chunk data", "methodName"))
+		}
+	}
+
+	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
+	err = unmarshaler.Unmarshal(&reportListData, &reportList)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("%s:error in unmarshaling to report list", "methodName"))
+	}
+	return &reportList, nil
+}
+
+// WaivedStr returns a string label based on the control waived status
+func WaivedStr(data *inspec.WaiverData) (str string) {
+	if data == nil || pcmp.DeepEqual(*data, inspec.WaiverData{}) {
+		return inspec.ControlWaivedStrNo
+	}
+
+	if strings.HasPrefix(data.Message, "Waiver expired") {
+		return inspec.ControlWaivedStrNoExpired
+	}
+
+	if data.Run {
+		return inspec.ControlWaivedStrYesRun
+	}
+
+	return inspec.ControlWaivedStrYes
+}
+
+func getTags(fields map[string]*structpb.Value) (string, error) {
+	tags := make(map[string]interface{})
+	for key, value := range fields {
+		tags[key] = value
+	}
+	tagsJson, err := json.Marshal(tags)
+	if err != nil {
+		return "", err
+	}
+	return string(tagsJson), nil
+}
+
+func getStringTags(fields map[string]*structpb.Value) (map[string]*reporting.TagValues, error) {
+	resp := make(map[string]*reporting.TagValues)
+	for tKey, tValue := range fields {
+		if _, isNullValue := tValue.GetKind().(*structpb.Value_NullValue); isNullValue {
+			resp[tKey] = &reporting.TagValues{
+				Values: []string{},
+			}
+		} else if _, isStringValue := tValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+			resp[tKey] = &reporting.TagValues{
+				Values: []string{tValue.GetStringValue()},
+			}
+		} else if _, isListValue := tValue.GetKind().(*structpb.Value_ListValue); isListValue {
+			stringValues := make([]string, 0)
+			for _, listValue := range tValue.GetListValue().Values {
+				if _, isStringValue := listValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+					stringValues = append(stringValues, listValue.GetStringValue())
+				}
+			}
+			if len(stringValues) > 0 {
+				resp[tKey] = &reporting.TagValues{
+					Values: stringValues,
+				}
+			}
+		}
+	}
+	if len(resp) > 0 {
+		return resp, nil
+	}
+	return nil, nil
 }

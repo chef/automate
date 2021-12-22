@@ -44,7 +44,7 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 			skippedProfiles := 0
 			failedProfiles := 0
 
-			for _, profile := range msg.Report.Profiles {
+			for idx, profile := range msg.Report.Profiles {
 				sum := *compliance.ProfileControlSummary(profile)
 				profileStatus := profile.Status
 
@@ -57,6 +57,8 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 				} else if profileStatus == inspec.ResultStatusFailed {
 					failedProfiles += 1
 				}
+
+				msg.Report.Profiles[idx].Status = profileStatus
 
 				logrus.WithFields(logrus.Fields{"ReportUuid": msg.Report.ReportUuid, "profile_status": profileStatus}).Debug("profileStatus yey!")
 
