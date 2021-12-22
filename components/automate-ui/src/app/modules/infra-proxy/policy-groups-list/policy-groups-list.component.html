@@ -13,7 +13,10 @@
             'organizations', orgId, 'policyGroups', policyGroup.policy_group]">{{policyGroup.policy_group}}</a>
           </app-authorized>
         </chef-td>
-        <chef-td>{{policyGroup.occurrence}}</chef-td>
+        <chef-td>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}', 'get', [serverId, orgId, policyGroup.policy_group]]">{{policyGroup.occurrence}}
+          </app-authorized>
+          </chef-td>
       </chef-tr>
   </chef-tbody>
 </chef-table>
