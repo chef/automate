@@ -20,6 +20,8 @@ type ObjectStore interface {
 	MakeBucket(ctx context.Context, bucketName string, opts minio.MakeBucketOptions) error
 
 	PresignedGetObject(ctx context.Context, bucketName, objectName string, expires time.Duration, reqParams url.Values) (*url.URL, error)
+
+	StatObject(ctx context.Context, bucketName string, objectName string, opts minio.GetObjectOptions) (minio.ObjectInfo, error)
 }
 
 type ReportManagerObjStore struct {
@@ -45,4 +47,8 @@ func (rmc ReportManagerObjStore) MakeBucket(ctx context.Context, bucketName stri
 
 func (rmc ReportManagerObjStore) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (u *url.URL, err error) {
 	return rmc.ObjStoreClient.PresignedGetObject(ctx, bucketName, objectName, expires, reqParams)
+}
+
+func (rmc ReportManagerObjStore) StatObject(ctx context.Context, bucketName string, objectName string, opts minio.GetObjectOptions) (minio.ObjectInfo, error) {
+	return rmc.ObjStoreClient.StatObject(ctx, bucketName, objectName, opts)
 }

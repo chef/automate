@@ -4,12 +4,13 @@ import "github.com/chef/automate/lib/tls/certs"
 
 // Configuration for the Report Manager Service
 type ReportManager struct {
-	Service         Service `mapstructure:"service"`
-	Log             Log
-	CerealConfig    CerealConfig `mapstructure:"cereal"`
-	Storage         Storage      `mapstructure:"storage"`
-	certs.TLSConfig `mapstructure:"tls"`
-	ObjStore        ObjStore `mapstructure:"objstore"`
+	Service          Service `mapstructure:"service"`
+	Log              Log
+	CerealConfig     CerealConfig     `mapstructure:"cereal"`
+	ComplianceConfig ComplianceConfig `mapstructure:"compliance"`
+	Storage          Storage          `mapstructure:"storage"`
+	certs.TLSConfig  `mapstructure:"tls"`
+	ObjStore         ObjStore `mapstructure:"objstore"`
 }
 
 type ObjStore struct {
@@ -29,6 +30,10 @@ type Log struct {
 }
 
 type CerealConfig struct {
+	Target string `mapstructure:"target"`
+}
+
+type ComplianceConfig struct {
 	Target string `mapstructure:"target"`
 }
 
