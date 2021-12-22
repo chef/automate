@@ -41,6 +41,7 @@ type Server struct {
 	Fqdn         string
 	IPAddress    string
 	OrgsCount    int32
+	Projects     []string
 	CredentialID string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
