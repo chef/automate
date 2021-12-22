@@ -138,3 +138,5 @@ require (
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
 
 replace github.com/chef/automate/api/external => ./api/external/
+
+replace github.com/go-chef/chef v0.23.2-0.20201213054559-3243f736d651 => github.com/chef/go-chef v0.4.4

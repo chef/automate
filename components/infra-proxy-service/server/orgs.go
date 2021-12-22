@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -207,6 +208,47 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 
 	return &response.ResetOrgAdminKey{
 		Org: fromStorageOrg(org),
+	}, nil
+}
+
+//GetInfraServerOrgs: Fetches the list of automate infra server organisations from the chef server and save it into the automate back end DB
+func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
+
+	// Get the credential ID from servers table
+	server, err := s.service.Storage.GetServer(ctx, req.ServerId)
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "server")
+	}
+	if server.CredentialID == "" {
+		return nil, errors.New("webui key is not available with server")
+	}
+	// Get web ui key from secrets service
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+	if err != nil {
+		return nil, err
+	}
+	// Get organization list from chef server
+	c, err := s.createChefServerClient(ctx, req.ServerId, GetAdminKeyFrom(secret), "pivotal", true)
+	if err != nil {
+		return nil, err
+	}
+	orgsList, err := c.client.Organizations.List()
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	// Save organisations in backend DB
+	orgs := []storage.Org{}
+	for key := range orgsList {
+		org, err := s.service.Storage.StoreOrg(ctx, key, key, "", "", req.ServerId, nil)
+		if err != nil {
+			return nil, service.ParseStorageError(err, *req, "org")
+		}
+		orgs = append(orgs, org)
+	}
+
+	return &response.GetInfraServerOrgs{
+		Orgs: fromStorageToListOrgs(orgs),
 	}, nil
 }
 

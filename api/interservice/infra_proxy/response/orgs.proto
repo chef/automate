@@ -28,6 +28,11 @@ message GetOrg {
     Org org = 1;
 }
 
+message GetInfraServerOrgs {
+    // Chef organization list from chef server
+    repeated Org orgs = 1;
+}
+
 message Org {
     // Chef organization ID.
     string id = 1;
