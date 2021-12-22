@@ -36,7 +36,7 @@ var errMLSA = "Chef Software Terms of Service and Master License and Services Ag
 var errProvisonInfra = `Architecture does not match with the requested one. 
 If you want to provision cluster then you have to first run provision command.
 
-		chef-automate provision-infra
+		chef-automate provision-infrastructure
 
 After that you can run this command`
 

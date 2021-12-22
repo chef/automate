@@ -2,13 +2,13 @@
 
 # SCENARIO 1
 
-If you are running chef-automate provision-infra and in between anything occure and provision get stopped then run below command to destroy that half part to start provision again.
+If you are running chef-automate provision-infrastructure and in between anything occure and provision get stopped then run below command to destroy that half part to start provision again.
 
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/;terraform destroy -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate;cd $i;done`
 
 # SCENARIO 2
 
-If you have successfully done provision-infra and after that if you want to destroy infra then run below command in below order.
+If you have successfully done provision-infrastructure and after that if you want to destroy infra then run below command in below order.
 
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done`
  

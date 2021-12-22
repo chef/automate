@@ -7,7 +7,7 @@ import (
 
 func newProvisionInfraCmd() *cobra.Command {
 	var provisionInfraCmd = &cobra.Command{
-		Use:   "provision-infra",
+		Use:   "provision-infrastructure",
 		Short: "Provision Automate HA infra.",
 		Long:  "Provision infra for Automate HA deployment.",
 		Args:  cobra.RangeArgs(0, 1),

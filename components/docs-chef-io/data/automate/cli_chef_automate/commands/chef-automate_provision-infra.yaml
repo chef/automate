@@ -1,6 +1,6 @@
-name: chef-automate provision-infra
+name: chef-automate provision-infrastructure
 synopsis: Provision Automate HA infra.
-usage: chef-automate provision-infra [flags]
+usage: chef-automate provision-infrastructure [flags]
 description: Provision infra for Automate HA deployment.
 options:
 - name: channel
@@ -8,7 +8,7 @@ options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for provision-infra
+  usage: help for provision-infrastructure
 inherited_options:
 - name: debug
   shorthand: d
