@@ -111,11 +111,6 @@ do_check() {
     check_static_binary() {
       build_line "Checking for dynamic links in ${1}"
       echo "Hello shaik this is your log check_static_binary "
-      if [ '/hab/cache/src/automate-gateway-0.1.0/bin/automate-gateway' == ${1} ]
-       then
-        cd ${1}
-        ls
-      fi
       echo 'shaik this is your log to ls'
       if ! ldd "${1}" | grep "not a dynamic executable"; then
           exit_with "${binary} is not a static executable" 1
