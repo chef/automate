@@ -9,8 +9,8 @@ import (
 	compliance "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	event "github.com/chef/automate/api/interservice/event"
 	gomock "github.com/golang/mock/gomock"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 )
 
@@ -38,14 +38,14 @@ func (m *MockComplianceIngesterServiceClient) EXPECT() *MockComplianceIngesterSe
 }
 
 // ProcessComplianceReport mocks base method
-func (m *MockComplianceIngesterServiceClient) ProcessComplianceReport(ctx context.Context, in *compliance.Report, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockComplianceIngesterServiceClient) ProcessComplianceReport(ctx context.Context, in *compliance.Report, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProcessComplianceReport", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -121,10 +121,10 @@ func (m *MockComplianceIngesterServiceServer) EXPECT() *MockComplianceIngesterSe
 }
 
 // ProcessComplianceReport mocks base method
-func (m *MockComplianceIngesterServiceServer) ProcessComplianceReport(arg0 context.Context, arg1 *compliance.Report) (*empty.Empty, error) {
+func (m *MockComplianceIngesterServiceServer) ProcessComplianceReport(arg0 context.Context, arg1 *compliance.Report) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessComplianceReport", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -8,8 +8,8 @@ import (
 	context "context"
 	nodes "github.com/chef/automate/api/interservice/nodemanager/nodes"
 	gomock "github.com/golang/mock/gomock"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 )
 
@@ -77,14 +77,14 @@ func (mr *MockNodeManagerServiceClientMockRecorder) Read(ctx, in interface{}, op
 }
 
 // Update mocks base method
-func (m *MockNodeManagerServiceClient) Update(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceClient) Update(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Update", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -97,14 +97,14 @@ func (mr *MockNodeManagerServiceClientMockRecorder) Update(ctx, in interface{}, 
 }
 
 // Delete mocks base method
-func (m *MockNodeManagerServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Delete", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -137,14 +137,14 @@ func (mr *MockNodeManagerServiceClientMockRecorder) DeleteWithNodes(ctx, in inte
 }
 
 // DeleteWithNodeStateStopped mocks base method
-func (m *MockNodeManagerServiceClient) DeleteWithNodeStateStopped(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceClient) DeleteWithNodeStateStopped(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DeleteWithNodeStateStopped", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -157,14 +157,14 @@ func (mr *MockNodeManagerServiceClientMockRecorder) DeleteWithNodeStateStopped(c
 }
 
 // DeleteWithNodeStateTerminated mocks base method
-func (m *MockNodeManagerServiceClient) DeleteWithNodeStateTerminated(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceClient) DeleteWithNodeStateTerminated(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DeleteWithNodeStateTerminated", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -197,14 +197,14 @@ func (mr *MockNodeManagerServiceClientMockRecorder) List(ctx, in interface{}, op
 }
 
 // Connect mocks base method
-func (m *MockNodeManagerServiceClient) Connect(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceClient) Connect(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Connect", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -217,14 +217,14 @@ func (mr *MockNodeManagerServiceClientMockRecorder) Connect(ctx, in interface{},
 }
 
 // ConnectManager mocks base method
-func (m *MockNodeManagerServiceClient) ConnectManager(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceClient) ConnectManager(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ConnectManager", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -410,10 +410,10 @@ func (mr *MockNodeManagerServiceServerMockRecorder) Read(arg0, arg1 interface{})
 }
 
 // Update mocks base method
-func (m *MockNodeManagerServiceServer) Update(arg0 context.Context, arg1 *NodeManager) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceServer) Update(arg0 context.Context, arg1 *NodeManager) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -425,10 +425,10 @@ func (mr *MockNodeManagerServiceServerMockRecorder) Update(arg0, arg1 interface{
 }
 
 // Delete mocks base method
-func (m *MockNodeManagerServiceServer) Delete(arg0 context.Context, arg1 *Id) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceServer) Delete(arg0 context.Context, arg1 *Id) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -455,10 +455,10 @@ func (mr *MockNodeManagerServiceServerMockRecorder) DeleteWithNodes(arg0, arg1 i
 }
 
 // DeleteWithNodeStateStopped mocks base method
-func (m *MockNodeManagerServiceServer) DeleteWithNodeStateStopped(arg0 context.Context, arg1 *Id) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceServer) DeleteWithNodeStateStopped(arg0 context.Context, arg1 *Id) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteWithNodeStateStopped", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -470,10 +470,10 @@ func (mr *MockNodeManagerServiceServerMockRecorder) DeleteWithNodeStateStopped(a
 }
 
 // DeleteWithNodeStateTerminated mocks base method
-func (m *MockNodeManagerServiceServer) DeleteWithNodeStateTerminated(arg0 context.Context, arg1 *Id) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceServer) DeleteWithNodeStateTerminated(arg0 context.Context, arg1 *Id) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteWithNodeStateTerminated", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -500,10 +500,10 @@ func (mr *MockNodeManagerServiceServerMockRecorder) List(arg0, arg1 interface{})
 }
 
 // Connect mocks base method
-func (m *MockNodeManagerServiceServer) Connect(arg0 context.Context, arg1 *NodeManager) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceServer) Connect(arg0 context.Context, arg1 *NodeManager) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Connect", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -515,10 +515,10 @@ func (mr *MockNodeManagerServiceServerMockRecorder) Connect(arg0, arg1 interface
 }
 
 // ConnectManager mocks base method
-func (m *MockNodeManagerServiceServer) ConnectManager(arg0 context.Context, arg1 *Id) (*empty.Empty, error) {
+func (m *MockNodeManagerServiceServer) ConnectManager(arg0 context.Context, arg1 *Id) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConnectManager", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
