@@ -27,13 +27,20 @@ import (
 func Serve(conf config.ReportManager, connFactory *secureconn.Factory) error {
 	ctx := context.Background()
 
-	//get object store connection
-	objStoreClient, err := getObjectStoreConnection(ctx, conf)
-	if err != nil {
-		logrus.WithError(err).Fatal("Error in establishing a connection to object store")
-		return err
+	var objStoreClient *minio.Client = nil
+	var err error
+	if conf.Service.EnableLargeReporting {
+		if conf.Minio.EndPoint == "" || conf.Minio.RootUser == "" || conf.Minio.RootPassword == "" {
+			return fmt.Errorf("minio endpoint, root_user and root_password should not be empty")
+		}
+		//get object store connection
+		objStoreClient, err = getObjectStoreConnection(ctx, conf)
+		if err != nil {
+			logrus.WithError(err).Fatal("Error in establishing a connection to object store")
+			return err
+		}
+		logrus.Infof("connection established to object store, endPoint:%s", objStoreClient.EndpointURL())
 	}
-	logrus.Infof("connection established to object store, endPoint:%s", objStoreClient.EndpointURL())
 
 	//get cereal manager
 	cerealManager, err := getCerealManager(conf, connFactory)
@@ -64,11 +71,9 @@ func getCerealManager(conf config.ReportManager, connFactory *secureconn.Factory
 }
 
 func getObjectStoreConnection(ctx context.Context, conf config.ReportManager) (*minio.Client, error) {
-
-	//TODO:: Get the below details from configuration
-	endpoint := "127.0.0.1:10197"
-	accessKeyID := "minioadmin"
-	secretAccessKey := "minioadmin"
+	endpoint := conf.Minio.EndPoint
+	accessKeyID := conf.Minio.RootUser
+	secretAccessKey := conf.Minio.RootPassword
 	useSSL := false
 
 	objStoreClient, err := minio.New(endpoint, &minio.Options{
