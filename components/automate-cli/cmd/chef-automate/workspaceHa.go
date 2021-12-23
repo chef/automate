@@ -14,7 +14,7 @@ func init() {
 }
 
 var workspaceCmd = &cobra.Command{
-	Use:   "workspace",
+	Use:   "ha-workspace",
 	Short: "Set workspace env for Automate HA.",
 	Long:  "Set up Automate HA cluster workspace.",
 	Annotations: map[string]string{

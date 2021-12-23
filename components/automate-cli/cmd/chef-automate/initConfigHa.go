@@ -172,7 +172,7 @@ func init() {
 }
 
 var initConfigHACmd = &cobra.Command{
-	Use:   "init-config-ha",
+	Use:   "ha-init-config",
 	Short: "Initialize default config for Automate HA",
 	Long:  "Initialized default configuration for HA and save it to a file.",
 	Annotations: map[string]string{

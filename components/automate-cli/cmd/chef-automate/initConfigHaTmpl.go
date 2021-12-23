@@ -133,7 +133,7 @@ Usage:
 
 Flags:
       --file string               File path to write the config (default "config.toml")
-  -h, --help                      help for init-config-ha
+  -h, --help                      help for ha-init-config
 
 Args: 
   aws				Generate initial automate high availability configuration for AWS deployment
