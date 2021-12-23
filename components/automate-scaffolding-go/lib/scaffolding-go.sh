@@ -106,9 +106,11 @@ do_default_install() {
 
 do_check() {
   # Ensure that the go binaries are static if we've set the flag
+  echo "Hello shaik this is your log"
   if ! [[ ${scaffolding_go_no_static} ]]; then
     check_static_binary() {
       build_line "Checking for dynamic links in ${1}"
+      echo "Hello shaik this is your log check_static_binary ${1}"
       if ! ldd "${1}" | grep "not a dynamic executable"; then
           exit_with "${binary} is not a static executable" 1
       fi
