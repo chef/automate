@@ -2,15 +2,23 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
@@ -137,18 +145,175 @@ func bootstrapEnv(dm deployManager) error {
 			"Merging command flag overrides into Chef Automate config failed",
 		)
 	}
+
+	offlineMode := deployCmdFlags.airgap != ""
+	manifestPath := ""
+	if offlineMode {
+		writer.Title("Installing artifact")
+		metadata, err := airgap.Unpack(deployCmdFlags.airgap)
+		if err != nil {
+			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
+		}
+		manifestPath = api.AirgapManifestPath
+
+		// We need to set the path for the hab binary so that the deployer does not
+		// try to go to the internet to get it
+		pathEnv := os.Getenv("PATH")
+
+		err = os.Setenv("PATH", fmt.Sprintf("%s:%s", path.Dir(metadata.HabBinPath), pathEnv))
+		if err != nil {
+			return err
+		}
+	} else {
+		manifestPath = conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()
+	}
+
 	manifestProvider := manifest.NewLocalHartManifestProvider(
-		mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),
+		mc.NewDefaultClient(manifestPath),
 		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
 		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
-	offlineMode := deployCmdFlags.airgap != ""
+
 	err := client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode)
 	if err != nil && !status.IsStatusError(err) {
+		return status.Annotate(err, status.DeployError)
+	}
+	err = moveAirgapToTransferDir()
+	if err != nil {
 		return status.Annotate(err, status.DeployError)
 	}
 	err = dm.generateConfig()
 	if err != nil {
 		return status.Annotate(err, status.DeployError)
+	}
+	return nil
+}
+
+func moveAirgapToTransferDir() error {
+	// moving airgap to transfer files
+	writer.Println("moving to transfer files")
+	if len(deployCmdFlags.airgap) > 0 {
+		var bundleName string = filepath.Base(deployCmdFlags.airgap)
+		writer.Println(bundleName)
+		if strings.Contains(bundleName, "automate") {
+			writer.Println("found automate")
+			bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
+		}
+		writer.Println("#$#$#$#$#$#$ Replaced automate ######")
+		writer.Println(bundleName)
+
+		err := copyFileContents(deployCmdFlags.airgap, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
+		if err != nil {
+			return err
+		}
+		//generating md5 sum for frontend bundle
+		err = generateChecksumFile(AIRGAP_HA_TRANS_DIR_PATH+bundleName, AIRGAP_HA_TRANS_DIR_PATH+bundleName+".md5")
+		if err != nil {
+			return err
+		}
+		//generating backend bundle
+		backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
+		err = removeBytesFromFileAndWriteToFile(deployCmdFlags.airgap,
+			backendBundleFile,
+			8)
+		if err != nil {
+			return err
+		}
+
+		err = generateChecksumFile(backendBundleFile, backendBundleFile+".md5")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+	// #### moved airgap to transfer file.
+}
+
+func copyFileContents(src, dst string) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer in.Close()
+	out, err := os.Create(dst)
+	if err != nil {
+		return
+	}
+	defer func() {
+		cerr := out.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
+	if _, err = io.Copy(out, in); err != nil {
+		return
+	}
+	err = out.Sync()
+	return
+}
+
+func removeBytesFromFileAndWriteToFile(filePath string, destPath string, skipBytes int64) error {
+	f, err := os.Open(filePath) // open file from argument
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := f.Close(); err != nil {
+			writer.Print(err.Error())
+			return
+		}
+	}()
+
+	fo, err := os.Create(destPath)
+	if err != nil {
+		return err
+	}
+	// close fo on exit and check for its returned error
+	defer func() {
+		if err := fo.Close(); err != nil {
+			writer.Print(err.Error())
+			return
+		}
+	}()
+
+	_, err = f.Seek(skipBytes, io.SeekStart) // skipping first bytes
+	if err != nil {
+		return err
+	}
+
+	buffer := make([]byte, 1024) // allocating buffer to read
+	for {
+		n, err := f.Read(buffer)
+		if err != nil && err != io.EOF {
+			panic(err)
+		}
+		if n == 0 {
+			break
+		}
+
+		// write a chunk
+		if _, err := fo.Write(buffer[:n]); err != nil {
+			panic(err)
+		}
+	}
+
+	return nil
+}
+
+func generateChecksumFile(sourceFileName string, checksumFileName string) error {
+	sfile, err := os.Open(sourceFileName)
+	if err != nil {
+		return err
+	}
+	defer sfile.Close()
+	hash := md5.New()
+	if _, err := io.Copy(hash, sfile); err != nil {
+		return err
+	}
+	sum := hash.Sum(nil)
+	hashedFileContent := hex.EncodeToString(sum) + "  " + filepath.Base(sfile.Name())
+	err = ioutil.WriteFile(checksumFileName, []byte(hashedFileContent), 0644)
+	if err != nil {
+		return err
 	}
 	return nil
 }
