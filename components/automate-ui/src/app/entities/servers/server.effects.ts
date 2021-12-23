@@ -202,7 +202,7 @@ export class ServerEffects {
 
   UpdateWebUIKeySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS),
-    map(({}) => new CreateNotification({
+    map(() => new CreateNotification({
     type: Type.info,
     message: 'Successfully updated Web UI Key.'
   }))));
