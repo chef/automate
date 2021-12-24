@@ -48,6 +48,7 @@ export class GetServersSuccess implements Action {
 
 export class GetServersFailure implements Action {
   readonly type = ServerActionTypes.GET_ALL_FAILURE;
+
   constructor(public payload: HttpErrorResponse) { }
 }
 
@@ -79,26 +80,31 @@ export interface CreateServerPayload {
 
 export class CreateServer implements Action {
   readonly type = ServerActionTypes.CREATE;
+
   constructor(public payload: CreateServerPayload) { }
 }
 
 export class CreateServerSuccess implements Action {
   readonly type = ServerActionTypes.CREATE_SUCCESS;
+
   constructor(public payload: ServerSuccessPayload) { }
 }
 
 export class CreateServerFailure implements Action {
   readonly type = ServerActionTypes.CREATE_FAILURE;
+
   constructor(public payload: HttpErrorResponse) { }
 }
 
 export class DeleteServer implements Action {
   readonly type = ServerActionTypes.DELETE;
+
   constructor(public payload: { id: string, name: string }) { }
 }
 
 export class DeleteServerSuccess implements Action {
   readonly type = ServerActionTypes.DELETE_SUCCESS;
+
   constructor(public payload: { id: string, name: string }) { }
 }
 
@@ -136,17 +142,14 @@ export class GetUsers implements Action {
 
 export class GetUsersSuccess implements Action {
   readonly type = ServerActionTypes.GET_USERS_SUCCESS;
+
   constructor(public payload: UsersSuccessPayload) { }
 }
 
 export class GetUsersFailure implements Action {
   readonly type = ServerActionTypes.GET_USERS_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
-}
 
-export interface WebUIKeyPayload {
-  server_id: any;
-  key: string;
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export class UpdateWebUIKey implements Action {
@@ -158,7 +161,7 @@ export class UpdateWebUIKey implements Action {
 export class UpdateWebUIKeySuccess implements Action {
   readonly type = ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS;
 
-  constructor(public payload: WebUIKeyPayload) { }
+  constructor(public payload: WebUIKey) { }
 }
 
 export class UpdateWebUIKeyFailure implements Action {
