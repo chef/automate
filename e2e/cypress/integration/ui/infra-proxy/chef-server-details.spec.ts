@@ -15,6 +15,7 @@ describe('chef server details', () => {
 
   // using dummy admin key value for creating the org
   const adminKey = 'Dummy--admin--key';
+  const webui_key = 'Dummy--webui-key';
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -29,7 +30,8 @@ describe('chef server details', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: serverIP,
+          webui_key: webui_key
         }
       });
 
@@ -54,6 +56,15 @@ describe('chef server details', () => {
       cy.get('chef-breadcrumbs').contains(serverName);
       cy.get('.page-title').contains(serverName);
       cy.get('[data-cy=add-org-button]').contains('Add Chef Organization');
+    });
+
+    it('it can update the webui key', () => {
+      cy.get('[data-cy=update-web-ui-key]').contains('Update').click();
+      cy.get('app-chef-server-details .sidenav-header').should('exist');
+      cy.get('[data-cy=enter-webui-key]').type(webui_key);
+
+      cy.get('[data-cy=update-webui-key-button]').click();
+      cy.get('app-chef-server-details .sidenav-header').should('not.be.visible');
     });
 
     it('can check empty org list', () => {

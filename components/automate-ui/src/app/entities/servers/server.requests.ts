@@ -5,7 +5,7 @@ import { mapKeys, snakeCase } from 'lodash/fp';
 
 import { environment as env } from 'environments/environment';
 import { Server, User, WebUIKey } from './server.model';
-import { CreateServerPayload, ServerSuccessPayload, WebUIKeyPayload } from './server.actions';
+import { CreateServerPayload, ServerSuccessPayload } from './server.actions';
 
 export interface ServersResponse {
   servers: Server[];
@@ -52,7 +52,7 @@ export class ServerRequests {
 
   // Need to change API endpoint for update WebUIKey
   public updateWebUIKey(payload): Observable<WebUIKey> {
-    return this.http.put<WebUIKeyPayload>
-    (`${env.infra_proxy_url}/servers/${payload.server_id}`, payload.key);
+    return this.http.post<WebUIKey>
+    (`${env.infra_proxy_url}/servers/update`, payload);
   }
 }

@@ -32,8 +32,7 @@ import {
   UsersSuccessPayload,
   UpdateWebUIKey,
   UpdateWebUIKeySuccess,
-  UpdateWebUIKeyFailure,
-  WebUIKeyPayload
+  UpdateWebUIKeyFailure
 } from './server.actions';
 
 import {
@@ -195,17 +194,17 @@ export class ServerEffects {
 
   UpdateWebUIKey$ = createEffect(() => this.actions$.pipe(
     ofType(ServerActionTypes.UPDATE_WEB_UI_KEY),
-    mergeMap(({ payload}: UpdateWebUIKey) =>
+    mergeMap(({ payload }: UpdateWebUIKey) =>
       this.requests.updateWebUIKey(payload).pipe(
-        map((resp: WebUIKeyPayload) => new UpdateWebUIKeySuccess(resp)),
+        map((resp) => new UpdateWebUIKeySuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateWebUIKeyFailure(error)))))));
 
   UpdateWebUIKeySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS),
-    map(({ payload: webuikey }: UpdateWebUIKeySuccess) => new CreateNotification({
+    map(() => new CreateNotification({
     type: Type.info,
-    message: `Successfully updated Web UI Key ${webuikey.server_id}.`
+    message: 'Successfully updated Web UI Key.'
   }))));
 
   UpdateWebUIKeyFailure$ = createEffect(() => this.actions$.pipe(
