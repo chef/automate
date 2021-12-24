@@ -40,14 +40,14 @@ Follow these steps to add a bastion host to your Linux environment on AWS cloud,
 1. Sign into your AWS account. If you don't have one, sign up at https://aws.amazon.com.
 1. Navigate to the AWS Management Console.
 
-{{< figure src="/images/automate/ha-aws-console.png" alt="Amazon Management Console">}}
+{{< figure src="/images/automate/ha_aws_console.png" alt="Amazon Management Console">}}
 
 1. Select an AWS Region from the top toolbar.
 1. Select EC2 under Services menu on the left.
 1. Click the Launch Instances button, and perform the following steps:
    1. Select linux based Amazon Machine Image (AMI).
 
-   {{< figure src="/images/automate/ha-aws-ami.png" alt="Amazon Machine Image">}}
+   {{< figure src="/images/automate/ha_aws_ami.png" alt="Amazon Machine Image">}}
 
    1. Select the *t2.medium* instance type. Ensure vCPUs is 1, Memory (GiB) is 4 and Instance Storage (GB) is EBS only.
    1. Click the Next: Configure Instance Details button.
@@ -69,12 +69,12 @@ Or, launch an EC2 instance, which was previously defined.
 1. Review all the details and click the Launch button. The AWS console prompts you to either create an existing SSH key pair, or use a pair you have previously established. 
    - If you choose to create a new key pair, specify a Key pair name and click Download Key Pair (private key file, .pem). Store the key file in a secure and accessible location.
 
-    {{< figure src="/images/automate/ha-aws-keypair.png" alt="AWS EC2 Launch Instances">}}
+    {{< figure src="/images/automate/ha_aws_keypair.png" alt="AWS EC2 Launch Instances">}}
 
-   - Else, select an existing key pair. 
+   - Else, select an existing key pair.
 1. Click Launch Instances. The AWS console confirms the launch of your host.
 
- {{< figure src="/images/automate/ha-aws-launch-status.png" alt="AWS EC2 Launch Status">}}
+ {{< figure src="/images/automate/ha_aws_launch_status.png" alt="AWS EC2 Launch Status">}}
 
 You can test the connectivity to the bastion server by navigating to the AWS Console under Instances > EC2 option and view the fresh bastion server running.
 
@@ -92,16 +92,18 @@ A key pair consists of a public key that AWS stores, and a private key file that
 1. Locate your private key file and navigate to that directory. 
 1. Run this command, `chmod 400 key.pem` (key.pem is the name of the key pair file name), to ensure your key is not publicly viewable.
 
-![AWS EC2 Launch Status](/images/automate/ha-aws-connect.png)
+![AWS EC2 Launch Status](/images/automate/ha_aws_connect.png)
 
 {{< figure src="/images/automate/ha-aws-launch-status.png" alt="AWS EC2 Launch Status">}}
 
 1. Connect to your instance using its public DNS. For example, `ssh -i "doc-bastion.pem" ubuntu@ec2-3-24-212-25.ap-southeast-2.compute.amazonaws.com`.
 1. Type `yes` when terminal prompts with you for connecting.
 
-{{< figure src="/images/automate/ha-aws-ssh-connection.png" alt="AWS SSH Connection Details">}}
+{{< figure src="/images/automate/ha_aws_ssh_connection.png" alt="AWS SSH Connection Details">}}
 
 This completes the SSH connection to the AWS EC2 instance.
+
+By default, you would be logged in as the Ubuntu user. You can switch to root access using the `sudo` command.
 
 ## Deployment Procedure on AWS Cloud
 
@@ -161,27 +163,27 @@ The Chef Automate HA deployment using AWS creates the following network resource
 
 - One instance for Chef Infra Server each. However, based on your requirements we can add more instances for Chef Infra server.
 
-{{< figure src="/images/automate/ha-aws-resources1.png" alt="Chef Automate HA ElasticSearch and PostgreSQL Instances">}}
+{{< figure src="/images/automate/ha_aws_resources1.png" alt="Chef Automate HA ElasticSearch and PostgreSQL Instances">}}
 
 - Two load balancers and two respective target groups. One each for Chef Automate server and Chef Infra server.
 
-{{< figure src="/images/automate/ha-aws-resources2.png" alt="Chef Automate HA Load Balancers and Target Groups">}}
+{{< figure src="/images/automate/ha_aws_resources2.png" alt="Chef Automate HA Load Balancers and Target Groups">}}
 
 - Elastic File System (EFS) for backup of all the instances.
 
-{{< figure src="/images/automate/ha-aws-resources3.png" alt="Chef Automate HA EFS Backup">}}
+{{< figure src="/images/automate/ha_aws_resources3.png" alt="Chef Automate HA EFS Backup">}}
 
 - Three private subnets (with no internet access) and three public subnets (with internet access).
 
-{{< figure src="/images/automate/ha-aws-resources4.png" alt="Chef Automate HA Public and Private Subnets">}}
+{{< figure src="/images/automate/ha_aws_resources4.png" alt="Chef Automate HA Public and Private Subnets">}}
 
 - One route table.
 
-{{< figure src="/images/automate/ha-aws-resources5.png" alt="Chef Automate HA Route Table">}}
+{{< figure src="/images/automate/ha_aws_resources5.png" alt="Chef Automate HA Route Table">}}
 
 - One Elastic IP address.
 
-{{< figure src="/images/automate/ha-aws-resources6.png" alt="Chef Automate HA Elastic IP">}}
+{{< figure src="/images/automate/ha_aws_resources6.png" alt="Chef Automate HA Elastic IP">}}
 
 ## Clear AWS Deployment Infrastructure
 
