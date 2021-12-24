@@ -75,3 +75,5 @@ Certificate is optional. Default certificate of Postgres n es. Required for load
 As a bastion server, it should have the public access with a public IPv4 address.
 
 Arn link in config.toml… default certificate we can use - certificate manager — 
+
+- full access is required for s3 backup
