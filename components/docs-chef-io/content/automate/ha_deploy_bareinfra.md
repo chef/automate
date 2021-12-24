@@ -109,7 +109,7 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 1. Type the command, `chef-automate test -full` and press **Enter**. This command runs smoke tests on the setup. 
 
-## Clear the Bare Metal Infratructure 
+## Clear the Bare Metal Infrastructure
 
 {{< note >}}
 
