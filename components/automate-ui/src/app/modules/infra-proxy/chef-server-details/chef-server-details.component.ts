@@ -13,11 +13,11 @@ import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
 import {
-  getStatus, serverFromRoute, updateStatus, getUsers, getUsersStatus
+  getStatus, serverFromRoute, updateStatus, getUsers, getUsersStatus, updateWebUIKey
 } from 'app/entities/servers/server.selectors';
 
-import { Server } from 'app/entities/servers/server.model';
-import { GetServer, UpdateServer
+import { Server, WebUIKey } from 'app/entities/servers/server.model';
+import { GetServer, UpdateServer, UpdateWebUIKey
   // , GetUsers
 } from 'app/entities/servers/server.actions';
 import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
@@ -68,6 +68,12 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public isValid = false;
 
+
+  public updateWebuiKeyForm: FormGroup;
+  public updatingWebuiKey = false;
+  public webuiKey: WebUIKey;
+  public updateWebUIKeySuccessful = false;
+
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
@@ -83,6 +89,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       admin_user: ['', [Validators.required]],
       admin_key: ['', [Validators.required]],
       projects: [[]]
+    });
+
+    this.updateWebuiKeyForm = this.fb.group({
+      webUiKey: ['', [Validators.required]]
     });
   }
 
@@ -220,6 +230,17 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.isUserLoaded = false;
       }
     });
+
+    this.store.select(updateWebUIKey).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.updatingWebuiKey && !pending(state)))
+    .subscribe((state) => {
+      this.updatingWebuiKey = false;
+      this.updateWebUIKeySuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.updateWebUIKeySuccessful) {
+        this.isValid = true;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -291,5 +312,19 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       ip_address: this.ipForm.controls.ip_address.value?.trim() || ''
     };
     this.store.dispatch(new UpdateServer({server: updatedServer}));
+  }
+
+
+  public updateWebuiKey(): void {
+    this.updatingWebuiKey = true;
+    this.webuiKey = {
+      id: this.id,
+      webui_key: this.updateWebuiKeyForm.controls['webUiKey'].value
+    };
+    this.updatingWebuiKeyData(this.webuiKey);
+    this.updateWebuiKeyForm.reset();
+  }
+  private updatingWebuiKeyData(webuikey: WebUIKey) {
+    this.store.dispatch(new UpdateWebUIKey(webuikey));
   }
 }
