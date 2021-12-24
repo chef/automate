@@ -9,7 +9,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Regex } from 'app/helpers/auth/regex';
 import { using } from 'app/testing/spec-helpers';
 import { WebUIKey } from 'app/entities/servers/server.model';
-import { UpdateWebUIKeyFailure, UpdateWebUIKeySuccess, WebUIKeyPayload } from 'app/entities/servers/server.actions';
+import { UpdateWebUIKeyFailure, UpdateWebUIKeySuccess } from 'app/entities/servers/server.actions';
 import { HttpStatus } from 'app/types/types';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -46,11 +46,11 @@ describe('UpdateWebUIKeySliderComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(UpdateWebUIKeySliderComponent);
     component = fixture.componentInstance;
-    component.updateKeyForm = new FormBuilder().group({
+    component.updateWebuiKeyForm = new FormBuilder().group({
       webuikey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]]
     });
-    updateKeyForm = component.updateKeyForm;
+    updateKeyForm = component.updateWebuiKeyForm;
     fixture.detectChanges();
   });
 
@@ -71,6 +71,7 @@ describe('UpdateWebUIKeySliderComponent', () => {
         expect(updateKeyForm.valid).toBeFalsy();
         expect(errors['required']).toBeTruthy();
       });
+    });
 
     describe('the form should be valid', () => {
       it('when all inputs are filled and valid', () => {
@@ -101,13 +102,8 @@ describe('UpdateWebUIKeySliderComponent', () => {
   describe('#webuikey', () => {
     let store: Store<NgrxStateAtom>;
     const webuikey: WebUIKey = {
-      server_id: 'test_server',
-      key: 'test_webuikey'
-    };
-
-    const key: WebUIKeyPayload = {
-      server_id: 'test_server',
-      key: 'test_webuikey'
+      id: 'test_server',
+      webui_key: 'test_webuikey'
     };
 
     beforeEach(() => {
@@ -120,25 +116,24 @@ describe('UpdateWebUIKeySliderComponent', () => {
     });
 
     it('should be invalid when no fields are filled out', () => {
-      expect(component.updateKeyForm.valid).toBeFalsy();
+      expect(component.updateWebuiKeyForm.valid).toBeFalsy();
     });
 
     it('should be valid when all fields are filled out', () => {
-      component.updateKeyForm.controls['webuikey'].setValue(webuikey.key);
-      expect(component.updateKeyForm.valid).toBeTruthy();
+      component.updateWebuiKeyForm.controls['webuikey'].setValue(webuikey.webui_key);
+      expect(component.updateWebuiKeyForm.valid).toBeTruthy();
     });
 
     it('hide slider after updating webuikey.', () => {
-      component.updateKeyForm.controls['webuikey'].setValue(webuikey.key);
-      component.onSubmit();
+      component.updateWebuiKeyForm.controls['webuikey'].setValue(webuikey.webui_key);
+      component.updateWebUIkey();
 
-      store.dispatch(new UpdateWebUIKeySuccess(
-        { server_id: key.server_id, key: key.key}));
+      store.dispatch(new UpdateWebUIKeySuccess(webuikey));
     });
 
     it('on create , slider is closed with failure banner', () => {
-      component.updateKeyForm.controls['webuikey'].setValue(webuikey.key);
-      component.onSubmit();
+      component.updateWebuiKeyForm.controls['webuikey'].setValue(webuikey.webui_key);
+      component.updateWebUIkey();
 
       const error = <HttpErrorResponse>{
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -148,5 +143,4 @@ describe('UpdateWebUIKeySliderComponent', () => {
       expect(component.conflictError).toBe(false);
     });
   });
- });
 });
