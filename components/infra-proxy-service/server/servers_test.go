@@ -496,28 +496,28 @@ func TestServers(t *testing.T) {
 		})
 	})
 
-	// t.Run("ValidateWebuiKey", func(t *testing.T) {
-	// 	test.ResetState(context.Background(), t, serviceRef)
+	t.Run("ValidateWebuiKey", func(t *testing.T) {
+		test.ResetState(context.Background(), t, serviceRef)
 
-	// 	secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-	// 	secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
-	// 	secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+		secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+		secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+		secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
-	// 	t.Run("when a valid webui key, return valid true", func(t *testing.T) {
-	// 		resp, err := cl.ValidateWebuiKey(ctx, &request.ValidateWebuiKey{
-	// 			Id:       "",
-	// 			Fqdn:     "example.com",
-	// 			WebuiKey: "--KEY--",
-	// 		})
+		t.Run("when a valid webui key, return valid true", func(t *testing.T) {
+			resp, err := cl.ValidateWebuiKey(ctx, &request.ValidateWebuiKey{
+				Id:       "",
+				Fqdn:     "example.com",
+				WebuiKey: "--KEY--",
+			})
 
-	// 		require.NoError(t, err)
-	// 		require.NotNil(t, resp)
+			require.NoError(t, err)
+			require.NotNil(t, resp)
 
-	// 		assert.Equal(t, true, resp.Valid)
-	// 		assert.Equal(t, "", resp.Error)
+			assert.Equal(t, true, resp.Valid)
+			assert.Equal(t, "", resp.Error)
 
-	// 	})
-	// })
+		})
+	})
 
 	t.Run("UpdateWebuiKey", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
