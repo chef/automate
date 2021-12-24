@@ -8,7 +8,7 @@
       <chef-icon>close</chef-icon>
     </chef-button>
   </div>
-  <form [formGroup]="updateKeyForm">
+  <form [formGroup]="updateWebuiKeyForm">
     <div class="sidenav-body">
       <div class="id-margin">
         <chef-form-field>
@@ -22,11 +22,11 @@
               type="text"
               autocomplete="off"
               (keyup)="handleInput($event)" 
-              data-cy="enter-key">
+              data-cy="enter-webui-key">
             </textarea>
           </label>
           <chef-error class="textarea-error"
-            *ngIf="updateKeyForm.get('webUiKey').hasError('required') && updateKeyForm.get('webUiKey').dirty">
+            *ngIf="updateWebuiKeyForm.get('webUiKey').hasError('required') && updateWebuiKeyForm.get('webUiKey').dirty">
             WEB UI KEY is required.
           </chef-error>
         </chef-form-field>
@@ -35,13 +35,13 @@
     </div>
     <div class="button-bar">
       <chef-button tertiary data-cy="cancel" (click)="closeUpdateModal()">Cancel</chef-button>
-      <chef-button primary data-cy="Upload"
-        [disabled]="!updateKeyForm?.valid || conflictError || updating"
+      <chef-button primary data-cy="update-webui-key-button"
+        [disabled]="!updateWebuiKeyForm?.valid || conflictError || updatingWebuiKey"
         id="upload-button-object-modal"
-        (click)="uploadWebUIKey()">
-        <chef-loading-spinner *ngIf="updating"></chef-loading-spinner>
-        <span *ngIf="!updating">Upload Web UI Key</span>
-        <span *ngIf="updating">Uploading Web UI Key</span>
+        (click)="updateWebUIkey()">
+        <chef-loading-spinner *ngIf="updatingWebuiKey"></chef-loading-spinner>
+        <span *ngIf="!updatingWebuiKey">Upload Web UI Key</span>
+        <span *ngIf="updatingWebuiKey">Uploading Web UI Key</span>
       </chef-button>
     </div>
   </form>
