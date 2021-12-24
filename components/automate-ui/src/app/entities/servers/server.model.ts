@@ -18,6 +18,6 @@ export interface User {
 }
 
 export interface WebUIKey {
-  server_id: string;
-  key: string;
+  id: string;
+  webui_key: string;
 }
