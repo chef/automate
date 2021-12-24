@@ -27,7 +27,8 @@
                 <img *ngIf="!isValid" src="../../../../assets/img/warning.png" alt="warning" />
                 <span *ngIf="!isValid" class="invalidStatus">Invalid</span>
                 <span class="update-link" data-cy="open-WebKey-slider">
-                  <a 
+                  <a
+                  data-cy="update-web-ui-key"
                   (click)="webUIKeySlider.slidePanel()"
                   >Update</a>
                 </span>
@@ -226,8 +227,13 @@
           <p data-cy="no-records">No Organization available.</p>
         </div>
       </section>
-      <app-update-web-uikey-slider
-       #webUIKeySlider>
+      <app-update-web-uikey-slider 
+        #webUIKeySlider
+        [updating]="updatingWebuiKey"
+        [updateWebuiKeyForm]="updateWebuiKeyForm"
+        [conflictErrorEvent]="conflictErrorEvent"
+        [updatingWebuiKey]="updatingWebuiKey"
+        (updateWebuiKeyClicked)="updateWebuiKey()">
       </app-update-web-uikey-slider>
     </main>
   </div>
