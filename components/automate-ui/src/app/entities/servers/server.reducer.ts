@@ -4,6 +4,7 @@ import { pipe, set, unset } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { ServerActionTypes, ServerActions } from './server.actions';
 import { Server, User } from './server.model';
+import { ValidateWebUIKeyResponse } from './server.requests';
 
 export interface ServerEntityState extends EntityState<Server> {
   getAllStatus: EntityStatus;
@@ -15,16 +16,19 @@ export interface ServerEntityState extends EntityState<Server> {
   getUsers: User[];
   getUsersStatus: EntityStatus;
   updateWebUIKeyStatus: EntityStatus;
+  getvalidateWebUIKeyStatus: ValidateWebUIKeyResponse;
+  validateWebUIKeyStatus: EntityStatus;
 }
 
-const GET_ALL_STATUS = 'getAllStatus';
-const SAVE_STATUS = 'saveStatus';
-const SAVE_ERROR = 'saveError';
-const UPDATE_STATUS = 'updateStatus';
-const GET_STATUS = 'getStatus';
-const DELETE_STATUS = 'deleteStatus';
-const GET_USERS_STATUS = 'getUsersStatus';
-const UPDATE_WEB_UI_KEY_STATUS = 'updateWebUIKeyStatus';
+const GET_ALL_STATUS             = 'getAllStatus';
+const SAVE_STATUS                = 'saveStatus';
+const SAVE_ERROR                 = 'saveError';
+const UPDATE_STATUS              = 'updateStatus';
+const GET_STATUS                 = 'getStatus';
+const DELETE_STATUS              = 'deleteStatus';
+const GET_USERS_STATUS           = 'getUsersStatus';
+const UPDATE_WEB_UI_KEY_STATUS   = 'updateWebUIKeyStatus';
+const VALIDATE_WEB_UI_KEY_STATUS = 'validateWebUIKeyStatus';
 
 export const serverEntityAdapter: EntityAdapter<Server> = createEntityAdapter<Server>();
 
@@ -38,7 +42,9 @@ export const ServerEntityInitialState: ServerEntityState =
     deleteStatus: EntityStatus.notLoaded,
     getUsers: null,
     getUsersStatus: EntityStatus.notLoaded,
-    updateWebUIKeyStatus: EntityStatus.notLoaded
+    updateWebUIKeyStatus: EntityStatus.notLoaded,
+    getvalidateWebUIKeyStatus: null,
+    validateWebUIKeyStatus: EntityStatus.notLoaded
   });
 
 export function serverEntityReducer(
@@ -148,11 +154,22 @@ export function serverEntityReducer(
       return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loading, state);
 
     case ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS:
-      return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingSuccess,
-        state);
+      return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingSuccess, state);
 
     case ServerActionTypes.UPDATE_WEB_UI_KEY_FAILURE:
       return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingFailure, state);
+
+    case ServerActionTypes.VALIDATE_WEB_UI_KEY:
+      return set(VALIDATE_WEB_UI_KEY_STATUS, EntityStatus.loading, state);
+
+    case ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS:
+      return pipe(
+        set(VALIDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingSuccess),
+        set('getvalidateWebUIKeyStatus', action.payload || {})
+      )(state) as ServerEntityState;
+
+    case ServerActionTypes.VALIDATE_WEB_UI_KEY_FAILURE:
+      return set(VALIDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingFailure, state);
   }
 
   return state;
