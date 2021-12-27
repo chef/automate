@@ -259,4 +259,10 @@ describe('ChefServerDetailsComponent', () => {
       });
     });
   });
+
+  describe('validate server webui key on details page', () => {
+    it('when server webui key is valid', () => {
+      expect(element.query(By.css('.webUIKeyStatus'))).toBeDefined();
+    });
+  });
 });

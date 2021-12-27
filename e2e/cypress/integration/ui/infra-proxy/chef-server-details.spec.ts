@@ -8,6 +8,7 @@ describe('chef server details', () => {
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
   const serverFQDN = 'chef-server-1617089723092818000.com';
   const serverIP = '176.119.50.159';
+  const webui_key = 'Dummy--webui--key';
   const orgName = `${cypressPrefix} org ${now}`;
   const generatedOrgID = orgName.split(' ').join('-');
   const customOrgID = `${cypressPrefix}-custom-id-${now}`;
@@ -15,7 +16,6 @@ describe('chef server details', () => {
 
   // using dummy admin key value for creating the org
   const adminKey = 'Dummy--admin--key';
-  const webui_key = 'Dummy--webui-key';
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -65,6 +65,10 @@ describe('chef server details', () => {
 
       cy.get('[data-cy=update-webui-key-button]').click();
       cy.get('app-chef-server-details .sidenav-header').should('not.be.visible');
+    });
+
+    it('can validate the server webui key', () => {
+      cy.get('[data-cy=valid-webui-key]').contains('Valid');
     });
 
     it('can check empty org list', () => {
