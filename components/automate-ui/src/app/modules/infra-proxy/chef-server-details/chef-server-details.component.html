@@ -23,9 +23,10 @@
               </li>
               <li>
                 <span class="heading">Web UI Key</span>
-                <span *ngIf="isValid" class="webUIKeyStatus">Valid</span>
-                <img *ngIf="!isValid" src="../../../../assets/img/warning.png" alt="warning" />
-                <span *ngIf="!isValid" class="invalidStatus">Invalid</span>
+                <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
+                <span *ngIf="(isValid && !validating)" data-cy="valid-webui-key" class="webUIKeyStatus">Valid</span>
+                <img *ngIf="(!isValid && !validating)" src="../../../../assets/img/warning.png" alt="warning" />
+                <span *ngIf="(!isValid && !validating)" class="invalidStatus">Invalid</span>
                 <span class="update-link" data-cy="open-WebKey-slider">
                   <a
                   data-cy="update-web-ui-key"
