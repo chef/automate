@@ -26,9 +26,10 @@ export enum ServerActionTypes {
   UPDATE_WEB_UI_KEY              = 'SERVER::UPDATE_WEB_UI_KEY',
   UPDATE_WEB_UI_KEY_SUCCESS      = 'SERVER::UPDATE_WEB_UI_KEY::SUCCESS',
   UPDATE_WEB_UI_KEY_FAILURE      = 'SERVER::UPDATE_WEB_UI_KEY::FAILURE',
-  VALIDATE_WEB_UI_KEY            = 'SERVER::VALIDATE_WEB_UI_key',
-  VALIDATE_WEB_UI_KEY_SUCCESS    = 'SERVER::VALIDATE_WEB_UI_key::SUCCESS',
-  VALIDATE_WEB_UI_KEY_FAILURE    = 'SERVER::VALIDATE_WEB_UI_key::FAILURE'
+  VALIDATE_WEB_UI_KEY            = 'SERVER::VALIDATE_WEB_UI_KEY',
+  VALIDATE_WEB_UI_KEY_SUCCESS    = 'SERVER::VALIDATE_WEB_UI_KEY::SUCCESS',
+  VALIDATE_WEB_UI_KEY_SUCCESS_NOT= 'SERVER::VALIDATE_WEB_UI_KEY::SUCCESS_NOT',
+  VALIDATE_WEB_UI_KEY_FAILURE    = 'SERVER::VALIDATE_WEB_UI_KEY::FAILURE'
 }
 
 
@@ -186,6 +187,12 @@ export class ValidateWebUIKeySuccess implements Action {
   constructor(public payload: ValidateWebUIKeyResponse) { }
 }
 
+export class ValidateWebUIKeySuccessNot implements Action {
+  readonly type = ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS_NOT;
+
+  constructor(public payload: ValidateWebUIKeyResponse) { }
+}
+
 export class ValidateWebUIKeyFailure implements Action {
   readonly type = ServerActionTypes.VALIDATE_WEB_UI_KEY_FAILURE;
 
@@ -216,4 +223,5 @@ export type ServerActions =
   | UpdateWebUIKeyFailure
   | ValidateWebUIKey
   | ValidateWebUIKeySuccess
+  | ValidateWebUIKeySuccessNot
   | ValidateWebUIKeyFailure;

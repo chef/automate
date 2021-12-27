@@ -36,6 +36,7 @@ import {
   ValidateWebUIKey,
   ValidateWebUIKeySuccess,
   ValidateWebUIKeyFailure,
+  ValidateWebUIKeySuccessNot
 } from './server.actions';
 
 import {
@@ -225,13 +226,14 @@ export class ServerEffects {
     ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY),
     mergeMap(({ payload }: ValidateWebUIKey) =>
       this.requests.validateWebUIKey(payload).pipe(
-        map((resp: ValidateWebUIKeyResponse) => new ValidateWebUIKeySuccess(resp)),
-        catchError((error: HttpErrorResponse) =>
-          observableOf(new ValidateWebUIKeyFailure(error)))))));
+        map((resp: ValidateWebUIKeyResponse) =>
+        resp.valid ? new ValidateWebUIKeySuccess(resp) : new ValidateWebUIKeySuccessNot(resp)),
+        catchError((error: HttpErrorResponse) => observableOf(new ValidateWebUIKeyFailure(error))
+      )))));
 
-  ValidateWebUIKeySuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS),
-    map(({ payload }: ValidateWebUIKeySuccess) => {
+  ValidateWebUIKeySuccessNot$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS_NOT),
+    map(({ payload }: ValidateWebUIKeySuccessNot) => {
       if (!payload.valid) {
         return new CreateNotification({
           type: Type.error,

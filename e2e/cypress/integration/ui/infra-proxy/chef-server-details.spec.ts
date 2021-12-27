@@ -16,7 +16,6 @@ describe('chef server details', () => {
 
   // using dummy admin key value for creating the org
   const adminKey = 'Dummy--admin--key';
-  const webui_key = 'Dummy--webui-key';
 
   before(() => {
     cy.adminLogin('/').then(() => {

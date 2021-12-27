@@ -24,7 +24,11 @@ import {
 } from 'app/entities/servers/server.selectors';
 
 import { Server, WebUIKey } from 'app/entities/servers/server.model';
-import { GetServer, UpdateServer, UpdateWebUIKey, ValidateWebUIKey
+import {
+  GetServer,
+  UpdateServer,
+  UpdateWebUIKey,
+  ValidateWebUIKey
   // , GetUsers
 } from 'app/entities/servers/server.actions';
 import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
@@ -74,6 +78,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public isValid = false;
   public isServerLoaded = false;
+  public validating = true;
 
 
   public updateWebuiKeyForm: FormGroup;
@@ -175,9 +180,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
       this.server = { ...ServerState };
-      if (this.isServerLoaded) {
-        this.validateWebUIKey(this.server);
-      }
       this.orgs = allOrgsState;
       this.updateServerForm.controls['name'].setValue(this.server.name);
       this.fqdnForm.controls['fqdn'].setValue(this.server.fqdn);
@@ -252,6 +254,12 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.isValid = true;
       }
     });
+
+    setTimeout(() => {
+      if (this.isServerLoaded) {
+        this.validateWebUIKey(this.server);
+      }
+    }, 1000);
   }
 
   ngOnDestroy(): void {
@@ -322,7 +330,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       .subscribe(([validateWebUISt, getValidateWebUIkeyState]) => {
         if (validateWebUISt === EntityStatus.loadingSuccess && !isNil(getValidateWebUIkeyState)) {
           this.isValid = getValidateWebUIkeyState.valid;
+          this.isServerLoaded = false;
         }
+        this.validating = false;
       });
   }
 
@@ -338,7 +348,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateServer({server: updatedServer}));
   }
 
-
   public updateWebuiKey(): void {
     this.updatingWebuiKey = true;
     this.webuiKey = {
@@ -348,6 +357,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.updatingWebuiKeyData(this.webuiKey);
     this.updateWebuiKeyForm.reset();
   }
+
   private updatingWebuiKeyData(webuikey: WebUIKey) {
     this.store.dispatch(new UpdateWebUIKey(webuikey));
   }
