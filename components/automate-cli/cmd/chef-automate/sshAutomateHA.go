@@ -214,7 +214,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	}
 	var sshString string = sshStrings[i-1]
 	sshTokens := strings.Split(sshString, " ")
-	return executeShellCommand(sshTokens[0], sshTokens[1:])
+	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
 
 func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
