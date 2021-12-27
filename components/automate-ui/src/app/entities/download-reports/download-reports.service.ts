@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ReportType } from './download-reports.model';
 import { Store } from '@ngrx/store';
@@ -22,6 +22,8 @@ export class DownloadReportsService implements OnDestroy {
   reportListSubscription: Subscription;
   notificationItems = {};
   retryLongPoll = 0;
+  private subject = new Subject();
+  obs$ = this.subject.asObservable();
   private units = ['bytes', 'kb', 'mb', 'gb'];
   constructor(private httpClient: HttpClient,
     private store: Store<NgrxStateAtom>) {
@@ -123,7 +125,7 @@ export class DownloadReportsService implements OnDestroy {
     const format = report.report_type;
     const filename = this.getFilename(report.created_at) + '.' + format;
     this.downloadReport(report.acknowledgement_id).subscribe((data) => {
-      console.log(data);
+      this.subject.next('close'); // close the loader
       const types = { 'json': 'application/json', 'csv': 'text/csv' };
       const type = types[format];
       const blob = new Blob([data], { type });

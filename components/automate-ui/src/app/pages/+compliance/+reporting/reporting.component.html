@@ -186,7 +186,7 @@
               <tr *ngFor="let report of downloadReportsService.reportList; index as i" [ngClass]="{'json': report.report_type === 'json', 'csv': report.report_type === 'csv'}">
                 <ng-container>
                   <td *ngIf="report.status === 'success'" class="success-status">
-                    <a (click)="downloadReportsService.onLinkToDownload(report)" class="download-link">
+                    <a (click)="showDownloadStatus();downloadReportsService.onLinkToDownload(report)" class="download-link">
                       <app-time [time]='report.created_at'></app-time>
                     </a>
                   </td>

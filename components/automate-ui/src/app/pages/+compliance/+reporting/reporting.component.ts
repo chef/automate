@@ -256,6 +256,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
         }
         return filter;
       })));
+
+    this.downloadReportsService.obs$.subscribe(() => {
+      this.hideDownloadStatus();
+    });
   }
 
   ngOnDestroy() {
