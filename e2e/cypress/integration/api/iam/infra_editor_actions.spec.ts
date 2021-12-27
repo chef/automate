@@ -133,20 +133,19 @@ describe('Infra Editor Policy', () => {
         });
     });
 
-    it('Create Env request returns 403 when infraEditor policy is allowed', () => {
+    it('Create Env request returns 200 when infraEditor policy is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraEditorActionToken },
             method: 'POST',
             body: {
                 org_id: 'test-org',
                 server_id: 'local-dev',
-                name: 'test',
+                name: 'test2',
                 description: 'cypress testing'
             },
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/environments',
-            failOnStatusCode: false
             }).then((resp) => {
-            assert.equal(resp.status, 403);
+            assert.equal(resp.status, 200);
         });
     });
 
@@ -176,17 +175,6 @@ describe('Infra Editor Policy', () => {
             headers: { 'api-token': withInfraEditorActionToken },
             method: 'DELETE',
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/data_bags/test',
-            failOnStatusCode: false
-            }).then((resp) => {
-            assert.equal(resp.status, 403);
-        });
-    });
-
-    it('Nodes put returns 403 when infraEditor policy is allowed', () => {
-        cy.request({
-            headers: { 'api-token': withInfraEditorActionToken },
-            method: 'PUT',
-            url: '/api/v0/infra/servers/local-dev/orgs/test-org/nodes/test-admin',
             failOnStatusCode: false
             }).then((resp) => {
             assert.equal(resp.status, 403);
