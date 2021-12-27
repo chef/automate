@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
 import { Server , User, WebUIKey } from './server.model';
+import { ValidateWebUIKeyResponse } from './server.requests';
 
 export enum ServerActionTypes {
   GET_ALL                        = 'SERVER::GET_ALL',
@@ -24,7 +25,11 @@ export enum ServerActionTypes {
   GET_USERS_FAILURE              = 'SERVER::GET_USERS::FAILURE',
   UPDATE_WEB_UI_KEY              = 'SERVER::UPDATE_WEB_UI_KEY',
   UPDATE_WEB_UI_KEY_SUCCESS      = 'SERVER::UPDATE_WEB_UI_KEY::SUCCESS',
-  UPDATE_WEB_UI_KEY_FAILURE      = 'SERVER::UPDATE_WEB_UI_KEY::FAILURE'
+  UPDATE_WEB_UI_KEY_FAILURE      = 'SERVER::UPDATE_WEB_UI_KEY::FAILURE',
+  VALIDATE_WEB_UI_KEY            = 'SERVER::VALIDATE_WEB_UI_KEY',
+  VALIDATE_WEB_UI_KEY_SUCCESS    = 'SERVER::VALIDATE_WEB_UI_KEY::SUCCESS',
+  VALIDATE_WEB_UI_KEY_SUCCESS_NOT= 'SERVER::VALIDATE_WEB_UI_KEY::SUCCESS_NOT',
+  VALIDATE_WEB_UI_KEY_FAILURE    = 'SERVER::VALIDATE_WEB_UI_KEY::FAILURE'
 }
 
 
@@ -170,6 +175,30 @@ export class UpdateWebUIKeyFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class ValidateWebUIKey implements Action {
+  readonly type = ServerActionTypes.VALIDATE_WEB_UI_KEY;
+
+  constructor(public payload: Server) { }
+}
+
+export class ValidateWebUIKeySuccess implements Action {
+  readonly type = ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS;
+
+  constructor(public payload: ValidateWebUIKeyResponse) { }
+}
+
+export class ValidateWebUIKeySuccessNot implements Action {
+  readonly type = ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS_NOT;
+
+  constructor(public payload: ValidateWebUIKeyResponse) { }
+}
+
+export class ValidateWebUIKeyFailure implements Action {
+  readonly type = ServerActionTypes.VALIDATE_WEB_UI_KEY_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServerActions =
   | GetServers
   | GetServersSuccess
@@ -191,4 +220,8 @@ export type ServerActions =
   | GetUsersFailure
   | UpdateWebUIKey
   | UpdateWebUIKeySuccess
-  | UpdateWebUIKeyFailure;
+  | UpdateWebUIKeyFailure
+  | ValidateWebUIKey
+  | ValidateWebUIKeySuccess
+  | ValidateWebUIKeySuccessNot
+  | ValidateWebUIKeyFailure;
