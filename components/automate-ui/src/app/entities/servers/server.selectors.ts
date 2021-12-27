@@ -61,3 +61,13 @@ export const updateWebUIKey = createSelector(
   serverState,
   (state) => state.updateWebUIKeyStatus
 );
+
+export const getValidateWebUIKeyStatus = createSelector(
+  serverState,
+  (state) => state.getvalidateWebUIKeyStatus
+);
+
+export const validateWebUIKeyStatus = createSelector(
+  serverState,
+  (state) => state.validateWebUIKeyStatus
+);
