@@ -19,6 +19,11 @@ export interface UserResponse {
   users: User[];
 }
 
+export interface ValidateWebUIKeyResponse {
+  valid: boolean;
+  error: string;
+}
+
 @Injectable()
 export class ServerRequests {
 
@@ -50,9 +55,13 @@ export class ServerRequests {
     return this.http.get<UserResponse>(`${env.infra_proxy_url}/servers/${payload.server_id}/automateinfraserverusers`);
   }
 
-  // Need to change API endpoint for update WebUIKey
-  public updateWebUIKey(payload): Observable<WebUIKey> {
+  public updateWebUIKey(payload: WebUIKey): Observable<WebUIKey> {
     return this.http.post<WebUIKey>
     (`${env.infra_proxy_url}/servers/update`, payload);
+  }
+
+  public validateWebUIKey(payload: Server): Observable<ValidateWebUIKeyResponse> {
+    return this.http.post<ValidateWebUIKeyResponse>
+    (`${env.infra_proxy_url}/servers/validate`, payload);
   }
 }
