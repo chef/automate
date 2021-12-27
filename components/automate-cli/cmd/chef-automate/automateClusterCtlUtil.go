@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
@@ -189,18 +190,11 @@ func bootstrapEnv(dm deployManager) error {
 }
 
 func moveAirgapToTransferDir() error {
-	// moving airgap to transfer files
-	writer.Println("moving to transfer files")
 	if len(deployCmdFlags.airgap) > 0 {
 		var bundleName string = filepath.Base(deployCmdFlags.airgap)
-		writer.Println(bundleName)
 		if strings.Contains(bundleName, "automate") {
-			writer.Println("found automate")
 			bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
 		}
-		writer.Println("#$#$#$#$#$#$ Replaced automate ######")
-		writer.Println(bundleName)
-
 		err := copyFileContents(deployCmdFlags.airgap, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
 		if err != nil {
 			return err
@@ -216,18 +210,12 @@ frontend_aib_dest_file = "/var/tmp/` + bundleName + `"
 frontend_aib_local_file = "` + bundleName + `"
 		`
 		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", []byte(frontendAutotfvarsTemplate), 0755)
-
 		//generating backend bundle
 		backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
-		cargs := []string{"-c", "+8", bundleName, ">", "temp_tar_file_name", "&&", "cat", "temp_tar_file_name", ">", backendBundleFile}
-		executeShellCommand("tail", cargs, AIRGAP_HA_TRANS_DIR_PATH)
-		/* err = removeBytesFromFileAndWriteToFile(deployCmdFlags.airgap,
-		backendBundleFile,
-		8)
+		err = generateBackendAIB(deployCmdFlags.airgap, backendBundleFile)
 		if err != nil {
 			return err
-		} */
-
+		}
 		err = generateChecksumFile(backendBundleFile, backendBundleFile+".md5")
 		if err != nil {
 			return err
@@ -238,25 +226,10 @@ backend_aib_dest_file = "/var/tmp/` + filepath.Base(backendBundleFile) + `"
 backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 `
 		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", []byte(backendAutotfvarsTemplate), 0755)
-
 		//generate manifest auto tfvars
-		var manifestAutotfvarsTemplate string = `
-pgleaderchk_pkg_ident = "            chef/automate-ha-pgleaderchk/0.1.0/20211122152431"
-postgresql_pkg_ident = "            chef/automate-ha-postgresql/11.2/20211118151626"
-proxy_pkg_ident = "            chef/automate-ha-haproxy/2.2.14/20211118151626"
-journalbeat_pkg_ident = "            chef/automate-ha-journalbeat/6.8.6/20211118151544"
-metricbeat_pkg_ident = "            chef/automate-ha-metricbeat/6.8.6/20211118151544"
-kibana_pkg_ident = "            chef/automate-ha-kibana/6.8.6/20211118151625"
-elasticsearch_pkg_ident = "            chef/automate-ha-elasticsearch/6.8.6/20211118151544"
-elasticsidecar_pkg_ident = "            chef/automate-ha-elasticsidecar/0.1.0/20211118151618"
-curator_pkg_ident = "            chef/automate-ha-curator/0.1.0/20211118151626"
-		`
-
-		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(manifestAutotfvarsTemplate), 0755)
-
+		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(manifestTfVars), 0755)
 	}
 	return nil
-	// #### moved airgap to transfer file.
 }
 
 func copyFileContents(src, dst string) (err error) {
@@ -282,49 +255,60 @@ func copyFileContents(src, dst string) (err error) {
 	return
 }
 
-func removeBytesFromFileAndWriteToFile(filePath string, destPath string, skipBytes int64) error {
-	f, err := os.Open(filePath) // open file from argument
+func generateBackendAIB(filePath string, destPath string) error {
+	installBundleFile, err := os.Open(filePath)
+	if err != nil {
+		return errors.New(err.Error() + " Failed to open install bundle file " + filePath)
+	}
+	defer installBundleFile.Close() // nolint: errcheck
+
+	bufReader := bufio.NewReader(installBundleFile)
+	// Read the header:
+	// AIB-1\n\n
+	s, err := bufReader.ReadString('\n')
+	if err != nil {
+		return errors.New(err.Error() + " Could not read artifact file")
+	}
+	if s != "AIB-1\n" {
+		return errors.New("Malformed install bundle file")
+	}
+
+	s, err = bufReader.ReadString('\n')
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			writer.Print(err.Error())
-			return
-		}
-	}()
+
+	if s != "\n" {
+		return errors.New("Malformed install bundle file")
+	}
 
 	fo, err := os.Create(destPath)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	// close fo on exit and check for its returned error
 	defer func() {
 		if err := fo.Close(); err != nil {
-			writer.Print(err.Error())
-			return
+			panic(err)
 		}
 	}()
 
-	_, err = f.Seek(skipBytes, io.SeekStart) // skipping first bytes
-	if err != nil {
-		return err
-	}
-
-	buffer := make([]byte, 1024) // allocating buffer to read
+	bufWriter := bufio.NewWriter(fo)
+	buf := make([]byte, 1024)
 	for {
-		n, err := f.Read(buffer)
+		n, err := bufReader.Read(buf)
 		if err != nil && err != io.EOF {
 			panic(err)
 		}
 		if n == 0 {
 			break
 		}
-
-		// write a chunk
-		if _, err := fo.Write(buffer[:n]); err != nil {
+		if _, err := bufWriter.Write(buf[:n]); err != nil {
 			panic(err)
 		}
+	}
+
+	if err = bufWriter.Flush(); err != nil {
+		panic(err)
 	}
 
 	return nil
