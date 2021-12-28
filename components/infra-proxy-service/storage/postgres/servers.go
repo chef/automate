@@ -81,6 +81,24 @@ func (p *postgres) EditServer(ctx context.Context, id string, name string, fqdn 
 	return s, nil
 }
 
+// EditServerWebuiKey only update the credential id on a database server.
+func (p *postgres) EditServerWebuiKey(ctx context.Context, id, credentialId string) (storage.Server, error) {
+	var s storage.Server
+
+	err := p.db.QueryRowContext(ctx,
+		`UPDATE servers
+		SET credential_id = $2, updated_at = now()
+		WHERE id = $1
+		RETURNING id, name, fqdn, ip_address, credential_id, created_at, updated_at`,
+		id, credentialId).
+		Scan(&s.ID, &s.Name, &s.Fqdn, &s.IPAddress, &s.CredentialID, &s.CreatedAt, &s.UpdatedAt)
+	if err != nil {
+		return storage.Server{}, p.processError(err)
+	}
+
+	return s, nil
+}
+
 // GetServers fetches servers from the DB as an array.
 func (p *postgres) GetServers(ctx context.Context) ([]storage.Server, error) {
 

@@ -97,6 +97,38 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/update": {
+      "post": {
+        "operationId": "InfraProxy_UpdateWebuiKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateWebuiKey"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateWebuiKey"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/validate": {
       "post": {
         "operationId": "InfraProxy_ValidateWebuiKey",
@@ -3283,6 +3315,19 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.UpdateWebuiKey": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "webui_key": {
+          "type": "string",
+          "title": "Chef Server Webui Key"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.ValidateWebuiKey": {
       "type": "object",
       "properties": {
@@ -4728,6 +4773,9 @@ func init() {
           "description": "Chef Infra Server."
         }
       }
+    },
+    "chef.automate.api.infra_proxy.response.UpdateWebuiKey": {
+      "type": "object"
     },
     "chef.automate.api.infra_proxy.response.UsersListItem": {
       "type": "object",
