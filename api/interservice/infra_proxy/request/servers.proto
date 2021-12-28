@@ -54,3 +54,10 @@ message ValidateWebuiKey {
     // Optional Chef Server Webui Key
     string webui_key = 3;
 }
+
+message UpdateWebuiKey {
+    // Chef Infra Server ID.
+    string id = 1;
+    // Chef Server Webui Key
+    string webui_key = 2;
+}
