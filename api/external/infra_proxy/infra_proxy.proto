@@ -51,6 +51,13 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 
+  rpc UpdateWebuiKey (infra_proxy.request.UpdateWebuiKey) returns (infra_proxy.response.UpdateWebuiKey) {
+    option (google.api.http).post = "/api/v0/infra/servers/update";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+  };
+
   rpc GetServer (infra_proxy.request.GetServer) returns (infra_proxy.response.GetServer) {
     option (google.api.http).get = "/api/v0/infra/servers/{id}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{id}";
