@@ -209,7 +209,10 @@ func moveAirgapToTransferDir() error {
 frontend_aib_dest_file = "/var/tmp/` + bundleName + `"
 frontend_aib_local_file = "` + bundleName + `"
 		`
-		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", []byte(frontendAutotfvarsTemplate), 0755)
+		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", []byte(frontendAutotfvarsTemplate), 0755)
+		if err != nil {
+			return err
+		}
 		//generating backend bundle
 		backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
 		err = generateBackendAIB(deployCmdFlags.airgap, backendBundleFile)
@@ -225,9 +228,15 @@ frontend_aib_local_file = "` + bundleName + `"
 backend_aib_dest_file = "/var/tmp/` + filepath.Base(backendBundleFile) + `"
 backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 `
-		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", []byte(backendAutotfvarsTemplate), 0755)
+		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", []byte(backendAutotfvarsTemplate), 0755)
+		if err != nil {
+			return err
+		}
 		//generate manifest auto tfvars
 		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(manifestTfVars), 0755)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
