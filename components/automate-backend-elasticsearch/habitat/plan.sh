@@ -12,7 +12,6 @@ pkg_deps=(
   chef/mlsa/1.0.1/20200421170200
   core/bash/5.1/20210826055113
   core/procps-ng/3.3.16/20210826054643
-  core/openssl
   "${UPSTREAM_PKG_IDENT}"
 )
 pkg_lib_dirs=(lib)
