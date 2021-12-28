@@ -126,6 +126,20 @@ func (a *InfraProxyServer) GetServerStatus(ctx context.Context, request *gwreq.G
 	}, nil
 }
 
+// UpdateWebuiKey updates the webui key
+func (a *InfraProxyServer) UpdateWebuiKey(ctx context.Context, r *gwreq.UpdateWebuiKey) (*gwres.UpdateWebuiKey, error) {
+	req := &infra_req.UpdateWebuiKey{
+		Id:       r.Id,
+		WebuiKey: r.WebuiKey,
+	}
+
+	_, err := a.client.UpdateWebuiKey(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.UpdateWebuiKey{}, nil
+}
+
 func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 	return &gwres.Server{
 		Id:        t.GetId(),
