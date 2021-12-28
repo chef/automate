@@ -244,7 +244,6 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 			return nil, err
 		}
 	*/
-
 	server, err := s.service.Storage.EditServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
@@ -303,6 +302,64 @@ func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStat
 	}
 
 	return statusRes, nil
+}
+
+// UpdateWebuiKey updates the webui key
+func (s *Server) UpdateWebuiKey(ctx context.Context, req *request.UpdateWebuiKey) (*response.UpdateWebuiKey, error) {
+
+	// validate the new webui key
+	server, err := s.service.Storage.GetServer(ctx, req.Id)
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "server")
+	}
+	validateWebuiKeyReq := request.ValidateWebuiKey{
+		Id:       req.Id,
+		Fqdn:     server.Fqdn,
+		WebuiKey: req.WebuiKey,
+	}
+
+	res, err := s.ValidateWebuiKey(ctx, &validateWebuiKeyReq)
+	if err != nil {
+		return nil, err
+	}
+
+	if !res.Valid {
+		return nil, errors.New(res.Error)
+	}
+
+	newSecret := &secrets.Secret{
+		Name: "infra-proxy-service-webui-key",
+		Type: "chef-server",
+		Data: []*query.Kv{
+			{Key: "key", Value: req.WebuiKey},
+		},
+	}
+
+	//If server does not have web ui key then create secret and save the credential id into the DB
+	if server.CredentialID == "" {
+		credential, err := s.service.Secrets.Create(ctx, newSecret)
+		if err != nil {
+			return nil, err
+		}
+		_, err = s.service.Storage.EditServerWebuiKey(ctx, req.Id, credential.Id)
+		if err != nil {
+			return nil, service.ParseStorageError(err, *req, "server")
+		}
+		return &response.UpdateWebuiKey{}, nil
+	}
+
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+	if err != nil {
+		return nil, err
+	}
+	newSecret.Id = secret.GetId()
+
+	_, err = s.service.Secrets.Update(ctx, newSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.UpdateWebuiKey{}, nil
 }
 
 // Create a response.Server from a storage.Server
