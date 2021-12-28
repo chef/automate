@@ -13,7 +13,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, Subscription } from 'rxjs';
 import * as moment from 'moment/moment';
 import {
   StatsService,
@@ -189,6 +189,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   // Used to notify all subscriptions to unsubscribe
   // http://stackoverflow.com/a/41177163/319074
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private downloadReportsSubscription: Subscription;
 
   constructor(
     private router: Router,
@@ -257,7 +258,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
         return filter;
       })));
 
-    this.downloadReportsService.obs$.subscribe(() => {
+    this.downloadReportsSubscription = this.downloadReportsService.obs$.subscribe(() => {
       this.hideDownloadStatus();
     });
   }
@@ -265,6 +266,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+    if (this.downloadReportsSubscription) {
+      this.downloadReportsSubscription.unsubscribe();
+    }
   }
 
   toggleDownloadDropdown() {

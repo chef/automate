@@ -125,13 +125,14 @@ export class DownloadReportsService implements OnDestroy {
     const format = report.report_type;
     const filename = this.getFilename(report.created_at) + '.' + format;
     this.downloadReport(report.acknowledgement_id).subscribe((data) => {
-      this.subject.next('close'); // close the loader
+      this.closeLoader();
       const types = { 'json': 'application/json', 'csv': 'text/csv' };
       const type = types[format];
       const blob = new Blob([data], { type });
       saveAs(blob, filename);
     }, (error) => {
       console.log(error);
+      this.closeLoader();
       this.store.dispatch(new CreateNotification({
         type: Type.error,
         message: 'Download failed.'
@@ -167,6 +168,10 @@ export class DownloadReportsService implements OnDestroy {
       return rem + this.units[sizeIndex];
     }
     return rem.toFixed(2) + this.units[sizeIndex];
+  }
+
+  closeLoader() {
+    this.subject.next('close'); // close the loader
   }
 
   ngOnDestroy() {
