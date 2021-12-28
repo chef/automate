@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -11,6 +12,8 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/api/external/common/query"
+	infra "github.com/chef/automate/api/external/infra_proxy"
+	"github.com/chef/automate/api/external/infra_proxy/response"
 	secrets "github.com/chef/automate/api/external/secrets"
 	request "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
@@ -22,6 +25,7 @@ func TestServers(t *testing.T) {
 	ctx := context.Background()
 	_, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
 	cl := infra_proxy.NewInfraProxyServiceClient(conn)
+	infraMockClient := infra.NewMockInfraProxyClient(gomock.NewController(t))
 
 	defer close()
 
@@ -513,6 +517,51 @@ func TestServers(t *testing.T) {
 			assert.Equal(t, "", resp.Error)
 
 		})
+	})
+
+	t.Run("UpdateWebuiKey", func(t *testing.T) {
+		test.ResetState(context.Background(), t, serviceRef)
+
+		secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+		secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+		secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+		req := request.CreateServer{
+			Id:        "chef-infra-server",
+			Name:      "Chef infra server",
+			Fqdn:      "example.com",
+			IpAddress: "0.0.0.0",
+			WebuiKey:  "--KEY--",
+		}
+		res := response.CreateServer{
+			Server: &response.Server{
+				Id:        "chef-infra-server",
+				Name:      "Chef infra server",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
+				OrgsCount: 2,
+			},
+		}
+		infraMockClient.EXPECT().CreateServer(gomock.Any(), &req, gomock.Any()).Return(res, nil)
+
+		t.Run("when a valid webui key, update web ui key successfully", func(t *testing.T) {
+
+			updateReq := &request.UpdateWebuiKey{
+				Id:       req.Id,
+				WebuiKey: "--KEY--",
+			}
+			res := &response.UpdateWebuiKey{}
+			infraMockClient.EXPECT().UpdateWebuiKey(gomock.Any(), &updateReq, gomock.Any()).Return(res, nil)
+		})
+
+		t.Run("when a webui key is not valid, do not update web ui key & return an error", func(t *testing.T) {
+
+			updateReq := &request.UpdateWebuiKey{
+				Id:       req.Id,
+				WebuiKey: "--KEY--",
+			}
+			infraMockClient.EXPECT().UpdateWebuiKey(gomock.Any(), &updateReq, gomock.Any()).Return(nil, errors.New("The user or client who made the request could not be authenticated. Verify the user/client name, and that the correct key was used to sign the request."))
+		})
+
 	})
 }
 
