@@ -11,7 +11,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 
 pkg_deps=(
   chef/mlsa
-  core/bash
+  core/bash/5.0.16/20200305233030
   "${UPSTREAM_PKG_IDENT}"
 )
 
