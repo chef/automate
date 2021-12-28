@@ -13,6 +13,7 @@ type Storage interface {
 	StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string, credentialId string) (Server, error)
 	DeleteServer(ctx context.Context, id string) (Server, error)
 	EditServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (Server, error)
+	EditServerWebuiKey(ctx context.Context, id, credentialId string) (Server, error)
 
 	GetOrg(ctx context.Context, orgID string, serverID string) (Org, error)
 	GetOrgs(ctx context.Context, serverID string) ([]Org, error)
