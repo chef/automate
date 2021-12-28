@@ -472,6 +472,44 @@ func (x *ValidateWebuiKey) GetError() string {
 	return ""
 }
 
+type UpdateWebuiKey struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UpdateWebuiKey) Reset() {
+	*x = UpdateWebuiKey{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_infra_proxy_response_servers_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateWebuiKey) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateWebuiKey) ProtoMessage() {}
+
+func (x *UpdateWebuiKey) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_infra_proxy_response_servers_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateWebuiKey.ProtoReflect.Descriptor instead.
+func (*UpdateWebuiKey) Descriptor() ([]byte, []int) {
+	return file_interservice_infra_proxy_response_servers_proto_rawDescGZIP(), []int{8}
+}
+
 var File_interservice_infra_proxy_response_servers_proto protoreflect.FileDescriptor
 
 var file_interservice_infra_proxy_response_servers_proto_rawDesc = []byte{
@@ -543,12 +581,13 @@ var file_interservice_infra_proxy_response_servers_proto_rawDesc = []byte{
 	0x0a, 0x10, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x57, 0x65, 0x62, 0x75, 0x69, 0x4b,
 	0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x08, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f,
-	0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x42, 0x40,
-	0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65,
-	0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69,
-	0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72,
-	0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x22, 0x10,
+	0x0a, 0x0e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x57, 0x65, 0x62, 0x75, 0x69, 0x4b, 0x65, 0x79,
+	0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63,
+	0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e,
+	0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -563,7 +602,7 @@ func file_interservice_infra_proxy_response_servers_proto_rawDescGZIP() []byte {
 	return file_interservice_infra_proxy_response_servers_proto_rawDescData
 }
 
-var file_interservice_infra_proxy_response_servers_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_interservice_infra_proxy_response_servers_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_interservice_infra_proxy_response_servers_proto_goTypes = []interface{}{
 	(*CreateServer)(nil),     // 0: chef.automate.domain.infra_proxy.response.CreateServer
 	(*DeleteServer)(nil),     // 1: chef.automate.domain.infra_proxy.response.DeleteServer
@@ -573,22 +612,23 @@ var file_interservice_infra_proxy_response_servers_proto_goTypes = []interface{}
 	(*Server)(nil),           // 5: chef.automate.domain.infra_proxy.response.Server
 	(*GetServerStatus)(nil),  // 6: chef.automate.domain.infra_proxy.response.GetServerStatus
 	(*ValidateWebuiKey)(nil), // 7: chef.automate.domain.infra_proxy.response.ValidateWebuiKey
-	nil,                      // 8: chef.automate.domain.infra_proxy.response.GetServerStatus.UpstreamsEntry
-	nil,                      // 9: chef.automate.domain.infra_proxy.response.GetServerStatus.KeygenEntry
+	(*UpdateWebuiKey)(nil),   // 8: chef.automate.domain.infra_proxy.response.UpdateWebuiKey
+	nil,                      // 9: chef.automate.domain.infra_proxy.response.GetServerStatus.UpstreamsEntry
+	nil,                      // 10: chef.automate.domain.infra_proxy.response.GetServerStatus.KeygenEntry
 }
 var file_interservice_infra_proxy_response_servers_proto_depIdxs = []int32{
-	5, // 0: chef.automate.domain.infra_proxy.response.CreateServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
-	5, // 1: chef.automate.domain.infra_proxy.response.DeleteServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
-	5, // 2: chef.automate.domain.infra_proxy.response.UpdateServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
-	5, // 3: chef.automate.domain.infra_proxy.response.GetServers.servers:type_name -> chef.automate.domain.infra_proxy.response.Server
-	5, // 4: chef.automate.domain.infra_proxy.response.GetServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
-	8, // 5: chef.automate.domain.infra_proxy.response.GetServerStatus.upstreams:type_name -> chef.automate.domain.infra_proxy.response.GetServerStatus.UpstreamsEntry
-	9, // 6: chef.automate.domain.infra_proxy.response.GetServerStatus.keygen:type_name -> chef.automate.domain.infra_proxy.response.GetServerStatus.KeygenEntry
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	5,  // 0: chef.automate.domain.infra_proxy.response.CreateServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
+	5,  // 1: chef.automate.domain.infra_proxy.response.DeleteServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
+	5,  // 2: chef.automate.domain.infra_proxy.response.UpdateServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
+	5,  // 3: chef.automate.domain.infra_proxy.response.GetServers.servers:type_name -> chef.automate.domain.infra_proxy.response.Server
+	5,  // 4: chef.automate.domain.infra_proxy.response.GetServer.server:type_name -> chef.automate.domain.infra_proxy.response.Server
+	9,  // 5: chef.automate.domain.infra_proxy.response.GetServerStatus.upstreams:type_name -> chef.automate.domain.infra_proxy.response.GetServerStatus.UpstreamsEntry
+	10, // 6: chef.automate.domain.infra_proxy.response.GetServerStatus.keygen:type_name -> chef.automate.domain.infra_proxy.response.GetServerStatus.KeygenEntry
+	7,  // [7:7] is the sub-list for method output_type
+	7,  // [7:7] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_interservice_infra_proxy_response_servers_proto_init() }
@@ -693,6 +733,18 @@ func file_interservice_infra_proxy_response_servers_proto_init() {
 				return nil
 			}
 		}
+		file_interservice_infra_proxy_response_servers_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateWebuiKey); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -700,7 +752,7 @@ func file_interservice_infra_proxy_response_servers_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_interservice_infra_proxy_response_servers_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
