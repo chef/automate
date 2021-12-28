@@ -7,7 +7,7 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Automate External Postgres Upgrade"
+    title = "External Postgres Upgrade"
     parent = "automate/configuring_automate"
     identifier = "automate/configuring_automate/postgres_upgrade.md Automate External Postgres Upgrade"
     weight = 10
@@ -67,7 +67,6 @@ gh_repo = "automate"
 
 To restore on a new host, run:
 
-Copy
 
   ```shell
   chef-automate backup restore </path/to/backups/>BACKUP_ID
