@@ -189,6 +189,10 @@ func bootstrapEnv(dm deployManager) error {
 	return nil
 }
 
+/*
+
+ */
+
 func moveAirgapToTransferDir() error {
 	if len(deployCmdFlags.airgap) > 0 {
 		var bundleName string = filepath.Base(deployCmdFlags.airgap)
@@ -233,7 +237,7 @@ backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 			return err
 		}
 		//generate manifest auto tfvars
-		ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(manifestTfVars), 0755)
+		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(manifestTfVars), 0755)
 		if err != nil {
 			return err
 		}
