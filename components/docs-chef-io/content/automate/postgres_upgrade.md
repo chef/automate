@@ -67,7 +67,6 @@ gh_repo = "automate"
 
 To restore on a new host, run:
 
-
   ```shell
   chef-automate backup restore </path/to/backups/>BACKUP_ID
   ```
