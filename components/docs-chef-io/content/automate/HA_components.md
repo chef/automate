@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA Components"
     parent = "automate/install"
     identifier = "automate/install/ha_components.md HA Components"
-    weight = 230
+    weight = 210
 +++
 
 ## A2HA Components -- need to clarify and browse for more description
