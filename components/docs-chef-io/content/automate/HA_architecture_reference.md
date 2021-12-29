@@ -21,7 +21,7 @@ The following Chef Automate HA architecture diagram shows the components involve
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
 
-<<<<<<< HEAD
+
 All application service, secret, recovery, data are stored in the Postgress. Compliance and client-run data that are generated on a time to time basis and requiring data to be accessible in real-time are stored in Elastic search. The Load balancer distributes to each of the automate components.
 
 **Journalbeat** and **Metricbeat** are common for all database instances. **Journalbeat** installed as an agent on the servers collects all the services logs and forwards them to Elasticsearch. **Metricbeat** installed on the servers periodically collects metrics from the operating system and services running on the server and sends them to the **Kibana**.
@@ -31,7 +31,7 @@ All application service, secret, recovery, data are stored in the Postgress. Com
 ### Automate Clusters
 =======
 All application service, secret, recovery, data are stored in the Postgress. Compliance and client run data that are generated on time to time basis and requiring data to be accessible in real-time are stored in Elastic search. Load balancer distributes to each of the automate components.
->>>>>>> 97b756fa (Punit/Eng comments and more edits)
+>>>>>>> a77f9ed1 (Netlify error fixes)
 
 The Chef Automate HA architecture involves two different clusters part of the main cluster, which are:
 
@@ -49,11 +49,7 @@ The backend and frontend clusters comprise **four** different servers with HA mo
 
 1. Chef-automate
 2. Chef Infra Server
-<<<<<<< HEAD
 3. Elasticsearch - an open-source search and analytics engine based on Apache Lucene and built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and is used for indexing purposes.
-=======
-3. Elasticsearch - an open-source search and analytics engine based on Apache Lucene and built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and is used for indexing purpose.
->>>>>>> 97b756fa (Punit/Eng comments and more edits)
 4. PostgreSQL - an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
 
 <!-- ! -- These four components reside in a VPC under one network in AWS. Every node sits on a specific machine irrespective of a database. Single database for all three nodes of automate. -->
@@ -66,7 +62,6 @@ Elastic Search internally manages the communication and backup, and does not fol
 
 ### Deployment Methods
 
-<<<<<<< HEAD
 Currently, Chef Automate High Availability (HA) supports two types of deployment, which are
 
 #### Amazon Web Services (AWS) Deployment
@@ -96,6 +91,3 @@ Some customers already have basic network infrastructure with VMs, networks, loa
 As an AWS setup, **Terraform** creates all components from scratch like EC2, Load Balancer. If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers just want to configure Chef Automate HA (**automate**, **chef-server**, **elasticsearch**, **postgresql**) in those servers, and then the customer should choose existing_node reference architecture.
 
 You can also utilize **Terraform** script for the bare infra deployment scenario. However, this script only handles installing and configuring components and does not create instances on the cloud providers.
-=======
-**Kibana** is an open-source, web-based data visualization and analytical tool that allows you to explore, visualize, and build a dashboard over the log data massed in Elasticsearch clusters. It is a part of the Elastic Stack and integrates with Elasticsearch. The **Kibana** **Dashboard** is a collection of charts, graphs, metrics, searches, and maps in a single pane and provides at-a-glance insights into data from multiple perspectives enabling you to drill down into the details.
->>>>>>> 97b756fa (Punit/Eng comments and more edits)
