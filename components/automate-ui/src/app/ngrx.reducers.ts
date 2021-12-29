@@ -15,6 +15,7 @@ import * as cdsEntity from './entities/cds/cds.reducer';
 import * as clientEntity from './entities/clients/client.reducer';
 import * as clientDetailsEntity from './entities/clients/client-details.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
+import * as controlDetailsEntity from './entities/control-details/control-details.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
@@ -23,6 +24,7 @@ import * as dataBagEntity from './entities/data-bags/data-bags.reducer';
 import * as dataBagItemsEntity from './entities/data-bags/data-bag-details.reducer';
 import * as dataBagItemDetailsEntity from './entities/data-bags/data-bag-item-details.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
+import * as downloadReportsEntity from './entities/download-reports/download-reports.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
 import * as environmentDetailsEntity from './entities/environments/environment-details.reducer';
 import * as infraNodeEntity from './entities/infra-nodes/infra-nodes.reducer';
@@ -94,6 +96,7 @@ export interface NgrxStateAtom {
   automateSettings: automateSettings.AutomateSettingsEntityState;
   cds: cdsEntity.CdsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
+  controlDetails: controlDetailsEntity.ControlDetailEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   clients: clientEntity.ClientEntityState;
   clientDetail: clientDetailsEntity.ClientDetailsEntityState;
@@ -106,6 +109,7 @@ export interface NgrxStateAtom {
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityState;
   desktops: desktopEntity.DesktopEntityState;
   destinations: destinationEntity.DestinationEntityState;
+  downloadReports: downloadReportsEntity.DownloadReportsEntityState;
   globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
@@ -236,6 +240,7 @@ export const defaultInitialState = {
   clients: clientEntity.ClientEntityInitialState,
   clientDetails: clientDetailsEntity.ClientEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
+  controlDetails: controlDetailsEntity.ControlDetailEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
@@ -243,6 +248,7 @@ export const defaultInitialState = {
   dataBagItems: dataBagItemsEntity.DataBagItemsEntityInitialState,
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
+  downloadReports: downloadReportsEntity.DownloadReportsEntityInitialState,
   globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
   environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
@@ -309,6 +315,7 @@ export const ngrxReducers = {
   clients: clientEntity.clientEntityReducer,
   clientDetails: clientDetailsEntity.clientDetailsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
+  controlDetails: controlDetailsEntity.controlDetailEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
   cookbookDetails: cookbookDetailsEntity.cookbookDetailsEntityReducer,
   cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
@@ -317,6 +324,7 @@ export const ngrxReducers = {
   dataBagItems: dataBagItemsEntity.dataBagItemsEntityReducer,
   dataBagItemDetails: dataBagItemDetailsEntity.dataBagItemDetailsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
+  downloadReports: downloadReportsEntity.downloadReportsEntityReducer,
   globalDataFeedConfig: destinationConfigEntity.globalConfigEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
   environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,
