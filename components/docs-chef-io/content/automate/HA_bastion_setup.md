@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA Bastion Setup"
     parent = "automate/install"
     identifier = "automate/install/ha_bastion_setup.md HA Bastion Setup"
-    weight = 220
+    weight = 200
 +++
 
 ## Bastion Host
@@ -29,7 +29,7 @@ The bastion hosts provide secure access to Linux instances located in the privat
 
 Virtual machine is required for either of the Chef Automate HA deployment types to trigger the deployment, which is actually a bastion host. This page explains the bastion host requirements and configurations for the two deployment modes of the Chef Automate HA.
 
-### Bastion Server Requirements for Bare Infra Deployment
+### Bastion Server Requirements for Bare Infra Deployment Method
 
 #### Prerequisites
 
@@ -42,7 +42,7 @@ Virtual machine is required for either of the Chef Automate HA deployment types 
 
 Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinfra.md" >}}) section for bare infra Chef Automate HA deployment procedure.
 
-### Bastion Server Setup for AWS (Amazon Web Services) Deployment
+### Bastion Server Setup for AWS (Amazon Web Services) Deployment Method
 
 #### Prerequisites
 
