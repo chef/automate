@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA IAM User"
     parent = "automate/install"
     identifier = "automate/install/ha_iam_user.md HA IAM User"
-    weight = 270
+    weight = 220
 +++
 
 ## IAM User
@@ -72,7 +72,7 @@ Once we have an AWS account, we’ll need to create an IAM user to programmatica
 1. Download and save the *Secret access key*.
 
 {{< figure src="/images/automate/ha_aws_iam_user_created.png" alt="AWS IAM User Created with Access Key">}}
-6. Take a note of the Access key ID and Secret access key. 
+1. Take a note of the Access key ID and Secret access key. 
 
 Now let’s configure our AWS CLI so we can deploy our applications from our command line.
 
