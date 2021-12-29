@@ -82,11 +82,11 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
    1. Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in bastion host.
    1. Ensure `ssh_key_pair_name` and `ssh key file path` have same value.
    1. Assign permission to the *ssh key file* by running command, `chmod 400 /root/.ssh/id_rsa`.
-   1. Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes value `1`. 
+   1. Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes value `1`.
    1. Ensure not to modify the cluster number value as `3` for PostgreSQL and ElasticSearch.
    1. Ensure the instance type supports the respective AWS region.
    1. Add load balancer certificate details for automate and chef-server. For example, as shown below:
-   
+
       <!-- automate_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e"
       <!-- chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e" --> -->
 
@@ -114,7 +114,7 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 1. Type the command, `./scripts/credentials set elasticsearch -auto` and press **Enter**. This command rotates the credentials for ElasticSearch.
 
-1. Type the command, `chef-automate test -full` and press **Enter**. This command runs smoke tests on the setup. 
+1. Type the command, `chef-automate test -full` and press **Enter**. This command runs smoke tests on the setup.
 
 <!-- The default location for the secrets key and secret storage is set in the config file. The default location for the key is /etc/chef-automate/secrets.key and the secret store file is in /hab/a2_deploy_workspace/secrets.json -->
 

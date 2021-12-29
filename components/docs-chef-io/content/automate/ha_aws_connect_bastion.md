@@ -22,7 +22,7 @@ A key pair consists of a public key that AWS stores, and a private key file that
 1. Search your instance and click the corresponding Instance ID. The AWS Console displays the Instance Summary screen.
 1. Click Connect. The AWS console displays various methods to connect to your instance. Here, we have used Mac system.
 1. Open an SSH client.
-1. Locate your private key file and navigate to that directory. 
+1. Locate your private key file and navigate to that directory.
 1. Run this command, `chmod 400 key.pem` (key.pem is the name of the key pair file name), to ensure your key is not publicly viewable.
 
 ![AWS EC2 Launch Status](/images/automate/ha_aws_connect.png)

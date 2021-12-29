@@ -38,15 +38,15 @@ Follow the steps below to deploy Chef Automate HA on AWS (Amazon Web Services) c
    1. Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in bastion host.
    1. Ensure `ssh_key_pair_name` and `ssh key file path` have same value.
    1. Assign permission to the *ssh key file* by running command, `chmod 400 /root/.ssh/id_rsa`.
-   1. Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes value `1`. 
+   1. Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes value `1`.
    1. Ensure not to modify the cluster number value as `1` for PostgreSQL and ElasticSearch.
    1. Ensure the instance type supports the respective AWS region, volume type, size and iops.
    <!-- 1. List of IP address for the cluster - there are options for private and public ip's. in case of we don't have public-ip for the vm's we can use the private ip -->
    <!-- Add load balancer certificate details for automate and chef-server. Navigate to Create Load Balancer screen in AWS console and copy the required LB ARN and DNS details-->
-  
+
   {{< figure src="/images/automate/ha_aws_lb.png" alt="Load Balancer Details">}}
   {{< figure src="/images/automate/ha_aws_lb1.png" alt="Load Balancer and DNS Details in AWS">}}
-  
+
    1. Setup the secrets management key and the required passwords. The default location for the secrets key and secret storage is set in the *config.toml* file. The default location for the key is `/etc/chef-automate/secrets.key` and the secret store file is in `/hab/a2_deploy_workspace/secrets.json`.
    1. Specify VPCID and CIDR block. You can use the default available VPC from AWS VPC page.
 
