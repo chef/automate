@@ -40,6 +40,7 @@ The Chef Automate HA equates to reliability, intending to increase functionality
 
 The Chef Automate Clusters is a professional services solution offering installation, high availability, system uptime/ scale-out performance, maintenance, and disaster recovery capabilities. It includes the Chef Infra Server API to simplify the Chef Infrastructure and is built for customers with more than 10,000 chef-client nodes. You can configure it in the private data center or preferred cloud.
 
+<<<<<<< HEAD
 ### Chef Automate High Availability (HA) Features
 
 This section lists the features offered by Chef Automate HA.
@@ -93,3 +94,6 @@ Both Chef Automate and Chef Infra Server have a load balancer with a UI. For exa
 - Automate Backend
 
 The **Elasticsearch** and **PostgreSQL** database instances act as an automated backend component. Chef habitat's hab supervisor concept is used to make a cluster for the database instance. Automate backend cluster rests in the habitat ring. For **Postgresql**, **pgleaderchk** service runs in all the **PostgreSQL** instances and ensures to choose a leader in case the leader database fails. For **Elasticsearch**, there is a **msae** concept of leader-follower, and for any database failure, a leader election occurs, and a new leader is chosen.
+=======
+It includes the Chef Infra Server API to simplify the Chef Infrastructure and is built for customers with more than 10,000 chef-client nodes. You can configure it in the private data center or preferred cloud.
+>>>>>>> 97b756fa (Punit/Eng comments and more edits)

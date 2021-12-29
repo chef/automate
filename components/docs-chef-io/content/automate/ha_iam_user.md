@@ -9,8 +9,13 @@ gh_repo = "automate"
   [menu.automate]
     title = "IAM Users"
     parent = "automate/install"
+<<<<<<< HEAD
     identifier = "automate/install/ha_iam_user.md IAM Users"
     weight = 320
+=======
+    identifier = "automate/install/ha_iam_user.md HA IAM User"
+    weight = 220
+>>>>>>> 97b756fa (Punit/Eng comments and more edits)
 +++
 
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
@@ -70,6 +75,10 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 1. Download and save the *Secret access key*.
 
 {{< figure src="/images/automate/ha_aws_iam_user_created.png" alt="AWS IAM User Created with Access Key">}}
+<<<<<<< HEAD
+=======
+1. Take a note of the Access key ID and Secret access key. 
+>>>>>>> 97b756fa (Punit/Eng comments and more edits)
 
 1. Take a note of the Access key ID and Secret access key.
 
