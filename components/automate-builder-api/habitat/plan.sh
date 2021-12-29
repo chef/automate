@@ -1,6 +1,8 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2039
 #shellcheck disable=SC2154
+#stable channel
+
 
 pkg_name="automate-builder-api"
 pkg_description="Wrapper package for habitat/builder-api"
@@ -14,7 +16,7 @@ pkg_deps=(
   core/bash
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # We need to pin here to get a build from unstable
-  "habitat/builder-api/9034/20200827185135"
+  "habitat/builder-api/9969/20211202182511"
 )
 
 pkg_binds=(

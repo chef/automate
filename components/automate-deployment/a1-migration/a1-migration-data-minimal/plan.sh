@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_repo=a2
 pkg_name=a1-migration-data-minimal
 pkg_description="Minimal Automate 1 Migration Data -- For use with the --self-test flag. No ES2 data."

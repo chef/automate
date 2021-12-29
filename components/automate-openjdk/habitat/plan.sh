@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 # Instead of wrapping the core/openjdk11 package, we're using our own so that
 # we don't need to depend on ALSA or FreeType, which have non-compatible licenses.

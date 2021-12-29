@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=backup-gateway
 pkg_version="0.1.0"
 pkg_origin=chef
