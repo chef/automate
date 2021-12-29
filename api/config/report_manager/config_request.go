@@ -36,7 +36,25 @@ func DefaultConfigRequest() *ConfigRequest {
 // instance of config.InvalidConfigError that has the missing keys and invalid
 // fields populated.
 func (c *ConfigRequest) Validate() error {
-	return nil
+	err := config.NewInvalidConfigError()
+
+	if c.GetV1().GetSys().GetService().GetEnableLargeReporting().GetValue() {
+		if c.GetV1().GetSys().GetMinio().GetEndpoint().GetValue() == "" {
+			err.AddInvalidValue("global.v1.external.minio.endpoint", "value should not be empty")
+		}
+		if c.GetV1().GetSys().GetMinio().GetRootUser().GetValue() == "" {
+			err.AddInvalidValue("global.v1.external.minio.root_user", "value should not be empty")
+		}
+		if c.GetV1().GetSys().GetMinio().GetRootPassword().GetValue() == "" {
+			err.AddInvalidValue("global.v1.external.minio.root_password", "value should not be empty")
+		}
+	}
+
+	if err.IsEmpty() {
+		return nil
+	}
+
+	return err
 }
 
 // PrepareSystemConfig returns a system configuration that can be used
@@ -60,5 +78,13 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 
 	if largeReporting := g.GetV1().GetLargeReporting().GetEnableLargeReporting(); largeReporting != nil {
 		c.V1.Sys.Service.EnableLargeReporting = largeReporting
+	}
+
+	if minio := g.GetV1().GetExternal().GetMinio(); minio != nil {
+		c.V1.Sys.Minio = &ConfigRequest_V1_System_Minio{
+			Endpoint:     minio.GetEndpoint(),
+			RootUser:     minio.GetRootUser(),
+			RootPassword: minio.GetRootPassword(),
+		}
 	}
 }
