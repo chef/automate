@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-UPSTREAM_PKG_IDENT="core/postgresql11/11.2"
+UPSTREAM_PKG_IDENT="core/postgresql11/11.8/20200706162428"
 pkg_name="automate-ha-postgresql"
 pkg_description="Wrapper package for core/postgresql11"
 pkg_origin="chef"
@@ -11,7 +11,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 
 pkg_deps=(
   chef/mlsa
-  core/bash/5.0.16/20200305233030
+  core/bash
   "${UPSTREAM_PKG_IDENT}"
 )
 
