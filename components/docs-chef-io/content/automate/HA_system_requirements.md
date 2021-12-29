@@ -22,7 +22,7 @@ This section lists the recommended operating systems requirements, virtual machi
 | Operating Systems                        | Tested                    |
 | :--------------------------------------: | :-----------------------: |
 | Red Hat Enterprise Linux (64 Bit OS)     | 7, 8 (For 8 or above versions, **SELinux** configuration must be permissive. By default, in RHEL 8 **SELinux** configuration is enforced). Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 |packages) and v2 (using RHEL 7packages). |
-| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
+| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x          |
 | Centos (64 Bit OS)                       | 7                         |
 
 ## Virtual Machine (VM) Instances Type
