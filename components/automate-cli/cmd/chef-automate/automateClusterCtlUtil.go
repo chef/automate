@@ -28,16 +28,6 @@ import (
 	"github.com/hpcloud/tail"
 )
 
-const frontendAutotfvarsTemplate = `
-frontend_aib_dest_file = "/var/tmp/{{ .bundleName }}"
-frontend_aib_local_file = "{{ .bundleName }}"
-		`
-
-const backendAutotfvarsTemplate = `
-backend_aib_dest_file = "/var/tmp/{{ .backendBundleFile }}"
-backend_aib_local_file = "{{ .backendBundleFile }}"
-`
-
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")

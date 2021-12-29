@@ -15,3 +15,13 @@ const AIRGAP_HA_TRANS_DIR_PATH = "/hab/a2_deploy_workspace/terraform/transfer_fi
 const AUTOMATE_HA_TERRAFORM_DIR = "/hab/a2_deploy_workspace/terraform/"
 const AUTOMATE_HA_FILE_PERMISSION_0755 = 0755
 const AUTOMATE_HA_FILE_PERMISSION_0644 = 0644
+
+const frontendAutotfvarsTemplate = `
+frontend_aib_dest_file = "/var/tmp/{{ .bundleName }}"
+frontend_aib_local_file = "{{ .bundleName }}"
+		`
+
+const backendAutotfvarsTemplate = `
+backend_aib_dest_file = "/var/tmp/{{ .backendBundleFile }}"
+backend_aib_local_file = "{{ .backendBundleFile }}"
+`
