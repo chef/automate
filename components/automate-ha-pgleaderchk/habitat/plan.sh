@@ -1,4 +1,6 @@
 # shellcheck disable=SC2148
+#stable channel
+
 pkg_name=automate-ha-pgleaderchk
 binary_name=pgleaderchk
 pkg_origin=chef
