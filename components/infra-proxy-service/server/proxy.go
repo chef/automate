@@ -101,6 +101,8 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	defer cancel()
 
 	// TODO: combine get server & org query in one statement.
+	var credentialID, adminUser string
+	var isWebuiKey bool
 	server, err := s.service.Storage.GetServer(ctx, serverID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, serverID, "server")
@@ -110,8 +112,14 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	if err != nil {
 		return nil, service.ParseStorageError(err, orgID, "org")
 	}
-
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
+	// If web ui key is available with server then use it otherwise use org admin key
+	if server.CredentialID != "" {
+		credentialID = server.CredentialID
+		isWebuiKey = true
+	} else {
+		credentialID = org.CredentialID
+	}
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: credentialID})
 	if err != nil {
 		return nil, err
 	}
@@ -120,12 +128,18 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}
-
+	// If using web ui key then set admin user as pivotal otherwise use org admin user
+	if isWebuiKey {
+		adminUser = "pivotal"
+	} else {
+		adminUser = org.AdminUser
+	}
 	client, err := NewChefClient(&ChefConfig{
-		Name:    org.AdminUser,
-		Key:     GetAdminKeyFrom(secret),
-		SkipSSL: true,
-		BaseURL: baseURL,
+		Name:       adminUser,
+		Key:        GetAdminKeyFrom(secret),
+		SkipSSL:    true,
+		BaseURL:    baseURL,
+		IsWebuiKey: isWebuiKey,
 	})
 
 	return client, err
