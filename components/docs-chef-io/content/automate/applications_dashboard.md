@@ -36,7 +36,7 @@ The right sidebar provides detailed reporting for each individual service.
 
 The _Service Health Status Count_ is the first collection of information on the page, which is a series of five containers.
 The first container on the left reports the total number of service groups and the remaining containers sort the services into four categories of criticality, on the basis of the health status of the most critical service in the group.
-The service health status containers are _Critical_, _Warning_, _OK_, and _Unknown_.
+The service health status containers are _Critical_, __, _OK_, and _Unknown_.
 Each service group is classified by its most critical service, which means that if any one instance in a service group reports a "critical" status, then Chef Automate counts that entire group counts as having a "critical" status.
 Selecting a container changes the Service Groups table to display only the service groups reporting with that health status.
 
@@ -56,7 +56,7 @@ The percentage inside the circle shows the percentage of services with the _OK_ 
 A corresponding status icon with a matching color appears next the circle display if applicable.
 For example, if a service group is 20% _OK_ and 80% _Critical_, a magenta triangle exclamation icon appears next to the service group's circle display and draws attention to the critical status.
 
-If there are multiple Service Groups with the same _OK_ health percentage, then the Service Groups will display in the same order of priority: _Critical_, _Unknown_, and _Warning_.
+If there are multiple Service Groups with the same _OK_ health percentage, then the Service Groups will display in the same order of priority: _Critical_, _Unknown_, and __.
 
 ### Service Group
 
@@ -78,7 +78,7 @@ The _App_ column, which is short for _Application_, displays the application nam
 Selecting a Service Group in a row populates the right-hand sidebar with information about each service in the Service Group.
 To filter the individual services in the side bar by their health status, select one of the health status buttons at the top of the sidebar.
 
-The individual service rows sort by their level of criticality, from the "most critical" status to the "least critical" status - "critical", "warning", "unknown", and "OK" respectively.
+The individual service rows sort by their level of criticality, from the "most critical" status to the "least critical" status - "critical", "", "unknown", and "OK" respectively.
 Individual disconnected services display a broken chain icon with a note of when the last received health check ocurred.
 The most critical issues appear at the top of the list, allowing you to determine the next steps for remediation.
 
