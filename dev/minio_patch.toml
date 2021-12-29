@@ -1,0 +1,8 @@
+[global.v1]
+  [global.v1.external.minio]
+    endpoint = "127.0.0.1:9000"
+    root_user = "minioadmin"
+    root_password = "minioadmin"
+
+  [global.v1.large_reporting]
+    enable_large_reporting = true
