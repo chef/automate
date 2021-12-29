@@ -31,6 +31,7 @@ import { ChefComponentsModule } from './components/chef-components.module';
 import { ChefPipesModule } from './pipes/chef-pipes.module';
 import { ComplianceModule } from './pages/+compliance/compliance.module';
 import { ComplianceSharedModule } from './pages/+compliance/shared/shared.module';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { IntegrationsModule } from './pages/integrations/integrations.module';
 import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
@@ -80,6 +81,7 @@ import { CookbookDetailsRequests } from './entities/cookbooks/cookbook-details.r
 import { CookbookVersionsRequests } from './entities/cookbooks/cookbook-versions.requests';
 import { ClientRequests } from './entities/clients/client.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
+import { ControlDetailRequests } from './entities/control-details/control-details.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
@@ -292,6 +294,7 @@ import {
     CookieModule.forRoot(),
     FormsModule,
     HttpClientModule,
+    InfiniteScrollModule,
     InfraProxyModule,
     IntegrationsModule,
     NgrxEffectsModule,
@@ -333,6 +336,7 @@ import {
     ComplianceStatsService,
     ConfigService,
     ClientRunsRequests,
+    ControlDetailRequests,
     CookbookDetailsRequests,
     CookbookRequests,
     CookbookVersionsRequests,
