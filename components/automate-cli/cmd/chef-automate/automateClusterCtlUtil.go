@@ -194,9 +194,15 @@ func bootstrapEnv(dm deployManager) error {
 }
 
 /*
-
- */
-
+In airgap deployement of A2HA we need to have two AIB files in /hab/a2_deploy_workspace/terraform/transfer_files/
+first airgap file will automate generated airgap bundle,
+second file will be backend airgap bundle which is same as automate(frontend) airgap bundle but without header.
+also we need to keep MD5 hash files both frontend and backend bundles.
+we also need to have following files in /hab/a2_deploy_workspace/terraform dir
+1. a2ha_aib_fe.auto.tfvars --> it will contain info of frontend airgap bundle
+2. a2ha_aib_be.auto.tfvars --> it will contain info of backend airgap bundle
+1. a2ha_manifest.auto.tfvars --> it will contain info of required packages to deploy a2ha.
+*/
 func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
 	if len(deployCmdFlags.airgap) > 0 {
 		var bundleName string = filepath.Base(deployCmdFlags.airgap)
@@ -240,6 +246,8 @@ backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 		if err != nil {
 			return err
 		}
+
+		//generate manifest auto tfvars
 		err = generateA2HAManifestTfvars(airgapMetadata)
 		if err != nil {
 			return err
@@ -249,7 +257,6 @@ backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 }
 
 func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
-	//generate manifest auto tfvars
 	var deployablePackages []string
 	for _, h := range airgapMetadata.HartifactPaths {
 		if strings.Contains(h, "automate-ha-pgleaderchk") {
