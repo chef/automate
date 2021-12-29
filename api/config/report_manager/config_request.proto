@@ -23,6 +23,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 3;
 			chef.automate.infra.config.Log log = 4;
 			Objstore objstore = 5;
+			Minio minio = 6;
 
 
 			message Service {
@@ -33,6 +34,12 @@ message ConfigRequest {
 
 			message Objstore {
 				google.protobuf.StringValue bucket = 1;
+			}
+
+			message Minio {
+				google.protobuf.StringValue endpoint = 1;
+				google.protobuf.StringValue root_user = 2;
+				google.protobuf.StringValue root_password = 3;
 			}
 		}
 

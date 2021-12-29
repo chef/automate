@@ -11,6 +11,13 @@ type ReportManager struct {
 	Storage          Storage          `mapstructure:"storage"`
 	certs.TLSConfig  `mapstructure:"tls"`
 	ObjStore         ObjStore `mapstructure:"objstore"`
+	Minio            Minio    `mapstructure:"minio"`
+}
+
+type Minio struct {
+	EndPoint     string `mapstructure:"endpoint"`
+	RootUser     string `mapstructure:"root_user"`
+	RootPassword string `mapstructure:"root_password"`
 }
 
 type ObjStore struct {
