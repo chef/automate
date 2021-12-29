@@ -149,12 +149,14 @@ func bootstrapEnv(dm deployManager) error {
 
 	offlineMode := deployCmdFlags.airgap != ""
 	manifestPath := ""
+	var airgapMetadata airgap.UnpackMetadata
 	if offlineMode {
 		writer.Title("Installing artifact")
 		metadata, err := airgap.Unpack(deployCmdFlags.airgap)
 		if err != nil {
 			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 		}
+		airgapMetadata = metadata
 		manifestPath = api.AirgapManifestPath
 
 		// We need to set the path for the hab binary so that the deployer does not
@@ -178,9 +180,11 @@ func bootstrapEnv(dm deployManager) error {
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
-	err = moveAirgapToTransferDir()
-	if err != nil {
-		return status.Annotate(err, status.DeployError)
+	if offlineMode {
+		err := moveAirgapToTransferDir(airgapMetadata)
+		if err != nil {
+			return status.Annotate(err, status.DeployError)
+		}
 	}
 	err = dm.generateConfig()
 	if err != nil {
@@ -193,7 +197,7 @@ func bootstrapEnv(dm deployManager) error {
 
  */
 
-func moveAirgapToTransferDir() error {
+func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
 	if len(deployCmdFlags.airgap) > 0 {
 		var bundleName string = filepath.Base(deployCmdFlags.airgap)
 		if strings.Contains(bundleName, "automate") {
@@ -236,13 +240,64 @@ backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 		if err != nil {
 			return err
 		}
-		//generate manifest auto tfvars
-		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(manifestTfVars), 0755)
+		err = generateA2HAManifestTfvars(airgapMetadata)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
+	//generate manifest auto tfvars
+	var deployablePackages []string
+	for _, h := range airgapMetadata.HartifactPaths {
+		if strings.Contains(h, "automate-ha-pgleaderchk") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `pgleaderchk_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-postgresql") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `postgresql_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-haproxy") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `proxy_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-journalbeat") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `journalbeat_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-metricbeat") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `metricbeat_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-kibana") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `kibana_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-elasticsearch") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `elasticsearch_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-elasticsidecar") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `elasticsidecar_pkg_ident = "`+packageName+`"`)
+		}
+		if strings.Contains(h, "automate-ha-curator") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, `curator_pkg_ident = "`+packageName+`"`)
+		}
+	}
+	return ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), 0755)
+}
+func extractPackageNameFromHartifactPath(path string) string {
+	path = strings.ReplaceAll(path, "/hab/cache/artifacts/", "")
+	path = strings.ReplaceAll(path, "-x86_64-linux.hart", "")
+	originIndex := strings.Index(path, "-")
+	orignName := path[0:originIndex]
+	packageName := (orignName + "/" + path[originIndex+1:])
+	return packageName
 }
 
 func copyFileContents(src, dst string) (err error) {
@@ -333,7 +388,7 @@ func generateChecksumFile(sourceFileName string, checksumFileName string) error 
 		return err
 	}
 	defer sfile.Close()
-	hash := md5.New()
+	hash := md5.New() // nosemgrep
 	if _, err := io.Copy(hash, sfile); err != nil {
 		return err
 	}
