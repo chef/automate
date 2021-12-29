@@ -151,12 +151,12 @@
                 (keyup)="handleInput($event)"
                 autofocus></textarea>
             </label>
-            <chef-error
+            <chef-error class="textarea-error"
             *ngIf="(webUIKeyForm.get('webui_key').hasError('required') || webUIKeyForm.get('webui_key').hasError('pattern')) && webUIKeyForm.get('webui_key').dirty">
             WEB UI KEY is required.
             </chef-error>
-            <span class="note_text">Note: A web UI Key is located <a href=''>Here</a>(Need Better Help Text).</span>
           </chef-form-field>
+          <span class="note_text">Note: A web UI Key is located <a href=''>Here</a>(Need Better Help Text).</span>
         </div>
         <div id="button-bar">
           <chef-button id="cancel-server-popup" tertiary [disabled]="creating" (click)="closeSeverSlider()">Cancel</chef-button>
