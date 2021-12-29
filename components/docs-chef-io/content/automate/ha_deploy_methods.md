@@ -28,7 +28,7 @@ Is this required?
 
 AWS is a comprehensive, evolving cloud computing platform provided by Amazon that includes a mixture of infrastructure as a service (IaaS), platform as a service (PaaS) and packaged software as a service (SaaS) offerings. AWS services can offer an organization tools such as compute power, database storage and content delivery services. Learn more @ <https://aws.amazon.com/what-is-cloud-computing/>.
 
-In AWS deployment, the entire Chef Automate HA infrastructure is built into the AWS cloud. If you choose AWS as a reference architecture, a standard **Terraform** script handles AWS deployment. This deployment terraform script first sets up all the prerequisites like creating a VPC, EC2, load balancer, security groups, subnets. Then, ensures the **VPCID** is provided for security purposes, and the **cidr** block is created manually based on respective **VPC**.
+In AWS deployment, the entire Chef Automate HA infrastructure is built into the AWS cloud. If you choose AWS as a reference architecture, a standard **Terraform** script handles AWS deployment. This deployment terraform script first sets up all the prerequisites like creating a EC2, load balancer, security groups, subnets. Then, ensure the existing **VPCID** is provided for security purposes, and the **cidr** block is created manually based on respective **VPC**.
 
 Its a standard cloud services.
 
@@ -54,6 +54,6 @@ You can install and manage Chef Automate HA by creating profiles for bare metal 
 
 Some customers already have basic network infrastructure with VMs, networks, load balancers in their environment. This environment can be on-premises or in the cloud, and the respective organizations might not wanting to provide access to create items like VMs. In such cases, IPs of their instances are used to set up Chef Automate HA on their network premises.
 
-As a AWS setup, **Terraform** creates all components from scratch like VPC, EC2, Load Balancer. If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers just want to configure Chef Automate HA (**automate**, **chef-server**, **elasticsearch**, **postgresql**) in those servers, and then the customer should choose existing_node reference architecture.
+As a AWS setup, **Terraform** creates all components from scratch like EC2, Load Balancer. If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers just want to configure Chef Automate HA (**automate**, **chef-server**, **elasticsearch**, **postgresql**) in those servers, and then the customer should choose existing_node reference architecture.
 
 You can also utilize **Terraform** script for bare infra deployment scenario. However, then this script only handles installing and configuring components and does not create instances on the cloud providers.
