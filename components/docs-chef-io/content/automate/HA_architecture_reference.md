@@ -21,7 +21,7 @@ The following Chef Automate HA architecture diagram shows the components involve
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
 
-All application service, secret, recovery, data are stored in the Postgress. Compliance and client run data that are generated on time to time basis and requiring data to be accessible in real-time are stored in Elastic search. Load balancer distributes to each of the automate components. 
+All application service, secret, recovery, data are stored in the Postgress. Compliance and client run data that are generated on time to time basis and requiring data to be accessible in real-time are stored in Elastic search. Load balancer distributes to each of the automate components.
 
 The Chef Automate HA architecture involves two different clusters part of the main cluster, which are:
 

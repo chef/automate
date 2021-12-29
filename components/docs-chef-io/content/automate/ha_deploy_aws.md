@@ -19,7 +19,7 @@ This page explains the procedure to deploy Chef Automate High Availability (HA) 
 
 - Set up the [prerequisites for Chef Automate HA Deployment]({{< relref "ha_aws_prereq.md" >}}) section.
 - Connect your [Bastion host to your AWS instance]({{< relref "ha_aws_connect_bastion.md" >}}) section.
-- Create an [AWS Identity and Access Management (IAM) user]({{< relref "ha_iam_user.md" >}}) section.
+- Create an [AWS Identity and Access Management IAM user]({{< relref "ha_iam_user.md" >}}) section.
 - Configure the [AWS credentials on your Bastion host]({{< relref "ha_configure_aws_credentials.md" >}}) section.
 - Create the DNS certificate.
 - Rotate the AWS certificates.
