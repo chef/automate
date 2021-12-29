@@ -12,11 +12,11 @@ gh_repo = "automate"
     weight = 210
 +++
 
-### Chef Automate High Availability (HA) Features
+## Chef Automate High Availability (HA) Features
 
 This section lists the features offered by Chef Automate HA.
 
-#### Performance and Scalability
+### Performance and Scalability
 
 Is this required?
 
@@ -38,7 +38,7 @@ Following guidelines are adhered to achieve a robust degree of high availability
 
 - As Chef Automate Cluster is offered as a Chef Professional Service, the customer receives expert architecture planning, system architecture recommendations, and performance tuning for their network infrastructure.
 
-#### Load Balancer
+### Load Balancer
 
 Load balancer aids in identifying possible failure points and thereby helps in reducing downtime. More efficient workload distribution helps optimize network infrastructure components and increases application availability.
 
@@ -46,13 +46,13 @@ When the Chef Automate HA system with Load Balancer detects server failure, it a
 
 It achieves optimal operational performance through either a single-node deployment or through a deployment across a cluster. In a single-node deployment, a single load-balancing controller performs all administrative functions and all analytics data gathering and processing. Whereas, in a high availability load balancing cluster, additional nodes provide node-level redundancy for the load-balancing controller and maximize performance for CPU-intensive analytics functions.
 
-#### Disaster Recovery (DR)
+### Disaster Recovery (DR)
 
 Disaster Recovery (DR) is a comprehensive plan for recovering critical operations and systems after catastrophic events. Chef Automate HA focuses on serious but more typical failures, such as a failing component or server. A DR plan may cope with the loss of an entire region.
 
 Chef Automate HA promotes the DR cluster through regular backup and restores measures syncing the data from the production cluster to the DR cluster. Typically, these two clusters are located in different data centers or cloud provider regions enabling a production environment in a short period with minimal data loss.
 
-#### Failover System
+### Failover System
 
 Chef Automate HA enables the ability of the system to continue functioning even after the failure of one or more servers. A part of HA is failover, which refers to the ability for client connections to migrate from one server to another in the event of server failure. The client applications can continue to operate with minimal downtime.
 

@@ -23,7 +23,7 @@ In order to run the terraform scripts, you need an IAM user with following permi
 - AmazonAPIGatewayAdministrator
 - AmazonS3FullAccess
 
-These permissions can either be directly added to the user or can be added via IAM Group. 
+These permissions can either be directly added to the user or can be added via IAM Group.
 
 {{< note >}}
 
@@ -54,25 +54,25 @@ Once we have an AWS account, we’ll need to create an IAM user to programmatica
 
   This account will be used by your AWS CLI and will be connecting to the AWS API directly by not using the Management Console.
 
-1. Select *Next: Permissions*. 
+1. Select *Next: Permissions*.
 1. Select *Attach existing policies directly*. Filter the policies by keyword: IAM. For this user, select IAMFullAccess from the list of available policies. The IAMFullAccess policy enables this user to create and manage user permissions in AWS.
 
 {{< figure src="/images/automate/ha_aws_iam_policy.png" alt="AWS IAM User Policy>}}
 
-1. Set the user permissions. 
-1. Search for **AdministratorAccess* and select the policy. 
+1. Set the user permissions.
+1. Search for **AdministratorAccess* and select the policy.
 1. Select *Next: Tags*.
 1. Provide key name and value as tagging for the user been created.
 1. Select *Next: Review*.
 
 {{< figure src="/images/automate/ha_aws_iam_user_review.png" alt="AWS IAM User Review with permissions">}}
 
-1. Select *Create user*. 
+1. Select *Create user*.
 1. Select *show* to reveal the secret access key.
 1. Download and save the *Secret access key*.
 
 {{< figure src="/images/automate/ha_aws_iam_user_created.png" alt="AWS IAM User Created with Access Key">}}
-1. Take a note of the Access key ID and Secret access key. 
+1. Take a note of the Access key ID and Secret access key.
 
 Now let’s configure our AWS CLI so we can deploy our applications from our command line.
 
