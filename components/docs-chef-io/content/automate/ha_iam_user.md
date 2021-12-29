@@ -57,7 +57,7 @@ Once we have an AWS account, we’ll need to create an IAM user to programmatica
 1. Select *Next: Permissions*.
 1. Select *Attach existing policies directly*. Filter the policies by keyword: IAM. For this user, select IAMFullAccess from the list of available policies. The IAMFullAccess policy enables this user to create and manage user permissions in AWS.
 
-{{< figure src="/images/automate/ha_aws_iam_policy.png" alt="AWS IAM User Policy>}}
+{{< figure src="/images/automate/ha_aws_iam_policy.png" alt="AWS IAM User Policy">}}
 
 1. Set the user permissions.
 1. Search for **AdministratorAccess* and select the policy.
