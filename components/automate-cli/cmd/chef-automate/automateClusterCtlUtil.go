@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"html/template"
 	"io"
 	"io/ioutil"
 	"os"
@@ -26,6 +27,16 @@ import (
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
 )
+
+const frontendAutotfvarsTemplate = `
+frontend_aib_dest_file = "/var/tmp/{{ .bundleName }}"
+frontend_aib_local_file = "{{ .bundleName }}"
+		`
+
+const backendAutotfvarsTemplate = `
+backend_aib_dest_file = "/var/tmp/{{ .backendBundleFile }}"
+backend_aib_local_file = "{{ .backendBundleFile }}"
+`
 
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
 	if len(command) < 1 {
@@ -219,11 +230,11 @@ func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
 			return err
 		}
 		//generating frontend auto tfvars
-		var frontendAutotfvarsTemplate string = `
-frontend_aib_dest_file = "/var/tmp/` + bundleName + `"
-frontend_aib_local_file = "` + bundleName + `"
-		`
-		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", []byte(frontendAutotfvarsTemplate), 0755) // nosemgrep
+		frontendTfvars := getBytesFromTempalte("frontendTfvars", frontendAutotfvarsTemplate, map[string]interface{}{
+			"bundleName": bundleName,
+		})
+
+		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", frontendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
 		if err != nil {
 			return err
 		}
@@ -238,11 +249,10 @@ frontend_aib_local_file = "` + bundleName + `"
 			return err
 		}
 		//generating backend auto tfvars
-		var backendAutotfvarsTemplate string = `
-backend_aib_dest_file = "/var/tmp/` + filepath.Base(backendBundleFile) + `"
-backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
-`
-		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", []byte(backendAutotfvarsTemplate), 0755) // nosemgrep
+		backendTfvars := getBytesFromTempalte("backendTfvars", backendAutotfvarsTemplate, map[string]interface{}{
+			"backendBundleFile": filepath.Base(backendBundleFile),
+		})
+		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", backendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
 		if err != nil {
 			return err
 		}
@@ -256,47 +266,56 @@ backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 	return nil
 }
 
+func getBytesFromTempalte(templateName string, templateContent string, placeholders map[string]interface{}) []byte {
+	t := template.Must(template.New(templateName).Parse(templateContent))
+	buf := &bytes.Buffer{}
+	if err := t.Execute(buf, placeholders); err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
+}
+
 func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
 	var deployablePackages []string
 	for _, h := range airgapMetadata.HartifactPaths {
 		if strings.Contains(h, "automate-ha-pgleaderchk") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `pgleaderchk_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "pgleaderchk_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-postgresql") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `postgresql_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "postgresql_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-haproxy") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `proxy_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "proxy_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-journalbeat") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `journalbeat_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "journalbeat_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-metricbeat") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `metricbeat_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "metricbeat_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-kibana") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `kibana_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "kibana_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-elasticsearch") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `elasticsearch_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "elasticsearch_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-elasticsidecar") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `elasticsidecar_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "elasticsidecar_pkg_ident = \""+packageName+"\"")
 		}
 		if strings.Contains(h, "automate-ha-curator") {
 			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, `curator_pkg_ident = "`+packageName+`"`)
+			deployablePackages = append(deployablePackages, "curator_pkg_ident = \""+packageName+"\"")
 		}
 	}
-	return ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), 0755) // nosemgrep
+	return ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
 }
 func extractPackageNameFromHartifactPath(path string) string {
 	path = strings.ReplaceAll(path, "/hab/cache/artifacts/", "")
@@ -345,7 +364,7 @@ func generateBackendAIB(filePath string, destPath string) error {
 		return errors.New(err.Error() + " Could not read artifact file")
 	}
 	if s != "AIB-1\n" {
-		return errors.New("Malformed install bundle file")
+		return errors.New("malformed install bundle file")
 	}
 
 	s, err = bufReader.ReadString('\n')
@@ -354,7 +373,7 @@ func generateBackendAIB(filePath string, destPath string) error {
 	}
 
 	if s != "\n" {
-		return errors.New("Malformed install bundle file")
+		return errors.New("malformed install bundle file")
 	}
 
 	fo, err := os.Create(destPath)
@@ -401,7 +420,7 @@ func generateChecksumFile(sourceFileName string, checksumFileName string) error 
 	}
 	sum := hash.Sum(nil)
 	hashedFileContent := hex.EncodeToString(sum) + "  " + filepath.Base(sfile.Name())
-	err = ioutil.WriteFile(checksumFileName, []byte(hashedFileContent), 0644) // nosemgrep
+	err = ioutil.WriteFile(checksumFileName, []byte(hashedFileContent), AUTOMATE_HA_FILE_PERMISSION_0644) // nosemgrep
 	if err != nil {
 		return err
 	}

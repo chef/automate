@@ -13,3 +13,5 @@ const AUTOMATE_HA_AUTOMATE_CONFIG_FILE = "/hab/a2_deploy_workspace/configs/autom
 const AUTOMATE_HA_INVALID_BASTION = "Invalid bastion, to run this command use automate bastion"
 const AIRGAP_HA_TRANS_DIR_PATH = "/hab/a2_deploy_workspace/terraform/transfer_files/"
 const AUTOMATE_HA_TERRAFORM_DIR = "/hab/a2_deploy_workspace/terraform/"
+const AUTOMATE_HA_FILE_PERMISSION_0755 = 0755
+const AUTOMATE_HA_FILE_PERMISSION_0644 = 0644
