@@ -22,7 +22,7 @@ gh_repo = "automate"
     ```shell
     chef-automate upgrade run
     ```
-   * After successful upgrade, stop Chef Automate Services.
+    * After successful upgrade, stop Chef Automate Services.
     ```shell
     sudo chef-automate stop
     ```
@@ -41,10 +41,10 @@ gh_repo = "automate"
 
   {{< note >}}
   While doing our testing we had major steps like:
-     1. Vacuum all data in PostgreSQL 9.6
-     2. pg_upgrade check
-     3. pg_upgrade
-     4. reindexing
+     1. Vacuum all data in PostgreSQL 9.6\
+     2. pg_upgrade check\
+     3. pg_upgrade\
+     4. reindexing\
   * During our testing we found that for 2GB of data in PostgreSQL it took 5 min of time to complete above steps.
   * This estimate is based on our non-production setup, please use these numbers as rough indicator on amount of downtime needed.
   {{< /note >}}
@@ -55,11 +55,9 @@ gh_repo = "automate"
 1. If the upgrade failed and you are left with a corrupted Chef Automate and/or a corrupted database, **DO NOT RISK YOUR BACKUP OF AUTOMATE**. Take all steps necessary to preserve the backup, including copying it to another disk. Take all steps necessary to preserve the backup, including copying it to another disk.
 2. Contact Chef customer support.
 3. If you have configured the backup directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory path to the `backup restore` command as shown in the snippet below. Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
-
-To restore on a new host, run:
-  ```shell
-  chef-automate backup restore </path/to/backups/>BACKUP_ID
-  ```
-For other restoration types please refer this [Restore]({{< ref "restore.md" >}})
-
+  To restore on a new host, run:
+      ```shell
+      chef-automate backup restore </path/to/backups/>BACKUP_ID
+      ```
+  For other restoration types please refer this [Restore]({{< ref "restore.md" >}})
 4. Do not continue upgrading PostgreSQL until you have an uncorrupted Chef Automate and an uncorrupted PostgreSQL database.
