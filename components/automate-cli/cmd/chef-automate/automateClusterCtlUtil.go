@@ -216,7 +216,7 @@ func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
 frontend_aib_dest_file = "/var/tmp/` + bundleName + `"
 frontend_aib_local_file = "` + bundleName + `"
 		`
-		err = io.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", []byte(frontendAutotfvarsTemplate), 0755)
+		err = os.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", []byte(frontendAutotfvarsTemplate), 0755)
 		if err != nil {
 			return err
 		}
@@ -235,7 +235,7 @@ frontend_aib_local_file = "` + bundleName + `"
 backend_aib_dest_file = "/var/tmp/` + filepath.Base(backendBundleFile) + `"
 backend_aib_local_file = "` + filepath.Base(backendBundleFile) + `"
 `
-		err = io.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", []byte(backendAutotfvarsTemplate), 0755)
+		err = os.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", []byte(backendAutotfvarsTemplate), 0755)
 		if err != nil {
 			return err
 		}
@@ -288,7 +288,7 @@ func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
 			deployablePackages = append(deployablePackages, `curator_pkg_ident = "`+packageName+`"`)
 		}
 	}
-	return io.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), 0755)
+	return os.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), 0755)
 }
 func extractPackageNameFromHartifactPath(path string) string {
 	path = strings.ReplaceAll(path, "/hab/cache/artifacts/", "")
@@ -393,7 +393,7 @@ func generateChecksumFile(sourceFileName string, checksumFileName string) error 
 	}
 	sum := hash.Sum(nil)
 	hashedFileContent := hex.EncodeToString(sum) + "  " + filepath.Base(sfile.Name())
-	err = io.WriteFile(checksumFileName, []byte(hashedFileContent), 0644)
+	err = os.WriteFile(checksumFileName, []byte(hashedFileContent), 0644)
 	if err != nil {
 		return err
 	}
