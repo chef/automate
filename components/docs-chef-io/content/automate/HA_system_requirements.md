@@ -9,8 +9,8 @@ gh_repo = "automate"
   [menu.automate]
     title = "High Availability - System and Software Requirements"
     parent = "automate/install"
-    identifier = "automate/install/ha_system_requirements.md High Availability - System and Software Requirements"
-    weight = 240
+    identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
+    weight = 200
 +++
 
 ## System & Software Requirements
@@ -41,8 +41,6 @@ ES volume size also depends on the number of nodes and frequency of Chef Infra C
 For **Elasticsearch** and **PostgresSQL**, a minimum of three node clusters is required.
 
 {{< /note >}}
-<<<<<<< HEAD
-=======
 
 ## Amazon's Virtual Private Cloud (VPC)
 
@@ -79,3 +77,5 @@ Subnet - A range of IP addresses in your VPC.
 
 VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv4 and IPv6 blocks. You can add primary and secondary CIDR blocks to your VPC, if the secondary CIDR block comes from the same address range as the primary block.
 >>>>>>> 6f2ef1dc (netlify error fixes)
+=======
+>>>>>>> 53b13ce6 (Punit/Eng comments and more edits)

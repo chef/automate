@@ -13,17 +13,9 @@ gh_repo = "automate"
     weight = 320
 +++
 
-<<<<<<< HEAD
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
 
 To run the terraform scripts, you need an IAM user with the following permissions:
-=======
-## IAM User
-
-AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
-
-In order to run the terraform scripts, you need an IAM user with following permissions:
->>>>>>> 00d6d38e (draft 2 - IAM changes)
 
 - AdministratorAccess
 - AmazonAPIGatewayAdministrator
@@ -37,16 +29,11 @@ Keep access key ID and secret access key handy. Refer [access key](https://docs.
 
 {{< /note >}}
 
-<<<<<<< HEAD
 Once we have an AWS account, we'll need to create an IAM user to programmatically interact with it and to configure our AWS CLI (command-line interface). Amazon IAM enables you to manage users and user permissions in AWS. You can create one or more IAM users in your AWS account. You might create an IAM user for someone who needs access to your AWS console, or when you have a new application that needs to make API calls to AWS. This is to add an extra layer of security to your AWS account.
-=======
-Once we have an AWS account, we’ll need to create an IAM user to programmatically interact with it and to configure our AWS CLI (command-line interface). Amazon IAM enables you to manage users and user permissions in AWS. You can create one or more IAM users in your AWS account. You might create an IAM user for someone who needs access to your AWS console, or when you have a new application that needs to make API calls to AWS. This is to add an extra layer of security to your AWS account.
->>>>>>> 00d6d38e (draft 2 - IAM changes)
 
 ## Creating an IAM User
 
 1. Navigate to your AWS account.
-<<<<<<< HEAD
 1. Select *IAM* from the list of services from the AWS console. The *IAM dashboard* screen appears.
 
 {{< figure src="/images/automate/ha_aws_iam.png" alt="AWS IAM Dashboard">}}
@@ -131,4 +118,3 @@ Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id
 Now let’s configure our AWS CLI so we can deploy our applications from our command line.
 
 Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating a IAM users through CLI and API methods.
->>>>>>> 00d6d38e (draft 2 - IAM changes)
