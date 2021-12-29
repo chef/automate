@@ -47,7 +47,7 @@ Follow these steps to add a bastion host to your Linux environment on AWS cloud,
 
    1. Select the *t2.medium* instance type. Ensure vCPUs is 1, Memory (GiB) is 4 and Instance Storage (GB) is EBS only.
    1. Click the Next: Configure Instance Details button.
-   1. Modify VPC and Subnet values as required. 
+   1. Modify VPC and Subnet values as required.
    1. Ensure you have selected 1 in Number of instances field, and make any other required changes.
    1. Click Next: Add Storage button.
    1. Specify 100 GB of storage in Size (GiB) field.
@@ -56,14 +56,14 @@ Follow these steps to add a bastion host to your Linux environment on AWS cloud,
    1. Click Next: Configure Security Group button.
    1. Select Create a new security group or Select an existing security group option.
    1. Based on your selection, select needed security groups for your EC2 instance, or add the rule by providing required details. You could change or update the security groups in the future if you want.
-   1. Ensure Type is SSH, Protocol is TCP, and Port Range is 22 to create rules and connections. 
+   1. Ensure Type is SSH, Protocol is TCP, and Port Range is 22 to create rules and connections.
    <!-- u must have private key -->
    1. Open port 9631 by adding TCP rule.
 
 Or, launch an EC2 instance, which was previously defined.
 
 1. Click Review and Launch button.
-1. Review all the details and click the Launch button. The AWS console prompts you to either create an existing SSH key pair, or use a pair you have previously established. 
+1. Review all the details and click the Launch button. The AWS console prompts you to either create an existing SSH key pair, or use a pair you have previously established.
    - If you choose to create a new key pair, specify a Key pair name and click Download Key Pair (private key file, .pem). Store the key file in a secure and accessible location.
 
     {{< figure src="/images/automate/ha_aws_keypair.png" alt="AWS EC2 Launch Instances">}}
