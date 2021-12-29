@@ -1,5 +1,5 @@
 +++
-title = "Automate External Postgres Upgrade from v9.6 to v13"
+title = "Automate External PostgreSQL Upgrade from v9.6 to v13"
 
 date = 2018-03-26T15:27:52-07:00
 draft = false
@@ -7,9 +7,9 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "External Postgres Upgrade"
+    title = "External PostgreSQL Upgrade"
     parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/postgres_upgrade.md Automate External Postgres Upgrade"
+    identifier = "automate/configuring_automate/postgres_upgrade.md Automate External PostgreSQL Upgrade"
     weight = 10
 +++
 
