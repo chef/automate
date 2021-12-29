@@ -152,6 +152,12 @@ message External {
     Authentication auth = 4;
     SSL ssl = 5;
   }
+  message Minio {
+    google.protobuf.StringValue endpoint = 1;
+    google.protobuf.StringValue root_user = 2;
+    google.protobuf.StringValue root_password = 3;
+  }
+
   message Postgresql {
     message Backup { google.protobuf.BoolValue enable = 1; }
 
@@ -204,6 +210,7 @@ message External {
   Postgresql postgresql = 2;
   Automate automate = 3;
   Opensearch opensearch = 4;
+  Minio minio = 5;
 }
 
 message Mlsa { google.protobuf.BoolValue accept = 1; }
