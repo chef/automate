@@ -36,8 +36,8 @@ Virtual machine is required for either of the Chef Automate HA deployment types 
 - Bastion Server/host IP address
 - Instance type: 2 vCPU
 - Operating System: Ubuntu 20.04
-- Memory: Minimum of 100GB
-- Hard Disk Space - 4 GB
+- Memory: Minimum of 4GB
+- Hard Disk Space - 100 GB
 - Ports to be publicly accessible: 22 and 9631
 
 Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinfra.md" >}}) section for bare infra Chef Automate HA deployment procedure.
