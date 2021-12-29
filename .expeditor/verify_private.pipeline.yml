@@ -566,7 +566,7 @@ steps:
   - label: "a1migration"
     command:
       - integration/run_test integration/tests/a1migration.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 30
     expeditor:
       executor:
         linux:
