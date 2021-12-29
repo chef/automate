@@ -13,7 +13,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, Subscription } from 'rxjs';
 import * as moment from 'moment/moment';
 import {
   StatsService,
@@ -32,7 +32,13 @@ import {
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
-
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { AckDownloadReports } from 'app/entities/download-reports/download-reports.actions';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { DownloadReportsService } from 'app/entities/download-reports/download-reports.service';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -183,6 +189,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   // Used to notify all subscriptions to unsubscribe
   // http://stackoverflow.com/a/41177163/319074
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private downloadReportsSubscription: Subscription;
 
   constructor(
     private router: Router,
@@ -191,8 +198,11 @@ export class ReportingComponent implements OnInit, OnDestroy {
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
     private route: ActivatedRoute,
-    private layoutFacade: LayoutFacadeService
-  ) { }
+    private layoutFacade: LayoutFacadeService,
+    private store: Store<NgrxStateAtom>,
+    public appConfigService: AppConfigService,
+    public downloadReportsService: DownloadReportsService
+  ) {}
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
@@ -247,11 +257,18 @@ export class ReportingComponent implements OnInit, OnDestroy {
         }
         return filter;
       })));
+
+    this.downloadReportsSubscription = this.downloadReportsService.obs$.subscribe(() => {
+      this.hideDownloadStatus();
+    });
   }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+    if (this.downloadReportsSubscription) {
+      this.downloadReportsSubscription.unsubscribe();
+    }
   }
 
   toggleDownloadDropdown() {
@@ -282,11 +299,20 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
-    const types = { 'json': 'application/json', 'csv': 'text/csv' };
     const onNext = data => {
-      const type = types[format];
-      const blob = new Blob([data], { type });
-      saveAs(blob, filename);
+      if (this.appConfigService.isLargeReportingEnabled) {
+        this.store.dispatch(new AckDownloadReports(JSON.parse(data).acknowledgement_id));
+        this.store.dispatch(new CreateNotification({
+          type: Type.info,
+          message: 'Download request is submitted. You will get notification once it is ready for download.'
+        }));
+        this.downloadReportsService.initiateLongPolling();
+      } else {
+        const types = { 'json': 'application/json', 'csv': 'text/csv' };
+        const type = types[format];
+        const blob = new Blob([data], { type });
+        saveAs(blob, filename);
+      }
       this.hideDownloadStatus();
     };
 
