@@ -7,16 +7,25 @@ import { StatsService } from './stats.service';
 import * as moment from 'moment/moment';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 const COMPLIANCE_URL = environment.compliance_url;
+
+class MockAppConfigService {
+  get isLargeReportingEnabled(): boolean {
+    return false;
+  }
+}
 
 describe('StatsService', () => {
   let httpTestingController: HttpTestingController;
   let service: StatsService;
+  let appConfigService: AppConfigService;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },
+        { provide: AppConfigService, useClass: MockAppConfigService },
         StatsService
       ],
       imports: [
@@ -26,6 +35,7 @@ describe('StatsService', () => {
     });
 
     service = TestBed.inject(StatsService);
+    appConfigService = TestBed.inject(AppConfigService);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -682,7 +692,12 @@ describe('StatsService', () => {
 
   describe('downloadReport()', () => {
     it('fetches a report export as text', done => {
-      const url = `${COMPLIANCE_URL}/reporting/export`;
+      let url = '';
+      if (appConfigService.isLargeReportingEnabled) {
+        url = `${COMPLIANCE_URL}/reporting/reportmanager/export`;
+      } else {
+        url = `${COMPLIANCE_URL}/reporting/export`;
+      }
       const type = 'csv';
       const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
       const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
