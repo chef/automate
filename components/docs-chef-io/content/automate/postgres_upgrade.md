@@ -18,7 +18,7 @@ gh_repo = "automate"
 
    * This is necessary just to ensure in case of any failure, there is a state to return to.
 
-   * On Chef Automate machine
+2. On Chef Automate machine
 
    * For Airgapped machine please follow [Airgapped Installation]({{< ref "airgapped_installation.md" >}})  to upgrade to the latest version of Chef Automate which supports External PostgreSQL v13.
 
@@ -55,6 +55,18 @@ gh_repo = "automate"
     ```shell
     sudo chef-automate status
     ```
+
+  {{< note >}}
+  While doing our testing we had major steps like:
+
+     1. Vacuum all data in PostgreSQL 9.6
+     2. pg_upgrade check
+     3. pg_upgrade
+     4. reindexing
+
+  During our testing we found that for 2GB of data in PostgreSQL it took 5 min of time to complete above steps.
+  This estimate is based on our non-production setup, please use these numbers as rough indicator on amount of downtime needed.
+  {{< /note >}}
 
 
 ## Upgrade Failure Troubleshooting
