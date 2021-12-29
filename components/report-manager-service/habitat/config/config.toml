@@ -36,3 +36,8 @@ target = "127.0.0.1:{{compliance-service.cfg.port}}"
 target = "127.0.0.1:{{cereal-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
+
+[minio]
+endpoint = "{{cfg.minio.endpoint}}"
+root_user = "{{cfg.minio.root_user}}"
+root_password = "{{cfg.minio.root_password}}"
