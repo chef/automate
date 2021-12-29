@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-builder-memcached
 pkg_version=1.5.19
 pkg_distname=memcached

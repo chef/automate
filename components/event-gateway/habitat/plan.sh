@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=event-gateway
 pkg_description="Event Gateway for Chef Automate: provides NATS-protocol API to external clients"
