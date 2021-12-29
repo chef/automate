@@ -50,7 +50,8 @@ Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinf
 - Create the certificate for the DNS
 - Operating System (OS): Bastion host with Ubuntu 20.04 or centOs-7 or RHEL-7
 - AWS instance type: *t2.medium*
-- Memory: Minimum of 100GB
+- Memory: Minimum of 4GB
+- Hard Disk Space - 100 GB
 - SSH: VPC to Port 22, publicly accessible
 - Setup Virtual Private Cloud (VPC) in AWS
 

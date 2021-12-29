@@ -96,14 +96,6 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 {{< figure src="/images/automate/ha_bare_chef_automate_configtoml_file.png" alt="Chef Automate Bare Infra `config.toml` file">}}
 
-1. Type the command, `./chef-automate secrets init` and press **Enter**. This command generates a new secrets key, which is used to encrypt the secret store. _optional_
-
-1. Type the command, `./chef-automate secrets set automate_admin_password` and press **Enter**. This command sets up the Chef Automate User interface (UI) password. _optional_
-
-1. Type the command `automate-cluster-ctl secrets set sudo_password` and press **Enter**. This command sets up the password for sudo. _optional_
-
-1. Similarly, type the commands, `automate-cluster-ctl secrets set fe_sudo_password` and `automate-cluster-ctl secrets set be_sudo_password` and press **Enter**. These commands sets up the passwords for front end and back end nodes. _optional_
-
 1. Type the command, `./chef-automate deploy` and press **Enter**. This command installs the latest deployment package and deploys (by provisioning with terraform) airgap bundles on the created infrastructure. The deployment procedure creates the *HAB* user by default.
 
 {{< figure src="/images/automate/ha_bare_chef_automate_complete.png" alt="Chef Automate Bare Infra Deployment Confirmation">}}
