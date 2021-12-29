@@ -1,16 +1,26 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
+	"fmt"
+	"html/template"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
@@ -137,18 +147,272 @@ func bootstrapEnv(dm deployManager) error {
 			"Merging command flag overrides into Chef Automate config failed",
 		)
 	}
+
+	offlineMode := deployCmdFlags.airgap != ""
+	manifestPath := ""
+	var airgapMetadata airgap.UnpackMetadata
+	if offlineMode {
+		writer.Title("Installing artifact")
+		metadata, err := airgap.Unpack(deployCmdFlags.airgap)
+		if err != nil {
+			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
+		}
+		airgapMetadata = metadata
+		manifestPath = api.AirgapManifestPath
+
+		// We need to set the path for the hab binary so that the deployer does not
+		// try to go to the internet to get it
+		pathEnv := os.Getenv("PATH")
+
+		err = os.Setenv("PATH", fmt.Sprintf("%s:%s", path.Dir(metadata.HabBinPath), pathEnv))
+		if err != nil {
+			return err
+		}
+	} else {
+		manifestPath = conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()
+	}
+
 	manifestProvider := manifest.NewLocalHartManifestProvider(
-		mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),
+		mc.NewDefaultClient(manifestPath),
 		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
 		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
-	offlineMode := deployCmdFlags.airgap != ""
+
 	err := client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode)
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
+	if offlineMode {
+		err := moveAirgapToTransferDir(airgapMetadata)
+		if err != nil {
+			return status.Annotate(err, status.DeployError)
+		}
+	}
 	err = dm.generateConfig()
 	if err != nil {
 		return status.Annotate(err, status.DeployError)
+	}
+	return nil
+}
+
+/*
+In airgap deployement of A2HA we need to have two AIB files in /hab/a2_deploy_workspace/terraform/transfer_files/
+first airgap file will automate generated airgap bundle,
+second file will be backend airgap bundle which is same as automate(frontend) airgap bundle but without header.
+also we need to keep MD5 hash files both frontend and backend bundles.
+we also need to have following files in /hab/a2_deploy_workspace/terraform dir
+1. a2ha_aib_fe.auto.tfvars --> it will contain info of frontend airgap bundle
+2. a2ha_aib_be.auto.tfvars --> it will contain info of backend airgap bundle
+1. a2ha_manifest.auto.tfvars --> it will contain info of required packages to deploy a2ha.
+*/
+func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
+	if len(deployCmdFlags.airgap) > 0 {
+		var bundleName string = filepath.Base(deployCmdFlags.airgap)
+		if strings.Contains(bundleName, "automate") {
+			bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
+		}
+		err := copyFileContents(deployCmdFlags.airgap, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
+		if err != nil {
+			return err
+		}
+		//generating md5 sum for frontend bundle
+		err = generateChecksumFile(AIRGAP_HA_TRANS_DIR_PATH+bundleName, AIRGAP_HA_TRANS_DIR_PATH+bundleName+".md5")
+		if err != nil {
+			return err
+		}
+		//generating frontend auto tfvars
+		frontendTfvars := getBytesFromTempalte("frontendTfvars", frontendAutotfvarsTemplate, map[string]interface{}{
+			"bundleName": bundleName,
+		})
+
+		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", frontendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+		if err != nil {
+			return err
+		}
+		//generating backend bundle
+		backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
+		err = generateBackendAIB(deployCmdFlags.airgap, backendBundleFile)
+		if err != nil {
+			return err
+		}
+		err = generateChecksumFile(backendBundleFile, backendBundleFile+".md5")
+		if err != nil {
+			return err
+		}
+		//generating backend auto tfvars
+		backendTfvars := getBytesFromTempalte("backendTfvars", backendAutotfvarsTemplate, map[string]interface{}{
+			"backendBundleFile": filepath.Base(backendBundleFile),
+		})
+		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", backendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+		if err != nil {
+			return err
+		}
+
+		//generate manifest auto tfvars
+		err = generateA2HAManifestTfvars(airgapMetadata)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getBytesFromTempalte(templateName string, templateContent string, placeholders map[string]interface{}) []byte {
+	t := template.Must(template.New(templateName).Parse(templateContent))
+	buf := &bytes.Buffer{}
+	if err := t.Execute(buf, placeholders); err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
+}
+
+func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
+	var deployablePackages []string
+	for _, h := range airgapMetadata.HartifactPaths {
+		if strings.Contains(h, "automate-ha-pgleaderchk") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "pgleaderchk_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-postgresql") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "postgresql_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-haproxy") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "proxy_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-journalbeat") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "journalbeat_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-metricbeat") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "metricbeat_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-kibana") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "kibana_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-elasticsearch") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "elasticsearch_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-elasticsidecar") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "elasticsidecar_pkg_ident = \""+packageName+"\"")
+		}
+		if strings.Contains(h, "automate-ha-curator") {
+			packageName := extractPackageNameFromHartifactPath(h)
+			deployablePackages = append(deployablePackages, "curator_pkg_ident = \""+packageName+"\"")
+		}
+	}
+	return ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+}
+func extractPackageNameFromHartifactPath(path string) string {
+	path = strings.ReplaceAll(path, "/hab/cache/artifacts/", "")
+	path = strings.ReplaceAll(path, "-x86_64-linux.hart", "")
+	originIndex := strings.Index(path, "-")
+	orignName := path[0:originIndex]
+	packageName := (orignName + "/" + path[originIndex+1:])
+	return packageName
+}
+
+func copyFileContents(src, dst string) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer in.Close()
+	out, err := os.Create(dst)
+	if err != nil {
+		return
+	}
+	defer func() {
+		cerr := out.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
+	if _, err = io.Copy(out, in); err != nil {
+		return
+	}
+	err = out.Sync()
+	return
+}
+
+func generateBackendAIB(filePath string, destPath string) error {
+	installBundleFile, err := os.Open(filePath)
+	if err != nil {
+		return errors.New(err.Error() + " Failed to open install bundle file " + filePath)
+	}
+	defer installBundleFile.Close() // nolint: errcheck
+
+	bufReader := bufio.NewReader(installBundleFile)
+	// Read the header:
+	// AIB-1\n\n
+	s, err := bufReader.ReadString('\n')
+	if err != nil {
+		return errors.New(err.Error() + " Could not read artifact file")
+	}
+	if s != "AIB-1\n" {
+		return errors.New("malformed install bundle file")
+	}
+
+	s, err = bufReader.ReadString('\n')
+	if err != nil {
+		return err
+	}
+
+	if s != "\n" {
+		return errors.New("malformed install bundle file")
+	}
+
+	fo, err := os.Create(destPath)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := fo.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	bufWriter := bufio.NewWriter(fo)
+	buf := make([]byte, 1024)
+	for {
+		n, err := bufReader.Read(buf)
+		if err != nil && err != io.EOF {
+			panic(err)
+		}
+		if n == 0 {
+			break
+		}
+		if _, err := bufWriter.Write(buf[:n]); err != nil {
+			panic(err)
+		}
+	}
+
+	if err = bufWriter.Flush(); err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
+func generateChecksumFile(sourceFileName string, checksumFileName string) error {
+	sfile, err := os.Open(sourceFileName)
+	if err != nil {
+		return err
+	}
+	defer sfile.Close()
+	hash := md5.New() // nosemgrep
+	if _, err := io.Copy(hash, sfile); err != nil {
+		return err
+	}
+	sum := hash.Sum(nil)
+	hashedFileContent := hex.EncodeToString(sum) + "  " + filepath.Base(sfile.Name())
+	err = ioutil.WriteFile(checksumFileName, []byte(hashedFileContent), AUTOMATE_HA_FILE_PERMISSION_0644) // nosemgrep
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -175,12 +439,15 @@ func executeSecretsInitCommand(secretsKeyFilePath string) error {
 	return nil
 }
 
-func executeShellCommand(command string, args []string) error {
+func executeShellCommand(command string, args []string, workingDir string) error {
 	writer.Printf("%s command execution started \n\n\n", command)
 	c := exec.Command(command, args...)
 	c.Stdin = os.Stdin
 	var out bytes.Buffer
 	var stderr bytes.Buffer
+	if len(workingDir) > 0 {
+		c.Dir = workingDir
+	}
 	c.Stdout = io.MultiWriter(&out)
 	c.Stderr = io.MultiWriter(&stderr)
 	err := c.Run()
