@@ -30,7 +30,7 @@ pkg_deps=(
   chef/mlsa
   # deployment-service uses the postgres11 client to backup/restore postgres.
   # we need pg11 because the ha backend uses postgres 11
-  core/postgresql11-client
+  core/postgresql13-client
 )
 pkg_bin_dirs=(bin)
 pkg_exports=(
