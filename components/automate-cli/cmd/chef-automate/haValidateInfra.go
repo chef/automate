@@ -108,7 +108,7 @@ func unpackAirgap() (airgap.UnpackMetadata, error) {
 }
 
 func generateValidationScript() error {
-	return ioutil.WriteFile(VALIDATION_SCRIPT_PATH, []byte(validationScript), 0755) //nosemgep
+	return ioutil.WriteFile(VALIDATION_SCRIPT_PATH, []byte(validationScript), 0755) // nosemgrep
 }
 
 func removeValidationScript() error {
