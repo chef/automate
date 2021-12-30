@@ -139,6 +139,7 @@ steps:
       - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
       - scripts/install_hab_pkg.sh core/opa
       - cd components/authz-service/engine/opa/policy
+      - make unit
       - make static unit
     timeout_in_minutes: 10
     retry:
