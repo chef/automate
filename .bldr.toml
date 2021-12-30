@@ -1187,6 +1187,12 @@ plan_path = "components/automate-cluster-ctl"
 paths = [
   "components/automate-cluster-ctl/*"
 ]
+
+[automate-netcat]
+plan_path = "components/automate-netcat"
+paths = [
+  "components/automate-netcat/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]

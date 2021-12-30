@@ -58,6 +58,7 @@
     "chef/automate-ha-pgleaderchk",
     "chef/automate-ha-postgresql",
     "chef/automate-ha-cluster-ctl",
+    "chef/automate-netcat",
     "core/rsync"
   ],
 
