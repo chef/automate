@@ -101,7 +101,7 @@ func TestExport(t *testing.T) {
 	}
 
 	connURI := connURI("test_database")
-	stdArgs := []string{"pkg", "exec", "core/postgresql11-client", "pg_dump", "--if-exists", "--verbose", "--clean", "--file", "test_database.sql", "--no-privileges", "--no-owner", connURI}
+	stdArgs := []string{"pkg", "exec", pg.Pg13Client, "pg_dump", "--if-exists", "--verbose", "--clean", "--file", "test_database.sql", "--no-privileges", "--no-owner", connURI}
 
 	tests := []struct {
 		desc           string
@@ -114,16 +114,16 @@ func TestExport(t *testing.T) {
 	}{
 		{"it exports the db with pg_dump", "", []string{}, stdArgs, nil, false, false},
 		{"it runs pg_dump with the right --exclude-table options", "", []string{"table1", "table2"},
-			[]string{"pkg", "exec", "core/postgresql11-client", "pg_dump",
+			[]string{"pkg", "exec", pg.Pg13Client, "pg_dump",
 				"--if-exists", "--verbose", "--clean", "--file", "test_database.sql", "--no-privileges", "--no-owner",
 				"--exclude-table", "table1", "--exclude-table", "table2",
 				connURI},
 			nil, false, false},
 		{"it runs pg_dump without --no-privileges and --no-owner if User is set", "testuser", []string{},
-			[]string{"pkg", "exec", "core/postgresql11-client", "pg_dump", "--if-exists", "--verbose", "--clean", "--file", "test_database.sql", connURI},
+			[]string{"pkg", "exec", pg.Pg13Client, "pg_dump", "--if-exists", "--verbose", "--clean", "--file", "test_database.sql", connURI},
 			nil, false, false},
 		{"it runs pg_dump with -Fc when UseCustomFormat is set to true", "testuser", []string{},
-			[]string{"pkg", "exec", "core/postgresql11-client", "pg_dump", "--if-exists",
+			[]string{"pkg", "exec", pg.Pg13Client, "pg_dump", "--if-exists",
 				"--verbose", "--clean", "--file", "test_database.fc", "-Fc", connURI},
 			nil, false, true},
 		{"it returns an error in psql resturns an error", "", []string{}, stdArgs, errors.New("test-error"), true, false},
@@ -192,7 +192,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile,
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(nil)
@@ -212,7 +212,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile,
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile,
 				connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(nil)
@@ -233,7 +233,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile,
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(nil)
@@ -255,7 +255,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile,
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(nil)
@@ -273,7 +273,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true",
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true",
 				connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(nil)
@@ -290,7 +290,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile,
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(nil)
@@ -309,7 +309,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile,
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(nil)
@@ -328,7 +328,7 @@ func TestImport(t *testing.T) {
 
 		mockExec.Expect("Run", command.ExpectedCommand{
 			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "psql", "-f", exportFile,
+			Args: []string{"pkg", "exec", pg.Pg13Client, "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
 			Env: testExpectedEnv,
 		}).Return(errors.New("test-error"))
