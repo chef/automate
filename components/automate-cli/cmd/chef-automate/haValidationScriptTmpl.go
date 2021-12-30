@@ -265,7 +265,7 @@ EOF
     done
     #automate-frontends -> elasticsearch-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from automate to elasticseach.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${elasticsearch_private_ip[@]};
     do
         for j in ${elasticsearch_port[@]}; 
@@ -304,7 +304,7 @@ EOF
     done
     #chef-server-frontends -> elasticsearch-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from automate to elasticseach.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${elasticsearch_private_ip[@]};
     do
         for j in ${elasticsearch_port[@]}; 
@@ -343,7 +343,7 @@ EOF
     done
     #chef-server-frontends -> postgres-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from automate to elasticseach.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${postgresql_private_ip[@]};
     do
         for j in ${postgresql_port[@]}; 
@@ -382,7 +382,7 @@ EOF
     done
     #automate-frontends -> postgres-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from automate to elasticseach.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${postgresql_private_ip[@]};
     do
         for j in ${postgresql_port[@]}; 
@@ -421,7 +421,7 @@ EOF
     done
     #elasticsearch-backends -> elasticsearch-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from every elasticseach to elasticseach.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${elasticsearch_private_ip[@]};
     do
         for j in ${elasticsearch_to_elasticsearch_port[@]}; 
@@ -464,7 +464,7 @@ EOF
     done
     #postgres-backends -> postgres-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from every postgres to postgres node.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${postgresql_private_ip[@]};
     do
         for j in ${postgres_to_postgres_port[@]}; 
@@ -505,7 +505,7 @@ EOF
     done
     #postgres-backends -> elasticsearch-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from every postgres to elasticsearch node.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${elasticsearch_private_ip[@]};
     do
         for j in ${postgres_to_elasticsearch_port[@]}; 
@@ -546,7 +546,7 @@ EOF
     done
     #elasticsearch-backends -> postgresql-backends connections will be checked. First loop will send some packets on secific port.
     #Second loop will try to establish connection using nc from every postgres to elasticsearch node.
-    #Third loop will kill the process taht we have started in first loop.
+    #Third loop will kill the process that we have started in first loop.
     for i in ${postgresql_private_ip[@]};
     do
         for j in ${elasticsearch_to_postgres_port[@]}; 
