@@ -97,9 +97,9 @@ func runValidateCmd(cmd *cobra.Command, args []string) error {
 
 func executeValidationScript(args []string, netcatHartFile string, offlineMode bool) error {
 	if offlineMode {
-		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, args[0], validateFlags.habitatBundlePath, netcatHartFile})
+		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, args[0], validateFlags.habitatBundlePath, netcatHartFile}, "")
 	} else {
-		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, args[0]})
+		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, args[0]}, "")
 	}
 }
 
