@@ -24,7 +24,7 @@ While doing our testing, these steps were monitored:
 3) pg_upgrade
 
 During our testing we found that for 2GB of data in PostgreSQL v9.6 it took 5 min of time to complete above steps.\
-This estimate is based on our non-production setup, please use these numbers as rough indicator on amount of downtime needed.
+This estimate is based on our non-production setup, please use these numbers as rough indicator on duration of downtime needed.
 {{< /note >}}
 
 ## Upgrade path for Chef Automate users on PostgreSQL v9.6
