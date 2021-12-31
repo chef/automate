@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-UPSTREAM_PKG_IDENT="core/postgresql11/11.2/20190311152155"
+UPSTREAM_PKG_IDENT="core/postgresql11/11.2/20200403150941"
 pkg_name="automate-ha-postgresql"
 pkg_description="Wrapper package for core/postgresql11"
 pkg_origin="chef"
