@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 10
 +++
 
-## Upgrade path for Chef Automate users on Postgres v9.6
+## Upgrade path for Chef Automate users on PostgreSQL v9.6
 1. Take backup of Chef automate - [Backup]({{< ref "backup.md" >}})
    * This is necessary just to ensure in case of any failure, there is a state to return to.
 2. On Chef Automate machine
@@ -28,6 +28,7 @@ gh_repo = "automate"
     ```
 3. Upgrade PostgeSQL 9.6 to 13.4
    * On External PostgreSQL, please contact your database administrator to perform the upgrade
+   * For reference, if you are running Single PostgreSQL v9.6 in a VM or Physical Machine with Ubuntu 18.04+ you can use [External Postgres Upgrade Steps]({{< ref "external_postgres_upgrade_steps.md" >}})
    * On AWS RDS, please follow instructions on [Upgrading the PostgreSQL DB engine for Amazon RDS - Amazon Relational Database Service](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_UpgradeDBInstance.PostgreSQL.html)
 4. On Chef Automate machine:
    * Start back Chef Automate
