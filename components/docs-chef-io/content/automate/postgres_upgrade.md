@@ -12,6 +12,20 @@ gh_repo = "automate"
     identifier = "automate/configuring_automate/postgres_upgrade.md Automate External PostgreSQL Upgrade"
     weight = 10
 +++
+This guide covers upgrading services used by Chef Automate.
+
+
+## Migration Planning
+The upgrade process for PostgreSQL v9.6 to v13 requires a one-time downtime. The time depends on amount of data, machine resources and steps followed.\
+{{< note >}}
+While doing our testing, these steps were monitored:
+1) Vacuum all data in PostgreSQL v9.6
+2) pg_upgrade check
+3) pg_upgrade
+
+During our testing we found that for 2GB of data in PostgreSQL v9.6 it took 5 min of time to complete above steps.\
+This estimate is based on our non-production setup, please use these numbers as rough indicator on amount of downtime needed.
+{{< /note >}}
 
 ## Upgrade path for Chef Automate users on PostgreSQL v9.6
 1. Take backup of Chef automate - [Backup]({{< ref "backup.md" >}})
@@ -40,16 +54,6 @@ gh_repo = "automate"
     sudo chef-automate status
     ```
 
-  {{< note >}}
-  While doing our testing we had major steps like:
-  1) Vacuum all data in PostgreSQL 9.6
-  2) pg_upgrade check
-  3) pg_upgrade
-  4) reindexing
-  
-  During our testing we found that for 2GB of data in PostgreSQL it took 5 min of time to complete above steps.\
-  This estimate is based on our non-production setup, please use these numbers as rough indicator on amount of downtime needed.
-  {{< /note >}}
 
 
 ## Upgrade Failure Troubleshooting
