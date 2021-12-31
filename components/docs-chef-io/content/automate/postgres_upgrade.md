@@ -12,7 +12,7 @@ gh_repo = "automate"
     identifier = "automate/configuring_automate/postgres_upgrade.md Automate External PostgreSQL Upgrade"
     weight = 10
 +++
-This guide covers upgrading services used by Chef Automate.
+This guide covers upgrading External PostgreSQL Database used by Chef Automate.
 
 
 ## Migration Planning
