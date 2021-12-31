@@ -16,7 +16,7 @@ This guide covers upgrading services used by Chef Automate.
 
 
 ## Migration Planning
-The upgrade process for PostgreSQL v9.6 to v13 requires a one-time downtime. The time depends on amount of data, machine resources and steps followed.\
+The upgrade process for PostgreSQL v9.6 to v13 requires a one-time downtime. The duration of downtime depends on amount of data, machine resources and steps followed.\
 {{< note >}}
 While doing our testing, these steps were monitored:
 1) Vacuum all data in PostgreSQL v9.6
