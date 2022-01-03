@@ -21,3 +21,14 @@ CREATE TABLE IF NOT EXISTS migration (
   created_at                TIMESTAMPTZ NOT NULL,
   updated_at                TIMESTAMPTZ NOT NULL
 );
+
+-- Insert rows into migration_type
+INSERT INTO migration_type (id,type)
+VALUES (md5(RANDOM()::TEXT),'user'),
+       (md5(RANDOM()::TEXT),'org');
+
+-- Insert rows into migration_status
+INSERT INTO migration_status(id,status_message)
+VALUES (md5(RANDOM()::TEXT),'In Progress'),
+       (md5(RANDOM()::TEXT),'Completed'),
+       (md5(RANDOM()::TEXT),'Failed');
