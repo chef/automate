@@ -38,8 +38,6 @@ TODO: the app is not yet released and hence we cannot find it in the store.
 
 {{< /note >}}
 
-TODO: the app is not yet released and hence we cannot find it in the store.
-
 ## Setup
 
 You can set up automatic event creation and alerts for:
@@ -68,7 +66,7 @@ You can set up automatic event creation and alerts for:
 
 ## Properties
 
-The Event Creation App has three configurable **Application Properties**. You must have the `admin` or `x_chef_event.admin` roles to change the default values in the **Application Properties**. Refer [Event Creation App Roles]({{< relref "servicenow_reference/#event-creation-app-roles" >}}) and [Event Creation App Properties]({{ relref "servicenow_reference/#event-creation-app-properties" >}}) sections for information related to event app creation roles and the application properties.
+The Event Creation App has three configurable **Application Properties**. You must have the `admin` or `x_chef_event.admin` roles to change the default values in the **Application Properties**. Refer [Event Creation App Properties]({{< relref "servicenow_reference/#event-creation-app-properties" >}}) section for information on event app properties.
 
 To change the Event Creation App properties:
 
