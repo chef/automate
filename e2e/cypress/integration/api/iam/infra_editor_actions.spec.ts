@@ -122,7 +122,7 @@ describe('Infra Editor Policy', () => {
             });
     });
 
-    it('cookbooks get returns 403 when infraEditor policy actions is denied', () => {
+    it('cookbook get returns 403 when infraEditor policy actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraEditorActionToken },
             method: 'GET',
