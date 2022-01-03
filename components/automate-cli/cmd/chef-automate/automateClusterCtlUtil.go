@@ -443,25 +443,12 @@ func executeShellCommand(command string, args []string, workingDir string) error
 	writer.Printf("%s command execution started \n\n\n", command)
 	c := exec.Command(command, args...)
 	c.Stdin = os.Stdin
-	var out bytes.Buffer
-	var stderr bytes.Buffer
 	if len(workingDir) > 0 {
 		c.Dir = workingDir
 	}
-	c.Stdout = io.MultiWriter(&out)
-	c.Stderr = io.MultiWriter(&stderr)
+	c.Stdout = io.MultiWriter(os.Stdout)
+	c.Stderr = io.MultiWriter(os.Stderr)
 	err := c.Run()
-	if err != nil {
-		writer.Printf(stderr.String())
-		return status.Wrap(err, status.CommandExecutionError, "")
-	}
-	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
-	if len(outStr) > 0 {
-		writer.Printf("\nout:\n%s", outStr)
-	}
-	if len(errStr) > 0 {
-		writer.Printf("\nerr:\n%s\n", errStr)
-	}
 	writer.Printf("%s command execution done, exiting\n", command)
 	return err
 }
