@@ -264,44 +264,57 @@ func getBytesFromTempalte(templateName string, templateContent string, placehold
 	}
 	return buf.Bytes()
 }
-
+func getPkgBldrFormate(pkgName string, actualPkgName string, replacePkgName string) string {
+	_packageName := pkgName
+	_packageName = strings.ReplaceAll(_packageName, "-", "/")
+	return strings.ReplaceAll(_packageName, replacePkgName, actualPkgName)
+}
 func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
 	var deployablePackages []string
 	for _, h := range airgapMetadata.HartifactPaths {
-		if strings.Contains(h, "automate-ha-pgleaderchk") {
+		if strings.Contains(h, AUTOMATE_HA_PKG_PG_LDR_CHK) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_PKG_PG_LDR_CHK, _AUTOMATE_HA_PKG_PG_LDR_CHK)
 			deployablePackages = append(deployablePackages, "pgleaderchk_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-postgresql") {
+		if strings.Contains(h, AUTOMATE_HA_PKG_PG) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_PKG_PG, _AUTOMATE_HA_PKG_PG)
 			deployablePackages = append(deployablePackages, "postgresql_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-haproxy") {
+		if strings.Contains(h, AUTOMATE_HA_PKG_HA_PROXY) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_PKG_HA_PROXY, _AUTOMATE_HA_PKG_HA_PROXY)
 			deployablePackages = append(deployablePackages, "proxy_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-journalbeat") {
+		if strings.Contains(h, AUTOMATE_HA_PKG_JOURNALBEAT) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_PKG_JOURNALBEAT, _AUTOMATE_HA_PKG_JOURNALBEAT)
 			deployablePackages = append(deployablePackages, "journalbeat_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-metricbeat") {
+		if strings.Contains(h, AUTOMATE_HA_PKG_METRICBEAT) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_PKG_METRICBEAT, _AUTOMATE_HA_PKG_METRICBEAT)
 			deployablePackages = append(deployablePackages, "metricbeat_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-kibana") {
+		if strings.Contains(h, AUTOMATE_HA_PKG_KIBANA) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_PKG_KIBANA, _AUTOMATE_HA_PKG_KIBANA)
 			deployablePackages = append(deployablePackages, "kibana_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-elasticsearch") {
+		if strings.Contains(h, AUTOMATE_HA_ES) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_ES, _AUTOMATE_HA_ES)
 			deployablePackages = append(deployablePackages, "elasticsearch_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-elasticsidecar") {
+		if strings.Contains(h, AUTOMATE_HA_ES_CAR) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_ES_CAR, _AUTOMATE_HA_ES_CAR)
 			deployablePackages = append(deployablePackages, "elasticsidecar_pkg_ident = \""+packageName+"\"")
 		}
-		if strings.Contains(h, "automate-ha-curator") {
+		if strings.Contains(h, AUTOMATE_HA_CURATOR) {
 			packageName := extractPackageNameFromHartifactPath(h)
+			packageName = getPkgBldrFormate(packageName, AUTOMATE_HA_CURATOR, _AUTOMATE_HA_CURATOR)
 			deployablePackages = append(deployablePackages, "curator_pkg_ident = \""+packageName+"\"")
 		}
 	}
