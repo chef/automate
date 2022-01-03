@@ -427,7 +427,7 @@ suitable for users responsible for integrating the Chef Automate data into Servi
 
 Set the value to `cookbook` to create an event for the failed cookbook. This associates all failing Chef Infra client runs with this cookbook failure with the event. `cookbook` is the default value because the number of cookbooks is independent of the number of nodes in any system. The message key description of the event provides information about the failure.
 
-![Chef Events Client Runs page] data not available
+TODO: [Chef Events Client Runs page] data not available
 
 The **Chef Infra Client Run Alerts** tab of the alerts displays the associated client run events. Setting the value to `node` creates an event for each failed node. All failing Chef Infra client runs for a node associated with the corresponding event. The message key description of the event provides information about the run failure for a node.
 

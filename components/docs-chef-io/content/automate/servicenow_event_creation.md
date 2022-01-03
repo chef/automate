@@ -22,10 +22,6 @@ The Event Creation App exposes the REST API endpoint for communication between C
 - Your unique ServiceNow URL. It has the format: `https://ven12345.service-now.com`.
 - Setting up the Event Creation App requires the `x_chef_automate.api` role in configuring it. Your ServiceNow administrator can enable this for you.
 
-## System Requirements
-
-- The [Integration App]({{< relref "servicenow_integration" >}}) is already installed and configured.
-
 ## Required ServiceNow Plugins
 
 Install the `Event Management Core` plugin from the Service Management dashboard. Contact your ServiceNow administrator for more information.
@@ -64,7 +60,7 @@ You can set up automatic event creation and alerts for:
 
 ## Properties
 
-The Event Creation App has three configurable **Application Properties**. You must have the `admin` or `x_chef_event.admin` roles to change the default values in the **Application Properties**.
+The Event Creation App has three configurable **Application Properties**. You must have the `admin` or `x_chef_event.admin` roles to change the default values in the **Application Properties**. Refer [Event Creation App Roles]({{< relref "servicenow_reference/#event-creation-app-roles" >}}) and [Event Creation App Properties]({{ relref "servicenow_reference/#event-creation-app-properties" >}}) sections for information related to event app creation roles and the application properties.
 
 To change the Event Creation App properties:
 
