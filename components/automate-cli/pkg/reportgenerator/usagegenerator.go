@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gocarina/gocsv"
@@ -29,23 +30,7 @@ type ConvergeInfo struct {
 	TotalResourceCount int    `json:"total_resource_count"`
 }
 
-
-type ComplianceInfo struct {
-	
-	NodeID               string `json:"node_uuid"`
-	Version              string `json:"version"`
-	NodeName             string `json:"node_name"`
-	Environment          string `json:"environment"`
-	EndTime              string `json:"end_time"`
-	Platform         	 string `json:"platform.name"`
-	ControlsSumsTotal    string `json:"controls_sums.total"`
-	ControlsSumsPassed   string `json:"controls_sums.passed.total"`
-	ControlsSumsSkipped  string `json:"controls_sums.skipped.total"`
-	ControlsSumsFailed   string `json:"controls_sums.failed.total"`
-	ProfilesName         string `json:"profiles.name"`
-	ProfilesTitle        string `json:"profiles.title"`
-	ProfilesVersion      string `json:"profiles.version"`
-}
+type ComplianceInfo []interface{}
 
 func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
 	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
@@ -175,6 +160,14 @@ func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.T
 
 	metric, ok := searchResult.Aggregations.ValueCount("nodes_count")
 	return metric, ok
+}
+
+func (s ComplianceInfo) mapAt(index int) map[string]interface{} {
+	if len(s) <= index {
+		return nil
+	}
+
+	return s[index].(map[string]interface{})
 }
 
 func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
@@ -387,7 +380,7 @@ func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endT
 	aggr := elastic.NewCardinalityAggregation().Field("node_uuid")
 	searchService := client.Search().
 		Query(rangeQuery).
-		Index("comp-7-r-2021.12.24").
+		Index("comp-7-r-*").
 		Size(100).
 		Aggregation("nodes_count", aggr)
 
@@ -410,7 +403,7 @@ func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime ti
 	}
 	defer f.Close()
 
-	writer := gocsv.DefaultCSVWriter(f)
+	w := gocsv.DefaultCSVWriter(f)
 
 	var sourceField = []string{
 		"node_uuid",
@@ -421,7 +414,7 @@ func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime ti
 		"controls_sums.total",
 		"controls_sums.passed.total",
 		"controls_sums.skipped.total",
-		"control_sums.failed.total",
+		"controls_sums.failed.total",
 		"profiles.name",
 		"profiles.title",
 		"profiles.version",
@@ -429,17 +422,17 @@ func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime ti
 	}
 
 	t := endTime.Add(24 * time.Hour)
-	//t := endTime.Add(-time.Hour * 24)
+
 	if t.Before(startTime) {
 		t = startTime
 	}
-
+	header := true
 	for {
 		rangeQuery := elastic.NewRangeQuery("end_time").
 			Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ")
 		rangeQuery.Gte(t)
 		rangeQuery.Lte(endTime)
-		
+
 		fetchSource := elastic.NewFetchSourceContext(true).Include(sourceField...)
 
 		searchService := client.Search().
@@ -455,28 +448,60 @@ func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime ti
 		}
 
 		if searchResult.Hits.TotalHits > 0 {
+			if header == true {
+				headers := []string{"Node_ID", "Version", "Node_Name", "Environment", "End_Time", "Platform__Name", "Controls_Sums__Total", "Controls_Sums__Passed", "Controls_Sums__Skipped", "Controls_Sums__Failed", "Profiles__Count"}
+				if err := w.Write(headers); err != nil {
+					fmt.Println("Error while writing csv: ", err)
+				}
+				w.Flush()
+				if err := w.Error(); err != nil {
+					fmt.Println("Error while writing csv: ", err)
+				}
+			}
 
-			for ind, hit := range searchResult.Hits.Hits {
+			for _, hit := range searchResult.Hits.Hits {
+				
+				var payload []byte
+
+				payload = []byte("[")
+				comma := []byte(",")
+				payload = append(payload, *hit.Source...)
+				payload = append(payload, comma...)
+				payload = payload[:len(payload)-1]
+				payload = append(payload, []byte("]")...)
 				var s ComplianceInfo
-				err = json.Unmarshal(*hit.Source, &s)
+
+				err = json.Unmarshal(payload, &s)
 				if err != nil {
 					fmt.Println("Json marshal err :", err)
 					os.Exit(1)
 				}
 
-				if ind == 0 {
-					err = gocsv.Marshal([]ComplianceInfo{s}, f)
-					if err != nil {
-						fmt.Println("Error while writing csv: ", err)
-						os.Exit(1)
+				for i := 0; i < len(s); i++ {
+					record := []string{
+						s.mapAt(i)["node_uuid"].(string),
+						s.mapAt(i)["version"].(string),
+						s.mapAt(i)["node_name"].(string),
+						s.mapAt(i)["environment"].(string),
+						s.mapAt(i)["end_time"].(string),
+						s.mapAt(i)["platform"].(map[string]interface{})["name"].(string),
+						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["total"]),
+						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["passed"].(map[string]interface{})["total"]),
+						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["skipped"].(map[string]interface{})["total"]),
+						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["failed"].(map[string]interface{})["total"]),
+						strconv.Itoa(len(s.mapAt(i)["profiles"].([]interface{}))),
 					}
-				} else {
-					err = gocsv.MarshalWithoutHeaders([]ComplianceInfo{s}, f)
-					if err != nil {
+					if err := w.Write(record); err != nil {
 						fmt.Println("Error while writing csv: ", err)
-						os.Exit(1)
+
 					}
-					writer.Flush()
+					w.Flush()
+					header = false
+					if err := w.Error(); err != nil {
+						fmt.Println("Error while writing csv: ", err)
+
+					}
+
 				}
 			}
 		}
