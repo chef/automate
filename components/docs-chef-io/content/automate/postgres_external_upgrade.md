@@ -8,7 +8,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "Upgrade External PostgreSQL"
     parent = "automate/reference"
-    identifier = "automate/reference/external_postgres_upgrade_steps.md.md External PostgreSQL Upgrade Steps"
+    identifier = "automate/reference/postgres_external_upgrade.md External PostgreSQL Upgrade Steps"
 +++
 
 This guide covers upgrading services used by Chef Automate.
@@ -29,12 +29,16 @@ The upgrade process for PostgreSQL from 9.6 to 13.3 requires a one-time downtime
 
 ### Requirements
 
-This upgrade guide was written for systems with:
+{{% warning %}}
+Upgrading PostgreSQL upgrades the database for all connected services. If you have multiple services connected to PostgreSQL, make sure that you have stopped the other services and prepared them for the upgrade.
+{{% /warning %}}
 
-- Single PostgreSQL 9.6 installation
-- Running on virtual machine such as EC2 or on a single physical machine
-- The server runs on Ubuntu 18.04 or higher
-- Enough free space to run a second copy of the data that is in the existing PostgreSQL 9.6 installation. This upgrade requires 55% free space on the machine.
+This upgrade guide is for systems running:
+
+- Ubuntu 18.04 or higher
+- A Single PostgreSQL 9.6 installation
+- On a virtual machine such as EC2 or on a single physical machine
+- Enough free space to run a second copy of the data that is in the existing PostgreSQL 9.6 installation. This upgrade requires a minimum of 55% free space on the machine.
 
 ### Backup Chef Automate
 
