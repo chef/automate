@@ -1,7 +1,7 @@
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
   HAB_BLDR_CHANNEL: "stable"
-  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable2021-q2"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
 
 expeditor:
   defaults:
@@ -139,7 +139,6 @@ steps:
       - scripts/install_hab_pkg.sh core/glibc # opa depends implicitly glibc
       - scripts/install_hab_pkg.sh core/opa
       - cd components/authz-service/engine/opa/policy
-      - make unit
       - make static unit
     timeout_in_minutes: 10
     retry:
