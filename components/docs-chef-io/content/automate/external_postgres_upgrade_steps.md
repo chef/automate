@@ -72,7 +72,7 @@ Please follow these steps only if you have a setup with below given conditions:
     ```
 7. Run pg_upgrade check command.
     ```shell
-    cd /tmp
+    cd ~
     /usr/lib/postgresql/13/bin/pg_upgrade \
     --old-datadir=/var/lib/postgresql/9.6/main \
     --new-datadir=/var/lib/postgresql/13/main \
@@ -84,7 +84,7 @@ Please follow these steps only if you have a setup with below given conditions:
     ```
 8. Migrate the Data (run pg_upgrade command without --check):
     ```shell
-    cd /tmp
+    cd ~
     /usr/lib/postgresql/13/bin/pg_upgrade \
     --old-datadir=/var/lib/postgresql/9.6/main \
     --new-datadir=/var/lib/postgresql/13/main \
@@ -115,6 +115,7 @@ Please follow these steps only if you have a setup with below given conditions:
     ```
 13. Run the generated `analyze_new_cluster.sh` script
     ```shell
+    cd ~
     ./analyze_new_cluster.sh
     ```
     Reindex is not required for Chef Automate usecase. But if pg_upgrade reported errors or need for reindexing please refer to [pg_upgrade documentation](https://www.postgresql.org/docs/13/pgupgrade.html) for details.
