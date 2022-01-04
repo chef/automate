@@ -1,6 +1,6 @@
 #stable channel
 
-kg_name="automate-ha-ctl"
+pkg_name="automate-ha-ctl"
 pkg_origin="chef"
 pkg_version="0.1.0"
 pkg_maintainer="The Chef Server Maintainers <support@chef.io>"
