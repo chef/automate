@@ -92,7 +92,7 @@ func DefaultPolicies() ([]Policy, error) {
 		return nil, err
 	}
 
-	// editor policy statements
+	// editor allow policy statements
 	s3, err := NewStatement(Allow, constants.EditorRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
@@ -106,6 +106,13 @@ func DefaultPolicies() ([]Policy, error) {
 
 	// ingest policy statements
 	s5, err := NewStatement(Allow, constants.IngestRoleID, []string{}, []string{"*"}, []string{})
+	if err != nil {
+		return nil, err
+	}
+
+	// editor deny policy statements
+	s6, err := NewStatement(Deny, "", []string{}, []string{"*"}, []string{"infra:infraServers:create", "infra:infraServers:update", "infra:infraServers:delete",
+		"infra:infraServersOrgs:create", "infra:infraServersOrgs:update", "infra:infraServersOrgs:delete"})
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +149,7 @@ func DefaultPolicies() ([]Policy, error) {
 		ID:         constants.EditorPolicyID,
 		Name:       "Editors",
 		Members:    []Member{editors},
-		Statements: []Statement{s3},
+		Statements: []Statement{s3, s6},
 		Type:       typeManaged,
 	}
 
