@@ -298,10 +298,6 @@ func v2DefaultPolicies() []v2Policy {
 	// ingest policy statements
 	s5 := newV2Statement(Allow, constants.IngestRoleID, []string{}, []string{"*"}, []string{})
 
-	// editor deny policy statements
-	s6 := newV2Statement(Deny, "", []string{}, []string{"*"}, []string{"infra:infraServers:create", "infra:infraServers:update", "infra:infraServers:delete",
-		"infra:infraServersOrgs:create", "infra:infraServersOrgs:update", "infra:infraServersOrgs:delete"})
-
 	admin := v2Member{Name: constants.LocalAdminsTeamSubject}
 	editors := v2Member{Name: constants.LocalEditorsTeamSubject}
 	viewers := v2Member{Name: constants.LocalViewersTeamSubject}
@@ -318,7 +314,7 @@ func v2DefaultPolicies() []v2Policy {
 		ID:         constants.EditorPolicyID,
 		Name:       "Editors",
 		Members:    []v2Member{editors},
-		Statements: []v2Statement{s3, s6},
+		Statements: []v2Statement{s3},
 		Type:       ChefManaged,
 	}
 
