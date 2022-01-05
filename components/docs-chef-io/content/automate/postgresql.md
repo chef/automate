@@ -1,5 +1,5 @@
 +++
-title = "Postgresql"
+title = "PostgreSQL"
 
 date = 2022-01-04T12:09:09-08:00
 draft = false

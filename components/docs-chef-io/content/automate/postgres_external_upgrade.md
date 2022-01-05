@@ -7,7 +7,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Upgrade External PostgreSQL"
-    identifier = "automate/configuring_automate/postgresql/postgres_external_upgrade.md Postgresql Upgrade"
+    identifier = "automate/configuring_automate/postgresql/postgres_external_upgrade.md PostgreSQL Upgrade"
     parent = "automate/configuring_automate/postgresql"
     weight = 20
 +++
