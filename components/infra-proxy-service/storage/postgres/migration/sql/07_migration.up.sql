@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS migration (
   created_at                TIMESTAMPTZ NOT NULL,
   updated_at                TIMESTAMPTZ NOT NULL
 );
+CREATE INDEX IF NOT EXISTS migration_server_id_index ON migration (server_id);
 
 -- Insert rows into migration_type
 INSERT INTO migration_type (id,type)
