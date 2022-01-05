@@ -143,7 +143,7 @@ describe('Infra Editor Policy', () => {
                 name: 'test2',
                 description: 'cypress testing'
             },
-            url: '/api/v0/infra/servers/local-dev/orgs/test-org/environments',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/environments'
             }).then((resp) => {
             assert.equal(resp.status, 200);
         });
