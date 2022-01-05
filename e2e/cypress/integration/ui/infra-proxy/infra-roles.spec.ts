@@ -4,12 +4,13 @@ describe('infra role', () => {
   let adminIdToken = '';
   const serverID = 'chef-manage';
   const serverName = 'chef manage';
-  const orgID = 'viveksingh_msys';
-  const orgName = 'viveksingh_msys';
-  const serverFQDN = 'api.chef.io';
-  const serverIP = '50.21.221.24';
-  const adminUser = 'viveksingh_msys';
+  const orgID = 'demoorg';
+  const orgName = 'demoorg';
+  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
+  const serverIP = '18-117-112-129';
+  const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('infra_webui_key').replace(/\\n/g, '\n');
   const roleName = `${cypressPrefix}-role-${now}-1`;
   const roleDescription = 'role description';
   const roleRunlistName = `${cypressPrefix}-role-${now}-2`;
@@ -32,7 +33,8 @@ describe('infra role', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: serverIP,
+          webui_key: webuiKey
         }
       }).then((resp) => {
         if (resp.status === 200 && resp.body.ok === true) {
