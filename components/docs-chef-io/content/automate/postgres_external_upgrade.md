@@ -7,8 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Upgrade External PostgreSQL"
-    parent = "automate/reference"
-    identifier = "automate/reference/postgres_external_upgrade.md External PostgreSQL Upgrade Steps"
+    identifier = "automate/configuring_automate/postgresql/postgres_external_upgrade.md Postgresql Upgrade"
+    parent = "automate/configuring_automate/postgresql"
+    weight = 20
 +++
 
 This guide covers upgrading services used by Chef Automate.

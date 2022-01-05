@@ -9,6 +9,7 @@ draft = false
     title = "Configure Postgresql"
     identifier = "automate/configuring_automate/postgresql/postgresql.md Postgresql"
     parent = "automate/configuring_automate/postgresql"
+    weight = 10
 +++
 
 [\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/postgresql.md)
