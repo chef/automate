@@ -20,8 +20,16 @@ describe('Infra Editor Policy', () => {
             actions: [
                 'infra:*:list',
                 'infra:*:get',
-                'infra:*:create',
-                'infra:*:update',
+                'infra:infraServersOrgsRoles:create',
+                'infra:infraServersOrgsRoles:update',
+                'infra:infraServersOrgsClient:create',
+                'infra:infraServersOrgsClient:update',
+                'infra:infraServersOrgsDataBags:create',
+                'infra:infraServersOrgsDataBagsItem:create',
+                'infra:infraServersOrgsDataBagsItem:update',
+                'infra:infraServersOrgsEnvironments:create',
+                'infra:infraServersOrgsEnvironments:update',
+                'infra:infraServersOrgsNodes:update',
                 'compliance:*',
                 'event:*',
                 'ingest:*',
@@ -32,21 +40,7 @@ describe('Infra Editor Policy', () => {
                 'applications:*'
             ],
             projects: ['*']
-        },
-        {
-            effect: 'DENY',
-            actions: [
-              'infra:infraServers:create',
-              'infra:infraServers:update',
-              'infra:infraServers:delete',
-              'infra:infraServersOrgs:create',
-              'infra:infraServersOrgs:update',
-              'infra:infraServersOrgs:delete'
-            ],
-            projects: [
-              '*'
-            ]
-          }
+        }
         ]
     };
 
@@ -62,8 +56,16 @@ describe('Infra Editor Policy', () => {
             actions: [
                 'infra:*:list',
                 'infra:*:get',
-                'infra:*:create',
-                'infra:*:update',
+                'infra:infraServersOrgsRoles:create',
+                'infra:infraServersOrgsRoles:update',
+                'infra:infraServersOrgsClient:create',
+                'infra:infraServersOrgsClient:update',
+                'infra:infraServersOrgsDataBags:create',
+                'infra:infraServersOrgsDataBagsItem:create',
+                'infra:infraServersOrgsDataBagsItem:update',
+                'infra:infraServersOrgsEnvironments:create',
+                'infra:infraServersOrgsEnvironments:update',
+                'infra:infraServersOrgsNodes:update',
                 'compliance:*',
                 'event:*',
                 'ingest:*',
@@ -74,21 +76,7 @@ describe('Infra Editor Policy', () => {
                 'applications:*'
             ],
             projects: ['*']
-        },
-        {
-            effect: 'DENY',
-            actions: [
-              'infra:infraServers:create',
-              'infra:infraServers:update',
-              'infra:infraServers:delete',
-              'infra:infraServersOrgs:create',
-              'infra:infraServersOrgs:update',
-              'infra:infraServersOrgs:delete'
-            ],
-            projects: [
-              '*'
-            ]
-          }
+        }
         ]
     };
 
