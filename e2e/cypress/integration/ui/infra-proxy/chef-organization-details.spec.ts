@@ -11,7 +11,7 @@ describe('chef server', () => {
   const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const tabNames = ['Roles', 'Environments', 'Data Bags', 'Clients', 'Policyfiles', 'Policy Groups', 'Cookbooks'];
-  const webuiKey = Cypress.env('infra_webui_key').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   before(() => {
     cy.adminLogin('/').then(() => {
