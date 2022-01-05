@@ -7,3 +7,4 @@
 - [`04_convert_table_to_human_readable_ids.up.sql`](04_convert_table_to_human_readable_ids.up.sql)
 - [`05_remove_orgs_pkey.up.sql`](05_remove_orgs_pkey.up.sql)
 - [`06_user_management.up.sql`](06_user_management.up.sql)
+- [`07_migration.up.sql`](07_migration.up.sql)
