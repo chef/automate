@@ -13,7 +13,7 @@ describe('chef server details', () => {
   const generatedOrgID = orgName.split(' ').join('-');
   const customOrgID = `${cypressPrefix}-custom-id-${now}`;
   const adminUser = 'test_admin_user';
-  const webuiKey = Cypress.env('infra_webui_key').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   // using dummy admin key value for creating the org
   const adminKey = 'Dummy--admin--key';
