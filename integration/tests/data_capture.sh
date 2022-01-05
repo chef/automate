@@ -92,7 +92,7 @@ do_test_deploy() {
 
     rm -f "$archive_file" "$breadcrumb_file"
 
-    if [ $error_count -gt 0 ]; then
+    if [ "$error_count" -gt 0 ]; then
         log_info "Total Errors: $error_count"
         abnormal_end
     fi

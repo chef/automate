@@ -87,25 +87,25 @@ airgap_bundle_create() {
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
     if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
-          cat "${original_aib_path}" > ${TARBALL_PATH}
+          cat "${original_aib_path}" > "${TARBALL_PATH}"
           outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
           bname=$(basename "${outfile}")
-          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > ${FRONTENDAIB_TFVARS}
-          echo "frontend_aib_local_file = \"${bname}\"" >> ${FRONTENDAIB_TFVARS}
+          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > "${FRONTENDAIB_TFVARS}"
+          echo "frontend_aib_local_file = \"${bname}\"" >> "${FRONTENDAIB_TFVARS}"
     fi
 
     if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
           # getting packges info from airgap bundle       
           ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${original_aib_path} > ${PACKAGES_INFO}
-          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
+          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > "${BACKENDAIB}"
           # this removes the magic header from the .aib
           # making it usable with the tar command
           rm -f ${TEMP_TAR_FILE}    
           outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
           backend_name=$(basename "${outfile_backend}")
-          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
-          echo "backend_aib_local_file = \"${backend_name}\"" >> ${BACKENDAIB_TFVARS}
+          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > "${BACKENDAIB_TFVARS}" 
+          echo "backend_aib_local_file = \"${backend_name}\"" >> "${BACKENDAIB_TFVARS}"
     fi
     rm -f "${original_aib_path}"
   else
