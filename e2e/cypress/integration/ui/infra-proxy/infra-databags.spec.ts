@@ -11,7 +11,7 @@ describe('infra databag', () => {
   const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const databagName = `${cypressPrefix}-databag-${now}-1`;
-  const webuiKey = Cypress.env('infra_webui_key').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   before(() => {
     cy.adminLogin('/').then(() => {

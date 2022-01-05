@@ -18,7 +18,7 @@ describe('chef server', () => {
     'Policyfiles',
     'Policy Groups',
     'Cookbooks'];
-  const webuiKey = Cypress.env('INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   before(() => {
     cy.adminLogin('/').then(() => {

@@ -10,7 +10,7 @@ describe('infra policy groups', () => {
   const serverIP = '18-117-112-129';
   const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-  const webuiKey = Cypress.env('infra_webui_key').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   const policyGroupName = `${cypressPrefix}-policyGroup-${now}-1`;
   let policies: any;
 
