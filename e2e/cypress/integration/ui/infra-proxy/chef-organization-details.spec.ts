@@ -10,7 +10,14 @@ describe('chef server', () => {
   const serverIP = '18-117-112-129';
   const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-  const tabNames = ['Roles', 'Environments', 'Data Bags', 'Clients', 'Policyfiles', 'Policy Groups', 'Cookbooks'];
+  const tabNames = [
+    'Roles',
+    'Environments',
+    'Data Bags',
+    'Clients',
+    'Policyfiles',
+    'Policy Groups',
+    'Cookbooks'];
   const webuiKey = Cypress.env('INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   before(() => {
