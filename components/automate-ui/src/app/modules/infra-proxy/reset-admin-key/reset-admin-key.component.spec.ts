@@ -23,7 +23,6 @@ describe('ResetAdminKeyComponent', () => {
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         ResetAdminKeyComponent
       ],
       providers: [
