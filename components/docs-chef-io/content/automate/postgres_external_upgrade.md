@@ -13,19 +13,19 @@ gh_repo = "automate"
 
 This guide covers upgrading services used by Chef Automate.
 
-## Upgrade PostgreSQL for Amazon RDS
+## Upgrade Amazon RDS for PostgreSQL
 
 Amazon Web Services Relational Database Service (AWS RDS) should upgrade by Monday, January 17. Amazon is automatically migrating all AWS RDS customers from PostgreSQL from 9.6 to 13 starting Tuesday, January 18, 2022.
 
 To upgrade AWS RDS, please follow instructions on [Upgrading the PostgreSQL DB engine for Amazon RDS - Amazon Relational Database Service](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_UpgradeDBInstance.PostgreSQL.html)
 
-## Upgrade External PostgreSQL from 9.6 to 13.3
+## Upgrade External PostgreSQL from 9.6 to 13.4
 
 Chef Automate uses PostgreSQL as the primary database for storing node data. [PostgreSQL 9.6 is EOL](https://endoflife.date/postgresql) and Chef customers running Chef Automate with PostgreSQL 9.6 should upgrade to [Postgres 13](https://www.postgresql.org/about/news/postgresql-13-released-2077/).
 
 ### Migration Planning
 
-The upgrade process for PostgreSQL from 9.6 to 13.3 requires a one-time downtime to vacuum, upgrade, and re-index the database. The entire upgrade operation takes about five minutes for each 2GB of data in PostgreSQL. This process may take longer depending on your server hardware and the size of the node objects in Chef Automate.
+The upgrade process for PostgreSQL from 9.6 to 13.4 requires a one-time downtime to vacuum, upgrade, and re-index the database. The entire upgrade operation takes about five minutes for each 2GB of data in PostgreSQL. This process may take longer depending on your server hardware and the size of the node objects in Chef Automate.
 
 ### Requirements
 
@@ -35,9 +35,9 @@ Upgrading PostgreSQL upgrades the database for all connected services. If you ha
 
 This upgrade guide is for systems running:
 
-- Ubuntu 18.04 or higher
 - A Single PostgreSQL 9.6 installation
-- On a virtual machine such as EC2 or on a single physical machine
+- Using Ubuntu 18.04 or higher
+- On a virtual machine such as an EC2 instance or on a single physical machine
 - Enough free space to run a second copy of the data that is in the existing PostgreSQL 9.6 installation. This upgrade requires a minimum of 55% free space on the machine.
 
 ### Backup Chef Automate
@@ -52,7 +52,7 @@ Follow the [Backup]({{< relref "backup.md" >}}) documentation to make a copy of 
 
 ### Upgrade Chef Automate
 
-- Airgapped Installations should follow the [Airgap Guide]({{< ref "airgapped_installation.md" >}}) to upgrade to the latest version of Chef Automate that supports External PostgreSQL v13.
+- For **airgapped** Chef Automate systems, follow the instructions in the [Airgap Installation Guide]({{< ref "airgapped_installation.md" >}}) to upgrade to the latest version.
 
 - Upgrade standard Chef Automate installations to the latest version that supports External PostgreSQL v13 with the command:
 
@@ -108,6 +108,10 @@ sudo chef-automate stop
 
 ### Prepare the Database for Migration
 
+Run `vacuumdb --all --full` on the PostgreSQL database if you don't have automatic vacuuming set up. This process will reduce the size of the database by deleting unnecessary data and speeds up the migration. This operation takes around 1 to 2 minutes per gigabyte of data depending on the complexity of the data, and requires at least as much free disk space as the size of your database.
+
+For more information on upgrading using `vacuumdb` see the PostgreSQL 13 documentation for [vacuumdb](https://www.postgresql.org/docs/13/app-vacuumdb.html).
+
 1. Run Vacuum DB before moving data from PostgreSQL v9.6 to v13
 
     ```bash
@@ -142,6 +146,8 @@ sudo chef-automate stop
     ```
 
 #### Upgrade
+
+For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` see the PostgreSQL 13 documentation for [pg_upgrade](https://www.postgresql.org/docs/13/pgupgrade.html).
 
 1. Run pg_upgrade check command.
 
@@ -195,7 +201,7 @@ sudo chef-automate stop
 
 #### Validate
 
-1. Check version:
+1. Confirm the installed version:
 
     ```bash
     sudo su - postgres
@@ -209,7 +215,7 @@ sudo chef-automate stop
     ./analyze_new_cluster.sh
     ```
 
-    Reindex is not required for Chef Automate usecase. But if pg_upgrade reported errors or need for reindexing please refer to [pg_upgrade documentation](https://www.postgresql.org/docs/13/pgupgrade.html) for details.
+    Reindexing is not required for Chef Automate. If `pg_upgrade` reported errors or need for reindexing please refer to [pg_upgrade documentation](https://www.postgresql.org/docs/13/pgupgrade.html) for details.
 
 1. Exit postgres user:
 
@@ -242,9 +248,9 @@ sudo su - postgres
 
 ## Troubleshoot Upgrade Failures
 
-1. If the upgrade failed and you are left with a corrupted Chef Automate and/or a corrupted database, **DO NOT RISK YOUR BACKUP OF AUTOMATE**. Take all steps necessary to preserve the backup, including copying it to another disk. Take all steps necessary to preserve the backup, including copying it to another disk.
+1. If the upgrade failed and you are left with a corrupted Chef Automate or a corrupted PostgreSQL database, **DO NOT RISK YOUR BACKUP OF AUTOMATE**. Take all steps necessary to preserve the backup, including copying it to another disk.
 1. Contact Chef customer support.
-1. If you have configured the backup directory other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory path to the `backup restore` command as shown in the snippet below. Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
+1. If you have configured the backup directory as a location other than the default directory (`/var/opt/chef-automate/backups`), you must supply the backup directory path to the `backup restore` command as shown in the snippet below. Without a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
    To restore on a new host, run:
 
