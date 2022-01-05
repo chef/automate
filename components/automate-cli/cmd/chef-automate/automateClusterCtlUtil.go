@@ -462,7 +462,7 @@ func executeShellCommand(command string, args []string, workingDir string) error
 }
 
 func extarctVersionAndRelease(filename string) (string, string) {
-	r := regexp.MustCompile(`.*-(\d+\.\d+\.\d+)-(\d{14})-.*\.hart$`)
+	r := regexp.MustCompile(RELEASE_AND_VERSION_PATTERN)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
 		logrus.Debug("failed to parse version of hart %s", filename)
@@ -471,7 +471,7 @@ func extarctVersionAndRelease(filename string) (string, string) {
 }
 
 func extractOrigin(filename string) string {
-	r := regexp.MustCompile(`[a-zA-z0-9]*`)
+	r := regexp.MustCompile(ORIGIN_PATTERN)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
 		logrus.Debug("failed to parse origin from of hart %s", filename)
@@ -480,7 +480,7 @@ func extractOrigin(filename string) string {
 }
 
 func extractPackageName(filename string) string {
-	r := regexp.MustCompile(`-[a-zA-z0-9]*-.*-\d\.`)
+	r := regexp.MustCompile(PACKAGE_NAME_PATTERN)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
 		fmt.Printf("failed to parse package name of hart %s", filename)
