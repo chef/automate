@@ -21,7 +21,7 @@ The authenticated endpoint `/status` provides status for the Chef Automate insta
 When all Chef Automate component services are up, `/status` returns a response code of 200.
 Otherwise, `/status` returns 500.
 
-The status of a service can be `OK`, `UNKNOWN`, or `CRITICAL`, and is show in the JSON output:
+The status of a service can be `OK`, `UNKNOWN`, or `CRITICAL`, and is shown in the JSON output:
 
    ```json
        {
