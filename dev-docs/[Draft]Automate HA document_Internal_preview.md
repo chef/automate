@@ -599,22 +599,34 @@ Start all Chef Automate and Chef Infra Server front-end nodes.
 sudo systemctl start chef-automate
 
 # Upgrade
-\1. To upgrade the complete cluster both frontends and backends
+**To upgrade the complete cluster both frontends and backends**
+
 Using this below command it will upgrade both the bundles and deploy it on their respective nodes
+
  `chef-automate upgrade run --upgrade-airgap-bundles`
+
 And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag
+
  `chef-automate upgrade run --upgrade-airgap-bundles --skip-deploy`
 
-\2. To upgrade only frontends 
+**To upgrade only frontends**
+
 Using this below command it will upgrade only frontend bundles and deploy it.
+
  `chef-automate upgrade run --upgrade-frontends`
+
  And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag 
+
  `chef-automate upgrade run --upgrade-frontends --skip-deploy`
 
-\3. To upgrade only backends
+**To upgrade only backends**
+
 Using this below command it will upgrade only backend bundles and deploy it.
+
  `chef-automate upgrade run --upgrade-backends`
+
 And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag 
+
  `chef-automate upgrade run --upgrade-backends --skip-deploy`
 
 # Migration
