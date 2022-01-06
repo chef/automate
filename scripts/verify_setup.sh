@@ -7,6 +7,7 @@
 # run` style integration test.
 #
 scripts/download_verify_harts.sh
+curl https://packages.chef.io/manifests/dev/automate/latest.json > results/build.json
 
 upload_logs() {
     echo "Attempting to upload logs to buildkite"
