@@ -33,6 +33,23 @@ chef-subheading {
     .dropdown {
       right: 0;
       z-index: 1;
+
+      .menu-list {
+        padding-left: 0px;
+        width: 140px;
+
+        li {
+          list-style-type: none;
+          font-size: 14px;
+          padding: 10px 10px 10px 10px;
+          color: $chef-primary-bright;
+        }
+        li:hover {
+          background: rgba($chef-primary-bright, 0.2);
+          cursor: pointer;
+          outline: 0;
+        }
+      }
     }
   }
 
