@@ -202,7 +202,7 @@ func HartFromPath(path string) (Hart, error) {
 	// based on the non-arbitrary RELEASE and our standard VERSION
 	// scheme and rely on the fact that we won't name our services
 	// anything too absurd.
-	r := regexp.MustCompile(`.*-(\d+\.\d+\.\d+)-(\d{14})-.*\.hart$`)
+	r := regexp.MustCompile(`.*-(\d+\.\d+\.*\d*)-(\d{14})-.*\.hart$`)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
 		return Hart{}, errors.Errorf("failed to parse version of hart %s", filename)
