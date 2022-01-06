@@ -6,7 +6,7 @@ describe('chef server', () => {
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
   const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
   const serverIP = '18-117-112-129';
-  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY');
 
   before(() => {
     cy.adminLogin('/infrastructure/chef-servers').then(() => {
