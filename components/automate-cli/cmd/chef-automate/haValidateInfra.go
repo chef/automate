@@ -39,9 +39,9 @@ func init() {
 }
 
 var validateCmd = &cobra.Command{
-	Use:   "ha-validate",
-	Short: "Validate existing infra of Automate HA",
-	Long:  "Validate existing infra of automate HA",
+	Use:   "validate-ha-infrastructure",
+	Short: "Validate existing infrastructure of Automate HA",
+	Long:  "Validate existing infrastructure of automate HA",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
