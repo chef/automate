@@ -38,4 +38,4 @@ const AUTOMATE_HA_CURATOR = "automate-ha-curator"
 
 const ORIGIN_PATTERN = `[a-zA-z0-9]*`
 const PACKAGE_NAME_PATTERN = `-[a-zA-Z0-9]*-.*-\d+\.`
-const RELEASE_AND_VERSION_PATTERN = `.*-(\d+\.\d+\.\d+)-(\d{14})-.*\.hart$`
+const RELEASE_AND_VERSION_PATTERN = `.*-(\d+\.\d+\.*\d*)-(\d{14})-.*\.hart$`
