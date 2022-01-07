@@ -31,8 +31,6 @@ type Storage interface {
 	StoreMigration(ctx context.Context, serverId, migType, migStatus string) (Migration, error)
 	GetMigration(ctx context.Context, id string) (Migration, error)
 	EditMigration(ctx context.Context, id, typeId, migStatus string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
-	//DeleteMigration(ctx context.Context, id string) (Migration, error)
-
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a

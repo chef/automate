@@ -248,7 +248,7 @@ func (s *Server) getInfraServerOrgs(c *ChefClient, serverId string, migration st
 	var totalSucceeded, totalSkipped, totalFailed int64
 
 	defer func() {
-		s.service.Storage.EditMigration(context.Background(), migration.ID, migration.TypeID, migrationStatus, totalSucceeded, totalSkipped, totalFailed)
+		_, _ = s.service.Storage.EditMigration(context.Background(), migration.ID, migration.TypeID, migrationStatus, totalSucceeded, totalSkipped, totalFailed)
 	}()
 
 	// Get organisation list from chef server

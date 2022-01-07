@@ -338,7 +338,7 @@ document "infra_service_load_sample_orgs" <<DOC
   It creates the organisations on chef server
 
   1. -N No of records Default: 50
-  2. -S Chef Infra Server id
+  2. -S Chef Infra Server id, which should be available on chef server and added in automate
   3. -O Chef organization's name prefix Default: chef-org
 
   Example:
@@ -351,7 +351,7 @@ function infra_service_load_sample_orgs() {
   install_if_missing core/grpcurl grpcurl
 
   local OPTIND opt 
-  local records=2
+  local records=50
   local server_id
   local org_prefix="chef-org"
   while getopts ":N:S:O:" opt; do
