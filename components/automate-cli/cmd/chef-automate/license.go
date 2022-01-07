@@ -81,7 +81,6 @@ var nodeUsageCommand = &cobra.Command{
 	},
 }
 
-
 var complianceUniqueNodeCounterCmd = &cobra.Command{
 	Use:   "complianceUniqNodeRunReport",
 	Short: "Generates the unique count of reported Compliance scans on hourly basis between the time duration",

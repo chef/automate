@@ -460,7 +460,7 @@ func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime ti
 			}
 
 			for _, hit := range searchResult.Hits.Hits {
-				
+
 				var payload []byte
 
 				payload = []byte("[")
