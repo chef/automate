@@ -253,8 +253,8 @@ describe('infra node detail', () => {
       if (nodeName !== '') {
         cy.get('.ng-arrow-wrapper').click();
         cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.ng-option').contains('google').then(option => {
-          option[0].click();  // this is jquery click() not cypress click()
+        cy.get('.ng-option').then(option => {
+          option[1].click();  // this is jquery click() not cypress click()
         });
         cy.get('[data-cy=change-confirm]').should(('be.visible'));
       }
@@ -277,12 +277,12 @@ describe('infra node detail', () => {
       if (nodeName !== '') {
         cy.get('.ng-arrow-wrapper').click();
         cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.ng-option').contains('chef-environment-609823800').then(option => {
-          option[0].click();  // this is jquery click() not cypress click()
+        cy.get('.ng-option').then(option => {
+          option[1].click();  // this is jquery click() not cypress click()
         });
         cy.get('.ng-arrow-wrapper').click();
         cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.ng-option').contains('_default').then(option => {
+        cy.get('.ng-option').then(option => {
           option[0].click();  // this is jquery click() not cypress click()
         });
         cy.get('[data-cy=change-confirm]').should(('be.visible'));

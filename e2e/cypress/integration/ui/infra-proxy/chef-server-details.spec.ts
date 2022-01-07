@@ -159,16 +159,14 @@ describe('chef server details', () => {
         .find('.mat-select-trigger').as('controlMenu');
 
       // we throw in a `should` so cypress retries until introspection allows menu to be shown
-      cy.get('@controlMenu').scrollIntoView().should('be.visible')
-        .click();
-      cy.get('[data-cy=delete-org]').should('be.visible')
-        .click();
+      cy.get('@controlMenu').scrollIntoView().should('be.visible').click();
+      cy.get('[data-cy=delete-org]').should('be.visible').click();
 
       // accept dialog
       cy.get('app-chef-server-details chef-button').contains('Delete').click();
 
       // verify success notification and then dismiss it
-      cy.get('app-notification.info').contains('Successfully deleted org');
+      cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
 
       cy.get('app-chef-server-details chef-tbody chef-td')
