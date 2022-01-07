@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -22,7 +23,6 @@ const MISSING_BUNDLE = "for offline mode airgap bundle path and habitat bundle p
 const VALIDATION_SCRIPT_PATH = "/var/tmp/validateInfra.sh"
 
 func init() {
-	//validateCmd.SetUsageTemplate("")
 	validateCmd.PersistentFlags().StringVar(
 		&validateFlags.airgapPath,
 		"airgap-bundle",
@@ -96,10 +96,14 @@ func runValidateCmd(cmd *cobra.Command, args []string) error {
 }
 
 func executeValidationScript(args []string, netcatHartFile string, offlineMode bool) error {
+	configFilePath, err := filepath.Abs(args[0])
+	if err != nil {
+		return err
+	}
 	if offlineMode {
-		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, args[0], validateFlags.habitatBundlePath, netcatHartFile}, "")
+		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, configFilePath, validateFlags.habitatBundlePath, netcatHartFile}, "")
 	} else {
-		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, args[0]}, "")
+		return executeShellCommand("/bin/bash", []string{VALIDATION_SCRIPT_PATH, configFilePath}, "")
 	}
 }
 
