@@ -27,6 +27,12 @@ type Storage interface {
 	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	DeleteUser(ctx context.Context, id string) (User, error)
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
+
+	StoreMigration(ctx context.Context, serverId, migType, migStatus string) (Migration, error)
+	GetMigration(ctx context.Context, id string) (Migration, error)
+	EditMigration(ctx context.Context, id, typeId, migStatus string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	//DeleteMigration(ctx context.Context, id string) (Migration, error)
+
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a
@@ -71,6 +77,28 @@ type User struct {
 	IsServerAdmin       bool
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
+}
+
+type Migration struct {
+	ID             string
+	TypeID         string
+	StatusID       string
+	ServerID       string
+	TotalSucceeded int64
+	TotalSkipped   int64
+	TotalFailed    int64
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+type MigrationType struct {
+	ID      string
+	MigType string
+}
+
+type MigrationStatus struct {
+	ID        string
+	MigStatus string
 }
 
 // Errors returned from the backend

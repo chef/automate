@@ -29,8 +29,8 @@ message GetOrg {
 }
 
 message GetInfraServerOrgs {
-    // Chef organization list from chef server
-    repeated Org orgs = 1;
+    // id of organisation migration
+    string migration_id = 1;
 }
 
 message Org {
@@ -51,4 +51,7 @@ message Org {
 message ResetOrgAdminKey {
     // Chef organization.
     Org org = 1;
+}
+
+message CreateInfraServerOrgs {
 }

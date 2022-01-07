@@ -339,6 +339,28 @@ func (mr *MockInfraProxyClientMockRecorder) DeleteRole(ctx, in interface{}, opts
 
 // DeleteServer mocks base method.
 func (m *MockInfraProxyClient) DeleteServer(ctx context.Context, in *request.DeleteServer, opts ...grpc.CallOption) (*response.DeleteServer, error) {
+// CreateInfraServerOrgs mocks base method
+func (m *MockInfraProxyClient) CreateInfraServerOrgs(ctx context.Context, in *request.CreateInfraServerOrgs, opts ...grpc.CallOption) (*response.CreateInfraServerOrgs, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateInfraServerOrgs", varargs...)
+	ret0, _ := ret[0].(*response.CreateInfraServerOrgs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateInfraServerOrgs indicates an expected call of CreateInfraServerOrgs
+func (mr *MockInfraProxyClientMockRecorder) CreateInfraServerOrgs(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateInfraServerOrgs", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateInfraServerOrgs), varargs...)
+}
+
+// GetCookbooks mocks base method
+func (m *MockInfraProxyClient) GetCookbooks(ctx context.Context, in *request.Cookbooks, opts ...grpc.CallOption) (*response.Cookbooks, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -1499,7 +1521,7 @@ func (m *MockInfraProxyServer) DeleteRole(arg0 context.Context, arg1 *request.Ro
 	return ret0, ret1
 }
 
-// DeleteRole indicates an expected call of DeleteRole.
+// DeleteRole indicates an expected call of Del
 func (mr *MockInfraProxyServerMockRecorder) DeleteRole(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRole", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteRole), arg0, arg1)
@@ -1507,6 +1529,23 @@ func (mr *MockInfraProxyServerMockRecorder) DeleteRole(arg0, arg1 interface{}) *
 
 // DeleteServer mocks base method.
 func (m *MockInfraProxyServer) DeleteServer(arg0 context.Context, arg1 *request.DeleteServer) (*response.DeleteServer, error) {
+// CreateInfraServerOrgs mocks base method
+func (m *MockInfraProxyServer) CreateInfraServerOrgs(arg0 context.Context, arg1 *request.CreateInfraServerOrgs) (*response.CreateInfraServerOrgs, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateInfraServerOrgs", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateInfraServerOrgs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateInfraServerOrgs indicates an expected call of CreateInfraServerOrgs
+func (mr *MockInfraProxyServerMockRecorder) CreateInfraServerOrgs(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateInfraServerOrgs", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateInfraServerOrgs), arg0, arg1)
+}
+
+// GetCookbooks mocks base method
+func (m *MockInfraProxyServer) GetCookbooks(arg0 context.Context, arg1 *request.Cookbooks) (*response.Cookbooks, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteServer", arg0, arg1)
 	ret0, _ := ret[0].(*response.DeleteServer)

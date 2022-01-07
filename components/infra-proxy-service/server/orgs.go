@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	"github.com/go-chef/chef"
 )
 
 // CreateOrg creates a new org
@@ -214,42 +215,80 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 //GetInfraServerOrgs: Fetches the list of automate infra server organisations from the chef server and save it into the automate back end DB
 func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
 
-	// Get the credential ID from servers table
-	server, err := s.service.Storage.GetServer(ctx, req.ServerId)
-	if err != nil {
-		return nil, service.ParseStorageError(err, *req, "server")
+	// Check whether any migration is in progress or not
+	if IsMigrationAlreadyRunning {
+		return nil, errors.New("Migration is already in process")
 	}
-	if server.CredentialID == "" {
-		return nil, errors.New("webui key is not available with server")
-	}
-	// Get web ui key from secrets service
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+
+	// Get chef client
+	client, err := s.getChefClient(ctx, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
-	// Get organization list from chef server
-	c, err := s.createChefServerClient(ctx, req.ServerId, GetAdminKeyFrom(secret), "pivotal", true)
+
+	setMigrationStatus(true)
+	defer setMigrationStatus(false)
+
+	//Store the status in migration table as in progress
+	migration, err := s.service.Storage.StoreMigration(ctx, req.ServerId, "org", "In Progress")
 	if err != nil {
 		return nil, err
 	}
+
+	// Get and save orgs in goroutine
+	go s.getInfraServerOrgs(client, req.ServerId, migration)
+
+	return &response.GetInfraServerOrgs{
+		MigrationId: migration.ID,
+	}, nil
+}
+
+func (s *Server) getInfraServerOrgs(c *ChefClient, serverId string, migration storage.Migration) {
+	var migrationStatus string
+	var totalSucceeded, totalSkipped, totalFailed int64
+
+	defer func() {
+		s.service.Storage.EditMigration(context.Background(), migration.ID, migration.TypeID, migrationStatus, totalSucceeded, totalSkipped, totalFailed)
+	}()
+
+	// Get organisation list from chef server
 	orgsList, err := c.client.Organizations.List()
 	if err != nil {
-		return nil, ParseAPIError(err)
+		migrationStatus = "Failed"
+		return
 	}
 
 	// Save organisations in backend DB
-	orgs := []storage.Org{}
 	for key := range orgsList {
-		org, err := s.service.Storage.StoreOrg(ctx, key, key, "", "", req.ServerId, nil)
+		_, err := s.service.Storage.StoreOrg(context.Background(), key, key, "", "", serverId, nil)
 		if err != nil {
-			return nil, service.ParseStorageError(err, *req, "org")
+			totalFailed++
+			continue
 		}
-		orgs = append(orgs, org)
+		totalSucceeded++
+	}
+	migrationStatus = "Completed"
+	return
+}
+
+//CreateInfraServerOrgs: Creates the organisations on chef server
+func (s *Server) CreateInfraServerOrgs(ctx context.Context, req *request.CreateInfraServerOrgs) (*response.CreateInfraServerOrgs, error) {
+
+	// Get chef client
+	c, err := s.getChefClient(ctx, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
-	return &response.GetInfraServerOrgs{
-		Orgs: fromStorageToListOrgs(orgs),
-	}, nil
+	org := chef.Organization{
+		Name:     req.Name,
+		FullName: req.FullName,
+	}
+	_, err = c.client.Organizations.Create(org)
+	if err != nil {
+		return nil, err
+	}
+	return &response.CreateInfraServerOrgs{}, nil
 }
 
 // Create a response.Org from a storage.Org

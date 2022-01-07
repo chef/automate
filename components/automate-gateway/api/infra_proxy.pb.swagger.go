@@ -318,6 +318,43 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
+      },
+      "post": {
+        "operationId": "InfraProxy_CreateInfraServerOrgs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateInfraServerOrgs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Automate Infra Server ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateInfraServerOrgs"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs": {
@@ -2867,6 +2904,23 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.CreateInfraServerOrgs": {
+      "type": "object",
+      "properties": {
+        "server_id": {
+          "type": "string",
+          "title": "Automate Infra Server ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Organisation name"
+        },
+        "full_name": {
+          "type": "string",
+          "title": "Orgabisation full_name"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.CreateOrg": {
       "type": "object",
       "properties": {
@@ -3776,6 +3830,9 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.CreateInfraServerOrgs": {
+      "type": "object"
+    },
     "chef.automate.api.infra_proxy.response.CreateOrg": {
       "type": "object",
       "properties": {
@@ -4018,12 +4075,9 @@ func init() {
     "chef.automate.api.infra_proxy.response.GetInfraServerOrgs": {
       "type": "object",
       "properties": {
-        "orgs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
-          },
-          "title": "Chef organization list from chef server"
+        "migration_id": {
+          "type": "string",
+          "title": "id of organisation migration"
         }
       }
     },
