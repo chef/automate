@@ -143,6 +143,13 @@ func TestSortableHartsFromPaths(t *testing.T) {
 	}
 }
 
+func TestHartFromPathSuccess1111(t *testing.T) {
+	h, err := HartFromPath("/some/path/chef-automate-ha-postgresql-11.11-20220106160928-x86_64-linux.hart")
+	assert.NoError(t, err)
+	assert.Equal(t, "11.11", h)
+	assert.Equal(t, "20220106160928", h.release)
+}
+
 func shufflePaths(paths []string) []string {
 	ret := make([]string, len(paths))
 	perms := rand.Perm(len(paths))

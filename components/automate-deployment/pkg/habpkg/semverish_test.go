@@ -15,6 +15,7 @@ var semverTests = []struct {
 	// The basics
 	{"1", SemverishVersion{parts: []int{1}}},
 	{"1.2", SemverishVersion{parts: []int{1, 2}}},
+	{"11.11", SemverishVersion{parts: []int{11, 11}}},
 	{"1.2.3", SemverishVersion{parts: []int{1, 2, 3}}},
 	{"123.456.789", SemverishVersion{parts: []int{123, 456, 789}}},
 	// We support arbitrary parts
