@@ -12,10 +12,10 @@
         <table>
           <thead>
             <tr class="detail-row">
-              <th class="id-column">Name</th>
-              <th class="id-column">Client Name</th>
-              <th class="id-column">Org Name</th>
-              <th class="id-column">JSON</th>
+              <th class="id-column" data-cy="name">Name</th>
+              <th class="id-column" data-cy="client_name">Client Name</th>
+              <th class="id-column" data-cy="client_org">Org Name</th>
+              <th class="id-column" data-cy="json">JSON</th>
             </tr>
           </thead>
           <tbody>
@@ -41,7 +41,7 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <chef-loading-spinner *ngIf="clientDetailsLoading" size="50"></chef-loading-spinner>
         <div *ngIf="!clientDetailsLoading" class="key-tab">
-          <div class="empty-section" *ngIf="!client?.client_key.public_key">
+          <div class="empty-section" data-cy="empty-list" *ngIf="!client?.client_key.public_key">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p>No public key available</p>
           </div>
@@ -52,7 +52,7 @@
             <div class="key-tab-details">
               <div class="key-tab-body-top">
                 <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset', 'put', [serverId, orgId, name]]">
-                <chef-button tertiary class="reset-key" (click)="openResetKeyClientModal()">
+                <chef-button tertiary class="reset-key" data-cy="reset-button" (click)="openResetKeyClientModal()">
                   <chef-icon>vpn_key</chef-icon>
                   <span>Reset Key</span>
                 </chef-button>

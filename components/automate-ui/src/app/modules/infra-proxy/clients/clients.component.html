@@ -29,7 +29,7 @@
           (changePage)= "onUpdatePage($event)"
         ></app-paginator>
         <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients', 'post', [serverId, orgId]]">
-        <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
+        <chef-button class="create-client" primary data-cy="create-client-button" (click)="openCreateClientModal()">Create Client</chef-button>
         </app-authorized>
       </div>
       <chef-loading-spinner class="full-screen-spinner" *ngIf="loading || deleting" size="50" fixed></chef-loading-spinner>
@@ -38,10 +38,10 @@
         <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
         <p *ngIf="searchValue === ''">No client available.</p>
       </div>
-      <chef-table *ngIf="clients.length">
+      <chef-table *ngIf="clients.length" data-cy="clients-table-container">
         <chef-thead>
           <chef-tr class="no_border_tr">
-            <chef-th class="no_border_th">Name</chef-th>
+            <chef-th class="no_border_th" data-cy="name">Name</chef-th>
             <chef-th class="no_border_th three-dot-column"></chef-th>
           </chef-tr>
         </chef-thead>
