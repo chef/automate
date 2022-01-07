@@ -182,7 +182,7 @@ func bootstrapEnv(dm deployManager) error {
 		return status.Annotate(err, status.DeployError)
 	}
 	if offlineMode {
-		err := moveAirgapToTransferDir(airgapMetadata)
+		err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, deployCmdFlags.airgap)
 		if err != nil {
 			return status.Annotate(err, status.DeployError)
 		}
@@ -204,54 +204,101 @@ we also need to have following files in /hab/a2_deploy_workspace/terraform dir
 2. a2ha_aib_be.auto.tfvars --> it will contain info of backend airgap bundle
 1. a2ha_manifest.auto.tfvars --> it will contain info of required packages to deploy a2ha.
 */
-func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
-	if len(deployCmdFlags.airgap) > 0 {
-		var bundleName string = filepath.Base(deployCmdFlags.airgap)
-		if strings.Contains(bundleName, "automate") {
-			bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
-		}
-		err := copyFileContents(deployCmdFlags.airgap, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
+func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
+	if len(airgapBundle) > 0 {
+		bundleName := getFrontendBundleName(airgapBundle)
+		err := generateFontendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
-		//generating md5 sum for frontend bundle
-		err = generateChecksumFile(AIRGAP_HA_TRANS_DIR_PATH+bundleName, AIRGAP_HA_TRANS_DIR_PATH+bundleName+".md5")
-		if err != nil { 
-			return err
-		}
-		//generating frontend auto tfvars
-		frontendTfvars := getBytesFromTempalte("frontendTfvars", frontendAutotfvarsTemplate, map[string]interface{}{
-			"bundleName": bundleName,
-		})
-
-		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", frontendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+		err = generateBackendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
-		//generating backend bundle
-		backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
-		err = generateBackendAIB(deployCmdFlags.airgap, backendBundleFile)
-		if err != nil {
-			return err
-		}
-		err = generateChecksumFile(backendBundleFile, backendBundleFile+".md5")
-		if err != nil {
-			return err
-		}
-		//generating backend auto tfvars
-		backendTfvars := getBytesFromTempalte("backendTfvars", backendAutotfvarsTemplate, map[string]interface{}{
-			"backendBundleFile": filepath.Base(backendBundleFile),
-		})
-		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", backendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
-		if err != nil {
-			return err
-		}
-
 		//generate manifest auto tfvars
 		err = generateA2HAManifestTfvars(airgapMetadata)
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
+	if len(airgapBundle) > 0 {
+		bundleName := getFrontendBundleName(airgapBundle)
+		err := generateFontendBundles(bundleName, airgapBundle)
+		if err != nil {
+			return err
+		}
+		//generate manifest auto tfvars
+		err = generateA2HAManifestTfvars(airgapMetadata)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
+	if len(airgapBundle) > 0 {
+		bundleName := getFrontendBundleName(airgapBundle)
+		err := generateBackendBundles(bundleName, airgapBundle)
+		if err != nil {
+			return err
+		}
+		//generate manifest auto tfvars
+		err = generateA2HAManifestTfvars(airgapMetadata)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func getFrontendBundleName(airgapPath string) string {
+	var bundleName string = filepath.Base(airgapPath)
+	if strings.Contains(bundleName, "automate") {
+		bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
+	}
+	return bundleName
+}
+func generateFontendBundles(bundleName string, airgapPath string) error {
+	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
+	if err != nil {
+		return err
+	}
+	//generating md5 sum for frontend bundle
+	err = generateChecksumFile(AIRGAP_HA_TRANS_DIR_PATH+bundleName, AIRGAP_HA_TRANS_DIR_PATH+bundleName+".md5")
+	if err != nil {
+		return err
+	}
+	//generating frontend auto tfvars
+	frontendTfvars := getBytesFromTempalte("frontendTfvars", frontendAutotfvarsTemplate, map[string]interface{}{
+		"bundleName": bundleName,
+	})
+	err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", frontendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func generateBackendBundles(bundleName string, airgapPath string) error {
+	//generating backend bundle
+	backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
+	err := generateBackendAIB(airgapPath, backendBundleFile)
+	if err != nil {
+		return err
+	}
+	err = generateChecksumFile(backendBundleFile, backendBundleFile+".md5")
+	if err != nil {
+		return err
+	}
+	//generating backend auto tfvars
+	backendTfvars := getBytesFromTempalte("backendTfvars", backendAutotfvarsTemplate, map[string]interface{}{
+		"backendBundleFile": filepath.Base(backendBundleFile),
+	})
+	err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", backendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+	if err != nil {
+		return err
 	}
 	return nil
 }

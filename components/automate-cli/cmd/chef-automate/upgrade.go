@@ -96,13 +96,19 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		if upgradeRunCmdFlags.skipDeploy {
 			args = append(args, "--skip-deploy")
 		}
-		if(offlineMode) {
+		if offlineMode {
 			writer.Title("Installing airgap install bundle")
 			airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
 			if err != nil {
 				return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 			}
-			moveAirgapToTransferDir(airgapMetaData)
+			if upgradeRunCmdFlags.upgradefrontends {
+				moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			} else if upgradeRunCmdFlags.upgradebackends {
+				moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			} else {
+				moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			}
 		}
 		return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
 	}
