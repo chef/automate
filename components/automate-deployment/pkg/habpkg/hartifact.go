@@ -205,12 +205,12 @@ func HartFromPath(path string) (Hart, error) {
 	r := regexp.MustCompile(`.*-(\d+\.\d+\.*\d*)-(\d{14})-.*\.hart$`)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
-		return Hart{}, errors.Errorf("failed to parse version of hart %s", filename)
+		return Hart{}, errors.Errorf("failed to parse version of hart FindStringSubmatch %s", filename)
 	}
 
 	parsedVersion, err := ParseSemverishVersion(match[1])
 	if err != nil {
-		return Hart{}, errors.Wrapf(err, "failed to parse version of hart %s", filename)
+		return Hart{}, errors.Wrapf(err, "failed to parse version of hart ParseSemverishVersion %s", filename)
 	}
 
 	return Hart{
