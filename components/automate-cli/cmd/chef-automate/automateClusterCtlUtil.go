@@ -485,5 +485,5 @@ func extractPackageName(filename string) string {
 	if match == nil {
 		fmt.Printf("failed to parse package name of hart %s", filename)
 	}
-	return match[0][1 : len(match[0])-3]
+	return match[0][1 : len(match[0])-(len(match[0])-(strings.LastIndexAny(match[0], "-")))]
 }
