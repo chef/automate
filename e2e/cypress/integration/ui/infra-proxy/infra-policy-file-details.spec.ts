@@ -229,8 +229,8 @@ describe('infra policy details', () => {
 
       it('can open cookbook details page', () => {
         if (policyFileName !== '') {
-          cy.get('[data-cy=cookbook-table-container] chef-td a').contains(policyFileName).click();
-          cy.get('[data-cy=close-cookbook-detail-button]').click();
+          cy.get('[data-cy=cookbook-table-container] chef-td a').eq(1).click();
+          cy.get('[data-cy=close-cookbook-detail-button]').click({ multiple: true, force: true });
           cy.get('[data-cy=close-cookbook-button]').click();
         }
       });
@@ -264,6 +264,7 @@ describe('infra policy details', () => {
           .contains(includedPolicyFileName).click();
           getPolicyFileDetails(includedPolicyFileName, includedPolicyRevision).then(response => {
             if (checkIncludedPolicyDetailsResponse(response)) {
+              cy.wait(1000);
               cy.get('[data-cy=policyfile-details]').contains('Go to Policyfile Details >').click();
             }
           });
@@ -283,8 +284,8 @@ describe('infra policy details', () => {
 
       it('can open runlist details slider', () => {
         if (policyFileName !== '') {
-          cy.get('[data-cy=run-list-table-container] chef-td a').contains(policyFileName).click();
-          cy.get('[data-cy=close-cookbook-detail-button] chef-icon').click();
+          cy.get('[data-cy=run-list-table-container] chef-td a').eq(1).click();
+          cy.get('[data-cy=close-cookbook-detail-button] chef-icon').click({ multiple: true, force: true });
         }
       });
     });

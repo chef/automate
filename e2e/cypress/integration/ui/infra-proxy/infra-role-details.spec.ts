@@ -318,10 +318,8 @@ describe('infra role detail', () => {
     it('can select multiple item from list, move to right then update the run list', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
-        .contains('audit::inspec').click();
-      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
-        .contains('chef-client').click();
+      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
+      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(2).click();
 
       cy.get('[data-cy=drag-right]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -376,8 +374,8 @@ describe('infra role detail', () => {
       () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('audit').click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('chef-client').click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(0).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
 
       cy.get('[data-cy=drag-left]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -404,8 +402,7 @@ describe('infra role detail', () => {
     it('can select a item from selected run list, move item up then update the run list', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('aix::nim_master_setup_standalone')
-        .click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
 
       cy.get('[data-cy=drag-up]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -435,9 +432,8 @@ describe('infra role detail', () => {
       () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('audit').click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('aix::nim_master_setup_standalone')
-        .click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(2).click();
       cy.wait(2000);
       cy.get('[data-cy=drag-up]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -481,7 +477,7 @@ describe('infra role detail', () => {
     xit('can select a item from selected run list, move item down then update the run list', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('centos-cookbook-file').click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
 
       cy.get('[data-cy=drag-down]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -511,10 +507,9 @@ describe('infra role detail', () => {
       () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('aix::nim_master_setup_standalone')
-        .click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('centos-cookbook-file').click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('cron').click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(2).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(3).click();
 
       cy.get('[data-cy=drag-down]').click();
       cy.get('[data-cy=update-run-list]').click();
