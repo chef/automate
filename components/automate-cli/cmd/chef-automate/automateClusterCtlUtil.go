@@ -216,7 +216,7 @@ func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
 		}
 		//generating md5 sum for frontend bundle
 		err = generateChecksumFile(AIRGAP_HA_TRANS_DIR_PATH+bundleName, AIRGAP_HA_TRANS_DIR_PATH+bundleName+".md5")
-		if err != nil {
+		if err != nil { 
 			return err
 		}
 		//generating frontend auto tfvars

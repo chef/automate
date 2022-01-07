@@ -72,16 +72,8 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 	offlineMode := upgradeRunCmdFlags.airgap != ""
 
-	if airgap.AirgapInUse() && !offlineMode {
-		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
-	}
-
-	if upgradeRunCmdFlags.version != "" && offlineMode {
-		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
-	}
 	// check if it is in HA mode
 	if isA2HARBFileExist() {
-
 		if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 			return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 		}
@@ -104,8 +96,23 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		if upgradeRunCmdFlags.skipDeploy {
 			args = append(args, "--skip-deploy")
 		}
-
+		if(offlineMode) {
+			writer.Title("Installing airgap install bundle")
+			airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return status.Annotate(err, status.AirgapUnpackInstallBundleError)
+			}
+			moveAirgapToTransferDir(airgapMetaData)
+		}
 		return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
+	}
+
+	if airgap.AirgapInUse() && !offlineMode {
+		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
+	}
+
+	if upgradeRunCmdFlags.version != "" && offlineMode {
+		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
 	}
 
 	if offlineMode {
