@@ -285,7 +285,8 @@ describe('infra policy details', () => {
       it('can open runlist details slider', () => {
         if (policyFileName !== '') {
           cy.get('[data-cy=run-list-table-container] chef-td a').eq(1).click();
-          cy.get('[data-cy=close-cookbook-detail-button] chef-icon').click({ multiple: true, force: true });
+          cy.get('[data-cy=close-cookbook-detail-button] chef-icon')
+            .click({ multiple: true, force: true });
         }
       });
     });

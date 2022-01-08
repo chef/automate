@@ -257,8 +257,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
 
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
 
         // here we exit with the Cancel button
         cy.get('[data-cy=cancel-run-list-button]').contains('Cancel').should('be.visible')
@@ -298,8 +297,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -322,8 +320,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -340,8 +337,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -369,8 +365,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -400,8 +395,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(2).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -428,8 +422,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -451,8 +444,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -484,8 +476,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();

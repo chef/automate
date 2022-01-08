@@ -8,7 +8,7 @@ describe('chef server details', () => {
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
   const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
   const serverIP = '18-117-112-129';
-  const webui_key = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   const orgName = `${cypressPrefix} org ${now}`;
   const generatedOrgID = orgName.split(' ').join('-');
   const customOrgID = `${cypressPrefix}-custom-id-${now}`;
@@ -31,7 +31,7 @@ describe('chef server details', () => {
           name: serverName,
           fqdn: serverFQDN,
           ip_address: serverIP,
-          webui_key: webui_key
+          webui_key: webuiKey
         }
       });
 
@@ -61,7 +61,7 @@ describe('chef server details', () => {
     it('it can update the webui key', () => {
       cy.get('[data-cy=update-web-ui-key]').contains('Update').click();
       cy.get('app-chef-server-details .sidenav-header').should('exist');
-      cy.get('[data-cy=enter-webui-key]').type(webui_key);
+      cy.get('[data-cy=enter-webui-key]').type(webuiKey);
 
       cy.get('[data-cy=update-webui-key-button]').click();
       cy.get('app-chef-server-details .sidenav-header').should('not.be.visible');
@@ -78,7 +78,8 @@ describe('chef server details', () => {
     });
 
     it('can add a organization', () => {
-      cy.get('[data-cy=add-org-button]').contains('Add Chef Organization').click();
+      cy.get('[data-cy=add-org-button]').contains('Add Chef Organization')
+        .click({multiple: true, force: true});
       cy.get('app-chef-server-details chef-modal').should('exist');
       cy.get('[data-cy=org-name]').type(orgName);
       cy.get('[data-cy=id-label]').contains(generatedOrgID);
@@ -91,7 +92,7 @@ describe('chef server details', () => {
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({multiple: true, force: true});
       cy.get('app-chef-server-details chef-tbody chef-td').contains(orgName).should('exist');
     });
 
@@ -103,7 +104,8 @@ describe('chef server details', () => {
     });
 
     it('can create a chef organization with a custom ID', () => {
-      cy.get('[data-cy=add-org-button]').contains('Add Chef Organization').click();
+      cy.get('[data-cy=add-org-button]').contains('Add Chef Organization')
+        .click({multiple: true, force: true});
       cy.get('app-chef-server-details chef-modal').should('exist');
       cy.get('[data-cy=org-name]').type(orgName);
       cy.get('[data-cy=add-id]').should('not.be.visible');
@@ -119,7 +121,7 @@ describe('chef server details', () => {
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({multiple: true, force: true});
 
       cy.get('app-chef-server-details chef-tbody chef-td').contains(orgName).should('exist');
     });
@@ -167,7 +169,7 @@ describe('chef server details', () => {
 
       // verify success notification and then dismiss it
       cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({multiple: true, force: true});
 
       cy.get('app-chef-server-details chef-tbody chef-td')
         .contains(customOrgID).should('not.exist');
