@@ -77,3 +77,91 @@ Specify the action to restrict user access to the specific action
 | Get Node | GET | infra:infraServersOrgsNodes:get | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes |
 | Update Node | POST | infra:infraServersOrgsNodes:update | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes |
 | Delete Node | DELETE | infra:infraServersOrgsNodes:delete | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name} |
+
+
+## Three types of user policies automatically gets created with creation of every project
+
+
+Infra Viewer Policy Actions
+
+```   
+    secrets:*:get,
+    secrets:*:list,
+    infra:*:get,
+    infra:*:list,
+    compliance:*:get,
+    compliance:*:list,
+    event:*:get,
+    event:*:list,
+    ingest:*:get,
+    ingest:*:list,
+    iam:projects:list,
+    iam:projects:get,
+    applications:*:get,
+    applications:*:list
+```
+
+Infra Editor Policy Actions
+
+```
+    infra:*:list,
+    infra:*:get,
+    infra:infraServersOrgsRoles:create,
+    infra:infraServersOrgsRoles:update,
+    infra:infraServersOrgsClient:create,
+    infra:infraServersOrgsClient:update,
+    infra:infraServersOrgsDataBags:create,
+    infra:infraServersOrgsDataBagsItem:create,
+    infra:infraServersOrgsDataBagsItem:update,
+    infra:infraServersOrgsEnvironments:create,
+    infra:infraServersOrgsEnvironments:update,
+    infra:infraServersOrgsNodes:update,
+    compliance:*,
+    event:*,
+    ingest:*,
+    secrets:*,
+    iam:projects:list,
+    iam:projects:get,
+    iam:projects:assign,
+    applications:*
+```
+
+Infra Project Owner Policy Actions
+
+```
+    infra:*:list,
+    infra:*:get,
+    infra:infraServersOrgsRoles:create,
+    infra:infraServersOrgsRoles:update,
+    infra:infraServersOrgsRoles:delete,
+    infra:infraServersOrgsClient:create,
+    infra:infraServersOrgsClient:update,
+    infra:infraServersOrgsClient:delete,
+    infra:infraServersOrgsDataBags:create,
+    infra:infraServersOrgsDataBags:delete,
+    infra:infraServersOrgsDataBagsItem:create,
+    infra:infraServersOrgsDataBagsItem:update,
+    infra:infraServersOrgsDataBagsItem:delete,
+    infra:infraServersOrgsEnvironments:create,
+    infra:infraServersOrgsEnvironments:update,
+    infra:infraServersOrgsEnvironments:delete,
+    infra:infraServersOrgsNodes:update,
+    infra:infraServersOrgsNodes:delete,
+    infra:infraServersOrgsPolicyFiles:delete,
+    compliance:*,
+    event:*,
+    ingest:*,
+    secrets:*,
+    iam:projects:list,
+    iam:projects:get,
+    iam:projects:assign,
+    iam:policies:list,
+    iam:policies:get,
+    iam:policyMembers:*,
+    iam:teams:list,
+    iam:teams:get,
+    iam:teamUsers:*,
+    iam:users:get,
+    iam:users:list,
+    applications:*
+```
