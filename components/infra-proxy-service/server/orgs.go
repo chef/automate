@@ -6,6 +6,10 @@ import (
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
+<<<<<<< HEAD
+=======
+	"github.com/chef/automate/api/interservice/authz"
+>>>>>>> 960571021 (stash changes)
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
@@ -240,7 +244,11 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	// Save organisations in backend DB
 	orgs := []storage.Org{}
 	for key := range orgsList {
-		org, err := s.service.Storage.StoreOrg(ctx, key, key, "", "", req.ServerId, nil)
+		projects, err := createProjectFromOrgIdAndServerID(s, ctx, req.ServerId, key)
+		if err != nil {
+			return nil, err
+		}
+		org, err := s.service.Storage.StoreOrg(ctx, key, key, "", "", req.ServerId, projects)
 		if err != nil {
 			return nil, service.ParseStorageError(err, *req, "org")
 		}
@@ -274,3 +282,21 @@ func fromStorageToListOrgs(sl []storage.Org) []*response.Org {
 
 	return tl
 }
+
+//function to create a new iam project for each client
+func createProjectFromOrgIdAndServerID(s *Server, ctx context.Context, serverId string, orgId string) ([]string, error) {
+
+	newProject := &authz.CreateProjectReq{
+		Name:         serverId + "_" + orgId,
+		Id:           serverId + "_" + orgId,
+		SkipPolicies: false,
+	}
+
+	projectID, err := s.service.AuthzProject.CreateProject(ctx, newProject)
+	if err != nil {
+		return nil, err
+	}
+
+	return []string{projectID.Project.Name}, nil
+}
+
