@@ -74,43 +74,10 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 	// check if it is in HA mode
 	if isA2HARBFileExist() {
-		if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
-			return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
-		}
-		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		err := runAutomateHAFlow(args, offlineMode)
 		if err != nil {
 			return err
 		}
-		if !strings.Contains(response, "y") {
-			return errors.New("canceled upgrade")
-		}
-		if upgradeRunCmdFlags.upgradefrontends {
-			args = append(args, "--upgrade-frontends", "-y")
-		}
-		if upgradeRunCmdFlags.upgradebackends {
-			args = append(args, "--upgrade-backends", "-y")
-		}
-		if upgradeRunCmdFlags.upgradeairgapbundles {
-			args = append(args, "--upgrade-airgap-bundles", "-y")
-		}
-		if upgradeRunCmdFlags.skipDeploy {
-			args = append(args, "--skip-deploy")
-		}
-		if offlineMode {
-			writer.Title("Installing airgap install bundle")
-			airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
-			if err != nil {
-				return status.Annotate(err, status.AirgapUnpackInstallBundleError)
-			}
-			if upgradeRunCmdFlags.upgradefrontends {
-				moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
-			} else if upgradeRunCmdFlags.upgradebackends {
-				moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
-			} else {
-				moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
-			}
-		}
-		return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
 	}
 
 	if airgap.AirgapInUse() && !offlineMode {
@@ -156,6 +123,55 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	// stuff breaks when deployment-service is restarted. Until that's fixed,
 	// it would be pointless to try to stream the events.
 	return nil
+}
+
+func runAutomateHAFlow(args []string, offlineMode bool) error {
+	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
+		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
+	}
+	response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(response, "y") {
+		return errors.New("canceled upgrade")
+	}
+	if upgradeRunCmdFlags.upgradefrontends {
+		args = append(args, "--upgrade-frontends", "-y")
+	}
+	if upgradeRunCmdFlags.upgradebackends {
+		args = append(args, "--upgrade-backends", "-y")
+	}
+	if upgradeRunCmdFlags.upgradeairgapbundles {
+		args = append(args, "--upgrade-airgap-bundles", "-y")
+	}
+	if upgradeRunCmdFlags.skipDeploy {
+		args = append(args, "--skip-deploy")
+	}
+	if offlineMode {
+		writer.Title("Installing airgap install bundle")
+		airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
+		if err != nil {
+			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
+		}
+		if upgradeRunCmdFlags.upgradefrontends {
+			err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		} else if upgradeRunCmdFlags.upgradebackends {
+			err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		} else {
+			err := moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
 }
 
 func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
