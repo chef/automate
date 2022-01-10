@@ -6,6 +6,7 @@ package dex
 import (
 	a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // ServiceName returns the name of the service this config belongs to
@@ -185,7 +186,7 @@ func (m *ConfigRequest) SetSecret(name string, value *wrappers.StringValue) erro
 		}
 		v4 := &(*v3).BindPassword
 		if *v4 == nil {
-			*v4 = &wrappers.StringValue{}
+			*v4 = &wrapperspb.StringValue{}
 		}
 		*v4 = value
 	case "msad_password":
@@ -207,7 +208,7 @@ func (m *ConfigRequest) SetSecret(name string, value *wrappers.StringValue) erro
 		}
 		v4 := &(*v3).BindPassword
 		if *v4 == nil {
-			*v4 = &wrappers.StringValue{}
+			*v4 = &wrapperspb.StringValue{}
 		}
 		*v4 = value
 	default:

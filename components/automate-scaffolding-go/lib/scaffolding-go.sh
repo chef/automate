@@ -109,7 +109,7 @@ do_check() {
   if ! [[ ${scaffolding_go_no_static} ]]; then
     check_static_binary() {
       build_line "Checking for dynamic links in ${1}"
-      if ! ldd "${1}" | grep "not a dynamic executable"; then
+      if ! ldd "${1}" 2>&1 | grep "not a dynamic executable"; then
           exit_with "${binary} is not a static executable" 1
       fi
     }
