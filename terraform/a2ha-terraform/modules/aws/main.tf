@@ -159,7 +159,7 @@ resource "aws_instance" "chef_automate_postgresql" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups]
+  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
 }
 
 resource "aws_instance" "chef_automate_elasticsearch" {
@@ -206,7 +206,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups]
+  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
 }
 
 resource "aws_instance" "chef_automate" {
@@ -253,7 +253,7 @@ resource "aws_instance" "chef_automate" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups]
+  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
 }
 
 resource "aws_instance" "chef_server" {
@@ -300,5 +300,5 @@ resource "aws_instance" "chef_server" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups]
+  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
 }
