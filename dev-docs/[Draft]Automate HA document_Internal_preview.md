@@ -382,6 +382,9 @@ Apply updated es\_config.toml config to Elasticsearch, this only needs to be don
 
 ` `curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check es. Check that all the indices is green or not)
 
+# Watch for a message about Elasticsearch going from RED to GREEN
+` `journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
+
 Configure Automate to handle external Elasticsearch backups	
 
 Create a automate.toml file on the provisioning server
