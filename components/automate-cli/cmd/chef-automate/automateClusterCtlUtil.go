@@ -452,7 +452,7 @@ func extarctVersionAndRelease(filename string) (string, string) {
 	r := regexp.MustCompile(RELEASE_AND_VERSION_PATTERN)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
-		logrus.Debug("failed to parse version of hart" + filename)
+		logrus.Debugf("failed to parse version of hart %s", filename)
 	}
 	return match[1], match[2]
 }
@@ -461,7 +461,7 @@ func extractOrigin(filename string) string {
 	r := regexp.MustCompile(ORIGIN_PATTERN)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
-		logrus.Debug("failed to parse origin from of hart" + filename)
+		logrus.Debugf("failed to parse origin from of hart %s", filename)
 	}
 	return match[0]
 }
@@ -470,7 +470,7 @@ func extractPackageName(filename string) string {
 	r := regexp.MustCompile(PACKAGE_NAME_PATTERN)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
-		logrus.Debug("failed to parse package name of hart" + filename)
+		logrus.Debugf("failed to parse package name of hart %s", filename)
 	}
 	return match[0][1 : len(match[0])-(len(match[0])-(strings.LastIndexAny(match[0], "-")))]
 }
