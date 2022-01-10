@@ -1,15 +1,15 @@
-describe('Infra Editor Policy', () => {
-    let withInfraEditorActionToken = '';
-    let withoutInfraEditorActionToken = '';
+describe('Infra Project Owner Policy', () => {
+    let withInfraProjectOwnerActionToken = '';
+    let withoutInfraProjectOwnerActionToken = '';
 
-    const cypressPrefix = 'infra-editor';
+    const cypressPrefix = 'infra-project-owner';
     const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
     const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
     const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
     const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
     const objectsToCleanUp = ['tokens', 'policies'];
 
-    const allowInfraEditorPolicy = {
+    const allowInfraProjectOwnerPolicy = {
     id: policyId1,
     name: tokenId1,
     projects: [],
@@ -22,14 +22,21 @@ describe('Infra Editor Policy', () => {
                 'infra:*:get',
                 'infra:infraServersOrgsRoles:create',
                 'infra:infraServersOrgsRoles:update',
+                'infra:infraServersOrgsRoles:delete',
                 'infra:infraServersOrgsClient:create',
                 'infra:infraServersOrgsClient:update',
+                'infra:infraServersOrgsClient:delete',
                 'infra:infraServersOrgsDataBags:create',
+                'infra:infraServersOrgsDataBags:delete',
                 'infra:infraServersOrgsDataBagsItem:create',
                 'infra:infraServersOrgsDataBagsItem:update',
+                'infra:infraServersOrgsDataBagsItem:delete',
                 'infra:infraServersOrgsEnvironments:create',
                 'infra:infraServersOrgsEnvironments:update',
+                'infra:infraServersOrgsEnvironments:delete',
                 'infra:infraServersOrgsNodes:update',
+                'infra:infraServersOrgsNodes:delete',
+                'infra:infraServersOrgsPolicyFiles:delete',
                 'compliance:*',
                 'event:*',
                 'ingest:*',
@@ -37,15 +44,22 @@ describe('Infra Editor Policy', () => {
                 'iam:projects:list',
                 'iam:projects:get',
                 'iam:projects:assign',
+                'iam:policies:list',
+                'iam:policies:get',
+                'iam:policyMembers:*',
+                'iam:teams:list',
+                'iam:teams:get',
+                'iam:teamUsers:*',
+                'iam:users:get',
+                'iam:users:list',
                 'applications:*'
             ],
             projects: ['*']
-        }
-        ]
+        }]
     };
 
 
-    const denyInfraEditorPolicy = {
+    const denyInfraProjectOwnerPolicy = {
         id: policyId2,
         name: tokenId2,
         projects: [],
@@ -58,14 +72,21 @@ describe('Infra Editor Policy', () => {
                 'infra:*:get',
                 'infra:infraServersOrgsRoles:create',
                 'infra:infraServersOrgsRoles:update',
+                'infra:infraServersOrgsRoles:delete',
                 'infra:infraServersOrgsClient:create',
                 'infra:infraServersOrgsClient:update',
+                'infra:infraServersOrgsClient:delete',
                 'infra:infraServersOrgsDataBags:create',
+                'infra:infraServersOrgsDataBags:delete',
                 'infra:infraServersOrgsDataBagsItem:create',
                 'infra:infraServersOrgsDataBagsItem:update',
+                'infra:infraServersOrgsDataBagsItem:delete',
                 'infra:infraServersOrgsEnvironments:create',
                 'infra:infraServersOrgsEnvironments:update',
+                'infra:infraServersOrgsEnvironments:delete',
                 'infra:infraServersOrgsNodes:update',
+                'infra:infraServersOrgsNodes:delete',
+                'infra:infraServersOrgsPolicyFiles:delete',
                 'compliance:*',
                 'event:*',
                 'ingest:*',
@@ -73,11 +94,18 @@ describe('Infra Editor Policy', () => {
                 'iam:projects:list',
                 'iam:projects:get',
                 'iam:projects:assign',
+                'iam:policies:list',
+                'iam:policies:get',
+                'iam:policyMembers:*',
+                'iam:teams:list',
+                'iam:teams:get',
+                'iam:teamUsers:*',
+                'iam:users:get',
+                'iam:users:list',
                 'applications:*'
             ],
             projects: ['*']
-        }
-        ]
+        }]
     };
 
     before(() => {
@@ -92,14 +120,14 @@ describe('Infra Editor Policy', () => {
                 name: tokenId1
             }
             }).then((resp) => {
-                withInfraEditorActionToken = resp.body.token.value;
+                withInfraProjectOwnerActionToken = resp.body.token.value;
             });
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'POST',
             url: '/apis/iam/v2/policies',
-            body: allowInfraEditorPolicy
+            body: allowInfraProjectOwnerPolicy
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
@@ -113,14 +141,14 @@ describe('Infra Editor Policy', () => {
                 name: tokenId2
             }
             }).then((resp) => {
-                withoutInfraEditorActionToken = resp.body.token.value;
+                withoutInfraProjectOwnerActionToken = resp.body.token.value;
             });
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'POST',
             url: '/apis/iam/v2/policies',
-            body: denyInfraEditorPolicy
+            body: denyInfraProjectOwnerPolicy
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
@@ -130,9 +158,9 @@ describe('Infra Editor Policy', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('cookbooks get returns 200 when infraEditor policy is allowed', () => {
+    it('cookbooks get returns 200 when InfraProjectOwner policy is allowed', () => {
         cy.request({
-            headers: { 'api-token': withInfraEditorActionToken },
+            headers: { 'api-token': withInfraProjectOwnerActionToken },
             method: 'GET',
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/cookbooks'
             }).then((resp) => {
@@ -140,9 +168,9 @@ describe('Infra Editor Policy', () => {
             });
     });
 
-    it('cookbooks get returns 403 when infraEditor policy actions is denied', () => {
+    it('cookbooks get returns 403 when InfraProjectOwner policy actions is denied', () => {
         cy.request({
-            headers: { 'api-token': withoutInfraEditorActionToken },
+            headers: { 'api-token': withoutInfraProjectOwnerActionToken },
             method: 'GET',
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/cookbooks',
             failOnStatusCode: false
@@ -151,9 +179,9 @@ describe('Infra Editor Policy', () => {
         });
     });
 
-    it('Create Env request returns 200 when infraEditor policy is allowed', () => {
+    it('Create Env request returns 200 when InfraProjectOwner policy is allowed', () => {
         cy.request({
-            headers: { 'api-token': withInfraEditorActionToken },
+            headers: { 'api-token': withInfraProjectOwnerActionToken },
             method: 'POST',
             body: {
                 org_id: 'test-org',
@@ -161,15 +189,15 @@ describe('Infra Editor Policy', () => {
                 name: 'test2',
                 description: 'cypress testing'
             },
-            url: '/api/v0/infra/servers/local-dev/orgs/test-org/environments'
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/environments',
             }).then((resp) => {
             assert.equal(resp.status, 200);
         });
     });
 
-    it('Roles get returns 200 when infraEditor policy is allowed', () => {
+    it('Roles get returns 200 when InfraProjectOwner policy is allowed', () => {
         cy.request({
-            headers: { 'api-token': withInfraEditorActionToken },
+            headers: { 'api-token': withInfraProjectOwnerActionToken },
             method: 'GET',
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/roles'
             }).then((resp) => {
@@ -177,9 +205,9 @@ describe('Infra Editor Policy', () => {
             });
     });
 
-    it('Roles get returns 403 when infraEditor policy is denied', () => {
+    it('Roles get returns 403 when InfraProjectOwner policy is denied', () => {
         cy.request({
-            headers: { 'api-token': withoutInfraEditorActionToken },
+            headers: { 'api-token': withoutInfraProjectOwnerActionToken },
             method: 'GET',
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/roles',
             failOnStatusCode: false
@@ -188,56 +216,45 @@ describe('Infra Editor Policy', () => {
         });
     });
 
-    it('databags delete returns 403 when infraEditor policy is allowed', () => {
+    it('Nodes delete returns 403 when infraServersOrgsNodes delete actions is denied', () => {
         cy.request({
-            headers: { 'api-token': withInfraEditorActionToken },
+            headers: { 'api-token': withoutInfraProjectOwnerActionToken },
             method: 'DELETE',
-            url: '/api/v0/infra/servers/local-dev/orgs/test-org/data_bags/test',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/nodes/test-admin',
             failOnStatusCode: false
             }).then((resp) => {
             assert.equal(resp.status, 403);
         });
     });
-  
-    it('create infra server post returns 403 when infraServers create actions is denied', () => {
+
+    it('Nodes delete returns 200 when infraServersOrgsNodes delete actions is allowed', () => {
         cy.request({
-            headers: { 'api-token': withInfraEditorActionToken },
-            method: 'POST',
-            url: '/api/v0/infra/servers',
-            body: {
-                fqdn: 'a2-dev.test',
-                id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
-                ip_address: '127.0.0.1',
-                name: 'test4'
-            },
+            headers: { 'api-token': withInfraProjectOwnerActionToken },
+            method: 'DELETE',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/nodes/test-admin'
+            }).then((resp) => {
+                assert.equal(resp.status, 200);
+            });
+    });
+
+    it('policyfiles delete returns 403 when delete actions is denied', () => {
+        cy.request({
+            headers: { 'api-token': withoutInfraProjectOwnerActionToken },
+            method: 'DELETE',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/policyfiles/examplecb',
             failOnStatusCode: false
             }).then((resp) => {
                 assert.equal(resp.status, 403);
             });
     });
 
-    it('infra server orgs post returns 403 when infraServers orgs create actions is denied', () => {
-        const serverID = `chef-server-dev-test-${Cypress.moment().format('MMDDYYhhmm')}`;
-        const orgID = `chef-org-dev-${Cypress.moment().format('MMDDYYhhmm')}`;
-        const orgName = '4thcoffee';
-        const adminUser = 'chefadmin';
-        // using dummy admin key value for creating the org
-        const adminKey = 'Dummy--admin--key';
+    it('policyfiles delete returns 200 when delete actions is allowed', () => {
         cy.request({
-            headers: { 'api-token': withInfraEditorActionToken,
-            'content-type': 'application/json+lax' },
-            method: 'POST',
-            body: {
-                id: `${orgID}-test-1`,
-                server_id: serverID,
-                name: orgName,
-                admin_user: adminUser,
-                admin_key: adminKey
-            },
-            failOnStatusCode: false,
-            url: `/api/v0/infra/servers/${serverID}/orgs`
-        }).then((resp) => {
-            assert.equal(resp.status, 403);
+            headers: { 'api-token': withInfraProjectOwnerActionToken },
+            method: 'DELETE',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/policyfiles/examplecb'
+            }).then((resp) => {
+            assert.equal(resp.status, 200);
         });
-    })
+    });
 });
