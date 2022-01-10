@@ -542,7 +542,7 @@ vi configs/automate.toml
 
 `    `# Use the credentials obtained from here [AWS-Credential](https://github.com/chef/automate-as-saas/wiki/Bastion-Setup#aws-credentials)
 
-`    `access\_key = "AKIARUQHMSKHGYTUJ&UI”
+`    `access\_key = "AKIARUQHMSKHGYTUJ&UI"
 
 `    `secret\_key = "s3kQ4Idyf9WjAgRXyv9tLYCQgYTRESDFRFV"
 
@@ -737,94 +737,88 @@ E.g For secret service `cat /hab/svc/secrets-service/data/secrets\_key`
 # Performance benchmarking
 # Certificates renewal
 
-Create "server\_cert\_ext.cnf" and "client\_cert\_ext.cnf" file and paste below content in both the file. Both files should be in same dir where openssl script is placed. As we see in below image cert.sh.
+execute this command from /hab/a2_deploy_workspace. This command will create a skeleton of certificate. 
 
-extendedKeyUsage = clientAuth, serverAuth
-
-
+./scripts/credentials set ssl --rotate-all 
 
 
-Use the script below to generate certs.   This is a bash script content so copy this content to a new file and execute it from bastion and this script will put certs at /hab/a2\_deploy\_worspace/certs directory. This will need a openssl utility so make sure that this utility is installed.
+Use the script below content to generate certs. This is a bash script content so copy this content to a new file and execute it from bastion and this script will put certs at /hab/a2\_deploy\_worspace/certs directory. This will need a openssl utility so make sure that this utility is installed.
 
 
 
 ----------------------------------------------------------cert.sh------------------------------------------------------------------
 
-#!/bin/bash
+#!/bin/bash 
 
+echo extendedKeyUsage = clientAuth, serverAuth > server_cert_ext.cnf 
 
+echo extendedKeyUsage = clientAuth, serverAuth > client_cert_ext.cnf 
 
-openssl genrsa -out ca\_root.key 2048
+openssl genrsa -out ca_root.key 2048 
 
+  
 
+openssl req -x509 -new -key ca_root.key -sha256 -out ca_root.pem -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca' 
 
-openssl req -x509 -new -key ca\_root.key -sha256 -out ca\_root.pem -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca'
+  
 
+openssl genrsa -out admin-pkcs12.key 2048 
 
+  
 
-openssl genrsa -out admin-pkcs12.key 2048
+openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "admin-pkcs12.key" -topk8 -out "es_admin_ssl_private.key" -nocrypt 
 
+  
 
+openssl req -new -key es_admin_ssl_private.key -out admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin' 
 
-openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "admin-pkcs12.key" -topk8 -out "es\_admin\_ssl\_private.key" -nocrypt
+  
 
+openssl x509 -req -in admin.csr -CA ca_root.pem -CAkey ca_root.key -CAcreateserial -out es_admin_ssl_public.pem -sha256 -extfile server_cert_ext.cnf 
 
+  
 
-openssl req -new -key es\_admin\_ssl\_private.key -out admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
+openssl genrsa -out ssl-pkcs12.key 2048 
 
+  
 
+openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "ssl-pkcs12.key" -topk8 -out  es_ssl_private.key -nocrypt 
 
-openssl x509 -req -in admin.csr -CA ca\_root.pem -CAkey ca\_root.key -CAcreateserial -out es\_admin\_ssl\_public.pem -sha256 -extfile server\_cert\_ext.cnf
+  
 
+openssl req -new -key es_ssl_private.key -out ssl.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' 
 
+  
 
-openssl genrsa -out ssl-pkcs12.key 2048
+openssl x509 -req -in ssl.csr -CA ca_root.pem -CAkey ca_root.key -CAcreateserial -out es_ssl_public.pem -sha256 -extfile client_cert_ext.cnf 
 
+  
 
+  
 
-openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "ssl-pkcs12.key" -topk8 -out  “es\_ssl\_private.key” -nocrypt
+cp ca_root.pem /hab/a2_deploy_workspace/certs/ca_root.pem 
 
+cp es_admin_ssl_public.pem /hab/a2_deploy_workspace/certs/es_admin_ssl_public.pem 
 
+cp es_admin_ssl_private.key /hab/a2_deploy_workspace/certs/es_admin_ssl_private.key 
 
-openssl req -new -key es\_ssl\_private.key -out ssl.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode'
+cp es_ssl_public.pem /hab/a2_deploy_workspace/certs/es_ssl_public.pem 
 
+cp es_ssl_private.key /hab/a2_deploy_workspace/certs/es_ssl_private.key 
 
+cp es_admin_ssl_private.key /hab/a2_deploy_workspace/certs/kibana_ssl_private.key 
 
-openssl x509 -req -in ssl.csr -CA ca\_root.pem -CAkey ca\_root.key -CAcreateserial -out es\_ssl\_public.pem -sha256 -extfile client\_cert\_ext.cnf
+cp es_admin_ssl_public.pem /hab/a2_deploy_workspace/certs/kibana_ssl_public.pem 
 
+cp es_ssl_private.key /hab/a2_deploy_workspace/certs/pg_ssl_private.key 
 
-
-
-
-cp ca\_root.pem /hab/a2\_deploy\_workspace/certs/ca\_root.pem
-
-cp es\_admin\_ssl\_public.pem /hab/a2\_deploy\_workspace/certs/es\_admin\_ssl\_public.pem
-
-cp es\_admin\_ssl\_private.key /hab/a2\_deploy\_workspace/certs/es\_admin\_ssl\_private.key
-
-cp es\_ssl\_public.pem /hab/a2\_deploy\_workspace/certs/es\_ssl\_public.pem
-
-cp es\_ssl\_private.key /hab/a2\_deploy\_workspace/certs/es\_ssl\_private.key
-
-cp es\_admin\_ssl\_private.key /hab/a2\_deploy\_workspace/certs/kibana\_ssl\_private.key
-
-cp es\_admin\_ssl\_public.pem /hab/a2\_deploy\_workspace/certs/kibana\_ssl\_public.pem
-
-cp es\_ssl\_private.key /hab/a2\_deploy\_workspace/certs/pg\_ssl\_private.key
-
-cp es\_ssl\_public.pem /hab/a2\_deploy\_workspace/certs/pg\_ssl\_public.pem
+cp es_ssl_public.pem /hab/a2_deploy_workspace/certs/pg_ssl_public.pem 
 
 
 
 \-------------------------------------------------------------------------------------------------------------------------------------
 
-` `Now copy the content of the certs in an appropriate file. See below steps
-
-Execute this command from /hab/a2\_deploy\_workspace. This command will craete skeleton of certificate.
-
-*./scripts/credentials set ssl --rotate-all*
-
-Execute bash script that we created above 
+` `Now copy the content of the certs in an appropriate file. See below steps execute bash script that we created above.
 
 bash cert.sh 
 
