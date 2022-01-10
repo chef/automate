@@ -30,7 +30,7 @@ type ConvergeInfo struct {
 	TotalResourceCount int    `json:"total_resource_count"`
 }
 
-type ComplianceInfo []interface{}
+type ComplianceInfo interface{}
 
 func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
 	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
@@ -69,7 +69,6 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 	}
 	defer f.Close()
 	writer := gocsv.DefaultCSVWriter(f)
-	//writer := struct2csv.NewWriter(f)
 	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
 	if err != nil {
 		fmt.Println("Error while writing csv: ", err)
@@ -162,12 +161,8 @@ func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.T
 	return metric, ok
 }
 
-func (s ComplianceInfo) mapAt(index int) map[string]interface{} {
-	if len(s) <= index {
-		return nil
-	}
-
-	return s[index].(map[string]interface{})
+func get(key string, s interface{}) interface{} {
+	return s.(map[string]interface{})[key]
 }
 
 func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
@@ -179,7 +174,6 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 	}
 	defer f.Close()
 
-	//	writer := struct2csv.NewWriter(f)
 	writer := gocsv.DefaultCSVWriter(f)
 
 	var sourceFields = []string{
@@ -201,7 +195,6 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 	}
 
 	t := endTime.Add(24 * time.Hour)
-	//t := endTime.Add(-time.Hour * 24)
 	if t.Before(startTime) {
 		t = startTime
 	}
@@ -301,7 +294,6 @@ func queryElasticSearchComplianceNodeCount(client *elastic.Client, startTime tim
 	}
 	defer f.Close()
 	writer := gocsv.DefaultCSVWriter(f)
-	//writer := struct2csv.NewWriter(f)
 	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
 	if err != nil {
 		fmt.Println("Error while writing csv: ", err)
@@ -459,48 +451,37 @@ func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime ti
 				}
 			}
 
+			var s ComplianceInfo
+
 			for _, hit := range searchResult.Hits.Hits {
 
-				var payload []byte
-
-				payload = []byte("[")
-				comma := []byte(",")
-				payload = append(payload, *hit.Source...)
-				payload = append(payload, comma...)
-				payload = payload[:len(payload)-1]
-				payload = append(payload, []byte("]")...)
-				var s ComplianceInfo
-
-				err = json.Unmarshal(payload, &s)
+				err = json.Unmarshal(*hit.Source, &s)
 				if err != nil {
 					fmt.Println("Json marshal err :", err)
 					os.Exit(1)
 				}
 
-				for i := 0; i < len(s); i++ {
-					record := []string{
-						s.mapAt(i)["node_uuid"].(string),
-						s.mapAt(i)["version"].(string),
-						s.mapAt(i)["node_name"].(string),
-						s.mapAt(i)["environment"].(string),
-						s.mapAt(i)["end_time"].(string),
-						s.mapAt(i)["platform"].(map[string]interface{})["name"].(string),
-						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["total"]),
-						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["passed"].(map[string]interface{})["total"]),
-						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["skipped"].(map[string]interface{})["total"]),
-						fmt.Sprint(s.mapAt(i)["controls_sums"].(map[string]interface{})["failed"].(map[string]interface{})["total"]),
-						strconv.Itoa(len(s.mapAt(i)["profiles"].([]interface{}))),
-					}
-					if err := w.Write(record); err != nil {
-						fmt.Println("Error while writing csv: ", err)
+				record := []string{
+					get("node_uuid", s).(string),
+					get("version", s).(string),
+					get("node_name", s).(string),
+					get("environment", s).(string),
+					get("end_time", s).(string),
+					get("name", get("platform", s)).(string),
+					fmt.Sprint(get("total", get("controls_sums", s))),
+					fmt.Sprint(get("total", get("passed", get("controls_sums", s)))),
+					fmt.Sprint(get("total", get("skipped", get("controls_sums", s)))),
+					fmt.Sprint(get("total", get("failed", get("controls_sums", s)))),
+					strconv.Itoa(len(get("profiles", s).([]interface{}))),
+				}
+				if err := w.Write(record); err != nil {
+					fmt.Println("Error while writing csv: ", err)
 
-					}
-					w.Flush()
-					header = false
-					if err := w.Error(); err != nil {
-						fmt.Println("Error while writing csv: ", err)
-
-					}
+				}
+				w.Flush()
+				header = false
+				if err := w.Error(); err != nil {
+					fmt.Println("Error while writing csv: ", err)
 
 				}
 			}
