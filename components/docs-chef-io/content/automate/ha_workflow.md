@@ -27,7 +27,7 @@ gh_repo = "automate"
    1. Elasticsearch instance of _m5.large_ type with 16GB RAM for production (8 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 300 volume iops.
    1. Chef Automate instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume iops
    1. Chef Infra Server instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume iops.
-   1. Ensure the following ports are open:
+1. Ensure the following ports are open:
 
     | Habitat gossip (UDP), 9638 | Habitat http API, 9631 |
     | --- | --- |
