@@ -8,12 +8,6 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 )
 
-var IsMigrationAlreadyRunning bool
-
-func setMigrationStatus(status bool) {
-	IsMigrationAlreadyRunning = status
-}
-
 // getChefClient: creates the chef client
 func (s *Server) getChefClient(ctx context.Context, serverId string) (*ChefClient, error) {
 	// Get the credential ID from servers table

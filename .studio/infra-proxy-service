@@ -349,7 +349,7 @@ function infra_service_load_sample_orgs() {
   install_if_missing core/grpcurl grpcurl
 
   local OPTIND opt 
-  local records=5
+  local records=50
   local server_id
   local org_prefix="chef-org"
   while getopts ":N:S:O:" opt; do
