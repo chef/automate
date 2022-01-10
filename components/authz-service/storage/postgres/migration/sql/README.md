@@ -77,3 +77,6 @@
 - [`75_update_roles_pols.up.sql`](75_update_roles_pols.up.sql)
 - [`76_compliance_roles_pols.up.sql`](76_compliance_roles_pols.up.sql)
 - [`77_update_infra_service_policies.up.sql`](77_update_infra_service_policies.up.sql)
+- [`78_update_viewer_role_pols.up.sql`](78_update_viewer_role_pols.up.sql)
+- [`79_infra_editor_update.up.sql`](79_infra_editor_update.up.sql)
+- [`80_infra_project_owner.up.sql`](80_infra_project_owner.up.sql)
