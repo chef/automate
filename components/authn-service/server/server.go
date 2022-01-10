@@ -200,7 +200,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		*/
 		var policyAssigned bool = false
 		for i := 4; i > 0; i-- {
-			_, err := policiesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
+			_, err = policiesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
 				Id:      IngestPolicyID,
 				Members: []string{fmt.Sprintf("token:%s", tokenID)},
 			})
