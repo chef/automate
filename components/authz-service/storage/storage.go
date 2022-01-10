@@ -92,7 +92,7 @@ func DefaultPolicies() ([]Policy, error) {
 		return nil, err
 	}
 
-	// editor policy statements
+	// editor allow policy statements
 	s3, err := NewStatement(Allow, constants.EditorRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
@@ -106,6 +106,10 @@ func DefaultPolicies() ([]Policy, error) {
 
 	// ingest policy statements
 	s5, err := NewStatement(Allow, constants.IngestRoleID, []string{}, []string{"*"}, []string{})
+	if err != nil {
+		return nil, err
+	}
+
 	if err != nil {
 		return nil, err
 	}
