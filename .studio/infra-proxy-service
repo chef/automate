@@ -331,3 +331,59 @@ EOF
   done  
   log_line "Sample data loaded of $records users for server with server name '$server_prefix' and server id '$server_id'"
 }
+
+document "infra_service_load_sample_orgs" <<DOC
+  Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
+  Hits the create org endpoint inside the infra-proxy-service. (CreateInfraServerOrgs)
+  It creates the organisations on chef server
+  1. -N No of records Default: 50
+  2. -S Chef Infra Server id, which should be available on chef server and added in automate
+  3. -O Chef organization's name prefix Default: chef-org
+  Example:
+  -----------------------------
+  infra_service_load_sample_orgs -N 100 -S chef-server -O chef-org
+DOC
+
+function infra_service_load_sample_orgs() {
+  install_if_missing core/jq-static jq
+  install_if_missing core/grpcurl grpcurl
+
+  local OPTIND opt 
+  local records=5
+  local server_id
+  local org_prefix="chef-org"
+  while getopts ":N:S:O:" opt; do
+    case $opt in
+      N) records="$OPTARG"
+      ;;
+      S) server_id="$OPTARG"
+      ;;
+      O) org_prefix="$OPTARG"
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+      : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+    esac
+  done
+  shift $((OPTIND -1))
+
+  log_line "Started Loading sample organizations..."
+  log_line "Total number of records: $records"
+  log_line "Chef Infra Server's id: $server_id"
+  log_line "Chef organization's name prefix: $org_prefix"
+
+  local ip_address
+  local timestamp
+  for _ in $(seq 1 ${records}); do
+    timestamp=$(date +%s%N)
+
+  chef-automate dev grpcurl infra-proxy-service -- -d \
+  "$(cat << EOF
+    {"server_id": "${server_id}", "name": "${org_prefix}-${timestamp}", "full_name": "${org_prefix}-${timestamp}"}
+EOF
+  )" chef.automate.domain.infra_proxy.service.InfraProxyService.CreateInfraServerOrgs >/dev/null
+  done  
+  log_line "Sample organisations loaded..."
+}

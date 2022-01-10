@@ -63,3 +63,12 @@ message GetInfraServerOrgs {
     // Automate Infra Server ID
     string server_id = 1;
 }
+
+message CreateInfraServerOrgs {
+    // Automate Infra Server ID
+    string server_id = 1;
+    // Organisation name
+    string name = 2;
+    // Orgabisation full_name
+    string full_name = 3;
+}
