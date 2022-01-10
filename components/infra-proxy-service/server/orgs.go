@@ -6,10 +6,7 @@ import (
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
-<<<<<<< HEAD
-=======
 	"github.com/chef/automate/api/interservice/authz"
->>>>>>> 960571021 (stash changes)
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
@@ -299,4 +296,3 @@ func createProjectFromOrgIdAndServerID(s *Server, ctx context.Context, serverId 
 
 	return []string{projectID.Project.Name}, nil
 }
-
