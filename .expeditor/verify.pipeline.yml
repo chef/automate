@@ -17,7 +17,6 @@ steps:
     command:
       - hab studio run "source .studiorc && verify_all_protobuf_components"
     timeout_in_minutes: 10
-    soft_fail: true
     retry:
       automatic:
         limit: 1
