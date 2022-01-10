@@ -1,16 +1,16 @@
-name: chef-automate provision-infra
-synopsis: Provision Automate HA infra.
-usage: chef-automate provision-infra [flags]
-description: Provision infra for Automate HA deployment.
+name: chef-automate validate-ha-infrastructure
+synopsis: Validate existing infrastructure of Automate HA
+usage: chef-automate validate-ha-infrastructure [flags]
+description: Validate existing infrastructure of automate HA
 options:
 - name: airgap-bundle
-  usage: Path to an airgap install bundle
-- name: channel
-  usage: Release channel to deploy all services from
+  usage: Path to airgap bundle
+- name: habitat-bundle
+  usage: Path to haitat tar bundle
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for provision-infra
+  usage: help for validate-ha-infrastructure
 inherited_options:
 - name: debug
   shorthand: d
