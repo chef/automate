@@ -470,7 +470,7 @@ func extractPackageName(filename string) string {
 	r := regexp.MustCompile(PACKAGE_NAME_PATTERN)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
-		fmt.Printf("failed to parse package name of hart" + filename)
+		logrus.Debug("failed to parse package name of hart" + filename)
 	}
 	return match[0][1 : len(match[0])-(len(match[0])-(strings.LastIndexAny(match[0], "-")))]
 }
