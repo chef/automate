@@ -136,6 +136,8 @@ This section includes Chef Automate High Availability (HA) high-level reference 
 
 The following Chef Automate HA architecture diagram shows the components involved in the Chef Automate HA that works on Leader-Follower strategy. We are creating the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch for Chef Automate HA.
 
+![Automate-HA-Architecture](automate-ha-architecture.png)
+
 
 The Chef Automate HA architecture involves two different clusters part of the main cluster, which are:
 ## Automate Backend Cluster 
