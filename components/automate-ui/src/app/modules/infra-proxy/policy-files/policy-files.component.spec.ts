@@ -30,7 +30,6 @@ describe('PolicyFilesComponent', () => {
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'mat-select' }),
