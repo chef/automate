@@ -388,7 +388,7 @@ type ConfigRequest_V1_LargeReporting struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EnableLargeReporting *wrappers.BoolValue `protobuf:"bytes,1,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
+	EnableLargeReporting *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
 }
 
 func (x *ConfigRequest_V1_LargeReporting) Reset() {
@@ -423,7 +423,7 @@ func (*ConfigRequest_V1_LargeReporting) Descriptor() ([]byte, []int) {
 	return file_config_ui_config_request_proto_rawDescGZIP(), []int{0, 0, 4}
 }
 
-func (x *ConfigRequest_V1_LargeReporting) GetEnableLargeReporting() *wrappers.BoolValue {
+func (x *ConfigRequest_V1_LargeReporting) GetEnableLargeReporting() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.EnableLargeReporting
 	}
@@ -1090,9 +1090,9 @@ var file_config_ui_config_request_proto_goTypes = []interface{}{
 	(*ConfigRequest_V1_System_Nginx_Http)(nil),     // 12: chef.automate.ui.ConfigRequest.V1.System.Nginx.Http
 	(*shared.Mlsa)(nil),                            // 13: chef.automate.infra.config.Mlsa
 	(*shared.TLSCredentials)(nil),                  // 14: chef.automate.infra.config.TLSCredentials
-	(*wrappers.BoolValue)(nil),                     // 15: google.protobuf.BoolValue
-	(*wrappers.StringValue)(nil),                   // 16: google.protobuf.StringValue
-	(*wrappers.Int32Value)(nil),                    // 17: google.protobuf.Int32Value
+	(*wrapperspb.BoolValue)(nil),                   // 15: google.protobuf.BoolValue
+	(*wrapperspb.StringValue)(nil),                 // 16: google.protobuf.StringValue
+	(*wrapperspb.Int32Value)(nil),                  // 17: google.protobuf.Int32Value
 }
 var file_config_ui_config_request_proto_depIdxs = []int32{
 	1,  // 0: chef.automate.ui.ConfigRequest.v1:type_name -> chef.automate.ui.ConfigRequest.V1

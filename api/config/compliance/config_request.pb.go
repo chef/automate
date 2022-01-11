@@ -287,11 +287,11 @@ type ConfigRequest_V1_System_Service struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Deprecated: Do not use.
-	Host                 *wrappers.StringValue `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty" toml:"host,omitempty" mapstructure:"host,omitempty"` // The listen host is no longer setable(localhost only)
-	Port                 *wrappers.Int32Value  `protobuf:"bytes,2,opt,name=port,proto3" json:"port,omitempty" toml:"port,omitempty" mapstructure:"port,omitempty"`
-	ExternalFqdn         *wrappers.StringValue `protobuf:"bytes,7,opt,name=external_fqdn,json=externalFqdn,proto3" json:"external_fqdn,omitempty" toml:"external_fqdn,omitempty" mapstructure:"external_fqdn,omitempty"`
-	MessageBufferSize    *wrappers.Int32Value  `protobuf:"bytes,8,opt,name=message_buffer_size,json=messageBufferSize,proto3" json:"message_buffer_size,omitempty" toml:"message_buffer_size,omitempty" mapstructure:"message_buffer_size,omitempty"`
-	EnableLargeReporting *wrappers.BoolValue   `protobuf:"bytes,9,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
+	Host                 *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty" toml:"host,omitempty" mapstructure:"host,omitempty"` // The listen host is no longer setable(localhost only)
+	Port                 *wrapperspb.Int32Value  `protobuf:"bytes,2,opt,name=port,proto3" json:"port,omitempty" toml:"port,omitempty" mapstructure:"port,omitempty"`
+	ExternalFqdn         *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=external_fqdn,json=externalFqdn,proto3" json:"external_fqdn,omitempty" toml:"external_fqdn,omitempty" mapstructure:"external_fqdn,omitempty"`
+	MessageBufferSize    *wrapperspb.Int32Value  `protobuf:"bytes,8,opt,name=message_buffer_size,json=messageBufferSize,proto3" json:"message_buffer_size,omitempty" toml:"message_buffer_size,omitempty" mapstructure:"message_buffer_size,omitempty"`
+	EnableLargeReporting *wrapperspb.BoolValue   `protobuf:"bytes,9,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
 }
 
 func (x *ConfigRequest_V1_System_Service) Reset() {
@@ -355,7 +355,7 @@ func (x *ConfigRequest_V1_System_Service) GetMessageBufferSize() *wrapperspb.Int
 	return nil
 }
 
-func (x *ConfigRequest_V1_System_Service) GetEnableLargeReporting() *wrappers.BoolValue {
+func (x *ConfigRequest_V1_System_Service) GetEnableLargeReporting() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.EnableLargeReporting
 	}
