@@ -1,6 +1,7 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2039
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=automate-pg-gateway
 pkg_origin=chef

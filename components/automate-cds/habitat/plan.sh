@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-cds
 pkg_description="Automate context delivery service proxy"
 pkg_origin=chef

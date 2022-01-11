@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-load-balancer
 pkg_origin=chef
 pkg_version="0.1.0"

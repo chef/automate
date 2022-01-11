@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-ha-cluster-ctl
 pkg_description="A package for automate-cluster-ctl for the A2 HA Backend."
 pkg_origin=chef

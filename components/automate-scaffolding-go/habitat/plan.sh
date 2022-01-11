@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=automate-scaffolding-go
 pkg_origin=chef
@@ -10,7 +11,7 @@ pkg_license=('Chef-MLSA')
 pkg_source=nosuchfile.tar.gz
 pkg_deps=(
   core/go/1.15 # This is only pinned to force a scaffolding rebuild to this version
-  core/git
+  core/git/2.26.2
 )
 
 do_build() {
