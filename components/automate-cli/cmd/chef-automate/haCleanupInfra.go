@@ -4,16 +4,16 @@ package main
 
 import (
 	"errors"
+	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"github.com/spf13/cobra"
 )
 
 var cleanupFlags = struct {
-	nodeName        string
-	directory       string
-	ports           string
+	nodeName  string
+	directory string
+	ports     string
 }{}
 
 const CLEANUP_SCRIPT_PATH = "/var/tmp/cleanup.sh"
@@ -52,7 +52,7 @@ var cleanupCmd = &cobra.Command{
 }
 
 func runCleanupCmd(cmd *cobra.Command, args []string) error {
-	
+
 	if len(args) < 0 {
 		return errors.New("config.toml is required as argument")
 	}
@@ -77,19 +77,17 @@ func executeCleanupScript(args []string) error {
 	if err != nil {
 		return err
 	}
-	if (len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) > 0){ 
-	return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c" ,configFilePath,"-n" ,cleanupFlags.nodeName }, "")
-	} else if (len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) < 0){ 
-		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c" ,configFilePath,"-n" ,cleanupFlags.nodeName, "-d" ,cleanupFlags.directory }, "")
-	}else if (len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) < 0 && len(cleanupFlags.ports) < 0){ 
-			return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath,"-n" ,cleanupFlags.nodeName }, "")
-	}else {
-		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath,"-p"}, "")
+	if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) > 0 {
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
+	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) < 0 {
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-d", cleanupFlags.directory}, "")
+	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) < 0 && len(cleanupFlags.ports) < 0 {
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
+	} else {
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-p"}, "")
 	}
-	
+
 }
-
-
 
 func generateCleanupScript() error {
 	return ioutil.WriteFile(CLEANUP_SCRIPT_PATH, []byte(cleanupScript), 0755) // nosemgrep
