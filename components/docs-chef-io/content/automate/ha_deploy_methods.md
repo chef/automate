@@ -17,8 +17,8 @@ gh_repo = "automate"
 
 Currently, Chef Automate High Availability (HA) supports two types of deployment, which are
 
-1. Amazon Web Services (AWS) Deployment
-2. Bare Metal Infrastructure Deployment (existing_node)
+1. Amazon Web Services (AWS) Deployment. Refer [Chef Automate HA Deployment using AWS]({{< relref "ha_deploy_aws.md" >}}) section for building an bastion host and Chef Automate HA deployment procedure using AWS.
+2. Bare Metal Infrastructure Deployment (existing_node). Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinfra.md" >}}) section for bare infra Chef Automate HA deployment procedure.
 
 ### AWS Deployment Method
 

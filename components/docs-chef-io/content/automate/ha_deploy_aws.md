@@ -17,13 +17,18 @@ gh_repo = "automate"
 
 This page explains the procedure to deploy Chef Automate High Availability (HA) in your network premises/ infrastructure using Amazon Web Services (AWS). To deploy Chef Automate HA, execute the following steps in the listed order:
 
-- Set up the [prerequisites for Chef Automate HA Deployment]({{< relref "ha_aws_prereq.md" >}}) section.
-- Connect your [Bastion host to your AWS instance]({{< relref "ha_aws_connect_bastion.md" >}}) section.
-- Create an [AWS Identity and Access Management IAM user]({{< relref "ha_iam_user.md" >}}) section.
-- Configure the [AWS credentials on your Bastion host]({{< relref "ha_configure_aws_credentials.md" >}}) section.
-- Create the DNS certificate.
-- Rotate the AWS certificates.
-- [Chef Automate HA deployment commands]({{< relref "ha_aws_deploy_steps.md" >}}) section.
+1. Set up the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_system_requirements.md" >}} )).
+1. Obtain an AWS account or if you already have one, sign on to your AWS account.
+1. Setup Virtual Private Cloud (VPC) in AWS.
+1. Setup the [bastion host requirements](( {{< relref "ha_aws_bastion.md#Bastion Server Requirements for AWS (Amazon Web Services)" >}} ))
+1. Configure [bastion host](( {{< relref "ha_aws_bastion.md#Bastion Host Configuration" >}} )).
+1. Ensure you have [Chef Automate utility](( {{< relref "ha_auto_install.md" >}})) installed, else download and install the latest version.
+1. Connect your [Bastion host to your AWS instance](( {{< relref "ha_aws_connect_bastion.md" >}} )).
+1. Create an [AWS Identity and Access Management IAM user](( {{< relref "ha_iam_user.md" >}} )).
+1. Configure the [AWS credentials on your Bastion host](( {{< relref "ha_configure_aws_credentials.md" >}} )).
+1. Create the certificate for the Chef Automate and Chef Server load balancers.
+1. Create and rotate the certificates. _optional_
+1. Execute the [Chef Automate HA deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )).
 
 ## AWS Infrastructure Resources
 
