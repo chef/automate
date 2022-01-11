@@ -497,6 +497,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-lsof",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }

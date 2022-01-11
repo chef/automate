@@ -1198,6 +1198,12 @@ plan_path = "components/automate-netcat"
 paths = [
   "components/automate-netcat/*"
 ]
+
+[automate-lsof]
+plan_path = "components/automate-lsof"
+paths = [
+  "components/automate-lsof/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
