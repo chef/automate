@@ -4,8 +4,9 @@ describe('chef server', () => {
   const serverName = `${cypressPrefix} server ${now}`;
   const generatedServerID = serverName.split(' ').join('-');
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
-  const serverFQDN = 'chef-server-1617089723092818000.com';
-  const serverIP = '176.119.50.159';
+  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
+  const serverIP = '18-117-112-129';
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   before(() => {
     cy.adminLogin('/infrastructure/chef-servers').then(() => {
@@ -30,7 +31,7 @@ describe('chef server', () => {
       cy.get('[data-cy=add-name]').type(serverName);
       cy.get('[data-cy=id-label]').contains(generatedServerID);
       cy.get('[data-cy=add-fqdn]').type(serverFQDN);
-
+      cy.get('[data-cy=webui_key]').type(webuiKey);
       cy.get('[data-cy=add-button]').click();
       cy.get('[data-cy=chef-infra-server-slider]').should('not.be.visible');
 
@@ -60,6 +61,7 @@ describe('chef server', () => {
       cy.get('[data-cy=id-label]').should('not.be.visible');
       cy.get('[data-cy=add-id]').should('be.visible').clear().type(customServerID);
       cy.get('[data-cy=add-fqdn]').type(serverFQDN);
+      cy.get('[data-cy=webui_key]').type(webuiKey);
 
       cy.get('[data-cy=add-button]').click();
       cy.get('app-chef-servers-list chef-modal').should('not.be.visible');
@@ -80,6 +82,7 @@ describe('chef server', () => {
       cy.get('chef-select').contains('FQDN').click();
       cy.get('chef-select chef-option').contains('IP Address').click();
       cy.get('[data-cy=add-ip-address]').type(serverIP);
+      cy.get('[data-cy=webui_key]').type(webuiKey);
 
       cy.get('[data-cy=add-button]').click();
       cy.get('[data-cy=chef-infra-server-slider]').should('not.be.visible');
@@ -101,6 +104,7 @@ describe('chef server', () => {
       cy.get('[data-cy=id-label]').should('not.be.visible');
       cy.get('[data-cy=add-id]').should('be.visible').clear().type(customServerID);
       cy.get('[data-cy=add-fqdn]').type(serverFQDN);
+      cy.get('[data-cy=webui_key]').type(webuiKey);
       cy.get('[data-cy=add-button]').click();
     });
 
