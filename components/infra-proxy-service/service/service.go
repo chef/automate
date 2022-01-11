@@ -27,7 +27,7 @@ type Service struct {
 
 // Start returns an instance of Service that connects to a postgres storage backend.
 func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secureconn.Factory, secretsClient secrets.SecretsServiceClient,
-	authzClient authz.AuthorizationServiceClient, authzClientProject authz.ProjectsServiceClient) (*Service, error) {
+	authzClient authz.AuthorizationServiceClient, authzProjectClient authz.ProjectsServiceClient) (*Service, error) {
 	p, err := postgres.New(l, migrationsConfig, authzClient)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 		ConnFactory:  connFactory,
 		Storage:      p,
 		Secrets:      secretsClient,
-		AuthzProject: authzClientProject,
+		AuthzProject: authzProjectClient,
 	}, nil
 }
 
