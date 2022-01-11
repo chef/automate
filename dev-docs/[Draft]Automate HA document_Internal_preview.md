@@ -339,7 +339,14 @@ This will give information about all server’s IP and automate’s URL deta
 
 This will give the status of frontend and backend node. 
 ## Air-gapped installation
-Need to ad steps for air-gapped installation.
+
+For airgap installation we need to have airgap-bundle (.aib) file handy in bastion host, 
+
+In case of aws deployemnt we need to pass airgap-bundel at the time of provision, 
+`chef-automate provision-infra </path/to/config.toml> --airgap-bundle </path/to/airgap-bundle>`
+
+In case of exiting infrastructure deployment we need to provide airgap bundle path to deploy command.
+`chef-automate deploy </path/to/config.toml> --airgap-bundle </path/to/airgap-bundle>`
 
 # Backup and restore
 Back-up configurations to be done before deploying cluster. 
@@ -631,6 +638,33 @@ Using this below command it will upgrade only backend bundles and deploy it.
 And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag 
 
  `chef-automate upgrade run --upgrade-backends --skip-deploy`
+ 
+
+# Upgrade with airgap
+
+using below command it will upgrade both frontend and backends with airgap
+
+`chef-automate upgrade run --airgap-bundle </path/to/arigap-bundle>`
+
+**To upgrade only frontends**
+
+Using this below command it will upgrade only frontend bundles from airgap file and deploy it.
+
+ `chef-automate upgrade run --upgrade-frontends --airgap-bundle </path/to/airgap-bundle>`
+
+ And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag 
+
+ `chef-automate upgrade run --upgrade-frontends --airgap-bundle </path/to/airgap-bundle> --skip-deploy`
+ 
+ **To upgrade only backends**
+
+Using this below command it will upgrade only backend bundles from airgap file and deploy it.
+
+ `chef-automate upgrade run --upgrade-backends --airgap-bundle </path/to/airgap-bundle>`
+
+And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag 
+
+ `chef-automate upgrade run --upgrade-backends --airgap-bundle </path/to/airgap-bundle> --skip-deploy`
 
 # Migration
 ## Chef server (HA- backend) to Automate HA
