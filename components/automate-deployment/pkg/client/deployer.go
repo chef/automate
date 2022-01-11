@@ -286,7 +286,7 @@ func DeployHA(writer cli.FormatWriter,
 	if err != nil {
 		logrus.Debug("Failed to get manifest for current channel")
 	}
-	b := bootstrap.NewCompatBootstrapper(target.NewLocalTarget(false))
+	b := bootstrap.NewCompatBootstrapper(d.target)
 	err = bootstrap.FullBootstrapHA(context.Background(), b, d.mergedCfg.Deployment, currentM, writer)
 	return err
 }
