@@ -32,7 +32,6 @@ const declarations: any[] = [
   MockComponent({ selector: 'chef-subheading' }),
   MockComponent({ selector: 'chef-toolbar' }),
   MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-  MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
   MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
   CookbookDetailsComponent
 ];
