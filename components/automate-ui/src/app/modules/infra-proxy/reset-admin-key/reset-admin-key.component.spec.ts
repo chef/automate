@@ -16,14 +16,12 @@ describe('ResetAdminKeyComponent', () => {
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         ResetAdminKeyComponent
       ],
       providers: [
