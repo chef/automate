@@ -62,6 +62,7 @@ describe('chef server details', () => {
       cy.get('[data-cy=update-web-ui-key]').contains('Update').click();
       cy.get('app-chef-server-details .sidenav-header').should('exist');
       cy.get('[data-cy=enter-webui-key]').type(webuiKey);
+      
       cy.get('[data-cy=update-webui-key-button]').click();
       cy.get('app-chef-server-details .sidenav-header').should('not.be.visible');
     });
