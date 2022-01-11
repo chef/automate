@@ -15,7 +15,6 @@ describe('ClientDetailsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'chef-button',
           inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'mat-select' }),
