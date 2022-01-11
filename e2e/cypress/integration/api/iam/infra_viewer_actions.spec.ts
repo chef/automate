@@ -196,4 +196,4 @@ describe('Infra Viewer Policy', () => {
             assert.equal(resp.status, 403);
         });
     });
-}); 
+});

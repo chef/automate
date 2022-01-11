@@ -6,12 +6,14 @@ describe('chef server details', () => {
   const updatedServerName = `${cypressPrefix} updated server ${now}`;
   const serverID = serverName.split(' ').join('-');
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
-  const serverFQDN = 'chef-server-1617089723092818000.com';
-  const serverIP = '176.119.50.159';
+  const orgID = 'demoorg';
+  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
+  const serverIP = '18-117-112-129';
   const orgName = `${cypressPrefix} org ${now}`;
   const generatedOrgID = orgName.split(' ').join('-');
   const customOrgID = `${cypressPrefix}-custom-id-${now}`;
   const adminUser = 'test_admin_user';
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   // using dummy admin key value for creating the org
   const adminKey = 'Dummy--admin--key';
@@ -29,7 +31,8 @@ describe('chef server details', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: serverIP,
+          webui_key: webuiKey
         }
       });
 
@@ -65,10 +68,10 @@ describe('chef server details', () => {
     it('check if Upload button is disabled before entering input', () => {
       cy.get('[data-cy=open-WebKey-slider]').contains('Update').click();
       cy.get('[data-cy=title]').contains('Update Web UI Key');
-      cy.get('[data-cy=Upload]')
+      cy.get('[data-cy=update-webui-key-button]')
       .invoke('attr', 'disabled')
       .then(disabled => {
-      disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=Upload]').click();
+      disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=update-webui-key-button]').click();
     });
       cy.get('[data-cy=cancel]').click();
   });
@@ -76,8 +79,8 @@ describe('chef server details', () => {
     it('Upload Web UI Key', () => {
       cy.get('[data-cy=open-WebKey-slider]').contains('Update').click();
       cy.get('[data-cy=title]').contains('Update Web UI Key');
-      cy.get('[data-cy=enter-key]').clear().type('testing');
-      cy.get('[data-cy=Upload').click();
+      cy.get('[data-cy=enter-webui-key]').clear().type('testing');
+      cy.get('[data-cy=update-webui-key-button').click();
     });
   });
 });

@@ -6,12 +6,13 @@ describe('infra node detail', () => {
   const environment = '';
   const serverID = 'chef-manage';
   const serverName = 'chef manage';
-  const orgID = 'viveksingh_msys';
-  const orgName = 'viveksingh_msys';
-  const serverFQDN = 'api.chef.io';
-  const serverIP = '50.21.221.24';
-  const adminUser = 'viveksingh_msys';
+  const orgID = 'demoorg';
+  const orgName = 'demoorg';
+  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
+  const serverIP = '18-117-112-129';
+  const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   const nullJson = '{}';
   const validJson = '{"test":"test"}';
   const invalidJson = '{"invalid "test"';
@@ -30,7 +31,8 @@ describe('infra node detail', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: serverIP,
+          webui_key: webuiKey
         }
       }).then((response) => {
         if (response.status === 200 && response.body.ok === true) {
@@ -251,8 +253,8 @@ describe('infra node detail', () => {
       if (nodeName !== '') {
         cy.get('.ng-arrow-wrapper').click();
         cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.ng-option').contains('google').then(option => {
-          option[0].click();  // this is jquery click() not cypress click()
+        cy.get('.ng-option').then(option => {
+          option[1].click();  // this is jquery click() not cypress click()
         });
         cy.get('[data-cy=change-confirm]').should(('be.visible'));
       }
@@ -275,12 +277,12 @@ describe('infra node detail', () => {
       if (nodeName !== '') {
         cy.get('.ng-arrow-wrapper').click();
         cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.ng-option').contains('chef-environment-609823800').then(option => {
-          option[0].click();  // this is jquery click() not cypress click()
+        cy.get('.ng-option').then(option => {
+          option[1].click();  // this is jquery click() not cypress click()
         });
         cy.get('.ng-arrow-wrapper').click();
         cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.ng-option').contains('_default').then(option => {
+        cy.get('.ng-option').then(option => {
           option[0].click();  // this is jquery click() not cypress click()
         });
         cy.get('[data-cy=change-confirm]').should(('be.visible'));
