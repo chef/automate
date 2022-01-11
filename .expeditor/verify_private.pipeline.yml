@@ -4,8 +4,8 @@
 
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
-  HAB_BLDR_CHANNEL: "stable2021-q2"
-  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable2021-q2"
+  HAB_BLDR_CHANNEL: "stable"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
 
 expeditor:
   defaults:
@@ -493,6 +493,9 @@ steps:
           field: data
         CYPRESS_AUTOMATE_INFRA_ADMIN_KEY:
           path: secret/a2/testing/infra_admin_key
+          field: data
+        CYPRESS_AUTOMATE_INFRA_WEBUI_KEY:
+          path: secret/a2/testing/infra_webui_key
           field: data
       executor:
         linux:

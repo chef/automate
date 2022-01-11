@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_repo=a2
 pkg_name=a1-migration-data-full
 pkg_description="Automate 1 Migration Data Full -- contains ES2 indexes"

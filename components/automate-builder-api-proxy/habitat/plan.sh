@@ -1,6 +1,8 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2039
 #shellcheck disable=SC2154
+#stable channel
+
 
 pkg_name="automate-builder-api-proxy"
 pkg_origin="chef"
@@ -11,8 +13,8 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_svc_user="root"
 pkg_deps=(
-  core/coreutils
-  core/bash
+  core/coreutils/8.30/20200305231640
+  core/bash/5.0.16/20200305233030
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # We need to pin here to get a build from unstable

@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name="builder-test-plan"
 pkg_description="Automate Builder Test Plan"
 pkg_origin="chef"

@@ -1,12 +1,14 @@
+#stable channel
+
 pkg_name=automate-builder-memcached
-pkg_version=1.5.19
+pkg_version=1.6.12
 pkg_distname=memcached
 pkg_dirname="${pkg_distname}-${pkg_version}"
 pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Apache-2.0' 'BSD')
 pkg_source="http://www.memcached.org/files/${pkg_distname}-${pkg_version}.tar.gz"
-pkg_shasum=3ddcdaa2d14d215f3111a7448b79c889c57618a26e97ad989581f1880a5a4be0
+pkg_shasum=f291a35f82ef9756ed1d952879ef5f4be870f932bdfcb2ab61356609abf82346
 pkg_deps=(
   core/bash
   core/glibc

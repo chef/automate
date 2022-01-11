@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-ui
 # Ignore this package when bind data is compiled for deployment service:
 chef_automate_dev_only_pkg=true

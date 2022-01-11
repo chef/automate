@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=config-mgmt-service
 pkg_description="Configuration management API Service"

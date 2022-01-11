@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -26,6 +27,7 @@ import (
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
+	"github.com/sirupsen/logrus"
 )
 
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
@@ -182,7 +184,7 @@ func bootstrapEnv(dm deployManager) error {
 		return status.Annotate(err, status.DeployError)
 	}
 	if offlineMode {
-		err := moveAirgapToTransferDir(airgapMetadata)
+		err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, deployCmdFlags.airgap)
 		if err != nil {
 			return status.Annotate(err, status.DeployError)
 		}
@@ -204,54 +206,101 @@ we also need to have following files in /hab/a2_deploy_workspace/terraform dir
 2. a2ha_aib_be.auto.tfvars --> it will contain info of backend airgap bundle
 1. a2ha_manifest.auto.tfvars --> it will contain info of required packages to deploy a2ha.
 */
-func moveAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata) error {
-	if len(deployCmdFlags.airgap) > 0 {
-		var bundleName string = filepath.Base(deployCmdFlags.airgap)
-		if strings.Contains(bundleName, "automate") {
-			bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
-		}
-		err := copyFileContents(deployCmdFlags.airgap, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
+func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
+	if len(airgapBundle) > 0 {
+		bundleName := getFrontendBundleName(airgapBundle)
+		err := generateFontendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
-		//generating md5 sum for frontend bundle
-		err = generateChecksumFile(AIRGAP_HA_TRANS_DIR_PATH+bundleName, AIRGAP_HA_TRANS_DIR_PATH+bundleName+".md5")
+		err = generateBackendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
-		//generating frontend auto tfvars
-		frontendTfvars := getBytesFromTempalte("frontendTfvars", frontendAutotfvarsTemplate, map[string]interface{}{
-			"bundleName": bundleName,
-		})
-
-		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", frontendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
-		if err != nil {
-			return err
-		}
-		//generating backend bundle
-		backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
-		err = generateBackendAIB(deployCmdFlags.airgap, backendBundleFile)
-		if err != nil {
-			return err
-		}
-		err = generateChecksumFile(backendBundleFile, backendBundleFile+".md5")
-		if err != nil {
-			return err
-		}
-		//generating backend auto tfvars
-		backendTfvars := getBytesFromTempalte("backendTfvars", backendAutotfvarsTemplate, map[string]interface{}{
-			"backendBundleFile": filepath.Base(backendBundleFile),
-		})
-		err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", backendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
-		if err != nil {
-			return err
-		}
-
 		//generate manifest auto tfvars
 		err = generateA2HAManifestTfvars(airgapMetadata)
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
+	if len(airgapBundle) > 0 {
+		bundleName := getFrontendBundleName(airgapBundle)
+		err := generateFontendBundles(bundleName, airgapBundle)
+		if err != nil {
+			return err
+		}
+		//generate manifest auto tfvars
+		err = generateA2HAManifestTfvars(airgapMetadata)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
+	if len(airgapBundle) > 0 {
+		bundleName := getFrontendBundleName(airgapBundle)
+		err := generateBackendBundles(bundleName, airgapBundle)
+		if err != nil {
+			return err
+		}
+		//generate manifest auto tfvars
+		err = generateA2HAManifestTfvars(airgapMetadata)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func getFrontendBundleName(airgapPath string) string {
+	var bundleName string = filepath.Base(airgapPath)
+	if strings.Contains(bundleName, "automate") {
+		bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
+	}
+	return bundleName
+}
+func generateFontendBundles(bundleName string, airgapPath string) error {
+	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
+	if err != nil {
+		return err
+	}
+	//generating md5 sum for frontend bundle
+	err = generateChecksumFile(AIRGAP_HA_TRANS_DIR_PATH+bundleName, AIRGAP_HA_TRANS_DIR_PATH+bundleName+".md5")
+	if err != nil {
+		return err
+	}
+	//generating frontend auto tfvars
+	frontendTfvars := getBytesFromTempalte("frontendTfvars", frontendAutotfvarsTemplate, map[string]interface{}{
+		"bundleName": bundleName,
+	})
+	err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_fe.auto.tfvars", frontendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func generateBackendBundles(bundleName string, airgapPath string) error {
+	//generating backend bundle
+	backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
+	err := generateBackendAIB(airgapPath, backendBundleFile)
+	if err != nil {
+		return err
+	}
+	err = generateChecksumFile(backendBundleFile, backendBundleFile+".md5")
+	if err != nil {
+		return err
+	}
+	//generating backend auto tfvars
+	backendTfvars := getBytesFromTempalte("backendTfvars", backendAutotfvarsTemplate, map[string]interface{}{
+		"backendBundleFile": filepath.Base(backendBundleFile),
+	})
+	err = ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_aib_be.auto.tfvars", backendTfvars, AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -264,56 +313,49 @@ func getBytesFromTempalte(templateName string, templateContent string, placehold
 	}
 	return buf.Bytes()
 }
-
+func getBldrSupportedPkgName(h string) string {
+	packageName := extractPackageNameFromHartifactPath(h)
+	ver, rel := extarctVersionAndRelease(packageName)
+	origin := extractOrigin(packageName)
+	pkg := extractPackageName(packageName)
+	return origin + "/" + pkg + "/" + ver + "/" + rel
+}
 func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
 	var deployablePackages []string
 	for _, h := range airgapMetadata.HartifactPaths {
-		if strings.Contains(h, "automate-ha-pgleaderchk") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "pgleaderchk_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_PKG_PG_LDR_CHK) {
+			deployablePackages = append(deployablePackages, "pgleaderchk_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-postgresql") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "postgresql_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_PKG_PG) {
+			deployablePackages = append(deployablePackages, "postgresql_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-haproxy") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "proxy_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_PKG_HA_PROXY) {
+			deployablePackages = append(deployablePackages, "proxy_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-journalbeat") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "journalbeat_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_PKG_JOURNALBEAT) {
+			deployablePackages = append(deployablePackages, "journalbeat_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-metricbeat") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "metricbeat_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_PKG_METRICBEAT) {
+			deployablePackages = append(deployablePackages, "metricbeat_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-kibana") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "kibana_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_PKG_KIBANA) {
+			deployablePackages = append(deployablePackages, "kibana_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-elasticsearch") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "elasticsearch_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_ES) {
+			deployablePackages = append(deployablePackages, "elasticsearch_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-elasticsidecar") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "elasticsidecar_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_ES_CAR) {
+			deployablePackages = append(deployablePackages, "elasticsidecar_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, "automate-ha-curator") {
-			packageName := extractPackageNameFromHartifactPath(h)
-			deployablePackages = append(deployablePackages, "curator_pkg_ident = \""+packageName+"\"")
+		if strings.Contains(h, AUTOMATE_HA_CURATOR) {
+			deployablePackages = append(deployablePackages, "curator_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
 	}
 	return ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
 }
 func extractPackageNameFromHartifactPath(path string) string {
 	path = strings.ReplaceAll(path, "/hab/cache/artifacts/", "")
-	path = strings.ReplaceAll(path, "-x86_64-linux.hart", "")
-	originIndex := strings.Index(path, "-")
-	orignName := path[0:originIndex]
-	packageName := (orignName + "/" + path[originIndex+1:])
-	return packageName
+	return path
 }
 
 func copyFileContents(src, dst string) (err error) {
@@ -443,25 +485,39 @@ func executeShellCommand(command string, args []string, workingDir string) error
 	writer.Printf("%s command execution started \n\n\n", command)
 	c := exec.Command(command, args...)
 	c.Stdin = os.Stdin
-	var out bytes.Buffer
-	var stderr bytes.Buffer
 	if len(workingDir) > 0 {
 		c.Dir = workingDir
 	}
-	c.Stdout = io.MultiWriter(&out)
-	c.Stderr = io.MultiWriter(&stderr)
+	c.Stdout = io.MultiWriter(os.Stdout)
+	c.Stderr = io.MultiWriter(os.Stderr)
 	err := c.Run()
-	if err != nil {
-		writer.Printf(stderr.String())
-		return status.Wrap(err, status.CommandExecutionError, "")
-	}
-	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
-	if len(outStr) > 0 {
-		writer.Printf("\nout:\n%s", outStr)
-	}
-	if len(errStr) > 0 {
-		writer.Printf("\nerr:\n%s\n", errStr)
-	}
 	writer.Printf("%s command execution done, exiting\n", command)
 	return err
+}
+
+func extarctVersionAndRelease(filename string) (string, string) {
+	r := regexp.MustCompile(RELEASE_AND_VERSION_PATTERN)
+	match := r.FindStringSubmatch(filename)
+	if match == nil {
+		logrus.Debugf("failed to parse version of hart %s", filename)
+	}
+	return match[1], match[2]
+}
+
+func extractOrigin(filename string) string {
+	r := regexp.MustCompile(ORIGIN_PATTERN)
+	match := r.FindStringSubmatch(filename)
+	if match == nil {
+		logrus.Debugf("failed to parse origin from of hart %s", filename)
+	}
+	return match[0]
+}
+
+func extractPackageName(filename string) string {
+	r := regexp.MustCompile(PACKAGE_NAME_PATTERN)
+	match := r.FindStringSubmatch(filename)
+	if match == nil {
+		logrus.Debugf("failed to parse package name of hart %s", filename)
+	}
+	return match[0][1 : len(match[0])-(len(match[0])-(strings.LastIndexAny(match[0], "-")))]
 }

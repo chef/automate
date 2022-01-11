@@ -19,6 +19,11 @@ func newProvisionInfraCmd() *cobra.Command {
 		"channel",
 		"",
 		"Release channel to deploy all services from")
+	provisionInfraCmd.PersistentFlags().StringVar(
+		&deployCmdFlags.airgap,
+		"airgap-bundle",
+		"",
+		"Path to an airgap install bundle")
 
 	return provisionInfraCmd
 }

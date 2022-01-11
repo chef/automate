@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=builder-scaffolding
 pkg_origin=ryancragun
 pkg_version="0.1.0"
