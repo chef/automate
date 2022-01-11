@@ -67,6 +67,7 @@ target_host=$(vault kv get -field=data secret/a2/testing/target_host)
 target_user=$(vault kv get -field=data secret/a2/testing/target_user)
 target_key=$(vault kv get -field=data secret/a2/testing/target_key)
 infra_admin_key=$(vault kv get -field=data secret/a2/testing/infra_admin_key)
+infra_webui_key=$(vault kv get -field=data secret/a2/testing/infra_webui_key)
 
 cat >dev/secrets-env.sh <<EOF
 # Secrets
@@ -80,4 +81,5 @@ export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST=$target_host
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER=$target_user
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY="$target_key"
 export CYPRESS_AUTOMATE_INFRA_ADMIN_KEY="$infra_admin_key"
+export CYPRESS_AUTOMATE_INFRA_WEBUI_KEY="$infra_webui_key"
 EOF
