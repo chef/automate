@@ -705,7 +705,7 @@ type LargeReporting struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EnableLargeReporting *wrappers.BoolValue `protobuf:"bytes,1,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
+	EnableLargeReporting *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
 }
 
 func (x *LargeReporting) Reset() {
@@ -740,7 +740,7 @@ func (*LargeReporting) Descriptor() ([]byte, []int) {
 	return file_config_shared_global_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *LargeReporting) GetEnableLargeReporting() *wrappers.BoolValue {
+func (x *LargeReporting) GetEnableLargeReporting() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.EnableLargeReporting
 	}
