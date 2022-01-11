@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=automate-cs-nginx
 pkg_origin=chef
@@ -9,8 +10,8 @@ pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="14.11.36"
 pkg_deps=(
-  core/coreutils
-  chef/mlsa
+  core/coreutils/8.30/20200305231640
+  chef/mlsa/1.0.1/20200421170200
   # TODO 2020-05-12: PIN PIN PIN
   #
   # All dependencies that are shared between this package and the

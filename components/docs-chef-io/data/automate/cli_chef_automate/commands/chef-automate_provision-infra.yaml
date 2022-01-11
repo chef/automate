@@ -3,6 +3,8 @@ synopsis: Provision Automate HA infra.
 usage: chef-automate provision-infra [flags]
 description: Provision infra for Automate HA deployment.
 options:
+- name: airgap-bundle
+  usage: Path to an airgap install bundle
 - name: channel
   usage: Release channel to deploy all services from
 - name: help

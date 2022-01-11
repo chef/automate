@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=pg-sidecar-service
 pkg_description="A service providing common functionality to Automate's Postgres consumers"

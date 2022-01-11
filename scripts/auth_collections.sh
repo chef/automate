@@ -200,7 +200,7 @@ authGen() {
   echo "$MODE $COUNT $RESOURCE..."
   for (( i = 0; i < COUNT; i++ )) 
   do
-    $operation "$token" "$host" $i
+    $operation "$token" "$host" "$i"
   done
 }
 

@@ -493,6 +493,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-netcat",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }

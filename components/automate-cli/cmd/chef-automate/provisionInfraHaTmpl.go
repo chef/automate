@@ -11,6 +11,8 @@ config file path:
 	config toml file path
 
 Options:
+    -c, --channel                    Provision infrastructure using particular channel, default channel is current
+    -p  --airgap-bundle              Provision using airgap bundle
     -o, --okta-aws                   Use okta_aws cli to authenticate with AWS
     -p, --parallelism WORKERS        Number of workers used for the terraform apply (default: 50)
     -d, --force-deploy               Force terraform deploy even if no changes have been detected. This is used when needing to update the tfstate

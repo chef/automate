@@ -1,4 +1,6 @@
 # shellcheck disable=SC2148
+# stable channel
+
 UPSTREAM_PKG_IDENT="chef/journalbeat/6.8.6"
 pkg_name="automate-ha-journalbeat"
 pkg_description="Wrapper package for chef/journalbeat"

@@ -1,4 +1,6 @@
 # shellcheck disable=SC2148
+# stable channel
+
 UPSTREAM_PKG_IDENT="chef/kibana-odfe/0.10.0.4"
 pkg_name="automate-ha-kibana"
 pkg_description="Wrapper package for chef/kibana"

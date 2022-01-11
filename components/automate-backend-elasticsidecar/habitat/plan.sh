@@ -1,4 +1,6 @@
 # shellcheck disable=SC2148
+# stable channel
+
 pkg_name="automate-ha-elasticsidecar"
 pkg_description="Password manager for elasticsearch-odfe"
 pkg_origin="chef"

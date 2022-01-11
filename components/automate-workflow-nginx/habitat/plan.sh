@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=automate-workflow-nginx
 pkg_origin=chef
@@ -12,11 +13,11 @@ pkg_deps=(
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/openresty-noroot/1.13.6.2/20210520120637"
   "${vendor_origin}/automate-workflow-web"
-  chef/mlsa
-  core/bash
-  core/curl
-  core/coreutils
-  core/libossp-uuid
+  chef/mlsa/1.0.1/20200421170200
+  core/bash/5.0.16/20200305233030
+  core/curl/7.68.0/20200601114640
+  core/coreutils/8.30/20200305231640
+  core/libossp-uuid/1.6.2/20200319193820
 )
 
 pkg_exposes=(port ssl-port)
