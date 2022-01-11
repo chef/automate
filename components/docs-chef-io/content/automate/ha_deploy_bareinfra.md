@@ -17,12 +17,9 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 
 ## Pre-requisites
 
-- Chef Automate Utility.
-- Servers provisioned and accessible through SSH from each other.
-- List of Virtual Machines (VM) with public and private numbers. Public IP address is not mandatory.
-- Obtain the IP address of the instances.
-- Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch
-- Bastion Host. See [Bastion Host Requirements for Bare Infra Deployment method]({{< relref "ha_deploy_bareinfra.md#Bastion_Server_Requirements_for_Bare_Infra Deployment_Method" >}}) section.
+- Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch nodes.
+- Obtain Bastion host server details from your system administrator. Ensure this server has the [needed requirements](( {{< relref "#Bastion Host Requirements" >}} ))` included.
+- Obtain the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_system_requirements.md" >}} )).
 - All VMs must expose the port 22 for SSH. You may need to open certain port across the VMs to establish the communication, which are:
 
    | Component                                | Port                    |
@@ -37,19 +34,18 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
    | Kibana                                   |     5601                |
    | Automate,ES-Node                         |     22,443              |
 
-### Download and Install Chef Automate Utility
+- Ensure you have [Chef Automate utility](( {{< relref "ha_auto_install.md" >}})) installed, else download and install the latest version.
+- Servers provisioned and accessible through SSH from each other.
+- Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch
 
-Both types of deployment models require you to install and configure Chef Automate on your network infrastructure. You can skip this section if you already have installed the Chef Automate utility where you are planning to deploy HA.
+### Bastion Host Requirements
 
-Follow these steps to install **Chef Automate** utility on the fresh server.
-
-- Open **Command Prompt** and navigate to your preferred location.
-- Type the `curl` and `gunzip` commands together, `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate` and press **Enter**. The command downloads the latest version of the Chef Automate utility installer in .zip format.
-- Type the  command,  and press **Enter**. The command installs the utility and provides the execute permission to the Chef Automate file.
-
-  The installation of the Chef Automate utility completes and a confirmation message displays on your terminal as shown in the below screen.
-
-{{< figure src="/images/automate/ha_bare_chef_automate_install.png" alt="Chef Automate Utility Installation">}}
+- Bastion Server/host IP address
+- Instance type: 2 vCPU
+- Operating System: Ubuntu 20.04
+- Memory: Minimum of 4GB
+- Hard Disk Space - 100 GB
+- Ports to be publicly accessible: 22 and 9631
 
 ## Deployment Procedure on Bare Infrastructure
 

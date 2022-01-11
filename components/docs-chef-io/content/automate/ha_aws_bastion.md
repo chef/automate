@@ -1,5 +1,5 @@
 +++
-title = "Prerequisites for Chef Automate HA Deployment"
+title = "Bastion Setup for AWS Deployment Type"
 
 draft = false
 
@@ -7,33 +7,30 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Prerequisites for Chef Automate HA Deployment"
+    title = "Bastion Setup for AWS Deployment Type"
     parent = "automate/install"
-    identifier = "automate/install/ha_aws_prereq.md Prerequisites for Chef Automate HA Deployment"
+    identifier = "automate/install/ha_aws_bastion.md Bastion Setup for AWS Deployment Type"
     weight = 220
 +++
 
-## Pre-requisites
+## Building an AWS bastion host
 
-### Download and Install Chef Automate Utility
+### Bastion Host Requirements for AWS (Amazon Web Services)
 
-Both types of deployment models require you to install and configure Chef Automate on your network infrastructure. You can skip this section if you already have installed the Chef Automate utility where you are planning to deploy HA.
+- Configure the AWS Credential on the bastion host. [Bastion Setup]({{< relref "ha_bastion_setup" >}})
+- Create the certificate for the DNS
+- Operating System (OS): Bastion host with Ubuntu 20.04 or centOs-7 or RHEL-7
+- AWS instance type: *t2.medium*
+- Memory: Minimum of 4GB
+- Hard Disk Space - 100 GB
+- SSH: VPC to Port 22, publicly accessible
+- Setup Virtual Private Cloud (VPC) in AWS
 
-Follow these steps to install **Chef Automate** utility on the fresh server.
-
-- Open **Command Prompt** and navigate to your preferred location.
-- Type the `curl` and `gunzip` commands together, `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate` and press **Enter**. The command downloads the Chef Automate utility installer in .zip format.
-- Type the  command,  and press **Enter**. The command installs the utility and provides the execute permission to the Chef Automate file.
-
-  The installation of the Chef Automate utility completes and a confirmation message displays on your terminal as shown in the below screen.
-
-{{< figure src="/images/automate/ha_aws_chef_automate_install.png" alt="Chef Automate Utility Installation">}}
-
-### Building an AWS bastion host
+### Bastion Host Configuration
 
 Follow these steps to add a bastion host to your Linux environment on AWS cloud, which connects to other internal network hosts:
 
-1. Sign into your AWS account. If you don't have one, sign up at https://aws.amazon.com.
+1. Sign into your AWS account. If you don't have one, [sign up at amazon](https://aws.amazon.com).
 1. Navigate to the AWS Management Console.
 
 {{< figure src="/images/automate/ha_aws_console.png" alt="Amazon Management Console">}}
@@ -75,4 +72,4 @@ Or, launch an EC2 instance, which was previously defined.
 
 You can test the connectivity to the bastion server by navigating to the AWS Console under Instances > EC2 option and view the fresh bastion server running.
 
-For detailed information to deploy Linux bastion hosts to manage your AWS Cloud deployments remotely, see https://aws.amazon.com/quickstart/architecture/linux-bastion/.
+Refer detailed information on deploying Linux bastion hosts to manage your [AWS Cloud deployments remotely](https://aws.amazon.com/quickstart/architecture/linux-bastion/) page.
