@@ -1358,7 +1358,7 @@ type NodeHeaderInfo struct {
 	// The reporting node name.
 	NodeName string `protobuf:"bytes,2,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
 	// The time that the report was completed.
-	EndTime *timestamp.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	EndTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	// The status of the run the report was made from.
 	Status string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	// The environment of the node making the report.
@@ -1421,7 +1421,7 @@ func (x *NodeHeaderInfo) GetNodeName() string {
 	return ""
 }
 
-func (x *NodeHeaderInfo) GetEndTime() *timestamp.Timestamp {
+func (x *NodeHeaderInfo) GetEndTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.EndTime
 	}
@@ -4769,8 +4769,8 @@ var file_external_compliance_reporting_reporting_proto_goTypes = []interface{}{
 	(*ControlElement)(nil),         // 45: chef.automate.api.compliance.reporting.v1.ControlElement
 	(*ControlElements)(nil),        // 46: chef.automate.api.compliance.reporting.v1.ControlElements
 	(*CustomReportResponse)(nil),   // 47: chef.automate.api.compliance.reporting.v1.CustomReportResponse
-	(*timestamp.Timestamp)(nil),    // 48: google.protobuf.Timestamp
-	(*empty.Empty)(nil),            // 49: google.protobuf.Empty
+	(*timestamppb.Timestamp)(nil),  // 48: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),          // 49: google.protobuf.Empty
 	(*common.ExportData)(nil),      // 50: chef.automate.api.common.ExportData
 	(*version.VersionInfo)(nil),    // 51: chef.automate.api.common.version.VersionInfo
 }
