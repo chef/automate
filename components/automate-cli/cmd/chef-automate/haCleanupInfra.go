@@ -78,11 +78,13 @@ func executeCleanupScript(args []string) error {
 		return err
 	}
 	if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) > 0 {
-		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-d", cleanupFlags.directory, "-p"}, "")
 	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) < 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-d", cleanupFlags.directory}, "")
 	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) < 0 && len(cleanupFlags.ports) < 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
+	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) < 0 && len(cleanupFlags.ports) > 0 {
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-p"}, "")
 	} else {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-p"}, "")
 	}

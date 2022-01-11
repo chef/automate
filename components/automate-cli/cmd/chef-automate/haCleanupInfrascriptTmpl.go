@@ -92,15 +92,10 @@ usage() {
   exit 1
 } 
 
-echo $config
-
-
 clean_dir() { 
     node="$1"
     path="$2"
-     
-	echo $node $path
-
+  
     if [ "$path" = "/var/tmp" ];then 
 	    path="/var/tmp/*"
     else
