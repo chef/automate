@@ -21,7 +21,6 @@ describe('InfraNodesComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),

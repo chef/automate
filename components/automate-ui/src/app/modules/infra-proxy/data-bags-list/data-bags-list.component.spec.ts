@@ -27,8 +27,6 @@ describe('DataBagsListComponent', () => {
         outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
@@ -39,7 +37,6 @@ describe('DataBagsListComponent', () => {
         MockComponent({ selector: 'chef-tr' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
         DataBagsListComponent
