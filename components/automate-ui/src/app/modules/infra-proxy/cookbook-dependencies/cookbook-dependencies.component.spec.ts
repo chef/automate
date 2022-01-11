@@ -38,7 +38,6 @@ describe('CookbookDependenciesComponent', () => {
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         CookbookDependenciesComponent
       ],
       providers: [
