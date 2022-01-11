@@ -161,7 +161,7 @@ describe('Infra Editor Policy', () => {
                 name: 'test2',
                 description: 'cypress testing'
             },
-            url: '/api/v0/infra/servers/local-dev/orgs/test-org/environments',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/environments'
             }).then((resp) => {
             assert.equal(resp.status, 200);
         });
@@ -198,7 +198,7 @@ describe('Infra Editor Policy', () => {
             assert.equal(resp.status, 403);
         });
     });
-
+  
     it('create infra server post returns 403 when infraServers create actions is denied', () => {
         cy.request({
             headers: { 'api-token': withInfraEditorActionToken },
@@ -240,4 +240,4 @@ describe('Infra Editor Policy', () => {
             assert.equal(resp.status, 403);
         });
     })
-}); 
+});

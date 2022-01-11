@@ -31,7 +31,6 @@ describe('InfraRolesComponent', () => {
         MockComponent({ selector: 'app-delete-infra-object-modal',
           inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
           outputs: ['close', 'deleteClicked'] }),
-        MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
