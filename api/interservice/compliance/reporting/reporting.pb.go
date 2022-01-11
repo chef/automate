@@ -1362,7 +1362,7 @@ type NodeHeaderInfo struct {
 
 	NodeId        string                   `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty" toml:"node_id,omitempty" mapstructure:"node_id,omitempty"`
 	NodeName      string                   `protobuf:"bytes,2,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty" toml:"node_name,omitempty" mapstructure:"node_name,omitempty"`
-	EndTime       *timestamp.Timestamp     `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty" toml:"end_time,omitempty" mapstructure:"end_time,omitempty"`
+	EndTime       *timestamppb.Timestamp   `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty" toml:"end_time,omitempty" mapstructure:"end_time,omitempty"`
 	Status        string                   `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty" toml:"status,omitempty" mapstructure:"status,omitempty"`
 	Environment   string                   `protobuf:"bytes,5,opt,name=environment,proto3" json:"environment,omitempty" toml:"environment,omitempty" mapstructure:"environment,omitempty"`
 	Version       string                   `protobuf:"bytes,6,opt,name=version,proto3" json:"version,omitempty" toml:"version,omitempty" mapstructure:"version,omitempty"`
@@ -1418,7 +1418,7 @@ func (x *NodeHeaderInfo) GetNodeName() string {
 	return ""
 }
 
-func (x *NodeHeaderInfo) GetEndTime() *timestamp.Timestamp {
+func (x *NodeHeaderInfo) GetEndTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.EndTime
 	}
@@ -4866,7 +4866,7 @@ var file_interservice_compliance_reporting_reporting_proto_goTypes = []interface
 	(*ReportResponse)(nil),                     // 53: chef.automate.domain.compliance.reporting.ReportResponse
 	(*ProfileResponse)(nil),                    // 54: chef.automate.domain.compliance.reporting.ProfileResponse
 	nil,                                        // 55: chef.automate.domain.compliance.reporting.Control.StringTagsEntry
-	(*timestamp.Timestamp)(nil),                // 56: google.protobuf.Timestamp
+	(*timestamppb.Timestamp)(nil),              // 56: google.protobuf.Timestamp
 }
 var file_interservice_compliance_reporting_reporting_proto_depIdxs = []int32{
 	6,  // 0: chef.automate.domain.compliance.reporting.ReportContentRequest.filters:type_name -> chef.automate.domain.compliance.reporting.ListFilter

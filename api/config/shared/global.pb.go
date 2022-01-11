@@ -710,7 +710,7 @@ type LargeReporting struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EnableLargeReporting *wrappers.BoolValue `protobuf:"bytes,1,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
+	EnableLargeReporting *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
 }
 
 func (x *LargeReporting) Reset() {
@@ -745,7 +745,7 @@ func (*LargeReporting) Descriptor() ([]byte, []int) {
 	return file_config_shared_global_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *LargeReporting) GetEnableLargeReporting() *wrappers.BoolValue {
+func (x *LargeReporting) GetEnableLargeReporting() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.EnableLargeReporting
 	}
@@ -836,9 +836,9 @@ type External_Minio struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Endpoint     *wrappers.StringValue `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty" toml:"endpoint,omitempty" mapstructure:"endpoint,omitempty"`
-	RootUser     *wrappers.StringValue `protobuf:"bytes,2,opt,name=root_user,json=rootUser,proto3" json:"root_user,omitempty" toml:"root_user,omitempty" mapstructure:"root_user,omitempty"`
-	RootPassword *wrappers.StringValue `protobuf:"bytes,3,opt,name=root_password,json=rootPassword,proto3" json:"root_password,omitempty" toml:"root_password,omitempty" mapstructure:"root_password,omitempty"`
+	Endpoint     *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty" toml:"endpoint,omitempty" mapstructure:"endpoint,omitempty"`
+	RootUser     *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=root_user,json=rootUser,proto3" json:"root_user,omitempty" toml:"root_user,omitempty" mapstructure:"root_user,omitempty"`
+	RootPassword *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=root_password,json=rootPassword,proto3" json:"root_password,omitempty" toml:"root_password,omitempty" mapstructure:"root_password,omitempty"`
 }
 
 func (x *External_Minio) Reset() {
@@ -873,21 +873,21 @@ func (*External_Minio) Descriptor() ([]byte, []int) {
 	return file_config_shared_global_proto_rawDescGZIP(), []int{2, 1}
 }
 
-func (x *External_Minio) GetEndpoint() *wrappers.StringValue {
+func (x *External_Minio) GetEndpoint() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Endpoint
 	}
 	return nil
 }
 
-func (x *External_Minio) GetRootUser() *wrappers.StringValue {
+func (x *External_Minio) GetRootUser() *wrapperspb.StringValue {
 	if x != nil {
 		return x.RootUser
 	}
 	return nil
 }
 
-func (x *External_Minio) GetRootPassword() *wrappers.StringValue {
+func (x *External_Minio) GetRootPassword() *wrapperspb.StringValue {
 	if x != nil {
 		return x.RootPassword
 	}
@@ -3449,10 +3449,10 @@ var file_config_shared_global_proto_goTypes = []interface{}{
 	(*Backups_GCS_GCPCredentials)(nil),                                     // 38: chef.automate.infra.config.Backups.GCS.GCPCredentials
 	(*Backups_GCS_Elasticsearch)(nil),                                      // 39: chef.automate.infra.config.Backups.GCS.Elasticsearch
 	(*Backups_GCS_Bucket)(nil),                                             // 40: chef.automate.infra.config.Backups.GCS.Bucket
-	(*wrappers.StringValue)(nil),                                           // 41: google.protobuf.StringValue
+	(*wrapperspb.StringValue)(nil),                                         // 41: google.protobuf.StringValue
 	(*FrontendTLSCredential)(nil),                                          // 42: chef.automate.infra.config.FrontendTLSCredential
-	(*wrappers.BoolValue)(nil),                                             // 43: google.protobuf.BoolValue
-	(*wrappers.Int32Value)(nil),                                            // 44: google.protobuf.Int32Value
+	(*wrapperspb.BoolValue)(nil),                                           // 43: google.protobuf.BoolValue
+	(*wrapperspb.Int32Value)(nil),                                          // 44: google.protobuf.Int32Value
 }
 var file_config_shared_global_proto_depIdxs = []int32{
 	1,   // 0: chef.automate.infra.config.GlobalConfig.v1:type_name -> chef.automate.infra.config.V1
