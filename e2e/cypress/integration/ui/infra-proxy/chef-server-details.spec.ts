@@ -6,15 +6,9 @@ describe('chef server details', () => {
   const updatedServerName = `${cypressPrefix} updated server ${now}`;
   const serverID = serverName.split(' ').join('-');
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
-<<<<<<< HEAD
-  const serverFQDN = 'chef-server-1617089723092818000.com';
-  const serverIP = '176.119.50.159';
-  const webui_key = 'Dummy--webui--key';
-=======
   const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
   const serverIP = '18-117-112-129';
   const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
->>>>>>> 7b075a77d305346999b24eb6a8a8e541522aa07b
   const orgName = `${cypressPrefix} org ${now}`;
   const generatedOrgID = orgName.split(' ').join('-');
   const customOrgID = `${cypressPrefix}-custom-id-${now}`;
@@ -37,11 +31,7 @@ describe('chef server details', () => {
           name: serverName,
           fqdn: serverFQDN,
           ip_address: serverIP,
-<<<<<<< HEAD
-          webui_key: webui_key
-=======
           webui_key: webuiKey
->>>>>>> 7b075a77d305346999b24eb6a8a8e541522aa07b
         }
       });
 
@@ -71,12 +61,7 @@ describe('chef server details', () => {
     it('it can update the webui key', () => {
       cy.get('[data-cy=update-web-ui-key]').contains('Update').click();
       cy.get('app-chef-server-details .sidenav-header').should('exist');
-<<<<<<< HEAD
-      cy.get('[data-cy=enter-webui-key]').type(webui_key);
-=======
       cy.get('[data-cy=enter-webui-key]').type(webuiKey);
->>>>>>> 7b075a77d305346999b24eb6a8a8e541522aa07b
-
       cy.get('[data-cy=update-webui-key-button]').click();
       cy.get('app-chef-server-details .sidenav-header').should('not.be.visible');
     });
