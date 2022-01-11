@@ -2,12 +2,13 @@ describe('infra policy details', () => {
   let adminIdToken = '';
   const serverID = 'chef-manage';
   const serverName = 'chef manage';
-  const orgID = 'viveksingh_msys';
-  const orgName = 'viveksingh_msys';
-  const serverFQDN = 'api.chef.io';
-  const serverIP = '50.21.221.24';
-  const adminUser = 'viveksingh_msys';
+  const orgID = 'demoorg';
+  const orgName = 'demoorg';
+  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
+  const serverIP = '18-117-112-129';
+  const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   let policyFileName = '';
   let revision = '';
   let includedPolicyFileName = '';
@@ -29,7 +30,8 @@ describe('infra policy details', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: serverIP,
+          webui_key: webuiKey
         }
       }).then((resp) => {
         if (resp.status === 200 && resp.body.ok === true) {
@@ -227,8 +229,8 @@ describe('infra policy details', () => {
 
       it('can open cookbook details page', () => {
         if (policyFileName !== '') {
-          cy.get('[data-cy=cookbook-table-container] chef-td a').contains(policyFileName).click();
-          cy.get('[data-cy=close-cookbook-detail-button]').click();
+          cy.get('[data-cy=cookbook-table-container] chef-td a').eq(1).click();
+          cy.get('[data-cy=close-cookbook-detail-button]').click({ multiple: true, force: true });
           cy.get('[data-cy=close-cookbook-button]').click();
         }
       });
@@ -262,6 +264,7 @@ describe('infra policy details', () => {
           .contains(includedPolicyFileName).click();
           getPolicyFileDetails(includedPolicyFileName, includedPolicyRevision).then(response => {
             if (checkIncludedPolicyDetailsResponse(response)) {
+              cy.wait(1000);
               cy.get('[data-cy=policyfile-details]').contains('Go to Policyfile Details >').click();
             }
           });
@@ -281,8 +284,9 @@ describe('infra policy details', () => {
 
       it('can open runlist details slider', () => {
         if (policyFileName !== '') {
-          cy.get('[data-cy=run-list-table-container] chef-td a').contains(policyFileName).click();
-          cy.get('[data-cy=close-cookbook-detail-button] chef-icon').click();
+          cy.get('[data-cy=run-list-table-container] chef-td a').eq(1).click();
+          cy.get('[data-cy=close-cookbook-detail-button] chef-icon')
+            .click({ multiple: true, force: true });
         }
       });
     });
