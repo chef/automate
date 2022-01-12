@@ -35,7 +35,9 @@ type ComplianceInfo interface{}
 var url = "http://%s:%s"
 var errorcsv = "Error while writing csv: "
 var timeFormat = "2006-01-02"
-var rangeFormat = "yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ"
+var dateFormat = "yyyy-MM-dd"
+var datetimeFormat = "yyyy-MM-dd-HH:mm:ss"
+var datetimesecFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
 
 func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client {
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
@@ -140,7 +142,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 
 func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
 	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format(rangeFormat)
+		Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
 	rangeQuery.Gte(startTime)
 	rangeQuery.Lte(endTime)
 
@@ -201,7 +203,7 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 
 	for {
 		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format(rangeFormat)
+			Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
 		rangeQuery.Gte(t)
 		rangeQuery.Lte(endTime)
 
@@ -347,7 +349,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 
 func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
 	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format(rangeFormat)
+		Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
 	rangeQuery.Gte(startTime)
 	rangeQuery.Lte(endTime)
 
@@ -403,7 +405,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 	header := true
 	for {
 		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format(rangeFormat)
+			Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
 		rangeQuery.Gte(t)
 		rangeQuery.Lte(endTime)
 
