@@ -257,7 +257,7 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 	fmt.Println("The details of the runs can be found in : ", filename)
 }
 
-func GenerateComplianceNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
+func GenerateComplianceResourceRunCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
 	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
@@ -268,10 +268,10 @@ func GenerateComplianceNodeCount(esHostName string, esPort string, startTime tim
 		os.Exit(1)
 	}
 
-	queryElasticSearchComplianceNodeCount(client, startTime, endTime)
+	queryElasticSearchComplianceResourceCount(client, startTime, endTime)
 }
 
-func GenerateComplianceNodeRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
+func GenerateComplianceResourceRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
 	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
@@ -282,14 +282,14 @@ func GenerateComplianceNodeRunReport(esHostName string, esPort string, startTime
 		os.Exit(1)
 	}
 
-	queryElasticSearchComplianceNodeReport(client, startTime, endTime)
+	queryElasticSearchComplianceResourceRunReport(client, startTime, endTime)
 }
 
-func queryElasticSearchComplianceNodeCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("compliancenodecount_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
+func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
+	filename := fmt.Sprintf("complianceresourcecount_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		fmt.Println("Failed to open Node Count report")
+		fmt.Println("Failed to open Resource Count report")
 		os.Exit(1)
 	}
 	defer f.Close()
@@ -386,8 +386,8 @@ func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endT
 	return metric, ok
 }
 
-func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("complianceinfo_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
+func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
+	filename := fmt.Sprintf("complianceresourceinfo_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		fmt.Println("Failed to open Compliance scan detail report")
@@ -441,7 +441,7 @@ func queryElasticSearchComplianceNodeReport(client *elastic.Client, startTime ti
 
 		if searchResult.Hits.TotalHits > 0 {
 			if header == true {
-				headers := []string{"Node_ID", "Version", "Node_Name", "Environment", "End_Time", "Platform__Name", "Controls_Sums__Total", "Controls_Sums__Passed", "Controls_Sums__Skipped", "Controls_Sums__Failed", "Profiles__Count"}
+				headers := []string{"Resource_ID", "Version", "Resource_Name", "Environment", "End_Time", "Platform__Name", "Controls_Sums__Total", "Controls_Sums__Passed", "Controls_Sums__Skipped", "Controls_Sums__Failed", "Profiles__Count"}
 				if err := w.Write(headers); err != nil {
 					fmt.Println("Error while writing csv: ", err)
 				}
