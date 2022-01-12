@@ -177,6 +177,8 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 	env["http_proxy"] = os.Getenv("https_proxy")
 	env["no_proxy"] = os.Getenv("no_proxy")
 
+	logrus.Println("::::::::http_proxy::::::", env["http_proxy"])
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
