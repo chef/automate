@@ -22,6 +22,7 @@ pkg_deps=(
   core/curl
   core/rsync
   core/terraform
+  core/busybox-static
   chef/automate-ha-cluster-ctl
 )
 
