@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	//"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/gocarina/gocsv"
 	elastic "gopkg.in/olivere/elastic.v6"
 )
@@ -38,7 +37,7 @@ var errorcsv = "Error while writing csv: "
 var timeFormat = "2006-01-02"
 var rangeFormat = "yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ"
 
-func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client{
+func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client {
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
