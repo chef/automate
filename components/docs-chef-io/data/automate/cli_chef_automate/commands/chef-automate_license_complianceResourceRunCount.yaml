@@ -1,7 +1,7 @@
-name: chef-automate license complianceUniqNodeRunReport
+name: chef-automate license complianceResourceRunCount
 synopsis: |
   Generates the unique count of reported Compliance scans on hourly basis between the time duration
-usage: chef-automate license complianceUniqNodeRunReport [flags]
+usage: chef-automate license complianceResourceRunCount [flags]
 options:
 - name: end_time
   shorthand: e
@@ -17,7 +17,7 @@ options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for complianceUniqNodeRunReport
+  usage: help for complianceResourceRunCount
 - name: start_time
   shorthand: s
   usage: start time of the report in yyyy-mm-dd format

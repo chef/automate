@@ -1,7 +1,7 @@
-name: chef-automate license complianceNodeRunReport
+name: chef-automate license complianceResourceRunReport
 synopsis: |
   Generates daily Infra Client Run reports for a span of time duration
-usage: chef-automate license complianceNodeRunReport [flags]
+usage: chef-automate license complianceResourceRunReport [flags]
 options:
 - name: end_time
   shorthand: e
@@ -17,7 +17,7 @@ options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for complianceNodeRunReport
+  usage: help for complianceResourceRunReport
 - name: start_time
   shorthand: s
   usage: start time of the report in yyyy-mm-dd format
