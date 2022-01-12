@@ -38,24 +38,24 @@ Follow these steps to add a bastion host to your Linux environment on AWS cloud,
 1. Select an AWS Region from the top toolbar.
 1. Select EC2 under Services menu on the left.
 1. Click the Launch Instances button, and perform the following steps:
-   1. Select linux based Amazon Machine Image (AMI). For example, `centos`.
+   - Select linux based Amazon Machine Image (AMI). For example, `centos`.
 
    {{< figure src="/images/automate/ha_aws_ami.png" alt="Amazon Machine Image">}}
 
-   1. Select the *t2.medium* instance type. Ensure vCPUs is 1, Memory (GiB) is 4 and Instance Storage (GB) is EBS only.
-   1. Click the Next: Configure Instance Details button.
-   1. Modify VPC and Subnet values as required.
-   1. Ensure you have selected 1 in Number of instances field, and make any other required changes.
-   1. Click Next: Add Storage button.
-   1. Specify 100 GB of storage in Size (GiB) field.
-   1. Click Next: Add Tags button.
-   1. Specify the key and value for the tag in Key and Value fields. This step is optional.
-   1. Click Next: Configure Security Group button.
-   1. Select Create a new security group or Select an existing security group option.
-   1. Based on your selection, select needed security groups for your EC2 instance, or add the rule by providing required details. You could change or update the security groups in the future if you want.
-   1. Ensure Type is SSH, Protocol is TCP, and Port Range is 22 to create rules and connections.
+   - Select the *t2.medium* instance type. Ensure vCPUs is 1, Memory (GiB) is 4 and Instance Storage (GB) is EBS only.
+   - Click the Next: Configure Instance Details button.
+   - Modify VPC and Subnet values as required.
+   - Ensure you have selected 1 in Number of instances field, and make any other required changes.
+   - Click Next: Add Storage button.
+   - Specify 100 GB of storage in Size (GiB) field.
+   - Click Next: Add Tags button.
+   - Specify the key and value for the tag in Key and Value fields. This step is optional.
+   - Click Next: Configure Security Group button.
+   - Select Create a new security group or Select an existing security group option.
+   - Based on your selection, select needed security groups for your EC2 instance, or add the rule by providing required details. You could change or update the security groups in the future if you want.
+   - Ensure Type is SSH, Protocol is TCP, and Port Range is 22 to create rules and connections.
    <!-- u must have private key -->
-   1. Open port 9631 by adding TCP rule.
+   - Open port 9631 by adding TCP rule.
 
 Or, launch an EC2 instance, which was previously defined.
 
