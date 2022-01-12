@@ -124,6 +124,11 @@ Expiration Date: %s
 
 `
 
+var startTimeFormat = "start time of the report in yyyy-mm-dd format"
+var endTimeFormat = "end time of the report in yyyy-mm-dd format"
+var hostnameES = "hostname of the ES host"
+var portES = "port of the ES host"
+
 type usageResult struct {
 	StartTimestamp   string           `json:"start_timestamp"`
 	EndTimestamp     string           `json:"end_timestamp"`
@@ -395,21 +400,21 @@ func init() {
 	licenseCmd.AddCommand(nodeUsageCommand)
 	licenseCmd.AddCommand(complianceUniqueResourceCounterCmd)
 	licenseCmd.AddCommand(complianceResourceUsageCmd)
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
-	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
-	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
 	licenseApplyCmd.Flags().BoolVarP(&licenseCmdFlags.forceSet, "force", "f", false, "Force set license")
 }
