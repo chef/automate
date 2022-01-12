@@ -1,5 +1,5 @@
 +++
-title = "Establishing AWS Connection with Bastion Host"
+title = "Establishing SSH Connection with Bastion Host"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Establishing AWS Connection with Bastion Host"
+    title = "Establishing SSH Connection with Bastion Host"
     parent = "automate/install"
-    identifier = "automate/install/ha_aws_connect_bastion.md Establishing AWS Connection with Bastion Host"
+    identifier = "automate/install/ha_aws_ssh_connect_bastion.md Establishing SSH Connection with Bastion Host"
     weight = 220
 +++
 

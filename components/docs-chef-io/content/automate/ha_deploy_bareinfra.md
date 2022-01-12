@@ -57,9 +57,9 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 1. Open the `config.toml` file in any editor and do the following:
 
-   1. Specify on-premise IPs, list of IP address for the cluster separated by comma.
+   - Specify on-premise IPs, list of IP address for the cluster separated by comma.
 
-   1. Specify public IPs for the virtual machines. In case, you dont have them, provide private IPs. The `config.toml` configuration file generates with default settings.
+   - Specify public IPs for the virtual machines. In case, you dont have them, provide private IPs. The `config.toml` configuration file generates with default settings.
 
 1. Type the command, `cat config.toml` and press **Enter** to view the generated configuration file.
 
@@ -75,20 +75,20 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 1. Make the following changes in `config.toml` file by opening the file in a editor. For example, `vi config.toml`.
 
-   1. Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in bastion host.
-   1. Ensure `ssh_key_pair_name` and `ssh key file path` have same value.
-   1. Assign permission to the *ssh key file* by running command, `chmod 400 /root/.ssh/id_rsa`.
-   1. Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes value `1`.
-   1. Ensure not to modify the cluster number value as `3` for PostgreSQL and ElasticSearch.
-   1. Ensure the instance type supports the respective AWS region.
-   1. Add load balancer certificate details for automate and chef-server. For example, as shown below:
+   - Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in bastion host.
+   - Ensure `ssh_key_pair_name` and `ssh key file path` have same value.
+   - Assign permission to the *ssh key file* by running command, `chmod 400 /root/.ssh/id_rsa`.
+   - Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes value `1`.
+   - Ensure not to modify the cluster number value as `3` for PostgreSQL and ElasticSearch.
+   - Ensure the instance type supports the respective AWS region.
+   - Add load balancer certificate details for automate and chef-server. For example, as shown below:
 
       <!-- automate_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e"
       <!-- chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e" --> -->
 
       {{< figure src="/images/automate/ha_bare_lb.png" alt="Load Balancer Details">}}
 
-   1. Setup the secrets management key and the required passwords. The default location for the secrets key and secret storage is set in the *config.toml* file. The default location for the key is `/etc/chef-automate/secrets.key` and the secret store file is in `/hab/a2_deploy_workspace/secrets.json`.
+   - Setup the secrets management key and the required passwords. The default location for the secrets key and secret storage is set in the *config.toml* file. The default location for the key is `/etc/chef-automate/secrets.key` and the secret store file is in `/hab/a2_deploy_workspace/secrets.json`.
 
 {{< figure src="/images/automate/ha_bare_chef_automate_configtoml_file.png" alt="Chef Automate Bare Infra `config.toml` file">}}
 
