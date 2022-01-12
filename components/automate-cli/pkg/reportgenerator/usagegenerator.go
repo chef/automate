@@ -32,8 +32,11 @@ type ConvergeInfo struct {
 
 type ComplianceInfo interface{}
 
+var url = "http://%s:%s"
+var errorcsv = "Error while writing csv: "
+
 func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
+	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
 		elastic.SetSniff(false),
@@ -47,7 +50,7 @@ func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, en
 }
 
 func GenerateNodeRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
+	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
 		elastic.SetSniff(false),
@@ -71,7 +74,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 	writer := gocsv.DefaultCSVWriter(f)
 	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
 	if err != nil {
-		fmt.Println("Error while writing csv: ", err)
+		fmt.Println(errorcsv, err)
 		os.Exit(1)
 	}
 
@@ -82,14 +85,14 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 
 		err = writer.Write([]string{"Day Count"})
 		if err != nil {
-			fmt.Println("Error while writing csv: ", err)
+			fmt.Println(errorcsv, err)
 			os.Exit(1)
 		}
 		dayCount, ok := getUniqueCounts(client, st, et)
 		if ok {
 			err = writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
 			if err != nil {
-				fmt.Println("Error while writing csv: ", err)
+				fmt.Println(errorcsv, err)
 				os.Exit(1)
 			}
 		}
@@ -99,7 +102,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		}
 		err = writer.Write([]string{"Hourly Count"})
 		if err != nil {
-			fmt.Println("Error while writing csv: ", err)
+			fmt.Println(errorcsv, err)
 			os.Exit(1)
 		}
 		writer.Flush()
@@ -108,7 +111,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 			if ok && *metric.Value > 0 {
 				err = writer.Write([]string{t.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *metric.Value)})
 				if err != nil {
-					fmt.Println("Error while writing csv: ", err)
+					fmt.Println(errorcsv, err)
 					os.Exit(1)
 				}
 				writer.Flush()
@@ -126,7 +129,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		}
 		err = writer.Write([]string{"", "", ""})
 		if err != nil {
-			fmt.Println("Error while writing csv: ", err)
+			fmt.Println(errorcsv, err)
 			os.Exit(1)
 		}
 		writer.Flush()
@@ -231,13 +234,13 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 				if ind == 0 {
 					err = gocsv.Marshal([]ConvergeInfo{s}, f)
 					if err != nil {
-						fmt.Println("Error while writing csv: ", err)
+						fmt.Println(errorcsv, err)
 						os.Exit(1)
 					}
 				} else {
 					err = gocsv.MarshalWithoutHeaders([]ConvergeInfo{s}, f)
 					if err != nil {
-						fmt.Println("Error while writing csv: ", err)
+						fmt.Println(errorcsv, err)
 						os.Exit(1)
 					}
 					writer.Flush()
@@ -258,7 +261,7 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 }
 
 func GenerateComplianceResourceRunCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
+	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
 		elastic.SetSniff(false),
@@ -272,7 +275,7 @@ func GenerateComplianceResourceRunCount(esHostName string, esPort string, startT
 }
 
 func GenerateComplianceResourceRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	elasticSearchURL := fmt.Sprintf("http://%s:%s", esHostName, esPort)
+	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
 		elastic.SetSniff(false),
@@ -296,7 +299,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 	writer := gocsv.DefaultCSVWriter(f)
 	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
 	if err != nil {
-		fmt.Println("Error while writing csv: ", err)
+		fmt.Println(errorcsv, err)
 		os.Exit(1)
 	}
 
@@ -307,14 +310,14 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 
 		err = writer.Write([]string{"Day Count"})
 		if err != nil {
-			fmt.Println("Error while writing csv: ", err)
+			fmt.Println(errorcsv, err)
 			os.Exit(1)
 		}
 		dayCount, ok := getUniqueComplianceCounts(client, st, et)
 		if ok {
 			err = writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
 			if err != nil {
-				fmt.Println("Error while writing csv: ", err)
+				fmt.Println(errorcsv, err)
 				os.Exit(1)
 			}
 		}
@@ -324,7 +327,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 		}
 		err = writer.Write([]string{"Hourly Count"})
 		if err != nil {
-			fmt.Println("Error while writing csv: ", err)
+			fmt.Println(errorcsv, err)
 			os.Exit(1)
 		}
 		writer.Flush()
@@ -333,7 +336,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 			if ok && *metric.Value > 0 {
 				err = writer.Write([]string{t.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *metric.Value)})
 				if err != nil {
-					fmt.Println("Error while writing csv: ", err)
+					fmt.Println(errorcsv, err)
 					os.Exit(1)
 				}
 				writer.Flush()
@@ -351,7 +354,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 		}
 		err = writer.Write([]string{"", "", ""})
 		if err != nil {
-			fmt.Println("Error while writing csv: ", err)
+			fmt.Println(errorcsv, err)
 			os.Exit(1)
 		}
 		writer.Flush()
@@ -443,11 +446,11 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 			if header == true {
 				headers := []string{"Resource_ID", "Version", "Resource_Name", "Environment", "End_Time", "Platform__Name", "Controls_Sums__Total", "Controls_Sums__Passed", "Controls_Sums__Skipped", "Controls_Sums__Failed", "Profiles__Count"}
 				if err := w.Write(headers); err != nil {
-					fmt.Println("Error while writing csv: ", err)
+					fmt.Println(errorcsv, err)
 				}
 				w.Flush()
 				if err := w.Error(); err != nil {
-					fmt.Println("Error while writing csv: ", err)
+					fmt.Println(errorcsv, err)
 				}
 			}
 
@@ -475,13 +478,13 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 					strconv.Itoa(len(get("profiles", s).([]interface{}))),
 				}
 				if err := w.Write(record); err != nil {
-					fmt.Println("Error while writing csv: ", err)
+					fmt.Println(errorcsv, err)
 
 				}
 				w.Flush()
 				header = false
 				if err := w.Error(); err != nil {
-					fmt.Println("Error while writing csv: ", err)
+					fmt.Println(errorcsv, err)
 
 				}
 			}
