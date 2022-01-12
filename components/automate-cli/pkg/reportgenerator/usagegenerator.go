@@ -35,6 +35,8 @@ type ComplianceInfo interface{}
 
 var url = "http://%s:%s"
 var errorcsv = "Error while writing csv: "
+var timeFormat = "2006-01-02"
+var rangeFormat = "yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ"
 
 func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client{
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
@@ -60,7 +62,7 @@ func GenerateNodeRunReport(esHostName string, esPort string, startTime time.Time
 }
 
 func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("nodecount_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
+	filename := fmt.Sprintf("nodecount_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		fmt.Println("Failed to open Node Count report")
@@ -139,7 +141,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 
 func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
 	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ")
+		Format(rangeFormat)
 	rangeQuery.Gte(startTime)
 	rangeQuery.Lte(endTime)
 
@@ -165,7 +167,7 @@ func get(key string, s interface{}) interface{} {
 }
 
 func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("nodeinfo_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
+	filename := fmt.Sprintf("nodeinfo_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		fmt.Println("Failed to open Node Detail report")
@@ -200,7 +202,7 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 
 	for {
 		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ")
+			Format(rangeFormat)
 		rangeQuery.Gte(t)
 		rangeQuery.Lte(endTime)
 
@@ -267,7 +269,7 @@ func GenerateComplianceResourceRunReport(esHostName string, esPort string, start
 }
 
 func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("complianceresourcecount_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
+	filename := fmt.Sprintf("complianceresourcecount_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		fmt.Println("Failed to open Resource Count report")
@@ -346,7 +348,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 
 func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
 	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ")
+		Format(rangeFormat)
 	rangeQuery.Gte(startTime)
 	rangeQuery.Lte(endTime)
 
@@ -368,7 +370,7 @@ func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endT
 }
 
 func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
-	filename := fmt.Sprintf("complianceresourceinfo_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
+	filename := fmt.Sprintf("complianceresourceinfo_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		fmt.Println("Failed to open Compliance scan detail report")
@@ -402,7 +404,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 	header := true
 	for {
 		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ")
+			Format(rangeFormat)
 		rangeQuery.Gte(t)
 		rangeQuery.Lte(endTime)
 
