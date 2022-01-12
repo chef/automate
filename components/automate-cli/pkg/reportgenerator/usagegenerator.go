@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	//"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/gocarina/gocsv"
 	elastic "gopkg.in/olivere/elastic.v6"
 )
@@ -35,7 +36,7 @@ type ComplianceInfo interface{}
 var url = "http://%s:%s"
 var errorcsv = "Error while writing csv: "
 
-func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
+func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client{
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
 	client, err := elastic.NewClient(
 		elastic.SetURL(elasticSearchURL),
@@ -45,21 +46,16 @@ func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, en
 		fmt.Println("Elastic error : ", err)
 		os.Exit(1)
 	}
+	return client
+}
 
+func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort)
 	queryElasticSearchNodeCount(client, startTime, endTime)
 }
 
 func GenerateNodeRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
-	client, err := elastic.NewClient(
-		elastic.SetURL(elasticSearchURL),
-		elastic.SetSniff(false),
-	)
-	if err != nil {
-		fmt.Println("Elastic error : ", err)
-		os.Exit(1)
-	}
-
+	client := elasticSearchConnection(url, esHostName, esPort)
 	queryElasticSearchNodeReport(client, startTime, endTime)
 }
 
@@ -261,30 +257,12 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 }
 
 func GenerateComplianceResourceRunCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
-	client, err := elastic.NewClient(
-		elastic.SetURL(elasticSearchURL),
-		elastic.SetSniff(false),
-	)
-	if err != nil {
-		fmt.Println("Elastic error : ", err)
-		os.Exit(1)
-	}
-
+	client := elasticSearchConnection(url, esHostName, esPort)
 	queryElasticSearchComplianceResourceCount(client, startTime, endTime)
 }
 
 func GenerateComplianceResourceRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
-	client, err := elastic.NewClient(
-		elastic.SetURL(elasticSearchURL),
-		elastic.SetSniff(false),
-	)
-	if err != nil {
-		fmt.Println("Elastic error : ", err)
-		os.Exit(1)
-	}
-
+	client := elasticSearchConnection(url, esHostName, esPort)
 	queryElasticSearchComplianceResourceRunReport(client, startTime, endTime)
 }
 
