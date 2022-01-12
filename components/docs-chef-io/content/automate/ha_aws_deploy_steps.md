@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Chef Automate HA AWS Deployment Procedure"
     parent = "automate/install"
     identifier = "automate/install/ha_aws_deploy_steps.md Chef Automate HA AWS Deployment Procedure"
-    weight = 220
+    weight = 340
 +++
 
 ## Deployment Procedure on AWS Cloud
@@ -35,8 +35,8 @@ Follow the steps below to deploy Chef Automate HA on AWS (Amazon Web Services) c
 
 1. Make the following changes in `config.toml` file by opening the file in a editor. For example, `vi config.toml`.
 
-   - Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in bastion host.
-   - Ensure `ssh_key_pair_name` and `ssh key file path` have same value.
+   - Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in bastion host where the Chef Automate deployment is taking place.
+   - Ensure `ssh_key_pair_name` and `ssh key file path` have same value and the one used to provision the bastion EC2 instance.
    - Assign permission to the *ssh key file* by running command, `chmod 400 /root/.ssh/id_rsa`.
    - Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes value `1`.
    - Ensure not to modify the cluster number value as `1` for PostgreSQL and ElasticSearch.

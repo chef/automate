@@ -10,21 +10,21 @@ gh_repo = "automate"
     title = "Bastion Setup for AWS Deployment Type"
     parent = "automate/install"
     identifier = "automate/install/ha_aws_bastion.md Bastion Setup for AWS Deployment Type"
-    weight = 220
+    weight = 290
 +++
 
 ## Building an AWS bastion host
 
 ### Bastion Host Requirements for AWS (Amazon Web Services)
 
-- Configure the AWS Credential on the bastion host. [Bastion Setup]({{< relref "ha_bastion_setup" >}})
+- [AWS Credential configured on your bastion host](( {{< relref "ha_configure_aws_credentials.md" >}} )).
 - Create the certificate for the DNS
 - Operating System (OS): Bastion host with Ubuntu 20.04 or centOs-7 or RHEL-7
 - AWS instance type: *t2.medium*
 - Memory: Minimum of 4GB
 - Hard Disk Space - 100 GB
-- SSH: VPC to Port 22, publicly accessible
-- Setup Virtual Private Cloud (VPC) in AWS
+- SSH: VPC to Port 22, publicly accessible. 
+- [Setup Virtual Private Cloud (VPC) in AWS](( {{< relref "ha_vpc_setup.md" >}}))
 
 ### Bastion Host Configuration
 
