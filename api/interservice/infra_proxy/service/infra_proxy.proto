@@ -45,6 +45,7 @@ service InfraProxyService {
     rpc GetOrg       (chef.automate.domain.infra_proxy.request.GetOrg) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
     rpc ResetOrgAdminKey (chef.automate.domain.infra_proxy.request.ResetOrgAdminKey) returns (chef.automate.domain.infra_proxy.response.ResetOrgAdminKey) {};
     rpc GetInfraServerOrgs (chef.automate.domain.infra_proxy.request.GetInfraServerOrgs) returns (chef.automate.domain.infra_proxy.response.GetInfraServerOrgs) {};
+    rpc CreateInfraServerOrgs (chef.automate.domain.infra_proxy.request.CreateInfraServerOrgs) returns (chef.automate.domain.infra_proxy.response.CreateInfraServerOrgs) {};
 
     rpc GetCookbooks (chef.automate.domain.infra_proxy.request.Cookbooks) returns (chef.automate.domain.infra_proxy.response.Cookbooks) {};
     rpc GetCookbookVersions (chef.automate.domain.infra_proxy.request.CookbookVersions) returns (chef.automate.domain.infra_proxy.response.CookbookVersions) {};

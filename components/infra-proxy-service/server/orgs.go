@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	chef "github.com/go-chef/chef"
 )
 
 // CreateOrg creates a new org
@@ -250,6 +251,26 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	return &response.GetInfraServerOrgs{
 		Orgs: fromStorageToListOrgs(orgs),
 	}, nil
+}
+
+//CreateInfraServerOrgs: Creates the organisations on chef server
+func (s *Server) CreateInfraServerOrgs(ctx context.Context, req *request.CreateInfraServerOrgs) (*response.CreateInfraServerOrgs, error) {
+
+	// Get chef client
+	c, err := s.getChefClient(ctx, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	org := chef.Organization{
+		Name:     req.Name,
+		FullName: req.FullName,
+	}
+	_, err = c.client.Organizations.Create(org)
+	if err != nil {
+		return nil, err
+	}
+	return &response.CreateInfraServerOrgs{}, nil
 }
 
 // Create a response.Org from a storage.Org

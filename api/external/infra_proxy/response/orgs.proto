@@ -52,3 +52,5 @@ message ResetOrgAdminKey {
     // Chef organization.
     Org org = 1;
 }
+
+message CreateInfraServerOrgs {}
