@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Chef Automate Utility Installation"
     parent = "automate/install"
     identifier = "automate/install/ha_auto_install.md Chef Automate Utility Installation"
-    weight = 210
+    weight = 270
 +++
 
 ## Download and Install Chef Automate Utility

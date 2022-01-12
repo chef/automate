@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Chef Automate HA AWS Deployment Procedure"
     parent = "automate/install"
     identifier = "automate/install/ha_deploy_aws.md Chef Automate HA AWS Deployment Procedure"
-    weight = 210
+    weight = 290
 +++
 
 !-- Chef gonna give storage calculator for customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page??

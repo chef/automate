@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA System and Software Requirements"
     parent = "automate/install"
     identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
-    weight = 200
+    weight = 240
 +++
 
 ## System & Software Requirements

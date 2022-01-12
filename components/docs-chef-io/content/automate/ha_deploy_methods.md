@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA Deployment Methods"
     parent = "automate/install"
     identifier = "automate/install/ha_deploy_methods.md HA Deployment Methods"
-    weight = 200
+    weight = 260
 +++
 
 ## Deployment Methods

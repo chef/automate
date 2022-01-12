@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA IAM User"
     parent = "automate/install"
     identifier = "automate/install/ha_iam_user.md HA IAM User"
-    weight = 220
+    weight = 310
 +++
 
 ## IAM User
