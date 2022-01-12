@@ -14,7 +14,7 @@
 
         <div class="button-bar options">
           <chef-button tertiary [disabled]="resetting" (click)="closeCreateModal()">Cancel</chef-button>
-          <chef-button primary id="reset-button-object-modal" [disabled]="resetting" (click)="resetKeyClient()">
+          <chef-button primary id="reset-button-object-modal" data-cy="final-reset" [disabled]="resetting" (click)="resetKeyClient()">
             <chef-loading-spinner *ngIf="resetting"></chef-loading-spinner>
             <span *ngIf="!resetting">Reset Key</span>
             <span *ngIf="resetting">Resetting...</span>
@@ -34,8 +34,8 @@
       </div>
 
       <div class="button-bar">
-        <chef-button tertiary (click)="closeCreateModal()">Close</chef-button>
-        <chef-button primary id="download-button-object-modal" (click)="downloadKey()">
+        <chef-button tertiary data-cy="close" (click)="closeCreateModal()">Close</chef-button>
+        <chef-button primary id="download-button-object-modal" data-cy="download-key" (click)="downloadKey()">
           Download
         </chef-button>
       </div>

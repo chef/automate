@@ -6,7 +6,7 @@
         <chef-form-field>
           <label *ngIf="!created">
             <span class="label">Client Name</span>
-            <input chefInput firstFocus formControlName="name" type="text" (keyup)="handleInput($event)" autocomplete="off" />
+            <input chefInput firstFocus formControlName="name" type="text" (keyup)="handleInput($event)" autocomplete="off" data-cy="client-name" />
           </label>
           <chef-error *ngIf="error">{{error}}</chef-error>
           <chef-error
@@ -16,7 +16,7 @@
         </chef-form-field>
         <chef-form-field>
           <chef-checkbox *ngIf="!created" (change)="updateValidatorCheckbox($event.detail)"
-            [checked]="checkedValidator">Validation Client</chef-checkbox>
+            [checked]="checkedValidator" data-cy="checkbox">Validation Client</chef-checkbox>
         </chef-form-field>
         <div *ngIf="created" class="detail">
           <div class="icon-wrap"><i></i></div>
@@ -28,9 +28,9 @@
         </div>
       </div>
       <div id="button-bar">
-        <chef-button tertiary *ngIf="!created"  [disabled]="creating" (click)="closeCreateModal()">Cancel</chef-button>
-        <chef-button tertiary *ngIf="created" (click)="closeCreateModal()">Close</chef-button>
-        <chef-button primary *ngIf="!created" [disabled]="!createForm?.valid || error || conflictError || creating"
+        <chef-button tertiary *ngIf="!created" data-cy="cancel-button" [disabled]="creating" (click)="closeCreateModal()">Cancel</chef-button>
+        <chef-button tertiary *ngIf="created" data-cy="close" (click)="closeCreateModal()">Close</chef-button>
+        <chef-button primary *ngIf="!created" data-cy="create" [disabled]="!createForm?.valid || error || conflictError || creating"
           id="create-button-object-modal" (click)="createClient()">
           <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
           <span *ngIf="!creating">Create</span>
