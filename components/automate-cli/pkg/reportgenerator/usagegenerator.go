@@ -308,15 +308,20 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 				writer.Flush()
 			}
 
+			
 			if t == st {
 				break
 			}
 
 			et = t
 			t = et.Add(-time.Hour)
-			if t.Before(st) {
-				t = st
+			switch {
+			case t.Before(st):
+					t = st
 			}
+			// if t.Before(st) {
+			// 	t = st
+			// }
 		}
 		err = writer.Write([]string{"", "", ""})
 		errorMessage(errorcsv, err)
@@ -454,4 +459,5 @@ func errorMessage(message string, err error) {
 		os.Exit(1)
 	}
 }
+
 
