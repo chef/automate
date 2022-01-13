@@ -286,10 +286,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 		st = et.Add(24 * -time.Hour)
 
 		err = writer.Write([]string{"Day Count"})
-		if err != nil {
-			fmt.Println(errorcsv, err)
-			os.Exit(1)
-		}
+		errorMessage(errorcsv, err)
 		dayCount, ok := getUniqueComplianceCounts(client, st, et)
 		if ok {
 			err = writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
@@ -307,10 +304,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 			metric, ok := getUniqueComplianceCounts(client, t, et)
 			if ok && *metric.Value > 0 {
 				err = writer.Write([]string{t.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *metric.Value)})
-				if err != nil {
-					fmt.Println(errorcsv, err)
-					os.Exit(1)
-				}
+				errorMessage(errorcsv, err)
 				writer.Flush()
 			}
 
@@ -325,17 +319,15 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 			}
 		}
 		err = writer.Write([]string{"", "", ""})
-		if err != nil {
-			fmt.Println(errorcsv, err)
-			os.Exit(1)
-		}
+		errorMessage(errorcsv, err)
+		
 		writer.Flush()
 		if st == startTime {
 			break
 		}
 	}
 	writer.Flush()
-	fmt.Println("The node count report is available in: ", filename)
+	fmt.Println("The resource count report is available in: ", filename)
 }
 
 func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
@@ -408,13 +400,11 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 		if searchResult.Hits.TotalHits > 0 {
 			if header == true {
 				headers := []string{"Resource_ID", "Version", "Resource_Name", "Environment", "End_Time", "Platform__Name", "Controls_Sums__Total", "Controls_Sums__Passed", "Controls_Sums__Skipped", "Controls_Sums__Failed", "Profiles__Count"}
-				if err := w.Write(headers); err != nil {
-					fmt.Println(errorcsv, err)
-				}
+				err := w.Write(headers); 
+				errorMessage(errorcsv, err)
 				w.Flush()
-				if err := w.Error(); err != nil {
-					fmt.Println(errorcsv, err)
-				}
+				err = w.Error(); 
+				errorMessage(errorcsv, err)
 			}
 
 			var s ComplianceInfo
@@ -441,10 +431,8 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 				errorMessage(errorcsv, err)
 				w.Flush()
 				header = false
-				if err := w.Error(); err != nil {
-					fmt.Println(errorcsv, err)
-
-				}
+				err = w.Error(); 
+				errorMessage(errorcsv, err)
 			}
 		}
 		if t == startTime {
