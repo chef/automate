@@ -293,9 +293,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 			errorMessage(errorcsv, err)
 		}
 		t := et.Add(-time.Hour)
-		if t.Before(st) {
-			t = st
-		}
+		endTimeBeforeStartTime(t, st)
 		err = writer.Write([]string{"Hourly Count"})
 		errorMessage(errorcsv, err)
 
@@ -308,24 +306,17 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 				writer.Flush()
 			}
 
-			
 			if t == st {
 				break
 			}
 
 			et = t
 			t = et.Add(-time.Hour)
-			switch {
-			case t.Before(st):
-					t = st
-			}
-			// if t.Before(st) {
-			// 	t = st
-			// }
+			endTimeBeforeStartTime(t, st)
 		}
 		err = writer.Write([]string{"", "", ""})
 		errorMessage(errorcsv, err)
-		
+
 		writer.Flush()
 		if st == startTime {
 			break
@@ -405,10 +396,10 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 		if searchResult.Hits.TotalHits > 0 {
 			if header == true {
 				headers := []string{"Resource_ID", "Version", "Resource_Name", "Environment", "End_Time", "Platform__Name", "Controls_Sums__Total", "Controls_Sums__Passed", "Controls_Sums__Skipped", "Controls_Sums__Failed", "Profiles__Count"}
-				err := w.Write(headers); 
+				err := w.Write(headers)
 				errorMessage(errorcsv, err)
 				w.Flush()
-				err = w.Error(); 
+				err = w.Error()
 				errorMessage(errorcsv, err)
 			}
 
@@ -436,7 +427,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 				errorMessage(errorcsv, err)
 				w.Flush()
 				header = false
-				err = w.Error(); 
+				err = w.Error()
 				errorMessage(errorcsv, err)
 			}
 		}
@@ -460,4 +451,8 @@ func errorMessage(message string, err error) {
 	}
 }
 
-
+func endTimeBeforeStartTime(t time.Time, st time.Time) {
+	if t.Before(st) {
+		t = st
+	}
+}
