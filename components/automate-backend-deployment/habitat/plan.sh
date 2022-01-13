@@ -87,6 +87,8 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../certs $pkg_prefix/workspace/ 
   cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/deployment-makefile/Makefile $pkg_prefix/workspace/
   cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/How-to-destroy-infra.md $pkg_prefix/workspace/terraform/
+  cp -r $PLAN_CONTEXT/.terraform $pkg_prefix/workspace/terraform/.terraform
+  cp -r $PLAN_CONTEXT/.terraform.lock.hcl $pkg_prefix/workspace/terraform/
 
   # make sure no state is copied over
   rm -f $pkg_prefix/workspace/terraform/*.tfstate
@@ -99,8 +101,6 @@ do_install() {
   rm -f $pkg_prefix/workspace/terraform/variables.tf
   rm -f $pkg_prefix/workspace/terraform/outputs.tf
   rm -f $pkg_prefix/workspace/terraform/versions.tf
-
-  rm -rf $pkg_prefix/workspace/terraform/.terraform
   rm -f $pkg_prefix/workspace/backups
 }
 
