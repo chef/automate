@@ -278,7 +278,7 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 	}
 	defer f.Close()
 	writer := gocsv.DefaultCSVWriter(f)
-	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
+	err = writer.Write([]string{"Start Time", "End Time", "Unique Resource Count"})
 	if err != nil {
 		fmt.Println(errorcsv, err)
 		os.Exit(1)
