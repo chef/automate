@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"strings"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -132,7 +132,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	if !strings.Contains(response, "y") {
 		return errors.New("canceled upgrade")
 	}
-	
+
 	if offlineMode {
 		writer.Title("Installing airgap install bundle")
 		airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
@@ -155,7 +155,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 				return err
 			}
 		}
-		args = append(args,"-y")
+		args = append(args, "-y")
 		if upgradeRunCmdFlags.skipDeploy {
 			return nil
 		}
