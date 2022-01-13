@@ -66,17 +66,11 @@ func GenerateNodeRunReport(esHostName string, esPort string, startTime time.Time
 func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
 	filename := fmt.Sprintf("nodecount_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		fmt.Println("Failed to open Node Count report")
-		os.Exit(1)
-	}
+	errorMessage("Failed to open Node Count report", err)
 	defer f.Close()
 	writer := gocsv.DefaultCSVWriter(f)
 	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
-	if err != nil {
-		fmt.Println(errorcsv, err)
-		os.Exit(1)
-	}
+	errorMessage(errorcsv, err)
 
 	st := endTime.Add(24 * time.Hour)
 	for {
@@ -84,36 +78,26 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		st = et.Add(24 * -time.Hour)
 
 		err = writer.Write([]string{"Day Count"})
-		if err != nil {
-			fmt.Println(errorcsv, err)
-			os.Exit(1)
-		}
+		errorMessage(errorcsv, err)
+		
 		dayCount, ok := getUniqueCounts(client, st, et)
 		if ok {
 			err = writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
-			if err != nil {
-				fmt.Println(errorcsv, err)
-				os.Exit(1)
-			}
+			errorMessage(errorcsv, err)
 		}
 		t := et.Add(-time.Hour)
 		if t.Before(st) {
 			t = st
 		}
 		err = writer.Write([]string{"Hourly Count"})
-		if err != nil {
-			fmt.Println(errorcsv, err)
-			os.Exit(1)
-		}
+		errorMessage(errorcsv, err)
+		
 		writer.Flush()
 		for {
 			metric, ok := getUniqueCounts(client, t, et)
 			if ok && *metric.Value > 0 {
 				err = writer.Write([]string{t.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *metric.Value)})
-				if err != nil {
-					fmt.Println(errorcsv, err)
-					os.Exit(1)
-				}
+				errorMessage(errorcsv, err)
 				writer.Flush()
 			}
 
@@ -128,10 +112,8 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 			}
 		}
 		err = writer.Write([]string{"", "", ""})
-		if err != nil {
-			fmt.Println(errorcsv, err)
-			os.Exit(1)
-		}
+		errorMessage(errorcsv, err)
+		
 		writer.Flush()
 		if st == startTime {
 			break
@@ -155,10 +137,7 @@ func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.T
 		Aggregation("nodes_count", aggr)
 
 	searchResult, err := searchService.Do(context.Background())
-	if err != nil {
-		fmt.Println(errorQuery, err)
-		os.Exit(1)
-	}
+	errorMessage(errorQuery, err)
 
 	metric, ok := searchResult.Aggregations.ValueCount("nodes_count")
 	return metric, ok
@@ -454,3 +433,4 @@ func errorMessage(message string, err error) {
 		os.Exit(1)
 	}
 }
+
