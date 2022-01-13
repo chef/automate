@@ -38,6 +38,7 @@ var timeFormat = "2006-01-02"
 var dateFormat = "yyyy-MM-dd"
 var datetimeFormat = "yyyy-MM-dd-HH:mm:ss"
 var datetimesecFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+var errorQuery = "Error in query: "
 
 func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client {
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
@@ -155,7 +156,7 @@ func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.T
 
 	searchResult, err := searchService.Do(context.Background())
 	if err != nil {
-		fmt.Println("Error in query: ", err)
+		fmt.Println(errorQuery, err)
 		os.Exit(1)
 	}
 
@@ -216,7 +217,7 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 
 		searchResult, err := searchService.Do(context.Background())
 		if err != nil {
-			fmt.Println("Error in query: ", err)
+			fmt.Println(errorQuery, err)
 			os.Exit(1)
 		}
 
@@ -362,7 +363,7 @@ func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endT
 
 	searchResult, err := searchService.Do(context.Background())
 	if err != nil {
-		fmt.Println("Error in query: ", err)
+		fmt.Println(errorQuery, err)
 		os.Exit(1)
 	}
 
@@ -419,7 +420,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 
 		searchResult, err := searchService.Do(context.Background())
 		if err != nil {
-			fmt.Println("Error in query: ", err)
+			fmt.Println(errorQuery, err)
 			os.Exit(1)
 		}
 
