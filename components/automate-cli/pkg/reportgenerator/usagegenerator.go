@@ -273,17 +273,12 @@ func GenerateComplianceResourceRunReport(esHostName string, esPort string, start
 func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
 	filename := fmt.Sprintf("complianceresourcecount_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		fmt.Println("Failed to open Resource Count report")
-		os.Exit(1)
-	}
+	errorMessage("Failed to open Resource Count report", err)
+
 	defer f.Close()
 	writer := gocsv.DefaultCSVWriter(f)
 	err = writer.Write([]string{"Start Time", "End Time", "Unique Resource Count"})
-	if err != nil {
-		fmt.Println(errorcsv, err)
-		os.Exit(1)
-	}
+	errorMessage(errorcsv, err)
 
 	st := endTime.Add(24 * time.Hour)
 	for {
@@ -298,20 +293,15 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 		dayCount, ok := getUniqueComplianceCounts(client, st, et)
 		if ok {
 			err = writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
-			if err != nil {
-				fmt.Println(errorcsv, err)
-				os.Exit(1)
-			}
+			errorMessage(errorcsv, err)
 		}
 		t := et.Add(-time.Hour)
 		if t.Before(st) {
 			t = st
 		}
 		err = writer.Write([]string{"Hourly Count"})
-		if err != nil {
-			fmt.Println(errorcsv, err)
-			os.Exit(1)
-		}
+		errorMessage(errorcsv, err)
+
 		writer.Flush()
 		for {
 			metric, ok := getUniqueComplianceCounts(client, t, et)
@@ -362,10 +352,7 @@ func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endT
 		Aggregation("nodes_count", aggr)
 
 	searchResult, err := searchService.Do(context.Background())
-	if err != nil {
-		fmt.Println(errorQuery, err)
-		os.Exit(1)
-	}
+	errorMessage(errorQuery, err)
 
 	metric, ok := searchResult.Aggregations.ValueCount("nodes_count")
 	return metric, ok
@@ -374,10 +361,7 @@ func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endT
 func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
 	filename := fmt.Sprintf("complianceresourceinfo_%s_%s.csv", startTime.Format(timeFormat), endTime.Format(timeFormat))
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		fmt.Println("Failed to open Compliance scan detail report")
-		os.Exit(1)
-	}
+	errorMessage("Failed to open Compliance scan detail report", err)
 	defer f.Close()
 
 	w := gocsv.DefaultCSVWriter(f)
@@ -419,10 +403,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 			FetchSourceContext(fetchSource)
 
 		searchResult, err := searchService.Do(context.Background())
-		if err != nil {
-			fmt.Println(errorQuery, err)
-			os.Exit(1)
-		}
+		errorMessage(errorQuery, err)
 
 		if searchResult.Hits.TotalHits > 0 {
 			if header == true {
@@ -441,10 +422,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 			for _, hit := range searchResult.Hits.Hits {
 
 				err = json.Unmarshal(*hit.Source, &s)
-				if err != nil {
-					fmt.Println("Json marshal err :", err)
-					os.Exit(1)
-				}
+				errorMessage("Json marshal err :", err)
 
 				record := []string{
 					get("node_uuid", s).(string),
@@ -459,10 +437,8 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 					fmt.Sprint(get("total", get("failed", get("controls_sums", s)))),
 					strconv.Itoa(len(get("profiles", s).([]interface{}))),
 				}
-				if err := w.Write(record); err != nil {
-					fmt.Println(errorcsv, err)
-
-				}
+				err := w.Write(record)
+				errorMessage(errorcsv, err)
 				w.Flush()
 				header = false
 				if err := w.Error(); err != nil {
@@ -482,4 +458,11 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 		}
 	}
 	fmt.Println("The details of the runs can be found in : ", filename)
+}
+
+func errorMessage(message string, err error) {
+	if err != nil {
+		fmt.Println(message, err)
+		os.Exit(1)
+	}
 }
