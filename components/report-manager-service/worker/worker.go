@@ -25,6 +25,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/lifecycle"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -249,6 +250,21 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 		}
 	}
 
+	config := lifecycle.NewConfiguration()
+	config.Rules = []lifecycle.Rule{
+		{
+			ID:     "expire-bucket",
+			Status: "Enabled",
+			Expiration: lifecycle.Expiration{
+				Days: 1,
+			},
+		},
+	}
+
+	err = t.ObjStoreClient.SetBucketLifecycle(context.Background(), job.RequestToProcess.RequestorId, config)
+	if err != nil {
+		return nil, err
+	}
 	var reportSize int64
 	var objectName string
 	if job.RequestToProcess.ReportType == "json" {

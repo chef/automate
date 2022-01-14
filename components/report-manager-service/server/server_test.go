@@ -25,6 +25,7 @@ import (
 	"github.com/go-gorp/gorp"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/lifecycle"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -66,6 +67,10 @@ func (m mockObjStore) BucketExists(ctx context.Context, bucketName string) (bool
 }
 
 func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts minio.MakeBucketOptions) error {
+	return nil
+}
+
+func (m mockObjStore) SetBucketLifecycle(ctx context.Context, bucketName string, config *lifecycle.Configuration) error {
 	return nil
 }
 
