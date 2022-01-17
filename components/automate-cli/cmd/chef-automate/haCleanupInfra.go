@@ -77,7 +77,7 @@ func executeCleanupScript(args []string) error {
 	} else if len(cleanupFlags.nodeName) < 0 && len(cleanupFlags.ports) > 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-p"}, "")
 	} else {
-		return errors.New("config.toml is required as argument")
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-p"}, "")
 	}
 
 }
