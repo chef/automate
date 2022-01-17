@@ -22,9 +22,9 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
         id = response.body.id;
       });
     });
-  
+
     let nodeId: any;
-  
+
     it('add node', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -48,37 +48,20 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
         nodeId = response.body.ids[0];
       });
     });
-  
+
     it('upload file', () => {
-      // const formData = new FormData();
-      // formData.set('file', new File(['data'], 'upload.txt'), 'upload.txt');
-  
-      // cy.request({
-      //   headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      //   method: 'POST',
-      //   url: 'api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin',
-      //   body: {
-      //     query: {
-      //       filter_map: []
-      //     }
-      //   }
-      // }).then((response) => {
-      //   expect(response.body.summary.valid).to.equal(true);
-      // });
-  
+
       cy.uploadFileRequest(
         'testproxy-0.1.0.tar.gz',
         'testproxy-0.1.0.tar.gz',
         'demoFileUploadRequest'
       );
-  
-      // cy.wait(30000)
-  
+
       cy.wait('@demoFileUploadRequest', {timeout: 120000}).then((response) => {
         expect(response.status).to.eq(200);
       });
     });
-  
+
     it('get manager id', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -89,7 +72,7 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
         id = response.body.managers[0].id;
       });
     });
-  
+
     it('run scan', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -114,22 +97,14 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
         id = response.body.id;
       });
     });
-  
+
     it('wait for scan', () => {
-  
-      // var dt = new Date();
-  
-      // let year  = dt.getFullYear();
-      // let month = (dt.getMonth() + 1).toString().padStart(2, "0");
-      // let day   = dt.getDate().toString().padStart(2, "0");
-      // let dayPrev   = (dt.getDate() - 1).toString().padStart(2, "0");
-  
       const endDate = Cypress.moment().utc().endOf('day');
       const startDate = Cypress.moment(endDate).subtract(10, 'days').startOf('day');
-  
+
       cy.task('log', endDate);
       cy.task('log', startDate);
-  
+
       cy.wait(90000);
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -148,18 +123,6 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
         id = response.body.id;
         expect(response.body.report_summary.status).to.eq('passed');
       });
-      // cy.request({
-      //   headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      //   method: 'POST',
-      //   url: `api/v0/compliance/reporting/reports/id/${nodeId}`,
-      //   body: {
-      //     filters: []
-      //   }
-      // }).then((response) => {
-      //   cy.task('log', response.body);
-      //   id = response.body.id;
-      //   expect(response.body.status).to.eq('passed');
-      // });
     });
   }
 });
@@ -176,7 +139,7 @@ Cypress.Commands.add('uploadFileRequest', (fileToUpload: any, uniqueName: any, a
   cy.server()
     .route({
       method: 'POST',
-      url: 'api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin',
+      url: 'api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin'
     })
     .as(aliasName)
     .window()
@@ -198,5 +161,4 @@ Cypress.Commands.add('uploadFileRequest', (fileToUpload: any, uniqueName: any, a
           xhr.send(data);
         });
     });
-})
-
+});
