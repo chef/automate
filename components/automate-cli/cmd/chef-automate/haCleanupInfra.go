@@ -12,7 +12,6 @@ import (
 
 var cleanupFlags = struct {
 	nodeName  string
-	directory string
 	ports     string
 }{}
 
@@ -24,13 +23,6 @@ func init() {
 		"nodeName",
 		"",
 		"node on which cleanup needs to be done")
-	RootCmd.AddCommand(cleanupCmd)
-
-	cleanupCmd.PersistentFlags().StringVar(
-		&cleanupFlags.directory,
-		"directory",
-		"",
-		"Directory which needs to be deleted")
 	RootCmd.AddCommand(cleanupCmd)
 
 	cleanupCmd.PersistentFlags().StringVar(
@@ -48,7 +40,8 @@ var cleanupCmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
-	RunE: runCleanupCmd,
+	RunE:   runCleanupCmd,
+	Hidden: true,
 }
 
 func runCleanupCmd(cmd *cobra.Command, args []string) error {
@@ -77,16 +70,14 @@ func executeCleanupScript(args []string) error {
 	if err != nil {
 		return err
 	}
-	if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) > 0 {
-		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-d", cleanupFlags.directory, "-p"}, "")
-	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) > 0 && len(cleanupFlags.ports) < 0 {
-		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-d", cleanupFlags.directory}, "")
-	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) < 0 && len(cleanupFlags.ports) < 0 {
-		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
-	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.directory) < 0 && len(cleanupFlags.ports) > 0 {
+	if len(cleanupFlags.nodeName) > 0  && len(cleanupFlags.ports) > 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-p"}, "")
-	} else {
+	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.ports) < 0 {
+		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
+	} else if len(cleanupFlags.nodeName) < 0 && len(cleanupFlags.ports) > 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-p"}, "")
+	} else {
+		return errors.New("config.toml is required as argument")
 	}
 
 }

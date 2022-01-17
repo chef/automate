@@ -3,18 +3,15 @@ package main
 const cleanupScript = `
 #!/bin/bash
 
-while getopts ":c:d:n:hp" opt; do
+while getopts ":c:n:hp" opt; do
   case "${opt}" in
-    d)
-      export DIR=${OPTARG}
-      ;;
     n)
       export NODE=${OPTARG}
       ;;
     p)
       export PORT="CLEAN_ALL"
       ;;
-	c)
+	  c)
       export CONFIG=${OPTARG}
       ;;
     h)
@@ -31,10 +28,6 @@ while getopts ":c:d:n:hp" opt; do
   esac
 done
 
-elasticsearch_port=(9631 9200 9300 9638 5601)
-postgresql_port=(9631 7432 5432 9638 6432)
-automate_port=(9631 9638 5432 6432 7432 443)
-chef_server_port=(9631 9638 5432 6432 7432 443)
 #Taking and filtering ssh_key from $CONFIG file
 SSH_KEY=$(grep -E '(^|\s)ssh_key_file($|\s)' $CONFIG | cut -c13- | sed 's/"//g' | sed 's/=//g')
 #Taking and filtering ssh_user from $CONFIG file
@@ -64,14 +57,13 @@ postgresql_private_ip=${postgresql_private_ip//,/ }
 postgresql_private_ip=${postgresql_private_ip##[}
 postgresql_private_ip=${postgresql_private_ip%]}
 eval postgresql_private_ip=($postgresql_private_ip)
-# Below 8 no. of loop will kill the process that is running on specific port.
+
 export BANNER="
 This script takes input from $CONFIG and clean your chef-automate HA nodes when in existing_node configuration
 The following arguments are available:
  -c [/home/centos/config.toml] Absolute path of config.toml
  -n [automate|chef_server|postgresql|elasticsearch]   if you select this flag and give node name then that node will get cleanup
- -d [/hab | /var/tmp]     The directory which you give with this flag will be deleted
- -p                        if you give this flag, then will make sure no service is running on your required ports for automate HA
+ -p if you give this flag, then will make sure no service is running on your required ports for automate HA
  [OPTIONS]
  -h                               Print this help message
  ex. 
@@ -79,11 +71,8 @@ The following arguments are available:
  bash cleanup.sh -c < Path to config.toml config.toml > -p 
  2) when you want to cleanup dir on particular node and close port on that particular node, 
  for example here we take elasticsearch 
- bash cleanup.sh -c < Path to config.toml config.toml > -n elasticsearch -d /hab -p
- 3) when you want to cleanup dir on particular node and remove hab directory, 
- for example here we take elasticsearch
- bash cleanup.sh -c < Path to config.toml config.toml > -n elasticsearch -d /hab
- 4) when you want to cleanup dir on particular node and remove both /hab and /var/tmp, 
+ bash cleanup.sh -c < Path to config.toml config.toml > -n elasticsearch  -p
+ 4) when you want to cleanup dir on particular node and not want to close any port , 
  for example here we take elasticsearch
  bash cleanup.sh -c < Path to config.toml config.toml > -n elasticsearch 
 "
@@ -94,40 +83,40 @@ usage() {
 
 clean_dir() { 
     node="$1"
-    path="$2"
-  
-    if [ "$path" = "/var/tmp" ];then 
-	    path="/var/tmp/*"
-    else
-	    path="/hab*"
-    fi
-
     if [ $node = "automate" ];then
         for i in ${automate_server_private_ip[@]};
         do  
             ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  <<EOF
-            sudo rm -rf $path
+            cd /var/tmp/
+            sudo rm -rf *
+            sudo rm -rf /hab
 EOF
         done
     elif [ "$node" = "elasticsearch" ];then
         for i in ${elasticsearch_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<EOF
-                sudo rm -rf $path
+                cd /var/tmp/
+                sudo rm -rf *
+                sudo rm -rf /hab
 EOF
         done
     elif [ "$node" = "postgresql" ]; then
         for i in ${postgresql_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<EOF
-                sudo rm -rf $path
+                cd /var/tmp/
+                sudo rm -rf *
+                sudo rm -rf /hab
 EOF
         done
     elif [ "$node" = "chef_server" ]; then
         for i in ${chef_server_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<EOF
-                sudo rm -rf $path
+                cd /var/tmp/
+                sudo rm -rf *
+                sudo rm -rf /hab
 EOF
         done
     else
@@ -142,28 +131,33 @@ close_port() {
         for i in ${automate_server_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                sudo kill -9 $(sudo lsof -t -i:$automate_port) > /dev/null 2>&1
+                ls -dtr1 /hab/cache/artifacts/core-netcat-* | tail -1 | xargs hab pkg install -bf
+                for j in ${automate_port[@]};
+	              do
+		                 ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			               ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+                done
 EOF
     done
     elif [ "$node" = "elasticsearch" ];then
         for i in ${elasticsearch_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                sudo kill -9 $(sudo lsof -t -i:$elasticsearch_port) > /dev/null 2>&1
+                sudo xargs kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
 EOF
     done
     elif [ "$node" = "postgresql" ];then
     for i in ${postgresql_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                sudo kill -9 $(sudo lsof -t -i:$postgresql_port) > /dev/null 2>&1
+                sudo xargs kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
 EOF
     done
     elif [ "$node" = "chef_server" ];then
     for i in ${chef_server_server_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                sudo kill -9 $(sudo lsof -t -i:$chef_server_port) > /dev/null 2>&1
+                sudo xargs kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
 EOF
     done
     else
@@ -173,7 +167,6 @@ EOF
 }
 
 if [ "$PORT" = "CLEAN_ALL" ]; then
-
         if [ ! -z "$NODE" ]
         then
                 close_port $NODE
@@ -189,20 +182,11 @@ fi
 
 if [[ ! -z "$NODE" ]]
 then 
-	if [[ ! -z "$DIR" ]];then
-		clean_dir $NODE $DIR
-	else	
-		clean_dir $NODE /hab
-	        clean_dir $NODE /var/tmp/*
-        fi
+	  clean_dir $NODE 
 else 
-	clean_dir automate /hab
-	clean_dir automate /var/tmp/*
-    clean_dir chef_server /hab
-	clean_dir chef_server /var/tmp/*
-    clean_dir elasticsearch /hab
-	clean_dir elasticsearch /var/tmp/*
-    clean_dir postgresql /hab
-	clean_dir postgresql /var/tmp/*
+  	clean_dir automate
+	  clean_dir chef_server
+    clean_dir elasticsearch
+    clean_dir postgresql
 fi
 `
