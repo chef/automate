@@ -43,6 +43,7 @@ func ManifestFromBytes(body []byte) (*manifest.A2, error) {
 	}
 
 	ver := versionedManifest.SchemaVersion
+	//Todo(milestone) Add a case for schema_version 2
 	switch ver {
 	case "1":
 		return parseV1Manifest(body)
