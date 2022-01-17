@@ -90,6 +90,7 @@ func NewHTTPClient(options ...Opt) *HTTP {
 		option(c)
 	}
 
+	// Todo(milestone) -- For milestone need to add milestone version format
 	if c.latestManifestURLFmt == "" {
 		c.latestManifestURLFmt = defaultLatestManifestURLFmt
 	}
@@ -100,6 +101,7 @@ func NewHTTPClient(options ...Opt) *HTTP {
 
 	// We allow skipping manifest verification if needed by setting this environment
 	// variable. Set it only if you must
+	//Todo(milestone) -- For milestone we cannot skip
 	if os.Getenv("CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION") == "true" {
 		c.noVerify = true
 	}
@@ -128,6 +130,8 @@ func NoVerify(noVerify bool) Opt {
 		c.noVerify = noVerify
 	}
 }
+
+//Todo(milestone) Add another function to check if a manifest exists
 
 // GetCurrentManifest retrieves the current manifest for the given
 // channel.
