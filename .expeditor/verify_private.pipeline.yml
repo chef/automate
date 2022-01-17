@@ -498,7 +498,6 @@ steps:
         linux:
           privileged: true
 
-
   - label: "iam v1 to v2 force-upgrade"
     command:
       - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh

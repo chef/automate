@@ -1,7 +1,9 @@
 describe('Node manager service ', () => {
 
-if (Cypress.env('IS_PROXY_ENV') === 'true') {
-  let id: any;
+  if (Cypress.env('IS_PROXY_ENV') === 'true') {
+    let id: any;
+    let nodeId: any;
+
     it('add secret', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -22,8 +24,6 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
         id = response.body.id;
       });
     });
-
-    let nodeId: any;
 
     it('add node', () => {
       cy.request({
@@ -50,7 +50,6 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
     });
 
     it('upload file', () => {
-
       cy.uploadFileRequest(
         'testproxy-0.1.0.tar.gz',
         'testproxy-0.1.0.tar.gz',
@@ -101,7 +100,6 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
     it('wait for scan', () => {
       const endDate = Cypress.moment().utc().endOf('day');
       const startDate = Cypress.moment(endDate).subtract(10, 'days').startOf('day');
-
       cy.wait(90000);
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -130,7 +128,6 @@ declare global {
 
 Cypress.Commands.add('uploadFileRequest', (fileToUpload: any, uniqueName: any, aliasName: any) => {
   const data = new FormData();
-
   cy.server()
     .route({
       method: 'POST',
@@ -143,16 +140,10 @@ Cypress.Commands.add('uploadFileRequest', (fileToUpload: any, uniqueName: any, a
         .then((binary) => Cypress.Blob.binaryStringToBlob(binary))
         .then((blob) => {
           const xhr = new win.XMLHttpRequest();
-
           data.set('file', blob, fileToUpload);
-          // var formData = new FormData();
-          // formData.append('testproxy-0.1.0.tar.gz', fileToUpload);
-
           xhr.open('POST', 'api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin');
-
           xhr.setRequestHeader('api-token', Cypress.env('ADMIN_TOKEN'));
           xhr.timeout = 300000;
-
           xhr.send(data);
         });
     });
