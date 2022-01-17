@@ -1,7 +1,4 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
-
-echo $http_proxy
-
 {{!--
 # The protocol for hab's health_check is to exit with a status of: 0 for
 # success, 1 for warning, 2 for error, and 3 for unknown.
