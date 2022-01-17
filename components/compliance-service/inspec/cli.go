@@ -173,11 +173,15 @@ func sanitizeEnv(env map[string]string) map[string]string {
 
 func run(args []string, conf *TargetConfig, timeout time.Duration, env map[string]string) ([]byte, []byte, error) {
 
-	env["https_proxy"] = os.Getenv("https_proxy")
-	env["http_proxy"] = os.Getenv("https_proxy")
-	env["no_proxy"] = os.Getenv("no_proxy")
-
-	logrus.Println("::::::::http_proxy::::::", env["http_proxy"])
+	if https_proxy := os.Getenv("https_proxy"); https_proxy != "" {
+		env["https_proxy"] = https_proxy
+	}
+	if http_proxy := os.Getenv("http_proxy"); http_proxy != "" {
+		env["http_proxy"] = http_proxy
+	}
+	if no_proxy := os.Getenv("no_proxy"); no_proxy != "" {
+		env["no_proxy"] = no_proxy
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

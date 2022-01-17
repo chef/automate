@@ -34,16 +34,12 @@ do_deploy() {
 
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
-
+    # shellcheck disable=SC2154
     proxyurl="http://${test_proxy_container_name}:3128"
     echo "export http_proxy=${proxyurl}" >> ~/.bashrc
     echo "export https_proxy=${proxyurl}" >> ~/.bashrc
+    #shellcheck disable=SC1090
     source ~/.bashrc
-
-    yum install openssh -y
-    yum install openssh-server -y
-    systemctl start sshd
-    chpasswd <<< 'root:123456'
 }
 
 do_test_deploy() {
