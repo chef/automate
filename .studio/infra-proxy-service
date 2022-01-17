@@ -331,6 +331,7 @@ EOF
   done  
   log_line "Sample data loaded of $records users for server with server name '$server_prefix' and server id '$server_id'"
 }
+<<<<<<< HEAD
 
 document "infra_service_load_sample_orgs" <<DOC
   Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
@@ -387,3 +388,5 @@ EOF
   done  
   log_line "Sample organisations loaded..."
 }
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef

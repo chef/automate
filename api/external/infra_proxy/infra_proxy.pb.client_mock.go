@@ -336,6 +336,7 @@ func (mr *MockInfraProxyClientMockRecorder) GetInfraServerOrgs(ctx, in interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfraServerOrgs", reflect.TypeOf((*MockInfraProxyClient)(nil).GetInfraServerOrgs), varargs...)
 }
 
+<<<<<<< HEAD
 // CreateInfraServerOrgs mocks base method
 func (m *MockInfraProxyClient) CreateInfraServerOrgs(ctx context.Context, in *request.CreateInfraServerOrgs, opts ...grpc.CallOption) (*response.CreateInfraServerOrgs, error) {
 	m.ctrl.T.Helper()
@@ -356,6 +357,8 @@ func (mr *MockInfraProxyClientMockRecorder) CreateInfraServerOrgs(ctx, in interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateInfraServerOrgs", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateInfraServerOrgs), varargs...)
 }
 
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 // GetCookbooks mocks base method
 func (m *MockInfraProxyClient) GetCookbooks(ctx context.Context, in *request.Cookbooks, opts ...grpc.CallOption) (*response.Cookbooks, error) {
 	m.ctrl.T.Helper()
@@ -1524,6 +1527,7 @@ func (mr *MockInfraProxyServerMockRecorder) GetInfraServerOrgs(arg0, arg1 interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfraServerOrgs", reflect.TypeOf((*MockInfraProxyServer)(nil).GetInfraServerOrgs), arg0, arg1)
 }
 
+<<<<<<< HEAD
 // CreateInfraServerOrgs mocks base method
 func (m *MockInfraProxyServer) CreateInfraServerOrgs(arg0 context.Context, arg1 *request.CreateInfraServerOrgs) (*response.CreateInfraServerOrgs, error) {
 	m.ctrl.T.Helper()
@@ -1539,6 +1543,8 @@ func (mr *MockInfraProxyServerMockRecorder) CreateInfraServerOrgs(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateInfraServerOrgs", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateInfraServerOrgs), arg0, arg1)
 }
 
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 // GetCookbooks mocks base method
 func (m *MockInfraProxyServer) GetCookbooks(arg0 context.Context, arg1 *request.Cookbooks) (*response.Cookbooks, error) {
 	m.ctrl.T.Helper()

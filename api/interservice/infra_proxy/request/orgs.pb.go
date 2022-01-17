@@ -478,6 +478,7 @@ func (x *GetInfraServerOrgs) GetServerId() string {
 	return ""
 }
 
+<<<<<<< HEAD
 type CreateInfraServerOrgs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -544,6 +545,8 @@ func (x *CreateInfraServerOrgs) GetFullName() string {
 	return ""
 }
 
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 var File_interservice_infra_proxy_request_orgs_proto protoreflect.FileDescriptor
 
 var file_interservice_infra_proxy_request_orgs_proto_rawDesc = []byte{
@@ -590,6 +593,7 @@ var file_interservice_infra_proxy_request_orgs_proto_rawDesc = []byte{
 	0x31, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x72, 0x61, 0x53, 0x65, 0x72, 0x76, 0x65,
 	0x72, 0x4f, 0x72, 0x67, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f,
 	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72,
+<<<<<<< HEAD
 	0x49, 0x64, 0x22, 0x65, 0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x49, 0x6e, 0x66, 0x72,
 	0x61, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x4f, 0x72, 0x67, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x73,
 	0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
@@ -602,6 +606,13 @@ var file_interservice_infra_proxy_request_orgs_proto_rawDesc = []byte{
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f,
 	0x78, 0x79, 0x2f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x33,
+=======
+	0x49, 0x64, 0x42, 0x3f, 0x5a, 0x3d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f,
+	0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 }
 
 var (
@@ -616,6 +627,7 @@ func file_interservice_infra_proxy_request_orgs_proto_rawDescGZIP() []byte {
 	return file_interservice_infra_proxy_request_orgs_proto_rawDescData
 }
 
+<<<<<<< HEAD
 var file_interservice_infra_proxy_request_orgs_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_interservice_infra_proxy_request_orgs_proto_goTypes = []interface{}{
 	(*CreateOrg)(nil),             // 0: chef.automate.domain.infra_proxy.request.CreateOrg
@@ -626,6 +638,17 @@ var file_interservice_infra_proxy_request_orgs_proto_goTypes = []interface{}{
 	(*ResetOrgAdminKey)(nil),      // 5: chef.automate.domain.infra_proxy.request.ResetOrgAdminKey
 	(*GetInfraServerOrgs)(nil),    // 6: chef.automate.domain.infra_proxy.request.GetInfraServerOrgs
 	(*CreateInfraServerOrgs)(nil), // 7: chef.automate.domain.infra_proxy.request.CreateInfraServerOrgs
+=======
+var file_interservice_infra_proxy_request_orgs_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_interservice_infra_proxy_request_orgs_proto_goTypes = []interface{}{
+	(*CreateOrg)(nil),          // 0: chef.automate.domain.infra_proxy.request.CreateOrg
+	(*UpdateOrg)(nil),          // 1: chef.automate.domain.infra_proxy.request.UpdateOrg
+	(*DeleteOrg)(nil),          // 2: chef.automate.domain.infra_proxy.request.DeleteOrg
+	(*GetOrgs)(nil),            // 3: chef.automate.domain.infra_proxy.request.GetOrgs
+	(*GetOrg)(nil),             // 4: chef.automate.domain.infra_proxy.request.GetOrg
+	(*ResetOrgAdminKey)(nil),   // 5: chef.automate.domain.infra_proxy.request.ResetOrgAdminKey
+	(*GetInfraServerOrgs)(nil), // 6: chef.automate.domain.infra_proxy.request.GetInfraServerOrgs
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 }
 var file_interservice_infra_proxy_request_orgs_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -725,6 +748,7 @@ func file_interservice_infra_proxy_request_orgs_proto_init() {
 				return nil
 			}
 		}
+<<<<<<< HEAD
 		file_interservice_infra_proxy_request_orgs_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateInfraServerOrgs); i {
 			case 0:
@@ -737,6 +761,8 @@ func file_interservice_infra_proxy_request_orgs_proto_init() {
 				return nil
 			}
 		}
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -744,7 +770,11 @@ func file_interservice_infra_proxy_request_orgs_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_interservice_infra_proxy_request_orgs_proto_rawDesc,
 			NumEnums:      0,
+<<<<<<< HEAD
 			NumMessages:   8,
+=======
+			NumMessages:   7,
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 			NumExtensions: 0,
 			NumServices:   0,
 		},

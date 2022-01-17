@@ -29,7 +29,11 @@
           (changePage)= "onUpdatePage($event)"
         ></app-paginator>
         <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients', 'post', [serverId, orgId]]">
+<<<<<<< HEAD
         <chef-button class="create-client" primary data-cy="create-client-button" (click)="openCreateClientModal()">Create Client</chef-button>
+=======
+        <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
         </app-authorized>
       </div>
       <chef-loading-spinner class="full-screen-spinner" *ngIf="loading || deleting" size="50" fixed></chef-loading-spinner>

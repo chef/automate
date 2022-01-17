@@ -119,12 +119,15 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:infraserverorgs";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+<<<<<<< HEAD
   rpc CreateInfraServerOrgs (infra_proxy.request.CreateInfraServerOrgs) returns (infra_proxy.response.CreateInfraServerOrgs) {
     option (google.api.http).post = "/api/v0/infra/servers/{server_id}/infraserverorgs";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:infraserverorgs";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 
   rpc GetCookbooks (infra_proxy.request.Cookbooks) returns (infra_proxy.response.Cookbooks) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks";

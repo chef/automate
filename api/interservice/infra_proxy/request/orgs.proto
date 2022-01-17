@@ -63,6 +63,7 @@ message GetInfraServerOrgs {
     // Automate Infra Server ID
     string server_id = 1;
 }
+<<<<<<< HEAD
 
 message CreateInfraServerOrgs {
     // Automate Infra Server ID
@@ -72,3 +73,5 @@ message CreateInfraServerOrgs {
     // Orgabisation full_name
     string full_name = 3;
 }
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef

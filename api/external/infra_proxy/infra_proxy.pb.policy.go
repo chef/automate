@@ -236,6 +236,7 @@ func init() {
 		}
 		return ""
 	})
+<<<<<<< HEAD
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/CreateInfraServerOrgs", "infra:infraServers:{server_id}:infraserverorgs", "infra:infraServers:get", "POST", "/api/v0/infra/servers/{server_id}/infraserverorgs", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateInfraServerOrgs); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
@@ -253,6 +254,8 @@ func init() {
 		}
 		return ""
 	})
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbooks", "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks", "infra:infraServersOrgsCookbooks:list", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Cookbooks); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {

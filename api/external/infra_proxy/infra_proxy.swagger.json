@@ -315,6 +315,7 @@
         "tags": [
           "InfraProxy"
         ]
+<<<<<<< HEAD
       },
       "post": {
         "operationId": "InfraProxy_CreateInfraServerOrgs",
@@ -352,6 +353,8 @@
         "tags": [
           "InfraProxy"
         ]
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs": {

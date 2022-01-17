@@ -52,7 +52,7 @@
             <div class="key-tab-details">
               <div class="key-tab-body-top">
                 <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset', 'put', [serverId, orgId, name]]">
-                <chef-button tertiary class="reset-key" data-cy="reset-button" (click)="openResetKeyClientModal()">
+                <chef-button tertiary class="reset-key" (click)="openResetKeyClientModal()">
                   <chef-icon>vpn_key</chef-icon>
                   <span>Reset Key</span>
                 </chef-button>

@@ -318,43 +318,6 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
-      },
-      "post": {
-        "operationId": "InfraProxy_CreateInfraServerOrgs",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateInfraServerOrgs"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "server_id",
-            "description": "Automate Infra Server ID",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateInfraServerOrgs"
-            }
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs": {
@@ -4887,7 +4850,7 @@ func init() {
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-      "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
+      "description": "`+"`"+`NullValue`+"`"+` is a singleton enumeration to represent the null value for the\n`+"`"+`Value`+"`"+` type union.\n\n The JSON representation for `+"`"+`NullValue`+"`"+` is JSON `+"`"+`null`+"`"+`.\n\n - NULL_VALUE: Null value."
     },
     "grpc.gateway.runtime.Error": {
       "type": "object",

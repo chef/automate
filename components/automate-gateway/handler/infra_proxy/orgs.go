@@ -121,6 +121,7 @@ func (c *InfraProxyServer) GetInfraServerOrgs(ctx context.Context, r *gwreq.GetI
 		Orgs: fromUpstreamOrgs(res.Orgs),
 	}, nil
 }
+<<<<<<< HEAD
 
 //CreateInfraServerOrgs: Creates the organisation on the chef server
 func (c *InfraProxyServer) CreateInfraServerOrgs(ctx context.Context, r *gwreq.CreateInfraServerOrgs) (*gwres.CreateInfraServerOrgs, error) {
@@ -136,6 +137,8 @@ func (c *InfraProxyServer) CreateInfraServerOrgs(ctx context.Context, r *gwreq.C
 	return &gwres.CreateInfraServerOrgs{}, nil
 }
 
+=======
+>>>>>>> 4a1348ad1b7b6faae7213b85cb526370bc36dfef
 func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 	return &gwres.Org{
 		Id:           t.GetId(),
