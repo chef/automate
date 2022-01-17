@@ -11,8 +11,8 @@ import (
 )
 
 var cleanupFlags = struct {
-	nodeName  string
-	ports     string
+	nodeName string
+	ports    string
 }{}
 
 const CLEANUP_SCRIPT_PATH = "/var/tmp/cleanup.sh"
@@ -70,7 +70,7 @@ func executeCleanupScript(args []string) error {
 	if err != nil {
 		return err
 	}
-	if len(cleanupFlags.nodeName) > 0  && len(cleanupFlags.ports) > 0 {
+	if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.ports) > 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-p"}, "")
 	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.ports) < 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
