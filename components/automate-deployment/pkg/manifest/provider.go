@@ -97,6 +97,8 @@ func (c *cachingReleaseManifestProvider) RefreshManifest(ctx context.Context, ch
 		return nil, err
 	}
 
+	// Todo(milestone) -- Add a check if the next version is a major version.
+
 	c.cache[channel] = cacheEntry{
 		lastCheck:      c.nowProvider(),
 		cachedManifest: m,
