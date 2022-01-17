@@ -1820,6 +1820,8 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is older than the current version %q", req.Version, currentRelease)
 		}
 
+		// Todo(milestone) Add the condition to check if the required version is incompatible
+
 		// TODO(ssd) 2018-09-13: We are not currently
 		// requiring that the version passed is actually in
 		// the channel they have configured. Should we?
