@@ -74,8 +74,6 @@ func executeCleanupScript(args []string) error {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName, "-p"}, "")
 	} else if len(cleanupFlags.nodeName) > 0 && len(cleanupFlags.ports) < 0 {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-n", cleanupFlags.nodeName}, "")
-	} else if len(cleanupFlags.nodeName) < 0 && len(cleanupFlags.ports) > 0 {
-		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-p"}, "")
 	} else {
 		return executeShellCommand("/bin/bash", []string{CLEANUP_SCRIPT_PATH, "-c", configFilePath, "-p"}, "")
 	}
