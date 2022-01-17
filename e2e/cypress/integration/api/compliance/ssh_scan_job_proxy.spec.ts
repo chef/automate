@@ -102,9 +102,6 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
       const endDate = Cypress.moment().utc().endOf('day');
       const startDate = Cypress.moment(endDate).subtract(10, 'days').startOf('day');
 
-      cy.task('log', endDate);
-      cy.task('log', startDate);
-
       cy.wait(90000);
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -118,8 +115,6 @@ if (Cypress.env('IS_PROXY_ENV') === 'true') {
             type: 'start_time',
             values: [startDate]}, {type: 'end_time', values: [endDate]}]}
       }).then((response) => {
-        cy.task('log', response.body);
-        cy.task('log', id);
         id = response.body.id;
         expect(response.body.report_summary.status).to.eq('passed');
       });
