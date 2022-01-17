@@ -52,6 +52,7 @@ func (m *A2) ListPackages() []habpkg.HabPkg {
 
 // Version returns the manifest version
 func (m *A2) Version() string {
+	//Todo(milestone): In case semantic version field available return that or else the build number
 	return m.Build
 }
 
