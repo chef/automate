@@ -6,175 +6,36 @@ package authz
 
 import (
 	context "context"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
-	reflect "reflect"
 )
 
-// MockProjectsServiceClient is a mock of ProjectsServiceClient interface
+// MockProjectsServiceClient is a mock of ProjectsServiceClient interface.
 type MockProjectsServiceClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockProjectsServiceClientMockRecorder
 }
 
-// MockProjectsServiceClientMockRecorder is the mock recorder for MockProjectsServiceClient
+// MockProjectsServiceClientMockRecorder is the mock recorder for MockProjectsServiceClient.
 type MockProjectsServiceClientMockRecorder struct {
 	mock *MockProjectsServiceClient
 }
 
-// NewMockProjectsServiceClient creates a new mock instance
+// NewMockProjectsServiceClient creates a new mock instance.
 func NewMockProjectsServiceClient(ctrl *gomock.Controller) *MockProjectsServiceClient {
 	mock := &MockProjectsServiceClient{ctrl: ctrl}
 	mock.recorder = &MockProjectsServiceClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockProjectsServiceClient) EXPECT() *MockProjectsServiceClientMockRecorder {
 	return m.recorder
 }
 
-// UpdateProject mocks base method
-func (m *MockProjectsServiceClient) UpdateProject(ctx context.Context, in *UpdateProjectReq, opts ...grpc.CallOption) (*UpdateProjectResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateProject", varargs...)
-	ret0, _ := ret[0].(*UpdateProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateProject indicates an expected call of UpdateProject
-func (mr *MockProjectsServiceClientMockRecorder) UpdateProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).UpdateProject), varargs...)
-}
-
-// CreateProject mocks base method
-func (m *MockProjectsServiceClient) CreateProject(ctx context.Context, in *CreateProjectReq, opts ...grpc.CallOption) (*CreateProjectResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateProject", varargs...)
-	ret0, _ := ret[0].(*CreateProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateProject indicates an expected call of CreateProject
-func (mr *MockProjectsServiceClientMockRecorder) CreateProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).CreateProject), varargs...)
-}
-
-// GetProject mocks base method
-func (m *MockProjectsServiceClient) GetProject(ctx context.Context, in *GetProjectReq, opts ...grpc.CallOption) (*GetProjectResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetProject", varargs...)
-	ret0, _ := ret[0].(*GetProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetProject indicates an expected call of GetProject
-func (mr *MockProjectsServiceClientMockRecorder) GetProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).GetProject), varargs...)
-}
-
-// DeleteProject mocks base method
-func (m *MockProjectsServiceClient) DeleteProject(ctx context.Context, in *DeleteProjectReq, opts ...grpc.CallOption) (*DeleteProjectResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteProject", varargs...)
-	ret0, _ := ret[0].(*DeleteProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteProject indicates an expected call of DeleteProject
-func (mr *MockProjectsServiceClientMockRecorder) DeleteProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).DeleteProject), varargs...)
-}
-
-// ListProjects mocks base method
-func (m *MockProjectsServiceClient) ListProjects(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ListProjects", varargs...)
-	ret0, _ := ret[0].(*ListProjectsResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListProjects indicates an expected call of ListProjects
-func (mr *MockProjectsServiceClientMockRecorder) ListProjects(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListProjects), varargs...)
-}
-
-// ListProjectsForIntrospection mocks base method
-func (m *MockProjectsServiceClient) ListProjectsForIntrospection(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ListProjectsForIntrospection", varargs...)
-	ret0, _ := ret[0].(*ListProjectsResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListProjectsForIntrospection indicates an expected call of ListProjectsForIntrospection
-func (mr *MockProjectsServiceClientMockRecorder) ListProjectsForIntrospection(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsForIntrospection", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListProjectsForIntrospection), varargs...)
-}
-
-// ApplyRulesStart mocks base method
-func (m *MockProjectsServiceClient) ApplyRulesStart(ctx context.Context, in *ApplyRulesStartReq, opts ...grpc.CallOption) (*ApplyRulesStartResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ApplyRulesStart", varargs...)
-	ret0, _ := ret[0].(*ApplyRulesStartResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ApplyRulesStart indicates an expected call of ApplyRulesStart
-func (mr *MockProjectsServiceClientMockRecorder) ApplyRulesStart(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStart", reflect.TypeOf((*MockProjectsServiceClient)(nil).ApplyRulesStart), varargs...)
-}
-
-// ApplyRulesCancel mocks base method
+// ApplyRulesCancel mocks base method.
 func (m *MockProjectsServiceClient) ApplyRulesCancel(ctx context.Context, in *ApplyRulesCancelReq, opts ...grpc.CallOption) (*ApplyRulesCancelResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -187,14 +48,34 @@ func (m *MockProjectsServiceClient) ApplyRulesCancel(ctx context.Context, in *Ap
 	return ret0, ret1
 }
 
-// ApplyRulesCancel indicates an expected call of ApplyRulesCancel
+// ApplyRulesCancel indicates an expected call of ApplyRulesCancel.
 func (mr *MockProjectsServiceClientMockRecorder) ApplyRulesCancel(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesCancel", reflect.TypeOf((*MockProjectsServiceClient)(nil).ApplyRulesCancel), varargs...)
 }
 
-// ApplyRulesStatus mocks base method
+// ApplyRulesStart mocks base method.
+func (m *MockProjectsServiceClient) ApplyRulesStart(ctx context.Context, in *ApplyRulesStartReq, opts ...grpc.CallOption) (*ApplyRulesStartResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ApplyRulesStart", varargs...)
+	ret0, _ := ret[0].(*ApplyRulesStartResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ApplyRulesStart indicates an expected call of ApplyRulesStart.
+func (mr *MockProjectsServiceClientMockRecorder) ApplyRulesStart(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStart", reflect.TypeOf((*MockProjectsServiceClient)(nil).ApplyRulesStart), varargs...)
+}
+
+// ApplyRulesStatus mocks base method.
 func (m *MockProjectsServiceClient) ApplyRulesStatus(ctx context.Context, in *ApplyRulesStatusReq, opts ...grpc.CallOption) (*ApplyRulesStatusResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -207,14 +88,34 @@ func (m *MockProjectsServiceClient) ApplyRulesStatus(ctx context.Context, in *Ap
 	return ret0, ret1
 }
 
-// ApplyRulesStatus indicates an expected call of ApplyRulesStatus
+// ApplyRulesStatus indicates an expected call of ApplyRulesStatus.
 func (mr *MockProjectsServiceClientMockRecorder) ApplyRulesStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStatus", reflect.TypeOf((*MockProjectsServiceClient)(nil).ApplyRulesStatus), varargs...)
 }
 
-// CreateRule mocks base method
+// CreateProject mocks base method.
+func (m *MockProjectsServiceClient) CreateProject(ctx context.Context, in *CreateProjectReq, opts ...grpc.CallOption) (*CreateProjectResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateProject", varargs...)
+	ret0, _ := ret[0].(*CreateProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateProject indicates an expected call of CreateProject.
+func (mr *MockProjectsServiceClientMockRecorder) CreateProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).CreateProject), varargs...)
+}
+
+// CreateRule mocks base method.
 func (m *MockProjectsServiceClient) CreateRule(ctx context.Context, in *CreateRuleReq, opts ...grpc.CallOption) (*CreateRuleResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -227,94 +128,34 @@ func (m *MockProjectsServiceClient) CreateRule(ctx context.Context, in *CreateRu
 	return ret0, ret1
 }
 
-// CreateRule indicates an expected call of CreateRule
+// CreateRule indicates an expected call of CreateRule.
 func (mr *MockProjectsServiceClientMockRecorder) CreateRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsServiceClient)(nil).CreateRule), varargs...)
 }
 
-// UpdateRule mocks base method
-func (m *MockProjectsServiceClient) UpdateRule(ctx context.Context, in *UpdateRuleReq, opts ...grpc.CallOption) (*UpdateRuleResp, error) {
+// DeleteProject mocks base method.
+func (m *MockProjectsServiceClient) DeleteProject(ctx context.Context, in *DeleteProjectReq, opts ...grpc.CallOption) (*DeleteProjectResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "UpdateRule", varargs...)
-	ret0, _ := ret[0].(*UpdateRuleResp)
+	ret := m.ctrl.Call(m, "DeleteProject", varargs...)
+	ret0, _ := ret[0].(*DeleteProjectResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateRule indicates an expected call of UpdateRule
-func (mr *MockProjectsServiceClientMockRecorder) UpdateRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+// DeleteProject indicates an expected call of DeleteProject.
+func (mr *MockProjectsServiceClientMockRecorder) DeleteProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRule", reflect.TypeOf((*MockProjectsServiceClient)(nil).UpdateRule), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).DeleteProject), varargs...)
 }
 
-// GetRule mocks base method
-func (m *MockProjectsServiceClient) GetRule(ctx context.Context, in *GetRuleReq, opts ...grpc.CallOption) (*GetRuleResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetRule", varargs...)
-	ret0, _ := ret[0].(*GetRuleResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRule indicates an expected call of GetRule
-func (mr *MockProjectsServiceClientMockRecorder) GetRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsServiceClient)(nil).GetRule), varargs...)
-}
-
-// ListRules mocks base method
-func (m *MockProjectsServiceClient) ListRules(ctx context.Context, in *ListRulesReq, opts ...grpc.CallOption) (*ListRulesResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ListRules", varargs...)
-	ret0, _ := ret[0].(*ListRulesResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListRules indicates an expected call of ListRules
-func (mr *MockProjectsServiceClientMockRecorder) ListRules(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListRules), varargs...)
-}
-
-// ListRulesForProject mocks base method
-func (m *MockProjectsServiceClient) ListRulesForProject(ctx context.Context, in *ListRulesForProjectReq, opts ...grpc.CallOption) (*ListRulesForProjectResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ListRulesForProject", varargs...)
-	ret0, _ := ret[0].(*ListRulesForProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListRulesForProject indicates an expected call of ListRulesForProject
-func (mr *MockProjectsServiceClientMockRecorder) ListRulesForProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRulesForProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListRulesForProject), varargs...)
-}
-
-// DeleteRule mocks base method
+// DeleteRule mocks base method.
 func (m *MockProjectsServiceClient) DeleteRule(ctx context.Context, in *DeleteRuleReq, opts ...grpc.CallOption) (*DeleteRuleResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -327,14 +168,114 @@ func (m *MockProjectsServiceClient) DeleteRule(ctx context.Context, in *DeleteRu
 	return ret0, ret1
 }
 
-// DeleteRule indicates an expected call of DeleteRule
+// DeleteRule indicates an expected call of DeleteRule.
 func (mr *MockProjectsServiceClientMockRecorder) DeleteRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRule", reflect.TypeOf((*MockProjectsServiceClient)(nil).DeleteRule), varargs...)
 }
 
-// ListRulesForAllProjects mocks base method
+// GetProject mocks base method.
+func (m *MockProjectsServiceClient) GetProject(ctx context.Context, in *GetProjectReq, opts ...grpc.CallOption) (*GetProjectResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetProject", varargs...)
+	ret0, _ := ret[0].(*GetProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProject indicates an expected call of GetProject.
+func (mr *MockProjectsServiceClientMockRecorder) GetProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).GetProject), varargs...)
+}
+
+// GetRule mocks base method.
+func (m *MockProjectsServiceClient) GetRule(ctx context.Context, in *GetRuleReq, opts ...grpc.CallOption) (*GetRuleResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRule", varargs...)
+	ret0, _ := ret[0].(*GetRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRule indicates an expected call of GetRule.
+func (mr *MockProjectsServiceClientMockRecorder) GetRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsServiceClient)(nil).GetRule), varargs...)
+}
+
+// ListProjects mocks base method.
+func (m *MockProjectsServiceClient) ListProjects(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListProjects", varargs...)
+	ret0, _ := ret[0].(*ListProjectsResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListProjects indicates an expected call of ListProjects.
+func (mr *MockProjectsServiceClientMockRecorder) ListProjects(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListProjects), varargs...)
+}
+
+// ListProjectsForIntrospection mocks base method.
+func (m *MockProjectsServiceClient) ListProjectsForIntrospection(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListProjectsForIntrospection", varargs...)
+	ret0, _ := ret[0].(*ListProjectsResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListProjectsForIntrospection indicates an expected call of ListProjectsForIntrospection.
+func (mr *MockProjectsServiceClientMockRecorder) ListProjectsForIntrospection(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsForIntrospection", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListProjectsForIntrospection), varargs...)
+}
+
+// ListRules mocks base method.
+func (m *MockProjectsServiceClient) ListRules(ctx context.Context, in *ListRulesReq, opts ...grpc.CallOption) (*ListRulesResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListRules", varargs...)
+	ret0, _ := ret[0].(*ListRulesResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRules indicates an expected call of ListRules.
+func (mr *MockProjectsServiceClientMockRecorder) ListRules(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListRules), varargs...)
+}
+
+// ListRulesForAllProjects mocks base method.
 func (m *MockProjectsServiceClient) ListRulesForAllProjects(ctx context.Context, in *ListRulesForAllProjectsReq, opts ...grpc.CallOption) (*ListRulesForAllProjectsResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -347,142 +288,97 @@ func (m *MockProjectsServiceClient) ListRulesForAllProjects(ctx context.Context,
 	return ret0, ret1
 }
 
-// ListRulesForAllProjects indicates an expected call of ListRulesForAllProjects
+// ListRulesForAllProjects indicates an expected call of ListRulesForAllProjects.
 func (mr *MockProjectsServiceClientMockRecorder) ListRulesForAllProjects(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRulesForAllProjects", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListRulesForAllProjects), varargs...)
 }
 
-// MockProjectsServiceServer is a mock of ProjectsServiceServer interface
+// ListRulesForProject mocks base method.
+func (m *MockProjectsServiceClient) ListRulesForProject(ctx context.Context, in *ListRulesForProjectReq, opts ...grpc.CallOption) (*ListRulesForProjectResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListRulesForProject", varargs...)
+	ret0, _ := ret[0].(*ListRulesForProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRulesForProject indicates an expected call of ListRulesForProject.
+func (mr *MockProjectsServiceClientMockRecorder) ListRulesForProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRulesForProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).ListRulesForProject), varargs...)
+}
+
+// UpdateProject mocks base method.
+func (m *MockProjectsServiceClient) UpdateProject(ctx context.Context, in *UpdateProjectReq, opts ...grpc.CallOption) (*UpdateProjectResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateProject", varargs...)
+	ret0, _ := ret[0].(*UpdateProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateProject indicates an expected call of UpdateProject.
+func (mr *MockProjectsServiceClientMockRecorder) UpdateProject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectsServiceClient)(nil).UpdateProject), varargs...)
+}
+
+// UpdateRule mocks base method.
+func (m *MockProjectsServiceClient) UpdateRule(ctx context.Context, in *UpdateRuleReq, opts ...grpc.CallOption) (*UpdateRuleResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateRule", varargs...)
+	ret0, _ := ret[0].(*UpdateRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRule indicates an expected call of UpdateRule.
+func (mr *MockProjectsServiceClientMockRecorder) UpdateRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRule", reflect.TypeOf((*MockProjectsServiceClient)(nil).UpdateRule), varargs...)
+}
+
+// MockProjectsServiceServer is a mock of ProjectsServiceServer interface.
 type MockProjectsServiceServer struct {
 	ctrl     *gomock.Controller
 	recorder *MockProjectsServiceServerMockRecorder
 }
 
-// MockProjectsServiceServerMockRecorder is the mock recorder for MockProjectsServiceServer
+// MockProjectsServiceServerMockRecorder is the mock recorder for MockProjectsServiceServer.
 type MockProjectsServiceServerMockRecorder struct {
 	mock *MockProjectsServiceServer
 }
 
-// NewMockProjectsServiceServer creates a new mock instance
+// NewMockProjectsServiceServer creates a new mock instance.
 func NewMockProjectsServiceServer(ctrl *gomock.Controller) *MockProjectsServiceServer {
 	mock := &MockProjectsServiceServer{ctrl: ctrl}
 	mock.recorder = &MockProjectsServiceServerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockProjectsServiceServer) EXPECT() *MockProjectsServiceServerMockRecorder {
 	return m.recorder
 }
 
-// UpdateProject mocks base method
-func (m *MockProjectsServiceServer) UpdateProject(arg0 context.Context, arg1 *UpdateProjectReq) (*UpdateProjectResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateProject", arg0, arg1)
-	ret0, _ := ret[0].(*UpdateProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateProject indicates an expected call of UpdateProject
-func (mr *MockProjectsServiceServerMockRecorder) UpdateProject(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).UpdateProject), arg0, arg1)
-}
-
-// CreateProject mocks base method
-func (m *MockProjectsServiceServer) CreateProject(arg0 context.Context, arg1 *CreateProjectReq) (*CreateProjectResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateProject", arg0, arg1)
-	ret0, _ := ret[0].(*CreateProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateProject indicates an expected call of CreateProject
-func (mr *MockProjectsServiceServerMockRecorder) CreateProject(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).CreateProject), arg0, arg1)
-}
-
-// GetProject mocks base method
-func (m *MockProjectsServiceServer) GetProject(arg0 context.Context, arg1 *GetProjectReq) (*GetProjectResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProject", arg0, arg1)
-	ret0, _ := ret[0].(*GetProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetProject indicates an expected call of GetProject
-func (mr *MockProjectsServiceServerMockRecorder) GetProject(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).GetProject), arg0, arg1)
-}
-
-// DeleteProject mocks base method
-func (m *MockProjectsServiceServer) DeleteProject(arg0 context.Context, arg1 *DeleteProjectReq) (*DeleteProjectResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteProject", arg0, arg1)
-	ret0, _ := ret[0].(*DeleteProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteProject indicates an expected call of DeleteProject
-func (mr *MockProjectsServiceServerMockRecorder) DeleteProject(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).DeleteProject), arg0, arg1)
-}
-
-// ListProjects mocks base method
-func (m *MockProjectsServiceServer) ListProjects(arg0 context.Context, arg1 *ListProjectsReq) (*ListProjectsResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjects", arg0, arg1)
-	ret0, _ := ret[0].(*ListProjectsResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListProjects indicates an expected call of ListProjects
-func (mr *MockProjectsServiceServerMockRecorder) ListProjects(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListProjects), arg0, arg1)
-}
-
-// ListProjectsForIntrospection mocks base method
-func (m *MockProjectsServiceServer) ListProjectsForIntrospection(arg0 context.Context, arg1 *ListProjectsReq) (*ListProjectsResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsForIntrospection", arg0, arg1)
-	ret0, _ := ret[0].(*ListProjectsResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListProjectsForIntrospection indicates an expected call of ListProjectsForIntrospection
-func (mr *MockProjectsServiceServerMockRecorder) ListProjectsForIntrospection(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsForIntrospection", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListProjectsForIntrospection), arg0, arg1)
-}
-
-// ApplyRulesStart mocks base method
-func (m *MockProjectsServiceServer) ApplyRulesStart(arg0 context.Context, arg1 *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ApplyRulesStart", arg0, arg1)
-	ret0, _ := ret[0].(*ApplyRulesStartResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ApplyRulesStart indicates an expected call of ApplyRulesStart
-func (mr *MockProjectsServiceServerMockRecorder) ApplyRulesStart(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStart", reflect.TypeOf((*MockProjectsServiceServer)(nil).ApplyRulesStart), arg0, arg1)
-}
-
-// ApplyRulesCancel mocks base method
+// ApplyRulesCancel mocks base method.
 func (m *MockProjectsServiceServer) ApplyRulesCancel(arg0 context.Context, arg1 *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ApplyRulesCancel", arg0, arg1)
@@ -491,13 +387,28 @@ func (m *MockProjectsServiceServer) ApplyRulesCancel(arg0 context.Context, arg1 
 	return ret0, ret1
 }
 
-// ApplyRulesCancel indicates an expected call of ApplyRulesCancel
+// ApplyRulesCancel indicates an expected call of ApplyRulesCancel.
 func (mr *MockProjectsServiceServerMockRecorder) ApplyRulesCancel(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesCancel", reflect.TypeOf((*MockProjectsServiceServer)(nil).ApplyRulesCancel), arg0, arg1)
 }
 
-// ApplyRulesStatus mocks base method
+// ApplyRulesStart mocks base method.
+func (m *MockProjectsServiceServer) ApplyRulesStart(arg0 context.Context, arg1 *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ApplyRulesStart", arg0, arg1)
+	ret0, _ := ret[0].(*ApplyRulesStartResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ApplyRulesStart indicates an expected call of ApplyRulesStart.
+func (mr *MockProjectsServiceServerMockRecorder) ApplyRulesStart(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStart", reflect.TypeOf((*MockProjectsServiceServer)(nil).ApplyRulesStart), arg0, arg1)
+}
+
+// ApplyRulesStatus mocks base method.
 func (m *MockProjectsServiceServer) ApplyRulesStatus(arg0 context.Context, arg1 *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ApplyRulesStatus", arg0, arg1)
@@ -506,13 +417,28 @@ func (m *MockProjectsServiceServer) ApplyRulesStatus(arg0 context.Context, arg1 
 	return ret0, ret1
 }
 
-// ApplyRulesStatus indicates an expected call of ApplyRulesStatus
+// ApplyRulesStatus indicates an expected call of ApplyRulesStatus.
 func (mr *MockProjectsServiceServerMockRecorder) ApplyRulesStatus(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStatus", reflect.TypeOf((*MockProjectsServiceServer)(nil).ApplyRulesStatus), arg0, arg1)
 }
 
-// CreateRule mocks base method
+// CreateProject mocks base method.
+func (m *MockProjectsServiceServer) CreateProject(arg0 context.Context, arg1 *CreateProjectReq) (*CreateProjectResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateProject", arg0, arg1)
+	ret0, _ := ret[0].(*CreateProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateProject indicates an expected call of CreateProject.
+func (mr *MockProjectsServiceServerMockRecorder) CreateProject(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).CreateProject), arg0, arg1)
+}
+
+// CreateRule mocks base method.
 func (m *MockProjectsServiceServer) CreateRule(arg0 context.Context, arg1 *CreateRuleReq) (*CreateRuleResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRule", arg0, arg1)
@@ -521,73 +447,28 @@ func (m *MockProjectsServiceServer) CreateRule(arg0 context.Context, arg1 *Creat
 	return ret0, ret1
 }
 
-// CreateRule indicates an expected call of CreateRule
+// CreateRule indicates an expected call of CreateRule.
 func (mr *MockProjectsServiceServerMockRecorder) CreateRule(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsServiceServer)(nil).CreateRule), arg0, arg1)
 }
 
-// UpdateRule mocks base method
-func (m *MockProjectsServiceServer) UpdateRule(arg0 context.Context, arg1 *UpdateRuleReq) (*UpdateRuleResp, error) {
+// DeleteProject mocks base method.
+func (m *MockProjectsServiceServer) DeleteProject(arg0 context.Context, arg1 *DeleteProjectReq) (*DeleteProjectResp, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateRule", arg0, arg1)
-	ret0, _ := ret[0].(*UpdateRuleResp)
+	ret := m.ctrl.Call(m, "DeleteProject", arg0, arg1)
+	ret0, _ := ret[0].(*DeleteProjectResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateRule indicates an expected call of UpdateRule
-func (mr *MockProjectsServiceServerMockRecorder) UpdateRule(arg0, arg1 interface{}) *gomock.Call {
+// DeleteProject indicates an expected call of DeleteProject.
+func (mr *MockProjectsServiceServerMockRecorder) DeleteProject(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRule", reflect.TypeOf((*MockProjectsServiceServer)(nil).UpdateRule), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).DeleteProject), arg0, arg1)
 }
 
-// GetRule mocks base method
-func (m *MockProjectsServiceServer) GetRule(arg0 context.Context, arg1 *GetRuleReq) (*GetRuleResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRule", arg0, arg1)
-	ret0, _ := ret[0].(*GetRuleResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRule indicates an expected call of GetRule
-func (mr *MockProjectsServiceServerMockRecorder) GetRule(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsServiceServer)(nil).GetRule), arg0, arg1)
-}
-
-// ListRules mocks base method
-func (m *MockProjectsServiceServer) ListRules(arg0 context.Context, arg1 *ListRulesReq) (*ListRulesResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListRules", arg0, arg1)
-	ret0, _ := ret[0].(*ListRulesResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListRules indicates an expected call of ListRules
-func (mr *MockProjectsServiceServerMockRecorder) ListRules(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListRules), arg0, arg1)
-}
-
-// ListRulesForProject mocks base method
-func (m *MockProjectsServiceServer) ListRulesForProject(arg0 context.Context, arg1 *ListRulesForProjectReq) (*ListRulesForProjectResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListRulesForProject", arg0, arg1)
-	ret0, _ := ret[0].(*ListRulesForProjectResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListRulesForProject indicates an expected call of ListRulesForProject
-func (mr *MockProjectsServiceServerMockRecorder) ListRulesForProject(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRulesForProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListRulesForProject), arg0, arg1)
-}
-
-// DeleteRule mocks base method
+// DeleteRule mocks base method.
 func (m *MockProjectsServiceServer) DeleteRule(arg0 context.Context, arg1 *DeleteRuleReq) (*DeleteRuleResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteRule", arg0, arg1)
@@ -596,13 +477,88 @@ func (m *MockProjectsServiceServer) DeleteRule(arg0 context.Context, arg1 *Delet
 	return ret0, ret1
 }
 
-// DeleteRule indicates an expected call of DeleteRule
+// DeleteRule indicates an expected call of DeleteRule.
 func (mr *MockProjectsServiceServerMockRecorder) DeleteRule(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRule", reflect.TypeOf((*MockProjectsServiceServer)(nil).DeleteRule), arg0, arg1)
 }
 
-// ListRulesForAllProjects mocks base method
+// GetProject mocks base method.
+func (m *MockProjectsServiceServer) GetProject(arg0 context.Context, arg1 *GetProjectReq) (*GetProjectResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProject", arg0, arg1)
+	ret0, _ := ret[0].(*GetProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProject indicates an expected call of GetProject.
+func (mr *MockProjectsServiceServerMockRecorder) GetProject(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).GetProject), arg0, arg1)
+}
+
+// GetRule mocks base method.
+func (m *MockProjectsServiceServer) GetRule(arg0 context.Context, arg1 *GetRuleReq) (*GetRuleResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRule", arg0, arg1)
+	ret0, _ := ret[0].(*GetRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRule indicates an expected call of GetRule.
+func (mr *MockProjectsServiceServerMockRecorder) GetRule(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsServiceServer)(nil).GetRule), arg0, arg1)
+}
+
+// ListProjects mocks base method.
+func (m *MockProjectsServiceServer) ListProjects(arg0 context.Context, arg1 *ListProjectsReq) (*ListProjectsResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListProjects", arg0, arg1)
+	ret0, _ := ret[0].(*ListProjectsResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListProjects indicates an expected call of ListProjects.
+func (mr *MockProjectsServiceServerMockRecorder) ListProjects(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListProjects), arg0, arg1)
+}
+
+// ListProjectsForIntrospection mocks base method.
+func (m *MockProjectsServiceServer) ListProjectsForIntrospection(arg0 context.Context, arg1 *ListProjectsReq) (*ListProjectsResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListProjectsForIntrospection", arg0, arg1)
+	ret0, _ := ret[0].(*ListProjectsResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListProjectsForIntrospection indicates an expected call of ListProjectsForIntrospection.
+func (mr *MockProjectsServiceServerMockRecorder) ListProjectsForIntrospection(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsForIntrospection", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListProjectsForIntrospection), arg0, arg1)
+}
+
+// ListRules mocks base method.
+func (m *MockProjectsServiceServer) ListRules(arg0 context.Context, arg1 *ListRulesReq) (*ListRulesResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListRules", arg0, arg1)
+	ret0, _ := ret[0].(*ListRulesResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRules indicates an expected call of ListRules.
+func (mr *MockProjectsServiceServerMockRecorder) ListRules(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListRules), arg0, arg1)
+}
+
+// ListRulesForAllProjects mocks base method.
 func (m *MockProjectsServiceServer) ListRulesForAllProjects(arg0 context.Context, arg1 *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListRulesForAllProjects", arg0, arg1)
@@ -611,8 +567,53 @@ func (m *MockProjectsServiceServer) ListRulesForAllProjects(arg0 context.Context
 	return ret0, ret1
 }
 
-// ListRulesForAllProjects indicates an expected call of ListRulesForAllProjects
+// ListRulesForAllProjects indicates an expected call of ListRulesForAllProjects.
 func (mr *MockProjectsServiceServerMockRecorder) ListRulesForAllProjects(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRulesForAllProjects", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListRulesForAllProjects), arg0, arg1)
+}
+
+// ListRulesForProject mocks base method.
+func (m *MockProjectsServiceServer) ListRulesForProject(arg0 context.Context, arg1 *ListRulesForProjectReq) (*ListRulesForProjectResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListRulesForProject", arg0, arg1)
+	ret0, _ := ret[0].(*ListRulesForProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRulesForProject indicates an expected call of ListRulesForProject.
+func (mr *MockProjectsServiceServerMockRecorder) ListRulesForProject(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRulesForProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).ListRulesForProject), arg0, arg1)
+}
+
+// UpdateProject mocks base method.
+func (m *MockProjectsServiceServer) UpdateProject(arg0 context.Context, arg1 *UpdateProjectReq) (*UpdateProjectResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProject", arg0, arg1)
+	ret0, _ := ret[0].(*UpdateProjectResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateProject indicates an expected call of UpdateProject.
+func (mr *MockProjectsServiceServerMockRecorder) UpdateProject(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProject", reflect.TypeOf((*MockProjectsServiceServer)(nil).UpdateProject), arg0, arg1)
+}
+
+// UpdateRule mocks base method.
+func (m *MockProjectsServiceServer) UpdateRule(arg0 context.Context, arg1 *UpdateRuleReq) (*UpdateRuleResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateRule", arg0, arg1)
+	ret0, _ := ret[0].(*UpdateRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRule indicates an expected call of UpdateRule.
+func (mr *MockProjectsServiceServerMockRecorder) UpdateRule(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRule", reflect.TypeOf((*MockProjectsServiceServer)(nil).UpdateRule), arg0, arg1)
 }
