@@ -131,33 +131,28 @@ close_port() {
         for i in ${automate_server_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                ls -dtr1 /hab/cache/artifacts/core-netcat-* | tail -1 | xargs hab pkg install -bf
-                for j in ${automate_port[@]};
-	              do
-		                 ssh -o StrictHostKeyChecking=no -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			               ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
-                done
+                sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
 EOF
     done
     elif [ "$node" = "elasticsearch" ];then
         for i in ${elasticsearch_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                sudo xargs kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
+                sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
 EOF
     done
     elif [ "$node" = "postgresql" ];then
     for i in ${postgresql_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                sudo xargs kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
+                sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
 EOF
     done
     elif [ "$node" = "chef_server" ];then
     for i in ${chef_server_server_private_ip[@]};
         do
                 ssh -i $SSH_KEY $SSH_USER@$i /bin/bash <<   EOF
-                sudo xargs kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
+                sudo  kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}') > /dev/null 2>&1
 EOF
     done
     else
