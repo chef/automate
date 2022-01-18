@@ -81,26 +81,26 @@ var nodeUsageCommand = &cobra.Command{
 	},
 }
 
-var complianceUniqueNodeCounterCmd = &cobra.Command{
-	Use:   "complianceUniqNodeRunReport",
+var complianceUniqueResourceCounterCmd = &cobra.Command{
+	Use:   "complianceResourceRunCount",
 	Short: "Generates the unique count of reported Compliance scans on hourly basis between the time duration",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateComplianceNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
 		return nil
 	},
 }
 
-var complianceNodeUsageCmd = &cobra.Command{
-	Use:   "complianceNodeRunReport",
+var complianceResourceUsageCmd = &cobra.Command{
+	Use:   "complianceResourceRunReport",
 	Short: "Generates daily Infra Client Run reports for a span of time duration",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateComplianceNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
 		return nil
 	},
 }
@@ -123,6 +123,11 @@ License ID:      %s
 Expiration Date: %s
 
 `
+
+var startTimeFormat = "start time of the report in yyyy-mm-dd format"
+var endTimeFormat = "end time of the report in yyyy-mm-dd format"
+var hostnameES = "hostname of the ES host"
+var portES = "port of the ES host"
 
 type usageResult struct {
 	StartTimestamp   string           `json:"start_timestamp"`
@@ -393,23 +398,23 @@ func init() {
 	licenseCmd.AddCommand(licenseUsageCmd)
 	licenseCmd.AddCommand(uniqueNodeCounterCmd)
 	licenseCmd.AddCommand(nodeUsageCommand)
-	licenseCmd.AddCommand(complianceUniqueNodeCounterCmd)
-	licenseCmd.AddCommand(complianceNodeUsageCmd)
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
-	complianceUniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	complianceUniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	complianceUniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	complianceUniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
-	complianceNodeUsageCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
-	complianceNodeUsageCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
-	complianceNodeUsageCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
-	complianceNodeUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
+	licenseCmd.AddCommand(complianceUniqueResourceCounterCmd)
+	licenseCmd.AddCommand(complianceResourceUsageCmd)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
 	licenseApplyCmd.Flags().BoolVarP(&licenseCmdFlags.forceSet, "force", "f", false, "Force set license")
 }
