@@ -209,7 +209,7 @@ we also need to have following files in /hab/a2_deploy_workspace/terraform dir
 func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
 		bundleName := getFrontendBundleName(airgapBundle)
-		err := generateFontendBundles(bundleName, airgapBundle)
+		err := generateFrontendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
@@ -228,12 +228,7 @@ func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata
 func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
 		bundleName := getFrontendBundleName(airgapBundle)
-		err := generateFontendBundles(bundleName, airgapBundle)
-		if err != nil {
-			return err
-		}
-		//generate manifest auto tfvars
-		err = generateA2HAManifestTfvars(airgapMetadata)
+		err := generateFrontendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
@@ -262,7 +257,7 @@ func getFrontendBundleName(airgapPath string) string {
 	}
 	return bundleName
 }
-func generateFontendBundles(bundleName string, airgapPath string) error {
+func generateFrontendBundles(bundleName string, airgapPath string) error {
 	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
 	if err != nil {
 		return err

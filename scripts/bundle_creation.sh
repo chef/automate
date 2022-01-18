@@ -115,7 +115,10 @@ airgap_bundle_create() {
   fi
   
     #Create Manifest auto_tfvars
-    create_manifest_auto_tfvars
+    if [ "$BUNDLE_TYPE" != "upgradefrontends" ]
+    then
+       create_manifest_auto_tfvars
+    fi
 
 }
 
