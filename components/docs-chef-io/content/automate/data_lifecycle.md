@@ -16,7 +16,7 @@ Data Lifecycle manages the retention of events, service groups, Chef Infra Clien
 Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in Elasticsearch or PostgreSQL.
 Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
-## Data Lifecycle UI
+## Data Lifecycle
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
@@ -64,13 +64,14 @@ To see the combined status and configuration for all data lifecycle jobs, you ca
 
 These examples use the Unix/Linux [`curl` command](https://man7.org/linux/man-pages/man1/curl.1.html) with the options:
 
-| Short Option | Long Option  | Definition                                                                                                |
-|--------------|--------------|-----------------------------------------------------------------------------------------------------------|
-| -s           | --silent     | Silent or quiet mode, does not show progress meter or error messages.                                     |
-| -S           | --show-error | When used with -s, --silent, it makes curl show an error message if it fails.                             |
-| -k           | --insecure   | This option allows curl to proceed and operate even for server connections otherwise considered insecure. |
-| -H           | --header     | Sends a header with the request. In this case, the header is your API token.                              |
+| Short Option | Long Option  | Definition                                                                                         |
+|--------------|--------------|---------------------------------------------------------------------------------------------------|
+| -s           | --silent     | Silent or quiet mode, does not show progress meter or error messages.                             |
+| -S           | --show-error | When used with -s, --silent, it makes curl show an error message if it fails.                     |
+| -k           | --insecure   | Instructs curl to proceed and operate even for server connections otherwise considered insecure.  |
+| -H           | --header     | Sends a header with the request. In this case, the header is your API token.                      |
 
+`curl -s -S` shows errors but does not show the progress meter:
 
 ```bash
 curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
@@ -248,7 +249,7 @@ Infra node lifecycle jobs have the following options:
 
 Purge jobs have the following options:
 
-* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage backend before purging occurs.
+* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage before purging occurs.
   * `elasticsearch` (array) - An array of Elasticsearch purge policies
     * `disabled` (bool) - True or false if this job is enabled.
     * `policy_name` (string) - The name of the purge policy you wish to update.
