@@ -327,6 +327,17 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 			}).Debug("Found hart override")
 		}
 
+		enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+		logrus.Debugln("Is External PG enabled : ", enableExternalPg)
+
+		if enableExternalPg {
+			if service.Name() == "automate-postgresql" {
+				service.DeploymentState = deployment.Skip
+			}
+		}
+		// logrus.Debugln("BUILD_DESIRED_STATE SERVICE_NAME ::: ", service.Name())
+		// logrus.Debugln("BUILD_DESIRED_STATE SERVICE_STATE ::: ", service.DeploymentState)
+
 		switch service.DeploymentState {
 		case deployment.Skip:
 			convergeState = converge.Skip()
@@ -541,6 +552,17 @@ func (s *server) doDeploySome(serviceNames []string,
 		eDeploy.waitForConverge(task)
 		// NOTE(ssd) 2018-01-25: We don't use the timeout from
 		// the request because a deploy outlives the request
+		enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+
+		if enableExternalPg {
+			for i, v := range serviceNames {
+				if v == "automate-postgresql" {
+					//logrus.Debugln("MODIFYING SERVICE LIST FOR HEALTHCHECK")
+					serviceNames = append(serviceNames[:i], serviceNames[i+1:]...)
+					break
+				}
+			}
+		}
 		eDeploy.ensureStatus(context.Background(), serviceNames, s.ensureStatusTimeout)
 		if !usedBootstrapBundle {
 			eDeploy.maybeCreateInitialUser(serviceNames)
