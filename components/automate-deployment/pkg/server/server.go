@@ -563,7 +563,6 @@ func (s *server) doDeploySome(serviceNames []string,
 
 		// NOTE(ssd) 2018-01-25: We don't use the timeout from
 		// the request because a deploy outlives the request
-
 		eDeploy.ensureStatus(context.Background(), serviceNames, s.ensureStatusTimeout)
 		if !usedBootstrapBundle {
 			eDeploy.maybeCreateInitialUser(serviceNames)
