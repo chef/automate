@@ -357,10 +357,10 @@ This will give the status of frontend and backend node. 
 5) Now login to your non-internet instance where you have copied airgap bundle and generate config.toml using below command. 
 	`./chef-automate init-config-ha existing_infra`
 
-6) Open config.toml and fill necessary details. Like ssh_user, ssh_key_file, fqdn, instance_count, automate_private_ip and other ips field. ssh into your instance where you want to set SElinux config.Reboot the instance after executing below command.
-     	`sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config`
+6) Open config.toml and fill necessary details. Like ssh_user, ssh_key_file, fqdn, instance_count, automate_private_ip and other ips field. 
       
-7) If your instance is redhat then set SElinux config "enforcing" to "permissive" in all the nodes.
+7) If your instance is redhat then set SElinux config "enforcing" to "permissive" in all the nodes. ssh into your instance where you want to set SElinux config.Reboot the instance after executing below command.
+     	`sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config`
 
 8) Now start the deployment process using below command.
 	`./chef-automate provision-infra </path/to/config.toml> --airgap-bundle </path/to/airgap-bundle>`
