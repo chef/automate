@@ -363,7 +363,7 @@ This will give the status of frontend and backend node. 
      	`sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config`
 
 8) Now start the deployment process using below command.
-	`./chef-automate provision-infra </path/to/config.toml> --airgap-bundle </path/to/airgap-bundle>`
+	`./chef-automate deploy </path/to/config.toml> --airgap-bundle </path/to/airgap-bundle>`
 
 # Backup and restore
 Back-up configurations to be done before deploying cluster. 
