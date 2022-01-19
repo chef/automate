@@ -51,5 +51,5 @@ if [ -f  "$pidfile" ]; then
 fi
 
 exec postgres \
-  -c config_file={{pkg.svc_config_path}}/postgresql.conf
+  -c config_file={{pkg.svc_config_path}}/postgresql13.conf
 {{~/if}}
