@@ -791,6 +791,8 @@ E.g For secret service `cat /hab/svc/secrets-service/data/secrets\_key`
 # Performance benchmarking
 # Certificates renewal
 
+# Certificate rotation using openssl
+
 execute this command from /hab/a2_deploy_workspace. This command will create a skeleton of certificate. 
 
 ./scripts/credentials set ssl --rotate-all 
@@ -889,6 +891,53 @@ Now apply first es ssl from /hab/a2\_deploy\_workspcae
 
 
 Go to automate and chef server instance and check the chef service status. If you see the service down or critical, then just wait for 3-4 min because after applying the certs it will take around 3-4 min to up.
+
+# Certificate rotation using own organization certs
+
+If you want to use existing certs of your organization then follow below steps.
+
+Note: This all command will run from the /hab/a2_deploy_workspace.
+
+1. Run ./scripts/credentials set ssl --rotate-all 
+
+    - If you run this command first time then it will create a skeleton of certs. You can find that in /hab/a2_deploy_workspace/certs directory. In that directory find the appropriate certs. E.g suppose if you want to rotate certs for PostgreSQL then put cert content into “pg_ssl_private.key” “pg_ssl_public.pem” and “ca_root.pem”. Now if you just want to rotate postgresql cert then run below command. If your ca_root is same for all the other certs like elasticsearch, kibana or frontend then ca_root will be remain same for all the certs just content of appropriate certs will be changes. 
+
+    - If you want to rotate Elasticsearch certs then you have to insert cert content of CA to ca_root.pem, es_admin_ssl_private.key, es_admin_ssl_public.pem, es_ssl_private.key, es_ssl_public.pem, kibana_ssl_private.key, kibana_ssl_public.pem
+
+    - Below command will rotate specific cert 
+
+    `./scripts/credentials set ssl  --pg-ssl` (This will rorate pg certs if you want to rotate)
+
+    `./scripts/credentials set ssl  --es-ssl`
+
+    - And if you want to change all the certs then put contents in the appropriate file and run below command 
+
+	`./scripts/credentials set ssl  --rotate-all`
+
+    - This command will give you all the info about cert rotation. 
+
+              `./scripts/credentials set ssl  --help` 
+
+If your organization issues cert from an Intermediate CA then put that cert after the server cert below order. 
+
+   For example, in certs/pg_ssl_public.pem paste them like so:      
+
+     Server Certificate 
+
+     Intermediate CA Certificate 1 
+
+     Intermediate CA Certificate n 
+
+
+# Rotate credentials
+
+    Note: This all command will run from the /hab/a2_deploy_workspace 
+
+    1. cd /hab/a2_deploy_workspace 
+       ./scripts/credentials set postgresql --auto 
+
+    2. cd /hab/a2_deploy_workspace 
+       ./scripts/credentials set elasticsearch --auto 
 
 # Security and firewall
 Automate Cluster requires several ports to be open between the Frontend and Backend servers in order to operate. Below it a breakdown of those ports and what needs to be open to each set of servers. 
