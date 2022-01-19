@@ -10,7 +10,7 @@
       </chef-breadcrumbs>
       <chef-page-header>
         <div class="meta-box">
-          <div class="summary-body">
+          <div class="summary-body first">
             <chef-heading data-cy="page-title">{{ server?.name }}</chef-heading>
             <ul>
               <li>
@@ -21,6 +21,10 @@
                 <span class="heading">IP Address</span>
                 <span>{{ server?.ip_address }}</span>
               </li>
+            </ul>
+          </div>
+          <div class="summary-body middle">
+            <ul>
               <li>
                 <span class="heading">Web UI Key</span>
                 <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
@@ -34,7 +38,17 @@
                   >Update</a>
                 </span>
               </li>
+              <li>
+                <span class="heading">Org &amp; User last synced</span>
+                <span>Thu, Feb 04, 12:00:00 UTC</span>
+              </li>
             </ul>
+          </div>
+          <div class="summary-body last">
+            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
+              <chef-button id="sync-button" class="sync-button" secondary primary data-cy="sync-button">Sync Org and Users
+              </chef-button>
+            </app-authorized>
           </div>
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
