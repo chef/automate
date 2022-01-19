@@ -11,10 +11,10 @@ import { Utilities } from 'app/helpers/utilities/utilities';
 export class SyncOrgUsersSliderComponent implements OnInit {
   @Input() visible = false;
   @Input() uploading = false;
+  @Input() uploadForm: FormGroup;
   @Input() conflictErrorEvent: EventEmitter<boolean>;
   @Output() close = new EventEmitter();
   @Output() uploadClicked = new EventEmitter();
-  @Input() uploadForm: FormGroup;
   @HostBinding('class.active') isSlideOpen = false;
 
   public conflictError = false;
@@ -33,17 +33,18 @@ export class SyncOrgUsersSliderComponent implements OnInit {
     if (!Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.uploadForm.controls.id.setValue(
-        IdMapper.transform(this.uploadForm.controls.name.value.trim()));
+        IdMapper.transform(this.uploadForm.controls.file.value.trim()));
     }
   }
 
   uploadFile(): void {
-    // this.toggleSlide();
     this.uploadClicked.emit();
   }
 
   closeUploadSlider() {
     this.toggleSlide();
+    const file = '';
+    this.fileInfo = `${file}`;
     this.close.emit();
   }
 

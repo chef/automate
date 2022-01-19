@@ -29,13 +29,13 @@
     margin-top: 28px;
     justify-content: center;
 
-    .input-margin, .id-margin {
-      margin-bottom: 20px;
+    .input-margin {
+      margin-bottom: 33px;
 
       .file-info {
         display: block;
         height: 36px;
-        padding: 10px;
+        padding: 6px;
         background-color: $chef-white;
         font-size: 14px;
         border: 1px solid $chef-light-grey;
@@ -51,6 +51,19 @@
         height: 36px;
         padding: 10px;
       }
+
+      .upload-input-wrapper {
+        position: relative;
+        overflow: hidden;
+
+        input[type=file] {
+          font-size: 100px;
+          position: absolute;
+          left: 0;
+          top: 0;
+          opacity: 0;
+        }
+      }
     }
 
     #button-bar {
@@ -62,18 +75,10 @@
         margin-right: 5px;
       }
 
-      .upload-btn-wrapper {
-        position: relative;
-        overflow: hidden;
-        display: inline-block;
-        
-        input[type=file] {
-          font-size: 100px;
-          position: absolute;
-          left: 0;
-          top: 0;
-          opacity: 0;
-        }
+      .svg-inline {
+        width: 17px;
+        height: 17px;
+        margin-right: 5px;
       }
     }
   }

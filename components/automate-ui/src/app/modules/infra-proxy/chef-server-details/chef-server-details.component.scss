@@ -81,6 +81,12 @@ chef-page-header {
     .sync-button {
       float: right;
       margin-bottom: 0;
+
+      .img-inline {
+        width: 17px;
+        height: 17px;
+        margin-right: 5px;
+      }
     }
   }
 }

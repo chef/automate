@@ -1,10 +1,10 @@
 <div data-cy="chef-infra-upload-slider" ngClass="{slide : isSlideOpen}">
   <div class="sidenav-header">
-    <chef-button class="back-button" secondary (click)="closeUploadSlider()" data-cy="back-button">
+    <chef-button class="back-button" secondary (click)="fileInput.value = null; closeUploadSlider()" data-cy="back-button">
       <chef-icon>arrow_back</chef-icon>
     </chef-button>
     <h2 slot="title">Sync Org and User </h2>
-    <chef-button class="close" secondary (click)="closeUploadSlider()" data-cy="close-chef-infra-button">
+    <chef-button class="close" secondary (click)="fileInput.value = null; closeUploadSlider()" data-cy="close-chef-infra-button">
       <chef-icon>close</chef-icon>
     </chef-button>
   </div>
@@ -12,24 +12,20 @@
     <div class="flex-container">
       <form [formGroup]="uploadForm">
         <div class="input-margin">
-          <span class="file-info">{{ fileInfo }}</span>
+          <div class="upload-input-wrapper">
+            <span class="file-info">{{ fileInfo }}</span>
+            <input type="file" name="file" #fileInput (change)="onFileSelect(fileInput)" accept=".zip" />
+          </div>
         </div>
         <div id="button-bar">
-          <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" (click)="closeUploadSlider()">Cancel
+          <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" (click)="fileInput.value = null; closeUploadSlider()">Cancel
           </chef-button>
-          <div class="upload-btn-wrapper">
-            <chef-button primary data-cy="upload-button"
-              id="upload-button" (click)="uploadFile()">              
-              <chef-loading-spinner *ngIf="uploading"></chef-loading-spinner>
-              <span *ngIf="!uploading">Upload File</span>
-              <span *ngIf="uploading">Uploading File ...</span>
-              <input type="file" 
-                name="myfile"
-                #fileInput
-                (change)="onFileSelect(fileInput)"
-                accept=".zip"/>
-            </chef-button>
-          </div>
+          <chef-button primary data-cy="upload-button" id="upload-button" (click)="uploadFile()">
+            <img alt="upload_icon" src="/assets/img/data-feed.svg" class="svg-inline" />
+            <chef-loading-spinner *ngIf="uploading"></chef-loading-spinner>
+            <span *ngIf="!uploading">Upload File</span>
+            <span *ngIf="uploading">Uploading File ...</span>
+          </chef-button>
         </div>
       </form>
     </div>

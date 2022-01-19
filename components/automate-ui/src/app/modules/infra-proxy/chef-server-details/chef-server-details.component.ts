@@ -370,12 +370,12 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public openUploadSlider(): void {
     this.uploadSliderVisible = true;
-    this.resetCreateModal();
+    this.resetUploadSlider();
   }
 
   public closeUploadSlider(): void {
     this.uploadSliderVisible = false;
-    this.resetCreateModal();
+    this.resetUploadSlider();
   }
 
   public uploadZipFile(): void {
