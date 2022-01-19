@@ -1,0 +1,99 @@
+@import "~styles/variables";
+@import '../infra_shared/slide-panel';
+
+:host {
+  z-index: 1;
+  width: 50%;
+  box-shadow: 0 35.8px 140.2px $chef-gulf-blue;
+  padding: 25px;
+
+  .sidenav-header {
+    margin-bottom: 5vh;
+
+    h2 {
+      flex-grow: 2;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      color: $chef-primary-dark;
+      line-height: 27px;
+      margin-bottom: 10px;
+    }
+
+    .back-button {
+      margin-left: 0;
+    }
+  }
+
+  .flex-container {
+    margin-top: 28px;
+    justify-content: center;
+
+    .input-margin, .id-margin {
+      margin-bottom: 20px;
+
+      .file-info {
+        display: block;
+        height: 36px;
+        padding: 10px;
+        background-color: $chef-white;
+        font-size: 14px;
+        border: 1px solid $chef-light-grey;
+        border-radius: 4px;
+      }
+    }
+
+    form {
+      flex-basis: 60%;
+
+      .chef-input {
+        font-size: 13px;
+        height: 36px;
+        padding: 10px;
+      }
+    }
+
+    #button-bar {
+      text-align: right;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+
+      .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        
+        input[type=file] {
+          font-size: 100px;
+          position: absolute;
+          left: 0;
+          top: 0;
+          opacity: 0;
+        }
+      }
+    }
+  }
+
+  chef-button {
+    height: 36px;
+    margin-top: 0;
+
+    .close {
+      margin: 0;
+      border: none;
+      color: var(--chef-primary-dark);
+      outline: none;
+
+      &:active {
+        background: none;
+        color: var(--chef-primary-dark);
+      }
+
+    }
+  }
+
+}

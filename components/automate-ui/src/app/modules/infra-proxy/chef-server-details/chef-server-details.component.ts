@@ -80,11 +80,13 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public isServerLoaded = false;
   public validating = true;
 
-
   public updateWebuiKeyForm: FormGroup;
   public updatingWebuiKey = false;
   public webuiKey: WebUIKey;
   public updateWebUIKeySuccessful = false;
+
+  public uploadSliderVisible = false;
+  public uploadZipForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -143,6 +145,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
       ]]
+    });
+    this.uploadZipForm = this.fb.group({
+      fileName: ['', [Validators.required]]
     });
 
     this.store.select(routeParams).pipe(
@@ -360,5 +365,25 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   private updatingWebuiKeyData(webuikey: WebUIKey) {
     this.store.dispatch(new UpdateWebUIKey(webuikey));
+  }
+
+
+  public openUploadSlider(): void {
+    this.uploadSliderVisible = true;
+    this.resetCreateModal();
+  }
+
+  public closeUploadSlider(): void {
+    this.uploadSliderVisible = false;
+    this.resetCreateModal();
+  }
+
+  public uploadZipFile(): void {
+    this.resetUploadSlider();
+  }
+
+  private resetUploadSlider(): void {
+    this.uploadZipForm.reset();
+    this.conflictErrorEvent.emit(false);
   }
 }

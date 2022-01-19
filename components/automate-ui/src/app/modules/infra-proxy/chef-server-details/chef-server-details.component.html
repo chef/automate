@@ -46,7 +46,7 @@
           </div>
           <div class="summary-body last">
             <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
-              <chef-button id="sync-button" class="sync-button" secondary primary data-cy="sync-button">Sync Org and Users
+              <chef-button id="sync-button" class="sync-button" secondary (click)="upload.slidePanel()" data-cy="sync-button">Sync Org and Users
               </chef-button>
             </app-authorized>
           </div>
@@ -75,6 +75,14 @@
         (deleteClicked)="deleteOrg()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
+      <app-sync-org-users-slider
+        #upload
+        [visible]="uploadSliderVisible"
+        [uploadForm]="uploadZipForm"
+        (close)="closeUploadSlider()"
+        [conflictErrorEvent]="conflictErrorEvent"
+        (uploadClicked)="uploadZipFile()">
+      </app-sync-org-users-slider>
       <section class="page-body details-tab" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">
           <chef-form-field>

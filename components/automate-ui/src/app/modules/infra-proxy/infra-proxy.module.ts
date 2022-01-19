@@ -62,6 +62,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PaginatorComponent } from './paginator/paginator.component';
 import { SelectBoxModule } from './select-box/src/public_api';
+import { SyncOrgUsersSliderComponent } from './sync-org-users-slider/sync-org-users-slider.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-web-uikey-slider.component';
 
@@ -106,6 +107,7 @@ import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-
     OrgDetailsComponent,
     OrgEditComponent,
     PaginationComponent,
+    PaginatorComponent,
     PolicyFilesComponent,
     PolicyFileDetailsComponent,
     PolicyGroupsComponent,
@@ -115,9 +117,9 @@ import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-
     ResetClientKeyComponent,
     ResetNodeKeyComponent,
     RevisionIdComponent,
+    SyncOrgUsersSliderComponent,
     UpdateNodeTagModalComponent,
-    UpdateWebUIKeySliderComponent,
-    PaginatorComponent
+    UpdateWebUIKeySliderComponent
   ],
   imports: [
     CommonModule,
