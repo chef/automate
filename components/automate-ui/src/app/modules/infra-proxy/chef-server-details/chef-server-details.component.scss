@@ -9,12 +9,25 @@ chef-page-header {
   border: 0.5px solid $chef-key-tab;
   border-radius: 4px;
   margin-bottom: 4em;
-  padding: 1em 0 4em;
+  padding: 1em 0 2em;
   background: $chef-white;
 
   .summary-body {
+    display: inline-block;
     font-size: 14px;
     padding: 0 1em;
+
+    &.first {
+      width: 33%;
+    }
+
+    &.middle {
+      width: 40%;
+    }
+
+    &.last {
+      width: 25%;
+    }
 
     .meta-head {
       text-transform: uppercase;
@@ -30,7 +43,7 @@ chef-page-header {
 
       li {
         display: flex;
-        margin-bottom: 5px;
+        margin-bottom: 15px;
 
         span {
           font-size: 14px;
@@ -40,7 +53,7 @@ chef-page-header {
           &.heading {
             display: inline-block;
             font-weight: bold;
-            width: 30%;
+            width: 50%;
           }
 
           &.webUIKeyStatus {
@@ -63,6 +76,11 @@ chef-page-header {
           height: 13.5px;
         }
       }
+    }
+
+    .sync-button {
+      float: right;
+      margin-bottom: 0;
     }
   }
 }
