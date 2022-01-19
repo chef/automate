@@ -906,13 +906,13 @@ Note: This all command will run from the /hab/a2_deploy_workspace.
 
     - Below command will rotate specific cert 
 
-    `./scripts/credentials set ssl  --pg-ssl` (This will rorate pg certs if you want to rotate)
+    		`./scripts/credentials set ssl  --pg-ssl` (This will rorate pg certs if you want to rotate)
 
-    `./scripts/credentials set ssl  --es-ssl`
+    		`./scripts/credentials set ssl  --es-ssl`
 
     - And if you want to change all the certs then put contents in the appropriate file and run below command 
 
-	`./scripts/credentials set ssl  --rotate-all`
+		`./scripts/credentials set ssl  --rotate-all`
 
     - This command will give you all the info about cert rotation. 
 
