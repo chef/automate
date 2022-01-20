@@ -19,6 +19,7 @@ import (
 )
 
 const (
+	// Todo(milestone) -- add new url to fetch semantically versioned manifest
 	defaultLatestManifestURLFmt = "https://packages.chef.io/manifests/%s/automate/latest.json"
 	defaultManifestURLFmt       = "https://packages.chef.io/manifests/automate/%s.json"
 	packagesChefIOSigAsc        = `-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -212,7 +213,11 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 		return nil, err
 	}
 
+	//Todo(milestone) Append min compatible version needed to upgrade for the current manifest
+
 	m.HartOverrides = []habpkg.Hart{}
 
 	return m, nil
 }
+
+//Todo(milestone) method to find min compatible version needed to upgrade.

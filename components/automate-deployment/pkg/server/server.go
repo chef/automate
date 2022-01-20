@@ -1827,8 +1827,15 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 		// the channel they have configured. Should we?
 		m, err = s.releaseManifestProvider.GetManifest(ctx, req.Version)
 	} else {
+		// Todo(milestone) get the next compatable manifest if it is not airgap
 		m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
+
+		//Todo(milestone) in airgap, get the manifest and perform the compatibility check.
 	}
+
+	//Todo(milestone) incase of airgap find out the upgrade is major or minor
+
+	//Todo(milestone) implement a process to present checklist
 
 	_, ok := err.(*manifest.NoSuchManifestError)
 	if ok {
