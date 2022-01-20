@@ -8,6 +8,7 @@
     "cypress:local": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_RUN_FLAKY=no cypress open",
     "cypress:local:flaky": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_RUN_FLAKY=yes cypress open",
     "cypress:run": "cypress run",
+    "cypress:run:proxy": "CYPRESS_IS_PROXY_ENV=true cypress run --spec cypress/integration/api/compliance/ssh_scan_job_proxy.spec.ts",
     "cypress:record": "cypress run --record",
     "lint": "tslint -p tsconfig.json"
   },

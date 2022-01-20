@@ -82,6 +82,7 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *config.TLSCredentials) (confi
 // SetGlobalConfig imports settings from the global configuration
 func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	c.V1.Sys.Mlsa = g.V1.Mlsa
+	c.V1.Sys.Proxy = g.V1.Proxy
 	c.V1.Sys.Service.ExternalFqdn = g.V1.GetFqdn()
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
