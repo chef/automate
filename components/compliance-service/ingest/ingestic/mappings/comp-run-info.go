@@ -3,7 +3,6 @@ package mappings
 // ComplianceRunInfo mapping used to create the `compliance-run-info index
 var ComplianceRunInfo = Mapping{
 	Index:      IndexNameComplianceRunInfo,
-	Type:       DocType,
 	Timeseries: false,
 	Mapping: `
 {
@@ -14,7 +13,7 @@ var ComplianceRunInfo = Mapping{
     }
   },
   "mappings": {
-    "` + DocType + `": {
+    {
       "properties": {
         "node_uuid": {
           "type": "keyword"

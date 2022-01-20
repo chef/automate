@@ -15,7 +15,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	elastic "gopkg.in/olivere/elastic.v6"
+	elastic "github.com/olivere/elastic/v7"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
@@ -69,7 +69,7 @@ func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) ([]st
 		bulkRequest := es.client.Bulk()
 		var nodeID nodeUUID
 		for _, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(*hit.Source, &nodeID)
+			err := json.Unmarshal(hit.Source, &nodeID)
 			if err != nil {
 				return nodeIds, err
 			}
@@ -154,11 +154,10 @@ func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (upd
 			// Delete node-attribute nodes matching
 			bulkRequest.Add(elastic.NewBulkDeleteRequest().
 				Index(mappings.NodeAttribute.Index).
-				Type(mappings.NodeAttribute.Type).
 				Id(hit.Id))
 
 			var node backend.Node
-			err = json.Unmarshal(*hit.Source, &node)
+			err = json.Unmarshal(hit.Source, &node)
 			if err != nil {
 				break
 			}
@@ -170,7 +169,6 @@ func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (upd
 		// Delete all the matching converge-history nodes for this scroll
 		bulkIndexByScrollResponse, err := elastic.NewDeleteByQueryService(es.client).
 			Index(allConvergeHistoryIndex).
-			Type(mappings.ConvergeHistory.Type).
 			Query(convergeHistoryQuery).
 			Do(ctx)
 
@@ -243,7 +241,7 @@ func (es *Backend) MarkMissingNodesForDeletion(ctx context.Context, threshold st
 		docIDs = make([]string, 0)
 		var nodeID nodeUUID
 		for _, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(*hit.Source, &nodeID)
+			err := json.Unmarshal(hit.Source, &nodeID)
 			if err != nil {
 				return nodeIds, err
 			}

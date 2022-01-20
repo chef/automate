@@ -46,7 +46,6 @@ var attrProps = `
 // NodeAttribute is the representation of our `node-state` Mapping
 var NodeAttribute = Mapping{
 	Index:      "node-attribute",
-	Type:       "node-attribute",
 	Timeseries: false,
 	Properties: fmt.Sprintf(`{ %s }`, attrProps),
 	Mapping: fmt.Sprintf(`

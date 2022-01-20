@@ -1,8 +1,8 @@
 package processor
 
 import (
+	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"

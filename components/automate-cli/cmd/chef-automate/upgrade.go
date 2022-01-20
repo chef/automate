@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"

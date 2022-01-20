@@ -20,7 +20,7 @@ POSTGRES_PORT ?= 15432
 POSTGRES_USER ?= postgres
 POSTGRES_PASS ?= admin
 POSTGRES_URI  ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASS)@$(POSTGRES_HOST):$(POSTGRES_PORT)/chef_automate?sslmode=disable
-ES_VER ?= 6
+ES_VER ?= 7
 PACKAGE = "github.com/chef/automate/components/compliance-service"
 
 GIT_SHA ?= $(shell git rev-parse HEAD)

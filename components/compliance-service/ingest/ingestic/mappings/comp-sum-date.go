@@ -3,7 +3,6 @@ package mappings
 // Compliance mapping used to create the `comp-<version>-s-<date>` index
 var ComplianceSumDate = Mapping{
 	Index:      IndexNameSum,
-	Type:       DocType,
 	Timeseries: true,
 	Mapping: `
 {
@@ -58,7 +57,7 @@ var ComplianceSumDate = Mapping{
     }
   },
   "mappings": {
-    "` + DocType + `": {
+    {
       "properties": {
         "controls_sums": {
           "properties": {

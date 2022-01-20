@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	elastic "gopkg.in/olivere/elastic.v6"
+	elastic "github.com/olivere/elastic/v7"
 )
 
 //GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt

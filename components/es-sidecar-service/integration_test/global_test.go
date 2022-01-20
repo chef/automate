@@ -22,8 +22,6 @@ const (
 	GRPC_HOST = "localhost"
 )
 
-const testTypeName = "test-data"
-
 // TestMain provides setup and teardown to surround test execution.
 // teardown everything after we have finished testing.
 // => Docs: https://golang.org/pkg/testing/#hdr-Main
@@ -54,7 +52,6 @@ type testDocument struct {
 func addDocToIndex(t *testing.T, indexName string, doc testDocument, id string) {
 	res, err := suite.esClient.Index().
 		Index(indexName).
-		Type(testTypeName).
 		Id(id).
 		BodyJson(doc).
 		Refresh("true").

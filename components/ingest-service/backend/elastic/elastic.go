@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/backend"
@@ -38,7 +38,6 @@ func (es *Backend) createBulkRequestUpsertNodeInfo(
 
 	return elastic.NewBulkUpdateRequest().
 		Index(mapping.Index).
-		Type(mapping.Type).
 		Id(ID).
 		Script(script).
 		Upsert(map[string]interface{}{
@@ -57,7 +56,6 @@ func (es *Backend) upsertNodeRunInfo(ctx context.Context, mapping mappings.Mappi
 
 	_, err := es.client.Update().
 		Index(mapping.Index).
-		Type(mapping.Type).
 		Id(id).
 		Script(script).
 		Upsert(map[string]interface{}{
@@ -171,7 +169,6 @@ func (es *Backend) addDataToTimeseriesIndex(ctx context.Context,
 		// Add a document on a particular index and let elasticsearch generate flake id
 		_, err := es.client.Index().
 			Index(index).
-			Type(mapping.Type).
 			BodyJson(data).
 			Do(ctx)
 		return err
@@ -193,7 +190,7 @@ func (es *Backend) createBulkUpdateRequestToTimeseriesIndex(
 	date time.Time,
 	data interface{}) elastic.BulkableRequest {
 	index := mapping.IndexTimeseriesFmt(date)
-	return elastic.NewBulkIndexRequest().Index(index).Type(mapping.Type).Doc(data)
+	return elastic.NewBulkIndexRequest().Index(index).Doc(data)
 }
 
 func (es *Backend) SendBulkRequest(ctx context.Context, bulkUpdateRequests []elastic.BulkableRequest) error {
@@ -225,7 +222,6 @@ func (es *Backend) upsertDataWithID(ctx context.Context,
 		_, err := es.client.Update().
 			Index(mapping.Index).
 			Id(ID).
-			Type(mapping.Type).
 			Doc(data).
 			DocAsUpsert(true).
 			RetryOnConflict(3).
@@ -250,7 +246,6 @@ func (es *Backend) createBulkRequestUpsertDataWithID(
 	data interface{}, upsertData interface{}) elastic.BulkableRequest {
 	return elastic.NewBulkUpdateRequest().
 		Index(mapping.Alias).
-		Type(mapping.Type).
 		Id(ID).
 		Upsert(upsertData). // Data used when the node is first created
 		Doc(data).          // Data used to update the node
@@ -271,7 +266,6 @@ func (es *Backend) addDataToIndexWithID(ctx context.Context,
 		_, err := es.client.Index().
 			Index(mapping.Index).
 			Id(ID).
-			Type(mapping.Type).
 			BodyJson(data).
 			Do(ctx)
 		return err
@@ -294,7 +288,6 @@ func (es *Backend) createBulkUpdateRequestToIndexWithID(
 	data interface{}) elastic.BulkableRequest {
 	return elastic.NewBulkUpdateRequest().
 		Index(mapping.Index).
-		Type(mapping.Type).
 		Id(ID).
 		Doc(data).DocAsUpsert(true)
 }
@@ -380,7 +373,7 @@ func (es *Backend) createStore(ctx context.Context, indexName string, mapping st
 }
 
 func (es *Backend) updateMapping(ctx context.Context, esMap mappings.Mapping) error {
-	_, err := es.client.PutMapping().Index(esMap.Index).Type(esMap.Type).BodyString(esMap.Properties).Do(ctx)
+	_, err := es.client.PutMapping().Index(esMap.Index).BodyString(esMap.Properties).Do(ctx)
 	return err
 }
 

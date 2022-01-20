@@ -586,7 +586,6 @@ var nodeProps = `
 var NodeState = Mapping{
 	Index:      "node-state-7",
 	Alias:      "node-state",
-	Type:       "node-state",
 	Timeseries: false,
 	Properties: fmt.Sprintf(`{ %s }`, nodeProps),
 	Mapping: fmt.Sprintf(`
