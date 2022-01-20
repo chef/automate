@@ -1789,7 +1789,7 @@ func (s *server) ManifestVersion(ctx context.Context, d *api.ManifestVersionRequ
 	}
 
 	return &api.ManifestVersionResponse{
-		BuildTimestamp: m.Build,
+		BuildTimestamp: m.Version(),
 		BuildSha:       m.BuildSHA,
 		CliRelease:     cliRelease,
 	}, nil
@@ -1804,13 +1804,36 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 	var currentRelease = ""
 	s.deployment.Lock()
 	if s.deployment.CurrentReleaseManifest != nil {
-		currentRelease = s.deployment.CurrentReleaseManifest.Build
+		currentRelease = s.deployment.CurrentReleaseManifest.Version()
 	}
 	channel := s.deployment.Channel()
 	s.deployment.Unlock()
 
 	var m *manifest.A2
 	var err error
+
+	nextManifestVersion := currentRelease
+	if !airgap.AirgapInUse() { //internet connected machine
+		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, channel, currentRelease)
+		if err != nil {
+			return nil, err
+		}
+
+		if !req.IsMajorUpgrade { //normal upgrade
+			if isMinorAvailable {
+				nextManifestVersion = compVersion
+			} else if isMajorAvailable {
+				return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --major` to further upgrade")
+			}
+		} else { //major upgrade
+			if isMinorAvailable {
+				return nil, status.Errorf(codes.InvalidArgument, "minor/patch version is available, please use `chef-automate upgrade run`")
+			} else if isMajorAvailable {
+				nextManifestVersion = compVersion
+			}
+		}
+	}
+
 	if req.Version != "" {
 		if airgap.AirgapInUse() {
 			return nil, status.Errorf(codes.InvalidArgument, "specifying a version is not allowed in airgap mode, please use `chef-automate upgrade run --airgap-bundle`")
@@ -1828,8 +1851,8 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 		m, err = s.releaseManifestProvider.GetManifest(ctx, req.Version)
 	} else {
 		// Todo(milestone) get the next compatable manifest if it is not airgap
-		m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
-
+		//m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
+		m, err = s.releaseManifestProvider.GetManifest(ctx, nextManifestVersion)
 		//Todo(milestone) in airgap, get the manifest and perform the compatibility check.
 	}
 
@@ -1866,7 +1889,7 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 
 	return &api.UpgradeResponse{
 		PreviousVersion: currentRelease,
-		NextVersion:     m.Build,
+		NextVersion:     m.Version(),
 		TaskId:          task.ID.String(),
 	}, nil
 }
