@@ -110,16 +110,6 @@ type Migration struct {
 	UpdatedTimestamp time.Time `json:"updated_timestamp"`
 }
 
-type MigrationType struct {
-	ID      string
-	MigType string
-}
-
-type MigrationStatus struct {
-	ID        string
-	MigStatus string
-}
-
 // Errors returned from the backend
 var (
 	// ErrNotFound is returned when a requested server wasn't found
