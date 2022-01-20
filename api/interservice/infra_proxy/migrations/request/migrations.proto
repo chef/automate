@@ -2,3 +2,22 @@ syntax = "proto3";
 
 package chef.automate.domain.infra_proxy.migrations.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/migrations/request";
+
+message UploadFileRequest{
+  //Chunk of the data in bytes
+  Chunk chunk = 2;
+  //Metadata for the request
+  Metadata meta =3;
+}
+
+message Metadata{
+  //Migration File name
+  string name = 1;
+  //Content type of the request
+  string contentType =2;
+}
+
+message Chunk{
+  //Bytes of data to upload
+  bytes data = 1;
+}

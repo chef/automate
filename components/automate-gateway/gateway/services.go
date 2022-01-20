@@ -314,10 +314,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
 
 	infraProxyClient, err := clients.InfraProxyClient()
+
+	infraProxyMigrationClient, err := clients.InfraProxyMigrationClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for infra proxy service")
 	}
-	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
+	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient, infraProxyMigrationClient))
 
 	userSettingsClient, err := clients.UserSettingsClient()
 	if err != nil {

@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 
+	grpc_s1 "github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/lib/grpc/health"
@@ -84,6 +85,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 	)
 	health.RegisterHealthServer(g, health.NewService())
 	grpc_s.RegisterInfraProxyServiceServer(g, NewServer(s))
+	grpc_s1.RegisterMigrationDataServiceServer(g, NewServer(s))
 	reflection.Register(g)
 	return g
 }

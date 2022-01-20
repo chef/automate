@@ -2,3 +2,8 @@ syntax = "proto3";
 
 package chef.automate.domain.infra_proxy.migrations.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/migrations/response";
+
+message UploadFileResponse{
+  string migrationId =1;
+  string status=2;
+}

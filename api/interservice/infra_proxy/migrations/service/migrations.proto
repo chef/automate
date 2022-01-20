@@ -2,3 +2,13 @@ syntax = "proto3";
 
 package chef.automate.domain.infra_proxy.migrations.service;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/migrations/service";
+
+import "interservice/infra_proxy/migrations/response/migrations.proto";
+import "interservice/infra_proxy/migrations/request/migrations.proto";
+import "google/api/annotations.proto";
+
+service MigrationDataService{
+
+  rpc UploadFile (stream chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest) returns (chef.automate.domain.infra_proxy.migrations.response.UploadFileResponse) {};
+
+}
