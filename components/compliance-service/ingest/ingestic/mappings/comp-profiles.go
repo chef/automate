@@ -3,7 +3,6 @@ package mappings
 // ComplianceProfiles mapping used to create the `compliance-profiles` index
 var ComplianceProfiles = Mapping{
 	Index:      IndexNameProf,
-	Type:       DocType,
 	Timeseries: false,
 	Mapping: `
 {
@@ -42,7 +41,7 @@ var ComplianceProfiles = Mapping{
     }
   },
   "mappings": {
-    "` + DocType + `": {
+    {
       "properties": {
         "name": {
           "type": "keyword",
