@@ -3,7 +3,6 @@ package mappings
 // ConvergeHistory is the representation of our `converge-history` Mapping
 var ConvergeHistory = Mapping{
 	Index:      "converge-history",
-	Type:       "converge",
 	Timeseries: true,
 	Mapping: `
 	{

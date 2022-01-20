@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
-	elasticaws "gopkg.in/olivere/elastic.v6/aws/v4"
+	elastic "github.com/olivere/elastic/v7"
+	elasticaws "github.com/olivere/elastic/v7/aws/v4"
 )
 
 const (
