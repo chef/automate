@@ -15,6 +15,8 @@ type ReleaseManifestProvider interface {
 	GetCurrentManifest(ctx context.Context, channel string) (*A2, error)
 	// GetManifest forces fetching the specified manifest
 	GetManifest(ctx context.Context, release string) (*A2, error)
+	// Todo(milestone) add new method to interface which fetches next compatible manifest
+	// and implement the method for LocalHartManifestProvider and CachingReleaseManifestProvider
 }
 
 // A LocalHartManifestProvider can add local harts to the manifest for another
