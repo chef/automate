@@ -19,6 +19,7 @@ type A2 struct {
 	BuildSHA      string          `json:"build_sha"`
 	Packages      []habpkg.HabPkg `json:"packages"`
 	HartOverrides []habpkg.Hart   `json:"hart_overrides"`
+	//Todo(milestone): add a field to hold min compatable version to upgrade for this release.
 }
 
 // PackageForServiceName returns a Package for the named service
