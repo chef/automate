@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
+	olivere "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	olivere "gopkg.in/olivere/elastic.v6"
 
 	"path"
 
