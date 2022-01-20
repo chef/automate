@@ -50,6 +50,10 @@ if [ -f  "$pidfile" ]; then
   fi
 fi
 
+if [[ "$BUILDKITE" = "true" ]]; then
+  sed -i -e 's/posix/mmap/g' {{pkg.svc_config_path}}/postgresql13.conf
+fi
+
 exec postgres \
   -c config_file={{pkg.svc_config_path}}/postgresql13.conf
 {{~/if}}
