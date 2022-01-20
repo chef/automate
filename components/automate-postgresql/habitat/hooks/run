@@ -51,7 +51,7 @@ if [ -f  "$pidfile" ]; then
 fi
 
 if [[ "$BUILDKITE" = "true" ]]; then
-  sed -i -e 's/posix/mmap/g' {{pkg.svc_config_path}}/postgresql13.conf
+  echo "dynamic_shared_memory_type = 'mmap'" >> {{pkg.svc_config_path}}/postgresql13.conf
 fi
 
 exec postgres \
