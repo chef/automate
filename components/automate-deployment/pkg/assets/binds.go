@@ -74,8 +74,9 @@ config-mgmt-service REQUIRED automate-es-gateway automate-pg-gateway pg-sidecar-
 config-mgmt-service BINDING_MODE strict
 data-feed-service REQUIRED automate-pg-gateway cereal-service compliance-service config-mgmt-service pg-sidecar-service secrets-service
 data-feed-service BINDING_MODE strict
-es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
-es-sidecar-service BINDING_MODE strict
+es-sidecar-service REQUIRED automate-es-gateway
+es-sidecar-service OPTIONAL automate-elasticsearch
+es-sidecar-service BINDING_MODE relaxed
 event-feed-service REQUIRED authz-service automate-es-gateway cereal-service
 event-feed-service OPTIONAL es-sidecar-service
 event-feed-service BINDING_MODE strict
