@@ -10,7 +10,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pg_version="13.4"
 pkg_deps=(
-  core/coreutils/8.30
+  core/coreutils
   chef/mlsa
   ${vendor_origin}/postgresql13/${pg_version}
 )
