@@ -550,19 +550,33 @@ func (s *server) doDeploySome(serviceNames []string,
 	go func(serviceNames []string) {
 		defer sender.TaskComplete()
 		eDeploy.waitForConverge(task)
-		// NOTE(ssd) 2018-01-25: We don't use the timeout from
-		// the request because a deploy outlives the request
-		enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+		//To remove internal services from health check in case External ES or PG is enabled
 
+		servicesToSkip := make([]string, 0, len(serviceNames))
+
+		enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
 		if enableExternalPg {
+			servicesToSkip = append(servicesToSkip, "automate-postgresql")
+		}
+		enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+
+		if enableExternalEs {
+			servicesToSkip = append(servicesToSkip, "automate-elasticsearch")
+		}
+		if len(servicesToSkip) > 0 {
 			for i, v := range serviceNames {
-				if v == "automate-postgresql" {
-					//logrus.Debugln("MODIFYING SERVICE LIST FOR HEALTHCHECK")
-					serviceNames = append(serviceNames[:i], serviceNames[i+1:]...)
-					break
+				for _, x := range servicesToSkip {
+					if x == v {
+						serviceNames = append(serviceNames[:i], serviceNames[i+1:]...)
+						break
+					}
 				}
 			}
 		}
+
+		// NOTE(ssd) 2018-01-25: We don't use the timeout from
+		// the request because a deploy outlives the request
+
 		eDeploy.ensureStatus(context.Background(), serviceNames, s.ensureStatusTimeout)
 		if !usedBootstrapBundle {
 			eDeploy.maybeCreateInitialUser(serviceNames)
