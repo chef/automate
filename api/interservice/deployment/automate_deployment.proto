@@ -654,6 +654,7 @@ message CancelBackupResponse {
 
 message UpgradeRequest {
 	string version = 1;
+	// Todo(milestone) add new field is_major_upgrade and generate go code
 }
 
 message UpgradeResponse {

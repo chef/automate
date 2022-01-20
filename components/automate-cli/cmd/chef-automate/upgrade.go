@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -26,6 +27,7 @@ var upgradeRunCmdFlags = struct {
 	upgradebackends      bool
 	upgradeairgapbundles bool
 	skipDeploy           bool
+	// Todo(milestone) add new field isMajorUpgrade
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -83,6 +85,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
 	}
+	//Todo(milestone) check if upgradeRunCmdFlags.version is compatible with current version.
 
 	if offlineMode {
 		writer.Title("Installing airgap install bundle")
@@ -98,6 +101,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
 		Version: upgradeRunCmdFlags.version,
+		// Todo(milestone) send is major upgrade or not.
 	})
 	if err != nil {
 		return status.Wrap(
@@ -312,6 +316,8 @@ func init() {
 		"skip-deploy",
 		false,
 		"will only upgrade and not deploy the bundle")
+
+	// Todo(milestone) add new flag to the run command
 
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
