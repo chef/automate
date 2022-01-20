@@ -93,7 +93,7 @@ describe("remove marked nodes", function () {
                         let convergeHistoryResponse = responses[2];
 
                         expect(nodeStateResponse).to.have.status(200);
-                        expect(2).to.equal(nodeStateResponse.body.hits.total);
+                        expect(2).to.equal(nodeStateResponse.body.hits.total.value);
 
                         let source1 = nodeStateResponse.body.hits.hits[0]._source
                         let source2 = nodeStateResponse.body.hits.hits[1]._source
@@ -101,10 +101,10 @@ describe("remove marked nodes", function () {
                         expect(source1.entity_uuid === entityUuid3 || source2.entity_uuid === entityUuid3).to.equal(true);
 
                         expect(convergeHistoryResponse).to.have.status(200);
-                        expect(convergeHistoryResponse.body.hits.total).to.equal(2);
+                        expect(convergeHistoryResponse.body.hits.total.value).to.equal(2);
 
                         expect(nodeAttributeResponse).to.have.status(200);
-                        expect(nodeAttributeResponse.body.hits.total).to.equal(2);
+                        expect(nodeAttributeResponse.body.hits.total.value).to.equal(2);
                       });
                     });
                   });
@@ -188,16 +188,16 @@ describe("remove marked nodes", function () {
                     let convergeHistoryResponse = responses[2];
 
                     expect(nodeStateResponse).to.have.status(200);
-                    expect(nodeStateResponse.body.hits.total).to.equal(1);
+                    expect(nodeStateResponse.body.hits.total.value).to.equal(1);
 
                     let source = nodeStateResponse.body.hits.hits[0]._source
                     expect(source.entity_uuid).to.equal(entityUuid3);
 
                     expect(nodeAttributeResponse).to.have.status(200);
-                    expect(nodeAttributeResponse.body.hits.total).to.equal(1);
+                    expect(nodeAttributeResponse.body.hits.total.value).to.equal(1);
 
                     expect(convergeHistoryResponse).to.have.status(200);
-                    expect(convergeHistoryResponse.body.hits.total).to.equal(1);
+                    expect(convergeHistoryResponse.body.hits.total.value).to.equal(1);
                   });
                 });
               });
@@ -258,16 +258,16 @@ describe("remove marked nodes", function () {
                       let convergeHistoryResponse = responses[2];
 
                       expect(nodeStateResponse).to.have.status(200);
-                      expect(nodeStateResponse.body.hits.total).to.equal(1);
+                      expect(nodeStateResponse.body.hits.total.value).to.equal(1);
 
                       let source = nodeStateResponse.body.hits.hits[0]._source
                       expect(source.entity_uuid).to.equal(entityUuid);
 
                       expect(nodeAttributeResponse).to.have.status(200);
-                      expect(nodeAttributeResponse.body.hits.total).to.equal(1);
+                      expect(nodeAttributeResponse.body.hits.total.value).to.equal(1);
 
                       expect(convergeHistoryResponse).to.have.status(200);
-                      expect(convergeHistoryResponse.body.hits.total).to.equal(1);
+                      expect(convergeHistoryResponse.body.hits.total.value).to.equal(1);
                     });
                   });
                 });

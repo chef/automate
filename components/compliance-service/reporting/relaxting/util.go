@@ -10,9 +10,9 @@ import (
 	"time"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
