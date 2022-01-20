@@ -306,6 +306,12 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 		return nil, err
 	}
 
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	logrus.Debugln("Is External PG enabled : ", enableExternalPg)
+
+	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+	logrus.Debugln("Is External PG enabled : ", enableExternalES)
+
 	for i, service := range expectedServices {
 		var convergeState converge.ServiceConvergeState
 		pkg := manifest.InstallableFromManifest(m, service.Name())
@@ -327,14 +333,28 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 			}).Debug("Found hart override")
 		}
 
-		enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
-		logrus.Debugln("Is External PG enabled : ", enableExternalPg)
-
 		if enableExternalPg {
 			if service.Name() == "automate-postgresql" {
-				service.DeploymentState = deployment.Skip
+				service.DeploymentState = deployment.Removed
+			}
+		} else {
+			if service.Name() == "automate-postgresql" && service.DeploymentState == deployment.Removed {
+				service.DeploymentState = deployment.Running
+
 			}
 		}
+
+		if enableExternalES {
+			if service.Name() == "automate-elasticsearch" {
+				service.DeploymentState = deployment.Removed
+			}
+		} else {
+			if service.Name() == "automate-elasticsearch" && service.DeploymentState == deployment.Removed {
+				service.DeploymentState = deployment.Running
+
+			}
+		}
+
 		// logrus.Debugln("BUILD_DESIRED_STATE SERVICE_NAME ::: ", service.Name())
 		// logrus.Debugln("BUILD_DESIRED_STATE SERVICE_STATE ::: ", service.DeploymentState)
 
@@ -550,29 +570,6 @@ func (s *server) doDeploySome(serviceNames []string,
 	go func(serviceNames []string) {
 		defer sender.TaskComplete()
 		eDeploy.waitForConverge(task)
-		//To remove internal services from health check in case External ES or PG is enabled
-
-		servicesToSkip := make([]string, 0, len(serviceNames))
-
-		enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
-		if enableExternalPg {
-			servicesToSkip = append(servicesToSkip, "automate-postgresql")
-		}
-		enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
-
-		if enableExternalEs {
-			servicesToSkip = append(servicesToSkip, "automate-elasticsearch")
-		}
-		if len(servicesToSkip) > 0 {
-			for i, v := range serviceNames {
-				for _, x := range servicesToSkip {
-					if x == v {
-						serviceNames = append(serviceNames[:i], serviceNames[i+1:]...)
-						break
-					}
-				}
-			}
-		}
 
 		// NOTE(ssd) 2018-01-25: We don't use the timeout from
 		// the request because a deploy outlives the request
@@ -900,6 +897,31 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 	if s.err != nil {
 		return
 	}
+
+	//To remove internal services from health check in case External ES or PG is enabled
+
+	servicesToSkip := make([]string, 0, len(serviceList))
+
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	if enableExternalPg {
+		servicesToSkip = append(servicesToSkip, "automate-postgresql")
+	}
+	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+
+	if enableExternalEs {
+		servicesToSkip = append(servicesToSkip, "automate-elasticsearch")
+	}
+	if len(servicesToSkip) > 0 {
+		for i, v := range serviceList {
+			for _, x := range servicesToSkip {
+				if x == v {
+					serviceList = append(serviceList[:i], serviceList[i+1:]...)
+					break
+				}
+			}
+		}
+	}
+
 	e := s.sender
 
 	logctx := logrus.WithFields(logrus.Fields{
