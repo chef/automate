@@ -23,9 +23,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/jsonpb"
 	empty "github.com/golang/protobuf/ptypes/empty"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 var complianceReportIndex = fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")
@@ -179,11 +179,11 @@ func (s *Suite) GetAllReportsESInSpecReport() ([]*relaxting.ESInSpecReport, erro
 		).
 		Do(context.Background())
 
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecReport := relaxting.ESInSpecReport{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esInSpecReport)
+				err := json.Unmarshal(hit.Source, &esInSpecReport)
 				if err != nil {
 					logrus.Errorf("GetAllReportsESInSpecReport unmarshal error: %s", err.Error())
 					return reports, err
@@ -210,11 +210,11 @@ func (s *Suite) GetAllSummaryESInSpecSummary() ([]*relaxting.ESInSpecSummary, er
 		).
 		Do(context.Background())
 
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecSummary := relaxting.ESInSpecSummary{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esInSpecSummary)
+				err := json.Unmarshal(hit.Source, &esInSpecSummary)
 				if err != nil {
 					logrus.Errorf("GetAllSummaryESInSpecSummary unmarshal error: %s", err.Error())
 					return summaries, err

@@ -8,8 +8,8 @@ import (
 
 	"fmt"
 
+	olivere "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	olivere "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-service/config"
