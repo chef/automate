@@ -28,9 +28,30 @@ type Storage interface {
 	DeleteUser(ctx context.Context, id string) (User, error)
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
 
-	StoreMigration(ctx context.Context, serverId, migType, migStatus string) (Migration, error)
-	GetMigration(ctx context.Context, id string) (Migration, error)
-	EditMigration(ctx context.Context, id, typeId, migStatus string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	// StartZipParsing(ctx context.Context, migrationId, serverId string) (Migration, error)
+	// CompleteZipParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	// StartOrgMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	// CompleteOrgMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	// StartUserMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	// CompleteUserMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	// StartAssciation(ctx context.Context, migrationId, serverId string) (Migration, error)
+	// CompleteAssciation(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	// StartPermissionMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	// CompletePermissionMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+}
+
+//TODO: After creating separate interface for migration, initialized postgres struct with db connection, Is it ok??
+type MigrationStorage interface {
+	StartZipParsing(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteZipParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartOrgMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteOrgMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartUserMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteUserMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartAssciation(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteAssciation(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartPermissionMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompletePermissionMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a
@@ -78,15 +99,15 @@ type User struct {
 }
 
 type Migration struct {
-	ID             string
-	TypeID         string
-	StatusID       string
-	ServerID       string
-	TotalSucceeded int64
-	TotalSkipped   int64
-	TotalFailed    int64
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID               string    `json:"id"`
+	MigrationID      string    `json:"migration_id"`
+	ServerID         string    `json:"server_id"`
+	TypeID           int64     `json:"type_id"`
+	StatusID         int64     `json:"status_id"`
+	TotalSucceeded   int64     `json:"total_succeeded"`
+	TotalSkipped     int64     `json:"total_skipped"`
+	TotalFailed      int64     `json:"total_failed"`
+	UpdatedTimestamp time.Time `json:"updated_timestamp"`
 }
 
 type MigrationType struct {

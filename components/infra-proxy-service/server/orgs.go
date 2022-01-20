@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	"github.com/gofrs/uuid"
 )
 
 // CreateOrg creates a new org
@@ -229,7 +230,7 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	defer setMigrationStatus(false)
 
 	//Store the status in migration table as in progress
-	migration, err := s.service.Storage.StoreMigration(ctx, req.ServerId, "org", "In Progress")
+	migration, err := s.service.Migration.StartOrgMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
 	if err != nil {
 		return nil, err
 	}
@@ -243,17 +244,17 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 }
 
 func (s *Server) getInfraServerOrgs(c *ChefClient, serverId string, migration storage.Migration) {
-	var migrationStatus string
+	//var migrationStatus string
 	var totalSucceeded, totalSkipped, totalFailed int64
 
 	defer func() {
-		_, _ = s.service.Storage.EditMigration(context.Background(), migration.ID, migration.TypeID, migrationStatus, totalSucceeded, totalSkipped, totalFailed)
+		_, _ = s.service.Migration.CompleteOrgMigration(context.Background(), migration.MigrationID, serverId, totalSucceeded, totalSkipped, totalFailed)
 	}()
 
 	// Get organisation list from chef server
 	orgsList, err := c.client.Organizations.List()
 	if err != nil {
-		migrationStatus = "Failed"
+		//migrationStatus = "Failed"
 		return
 	}
 
@@ -266,7 +267,7 @@ func (s *Server) getInfraServerOrgs(c *ChefClient, serverId string, migration st
 		}
 		totalSucceeded++
 	}
-	migrationStatus = "Completed"
+	//migrationStatus = "Completed"
 	return
 }
 

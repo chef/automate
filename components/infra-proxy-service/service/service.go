@@ -21,6 +21,7 @@ type Service struct {
 	Logger      logger.Logger
 	ConnFactory *secureconn.Factory
 	Storage     storage.Storage
+	Migration   storage.MigrationStorage
 	Secrets     secrets.SecretsServiceClient
 }
 
@@ -31,11 +32,15 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 	if err != nil {
 		return nil, err
 	}
-
+	pObj, err := postgres.NewMigration(l, migrationsConfig, authzClient)
+	if err != nil {
+		return nil, err
+	}
 	return &Service{
 		Logger:      l,
 		ConnFactory: connFactory,
 		Storage:     p,
+		Migration:   pObj,
 		Secrets:     secretsClient,
 	}, nil
 }
