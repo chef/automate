@@ -21,7 +21,7 @@ Chef Automate supports externally managed users from an external identity provid
 
 If you are only using local users and teams that you create in Chef Automate, then you do not need to configure an external IdP. See the [Users]({{< relref "users.md" >}}) documentation for information on creating and managing local users.
 
-{{% warning %}}
+{{< warning >}}
 A Chef Automate instance supports using two different IdPs at the same time:
 
 - One IdP using SAML and
@@ -29,9 +29,9 @@ A Chef Automate instance supports using two different IdPs at the same time:
 
 A Chef Automate does not support using two of the _same_ IdPs at one time:
 
-- Two SAML IdPs on one Chef Automate instance will not work
-- Two LDAP IdPs on one Chef Automate instance will not work
-{{% /warning %}}
+- Two SAML IdPs on one Chef Automate instance will not work.
+- Two LDAP IdPs on one Chef Automate instance will not work/
+{{< /warning >}}
 
 ### Configure Identity Providers
 
