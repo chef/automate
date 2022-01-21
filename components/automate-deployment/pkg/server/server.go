@@ -898,36 +898,39 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 		return
 	}
 
-	//To remove internal services from health check in case External ES or PG is enabled
-
-	servicesToSkip := make([]string, 0, len(serviceList))
-
-	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
-	if enableExternalPg {
-		servicesToSkip = append(servicesToSkip, "automate-postgresql")
-	}
-	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
-
-	if enableExternalEs {
-		servicesToSkip = append(servicesToSkip, "automate-elasticsearch")
-	}
-	if len(servicesToSkip) > 0 {
-		for i, v := range serviceList {
-			for _, x := range servicesToSkip {
-				if x == v {
-					serviceList = append(serviceList[:i], serviceList[i+1:]...)
-					break
-				}
-			}
-		}
-	}
-
 	e := s.sender
 
 	logctx := logrus.WithFields(logrus.Fields{
 		"mod":     "server.ensureStatus",
 		"timeout": timeout,
 	})
+
+	//To remove internal services from health check in case External ES or PG is enabled
+
+	servicesToSkip := make([]string, 0, len(serviceList))
+
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	if enableExternalPg {
+		logctx.Debug("External PG is enabled.")
+		servicesToSkip = append(servicesToSkip, "automate-postgresql")
+	}
+	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+
+	if enableExternalEs {
+		logctx.Debug("External ES is enabled.")
+		servicesToSkip = append(servicesToSkip, "automate-elasticsearch")
+	}
+	if len(servicesToSkip) > 0 {
+		for i, v := range serviceList {
+			for _, x := range servicesToSkip {
+				if x == v {
+					logctx.Debug("Removed service " + x + " from Health Check")
+					serviceList = append(serviceList[:i], serviceList[i+1:]...)
+					break
+				}
+			}
+		}
+	}
 
 	var status *api.ServiceStatus
 	e.Phase(api.Running, events.CheckingServiceHealth)
