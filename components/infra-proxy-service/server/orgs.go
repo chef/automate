@@ -230,7 +230,8 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	defer setMigrationStatus(false)
 
 	//Store the status in migration table as in progress
-	migration, err := s.service.Migration.StartOrgMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
+	migration, err := s.service.Migration.StartMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
+	migration, err = s.service.Migration.StartOrgMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
 	if err != nil {
 		return nil, err
 	}

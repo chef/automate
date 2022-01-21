@@ -48,9 +48,9 @@ func NewMigration(logger logger.Logger, migrationConfig migration.Config, authzC
 		return nil, errors.Wrap(err, "initialize database")
 	}
 
-	if err := migrationConfig.Migrate(); err != nil {
-		return nil, errors.Wrap(err, "database migrations")
-	}
+	// if err := migrationConfig.Migrate(); err != nil {
+	// 	return nil, errors.Wrap(err, "database migrations")
+	// }
 
 	return &postgres{db, logger, authzClient}, nil
 }
