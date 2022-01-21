@@ -119,7 +119,7 @@ type Migration struct {
 	TotalSucceeded   int64     `json:"total_succeeded"`
 	TotalSkipped     int64     `json:"total_skipped"`
 	TotalFailed      int64     `json:"total_failed"`
-	message          string    `json:"message"`
+	Message          string    `json:"message"`
 	UpdatedTimestamp time.Time `json:"updated_timestamp"`
 }
 
