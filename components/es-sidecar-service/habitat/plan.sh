@@ -13,8 +13,11 @@ pkg_upstream_url="http://github.com/chef/automate/components/es-sidecar-service"
 chef_automate_hab_binding_mode="relaxed"
 
 pkg_binds=(
-  [automate-elasticsearch]="deprecated_external_es"
   [automate-es-gateway]="http-port"
+)
+
+pkg_binds_optional=(
+  [automate-elasticsearch]="deprecated_external_es"
 )
 pkg_exports=(
   [port]=service.port
