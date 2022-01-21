@@ -8,7 +8,6 @@ var AllMappings = []Mapping{
 
 const (
 	feedsIndicesVersion = "2"
-	DocType             = "_doc"
 	IndexNameFeeds      = "eventfeed-" + feedsIndicesVersion + "-feeds"
 )
 
@@ -162,8 +161,8 @@ var Feeds = Mapping{
 	Properties: fmt.Sprintf(`{ %s }`, feedProps),
 	Mapping: fmt.Sprintf(`
 			{
-				"template":"`+IndexNameFeeds+`",
 				"settings":{
+					"number_of_shards": 5,
 					"analysis": {
 						"analyzer": {
 							"autocomplete": {
@@ -197,10 +196,7 @@ var Feeds = Mapping{
 					}
 				},
 				"mappings":{
-					"`+DocType+`":{
-						"dynamic": false,
 						%s
-					}
 				}
 			}
 		`, feedProps),
