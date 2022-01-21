@@ -8,6 +8,12 @@ export GODEBUG=x509ignoreCN=0
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
+{{ #if cfg.proxy.connection_string ~}}
+export https_proxy="{{cfg.proxy.connection_string}}"
+export http_proxy="{{cfg.proxy.connection_string}}"
+export no_proxy="{{cfg.proxy.no_proxy_string}}"
+{{ /if ~ }}
+
 # create tmp folder for inspec
 mkdir -p {{pkg.svc_var_path}}/tmp
 chmod 0775 {{pkg.svc_var_path}}
