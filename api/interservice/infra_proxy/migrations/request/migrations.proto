@@ -4,6 +4,8 @@ package chef.automate.domain.infra_proxy.migrations.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/migrations/request";
 
 message UploadFileRequest{
+  //Chef infra server id for the file
+  string serverId =1;
   //Chunk of the data in bytes
   Chunk chunk = 2;
   //Metadata for the request
