@@ -58,6 +58,12 @@ func printServerVersion() error {
 			"Server version cannot be listed because this command was not run as root. Re-run this command as root to see full server version information.",
 		)
 	}
+	
+	// Check for bastion
+	if isA2HARBFileExist() {
+		writer.Bodyf("For getting automate version, Please login to chef-automate and use command chef-automate version ")
+		return  nil			
+	}
 
 	// Connect to the server to get the server version.
 	connection, err := client.Connection(client.DefaultClientTimeout)
