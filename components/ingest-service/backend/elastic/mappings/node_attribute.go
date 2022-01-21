@@ -50,18 +50,14 @@ var NodeAttribute = Mapping{
 	Properties: fmt.Sprintf(`{ %s }`, attrProps),
 	Mapping: fmt.Sprintf(`
 	{
-		"template": "node-attribute",
-		"index_patterns": ["node-attribute"],
 		"settings": {
+			"number_of_shards": 5,
 			"index": {
 				"refresh_interval": "5s"
 			}
 		},
 		"mappings": {
-			"node-attribute": {
-				"dynamic": true,
 				%s
-			}
 		}
 	}
 	`, attrProps),

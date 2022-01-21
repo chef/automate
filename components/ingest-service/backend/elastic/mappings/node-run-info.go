@@ -30,9 +30,7 @@ var NodeRunInfo = Mapping{
 			} 
 		}, 
 		"mappings": {
-			"%s": { 
-				%s
-			} 
+				%s 
 		} 
-	}`, IndexNameNodeRunInfo, DocType, runInfoProps),
+	}`, IndexNameNodeRunInfo, runInfoProps),
 }
