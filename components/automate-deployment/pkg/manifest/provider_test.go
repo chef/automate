@@ -166,6 +166,20 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 				"1.0.0",
 				"2.0.0",
 			}
+		} else if param[0] == "set4" {
+			resp = []string{
+				"20220112171518",
+				"20220112175624",
+				"20220113145751",
+				"20220113154113",
+				"20220120081508",
+				"20220120081530",
+			}
+		} else if param[0] == "set5" {
+			resp = []string{
+				"1.0.0",
+				"1.2.5",
+			}
 		}
 		bytes, _ := json.Marshal(resp)
 		w.Write(bytes)
@@ -250,6 +264,24 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 			isMinorAvailable:  false,
 			isMajorAvailable:  true,
 			compatibleVersion: "2.0.0",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set4",
+			version:           "20220120081508",
+			isMinorAvailable:  true,
+			isMajorAvailable:  false,
+			compatibleVersion: "20220120081530",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set5",
+			version:           "1.0.0",
+			isMinorAvailable:  true,
+			isMajorAvailable:  false,
+			compatibleVersion: "1.2.5",
 			isError:           false,
 			errorString:       "",
 		},

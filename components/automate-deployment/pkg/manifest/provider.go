@@ -194,13 +194,6 @@ func (c *cachingReleaseManifestProvider) GetCompatibleVersion(ctx context.Contex
 	return getCompatibleManifestVersion(ctx, version, url)
 }
 
-/*func (provider *LocalHartManifestProvider) GetCompatibleVersion(ctx context.Context, channel,
-	version string) (isMinorAvailable, isMajorAvailable bool, compVersion string, err error) {
-
-	url := fmt.Sprintf(automateVersionsURLFmt, channel)
-	return getCompatibleManifestVersion(ctx, version, url)
-}*/
-
 func getCompatibleManifestVersion(ctx context.Context, version, url string) (isMinorAvailable, isMajorAvailable bool, compVersion string, err error) {
 	//get the list of all versions
 	req, err := http.NewRequest("GET", url, nil)
@@ -285,6 +278,8 @@ func findLatestTimeStampVersion(list []string) (index int, version string) {
 	for index, item := range list {
 		if _, isSem := isSemVersionFmt(item); isSem {
 			return index - 1, list[index-1]
+		} else if index == len(list)-1 { //reached to end
+			return index, list[index]
 		}
 	}
 	//ideally, this should not execute
@@ -312,6 +307,8 @@ func findPatchVersionForSemantic(currentMajor string, list []string) (int, strin
 	for index, item := range list {
 		if major, _ := isSemVersionFmt(item); currentMajor != major {
 			return index - 1, list[index-1]
+		} else if index == len(list)-1 { //reached to end
+			return index, list[index]
 		}
 	}
 	//ideally, this should not execute
