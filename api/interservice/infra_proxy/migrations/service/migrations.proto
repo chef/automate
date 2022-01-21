@@ -9,6 +9,6 @@ import "google/api/annotations.proto";
 
 service MigrationDataService{
 
-  rpc UploadFile (stream chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest) returns (chef.automate.domain.infra_proxy.migrations.response.UploadFileResponse) {};
+  rpc UploadFile (stream chef.automate.domain.infra_proxy.migrations.request.UploadZipFileRequest) returns (chef.automate.domain.infra_proxy.migrations.response.UploadZipFileResponse) {};
 
 }

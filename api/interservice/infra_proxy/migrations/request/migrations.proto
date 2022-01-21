@@ -3,13 +3,13 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.migrations.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/migrations/request";
 
-message UploadFileRequest{
+message UploadZipFileRequest{
   //Chef infra server id for the file
   string serverId =1;
   //Chunk of the data in bytes
   Chunk chunk = 2;
   //Metadata for the request
-  Metadata meta =3;
+  Metadata meta = 3;
 }
 
 message Metadata{
@@ -19,7 +19,10 @@ message Metadata{
   string contentType =2;
 }
 
-message Chunk{
-  //Bytes of data to upload
+// Zip content in byte form.
+message Chunk {
+  // Byte data
   bytes data = 1;
+  // Stream pointer
+  int64 position = 2;
 }
