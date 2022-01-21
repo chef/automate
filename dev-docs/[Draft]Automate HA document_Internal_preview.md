@@ -254,6 +254,11 @@ This aligns nicely with the theory of AWS cloud computing where IT applications 
 Each Amazon account can host multiple VPCs. Because VPCs are isolated from each other, you can duplicate private subnets among VPCs the same way you could use the same subnet in two different physical data centers. You can also add public IP addresses that can be used to reach VPC-launched instances from the internet.
 
 You can modify or use that VPC for your cloud configurations or you can build a new VPC and supporting services from scratch.
+
+Need to enable dnshostname in vpc , It Determines whether the VPC supports assigning public DNS hostnames to instances with public IP addresses.
+If both DNS attributes enableDnsSupport and `enableDnsHostnames` ,are true, instances in the VPC get public DNS hostnames.
+The default for this attribute is false unless the VPC is a default VPC or the VPC was created using the VPC console wizard.
+
 #### *Amazon’s Virtual Private Cloud (VPC) Limit*
 Note: - You require a minimum of three node clusters for Elasticsearch and Postgres-sql instances.
 
