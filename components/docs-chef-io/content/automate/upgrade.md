@@ -10,7 +10,7 @@ draft = false
     parent = "automate"
 +++
 
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/upgrade.md)
+[\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/upgrade.md)
 
 By default, Chef Automate automatically upgrades to the latest version.
 
