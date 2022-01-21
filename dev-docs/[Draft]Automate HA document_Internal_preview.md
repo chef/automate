@@ -76,6 +76,7 @@
     - [Error: Cached artifact not found in offline mode](#)
     - [Error: Existing arch does not match the requested one](#) 
     - [Other Errors](#)
+    - [Infrastructure cleanup steps for on prem nodes](#infrastructure-cleanup-steps-for-on-prem-nodes)
 
 [Appendix](#appendix) 
 
@@ -1080,6 +1081,17 @@ for i in 1;do i=$PWD;cd /hab/a2\_deploy\_workspace/terraform/;terraform destroy;
 After that do deploy again using below command
 
 *./chef-automate deploy config.toml* 
+	
+### Infrastructure cleanup steps for on prem nodes
+	
+**Follow below steps to perform clean up of deployed Automate HA infrastructure: **
+- Run below commands on all the instances/nodes of Automate HA infrastructure (Automate, Server, 3 instance of Postgres, 3 instances of Elastic search)
+	- `rm -rf /hab`
+	-  `cd /var/tmp && rm frontend-* && backend-*`
+	-  `sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}')`
+
+- Run  `rm -rf /hab` on Bastion node
+
 
 # Appendix
 ## [What to change in config.toml](https://progresssoftware.sharepoint.com/sites/ChefCoreC/_layouts/15/doc.aspx?sourcedoc=%7bac26b0b0-9621-4d83-a6ef-47c363a9aaf7%7d&action=edit)
