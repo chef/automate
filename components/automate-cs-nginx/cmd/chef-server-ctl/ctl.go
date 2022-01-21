@@ -16,9 +16,11 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/secrets"
 )
 
@@ -72,6 +74,7 @@ const unsupportedNoAltFmt = "The command %q is not supported by the Chef Automat
 const unsupportedWithAltFmt = "The command %q is not supported by the Chef Automate Chef server. Instead, try\n    %s\n"
 
 func (c unsupported) Run([]string) error {
+	fmt.Println("::::::called in unsupported run")
 	if c.alternative == "" {
 		fmt.Printf(unsupportedNoAltFmt, c.name)
 	} else {
@@ -94,6 +97,7 @@ type wrapKnife struct {
 }
 
 func (c wrapKnife) Run(args []string) error {
+	fmt.Println("::::::called in wrap run")
 	// knife opc "org user" add
 	cmdArgs := append([]string{"opc"}, strings.Fields(c.cmdNoun)...)
 	cmdArgs = append(cmdArgs, c.cmdVerb)
@@ -130,6 +134,8 @@ type passthrough struct {
 }
 
 func (c passthrough) Run(args []string) error {
+
+	fmt.Println("::::::called in passthrought run")
 	// The wrapper in core/chef-server-ctl sets up an environment
 	// that assumes the chef/chef-server-ctl service is running.
 	// Since we don't want to deploy that service we can't `hab
@@ -163,6 +169,30 @@ func (c passthrough) Run(args []string) error {
 		bifrostSuperuserID = string(bifrostSecData)
 	}
 
+	erchefDB, err := platform_config.PGURIFromEnvironment("automate-cs-oc-erchef")
+	if err != nil {
+		logrus.WithError(err).Error("could not create pg connection url for erchef")
+	}
+	if erchefDB == "" {
+		erchefDB = erchefDBURI
+	}
+
+	bifrostDB, err := platform_config.PGURIFromEnvironment("automate-cs-oc-bifrost")
+	fmt.Println(":::::", bifrostDB)
+	if err != nil {
+		logrus.WithError(err).Error("could not create pg connection url for bifrost")
+	}
+	if bifrostDB == "" {
+		bifrostDB = bifrostDBURI
+	}
+
+	if os.Getenv("CSC_ERCHEF_DB_URI") != "" {
+		erchefDB = os.Getenv("CSC_ERCHEF_DB_URI")
+	}
+	if os.Getenv("CSC_BIFROST_DB_URI") != "" {
+		bifrostDB = os.Getenv("CSC_BIFROST_DB_URI")
+	}
+
 	// chef-server-ctl has been modified to take all necessary
 	// config via environment variables. All CSC_ variables are
 	// chef-server-ctl specific configuration.
@@ -171,8 +201,8 @@ func (c passthrough) Run(args []string) error {
 		fmt.Sprintf("CSC_LB_URL=%s", lbURL),
 		fmt.Sprintf("CSC_BIFROST_SUPERUSER_ID=%s", bifrostSuperuserID),
 		fmt.Sprintf("CSC_BIFROST_URL=%s", bifrostURL),
-		fmt.Sprintf("CSC_BIFROST_DB_URI=%s", bifrostDBURI),
-		fmt.Sprintf("CSC_ERCHEF_DB_URI=%s", erchefDBURI),
+		fmt.Sprintf("CSC_BIFROST_DB_URI=%s", bifrostDB),
+		fmt.Sprintf("CSC_ERCHEF_DB_URI=%s", erchefDB),
 		fmt.Sprintf("CSC_ERCHEF_REINDEX_SCRIPT=%s", erchefReindexScript),
 		fmt.Sprintf("CSC_KNIFE_CONFIG_FILE=%s", knifeConfigFile),
 		fmt.Sprintf("CSC_TLS_KEY=%s", tlsKey),
@@ -204,7 +234,9 @@ func (c passthrough) Run(args []string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	err = cmd.Run()
+	time.Sleep(time.Millisecond * 500)
+	return err
 }
 
 func (c passthrough) Hidden() bool     { return false }
