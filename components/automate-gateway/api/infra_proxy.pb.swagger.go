@@ -4018,12 +4018,9 @@ func init() {
     "chef.automate.api.infra_proxy.response.GetInfraServerOrgs": {
       "type": "object",
       "properties": {
-        "orgs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Org"
-          },
-          "title": "Chef organization list from chef server"
+        "migration_id": {
+          "type": "string",
+          "title": "id of organisation migration"
         }
       }
     },

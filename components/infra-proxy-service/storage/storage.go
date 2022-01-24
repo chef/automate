@@ -29,6 +29,32 @@ type Storage interface {
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
 }
 
+type MigrationStorage interface {
+	StartMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	StartFileUpload(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteFileUpload(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedFileUpload(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartUnzip(ctx context.Context, migrationId, serverId string) (Migration, error)
+	ComplteUnzip(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedUnzip(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartZipParsing(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteZipParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedZipParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartOrgMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteOrgMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedOrgMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartUserMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteUserMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedUserMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartAssciation(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompleteAssciation(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedAssciation(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	StartPermissionMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
+	CompletePermissionMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedPermissionMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	CompleteMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+}
+
 // Resetter is, if exposed, used for tests to reset the storage backend to a
 // pristine state.
 type Resetter interface {
@@ -71,6 +97,19 @@ type User struct {
 	IsServerAdmin       bool
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
+}
+
+type Migration struct {
+	ID               string    `json:"id"`
+	MigrationID      string    `json:"migration_id"`
+	ServerID         string    `json:"server_id"`
+	TypeID           int64     `json:"type_id"`
+	StatusID         int64     `json:"status_id"`
+	TotalSucceeded   int64     `json:"total_succeeded"`
+	TotalSkipped     int64     `json:"total_skipped"`
+	TotalFailed      int64     `json:"total_failed"`
+	Message          string    `json:"message"`
+	UpdatedTimestamp time.Time `json:"updated_timestamp"`
 }
 
 // Errors returned from the backend
