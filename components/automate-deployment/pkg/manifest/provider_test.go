@@ -290,7 +290,7 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.version, func(t *testing.T) {
 			url := fmt.Sprintf("%s?set=%s", ts.URL, tc.input)
-			isMinorAvailable, isMajorAvailable, compatibleVersion, err := getCompatibleManifestVersion(context.TODO(), tc.version, url)
+			isMinorAvailable, isMajorAvailable, compatibleVersion, err := getCompatibleManifestVersion(context.TODO(), tc.version, "dev", url)
 			if !tc.isError {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.isMinorAvailable, isMinorAvailable)
@@ -302,7 +302,55 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 			}
 		})
 	}
+}
 
-	//
+func TestGetAllVersions(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pValues := r.URL.Query()
+		param := pValues["set"]
+		var resp []string
+		if param[0] == "set1" {
+			resp = []string{
+				"20220113154113",
+				"20211201164433",
+				"20211220104140",
+				"20220113145751",
+			}
+		} else if param[0] == "set2" {
+			resp = []string{
+				"20220113154113",
+				"22.0.0",
+				"22.2.6",
+				"23.2.4",
+				"22.2.16",
+			}
+		}
 
+		bytes, _ := json.Marshal(resp)
+		w.Write(bytes)
+	}))
+	defer ts.Close()
+
+	tests := []struct {
+		input  string
+		output []string
+	}{
+		{
+			input:  "set1",
+			output: []string{"20211201164433", "20211220104140", "20220113145751", "20220113154113"},
+		},
+		{
+			input:  "set2",
+			output: []string{"20220113154113", "22.0.0", "22.2.6", "22.2.16", "23.2.4"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.input, func(t *testing.T) {
+			url := fmt.Sprintf("%s?set=%s", ts.URL, tc.input)
+			result, err := getAllVersions(context.TODO(), url)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.output, result)
+		})
+	}
 }
