@@ -28,6 +28,16 @@ This page explains the procedure to deploy Chef Automate High Availability (HA) 
 1. Configure the [AWS credentials on your Bastion host](( {{< relref "ha_configure_aws_credentials.md" >}} )).
 1. Create the certificate for the Chef Automate and Chef Server load balancers.
 1. Create and rotate the certificates. _optional_
+1. Enable *dnshostname* in VPC, which determines whether the VPC supports assigning public DNS hostnames to instances with public IP addresses.
+
+{{< note >}}
+
+A DNS hostname uniquely names a computer and consists of a host name and a domain name. DNS servers resolve DNS hostnames to their corresponding IP addresses. To set up DNS in your VPC, ensure that DNS hostnames and DNS resolution are both enabled in your VPC. Refer [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/set-up-vpc-dns.html) page.
+
+If the DNS attributes, *enableDnsSupport* and *enableDnsHostnames* are true, instances in the VPC is set with public DNS hostnames. The default for these attributes are `false` when the VPC is a default VPC or the VPC is created using the VPC console wizard.
+
+{{ < note/>}}
+
 1. Execute the [Chef Automate HA deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )).
 
 ## AWS Infrastructure Resources
