@@ -15,7 +15,7 @@ There are several issues:
 # Architecture Diagram
 The following picture illustrates the complete architecture:
 
-![Architecture](https://raw.githubusercontent.com/Sahiba31/UI-Training/main/architecture.png)
+![Architecture](https://raw.githubusercontent.com/chef/automate/sahiba/lcr_documentation/Markdown/architecture.png)
 
 # Config
 
