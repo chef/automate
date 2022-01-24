@@ -27,17 +27,6 @@ type Storage interface {
 	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	DeleteUser(ctx context.Context, id string) (User, error)
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
-
-	// StartZipParsing(ctx context.Context, migrationId, serverId string) (Migration, error)
-	// CompleteZipParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
-	// StartOrgMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
-	// CompleteOrgMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
-	// StartUserMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
-	// CompleteUserMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
-	// StartAssciation(ctx context.Context, migrationId, serverId string) (Migration, error)
-	// CompleteAssciation(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
-	// StartPermissionMigration(ctx context.Context, migrationId, serverId string) (Migration, error)
-	// CompletePermissionMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 }
 
 type MigrationStorage interface {
