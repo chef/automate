@@ -26,18 +26,18 @@ type querier interface {
 }
 
 // New instantiates and returns a postgres storage implementation
-func New(logger logger.Logger, migrationConfig migration.Config, authzClient authz.AuthorizationServiceClient) (storage.Storage, error) {
+func New(logger logger.Logger, migrationConfig migration.Config, authzClient authz.AuthorizationServiceClient) (storage.Storage, storage.MigrationStorage, error) {
 
 	db, err := initPostgresDB(migrationConfig.PGURL.String())
 	if err != nil {
-		return nil, errors.Wrap(err, "initialize database")
+		return nil, nil, errors.Wrap(err, "initialize database")
 	}
 
 	if err := migrationConfig.Migrate(); err != nil {
-		return nil, errors.Wrap(err, "database migrations")
+		return nil, nil, errors.Wrap(err, "database migrations")
 	}
 
-	return &postgres{db, logger, authzClient}, nil
+	return &postgres{db, logger, authzClient}, &postgres{db, logger, authzClient}, nil
 }
 
 // New instantiates and returns a postgres migration implementation
