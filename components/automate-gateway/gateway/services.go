@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -964,11 +965,10 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 
 // UploadZipFile used to upload the migration zip file of infraProxy
 func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
-	var fileData []byte
 	var cType, fileName string
-
 	var content bytes.Buffer
-	file, _, err := r.FormFile("file")
+	file, metaData, err := r.FormFile("file")
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -981,19 +981,13 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileData = content.Bytes()
-	cType = r.URL.Query().Get("contentType")
-
-	owner := r.URL.Query().Get("owner")
+	cType = r.Header.Get("Content-type")
+	fileName = metaData.Filename
 
 	const (
 		action   = "infra:infraServers:sync"
 		resource = "infra:infraServers"
 	)
-
-	fmt.Println("-----------------------", r.URL)
-	fmt.Println("-----------------------", cType)
-	fmt.Println("-----------------------", owner)
 
 	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
@@ -1014,18 +1008,35 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := infra_proxy.UploadZipFileRequest{
-		Chunk: &infra_proxy.Chunk{Data: fileData},
-		Meta: &infra_proxy.Metadata{
-			ContentType: cType,
-			Name:        fileName,
-		},
+	// break the data in chunks
+	reader := bufio.NewReader(&content)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			log.Fatal("cannot read chunk to buffer: ", err)
+		}
+
+		request := infra_proxy.UploadZipFileRequest{
+			Chunk: &infra_proxy.Chunk{Data: buffer[:n]},
+			Meta: &infra_proxy.Metadata{
+				ContentType: cType,
+				Name:        fileName,
+			},
+		}
+
+		err = stream.Send(&request)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 	}
-	err = stream.Send(&request)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+
 	reply, err := stream.CloseAndRecv()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

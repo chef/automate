@@ -36,24 +36,25 @@ func saveFile(migrationId string, filename string, fileData bytes.Buffer) error 
 
 // UploadFile Takes the stream of data to upload a file
 func (*Server) UploadFile(stream service.MigrationDataService_UploadFileServer) error {
-	in, err := stream.Recv()
-	if err != io.EOF && err != nil {
-		return err
-	}
+	var fileName string
 	migrationId, err := createMigrationId()
 	if err != nil {
 		log.WithError(err).Error("Unable to create migration id")
 	}
-	folderName := in.GetMeta().Name
+
 	fileData := bytes.Buffer{}
+
 	for {
 		req, err := stream.Recv()
+
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			return err
 		}
+
+		fileName = req.GetMeta().GetName()
 		chunk := req.GetChunk().Data
 
 		_, err = fileData.Write(chunk)
@@ -61,7 +62,9 @@ func (*Server) UploadFile(stream service.MigrationDataService_UploadFileServer) 
 			return err
 		}
 	}
-	err = saveFile(migrationId, folderName, fileData)
+
+	err = saveFile(migrationId, fileName, fileData)
+
 	if err != nil {
 		return err
 	}
