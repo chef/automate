@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/service_authn"
+	"github.com/chef/automate/lib/logger"
 )
 
 // NewAuthInterceptor returns an AuthInterceptor that performs
@@ -77,6 +78,14 @@ func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (
 			log.Debugf("error authenticating request: %s", err)
 			return nil, err
 		}
+
+		resource := context.WithValue(authCtx, "subject", authResponse.Subject)
+		username := resource.Value("subject")
+
+		teams := context.WithValue(authCtx, "teams", authResponse.Teams)
+		permissions := teams.Value("teams")
+
+		a.InfraProxyLogData(authCtx, username, permissions)
 		authCtx = context.WithValue(authCtx, "requestorID", authResponse.Requestor)
 		subs = append(authResponse.Teams, authResponse.Subject)
 	}
@@ -111,6 +120,19 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 		return handler(ctxForDownstream, req)
 	}
+}
+
+func (a *authInterceptor) InfraProxyLogData(ctx context.Context, username interface{}, permission interface{}) {
+	log := ctxlogrus.Extract(ctx)
+	logData := log.Data
+	log.WithFields(logger.KV{
+		"Username":   username,
+		"Permission": permission,
+		"Action":     logData["grpc.method"],
+		"Service":    logData["grpc.service"],
+		"API info":   logData["grpc.method"],
+		"Time":       logData["grpc.start_time"],
+	}).Info("Infra proxy server API logs")
 }
 
 // interceptedServerStream wraps a grpc.ServerStream in order to allow an
