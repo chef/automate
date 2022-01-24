@@ -118,7 +118,7 @@ func (c *InfraProxyServer) GetInfraServerOrgs(ctx context.Context, r *gwreq.GetI
 		return nil, err
 	}
 	return &gwres.GetInfraServerOrgs{
-		Orgs: fromUpstreamOrgs(res.Orgs),
+		MigrationId: res.MigrationId,
 	}, nil
 }
 func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
