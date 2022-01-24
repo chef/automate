@@ -44,7 +44,7 @@
 
 [Backup and restore](#backup-and-restore) 
 -   [Pre-back-up configuration](#pre-back-up-configuration)
-    - [ES configuration and setup](#es-configuration-and-setup) 
+    - [Pre backup configuration and setup for file system backup](#es-configuration-and-setup) 
     - [S3 Configuration for backup](#s3-configuration-for-backup) 
     - [File System (EFS)Configuration for backup](#file-system-(efs)-configuration-for-backup) 
 - [Backup](#backup) 
