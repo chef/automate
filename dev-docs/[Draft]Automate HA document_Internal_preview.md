@@ -374,7 +374,7 @@ This will give the status of frontend and backend node. 
 # Backup and restore
 Back-up configurations to be done before deploying cluster. 
 ## Pre-back-up configuration:
-### ES configuration and setup
+### Pre-backup configuration and setup for File system backup 
 A shared file system is needed to create Elasticsearch snapshots. In order to register the snapshot repository with Elasticsearch it is necessary to mount the same shared filesystem to the same location on all master and data nodes. This location (or one of its parent directories) must be registered in the path.repo setting on all master and data nodes.
 
 Assuming that the shared filesystem is mounted to /mnt/automate\_backups, we can configure Automate to register the snapshot locations with Elasticsearch.
