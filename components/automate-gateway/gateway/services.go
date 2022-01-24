@@ -47,6 +47,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	inter_eventfeed_Req "github.com/chef/automate/api/interservice/event_feed"
+	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
@@ -316,6 +317,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	infraProxyClient, err := clients.InfraProxyClient()
 
 	infraProxyMigrationClient, err := clients.InfraProxyMigrationClient()
+
 	if err != nil {
 		return errors.Wrap(err, "create client for infra proxy service")
 	}
@@ -958,6 +960,83 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// UploadZipFile used to upload the migration zip file of infraProxy
+func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
+	var fileData []byte
+	var cType, fileName string
+
+	var content bytes.Buffer
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer file.Close() // nolint: errcheck
+
+	_, err = io.Copy(&content, file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fileData = content.Bytes()
+	cType = r.URL.Query().Get("contentType")
+
+	owner := r.URL.Query().Get("owner")
+
+	const (
+		action   = "infra:infraServers:sync"
+		resource = "infra:infraServers"
+	)
+
+	fmt.Println("-----------------------", r.URL)
+	fmt.Println("-----------------------", cType)
+	fmt.Println("-----------------------", owner)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	infraClient, err := s.clientsFactory.InfraProxyMigrationClient()
+	if err != nil {
+		http.Error(w, "grpc service for compliance unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	// call the infra proxy service function
+	stream, err := infraClient.UploadFile(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	request := infra_proxy.UploadZipFileRequest{
+		Chunk: &infra_proxy.Chunk{Data: fileData},
+		Meta: &infra_proxy.Metadata{
+			ContentType: cType,
+			Name:        fileName,
+		},
+	}
+	err = stream.Send(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	reply, err := stream.CloseAndRecv()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	data, err := json.Marshal(reply)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(data) // nolint: errcheck
 }
 
 func init() {
