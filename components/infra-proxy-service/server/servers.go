@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/chef/automate/api/external/common/query"
@@ -388,7 +387,6 @@ func fromStorageToListServers(sl []storage.Server) []*response.Server {
 
 // Create a response.Server from a storage.Server with migration
 func fromStorageServerWithMigrationDetails(s storage.Server, m storage.ActiveMigration) *response.Server {
-	fmt.Println("testing the migration", m, "--------------------------")
 	return &response.Server{
 		Id:              s.ID,
 		Name:            s.Name,
