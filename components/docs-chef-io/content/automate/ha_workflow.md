@@ -23,10 +23,10 @@ gh_repo = "automate"
 
    1. Linux or Centos 64 bit operating system available.
    1. A Bastion host has the necessary 4 GB memory, 100 GB hard disk, and ports 22 and 9631 publicly accessible.
-   1. PostgreSQL instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 150 volume iops (input/output operations per second).
-   1. Elasticsearch instance of _m5.large_ type with 16GB RAM for production (8 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 300 volume iops.
-   1. Chef Automate instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume iops
-   1. Chef Infra Server instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume iops.
+   1. PostgreSQL instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 150 volume IOPS (input/output operations per second).
+   1. Elasticsearch instance of _m5.large_ type with 16GB RAM for production (8 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 300 volume IOPS.
+   1. Chef Automate instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume IOPS.
+   1. Chef Infra Server instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume IOPS.
 1. Ensure the following ports are open:
 
     | Habitat gossip (UDP), 9638 | Habitat http API, 9631 |
@@ -40,7 +40,7 @@ gh_repo = "automate"
 1. Ensure you have *Chef Automate* utility installed, else download and install the latest version.
 1. Execute the command, _./chef-automate init-config-ha existing\_infra_, that generates **config.toml** file.
 1. In the **config.toml** file, specify the list of VM&#39;s public IP addresses for the cluster.
-1. Execute the command, **./chef-automate deploy config.toml** , that creates deployment workspace (\*/hab/a2\_deploy\_workspace\*), downloads Habitat, and establishs the cluster provisioning in your workspace.
+1. Execute the command, **./chef-automate deploy config.toml** , that creates deployment workspace (\*/hab/a2\_deploy\_workspace\*), downloads Habitat, and establishes the cluster provisioning in your workspace.
 1. Specify the following edits in the **config.toml** file:
 
     1. SSH pair name, key file path, chef automate nodes, number of PostgreSQL nodes, number of Chef Server, and ElasticSearch nodes.
@@ -55,11 +55,11 @@ gh_repo = "automate"
 1. Ensure the following network infrastructure is available in your AWS account:
 
    1. Linux or Centos 64 bit operating system available.
-   1. Bastion host has the necessary 4 GB memory, 100 GB hard disk, and ports 22 and _9631_ publicly accessible.
-   1. PostgreSQL instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 150 volume iops (input/output operations per second).
-   1. Elasticsearch instance of _m5.large_ type with 16GB RAM for production (8 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 300 volume iops.
-   1. Chef Automate instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume iops.
-   1. Chef Infra Server instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume iops.
+   1. A bastion host has the necessary 4 GB memory, 100 GB hard disk, and ports 22 and _9631_ publicly accessible.
+   1. PostgreSQL instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 150 volume IOPS (input/output operations per second).
+   1. Elasticsearch instance of _m5.large_ type with 16GB RAM for production (8 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 300 volume IOPS.
+   1. Chef Automate instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume IOPS.
+   1. Chef Infra Server instance of _t3.medium_ type with 8GB RAM for production (4 GB is enough for testing), 50 GB hard disk space, gp2 volume type, and 100 volume IOPS.
 1. Setup Virtual Private Cloud (VPC) in AWS.
 1. Build an AWS bastion host using the **AWS EC2 instance** option.
    1. Specify instance type as t2.medium, vCPUs as 1, Memory (GiB) as 4, and Instance Storage (GB) as EBS only.
@@ -68,7 +68,7 @@ gh_repo = "automate"
    1. Create a new security group or Select an existing security group option. Ensure Type is SSH, Protocol is TCP, and Port Range is 22 to create rules and connections.
    1. Launch the EC2 instance.
 1. Ensure you have Chef Automate utility installed, else download and install the latest version.
-1. Establish AWS connection with the bastion host.
+1. Establish an AWS connection with the bastion host.
     1. SSH your instance using public DNS.
 1. Create an IAM user using your AWS account.
     1. Provide the Programmatic access to the created user.
