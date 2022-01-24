@@ -21,8 +21,8 @@ pkg_deps=(
   chef/automate-platform-tools
   # Pin postgresql, sqitch_pg, and postgresql client until automate-postgresql
   # is updated.
-  core/postgresql13/13.4 # for psql and pg_dump
-  core/postgresql13-client/13.4
+  core/postgresql13/13.5 # for psql and pg_dump
+  core/postgresql13-client/13.5
   core/sqitch_pg/3.14.2
 )
 pkg_bin_dirs=(bin)
