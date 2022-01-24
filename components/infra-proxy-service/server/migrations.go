@@ -2,11 +2,12 @@ package server
 
 import (
 	"bytes"
-	uuid "github.com/chef/automate/lib/uuid4"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path"
+
+	uuid "github.com/chef/automate/lib/uuid4"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
@@ -65,9 +66,9 @@ func (*Server) UploadFile(stream service.MigrationDataService_UploadFileServer) 
 		return err
 	}
 
-	res := &response.UploadFileResponse{
+	res := &response.UploadZipFileResponse{
 		MigrationId: migrationId,
-		Status:      "Completed",
+		Success:     true,
 	}
 
 	err = stream.SendAndClose(res)
