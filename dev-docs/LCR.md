@@ -33,7 +33,12 @@ MinIO is a High Performance Object Storage released under GNU Affero General Pub
 
 
 # Minio Configuration
-MinIO is 100% open source under the Affero General Public License Version 3 (AGPLv3). This means that MinIO’s customers are free from lock in, free to inspect, free to innovate, free to modify and free to redistribute.
+MinIO is 100% open source under the Affero General Public License Version 3 (AGPLv3). This means that MinIO’s customers are free from lock in, free to inspect, free to innovate, free to modify and free to redistribute. MinIO is hardware agnostic and runs on a variety of hardware architectures ranging from ARM-based embedded systems to high-end x64 and POWER9 servers. However, for a large scale data storage infrastructure, we recommend the following server configurations in high-density and high-capacity flavors.
+- Processor: Dual Intel® Xeon® Scalable GoId CPUs (minimum 8 cores per socket).
+- Network: 25GbE for high-density and 100GbE NICs for high-performance.
+- Drives: SATA/SAS HDDs for high-density and NVMe SSDs for high-performance (minimum of 8 drives per server).
+- Memory: 128GB RAM
+- Cluster Size: The minimum cluster size is 4 nodes and the maximum cluster size is 32 nodes. Multiple MinIO clusters can be federated to create larger clusters.
 
 
 # Changes in ingestion flow
