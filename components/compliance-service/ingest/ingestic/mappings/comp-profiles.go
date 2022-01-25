@@ -6,7 +6,6 @@ var ComplianceProfiles = Mapping{
 	Timeseries: false,
 	Mapping: `
 {
-  "template": "` + IndexNameProf + `",
   "settings": {
     "index": {
       "refresh_interval": "1s"
