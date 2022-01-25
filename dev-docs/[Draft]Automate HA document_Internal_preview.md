@@ -77,7 +77,7 @@
     - [Error: Existing arch does not match the requested one](#) 
     - [Other Errors](#)
     - [Infrastructure cleanup steps for on prem nodes](#infrastructure-cleanup-steps-for-on-prem-nodes)
-    - [Cert rotation with heavy cert file](#cert-rotation-with-heavy-cert-file)
+    - [Cert rotation with large CA cert file](#cert-rotation-with-large-ca-cert-file)
 
 [Appendix](#appendix) 
 
@@ -1093,7 +1093,9 @@ After that do deploy again using below command
 
 - Run  `rm -rf /hab` on Bastion node
 
-### Cert roation with heavy cert file
+### Cert rotation with large CA cert file
+	
+* Elastic Search cert rotation*	
 
 - Go to all the instances of elasticsearch and unload ES service using below command
 	- `sudo hab svc unload chef/automate-ha-elasticsearch/6.8.6/20220110171138`
@@ -1124,6 +1126,10 @@ After that do deploy again using below command
  - Chek status of ES on all there instances using below command:
 	- `hab svc status`
 
+	
+* PostgreSQL cert rotation*	
+
+	
 # Appendix
 ## [What to change in config.toml](https://progresssoftware.sharepoint.com/sites/ChefCoreC/_layouts/15/doc.aspx?sourcedoc=%7bac26b0b0-9621-4d83-a6ef-47c363a9aaf7%7d&action=edit)
 \1. Specify the ssh username and the ssh\_key\_file path. This path should be from bastion and If you scroll down in config.toml then you will find 	 here this key pair name and key file both should have a same content. Suppose you have mentioned the "a2ha-aws" name in key\_pair section then put that file content in ssh\_key\_file path's file.
