@@ -45,8 +45,7 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 	migrationId, err := createMigrationId()
 	if err != nil {
 		log.WithError(err).Error("Unable to create migration id")
-		res := createResponseWithErrors(err, migrationId)
-		handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
+		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 		stream.SendAndClose(res)
 		return err
 	}
@@ -65,18 +64,16 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 		}
 
 		if err != nil {
-			res := createResponseWithErrors(err, migrationId)
+			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 			stream.SendAndClose(res)
-			handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 			return err
 		}
 
 		chunk := req.GetChunk().Data
 		_, err = fileData.Write(chunk)
 		if err != nil {
-			res := createResponseWithErrors(err, migrationId)
+			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 			stream.SendAndClose(res)
-			handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 			return err
 		}
 	}
@@ -84,9 +81,8 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 	err = saveFile(migrationId, fileName, fileData)
 	log.Info("File successfully saved in the directory for the requested file")
 	if err != nil {
-		res := createResponseWithErrors(err, migrationId)
+		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 		stream.SendAndClose(res)
-		handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 		return err
 	}
 
@@ -98,7 +94,6 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 	log.Info("File successfully uploaded in the directory for the requested file")
 	err = stream.SendAndClose(res)
 	if err != nil {
-		createResponseWithErrors(err, migrationId)
 		handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 		return err
 	}
@@ -116,9 +111,12 @@ func createMigrationId() (string, error) {
 }
 
 //handleErrorForUploadFileAndMigration handles the error for the file upload
-func handleErrorForUploadFileAndMigration(err error, migrationId string, serviceId string, s *Server, ctx context.Context) {
+func handleErrorForUploadFileAndMigration(err error, migrationId string, serviceId string, s *Server, ctx context.Context) *response.UploadZipFileResponse {
+	response := createResponseWithErrors(err, migrationId)
 	s.service.Migration.FailedFileUpload(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	//ToDo to add the Failded migration status as well
+	return response
+
 }
 
 //createResponseWithErrors created a response with errors
