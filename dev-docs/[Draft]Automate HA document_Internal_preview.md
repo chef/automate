@@ -77,6 +77,7 @@
     - [Error: Existing arch does not match the requested one](#) 
     - [Other Errors](#)
     - [Infrastructure cleanup steps for on prem nodes](#infrastructure-cleanup-steps-for-on-prem-nodes)
+    - [Cert rotation with heavy cert file](#cert-rotation-with-heavy-cert-file)
 
 [Appendix](#appendix) 
 
@@ -1092,6 +1093,36 @@ After that do deploy again using below command
 
 - Run  `rm -rf /hab` on Bastion node
 
+### Cert roation with heavy cert file
+
+- Go to all the instances of elasticsearch and unload ES service using below command
+	- `sudo hab svc unload chef/automate-ha-elasticsearch/6.8.6/20220110171138`
+ 
+- Come back to  1st instance of the elastic search and follow below commands:
+
+- Step 1: `mkdir -p /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs && touch MyRootCA.pem`
+ 
+- Step 2: Put your content into `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs/MyRootCA.pem`
+ 
+- Step 3: `vi /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/default.toml`
+	- Go to 47 and 67 number line(pemtrustedcas_filepath) and set this path certificates/MyRootCA.pem to rotated-certs/MyRootCA.pem
+	- Just replace rotated-certs/MyRootCA.pem this path. you don’t need to give whole path
+ 	- e.g. `pemtrustedcas_filepath = "rotated-certs/MyRootCA.pem"`
+ 
+- Step 4: Remove MyRootCA.pem from below directory
+	- `cd /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates && rm MyRootCA.pem`
+ 
+
+- Step 5: `cd /hab/svc && rm -rf automate-ha-elasticsearch`
+ 
+
+- Step 6: `hab svc load chef/automate-ha-elasticsearch/6.8.6/20220110171138 --topology standalone --strategy none`
+
+
+ - Perform step 1 to step 6 on other 2 instances of elasticsearch 
+
+ - Chek status of ES on all there instances using below command:
+	- `hab svc status`
 
 # Appendix
 ## [What to change in config.toml](https://progresssoftware.sharepoint.com/sites/ChefCoreC/_layouts/15/doc.aspx?sourcedoc=%7bac26b0b0-9621-4d83-a6ef-47c363a9aaf7%7d&action=edit)
