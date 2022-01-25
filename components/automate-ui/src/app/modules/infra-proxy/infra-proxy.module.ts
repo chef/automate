@@ -23,6 +23,7 @@ import { CreateInfraRoleModalComponent } from './create-infra-role-modal/create-
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
 import { DeleteInfraObjectModalComponent } from './delete-infra-object-modal/delete-infra-object-modal.component';
+import { DragDropDirective } from './drag-drop/drag-drop.directive';
 import { EditDataBagItemModalComponent } from './edit-data-bag-item-modal/edit-data-bag-item-modal.component';
 import { EditEnvironmentAttributeModalComponent } from './edit-environment-attribute-modal/edit-environment-attribute-modal.component';
 import { EditInfraNodeModalComponent } from './edit-infra-node-modal/edit-infra-node-modal.component';
@@ -59,6 +60,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MigrationSliderComponent } from './migration-slider/migration-slider.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PaginatorComponent } from './paginator/paginator.component';
 import { SelectBoxModule } from './select-box/src/public_api';
@@ -86,6 +88,7 @@ import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-
     DataBagsDetailsComponent,
     DataBagsListComponent,
     DeleteInfraObjectModalComponent,
+    DragDropDirective,
     EditDataBagItemModalComponent,
     EditEnvironmentAttributeModalComponent,
     EditInfraNodeModalComponent,
@@ -104,6 +107,7 @@ import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-
     InfraSearchBarComponent,
     InfraTabComponent,
     InfraTabChangeComponent,
+    MigrationSliderComponent,
     OrgDetailsComponent,
     OrgEditComponent,
     PaginationComponent,

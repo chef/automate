@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, HostBinding } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, HostBinding, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Utilities } from 'app/helpers/utilities/utilities';
@@ -18,7 +18,12 @@ export class SyncOrgUsersSliderComponent implements OnInit {
   @HostBinding('class.active') isSlideOpen = false;
 
   public conflictError = false;
-  fileInfo: string;
+  public migrationSliderVisible = false;
+  public migrationSlider = false;
+
+  @ViewChild('fileDropRef', { static: false }) fileDropEl: ElementRef;
+  public file: any;
+  public isFile = false;
 
   constructor() { }
 
@@ -39,13 +44,14 @@ export class SyncOrgUsersSliderComponent implements OnInit {
 
   uploadFile(): void {
     this.uploadClicked.emit();
+    this.migrationSlider = true;
   }
 
   closeUploadSlider() {
     this.toggleSlide();
-    const file = '';
-    this.fileInfo = `${file}`;
     this.close.emit();
+    this.file = '';
+    this.isFile = false;
   }
 
   toggleSlide() {
@@ -56,8 +62,38 @@ export class SyncOrgUsersSliderComponent implements OnInit {
     this.isSlideOpen = true;
   }
 
-  onFileSelect(input: HTMLInputElement): void {
-    const file = input.files[0];
-    this.fileInfo = `${file.name}`;
+  public openMigrationSlider(): void {
+    this.migrationSliderVisible = true;
+    this.resetMigrationSlider();
+  }
+
+  public closeMigrationSlider(): void {
+    this.migrationSliderVisible = false;
+    this.resetMigrationSlider();
+  }
+
+  private resetMigrationSlider(): void {
+    this.conflictErrorEvent.emit(false);
+  }
+
+  /*** on file drop handler */
+  onFileDropped($event: any[]) {
+    this.prepareFilesList($event);
+  }
+
+  /*** handle file from browsing */
+  fileBrowseHandler(file: any) {
+    this.prepareFilesList(file);
+  }
+
+  prepareFilesList(file: any) {    
+    this.file = file[0];
+    if(this.file.type !== 'application/zip'){
+      this.isFile = false;
+      this.file = '';
+    } else {
+      this.isFile = true;
+    }
+    this.fileDropEl.nativeElement.value = '';
   }
 }

@@ -1,10 +1,10 @@
 <div data-cy="chef-infra-upload-slider" ngClass="{slide : isSlideOpen}">
   <div class="sidenav-header">
-    <chef-button class="back-button" secondary (click)="fileInput.value = null; closeUploadSlider()" data-cy="back-button">
+    <chef-button class="back-button" secondary (click)="closeUploadSlider()" data-cy="back-button">
       <chef-icon>arrow_back</chef-icon>
     </chef-button>
     <h2 slot="title">Sync Org and User </h2>
-    <chef-button class="close" secondary (click)="fileInput.value = null; closeUploadSlider()" data-cy="close-chef-infra-button">
+    <chef-button class="close" secondary (click)="closeUploadSlider()" data-cy="close-chef-infra-button">
       <chef-icon>close</chef-icon>
     </chef-button>
   </div>
@@ -12,15 +12,27 @@
     <div class="flex-container">
       <form [formGroup]="uploadForm">
         <div class="input-margin">
-          <div class="upload-input-wrapper">
-            <span class="file-info">{{ fileInfo }}</span>
-            <input type="file" name="file" #fileInput (change)="onFileSelect(fileInput)" accept=".zip" />
+          <div *ngIf="isFile">
+            <span class="file-info">{{ file.name }}</span>
+          </div>
+          <div *ngIf="!isFile" class="container" appDragDrop (fileDropped)="onFileDropped($event)">
+            <input
+              type="file" 
+              #fileDropRef
+              id="fileDropRef" 
+              (change)="fileBrowseHandler($event.target.files)"
+              accept=".zip"
+              [multiple]="false"/>
+            <img src="assets/img/upload-file.png" alt="upload-file">
+            <h4>Drag you Zip file here</h4>
+            <h4 class="grayText"><span>OR</span></h4>
+            <chef-button secondary>Browse file</chef-button>
           </div>
         </div>
         <div id="button-bar">
-          <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" (click)="fileInput.value = null; closeUploadSlider()">Cancel
+          <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" (click)="closeUploadSlider()">Cancel
           </chef-button>
-          <chef-button primary data-cy="upload-button" id="upload-button" (click)="uploadFile()">
+          <chef-button primary [disabled]="!isFile" data-cy="upload-button" id="upload-button" (click)="migrationSlider.slidePanel()">
             <img alt="upload_icon" src="/assets/img/data-feed.svg" class="svg-inline" />
             <chef-loading-spinner *ngIf="uploading"></chef-loading-spinner>
             <span *ngIf="!uploading">Upload File</span>
@@ -29,5 +41,8 @@
         </div>
       </form>
     </div>
+    <app-migration-slider
+      #migrationSlider>
+    </app-migration-slider>
   </div>
 </div>
