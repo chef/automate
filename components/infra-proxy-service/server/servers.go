@@ -178,10 +178,10 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
 	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
-	res1 := &response.GetServer{
+	resp := &response.GetServer{
 		Server: fromStorageServerWithMigrationDetails(server, migration),
 	}
-	return res1, nil
+	return resp, nil
 }
 
 // DeleteServer deletes a server from the db
