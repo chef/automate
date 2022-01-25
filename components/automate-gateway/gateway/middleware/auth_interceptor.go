@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
-	"github.com/prometheus/common/log"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -45,6 +44,9 @@ type authInterceptor struct {
 }
 
 func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (context.Context, error) {
+	// extract request-scoped logger
+	log := ctxlogrus.Extract(ctxIn)
+
 	// this context is only used for authenticating the request: we need
 	// headers!
 	// grpc-gateway translates these into metadata, and we'll forward that to
