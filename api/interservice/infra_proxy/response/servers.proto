@@ -39,6 +39,10 @@ message Server {
     string ip_address = 5;
     // Chef organizations count associated with Chef Infra Server.
     int32 orgs_count = 6;
+    //Migration Id for active Chef Infra server migration
+    string migration_id = 7;
+    //Migration type for active Chef Infra server migration
+    string migration_status =8;
 }
 
 message GetServerStatus {

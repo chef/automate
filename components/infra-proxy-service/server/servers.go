@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/chef/automate/api/external/common/query"
@@ -177,10 +178,11 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
-
-	return &response.GetServer{
-		Server: fromStorageServer(server),
-	}, nil
+	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
+	res1 := &response.GetServer{
+		Server: fromStorageServerWithMigrationDetails(server, migration),
+	}
+	return res1, nil
 }
 
 // DeleteServer deletes a server from the db
@@ -382,4 +384,18 @@ func fromStorageToListServers(sl []storage.Server) []*response.Server {
 	}
 
 	return tl
+}
+
+// Create a response.Server from a storage.Server with migration
+func fromStorageServerWithMigrationDetails(s storage.Server, m storage.ActiveMigration) *response.Server {
+	fmt.Println("testing the migration", m, "--------------------------")
+	return &response.Server{
+		Id:              s.ID,
+		Name:            s.Name,
+		Fqdn:            s.Fqdn,
+		IpAddress:       s.IPAddress,
+		OrgsCount:       s.OrgsCount,
+		MigrationId:     m.MigrationId,
+		MigrationStatus: m.MigrationType,
+	}
 }

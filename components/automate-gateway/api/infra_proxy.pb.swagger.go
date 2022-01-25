@@ -4658,6 +4658,14 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Chef organizations count associated with Chef Infra Server."
+        },
+        "migration_id": {
+          "type": "string",
+          "title": "Migration Id for active Chef Infra server migration"
+        },
+        "migration_status": {
+          "type": "string",
+          "title": "Migration Id for active Chef Infra server migration"
         }
       }
     },
