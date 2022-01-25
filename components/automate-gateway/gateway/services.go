@@ -982,6 +982,13 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cType = r.Header.Get("Content-type")
+
+	// validate the content type
+	if cType != "multipart/form-data" {
+		http.Error(w, "content type not supported.", http.StatusBadRequest)
+		return
+	}
+
 	fileName = metaData.Filename
 
 	const (
