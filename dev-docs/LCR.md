@@ -44,12 +44,12 @@ MinIO is 100% open source under the Affero General Public License Version 3 (AGP
 # Changes in ingestion flow
  Even if Inspec does not implement the report compression, Automate can do it before sending to the GRPC endpoint.
  
- Current Design of Report Ingestion is:
+ **Current Design** of Report Ingestion is:
  ![Cuurent Design](diagrams/ingestion-current.png)
 
  Requests more than the limit(4MB) causes GRPC server to throw back an error back to the caller API. So to solve this, the data will be streamed in chunks from the DC endpoint to the compliance service. 
  
- Hence Proposed Design of Report Ingestion is:
+ Hence **Proposed Design** of Report Ingestion is:
  ![Proposed Design](diagrams/ingestion-proposed.png)
 
 
@@ -62,12 +62,12 @@ Export of report can be by:
 * Date - This downloads the report for the latest scans of all the nodes on a given date.
 * Node - This downloads all the scans for a node.
 
-Current System:
+**Current System:**
 Search report based on the filters, type in ES and export in the format user asked for.
 
 ![Current System](diagrams/download-current.png)
 
-Proposed System:
+**Proposed System:**
 * Compliance service will fetch the reportIDs based on the search options from ES.
 * It will pass the reportID, deep filters (if any), report format to the Report Manager.
 * The report Manager on getting the request will look for the report in the local storage. The Report Manager would be responsible to look up to the object storage by the report id, parse the JSON data to fetch the data as per the filter and convert the JSON to the specified format (like CSV).
@@ -75,6 +75,14 @@ Proposed System:
 ![Proposed System](diagrams/download-proposed.png)
 
 # How to enable Large Compliance report ingestion?
+For enabling Large Compliance Report(LCR): 
+
+Patch the below configuration
+
+>[global.v1.large_reporting]                                
+enable_large_reporting = true
+
+
 
 
 
