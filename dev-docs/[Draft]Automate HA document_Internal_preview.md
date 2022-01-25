@@ -1110,18 +1110,30 @@ After that do deploy again using below command
 	- Go to 47 and 67 number line(pemtrustedcas_filepath) and set this path certificates/MyRootCA.pem to rotated-certs/MyRootCA.pem
 	- Just replace rotated-certs/MyRootCA.pem this path. you don’t need to give whole path
  	- e.g. `pemtrustedcas_filepath = "rotated-certs/MyRootCA.pem"`
- 
-- Step 4: Remove MyRootCA.pem from below directory
+   
+- step 4: Remove all the contents mentioned in below file:
+
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.key`
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.pem`
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.key`
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.pem`
+	
+	 Now put your admin private and public cert respectively '/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-                admin.key' and '/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.pem'
+ 
+ 	 same way put ssl private and public content in /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.key and                /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.pem
+	
+	
+- Step 5: Remove MyRootCA.pem from below directory
 	- `cd /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates && rm MyRootCA.pem`
  
 
-- Step 5: `cd /hab/svc && rm -rf automate-ha-elasticsearch`
+- Step 6: `cd /hab/svc && rm -rf automate-ha-elasticsearch`
  
 
-- Step 6: `hab svc load chef/automate-ha-elasticsearch/6.8.6/20220110171138 --topology standalone --strategy none`
+- Step 7: `hab svc load chef/automate-ha-elasticsearch/6.8.6/20220110171138 --topology standalone --strategy none`
 
 
- - Perform step 1 to step 6 on other 2 instances of elasticsearch 
+ - Perform step 1 to step 7 on other 2 instances of elasticsearch 
 
  - Chek status of ES on all there instances using below command:
 	- `hab svc status`
@@ -1129,6 +1141,23 @@ After that do deploy again using below command
 	
 * PostgreSQL cert rotation*	
 
+- Go to all the instances of postgresql and unload PG service using below command
+	- `sudo hab svc unload chef/automate-ha-postgresql/11.11.0/20220110171200`
+ 
+- Come back to  1st instance of the postgres instance and follow below commands:
+	
+- Step 1: Open this file /hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/default.toml
+and put your ca cert in 'issuer_cert = '
+
+- Step 2: Also update your private and pblic key respectively '/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.key' and 
+'/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.crt'
+	
+- Step 3: cd /hab/svc && rm -rf automate-ha-postgresql
+	
+- Step 4: Load PG service again
+	- `hab svc load chef/automate-ha-postgresql/11.11.0/20220110171200 --topology leader --strategy none`
+	
+Do above things from 1 step to last on another 2 instances of postgresql.
 	
 # Appendix
 ## [What to change in config.toml](https://progresssoftware.sharepoint.com/sites/ChefCoreC/_layouts/15/doc.aspx?sourcedoc=%7bac26b0b0-9621-4d83-a6ef-47c363a9aaf7%7d&action=edit)
