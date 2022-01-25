@@ -1118,9 +1118,9 @@ After that do deploy again using below command
 	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.key`
 	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.pem`
 	
-	 Now put your admin private and public cert respectively '/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-                admin.key' and '/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.pem'
+	 Now put your admin private and public cert respectively `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-                admin.key` and `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.pem`
  
- 	 same way put ssl private and public content in /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.key and                /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.pem
+ 	 same way put ssl private and public content in `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.key` and                `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.pem`
 	
 	
 - Step 5: Remove MyRootCA.pem from below directory
@@ -1146,11 +1146,11 @@ After that do deploy again using below command
  
 - Come back to  1st instance of the postgres instance and follow below commands:
 	
-- Step 1: Open this file /hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/default.toml
+- Step 1: Open this file `/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/default.toml`
 and put your ca cert in 'issuer_cert = '
 
-- Step 2: Also update your private and pblic key respectively '/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.key' and 
-'/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.crt'
+- Step 2: Also update your private and pblic key respectively `/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.key` and 
+`/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.crt`
 	
 - Step 3: cd /hab/svc && rm -rf automate-ha-postgresql
 	
