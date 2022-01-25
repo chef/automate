@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	"github.com/chef/automate/api/external/common/query"
@@ -229,9 +230,20 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	setMigrationStatus(true)
 	defer setMigrationStatus(false)
 
-	//Store the status in migration table as in progress
-	migration, err := s.service.Migration.StartMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
-	migration, err = s.service.Migration.StartOrgMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
+	// This is only for reference to use the migration_stage storage functions
+	parsedData, err := json.Marshal(&storage.Org{ID: "1234", Name: "demo_org"})
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.service.Migration.StoreMigrationStage(ctx, uuid.Must(uuid.NewV4()).String(), parsedData)
+	if err != nil {
+		return nil, err
+
+	}
+	_, _ = s.service.Migration.GetMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
+	_, _ = s.service.Migration.DeleteMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
+	_, _ = s.service.Migration.GetMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
+	migration, err := s.service.Migration.StartOrgMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
 	if err != nil {
 		return nil, err
 	}
