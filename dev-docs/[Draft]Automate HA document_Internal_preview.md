@@ -153,7 +153,7 @@ Chef-automate
 
 Chef Infra Server
 
-Elasticsearch - an open-source search and analytics engine based on Apache Lucene and built with 	Java. It is a NoSQL database that stores data in an unstructured way.
+Elasticsearch - an open-source search and analytics engine based on Apache Lucene and built with Java. It is a NoSQL database that stores data in an unstructured way.
 
 PostgreSQL - an open-source relational database management system (RDBMS) emphasizing 		extensibility and SQL compliance.
 
@@ -220,7 +220,7 @@ The bastion hosts provide secure access to Linux instances located in the privat
 ## Package download
 Chef-automate is the main utility used for installation of chef-automate. If you are doing installation on fresh 	server where you don’t have chef-automate utility, you can download it using below link	
 
-*curl [https://packages.chef.io/files/current/latest/chef-automate-cli/chef-*](https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip)*		*automate\_linux\_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp chef-automate /usr/bin/chef-automate*
+curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp chef-automate /usr/bin/chef-automate
 
 # Configuration and Provisioning – Cloud
 This section is only for cloud deployment. Currently we support AWS based provisioning and 	deployment. 
