@@ -982,7 +982,10 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	contentType := strings.Split(r.Header.Get("Content-Type"), ";")
-	cType = contentType[0]
+
+	if len(contentType) > 0 {
+		cType = contentType[0]
+	}
 
 	// validate the content type
 	if cType != "multipart/form-data" {
