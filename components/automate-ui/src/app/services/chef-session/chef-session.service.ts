@@ -364,7 +364,7 @@ export class ChefSessionService implements CanActivate {
 
   private userTelemetryStorageKey(): string {
     const telemetryStorage = localStorage.getItem(`${this.uuid}-telemetry-enabled`);
-    if(isNull(telemetryStorage)) {
+    if (isNull(telemetryStorage)) {
       localStorage.setItem(`${this.uuid}-telemetry-enabled`, this.booleanToString(true));
     }
     return !isNil(this.user) ? `${this.uuid}-telemetry-enabled` : null;
