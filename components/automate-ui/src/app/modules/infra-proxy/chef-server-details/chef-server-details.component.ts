@@ -400,9 +400,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
     this.resetUploadSlider();
     const uploadZipPayload = {
-      server_id: this.server.id,
-      // formData: formData
-      file: file.name
+      // server_id: this.server.id,
+      formData: formData
+      // file: file.name
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
   }

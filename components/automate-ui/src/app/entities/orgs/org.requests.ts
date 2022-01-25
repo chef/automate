@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient
+  , HttpHeaders
+ } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { Org } from './org.model';
@@ -7,7 +9,14 @@ import { Org } from './org.model';
 import {
   OrgsSuccessPayload, OrgSuccessPayload, CreateOrgPayload, UploadResponce
 } from './org.actions';
+// import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
+// const headers = new HttpHeaders().set(InterceptorSkipHeader, 'Content-Type: multipart/form-data');
+// const headers = new HttpHeaders().set( 'content-type': 'multipart/form-data', 'boundary=--------------------------507004132360627887457202');
+const headers = new HttpHeaders()
+.set('content-type','multipart/form-data');
+
+console.log("header", headers);
 @Injectable()
 export class OrgRequests {
 
@@ -37,9 +46,18 @@ export class OrgRequests {
       `${env.infra_proxy_url}/servers/${org.server_id}/orgs/${org.id}`, org);
   }
 
-  public uploadZip(payload): Observable<UploadResponce> {
-    return this.http.put<UploadResponce>(
-      `${env.infra_proxy_url}/servers/migrations/upload`, payload);
+  public uploadZip(formData): Observable<UploadResponce> {
+    formData.forEach((value, key) => {
+      console.log(key + " " + value)
+    });
+    return this.http.post<UploadResponce>(
+      `${env.infra_proxy_url}/servers/migrations/upload`, formData);
   }
 
+
+  // public deleteRole(server_id: string, org_id: string, name: string): Observable<{}> {
+  //   return this.http.delete(
+  //     `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`,
+  //   {headers});
+  // }
 }

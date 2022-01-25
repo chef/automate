@@ -168,8 +168,8 @@ export class OrgEffects {
   uploadZip$ = createEffect(() =>
     this.actions$.pipe(
       ofType(OrgActionTypes.UPLOAD),
-      mergeMap(( payload: UploadZip) =>
-        this.requests.uploadZip(payload).pipe(
+      mergeMap(({ payload: { formData } }: UploadZip) =>
+        this.requests.uploadZip(formData).pipe(
           map((resp: UploadResponce) => new UploadZipSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new UploadZipFailure(error)))))));
