@@ -15,9 +15,17 @@ There are several issues:
 # Architecture Diagram
 The following picture illustrates the complete architecture:
 
-![Architecture](https://raw.githubusercontent.com/chef/automate/sahiba/lcr_documentation/Markdown/architecture.png)
+![LCR Architecture](diagrams/lcr_architecture.png)
 
-# Config
+# What is Minio?
+
+# Minio Configuration
+
+# Changes in ingestion flow
+
+# Changes in download flow
+
+# How to enable Large Compliance report ingestion?
 
 
 
