@@ -44,10 +44,10 @@ var migrateCmd = &cobra.Command{
 
 func newRemovePgDatadirCmd() *cobra.Command {
 	var removePgDatadirCmd = &cobra.Command{
-		Use:   "remove_pg_datadir",
+		Use:   "cleanup",
 		Short: "Chef Automate migrate_pg",
 		Long:  "Chef Automate migrate_pg. from one version to another",
-		RunE:  runRemovePgDatadir,
+		RunE:  runCleanup,
 	}
 	return removePgDatadirCmd
 }
@@ -70,9 +70,11 @@ func newMigratePgCmd() *cobra.Command {
 	return migratePgCmd
 }
 
-func runRemovePgDatadir(cmd *cobra.Command, args []string) error {
+func runCleanup(cmd *cobra.Command, args []string) error {
 	writer.Title("remove pg datadir")
 	removePgDatadir()
+	writer.Title("Deleting file created by pg_upgrade")
+	cleanUp()
 	return nil
 }
 
@@ -85,7 +87,22 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 	checkUpdateMigration(migratePgCmdFlags.check)
 	chefAutomateStart()
 	chefAutomateStatus()
+	vacuumDb()
 	return nil
+}
+
+func vacuumDb() {
+	args := []string{
+		"./analyze_new_cluster.sh",
+	}
+	c := exec.Command("/bin/sh", args...)
+	checkErrorForCommand(c)
+}
+
+func cleanUp() {
+
+	c := exec.Command("rm", "-rf", "./analyze_new_cluster.sh", "./delete_old_cluster.sh", "pgmigrate.log")
+	checkErrorForCommand(c)
 }
 
 func removePgDatadir() {
@@ -133,7 +150,6 @@ func chefAutomateStart() {
 }
 
 func executePgdata13ShellScript() {
-	// su -- hab -c "./pgdata13.sh"
 	args := []string{
 		"./pgdata13.sh",
 	}
@@ -151,9 +167,6 @@ func executePgdata13ShellScript() {
 func checkUpdateMigration(check bool) {
 
 	writer.Title("Checking for pg_upgrade")
-	// pg_upgrade_internal.log
-	// createLog := exec.Command("mkdir", "pg_upgrade_internal.log")
-	// checkErrorForCommand(createLog)
 	args := []string{
 		"--old-datadir=/hab/svc/automate-postgresql/data/pgdata",
 		"--new-datadir=/hab/svc/automate-postgresql/data/pgdata13",
@@ -168,7 +181,11 @@ func checkUpdateMigration(check bool) {
 		strSlice := RemoveIndex(args, 4)
 		args = strSlice
 	}
-	err := executeAutomateCommandAsync("/hab/pkgs/core/postgresql13/13.4/20220120060519/bin/pg_upgrade", args, "", "pgmigrate.log")
+	err := executeAutomateCommandAsync(
+		"/hab/pkgs/core/postgresql13/13.4/20220120060519/bin/pg_upgrade",
+		args,
+		"",
+		AUTOMATE_PG_MIGRATE_LOG_DIR+"/pgmigrate.log")
 	if err != nil {
 		fmt.Println(err)
 	}
