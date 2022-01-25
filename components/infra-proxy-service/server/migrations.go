@@ -37,9 +37,9 @@ func saveFile(migrationId string, filename string, fileData bytes.Buffer) error 
 
 // UploadFile Takes the stream of data to upload a file
 func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer) error {
-	var fileName string
-	var serverId string
-
+	req, err := stream.Recv()
+	serverId := req.ServerId
+	fileName := req.GetMeta().GetName()
 	ctx := context.Background()
 	migrationId, err := createMigrationId()
 	if err != nil {
@@ -49,8 +49,9 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 		return err
 	}
 
+	_, err = s.service.Migration.StartMigration(ctx, migrationId, serverId)
 	fileData := bytes.Buffer{}
-
+	s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
 	for {
 		req, err := stream.Recv()
 
@@ -61,16 +62,12 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 			return err
 		}
 
-		serverId = req.ServerId
-
-		_, err = s.service.Migration.StartMigration(ctx, migrationId, serverId)
 		if err != nil {
 			res := createResponseWithErrors(err, migrationId)
 			stream.SendAndClose(res)
 			return err
 		}
 
-		fileName = req.GetMeta().GetName()
 		chunk := req.GetChunk().Data
 		_, err = fileData.Write(chunk)
 		if err != nil {
@@ -79,7 +76,7 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 			return err
 		}
 	}
-	s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
+
 	err = saveFile(migrationId, fileName, fileData)
 
 	if err != nil {

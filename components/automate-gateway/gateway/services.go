@@ -1009,10 +1009,23 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	request := infra_proxy.UploadZipFileRequest{
+		ServerId: serverId,
+		Meta: &infra_proxy.Metadata{
+			ContentType: cType,
+			Name:        fileName,
+		},
+	}
 	// call the infra proxy service function
 	stream, err := infraClient.UploadFile(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = stream.Send(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
