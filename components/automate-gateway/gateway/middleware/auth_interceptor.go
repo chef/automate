@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
+	"github.com/prometheus/common/log"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -45,29 +46,36 @@ type authInterceptor struct {
 
 func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (context.Context, error) {
 	// extract request-scoped logger
-	log := ctxlogrus.Extract(ctxIn)
-	interfaceValue := reflect.ValueOf(req)
-	i := 0
-	for i < reflect.Indirect(interfaceValue).NumField() {
-		v := reflect.Indirect(interfaceValue).Field(i)
-		v1 := reflect.Indirect(reflect.ValueOf(req)).Type().Field(i).Name
-		log.Debug("Val::", v)
-		log.Debug("Val1::", v1)
-		i = i + 1
-	}
-	method := reflect.Indirect(interfaceValue).FieldByName("ServerID")
-	service := reflect.Indirect(interfaceValue).FieldByName("OrgID")
-	log.Debug("GRPC Method::", method)
-	log.Debug("GRPC Service::", service)
-	log.Debug("GRPC Service String::", service.String())
-	if strings.Contains(service.String(), "chef.automate.api.infra_proxy.InfraProxy") {
-		log.Debug("Type::", reflect.TypeOf(req))
-		log.Debug("Field Len::", reflect.ValueOf(req).NumField())
-		log.Debug("Val1::", reflect.ValueOf(req).Field(0))
-		log.Debug("CTX:", ctxIn)
-		log.Debug("REQ:", req)
-		log.Debug("Method::", method)
-	}
+	// log := ctxlogrus.Extract(ctxIn)
+	// interfaceValue := reflect.ValueOf(req)
+	// i := 0
+	// for i < reflect.Indirect(interfaceValue).NumField() {
+	// 	v := reflect.Indirect(interfaceValue).Field(i)
+	// 	v1 := reflect.Indirect(reflect.ValueOf(req)).Type().Field(i).Name
+	// 	log.Debug("Val::", v)
+	// 	log.Debug("Val1::", v1)
+	// 	i = i + 1
+	// }
+	// fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+	// method := reflect.Indirect(interfaceValue)
+	// service := reflect.Indirect(interfaceValue).FieldByName("OrgID")
+
+	// fmt.Println("-----------", method)
+	// fmt.Println("============================================================================")
+	// fmt.Println("-----------", log)
+	// fmt.Println("-----------", interfaceValue)
+	// fmt.Println("-----------", method)
+	// fmt.Println("-----------", service)
+	// fmt.Println("-----------", service.String())
+	// fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+	// if strings.Contains(service.String(), "chef.automate.api.infra_proxy.InfraProxy") {
+	// 	log.Debug("Type::", reflect.TypeOf(req))
+	// 	log.Debug("Field Len::", reflect.ValueOf(req).NumField())
+	// 	log.Debug("Val1::", reflect.ValueOf(req).Field(0))
+	// 	log.Debug("CTX:", ctxIn)
+	// 	log.Debug("REQ:", req)
+	// 	log.Debug("Method::", method)
+	// }
 
 	// this context is only used for authenticating the request: we need
 	// headers!
@@ -102,13 +110,13 @@ func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (
 			return nil, err
 		}
 
-		resource := context.WithValue(authCtx, "subject", authResponse.Subject)
-		username := resource.Value("subject")
+		// resource := context.WithValue(authCtx, "subject", authResponse.Subject)
+		// username := resource.Value("subject")
 
-		teams := context.WithValue(authCtx, "teams", authResponse.Teams)
-		permissions := teams.Value("teams")
+		// teams := context.WithValue(authCtx, "teams", authResponse.Teams)
+		// permissions := teams.Value("teams")
 
-		a.InfraProxyLogData(authCtx, username, permissions)
+		// a.InfraProxyLogData(authCtx, username, permissions)
 		authCtx = context.WithValue(authCtx, "requestorID", authResponse.Requestor)
 		subs = append(authResponse.Teams, authResponse.Subject)
 	}
@@ -141,23 +149,30 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		a.logInfraProxyLogData(ctxForDownstream, req, info)
+		a.logInfraProxyLogData(ctxForDownstream, req)
+
 		return handler(ctxForDownstream, req)
 	}
 }
 
-func (a *authInterceptor) logInfraProxyLogData(ctx context.Context, username interface{}, permission interface{}) {
+func (a *authInterceptor) logInfraProxyLogData(ctx context.Context, req interface{}) {
 
 	log := ctxlogrus.Extract(ctx)
 	logData := log.Data
-	log.WithFields(logger.KV{
-		"Username":   username,
-		"Permission": permission,
-		"Action":     logData["grpc.method"],
-		"Service":    logData["grpc.service"],
-		"API info":   logData["grpc.method"],
-		"Time":       logData["grpc.start_time"],
-	}).Info("Infra proxy server API logs")
+
+	if logData["grpc.service"] == "chef.automate.api.infra_proxy.InfraProxy" {
+		interfaceValue := reflect.ValueOf(req)
+
+		// TODO: We need to improve the audit log information for infra proxy
+		log.Logger.WithFields(logger.KV{
+			"User::":       logData["auth.subjects"],
+			"GrpcMethod::": logData["grpc.method"],
+			"Service::":    logData["grpc.service"],
+			"API info::":   logData["auth.action"],
+			"Time::":       logData["grpc.start_time"],
+			"API params::": interfaceValue.Interface(),
+		}).Info("Infra proxy server API logs")
+	}
 }
 
 // interceptedServerStream wraps a grpc.ServerStream in order to allow an
