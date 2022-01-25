@@ -1093,16 +1093,16 @@ After that do deploy again using below command
 
 - Run  `rm -rf /hab` on Bastion node
 
-### Cert rotation with large CA cert file
+# Cert rotation with large CA cert file
 	
-# Elastic Search cert rotation
+### Elastic Search cert rotation
 
 - Go to all the instances of elasticsearch and unload ES service using below command
 	- `sudo hab svc unload chef/automate-ha-elasticsearch/6.8.6/20220110171138`
  
 - Come back to  1st instance of the elastic search and follow below commands:
 
-- Step 1: `mkdir -p /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs && touch MyRootCA.pem`
+- Step 1: `mkdir -p /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs && touch /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs/MyRootCA.pem`
  
 - Step 2: Put your content into `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs/MyRootCA.pem`
  
@@ -1139,7 +1139,7 @@ After that do deploy again using below command
 	- `hab svc status`
 
 	
-# PostgreSQL cert rotation	
+### PostgreSQL cert rotation	
 
 - Go to all the instances of postgresql and unload PG service using below command
 	- `sudo hab svc unload chef/automate-ha-postgresql/11.11.0/20220110171200`
