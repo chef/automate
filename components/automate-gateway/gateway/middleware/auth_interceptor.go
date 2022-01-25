@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
@@ -20,6 +21,7 @@ import (
 	"github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/service_authn"
+	"github.com/chef/automate/lib/logger"
 )
 
 // NewAuthInterceptor returns an AuthInterceptor that performs
@@ -77,6 +79,7 @@ func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (
 			log.Debugf("error authenticating request: %s", err)
 			return nil, err
 		}
+
 		authCtx = context.WithValue(authCtx, "requestorID", authResponse.Requestor)
 		subs = append(authResponse.Teams, authResponse.Subject)
 	}
@@ -109,7 +112,29 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
+		a.logInfraProxyLogData(ctxForDownstream, req)
+
 		return handler(ctxForDownstream, req)
+	}
+}
+
+func (a *authInterceptor) logInfraProxyLogData(ctx context.Context, req interface{}) {
+
+	log := ctxlogrus.Extract(ctx)
+	logData := log.Data
+
+	if logData["grpc.service"] == "chef.automate.api.infra_proxy.InfraProxy" {
+		interfaceValue := reflect.ValueOf(req)
+
+		// TODO: We need to improve the audit log information for infra proxy
+		log.Logger.WithFields(logger.KV{
+			"User::":       logData["auth.subjects"],
+			"GrpcMethod::": logData["grpc.method"],
+			"Service::":    logData["grpc.service"],
+			"API info::":   logData["auth.action"],
+			"Time::":       logData["grpc.start_time"],
+			"API params::": interfaceValue.Interface(),
+		}).Info("Infra proxy server API logs")
 	}
 }
 
