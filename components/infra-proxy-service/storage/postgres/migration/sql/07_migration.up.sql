@@ -103,7 +103,7 @@ LANGUAGE plpgsql;
 CREATE TABLE IF NOT EXISTS migration_stage (
   id                               SERIAL PRIMARY KEY,
   migration_id                     TEXT NOT NULL,
-  parsed_data                      json,
+  parsed_data                      json NOT NULL DEFAULT '{}',
   created_at                       TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at                       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
