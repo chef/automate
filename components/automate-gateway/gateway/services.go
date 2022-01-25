@@ -965,9 +965,10 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 
 // UploadZipFile used to upload the migration zip file of infraProxy
 func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
-	var cType, fileName string
+	var cType, fileName, serverId string
 	var content bytes.Buffer
 	file, metaData, err := r.FormFile("file")
+	serverId = r.FormValue("serverId")
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -1030,7 +1031,8 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 		}
 
 		request := infra_proxy.UploadZipFileRequest{
-			Chunk: &infra_proxy.Chunk{Data: buffer[:n]},
+			ServerId: serverId,
+			Chunk:    &infra_proxy.Chunk{Data: buffer[:n]},
 			Meta: &infra_proxy.Metadata{
 				ContentType: cType,
 				Name:        fileName,

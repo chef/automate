@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"path"
@@ -35,11 +36,17 @@ func saveFile(migrationId string, filename string, fileData bytes.Buffer) error 
 }
 
 // UploadFile Takes the stream of data to upload a file
-func (*Server) UploadFile(stream service.MigrationDataService_UploadFileServer) error {
+func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer) error {
 	var fileName string
+	var serverId string
+
+	ctx := context.Background()
 	migrationId, err := createMigrationId()
 	if err != nil {
 		log.WithError(err).Error("Unable to create migration id")
+		res := createResponseWithErrors(err, migrationId)
+		stream.SendAndClose(res)
+		return err
 	}
 
 	fileData := bytes.Buffer{}
@@ -54,18 +61,30 @@ func (*Server) UploadFile(stream service.MigrationDataService_UploadFileServer) 
 			return err
 		}
 
+		serverId = req.ServerId
+
+		_, err = s.service.Migration.StartMigration(ctx, migrationId, serverId)
+		if err != nil {
+			res := createResponseWithErrors(err, migrationId)
+			stream.SendAndClose(res)
+			return err
+		}
+
 		fileName = req.GetMeta().GetName()
 		chunk := req.GetChunk().Data
-
 		_, err = fileData.Write(chunk)
 		if err != nil {
+			res := createResponseWithErrors(err, migrationId)
+			stream.SendAndClose(res)
 			return err
 		}
 	}
-
+	s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
 	err = saveFile(migrationId, fileName, fileData)
 
 	if err != nil {
+		res := createResponseWithErrors(err, migrationId)
+		stream.SendAndClose(res)
 		return err
 	}
 
@@ -73,9 +92,11 @@ func (*Server) UploadFile(stream service.MigrationDataService_UploadFileServer) 
 		MigrationId: migrationId,
 		Success:     true,
 	}
+	s.service.Migration.CompleteFileUpload(ctx, migrationId, serverId, 0, 0, 0)
 
 	err = stream.SendAndClose(res)
 	if err != nil {
+		createResponseWithErrors(err, migrationId)
 		return err
 	}
 
@@ -89,4 +110,13 @@ func createMigrationId() (string, error) {
 		return "", err
 	}
 	return uuid.String(), nil
+}
+
+func createResponseWithErrors(err error, migrationId string) *response.UploadZipFileResponse {
+	errors := []string{err.Error()}
+	return &response.UploadZipFileResponse{
+		Success:     false,
+		MigrationId: migrationId,
+		Errors:      errors,
+	}
 }
