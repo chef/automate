@@ -223,7 +223,7 @@ Chef-automate is the main utility used for installation of chef-automate. If you
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp chef-automate /usr/bin/chef-automate
 
 # Configuration and Provisioning – Cloud
-This section is only for cloud deployment. Currently we support AWS based provisioning and 	deployment. 
+This section is only for cloud deployment. Currently we support AWS based provisioning and deployment. 
 ## Cloud System Requirements
 Please refer to [Common System Requirements](#_System_and_software) for general requirement guidelines.
 ### Virtual Machine (VM) Instances Type
@@ -624,7 +624,7 @@ sudo systemctl start chef-automate
 
 **In case of S3 back-up:**
 
-Login to same instance of Chef Automate front-end node from which backup is taken run the restore 	command
+Login to same instance of Chef Automate front-end node from which backup is taken run the restore command
 
 chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --skip-preflight --s3-access-key "Access\_Key"  --s3-secret-key "Secret\_Key"
 
@@ -696,9 +696,9 @@ If existing customer wants to move its existing chef infrastructure to our new a
 
 **For that we have identified there can be 2 scenarios** 
 
-\1. Migrating from standalone chef-server to automate chef-server which is part of a2-ha-backend frontend nodes cluster
+1. Migrating from standalone chef-server to automate chef-server which is part of a2-ha-backend frontend nodes cluster
 
-\2. Migrating from chef-backend cluster to automate chef-server which is part of a2-ha-backend frontend nodes cluster
+2. Migrating from chef-backend cluster to automate chef-server which is part of a2-ha-backend frontend nodes cluster
 
 In both the cases we need to take backup using knife-ec-backup utility and then move the backup folder on the new chef-server where will take restore using the same utility. This backup will migrate all the cookbooks, users, data-bags, policies and organisations.
 
@@ -723,7 +723,7 @@ Generate a knife tidy server report to examine stale nodes and unused cookbooks
 
 Initiate a backup of your Chef Server data
 
-`hab pkg exec chef/knife-ec-backup knife ec backup -c /etc/opscode/chef-server.rb backup\_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui\_priv.pem --with-user-sql --with-key-sql`
+`hab pkg exec chef/knife-ec-backup knife ec backup -c /etc/opscode/chef-server.rb backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem --with-user-sql --with-key-sql`
 
 `--with-user-sql` This is required to correctly handle user passwords and to ensure user-specific association groups are not duplicated.
 
