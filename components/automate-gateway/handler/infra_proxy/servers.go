@@ -142,11 +142,13 @@ func (a *InfraProxyServer) UpdateWebuiKey(ctx context.Context, r *gwreq.UpdateWe
 
 func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 	return &gwres.Server{
-		Id:        t.GetId(),
-		Name:      t.GetName(),
-		Fqdn:      t.GetFqdn(),
-		IpAddress: t.GetIpAddress(),
-		OrgsCount: t.GetOrgsCount(),
+		Id:              t.GetId(),
+		Name:            t.GetName(),
+		Fqdn:            t.GetFqdn(),
+		IpAddress:       t.GetIpAddress(),
+		OrgsCount:       t.GetOrgsCount(),
+		MigrationId:     t.GetMigrationId(),
+		MigrationStatus: t.GetMigrationStatus(),
 	}
 }
 
