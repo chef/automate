@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
@@ -141,5 +142,81 @@ func (p *postgres) insertMigration(ctx context.Context, migrationId, serverId, m
 		return storage.Migration{}, err
 	}
 
+	return m, nil
+}
+
+//StoreMigrationStage Inserts an entry to the migration_stage
+// To use this function, make sure that you should pass the searialized parsed data in []byte
+func (p *postgres) StoreMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (storage.MigrationStage, error) {
+	return p.insertMigrationStage(ctx, migrationId, parsedData)
+}
+
+//GetMigrationStage Get entry to the migration_stage
+func (p *postgres) GetMigrationStage(ctx context.Context, migrationId string) (storage.MigrationStage, error) {
+	return p.getMigrationStage(ctx, migrationId)
+}
+
+//DeleteMigrationStage Delete entry from migration_stage
+func (p *postgres) DeleteMigrationStage(ctx context.Context, migrationId string) (storage.MigrationStage, error) {
+	return p.deleteMigrationStage(ctx, migrationId)
+}
+
+//insertMigrationStage Inserts an entry to the migration_stage
+func (p *postgres) insertMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (storage.MigrationStage, error) {
+
+	var m storage.MigrationStage
+	var mByte []byte
+	var ok bool
+	if mByte, ok = parsedData.([]byte); !ok {
+		return m, errors.New("Cannot parse the data")
+	}
+	query := "SELECT insert_migration_stage($1, $2)"
+	row := p.db.QueryRowContext(ctx, query, migrationId, mByte)
+	err := row.Scan(&mByte)
+	if err != nil {
+		return storage.MigrationStage{}, err
+	}
+	err = json.Unmarshal(mByte, &m)
+	if err != nil {
+		return storage.MigrationStage{}, err
+	}
+	return m, nil
+}
+
+//getMigrationStage Get an entry from migration_stage
+func (p *postgres) getMigrationStage(ctx context.Context, migrationId string) (storage.MigrationStage, error) {
+
+	var m storage.MigrationStage
+	var mByte []byte
+
+	query := "SELECT get_migration_stage($1)"
+	row := p.db.QueryRowContext(ctx, query, migrationId)
+	err := row.Scan(&mByte)
+	if err != nil {
+		return storage.MigrationStage{}, err
+	}
+	err = json.Unmarshal(mByte, &m)
+	if err != nil {
+		return storage.MigrationStage{}, err
+	}
+	return m, nil
+}
+
+//deleteMigrationStage Delete an entry from migration_stage
+func (p *postgres) deleteMigrationStage(ctx context.Context, migrationId string) (storage.MigrationStage, error) {
+
+	var m storage.MigrationStage
+	var mByte []byte
+
+	query := "SELECT delete_migration_stage($1)"
+	row := p.db.QueryRowContext(ctx, query, migrationId)
+	err := row.Scan(&mByte)
+	if err != nil {
+		return storage.MigrationStage{}, err
+	}
+	err = json.Unmarshal(mByte, &m)
+	if err != nil {
+		return storage.MigrationStage{}, err
+	}
 	return m, nil
 }
