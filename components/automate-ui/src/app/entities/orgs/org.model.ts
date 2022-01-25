@@ -5,3 +5,9 @@ export interface Org {
   admin_user: string;
   projects?: string[];
 }
+
+export interface UploadFile {
+  server_id: string;
+  file: string;
+  // formData: any;
+}

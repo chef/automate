@@ -13,6 +13,7 @@ export interface OrgEntityState extends EntityState<Org> {
   createError: HttpErrorResponse;
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
+  uploadStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -21,6 +22,7 @@ const CREATE_STATUS = 'createStatus';
 const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
+const UPLOAD_STATUS = 'uploadStatus';
 
 export const orgEntityAdapter: EntityAdapter<Org> = createEntityAdapter<Org>();
 
@@ -31,7 +33,8 @@ export const OrgEntityInitialState: OrgEntityState =
     createStatus: EntityStatus.notLoaded,
     createError: null,
     deleteStatus: EntityStatus.notLoaded,
-    updateStatus: EntityStatus.notLoaded
+    updateStatus: EntityStatus.notLoaded,
+    uploadStatus: EntityStatus.notLoaded
   });
 
 export function orgEntityReducer(
@@ -97,6 +100,15 @@ export function orgEntityReducer(
 
     case OrgActionTypes.UPDATE_FAILURE:
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.UPLOAD:
+      return set(UPLOAD_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.UPLOAD_SUCCESS:
+      return set(UPLOAD_STATUS, EntityStatus.loadingSuccess, state);
+
+    case OrgActionTypes.UPLOAD_FAILURE:
+      return set(UPLOAD_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

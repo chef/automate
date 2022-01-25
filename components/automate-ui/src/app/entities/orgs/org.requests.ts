@@ -5,7 +5,7 @@ import { environment as env } from 'environments/environment';
 import { Org } from './org.model';
 
 import {
-  OrgsSuccessPayload, OrgSuccessPayload, CreateOrgPayload
+  OrgsSuccessPayload, OrgSuccessPayload, CreateOrgPayload, UploadResponce
 } from './org.actions';
 
 @Injectable()
@@ -36,4 +36,10 @@ export class OrgRequests {
     return this.http.put<OrgSuccessPayload>(
       `${env.infra_proxy_url}/servers/${org.server_id}/orgs/${org.id}`, org);
   }
+
+  public uploadZip(payload): Observable<UploadResponce> {
+    return this.http.put<UploadResponce>(
+      `${env.infra_proxy_url}/servers/migrations/upload`, payload);
+  }
+
 }

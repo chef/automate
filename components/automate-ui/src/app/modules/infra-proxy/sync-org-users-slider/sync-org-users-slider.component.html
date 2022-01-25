@@ -32,7 +32,7 @@
         <div id="button-bar">
           <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" (click)="closeUploadSlider()">Cancel
           </chef-button>
-          <chef-button primary [disabled]="!isFile" data-cy="upload-button" id="upload-button" (click)="migrationSlider.slidePanel()">
+          <chef-button primary [disabled]="!isFile" data-cy="upload-button" id="upload-button" (click)="uploadFile()">
             <img alt="upload_icon" src="/assets/img/data-feed.svg" class="svg-inline" />
             <chef-loading-spinner *ngIf="uploading"></chef-loading-spinner>
             <span *ngIf="!uploading">Upload File</span>

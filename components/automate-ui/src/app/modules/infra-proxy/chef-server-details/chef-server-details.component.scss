@@ -44,6 +44,7 @@ chef-page-header {
       li {
         display: flex;
         margin-bottom: 15px;
+        height: 50px;
 
         span {
           font-size: 14px;
@@ -129,7 +130,7 @@ th {
 
 tbody > .detail-row {
   padding-top: 0px;
-  padding-bottom: 15px;
+  padding-bottom: 15px;    height: 50px;
 }
 
 .detail-row {

@@ -31,7 +31,7 @@ import {
   ValidateWebUIKey
   // , GetUsers
 } from 'app/entities/servers/server.actions';
-import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
+import { GetOrgs, CreateOrg, DeleteOrg, UploadZip } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   createStatus,
@@ -87,6 +87,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public uploadSliderVisible = false;
   public uploadZipForm: FormGroup;
+  public zipFile: FormData;
 
   constructor(
     private fb: FormBuilder,
@@ -147,7 +148,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       ]]
     });
     this.uploadZipForm = this.fb.group({
-      fileName: ['', [Validators.required]]
+      file: ['', [Validators.required]]
     });
 
     this.store.select(routeParams).pipe(
@@ -367,7 +368,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateWebUIKey(webuikey));
   }
 
-
+  // upload zip slider functions
   public openUploadSlider(): void {
     this.uploadSliderVisible = true;
     this.resetUploadSlider();
@@ -378,8 +379,32 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.resetUploadSlider();
   }
 
-  public uploadZipFile(): void {
+  public uploadZipFile(file: File): void {
+    debugger
+    // this.uploadZipForm.get('file').setValue(file);
+    // this.uploadZipForm.controls['file'].value
+    // let formData = new FormData();
+    // formData.append('file', file);
+    // formData.append('file', this.uploadZipForm.controls['file'].value);
+    // console.log("-----------",formData);
+    let formData: FormData = new FormData();
+
+    if (file) {
+      formData.append('server_id', this.server.id);
+      formData.append('file', file);
+    }
+
+    formData.forEach((value, key) => {
+      console.log(key + " " + value)
+    });
+
     this.resetUploadSlider();
+    const uploadZipPayload = {
+      server_id: this.server.id,
+      // formData: formData
+      file: file.name
+    };
+    this.store.dispatch(new UploadZip( uploadZipPayload ));
   }
 
   private resetUploadSlider(): void {

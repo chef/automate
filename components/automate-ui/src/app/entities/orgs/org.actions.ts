@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { Org } from './org.model';
+import { Org, UploadFile } from './org.model';
 
 export enum OrgActionTypes {
   GET_ALL = 'ORGS::GET_ALL',
@@ -18,7 +18,10 @@ export enum OrgActionTypes {
   DELETE_FAILURE = 'ORGS::DELETE::FAILURE',
   UPDATE = 'ORGS::UPDATE',
   UPDATE_SUCCESS = 'ORGS::UPDATE::SUCCESS',
-  UPDATE_FAILURE = 'ORGS::UPDATE::FAILURE'
+  UPDATE_FAILURE = 'ORGS::UPDATE::FAILURE',
+  UPLOAD = 'ORGS::UPLOAD',
+  UPLOAD_SUCCESS = 'ORGS::UPLOAD::SUCCESS',
+  UPLOAD_FAILURE = 'ORGS::UPLOAD::FAILURE',
 }
 
 export interface OrgSuccessPayload {
@@ -124,6 +127,30 @@ export class UpdateOrgFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface UploadResponce {
+  success : boolean,
+  migrationId : string 
+}
+
+
+export class UploadZip implements Action {
+  readonly type = OrgActionTypes.UPLOAD;
+
+  constructor(public payload: UploadFile) { }
+}
+
+export class UploadZipSuccess implements Action {
+  readonly type = OrgActionTypes.UPLOAD_SUCCESS;
+
+  constructor(public payload: UploadResponce) { }
+}
+
+export class UploadZipFailure implements Action {
+  readonly type = OrgActionTypes.UPLOAD_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type OrgActions =
   | GetOrgs
   | GetOrgsSuccess
@@ -139,4 +166,7 @@ export type OrgActions =
   | DeleteOrgFailure
   | UpdateOrg
   | UpdateOrgSuccess
-  | UpdateOrgFailure;
+  | UpdateOrgFailure
+  | UploadZip
+  | UploadZipSuccess
+  | UploadZipFailure;

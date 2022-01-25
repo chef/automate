@@ -83,7 +83,7 @@
         [uploadForm]="uploadZipForm"
         (close)="closeUploadSlider()"
         [conflictErrorEvent]="conflictErrorEvent"
-        (uploadClicked)="uploadZipFile()">
+        (uploadClicked)="uploadZipFile($event)">
       </app-sync-org-users-slider>
       <section class="page-body details-tab" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">

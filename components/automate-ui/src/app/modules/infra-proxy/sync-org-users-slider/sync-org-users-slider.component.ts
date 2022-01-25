@@ -43,7 +43,10 @@ export class SyncOrgUsersSliderComponent implements OnInit {
   }
 
   uploadFile(): void {
-    this.uploadClicked.emit();
+    debugger
+    const formData = new FormData();
+    formData.append('file', this.uploadForm.get('file').value);
+    this.uploadClicked.emit(this.uploadForm.get('file').value);
     this.migrationSlider = true;
   }
 
@@ -88,6 +91,7 @@ export class SyncOrgUsersSliderComponent implements OnInit {
 
   prepareFilesList(file: any) {    
     this.file = file[0];
+    this.uploadForm.get('file').setValue(this.file);
     if(this.file.type !== 'application/zip'){
       this.isFile = false;
       this.file = '';

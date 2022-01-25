@@ -26,6 +26,10 @@ import {
   UpdateOrgFailure,
   UpdateOrgSuccess,
   OrgSuccessPayload,
+  UploadZip,
+  UploadZipSuccess,
+  UploadZipFailure,
+  UploadResponce,
   OrgActionTypes
 } from './org.actions';
 
@@ -158,6 +162,34 @@ export class OrgEffects {
         return new CreateNotification({
           type: Type.error,
           message: `Could not update organization: ${msg || payload.error}`
+        });
+      })));
+
+  uploadZip$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.UPLOAD),
+      mergeMap(( payload: UploadZip) =>
+        this.requests.uploadZip(payload).pipe(
+          map((resp: UploadResponce) => new UploadZipSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new UploadZipFailure(error)))))));
+
+  uploadZipSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.UPLOAD_SUCCESS),
+      map((_UploadZipSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Successfully uploaded file.`
+    }))));
+
+  uploadZipFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.UPLOAD_FAILURE),
+      map(({ payload }: UploadZipFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not upload file: ${msg || payload.error}`
         });
       })));
 
