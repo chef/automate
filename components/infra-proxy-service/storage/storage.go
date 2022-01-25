@@ -53,7 +53,7 @@ type MigrationStorage interface {
 	CompletePermissionMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 	FailedPermissionMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 	CompleteMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
-
+	GetActiveMigration(ctx context.Context, serverId string) (ActiveMigration, error)
 	StoreMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (MigrationStage, error)
 	GetMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
 	DeleteMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
@@ -114,6 +114,11 @@ type Migration struct {
 	TotalFailed      int64     `json:"total_failed"`
 	Message          string    `json:"message"`
 	UpdatedTimestamp time.Time `json:"updated_timestamp"`
+}
+
+type ActiveMigration struct {
+	MigrationId   string
+	MigrationType string
 }
 
 type MigrationStage struct {
