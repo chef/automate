@@ -40,21 +40,6 @@ func New(logger logger.Logger, migrationConfig migration.Config, authzClient aut
 	return &postgres{db, logger, authzClient}, &postgres{db, logger, authzClient}, nil
 }
 
-// New instantiates and returns a postgres migration implementation
-func NewMigration(logger logger.Logger, migrationConfig migration.Config, authzClient authz.AuthorizationServiceClient) (storage.MigrationStorage, error) {
-
-	db, err := initPostgresDB(migrationConfig.PGURL.String())
-	if err != nil {
-		return nil, errors.Wrap(err, "initialize database")
-	}
-
-	// if err := migrationConfig.Migrate(); err != nil {
-	// 	return nil, errors.Wrap(err, "database migrations")
-	// }
-
-	return &postgres{db, logger, authzClient}, nil
-}
-
 func initPostgresDB(pgURL string) (*sql.DB, error) {
 	d, err := db.PGOpen(pgURL)
 	if err != nil {
