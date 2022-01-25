@@ -77,15 +77,17 @@ func runRemovePgDatadir(cmd *cobra.Command, args []string) error {
 }
 
 func runMigratePgCmd(cmd *cobra.Command, args []string) error {
-	chefAutomateStart()
-	checkUpdateMigration(migratePgCmdFlags.check)
+	chefAutomateStop()
+	removeAndReplacePgdata13()
+	executePgdata13ShellScript()
 	writer.Title(" migration from: " + migratePgCmdFlags.fromVersion + " to: " + migratePgCmdFlags.toVersion)
 	writer.Title("--------------------------------")
-	checkUpdateMigration(false)
+	checkUpdateMigration(migratePgCmdFlags.check)
 	chefAutomateStart()
-
+	chefAutomateStatus()
 	return nil
 }
+
 func removePgDatadir() {
 	writer.Title("remove pg datadir")
 	writer.Title("--------------------------------")
@@ -100,6 +102,15 @@ func chefAutomateStop() {
 
 	stopChefAutomate := exec.Command("chef-automate", args...)
 	checkErrorForCommand(stopChefAutomate)
+}
+
+func chefAutomateStatus() {
+	args := []string{
+		"status",
+	}
+
+	statusChefAutomate := exec.Command("chef-automate", args...)
+	checkErrorForCommand(statusChefAutomate)
 }
 
 func removeAndReplacePgdata13() {
@@ -119,19 +130,30 @@ func chefAutomateStart() {
 	}
 	chefAutomateStart := exec.Command("chef-automate", args...)
 	checkErrorForCommand(chefAutomateStart)
+}
 
-	// err := executeAutomateCommandAsync("chef-automate", args, "", "chefautomateStart.log", false)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+func executePgdata13ShellScript() {
+	// su -- hab -c "./pgdata13.sh"
+	args := []string{
+		"./pgdata13.sh",
+	}
+	c := exec.Command("/bin/sh", args...)
+	c.SysProcAttr = &syscall.SysProcAttr{}
+	uid, gid, err := lookupUser("hab")
+	if err != nil {
+		fmt.Printf("failed fetching hab uid and gid: %s\n", err.Error())
+		return
+	}
+	c.SysProcAttr.Credential = &syscall.Credential{Uid: uint32(uid), Gid: uint32(gid)}
+	checkErrorForCommand(c)
 }
 
 func checkUpdateMigration(check bool) {
 
 	writer.Title("Checking for pg_upgrade")
 	// pg_upgrade_internal.log
-	createLog := exec.Command("mkdir", "pg_upgrade_internal.log")
-	checkErrorForCommand(createLog)
+	// createLog := exec.Command("mkdir", "pg_upgrade_internal.log")
+	// checkErrorForCommand(createLog)
 	args := []string{
 		"--old-datadir=/hab/svc/automate-postgresql/data/pgdata",
 		"--new-datadir=/hab/svc/automate-postgresql/data/pgdata13",
