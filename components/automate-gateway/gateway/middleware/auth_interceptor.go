@@ -45,38 +45,6 @@ type authInterceptor struct {
 }
 
 func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (context.Context, error) {
-	// extract request-scoped logger
-	// log := ctxlogrus.Extract(ctxIn)
-	// interfaceValue := reflect.ValueOf(req)
-	// i := 0
-	// for i < reflect.Indirect(interfaceValue).NumField() {
-	// 	v := reflect.Indirect(interfaceValue).Field(i)
-	// 	v1 := reflect.Indirect(reflect.ValueOf(req)).Type().Field(i).Name
-	// 	log.Debug("Val::", v)
-	// 	log.Debug("Val1::", v1)
-	// 	i = i + 1
-	// }
-	// fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-	// method := reflect.Indirect(interfaceValue)
-	// service := reflect.Indirect(interfaceValue).FieldByName("OrgID")
-
-	// fmt.Println("-----------", method)
-	// fmt.Println("============================================================================")
-	// fmt.Println("-----------", log)
-	// fmt.Println("-----------", interfaceValue)
-	// fmt.Println("-----------", method)
-	// fmt.Println("-----------", service)
-	// fmt.Println("-----------", service.String())
-	// fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-	// if strings.Contains(service.String(), "chef.automate.api.infra_proxy.InfraProxy") {
-	// 	log.Debug("Type::", reflect.TypeOf(req))
-	// 	log.Debug("Field Len::", reflect.ValueOf(req).NumField())
-	// 	log.Debug("Val1::", reflect.ValueOf(req).Field(0))
-	// 	log.Debug("CTX:", ctxIn)
-	// 	log.Debug("REQ:", req)
-	// 	log.Debug("Method::", method)
-	// }
-
 	// this context is only used for authenticating the request: we need
 	// headers!
 	// grpc-gateway translates these into metadata, and we'll forward that to
@@ -110,13 +78,6 @@ func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (
 			return nil, err
 		}
 
-		// resource := context.WithValue(authCtx, "subject", authResponse.Subject)
-		// username := resource.Value("subject")
-
-		// teams := context.WithValue(authCtx, "teams", authResponse.Teams)
-		// permissions := teams.Value("teams")
-
-		// a.InfraProxyLogData(authCtx, username, permissions)
 		authCtx = context.WithValue(authCtx, "requestorID", authResponse.Requestor)
 		subs = append(authResponse.Teams, authResponse.Subject)
 	}
