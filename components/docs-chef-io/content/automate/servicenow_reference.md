@@ -1,7 +1,7 @@
 +++
 title = "ServiceNow Administrator Reference"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 aliases = "servicenow_integration_reference"
