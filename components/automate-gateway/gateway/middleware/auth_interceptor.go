@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
@@ -45,6 +46,28 @@ type authInterceptor struct {
 func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (context.Context, error) {
 	// extract request-scoped logger
 	log := ctxlogrus.Extract(ctxIn)
+	interfaceValue := reflect.ValueOf(req)
+	i := 0
+	for i < reflect.Indirect(interfaceValue).NumField() {
+		v := reflect.Indirect(interfaceValue).Field(i)
+		v1 := reflect.Indirect(reflect.ValueOf(req)).Type().Field(i).Name
+		log.Debug("Val::", v)
+		log.Debug("Val1::", v1)
+		i = i + 1
+	}
+	method := reflect.Indirect(interfaceValue).FieldByName("ServerID")
+	service := reflect.Indirect(interfaceValue).FieldByName("OrgID")
+	log.Debug("GRPC Method::", method)
+	log.Debug("GRPC Service::", service)
+	log.Debug("GRPC Service String::", service.String())
+	if strings.Contains(service.String(), "chef.automate.api.infra_proxy.InfraProxy") {
+		log.Debug("Type::", reflect.TypeOf(req))
+		log.Debug("Field Len::", reflect.ValueOf(req).NumField())
+		log.Debug("Val1::", reflect.ValueOf(req).Field(0))
+		log.Debug("CTX:", ctxIn)
+		log.Debug("REQ:", req)
+		log.Debug("Method::", method)
+	}
 
 	// this context is only used for authenticating the request: we need
 	// headers!
@@ -118,11 +141,13 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
+		a.logInfraProxyLogData(ctxForDownstream, req, info)
 		return handler(ctxForDownstream, req)
 	}
 }
 
-func (a *authInterceptor) InfraProxyLogData(ctx context.Context, username interface{}, permission interface{}) {
+func (a *authInterceptor) logInfraProxyLogData(ctx context.Context, username interface{}, permission interface{}) {
+
 	log := ctxlogrus.Extract(ctx)
 	logData := log.Data
 	log.WithFields(logger.KV{
