@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-
 	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
@@ -140,6 +139,21 @@ func (p *postgres) insertMigration(ctx context.Context, migrationId, serverId, m
 	err = json.Unmarshal(mByte, &m)
 	if err != nil {
 		return storage.Migration{}, err
+	}
+
+	return m, nil
+}
+
+//GetActiveMigration gets the Migration ID and Migration Status for a server id
+func (p *postgres) GetActiveMigration(ctx context.Context, serverId string) (storage.ActiveMigration, error) {
+	var m storage.ActiveMigration
+	query := "select m.id,t.type from migration m join migration_type t on m.type_id=t.id and t.id < 5000 and m.server_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY"
+	err := p.db.QueryRowContext(ctx,
+		query, serverId).
+		Scan(&m.MigrationId, &m.MigrationType)
+
+	if err != nil {
+		return storage.ActiveMigration{}, err
 	}
 
 	return m, nil
