@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -47,6 +48,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	inter_eventfeed_Req "github.com/chef/automate/api/interservice/event_feed"
+	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
@@ -314,10 +316,13 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
 
 	infraProxyClient, err := clients.InfraProxyClient()
+
+	infraProxyMigrationClient, err := clients.InfraProxyMigrationClient()
+
 	if err != nil {
 		return errors.Wrap(err, "create client for infra proxy service")
 	}
-	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
+	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient, infraProxyMigrationClient))
 
 	userSettingsClient, err := clients.UserSettingsClient()
 	if err != nil {
@@ -956,6 +961,118 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// UploadZipFile used to upload the migration zip file of infraProxy
+func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
+	var cType, fileName, serverId string
+	var content bytes.Buffer
+	file, metaData, err := r.FormFile("file")
+	serverId = r.FormValue("serverId")
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer file.Close() // nolint: errcheck
+
+	_, err = io.Copy(&content, file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	contentType := strings.Split(r.Header.Get("Content-Type"), ";")
+
+	if len(contentType) > 0 {
+		cType = contentType[0]
+	}
+
+	// validate the content type
+	if cType != "multipart/form-data" {
+		http.Error(w, "content type not supported.", http.StatusBadRequest)
+		return
+	}
+
+	fileName = metaData.Filename
+
+	const (
+		action   = "infra:infraServers:sync"
+		resource = "infra:infraServers"
+	)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	infraClient, err := s.clientsFactory.InfraProxyMigrationClient()
+	if err != nil {
+		http.Error(w, "grpc service for compliance unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	request := infra_proxy.UploadZipFileRequest{
+		ServerId: serverId,
+		Meta: &infra_proxy.Metadata{
+			ContentType: cType,
+			Name:        fileName,
+		},
+	}
+	// call the infra proxy service function
+	stream, err := infraClient.UploadFile(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = stream.Send(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// break the data in chunks
+	reader := bufio.NewReader(&content)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			log.Fatal("cannot read chunk to buffer: ", err)
+		}
+
+		request := infra_proxy.UploadZipFileRequest{
+			ServerId: serverId,
+			Chunk:    &infra_proxy.Chunk{Data: buffer[:n]},
+			Meta: &infra_proxy.Metadata{
+				ContentType: cType,
+				Name:        fileName,
+			},
+		}
+
+		err = stream.Send(&request)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	reply, err := stream.CloseAndRecv()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	data, err := json.Marshal(reply)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(data) // nolint: errcheck
 }
 
 func init() {
