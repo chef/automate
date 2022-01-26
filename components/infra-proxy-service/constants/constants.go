@@ -18,27 +18,17 @@ const (
 )
 
 const (
-	StartFileUpload MigrationPhase = iota + 1000
-	CompleteFileUpload
-	FailedFileUpload
-	StartUnzip
-	ComplteUnzip
-	FailedUnzip
-	StartZipParsing
-	CompleteZipParsing
-	FailedZipParsing
-	StartOrgMigration
-	CompleteOrgMigration
-	FailedOrgMigration
-	StartUserMigration
-	CompleteUserMigration
-	FailedUserMigration
-	StartAssciation
-	CompleteAssciation
-	FailedAssciation
-	StartPermissionMigration
-	CompletePermissionMigration
-	FailedPermissionMigration
+	FileUpload MigrationPhase = iota + 1000
+	FileUnzip
+	OrgsParsing
+	UsersParsing
+	UserAssociationParsing
+	PermissionParsing
+	CreatePreview
+	OrgsMigration
+	UserMigration
+	UserAssociation
+	PermissionMigration
 )
 
 const (

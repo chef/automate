@@ -6,97 +6,36 @@ package nodes
 
 import (
 	context "context"
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	reflect "reflect"
 )
 
-// MockNodesServiceClient is a mock of NodesServiceClient interface.
+// MockNodesServiceClient is a mock of NodesServiceClient interface
 type MockNodesServiceClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockNodesServiceClientMockRecorder
 }
 
-// MockNodesServiceClientMockRecorder is the mock recorder for MockNodesServiceClient.
+// MockNodesServiceClientMockRecorder is the mock recorder for MockNodesServiceClient
 type MockNodesServiceClientMockRecorder struct {
 	mock *MockNodesServiceClient
 }
 
-// NewMockNodesServiceClient creates a new mock instance.
+// NewMockNodesServiceClient creates a new mock instance
 func NewMockNodesServiceClient(ctrl *gomock.Controller) *MockNodesServiceClient {
 	mock := &MockNodesServiceClient{ctrl: ctrl}
 	mock.recorder = &MockNodesServiceClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockNodesServiceClient) EXPECT() *MockNodesServiceClientMockRecorder {
 	return m.recorder
 }
 
-// BulkCreate mocks base method.
-func (m *MockNodesServiceClient) BulkCreate(ctx context.Context, in *Nodes, opts ...grpc.CallOption) (*Ids, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "BulkCreate", varargs...)
-	ret0, _ := ret[0].(*Ids)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BulkCreate indicates an expected call of BulkCreate.
-func (mr *MockNodesServiceClientMockRecorder) BulkCreate(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockNodesServiceClient)(nil).BulkCreate), varargs...)
-}
-
-// BulkDelete mocks base method.
-func (m *MockNodesServiceClient) BulkDelete(ctx context.Context, in *Query, opts ...grpc.CallOption) (*BulkDeleteResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "BulkDelete", varargs...)
-	ret0, _ := ret[0].(*BulkDeleteResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BulkDelete indicates an expected call of BulkDelete.
-func (mr *MockNodesServiceClientMockRecorder) BulkDelete(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDelete", reflect.TypeOf((*MockNodesServiceClient)(nil).BulkDelete), varargs...)
-}
-
-// BulkDeleteById mocks base method.
-func (m *MockNodesServiceClient) BulkDeleteById(ctx context.Context, in *Ids, opts ...grpc.CallOption) (*BulkDeleteResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "BulkDeleteById", varargs...)
-	ret0, _ := ret[0].(*BulkDeleteResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BulkDeleteById indicates an expected call of BulkDeleteById.
-func (mr *MockNodesServiceClientMockRecorder) BulkDeleteById(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDeleteById", reflect.TypeOf((*MockNodesServiceClient)(nil).BulkDeleteById), varargs...)
-}
-
-// Create mocks base method.
+// Create mocks base method
 func (m *MockNodesServiceClient) Create(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Id, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -109,54 +48,14 @@ func (m *MockNodesServiceClient) Create(ctx context.Context, in *Node, opts ...g
 	return ret0, ret1
 }
 
-// Create indicates an expected call of Create.
+// Create indicates an expected call of Create
 func (mr *MockNodesServiceClientMockRecorder) Create(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockNodesServiceClient)(nil).Create), varargs...)
 }
 
-// Delete mocks base method.
-func (m *MockNodesServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Delete", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Delete indicates an expected call of Delete.
-func (mr *MockNodesServiceClientMockRecorder) Delete(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockNodesServiceClient)(nil).Delete), varargs...)
-}
-
-// List mocks base method.
-func (m *MockNodesServiceClient) List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "List", varargs...)
-	ret0, _ := ret[0].(*Nodes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// List indicates an expected call of List.
-func (mr *MockNodesServiceClientMockRecorder) List(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockNodesServiceClient)(nil).List), varargs...)
-}
-
-// Read mocks base method.
+// Read mocks base method
 func (m *MockNodesServiceClient) Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -169,14 +68,14 @@ func (m *MockNodesServiceClient) Read(ctx context.Context, in *Id, opts ...grpc.
 	return ret0, ret1
 }
 
-// Read indicates an expected call of Read.
+// Read indicates an expected call of Read
 func (mr *MockNodesServiceClientMockRecorder) Read(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockNodesServiceClient)(nil).Read), varargs...)
 }
 
-// Update mocks base method.
+// Update mocks base method
 func (m *MockNodesServiceClient) Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -189,34 +88,94 @@ func (m *MockNodesServiceClient) Update(ctx context.Context, in *Node, opts ...g
 	return ret0, ret1
 }
 
-// Update indicates an expected call of Update.
+// Update indicates an expected call of Update
 func (mr *MockNodesServiceClientMockRecorder) Update(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockNodesServiceClient)(nil).Update), varargs...)
 }
 
-// UpdateNodeConnectionError mocks base method.
-func (m *MockNodesServiceClient) UpdateNodeConnectionError(ctx context.Context, in *NodeError, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+// Delete mocks base method
+func (m *MockNodesServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "UpdateNodeConnectionError", varargs...)
+	ret := m.ctrl.Call(m, "Delete", varargs...)
 	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateNodeConnectionError indicates an expected call of UpdateNodeConnectionError.
-func (mr *MockNodesServiceClientMockRecorder) UpdateNodeConnectionError(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+// Delete indicates an expected call of Delete
+func (mr *MockNodesServiceClientMockRecorder) Delete(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeConnectionError", reflect.TypeOf((*MockNodesServiceClient)(nil).UpdateNodeConnectionError), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockNodesServiceClient)(nil).Delete), varargs...)
 }
 
-// UpdateNodeDetectInfo mocks base method.
+// List mocks base method
+func (m *MockNodesServiceClient) List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "List", varargs...)
+	ret0, _ := ret[0].(*Nodes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List
+func (mr *MockNodesServiceClientMockRecorder) List(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockNodesServiceClient)(nil).List), varargs...)
+}
+
+// BulkDelete mocks base method
+func (m *MockNodesServiceClient) BulkDelete(ctx context.Context, in *Query, opts ...grpc.CallOption) (*BulkDeleteResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BulkDelete", varargs...)
+	ret0, _ := ret[0].(*BulkDeleteResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BulkDelete indicates an expected call of BulkDelete
+func (mr *MockNodesServiceClientMockRecorder) BulkDelete(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDelete", reflect.TypeOf((*MockNodesServiceClient)(nil).BulkDelete), varargs...)
+}
+
+// BulkCreate mocks base method
+func (m *MockNodesServiceClient) BulkCreate(ctx context.Context, in *Nodes, opts ...grpc.CallOption) (*Ids, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BulkCreate", varargs...)
+	ret0, _ := ret[0].(*Ids)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BulkCreate indicates an expected call of BulkCreate
+func (mr *MockNodesServiceClientMockRecorder) BulkCreate(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockNodesServiceClient)(nil).BulkCreate), varargs...)
+}
+
+// UpdateNodeDetectInfo mocks base method
 func (m *MockNodesServiceClient) UpdateNodeDetectInfo(ctx context.Context, in *NodeDetectJobInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -229,82 +188,77 @@ func (m *MockNodesServiceClient) UpdateNodeDetectInfo(ctx context.Context, in *N
 	return ret0, ret1
 }
 
-// UpdateNodeDetectInfo indicates an expected call of UpdateNodeDetectInfo.
+// UpdateNodeDetectInfo indicates an expected call of UpdateNodeDetectInfo
 func (mr *MockNodesServiceClientMockRecorder) UpdateNodeDetectInfo(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeDetectInfo", reflect.TypeOf((*MockNodesServiceClient)(nil).UpdateNodeDetectInfo), varargs...)
 }
 
-// MockNodesServiceServer is a mock of NodesServiceServer interface.
+// UpdateNodeConnectionError mocks base method
+func (m *MockNodesServiceClient) UpdateNodeConnectionError(ctx context.Context, in *NodeError, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateNodeConnectionError", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeConnectionError indicates an expected call of UpdateNodeConnectionError
+func (mr *MockNodesServiceClientMockRecorder) UpdateNodeConnectionError(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeConnectionError", reflect.TypeOf((*MockNodesServiceClient)(nil).UpdateNodeConnectionError), varargs...)
+}
+
+// BulkDeleteById mocks base method
+func (m *MockNodesServiceClient) BulkDeleteById(ctx context.Context, in *Ids, opts ...grpc.CallOption) (*BulkDeleteResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BulkDeleteById", varargs...)
+	ret0, _ := ret[0].(*BulkDeleteResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BulkDeleteById indicates an expected call of BulkDeleteById
+func (mr *MockNodesServiceClientMockRecorder) BulkDeleteById(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDeleteById", reflect.TypeOf((*MockNodesServiceClient)(nil).BulkDeleteById), varargs...)
+}
+
+// MockNodesServiceServer is a mock of NodesServiceServer interface
 type MockNodesServiceServer struct {
 	ctrl     *gomock.Controller
 	recorder *MockNodesServiceServerMockRecorder
 }
 
-// MockNodesServiceServerMockRecorder is the mock recorder for MockNodesServiceServer.
+// MockNodesServiceServerMockRecorder is the mock recorder for MockNodesServiceServer
 type MockNodesServiceServerMockRecorder struct {
 	mock *MockNodesServiceServer
 }
 
-// NewMockNodesServiceServer creates a new mock instance.
+// NewMockNodesServiceServer creates a new mock instance
 func NewMockNodesServiceServer(ctrl *gomock.Controller) *MockNodesServiceServer {
 	mock := &MockNodesServiceServer{ctrl: ctrl}
 	mock.recorder = &MockNodesServiceServerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockNodesServiceServer) EXPECT() *MockNodesServiceServerMockRecorder {
 	return m.recorder
 }
 
-// BulkCreate mocks base method.
-func (m *MockNodesServiceServer) BulkCreate(arg0 context.Context, arg1 *Nodes) (*Ids, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BulkCreate", arg0, arg1)
-	ret0, _ := ret[0].(*Ids)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BulkCreate indicates an expected call of BulkCreate.
-func (mr *MockNodesServiceServerMockRecorder) BulkCreate(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockNodesServiceServer)(nil).BulkCreate), arg0, arg1)
-}
-
-// BulkDelete mocks base method.
-func (m *MockNodesServiceServer) BulkDelete(arg0 context.Context, arg1 *Query) (*BulkDeleteResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BulkDelete", arg0, arg1)
-	ret0, _ := ret[0].(*BulkDeleteResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BulkDelete indicates an expected call of BulkDelete.
-func (mr *MockNodesServiceServerMockRecorder) BulkDelete(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDelete", reflect.TypeOf((*MockNodesServiceServer)(nil).BulkDelete), arg0, arg1)
-}
-
-// BulkDeleteById mocks base method.
-func (m *MockNodesServiceServer) BulkDeleteById(arg0 context.Context, arg1 *Ids) (*BulkDeleteResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BulkDeleteById", arg0, arg1)
-	ret0, _ := ret[0].(*BulkDeleteResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// BulkDeleteById indicates an expected call of BulkDeleteById.
-func (mr *MockNodesServiceServerMockRecorder) BulkDeleteById(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDeleteById", reflect.TypeOf((*MockNodesServiceServer)(nil).BulkDeleteById), arg0, arg1)
-}
-
-// Create mocks base method.
+// Create mocks base method
 func (m *MockNodesServiceServer) Create(arg0 context.Context, arg1 *Node) (*Id, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0, arg1)
@@ -313,43 +267,13 @@ func (m *MockNodesServiceServer) Create(arg0 context.Context, arg1 *Node) (*Id, 
 	return ret0, ret1
 }
 
-// Create indicates an expected call of Create.
+// Create indicates an expected call of Create
 func (mr *MockNodesServiceServerMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockNodesServiceServer)(nil).Create), arg0, arg1)
 }
 
-// Delete mocks base method.
-func (m *MockNodesServiceServer) Delete(arg0 context.Context, arg1 *Id) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Delete indicates an expected call of Delete.
-func (mr *MockNodesServiceServerMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockNodesServiceServer)(nil).Delete), arg0, arg1)
-}
-
-// List mocks base method.
-func (m *MockNodesServiceServer) List(arg0 context.Context, arg1 *Query) (*Nodes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", arg0, arg1)
-	ret0, _ := ret[0].(*Nodes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// List indicates an expected call of List.
-func (mr *MockNodesServiceServerMockRecorder) List(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockNodesServiceServer)(nil).List), arg0, arg1)
-}
-
-// Read mocks base method.
+// Read mocks base method
 func (m *MockNodesServiceServer) Read(arg0 context.Context, arg1 *Id) (*Node, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0, arg1)
@@ -358,13 +282,13 @@ func (m *MockNodesServiceServer) Read(arg0 context.Context, arg1 *Id) (*Node, er
 	return ret0, ret1
 }
 
-// Read indicates an expected call of Read.
+// Read indicates an expected call of Read
 func (mr *MockNodesServiceServerMockRecorder) Read(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockNodesServiceServer)(nil).Read), arg0, arg1)
 }
 
-// Update mocks base method.
+// Update mocks base method
 func (m *MockNodesServiceServer) Update(arg0 context.Context, arg1 *Node) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1)
@@ -373,28 +297,73 @@ func (m *MockNodesServiceServer) Update(arg0 context.Context, arg1 *Node) (*empt
 	return ret0, ret1
 }
 
-// Update indicates an expected call of Update.
+// Update indicates an expected call of Update
 func (mr *MockNodesServiceServerMockRecorder) Update(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockNodesServiceServer)(nil).Update), arg0, arg1)
 }
 
-// UpdateNodeConnectionError mocks base method.
-func (m *MockNodesServiceServer) UpdateNodeConnectionError(arg0 context.Context, arg1 *NodeError) (*emptypb.Empty, error) {
+// Delete mocks base method
+func (m *MockNodesServiceServer) Delete(arg0 context.Context, arg1 *Id) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateNodeConnectionError", arg0, arg1)
+	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateNodeConnectionError indicates an expected call of UpdateNodeConnectionError.
-func (mr *MockNodesServiceServerMockRecorder) UpdateNodeConnectionError(arg0, arg1 interface{}) *gomock.Call {
+// Delete indicates an expected call of Delete
+func (mr *MockNodesServiceServerMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeConnectionError", reflect.TypeOf((*MockNodesServiceServer)(nil).UpdateNodeConnectionError), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockNodesServiceServer)(nil).Delete), arg0, arg1)
 }
 
-// UpdateNodeDetectInfo mocks base method.
+// List mocks base method
+func (m *MockNodesServiceServer) List(arg0 context.Context, arg1 *Query) (*Nodes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", arg0, arg1)
+	ret0, _ := ret[0].(*Nodes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List
+func (mr *MockNodesServiceServerMockRecorder) List(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockNodesServiceServer)(nil).List), arg0, arg1)
+}
+
+// BulkDelete mocks base method
+func (m *MockNodesServiceServer) BulkDelete(arg0 context.Context, arg1 *Query) (*BulkDeleteResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BulkDelete", arg0, arg1)
+	ret0, _ := ret[0].(*BulkDeleteResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BulkDelete indicates an expected call of BulkDelete
+func (mr *MockNodesServiceServerMockRecorder) BulkDelete(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDelete", reflect.TypeOf((*MockNodesServiceServer)(nil).BulkDelete), arg0, arg1)
+}
+
+// BulkCreate mocks base method
+func (m *MockNodesServiceServer) BulkCreate(arg0 context.Context, arg1 *Nodes) (*Ids, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BulkCreate", arg0, arg1)
+	ret0, _ := ret[0].(*Ids)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BulkCreate indicates an expected call of BulkCreate
+func (mr *MockNodesServiceServerMockRecorder) BulkCreate(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkCreate", reflect.TypeOf((*MockNodesServiceServer)(nil).BulkCreate), arg0, arg1)
+}
+
+// UpdateNodeDetectInfo mocks base method
 func (m *MockNodesServiceServer) UpdateNodeDetectInfo(arg0 context.Context, arg1 *NodeDetectJobInfo) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateNodeDetectInfo", arg0, arg1)
@@ -403,8 +372,38 @@ func (m *MockNodesServiceServer) UpdateNodeDetectInfo(arg0 context.Context, arg1
 	return ret0, ret1
 }
 
-// UpdateNodeDetectInfo indicates an expected call of UpdateNodeDetectInfo.
+// UpdateNodeDetectInfo indicates an expected call of UpdateNodeDetectInfo
 func (mr *MockNodesServiceServerMockRecorder) UpdateNodeDetectInfo(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeDetectInfo", reflect.TypeOf((*MockNodesServiceServer)(nil).UpdateNodeDetectInfo), arg0, arg1)
+}
+
+// UpdateNodeConnectionError mocks base method
+func (m *MockNodesServiceServer) UpdateNodeConnectionError(arg0 context.Context, arg1 *NodeError) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateNodeConnectionError", arg0, arg1)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeConnectionError indicates an expected call of UpdateNodeConnectionError
+func (mr *MockNodesServiceServerMockRecorder) UpdateNodeConnectionError(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeConnectionError", reflect.TypeOf((*MockNodesServiceServer)(nil).UpdateNodeConnectionError), arg0, arg1)
+}
+
+// BulkDeleteById mocks base method
+func (m *MockNodesServiceServer) BulkDeleteById(arg0 context.Context, arg1 *Ids) (*BulkDeleteResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BulkDeleteById", arg0, arg1)
+	ret0, _ := ret[0].(*BulkDeleteResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BulkDeleteById indicates an expected call of BulkDeleteById
+func (mr *MockNodesServiceServerMockRecorder) BulkDeleteById(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkDeleteById", reflect.TypeOf((*MockNodesServiceServer)(nil).BulkDeleteById), arg0, arg1)
 }
