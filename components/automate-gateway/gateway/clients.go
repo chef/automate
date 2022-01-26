@@ -25,6 +25,7 @@ import (
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/api/interservice/event_feed"
+	infra_proxy_migration "github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
 	chef_ingest "github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/license_control"
@@ -121,6 +122,7 @@ type ClientsFactory interface {
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
 	InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error)
+	InfraProxyMigrationClient() (infra_proxy_migration.MigrationDataServiceClient, error)
 	CdsClient() (cds.AutomateCdsServiceClient, error)
 	UserSettingsClient() (user_settings.UserSettingsServiceClient, error)
 	Close() error
@@ -449,6 +451,14 @@ func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyServiceClient
 		return nil, err
 	}
 	return infra_proxy.NewInfraProxyServiceClient(conn), nil
+}
+
+func (c *clientsFactory) InfraProxyMigrationClient() (infra_proxy_migration.MigrationDataServiceClient, error) {
+	conn, err := c.connectionByName("infra-proxy-service")
+	if err != nil {
+		return nil, err
+	}
+	return infra_proxy_migration.NewMigrationDataServiceClient(conn), nil
 }
 
 func (c *clientsFactory) UserSettingsClient() (user_settings.UserSettingsServiceClient, error) {
