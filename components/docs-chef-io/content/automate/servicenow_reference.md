@@ -1,7 +1,7 @@
 +++
 title = "ServiceNow Administrator Reference"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 aliases = "servicenow_integration_reference"
@@ -17,7 +17,7 @@ This page details information on the topics that will aid you while installing a
 
 - [Integration App]({{< relref "servicenow_integration" >}})
 - [Incident App]({{< relref "servicenow_incident_creation" >}})
-- [Event Creation App]({{< relref "servicenow_event_creation" >}})
+<!-- - [Event Creation App]({{< relref "servicenow_event_creation" >}}) -->
 
 Find the Chef Automate features in the ServiceNow instance by searching **Chef** in the **Filer Navigator** . All Chef features display within **Chef Automate** menu.
 
@@ -378,7 +378,7 @@ The ServiceNow app deletes these records of the corresponding closed incidents, 
 
 : Used to debug the data in ServiceNow. Enables the selected logging level and is visible in logs. The possible values are `debug`, `warn`, `info`, and `error`. Default: `error`.
 
-## Event Creation App Roles
+<!-- ## Event Creation App Roles
 
 You can associate a single user with more than one role.
 
@@ -449,4 +449,4 @@ The **Chef InSpec Scan Alerts** tab of the event displays the associated Chef In
 
 : Set to `Yes` to enable logging and `No` to disable it. Once enabled, authorized users can view the logs at **Chef Events** > **Logs** and **System logs** > **Application logs**. Default: `No`.
 
-![Chef Events Properties page](/images/automate/sn_event_app_properties.png)
+![Chef Events Properties page](/images/automate/sn_event_app_properties.png) -->
