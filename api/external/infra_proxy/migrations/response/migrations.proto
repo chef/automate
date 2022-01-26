@@ -2,3 +2,13 @@ syntax = "proto3";
 
 package chef.automate.api.infra_proxy.migrations.response;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/migrations/response";
+
+
+message UploadZipFileResponse {
+  // Success responce for zip upload.
+  bool success = 1;
+  // Migration ID
+  string migrationId = 2;
+  // Error data in case of failure.
+  repeated string errors = 3;
+}

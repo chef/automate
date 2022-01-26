@@ -408,6 +408,9 @@ func (s *Server) startHTTPServer() error {
 	// `rpc Create (stream ProfilePostRequest) returns (CheckResult) {};`
 	mux.HandleFunc("/api/v0/compliance/profiles", s.ProfileCreateHandler)
 
+	// upload the chef infra server migration zip file
+	mux.HandleFunc("/api/v0/infra/servers/migrations/upload", s.UploadZipFile)
+
 	profileTarHandlerUnlessDELETE := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			s.ProfileTarHandler(w, r)
