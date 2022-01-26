@@ -335,7 +335,7 @@ version = ENV["VERSION"] || DateTime.now.strftime("%Y%m%d%H%M%S")
 filename = if ENV["VERSION"]
              "#{ENV["VERSION"]}.json"
            else
-             "manifest.json"
+             "manifest_semver.json"
            end
 # Packages that are present in products.meta but we wish to exclude
 # from the manifest (probably because they are not yet published to

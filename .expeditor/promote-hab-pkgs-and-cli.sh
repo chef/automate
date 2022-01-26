@@ -26,7 +26,7 @@ export HAB_AUTH_TOKEN
 source_channel=$EXPEDITOR_PROMOTABLE
 
 # Download the manifest
-aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest.json" manifest.json --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest_semver.json" manifest_semver.json --profile chef-cd
 
 # Download or create the versions file
 aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/versions.json" existing-versions.json --profile chef-cd || echo "[]" > existing-versions.json
@@ -35,10 +35,10 @@ aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/autom
 aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/releases.json" existing-releases.json --profile chef-cd || echo "[]" > existing-releases.json
 
 # Pull the version from the manifest
-version=$(jq -r -c ".build" manifest.json)
+version=$(jq -r -c ".build" manifest_semver.json)
 
 # Promote the artifacts in Habitat Depot
-jq -r -c ".packages[]" manifest.json | while read -r service_ident; do
+jq -r -c ".packages[]" manifest_semver.json | while read -r service_ident; do
   pkg_origin=${service_ident%/*/*/*}
 
   if [ "$pkg_origin" = "core" ];
@@ -51,7 +51,7 @@ jq -r -c ".packages[]" manifest.json | while read -r service_ident; do
 done
 
 # Append the new version to the target channel versions file
-jq ". |= .+ [\"$version\"]" existing-versions.json > updated-versions.json
+jq ". |= .+ [\"$version\"] | sort" existing-versions.json > updated-versions.json
 
 # Append the new release to the dev channel releases file
 release_date=$(date -u +"%Y-%m-%dT%H:%M:%S+00:00")
@@ -70,9 +70,9 @@ aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/chef-a
 aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/licenses.json" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/licenses.json" --acl public-read  --profile chef-cd
 
 # Promote the manifest
-aws s3 cp manifest.json "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest.json" --acl public-read  --profile chef-cd
-aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest.json.asc" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest.json.asc" --acl public-read  --profile chef-cd
-aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest.json.sha256sum" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest.json.sha256sum" --acl public-read  --profile chef-cd
+aws s3 cp manifest_semver.json "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest_semver.json" --acl public-read  --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest_semver.json.asc" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest_semver.json.asc" --acl public-read  --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest_semver.json.sha256sum" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest_semver.json.sha256sum" --acl public-read  --profile chef-cd
 
 # Upload the updated versions file
 aws s3 cp updated-versions.json "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/versions.json" --acl public-read  --profile chef-cd
@@ -81,7 +81,7 @@ aws s3 cp updated-versions.json "s3://chef-automate-artifacts/${EXPEDITOR_TARGET
 aws s3 cp updated-releases.json "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/releases.json" --acl public-read --profile chef-cd
 
 # Cleanup
-rm manifest.json
+rm manifest_semver.json
 rm existing-versions.json
 rm existing-releases.json
 rm updated-versions.json
