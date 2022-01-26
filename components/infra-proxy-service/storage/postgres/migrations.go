@@ -43,34 +43,94 @@ func (p *postgres) FailedUnzip(ctx context.Context, migrationId, serverId, messa
 	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.FileUnzip), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
 }
 
-// StartZipParsing Insert a migration entry to the DB for zip parsing started
-func (p *postgres) StartZipParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
-	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.ZipParsing), int64(constants.InProgress), 0, 0, 0)
+// StartOrgsParsing Insert a migration entry to the DB for zip parsing started
+func (p *postgres) StartOrgParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.OrgsParsing), int64(constants.InProgress), 0, 0, 0)
 }
 
-// CompleteZipParsing Insert a migration entry to the DB for zip parsing completed
-func (p *postgres) CompleteZipParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.ZipParsing), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
+// CompleteOrgsParsing Insert a migration entry to the DB for zip parsing completed
+func (p *postgres) CompleteOrgParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.OrgsParsing), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
 }
 
-// FailedZipParsing Insert a migration entry to the DB for zip parsing failed
-func (p *postgres) FailedZipParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.ZipParsing), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
+// FailedOrgsParsing Insert a migration entry to the DB for zip parsing failed
+func (p *postgres) FailedOrgParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.OrgsParsing), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
 }
 
-// StartOrgMigration Insert a migration entry to the DB for org migration started
+// StartUsersParsing Insert a migration entry to the DB for zip parsing started
+func (p *postgres) StartUsersParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.UsersParsing), int64(constants.InProgress), 0, 0, 0)
+}
+
+// CompleteUsersParsing Insert a migration entry to the DB for zip parsing completed
+func (p *postgres) CompleteUsersParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.UsersParsing), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// FailedUsersParsing Insert a migration entry to the DB for zip parsing failed
+func (p *postgres) FailedUsersParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.UsersParsing), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// StartUserAssociationParsing Insert a migration entry to the DB for zip parsing started
+func (p *postgres) StartUserAssociationParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.UserAssociationParsing), int64(constants.InProgress), 0, 0, 0)
+}
+
+// CompleteUserAssociationParsing Insert a migration entry to the DB for zip parsing completed
+func (p *postgres) CompleteUserAssociationParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.UserAssociationParsing), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// FailedUserAssociationParsing Insert a migration entry to the DB for zip parsing failed
+func (p *postgres) FailedUserAssociationParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.UserAssociationParsing), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// StartPermissionParsing Insert a migration entry to the DB for zip parsing started
+func (p *postgres) StartPermissionParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.PermissionParsing), int64(constants.InProgress), 0, 0, 0)
+}
+
+// CompletePermissionParsing Insert a migration entry to the DB for zip parsing completed
+func (p *postgres) CompletePermissionParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.PermissionParsing), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// FailedPermissionParsing Insert a migration entry to the DB for zip parsing failed
+func (p *postgres) FailedPermissionParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.PermissionParsing), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// StartCreatePreview Insert a migration entry to the DB for zip parsing started
+func (p *postgres) StartCreatePreview(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.CreatePreview), int64(constants.InProgress), 0, 0, 0)
+}
+
+// CompleteCreatePreview Insert a migration entry to the DB for zip parsing completed
+func (p *postgres) CompleteCreatePreview(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.CreatePreview), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// FailedCreatePreview Insert a migration entry to the DB for zip parsing failed
+func (p *postgres) FailedCreatePreview(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
+	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.CreatePreview), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
+}
+
+// StartOrgsMigration Insert a migration entry to the DB for org migration started
 func (p *postgres) StartOrgMigration(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
-	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.OrgMigration), int64(constants.InProgress), 0, 0, 0)
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.OrgsMigration), int64(constants.InProgress), 0, 0, 0)
 }
 
-// CompleteOrgMigration Insert a migration entry to the DB for org migration completed
+// CompleteOrgsMigration Insert a migration entry to the DB for org migration completed
 func (p *postgres) CompleteOrgMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.OrgMigration), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
+	return p.insertMigration(ctx, migrationId, serverId, "", int64(constants.OrgsMigration), int64(constants.Completed), totalSucceeded, totalSkipped, totalFailed)
 }
 
-// FailedOrgMigration Insert a migration entry to the DB for org migration failed
+// FailedOrgsMigration Insert a migration entry to the DB for org migration failed
 func (p *postgres) FailedOrgMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.OrgMigration), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
+	return p.insertMigration(ctx, migrationId, serverId, message, int64(constants.OrgsMigration), int64(constants.Failed), totalSucceeded, totalSkipped, totalFailed)
 }
 
 // StartUserMigration Insert a migration entry to the DB for user migration started

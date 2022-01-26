@@ -20,8 +20,12 @@ const (
 const (
 	FileUpload MigrationPhase = iota + 1000
 	FileUnzip
-	ZipParsing
-	OrgMigration
+	OrgsParsing
+	UsersParsing
+	UserAssociationParsing
+	PermissionParsing
+	CreatePreview
+	OrgsMigration
 	UserMigration
 	UserAssociation
 	PermissionMigration

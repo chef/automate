@@ -95,6 +95,7 @@ func (s *Server) UploadFile(stream service.MigrationDataService_UploadFileServer
 	log.Info("File successfully uploaded in the directory for the requested file for migration id: ", migrationId)
 	err = stream.SendAndClose(res)
 	if err != nil {
+		handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 		log.Errorf("Failed to send the response for migration id %s : %s", migrationId, err.Error())
 		return err
 	}
@@ -116,6 +117,7 @@ func handleErrorForUploadFileAndMigration(err error, migrationId string, service
 	response := createResponseWithErrors(err, migrationId)
 	s.service.Migration.FailedFileUpload(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	//ToDo to add the Failed migration status as well
+	s.service.Migration.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	return response
 
 }

@@ -30,12 +30,16 @@ CREATE INDEX IF NOT EXISTS migration_migration_id_index ON migration (migration_
 INSERT INTO migration_type VALUES
       (100,'Migration started'),
       (1000,'Upload of zip file'),
-      (1010,'Unzip of zip file'),
-      (1020,'Parsing of zip file'),
-      (1030,'Migration of organization'),
-      (1040,'Migration of users'),
-      (1050,'Association of users to orgs'),
-      (1060,'Migrating user permissions'),
+      (1001,'Unzip of zip file'),
+      (1002,'Parsing of orgs file'),
+      (1003,'Parsing of users file'),
+      (1004,'Parsing of user association file'),
+      (1005,'Parsing of user permissions file'),
+      (1006,'Creating Preview'),
+      (1007,'Migration of organization'),
+      (1008,'Migration of users'),
+      (1009,'Association of users to orgs'),
+      (1010,'Migrating user permissions'),
       (5000,'Migration Completed')
 ;
 
