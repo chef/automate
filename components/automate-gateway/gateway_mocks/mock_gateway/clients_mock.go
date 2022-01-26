@@ -21,7 +21,8 @@ import (
 	data_lifecycle "github.com/chef/automate/api/interservice/data_lifecycle"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	event_feed "github.com/chef/automate/api/interservice/event_feed"
-	service1 "github.com/chef/automate/api/interservice/infra_proxy/service"
+	service1 "github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
+	service2 "github.com/chef/automate/api/interservice/infra_proxy/service"
 	ingest0 "github.com/chef/automate/api/interservice/ingest"
 	license_control "github.com/chef/automate/api/interservice/license_control"
 	local_user "github.com/chef/automate/api/interservice/local_user"
@@ -479,10 +480,10 @@ func (mr *MockClientsFactoryMockRecorder) PurgeClient(service interface{}) *gomo
 }
 
 // InfraProxyClient mocks base method
-func (m *MockClientsFactory) InfraProxyClient() (service1.InfraProxyServiceClient, error) {
+func (m *MockClientsFactory) InfraProxyClient() (service2.InfraProxyServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InfraProxyClient")
-	ret0, _ := ret[0].(service1.InfraProxyServiceClient)
+	ret0, _ := ret[0].(service2.InfraProxyServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -491,6 +492,21 @@ func (m *MockClientsFactory) InfraProxyClient() (service1.InfraProxyServiceClien
 func (mr *MockClientsFactoryMockRecorder) InfraProxyClient() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InfraProxyClient", reflect.TypeOf((*MockClientsFactory)(nil).InfraProxyClient))
+}
+
+// InfraProxyMigrationClient mocks base method
+func (m *MockClientsFactory) InfraProxyMigrationClient() (service1.MigrationDataServiceClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InfraProxyMigrationClient")
+	ret0, _ := ret[0].(service1.MigrationDataServiceClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InfraProxyMigrationClient indicates an expected call of InfraProxyMigrationClient
+func (mr *MockClientsFactoryMockRecorder) InfraProxyMigrationClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InfraProxyMigrationClient", reflect.TypeOf((*MockClientsFactory)(nil).InfraProxyMigrationClient))
 }
 
 // CdsClient mocks base method

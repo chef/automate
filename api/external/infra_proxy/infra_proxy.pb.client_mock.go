@@ -6,978 +6,37 @@ package infra_proxy
 
 import (
 	context "context"
-	reflect "reflect"
-
 	request "github.com/chef/automate/api/external/infra_proxy/request"
 	response "github.com/chef/automate/api/external/infra_proxy/response"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
+	reflect "reflect"
 )
 
-// MockInfraProxyClient is a mock of InfraProxyClient interface.
+// MockInfraProxyClient is a mock of InfraProxyClient interface
 type MockInfraProxyClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockInfraProxyClientMockRecorder
 }
 
-// MockInfraProxyClientMockRecorder is the mock recorder for MockInfraProxyClient.
+// MockInfraProxyClientMockRecorder is the mock recorder for MockInfraProxyClient
 type MockInfraProxyClientMockRecorder struct {
 	mock *MockInfraProxyClient
 }
 
-// NewMockInfraProxyClient creates a new mock instance.
+// NewMockInfraProxyClient creates a new mock instance
 func NewMockInfraProxyClient(ctrl *gomock.Controller) *MockInfraProxyClient {
 	mock := &MockInfraProxyClient{ctrl: ctrl}
 	mock.recorder = &MockInfraProxyClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockInfraProxyClient) EXPECT() *MockInfraProxyClientMockRecorder {
 	return m.recorder
 }
 
-// CreateClient mocks base method.
-func (m *MockInfraProxyClient) CreateClient(ctx context.Context, in *request.CreateClient, opts ...grpc.CallOption) (*response.CreateClient, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateClient", varargs...)
-	ret0, _ := ret[0].(*response.CreateClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateClient indicates an expected call of CreateClient.
-func (mr *MockInfraProxyClientMockRecorder) CreateClient(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateClient), varargs...)
-}
-
-// CreateDataBag mocks base method.
-func (m *MockInfraProxyClient) CreateDataBag(ctx context.Context, in *request.CreateDataBag, opts ...grpc.CallOption) (*response.CreateDataBag, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateDataBag", varargs...)
-	ret0, _ := ret[0].(*response.CreateDataBag)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateDataBag indicates an expected call of CreateDataBag.
-func (mr *MockInfraProxyClientMockRecorder) CreateDataBag(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBag", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateDataBag), varargs...)
-}
-
-// CreateDataBagItem mocks base method.
-func (m *MockInfraProxyClient) CreateDataBagItem(ctx context.Context, in *request.CreateDataBagItem, opts ...grpc.CallOption) (*response.CreateDataBagItem, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateDataBagItem", varargs...)
-	ret0, _ := ret[0].(*response.CreateDataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateDataBagItem indicates an expected call of CreateDataBagItem.
-func (mr *MockInfraProxyClientMockRecorder) CreateDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateDataBagItem), varargs...)
-}
-
-// CreateEnvironment mocks base method.
-func (m *MockInfraProxyClient) CreateEnvironment(ctx context.Context, in *request.CreateEnvironment, opts ...grpc.CallOption) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateEnvironment", varargs...)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateEnvironment indicates an expected call of CreateEnvironment.
-func (mr *MockInfraProxyClientMockRecorder) CreateEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateEnvironment), varargs...)
-}
-
-// CreateOrg mocks base method.
-func (m *MockInfraProxyClient) CreateOrg(ctx context.Context, in *request.CreateOrg, opts ...grpc.CallOption) (*response.CreateOrg, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateOrg", varargs...)
-	ret0, _ := ret[0].(*response.CreateOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateOrg indicates an expected call of CreateOrg.
-func (mr *MockInfraProxyClientMockRecorder) CreateOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateOrg), varargs...)
-}
-
-// CreateRole mocks base method.
-func (m *MockInfraProxyClient) CreateRole(ctx context.Context, in *request.CreateRole, opts ...grpc.CallOption) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateRole", varargs...)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateRole indicates an expected call of CreateRole.
-func (mr *MockInfraProxyClientMockRecorder) CreateRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRole", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateRole), varargs...)
-}
-
-// CreateServer mocks base method.
-func (m *MockInfraProxyClient) CreateServer(ctx context.Context, in *request.CreateServer, opts ...grpc.CallOption) (*response.CreateServer, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateServer", varargs...)
-	ret0, _ := ret[0].(*response.CreateServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateServer indicates an expected call of CreateServer.
-func (mr *MockInfraProxyClientMockRecorder) CreateServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServer", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateServer), varargs...)
-}
-
-// DeleteClient mocks base method.
-func (m *MockInfraProxyClient) DeleteClient(ctx context.Context, in *request.Client, opts ...grpc.CallOption) (*response.Client, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteClient", varargs...)
-	ret0, _ := ret[0].(*response.Client)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteClient indicates an expected call of DeleteClient.
-func (mr *MockInfraProxyClientMockRecorder) DeleteClient(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteClient", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteClient), varargs...)
-}
-
-// DeleteDataBag mocks base method.
-func (m *MockInfraProxyClient) DeleteDataBag(ctx context.Context, in *request.DataBag, opts ...grpc.CallOption) (*response.DataBag, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteDataBag", varargs...)
-	ret0, _ := ret[0].(*response.DataBag)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteDataBag indicates an expected call of DeleteDataBag.
-func (mr *MockInfraProxyClientMockRecorder) DeleteDataBag(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBag", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteDataBag), varargs...)
-}
-
-// DeleteDataBagItem mocks base method.
-func (m *MockInfraProxyClient) DeleteDataBagItem(ctx context.Context, in *request.DataBagItem, opts ...grpc.CallOption) (*response.DataBagItem, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteDataBagItem", varargs...)
-	ret0, _ := ret[0].(*response.DataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteDataBagItem indicates an expected call of DeleteDataBagItem.
-func (mr *MockInfraProxyClientMockRecorder) DeleteDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteDataBagItem), varargs...)
-}
-
-// DeleteEnvironment mocks base method.
-func (m *MockInfraProxyClient) DeleteEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteEnvironment", varargs...)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteEnvironment indicates an expected call of DeleteEnvironment.
-func (mr *MockInfraProxyClientMockRecorder) DeleteEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteEnvironment), varargs...)
-}
-
-// DeleteNode mocks base method.
-func (m *MockInfraProxyClient) DeleteNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.DeleteNode, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteNode", varargs...)
-	ret0, _ := ret[0].(*response.DeleteNode)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteNode indicates an expected call of DeleteNode.
-func (mr *MockInfraProxyClientMockRecorder) DeleteNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNode", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteNode), varargs...)
-}
-
-// DeleteOrg mocks base method.
-func (m *MockInfraProxyClient) DeleteOrg(ctx context.Context, in *request.DeleteOrg, opts ...grpc.CallOption) (*response.DeleteOrg, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteOrg", varargs...)
-	ret0, _ := ret[0].(*response.DeleteOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteOrg indicates an expected call of DeleteOrg.
-func (mr *MockInfraProxyClientMockRecorder) DeleteOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteOrg), varargs...)
-}
-
-// DeletePolicyfile mocks base method.
-func (m *MockInfraProxyClient) DeletePolicyfile(ctx context.Context, in *request.DeletePolicyfile, opts ...grpc.CallOption) (*response.DeletePolicyfile, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeletePolicyfile", varargs...)
-	ret0, _ := ret[0].(*response.DeletePolicyfile)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeletePolicyfile indicates an expected call of DeletePolicyfile.
-func (mr *MockInfraProxyClientMockRecorder) DeletePolicyfile(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePolicyfile", reflect.TypeOf((*MockInfraProxyClient)(nil).DeletePolicyfile), varargs...)
-}
-
-// DeleteRole mocks base method.
-func (m *MockInfraProxyClient) DeleteRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteRole", varargs...)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteRole indicates an expected call of DeleteRole.
-func (mr *MockInfraProxyClientMockRecorder) DeleteRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRole", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteRole), varargs...)
-}
-
-// DeleteServer mocks base method.
-func (m *MockInfraProxyClient) DeleteServer(ctx context.Context, in *request.DeleteServer, opts ...grpc.CallOption) (*response.DeleteServer, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "DeleteServer", varargs...)
-	ret0, _ := ret[0].(*response.DeleteServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteServer indicates an expected call of DeleteServer.
-func (mr *MockInfraProxyClientMockRecorder) DeleteServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServer", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteServer), varargs...)
-}
-
-// GetAutomateInfraServerUsersList mocks base method.
-func (m *MockInfraProxyClient) GetAutomateInfraServerUsersList(ctx context.Context, in *request.AutomateInfraServerUsers, opts ...grpc.CallOption) (*response.AutomateInfraServerUsers, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetAutomateInfraServerUsersList", varargs...)
-	ret0, _ := ret[0].(*response.AutomateInfraServerUsers)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAutomateInfraServerUsersList indicates an expected call of GetAutomateInfraServerUsersList.
-func (mr *MockInfraProxyClientMockRecorder) GetAutomateInfraServerUsersList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAutomateInfraServerUsersList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetAutomateInfraServerUsersList), varargs...)
-}
-
-// GetClient mocks base method.
-func (m *MockInfraProxyClient) GetClient(ctx context.Context, in *request.Client, opts ...grpc.CallOption) (*response.Client, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetClient", varargs...)
-	ret0, _ := ret[0].(*response.Client)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetClient indicates an expected call of GetClient.
-func (mr *MockInfraProxyClientMockRecorder) GetClient(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClient", reflect.TypeOf((*MockInfraProxyClient)(nil).GetClient), varargs...)
-}
-
-// GetClients mocks base method.
-func (m *MockInfraProxyClient) GetClients(ctx context.Context, in *request.Clients, opts ...grpc.CallOption) (*response.Clients, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetClients", varargs...)
-	ret0, _ := ret[0].(*response.Clients)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetClients indicates an expected call of GetClients.
-func (mr *MockInfraProxyClientMockRecorder) GetClients(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClients", reflect.TypeOf((*MockInfraProxyClient)(nil).GetClients), varargs...)
-}
-
-// GetCookbook mocks base method.
-func (m *MockInfraProxyClient) GetCookbook(ctx context.Context, in *request.Cookbook, opts ...grpc.CallOption) (*response.Cookbook, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetCookbook", varargs...)
-	ret0, _ := ret[0].(*response.Cookbook)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbook indicates an expected call of GetCookbook.
-func (mr *MockInfraProxyClientMockRecorder) GetCookbook(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbook", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbook), varargs...)
-}
-
-// GetCookbookFileContent mocks base method.
-func (m *MockInfraProxyClient) GetCookbookFileContent(ctx context.Context, in *request.CookbookFileContent, opts ...grpc.CallOption) (*response.CookbookFileContent, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetCookbookFileContent", varargs...)
-	ret0, _ := ret[0].(*response.CookbookFileContent)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbookFileContent indicates an expected call of GetCookbookFileContent.
-func (mr *MockInfraProxyClientMockRecorder) GetCookbookFileContent(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookFileContent", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbookFileContent), varargs...)
-}
-
-// GetCookbookVersions mocks base method.
-func (m *MockInfraProxyClient) GetCookbookVersions(ctx context.Context, in *request.CookbookVersions, opts ...grpc.CallOption) (*response.CookbookVersions, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetCookbookVersions", varargs...)
-	ret0, _ := ret[0].(*response.CookbookVersions)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbookVersions indicates an expected call of GetCookbookVersions.
-func (mr *MockInfraProxyClientMockRecorder) GetCookbookVersions(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookVersions", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbookVersions), varargs...)
-}
-
-// GetCookbooks mocks base method.
-func (m *MockInfraProxyClient) GetCookbooks(ctx context.Context, in *request.Cookbooks, opts ...grpc.CallOption) (*response.Cookbooks, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetCookbooks", varargs...)
-	ret0, _ := ret[0].(*response.Cookbooks)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbooks indicates an expected call of GetCookbooks.
-func (mr *MockInfraProxyClientMockRecorder) GetCookbooks(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbooks", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbooks), varargs...)
-}
-
-// GetDataBagItem mocks base method.
-func (m *MockInfraProxyClient) GetDataBagItem(ctx context.Context, in *request.DataBagItem, opts ...grpc.CallOption) (*response.DataBagItem, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetDataBagItem", varargs...)
-	ret0, _ := ret[0].(*response.DataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDataBagItem indicates an expected call of GetDataBagItem.
-func (mr *MockInfraProxyClientMockRecorder) GetDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).GetDataBagItem), varargs...)
-}
-
-// GetDataBagItems mocks base method.
-func (m *MockInfraProxyClient) GetDataBagItems(ctx context.Context, in *request.DataBagItems, opts ...grpc.CallOption) (*response.DataBagItems, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetDataBagItems", varargs...)
-	ret0, _ := ret[0].(*response.DataBagItems)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDataBagItems indicates an expected call of GetDataBagItems.
-func (mr *MockInfraProxyClientMockRecorder) GetDataBagItems(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItems", reflect.TypeOf((*MockInfraProxyClient)(nil).GetDataBagItems), varargs...)
-}
-
-// GetDataBags mocks base method.
-func (m *MockInfraProxyClient) GetDataBags(ctx context.Context, in *request.DataBags, opts ...grpc.CallOption) (*response.DataBags, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetDataBags", varargs...)
-	ret0, _ := ret[0].(*response.DataBags)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDataBags indicates an expected call of GetDataBags.
-func (mr *MockInfraProxyClientMockRecorder) GetDataBags(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBags", reflect.TypeOf((*MockInfraProxyClient)(nil).GetDataBags), varargs...)
-}
-
-// GetEnvironment mocks base method.
-func (m *MockInfraProxyClient) GetEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetEnvironment", varargs...)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvironment indicates an expected call of GetEnvironment.
-func (mr *MockInfraProxyClientMockRecorder) GetEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).GetEnvironment), varargs...)
-}
-
-// GetEnvironmentRecipes mocks base method.
-func (m *MockInfraProxyClient) GetEnvironmentRecipes(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.EnvironmentRecipesList, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetEnvironmentRecipes", varargs...)
-	ret0, _ := ret[0].(*response.EnvironmentRecipesList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvironmentRecipes indicates an expected call of GetEnvironmentRecipes.
-func (mr *MockInfraProxyClientMockRecorder) GetEnvironmentRecipes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironmentRecipes", reflect.TypeOf((*MockInfraProxyClient)(nil).GetEnvironmentRecipes), varargs...)
-}
-
-// GetEnvironments mocks base method.
-func (m *MockInfraProxyClient) GetEnvironments(ctx context.Context, in *request.Environments, opts ...grpc.CallOption) (*response.Environments, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetEnvironments", varargs...)
-	ret0, _ := ret[0].(*response.Environments)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvironments indicates an expected call of GetEnvironments.
-func (mr *MockInfraProxyClientMockRecorder) GetEnvironments(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironments", reflect.TypeOf((*MockInfraProxyClient)(nil).GetEnvironments), varargs...)
-}
-
-// GetInfraServerOrgs mocks base method.
-func (m *MockInfraProxyClient) GetInfraServerOrgs(ctx context.Context, in *request.GetInfraServerOrgs, opts ...grpc.CallOption) (*response.GetInfraServerOrgs, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetInfraServerOrgs", varargs...)
-	ret0, _ := ret[0].(*response.GetInfraServerOrgs)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetInfraServerOrgs indicates an expected call of GetInfraServerOrgs.
-func (mr *MockInfraProxyClientMockRecorder) GetInfraServerOrgs(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfraServerOrgs", reflect.TypeOf((*MockInfraProxyClient)(nil).GetInfraServerOrgs), varargs...)
-}
-
-// GetNode mocks base method.
-func (m *MockInfraProxyClient) GetNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.Node, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetNode", varargs...)
-	ret0, _ := ret[0].(*response.Node)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNode indicates an expected call of GetNode.
-func (mr *MockInfraProxyClientMockRecorder) GetNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNode), varargs...)
-}
-
-// GetNodeExpandedRunList mocks base method.
-func (m *MockInfraProxyClient) GetNodeExpandedRunList(ctx context.Context, in *request.NodeExpandedRunList, opts ...grpc.CallOption) (*response.NodeExpandedRunList, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetNodeExpandedRunList", varargs...)
-	ret0, _ := ret[0].(*response.NodeExpandedRunList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNodeExpandedRunList indicates an expected call of GetNodeExpandedRunList.
-func (mr *MockInfraProxyClientMockRecorder) GetNodeExpandedRunList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeExpandedRunList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNodeExpandedRunList), varargs...)
-}
-
-// GetNodes mocks base method.
-func (m *MockInfraProxyClient) GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*response.Nodes, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetNodes", varargs...)
-	ret0, _ := ret[0].(*response.Nodes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNodes indicates an expected call of GetNodes.
-func (mr *MockInfraProxyClientMockRecorder) GetNodes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodes", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNodes), varargs...)
-}
-
-// GetOrg mocks base method.
-func (m *MockInfraProxyClient) GetOrg(ctx context.Context, in *request.GetOrg, opts ...grpc.CallOption) (*response.GetOrg, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetOrg", varargs...)
-	ret0, _ := ret[0].(*response.GetOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOrg indicates an expected call of GetOrg.
-func (mr *MockInfraProxyClientMockRecorder) GetOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).GetOrg), varargs...)
-}
-
-// GetOrgUsersList mocks base method.
-func (m *MockInfraProxyClient) GetOrgUsersList(ctx context.Context, in *request.OrgUsers, opts ...grpc.CallOption) (*response.OrgUsers, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetOrgUsersList", varargs...)
-	ret0, _ := ret[0].(*response.OrgUsers)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOrgUsersList indicates an expected call of GetOrgUsersList.
-func (mr *MockInfraProxyClientMockRecorder) GetOrgUsersList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgUsersList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetOrgUsersList), varargs...)
-}
-
-// GetOrgs mocks base method.
-func (m *MockInfraProxyClient) GetOrgs(ctx context.Context, in *request.GetOrgs, opts ...grpc.CallOption) (*response.GetOrgs, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetOrgs", varargs...)
-	ret0, _ := ret[0].(*response.GetOrgs)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOrgs indicates an expected call of GetOrgs.
-func (mr *MockInfraProxyClientMockRecorder) GetOrgs(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgs", reflect.TypeOf((*MockInfraProxyClient)(nil).GetOrgs), varargs...)
-}
-
-// GetPolicyfile mocks base method.
-func (m *MockInfraProxyClient) GetPolicyfile(ctx context.Context, in *request.Policyfile, opts ...grpc.CallOption) (*response.Policyfile, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetPolicyfile", varargs...)
-	ret0, _ := ret[0].(*response.Policyfile)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicyfile indicates an expected call of GetPolicyfile.
-func (mr *MockInfraProxyClientMockRecorder) GetPolicyfile(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfile", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicyfile), varargs...)
-}
-
-// GetPolicyfileRevisions mocks base method.
-func (m *MockInfraProxyClient) GetPolicyfileRevisions(ctx context.Context, in *request.PolicyfileRevisions, opts ...grpc.CallOption) (*response.PolicyfileRevisions, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetPolicyfileRevisions", varargs...)
-	ret0, _ := ret[0].(*response.PolicyfileRevisions)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicyfileRevisions indicates an expected call of GetPolicyfileRevisions.
-func (mr *MockInfraProxyClientMockRecorder) GetPolicyfileRevisions(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfileRevisions", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicyfileRevisions), varargs...)
-}
-
-// GetPolicyfiles mocks base method.
-func (m *MockInfraProxyClient) GetPolicyfiles(ctx context.Context, in *request.Policyfiles, opts ...grpc.CallOption) (*response.Policyfiles, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetPolicyfiles", varargs...)
-	ret0, _ := ret[0].(*response.Policyfiles)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicyfiles indicates an expected call of GetPolicyfiles.
-func (mr *MockInfraProxyClientMockRecorder) GetPolicyfiles(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfiles", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicyfiles), varargs...)
-}
-
-// GetPolicygroup mocks base method.
-func (m *MockInfraProxyClient) GetPolicygroup(ctx context.Context, in *request.Policygroup, opts ...grpc.CallOption) (*response.Policygroup, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetPolicygroup", varargs...)
-	ret0, _ := ret[0].(*response.Policygroup)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicygroup indicates an expected call of GetPolicygroup.
-func (mr *MockInfraProxyClientMockRecorder) GetPolicygroup(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicygroup", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicygroup), varargs...)
-}
-
-// GetRole mocks base method.
-func (m *MockInfraProxyClient) GetRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetRole", varargs...)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRole indicates an expected call of GetRole.
-func (mr *MockInfraProxyClientMockRecorder) GetRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRole", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRole), varargs...)
-}
-
-// GetRoleEnvironments mocks base method.
-func (m *MockInfraProxyClient) GetRoleEnvironments(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.RoleEnvironments, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetRoleEnvironments", varargs...)
-	ret0, _ := ret[0].(*response.RoleEnvironments)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRoleEnvironments indicates an expected call of GetRoleEnvironments.
-func (mr *MockInfraProxyClientMockRecorder) GetRoleEnvironments(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleEnvironments", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRoleEnvironments), varargs...)
-}
-
-// GetRoleExpandedRunList mocks base method.
-func (m *MockInfraProxyClient) GetRoleExpandedRunList(ctx context.Context, in *request.ExpandedRunList, opts ...grpc.CallOption) (*response.ExpandedRunList, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetRoleExpandedRunList", varargs...)
-	ret0, _ := ret[0].(*response.ExpandedRunList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRoleExpandedRunList indicates an expected call of GetRoleExpandedRunList.
-func (mr *MockInfraProxyClientMockRecorder) GetRoleExpandedRunList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleExpandedRunList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRoleExpandedRunList), varargs...)
-}
-
-// GetRoles mocks base method.
-func (m *MockInfraProxyClient) GetRoles(ctx context.Context, in *request.Roles, opts ...grpc.CallOption) (*response.Roles, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetRoles", varargs...)
-	ret0, _ := ret[0].(*response.Roles)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRoles indicates an expected call of GetRoles.
-func (mr *MockInfraProxyClientMockRecorder) GetRoles(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRoles), varargs...)
-}
-
-// GetServer mocks base method.
-func (m *MockInfraProxyClient) GetServer(ctx context.Context, in *request.GetServer, opts ...grpc.CallOption) (*response.GetServer, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetServer", varargs...)
-	ret0, _ := ret[0].(*response.GetServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetServer indicates an expected call of GetServer.
-func (mr *MockInfraProxyClientMockRecorder) GetServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockInfraProxyClient)(nil).GetServer), varargs...)
-}
-
-// GetServerStatus mocks base method.
-func (m *MockInfraProxyClient) GetServerStatus(ctx context.Context, in *request.GetServerStatus, opts ...grpc.CallOption) (*response.GetServerStatus, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetServerStatus", varargs...)
-	ret0, _ := ret[0].(*response.GetServerStatus)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetServerStatus indicates an expected call of GetServerStatus.
-func (mr *MockInfraProxyClientMockRecorder) GetServerStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerStatus", reflect.TypeOf((*MockInfraProxyClient)(nil).GetServerStatus), varargs...)
-}
-
-// GetServerUsersList mocks base method.
-func (m *MockInfraProxyClient) GetServerUsersList(ctx context.Context, in *request.ServerUsers, opts ...grpc.CallOption) (*response.ServerUsers, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetServerUsersList", varargs...)
-	ret0, _ := ret[0].(*response.ServerUsers)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetServerUsersList indicates an expected call of GetServerUsersList.
-func (mr *MockInfraProxyClientMockRecorder) GetServerUsersList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerUsersList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetServerUsersList), varargs...)
-}
-
-// GetServers mocks base method.
+// GetServers mocks base method
 func (m *MockInfraProxyClient) GetServers(ctx context.Context, in *request.GetServers, opts ...grpc.CallOption) (*response.GetServers, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -990,254 +49,34 @@ func (m *MockInfraProxyClient) GetServers(ctx context.Context, in *request.GetSe
 	return ret0, ret1
 }
 
-// GetServers indicates an expected call of GetServers.
+// GetServers indicates an expected call of GetServers
 func (mr *MockInfraProxyClientMockRecorder) GetServers(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServers", reflect.TypeOf((*MockInfraProxyClient)(nil).GetServers), varargs...)
 }
 
-// ResetClientKey mocks base method.
-func (m *MockInfraProxyClient) ResetClientKey(ctx context.Context, in *request.ClientKey, opts ...grpc.CallOption) (*response.ResetClient, error) {
+// GetServerStatus mocks base method
+func (m *MockInfraProxyClient) GetServerStatus(ctx context.Context, in *request.GetServerStatus, opts ...grpc.CallOption) (*response.GetServerStatus, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "ResetClientKey", varargs...)
-	ret0, _ := ret[0].(*response.ResetClient)
+	ret := m.ctrl.Call(m, "GetServerStatus", varargs...)
+	ret0, _ := ret[0].(*response.GetServerStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResetClientKey indicates an expected call of ResetClientKey.
-func (mr *MockInfraProxyClientMockRecorder) ResetClientKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+// GetServerStatus indicates an expected call of GetServerStatus
+func (mr *MockInfraProxyClientMockRecorder) GetServerStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetClientKey", reflect.TypeOf((*MockInfraProxyClient)(nil).ResetClientKey), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerStatus", reflect.TypeOf((*MockInfraProxyClient)(nil).GetServerStatus), varargs...)
 }
 
-// ResetOrgAdminKey mocks base method.
-func (m *MockInfraProxyClient) ResetOrgAdminKey(ctx context.Context, in *request.ResetOrgAdminKey, opts ...grpc.CallOption) (*response.ResetOrgAdminKey, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ResetOrgAdminKey", varargs...)
-	ret0, _ := ret[0].(*response.ResetOrgAdminKey)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ResetOrgAdminKey indicates an expected call of ResetOrgAdminKey.
-func (mr *MockInfraProxyClientMockRecorder) ResetOrgAdminKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOrgAdminKey", reflect.TypeOf((*MockInfraProxyClient)(nil).ResetOrgAdminKey), varargs...)
-}
-
-// UpdateDataBagItem mocks base method.
-func (m *MockInfraProxyClient) UpdateDataBagItem(ctx context.Context, in *request.UpdateDataBagItem, opts ...grpc.CallOption) (*response.UpdateDataBagItem, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateDataBagItem", varargs...)
-	ret0, _ := ret[0].(*response.UpdateDataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateDataBagItem indicates an expected call of UpdateDataBagItem.
-func (mr *MockInfraProxyClientMockRecorder) UpdateDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateDataBagItem), varargs...)
-}
-
-// UpdateEnvironment mocks base method.
-func (m *MockInfraProxyClient) UpdateEnvironment(ctx context.Context, in *request.UpdateEnvironment, opts ...grpc.CallOption) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateEnvironment", varargs...)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateEnvironment indicates an expected call of UpdateEnvironment.
-func (mr *MockInfraProxyClientMockRecorder) UpdateEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateEnvironment), varargs...)
-}
-
-// UpdateNode mocks base method.
-func (m *MockInfraProxyClient) UpdateNode(ctx context.Context, in *request.NodeDetails, opts ...grpc.CallOption) (*response.Node, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateNode", varargs...)
-	ret0, _ := ret[0].(*response.Node)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNode indicates an expected call of UpdateNode.
-func (mr *MockInfraProxyClientMockRecorder) UpdateNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNode", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNode), varargs...)
-}
-
-// UpdateNodeAttributes mocks base method.
-func (m *MockInfraProxyClient) UpdateNodeAttributes(ctx context.Context, in *request.UpdateNodeAttributes, opts ...grpc.CallOption) (*response.UpdateNodeAttributes, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateNodeAttributes", varargs...)
-	ret0, _ := ret[0].(*response.UpdateNodeAttributes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNodeAttributes indicates an expected call of UpdateNodeAttributes.
-func (mr *MockInfraProxyClientMockRecorder) UpdateNodeAttributes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeAttributes", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNodeAttributes), varargs...)
-}
-
-// UpdateNodeEnvironment mocks base method.
-func (m *MockInfraProxyClient) UpdateNodeEnvironment(ctx context.Context, in *request.UpdateNodeEnvironment, opts ...grpc.CallOption) (*response.UpdateNodeEnvironment, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateNodeEnvironment", varargs...)
-	ret0, _ := ret[0].(*response.UpdateNodeEnvironment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNodeEnvironment indicates an expected call of UpdateNodeEnvironment.
-func (mr *MockInfraProxyClientMockRecorder) UpdateNodeEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNodeEnvironment), varargs...)
-}
-
-// UpdateNodeTags mocks base method.
-func (m *MockInfraProxyClient) UpdateNodeTags(ctx context.Context, in *request.UpdateNodeTags, opts ...grpc.CallOption) (*response.UpdateNodeTags, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateNodeTags", varargs...)
-	ret0, _ := ret[0].(*response.UpdateNodeTags)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNodeTags indicates an expected call of UpdateNodeTags.
-func (mr *MockInfraProxyClientMockRecorder) UpdateNodeTags(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeTags", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNodeTags), varargs...)
-}
-
-// UpdateOrg mocks base method.
-func (m *MockInfraProxyClient) UpdateOrg(ctx context.Context, in *request.UpdateOrg, opts ...grpc.CallOption) (*response.UpdateOrg, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateOrg", varargs...)
-	ret0, _ := ret[0].(*response.UpdateOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateOrg indicates an expected call of UpdateOrg.
-func (mr *MockInfraProxyClientMockRecorder) UpdateOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateOrg), varargs...)
-}
-
-// UpdateRole mocks base method.
-func (m *MockInfraProxyClient) UpdateRole(ctx context.Context, in *request.UpdateRole, opts ...grpc.CallOption) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateRole", varargs...)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateRole indicates an expected call of UpdateRole.
-func (mr *MockInfraProxyClientMockRecorder) UpdateRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRole", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateRole), varargs...)
-}
-
-// UpdateServer mocks base method.
-func (m *MockInfraProxyClient) UpdateServer(ctx context.Context, in *request.UpdateServer, opts ...grpc.CallOption) (*response.UpdateServer, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateServer", varargs...)
-	ret0, _ := ret[0].(*response.UpdateServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateServer indicates an expected call of UpdateServer.
-func (mr *MockInfraProxyClientMockRecorder) UpdateServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServer", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateServer), varargs...)
-}
-
-// UpdateWebuiKey mocks base method.
-func (m *MockInfraProxyClient) UpdateWebuiKey(ctx context.Context, in *request.UpdateWebuiKey, opts ...grpc.CallOption) (*response.UpdateWebuiKey, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "UpdateWebuiKey", varargs...)
-	ret0, _ := ret[0].(*response.UpdateWebuiKey)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateWebuiKey indicates an expected call of UpdateWebuiKey.
-func (mr *MockInfraProxyClientMockRecorder) UpdateWebuiKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWebuiKey", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateWebuiKey), varargs...)
-}
-
-// ValidateWebuiKey mocks base method.
+// ValidateWebuiKey mocks base method
 func (m *MockInfraProxyClient) ValidateWebuiKey(ctx context.Context, in *request.ValidateWebuiKey, opts ...grpc.CallOption) (*response.ValidateWebuiKey, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -1250,742 +89,1197 @@ func (m *MockInfraProxyClient) ValidateWebuiKey(ctx context.Context, in *request
 	return ret0, ret1
 }
 
-// ValidateWebuiKey indicates an expected call of ValidateWebuiKey.
+// ValidateWebuiKey indicates an expected call of ValidateWebuiKey
 func (mr *MockInfraProxyClientMockRecorder) ValidateWebuiKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateWebuiKey", reflect.TypeOf((*MockInfraProxyClient)(nil).ValidateWebuiKey), varargs...)
 }
 
-// MockInfraProxyServer is a mock of InfraProxyServer interface.
+// UpdateWebuiKey mocks base method
+func (m *MockInfraProxyClient) UpdateWebuiKey(ctx context.Context, in *request.UpdateWebuiKey, opts ...grpc.CallOption) (*response.UpdateWebuiKey, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateWebuiKey", varargs...)
+	ret0, _ := ret[0].(*response.UpdateWebuiKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateWebuiKey indicates an expected call of UpdateWebuiKey
+func (mr *MockInfraProxyClientMockRecorder) UpdateWebuiKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWebuiKey", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateWebuiKey), varargs...)
+}
+
+// GetServer mocks base method
+func (m *MockInfraProxyClient) GetServer(ctx context.Context, in *request.GetServer, opts ...grpc.CallOption) (*response.GetServer, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetServer", varargs...)
+	ret0, _ := ret[0].(*response.GetServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetServer indicates an expected call of GetServer
+func (mr *MockInfraProxyClientMockRecorder) GetServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockInfraProxyClient)(nil).GetServer), varargs...)
+}
+
+// CreateServer mocks base method
+func (m *MockInfraProxyClient) CreateServer(ctx context.Context, in *request.CreateServer, opts ...grpc.CallOption) (*response.CreateServer, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateServer", varargs...)
+	ret0, _ := ret[0].(*response.CreateServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateServer indicates an expected call of CreateServer
+func (mr *MockInfraProxyClientMockRecorder) CreateServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServer", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateServer), varargs...)
+}
+
+// UpdateServer mocks base method
+func (m *MockInfraProxyClient) UpdateServer(ctx context.Context, in *request.UpdateServer, opts ...grpc.CallOption) (*response.UpdateServer, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateServer", varargs...)
+	ret0, _ := ret[0].(*response.UpdateServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateServer indicates an expected call of UpdateServer
+func (mr *MockInfraProxyClientMockRecorder) UpdateServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServer", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateServer), varargs...)
+}
+
+// DeleteServer mocks base method
+func (m *MockInfraProxyClient) DeleteServer(ctx context.Context, in *request.DeleteServer, opts ...grpc.CallOption) (*response.DeleteServer, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteServer", varargs...)
+	ret0, _ := ret[0].(*response.DeleteServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteServer indicates an expected call of DeleteServer
+func (mr *MockInfraProxyClientMockRecorder) DeleteServer(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServer", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteServer), varargs...)
+}
+
+// GetOrgs mocks base method
+func (m *MockInfraProxyClient) GetOrgs(ctx context.Context, in *request.GetOrgs, opts ...grpc.CallOption) (*response.GetOrgs, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetOrgs", varargs...)
+	ret0, _ := ret[0].(*response.GetOrgs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrgs indicates an expected call of GetOrgs
+func (mr *MockInfraProxyClientMockRecorder) GetOrgs(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgs", reflect.TypeOf((*MockInfraProxyClient)(nil).GetOrgs), varargs...)
+}
+
+// GetOrg mocks base method
+func (m *MockInfraProxyClient) GetOrg(ctx context.Context, in *request.GetOrg, opts ...grpc.CallOption) (*response.GetOrg, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetOrg", varargs...)
+	ret0, _ := ret[0].(*response.GetOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrg indicates an expected call of GetOrg
+func (mr *MockInfraProxyClientMockRecorder) GetOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).GetOrg), varargs...)
+}
+
+// CreateOrg mocks base method
+func (m *MockInfraProxyClient) CreateOrg(ctx context.Context, in *request.CreateOrg, opts ...grpc.CallOption) (*response.CreateOrg, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateOrg", varargs...)
+	ret0, _ := ret[0].(*response.CreateOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrg indicates an expected call of CreateOrg
+func (mr *MockInfraProxyClientMockRecorder) CreateOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateOrg), varargs...)
+}
+
+// UpdateOrg mocks base method
+func (m *MockInfraProxyClient) UpdateOrg(ctx context.Context, in *request.UpdateOrg, opts ...grpc.CallOption) (*response.UpdateOrg, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateOrg", varargs...)
+	ret0, _ := ret[0].(*response.UpdateOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateOrg indicates an expected call of UpdateOrg
+func (mr *MockInfraProxyClientMockRecorder) UpdateOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateOrg), varargs...)
+}
+
+// DeleteOrg mocks base method
+func (m *MockInfraProxyClient) DeleteOrg(ctx context.Context, in *request.DeleteOrg, opts ...grpc.CallOption) (*response.DeleteOrg, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteOrg", varargs...)
+	ret0, _ := ret[0].(*response.DeleteOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteOrg indicates an expected call of DeleteOrg
+func (mr *MockInfraProxyClientMockRecorder) DeleteOrg(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrg", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteOrg), varargs...)
+}
+
+// ResetOrgAdminKey mocks base method
+func (m *MockInfraProxyClient) ResetOrgAdminKey(ctx context.Context, in *request.ResetOrgAdminKey, opts ...grpc.CallOption) (*response.ResetOrgAdminKey, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ResetOrgAdminKey", varargs...)
+	ret0, _ := ret[0].(*response.ResetOrgAdminKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResetOrgAdminKey indicates an expected call of ResetOrgAdminKey
+func (mr *MockInfraProxyClientMockRecorder) ResetOrgAdminKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOrgAdminKey", reflect.TypeOf((*MockInfraProxyClient)(nil).ResetOrgAdminKey), varargs...)
+}
+
+// GetInfraServerOrgs mocks base method
+func (m *MockInfraProxyClient) GetInfraServerOrgs(ctx context.Context, in *request.GetInfraServerOrgs, opts ...grpc.CallOption) (*response.GetInfraServerOrgs, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetInfraServerOrgs", varargs...)
+	ret0, _ := ret[0].(*response.GetInfraServerOrgs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetInfraServerOrgs indicates an expected call of GetInfraServerOrgs
+func (mr *MockInfraProxyClientMockRecorder) GetInfraServerOrgs(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfraServerOrgs", reflect.TypeOf((*MockInfraProxyClient)(nil).GetInfraServerOrgs), varargs...)
+}
+
+// GetCookbooks mocks base method
+func (m *MockInfraProxyClient) GetCookbooks(ctx context.Context, in *request.Cookbooks, opts ...grpc.CallOption) (*response.Cookbooks, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetCookbooks", varargs...)
+	ret0, _ := ret[0].(*response.Cookbooks)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbooks indicates an expected call of GetCookbooks
+func (mr *MockInfraProxyClientMockRecorder) GetCookbooks(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbooks", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbooks), varargs...)
+}
+
+// GetCookbookVersions mocks base method
+func (m *MockInfraProxyClient) GetCookbookVersions(ctx context.Context, in *request.CookbookVersions, opts ...grpc.CallOption) (*response.CookbookVersions, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetCookbookVersions", varargs...)
+	ret0, _ := ret[0].(*response.CookbookVersions)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbookVersions indicates an expected call of GetCookbookVersions
+func (mr *MockInfraProxyClientMockRecorder) GetCookbookVersions(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookVersions", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbookVersions), varargs...)
+}
+
+// GetCookbook mocks base method
+func (m *MockInfraProxyClient) GetCookbook(ctx context.Context, in *request.Cookbook, opts ...grpc.CallOption) (*response.Cookbook, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetCookbook", varargs...)
+	ret0, _ := ret[0].(*response.Cookbook)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbook indicates an expected call of GetCookbook
+func (mr *MockInfraProxyClientMockRecorder) GetCookbook(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbook", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbook), varargs...)
+}
+
+// GetCookbookFileContent mocks base method
+func (m *MockInfraProxyClient) GetCookbookFileContent(ctx context.Context, in *request.CookbookFileContent, opts ...grpc.CallOption) (*response.CookbookFileContent, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetCookbookFileContent", varargs...)
+	ret0, _ := ret[0].(*response.CookbookFileContent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbookFileContent indicates an expected call of GetCookbookFileContent
+func (mr *MockInfraProxyClientMockRecorder) GetCookbookFileContent(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookFileContent", reflect.TypeOf((*MockInfraProxyClient)(nil).GetCookbookFileContent), varargs...)
+}
+
+// GetRoles mocks base method
+func (m *MockInfraProxyClient) GetRoles(ctx context.Context, in *request.Roles, opts ...grpc.CallOption) (*response.Roles, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRoles", varargs...)
+	ret0, _ := ret[0].(*response.Roles)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoles indicates an expected call of GetRoles
+func (mr *MockInfraProxyClientMockRecorder) GetRoles(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRoles), varargs...)
+}
+
+// GetRole mocks base method
+func (m *MockInfraProxyClient) GetRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRole", varargs...)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRole indicates an expected call of GetRole
+func (mr *MockInfraProxyClientMockRecorder) GetRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRole", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRole), varargs...)
+}
+
+// GetRoleExpandedRunList mocks base method
+func (m *MockInfraProxyClient) GetRoleExpandedRunList(ctx context.Context, in *request.ExpandedRunList, opts ...grpc.CallOption) (*response.ExpandedRunList, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRoleExpandedRunList", varargs...)
+	ret0, _ := ret[0].(*response.ExpandedRunList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoleExpandedRunList indicates an expected call of GetRoleExpandedRunList
+func (mr *MockInfraProxyClientMockRecorder) GetRoleExpandedRunList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleExpandedRunList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRoleExpandedRunList), varargs...)
+}
+
+// GetRoleEnvironments mocks base method
+func (m *MockInfraProxyClient) GetRoleEnvironments(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.RoleEnvironments, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRoleEnvironments", varargs...)
+	ret0, _ := ret[0].(*response.RoleEnvironments)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoleEnvironments indicates an expected call of GetRoleEnvironments
+func (mr *MockInfraProxyClientMockRecorder) GetRoleEnvironments(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleEnvironments", reflect.TypeOf((*MockInfraProxyClient)(nil).GetRoleEnvironments), varargs...)
+}
+
+// CreateRole mocks base method
+func (m *MockInfraProxyClient) CreateRole(ctx context.Context, in *request.CreateRole, opts ...grpc.CallOption) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateRole", varargs...)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRole indicates an expected call of CreateRole
+func (mr *MockInfraProxyClientMockRecorder) CreateRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRole", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateRole), varargs...)
+}
+
+// DeleteRole mocks base method
+func (m *MockInfraProxyClient) DeleteRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteRole", varargs...)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteRole indicates an expected call of DeleteRole
+func (mr *MockInfraProxyClientMockRecorder) DeleteRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRole", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteRole), varargs...)
+}
+
+// UpdateRole mocks base method
+func (m *MockInfraProxyClient) UpdateRole(ctx context.Context, in *request.UpdateRole, opts ...grpc.CallOption) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateRole", varargs...)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRole indicates an expected call of UpdateRole
+func (mr *MockInfraProxyClientMockRecorder) UpdateRole(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRole", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateRole), varargs...)
+}
+
+// GetClients mocks base method
+func (m *MockInfraProxyClient) GetClients(ctx context.Context, in *request.Clients, opts ...grpc.CallOption) (*response.Clients, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetClients", varargs...)
+	ret0, _ := ret[0].(*response.Clients)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClients indicates an expected call of GetClients
+func (mr *MockInfraProxyClientMockRecorder) GetClients(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClients", reflect.TypeOf((*MockInfraProxyClient)(nil).GetClients), varargs...)
+}
+
+// GetClient mocks base method
+func (m *MockInfraProxyClient) GetClient(ctx context.Context, in *request.Client, opts ...grpc.CallOption) (*response.Client, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetClient", varargs...)
+	ret0, _ := ret[0].(*response.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClient indicates an expected call of GetClient
+func (mr *MockInfraProxyClientMockRecorder) GetClient(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClient", reflect.TypeOf((*MockInfraProxyClient)(nil).GetClient), varargs...)
+}
+
+// CreateClient mocks base method
+func (m *MockInfraProxyClient) CreateClient(ctx context.Context, in *request.CreateClient, opts ...grpc.CallOption) (*response.CreateClient, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateClient", varargs...)
+	ret0, _ := ret[0].(*response.CreateClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateClient indicates an expected call of CreateClient
+func (mr *MockInfraProxyClientMockRecorder) CreateClient(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateClient), varargs...)
+}
+
+// DeleteClient mocks base method
+func (m *MockInfraProxyClient) DeleteClient(ctx context.Context, in *request.Client, opts ...grpc.CallOption) (*response.Client, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteClient", varargs...)
+	ret0, _ := ret[0].(*response.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteClient indicates an expected call of DeleteClient
+func (mr *MockInfraProxyClientMockRecorder) DeleteClient(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteClient", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteClient), varargs...)
+}
+
+// ResetClientKey mocks base method
+func (m *MockInfraProxyClient) ResetClientKey(ctx context.Context, in *request.ClientKey, opts ...grpc.CallOption) (*response.ResetClient, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ResetClientKey", varargs...)
+	ret0, _ := ret[0].(*response.ResetClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResetClientKey indicates an expected call of ResetClientKey
+func (mr *MockInfraProxyClientMockRecorder) ResetClientKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetClientKey", reflect.TypeOf((*MockInfraProxyClient)(nil).ResetClientKey), varargs...)
+}
+
+// GetDataBags mocks base method
+func (m *MockInfraProxyClient) GetDataBags(ctx context.Context, in *request.DataBags, opts ...grpc.CallOption) (*response.DataBags, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDataBags", varargs...)
+	ret0, _ := ret[0].(*response.DataBags)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDataBags indicates an expected call of GetDataBags
+func (mr *MockInfraProxyClientMockRecorder) GetDataBags(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBags", reflect.TypeOf((*MockInfraProxyClient)(nil).GetDataBags), varargs...)
+}
+
+// GetDataBagItems mocks base method
+func (m *MockInfraProxyClient) GetDataBagItems(ctx context.Context, in *request.DataBagItems, opts ...grpc.CallOption) (*response.DataBagItems, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDataBagItems", varargs...)
+	ret0, _ := ret[0].(*response.DataBagItems)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDataBagItems indicates an expected call of GetDataBagItems
+func (mr *MockInfraProxyClientMockRecorder) GetDataBagItems(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItems", reflect.TypeOf((*MockInfraProxyClient)(nil).GetDataBagItems), varargs...)
+}
+
+// GetDataBagItem mocks base method
+func (m *MockInfraProxyClient) GetDataBagItem(ctx context.Context, in *request.DataBagItem, opts ...grpc.CallOption) (*response.DataBagItem, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDataBagItem", varargs...)
+	ret0, _ := ret[0].(*response.DataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDataBagItem indicates an expected call of GetDataBagItem
+func (mr *MockInfraProxyClientMockRecorder) GetDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).GetDataBagItem), varargs...)
+}
+
+// CreateDataBag mocks base method
+func (m *MockInfraProxyClient) CreateDataBag(ctx context.Context, in *request.CreateDataBag, opts ...grpc.CallOption) (*response.CreateDataBag, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateDataBag", varargs...)
+	ret0, _ := ret[0].(*response.CreateDataBag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDataBag indicates an expected call of CreateDataBag
+func (mr *MockInfraProxyClientMockRecorder) CreateDataBag(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBag", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateDataBag), varargs...)
+}
+
+// CreateDataBagItem mocks base method
+func (m *MockInfraProxyClient) CreateDataBagItem(ctx context.Context, in *request.CreateDataBagItem, opts ...grpc.CallOption) (*response.CreateDataBagItem, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateDataBagItem", varargs...)
+	ret0, _ := ret[0].(*response.CreateDataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDataBagItem indicates an expected call of CreateDataBagItem
+func (mr *MockInfraProxyClientMockRecorder) CreateDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateDataBagItem), varargs...)
+}
+
+// DeleteDataBag mocks base method
+func (m *MockInfraProxyClient) DeleteDataBag(ctx context.Context, in *request.DataBag, opts ...grpc.CallOption) (*response.DataBag, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteDataBag", varargs...)
+	ret0, _ := ret[0].(*response.DataBag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteDataBag indicates an expected call of DeleteDataBag
+func (mr *MockInfraProxyClientMockRecorder) DeleteDataBag(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBag", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteDataBag), varargs...)
+}
+
+// DeleteDataBagItem mocks base method
+func (m *MockInfraProxyClient) DeleteDataBagItem(ctx context.Context, in *request.DataBagItem, opts ...grpc.CallOption) (*response.DataBagItem, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteDataBagItem", varargs...)
+	ret0, _ := ret[0].(*response.DataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteDataBagItem indicates an expected call of DeleteDataBagItem
+func (mr *MockInfraProxyClientMockRecorder) DeleteDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteDataBagItem), varargs...)
+}
+
+// UpdateDataBagItem mocks base method
+func (m *MockInfraProxyClient) UpdateDataBagItem(ctx context.Context, in *request.UpdateDataBagItem, opts ...grpc.CallOption) (*response.UpdateDataBagItem, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateDataBagItem", varargs...)
+	ret0, _ := ret[0].(*response.UpdateDataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDataBagItem indicates an expected call of UpdateDataBagItem
+func (mr *MockInfraProxyClientMockRecorder) UpdateDataBagItem(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDataBagItem", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateDataBagItem), varargs...)
+}
+
+// GetEnvironments mocks base method
+func (m *MockInfraProxyClient) GetEnvironments(ctx context.Context, in *request.Environments, opts ...grpc.CallOption) (*response.Environments, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetEnvironments", varargs...)
+	ret0, _ := ret[0].(*response.Environments)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEnvironments indicates an expected call of GetEnvironments
+func (mr *MockInfraProxyClientMockRecorder) GetEnvironments(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironments", reflect.TypeOf((*MockInfraProxyClient)(nil).GetEnvironments), varargs...)
+}
+
+// GetEnvironment mocks base method
+func (m *MockInfraProxyClient) GetEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetEnvironment", varargs...)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEnvironment indicates an expected call of GetEnvironment
+func (mr *MockInfraProxyClientMockRecorder) GetEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).GetEnvironment), varargs...)
+}
+
+// CreateEnvironment mocks base method
+func (m *MockInfraProxyClient) CreateEnvironment(ctx context.Context, in *request.CreateEnvironment, opts ...grpc.CallOption) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateEnvironment", varargs...)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateEnvironment indicates an expected call of CreateEnvironment
+func (mr *MockInfraProxyClientMockRecorder) CreateEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).CreateEnvironment), varargs...)
+}
+
+// DeleteEnvironment mocks base method
+func (m *MockInfraProxyClient) DeleteEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteEnvironment", varargs...)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteEnvironment indicates an expected call of DeleteEnvironment
+func (mr *MockInfraProxyClientMockRecorder) DeleteEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteEnvironment), varargs...)
+}
+
+// UpdateEnvironment mocks base method
+func (m *MockInfraProxyClient) UpdateEnvironment(ctx context.Context, in *request.UpdateEnvironment, opts ...grpc.CallOption) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateEnvironment", varargs...)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateEnvironment indicates an expected call of UpdateEnvironment
+func (mr *MockInfraProxyClientMockRecorder) UpdateEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateEnvironment), varargs...)
+}
+
+// GetEnvironmentRecipes mocks base method
+func (m *MockInfraProxyClient) GetEnvironmentRecipes(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.EnvironmentRecipesList, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetEnvironmentRecipes", varargs...)
+	ret0, _ := ret[0].(*response.EnvironmentRecipesList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEnvironmentRecipes indicates an expected call of GetEnvironmentRecipes
+func (mr *MockInfraProxyClientMockRecorder) GetEnvironmentRecipes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironmentRecipes", reflect.TypeOf((*MockInfraProxyClient)(nil).GetEnvironmentRecipes), varargs...)
+}
+
+// GetNodes mocks base method
+func (m *MockInfraProxyClient) GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*response.Nodes, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetNodes", varargs...)
+	ret0, _ := ret[0].(*response.Nodes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodes indicates an expected call of GetNodes
+func (mr *MockInfraProxyClientMockRecorder) GetNodes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodes", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNodes), varargs...)
+}
+
+// DeleteNode mocks base method
+func (m *MockInfraProxyClient) DeleteNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.DeleteNode, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteNode", varargs...)
+	ret0, _ := ret[0].(*response.DeleteNode)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteNode indicates an expected call of DeleteNode
+func (mr *MockInfraProxyClientMockRecorder) DeleteNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNode", reflect.TypeOf((*MockInfraProxyClient)(nil).DeleteNode), varargs...)
+}
+
+// UpdateNode mocks base method
+func (m *MockInfraProxyClient) UpdateNode(ctx context.Context, in *request.NodeDetails, opts ...grpc.CallOption) (*response.Node, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateNode", varargs...)
+	ret0, _ := ret[0].(*response.Node)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNode indicates an expected call of UpdateNode
+func (mr *MockInfraProxyClientMockRecorder) UpdateNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNode", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNode), varargs...)
+}
+
+// UpdateNodeAttributes mocks base method
+func (m *MockInfraProxyClient) UpdateNodeAttributes(ctx context.Context, in *request.UpdateNodeAttributes, opts ...grpc.CallOption) (*response.UpdateNodeAttributes, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateNodeAttributes", varargs...)
+	ret0, _ := ret[0].(*response.UpdateNodeAttributes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeAttributes indicates an expected call of UpdateNodeAttributes
+func (mr *MockInfraProxyClientMockRecorder) UpdateNodeAttributes(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeAttributes", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNodeAttributes), varargs...)
+}
+
+// GetNode mocks base method
+func (m *MockInfraProxyClient) GetNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.Node, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetNode", varargs...)
+	ret0, _ := ret[0].(*response.Node)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNode indicates an expected call of GetNode
+func (mr *MockInfraProxyClientMockRecorder) GetNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNode), varargs...)
+}
+
+// GetNodeExpandedRunList mocks base method
+func (m *MockInfraProxyClient) GetNodeExpandedRunList(ctx context.Context, in *request.NodeExpandedRunList, opts ...grpc.CallOption) (*response.NodeExpandedRunList, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetNodeExpandedRunList", varargs...)
+	ret0, _ := ret[0].(*response.NodeExpandedRunList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodeExpandedRunList indicates an expected call of GetNodeExpandedRunList
+func (mr *MockInfraProxyClientMockRecorder) GetNodeExpandedRunList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeExpandedRunList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNodeExpandedRunList), varargs...)
+}
+
+// UpdateNodeTags mocks base method
+func (m *MockInfraProxyClient) UpdateNodeTags(ctx context.Context, in *request.UpdateNodeTags, opts ...grpc.CallOption) (*response.UpdateNodeTags, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateNodeTags", varargs...)
+	ret0, _ := ret[0].(*response.UpdateNodeTags)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeTags indicates an expected call of UpdateNodeTags
+func (mr *MockInfraProxyClientMockRecorder) UpdateNodeTags(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeTags", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNodeTags), varargs...)
+}
+
+// UpdateNodeEnvironment mocks base method
+func (m *MockInfraProxyClient) UpdateNodeEnvironment(ctx context.Context, in *request.UpdateNodeEnvironment, opts ...grpc.CallOption) (*response.UpdateNodeEnvironment, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateNodeEnvironment", varargs...)
+	ret0, _ := ret[0].(*response.UpdateNodeEnvironment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeEnvironment indicates an expected call of UpdateNodeEnvironment
+func (mr *MockInfraProxyClientMockRecorder) UpdateNodeEnvironment(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeEnvironment", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNodeEnvironment), varargs...)
+}
+
+// GetPolicyfiles mocks base method
+func (m *MockInfraProxyClient) GetPolicyfiles(ctx context.Context, in *request.Policyfiles, opts ...grpc.CallOption) (*response.Policyfiles, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetPolicyfiles", varargs...)
+	ret0, _ := ret[0].(*response.Policyfiles)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicyfiles indicates an expected call of GetPolicyfiles
+func (mr *MockInfraProxyClientMockRecorder) GetPolicyfiles(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfiles", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicyfiles), varargs...)
+}
+
+// GetPolicyfile mocks base method
+func (m *MockInfraProxyClient) GetPolicyfile(ctx context.Context, in *request.Policyfile, opts ...grpc.CallOption) (*response.Policyfile, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetPolicyfile", varargs...)
+	ret0, _ := ret[0].(*response.Policyfile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicyfile indicates an expected call of GetPolicyfile
+func (mr *MockInfraProxyClientMockRecorder) GetPolicyfile(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfile", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicyfile), varargs...)
+}
+
+// DeletePolicyfile mocks base method
+func (m *MockInfraProxyClient) DeletePolicyfile(ctx context.Context, in *request.DeletePolicyfile, opts ...grpc.CallOption) (*response.DeletePolicyfile, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeletePolicyfile", varargs...)
+	ret0, _ := ret[0].(*response.DeletePolicyfile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeletePolicyfile indicates an expected call of DeletePolicyfile
+func (mr *MockInfraProxyClientMockRecorder) DeletePolicyfile(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePolicyfile", reflect.TypeOf((*MockInfraProxyClient)(nil).DeletePolicyfile), varargs...)
+}
+
+// GetPolicyfileRevisions mocks base method
+func (m *MockInfraProxyClient) GetPolicyfileRevisions(ctx context.Context, in *request.PolicyfileRevisions, opts ...grpc.CallOption) (*response.PolicyfileRevisions, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetPolicyfileRevisions", varargs...)
+	ret0, _ := ret[0].(*response.PolicyfileRevisions)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicyfileRevisions indicates an expected call of GetPolicyfileRevisions
+func (mr *MockInfraProxyClientMockRecorder) GetPolicyfileRevisions(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfileRevisions", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicyfileRevisions), varargs...)
+}
+
+// GetPolicygroup mocks base method
+func (m *MockInfraProxyClient) GetPolicygroup(ctx context.Context, in *request.Policygroup, opts ...grpc.CallOption) (*response.Policygroup, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetPolicygroup", varargs...)
+	ret0, _ := ret[0].(*response.Policygroup)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicygroup indicates an expected call of GetPolicygroup
+func (mr *MockInfraProxyClientMockRecorder) GetPolicygroup(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicygroup", reflect.TypeOf((*MockInfraProxyClient)(nil).GetPolicygroup), varargs...)
+}
+
+// GetOrgUsersList mocks base method
+func (m *MockInfraProxyClient) GetOrgUsersList(ctx context.Context, in *request.OrgUsers, opts ...grpc.CallOption) (*response.OrgUsers, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetOrgUsersList", varargs...)
+	ret0, _ := ret[0].(*response.OrgUsers)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrgUsersList indicates an expected call of GetOrgUsersList
+func (mr *MockInfraProxyClientMockRecorder) GetOrgUsersList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgUsersList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetOrgUsersList), varargs...)
+}
+
+// GetServerUsersList mocks base method
+func (m *MockInfraProxyClient) GetServerUsersList(ctx context.Context, in *request.ServerUsers, opts ...grpc.CallOption) (*response.ServerUsers, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetServerUsersList", varargs...)
+	ret0, _ := ret[0].(*response.ServerUsers)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetServerUsersList indicates an expected call of GetServerUsersList
+func (mr *MockInfraProxyClientMockRecorder) GetServerUsersList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerUsersList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetServerUsersList), varargs...)
+}
+
+// GetAutomateInfraServerUsersList mocks base method
+func (m *MockInfraProxyClient) GetAutomateInfraServerUsersList(ctx context.Context, in *request.AutomateInfraServerUsers, opts ...grpc.CallOption) (*response.AutomateInfraServerUsers, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAutomateInfraServerUsersList", varargs...)
+	ret0, _ := ret[0].(*response.AutomateInfraServerUsers)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAutomateInfraServerUsersList indicates an expected call of GetAutomateInfraServerUsersList
+func (mr *MockInfraProxyClientMockRecorder) GetAutomateInfraServerUsersList(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAutomateInfraServerUsersList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetAutomateInfraServerUsersList), varargs...)
+}
+
+// MockInfraProxyServer is a mock of InfraProxyServer interface
 type MockInfraProxyServer struct {
 	ctrl     *gomock.Controller
 	recorder *MockInfraProxyServerMockRecorder
 }
 
-// MockInfraProxyServerMockRecorder is the mock recorder for MockInfraProxyServer.
+// MockInfraProxyServerMockRecorder is the mock recorder for MockInfraProxyServer
 type MockInfraProxyServerMockRecorder struct {
 	mock *MockInfraProxyServer
 }
 
-// NewMockInfraProxyServer creates a new mock instance.
+// NewMockInfraProxyServer creates a new mock instance
 func NewMockInfraProxyServer(ctrl *gomock.Controller) *MockInfraProxyServer {
 	mock := &MockInfraProxyServer{ctrl: ctrl}
 	mock.recorder = &MockInfraProxyServerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use.
+// EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockInfraProxyServer) EXPECT() *MockInfraProxyServerMockRecorder {
 	return m.recorder
 }
 
-// CreateClient mocks base method.
-func (m *MockInfraProxyServer) CreateClient(arg0 context.Context, arg1 *request.CreateClient) (*response.CreateClient, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateClient", arg0, arg1)
-	ret0, _ := ret[0].(*response.CreateClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateClient indicates an expected call of CreateClient.
-func (mr *MockInfraProxyServerMockRecorder) CreateClient(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateClient), arg0, arg1)
-}
-
-// CreateDataBag mocks base method.
-func (m *MockInfraProxyServer) CreateDataBag(arg0 context.Context, arg1 *request.CreateDataBag) (*response.CreateDataBag, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateDataBag", arg0, arg1)
-	ret0, _ := ret[0].(*response.CreateDataBag)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateDataBag indicates an expected call of CreateDataBag.
-func (mr *MockInfraProxyServerMockRecorder) CreateDataBag(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBag", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateDataBag), arg0, arg1)
-}
-
-// CreateDataBagItem mocks base method.
-func (m *MockInfraProxyServer) CreateDataBagItem(arg0 context.Context, arg1 *request.CreateDataBagItem) (*response.CreateDataBagItem, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateDataBagItem", arg0, arg1)
-	ret0, _ := ret[0].(*response.CreateDataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateDataBagItem indicates an expected call of CreateDataBagItem.
-func (mr *MockInfraProxyServerMockRecorder) CreateDataBagItem(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateDataBagItem), arg0, arg1)
-}
-
-// CreateEnvironment mocks base method.
-func (m *MockInfraProxyServer) CreateEnvironment(arg0 context.Context, arg1 *request.CreateEnvironment) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateEnvironment", arg0, arg1)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateEnvironment indicates an expected call of CreateEnvironment.
-func (mr *MockInfraProxyServerMockRecorder) CreateEnvironment(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateEnvironment), arg0, arg1)
-}
-
-// CreateOrg mocks base method.
-func (m *MockInfraProxyServer) CreateOrg(arg0 context.Context, arg1 *request.CreateOrg) (*response.CreateOrg, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateOrg", arg0, arg1)
-	ret0, _ := ret[0].(*response.CreateOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateOrg indicates an expected call of CreateOrg.
-func (mr *MockInfraProxyServerMockRecorder) CreateOrg(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateOrg), arg0, arg1)
-}
-
-// CreateRole mocks base method.
-func (m *MockInfraProxyServer) CreateRole(arg0 context.Context, arg1 *request.CreateRole) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRole", arg0, arg1)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateRole indicates an expected call of CreateRole.
-func (mr *MockInfraProxyServerMockRecorder) CreateRole(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRole", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateRole), arg0, arg1)
-}
-
-// CreateServer mocks base method.
-func (m *MockInfraProxyServer) CreateServer(arg0 context.Context, arg1 *request.CreateServer) (*response.CreateServer, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateServer", arg0, arg1)
-	ret0, _ := ret[0].(*response.CreateServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateServer indicates an expected call of CreateServer.
-func (mr *MockInfraProxyServerMockRecorder) CreateServer(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServer", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateServer), arg0, arg1)
-}
-
-// DeleteClient mocks base method.
-func (m *MockInfraProxyServer) DeleteClient(arg0 context.Context, arg1 *request.Client) (*response.Client, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteClient", arg0, arg1)
-	ret0, _ := ret[0].(*response.Client)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteClient indicates an expected call of DeleteClient.
-func (mr *MockInfraProxyServerMockRecorder) DeleteClient(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteClient", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteClient), arg0, arg1)
-}
-
-// DeleteDataBag mocks base method.
-func (m *MockInfraProxyServer) DeleteDataBag(arg0 context.Context, arg1 *request.DataBag) (*response.DataBag, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteDataBag", arg0, arg1)
-	ret0, _ := ret[0].(*response.DataBag)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteDataBag indicates an expected call of DeleteDataBag.
-func (mr *MockInfraProxyServerMockRecorder) DeleteDataBag(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBag", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteDataBag), arg0, arg1)
-}
-
-// DeleteDataBagItem mocks base method.
-func (m *MockInfraProxyServer) DeleteDataBagItem(arg0 context.Context, arg1 *request.DataBagItem) (*response.DataBagItem, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteDataBagItem", arg0, arg1)
-	ret0, _ := ret[0].(*response.DataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteDataBagItem indicates an expected call of DeleteDataBagItem.
-func (mr *MockInfraProxyServerMockRecorder) DeleteDataBagItem(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteDataBagItem), arg0, arg1)
-}
-
-// DeleteEnvironment mocks base method.
-func (m *MockInfraProxyServer) DeleteEnvironment(arg0 context.Context, arg1 *request.Environment) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteEnvironment", arg0, arg1)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteEnvironment indicates an expected call of DeleteEnvironment.
-func (mr *MockInfraProxyServerMockRecorder) DeleteEnvironment(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteEnvironment), arg0, arg1)
-}
-
-// DeleteNode mocks base method.
-func (m *MockInfraProxyServer) DeleteNode(arg0 context.Context, arg1 *request.Node) (*response.DeleteNode, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteNode", arg0, arg1)
-	ret0, _ := ret[0].(*response.DeleteNode)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteNode indicates an expected call of DeleteNode.
-func (mr *MockInfraProxyServerMockRecorder) DeleteNode(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNode", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteNode), arg0, arg1)
-}
-
-// DeleteOrg mocks base method.
-func (m *MockInfraProxyServer) DeleteOrg(arg0 context.Context, arg1 *request.DeleteOrg) (*response.DeleteOrg, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteOrg", arg0, arg1)
-	ret0, _ := ret[0].(*response.DeleteOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteOrg indicates an expected call of DeleteOrg.
-func (mr *MockInfraProxyServerMockRecorder) DeleteOrg(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteOrg), arg0, arg1)
-}
-
-// DeletePolicyfile mocks base method.
-func (m *MockInfraProxyServer) DeletePolicyfile(arg0 context.Context, arg1 *request.DeletePolicyfile) (*response.DeletePolicyfile, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletePolicyfile", arg0, arg1)
-	ret0, _ := ret[0].(*response.DeletePolicyfile)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeletePolicyfile indicates an expected call of DeletePolicyfile.
-func (mr *MockInfraProxyServerMockRecorder) DeletePolicyfile(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePolicyfile", reflect.TypeOf((*MockInfraProxyServer)(nil).DeletePolicyfile), arg0, arg1)
-}
-
-// DeleteRole mocks base method.
-func (m *MockInfraProxyServer) DeleteRole(arg0 context.Context, arg1 *request.Role) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteRole", arg0, arg1)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteRole indicates an expected call of DeleteRole.
-func (mr *MockInfraProxyServerMockRecorder) DeleteRole(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRole", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteRole), arg0, arg1)
-}
-
-// DeleteServer mocks base method.
-func (m *MockInfraProxyServer) DeleteServer(arg0 context.Context, arg1 *request.DeleteServer) (*response.DeleteServer, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteServer", arg0, arg1)
-	ret0, _ := ret[0].(*response.DeleteServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DeleteServer indicates an expected call of DeleteServer.
-func (mr *MockInfraProxyServerMockRecorder) DeleteServer(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServer", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteServer), arg0, arg1)
-}
-
-// GetAutomateInfraServerUsersList mocks base method.
-func (m *MockInfraProxyServer) GetAutomateInfraServerUsersList(arg0 context.Context, arg1 *request.AutomateInfraServerUsers) (*response.AutomateInfraServerUsers, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAutomateInfraServerUsersList", arg0, arg1)
-	ret0, _ := ret[0].(*response.AutomateInfraServerUsers)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAutomateInfraServerUsersList indicates an expected call of GetAutomateInfraServerUsersList.
-func (mr *MockInfraProxyServerMockRecorder) GetAutomateInfraServerUsersList(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAutomateInfraServerUsersList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetAutomateInfraServerUsersList), arg0, arg1)
-}
-
-// GetClient mocks base method.
-func (m *MockInfraProxyServer) GetClient(arg0 context.Context, arg1 *request.Client) (*response.Client, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetClient", arg0, arg1)
-	ret0, _ := ret[0].(*response.Client)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetClient indicates an expected call of GetClient.
-func (mr *MockInfraProxyServerMockRecorder) GetClient(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClient", reflect.TypeOf((*MockInfraProxyServer)(nil).GetClient), arg0, arg1)
-}
-
-// GetClients mocks base method.
-func (m *MockInfraProxyServer) GetClients(arg0 context.Context, arg1 *request.Clients) (*response.Clients, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetClients", arg0, arg1)
-	ret0, _ := ret[0].(*response.Clients)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetClients indicates an expected call of GetClients.
-func (mr *MockInfraProxyServerMockRecorder) GetClients(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClients", reflect.TypeOf((*MockInfraProxyServer)(nil).GetClients), arg0, arg1)
-}
-
-// GetCookbook mocks base method.
-func (m *MockInfraProxyServer) GetCookbook(arg0 context.Context, arg1 *request.Cookbook) (*response.Cookbook, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCookbook", arg0, arg1)
-	ret0, _ := ret[0].(*response.Cookbook)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbook indicates an expected call of GetCookbook.
-func (mr *MockInfraProxyServerMockRecorder) GetCookbook(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbook", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbook), arg0, arg1)
-}
-
-// GetCookbookFileContent mocks base method.
-func (m *MockInfraProxyServer) GetCookbookFileContent(arg0 context.Context, arg1 *request.CookbookFileContent) (*response.CookbookFileContent, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCookbookFileContent", arg0, arg1)
-	ret0, _ := ret[0].(*response.CookbookFileContent)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbookFileContent indicates an expected call of GetCookbookFileContent.
-func (mr *MockInfraProxyServerMockRecorder) GetCookbookFileContent(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookFileContent", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbookFileContent), arg0, arg1)
-}
-
-// GetCookbookVersions mocks base method.
-func (m *MockInfraProxyServer) GetCookbookVersions(arg0 context.Context, arg1 *request.CookbookVersions) (*response.CookbookVersions, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCookbookVersions", arg0, arg1)
-	ret0, _ := ret[0].(*response.CookbookVersions)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbookVersions indicates an expected call of GetCookbookVersions.
-func (mr *MockInfraProxyServerMockRecorder) GetCookbookVersions(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookVersions", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbookVersions), arg0, arg1)
-}
-
-// GetCookbooks mocks base method.
-func (m *MockInfraProxyServer) GetCookbooks(arg0 context.Context, arg1 *request.Cookbooks) (*response.Cookbooks, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCookbooks", arg0, arg1)
-	ret0, _ := ret[0].(*response.Cookbooks)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCookbooks indicates an expected call of GetCookbooks.
-func (mr *MockInfraProxyServerMockRecorder) GetCookbooks(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbooks", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbooks), arg0, arg1)
-}
-
-// GetDataBagItem mocks base method.
-func (m *MockInfraProxyServer) GetDataBagItem(arg0 context.Context, arg1 *request.DataBagItem) (*response.DataBagItem, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDataBagItem", arg0, arg1)
-	ret0, _ := ret[0].(*response.DataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDataBagItem indicates an expected call of GetDataBagItem.
-func (mr *MockInfraProxyServerMockRecorder) GetDataBagItem(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).GetDataBagItem), arg0, arg1)
-}
-
-// GetDataBagItems mocks base method.
-func (m *MockInfraProxyServer) GetDataBagItems(arg0 context.Context, arg1 *request.DataBagItems) (*response.DataBagItems, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDataBagItems", arg0, arg1)
-	ret0, _ := ret[0].(*response.DataBagItems)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDataBagItems indicates an expected call of GetDataBagItems.
-func (mr *MockInfraProxyServerMockRecorder) GetDataBagItems(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItems", reflect.TypeOf((*MockInfraProxyServer)(nil).GetDataBagItems), arg0, arg1)
-}
-
-// GetDataBags mocks base method.
-func (m *MockInfraProxyServer) GetDataBags(arg0 context.Context, arg1 *request.DataBags) (*response.DataBags, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDataBags", arg0, arg1)
-	ret0, _ := ret[0].(*response.DataBags)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDataBags indicates an expected call of GetDataBags.
-func (mr *MockInfraProxyServerMockRecorder) GetDataBags(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBags", reflect.TypeOf((*MockInfraProxyServer)(nil).GetDataBags), arg0, arg1)
-}
-
-// GetEnvironment mocks base method.
-func (m *MockInfraProxyServer) GetEnvironment(arg0 context.Context, arg1 *request.Environment) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEnvironment", arg0, arg1)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvironment indicates an expected call of GetEnvironment.
-func (mr *MockInfraProxyServerMockRecorder) GetEnvironment(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).GetEnvironment), arg0, arg1)
-}
-
-// GetEnvironmentRecipes mocks base method.
-func (m *MockInfraProxyServer) GetEnvironmentRecipes(arg0 context.Context, arg1 *request.Environment) (*response.EnvironmentRecipesList, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEnvironmentRecipes", arg0, arg1)
-	ret0, _ := ret[0].(*response.EnvironmentRecipesList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvironmentRecipes indicates an expected call of GetEnvironmentRecipes.
-func (mr *MockInfraProxyServerMockRecorder) GetEnvironmentRecipes(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironmentRecipes", reflect.TypeOf((*MockInfraProxyServer)(nil).GetEnvironmentRecipes), arg0, arg1)
-}
-
-// GetEnvironments mocks base method.
-func (m *MockInfraProxyServer) GetEnvironments(arg0 context.Context, arg1 *request.Environments) (*response.Environments, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEnvironments", arg0, arg1)
-	ret0, _ := ret[0].(*response.Environments)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvironments indicates an expected call of GetEnvironments.
-func (mr *MockInfraProxyServerMockRecorder) GetEnvironments(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironments", reflect.TypeOf((*MockInfraProxyServer)(nil).GetEnvironments), arg0, arg1)
-}
-
-// GetInfraServerOrgs mocks base method.
-func (m *MockInfraProxyServer) GetInfraServerOrgs(arg0 context.Context, arg1 *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetInfraServerOrgs", arg0, arg1)
-	ret0, _ := ret[0].(*response.GetInfraServerOrgs)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetInfraServerOrgs indicates an expected call of GetInfraServerOrgs.
-func (mr *MockInfraProxyServerMockRecorder) GetInfraServerOrgs(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfraServerOrgs", reflect.TypeOf((*MockInfraProxyServer)(nil).GetInfraServerOrgs), arg0, arg1)
-}
-
-// GetNode mocks base method.
-func (m *MockInfraProxyServer) GetNode(arg0 context.Context, arg1 *request.Node) (*response.Node, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNode", arg0, arg1)
-	ret0, _ := ret[0].(*response.Node)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNode indicates an expected call of GetNode.
-func (mr *MockInfraProxyServerMockRecorder) GetNode(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNode), arg0, arg1)
-}
-
-// GetNodeExpandedRunList mocks base method.
-func (m *MockInfraProxyServer) GetNodeExpandedRunList(arg0 context.Context, arg1 *request.NodeExpandedRunList) (*response.NodeExpandedRunList, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNodeExpandedRunList", arg0, arg1)
-	ret0, _ := ret[0].(*response.NodeExpandedRunList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNodeExpandedRunList indicates an expected call of GetNodeExpandedRunList.
-func (mr *MockInfraProxyServerMockRecorder) GetNodeExpandedRunList(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeExpandedRunList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNodeExpandedRunList), arg0, arg1)
-}
-
-// GetNodes mocks base method.
-func (m *MockInfraProxyServer) GetNodes(arg0 context.Context, arg1 *request.Nodes) (*response.Nodes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNodes", arg0, arg1)
-	ret0, _ := ret[0].(*response.Nodes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNodes indicates an expected call of GetNodes.
-func (mr *MockInfraProxyServerMockRecorder) GetNodes(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodes", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNodes), arg0, arg1)
-}
-
-// GetOrg mocks base method.
-func (m *MockInfraProxyServer) GetOrg(arg0 context.Context, arg1 *request.GetOrg) (*response.GetOrg, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetOrg", arg0, arg1)
-	ret0, _ := ret[0].(*response.GetOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOrg indicates an expected call of GetOrg.
-func (mr *MockInfraProxyServerMockRecorder) GetOrg(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).GetOrg), arg0, arg1)
-}
-
-// GetOrgUsersList mocks base method.
-func (m *MockInfraProxyServer) GetOrgUsersList(arg0 context.Context, arg1 *request.OrgUsers) (*response.OrgUsers, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetOrgUsersList", arg0, arg1)
-	ret0, _ := ret[0].(*response.OrgUsers)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOrgUsersList indicates an expected call of GetOrgUsersList.
-func (mr *MockInfraProxyServerMockRecorder) GetOrgUsersList(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgUsersList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetOrgUsersList), arg0, arg1)
-}
-
-// GetOrgs mocks base method.
-func (m *MockInfraProxyServer) GetOrgs(arg0 context.Context, arg1 *request.GetOrgs) (*response.GetOrgs, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetOrgs", arg0, arg1)
-	ret0, _ := ret[0].(*response.GetOrgs)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOrgs indicates an expected call of GetOrgs.
-func (mr *MockInfraProxyServerMockRecorder) GetOrgs(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgs", reflect.TypeOf((*MockInfraProxyServer)(nil).GetOrgs), arg0, arg1)
-}
-
-// GetPolicyfile mocks base method.
-func (m *MockInfraProxyServer) GetPolicyfile(arg0 context.Context, arg1 *request.Policyfile) (*response.Policyfile, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPolicyfile", arg0, arg1)
-	ret0, _ := ret[0].(*response.Policyfile)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicyfile indicates an expected call of GetPolicyfile.
-func (mr *MockInfraProxyServerMockRecorder) GetPolicyfile(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfile", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicyfile), arg0, arg1)
-}
-
-// GetPolicyfileRevisions mocks base method.
-func (m *MockInfraProxyServer) GetPolicyfileRevisions(arg0 context.Context, arg1 *request.PolicyfileRevisions) (*response.PolicyfileRevisions, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPolicyfileRevisions", arg0, arg1)
-	ret0, _ := ret[0].(*response.PolicyfileRevisions)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicyfileRevisions indicates an expected call of GetPolicyfileRevisions.
-func (mr *MockInfraProxyServerMockRecorder) GetPolicyfileRevisions(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfileRevisions", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicyfileRevisions), arg0, arg1)
-}
-
-// GetPolicyfiles mocks base method.
-func (m *MockInfraProxyServer) GetPolicyfiles(arg0 context.Context, arg1 *request.Policyfiles) (*response.Policyfiles, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPolicyfiles", arg0, arg1)
-	ret0, _ := ret[0].(*response.Policyfiles)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicyfiles indicates an expected call of GetPolicyfiles.
-func (mr *MockInfraProxyServerMockRecorder) GetPolicyfiles(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfiles", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicyfiles), arg0, arg1)
-}
-
-// GetPolicygroup mocks base method.
-func (m *MockInfraProxyServer) GetPolicygroup(arg0 context.Context, arg1 *request.Policygroup) (*response.Policygroup, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPolicygroup", arg0, arg1)
-	ret0, _ := ret[0].(*response.Policygroup)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPolicygroup indicates an expected call of GetPolicygroup.
-func (mr *MockInfraProxyServerMockRecorder) GetPolicygroup(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicygroup", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicygroup), arg0, arg1)
-}
-
-// GetRole mocks base method.
-func (m *MockInfraProxyServer) GetRole(arg0 context.Context, arg1 *request.Role) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRole", arg0, arg1)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRole indicates an expected call of GetRole.
-func (mr *MockInfraProxyServerMockRecorder) GetRole(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRole", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRole), arg0, arg1)
-}
-
-// GetRoleEnvironments mocks base method.
-func (m *MockInfraProxyServer) GetRoleEnvironments(arg0 context.Context, arg1 *request.Role) (*response.RoleEnvironments, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRoleEnvironments", arg0, arg1)
-	ret0, _ := ret[0].(*response.RoleEnvironments)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRoleEnvironments indicates an expected call of GetRoleEnvironments.
-func (mr *MockInfraProxyServerMockRecorder) GetRoleEnvironments(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleEnvironments", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRoleEnvironments), arg0, arg1)
-}
-
-// GetRoleExpandedRunList mocks base method.
-func (m *MockInfraProxyServer) GetRoleExpandedRunList(arg0 context.Context, arg1 *request.ExpandedRunList) (*response.ExpandedRunList, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRoleExpandedRunList", arg0, arg1)
-	ret0, _ := ret[0].(*response.ExpandedRunList)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRoleExpandedRunList indicates an expected call of GetRoleExpandedRunList.
-func (mr *MockInfraProxyServerMockRecorder) GetRoleExpandedRunList(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleExpandedRunList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRoleExpandedRunList), arg0, arg1)
-}
-
-// GetRoles mocks base method.
-func (m *MockInfraProxyServer) GetRoles(arg0 context.Context, arg1 *request.Roles) (*response.Roles, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRoles", arg0, arg1)
-	ret0, _ := ret[0].(*response.Roles)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRoles indicates an expected call of GetRoles.
-func (mr *MockInfraProxyServerMockRecorder) GetRoles(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRoles), arg0, arg1)
-}
-
-// GetServer mocks base method.
-func (m *MockInfraProxyServer) GetServer(arg0 context.Context, arg1 *request.GetServer) (*response.GetServer, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetServer", arg0, arg1)
-	ret0, _ := ret[0].(*response.GetServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetServer indicates an expected call of GetServer.
-func (mr *MockInfraProxyServerMockRecorder) GetServer(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockInfraProxyServer)(nil).GetServer), arg0, arg1)
-}
-
-// GetServerStatus mocks base method.
-func (m *MockInfraProxyServer) GetServerStatus(arg0 context.Context, arg1 *request.GetServerStatus) (*response.GetServerStatus, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetServerStatus", arg0, arg1)
-	ret0, _ := ret[0].(*response.GetServerStatus)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetServerStatus indicates an expected call of GetServerStatus.
-func (mr *MockInfraProxyServerMockRecorder) GetServerStatus(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerStatus", reflect.TypeOf((*MockInfraProxyServer)(nil).GetServerStatus), arg0, arg1)
-}
-
-// GetServerUsersList mocks base method.
-func (m *MockInfraProxyServer) GetServerUsersList(arg0 context.Context, arg1 *request.ServerUsers) (*response.ServerUsers, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetServerUsersList", arg0, arg1)
-	ret0, _ := ret[0].(*response.ServerUsers)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetServerUsersList indicates an expected call of GetServerUsersList.
-func (mr *MockInfraProxyServerMockRecorder) GetServerUsersList(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerUsersList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetServerUsersList), arg0, arg1)
-}
-
-// GetServers mocks base method.
+// GetServers mocks base method
 func (m *MockInfraProxyServer) GetServers(arg0 context.Context, arg1 *request.GetServers) (*response.GetServers, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetServers", arg0, arg1)
@@ -1994,193 +1288,28 @@ func (m *MockInfraProxyServer) GetServers(arg0 context.Context, arg1 *request.Ge
 	return ret0, ret1
 }
 
-// GetServers indicates an expected call of GetServers.
+// GetServers indicates an expected call of GetServers
 func (mr *MockInfraProxyServerMockRecorder) GetServers(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServers", reflect.TypeOf((*MockInfraProxyServer)(nil).GetServers), arg0, arg1)
 }
 
-// ResetClientKey mocks base method.
-func (m *MockInfraProxyServer) ResetClientKey(arg0 context.Context, arg1 *request.ClientKey) (*response.ResetClient, error) {
+// GetServerStatus mocks base method
+func (m *MockInfraProxyServer) GetServerStatus(arg0 context.Context, arg1 *request.GetServerStatus) (*response.GetServerStatus, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResetClientKey", arg0, arg1)
-	ret0, _ := ret[0].(*response.ResetClient)
+	ret := m.ctrl.Call(m, "GetServerStatus", arg0, arg1)
+	ret0, _ := ret[0].(*response.GetServerStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ResetClientKey indicates an expected call of ResetClientKey.
-func (mr *MockInfraProxyServerMockRecorder) ResetClientKey(arg0, arg1 interface{}) *gomock.Call {
+// GetServerStatus indicates an expected call of GetServerStatus
+func (mr *MockInfraProxyServerMockRecorder) GetServerStatus(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetClientKey", reflect.TypeOf((*MockInfraProxyServer)(nil).ResetClientKey), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerStatus", reflect.TypeOf((*MockInfraProxyServer)(nil).GetServerStatus), arg0, arg1)
 }
 
-// ResetOrgAdminKey mocks base method.
-func (m *MockInfraProxyServer) ResetOrgAdminKey(arg0 context.Context, arg1 *request.ResetOrgAdminKey) (*response.ResetOrgAdminKey, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResetOrgAdminKey", arg0, arg1)
-	ret0, _ := ret[0].(*response.ResetOrgAdminKey)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ResetOrgAdminKey indicates an expected call of ResetOrgAdminKey.
-func (mr *MockInfraProxyServerMockRecorder) ResetOrgAdminKey(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOrgAdminKey", reflect.TypeOf((*MockInfraProxyServer)(nil).ResetOrgAdminKey), arg0, arg1)
-}
-
-// UpdateDataBagItem mocks base method.
-func (m *MockInfraProxyServer) UpdateDataBagItem(arg0 context.Context, arg1 *request.UpdateDataBagItem) (*response.UpdateDataBagItem, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateDataBagItem", arg0, arg1)
-	ret0, _ := ret[0].(*response.UpdateDataBagItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateDataBagItem indicates an expected call of UpdateDataBagItem.
-func (mr *MockInfraProxyServerMockRecorder) UpdateDataBagItem(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateDataBagItem), arg0, arg1)
-}
-
-// UpdateEnvironment mocks base method.
-func (m *MockInfraProxyServer) UpdateEnvironment(arg0 context.Context, arg1 *request.UpdateEnvironment) (*response.Environment, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateEnvironment", arg0, arg1)
-	ret0, _ := ret[0].(*response.Environment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateEnvironment indicates an expected call of UpdateEnvironment.
-func (mr *MockInfraProxyServerMockRecorder) UpdateEnvironment(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateEnvironment), arg0, arg1)
-}
-
-// UpdateNode mocks base method.
-func (m *MockInfraProxyServer) UpdateNode(arg0 context.Context, arg1 *request.NodeDetails) (*response.Node, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateNode", arg0, arg1)
-	ret0, _ := ret[0].(*response.Node)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNode indicates an expected call of UpdateNode.
-func (mr *MockInfraProxyServerMockRecorder) UpdateNode(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNode", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNode), arg0, arg1)
-}
-
-// UpdateNodeAttributes mocks base method.
-func (m *MockInfraProxyServer) UpdateNodeAttributes(arg0 context.Context, arg1 *request.UpdateNodeAttributes) (*response.UpdateNodeAttributes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateNodeAttributes", arg0, arg1)
-	ret0, _ := ret[0].(*response.UpdateNodeAttributes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNodeAttributes indicates an expected call of UpdateNodeAttributes.
-func (mr *MockInfraProxyServerMockRecorder) UpdateNodeAttributes(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeAttributes", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNodeAttributes), arg0, arg1)
-}
-
-// UpdateNodeEnvironment mocks base method.
-func (m *MockInfraProxyServer) UpdateNodeEnvironment(arg0 context.Context, arg1 *request.UpdateNodeEnvironment) (*response.UpdateNodeEnvironment, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateNodeEnvironment", arg0, arg1)
-	ret0, _ := ret[0].(*response.UpdateNodeEnvironment)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNodeEnvironment indicates an expected call of UpdateNodeEnvironment.
-func (mr *MockInfraProxyServerMockRecorder) UpdateNodeEnvironment(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNodeEnvironment), arg0, arg1)
-}
-
-// UpdateNodeTags mocks base method.
-func (m *MockInfraProxyServer) UpdateNodeTags(arg0 context.Context, arg1 *request.UpdateNodeTags) (*response.UpdateNodeTags, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateNodeTags", arg0, arg1)
-	ret0, _ := ret[0].(*response.UpdateNodeTags)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateNodeTags indicates an expected call of UpdateNodeTags.
-func (mr *MockInfraProxyServerMockRecorder) UpdateNodeTags(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeTags", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNodeTags), arg0, arg1)
-}
-
-// UpdateOrg mocks base method.
-func (m *MockInfraProxyServer) UpdateOrg(arg0 context.Context, arg1 *request.UpdateOrg) (*response.UpdateOrg, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateOrg", arg0, arg1)
-	ret0, _ := ret[0].(*response.UpdateOrg)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateOrg indicates an expected call of UpdateOrg.
-func (mr *MockInfraProxyServerMockRecorder) UpdateOrg(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateOrg), arg0, arg1)
-}
-
-// UpdateRole mocks base method.
-func (m *MockInfraProxyServer) UpdateRole(arg0 context.Context, arg1 *request.UpdateRole) (*response.Role, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateRole", arg0, arg1)
-	ret0, _ := ret[0].(*response.Role)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateRole indicates an expected call of UpdateRole.
-func (mr *MockInfraProxyServerMockRecorder) UpdateRole(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRole", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateRole), arg0, arg1)
-}
-
-// UpdateServer mocks base method.
-func (m *MockInfraProxyServer) UpdateServer(arg0 context.Context, arg1 *request.UpdateServer) (*response.UpdateServer, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateServer", arg0, arg1)
-	ret0, _ := ret[0].(*response.UpdateServer)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateServer indicates an expected call of UpdateServer.
-func (mr *MockInfraProxyServerMockRecorder) UpdateServer(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServer", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateServer), arg0, arg1)
-}
-
-// UpdateWebuiKey mocks base method.
-func (m *MockInfraProxyServer) UpdateWebuiKey(arg0 context.Context, arg1 *request.UpdateWebuiKey) (*response.UpdateWebuiKey, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateWebuiKey", arg0, arg1)
-	ret0, _ := ret[0].(*response.UpdateWebuiKey)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateWebuiKey indicates an expected call of UpdateWebuiKey.
-func (mr *MockInfraProxyServerMockRecorder) UpdateWebuiKey(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWebuiKey", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateWebuiKey), arg0, arg1)
-}
-
-// ValidateWebuiKey mocks base method.
+// ValidateWebuiKey mocks base method
 func (m *MockInfraProxyServer) ValidateWebuiKey(arg0 context.Context, arg1 *request.ValidateWebuiKey) (*response.ValidateWebuiKey, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidateWebuiKey", arg0, arg1)
@@ -2189,8 +1318,878 @@ func (m *MockInfraProxyServer) ValidateWebuiKey(arg0 context.Context, arg1 *requ
 	return ret0, ret1
 }
 
-// ValidateWebuiKey indicates an expected call of ValidateWebuiKey.
+// ValidateWebuiKey indicates an expected call of ValidateWebuiKey
 func (mr *MockInfraProxyServerMockRecorder) ValidateWebuiKey(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateWebuiKey", reflect.TypeOf((*MockInfraProxyServer)(nil).ValidateWebuiKey), arg0, arg1)
+}
+
+// UpdateWebuiKey mocks base method
+func (m *MockInfraProxyServer) UpdateWebuiKey(arg0 context.Context, arg1 *request.UpdateWebuiKey) (*response.UpdateWebuiKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateWebuiKey", arg0, arg1)
+	ret0, _ := ret[0].(*response.UpdateWebuiKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateWebuiKey indicates an expected call of UpdateWebuiKey
+func (mr *MockInfraProxyServerMockRecorder) UpdateWebuiKey(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWebuiKey", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateWebuiKey), arg0, arg1)
+}
+
+// GetServer mocks base method
+func (m *MockInfraProxyServer) GetServer(arg0 context.Context, arg1 *request.GetServer) (*response.GetServer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServer", arg0, arg1)
+	ret0, _ := ret[0].(*response.GetServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetServer indicates an expected call of GetServer
+func (mr *MockInfraProxyServerMockRecorder) GetServer(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockInfraProxyServer)(nil).GetServer), arg0, arg1)
+}
+
+// CreateServer mocks base method
+func (m *MockInfraProxyServer) CreateServer(arg0 context.Context, arg1 *request.CreateServer) (*response.CreateServer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateServer", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateServer indicates an expected call of CreateServer
+func (mr *MockInfraProxyServerMockRecorder) CreateServer(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateServer", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateServer), arg0, arg1)
+}
+
+// UpdateServer mocks base method
+func (m *MockInfraProxyServer) UpdateServer(arg0 context.Context, arg1 *request.UpdateServer) (*response.UpdateServer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateServer", arg0, arg1)
+	ret0, _ := ret[0].(*response.UpdateServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateServer indicates an expected call of UpdateServer
+func (mr *MockInfraProxyServerMockRecorder) UpdateServer(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateServer", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateServer), arg0, arg1)
+}
+
+// DeleteServer mocks base method
+func (m *MockInfraProxyServer) DeleteServer(arg0 context.Context, arg1 *request.DeleteServer) (*response.DeleteServer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteServer", arg0, arg1)
+	ret0, _ := ret[0].(*response.DeleteServer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteServer indicates an expected call of DeleteServer
+func (mr *MockInfraProxyServerMockRecorder) DeleteServer(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteServer", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteServer), arg0, arg1)
+}
+
+// GetOrgs mocks base method
+func (m *MockInfraProxyServer) GetOrgs(arg0 context.Context, arg1 *request.GetOrgs) (*response.GetOrgs, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrgs", arg0, arg1)
+	ret0, _ := ret[0].(*response.GetOrgs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrgs indicates an expected call of GetOrgs
+func (mr *MockInfraProxyServerMockRecorder) GetOrgs(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgs", reflect.TypeOf((*MockInfraProxyServer)(nil).GetOrgs), arg0, arg1)
+}
+
+// GetOrg mocks base method
+func (m *MockInfraProxyServer) GetOrg(arg0 context.Context, arg1 *request.GetOrg) (*response.GetOrg, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrg", arg0, arg1)
+	ret0, _ := ret[0].(*response.GetOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrg indicates an expected call of GetOrg
+func (mr *MockInfraProxyServerMockRecorder) GetOrg(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).GetOrg), arg0, arg1)
+}
+
+// CreateOrg mocks base method
+func (m *MockInfraProxyServer) CreateOrg(arg0 context.Context, arg1 *request.CreateOrg) (*response.CreateOrg, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateOrg", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrg indicates an expected call of CreateOrg
+func (mr *MockInfraProxyServerMockRecorder) CreateOrg(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateOrg), arg0, arg1)
+}
+
+// UpdateOrg mocks base method
+func (m *MockInfraProxyServer) UpdateOrg(arg0 context.Context, arg1 *request.UpdateOrg) (*response.UpdateOrg, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateOrg", arg0, arg1)
+	ret0, _ := ret[0].(*response.UpdateOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateOrg indicates an expected call of UpdateOrg
+func (mr *MockInfraProxyServerMockRecorder) UpdateOrg(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateOrg), arg0, arg1)
+}
+
+// DeleteOrg mocks base method
+func (m *MockInfraProxyServer) DeleteOrg(arg0 context.Context, arg1 *request.DeleteOrg) (*response.DeleteOrg, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteOrg", arg0, arg1)
+	ret0, _ := ret[0].(*response.DeleteOrg)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteOrg indicates an expected call of DeleteOrg
+func (mr *MockInfraProxyServerMockRecorder) DeleteOrg(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrg", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteOrg), arg0, arg1)
+}
+
+// ResetOrgAdminKey mocks base method
+func (m *MockInfraProxyServer) ResetOrgAdminKey(arg0 context.Context, arg1 *request.ResetOrgAdminKey) (*response.ResetOrgAdminKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetOrgAdminKey", arg0, arg1)
+	ret0, _ := ret[0].(*response.ResetOrgAdminKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResetOrgAdminKey indicates an expected call of ResetOrgAdminKey
+func (mr *MockInfraProxyServerMockRecorder) ResetOrgAdminKey(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOrgAdminKey", reflect.TypeOf((*MockInfraProxyServer)(nil).ResetOrgAdminKey), arg0, arg1)
+}
+
+// GetInfraServerOrgs mocks base method
+func (m *MockInfraProxyServer) GetInfraServerOrgs(arg0 context.Context, arg1 *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetInfraServerOrgs", arg0, arg1)
+	ret0, _ := ret[0].(*response.GetInfraServerOrgs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetInfraServerOrgs indicates an expected call of GetInfraServerOrgs
+func (mr *MockInfraProxyServerMockRecorder) GetInfraServerOrgs(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfraServerOrgs", reflect.TypeOf((*MockInfraProxyServer)(nil).GetInfraServerOrgs), arg0, arg1)
+}
+
+// GetCookbooks mocks base method
+func (m *MockInfraProxyServer) GetCookbooks(arg0 context.Context, arg1 *request.Cookbooks) (*response.Cookbooks, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCookbooks", arg0, arg1)
+	ret0, _ := ret[0].(*response.Cookbooks)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbooks indicates an expected call of GetCookbooks
+func (mr *MockInfraProxyServerMockRecorder) GetCookbooks(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbooks", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbooks), arg0, arg1)
+}
+
+// GetCookbookVersions mocks base method
+func (m *MockInfraProxyServer) GetCookbookVersions(arg0 context.Context, arg1 *request.CookbookVersions) (*response.CookbookVersions, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCookbookVersions", arg0, arg1)
+	ret0, _ := ret[0].(*response.CookbookVersions)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbookVersions indicates an expected call of GetCookbookVersions
+func (mr *MockInfraProxyServerMockRecorder) GetCookbookVersions(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookVersions", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbookVersions), arg0, arg1)
+}
+
+// GetCookbook mocks base method
+func (m *MockInfraProxyServer) GetCookbook(arg0 context.Context, arg1 *request.Cookbook) (*response.Cookbook, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCookbook", arg0, arg1)
+	ret0, _ := ret[0].(*response.Cookbook)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbook indicates an expected call of GetCookbook
+func (mr *MockInfraProxyServerMockRecorder) GetCookbook(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbook", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbook), arg0, arg1)
+}
+
+// GetCookbookFileContent mocks base method
+func (m *MockInfraProxyServer) GetCookbookFileContent(arg0 context.Context, arg1 *request.CookbookFileContent) (*response.CookbookFileContent, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCookbookFileContent", arg0, arg1)
+	ret0, _ := ret[0].(*response.CookbookFileContent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCookbookFileContent indicates an expected call of GetCookbookFileContent
+func (mr *MockInfraProxyServerMockRecorder) GetCookbookFileContent(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCookbookFileContent", reflect.TypeOf((*MockInfraProxyServer)(nil).GetCookbookFileContent), arg0, arg1)
+}
+
+// GetRoles mocks base method
+func (m *MockInfraProxyServer) GetRoles(arg0 context.Context, arg1 *request.Roles) (*response.Roles, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoles", arg0, arg1)
+	ret0, _ := ret[0].(*response.Roles)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoles indicates an expected call of GetRoles
+func (mr *MockInfraProxyServerMockRecorder) GetRoles(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRoles), arg0, arg1)
+}
+
+// GetRole mocks base method
+func (m *MockInfraProxyServer) GetRole(arg0 context.Context, arg1 *request.Role) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRole", arg0, arg1)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRole indicates an expected call of GetRole
+func (mr *MockInfraProxyServerMockRecorder) GetRole(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRole", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRole), arg0, arg1)
+}
+
+// GetRoleExpandedRunList mocks base method
+func (m *MockInfraProxyServer) GetRoleExpandedRunList(arg0 context.Context, arg1 *request.ExpandedRunList) (*response.ExpandedRunList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoleExpandedRunList", arg0, arg1)
+	ret0, _ := ret[0].(*response.ExpandedRunList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoleExpandedRunList indicates an expected call of GetRoleExpandedRunList
+func (mr *MockInfraProxyServerMockRecorder) GetRoleExpandedRunList(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleExpandedRunList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRoleExpandedRunList), arg0, arg1)
+}
+
+// GetRoleEnvironments mocks base method
+func (m *MockInfraProxyServer) GetRoleEnvironments(arg0 context.Context, arg1 *request.Role) (*response.RoleEnvironments, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoleEnvironments", arg0, arg1)
+	ret0, _ := ret[0].(*response.RoleEnvironments)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoleEnvironments indicates an expected call of GetRoleEnvironments
+func (mr *MockInfraProxyServerMockRecorder) GetRoleEnvironments(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleEnvironments", reflect.TypeOf((*MockInfraProxyServer)(nil).GetRoleEnvironments), arg0, arg1)
+}
+
+// CreateRole mocks base method
+func (m *MockInfraProxyServer) CreateRole(arg0 context.Context, arg1 *request.CreateRole) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRole", arg0, arg1)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRole indicates an expected call of CreateRole
+func (mr *MockInfraProxyServerMockRecorder) CreateRole(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRole", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateRole), arg0, arg1)
+}
+
+// DeleteRole mocks base method
+func (m *MockInfraProxyServer) DeleteRole(arg0 context.Context, arg1 *request.Role) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteRole", arg0, arg1)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteRole indicates an expected call of DeleteRole
+func (mr *MockInfraProxyServerMockRecorder) DeleteRole(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRole", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteRole), arg0, arg1)
+}
+
+// UpdateRole mocks base method
+func (m *MockInfraProxyServer) UpdateRole(arg0 context.Context, arg1 *request.UpdateRole) (*response.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateRole", arg0, arg1)
+	ret0, _ := ret[0].(*response.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRole indicates an expected call of UpdateRole
+func (mr *MockInfraProxyServerMockRecorder) UpdateRole(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRole", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateRole), arg0, arg1)
+}
+
+// GetClients mocks base method
+func (m *MockInfraProxyServer) GetClients(arg0 context.Context, arg1 *request.Clients) (*response.Clients, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClients", arg0, arg1)
+	ret0, _ := ret[0].(*response.Clients)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClients indicates an expected call of GetClients
+func (mr *MockInfraProxyServerMockRecorder) GetClients(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClients", reflect.TypeOf((*MockInfraProxyServer)(nil).GetClients), arg0, arg1)
+}
+
+// GetClient mocks base method
+func (m *MockInfraProxyServer) GetClient(arg0 context.Context, arg1 *request.Client) (*response.Client, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClient", arg0, arg1)
+	ret0, _ := ret[0].(*response.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClient indicates an expected call of GetClient
+func (mr *MockInfraProxyServerMockRecorder) GetClient(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClient", reflect.TypeOf((*MockInfraProxyServer)(nil).GetClient), arg0, arg1)
+}
+
+// CreateClient mocks base method
+func (m *MockInfraProxyServer) CreateClient(arg0 context.Context, arg1 *request.CreateClient) (*response.CreateClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateClient", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateClient indicates an expected call of CreateClient
+func (mr *MockInfraProxyServerMockRecorder) CreateClient(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClient", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateClient), arg0, arg1)
+}
+
+// DeleteClient mocks base method
+func (m *MockInfraProxyServer) DeleteClient(arg0 context.Context, arg1 *request.Client) (*response.Client, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteClient", arg0, arg1)
+	ret0, _ := ret[0].(*response.Client)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteClient indicates an expected call of DeleteClient
+func (mr *MockInfraProxyServerMockRecorder) DeleteClient(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteClient", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteClient), arg0, arg1)
+}
+
+// ResetClientKey mocks base method
+func (m *MockInfraProxyServer) ResetClientKey(arg0 context.Context, arg1 *request.ClientKey) (*response.ResetClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetClientKey", arg0, arg1)
+	ret0, _ := ret[0].(*response.ResetClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResetClientKey indicates an expected call of ResetClientKey
+func (mr *MockInfraProxyServerMockRecorder) ResetClientKey(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetClientKey", reflect.TypeOf((*MockInfraProxyServer)(nil).ResetClientKey), arg0, arg1)
+}
+
+// GetDataBags mocks base method
+func (m *MockInfraProxyServer) GetDataBags(arg0 context.Context, arg1 *request.DataBags) (*response.DataBags, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDataBags", arg0, arg1)
+	ret0, _ := ret[0].(*response.DataBags)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDataBags indicates an expected call of GetDataBags
+func (mr *MockInfraProxyServerMockRecorder) GetDataBags(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBags", reflect.TypeOf((*MockInfraProxyServer)(nil).GetDataBags), arg0, arg1)
+}
+
+// GetDataBagItems mocks base method
+func (m *MockInfraProxyServer) GetDataBagItems(arg0 context.Context, arg1 *request.DataBagItems) (*response.DataBagItems, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDataBagItems", arg0, arg1)
+	ret0, _ := ret[0].(*response.DataBagItems)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDataBagItems indicates an expected call of GetDataBagItems
+func (mr *MockInfraProxyServerMockRecorder) GetDataBagItems(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItems", reflect.TypeOf((*MockInfraProxyServer)(nil).GetDataBagItems), arg0, arg1)
+}
+
+// GetDataBagItem mocks base method
+func (m *MockInfraProxyServer) GetDataBagItem(arg0 context.Context, arg1 *request.DataBagItem) (*response.DataBagItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDataBagItem", arg0, arg1)
+	ret0, _ := ret[0].(*response.DataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDataBagItem indicates an expected call of GetDataBagItem
+func (mr *MockInfraProxyServerMockRecorder) GetDataBagItem(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).GetDataBagItem), arg0, arg1)
+}
+
+// CreateDataBag mocks base method
+func (m *MockInfraProxyServer) CreateDataBag(arg0 context.Context, arg1 *request.CreateDataBag) (*response.CreateDataBag, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDataBag", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateDataBag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDataBag indicates an expected call of CreateDataBag
+func (mr *MockInfraProxyServerMockRecorder) CreateDataBag(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBag", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateDataBag), arg0, arg1)
+}
+
+// CreateDataBagItem mocks base method
+func (m *MockInfraProxyServer) CreateDataBagItem(arg0 context.Context, arg1 *request.CreateDataBagItem) (*response.CreateDataBagItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDataBagItem", arg0, arg1)
+	ret0, _ := ret[0].(*response.CreateDataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDataBagItem indicates an expected call of CreateDataBagItem
+func (mr *MockInfraProxyServerMockRecorder) CreateDataBagItem(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateDataBagItem), arg0, arg1)
+}
+
+// DeleteDataBag mocks base method
+func (m *MockInfraProxyServer) DeleteDataBag(arg0 context.Context, arg1 *request.DataBag) (*response.DataBag, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDataBag", arg0, arg1)
+	ret0, _ := ret[0].(*response.DataBag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteDataBag indicates an expected call of DeleteDataBag
+func (mr *MockInfraProxyServerMockRecorder) DeleteDataBag(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBag", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteDataBag), arg0, arg1)
+}
+
+// DeleteDataBagItem mocks base method
+func (m *MockInfraProxyServer) DeleteDataBagItem(arg0 context.Context, arg1 *request.DataBagItem) (*response.DataBagItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDataBagItem", arg0, arg1)
+	ret0, _ := ret[0].(*response.DataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteDataBagItem indicates an expected call of DeleteDataBagItem
+func (mr *MockInfraProxyServerMockRecorder) DeleteDataBagItem(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteDataBagItem), arg0, arg1)
+}
+
+// UpdateDataBagItem mocks base method
+func (m *MockInfraProxyServer) UpdateDataBagItem(arg0 context.Context, arg1 *request.UpdateDataBagItem) (*response.UpdateDataBagItem, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDataBagItem", arg0, arg1)
+	ret0, _ := ret[0].(*response.UpdateDataBagItem)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDataBagItem indicates an expected call of UpdateDataBagItem
+func (mr *MockInfraProxyServerMockRecorder) UpdateDataBagItem(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDataBagItem", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateDataBagItem), arg0, arg1)
+}
+
+// GetEnvironments mocks base method
+func (m *MockInfraProxyServer) GetEnvironments(arg0 context.Context, arg1 *request.Environments) (*response.Environments, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEnvironments", arg0, arg1)
+	ret0, _ := ret[0].(*response.Environments)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEnvironments indicates an expected call of GetEnvironments
+func (mr *MockInfraProxyServerMockRecorder) GetEnvironments(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironments", reflect.TypeOf((*MockInfraProxyServer)(nil).GetEnvironments), arg0, arg1)
+}
+
+// GetEnvironment mocks base method
+func (m *MockInfraProxyServer) GetEnvironment(arg0 context.Context, arg1 *request.Environment) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEnvironment", arg0, arg1)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEnvironment indicates an expected call of GetEnvironment
+func (mr *MockInfraProxyServerMockRecorder) GetEnvironment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).GetEnvironment), arg0, arg1)
+}
+
+// CreateEnvironment mocks base method
+func (m *MockInfraProxyServer) CreateEnvironment(arg0 context.Context, arg1 *request.CreateEnvironment) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateEnvironment", arg0, arg1)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateEnvironment indicates an expected call of CreateEnvironment
+func (mr *MockInfraProxyServerMockRecorder) CreateEnvironment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).CreateEnvironment), arg0, arg1)
+}
+
+// DeleteEnvironment mocks base method
+func (m *MockInfraProxyServer) DeleteEnvironment(arg0 context.Context, arg1 *request.Environment) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteEnvironment", arg0, arg1)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteEnvironment indicates an expected call of DeleteEnvironment
+func (mr *MockInfraProxyServerMockRecorder) DeleteEnvironment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteEnvironment), arg0, arg1)
+}
+
+// UpdateEnvironment mocks base method
+func (m *MockInfraProxyServer) UpdateEnvironment(arg0 context.Context, arg1 *request.UpdateEnvironment) (*response.Environment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateEnvironment", arg0, arg1)
+	ret0, _ := ret[0].(*response.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateEnvironment indicates an expected call of UpdateEnvironment
+func (mr *MockInfraProxyServerMockRecorder) UpdateEnvironment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateEnvironment), arg0, arg1)
+}
+
+// GetEnvironmentRecipes mocks base method
+func (m *MockInfraProxyServer) GetEnvironmentRecipes(arg0 context.Context, arg1 *request.Environment) (*response.EnvironmentRecipesList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEnvironmentRecipes", arg0, arg1)
+	ret0, _ := ret[0].(*response.EnvironmentRecipesList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEnvironmentRecipes indicates an expected call of GetEnvironmentRecipes
+func (mr *MockInfraProxyServerMockRecorder) GetEnvironmentRecipes(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvironmentRecipes", reflect.TypeOf((*MockInfraProxyServer)(nil).GetEnvironmentRecipes), arg0, arg1)
+}
+
+// GetNodes mocks base method
+func (m *MockInfraProxyServer) GetNodes(arg0 context.Context, arg1 *request.Nodes) (*response.Nodes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNodes", arg0, arg1)
+	ret0, _ := ret[0].(*response.Nodes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodes indicates an expected call of GetNodes
+func (mr *MockInfraProxyServerMockRecorder) GetNodes(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodes", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNodes), arg0, arg1)
+}
+
+// DeleteNode mocks base method
+func (m *MockInfraProxyServer) DeleteNode(arg0 context.Context, arg1 *request.Node) (*response.DeleteNode, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteNode", arg0, arg1)
+	ret0, _ := ret[0].(*response.DeleteNode)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteNode indicates an expected call of DeleteNode
+func (mr *MockInfraProxyServerMockRecorder) DeleteNode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNode", reflect.TypeOf((*MockInfraProxyServer)(nil).DeleteNode), arg0, arg1)
+}
+
+// UpdateNode mocks base method
+func (m *MockInfraProxyServer) UpdateNode(arg0 context.Context, arg1 *request.NodeDetails) (*response.Node, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateNode", arg0, arg1)
+	ret0, _ := ret[0].(*response.Node)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNode indicates an expected call of UpdateNode
+func (mr *MockInfraProxyServerMockRecorder) UpdateNode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNode", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNode), arg0, arg1)
+}
+
+// UpdateNodeAttributes mocks base method
+func (m *MockInfraProxyServer) UpdateNodeAttributes(arg0 context.Context, arg1 *request.UpdateNodeAttributes) (*response.UpdateNodeAttributes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateNodeAttributes", arg0, arg1)
+	ret0, _ := ret[0].(*response.UpdateNodeAttributes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeAttributes indicates an expected call of UpdateNodeAttributes
+func (mr *MockInfraProxyServerMockRecorder) UpdateNodeAttributes(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeAttributes", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNodeAttributes), arg0, arg1)
+}
+
+// GetNode mocks base method
+func (m *MockInfraProxyServer) GetNode(arg0 context.Context, arg1 *request.Node) (*response.Node, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNode", arg0, arg1)
+	ret0, _ := ret[0].(*response.Node)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNode indicates an expected call of GetNode
+func (mr *MockInfraProxyServerMockRecorder) GetNode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNode), arg0, arg1)
+}
+
+// GetNodeExpandedRunList mocks base method
+func (m *MockInfraProxyServer) GetNodeExpandedRunList(arg0 context.Context, arg1 *request.NodeExpandedRunList) (*response.NodeExpandedRunList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNodeExpandedRunList", arg0, arg1)
+	ret0, _ := ret[0].(*response.NodeExpandedRunList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNodeExpandedRunList indicates an expected call of GetNodeExpandedRunList
+func (mr *MockInfraProxyServerMockRecorder) GetNodeExpandedRunList(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeExpandedRunList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNodeExpandedRunList), arg0, arg1)
+}
+
+// UpdateNodeTags mocks base method
+func (m *MockInfraProxyServer) UpdateNodeTags(arg0 context.Context, arg1 *request.UpdateNodeTags) (*response.UpdateNodeTags, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateNodeTags", arg0, arg1)
+	ret0, _ := ret[0].(*response.UpdateNodeTags)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeTags indicates an expected call of UpdateNodeTags
+func (mr *MockInfraProxyServerMockRecorder) UpdateNodeTags(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeTags", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNodeTags), arg0, arg1)
+}
+
+// UpdateNodeEnvironment mocks base method
+func (m *MockInfraProxyServer) UpdateNodeEnvironment(arg0 context.Context, arg1 *request.UpdateNodeEnvironment) (*response.UpdateNodeEnvironment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateNodeEnvironment", arg0, arg1)
+	ret0, _ := ret[0].(*response.UpdateNodeEnvironment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNodeEnvironment indicates an expected call of UpdateNodeEnvironment
+func (mr *MockInfraProxyServerMockRecorder) UpdateNodeEnvironment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeEnvironment", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNodeEnvironment), arg0, arg1)
+}
+
+// GetPolicyfiles mocks base method
+func (m *MockInfraProxyServer) GetPolicyfiles(arg0 context.Context, arg1 *request.Policyfiles) (*response.Policyfiles, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicyfiles", arg0, arg1)
+	ret0, _ := ret[0].(*response.Policyfiles)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicyfiles indicates an expected call of GetPolicyfiles
+func (mr *MockInfraProxyServerMockRecorder) GetPolicyfiles(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfiles", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicyfiles), arg0, arg1)
+}
+
+// GetPolicyfile mocks base method
+func (m *MockInfraProxyServer) GetPolicyfile(arg0 context.Context, arg1 *request.Policyfile) (*response.Policyfile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicyfile", arg0, arg1)
+	ret0, _ := ret[0].(*response.Policyfile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicyfile indicates an expected call of GetPolicyfile
+func (mr *MockInfraProxyServerMockRecorder) GetPolicyfile(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfile", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicyfile), arg0, arg1)
+}
+
+// DeletePolicyfile mocks base method
+func (m *MockInfraProxyServer) DeletePolicyfile(arg0 context.Context, arg1 *request.DeletePolicyfile) (*response.DeletePolicyfile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeletePolicyfile", arg0, arg1)
+	ret0, _ := ret[0].(*response.DeletePolicyfile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeletePolicyfile indicates an expected call of DeletePolicyfile
+func (mr *MockInfraProxyServerMockRecorder) DeletePolicyfile(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePolicyfile", reflect.TypeOf((*MockInfraProxyServer)(nil).DeletePolicyfile), arg0, arg1)
+}
+
+// GetPolicyfileRevisions mocks base method
+func (m *MockInfraProxyServer) GetPolicyfileRevisions(arg0 context.Context, arg1 *request.PolicyfileRevisions) (*response.PolicyfileRevisions, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicyfileRevisions", arg0, arg1)
+	ret0, _ := ret[0].(*response.PolicyfileRevisions)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicyfileRevisions indicates an expected call of GetPolicyfileRevisions
+func (mr *MockInfraProxyServerMockRecorder) GetPolicyfileRevisions(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyfileRevisions", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicyfileRevisions), arg0, arg1)
+}
+
+// GetPolicygroup mocks base method
+func (m *MockInfraProxyServer) GetPolicygroup(arg0 context.Context, arg1 *request.Policygroup) (*response.Policygroup, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPolicygroup", arg0, arg1)
+	ret0, _ := ret[0].(*response.Policygroup)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPolicygroup indicates an expected call of GetPolicygroup
+func (mr *MockInfraProxyServerMockRecorder) GetPolicygroup(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicygroup", reflect.TypeOf((*MockInfraProxyServer)(nil).GetPolicygroup), arg0, arg1)
+}
+
+// GetOrgUsersList mocks base method
+func (m *MockInfraProxyServer) GetOrgUsersList(arg0 context.Context, arg1 *request.OrgUsers) (*response.OrgUsers, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrgUsersList", arg0, arg1)
+	ret0, _ := ret[0].(*response.OrgUsers)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrgUsersList indicates an expected call of GetOrgUsersList
+func (mr *MockInfraProxyServerMockRecorder) GetOrgUsersList(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgUsersList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetOrgUsersList), arg0, arg1)
+}
+
+// GetServerUsersList mocks base method
+func (m *MockInfraProxyServer) GetServerUsersList(arg0 context.Context, arg1 *request.ServerUsers) (*response.ServerUsers, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServerUsersList", arg0, arg1)
+	ret0, _ := ret[0].(*response.ServerUsers)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetServerUsersList indicates an expected call of GetServerUsersList
+func (mr *MockInfraProxyServerMockRecorder) GetServerUsersList(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServerUsersList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetServerUsersList), arg0, arg1)
+}
+
+// GetAutomateInfraServerUsersList mocks base method
+func (m *MockInfraProxyServer) GetAutomateInfraServerUsersList(arg0 context.Context, arg1 *request.AutomateInfraServerUsers) (*response.AutomateInfraServerUsers, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAutomateInfraServerUsersList", arg0, arg1)
+	ret0, _ := ret[0].(*response.AutomateInfraServerUsers)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAutomateInfraServerUsersList indicates an expected call of GetAutomateInfraServerUsersList
+func (mr *MockInfraProxyServerMockRecorder) GetAutomateInfraServerUsersList(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAutomateInfraServerUsersList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetAutomateInfraServerUsersList), arg0, arg1)
 }
