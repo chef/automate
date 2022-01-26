@@ -16,12 +16,13 @@ import (
 
 // Takes up file name from service.MigrationDataService_UploadFileServer.MigrationId and creates the file in the same directory
 func saveFile(migrationId string, filename string, fileData bytes.Buffer) error {
-	err := os.Mkdir(migrationId, 0777)
+	folderPath := path.Join("/hab/svc/infra-proxy-service/data", migrationId)
+	err := os.Mkdir(folderPath, 0777)
 	if err != nil {
 		log.WithError(err).Error("Unable to create directory for migration id", migrationId)
 		return err
 	}
-	filePath := path.Join(migrationId, filename)
+	filePath := path.Join(folderPath, filename)
 	file, err := os.Create(filePath)
 	if err != nil {
 		log.WithError(err).Error("Unable to create file")
