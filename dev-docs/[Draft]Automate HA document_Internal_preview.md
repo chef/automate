@@ -659,11 +659,11 @@ We need to check if the IAM user has all the required permissions or not. Listed
 ```
 AdministratorAccess
 
-AmazonAPIGatewayAdministrator
+APIGatewayAdministrator (For aws AmazonAPIGatewayAdministrator)
 
-AmazonS3FullAccess
+S3FullAccess (for aws AmazonS3FullAccess)
 ```
-We also have to create IAM role to give access of s3 to elasticsearch iinstances.
+We also have to create IAM role to give access of s3 to elasticsearch instances.
 
 These permissions can either be directly added to the user or can be added via IAM Group.
 
@@ -671,9 +671,9 @@ After doing the above steps, we need to create toml file and patch the config. P
 
 bucket name (bucket = "bucket-name" and name = "bucket-name")
 
-mkdir configs
+`mkdir configs`
 
-vi configs/automate.toml
+`vi configs/automate.toml`
 
 
 
@@ -739,7 +739,7 @@ vi configs/automate.toml
 	
 After putting contents in automate.toml file, we need to eceute below command. This command will also trigger the deployment. 
 
-**./chef-automate patch configs/automate.toml** 
+`./chef-automate patch configs/automate.toml`
 
 Back-up configurations to be done after deploying cluster
 
@@ -760,8 +760,8 @@ Open the port(2049) Proto(NFS) for EFS security group.
 
 To create a new backup run chef-automate backup create from a Chef-Automate front-end node.
 
-`  `*./chef-automate backup create*
-## ` `Restore
+`./chef-automate backup create`
+##Restore
 Check status of all Chef Automate and Chef Infra Server front-end nodes.
 
 *chef-automate status*
