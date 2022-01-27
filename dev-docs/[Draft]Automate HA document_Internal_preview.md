@@ -553,41 +553,44 @@ A shared file system is needed to create Elasticsearch snapshots. In order to re
 
 Assuming that the shared filesystem is mounted to /mnt/automate\_backups, we can configure Automate to register the snapshot locations with Elasticsearch.
 
-Ensure the shared file system is mounted on all Elasticsearch servers:
-
-*mount /mnt/automate\_backups*
+1. Ensure the shared file system is mounted on all Elasticsearch servers:
+```
+      mount /mnt/automate_backups
+```
 
 Create elasticsearch sub-directory and set permissions, this will only need to be done on a single Elasticsearch server if the network mount is correctly mounted.
 
-*sudo mkdir /mnt/automate\_backups/elasticsearch*      
-
-*sudo chown hab:hab 	/mnt/automate\_backups/elasticsearch/*
-
-Configure Elasticsearch path.repo setting by SSHing to a single Elasticsearch server and using the following steps:
-
-Export the current Elasticsearch config from the Habitat supervisor. You will need to have root access to run the following commmands
-
-   		  `source /hab/sup/default/SystemdEnvironmentFile.sh`
-                   `automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml`
-
-Edit es_config.toml and add the following settings to the end of the file.
-Note: If credentials have never been rotated this file may be empty.
 ```
-[es_yaml.path]      
-
-repo = "/mnt/automate_backups/elasticsearch"
+      sudo mkdir /mnt/automate_backups/elasticsearch
+      sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 ```
-Apply updated es\_config.toml config to Elasticsearch, this only needs to be done once. This will trigger a restart of the Elasticsearch services on each server.
 
-`hab config apply automate-ha-elasticsearch.default $(date '+%s') es\_config.toml`
+Configure Elasticsearch path.repo setting by SSHing to a single Elasticsearch server and using the following steps:  
+* Export the current Elasticsearch config from the Habitat supervisor. You will need to have root access to run the following commmands
+```
+source /hab/sup/default/SystemdEnvironmentFile.sh
+automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml
+```
+* Edit es_config.toml and add the following settings to the end of the file.  
+Note: If credentials have never been rotated this file may be empty.  
 
-`hab svc status (check elasticsearch service is up or not)`
+```
+   [es_yaml.path]   
+   # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb   
+   repo = "/mnt/automate_backups/elasticsearch" 
+```
+* Apply updated es_config.toml config to Elasticsearch, this only needs to be done once.
+This will trigger a restart of the Elasticsearch services on each server.
+```	
+hab config apply automate-ha-elasticsearch.default $(date '+%s') es\_config.toml
 
-`curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check es. Check that all the indices is green or not)`
+hab svc status (check elasticsearch service is up or not)
+
+curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check es. Check that all the indices is green or not)
 
 # Watch for a message about Elasticsearch going from RED to GREEN
 `journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
-
+```
 Configure Automate to handle external Elasticsearch backups	
 
 Create a automate.toml file on the provisioning server
