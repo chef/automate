@@ -28,7 +28,7 @@ var migratePgCmdFlags = struct {
 	pgUpgradeBinPath string
 }{}
 
-const AUTOMATE_PG_MIGRATE_LOG_DIR = "/src/logs"
+const AUTOMATE_PG_MIGRATE_LOG_DIR = "/src/"
 
 func init() {
 	migrateCmd.AddCommand(newMigratePgCmd())
@@ -86,12 +86,21 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 	writer.Title("--------------------------------")
 	checkUpdateMigration(migratePgCmdFlags.check)
 	chefAutomateStart()
-	chefAutomateStatus()
+	time.Sleep(10 * time.Second)
+	// chefAutomateStatus()
 	vacuumDb()
 	return nil
 }
 
 func vacuumDb() {
+	os.Setenv("PGPORT", "5432")
+	os.Setenv("PGHOST", "0.0.0.0")
+	os.Setenv("PGUSER", "automate")
+	os.Setenv("PGDATABASE", "postgres")
+	os.Setenv("PGSSLMODE", "verify-ca")
+	os.Setenv("PGSSLCERT", "/hab/svc/automate-postgresql/config/server.crt")
+	os.Setenv("PGSSLKEY", "/hab/svc/automate-postgresql/config/server.key")
+	os.Setenv("PGSSLROOTCERT", "/hab/svc/automate-postgresql/config/root.crt")
 	args := []string{
 		"./analyze_new_cluster.sh",
 	}
@@ -102,6 +111,7 @@ func vacuumDb() {
 func cleanUp() {
 
 	c := exec.Command("rm", "-rf", "./analyze_new_cluster.sh", "./delete_old_cluster.sh", "pgmigrate.log")
+	
 	checkErrorForCommand(c)
 }
 
@@ -125,9 +135,16 @@ func chefAutomateStatus() {
 	args := []string{
 		"status",
 	}
-
-	statusChefAutomate := exec.Command("chef-automate", args...)
-	checkErrorForCommand(statusChefAutomate)
+	err := executeAutomateCommandAsync(
+		"chef-automate",
+		args,
+		"",
+		"./pgmigrate.log")
+	if err != nil {
+		fmt.Println(err)
+	}
+	// statusChefAutomate := exec.Command("chef-automate", args...)
+	// checkErrorForCommand(statusChefAutomate)
 }
 
 func removeAndReplacePgdata13() {
@@ -166,6 +183,8 @@ func executePgdata13ShellScript() {
 
 func checkUpdateMigration(check bool) {
 
+	os.Unsetenv("PGHOST")
+
 	writer.Title("Checking for pg_upgrade")
 	args := []string{
 		"--old-datadir=/hab/svc/automate-postgresql/data/pgdata",
@@ -185,7 +204,7 @@ func checkUpdateMigration(check bool) {
 		"/hab/pkgs/core/postgresql13/13.4/20220120060519/bin/pg_upgrade",
 		args,
 		"",
-		AUTOMATE_PG_MIGRATE_LOG_DIR+"/pgmigrate.log")
+		"./pgmigrate.log")
 	if err != nil {
 		fmt.Println(err)
 	}
