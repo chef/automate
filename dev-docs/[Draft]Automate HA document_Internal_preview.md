@@ -290,6 +290,59 @@ So here you should make all the changes required for AWS deployment. Refer this 
 ` `*./chef-automate provision-infra <path to config.toml>*
 `	`This step will download habitat and create workspace /hab/a2\_deploy\_workspace for you and this will 	provision infrastructure for you on AWS 
 
+# mandatory fields in config.toml
+config.toml is divided into different configs, according to nodes and architecture chosen
+
+// architecture config
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+Path to secrets key file
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+Path to secrets json 
+architecture = "aws"
+This will come according to 
+workspace_path = "/hab/a2_deploy_workspace"
+ssh_user = "centos"
+ssh_key_file = "/home/ubuntu/a2ha-london.pem"
+fqdn = ""
+instance_count = "1"
+config_file = "configs/automate.toml"
+[chef_server.config]
+instance_count = "1"
+
+[elasticsearch.config]
+instance_count = "3"
+
+[postgresql.config]
+instance_count = "3"
+
+[aws.config]
+profile = "default"
+region = "eu-west-2"
+
+ssh_key_pair_name = "a2ha-london"
+ami_filter_name = ""
+ami_filter_virt_type = ""
+ami_filter_owner = ""
+ami_id = ""
+automate_server_instance_type = "t3.medium"
+chef_server_instance_type = "t3.medium"
+elasticsearch_server_instance_type = "m5.large"
+postgresql_server_instance_type = "t3.medium"
+automate_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"
+chef_server_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"
+automate_ebs_volume_iops = "100"
+automate_ebs_volume_size = "50"
+automate_ebs_volume_type = "gp2"
+chef_ebs_volume_iops = "100"
+chef_ebs_volume_size = "50"
+chef_ebs_volume_type = "gp2"
+elasticsearch_ebs_volume_iops = "100"
+elasticsearch_ebs_volume_size = "50"
+elasticsearch_ebs_volume_type = "gp2"
+postgresql_ebs_volume_iops = "100"
+postgresql_ebs_volume_size = "50"
+postgresql_ebs_volume_type = "gp2"
+
 
 # On-prem Configuration
 This section is for configuration related information for on-prem deployment. For this type of deployment user will their own provisioned VMs based on the [System requirements](#_System_and_software). Hence no provisioning step is required for on-prem deployment.
