@@ -650,7 +650,7 @@ After that patch the config. This will trigger also the deployment.
 
 `./chef-automate config patch automate.toml`
 
-### S3 Configuration for backup 
+### Pre backup Configuration for s3 backup 
 In order to run the terraform scripts, we need an IAM user with proper permissions. All the required permissions are mentioned in the next section. We need to make sure that we have the access key id and secret access key for the user. If not, then regenerate a new access key and keep it handy.
 
 Permissions to be provided:
