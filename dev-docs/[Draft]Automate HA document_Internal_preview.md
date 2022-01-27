@@ -646,113 +646,67 @@ vi configs/automate.toml
 **Put below content in automate.toml file:**
 
 
+    [global.v1.external.elasticsearch.backup]
+        enable = true
+        location = "s3"
 
-[global.v1.external.elasticsearch.backup]
+    [global.v1.external.elasticsearch.backup.s3]
 
-`    `enable = true
+      # bucket (required): The name of the bucket
+      bucket = "bucket-name"
 
-`    `location = "s3"
+      # base_path (optional):  The path within the bucket where backups should be stored
+      # If base_path is not set, backups will be stored at the root of the bucket.
+      base_path = "elasticsearch"
 
+      # name of an s3 client configuration you create in your elasticsearch.yml
+      # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
+      # for full documentation on how to configure client settings on your
+      # Elasticsearch nodes
+      client = "default"
 
+    [global.v1.external.elasticsearch.backup.s3.settings]
+        ## The meaning of these settings is documented in the S3 Repository Plugin
+        ## documentation. See the following links:
+        ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
 
-[global.v1.external.elasticsearch.backup.s3]
+        ## Backup repo settings
+        # compress = false
+        # server_side_encryption = false
+        # buffer_size = "100mb"
+        # canned_acl = "private"
+        # storage_class = "standard"
+        ## Snapshot settings
+        # max_snapshot_bytes_per_sec = "40mb"
+        # max_restore_bytes_per_sec = "40mb"
+        # chunk_size = "null"
+        ## S3 client settings
+        # read_timeout = "50s"
+        # max_retries = 3
+        # use_throttle_retries = true
+        # protocol = "https"
+    [global.v1.backups]
+        location = "s3"
+    [global.v1.backups.s3.bucket]
+        # name (required): The name of the bucket
+        name = "bucket-name"
 
-`  `# bucket (required): The name of the bucket
+        # endpoint (required): The endpoint for the region the bucket lives in.
+        # See https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+        endpoint = "https://s3.amazonaws.com"
 
-`  `bucket = "bucket-name"
+        # base_path (optional):  The path within the bucket where backups should be stored
+        # If base_path is not set, backups will be stored at the root of the bucket.
+        base_path = "automate"
 
-`  `# base\_path (optional):  The path within the bucket where backups should be stored
-
-`  `# If base\_path is not set, backups will be stored at the root of the bucket.
-
-`  `base\_path = "elasticsearch"
-
-`  `# name of an s3 client configuration you create in your elasticsearch.yml
-
-`  `# see <https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html>
-
-`  `# for full documentation on how to configure client settings on your
-
-`  `# Elasticsearch nodes
-
-`  `client = "default"
-
-[global.v1.external.elasticsearch.backup.s3.settings]
-
-`    `## The meaning of these settings is documented in the S3 Repository Plugin
-
-`    `## documentation. See the following links:
-
-`    `## <https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html>
-
-
-
-`    `## Backup repo settings
-
-`    `# compress = false
-
-`    `# server\_side\_encryption = false
-
-`    `# buffer\_size = "100mb"
-
-`    `# canned\_acl = "private"
-
-`    `# storage\_class = "standard"
-
-`    `## Snapshot settings
-
-`    `# max\_snapshot\_bytes\_per\_sec = "40mb"
-
-`    `# max\_restore\_bytes\_per\_sec = "40mb"
-
-`    `# chunk\_size = "null"
-
-`    `## S3 client settings
-
-`    `# read\_timeout = "50s"
-
-`    `# max\_retries = 3
-
-`    `# use\_throttle\_retries = true
-
-`    `# protocol = "https"
-
-[global.v1.backups]
-
-`    `location = "s3"
-
-[global.v1.backups.s3.bucket]
-
-`    `# name (required): The name of the bucket
-
-`    `name = "bucket-name"
-
-`    `# endpoint (required): The endpoint for the region the bucket lives in.
-
-`    `# See <https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region>
-
-`    `endpoint = "[https://s3.amazonaws.com](https://s3.amazonaws.com/)"
-
-`    `# base\_path (optional):  The path within the bucket where backups should be stored
-
-`    `# If base\_path is not set, backups will be stored at the root of the bucket.
-
-`    `base\_path = "automate"
-
-[global.v1.backups.s3.credentials]
-
-`    `# Optionally, AWS credentials may be provided. If these are not provided, IAM instance
-
-`    `# credentials will be used. It's also possible for these to be read through the standard
-
-`    `# AWS environment variables or through the shared AWS config files.
-
-`    `# Use the credentials obtained from here [AWS-Credential](https://github.com/chef/automate-as-saas/wiki/Bastion-Setup#aws-credentials)
-
-`    `access\_key = "AKIARUQHMSKHGYTUJ&UI"
-
-`    `secret\_key = "s3kQ4Idyf9WjAgRXyv9tLYCQgYTRESDFRFV"
-
+    [global.v1.backups.s3.credentials]
+        # Optionally, AWS credentials may be provided. If these are not provided, IAM instance
+        # credentials will be used. It's also possible for these to be read through the standard
+        # AWS environment variables or through the shared AWS config files.
+        # Use the credentials obtained from here [AWS-Credential](https://github.com/chef/automate-as-saas/wiki/Bastion-Setup#aws-credentials)
+        access_key = "AKIARUQHMSKV6BXLAXHO"
+        secret_key = "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"
+	
 After putting contents in automate.toml file, we need to eceute below command. This command will also trigger the deployment. 
 
 **./chef-automate patch configs/automate.toml** 
