@@ -44,7 +44,7 @@
 
 [Backup and restore](#backup-and-restore) 
 -   [Pre-back-up configuration](#pre-back-up-configuration)
-    - [ES configuration and setup](#es-configuration-and-setup) 
+    - [Pre backup configuration and setup for file system backup](#es-configuration-and-setup) 
     - [S3 Configuration for backup](#s3-configuration-for-backup) 
     - [File System (EFS)Configuration for backup](#file-system-(efs)-configuration-for-backup) 
 - [Backup](#backup) 
@@ -76,6 +76,8 @@
     - [Error: Cached artifact not found in offline mode](#)
     - [Error: Existing arch does not match the requested one](#) 
     - [Other Errors](#)
+    - [Infrastructure cleanup steps for on prem nodes](#infrastructure-cleanup-steps-for-on-prem-nodes)
+    - [Cert rotation with large CA cert file](#cert-rotation-with-large-ca-cert-file)
 
 [Appendix](#appendix) 
 
@@ -151,7 +153,7 @@ Chef-automate
 
 Chef Infra Server
 
-Elasticsearch - an open-source search and analytics engine based on Apache Lucene and built with 	Java. It is a NoSQL database that stores data in an unstructured way.
+Elasticsearch - an open-source search and analytics engine based on Apache Lucene and built with Java. It is a NoSQL database that stores data in an unstructured way.
 
 PostgreSQL - an open-source relational database management system (RDBMS) emphasizing 		extensibility and SQL compliance.
 
@@ -218,10 +220,10 @@ The bastion hosts provide secure access to Linux instances located in the privat
 ## Package download
 Chef-automate is the main utility used for installation of chef-automate. If you are doing installation on fresh 	server where you don’t have chef-automate utility, you can download it using below link	
 
-*curl [https://packages.chef.io/files/current/latest/chef-automate-cli/chef-*](https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip)*		*automate\_linux\_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp chef-automate /usr/bin/chef-automate*
+curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp chef-automate /usr/bin/chef-automate
 
 # Configuration and Provisioning – Cloud
-This section is only for cloud deployment. Currently we support AWS based provisioning and 	deployment. 
+This section is only for cloud deployment. Currently we support AWS based provisioning and deployment. 
 ## Cloud System Requirements
 Please refer to [Common System Requirements](#_System_and_software) for general requirement guidelines.
 ### Virtual Machine (VM) Instances Type
@@ -546,7 +548,7 @@ This will give the status of frontend and backend node. 
 # Backup and restore
 Back-up configurations to be done before deploying cluster. 
 ## Pre-back-up configuration:
-### ES configuration and setup
+### Pre-backup configuration and setup for File system backup 
 A shared file system is needed to create Elasticsearch snapshots. In order to register the snapshot repository with Elasticsearch it is necessary to mount the same shared filesystem to the same location on all master and data nodes. This location (or one of its parent directories) must be registered in the path.repo setting on all master and data nodes.
 
 Assuming that the shared filesystem is mounted to /mnt/automate\_backups, we can configure Automate to register the snapshot locations with Elasticsearch.
@@ -795,7 +797,7 @@ sudo systemctl start chef-automate
 
 **In case of S3 back-up:**
 
-Login to same instance of Chef Automate front-end node from which backup is taken run the restore 	command
+Login to same instance of Chef Automate front-end node from which backup is taken run the restore command
 
 chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --skip-preflight --s3-access-key "Access\_Key"  --s3-secret-key "Secret\_Key"
 
@@ -867,9 +869,9 @@ If existing customer wants to move its existing chef infrastructure to our new a
 
 **For that we have identified there can be 2 scenarios** 
 
-\1. Migrating from standalone chef-server to automate chef-server which is part of a2-ha-backend frontend nodes cluster
+1. Migrating from standalone chef-server to automate chef-server which is part of a2-ha-backend frontend nodes cluster
 
-\2. Migrating from chef-backend cluster to automate chef-server which is part of a2-ha-backend frontend nodes cluster
+2. Migrating from chef-backend cluster to automate chef-server which is part of a2-ha-backend frontend nodes cluster
 
 In both the cases we need to take backup using knife-ec-backup utility and then move the backup folder on the new chef-server where will take restore using the same utility. This backup will migrate all the cookbooks, users, data-bags, policies and organisations.
 
@@ -894,7 +896,7 @@ Generate a knife tidy server report to examine stale nodes and unused cookbooks
 
 Initiate a backup of your Chef Server data
 
-`hab pkg exec chef/knife-ec-backup knife ec backup -c /etc/opscode/chef-server.rb backup\_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui\_priv.pem --with-user-sql --with-key-sql`
+`hab pkg exec chef/knife-ec-backup knife ec backup -c /etc/opscode/chef-server.rb backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem --with-user-sql --with-key-sql`
 
 `--with-user-sql` This is required to correctly handle user passwords and to ensure user-specific association groups are not duplicated.
 
@@ -1253,7 +1255,83 @@ for i in 1;do i=$PWD;cd /hab/a2\_deploy\_workspace/terraform/;terraform destroy;
 After that do deploy again using below command
 
 *./chef-automate deploy config.toml* 
+	
+### Infrastructure cleanup steps for on prem nodes
+	
+**Follow below steps to perform clean up of deployed Automate HA infrastructure: **
+- Run below commands on all the instances/nodes of Automate HA infrastructure (Automate, Server, 3 instance of Postgres, 3 instances of Elastic search)
+	- `rm -rf /hab`
+	-  `cd /var/tmp && rm frontend-* && backend-*`
+	-  `sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}')`
 
+- Run  `rm -rf /hab` on Bastion node
+
+# Cert rotation with large CA cert file
+	
+### Elastic Search cert rotation
+
+- Go to all the instances of elasticsearch and unload ES service using below command
+	- `sudo hab svc unload chef/automate-ha-elasticsearch/6.8.6/20220110171138`
+ 
+- Come back to  1st instance of the elastic search and follow below commands:
+
+- Step 1: `mkdir -p /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs && touch /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs/MyRootCA.pem`
+ 
+- Step 2: Put your content into `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/rotated-certs/MyRootCA.pem`
+ 
+- Step 3: `vi /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/default.toml`
+	- Go to 47 and 67 number line(pemtrustedcas_filepath) and set this path certificates/MyRootCA.pem to rotated-certs/MyRootCA.pem
+	- Just replace rotated-certs/MyRootCA.pem this path. you don’t need to give whole path
+ 	- e.g. `pemtrustedcas_filepath = "rotated-certs/MyRootCA.pem"`
+   
+- step 4: Remove all the contents mentioned in below file:
+
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.key`
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.pem`
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.key`
+	`/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.pem`
+	
+	 Now put your admin private and public cert respectively `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-                admin.key` and `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-admin.pem`
+ 
+ 	 same way put ssl private and public content in `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.key` and                `/hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates/odfe-ssl.pem`
+	
+	
+- Step 5: Remove MyRootCA.pem from below directory
+	- `cd /hab/pkgs/chef/automate-ha-elasticsearch/6.8.6/20220110171138/config/certificates && rm MyRootCA.pem`
+ 
+
+- Step 6: `cd /hab/svc && rm -rf automate-ha-elasticsearch`
+ 
+
+- Step 7: `hab svc load chef/automate-ha-elasticsearch/6.8.6/20220110171138 --topology standalone --strategy none`
+
+
+ - Perform step 1 to step 7 on other 2 instances of elasticsearch 
+
+ - Chek status of ES on all there instances using below command:
+	- `hab svc status`
+
+	
+### PostgreSQL cert rotation	
+
+- Go to all the instances of postgresql and unload PG service using below command
+	- `sudo hab svc unload chef/automate-ha-postgresql/11.11.0/20220110171200`
+ 
+- Come back to  1st instance of the postgres instance and follow below commands:
+	
+- Step 1: Open this file `/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/default.toml`
+and put your ca cert in 'issuer_cert = '
+
+- Step 2: Also update your private and pblic key respectively `/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.key` and 
+`/hab/pkgs/chef/automate-ha-postgresql/11.11.0/20220110171200/config/server.crt`
+	
+- Step 3: cd /hab/svc && rm -rf automate-ha-postgresql
+	
+- Step 4: Load PG service again
+	- `hab svc load chef/automate-ha-postgresql/11.11.0/20220110171200 --topology leader --strategy none`
+	
+Do above things from 1 step to last on another 2 instances of postgresql.
+	
 # Appendix
 ## [What to change in config.toml](https://progresssoftware.sharepoint.com/sites/ChefCoreC/_layouts/15/doc.aspx?sourcedoc=%7bac26b0b0-9621-4d83-a6ef-47c363a9aaf7%7d&action=edit)
 \1. Specify the ssh username and the ssh\_key\_file path. This path should be from bastion and If you scroll down in config.toml then you will find 	 here this key pair name and key file both should have a same content. Suppose you have mentioned the "a2ha-aws" name in key\_pair section then put that file content in ssh\_key\_file path's file.
