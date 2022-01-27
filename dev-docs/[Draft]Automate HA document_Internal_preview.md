@@ -567,68 +567,66 @@ Configure Elasticsearch path.repo setting by SSHing to a single Elasticsearch se
 
 Export the current Elasticsearch config from the Habitat supervisor. You will need to have root access to run the following commmands
 
-`   		  `*source /hab/sup/default/SystemdEnvironmentFile.sh*    
+   		  `source /hab/sup/default/SystemdEnvironmentFile.sh`
+                   `automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml`
 
-`                              `*automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es\_config.toml*
-
-Edit es\_config.toml and add the following settings to the end of the file.
+Edit es_config.toml and add the following settings to the end of the file.
 Note: If credentials have never been rotated this file may be empty.
+```
+[es_yaml.path]      
 
-*[es\_yaml.path]*      
-
-`  `*repo = "/mnt/automate\_backups/elasticsearch"*
-
+repo = "/mnt/automate_backups/elasticsearch"
+```
 Apply updated es\_config.toml config to Elasticsearch, this only needs to be done once. This will trigger a restart of the Elasticsearch services on each server.
 
-`  `*hab config apply automate-ha-elasticsearch.default $(date '+%s') es\_config.toml*
+`hab config apply automate-ha-elasticsearch.default $(date '+%s') es\_config.toml`
 
-`  `hab svc status (check elasticsearch service is up or not)
+`hab svc status (check elasticsearch service is up or not)`
 
-` `curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check es. Check that all the indices is green or not)
+`curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check es. Check that all the indices is green or not)`
 
 # Watch for a message about Elasticsearch going from RED to GREEN
-` `journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
+`journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
 
 Configure Automate to handle external Elasticsearch backups	
 
 Create a automate.toml file on the provisioning server
 
-touch automate.toml
+`touch automate.toml`
 
-`             `Add the following configuration to automate.toml on the provisioning host.
+`Add the following configuration to automate.toml on the provisioning host.`
 
-[global.v1.external.elasticsearch.backup]   
+```
+   [global.v1.external.elasticsearch.backup]
+   enable = true
+   location = "fs"
 
-enable = true   
+   [global.v1.external.elasticsearch.backup.fs]
+   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
+   # a parent directory of the setting you configure here:
+   path = "/mnt/automate_backups/elasticsearch"
 
-location = "fs"   
-
-[global.v1.external.elasticsearch.backup.fs]   
-
-\# The `path.repo` setting you've configured on your Elasticsearch nodes must be a parent directory of the setting you configure here:   
-
-path = "/mnt/automate\_backups/elasticsearch"  
-
-[global.v1.backups.filesystem]   
-
-path = "/mnt/automate\_backups/backups"
+   [global.v1.backups.filesystem]
+   path = "/mnt/automate_backups/backups"
+```
 
 After that patch the config. This will trigger also the deployment.
 
-./chef-automate config patch automate.toml
+`./chef-automate config patch automate.toml`
+
 ### S3 Configuration for backup 
 In order to run the terraform scripts, we need an IAM user with proper permissions. All the required permissions are mentioned in the next section. We need to make sure that we have the access key id and secret access key for the user. If not, then regenerate a new access key and keep it handy.
 
 Permissions to be provided:
 
 We need to check if the IAM user has all the required permissions or not. Listed below are the must have permission policies:
-
+```
 AdministratorAccess
 
 AmazonAPIGatewayAdministrator
 
 AmazonS3FullAccess
-
+```
 We also have to create IAM role to give access of s3 to elasticsearch iinstances.
 
 These permissions can either be directly added to the user or can be added via IAM Group.
@@ -700,10 +698,6 @@ vi configs/automate.toml
         base_path = "automate"
 
     [global.v1.backups.s3.credentials]
-        # Optionally, AWS credentials may be provided. If these are not provided, IAM instance
-        # credentials will be used. It's also possible for these to be read through the standard
-        # AWS environment variables or through the shared AWS config files.
-        # Use the credentials obtained from here [AWS-Credential](https://github.com/chef/automate-as-saas/wiki/Bastion-Setup#aws-credentials)
         access_key = "AKIARUQHMSKV6BXLAXHO"
         secret_key = "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"
 	
