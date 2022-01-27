@@ -368,50 +368,41 @@ X-Project = ""
 
 So here you should make all the changes required for AWS deployment. Refer this doc for config.toml [What to change in config.toml] 
 
-` `*./chef-automate provision-infra <path to config.toml>*
-`	`This step will download habitat and create workspace /hab/a2\_deploy\_workspace for you and this will 	provision infrastructure for you on AWS
+`./chef-automate provision-infra <path to config.toml>`
+`This step will download habitat and create workspace /hab/a2\_deploy\_workspace for you and this will 	provision infrastructure for you on AWS
 
 ### mandatory fields in config.toml for aws
-secrets_key_file = "/hab/a2_deploy_workspace/"
+Path to secrets key file
+`secrets_key_file = "/hab/a2_deploy_workspace/"`
 
-`Path to secrets key file`
+Path to secrets json
+`secrets_store_file = "/hab/a2_deploy_workspace/"`
 
-secrets_store_file = "/hab/a2_deploy_workspace/"
+This will come according to architecture for which you are deploying
+`architecture = "aws"`
 
-`Path to secrets json`
+ssh user to conect to your nodes
+`ssh_user = "centos"`
 
-architecture = "aws"
-
-`This will come according to architecture for which you are deploying`
-
-ssh_user = "centos"
-
-`ssh user to conect to your nodes`
-
-ssh_key_file = "/home/ubuntu/a2ha-london.pem"
-
-`Path to ssh key file`
-
-config_file = "configs/automate.toml"
+Path to ssh key file
+`ssh_key_file = "/home/ubuntu/a2ha-london.pem"`
 
 `Config file location of automate, where we can give additional config for automate`
+config_file = "configs/automate.toml"
 
+
+`Region in which we need to deploy`
 region = "eu-west-2"
 
-`Region in which we need to deploy `
+key pair name of ssh key
+`ssh_key_pair_name = "a2ha-london"`
 
-ssh_key_pair_name = "a2ha-london"
+ARN (amazon resource name) of certificate which will be used for LB creation
+`automate_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"`
 
-key pair name of ssh key`
 
-automate_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"
-
-`ARN (amazon resource name) of certificate which will be used for LB creation`
-
-chef_server_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"
-
-`<ARN (amazon resource name) of certificate which will be used for LB creation>`
-
+<ARN (amazon resource name) of certificate which will be used for LB creation>
+`chef_server_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"`
 
 
 # On-prem Configuration
@@ -421,9 +412,9 @@ This section is for configuration related information for on-prem deployment. Fo
 ## On-prem Prerequisite
 List of VM with public and private IP. Public-ip is only mandatory for Elasticsearch. 
 
-` `All the VM must expose the port 22 for SSH.   
+- All the VM must expose the port 22 for SSH.   
 
-` `We need to open certain port across the VM to make the communication. Please refer this doc for
+- We need to open certain port across the VM to make the communication. Please refer this doc for
 
 [Firewall and security settings](#_Security_and_firewall) that need to be done before deployment. 
 
@@ -442,8 +433,7 @@ Configuration 	 
 
 ----------------
 Setup configuration file for HA Deployment on AWs 
-*./chef-automate init-config-ha existing\_infra* 
-\*
+`./chef-automate init-config-ha existing_infra`
 
 This will create configuration for deployment on existing nodes. Config.toml is the config file where you need to make changes for any change in Automate HA 
 
@@ -539,18 +529,15 @@ ssh_key_pair_name = "a2ha-london"
 
 # Validation
 Validation command work is in progress. This command will internally call a set of scripts and trigger the checks for required firewalls and security settings. This is a pre-deployment step.
+
 # Installation
-*./chef automate deploy  <path to config.toml>* 
+`./chef automate deploy  <path to config.toml>`
+
 This will generate workspace and download the habitat on your system. 
-
-
-./*chef-automate info* 
+`./chef-automate info`
 
 This will give information about all server’s IP and automate’s URL details. 
-
-
-
-*./chef-automate status* 
+`./chef-automate status`
 
 This will give the status of frontend and backend node. 
 ## Air-gapped installation
@@ -663,7 +650,7 @@ APIGatewayAdministrator (For aws AmazonAPIGatewayAdministrator)
 
 S3FullAccess (for aws AmazonS3FullAccess)
 ```
-We also have to create IAM role to give access of s3 to elasticsearch instances.
+We also have to create IAM role to give access of s3 to elasticsearch instances. Because ES instance wiill try to communicate s3 so we have to assign role for that.
 
 These permissions can either be directly added to the user or can be added via IAM Group.
 
@@ -778,7 +765,7 @@ Start all Chef Automate and Chef Infra Server front-end nodes.
 `sudo systemctl start chef-automate`
 
 
-**In case of S3 back-up how to restore:**
+##S3 Restore
 
 Check status of all Chef Automate and Chef Infra Server front-end nodes. 
 `chef-automate status`
