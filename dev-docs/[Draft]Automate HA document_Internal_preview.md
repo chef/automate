@@ -764,30 +764,30 @@ To create a new backup run chef-automate backup create from a Chef-Automate fron
 ##Restore
 Check status of all Chef Automate and Chef Infra Server front-end nodes.
 
-*chef-automate status*
+`chef-automate status`
 
 Shutdown Chef Automate service on all front-end nodes.
 
-*sudo systemctl stop chef-automate*
+`sudo systemctl stop chef-automate`
 
-` 	`Login to same instance of Chef Automate front-end node from which backup is taken run the restore command
+`Login to same instance of Chef Automate front-end node from which backup is taken run the restore command
 
-chef-automate backup restore --yes -b /mnt/automate\_backups/backups --patch-config /etc/chef-automate/config.toml
+`chef-automate backup restore --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`
 
 Start all Chef Automate and Chef Infra Server front-end nodes.
 
-sudo systemctl start chef-automate
+`sudo systemctl start chef-automate`
 
 
 **In case of S3 back-up:**
 
 Login to same instance of Chef Automate front-end node from which backup is taken run the restore command
 
-chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --skip-preflight --s3-access-key "Access\_Key"  --s3-secret-key "Secret\_Key"
+`chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"`
 
 Start all Chef Automate and Chef Infra Server front-end nodes.
 
-sudo systemctl start chef-automate
+`sudo systemctl start chef-automate`
 
 # Upgrade
 **To upgrade the complete cluster both frontends and backends**
