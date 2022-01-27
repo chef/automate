@@ -1054,9 +1054,9 @@ cp es_ssl_public.pem /hab/a2_deploy_workspace/certs/pg_ssl_public.pem
 
 -------------------------------------------------------------------------------------------------------------------------------------
 
-` `Now copy the content of the certs in an appropriate file. See below steps execute bash script that we created above.
+Now copy the content of the certs in an appropriate file. See below steps execute bash script that we created above.
 
-bash cert.sh 
+`bash cert.sh`
 
 Now apply first es ssl from /hab/a2\_deploy\_workspcae
 
