@@ -275,10 +275,10 @@ Create a config for aws using below command
 
 ./chef-automate init-config-ha aws 
 ## Provisioning
-`	`This step is only for cloud deployment. Using provisioning command, we provision the cloud infrastructure as per configuration provided for Automate HA.
+This step is only for cloud deployment. Using provisioning command, we provision the cloud infrastructure as per configuration provided for Automate HA.
 ### AWS provisioning
 **Setup configuration file for HA Deployment on AWS**
-`			`*/chef-automate provision-infra config.toml*
+./chef-automate provision-infra config.toml
 
 This will create configuration for deployment on AWS. config.toml is the config file where you need to make changes for any change in Automate HA
 
