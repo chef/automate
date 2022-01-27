@@ -314,6 +314,9 @@ module AutomateCluster
           # power forward and finish the other frontends, then do the backends.
           script = bash_script <<~SCRIPT
             [ -s #{remote_conf_filename} ] && /bin/hab pkg exec core/coreutils timeout 10 /bin/chef-automate config patch #{remote_conf_filename} || true
+            [ -s #{remote_conf_filename} ] && /bin/hab pkg exec core/coreutils timeout 10 /bin/chef-automate config show > temp.toml || true
+            cp temp.toml /etc/chef-automate/config.toml
+            rm -f temp.toml
             rm -f #{remote_conf_filename}
           SCRIPT
 
