@@ -586,7 +586,7 @@ A shared file system is needed to create Elasticsearch snapshots. In order to re
 
 Assuming that the shared filesystem is mounted to /mnt/automate\_backups, we can configure Automate to register the snapshot locations with Elasticsearch.
 
-1. Ensure the shared file system is mounted on all Elasticsearch servers:
+* Ensure the shared file system is mounted on all Elasticsearch servers:
 ```
       mount /mnt/automate_backups
 ```
@@ -646,7 +646,7 @@ Create a automate.toml file on the provisioning server
    path = "/mnt/automate_backups/backups"
 ```
 
-After that patch the config. This will trigger also the deployment.
+After that patch the config. This will trigger the deployment also.
 
 `./chef-automate config patch automate.toml`
 
@@ -674,8 +674,6 @@ bucket name (bucket = "bucket-name" and name = "bucket-name")
 `mkdir configs`
 
 `vi configs/automate.toml`
-
-
 
 **Put below content in automate.toml file:**
 
@@ -737,7 +735,7 @@ bucket name (bucket = "bucket-name" and name = "bucket-name")
         access_key = "AKIARUQHMSKV6BXLAXHO"
         secret_key = "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"
 	
-After putting contents in automate.toml file, we need to eceute below command. This command will also trigger the deployment. 
+After putting contents in automate.toml file, we need to execute below command. This command will also trigger the deployment. 
 
 `./chef-automate patch configs/automate.toml`
 
@@ -761,7 +759,8 @@ Open the port(2049) Proto(NFS) for EFS security group.
 To create a new backup run chef-automate backup create from a Chef-Automate front-end node.
 
 `./chef-automate backup create`
-##Restore
+
+## EFS Restore
 Check status of all Chef Automate and Chef Infra Server front-end nodes.
 
 `chef-automate status`
@@ -779,14 +778,18 @@ Start all Chef Automate and Chef Infra Server front-end nodes.
 `sudo systemctl start chef-automate`
 
 
-**In case of S3 back-up:**
+**In case of S3 back-up how to restore:**
 
-Login to same instance of Chef Automate front-end node from which backup is taken run the restore command
+Check status of all Chef Automate and Chef Infra Server front-end nodes. 
+`chef-automate status`
 
+Shutdown Chef Automate service on all front-end nodes. 
+`sudo systemctl stop chef-automate`
+	
+Login to same instance of Chef Automate front-end node from which backup is taken run the restore command.
 `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"`
 
 Start all Chef Automate and Chef Infra Server front-end nodes.
-
 `sudo systemctl start chef-automate`
 
 # Upgrade
