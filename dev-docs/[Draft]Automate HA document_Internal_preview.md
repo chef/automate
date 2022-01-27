@@ -282,30 +282,40 @@ This will create configuration for deployment on AWS. config.toml is the config 
 
 By default, config file will look like below: 
 
+`
+# This is a Chef Automate AWS HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
 
-
-
-So here you should make all the changes required for AWS deployment. Refer this doc for config.toml [What to change in config.toml](#_What_to_change)
-
-` `*./chef-automate provision-infra <path to config.toml>*
-`	`This step will download habitat and create workspace /hab/a2\_deploy\_workspace for you and this will 	provision infrastructure for you on AWS 
-
-# mandatory fields in config.toml
-config.toml is divided into different configs, according to nodes and architecture chosen
-
-// architecture config
+[architecture.aws]
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-Path to secrets key file
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-Path to secrets json 
 architecture = "aws"
-This will come according to 
 workspace_path = "/hab/a2_deploy_workspace"
+
+
+# ssh user name for ssh login to instance like default user for centos will centos or for red-hat will be ec2-user
 ssh_user = "centos"
+# private ssh key file path to access instances
 ssh_key_file = "/home/ubuntu/a2ha-london.pem"
-fqdn = ""
+# sudo_password = ""
+# logging_monitoring_management = ""
+# new_elk = ""
+# existing_elk_instance_ip ""
+# existing_elk_port ""
+# existing_elk_cert ""
+# existing_elk_username ""
+# existing_elk_password ""
+backup_mount = "/mnt/automate_backups"
+
+[automate.config]
+# admin_password = ""
+# automate load balancer fqdn IP or path
+# fqdn = ""
 instance_count = "1"
+# teams_port = ""
 config_file = "configs/automate.toml"
+
 [chef_server.config]
 instance_count = "1"
 
@@ -318,7 +328,12 @@ instance_count = "3"
 [aws.config]
 profile = "default"
 region = "eu-west-2"
-
+# Provide vpcid and cidr block
+# E.g. aws_vpc_id = "vpc12318h"
+# E.g. aws_cidr_block_addr = "172.31.64.0"
+aws_vpc_id  = "vpc-24f8cc4d"
+aws_cidr_block_addr  = "172.31.128.0"
+# ssh key pair name in AWS to access instances
 ssh_key_pair_name = "a2ha-london"
 ami_filter_name = ""
 ami_filter_virt_type = ""
@@ -342,6 +357,40 @@ elasticsearch_ebs_volume_type = "gp2"
 postgresql_ebs_volume_iops = "100"
 postgresql_ebs_volume_size = "50"
 postgresql_ebs_volume_type = "gp2"
+X-Contact = "chef-automate-ha@progress.com"
+X-Dept = ""
+X-Project = ""
+`
+
+
+So here you should make all the changes required for AWS deployment. Refer this doc for config.toml [What to change in config.toml] 
+
+` `*./chef-automate provision-infra <path to config.toml>*
+`	`This step will download habitat and create workspace /hab/a2\_deploy\_workspace for you and this will 	provision infrastructure for you on AWS
+
+# mandatory fields in config.toml for aws
+architecture config
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+<Path to secrets key file>
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+<Path to secrets json>
+architecture = "aws"
+<This will come according to architecture for which you are deploying>
+ssh_user = "centos"
+<ssh user to conect to your nodes>
+ssh_key_file = "/home/ubuntu/a2ha-london.pem"
+<Path to ssh key file>
+config_file = "configs/automate.toml"
+<Config file location of automate, where we can give additional config for automate>
+region = "eu-west-2"
+<Region in which we need to deploy >
+ssh_key_pair_name = "a2ha-london"
+<key pair name of ssh key>
+automate_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"
+<ARN (amazon resource name) of certificate which will be used for LB creation>
+<ARN (amazon resource name) of certificate which will be used for LB creation>
+chef_server_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"
+
 
 
 # On-prem Configuration
@@ -376,9 +425,80 @@ Setup configuration file for HA Deployment on AWs 
 \*
 
 This will create configuration for deployment on existing nodes. Config.toml is the config file where you need to make changes for any change in Automate HA 
+
+At the end in existing\_infra config part, you need to provide IP’s of your on premise details separated by comma. we must mention the List of IP address for the cluster. In the below image there are options for private and public ip's (public IP is needed for elastic search only).
 By default, config file will look like below: 
 
-At the end in existing\_infra config part, you need to provide IP’s of your on premise details separated by comma. we must mention the List of IP address for the cluster. In the below image there are options for private and public ip's (public IP is needed for elastic search only). 
+`
+# This is a Chef Automate AWS HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
+
+[architecture.existing_infra]
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "existing_nodes"
+workspace_path = "/hab/a2_deploy_workspace"
+ssh_user = "ec2-user"
+# private ssh key file path to access instances
+ssh_key_file = "/root/meetg-canada.pem"
+sudo_password = ""
+# logging_monitoring_management = "{{ .LoggingMonitoringManagement }}"
+# new_elk = "{{ .NewElk }}"
+# existing_elk_instance_ip "{{ .ExistingElk }}"
+# existing_elk_port "{{ .ExistingElkPort }}"
+# existing_elk_cert "{{ .ExistingElkCert }}"
+# existing_elk_username "{{ .ExistingElkUsername }}"
+# existing_elk_password "{{ .ExistingElkPassword }}"
+backup_mount = "/mnt/automate_backups"
+
+[automate.config]
+# admin_password = ""
+# automate load balancer fqdn IP or path
+fqdn = "A2-330e4626-automate-lb-1322606881.ca-central-1.elb.amazonaws.com"
+instance_count = "3"
+# teams_port = ""
+config_file = "configs/automate.toml"
+
+[chef_server.config]
+instance_count = "3"
+
+[elasticsearch.config]
+instance_count = "3"
+
+[postgresql.config]
+instance_count = "3"
+
+[existing_infra.config]
+automate_private_ips = ["172.31.192.21","172.31.192.39","172.31.192.58"]
+chef_server_private_ips = ["172.31.192.25","172.31.192.46","172.31.192.53"]
+elasticsearch_ips = ["172.31.192.119","172.31.192.132","172.31.192.210"]
+elasticsearch_private_ips = ["172.31.192.119","172.31.192.132","172.31.192.210"]
+postgresql_private_ips = ["172.31.192.30","172.31.192.36","172.31.192.57"]
+`
+
+ 
+
+# mandatory fields in config.toml for existing_nodes
+architecture config
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+<Path to secrets key file>
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+<Path to secrets json>
+architecture = "existing_nodes"
+<This will come according to architecture for which you are deploying>
+ssh_user = "centos"
+<ssh user to conect to your nodes>
+ssh_key_file = "/home/ubuntu/a2ha-london.pem"
+<Path to ssh key file>
+fqdn = ""
+<automate load balancer fqdn IP or if there is 1 instance can use IP of that automate machine>
+config_file = "configs/automate.toml"
+<Config file location of automate, where we can give additional config for automate>
+region = "eu-west-2"
+<Region in which we need to deploy >
+ssh_key_pair_name = "a2ha-london"
+<key pair name of ssh key>
 
 
 
