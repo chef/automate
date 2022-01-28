@@ -7,7 +7,7 @@ type InfraProxyMigrationServer struct {
 	migrationClient migrations.MigrationDataServiceClient
 }
 
-// NewInfraProxyHandler initializes InfraProxyServer with client
+// NewInfraProxyMigrationHandler initializes InfraProxyMigrationServer with client
 func NewInfraProxyMigrationHandler(migrationClient migrations.MigrationDataServiceClient) *InfraProxyMigrationServer {
 	return &InfraProxyMigrationServer{
 		migrationClient: migrationClient,

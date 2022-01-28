@@ -8,7 +8,7 @@ import (
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 )
 
-// GetMigrationStatus fetch migration status against migration id
+// GetMigrationStatus fetches the latest migration status against migration id
 func (a *InfraProxyMigrationServer) GetMigrationStatus(ctx context.Context, r *gwreq.GetMigrationStatus) (*gwres.GetMigrationStatus, error) {
 	req := &infra_req.GetMigrationStatus{
 		MigrationId: r.MigrationId,

@@ -14,6 +14,6 @@ service  InfraProxyMigration {
     rpc GetMigrationStatus (infra_proxy.migrations.request.GetMigrationStatus) returns (infra_proxy.migrations.response.GetMigrationStatus) {
         option (google.api.http).get = "/api/v0/infra/servers/migrations/status/{migration_id}";
         option (chef.automate.api.iam.policy).resource = "infra:infraServers";
-        option (chef.automate.api.iam.policy).action = "infra:infraServers:list";
+        option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
     };
 }

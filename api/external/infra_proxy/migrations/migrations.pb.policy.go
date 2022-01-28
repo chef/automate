@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.migrations.InfraProxyMigration/GetMigrationStatus", "infra:infraServers", "infra:infraServers:list", "GET", "/api/v0/infra/servers/migrations/status/{migration_id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.migrations.InfraProxyMigration/GetMigrationStatus", "infra:infraServers", "infra:infraServers:get", "GET", "/api/v0/infra/servers/migrations/status/{migration_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetMigrationStatus); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
