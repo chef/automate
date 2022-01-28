@@ -18,7 +18,7 @@ pkg_deps=(
   core/bash
   core/coreutils
   core/glibc
-  core/postgresql13-client/13.4
+  core/postgresql-client
 )
 
 pkg_build_deps=(
