@@ -534,7 +534,7 @@ config_file = "configs/automate.toml"
 Validation command work is in progress. This command will internally call a set of scripts and trigger the checks for required firewalls and security settings. This is a pre-deployment step.
 
 # Installation
-`./chef automate deploy  <path to config.toml>`
+`./chef-automate deploy  <path to config.toml>`
 
 This will generate workspace and download the habitat on your system. 
 `./chef-automate info`
