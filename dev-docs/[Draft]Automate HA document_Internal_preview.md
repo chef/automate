@@ -528,13 +528,6 @@ config_file = "configs/automate.toml"
 
 `Config file location of automate, where we can give additional config for automate`
 
-region = "eu-west-2"
-
-`Region in which we need to deploy `
-
-ssh_key_pair_name = "a2ha-london"
-
-`key pair name of ssh key`
 
 
 # Validation
