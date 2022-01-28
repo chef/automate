@@ -14,6 +14,10 @@ gh_repo = "automate"
     weight = 20
 +++
 
+## System Config
+
+SELinux must be in permissive mode or disabled for ALL Chef software to work. Chef does not test, nor maintain any configurations that are guaranteed to work within SELinux in Enforcing mode
+
 ## Hardware
 
 Chef Automate requires a minimum of
