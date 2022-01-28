@@ -22,7 +22,7 @@ Desktop information populates this dashboard after a Chef Infra Client run has e
 We recommend starting with a fresh installation of Chef Automate, Chef Infra Server, and Chef Desktop because the servers do not distinguish between the types of managed nodes when combining existing Chef Automate nodes with a new Chef Desktop installation.
 {{< /warning >}}
 
-For guidance on installing Chef Desktop, see the [installing Chef Desktop documentation](https://docs.chef.io/desktop/desktop_setup_chef/#install-chef-automate-and-chef-infra-server).
+For guidance on installing Chef Desktop, see the [installing Chef Desktop documentation](https://docs.chef.io/desktop/demonstration_setup/).
 The Desktop dashboard has no supported compliance profiles, and Chef Desktop installation includes no compliance profiles.
 
 {{< note >}}
