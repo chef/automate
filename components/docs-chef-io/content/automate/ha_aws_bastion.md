@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Bastion Setup for AWS Deployment Type"
     parent = "automate/install"
     identifier = "automate/install/ha_aws_bastion.md Bastion Setup for AWS Deployment Type"
-    weight = 290
+    weight = 300
 +++
 
 ## Building an AWS bastion host

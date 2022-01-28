@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Establishing SSH Connection with Bastion Host"
     parent = "automate/install"
     identifier = "automate/install/ha_aws_ssh_connect_bastion.md Establishing SSH Connection with Bastion Host"
-    weight = 300
+    weight = 310
 +++
 
 ## Establishing AWS Connection with Bastion Host
