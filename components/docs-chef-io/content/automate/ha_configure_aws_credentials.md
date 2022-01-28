@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Configuration of AWS Credential on Bastion Host"
     parent = "automate/install"
     identifier = "automate/install/ha_configure_aws_credentials.md Configuration of AWS Credential on Bastion Host"
-    weight = 320
+    weight = 330
 +++
 
 ## Configuration of AWS Credential on Bastion Host

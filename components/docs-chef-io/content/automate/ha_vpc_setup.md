@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "VPC Setup"
     parent = "automate/install"
     identifier = "automate/install/ha_vpc_setup.md VPC Setup"
-    weight = 330
+    weight = 350
 +++
 
 ## Amazon's Virtual Private Cloud (VPC)
