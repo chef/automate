@@ -371,37 +371,47 @@ So here you should make all the changes required for AWS deployment. Refer this 
 `./chef-automate provision-infra <path to config.toml>`
 `This step will download habitat and create workspace /hab/a2\_deploy\_workspace for you and this will 	provision infrastructure for you on AWS
 
-### mandatory fields in config.toml for aws
+### Mandatory fields in config.toml for aws
 Path to secrets key file
-`secrets_key_file = "/hab/a2_deploy_workspace/"`
+
+`secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"`
 
 Path to secrets json
-`secrets_store_file = "/hab/a2_deploy_workspace/"`
+
+`secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"`
 
 This will come according to architecture for which you are deploying
+
 `architecture = "aws"`
 
 ssh user to conect to your nodes
+
 `ssh_user = "centos"`
 
 Path to ssh key file
+
 `ssh_key_file = "/home/ubuntu/a2ha-london.pem"`
 
 `Config file location of automate, where we can give additional config for automate`
+
 config_file = "configs/automate.toml"
 
 
 `Region in which we need to deploy`
+
 region = "eu-west-2"
 
 key pair name of ssh key
+
 `ssh_key_pair_name = "a2ha-london"`
 
 ARN (amazon resource name) of certificate which will be used for LB creation
+
 `automate_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"`
 
 
 <ARN (amazon resource name) of certificate which will be used for LB creation>
+
 `chef_server_lb_certificate_arn = "arn:aws:acm:eu-west-2:112758395563:certificate/508ef207-0f30-4fd4-9c5b-dc76f40915f1"`
 
 
