@@ -12,7 +12,80 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Meta --> About zip file, unzipped location
+//          Overall Result
+// Orgs --> [ {
+//   orgname:
+//   fullname:
+// }]
+// Users --> [ {
+//   serverusername:
+//	   ldapusername:
+//     automateusername: // if ldapusername != "" then ldapusername or serverusername
+//		   isconflicting: // if ldapusername != "" then false or check with auth service
+//       hashKey: // store for password only if ldapusername != ""
+//}
+//   ]
+// OrgsUsersAssoiat --> orgs [
+//   {
+//	   orgname: <orgname>
+//		   users: [
+//	   {
+//		   username: <username>,
+//			   isadmin: true/false
+//	   }
+//	   ],
+//}
+//]
+
+type Result struct {
+	meta         *Meta
+	parsedResult *ParsedReseult
+}
+
+type Meta struct {
+	stageResults []StageResult
+}
+
+type StageResult struct {
+	stageName string
+	isSuccess bool
+	failure   error
+}
+
+type ParsedResult struct {
+	orgs      Organisations
+	users     Users
+	orgsUsers OrgsUsersAssociations
+}
+
+type Org struct {
+	Name     string    `json:"name"`
+	FullName string    `json:"full_name"`
+	Action   ActionOps // This to identify if the org needs to be added, removed, updated, skipped
+}
+
+type ActionOps int
+
+const (
+	Insert ActionOps = 1 + iota
+	Skip
+	Delete
+	Update
+)
+
+type ActionOps struct {
+}
+
 // Unzip returns all the files of the zipped file
+
+// --> Unzip --> ParseOrgs --> ParseUsers --> ........ --> CompletePhase1 --> Finish Pipeline ( Convert struct to JSON, store JSON to stage table, Update the status)
+//      |---------|---------------|------------------------------------------> Error Handle
+
+// --> StageTableReadJSON --> PopulateOrgs --> PopulateUsers --> ........ --> CompletePhase2 --> Finish Pipeline ( Update the status)
+//      |---------|---------------|------------------------------------------> Error Handle
+
+// func unZip(ctx context.Context, src <-chan string, errc <-chan error) <-chan *Result
 func Unzip(ctx context.Context, src string) (<-chan string, <-chan error) {
 	filePath := make(chan string)
 	errc := make(chan error, 1)
@@ -86,14 +159,15 @@ func Unzip(ctx context.Context, src string) (<-chan string, <-chan error) {
 }
 
 // ParseOrg returns all the organizations from the unzipped file
-func ParseOrg(ctx context.Context, fileDest <-chan string) (<-chan Org, <-chan error) {
+func ParseOrg(ctx context.Context, fileDest ...<-chan interface{}) (<-chan Org, <-chan error) {
 	orgChan := make(chan Org)
 	errc := make(chan error, 1)
 
 	go func() {
 		defer close(orgChan)
 		defer close(errc)
-
+		// org OrhStruct := YashviOrgsfunction(folderPath string)
+		// in.org = &org
 		orgChan <- Org{Name: "Org Alpha"}
 		orgChan <- Org{Name: "Org Beta"}
 	}()
@@ -180,7 +254,7 @@ func AdminUsers(ctx context.Context, user <-chan User) (<-chan User, <-chan erro
 func RunMigrationPipeline(filePath string) {
 	fmt.Println("Pipeline started. Waiting for pipeline to complete.")
 
-	var errcList []<-chan error
+	var errc <-chan error
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 
@@ -236,4 +310,5 @@ func RunMigrationPipeline(filePath string) {
 	}
 
 	// Log all the errors stored in errcList variable
+
 }

@@ -22,7 +22,6 @@ type KeyDump struct {
 type Org struct {
 	Name     string `json:"name"`
 	FullName string `json:"full_name"`
-	GUID     string `json:"guid"`
 }
 
 type User struct {
@@ -32,5 +31,4 @@ type User struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
 	MiddleName  string `json:"middle_name"`
-	PublicKey   string `json:"public_key"`
 }
