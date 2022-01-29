@@ -20,6 +20,5 @@ declare namespace Cypress {
     waitUntilNodemanagerNodeIsDeleted(nodeName: string): void
     waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId: string): void
     sendToDataCollector(report: any): void
-    uploadFileRequest(fileToUpload: any, uniqueName: any, aliasName: any): void
   }
 }
