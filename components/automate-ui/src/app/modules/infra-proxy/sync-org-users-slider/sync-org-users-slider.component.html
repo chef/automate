@@ -3,7 +3,7 @@
     <chef-button class="back-button" secondary (click)="closeUploadSlider()" data-cy="back-button">
       <chef-icon>arrow_back</chef-icon>
     </chef-button>
-    <h2 slot="title">Sync Org and User </h2>
+    <h2 slot="title" data-cy="title">Sync Org and User </h2>
     <chef-button class="close" secondary (click)="closeUploadSlider()" data-cy="close-chef-infra-button">
       <chef-icon>close</chef-icon>
     </chef-button>
@@ -20,6 +20,7 @@
               type="file" 
               #fileDropRef
               id="fileDropRef" 
+              data-cy="file-input"
               (change)="fileBrowseHandler($event.target.files)"
               accept=".zip"
               [multiple]="false"/>
@@ -30,7 +31,7 @@
           </div>
         </div>
         <div id="button-bar">
-          <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" (click)="closeUploadSlider()">Cancel
+          <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" data-cy="cancel" (click)="closeUploadSlider()">Cancel
           </chef-button>
           <chef-button primary [disabled]="!isFile" data-cy="upload-button" id="upload-button" (click)="uploadFile()">
             <img alt="upload_icon" src="/assets/img/data-feed.svg" class="svg-inline" />

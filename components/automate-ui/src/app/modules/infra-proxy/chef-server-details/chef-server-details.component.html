@@ -46,7 +46,7 @@
           </div>
           <div class="summary-body last">
             <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
-              <chef-button id="sync-button" class="sync-button" secondary (click)="upload.slidePanel()" data-cy="sync-button">
+              <chef-button id="sync-button" class="sync-button" secondary data-cy="sync-org-and-users" (click)="upload.slidePanel()">
                 <img alt="sync-button" src="/assets/img/sync_arrow.png" class="img-inline"/>
                 <span>Sync Org and Users</span>
               </chef-button>

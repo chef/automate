@@ -7,7 +7,5 @@ export interface Org {
 }
 
 export interface UploadFile {
-  // server_id: string;
-  // file: string;
   formData: FormData;
 }

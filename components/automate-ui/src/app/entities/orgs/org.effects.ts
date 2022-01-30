@@ -179,7 +179,7 @@ export class OrgEffects {
       ofType(OrgActionTypes.UPLOAD_SUCCESS),
       map((_UploadZipSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Successfully uploaded file.`
+      message: 'Successfully uploaded file.'
     }))));
 
   uploadZipFailure$ = createEffect(() =>

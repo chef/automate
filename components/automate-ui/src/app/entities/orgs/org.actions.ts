@@ -21,7 +21,7 @@ export enum OrgActionTypes {
   UPDATE_FAILURE = 'ORGS::UPDATE::FAILURE',
   UPLOAD = 'ORGS::UPLOAD',
   UPLOAD_SUCCESS = 'ORGS::UPLOAD::SUCCESS',
-  UPLOAD_FAILURE = 'ORGS::UPLOAD::FAILURE',
+  UPLOAD_FAILURE = 'ORGS::UPLOAD::FAILURE'
 }
 
 export interface OrgSuccessPayload {
@@ -128,10 +128,9 @@ export class UpdateOrgFailure implements Action {
 }
 
 export interface UploadResponce {
-  success : boolean,
-  migrationId : string 
+  success: boolean;
+  migrationId: string;
 }
-
 
 export class UploadZip implements Action {
   readonly type = OrgActionTypes.UPLOAD;

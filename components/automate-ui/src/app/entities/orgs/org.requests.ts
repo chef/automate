@@ -1,22 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient
-  , HttpHeaders
- } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { Org } from './org.model';
-
 import {
-  OrgsSuccessPayload, OrgSuccessPayload, CreateOrgPayload, UploadResponce
+  OrgsSuccessPayload,
+  OrgSuccessPayload,
+  CreateOrgPayload,
+  UploadResponce
 } from './org.actions';
 // import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
-// const headers = new HttpHeaders().set(InterceptorSkipHeader, 'Content-Type: multipart/form-data');
-// const headers = new HttpHeaders().set( 'content-type': 'multipart/form-data', 'boundary=--------------------------507004132360627887457202');
-const headers = new HttpHeaders()
-.set('content-type','multipart/form-data');
+// const headers = new HttpHeaders().set(InterceptorSkipHeader,
+//  'Content-Type: multipart/form-data');
 
-console.log("header", headers);
+// const headers = new HttpHeaders()
+// .set('content-type','multipart/form-data');
+
+// const headers = new HttpHeaders({
+//   'Content-Type' :  'multipart/form-data'
+// });
+// console.log("header", headers);
 @Injectable()
 export class OrgRequests {
 
@@ -48,16 +52,12 @@ export class OrgRequests {
 
   public uploadZip(formData): Observable<UploadResponce> {
     formData.forEach((value, key) => {
-      console.log(key + " " + value)
+      console.log(key + ' ' + value);
     });
     return this.http.post<UploadResponce>(
-      `${env.infra_proxy_url}/servers/migrations/upload`, formData);
+      `${env.infra_proxy_url}/servers/migrations/upload`,
+      formData,
+      { params: { unfiltered: 'true' }}
+    );
   }
-
-
-  // public deleteRole(server_id: string, org_id: string, name: string): Observable<{}> {
-  //   return this.http.delete(
-  //     `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`,
-  //   {headers});
-  // }
 }

@@ -380,14 +380,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   public uploadZipFile(file: File): void {
-    debugger
-    // this.uploadZipForm.get('file').setValue(file);
-    // this.uploadZipForm.controls['file'].value
-    // let formData = new FormData();
-    // formData.append('file', file);
-    // formData.append('file', this.uploadZipForm.controls['file'].value);
-    // console.log("-----------",formData);
-    let formData: FormData = new FormData();
+    const formData: FormData = new FormData();
 
     if (file) {
       formData.append('server_id', this.server.id);
@@ -395,14 +388,12 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     }
 
     formData.forEach((value, key) => {
-      console.log(key + " " + value)
+      console.log(key + ' ' + value);
     });
 
     this.resetUploadSlider();
     const uploadZipPayload = {
-      // server_id: this.server.id,
       formData: formData
-      // file: file.name
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
   }
