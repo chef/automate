@@ -40,6 +40,11 @@ const (
 	tlsCrt              = "/hab/svc/automate-cs-nginx/config/service.crt"
 	tlsKey              = "/hab/svc/automate-cs-nginx/config/service.key"
 	tlsCA               = "/hab/svc/automate-cs-nginx/config/root_ca.crt"
+	erchefSvcName       = "automate-cs-oc-erchef"
+	erchefDBName        = "automate-cs-oc-erchef"
+	bifrostSvcName      = "automate-cs-oc-bifrost"
+	bifrostDBName       = "automate-cs-oc-bifrost"
+	automateSvcPath     = "/hab/svc/"
 )
 
 // These paths are injected at BUILD time based on our dependencies to
@@ -134,8 +139,6 @@ type passthrough struct {
 }
 
 func (c passthrough) Run(args []string) error {
-
-	fmt.Println("::::::called in passthrought run")
 	// The wrapper in core/chef-server-ctl sets up an environment
 	// that assumes the chef/chef-server-ctl service is running.
 	// Since we don't want to deploy that service we can't `hab
@@ -169,7 +172,13 @@ func (c passthrough) Run(args []string) error {
 		bifrostSuperuserID = string(bifrostSecData)
 	}
 
-	erchefDB, err := platform_config.PGURIFromEnvironment("automate-cs-oc-erchef")
+	svcPath := automateSvcPath
+	// svc path can be overridden with SVC_PATH env variable in the format: "/hab/svc/"
+	if path := os.Getenv("SVC_PATH"); path != "" {
+		svcPath = path
+	}
+
+	erchefDB, err := platform_config.PGURIFromEnvironmentWithParams(erchefDBName, erchefSvcName, svcPath+erchefSvcName, "")
 	if err != nil {
 		logrus.WithError(err).Error("could not create pg connection url for erchef")
 	}
@@ -177,8 +186,7 @@ func (c passthrough) Run(args []string) error {
 		erchefDB = erchefDBURI
 	}
 
-	bifrostDB, err := platform_config.PGURIFromEnvironment("automate-cs-oc-bifrost")
-	fmt.Println(":::::", bifrostDB)
+	bifrostDB, err := platform_config.PGURIFromEnvironmentWithParams(bifrostDBName, bifrostSvcName, svcPath+bifrostSvcName, "")
 	if err != nil {
 		logrus.WithError(err).Error("could not create pg connection url for bifrost")
 	}
@@ -186,11 +194,12 @@ func (c passthrough) Run(args []string) error {
 		bifrostDB = bifrostDBURI
 	}
 
-	if os.Getenv("CSC_ERCHEF_DB_URI") != "" {
-		erchefDB = os.Getenv("CSC_ERCHEF_DB_URI")
+	// incase user wants to overide the uri
+	if erchefDBEnv := os.Getenv("CSC_ERCHEF_DB_URI"); erchefDBEnv != "" {
+		erchefDB = erchefDBEnv
 	}
-	if os.Getenv("CSC_BIFROST_DB_URI") != "" {
-		bifrostDB = os.Getenv("CSC_BIFROST_DB_URI")
+	if bifrostDBEnv := os.Getenv("CSC_BIFROST_DB_URI"); bifrostDBEnv != "" {
+		bifrostDB = bifrostDBEnv
 	}
 
 	// chef-server-ctl has been modified to take all necessary
