@@ -5,8 +5,8 @@
 # This file configures the `buf` tool, you run buf's linter as `buf check lint`, or
 # use `lint_all_protobuf_components` in the habitat studio.
 #
-# ## References: 
-# 
+# ## References:
+#
 # - Style Guide: https://buf.build/docs/style-guide/
 # - Docs for individual checkers: https://buf.build/docs/lint-checkers
 # - Config docs: https://buf.build/docs/lint-configuration
@@ -57,12 +57,12 @@ lint:
   use:
     - DEFAULT
   except:
-    # This linter requires your proto package names to end with .v1 or similar. 
+    # This linter requires your proto package names to end with .v1 or similar.
     # Adopting this for existing code would break anyone using our protos
-    - PACKAGE_VERSION_SUFFIX 
+    - PACKAGE_VERSION_SUFFIX
     # buf wants you to use a file hierarchy that matches your proto package
     # names, but this is difficult and probably breaking to adopt now
-    - PACKAGE_SAME_DIRECTORY 
+    - PACKAGE_SAME_DIRECTORY
     - PACKAGE_DIRECTORY_MATCH
   ignore_only:
     SERVICE_SUFFIX:
@@ -443,4 +443,4 @@ breaking:
     - external/compliance/reporting/reporting.proto
     - config/ui/config_request.proto
     - external/compliance/reporting/stats/stats.proto
-
+    - config/postgresql/config_request.proto
