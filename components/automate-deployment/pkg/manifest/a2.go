@@ -19,6 +19,7 @@ type A2 struct {
 	BuildSHA      string          `json:"build_sha"`
 	Packages      []habpkg.HabPkg `json:"packages"`
 	HartOverrides []habpkg.Hart   `json:"hart_overrides"`
+	SemVersion    string          `json:"version"`
 	//Todo(milestone): add a field to hold min compatable version to upgrade for this release.
 }
 
@@ -53,7 +54,10 @@ func (m *A2) ListPackages() []habpkg.HabPkg {
 
 // Version returns the manifest version
 func (m *A2) Version() string {
-	//Todo(milestone): In case semantic version field available return that or else the build number
+	//In case semantic version field available return that or else the build number
+	if m.SemVersion != "" {
+		return m.SemVersion
+	}
 	return m.Build
 }
 
