@@ -27,6 +27,13 @@ message Chunk {
   int64 position = 2;
 }
 message GetMigrationStatus {
-    // Migration ID.
-    string migration_id = 1;
+  // Migration ID.
+  string migration_id = 1;
+}
+
+message CancelMigrationRequest {
+  // Chef Server ID
+  string server_id = 1;
+  // Migration ID
+  string migration_id = 2; 
 }

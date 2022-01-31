@@ -160,3 +160,38 @@ func createResponseWithErrors(err error, migrationId string) *response.UploadZip
 		Errors:      errors,
 	}
 }
+
+// CancelMigration cancle the ongoing migration
+func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.CancelMigrationRequest) (*response.CancelMigrationResponce, error) {
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	//  Remove the migration folder
+	folderPath := path.Join("/hab/svc/infra-proxy-service/data", req.MigrationId)
+	err = os.RemoveAll(folderPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the migration status
+	// migration, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	errors := []string{err.Error()}
+
+	return &response.CancelMigrationResponce{
+		Success: true,
+		Errors:  errors,
+	}, nil
+}
