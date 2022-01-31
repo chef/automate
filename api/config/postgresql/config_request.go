@@ -44,7 +44,7 @@ func DefaultPGConfig() *ConfigRequest_V1_System_PGConfig {
 	c := NewPGConfig()
 	c.MaxWalSize = w.String("1GB")
 	c.MinWalSize = w.String("80MB")
-	c.WalKeepSegments = w.Int32(32)
+	c.WalKeepSize = w.Int32(512)
 	c.CheckpointTimeout = w.String("5min")
 	c.CheckpointCompletionTarget = w.Float(0.5)
 	c.MaxConnections = w.Int32(100)
