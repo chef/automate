@@ -386,14 +386,14 @@ func fromStorageToListServers(sl []storage.Server) []*response.Server {
 }
 
 // Create a response.Server from a storage.Server with migration
-func fromStorageServerWithMigrationDetails(s storage.Server, m storage.ActiveMigration) *response.Server {
+func fromStorageServerWithMigrationDetails(s storage.Server, m storage.MigrationStatus) *response.Server {
 	return &response.Server{
 		Id:              s.ID,
 		Name:            s.Name,
 		Fqdn:            s.Fqdn,
 		IpAddress:       s.IPAddress,
 		OrgsCount:       s.OrgsCount,
-		MigrationId:     m.MigrationId,
+		MigrationId:     m.MigrationID,
 		MigrationStatus: m.MigrationType,
 	}
 }

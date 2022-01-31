@@ -37,6 +37,8 @@ import (
 	pb_iam "github.com/chef/automate/api/external/iam/v2"
 	policy "github.com/chef/automate/api/external/iam/v2/policy"
 	pb_infra_proxy "github.com/chef/automate/api/external/infra_proxy"
+	pb_infra_proxy_migrations "github.com/chef/automate/api/external/infra_proxy/migrations"
+
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
@@ -68,6 +70,7 @@ import (
 	handler_tokens "github.com/chef/automate/components/automate-gateway/handler/iam/v2/tokens"
 	handler_users "github.com/chef/automate/components/automate-gateway/handler/iam/v2/users"
 	handler_infra_proxy "github.com/chef/automate/components/automate-gateway/handler/infra_proxy"
+	handler_infra_proxy_migration "github.com/chef/automate/components/automate-gateway/handler/infra_proxy/migrations"
 
 	// anything else
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
@@ -316,13 +319,17 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
 
 	infraProxyClient, err := clients.InfraProxyClient()
-
-	infraProxyMigrationClient, err := clients.InfraProxyMigrationClient()
-
 	if err != nil {
 		return errors.Wrap(err, "create client for infra proxy service")
 	}
-	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient, infraProxyMigrationClient))
+
+	infraProxyMigrationClient, err := clients.InfraProxyMigrationClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for infra proxy migration service")
+	}
+	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
+
+	pb_infra_proxy_migrations.RegisterInfraProxyMigrationServer(grpcServer, handler_infra_proxy_migration.NewInfraProxyMigrationHandler(infraProxyMigrationClient))
 
 	userSettingsClient, err := clients.UserSettingsClient()
 	if err != nil {
@@ -377,6 +384,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"data-lifecycle":           pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
 		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
 		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
+		"infra-proxy-migrations":   pb_infra_proxy_migrations.RegisterInfraProxyMigrationHandlerFromEndpoint,
 		"user-settings":            pb_user_settings.RegisterUserSettingsServiceHandlerFromEndpoint,
 	})
 }
