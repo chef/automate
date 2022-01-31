@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -99,6 +100,44 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
+		Version:        upgradeRunCmdFlags.version,
+		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+	})
+
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to start upgrade failed",
+		)
+	}
+
+	if validatedResp.CurrentVersion == validatedResp.TargetVersion {
+		writer.Println("Chef Automate up-to-date")
+		return nil
+	}
+
+	if upgradeRunCmdFlags.isMajorUpgrade {
+		ci, err := majorupgradechecklist.NewChecklistInspector(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to start upgrade failed",
+			)
+		}
+		err = ci.RunChecklist()
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to start upgrade failed",
+			)
+		}
+	}
+
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
 		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
@@ -209,6 +248,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	switch resp.State {
 	case api.UpgradeStatusResponse_IDLE:
 		switch {
+		//Todo(milestone) - update the comparision logic of current version and latest available version
 		case resp.CurrentVersion != "" && resp.CurrentVersion < resp.LatestAvailableVersion:
 			writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
 				resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
@@ -231,13 +271,23 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			if resp.IsAirgapped {
 				writer.Titlef("Automate is upgrading to airgap bundle %s", resp.DesiredVersion)
 			} else {
-				writer.Titlef("Automate is upgrading to %s", resp.DesiredVersion)
+				if !resp.IsConvergeCompatable {
+					writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
+						resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+				} else {
+					writer.Titlef("Automate is upgrading to %s", resp.DesiredVersion)
+				}
 			}
 		} else {
 			if resp.IsAirgapped {
 				writer.Titlef("Automate is upgrading to airgap bundle %s", resp.LatestAvailableVersion)
 			} else {
-				writer.Titlef("Automate is upgrading to %s", resp.LatestAvailableVersion)
+				if !resp.IsConvergeCompatable {
+					writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
+						resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+				} else {
+					writer.Titlef("Automate is upgrading to %s", resp.LatestAvailableVersion)
+				}
 			}
 		}
 
