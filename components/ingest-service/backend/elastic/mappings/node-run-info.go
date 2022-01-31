@@ -23,6 +23,7 @@ var NodeRunInfo = Mapping{
 	Properties: fmt.Sprintf(`{ %s }`, runInfoProps),
 	Mapping: fmt.Sprintf(`
 	{
+		"index_patterns": ["%s"],
 		"settings": {
 			"index": {
 				"refresh_interval": "1s" 
@@ -31,5 +32,5 @@ var NodeRunInfo = Mapping{
 		"mappings": {
 				%s 
 		} 
-	}`, runInfoProps),
+	}`, IndexNameNodeRunInfo, runInfoProps),
 }

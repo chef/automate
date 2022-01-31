@@ -161,6 +161,7 @@ var Feeds = Mapping{
 	Properties: fmt.Sprintf(`{ %s }`, feedProps),
 	Mapping: fmt.Sprintf(`
 			{
+				"index_patterns": ["`+IndexNameFeeds+`"],
 				"settings":{
 					"number_of_shards": 5,
 					"analysis": {
