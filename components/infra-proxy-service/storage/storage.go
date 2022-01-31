@@ -66,10 +66,13 @@ type MigrationStorage interface {
 	FailedPermissionMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 	CompleteMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 	FailedMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
-	GetActiveMigration(ctx context.Context, serverId string) (ActiveMigration, error)
+
 	StoreMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (MigrationStage, error)
 	GetMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
 	DeleteMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
+
+	GetActiveMigration(ctx context.Context, serverId string) (MigrationStatus, error)
+	GetMigrationStatus(ctx context.Context, migrationId string) (MigrationStatus, error)
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a
@@ -128,18 +131,18 @@ type Migration struct {
 	Message          string    `json:"message"`
 	UpdatedTimestamp time.Time `json:"updated_timestamp"`
 }
-
-type ActiveMigration struct {
-	MigrationId   string
-	MigrationType string
-}
-
 type MigrationStage struct {
 	ID          string      `json:"id"`
 	MigrationID string      `json:"migration_id"`
 	ParsedData  interface{} `json:"parsed_data"`
 	CreatedAt   time.Time   `json:"created_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
+}
+
+type MigrationStatus struct {
+	MigrationID     string
+	MigrationType   string
+	MigrationStatus string
 }
 
 // Errors returned from the backend
