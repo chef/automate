@@ -10,7 +10,7 @@ level = "error"
 scoped_levels = ["tokio_core=error","tokio_reactor=error","zmq=error","hyper=error"]
 
 [datastore]
-user = "automate-builder-api"
+user = "automate"
 database = "automate-builder-api"
 connection_retry_ms = 300
 connection_timeout_sec = 3600
