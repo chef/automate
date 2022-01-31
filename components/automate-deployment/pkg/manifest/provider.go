@@ -2,12 +2,24 @@ package manifest
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
+)
+
+const (
+	automateVersionsURLFmt = "https://packages.chef.io/manifests/%s/automate/versions.json"
 )
 
 // A ReleaseManifestProvider is something that can return a manifest
@@ -15,8 +27,6 @@ type ReleaseManifestProvider interface {
 	GetCurrentManifest(ctx context.Context, channel string) (*A2, error)
 	// GetManifest forces fetching the specified manifest
 	GetManifest(ctx context.Context, release string) (*A2, error)
-	// Todo(milestone) add new method to interface which fetches next compatible manifest
-	// and implement the method for LocalHartManifestProvider and CachingReleaseManifestProvider
 }
 
 // A LocalHartManifestProvider can add local harts to the manifest for another
@@ -33,6 +43,10 @@ type CachingReleaseManifestProvider interface {
 	ReleaseManifestProvider
 	// RefreshManifest forces fetching a new manifest from the given channel
 	RefreshManifest(ctx context.Context, channel string) (*A2, error)
+
+	//GetCompatibleVersion fetches the next compatible version for the given version
+	GetCompatibleVersion(ctx context.Context, channel, version string) (isMinorAvailable, isMajorAvailable bool,
+		compVersion string, err error)
 }
 
 type cacheEntry struct {
@@ -173,4 +187,259 @@ func (provider *LocalHartManifestProvider) overlayLocalHarts(baseManifest *A2) (
 	}
 
 	return baseManifest, nil
+}
+
+func (c *cachingReleaseManifestProvider) GetCompatibleVersion(ctx context.Context, channel,
+	version string) (isMinorAvailable, isMajorAvailable bool, compVersion string, err error) {
+	return getCompatibleManifestVersion(ctx, version, channel)
+}
+
+func getCompatibleManifestVersion(ctx context.Context, version, channel string, optionalURL ...string) (isMinorAvailable, isMajorAvailable bool, compVersion string, err error) {
+	//get the list of all versions on ascending order
+	allVersions, err := GetAllVersions(ctx, channel, optionalURL[0])
+	if err != nil {
+		return false, false, "", errors.Wrap(err, fmt.Sprintf("error in getting the versions from %s channel", channel))
+	}
+
+	currentVersionIndex := len(allVersions)
+	for i := len(allVersions) - 1; i >= 0; i-- {
+		if allVersions[i] == version {
+			currentVersionIndex = i
+			break
+		}
+	}
+
+	if currentVersionIndex == len(allVersions) {
+		return false, false, "", fmt.Errorf("invalid version, given version %s is not available in valid list of versions from %s channel", version, channel)
+	}
+
+	//reached the end, no further updates are available
+	if currentVersionIndex == len(allVersions)-1 {
+		return false, false, version, nil
+	}
+
+	//trim the slice, as we doesn't required the previous releases
+	allVersions = allVersions[currentVersionIndex:]
+
+	//get the minor/patch versions are available or not.
+	//check the current version is timestamp or semantic version
+	currentMajor, isSemVersion := IsSemVersionFmt(version)
+
+	if !isSemVersion {
+		//check for any minor
+		index, timeStampVersion := findLatestTimeStampVersion(allVersions)
+		if index != 0 {
+			return true, false, timeStampVersion, nil
+		}
+		_, nextMajorVersion := findNextMajorVersionForTimeStamp(allVersions)
+		return false, true, nextMajorVersion, nil
+	} else {
+		index, patchVersion := findPatchVersionForSemantic(currentMajor, allVersions)
+		if index != 0 {
+			return true, false, patchVersion, nil
+		}
+		_, nextMajorVersion := findNextMajorVersionForSemantic(currentMajor, allVersions)
+		return false, true, nextMajorVersion, nil
+	}
+}
+
+//isSemVersionFmt checks the provided version is in semantic version format, if yes, will return the major version
+func IsSemVersionFmt(version string) (string, bool) {
+	splitStrings := strings.Split(version, ".")
+	if len(splitStrings) > 1 {
+		return splitStrings[0], true
+	}
+	return "", false
+}
+
+func findLatestTimeStampVersion(list []string) (index int, version string) {
+	for index, item := range list {
+		if _, isSem := IsSemVersionFmt(item); isSem {
+			return index - 1, list[index-1]
+		} else if index == len(list)-1 { //reached to end
+			return index, list[index]
+		}
+	}
+	//ideally, this should not execute
+	return 0, list[0]
+}
+
+func findNextMajorVersionForTimeStamp(list []string) (int, string) {
+	majorVersion := ""
+	for index, item := range list {
+		if major, isSem := IsSemVersionFmt(item); isSem {
+			if majorVersion == "" {
+				majorVersion = major
+			} else if majorVersion != major {
+				return index - 1, list[index-1]
+			}
+			if index == len(list)-1 && majorVersion != "" {
+				return index, list[index]
+			}
+		}
+	}
+	return 0, ""
+}
+
+func findPatchVersionForSemantic(currentMajor string, list []string) (int, string) {
+	for index, item := range list {
+		if major, _ := IsSemVersionFmt(item); currentMajor != major {
+			return index - 1, list[index-1]
+		} else if index == len(list)-1 { //reached to end
+			return index, list[index]
+		}
+	}
+	//ideally, this should not execute
+	return 0, list[0]
+}
+
+func findNextMajorVersionForSemantic(currentMajor string, list []string) (int, string) {
+	nextMajorVersion := ""
+	for index, item := range list {
+		if major, _ := IsSemVersionFmt(item); currentMajor != major {
+			if nextMajorVersion == "" {
+				nextMajorVersion = major
+			} else if nextMajorVersion != major {
+				return index - 1, list[index-1]
+			}
+			if nextMajorVersion != "" && index == len(list)-1 {
+				return index, list[index]
+			}
+		}
+	}
+	return 0, ""
+}
+
+//GetAllVersions gives the list of all released versions of given channel in ascending order of version numbers
+func GetAllVersions(ctx context.Context, channel string, optionalURL ...string) ([]string, error) {
+	var url string
+	//optionalURL is only for testing, used to override the actual url with mockurl
+	if len(optionalURL) > 0 {
+		url = optionalURL[0]
+	} else {
+		url = fmt.Sprintf(automateVersionsURLFmt, channel)
+	}
+
+	return getAllVersions(ctx, url)
+}
+
+func getAllVersions(ctx context.Context, url string) ([]string, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "error in preparing the request to get the list of available versions")
+	}
+	req = req.WithContext(ctx)
+	httpClient := &http.Client{}
+	response, err := httpClient.Do(req)
+	if err != nil {
+		return []string{}, errors.Wrap(err, fmt.Sprintf("error in invoking the endpoint %s", url))
+	}
+	defer response.Body.Close() // nolint: errcheck
+
+	if response.StatusCode != http.StatusOK {
+		return []string{}, errors.Errorf("Unexpected HTTP response from %s: %s", url, response.Status)
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return []string{}, errors.Wrap(err, fmt.Sprintf("error in reading the response of the endpoint %s", url))
+	}
+
+	var allVersions []string
+	err = json.Unmarshal(body, &allVersions)
+	if err != nil {
+		return []string{}, errors.Wrap(err, fmt.Sprintf("error in converting the response of the endpoint %s to slice", url))
+	}
+
+	sort.SliceStable(allVersions, func(i, j int) bool {
+
+		v1 := allVersions[i]
+		v2 := allVersions[j]
+		_, isV1Sem := IsSemVersionFmt(v1)
+		_, isV2Sem := IsSemVersionFmt(v2)
+
+		if !isV1Sem && !isV2Sem { //both are in timestamp version format
+			return v1 < v2
+		} else if !isV1Sem && isV2Sem {
+			return true
+		} else if isV1Sem && !isV2Sem {
+			return false
+		} else {
+			return IsCompareSemVersions(v1, v2)
+		}
+	})
+	return allVersions, nil
+}
+
+// isCompareSemVersions return true if v1 is less than or equal to v2
+func IsCompareSemVersions(v1, v2 string) bool {
+	if v1 == v2 {
+		return true
+	}
+	v1Major, v1Minor, v1Patch := fetchVersions(v1)
+	v2Major, v2Minor, v2Patch := fetchVersions(v2)
+
+	v1MajorInt, err := strconv.Atoi(v1Major)
+	if err != nil {
+		logrus.WithError(err).Error("cannot convert major version to integer format")
+		return false
+	}
+
+	v2MajorInt, err := strconv.Atoi(v2Major)
+	if err != nil {
+		logrus.WithError(err).Error("cannot convert major version to integer format")
+		return false
+	}
+
+	if v1MajorInt < v2MajorInt {
+		return true
+	}
+	if v1MajorInt == v2MajorInt {
+		v1MinorInt, err := strconv.Atoi(v1Minor)
+		if err != nil {
+			logrus.WithError(err).Error("cannot convert minor version to integer format")
+			return false
+		}
+
+		v2MinorInt, err := strconv.Atoi(v2Minor)
+		if err != nil {
+			logrus.WithError(err).Error("cannot convert minor version to integer format")
+			return false
+		}
+
+		if v1MinorInt < v2MinorInt {
+			return true
+		}
+		if v1MinorInt == v2MinorInt {
+			v1PatchInt, err := strconv.Atoi(v1Patch)
+			if err != nil {
+				logrus.WithError(err).Error("cannot convert minor version to integer format")
+				return false
+			}
+
+			v2PatchInt, err := strconv.Atoi(v2Patch)
+			if err != nil {
+				logrus.WithError(err).Error("cannot convert minor version to integer format")
+				return false
+			}
+
+			if v1PatchInt < v2PatchInt {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// fetch versions returns the major, minor, and patch versions of a release if it is in semantic versioned.
+// return empty values, if the release is in timestamp mode
+func fetchVersions(release string) (major, minor, patch string) {
+	if release == "" {
+		return "", "", ""
+	}
+	splitStrings := strings.Split(release, ".")
+	if len(splitStrings) == 1 {
+		return "", "", ""
+	}
+	return splitStrings[0], splitStrings[1], splitStrings[2]
 }

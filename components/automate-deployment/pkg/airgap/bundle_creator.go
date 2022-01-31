@@ -239,7 +239,7 @@ func (creator *InstallBundleCreator) Create(progress InstallBundleCreatorProgres
 
 	//Todo(milestone): Add a check to see if the latest manifest is compatible with the current version
 	if creator.outputFile == "" {
-		creator.outputFile = fmt.Sprintf("automate-%s.aib", m.Build)
+		creator.outputFile = fmt.Sprintf("automate-%s.aib", m.Version())
 	}
 
 	if err := creator.createDirectories(); err != nil {
