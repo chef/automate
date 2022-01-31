@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -216,19 +215,11 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 //GetInfraServerOrgs: Fetches the list of automate infra server organisations from the chef server and save it into the automate back end DB
 func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
 
-	// Check whether any migration is in progress or not
-	if IsMigrationAlreadyRunning {
-		return nil, errors.New("Migration is already in process")
-	}
-
 	// Get chef client
 	client, err := s.getChefClient(ctx, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
-
-	setMigrationStatus(true)
-	defer setMigrationStatus(false)
 
 	// This is only for reference to use the migration_stage storage functions
 	parsedData, err := json.Marshal(&storage.Org{ID: "1234", Name: "demo_org"})

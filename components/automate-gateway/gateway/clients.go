@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"fmt"
+
 	"github.com/chef/automate/api/interservice/user_settings"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -35,6 +36,7 @@ import (
 	"github.com/chef/automate/api/interservice/teams"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
+
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
 )
