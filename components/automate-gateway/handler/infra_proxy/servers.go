@@ -148,6 +148,7 @@ func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 		IpAddress:       t.GetIpAddress(),
 		OrgsCount:       t.GetOrgsCount(),
 		MigrationId:     t.GetMigrationId(),
+		MigrationType:   t.GetMigrationType(),
 		MigrationStatus: t.GetMigrationStatus(),
 	}
 }
