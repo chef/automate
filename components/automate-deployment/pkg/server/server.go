@@ -1789,7 +1789,7 @@ func (s *server) ManifestVersion(ctx context.Context, d *api.ManifestVersionRequ
 	}
 
 	return &api.ManifestVersionResponse{
-		BuildTimestamp: m.Build,
+		BuildTimestamp: m.Version(),
 		BuildSha:       m.BuildSHA,
 		CliRelease:     cliRelease,
 	}, nil
@@ -1804,34 +1804,56 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 	var currentRelease = ""
 	s.deployment.Lock()
 	if s.deployment.CurrentReleaseManifest != nil {
-		currentRelease = s.deployment.CurrentReleaseManifest.Build
+		currentRelease = s.deployment.CurrentReleaseManifest.Version()
 	}
 	channel := s.deployment.Channel()
 	s.deployment.Unlock()
 
 	var m *manifest.A2
 	var err error
+
+	nextManifestVersion := currentRelease
+	if !airgap.AirgapInUse() { //internet connected machine
+		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, channel, currentRelease)
+		if err != nil {
+			return nil, err
+		}
+
+		if !req.IsMajorUpgrade { //normal upgrade
+			if isMinorAvailable {
+				nextManifestVersion = compVersion
+			} else if isMajorAvailable {
+				return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --major` to further upgrade")
+			}
+		} else { //major upgrade
+			if isMinorAvailable {
+				return nil, status.Errorf(codes.InvalidArgument, "minor/patch version is available, please use `chef-automate upgrade run`")
+			} else if isMajorAvailable {
+				nextManifestVersion = compVersion
+			}
+		}
+	}
+
 	if req.Version != "" {
 		if airgap.AirgapInUse() {
 			return nil, status.Errorf(codes.InvalidArgument, "specifying a version is not allowed in airgap mode, please use `chef-automate upgrade run --airgap-bundle`")
 		}
 
-		if currentRelease != "" && req.Version < currentRelease {
-			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is older than the current version %q", req.Version, currentRelease)
+		if !isCompatible(currentRelease, req.Version, nextManifestVersion) {
+			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", req.Version, currentRelease)
 		}
 
-		// Todo(milestone) Add the condition to check if the required version is incompatible
+		nextManifestVersion = req.Version
 
 		// TODO(ssd) 2018-09-13: We are not currently
 		// requiring that the version passed is actually in
 		// the channel they have configured. Should we?
-		m, err = s.releaseManifestProvider.GetManifest(ctx, req.Version)
-	} else {
-		// Todo(milestone) get the next compatable manifest if it is not airgap
-		m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
-
-		//Todo(milestone) in airgap, get the manifest and perform the compatibility check.
 	}
+	m, err = s.releaseManifestProvider.GetManifest(ctx, nextManifestVersion)
+	/*} else {
+		//m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
+		//Todo(milestone) in airgap, get the manifest and perform the compatibility check.
+	}*/
 
 	//Todo(milestone) incase of airgap find out the upgrade is major or minor
 
@@ -1866,9 +1888,44 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 
 	return &api.UpgradeResponse{
 		PreviousVersion: currentRelease,
-		NextVersion:     m.Build,
+		NextVersion:     m.Version(),
 		TaskId:          task.ID.String(),
 	}, nil
+}
+
+func isCompatible(current, givenVersion, maxPossibleVersion string) bool {
+	_, isCurrentSem := manifest.IsSemVersionFmt(current)
+	givenMajor, isGivenVSem := manifest.IsSemVersionFmt(givenVersion)
+	maxPossibleMajor, isMaxPossibleSem := manifest.IsSemVersionFmt(maxPossibleVersion)
+
+	if !isCurrentSem { //current version is in timestamp version
+		if !isGivenVSem { //given version is in timestamp version
+			if !isMaxPossibleSem { //max possible version is in timestamp version
+				if current < givenVersion && givenVersion <= maxPossibleVersion {
+					return true
+				}
+				return false
+			} else { //max possible version is in semantic version
+				return current < givenVersion
+			}
+		} else { //given version is in semantic version
+			if !isMaxPossibleSem { //max possible version is in timestamp version
+				return false
+			} else { //max possible version is in semantic version
+				if givenMajor == maxPossibleMajor {
+					return manifest.IsCompareSemVersions(givenVersion, maxPossibleVersion)
+				}
+			}
+		}
+	} else { //current version is in semantic version
+		if !isGivenVSem || !isMaxPossibleSem { // given version is in time stamp version or max possible version is in timestamp version
+			return false
+		}
+		if givenMajor == maxPossibleMajor {
+			return manifest.IsCompareSemVersions(givenVersion, maxPossibleVersion)
+		}
+	}
+	return false
 }
 
 func (s *server) getPackageCleanupMode() string {

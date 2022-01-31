@@ -123,7 +123,7 @@ func TestManifestFromBytes(t *testing.T) {
 	t.Run("v1", func(t *testing.T) {
 		manifest, err := parser.ManifestFromBytes([]byte(goodV1Manifest))
 		assert.Nil(t, err)
-		assert.Equal(t, "20180207073355", manifest.Build)
+		assert.Equal(t, "20180207073355", manifest.Version())
 		assert.Equal(t, "a_test_sha", manifest.BuildSHA)
 	})
 
@@ -133,7 +133,7 @@ func TestManifestFromBytes(t *testing.T) {
 
 		assert.Equal(t, 29, len(manifest.Packages))
 		assert.Equal(t, 2, len(manifest.HartOverrides))
-		assert.Equal(t, "20180716213113", manifest.Build)
+		assert.Equal(t, "20180716213113", manifest.Version())
 		assert.Equal(t, "844b78fb80ca19c6a555de34d24e3e9b5a56ce06", manifest.BuildSHA)
 	})
 }
