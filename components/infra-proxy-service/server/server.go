@@ -4,17 +4,21 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net"
+	"net/http"
+
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
-	"net"
-	"net/http"
+
+	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
 
 	grpc_migration "github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
-	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
+	migrations "github.com/chef/automate/components/infra-proxy-service/server/migrations"
+
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
@@ -85,7 +89,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 	)
 	health.RegisterHealthServer(g, health.NewService())
 	grpc_s.RegisterInfraProxyServiceServer(g, NewServer(s))
-	grpc_migration.RegisterMigrationDataServiceServer(g, NewServer(s))
+	grpc_migration.RegisterMigrationDataServiceServer(g, migrations.NewMigrationServer(s))
 	reflection.Register(g)
 	return g
 }
