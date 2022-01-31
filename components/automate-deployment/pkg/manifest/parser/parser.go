@@ -23,6 +23,7 @@ type v1Manifest struct {
 	BuildT        string          `json:"build"`
 	Packages      []habpkg.HabPkg `json:"packages"`
 	HabPackages   []habpkg.HabPkg `json:"hab"`
+	SemVersion    string          `json:"version"`
 }
 
 // ManifestFromBytes parses the passed []byte's assuming it is either an A2
@@ -43,9 +44,8 @@ func ManifestFromBytes(body []byte) (*manifest.A2, error) {
 	}
 
 	ver := versionedManifest.SchemaVersion
-	//Todo(milestone) Add a case for schema_version 2
 	switch ver {
-	case "1":
+	case "1", "2":
 		return parseV1Manifest(body)
 	default:
 		return nil, manifest.NewInvalidSchemaError(errors.Errorf("schema version unknown: %s", ver))
@@ -61,6 +61,7 @@ func parseV1Manifest(body []byte) (*manifest.A2, error) {
 
 	m := &manifest.A2{}
 	m.Build = v1.BuildT
+	m.SemVersion = v1.SemVersion
 	m.BuildSHA = v1.SHA
 	m.Packages = append(v1.Packages, v1.HabPackages...)
 

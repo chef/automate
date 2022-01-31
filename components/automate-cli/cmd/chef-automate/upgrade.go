@@ -27,7 +27,7 @@ var upgradeRunCmdFlags = struct {
 	upgradebackends      bool
 	upgradeairgapbundles bool
 	skipDeploy           bool
-	// Todo(milestone) add new field isMajorUpgrade
+	isMajorUpgrade       bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -100,8 +100,8 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
-		Version: upgradeRunCmdFlags.version,
-		// Todo(milestone) send is major upgrade or not.
+		Version:        upgradeRunCmdFlags.version,
+		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
 	})
 	if err != nil {
 		return status.Wrap(
@@ -317,7 +317,11 @@ func init() {
 		false,
 		"will only upgrade and not deploy the bundle")
 
-	// Todo(milestone) add new flag to the run command
+	upgradeRunCmd.PersistentFlags().BoolVar(
+		&upgradeRunCmdFlags.isMajorUpgrade,
+		"major",
+		false,
+		"will be used for major upgrade")
 
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)

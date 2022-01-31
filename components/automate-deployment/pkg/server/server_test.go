@@ -251,3 +251,118 @@ func TestConvergeDisabled(t *testing.T) {
 		assert.False(t, svr.convergeDisabled(), "disables the converging when disable file is not present")
 	})
 }
+
+func TestIsCompatible(t *testing.T) {
+	tests := []struct {
+		name               string
+		currentVersion     string
+		givenVersion       string
+		maxPossibleVersion string
+		isCompatible       bool
+	}{
+		{
+			name:               "timestampversion,timestampversion,timestampversion",
+			currentVersion:     "20220110173839",
+			givenVersion:       "20220112175624",
+			maxPossibleVersion: "20220120081508",
+			isCompatible:       true,
+		},
+		{
+			name:               "timestampversion,timestampversion,timestampversion_equal",
+			currentVersion:     "20220110173839",
+			givenVersion:       "20220120081508",
+			maxPossibleVersion: "20220120081508",
+			isCompatible:       true,
+		},
+		{
+			name:               "timestampversion,timestampversion,timestampversion_fail",
+			currentVersion:     "20220110173839",
+			givenVersion:       "20220120081508",
+			maxPossibleVersion: "20220112175624",
+			isCompatible:       false,
+		},
+		{
+			name:               "timestampversion,timestampversion,semVersion",
+			currentVersion:     "20220110173839",
+			givenVersion:       "20220120081508",
+			maxPossibleVersion: "22.0.0",
+			isCompatible:       true,
+		},
+		{
+			name:               "timestampversion,timestampversion,semVersion_fail",
+			currentVersion:     "20220120081508",
+			givenVersion:       "20220110173839",
+			maxPossibleVersion: "22.0.0",
+			isCompatible:       false,
+		},
+		{
+			name:               "timestampversion,semVersion,timestampversion",
+			currentVersion:     "20220110173839",
+			givenVersion:       "22.0.0",
+			maxPossibleVersion: "20220120081508",
+			isCompatible:       false,
+		},
+		{
+			name:               "timestampversion,semVersion,semVersion",
+			currentVersion:     "20220110173839",
+			givenVersion:       "22.0.0",
+			maxPossibleVersion: "22.0.6",
+			isCompatible:       true,
+		},
+		{
+			name:               "timestampversion,semVersion,semVersion_equal",
+			currentVersion:     "20220110173839",
+			givenVersion:       "22.2.6",
+			maxPossibleVersion: "22.2.6",
+			isCompatible:       true,
+		},
+		{
+			name:               "timestampversion,semVersion,semVersion_fail",
+			currentVersion:     "20220110173839",
+			givenVersion:       "22.2.6",
+			maxPossibleVersion: "22.0.0",
+			isCompatible:       false,
+		},
+		{
+			name:               "semVersion,timestampversion,semVersion",
+			currentVersion:     "22.0.0",
+			givenVersion:       "20220120081508",
+			maxPossibleVersion: "22.0.0",
+			isCompatible:       false,
+		},
+		{
+			name:               "semVersion,semVersion,semVersion",
+			currentVersion:     "22.0.0",
+			givenVersion:       "22.9.0",
+			maxPossibleVersion: "22.12.0",
+			isCompatible:       true,
+		},
+		{
+			name:               "semVersion,semVersion,semVersion_equal",
+			currentVersion:     "22.0.0",
+			givenVersion:       "22.0.0",
+			maxPossibleVersion: "22.0.0",
+			isCompatible:       true,
+		},
+		{
+			name:               "semVersion,semVersion,semVersion_fail_minor",
+			currentVersion:     "22.0.0",
+			givenVersion:       "22.4.0",
+			maxPossibleVersion: "22.3.0",
+			isCompatible:       false,
+		},
+		{
+			name:               "semVersion,semVersion,semVersion_fail_patch",
+			currentVersion:     "22.0.0",
+			givenVersion:       "22.4.10",
+			maxPossibleVersion: "22.4.8",
+			isCompatible:       false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := isCompatible(tc.currentVersion, tc.givenVersion, tc.maxPossibleVersion)
+			assert.Equal(t, tc.isCompatible, result)
+		})
+	}
+}
