@@ -16,7 +16,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -79,7 +78,6 @@ const unsupportedNoAltFmt = "The command %q is not supported by the Chef Automat
 const unsupportedWithAltFmt = "The command %q is not supported by the Chef Automate Chef server. Instead, try\n    %s\n"
 
 func (c unsupported) Run([]string) error {
-	fmt.Println("::::::called in unsupported run")
 	if c.alternative == "" {
 		fmt.Printf(unsupportedNoAltFmt, c.name)
 	} else {
@@ -102,7 +100,6 @@ type wrapKnife struct {
 }
 
 func (c wrapKnife) Run(args []string) error {
-	fmt.Println("::::::called in wrap run")
 	// knife opc "org user" add
 	cmdArgs := append([]string{"opc"}, strings.Fields(c.cmdNoun)...)
 	cmdArgs = append(cmdArgs, c.cmdVerb)
@@ -243,9 +240,7 @@ func (c passthrough) Run(args []string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	time.Sleep(time.Millisecond * 500)
-	return err
+	return cmd.Run()
 }
 
 func (c passthrough) Hidden() bool     { return false }
