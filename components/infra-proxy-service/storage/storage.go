@@ -71,7 +71,7 @@ type MigrationStorage interface {
 	GetMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
 	DeleteMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
 
-	GetActiveMigration(ctx context.Context, serverId string) (MigrationStatus, error)
+	GetActiveMigrationForServer(ctx context.Context, serverId string) (MigrationStatus, error)
 	GetMigrationStatus(ctx context.Context, migrationId string) (MigrationStatus, error)
 }
 

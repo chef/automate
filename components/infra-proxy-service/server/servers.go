@@ -177,7 +177,7 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
-	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
+	migration, err := s.service.Migration.GetActiveMigrationForServer(ctx, req.Id)
 	resp := &response.GetServer{
 		Server: fromStorageServerWithMigrationDetails(server, migration),
 	}
@@ -394,6 +394,7 @@ func fromStorageServerWithMigrationDetails(s storage.Server, m storage.Migration
 		IpAddress:       s.IPAddress,
 		OrgsCount:       s.OrgsCount,
 		MigrationId:     m.MigrationID,
-		MigrationStatus: m.MigrationType,
+		MigrationType:   m.MigrationType,
+		MigrationStatus: m.MigrationStatus,
 	}
 }
