@@ -304,6 +304,149 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 	}
 }
 
+func TestGetMinCurrentVersion(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pValues := r.URL.Query()
+		param := pValues["set"]
+		var resp []string
+		if param[0] == "set1" {
+			resp = []string{
+				"20211201164433",
+				"20211220104140",
+				"20220113145751",
+				"20220113154113",
+				"1.0.0",
+				"1.1.9",
+				"1.2.1",
+				"2.0.0",
+				"2.1.2",
+				"3.4.5",
+			}
+		} else if param[0] == "set2" {
+			resp = []string{
+				"20220113154113",
+				"1.0.0",
+			}
+		} else if param[0] == "set3" {
+			resp = []string{
+				"20220113154113",
+				"1.0.0",
+				"2.0.0",
+			}
+		} else if param[0] == "set4" {
+			resp = []string{
+				"20220112171518",
+				"20220112175624",
+				"20220113145751",
+				"20220113154113",
+				"20220120081508",
+				"20220120081530",
+			}
+		} else if param[0] == "set5" {
+			resp = []string{
+				"1.0.0",
+				"1.2.5",
+			}
+		}
+		bytes, _ := json.Marshal(resp)
+		w.Write(bytes)
+	}))
+	defer ts.Close()
+
+	tests := []struct {
+		input             string
+		version           string
+		compatibleVersion string
+		isError           bool
+		errorString       string
+	}{
+		{
+			input:             "set1",
+			version:           "2.1.2",
+			compatibleVersion: "1.2.1",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set1",
+			version:           "20220113145751",
+			compatibleVersion: "20211201164433",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set1",
+			version:           "3.4.5",
+			compatibleVersion: "2.1.2",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set1",
+			version:           "1.0.0",
+			compatibleVersion: "20220113154113",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set1",
+			version:           "1.2.1",
+			compatibleVersion: "20220113154113",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set2",
+			version:           "20220113154113",
+			compatibleVersion: "20220113154113",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set2",
+			version:           "1.0.0",
+			compatibleVersion: "20220113154113",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set3",
+			version:           "2.0.0",
+			compatibleVersion: "1.0.0",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set4",
+			version:           "20220120081530",
+			compatibleVersion: "20220112171518",
+			isError:           false,
+			errorString:       "",
+		},
+		{
+			input:             "set5",
+			version:           "1.2.5",
+			compatibleVersion: "1.0.0",
+			isError:           false,
+			errorString:       "",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.version, func(t *testing.T) {
+			url := fmt.Sprintf("%s?set=%s", ts.URL, tc.input)
+			compatibleVersion, err := getMinimumCurrentManifestVersion(context.TODO(), tc.version, "dev", url)
+			if !tc.isError {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.compatibleVersion, compatibleVersion)
+			} else {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorString)
+			}
+		})
+	}
+}
+
 func TestGetAllVersions(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pValues := r.URL.Query()

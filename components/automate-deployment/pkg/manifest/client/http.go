@@ -22,6 +22,7 @@ const (
 	defaultSemanticManifestURLFmt = "https://packages.chef.io/manifests/%s/automate/latest_semver.json"
 	defaultLatestManifestURLFmt   = "https://packages.chef.io/manifests/%s/automate/latest.json"
 	defaultManifestURLFmt         = "https://packages.chef.io/manifests/automate/%s.json"
+	defaultVersionsURLFmt         = "https://packages.chef.io/manifests/%s/automate/versions.json"
 	packagesChefIOSigAsc          = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.12 (Darwin)
 Comment: GPGTools - http://gpgtools.org
@@ -76,6 +77,7 @@ type HTTP struct {
 	latestManifestURLFmt         string
 	latestSemanticManifestURLFmt string
 	manifestURLFmt               string
+	versionsURLFmt               string
 	noVerify                     bool
 }
 
@@ -104,6 +106,10 @@ func NewHTTPClient(options ...Opt) *HTTP {
 		c.manifestURLFmt = defaultManifestURLFmt
 	}
 
+	if c.versionsURLFmt == "" {
+		c.versionsURLFmt = defaultVersionsURLFmt
+	}
+
 	// We allow skipping manifest verification if needed by setting this environment
 	// variable. Set it only if you must
 	//Todo(milestone) -- For milestone we cannot skip
@@ -124,6 +130,12 @@ func LatestURLFormat(urlFormat string) Opt {
 func LatestSemanticURLFormat(urlFormat string) Opt {
 	return func(c *HTTP) {
 		c.latestSemanticManifestURLFmt = urlFormat
+	}
+}
+
+func VersionsURLFormat(urlFormat string) Opt {
+	return func(c *HTTP) {
+		c.versionsURLFmt = urlFormat
 	}
 }
 
@@ -149,14 +161,14 @@ func NoVerify(noVerify bool) Opt {
 func (c *HTTP) GetCurrentManifest(ctx context.Context, channel string) (*manifest.A2, error) {
 	//try to get semantic version manifest
 	url := fmt.Sprintf(c.latestSemanticManifestURLFmt, channel)
-	m, err := c.manifestFromURL(ctx, url)
+	m, err := c.manifestFromURL(ctx, url, channel)
 	if err == nil {
 		return m, nil
 	}
 	if strings.Contains(err.Error(), "failed to locate manifest") {
 		//since received error in fetching semantic version, try to fetch timestamp versioned manifest
 		url = fmt.Sprintf(c.latestManifestURLFmt, channel)
-		return c.manifestFromURL(ctx, url)
+		return c.manifestFromURL(ctx, url, channel)
 	}
 
 	return nil, err
@@ -166,10 +178,10 @@ func (c *HTTP) GetCurrentManifest(ctx context.Context, channel string) (*manifes
 // channel.
 func (c *HTTP) GetManifest(ctx context.Context, release string) (*manifest.A2, error) {
 	url := fmt.Sprintf(c.manifestURLFmt, release)
-	return c.manifestFromURL(ctx, url)
+	return c.manifestFromURL(ctx, url, "current")
 }
 
-func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, error) {
+func (c *HTTP) manifestFromURL(ctx context.Context, url string, channel string, optionalURL ...string) (*manifest.A2, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -234,8 +246,11 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 		return nil, err
 	}
 
-	//Todo(milestone) Append min compatible version needed to upgrade for the current manifest
-
+	minCurrentVersion, err := manifest.GetMinCurrentVersion(ctx, channel, m.Version(), c.versionsURLFmt)
+	if err != nil {
+		return nil, err
+	}
+	m.MinCompatibleVer = minCurrentVersion
 	m.HartOverrides = []habpkg.Hart{}
 
 	return m, nil
