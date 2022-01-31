@@ -213,10 +213,14 @@ func (p *postgres) insertMigration(ctx context.Context, migrationId, serverId, m
 //GetActiveMigration gets the Migration ID and Migration Status for a server id
 func (p *postgres) GetActiveMigration(ctx context.Context, serverId string) (storage.MigrationStatus, error) {
 	var m storage.MigrationStatus
-	query := "select m.migration_id,t.type from migration m join migration_type t on m.type_id=t.id and t.id < 5000 and m.server_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY"
+	query := `select m.migration_id,t.type,s.status_message
+			  from migration m 
+			  join migration_type t on m.type_id=t.id 
+			  join migration_status s on m.status_id=s.id 
+			  and t.id <= 5000 and m.server_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY`
 	err := p.db.QueryRowContext(ctx,
 		query, serverId).
-		Scan(&m.MigrationID, &m.MigrationType)
+		Scan(&m.MigrationID, &m.MigrationType, &m.MigrationStatus)
 
 	if err != nil {
 		return storage.MigrationStatus{}, err
