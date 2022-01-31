@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { Org } from './org.model';
@@ -9,12 +9,6 @@ import {
   CreateOrgPayload,
   UploadResponce
 } from './org.actions';
-// import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
-
-// let headers = new HttpHeaders().set(InterceptorSkipHeader, '');
-let headers = new HttpHeaders();
-// headers = headers.set('Content-Type' , 'multipart/form-data');
-headers = headers.delete('Content-Type' , 'application/json+lax');
 
 @Injectable()
 export class OrgRequests {
@@ -45,14 +39,7 @@ export class OrgRequests {
       `${env.infra_proxy_url}/servers/${org.server_id}/orgs/${org.id}`, org);
   }
 
-  public uploadZip(formData): Observable<UploadResponce> {
-    formData.forEach((value, key) => {
-      console.log(key + ' ' + value);
-    });
-    return this.http.post<UploadResponce>(
-      `${env.infra_proxy_url}/servers/migrations/upload`,
-      formData,
-      { headers, params: { unfiltered: 'true' }}
-    );
+  public uploadZip(formData: FormData): Observable<UploadResponce> {
+    return this.http.post<UploadResponce>(`${env.infra_proxy_url}/servers/migrations/upload`, formData);
   }
 }

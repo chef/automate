@@ -21,7 +21,7 @@ export class SyncOrgUsersSliderComponent implements OnInit {
   public migrationSlider = false;
 
   @ViewChild('fileDropRef', { static: false }) fileDropEl: ElementRef;
-  public file: any;
+  public file: File = null;
   public isFile = false;
 
   constructor() { }
@@ -44,17 +44,20 @@ export class SyncOrgUsersSliderComponent implements OnInit {
   uploadFile(): void {
     this.uploading = true;
     const formData = new FormData();
-    formData.append('file', this.uploadForm.get('file').value);
-    this.uploadClicked.emit(this.uploadForm.get('file').value);
+    this.file = this.uploadForm.get('file').value;
+    formData.append('file', this.file);
+    this.uploadClicked.emit(this.file);
     this.migrationSlider = true;
+    this.closeUploadSlider();
   }
 
   closeUploadSlider() {
     this.uploading = false;
     this.isUploaded = false;
     this.toggleSlide();
-    this.file = '';
+    this.file = null;
     this.isFile = false;
+    this.isSlideOpen = false;
   }
 
   toggleSlide() {
@@ -94,7 +97,7 @@ export class SyncOrgUsersSliderComponent implements OnInit {
     this.uploadForm.get('file').setValue(this.file);
     if ( this.file.type !== 'application/zip' ) {
       this.isFile = false;
-      this.file = '';
+      this.file = null;
     } else {
       this.isFile = true;
     }
