@@ -5,51 +5,53 @@ var ComplianceProfiles = Mapping{
 	Index:      IndexNameProf,
 	Timeseries: false,
 	Mapping: `
-{
-  "settings": {
-    "index": {
-      "refresh_interval": "1s"
-    },
-    "analysis": {
-      "analyzer": {
-        "autocomplete": {
-          "tokenizer": "autocomplete_tokenizer",
-          "filter": [
-            "lowercase"
-          ]
-        }
+  {
+    "settings": {
+      "index": {
+        "refresh_interval": "1s"
       },
-      "tokenizer": {
-        "autocomplete_tokenizer": {
-          "type": "edge_ngram",
-          "min_gram": 2,
-          "max_gram": 20,
-          "token_chars": [
-            "letter",
-            "digit"
-          ]
-        }
-      },
-      "normalizer": {
-        "case_insensitive": {
-          "type": "custom",
-          "char_filter": [],
-          "filter": ["lowercase", "asciifolding"]
+      "analysis": {
+        "analyzer": {
+          "autocomplete": {
+            "tokenizer": "autocomplete_tokenizer",
+            "filter": [
+              "lowercase"
+            ]
+          }
+        },
+        "tokenizer": {
+          "autocomplete_tokenizer": {
+            "type": "edge_ngram",
+            "min_gram": 2,
+            "max_gram": 20,
+            "token_chars": [
+              "letter",
+              "digit"
+            ]
+          }
+        },
+        "normalizer": {
+          "case_insensitive": {
+            "type": "custom",
+            "char_filter": [],
+            "filter": [
+              "lowercase",
+              "asciifolding"
+            ]
+          }
         }
       }
-    }
-  },
-  "mappings": {
-    {
+    },
+    "mappings": {
       "properties": {
         "name": {
           "type": "keyword",
           "fields": {
-			"lower": {
-			  "normalizer": "case_insensitive",
-			  "type": "keyword"
-			}
-		  }
+            "lower": {
+              "normalizer": "case_insensitive",
+              "type": "keyword"
+            }
+          }
         },
         "title": {
           "type": "keyword",
@@ -204,6 +206,5 @@ var ComplianceProfiles = Mapping{
       }
     }
   }
-}
 	`,
 }

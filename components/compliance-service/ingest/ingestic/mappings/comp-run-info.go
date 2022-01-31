@@ -5,14 +5,13 @@ var ComplianceRunInfo = Mapping{
 	Index:      IndexNameComplianceRunInfo,
 	Timeseries: false,
 	Mapping: `
-{
-  "settings": {
-    "index": {
-      "refresh_interval": "1s"
-    }
-  },
-  "mappings": {
-    {
+  {
+    "settings": {
+      "index": {
+        "refresh_interval": "1s"
+      }
+    },
+    "mappings": {
       "properties": {
         "node_uuid": {
           "type": "keyword"
@@ -26,6 +25,5 @@ var ComplianceRunInfo = Mapping{
       }
     }
   }
-}
 	`,
 }
