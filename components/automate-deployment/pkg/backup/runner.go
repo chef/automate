@@ -508,7 +508,7 @@ func (r *Runner) ShowBackup(ctx context.Context, t *api.BackupTask) (*api.Backup
 	desc := &api.BackupDescription{
 		Id:            t.TaskID(),
 		Sha256:        sha256,
-		ServerVersion: m.Build,
+		ServerVersion: m.Version(),
 		CliVersion:    cliRelease,
 	}
 	return desc, nil
