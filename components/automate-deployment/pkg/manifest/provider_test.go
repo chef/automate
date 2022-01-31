@@ -79,7 +79,6 @@ func (mp *mockManifestProvider) GetManifest(ctx context.Context, release string)
 }
 
 func TestCachingReleaseManifestProvider(t *testing.T) {
-
 	t.Run("Fetches a new manifest when none is cached", func(t *testing.T) {
 		mockProvider := newMockManifestProvider(t)
 		mockProvider.AddResponse(&A2{Build: "foobuild"}, nil)
@@ -138,52 +137,7 @@ func TestCachingReleaseManifestProvider(t *testing.T) {
 }
 
 func TestGetCompatibleManifestVersion(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pValues := r.URL.Query()
-		param := pValues["set"]
-		var resp []string
-		if param[0] == "set1" {
-			resp = []string{
-				"20211201164433",
-				"20211220104140",
-				"20220113145751",
-				"20220113154113",
-				"1.0.0",
-				"1.1.9",
-				"1.2.1",
-				"2.0.0",
-				"2.1.2",
-				"3.4.5",
-			}
-		} else if param[0] == "set2" {
-			resp = []string{
-				"20220113154113",
-				"1.0.0",
-			}
-		} else if param[0] == "set3" {
-			resp = []string{
-				"20220113154113",
-				"1.0.0",
-				"2.0.0",
-			}
-		} else if param[0] == "set4" {
-			resp = []string{
-				"20220112171518",
-				"20220112175624",
-				"20220113145751",
-				"20220113154113",
-				"20220120081508",
-				"20220120081530",
-			}
-		} else if param[0] == "set5" {
-			resp = []string{
-				"1.0.0",
-				"1.2.5",
-			}
-		}
-		bytes, _ := json.Marshal(resp)
-		w.Write(bytes)
-	}))
+	ts := compatibleVerServer()
 	defer ts.Close()
 
 	tests := []struct {
@@ -305,52 +259,7 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 }
 
 func TestGetMinCurrentVersion(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pValues := r.URL.Query()
-		param := pValues["set"]
-		var resp []string
-		if param[0] == "set1" {
-			resp = []string{
-				"20211201164433",
-				"20211220104140",
-				"20220113145751",
-				"20220113154113",
-				"1.0.0",
-				"1.1.9",
-				"1.2.1",
-				"2.0.0",
-				"2.1.2",
-				"3.4.5",
-			}
-		} else if param[0] == "set2" {
-			resp = []string{
-				"20220113154113",
-				"1.0.0",
-			}
-		} else if param[0] == "set3" {
-			resp = []string{
-				"20220113154113",
-				"1.0.0",
-				"2.0.0",
-			}
-		} else if param[0] == "set4" {
-			resp = []string{
-				"20220112171518",
-				"20220112175624",
-				"20220113145751",
-				"20220113154113",
-				"20220120081508",
-				"20220120081530",
-			}
-		} else if param[0] == "set5" {
-			resp = []string{
-				"1.0.0",
-				"1.2.5",
-			}
-		}
-		bytes, _ := json.Marshal(resp)
-		w.Write(bytes)
-	}))
+	ts := compatibleVerServer()
 	defer ts.Close()
 
 	tests := []struct {
@@ -496,4 +405,54 @@ func TestGetAllVersions(t *testing.T) {
 			assert.Equal(t, tc.output, result)
 		})
 	}
+}
+
+func compatibleVerServer() *httptest.Server {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pValues := r.URL.Query()
+		param := pValues["set"]
+		var resp []string
+		if param[0] == "set1" {
+			resp = []string{
+				"20211201164433",
+				"20211220104140",
+				"20220113145751",
+				"20220113154113",
+				"1.0.0",
+				"1.1.9",
+				"1.2.1",
+				"2.0.0",
+				"2.1.2",
+				"3.4.5",
+			}
+		} else if param[0] == "set2" {
+			resp = []string{
+				"20220113154113",
+				"1.0.0",
+			}
+		} else if param[0] == "set3" {
+			resp = []string{
+				"20220113154113",
+				"1.0.0",
+				"2.0.0",
+			}
+		} else if param[0] == "set4" {
+			resp = []string{
+				"20220112171518",
+				"20220112175624",
+				"20220113145751",
+				"20220113154113",
+				"20220120081508",
+				"20220120081530",
+			}
+		} else if param[0] == "set5" {
+			resp = []string{
+				"1.0.0",
+				"1.2.5",
+			}
+		}
+		bytes, _ := json.Marshal(resp)
+		w.Write(bytes)
+	}))
+	return ts
 }
