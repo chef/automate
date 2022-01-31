@@ -394,6 +394,7 @@ func fromStorageServerWithMigrationDetails(s storage.Server, m storage.Migration
 		IpAddress:       s.IPAddress,
 		OrgsCount:       s.OrgsCount,
 		MigrationId:     m.MigrationID,
-		MigrationStatus: m.MigrationType,
+		MigrationType:   m.MigrationType,
+		MigrationStatus: m.MigrationStatus,
 	}
 }
