@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { Org } from './org.model';
@@ -11,16 +11,11 @@ import {
 } from './org.actions';
 // import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
-// const headers = new HttpHeaders().set(InterceptorSkipHeader,
-//  'Content-Type: multipart/form-data');
+// let headers = new HttpHeaders().set(InterceptorSkipHeader, '');
+let headers = new HttpHeaders();
+// headers = headers.set('Content-Type' , 'multipart/form-data');
+headers = headers.delete('Content-Type' , 'application/json+lax');
 
-// const headers = new HttpHeaders()
-// .set('content-type','multipart/form-data');
-
-// const headers = new HttpHeaders({
-//   'Content-Type' :  'multipart/form-data'
-// });
-// console.log("header", headers);
 @Injectable()
 export class OrgRequests {
 
@@ -57,7 +52,7 @@ export class OrgRequests {
     return this.http.post<UploadResponce>(
       `${env.infra_proxy_url}/servers/migrations/upload`,
       formData,
-      { params: { unfiltered: 'true' }}
+      { headers, params: { unfiltered: 'true' }}
     );
   }
 }
