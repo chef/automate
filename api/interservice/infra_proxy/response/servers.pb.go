@@ -282,7 +282,7 @@ type Server struct {
 	OrgsCount int32 `protobuf:"varint,6,opt,name=orgs_count,json=orgsCount,proto3" json:"orgs_count,omitempty" toml:"orgs_count,omitempty" mapstructure:"orgs_count,omitempty"`
 	//Migration Id for active Chef Infra server migration
 	MigrationId string `protobuf:"bytes,7,opt,name=migration_id,json=migrationId,proto3" json:"migration_id,omitempty" toml:"migration_id,omitempty" mapstructure:"migration_id,omitempty"`
-	//Migration Id for active Chef Infra server migration
+	//Migration type for active Chef Infra server migration
 	MigrationStatus string `protobuf:"bytes,8,opt,name=migration_status,json=migrationStatus,proto3" json:"migration_status,omitempty" toml:"migration_status,omitempty" mapstructure:"migration_status,omitempty"`
 }
 
