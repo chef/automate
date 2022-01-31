@@ -211,7 +211,7 @@ func (p *postgres) insertMigration(ctx context.Context, migrationId, serverId, m
 }
 
 //GetActiveMigration gets the Migration ID and Migration Status for a server id
-func (p *postgres) GetActiveMigrationForServer(ctx context.Context, serverId string) (storage.MigrationStatus, error) {
+func (p *postgres) GetActiveMigration(ctx context.Context, serverId string) (storage.MigrationStatus, error) {
 	var m storage.MigrationStatus
 	query := `select m.migration_id,t.type,s.status_message
 			  from migration m 
