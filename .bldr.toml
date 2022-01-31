@@ -891,8 +891,13 @@ paths = [
 plan_path = "components/automate-cs-nginx"
 paths = [
   "components/automate-cs-nginx/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
   "lib/io/*",
+  "lib/platform/config/*",
+  "lib/proxy/*",
   "lib/secrets/*",
+  "lib/stringutils/*",
   "lib/user/*"
 ]
 
