@@ -4663,6 +4663,10 @@ func init() {
           "type": "string",
           "title": "Migration Id for active Chef Infra server migration"
         },
+        "migration_type": {
+          "type": "string",
+          "title": "Migration Phase for active Chef Infra server migration"
+        },
         "migration_status": {
           "type": "string",
           "title": "Migration Id for active Chef Infra server migration"
