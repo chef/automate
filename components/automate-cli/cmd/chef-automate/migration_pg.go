@@ -3,10 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -15,17 +17,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var migratePgCmdFlags = struct {
-	fromVersion      string
-	toVersion        string
-	oldDatadir       string
-	newDatadir       string
-	oldBindir        string
-	newBindir        string
-	oldOptions       string
-	newOptions       string
-	check            bool
-	pgUpgradeBinPath string
+var migrateDataCmdFlags = struct {
+	check bool
+	data  string
+}{}
+
+var ClearDataCmdFlags = struct {
+	data string
 }{}
 
 const AUTOMATE_PG_MIGRATE_LOG_DIR = "/src/"
@@ -37,62 +35,82 @@ func init() {
 }
 
 var migrateCmd = &cobra.Command{
-	Use:    "migrate COMMAND",
-	Short:  "Utilities for Chef Automate development",
+	Use:    "post-major-upgrade COMMAND",
+	Short:  "Utilities for post-major-upgrade",
 	Hidden: true,
 }
 
 func newRemovePgDatadirCmd() *cobra.Command {
 	var removePgDatadirCmd = &cobra.Command{
-		Use:   "cleanup",
-		Short: "Chef Automate migrate_pg",
+		Use:   "clear-data",
+		Short: "Chef Automate post-major-upgrade clear-data",
 		Long:  "Chef Automate migrate_pg. from one version to another",
 		RunE:  runCleanup,
 	}
+	removePgDatadirCmd.PersistentFlags().StringVar(&ClearDataCmdFlags.data, "data", "", "data")
+
 	return removePgDatadirCmd
 }
 
 func newMigratePgCmd() *cobra.Command {
 	var migratePgCmd = &cobra.Command{
-		Use:   "pg",
-		Short: "Chef Automate migrate_pg",
-		Long:  "Chef Automate migrate_pg. from one version to another",
+		Use:   "migrate",
+		Short: "Chef Automate post-major-upgrade migrate",
+		Long:  "Chef Automate migrate. migrate can be used to pg migrate or es migrate",
 		RunE:  runMigratePgCmd,
 	}
-	migratePgCmd.PersistentFlags().StringVar(&migratePgCmdFlags.fromVersion, "from-version", "9.6.21", "from version")
-	migratePgCmd.PersistentFlags().StringVar(&migratePgCmdFlags.toVersion, "to-version", "13.4", "to version")
-	migratePgCmd.PersistentFlags().StringVar(&migratePgCmdFlags.oldDatadir, "old-datadir", "/hab/svc/automate-postgresql/data/pgdata", "old datadir")
-	migratePgCmd.PersistentFlags().StringVar(&migratePgCmdFlags.newDatadir, "new-datadir", "/hab/svc/automate-postgresql/data/pgdata13", "new datadir")
-	migratePgCmd.PersistentFlags().StringVar(&migratePgCmdFlags.oldBindir, "old-bindir", "/hab/pkgs/core/postgresql/9.6.21/20211016180117/bin", "old bindir")
-	migratePgCmd.PersistentFlags().StringVar(&migratePgCmdFlags.newBindir, "new-bindir", "/hab/pkgs/core/postgresql13/13.4/20210827075515/bin", "new bindir")
-	migratePgCmd.PersistentFlags().BoolVar(&migratePgCmdFlags.check, "check", false, "check")
-	migratePgCmd.PersistentFlags().StringVar(&migratePgCmdFlags.pgUpgradeBinPath, "pg-upgrade-bin-path", "/hab/pkgs/core/postgresql13/13.4/20210827075515/bin/pg_upgrade", "pg_upgrade bin path")
+	migratePgCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
+	migratePgCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
 	return migratePgCmd
 }
 
 func runCleanup(cmd *cobra.Command, args []string) error {
-	writer.Title("remove pg datadir")
-	removePgDatadir()
-	writer.Title("Deleting file created by pg_upgrade")
+	writer.Title("Cleanup")
+	if ClearDataCmdFlags.data == "" {
+		return errors.New("data flag is required")
+	} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
+		writer.Title("Deleting file created by pg_upgrade")
+	} else {
+		return errors.New("Please provide valid input for data flag")
+	}
 	cleanUp()
+	writer.Title("successfully deleted files")
 	return nil
 }
 
 func runMigratePgCmd(cmd *cobra.Command, args []string) error {
-	chefAutomateStop()
-	removeAndReplacePgdata13()
-	executePgdata13ShellScript()
-	writer.Title(" migration from: " + migratePgCmdFlags.fromVersion + " to: " + migratePgCmdFlags.toVersion)
-	writer.Title("--------------------------------")
-	checkUpdateMigration(migratePgCmdFlags.check)
-	chefAutomateStart()
-	time.Sleep(10 * time.Second)
-	// chefAutomateStatus()
-	vacuumDb()
+	if !migrateDataCmdFlags.check {
+		response, err := writer.Prompt(`it will start the migration immediately after check.
+		Press y to agree, n to disagree? [y/n]`)
+		if err != nil {
+			return err
+		}
+		if !strings.Contains(response, "y") {
+			return errors.New("canceled")
+		}
+	}
+
+	if migrateDataCmdFlags.data == "" {
+		return errors.New("data flag is required")
+	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
+		chefAutomateStop()
+		removeAndReplacePgdata13()
+		executePgdata13ShellScript()
+		checkUpdateMigration(migrateDataCmdFlags.check)
+		chefAutomateStart()
+		chefAutomateStatus()
+		if !migrateDataCmdFlags.check {
+			vacuumDb()
+		}
+	} else {
+		return errors.New("Plase provide valid input for data flag")
+	}
 	return nil
 }
 
 func vacuumDb() {
+	writer.Title("vacuum db")
+	writer.Title("--------------------------------")
 	os.Setenv("PGPORT", "5432")
 	os.Setenv("PGHOST", "0.0.0.0")
 	os.Setenv("PGUSER", "automate")
@@ -104,69 +122,81 @@ func vacuumDb() {
 	args := []string{
 		"./analyze_new_cluster.sh",
 	}
-	c := exec.Command("/bin/sh", args...)
-	checkErrorForCommand(c)
+	executeCommand("/bin/sh", args, "")
+
 }
 
-func cleanUp() {
-
-	c := exec.Command("rm", "-rf", "./analyze_new_cluster.sh", "./delete_old_cluster.sh", "pgmigrate.log")
-	
-	checkErrorForCommand(c)
-}
-
-func removePgDatadir() {
-	writer.Title("remove pg datadir")
-	writer.Title("--------------------------------")
-	removePgDatadir := exec.Command("rm", "-rf", migratePgCmdFlags.oldDatadir)
-	checkErrorForCommand(removePgDatadir)
+func cleanUp() error {
+	response, err := writer.Prompt(`Are you sure do you want to delete old pg-data
+	This will delete all the data in the database (pg 9.6) and will not be able to recover it.
+	Press y to agree, n to disagree? [y/n]`)
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(response, "y") {
+		return errors.New("canceled")
+	}
+	args := []string{
+		"-rf",
+		"./analyze_new_cluster.sh",
+		"./delete_old_cluster.sh",
+		"./pgmigrate.log",
+		"/hab/svc/automate-postgresql/data/pgdata",
+	}
+	executeCommand("rm", args, "")
+	return nil
 }
 
 func chefAutomateStop() {
+	writer.Title("Chef-automate stop")
+	writer.Title("--------------------------------")
 	args := []string{
 		"stop",
 	}
 
-	stopChefAutomate := exec.Command("chef-automate", args...)
-	checkErrorForCommand(stopChefAutomate)
+	executeCommand("chef-automate", args, "")
+
 }
 
 func chefAutomateStatus() {
+	writer.Title("Chef-automate status")
+	writer.Title("--------------------------------")
 	args := []string{
 		"status",
+		"--wait-for-healthy",
 	}
-	err := executeAutomateCommandAsync(
-		"chef-automate",
-		args,
-		"",
-		"./pgmigrate.log")
-	if err != nil {
-		fmt.Println(err)
-	}
-	// statusChefAutomate := exec.Command("chef-automate", args...)
-	// checkErrorForCommand(statusChefAutomate)
+	executeCommand("chef-automate", args, "")
 }
 
 func removeAndReplacePgdata13() {
+
+	writer.Title("remove and replace pgdata13 directory")
+	writer.Title("--------------------------------")
+
 	argsToRemove := []string{
 		"-rf",
 		"/hab/svc/automate-postgresql/data/pgdata13",
 	}
 
-	removePgDatadir := exec.Command("rm", argsToRemove...)
-	checkErrorForCommand(removePgDatadir)
+	executeCommand("rm", argsToRemove, "")
 
 }
 
 func chefAutomateStart() {
+	writer.Title("Chef-automate start")
+	writer.Title("--------------------------------")
+
 	args := []string{
 		"start",
 	}
-	chefAutomateStart := exec.Command("chef-automate", args...)
-	checkErrorForCommand(chefAutomateStart)
+
+	executeCommand("chef-automate", args, "")
+
 }
 
 func executePgdata13ShellScript() {
+	writer.Title("execute pgdata13 shell script")
+	writer.Title("--------------------------------")
 	args := []string{
 		"./pgdata13.sh",
 	}
@@ -182,6 +212,8 @@ func executePgdata13ShellScript() {
 }
 
 func checkUpdateMigration(check bool) {
+	writer.Title(" migration from: 9.6 to: 13")
+	writer.Title("--------------------------------")
 
 	os.Unsetenv("PGHOST")
 
@@ -210,14 +242,20 @@ func checkUpdateMigration(check bool) {
 	}
 }
 
-func checkErrorForCommand(executable *exec.Cmd) {
-	out, err := executable.Output()
-	if err != nil {
-		log.Fatal(err)
+func executeCommand(command string, args []string, workingDir string) {
+	c := exec.Command(command, args...)
+	c.Stdin = os.Stdin
+	if len(workingDir) > 0 {
+		c.Dir = workingDir
 	}
-	fmt.Println(string(out))
+	c.Stdout = io.MultiWriter(os.Stdout)
+	c.Stderr = io.MultiWriter(os.Stderr)
+	err := c.Run()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 }
-
 func executeAutomateCommandAsync(command string, args []string, helpDocs string, logFilePath string) error {
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
@@ -282,4 +320,13 @@ func lookupUser(username string) (uid, gid int, err error) {
 
 func RemoveIndex(s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
+}
+
+func checkErrorForCommand(executable *exec.Cmd) {
+	out, err := executable.Output()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	fmt.Println(string(out))
 }
