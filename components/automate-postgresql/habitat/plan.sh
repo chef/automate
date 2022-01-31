@@ -12,7 +12,7 @@ pg_version="13.5"
 pkg_deps=(
   core/coreutils
   chef/mlsa
-  ${vendor_origin}/postgresql13/${pkg_version}
+  ${vendor_origin}/postgresql13/${pg_version}
 )
 
 pkg_exports=(
