@@ -6,6 +6,7 @@ var ComplianceRunInfo = Mapping{
 	Timeseries: false,
 	Mapping: `
   {
+    "index_patterns": ["` + IndexNameComplianceRunInfo + `"],
     "settings": {
       "index": {
         "refresh_interval": "1s"
