@@ -9,14 +9,13 @@ import { Utilities } from 'app/helpers/utilities/utilities';
   styleUrls: ['./sync-org-users-slider.component.scss']
 })
 export class SyncOrgUsersSliderComponent implements OnInit {
-  @Input() visible = false;
-  @Input() uploading = false;
+  @Input() isUploaded = false;
   @Input() uploadForm: FormGroup;
   @Input() conflictErrorEvent: EventEmitter<boolean>;
-  @Output() close = new EventEmitter();
   @Output() uploadClicked = new EventEmitter();
   @HostBinding('class.active') isSlideOpen = false;
 
+  public uploading = false;
   public conflictError = false;
   public migrationSliderVisible = false;
   public migrationSlider = false;
@@ -43,6 +42,7 @@ export class SyncOrgUsersSliderComponent implements OnInit {
   }
 
   uploadFile(): void {
+    this.uploading = true;
     const formData = new FormData();
     formData.append('file', this.uploadForm.get('file').value);
     this.uploadClicked.emit(this.uploadForm.get('file').value);
@@ -50,8 +50,9 @@ export class SyncOrgUsersSliderComponent implements OnInit {
   }
 
   closeUploadSlider() {
+    this.uploading = false;
+    this.isUploaded = false;
     this.toggleSlide();
-    this.close.emit();
     this.file = '';
     this.isFile = false;
   }

@@ -1,4 +1,5 @@
 <div data-cy="chef-infra-upload-slider" ngClass="{slide : isSlideOpen}">
+  <chef-loading-spinner *ngIf="uploading" size="50" fixed></chef-loading-spinner>
   <div class="sidenav-header">
     <chef-button class="back-button" secondary (click)="closeUploadSlider()" data-cy="back-button">
       <chef-icon>arrow_back</chef-icon>

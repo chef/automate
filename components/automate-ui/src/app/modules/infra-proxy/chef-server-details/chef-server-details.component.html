@@ -79,10 +79,9 @@
       </app-delete-infra-object-modal>
       <app-sync-org-users-slider
         #upload
-        [visible]="uploadSliderVisible"
         [uploadForm]="uploadZipForm"
-        (close)="closeUploadSlider()"
         [conflictErrorEvent]="conflictErrorEvent"
+        [isUploaded]="isUploaded"
         (uploadClicked)="uploadZipFile($event)">
       </app-sync-org-users-slider>
       <section class="page-body details-tab" *ngIf="tabValue === 'details'">

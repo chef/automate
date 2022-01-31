@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
@@ -38,9 +38,11 @@ import {
   createError,
   allOrgs,
   getAllStatus as getAllOrgsForServerStatus,
-  deleteStatus as deleteOrgStatus
+  deleteStatus as deleteOrgStatus,
+  uploadStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
+import { SyncOrgUsersSliderComponent } from '../sync-org-users-slider/sync-org-users-slider.component';
 
 export type ChefServerTabName = 'orgs' | 'users' | 'details';
 @Component({
@@ -88,6 +90,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public uploadSliderVisible = false;
   public uploadZipForm: FormGroup;
   public zipFile: FormData;
+  public isUploaded = false;
+  public uploadSuccessful = false;
+  @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
   constructor(
     private fb: FormBuilder,
@@ -261,7 +266,22 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-    setTimeout(() => {
+    this.store.select(uploadStatus).pipe(
+      takeUntil(this.isDestroyed))
+    .subscribe((state) => {
+      this.uploadSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.uploadSuccessful) {
+        // show migration slider
+        this.isUploaded = true;
+      }
+      if (state === EntityStatus.loadingFailure) {
+        // close current slider
+        this.isUploaded = false;
+        this.upload.closeUploadSlider();
+      }
+    });
+
+      setTimeout(() => {
       if (this.isServerLoaded) {
         this.validateWebUIKey(this.server);
       }
@@ -369,16 +389,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   // upload zip slider functions
-  public openUploadSlider(): void {
-    this.uploadSliderVisible = true;
-    this.resetUploadSlider();
-  }
-
-  public closeUploadSlider(): void {
-    this.uploadSliderVisible = false;
-    this.resetUploadSlider();
-  }
-
   public uploadZipFile(file: File): void {
     const formData: FormData = new FormData();
 
@@ -391,15 +401,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       console.log(key + ' ' + value);
     });
 
-    this.resetUploadSlider();
     const uploadZipPayload = {
       formData: formData
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
-  }
-
-  private resetUploadSlider(): void {
-    this.uploadZipForm.reset();
-    this.conflictErrorEvent.emit(false);
   }
 }
