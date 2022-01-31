@@ -853,8 +853,8 @@ If existing customer wants to move its existing chef infrastructure to our new a
 In both the cases we need to take backup using knife-ec-backup utility and then move the backup folder on the new chef-server where will take restore using the same utility. This backup will migrate all the cookbooks, users, data-bags, policies and organisations.
 
 knife-ec-backup can backup and restore the data in an Enterprise Chef Server installation, preserving the data in an intermediate, editable text format. It is similar to the knife download and knife upload commands and uses the same underlying libraries, but also includes workarounds for objects not yet supported by those tools and various Server API deficiencies. The long-run goal is to improve knife download, knife upload and the Chef Infra Server API and deprecate this tool.
+This migration procedure is tested on chef-server version 14+.
 
-**This plugin currently supports Enterprise Chef 11 and Chef Infra Server 12+ .**
 ### Backup on your existing chef-server:
 Install habitat
 
