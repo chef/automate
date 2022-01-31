@@ -26,3 +26,8 @@ message Chunk {
   // Stream pointer
   int64 position = 2;
 }
+
+message GetMigrationStatus {
+    // Migration ID.
+    string migration_id = 1;
+}
