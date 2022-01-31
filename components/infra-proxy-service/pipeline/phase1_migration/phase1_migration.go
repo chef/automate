@@ -69,16 +69,16 @@ func unzip(ctx context.Context, src string) <-chan Result {
 	return result
 }
 
+// ParseOrg returns MigrationPipe
 func ParseOrg(res <-chan Result) MigrationPipe {
 	return func(in <-chan Result) <-chan Result {
 		return parseOrg(context.Background(), res)
 	}
 }
 
-// ParseOrg returns all the organizations from the unzipped file
 func parseOrg(ctx context.Context, result <-chan Result) <-chan Result {
 	go func() {
-		fmt.Println("ParseOrg function is called!")
+		fmt.Println("ParseOrg routine is called!")
 	}()
 	return result
 }
