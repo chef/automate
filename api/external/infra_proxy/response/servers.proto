@@ -41,8 +41,10 @@ message Server {
     int32 orgs_count = 6;
     //Migration Id for active Chef Infra server migration
     string migration_id = 7;
+    //Migration Phase for active Chef Infra server migration
+    string migration_type =8;
     //Migration Id for active Chef Infra server migration
-    string migration_status =8;
+    string migration_status =9;
 }
 
 message GetServerStatus {
