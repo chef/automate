@@ -128,7 +128,7 @@ func vacuumDb() {
 
 func cleanUp() error {
 	response, err := writer.Prompt(`Are you sure do you want to delete old pg-data
-	This will delete all the data in the database (pg 9.6) and will not be able to recover it.
+	This will delete all the data (pg 9.6) and will not be able to recover it.
 	Press y to agree, n to disagree? [y/n]`)
 	if err != nil {
 		return err
@@ -141,7 +141,9 @@ func cleanUp() error {
 		"./analyze_new_cluster.sh",
 		"./delete_old_cluster.sh",
 		"./pgmigrate.log",
-		"/hab/svc/automate-postgresql/data/pgdata",
+		"pg_upgrade_internal.log",
+		"pg_upgrade_server.log",
+		"pg_upgrade_utility.log",
 	}
 	executeCommand("rm", args, "")
 	return nil
@@ -198,7 +200,7 @@ func executePgdata13ShellScript() {
 	writer.Title("execute pgdata13 shell script")
 	writer.Title("--------------------------------")
 	args := []string{
-		"./pgdata13.sh",
+		"./scripts/pgdata13.sh",
 	}
 	c := exec.Command("/bin/sh", args...)
 	c.SysProcAttr = &syscall.SysProcAttr{}
