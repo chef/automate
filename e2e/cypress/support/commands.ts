@@ -1,4 +1,5 @@
 import { eventExist } from '../support/helpers';
+import 'cypress-file-upload';
 
 // Cypress Commands: any action that could be taken in any test
 // any command added in here must also have its signature added to index.d.ts
