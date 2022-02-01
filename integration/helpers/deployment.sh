@@ -53,6 +53,7 @@ run_upgrade() {
 
     #shellcheck disable=SC2154
     wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+    chef-automate post-major-upgrade migrate --data=PG
 }
 
 wait_for_upgrade() {
