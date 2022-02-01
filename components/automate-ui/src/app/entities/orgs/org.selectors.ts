@@ -50,3 +50,8 @@ export const uploadStatus = createSelector(
   orgState,
   (state) => state.uploadStatus
 );
+
+export const uploadDetails = createSelector(
+  orgState,
+  (state) => state.uploadDetails
+);

@@ -127,7 +127,7 @@ export class UpdateOrgFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export interface UploadResponce {
+export interface UploadSuccessPayload {
   success: boolean;
   migrationId: string;
 }
@@ -141,7 +141,7 @@ export class UploadZip implements Action {
 export class UploadZipSuccess implements Action {
   readonly type = OrgActionTypes.UPLOAD_SUCCESS;
 
-  constructor(public payload: UploadResponce) { }
+  constructor(public payload: UploadSuccessPayload) { }
 }
 
 export class UploadZipFailure implements Action {

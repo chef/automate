@@ -29,7 +29,7 @@ import {
   UploadZip,
   UploadZipSuccess,
   UploadZipFailure,
-  UploadResponce,
+  UploadSuccessPayload,
   OrgActionTypes
 } from './org.actions';
 
@@ -170,7 +170,7 @@ export class OrgEffects {
       ofType(OrgActionTypes.UPLOAD),
       mergeMap(({ payload: { formData } }: UploadZip) =>
         this.requests.uploadZip(formData).pipe(
-          map((resp: UploadResponce) => new UploadZipSuccess(resp)),
+          map((resp: UploadSuccessPayload) => new UploadZipSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new UploadZipFailure(error)))))));
 

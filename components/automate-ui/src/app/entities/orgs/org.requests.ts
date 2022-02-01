@@ -7,7 +7,7 @@ import {
   OrgsSuccessPayload,
   OrgSuccessPayload,
   CreateOrgPayload,
-  UploadResponce
+  UploadSuccessPayload
 } from './org.actions';
 
 @Injectable()
@@ -39,7 +39,8 @@ export class OrgRequests {
       `${env.infra_proxy_url}/servers/${org.server_id}/orgs/${org.id}`, org);
   }
 
-  public uploadZip(formData: FormData): Observable<UploadResponce> {
-    return this.http.post<UploadResponce>(`${env.infra_proxy_url}/servers/migrations/upload`, formData);
+  public uploadZip(formData: FormData): Observable<UploadSuccessPayload> {
+    return this.http.post<UploadSuccessPayload>
+    (`${env.infra_proxy_url}/servers/migrations/upload`, formData);
   }
 }

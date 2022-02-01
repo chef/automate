@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { OrgActionTypes, OrgActions } from './org.actions';
+import { OrgActionTypes, OrgActions, UploadSuccessPayload } from './org.actions';
 import { Org } from './org.model';
 
 export interface OrgEntityState extends EntityState<Org> {
@@ -14,6 +14,7 @@ export interface OrgEntityState extends EntityState<Org> {
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
   uploadStatus: EntityStatus;
+  uploadDetails: UploadSuccessPayload;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -34,7 +35,9 @@ export const OrgEntityInitialState: OrgEntityState =
     createError: null,
     deleteStatus: EntityStatus.notLoaded,
     updateStatus: EntityStatus.notLoaded,
-    uploadStatus: EntityStatus.notLoaded
+    uploadStatus: EntityStatus.notLoaded,
+    uploadDetails: null
+
   });
 
 export function orgEntityReducer(
@@ -105,7 +108,10 @@ export function orgEntityReducer(
       return set(UPLOAD_STATUS, EntityStatus.loading, state);
 
     case OrgActionTypes.UPLOAD_SUCCESS:
-      return set(UPLOAD_STATUS, EntityStatus.loadingSuccess, state);
+      return pipe(
+        set(UPLOAD_STATUS, EntityStatus.loadingSuccess),
+        set('uploadDetails', action.payload || [])
+      )(state) as OrgEntityState;
 
     case OrgActionTypes.UPLOAD_FAILURE:
       return set(UPLOAD_STATUS, EntityStatus.loadingFailure, state);
