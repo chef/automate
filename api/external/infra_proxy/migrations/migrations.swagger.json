@@ -41,9 +41,64 @@
           "InfraProxyMigration"
         ]
       }
+    },
+    "/api/v0/infra/servers/{server_id}/migrations/cancel_migration/{migration_id}": {
+      "get": {
+        "operationId": "InfraProxyMigration_CancelMigration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponce"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Server ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "migration_id",
+            "description": "Migration ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxyMigration"
+        ]
+      }
     }
   },
   "definitions": {
+    "chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponce": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "migration ID"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Error message"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.migrations.response.GetMigrationStatus": {
       "type": "object",
       "properties": {

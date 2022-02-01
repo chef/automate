@@ -66,6 +66,8 @@ type MigrationStorage interface {
 	FailedPermissionMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 	CompleteMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 	FailedMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	CancelMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
+	FailedCancelMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (Migration, error)
 
 	StoreMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (MigrationStage, error)
 	GetMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
@@ -140,9 +142,11 @@ type MigrationStage struct {
 }
 
 type MigrationStatus struct {
-	MigrationID     string
-	MigrationType   string
-	MigrationStatus string
+	MigrationID       string
+	MigrationType     string
+	MigrationStatus   string
+	MigrationStatusID int64
+	MigrationTypeID   int64
 }
 
 // Errors returned from the backend

@@ -11,6 +11,5 @@ service MigrationDataService{
 
   rpc UploadFile (stream chef.automate.domain.infra_proxy.migrations.request.UploadZipFileRequest) returns (chef.automate.domain.infra_proxy.migrations.response.UploadZipFileResponse) {};
   rpc GetMigrationStatus (chef.automate.domain.infra_proxy.migrations.request.GetMigrationStatus) returns (chef.automate.domain.infra_proxy.migrations.response.GetMigrationStatus) {};
-
+  rpc CancelMigration (chef.automate.domain.infra_proxy.migrations.request.CancelMigrationRequest) returns (chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponce) {};
 }
-
