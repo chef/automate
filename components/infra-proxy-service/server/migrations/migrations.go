@@ -122,11 +122,11 @@ func (s *MigrationServer) StoreOrgs(ctx context.Context, result chan pipeline.Re
 		var err error
 		switch org.ActionOps {
 		case pipeline.Insert:
-			_, err = s.service.Storage.StoreOrg(ctx, org.Name, org.FullName, "", "", result.Meta.ServerID, nil)
+			_, err = s.service.Storage.StoreOrg(ctx, org.Name, org.FullName, "", "", res.Meta.ServerID, nil)
 		case pipeline.Delete:
-			_, err = s.service.Storage.DeleteOrg(ctx, org.Name, result.Meta.ServerID)
+			_, err = s.service.Storage.DeleteOrg(ctx, org.Name, res.Meta.ServerID)
 		case pipeline.Update:
-			_, err = s.service.Storage.EditOrg(ctx, org.Name, org.FullName, "", result.Meta.ServerID, nil)
+			_, err = s.service.Storage.EditOrg(ctx, org.Name, org.FullName, "", res.Meta.ServerID, nil)
 		default:
 		}
 		//TODO: Need to handle the error in pipeline channel
