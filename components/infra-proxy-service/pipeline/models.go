@@ -27,6 +27,9 @@ type Meta struct {
 
 	// UnzipFolder for unzipped folder's location
 	UnzipFolder string `json:"unzip_folder"`
+
+	// Chef Infra Server ID
+	ServerID string `json:"server_id"`
 }
 
 type StageResult struct {
