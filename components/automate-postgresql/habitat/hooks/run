@@ -51,9 +51,9 @@ if [ -f  "$pidfile" ]; then
 fi
 
 # if [[ "$BUILDKITE" = "true" ]]; then
-#   echo "dynamic_shared_memory_type = 'mmap'" >> {{pkg.svc_config_path}}/postgresql13.conf
+#   echo "dynamic_shared_memory_type = 'mmap'" >> {{pkg.svc_config_path}}/postgresql.conf
 # fi
 
 exec postgres \
-  -c config_file={{pkg.svc_config_path}}/postgresql13.conf
+  -c config_file={{pkg.svc_config_path}}/postgresql.conf
 {{~/if}}
