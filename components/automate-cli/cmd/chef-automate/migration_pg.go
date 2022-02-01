@@ -24,12 +24,14 @@ var migrateDataCmdFlags = struct {
 }{}
 
 var ClearDataCmdFlags = struct {
-	data string
+	data       string
 	autoAccept bool
 }{}
 
 const (
 	AUTOMATE_PG_MIGRATE_LOG_DIR = "/src"
+	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
+	NEW_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata13"
 )
 
 func init() {
@@ -100,7 +102,12 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
 		chefAutomateStop()
-		removeAndReplacePgdata13()
+
+		existDir, _ := dirExists(NEW_PG_DATA_DIR)
+		if existDir {
+			removeAndReplacePgdata13()
+		}
+
 		executePgdata13ShellScript()
 		checkUpdateMigration(migrateDataCmdFlags.check)
 		chefAutomateStart()
@@ -108,6 +115,7 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 		if !migrateDataCmdFlags.check {
 			vacuumDb()
 		}
+		
 	} else {
 		return errors.New("Plase provide valid input for data flag")
 	}
@@ -124,10 +132,16 @@ func vacuumDb() {
 	os.Setenv("PGSSLCERT", "/hab/svc/automate-postgresql/config/server.crt")
 	os.Setenv("PGSSLKEY", "/hab/svc/automate-postgresql/config/server.key")
 	os.Setenv("PGSSLROOTCERT", "/hab/svc/automate-postgresql/config/root.crt")
+
 	args := []string{
 		"./analyze_new_cluster.sh",
 	}
-	executeCommand("/bin/sh", args, "")
+
+	err := executeCommand("/bin/sh", args, "")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 
 }
 
@@ -150,11 +164,12 @@ func cleanUp() error {
 		"./analyze_new_cluster.sh",
 		"./delete_old_cluster.sh",
 		"./pgmigrate.log",
-		"pg_upgrade_internal.log",
-		"pg_upgrade_server.log",
-		"pg_upgrade_utility.log",
 	}
-	executeCommand("rm", args, "")
+	err := executeCommand("rm", args, "")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 	return nil
 }
 
@@ -164,7 +179,16 @@ func chefAutomateStop() {
 		"stop",
 	}
 
-	executeCommand("chef-automate", args, "")
+	err := executeCommand("chef-automate", args, "")
+	if err != nil {
+		if err.Error() == "exit status 99" { // exit status 99 means already stopped
+			writer.Warn("chef-automate already stopped")
+		} else {
+			writer.Fail("chef-automate stop failed")
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+	}
 
 }
 
@@ -174,7 +198,11 @@ func chefAutomateStatus() {
 		"status",
 		"--wait-for-healthy",
 	}
-	executeCommand("chef-automate", args, "")
+	err := executeCommand("chef-automate", args, "")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 }
 
 func removeAndReplacePgdata13() {
@@ -185,8 +213,11 @@ func removeAndReplacePgdata13() {
 		"/hab/svc/automate-postgresql/data/pgdata13",
 	}
 
-	executeCommand("rm", argsToRemove, "")
-
+	err := executeCommand("rm", argsToRemove, "")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 }
 
 func chefAutomateStart() {
@@ -196,8 +227,11 @@ func chefAutomateStart() {
 		"start",
 	}
 
-	executeCommand("chef-automate", args, "")
-
+	err := executeCommand("chef-automate", args, "")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 }
 
 func executePgdata13ShellScript() {
@@ -246,7 +280,7 @@ func checkUpdateMigration(check bool) {
 	}
 }
 
-func executeCommand(command string, args []string, workingDir string) {
+func executeCommand(command string, args []string, workingDir string) error {
 	c := exec.Command(command, args...)
 	c.Stdin = os.Stdin
 	if len(workingDir) > 0 {
@@ -255,11 +289,9 @@ func executeCommand(command string, args []string, workingDir string) {
 	c.Stdout = io.MultiWriter(os.Stdout)
 	c.Stderr = io.MultiWriter(os.Stderr)
 	err := c.Run()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
-	}
+	return err
 }
+
 func executeAutomateCommandAsync(command string, args []string, helpDocs string, logFilePath string) error {
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
@@ -333,4 +365,15 @@ func checkErrorForCommand(executable *exec.Cmd) {
 		os.Exit(1)
 	}
 	fmt.Println(string(out))
+}
+
+func dirExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
