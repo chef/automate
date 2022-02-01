@@ -45,3 +45,13 @@ export const orgFromRoute = createSelector(
   routeParams,
   (state, { 'org-id': org_id }) => state[org_id]
 );
+
+export const uploadStatus = createSelector(
+  orgState,
+  (state) => state.uploadStatus
+);
+
+export const uploadDetails = createSelector(
+  orgState,
+  (state) => state.uploadDetails
+);

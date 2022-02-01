@@ -3,9 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { Org } from './org.model';
-
 import {
-  OrgsSuccessPayload, OrgSuccessPayload, CreateOrgPayload
+  OrgsSuccessPayload,
+  OrgSuccessPayload,
+  CreateOrgPayload,
+  UploadSuccessPayload
 } from './org.actions';
 
 @Injectable()
@@ -35,5 +37,10 @@ export class OrgRequests {
   public updateOrg(org: Org): Observable<OrgSuccessPayload> {
     return this.http.put<OrgSuccessPayload>(
       `${env.infra_proxy_url}/servers/${org.server_id}/orgs/${org.id}`, org);
+  }
+
+  public uploadZip(formData: FormData): Observable<UploadSuccessPayload> {
+    return this.http.post<UploadSuccessPayload>
+    (`${env.infra_proxy_url}/servers/migrations/upload`, formData);
   }
 }

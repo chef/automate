@@ -1,0 +1,30 @@
+<div data-cy="migration-slider" ngClass="{slide : isSlideOpen1}">
+  <div class="sidenav-header">
+    <chef-button class="back-button" secondary (click)="closeMigrationSlider()" data-cy="back-button">
+      <chef-icon>arrow_back</chef-icon>
+    </chef-button>
+    <h2 slot="title">Migration </h2>
+    <chef-button class="close" secondary (click)="closeMigrationSlider()" data-cy="close-chef-infra-button">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="sidenav-body">
+    <div class="flex-container">
+      <form>
+        <div class="input-margin">
+
+        </div>
+        <div id="button-bar">
+          <chef-button id="cancel-migration-slider" tertiary [disabled]="migrating" (click)="closeMigrationSlider()">
+            Cancel
+          </chef-button>
+          <chef-button primary data-cy="migration-button" id="migration-button" (click)="migrationFile();">
+            <chef-loading-spinner *ngIf="migrating"></chef-loading-spinner>
+            <span *ngIf="!migrating">Continue</span>
+            <span *ngIf="migrating">Uploading File ...</span>
+          </chef-button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

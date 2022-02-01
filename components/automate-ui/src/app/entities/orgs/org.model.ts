@@ -5,3 +5,7 @@ export interface Org {
   admin_user: string;
   projects?: string[];
 }
+
+export interface UploadFile {
+  formData: FormData;
+}
