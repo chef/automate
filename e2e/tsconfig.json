@@ -9,7 +9,8 @@
       "dom"
     ],
     "types": [
-      "cypress"
+      "cypress",
+      "cypress-file-upload"
     ],
     "typeRoots": [
       "./support"

@@ -1,0 +1,27 @@
+@import "~styles/variables";
+@import "../infra_shared/slide-panel.scss";
+
+:host {
+  z-index: 2;
+  width: 80%;
+  box-shadow: 0 35.8px 140.2px $chef-gulf-blue;
+  padding: 25px;
+
+  .sidenav-header {
+    margin-bottom: 5vh;
+
+    h2 {
+      flex-grow: 2;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      color: $chef-primary-dark;
+      line-height: 27px;
+      margin-bottom: 10px;
+    }
+
+    .back-button {
+      margin-left: 0;
+    }
+  }
+}
