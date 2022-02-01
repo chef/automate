@@ -3,6 +3,7 @@ package migrations
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -10,6 +11,7 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
+	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	"github.com/gofrs/uuid"
 	log "github.com/sirupsen/logrus"
@@ -159,4 +161,53 @@ func createResponseWithErrors(err error, migrationId string) *response.UploadZip
 		MigrationId: migrationId,
 		Errors:      errors,
 	}
+}
+
+// CancelMigration cancle the ongoing migration
+func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.CancelMigrationRequest) (*response.CancelMigrationResponce, error) {
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Cancellation is allowed for a running pipeline only if the parsing is done but the data commitment is yet to be performed
+	currentMigrationPhase, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)
+	if currentMigrationPhase.MigrationStatusID != int64(constants.CreatePreview) {
+		return nil, fmt.Errorf("cancellation is not allowed when migration is not in Create Preview State: %s", req.MigrationId)
+	}
+
+	//  Remove the migration folder
+	folderPath := path.Join("/hab/svc/infra-proxy-service/data", req.MigrationId)
+	err = os.RemoveAll(folderPath)
+	if err != nil {
+		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		return nil, err
+	}
+
+	// Clear up the stage table
+	_, err = s.service.Migration.DeleteMigrationStage(ctx, req.MigrationId)
+	if err != nil {
+		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		return nil, err
+	}
+
+	// Update the migration status
+	_, err = s.service.Migration.CancelMigration(ctx, req.MigrationId, req.ServerId, 0, 0, 0)
+	if err != nil {
+		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		return nil, err
+	}
+
+	errors := []string{err.Error()}
+
+	return &response.CancelMigrationResponce{
+		Success: true,
+		Errors:  errors,
+	}, nil
 }
