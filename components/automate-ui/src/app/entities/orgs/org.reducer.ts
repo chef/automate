@@ -3,7 +3,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
+<<<<<<< HEAD
 import { OrgActionTypes, OrgActions, UploadSuccessPayload, PreviewSuccessPayload } from './org.actions';
+=======
+import { OrgActionTypes, OrgActions, UploadSuccessPayload } from './org.actions';
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 import { Org } from './org.model';
 
 export interface OrgEntityState extends EntityState<Org> {
@@ -15,10 +19,13 @@ export interface OrgEntityState extends EntityState<Org> {
   deleteStatus: EntityStatus;
   uploadStatus: EntityStatus;
   uploadDetails: UploadSuccessPayload;
+<<<<<<< HEAD
   cancelStatus: EntityStatus;
   previewStatus: EntityStatus;
   previewData: PreviewSuccessPayload;
   confirmPreviewStatus: EntityStatus;
+=======
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -28,9 +35,12 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 const UPLOAD_STATUS = 'uploadStatus';
+<<<<<<< HEAD
 const CANCEL_STATUS = 'cancelStatus';
 const PREVIEW_STATUS = 'previewStatus';
 const CONFIRM_PREVIEW_STATUS = 'confirmPreviewStatus';
+=======
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 
 export const orgEntityAdapter: EntityAdapter<Org> = createEntityAdapter<Org>();
 
@@ -43,10 +53,15 @@ export const OrgEntityInitialState: OrgEntityState =
     deleteStatus: EntityStatus.notLoaded,
     updateStatus: EntityStatus.notLoaded,
     uploadStatus: EntityStatus.notLoaded,
+<<<<<<< HEAD
     uploadDetails: null,
     cancelStatus: EntityStatus.notLoaded,
     previewData: null,
     confirmPreviewStatus: EntityStatus.notLoaded
+=======
+    uploadDetails: null
+
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
   });
 
 export function orgEntityReducer(
@@ -125,6 +140,7 @@ export function orgEntityReducer(
     case OrgActionTypes.UPLOAD_FAILURE:
       return set(UPLOAD_STATUS, EntityStatus.loadingFailure, state);
 
+<<<<<<< HEAD
     case OrgActionTypes.CANCEL_MIGRATION:
       return set(CANCEL_STATUS, EntityStatus.loading, state);
 
@@ -155,6 +171,8 @@ export function orgEntityReducer(
     case OrgActionTypes.CONFIRM_PREVIEW_FAILURE:
       return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loadingFailure, state);
 
+=======
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
     default:
       return state;
   }

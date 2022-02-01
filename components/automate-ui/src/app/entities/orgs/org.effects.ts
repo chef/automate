@@ -30,6 +30,7 @@ import {
   UploadZipSuccess,
   UploadZipFailure,
   UploadSuccessPayload,
+<<<<<<< HEAD
   CancelMigration,
   CancelMigrationSuccess,
   CancelMigrationFailure,
@@ -39,6 +40,8 @@ import {
   ConfirmPreview,
   ConfirmPreviewSuccess,
   ConfirmPreviewFailure,
+=======
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
   OrgActionTypes
 } from './org.actions';
 
@@ -200,6 +203,7 @@ export class OrgEffects {
           type: Type.error,
           message: `Could not upload file: ${msg || payload.error}`
         });
+<<<<<<< HEAD
     })));
 
   cancelMigration$ = createEffect(() =>
@@ -277,4 +281,8 @@ export class OrgEffects {
           message: `Could not confirm preview: ${msg || payload.error}`
         });
     })));
+=======
+      })));
+
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 }

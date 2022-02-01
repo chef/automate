@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
+<<<<<<< HEAD
 import { Org, UploadFile, PreviewData } from './org.model';
 
 export enum OrgActionTypes {
@@ -31,6 +32,29 @@ export enum OrgActionTypes {
   CONFIRM_PREVIEW          = 'ORGS::CONFIRM_PREVIEW',
   CONFIRM_PREVIEW_SUCCESS  = 'ORGS::CONFIRM_PREVIEW::SUCCESS',
   CONFIRM_PREVIEW_FAILURE  = 'ORGS::CONFIRM_PREVIEW::FAILURE'
+=======
+import { Org, UploadFile } from './org.model';
+
+export enum OrgActionTypes {
+  GET_ALL = 'ORGS::GET_ALL',
+  GET_ALL_SUCCESS = 'ORGS::GET_ALL::SUCCESS',
+  GET_ALL_FAILURE = 'ORGS::GET_ALL::FAILURE',
+  GET = 'ORGS::GET',
+  GET_SUCCESS = 'ORGS::GET::SUCCESS',
+  GET_FAILURE = 'ORGS::GET::FAILURE',
+  CREATE = 'ORGS::CREATE',
+  CREATE_SUCCESS = 'ORGS::CREATE::SUCCESS',
+  CREATE_FAILURE = 'ORGS::CREATE::FAILURE',
+  DELETE = 'ORGS::DELETE',
+  DELETE_SUCCESS = 'ORGS::DELETE::SUCCESS',
+  DELETE_FAILURE = 'ORGS::DELETE::FAILURE',
+  UPDATE = 'ORGS::UPDATE',
+  UPDATE_SUCCESS = 'ORGS::UPDATE::SUCCESS',
+  UPDATE_FAILURE = 'ORGS::UPDATE::FAILURE',
+  UPLOAD = 'ORGS::UPLOAD',
+  UPLOAD_SUCCESS = 'ORGS::UPLOAD::SUCCESS',
+  UPLOAD_FAILURE = 'ORGS::UPLOAD::FAILURE'
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 }
 
 export interface OrgSuccessPayload {
@@ -138,7 +162,11 @@ export class UpdateOrgFailure implements Action {
 
 export interface UploadSuccessPayload {
   success: boolean;
+<<<<<<< HEAD
   migration_id: string;
+=======
+  migrationId: string;
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 }
 
 export class UploadZip implements Action {
@@ -159,6 +187,7 @@ export class UploadZipFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+<<<<<<< HEAD
 export interface CancelSuccessPayload {
   success: boolean;
   error: [];
@@ -227,6 +256,8 @@ export class ConfirmPreviewFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+=======
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 export type OrgActions =
   | GetOrgs
   | GetOrgsSuccess
@@ -245,6 +276,7 @@ export type OrgActions =
   | UpdateOrgFailure
   | UploadZip
   | UploadZipSuccess
+<<<<<<< HEAD
   | UploadZipFailure
   | CancelMigration
   | CancelMigrationSuccess
@@ -255,3 +287,6 @@ export type OrgActions =
   | ConfirmPreview
   | ConfirmPreviewSuccess
   | ConfirmPreviewFailure;
+=======
+  | UploadZipFailure;
+>>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
