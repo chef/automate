@@ -12,7 +12,6 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"
-	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	"github.com/gofrs/uuid"
 	log "github.com/sirupsen/logrus"
@@ -113,28 +112,6 @@ func (s *MigrationServer) GetMigrationStatus(ctx context.Context, req *request.G
 		MigrationType:   migration.MigrationType,
 		MigrationStatus: migration.MigrationStatus,
 	}, nil
-}
-
-// Pipeline function to store thee orgs
-func (s *MigrationServer) StoreOrgs(ctx context.Context, result chan pipeline.Result) chan pipeline.Result {
-	res := <-result
-	for _, org := range res.ParsedResult.Orgs {
-		var err error
-		switch org.ActionOps {
-		case pipeline.Insert:
-			_, err = s.service.Storage.StoreOrg(ctx, org.Name, org.FullName, "", "", res.Meta.ServerID, nil)
-		case pipeline.Delete:
-			_, err = s.service.Storage.DeleteOrg(ctx, org.Name, res.Meta.ServerID)
-		case pipeline.Update:
-			_, err = s.service.Storage.EditOrg(ctx, org.Name, org.FullName, "", res.Meta.ServerID, nil)
-		default:
-		}
-		//TODO: Need to handle the error in pipeline channel
-		if err != nil {
-			fmt.Println("#######Error#######", err)
-		}
-	}
-	return result
 }
 
 // Takes up file name from service.MigrationDataService_UploadFileServer.MigrationId and creates the file in the same directory
