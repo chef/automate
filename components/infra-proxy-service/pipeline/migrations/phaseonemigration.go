@@ -17,10 +17,16 @@ func UnzipSrc(res <-chan pipeline.Result) MigrationPipe {
 }
 
 func unzip(ctx context.Context, result <-chan pipeline.Result) <-chan pipeline.Result {
+	out := make(chan pipeline.Result, 1)
 	go func() {
+		defer close(out)
+		for i := range result {
+			// Some code
+			out <- i
+		}
 		fmt.Println("Zip function is called!")
 	}()
-	return result
+	return out
 }
 
 // ParseOrg returns MigrationPipe
@@ -88,19 +94,19 @@ func AdminUsers(res <-chan pipeline.Result) MigrationPipe {
 
 func adminUsers(ctx context.Context, result <-chan pipeline.Result) <-chan pipeline.Result {
 	go func() {
+
 		fmt.Println("adminUsers routine is called!")
 	}()
 	return result
 }
 
-// AdminUsers Return MigrationPipe
+// ParseKeyDump returns MigrationPipe
 func ParseKeyDump(res <-chan pipeline.Result) MigrationPipe {
 	return func(in <-chan pipeline.Result) <-chan pipeline.Result {
 		return parseKeyDump(context.Background(), res)
 	}
 }
 
-// ParseKeyDump returns Key Dump
 func parseKeyDump(ctx context.Context, result <-chan pipeline.Result) <-chan pipeline.Result {
 	go func() {
 		fmt.Println("parseKeyDump routine is called!")
@@ -111,6 +117,7 @@ func parseKeyDump(ctx context.Context, result <-chan pipeline.Result) <-chan pip
 func migrationPipeline(source <-chan pipeline.Result, pipes ...MigrationPipe) {
 	fmt.Println("Pipeline started. Waiting for pipeline to complete.")
 	msg := make(chan string)
+
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -125,11 +132,11 @@ func migrationPipeline(source <-chan pipeline.Result, pipes ...MigrationPipe) {
 	fmt.Println("Pipeline Status: ", <-msg)
 }
 
-func RunPhaseOnePipeline(src string) {
+func RunPhaseOnePipeline(ctx, src string) {
 	c := make(chan pipeline.Result, 1)
+	defer close(c)
 
 	c <- pipeline.Result{}
-	defer close(c)
 
 	migrationPipeline(c,
 		UnzipSrc(c),
@@ -140,3 +147,7 @@ func RunPhaseOnePipeline(src string) {
 		AdminUsers(c),
 	)
 }
+
+// Parse ctx
+// Error handling
+// Make chan bidirectional
