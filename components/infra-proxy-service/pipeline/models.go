@@ -13,6 +13,7 @@ const (
 type Result struct {
 	// Meta for Zip file info
 	Meta Meta `json:"meta"`
+
 	// ParsedResult for Orgs, Users
 	ParsedResult ParsedResult `json:"parsed_result"`
 }
