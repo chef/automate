@@ -24,3 +24,19 @@ func (a *InfraProxyMigrationServer) GetMigrationStatus(ctx context.Context, r *g
 		MigrationStatus: res.GetMigrationStatus(),
 	}, nil
 }
+
+// CancelMigration cancel the ongoing migration
+func (a *InfraProxyMigrationServer) CancelMigration(ctx context.Context, r *gwreq.CancelMigrationRequest) (*gwres.CancelMigrationResponce, error) {
+	req := &infra_req.CancelMigrationRequest{
+		MigrationId: r.MigrationId,
+	}
+	res, err := a.migrationClient.CancelMigration(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.CancelMigrationResponce{
+		Success: res.Success,
+		Errors:  res.Errors,
+	}, nil
+}
