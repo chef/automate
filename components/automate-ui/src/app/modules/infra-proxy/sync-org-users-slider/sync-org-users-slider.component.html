@@ -1,0 +1,50 @@
+<div data-cy="chef-infra-upload-slider" ngClass="{slide : isSlideOpen}">
+  <chef-loading-spinner *ngIf="uploading" size="50" fixed></chef-loading-spinner>
+  <div class="sidenav-header">
+    <chef-button class="back-button" secondary (click)="closeUploadSlider()" data-cy="back-button">
+      <chef-icon>arrow_back</chef-icon>
+    </chef-button>
+    <h2 slot="title" data-cy="title">Sync Org and User </h2>
+    <chef-button class="close" secondary (click)="closeUploadSlider()" data-cy="close-chef-infra-button">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="sidenav-body">
+    <div class="flex-container">
+      <form [formGroup]="uploadForm">
+        <div class="input-margin">
+          <div *ngIf="isFile">
+            <span class="file-info">{{ file.name }}</span>
+          </div>
+          <div *ngIf="!isFile" class="container" appDragDrop (fileDropped)="onFileDropped($event)">
+            <input
+              type="file" 
+              #fileDropRef
+              id="fileDropRef" 
+              data-cy="file-input"
+              (change)="fileBrowseHandler($event.target.files)"
+              accept=".zip"
+              [multiple]="false"/>
+            <img src="assets/img/upload-file.png" alt="upload-file">
+            <h4>Drag you Zip file here</h4>
+            <h4 class="grayText"><span>OR</span></h4>
+            <chef-button secondary>Browse file</chef-button>
+          </div>
+        </div>
+        <div id="button-bar">
+          <chef-button id="cancel-upload-slider" tertiary [disabled]="uploading" data-cy="cancel" (click)="closeUploadSlider()">Cancel
+          </chef-button>
+          <chef-button primary [disabled]="!isFile" data-cy="upload-button" id="upload-button" (click)="uploadFile()">
+            <img alt="upload_icon" src="/assets/img/data-feed.svg" class="svg-inline" />
+            <chef-loading-spinner *ngIf="uploading"></chef-loading-spinner>
+            <span *ngIf="!uploading">Upload File</span>
+            <span *ngIf="uploading">Uploading File ...</span>
+          </chef-button>
+        </div>
+      </form>
+    </div>
+    <app-migration-slider
+      #migrationSlider>
+    </app-migration-slider>
+  </div>
+</div>
