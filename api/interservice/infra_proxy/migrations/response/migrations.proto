@@ -20,3 +20,10 @@ message GetMigrationStatus {
   // Migration status
   string migration_status = 3;
 }
+
+message CancelMigrationResponce {
+  //  migration ID
+  bool success = 1;
+  // Error message
+  repeated string errors = 2; 
+}

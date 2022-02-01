@@ -40,7 +40,8 @@ INSERT INTO migration_type VALUES
       (1008,'Migration of users'),
       (1009,'Association of users to orgs'),
       (1010,'Migrating user permissions'),
-      (5000,'Migration Completed')
+      (5000,'Migration Completed'),
+      (6000,'Migration Cancelled')
 ;
 
 -- Insert rows into migration_status
