@@ -6,14 +6,6 @@ resource "aws_security_group" "base_linux" {
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_linux_security_group"))
 }
 
-resource "aws_security_group" "base_windows" {
-  name        = "base_windows_${random_id.random.hex}"
-  description = "base security rules for all windows nodes"
-  vpc_id      = data.aws_vpc.default.id
-
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_windows_security_group"))
-}
-
 resource "aws_security_group" "habitat_supervisor" {
   name        = "habitat_supervisor_${random_id.random.hex}"
   description = "Security rules for the Habitat supervisor"
@@ -44,6 +36,96 @@ resource "aws_security_group_rule" "ingress_allow_22_tcp_all" {
   type              = "ingress"
   from_port         = 22
   to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_80_tcp_all" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_443_tcp_all" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_5601_tcp_all" {
+  type              = "egress"
+  from_port         = 5601
+  to_port           = 5601
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_9200_tcp_all" {
+  type              = "egress"
+  from_port         = 9200
+  to_port           = 9200
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_9631_tcp_all" {
+  type              = "egress"
+  from_port         = 9631
+  to_port           = 9631
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_9300_tcp_all" {
+  type              = "egress"
+  from_port         = 9300
+  to_port           = 9300
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_9638_tcp_all" {
+  type              = "egress"
+  from_port         = 9638
+  to_port           = 9638
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_9638_udp_all" {
+  type              = "egress"
+  from_port         = 9638
+  to_port           = 9638
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_7432_tcp_all" {
+  type              = "egress"
+  from_port         = 7432
+  to_port           = 7432
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "egress_allow_5432_tcp_all" {
+  type              = "egress"
+  from_port         = 5432
+  to_port           = 5432
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.base_linux.id

@@ -78,6 +78,7 @@ module AutomateCluster
         end
 
         def remote_filename
+          
           '/var/tmp/' + SecureRandom.alphanumeric + '.toml'
         end
 
@@ -230,6 +231,7 @@ module AutomateCluster
           conn.upload(local_script_file.path, remote_script_filename)
           local_script_file.unlink
           utils.backend_logger.debug script
+          puts "---------------------------------------------------------"
           result = conn.run_command "bash #{remote_script_filename}"
           utils.backend_logger.info "STDOUT: #{result.stdout}\nSTDERR: #{result.stderr}\nEXIT_STATUS: #{result.exit_status}"
           raise CmdFailed, result.stderr if result.exit_status != 0 && options[:exit_on_error]

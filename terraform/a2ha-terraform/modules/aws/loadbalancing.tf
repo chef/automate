@@ -7,13 +7,16 @@ resource "aws_alb" "automate_lb" {
   security_groups    = [aws_security_group.base_linux.id, aws_security_group.chef_automate.id]
   subnets            = aws_subnet.public.*.id
   tags               = var.tags
+  access_logs        = var.lb_access_logs
+  bucket             = var.s3_bucket_name_lb_access
 }
 
 resource "aws_alb_target_group" "automate_tg" {
-  name     = "${var.tag_name}-${random_id.random.hex}-automate-tg"
-  port     = 443
-  protocol = "HTTPS"
-  vpc_id   = data.aws_vpc.default.id
+  name                          = "${var.tag_name}-${random_id.random.hex}-automate-tg"
+  port                          = 443
+  protocol                      = "HTTPS"
+  vpc_id                        = data.aws_vpc.default.id
+  load_balancing_algorithm_type = "least_outstanding_requests"
 }
 
 resource "aws_alb_target_group_attachment" "automate_tg_attachment" {

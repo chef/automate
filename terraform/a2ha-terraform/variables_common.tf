@@ -145,6 +145,10 @@ variable "kibana_pkg_ident" {
   default = "chef/automate-ha-kibana"
 }
 
+variable "lb_access_logs" {
+  default = false
+}
+
 variable "metricbeat_pkg_ident" {
   default = "chef/automate-ha-metricbeat"
 }
@@ -217,6 +221,10 @@ variable "proxy_svc_load_args" {
 variable "rsync_files" {
   default     = []
   description = "An ordered array of SRC1,DST1,SRC2,DST2 file pairs. SRC is relative to the terraform/transfer_files directory"
+}
+
+variable "s3_bucket_name_lb_access" {
+  default     = ""
 }
 
 variable "teams_port" {
