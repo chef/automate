@@ -18,15 +18,19 @@ import (
 )
 
 var migrateDataCmdFlags = struct {
-	check bool
-	data  string
+	check      bool
+	data       string
+	autoAccept bool
 }{}
 
 var ClearDataCmdFlags = struct {
 	data string
+	autoAccept bool
 }{}
 
-const AUTOMATE_PG_MIGRATE_LOG_DIR = "/src/"
+const (
+	AUTOMATE_PG_MIGRATE_LOG_DIR = "/src"
+)
 
 func init() {
 	migrateCmd.AddCommand(newMigratePgCmd())
@@ -48,6 +52,7 @@ func newRemovePgDatadirCmd() *cobra.Command {
 		RunE:  runCleanup,
 	}
 	removePgDatadirCmd.PersistentFlags().StringVar(&ClearDataCmdFlags.data, "data", "", "data")
+	removePgDatadirCmd.PersistentFlags().BoolVarP(&ClearDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
 
 	return removePgDatadirCmd
 }
@@ -61,6 +66,7 @@ func newMigratePgCmd() *cobra.Command {
 	}
 	migratePgCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
 	migratePgCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
+	migratePgCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
 	return migratePgCmd
 }
 
@@ -79,7 +85,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 }
 
 func runMigratePgCmd(cmd *cobra.Command, args []string) error {
-	if !migrateDataCmdFlags.check {
+	if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
 		response, err := writer.Prompt(`it will start the migration immediately after check.
 		Press y to agree, n to disagree? [y/n]`)
 		if err != nil {
@@ -110,7 +116,6 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 
 func vacuumDb() {
 	writer.Title("vacuum db")
-	writer.Title("--------------------------------")
 	os.Setenv("PGPORT", "5432")
 	os.Setenv("PGHOST", "0.0.0.0")
 	os.Setenv("PGUSER", "automate")
@@ -127,15 +132,19 @@ func vacuumDb() {
 }
 
 func cleanUp() error {
-	response, err := writer.Prompt(`Are you sure do you want to delete old pg-data
-	This will delete all the data (pg 9.6) and will not be able to recover it.
-	Press y to agree, n to disagree? [y/n]`)
-	if err != nil {
-		return err
+
+	if !migrateDataCmdFlags.autoAccept {
+		response, err := writer.Prompt(`Are you sure do you want to delete old pg-data
+		This will delete all the data (pg 9.6) and will not be able to recover it.
+		Press y to agree, n to disagree? [y/n]`)
+		if err != nil {
+			return err
+		}
+		if !strings.Contains(response, "y") {
+			return errors.New("canceled")
+		}
 	}
-	if !strings.Contains(response, "y") {
-		return errors.New("canceled")
-	}
+
 	args := []string{
 		"-rf",
 		"./analyze_new_cluster.sh",
@@ -151,7 +160,6 @@ func cleanUp() error {
 
 func chefAutomateStop() {
 	writer.Title("Chef-automate stop")
-	writer.Title("--------------------------------")
 	args := []string{
 		"stop",
 	}
@@ -162,7 +170,6 @@ func chefAutomateStop() {
 
 func chefAutomateStatus() {
 	writer.Title("Chef-automate status")
-	writer.Title("--------------------------------")
 	args := []string{
 		"status",
 		"--wait-for-healthy",
@@ -173,8 +180,6 @@ func chefAutomateStatus() {
 func removeAndReplacePgdata13() {
 
 	writer.Title("remove and replace pgdata13 directory")
-	writer.Title("--------------------------------")
-
 	argsToRemove := []string{
 		"-rf",
 		"/hab/svc/automate-postgresql/data/pgdata13",
@@ -186,7 +191,6 @@ func removeAndReplacePgdata13() {
 
 func chefAutomateStart() {
 	writer.Title("Chef-automate start")
-	writer.Title("--------------------------------")
 
 	args := []string{
 		"start",
@@ -198,7 +202,6 @@ func chefAutomateStart() {
 
 func executePgdata13ShellScript() {
 	writer.Title("execute pgdata13 shell script")
-	writer.Title("--------------------------------")
 	args := []string{
 		"./scripts/pgdata13.sh",
 	}
@@ -215,7 +218,6 @@ func executePgdata13ShellScript() {
 
 func checkUpdateMigration(check bool) {
 	writer.Title(" migration from: 9.6 to: 13")
-	writer.Title("--------------------------------")
 
 	os.Unsetenv("PGHOST")
 
@@ -224,7 +226,7 @@ func checkUpdateMigration(check bool) {
 		"--old-datadir=/hab/svc/automate-postgresql/data/pgdata",
 		"--new-datadir=/hab/svc/automate-postgresql/data/pgdata13",
 		"--old-bindir=/hab/pkgs/core/postgresql/9.6.21/20211016180117/bin",
-		"--new-bindir=/hab/pkgs/core/postgresql13/13.4/20220120060519/bin",
+		"--new-bindir=/hab/pkgs/core/postgresql13/13.5/20220120092917/bin",
 		"--check",
 		"-U",
 		"automate",
@@ -235,7 +237,7 @@ func checkUpdateMigration(check bool) {
 		args = strSlice
 	}
 	err := executeAutomateCommandAsync(
-		"/hab/pkgs/core/postgresql13/13.4/20220120060519/bin/pg_upgrade",
+		"/hab/pkgs/core/postgresql13/13.5/20220120092917/bin/pg_upgrade",
 		args,
 		"",
 		"./pgmigrate.log")
