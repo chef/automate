@@ -14,10 +14,17 @@ message UploadZipFileResponse {
 }
 
 message GetMigrationStatus {
-    // Migration ID.
-    string migration_id = 1;
-    // Migration type
-    string migration_type = 2;
-    // Migration status
-    string migration_status = 3;
+  // Migration ID.
+  string migration_id = 1;
+  // Migration type
+  string migration_type = 2;
+  // Migration status
+  string migration_status = 3;
+}
+
+message CancelMigrationResponce {
+  //  migration ID
+  bool success = 1;
+  // Error message
+  repeated string errors = 2; 
 }

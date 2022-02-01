@@ -7,6 +7,7 @@ type MigrationPhase int64
 const (
 	StartMigration    = 100
 	CompleteMigration = 5000
+	CancelMigration   = 6000
 )
 
 // MigrationStatus: enum of migration status
