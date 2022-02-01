@@ -19,6 +19,7 @@ import (
 )
 
 const (
+	defaultChannel                = "current"
 	defaultSemanticManifestURLFmt = "https://packages.chef.io/manifests/%s/automate/latest_semver.json"
 	defaultLatestManifestURLFmt   = "https://packages.chef.io/manifests/%s/automate/latest.json"
 	defaultManifestURLFmt         = "https://packages.chef.io/manifests/automate/%s.json"
@@ -78,6 +79,7 @@ type HTTP struct {
 	latestSemanticManifestURLFmt string
 	manifestURLFmt               string
 	versionsURLFmt               string
+	Channel                      string
 	noVerify                     bool
 }
 
@@ -133,9 +135,17 @@ func LatestSemanticURLFormat(urlFormat string) Opt {
 	}
 }
 
+//VersionsURLFormat - the url that holds the list of automate versions
 func VersionsURLFormat(urlFormat string) Opt {
 	return func(c *HTTP) {
 		c.versionsURLFmt = urlFormat
+	}
+}
+
+//Channel - the url that holds the list of automate versions
+func Channel(channel string) Opt {
+	return func(c *HTTP) {
+		c.Channel = channel
 	}
 }
 
@@ -161,14 +171,14 @@ func NoVerify(noVerify bool) Opt {
 func (c *HTTP) GetCurrentManifest(ctx context.Context, channel string) (*manifest.A2, error) {
 	//try to get semantic version manifest
 	url := fmt.Sprintf(c.latestSemanticManifestURLFmt, channel)
-	m, err := c.manifestFromURL(ctx, url, channel)
+	m, err := c.manifestFromURL(ctx, url)
 	if err == nil {
 		return m, nil
 	}
 	if strings.Contains(err.Error(), "failed to locate manifest") {
 		//since received error in fetching semantic version, try to fetch timestamp versioned manifest
 		url = fmt.Sprintf(c.latestManifestURLFmt, channel)
-		return c.manifestFromURL(ctx, url, channel)
+		return c.manifestFromURL(ctx, url)
 	}
 
 	return nil, err
@@ -178,10 +188,10 @@ func (c *HTTP) GetCurrentManifest(ctx context.Context, channel string) (*manifes
 // channel.
 func (c *HTTP) GetManifest(ctx context.Context, release string) (*manifest.A2, error) {
 	url := fmt.Sprintf(c.manifestURLFmt, release)
-	return c.manifestFromURL(ctx, url, "current")
+	return c.manifestFromURL(ctx, url)
 }
 
-func (c *HTTP) manifestFromURL(ctx context.Context, url string, channel string, optionalURL ...string) (*manifest.A2, error) {
+func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -246,7 +256,7 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string, channel string, 
 		return nil, err
 	}
 
-	minCurrentVersion, err := manifest.GetMinCurrentVersion(ctx, channel, m.Version(), c.versionsURLFmt)
+	minCurrentVersion, err := manifest.GetMinCurrentVersion(ctx, c.Channel, m.Version(), c.versionsURLFmt)
 	if err != nil {
 		return nil, err
 	}

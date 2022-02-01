@@ -355,6 +355,10 @@ func (creator *InstallBundleCreator) loadManifest() (*manifest.A2, error) {
 	var manifestProvider manifest.ReleaseManifestProvider
 	manifestProvider = client.NewDefaultClient(creator.manifestFile)
 
+	if _, ok := manifestProvider.(*client.HTTP); ok {
+		manifestProvider.(*client.HTTP).Channel = creator.channel
+	}
+
 	if creator.hartifactsPath != "" && creator.overrideOrigin != "" {
 		manifestProvider = manifest.NewLocalHartManifestProvider(manifestProvider, creator.hartifactsPath, creator.overrideOrigin)
 	}
