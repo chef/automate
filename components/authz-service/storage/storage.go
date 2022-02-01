@@ -110,10 +110,6 @@ func DefaultPolicies() ([]Policy, error) {
 		return nil, err
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	typeManaged, err := NewType("chef-managed")
 	if err != nil {
 		return nil, err

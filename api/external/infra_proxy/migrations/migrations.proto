@@ -7,13 +7,18 @@ import "google/api/annotations.proto";
 import "external/annotations/iam/annotations.proto";
 
 import "external/infra_proxy/migrations/request/migrations.proto";
-
 import "external/infra_proxy/migrations/response/migrations.proto";
 
 service  InfraProxyMigration {
     rpc GetMigrationStatus (infra_proxy.migrations.request.GetMigrationStatus) returns (infra_proxy.migrations.response.GetMigrationStatus) {
         option (google.api.http).get = "/api/v0/infra/servers/migrations/status/{migration_id}";
         option (chef.automate.api.iam.policy).resource = "infra:infraServers";
+        option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    };
+
+    rpc CancelMigration (infra_proxy.migrations.request.CancelMigrationRequest) returns (infra_proxy.migrations.response.CancelMigrationResponce) {
+        option (google.api.http).get = "/api/v0/infra/servers/{server_id}/migrations/cancel_migration/{migration_id}";
+        option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:migrations:{migration_id}";
         option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
     };
 }
