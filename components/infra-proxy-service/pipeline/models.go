@@ -13,6 +13,7 @@ const (
 type Result struct {
 	// Meta for Zip file info
 	Meta Meta `json:"meta"`
+
 	// ParsedResult for Orgs, Users
 	ParsedResult ParsedResult `json:"parsed_result"`
 }
@@ -20,8 +21,10 @@ type Result struct {
 type Meta struct {
 	// StageResults holds Skipped instances
 	StageResults []StageResult `json:"stage_results"`
+
 	// ZipFile for zip file location
 	ZipFile string `json:"zip_file"`
+
 	// UnzipFolder for unzipped folder's location
 	UnzipFolder string `json:"unzip_folder"`
 }
@@ -35,8 +38,10 @@ type StageResult struct {
 type ParsedResult struct {
 	// Orgs array
 	Orgs []Org `json:"orgs"`
+
 	// Users array
 	Users []User `json:"users"`
+
 	// OrgsUsers for Orgs and Users associations
 	OrgsUsers []OrgsUsersAssociations `json:"orgs_users_associations"`
 }
@@ -45,12 +50,14 @@ type ParsedResult struct {
 type OrgsUsersAssociations struct {
 	// OrgName
 	OrgName Org `json:"org_name"`
+
 	// Users UserAssociation slice
 	Users []UserAssociation `json:"user_association"`
 }
 type UserAssociation struct {
 	// Username
 	Username string `json:"username"`
+
 	// IsAdmin
 	IsAdmin bool `json:"is_admin"`
 }
@@ -75,10 +82,13 @@ type KeyDump struct {
 }
 
 type Org struct {
+
 	// Org Name
 	Name string `json:"name"`
+
 	// FullName
 	FullName string `json:"full_name"`
+
 	// ActionOps for Insert Skip Update and Delete
 	ActionOps ActionOps `json:"guid"`
 }
@@ -90,12 +100,16 @@ type User struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
 	MiddleName  string `json:"middle_name"`
+
 	// AutomateUsername is ldap username
 	AutomateUsername string `json:"automate_username"`
+
 	// Connector ldap user
 	Connector string `json:"connector"`
+
 	// IsConflicting for user's existance in db
 	IsConflicting bool `json:"is_conflicting"`
+
 	// IsAdmin (user is admin or not)
 	IsAdmin bool `json:"is_admin"`
 }
