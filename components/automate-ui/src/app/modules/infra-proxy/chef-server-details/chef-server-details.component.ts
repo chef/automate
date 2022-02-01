@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
@@ -31,16 +31,19 @@ import {
   ValidateWebUIKey
   // , GetUsers
 } from 'app/entities/servers/server.actions';
-import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
+import { GetOrgs, CreateOrg, DeleteOrg, UploadZip } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   createStatus,
   createError,
   allOrgs,
   getAllStatus as getAllOrgsForServerStatus,
-  deleteStatus as deleteOrgStatus
+  deleteStatus as deleteOrgStatus,
+  uploadStatus,
+  uploadDetails
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
+import { SyncOrgUsersSliderComponent } from '../sync-org-users-slider/sync-org-users-slider.component';
 
 export type ChefServerTabName = 'orgs' | 'users' | 'details';
 @Component({
@@ -80,11 +83,16 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public isServerLoaded = false;
   public validating = true;
 
-
   public updateWebuiKeyForm: FormGroup;
   public updatingWebuiKey = false;
   public webuiKey: WebUIKey;
   public updateWebUIKeySuccessful = false;
+
+  public uploadZipForm: FormGroup;
+  public isUploaded = false;
+  public migrationID: string;
+
+  @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
   constructor(
     private fb: FormBuilder,
@@ -143,6 +151,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
       ]]
+    });
+    this.uploadZipForm = this.fb.group({
+      file: ['', [Validators.required]]
     });
 
     this.store.select(routeParams).pipe(
@@ -255,7 +266,23 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-    setTimeout(() => {
+    combineLatest([
+      this.store.select(uploadStatus),
+      this.store.select(uploadDetails)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([uploadStatusSt, uploadDetailsState]) => {
+      if (uploadStatusSt === EntityStatus.loadingSuccess && !isNil(uploadDetailsState)) {
+        // show migration slider
+        this.isUploaded = true;
+        this.migrationID = uploadDetailsState.migrationId;
+      } else if (uploadStatusSt === EntityStatus.loadingFailure) {
+        // close upload slider with error notification
+        this.isUploaded = false;
+        this.upload.closeUploadSlider();
+      }
+    });
+
+      setTimeout(() => {
       if (this.isServerLoaded) {
         this.validateWebUIKey(this.server);
       }
@@ -360,5 +387,18 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   private updatingWebuiKeyData(webuikey: WebUIKey) {
     this.store.dispatch(new UpdateWebUIKey(webuikey));
+  }
+
+  // upload zip slider functions
+  public uploadZipFile(file: File): void {
+    const formData: FormData = new FormData();
+    if (file) {
+      formData.append('server_id', this.server.id);
+      formData.append('file', file);
+    }
+    const uploadZipPayload = {
+      formData: formData
+    };
+    this.store.dispatch(new UploadZip( uploadZipPayload ));
   }
 }

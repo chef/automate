@@ -39,7 +39,12 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
     //           request payloads in many places. We should not send any of those. But
     //           Fixing that blows the scope of my little API validation adventure, so
     //           we take a shortcut: ask the API not to be too strict on us.
-    headers = headers.set('Content-Type', 'application/json+lax');
+
+    // Infra Proxy Server API - restrict to set the headers for migration file upload
+    if (!request.url.includes('/migrations/upload')) {
+      headers = headers.set('Content-Type', 'application/json+lax');
+    }
+
     // Check and then remove `unfiltered` param; it is a piggybacked parameter
     // needed by this interceptor, not to be passed on.
     // It allows certain URLs to suppress sending the projects filter.
