@@ -112,6 +112,10 @@ func NewHTTPClient(options ...Opt) *HTTP {
 		c.versionsURLFmt = defaultVersionsURLFmt
 	}
 
+	if c.Channel == "" {
+		c.Channel = defaultChannel
+	}
+
 	// We allow skipping manifest verification if needed by setting this environment
 	// variable. Set it only if you must
 	//Todo(milestone) -- For milestone we cannot skip

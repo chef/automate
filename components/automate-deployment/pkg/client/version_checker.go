@@ -60,8 +60,10 @@ func WarnIfNotUpToDateAgainstServer(connection ManifestVersionClient, writer War
 }
 
 func CLIUpToDateWithLatestManifest(hartifactsPath, overrideOrigin, channel, version string) error {
+	bp := manifest_client.NewHTTPClient()
+	bp.Channel = channel
 	provider := manifest.NewLocalHartManifestProvider(
-		manifest_client.NewHTTPClient(),
+		bp,
 		hartifactsPath,
 		overrideOrigin,
 	)
