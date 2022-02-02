@@ -10,9 +10,50 @@
   </div>
   <div class="sidenav-body">
     <div class="flex-container">
-      <form>
+        <div class="meta-box">
+          <p>We have found 4 users on the Chef Server server_1 and 2 orgs to be migrated, skipped and Updated . 
+            You have the option to choose which users to migrate.</p>
+        </div>
+      <form [formGroup]="migrationForm">
         <div class="input-margin">
-
+          <div id="migration-table-container">
+            <chef-table>
+              <chef-thead>
+                <chef-tr>
+                  <chef-th class="no-border first"></chef-th>
+                  <chef-th class="no-border middle">Chef Server User</chef-th>
+                  <chef-th class="no-border middle">Automate User</chef-th>
+                  <chef-th class="no-border middle"></chef-th>
+                  <chef-th class="no-border last"></chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr >
+                  <chef-td class="first">
+                    <chef-checkbox (change)="selectedUser($event)" [checked]="checkedUser"></chef-checkbox>
+                  </chef-td>
+                  <chef-td class="middle">
+                    Chef Server User
+                  </chef-td>
+                  <chef-td class="middle">
+                     Automate User
+                  </chef-td>
+                  <chef-td class="middle">
+                    <input
+                      chefInput
+                      firstFocus
+                      formControlName="name"
+                      type="text"
+                      (keyup)="handleNameInput($event)"
+                      autocomplete="off" />
+                  </chef-td>
+                  <chef-td class="last">
+                    <p class="warning-msg">Warning. User already exists in Automate. This will overwrite this users IAM settings.</p>
+                  </chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
+          </div>
         </div>
         <div id="button-bar">
           <chef-button id="cancel-migration-slider" tertiary [disabled]="migrating" (click)="closeMigrationSlider()">
@@ -20,8 +61,7 @@
           </chef-button>
           <chef-button primary data-cy="migration-button" id="migration-button" (click)="migrationFile();">
             <chef-loading-spinner *ngIf="migrating"></chef-loading-spinner>
-            <span *ngIf="!migrating">Continue</span>
-            <span *ngIf="migrating">Uploading File ...</span>
+            <span *ngIf="!migrating">confirm</span>
           </chef-button>
         </div>
       </form>

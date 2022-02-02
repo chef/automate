@@ -24,4 +24,60 @@
       margin-left: 0;
     }
   }
+
+  .sidenav-body {
+    .meta-box {
+      // border: 0.5px solid $chef-key-tab;
+      // border-radius: 4px;
+      margin-bottom: 1.5em;
+      padding: 0 2em 1em;
+      background: $chef-white;
+    }
+
+    #migration-table-container {
+      .no-border {
+        background-color: $chef-white;
+      }
+
+      chef-td {
+        padding: 5px 14px;
+      }
+
+      .first {
+        width: 5%;
+      }
+
+      .middle {
+        width: 30%;
+
+        input {
+          height: 35px;
+        }
+      }
+    }
+
+    .warning-msg {
+      margin-bottom: 0;
+    
+      &::before {
+        content: '';
+        background: url('/assets/img/warning.png');
+        width: 11px;
+        height: 13.5px;
+        display: inline-block;
+        background-size: 11px 13.5px;
+        margin-right: 7px;
+      }
+    }
+
+    ::ng-deep chef-checkbox .check-wrap {
+      min-width: 15px;
+      width: 15px;
+      height: 15px;
+    }
+
+    #button-bar {
+      text-align: right;
+    }
+  }
 }

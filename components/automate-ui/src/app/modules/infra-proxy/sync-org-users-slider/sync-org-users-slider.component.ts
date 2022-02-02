@@ -68,20 +68,6 @@ export class SyncOrgUsersSliderComponent implements OnInit {
     this.isSlideOpen = true;
   }
 
-  public openMigrationSlider(): void {
-    this.migrationSliderVisible = true;
-    this.resetMigrationSlider();
-  }
-
-  public closeMigrationSlider(): void {
-    this.migrationSliderVisible = false;
-    this.resetMigrationSlider();
-  }
-
-  private resetMigrationSlider(): void {
-    this.conflictErrorEvent.emit(false);
-  }
-
   /*** on file drop handler */
   onFileDropped($event: any[]) {
     this.prepareFilesList($event);

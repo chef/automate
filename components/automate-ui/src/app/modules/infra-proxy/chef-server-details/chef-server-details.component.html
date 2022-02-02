@@ -101,6 +101,9 @@
                 <span>Sync Org and Users</span>
               </chef-button>
             </app-authorized>
+              <chef-button class="migrationSlider-button" secondary (click)="migrationSlider.slidePanel()">
+                <span>migrationSlider</span>
+              </chef-button>
           </div>
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
@@ -309,6 +312,9 @@
         [updatingWebuiKey]="updatingWebuiKey"
         (updateWebuiKeyClicked)="updateWebuiKey()">
       </app-update-web-uikey-slider>
+      <app-migration-slider
+        #migrationSlider>
+      </app-migration-slider>
     </main>
   </div>
 </div>
