@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/chef/automate/components/infra-proxy-service/migrations"
 	"net"
 	"net/http"
 
@@ -17,8 +18,6 @@ import (
 	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
 
 	grpc_migration "github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
-	migrations "github.com/chef/automate/components/infra-proxy-service/server/migrations"
-
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
