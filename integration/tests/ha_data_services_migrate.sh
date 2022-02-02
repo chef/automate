@@ -31,7 +31,7 @@ do_build() {
     log_info "Creating update airgap bundle"
     #shellcheck disable=SC2154
     chef-automate airgap bundle create \
-        --manifest "$test_manifest_dir/build.json" \
+        --manifest "$test_manifest_milestone_dir/build.json" \
         --hartifacts "${test_hartifacts_path}" \
         --override-origin "$HAB_ORIGIN" \
         update.aib

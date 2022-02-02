@@ -74,6 +74,7 @@ declare -r test_manifest_path="local_manifest.json"
 # test_manifest_dir is the directory where we save all manifests
 # to. You should not normally need to change this variable.
 declare -r test_manifest_dir="/tmp/manifests"
+declare -r test_manifest_milestone_dir="/tmp/milestone"
 #
 # test_upgrade_begin_manifest is the filename of the manifest that
 # will be used for the INITIAL deploy in the upgrade tests. That is,
@@ -134,20 +135,34 @@ do_build_default() {
     fi
 
     mkdir $test_manifest_dir
+    mkdir $test_manifest_milestone_dir
 
     if [[ -f "$test_hartifacts_path/.prebuilt_artifacts" ]]; then
         log_info "Using pre-built Hartifacts and Manifests"
         cp results/*.json $test_manifest_dir
     else
-        log_info "No pre-built sentinel file found"
-        log_info "Building Changes"
-        #build_changed
-        log_info "Downloading channel manifests"
-        download_manifest "dev" "$test_manifest_dir/dev.json"
-        download_manifest "acceptance" "$test_manifest_dir/acceptance.json"
-        download_manifest "current" "$test_manifest_dir/current.json"
-        log_info "Creating build.json"
-        create_manifest "$test_manifest_dir/build.json"
+
+        if [ $test_upgrades = true ]; then
+            log_info "No pre-built sentinel file found"
+            log_info "Building Changes"
+            #build_changed
+            log_info "Downloading channel manifests"
+            download_manifest_version "dev" "$test_manifest_milestone_dir/dev.json" "20220131135806"
+            download_manifest_version "acceptance" "$test_manifest_milestone_dir/acceptance.json" "20220121191356"
+            download_manifest_version "current" "$test_manifest_milestone_dir/current.json" "20220121191356"
+            log_info "Creating build.json"
+            create_manifest "$test_manifest_milestone_dir/build.json"
+        else
+            log_info "No pre-built sentinel file found"
+            log_info "Building Changes"
+            #build_changed
+            log_info "Downloading channel manifests"
+            download_manifest "dev" "$test_manifest_dir/dev.json"
+            download_manifest "acceptance" "$test_manifest_dir/acceptance.json"
+            download_manifest "current" "$test_manifest_dir/current.json"
+            log_info "Creating build.json"
+            create_manifest "$test_manifest_dir/build.json"
+        fi
     fi
 
     log_info "Building Tools"

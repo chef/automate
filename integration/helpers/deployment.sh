@@ -41,7 +41,7 @@ run_upgrade() {
     # because that directory isn't watched for changes. Therefore, we'll trigger
     # a manifest rebuild with the run command.
     if [ -z "$airgap_artifact_path" ]; then
-        chef-automate upgrade run --version "20220121191356"
+        chef-automate upgrade run
     else
         chef-automate upgrade run --airgap-bundle "$airgap_artifact_path"
     fi
@@ -189,4 +189,12 @@ download_manifest() {
     local dst="$2"
 
     curl "https://packages.chef.io/manifests/$channel/automate/latest.json" > "$dst"
+}
+
+download_manifest_version() {
+    local channel="$1"
+    local dst="$2"
+    local version="$3"
+
+    curl "https://packages.chef.io/manifests/$channel/automate/$version.json" > "$dst"
 }

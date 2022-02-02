@@ -60,7 +60,7 @@ do_prepare_upgrade() {
 do_upgrade() {
     local release target_manifest
     #shellcheck disable=SC2154
-    target_manifest="$test_manifest_dir/build.json"
+    target_manifest="$test_manifest_milestone_dir/build.json"
     release=$(jq -r .build <"$target_manifest")
     if [[ -z "$release" ]]
     then
@@ -79,7 +79,7 @@ do_upgrade() {
 
 do_test_upgrade() {
     local release
-    local target_manifest="$test_manifest_dir/build.json"
+    local target_manifest="$test_manifest_milestone_dir/build.json"
     release=$(jq -r .build <"$target_manifest")
     if [[ -z "$release" ]]
     then
