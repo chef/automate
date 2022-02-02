@@ -330,22 +330,22 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 		}
 
 		if enableExternalPg {
-			if service.Name() == "automate-postgresql" {
+			if service.Name() == constants.AutomatePGService {
 				service.DeploymentState = deployment.Removed
 			}
 		} else {
-			if service.Name() == "automate-postgresql" && service.DeploymentState == deployment.Removed {
+			if service.Name() == constants.AutomatePGService && service.DeploymentState == deployment.Removed {
 				service.DeploymentState = deployment.Running
 
 			}
 		}
 
 		if enableExternalES {
-			if service.Name() == "automate-elasticsearch" {
+			if service.Name() == constants.AutomateESService {
 				service.DeploymentState = deployment.Removed
 			}
 		} else {
-			if service.Name() == "automate-elasticsearch" && service.DeploymentState == deployment.Removed {
+			if service.Name() == constants.AutomateESService && service.DeploymentState == deployment.Removed {
 				service.DeploymentState = deployment.Running
 
 			}
@@ -908,13 +908,13 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
 	if enableExternalPg {
 		logctx.Debug("External PG is enabled.")
-		servicesToSkip = append(servicesToSkip, "automate-postgresql")
+		servicesToSkip = append(servicesToSkip, constants.AutomatePGService)
 	}
 	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
 
 	if enableExternalEs {
 		logctx.Debug("External ES is enabled.")
-		servicesToSkip = append(servicesToSkip, "automate-elasticsearch")
+		servicesToSkip = append(servicesToSkip, constants.AutomateESService)
 	}
 	if len(servicesToSkip) > 0 {
 		for i, v := range serviceList {
