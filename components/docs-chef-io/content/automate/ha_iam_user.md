@@ -1,5 +1,5 @@
 +++
-title = "HA IAM User"
+title = "IAM Users"
 
 draft = false
 
@@ -7,13 +7,11 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA IAM User"
+    title = "IAM Users"
     parent = "automate/install"
-    identifier = "automate/install/ha_iam_user.md HA IAM User"
+    identifier = "automate/install/ha_iam_user.md IAM Users"
     weight = 320
 +++
-
-## IAM User
 
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
 

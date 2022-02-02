@@ -1,5 +1,5 @@
 +++
-title = "HA Deployment Procedure for Bare Metal Infrastructure"
+title = "Bare Metal Deployment Procedure"
 
 draft = false
 
@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA Deployment Procedure for Bare Metal Infrastructure"
+    title = "Bare Metal Deployment Procedure"
     parent = "automate/install"
-    identifier = "automate/install/ha_deploy_bareinfra.md HA Deployment Procedure for Bare Metal Infrastructure"
-    weight = 280
+    identifier = "automate/install/ha_deploy_bareinfra.md Bare Metal Deployment Procedure"
+    weight = 360
 +++
 
 This section explains the Bare Metal Infrastructure Deployment (existing_node) to support Chef Automate High Availability (HA) in your network premises/ infrastructure.
@@ -18,7 +18,7 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 ## Pre-requisites
 
 - Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch nodes.
-- Obtain Bastion host server details from your system administrator. Ensure this server has the [needed requirements](( {{< relref "#Bastion Host Requirements" >}} ))` included.
+- Obtain Bastion host server details from your system administrator. Ensure this server has the [needed requirements](( {{< relref "ha_bastion.md#Bastion Host Requirements for On-Premise Deployment" >}} )) included.
 - Obtain the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_system_requirements.md" >}} )).
 - All VMs must expose the port 22 for SSH. You may need to open certain port across the VMs to establish the communication, which are:
 
@@ -39,15 +39,6 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 - Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch.
 - [Create the certificates](( {{< relref "ha_cert_selfsign.md" >}} )) for security and authentication purposes. _optional_
 - [Rotate the certificates](( {{< relref "ha_cert_rotaion.md" >}} )) if the certificates are expired or compromised. _optional_
-
-### Bastion Host Requirements
-
-- Bastion Server/host IP address
-- Instance type: 2 vCPU
-- Operating System: Ubuntu 20.04
-- Memory: Minimum of 4GB
-- Hard Disk Space - 100 GB
-- Ports to be publicly accessible: 22 and 9631
 
 ## Deployment Procedure on Bare Infrastructure
 
