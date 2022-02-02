@@ -5,6 +5,9 @@ export interface Server {
   ip_address: string;
   orgs_count?: number;
   webui_key?: string;
+  migration_id?: string;
+  migration_type?: string;
+  migration_status?: string;
 }
 
 export interface User {
@@ -20,4 +23,10 @@ export interface User {
 export interface WebUIKey {
   id: string;
   webui_key: string;
+}
+
+export interface MigrationStatus {
+  migration_id: string;
+  migration_type: string;
+  migration_status: string;
 }

@@ -18,15 +18,35 @@ chef-page-header {
     padding: 0 1em;
 
     &.first {
-      width: 33%;
+      width: 40%;
+
+      .heading {
+        display: inline-block;
+        font-weight: bold;
+        width: 30%;
+      }
+
+      .server-entity-value {
+        width: 70%;
+      }
     }
 
     &.middle {
-      width: 40%;
+      width: 45%;
+
+      .heading {
+        display: inline-block;
+        font-weight: bold;
+        width: 30%;
+      }
+
+      .server-entity-value {
+        width: 70%;
+      }
     }
 
     &.last {
-      width: 25%;
+      width: 14%;
     }
 
     .meta-head {
@@ -44,18 +64,12 @@ chef-page-header {
       li {
         display: flex;
         margin-bottom: 15px;
-        height: 50px;
+        height: 20px;
 
         span {
           font-size: 14px;
           line-height: 21px;
           letter-spacing: 0.2px;
-
-          &.heading {
-            display: inline-block;
-            font-weight: bold;
-            width: 50%;
-          }
 
           &.webUIKeyStatus {
             text-transform: uppercase;
@@ -81,7 +95,7 @@ chef-page-header {
 
     .sync-button {
       float: right;
-      margin-bottom: 0;
+      margin-bottom: -16px;
 
       .img-inline {
         width: 17px;
@@ -231,3 +245,67 @@ img {
   }
 }
 
+.circular-chart {
+  display: inline-block;
+  width: 30px;
+  justify-content: space-around ;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+.circular-chart.blue .circle {
+  stroke: #3864F1;
+}
+
+.svg-block {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-icon-completed {
+  position: absolute;
+  margin-top: 0px;
+
+  &::before {
+    font-family: "Material Icons";
+    content: "\E86C";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
+    color: #3864F1;
+    padding-right: 0.5em;
+    font-size: 17px;
+  }
+}
+.status-icon-failed {
+  position: absolute;
+  margin-top: 0px;
+
+  &::before {
+    font-family: "Material Icons";
+    content: "\e000";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
+    color: #E0408A;
+    padding-right: 0.5em;
+    font-size: 17px;
+  }
+}
+
+.status-text {
+  margin-left: 25px;
+}

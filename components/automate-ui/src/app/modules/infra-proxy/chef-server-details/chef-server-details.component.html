@@ -15,11 +15,11 @@
             <ul>
               <li>
                 <span class="heading">FQDN</span>
-                <span data-cy="node-env">{{ server?.fqdn }}</span>
+                <span class="server-entity-value" data-cy="node-env">{{ server?.fqdn }}</span>
               </li>
               <li>
                 <span class="heading">IP Address</span>
-                <span>{{ server?.ip_address }}</span>
+                <span class="server-entity-value">{{ server?.ip_address === '' ? '--' : server?.ip_address }}</span>
               </li>
             </ul>
           </div>
@@ -27,20 +27,48 @@
             <ul>
               <li>
                 <span class="heading">Web UI Key</span>
-                <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
-                <span *ngIf="(isValid && !validating)" data-cy="valid-webui-key" class="webUIKeyStatus">Valid</span>
-                <img *ngIf="(!isValid && !validating)" src="../../../../assets/img/warning.png" alt="warning" />
-                <span *ngIf="(!isValid && !validating)" class="invalidStatus">Invalid</span>
-                <span class="update-link" data-cy="open-WebKey-slider">
-                  <a
-                  data-cy="update-web-ui-key"
-                  (click)="webUIKeySlider.slidePanel()"
-                  >Update</a>
+                <span class="server-entity-value">
+                  <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
+                  <span *ngIf="(isValid && !validating)" data-cy="valid-webui-key" class="webUIKeyStatus">Valid</span>
+                  <img *ngIf="(!isValid && !validating)" src="../../../../assets/img/warning.png" alt="warning" />
+                  <span *ngIf="(!isValid && !validating)" class="invalidStatus">Invalid</span>
+                  <span class="update-link" data-cy="open-WebKey-slider">
+                    <a
+                    data-cy="update-web-ui-key"
+                    (click)="webUIKeySlider.slidePanel()"
+                    >Update</a>
+                  </span>
                 </span>
               </li>
               <li>
                 <span class="heading">Org &amp; User last synced</span>
-                <span>Thu, Feb 04, 12:00:00 UTC</span>
+                <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
+              </li>
+              <li>
+                <span *ngIf="migrationCompleted || migrationfailed || migrationLoading" class="heading">Last Migration Status </span>
+                <!-- Completed and Failed status -->
+                <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value"><span class="status-icon-completed"></span><span class="status-text">Completed</span></span>                
+                <span *ngIf="!migrationLoading && migrationStarted && migrationfailed" class="server-entity-value"><span class="status-icon-failed"></span><span class="status-text">Failed</span></span>
+                <!-- in progress status -->
+                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress" class="heading">Sync In Progress </span>
+                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress" class="server-entity-value svg-block">
+                  <svg viewBox="0 0 36 36" class="circular-chart single-chart blue">
+                    <path class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path class="circle"
+                      [attr.stroke-dasharray]="currentMigrationProcess()"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <span>{{currentMigrationPercent()}}% Completed</span>
+                </span>
+                <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
+                <span *ngIf="!migrationStarted" class="server-entity-value">--</span>
               </li>
             </ul>
           </div>

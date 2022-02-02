@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest } from 'rxjs';
+import { Subject, combineLatest, interval } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
@@ -20,11 +20,14 @@ import {
   getUsersStatus,
   updateWebUIKey,
   validateWebUIKeyStatus,
-  getValidateWebUIKeyStatus
+  getValidateWebUIKeyStatus,
+  migrationStatus,
+  getMigrationStatus
 } from 'app/entities/servers/server.selectors';
 
-import { Server, WebUIKey } from 'app/entities/servers/server.model';
+import { MigrationStatus, Server, WebUIKey } from 'app/entities/servers/server.model';
 import {
+  GetMigrationStatus,
   GetServer,
   UpdateServer,
   UpdateWebUIKey,
@@ -91,6 +94,30 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public uploadZipForm: FormGroup;
   public isUploaded = false;
   public migrationID: string;
+  public migrationStatus: MigrationStatus;
+  public migrationStatusPercentage: number;
+  public totalMigrationSteps = 13;
+  public migrationStepValue: number;
+  public migrationfailed = false;
+  public migrationCompleted = false;
+  public migrationInProgress = false;
+  public migrationLoading = true;
+  public migrationStarted = false;
+  public migrationSteps: Record<string, string> = {
+    1: 'Migration started',
+    2: 'Upload of zip file',
+    3: 'Unzip of zip file',
+    4: 'Parsing of orgs file',
+    5: 'Parsing of users file',
+    6: 'Parsing of user association file',
+    7: 'Parsing of user permissions file',
+    8: 'Creating Preview',
+    9: 'Migration of organization',
+    10: 'Migration of users',
+    11: 'Association of users to orgs',
+    12: 'Migrating user permissions',
+    13: 'Migration Completed'
+  };
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
@@ -199,6 +226,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.orgsListLoading = false;
       this.closeCreateModal();
       this.isServerLoaded = true;
+      if (this.server.migration_id !== '') {
+        this.migrationStarted = true;
+      }
     });
 
     combineLatest([
@@ -282,11 +312,17 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-      setTimeout(() => {
+    setTimeout(() => {
       if (this.isServerLoaded) {
         this.validateWebUIKey(this.server);
       }
     }, 1000);
+
+    interval(200000).subscribe(() => {
+      if (this.migrationStarted) {
+        this.getMigrationStatus(this.server.migration_id);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -361,6 +397,48 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         }
         this.validating = false;
       });
+  }
+
+  // get migration status
+  private getMigrationStatus(migration_id: string): void {
+    this.store.dispatch(new GetMigrationStatus(migration_id));
+    combineLatest([
+      this.store.select(migrationStatus),
+      this.store.select(getMigrationStatus)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([migrationSt, getMigrationState]) => {
+        if (migrationSt === EntityStatus.loadingSuccess && !isNil(getMigrationState)) {
+          this.migrationStatus = getMigrationState;
+          const migration_type = this.migrationStatus.migration_type;
+          const migration_status = this.migrationStatus.migration_status;
+          if (migration_status === 'Completed' ) {
+            this.migrationStepValue = this.getKeyByValue(this.migrationSteps, migration_type);
+            this.migrationStatusPercentage =
+              Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
+            this.migrationInProgress = true;
+            this.migrationLoading = false;
+            if (this.migrationStatusPercentage.toFixed(0) === '100') {
+              this.migrationCompleted = true;
+              this.migrationInProgress = false;
+            }
+          } else {
+            this.migrationfailed = true;
+          }
+        }
+      });
+  }
+
+  public getKeyByValue(object: Record<string, string>, value: string) {
+    return Number(Object.keys(object).find(key =>
+      object[key] === value));
+  }
+
+  public currentMigrationProcess() {
+    return `${this.migrationStatusPercentage.toFixed(0)}, 100`;
+  }
+
+  public currentMigrationPercent() {
+    return this.migrationStatusPercentage.toFixed(0);
   }
 
   saveServer(): void {

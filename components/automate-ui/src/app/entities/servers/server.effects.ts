@@ -36,7 +36,10 @@ import {
   ValidateWebUIKey,
   ValidateWebUIKeySuccess,
   ValidateWebUIKeyFailure,
-  ValidateWebUIKeySuccessNot
+  ValidateWebUIKeySuccessNot,
+  GetMigrationStatus,
+  GetMigrationStatusSuccess,
+  GetMigrationStatusFailure
 } from './server.actions';
 
 import {
@@ -249,6 +252,31 @@ export class ServerEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not validated Web UI Key ${msg || payload.error}.`
+      });
+    })));
+
+  GetMigrationStatus$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.GET_MIGRATION_STATUS),
+    mergeMap(({ payload }: GetMigrationStatus) =>
+      this.requests.getMigrationStatus(payload).pipe(
+        map((resp) => new GetMigrationStatusSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetMigrationStatusFailure(error)))))));
+
+  GetMigrationStatusSuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.GET_MIGRATION_STATUS_SUCCESS),
+    map(() => new CreateNotification({
+    type: Type.info,
+    message: 'Migration status updated.'
+  }))));
+
+  GetMigrationStatusFailure$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.GET_MIGRATION_STATUS_FAILURE),
+    map(({ payload }: GetMigrationStatusFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not update Migration status: ${msg || payload.error}.`
       });
     })));
 }
