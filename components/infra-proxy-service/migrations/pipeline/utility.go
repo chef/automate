@@ -20,7 +20,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		if err != nil {
 			msg = err.Error()
 			totalFailed++
-			continue
+			break
 		}
 		if org.ActionOps == Skip {
 			totalSkipped++
