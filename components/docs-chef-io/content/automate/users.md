@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Users"
-    identifier = "automate/settings/users.md Users"
-    parent = "automate/settings"
+    identifier = "automate/users/users.md Users"
+    parent = "automate/users"
     weight = 60
 +++
 
@@ -17,7 +17,7 @@ gh_repo = "automate"
 
 Chef Automate supports three different types of users: local users, [LDAP users]({{< relref "ldap.md" >}}), and [SAML users]({{< relref "saml.md" >}}). Manage local users from the **Settings** tab.
 
-Local users can sign in and interact with the system independent of LDAP or SAML. 
+Local users can sign in and interact with the system independent of LDAP or SAML.
 Local users will have their Chef Automate sessions refreshed while their Chef Automate browser window remains open or until they sign out directly.
 
 Permission for the `iam:users` action is required to interact with users other than yourself. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM custom policies]({{< relref "iam_v2_guide.md#creating-custom-policies" >}}) can be created to assign this permission.

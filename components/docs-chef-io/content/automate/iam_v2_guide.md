@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "IAM Users Guide"
-    parent = "automate/authorization"
-    identifier = "automate/authorization/iam_v2_guide.md IAM Users Guide"
+    parent = "automate/users/authorization"
+    identifier = "automate/users/authorization/iam_v2_guide.md IAM Users Guide"
     weight = 20
 +++
 
@@ -374,7 +374,7 @@ To create a project that contains all Effortless Infra nodes, create a ingest ru
 
 ![](/images/automate/effortless-project-rule.png)
 
-The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Infra Server` attribute as `localhost`. 
+The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Infra Server` attribute as `localhost`.
 
 If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`.
 

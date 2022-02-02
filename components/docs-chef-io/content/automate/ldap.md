@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "LDAP"
-    parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/ldap.md LDAP"
+    parent = "automate/users/authentication"
+    identifier = "automate/users/authentication/ldap.md LDAP"
     weight = 30
 +++
 
