@@ -10,6 +10,7 @@ import (
 // StoreOrgs reads the Result struct and populate the orgs table
 func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, res Result) (Result, error) {
 	var err error
+	var msg string
 	var totalSucceeded, totalSkipped, totalFailed int64
 	_, err = mst.StartOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID)
 	if err != nil {
@@ -20,7 +21,8 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID)
 		if err != nil {
 			totalFailed++
-			break
+			msg = err.Error()
+			continue
 		}
 		if org.ActionOps == Skip {
 			totalSkipped++
@@ -28,13 +30,9 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		}
 		totalSucceeded++
 	}
-	if err != nil {
+	if len(res.ParsedResult.Orgs) == int(totalFailed) {
 		log.Errorf("Failed to migrate orgs for migration id %s : %s", res.Meta.MigrationID, err.Error())
-		_, err = mst.FailedOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, err.Error(), totalSucceeded, totalSkipped, totalFailed)
-		if err != nil {
-			log.Errorf("Failed to update the status for migration id %s : %s", res.Meta.MigrationID, err.Error())
-			return res, err
-		}
+		_, _ = mst.FailedOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, msg, totalSucceeded, totalSkipped, totalFailed)
 		return res, err
 	}
 	_, err = mst.CompleteOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, totalSucceeded, totalSkipped, totalFailed)
