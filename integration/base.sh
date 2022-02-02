@@ -90,7 +90,7 @@ declare -r test_tmp_hartifacts_path="tmp_results/"
 
 set_test_manifest() {
     local target_manifest_name=$1
-    cp "$test_manifest_dir/$target_manifest_name" "$test_manifest_path"
+    cp "$test_manifest_milestone_dir/$target_manifest_name" "$test_manifest_path"
 }
 
 do_setup() {
@@ -210,7 +210,8 @@ do_prepare_deploy_default() {
         mv -f $test_hartifacts_path/* "$test_tmp_hartifacts_path/" || true
         set_test_manifest "$test_upgrade_begin_manifest"
     else
-        set_test_manifest "build.json"
+        local target_manifest_name="build.json"
+        cp "$test_manifest_dir/$target_manifest_name" "$test_manifest_path"
     fi
 }
 
