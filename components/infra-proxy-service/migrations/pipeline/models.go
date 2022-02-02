@@ -30,6 +30,9 @@ type Meta struct {
 
 	// Chef Infra Server ID
 	ServerID string `json:"server_id"`
+
+	// Migration ID
+	MigrationID string `json:"migration_id"`
 }
 
 type StageResult struct {
