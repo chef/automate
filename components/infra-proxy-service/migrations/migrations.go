@@ -17,8 +17,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//var server *MigrationServer
-
 // UploadFile Takes the stream of data to upload a file
 func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadFileServer) error {
 	log.Info("Starting the with the request to upload file")
