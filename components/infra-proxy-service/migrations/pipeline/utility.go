@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/chef/automate/components/infra-proxy-service/storage"
+	log "github.com/sirupsen/logrus"
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
@@ -15,6 +16,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	if err != nil {
 		return res, err
 	}
+	log.Info("Starting the organisation migration phase for migration id: ", res.Meta.MigrationID)
 	for _, org := range res.ParsedResult.Orgs {
 		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID)
 		if err != nil {
@@ -29,16 +31,20 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		totalSucceeded++
 	}
 	if len(res.ParsedResult.Orgs) == int(totalFailed) {
+		log.Errorf("Failed to migrate orgs for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		_, err = mst.FailedOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, msg, totalSucceeded, totalSkipped, totalFailed)
 		if err != nil {
+			log.Errorf("Failed to update the status for migration id %s : %s", res.Meta.MigrationID, err.Error())
 			return res, err
 		}
 		return res, err
 	}
 	_, err = mst.CompleteOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, totalSucceeded, totalSkipped, totalFailed)
 	if err != nil {
+		log.Errorf("Failed to update the status for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		return res, err
 	}
+	log.Info("Successfully completed the organisation migration phase for migration id: ", res.Meta.MigrationID)
 	return res, err
 }
 
