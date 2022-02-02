@@ -30,7 +30,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		}
 		totalSucceeded++
 	}
-	if len(res.ParsedResult.Orgs) == int(totalFailed) {
+	if err != nil {
 		log.Errorf("Failed to migrate orgs for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		_, err = mst.FailedOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, msg, totalSucceeded, totalSkipped, totalFailed)
 		if err != nil {
