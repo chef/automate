@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate HA AWS Deployment Procedure"
+title = "Deployment Procedure using AWS Cloud"
 
 draft = false
 
@@ -7,13 +7,11 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Chef Automate HA AWS Deployment Procedure"
+    title = "Deployment Procedure using AWS Cloud"
     parent = "automate/install"
-    identifier = "automate/install/ha_aws_deploy_steps.md Chef Automate HA AWS Deployment Procedure"
-    weight = 340
+    identifier = "automate/install/ha_aws_deploy_steps.md Deployment Procedure using AWS Cloud"
+    weight = 350
 +++
-
-## Deployment Procedure on AWS Cloud
 
 Follow the steps below to deploy Chef Automate HA on AWS (Amazon Web Services) cloud.
 

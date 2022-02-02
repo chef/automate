@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate HA AWS Deployment Procedure"
+title = "High Availability Provisioning Using AWS"
 
 draft = false
 
@@ -7,29 +7,28 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Chef Automate HA AWS Deployment Procedure"
+    title = "High Availability Provisioning Using AWS"
     parent = "automate/install"
-    identifier = "automate/install/ha_deploy_aws.md Chef Automate HA AWS Deployment Procedure"
-    weight = 290
+    identifier = "automate/install/ha_deploy_aws.md High Availability Provisioning Using AWS"
+    weight = 270
 +++
 
-!-- Chef gonna give storage calculator for customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page??
+<!-- !-- Chef gonna give storage calculator for customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page?? -->
 
 This page explains the procedure to deploy Chef Automate High Availability (HA) in your network premises/ infrastructure using Amazon Web Services (AWS). To deploy Chef Automate HA, execute the following steps in the listed order:
 
 1. Set up the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_system_requirements.md" >}} )).
 1. Obtain an AWS account or if you already have one, sign on to your AWS account.
-1. Setup Virtual Private Cloud (VPC) in AWS.
-1. Setup the [bastion host requirements](( {{< relref "ha_aws_bastion.md#Bastion Server Requirements for AWS (Amazon Web Services)" >}} ))
-1. Configure [bastion host](( {{< relref "ha_aws_bastion.md#Bastion Host Configuration" >}} )).
+1. Setup the [Bastion Host AWS requirements](( {{< relref "ha_bastion.md#Bastion Host Requirements for AWS (Amazon Web Services)" >}} )).
+1. Configure [Bastion Host for AWS ](( {{< relref "ha_aws_bastion.md#Bastion Host Configuration" >}} )).
 1. Ensure you have [Chef Automate utility](( {{< relref "ha_auto_install.md" >}})) installed, else download and install the latest version.
 1. Connect your [Bastion host to your AWS instance](( {{< relref "ha_aws_ssh_connect_bastion.md" >}} )).
 1. Create an [AWS Identity and Access Management IAM user](( {{< relref "ha_iam_user.md" >}} )).
-1. Configure the [AWS credentials on your Bastion host](( {{< relref "ha_configure_aws_credentials.md" >}} )).
 1. Create the certificate for the Chef Automate and Chef Server load balancers.
 1. [Create the certificates](( {{< relref "ha_cert_selfsign.md" >}} )) for security and authentication purposes. _optional_
 1. [Rotate the certificates](( {{< relref "ha_cert_rotaion.md" >}} )) if the certificates are expired or compromised. _optional_
 1. Enable *dnshostname* in VPC, which determines whether the VPC supports assigning public DNS hostnames to instances with public IP addresses.
+1. Execute [AWS Deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )) to provision the Chef Automate HA on your cloud  network infrastructure.
 
 {{< note >}}
 

@@ -1,5 +1,5 @@
 +++
-title = "HA Components"
+title = "High Availability (HA) Components"
 
 draft = false
 
@@ -7,13 +7,11 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA Components"
+    title = "High Availability (HA) Components"
     parent = "automate/install"
-    identifier = "automate/install/ha_components.md HA Components"
-    weight = 230
+    identifier = "automate/install/ha_components.md High Availability (HA) Components"
+    weight = 210
 +++
-
-## A2HA Components -- need to clarify and browse for more description
 
 This section lists the various Chef Automate High Availability (HA) components and their purpose.
 
