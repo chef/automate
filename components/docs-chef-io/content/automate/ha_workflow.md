@@ -1,20 +1,20 @@
 +++
-title = "HA Wrokflow"
+title = "Deployment Workflows"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA Workflow"
+    title = "Deployment Workflows"
     parent = "automate/install"
-    identifier = "automate/install/ha_workflow.md HA Workflow"
-    weight = 200
+    identifier = "automate/install/ha_workflow.md Deployment Workflows"
+    weight = 230
 +++
 
-## Chef Automate High Availability (HA) Workflows
+This page includes the two types of Chef Automate High Availability (HA) Workflows in words and info-graphic format.
 
-### Bare Infra Deployment
+## Bare Infra Deployment
 
 1. Set the software and hardware requirements.
 1. Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the **Chef Automate** , **Chef Server** , **Postgres** , and **Elasticsearch** nodes.
@@ -48,7 +48,7 @@ gh_repo = "automate"
 
 1. Deploy and provision the Chef Automate HA.
 
-### AWS Deployment
+## AWS Deployment
 
 1. Set the software and hardware requirements.
 1. Access or obtain an AWS account.
