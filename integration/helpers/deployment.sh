@@ -41,7 +41,7 @@ run_upgrade() {
     # because that directory isn't watched for changes. Therefore, we'll trigger
     # a manifest rebuild with the run command.
     if [ -z "$airgap_artifact_path" ]; then
-        chef-automate upgrade run
+        chef-automate upgrade run --version "20220121191356"
     else
         chef-automate upgrade run --airgap-bundle "$airgap_artifact_path"
     fi
@@ -53,7 +53,6 @@ run_upgrade() {
 
     #shellcheck disable=SC2154
     wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
-    chef-automate post-major-upgrade migrate --data=PG -y
 }
 
 wait_for_upgrade() {
