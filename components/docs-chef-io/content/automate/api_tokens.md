@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "API Tokens"
     identifier = "automate/users/api_tokens.md API Tokens"
     parent = "automate/users"
-    weight = 80
+    weight = 40
 +++
 
 ## Overview

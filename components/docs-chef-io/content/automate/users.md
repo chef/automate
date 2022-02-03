@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Users"
     identifier = "automate/users/users.md Users"
     parent = "automate/users"
-    weight = 60
+    weight = 80
 +++
 
 ## Overview

@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Roles"
     identifier = "automate/users/roles.md Roles"
     parent = "automate/users"
-    weight = 100
+    weight = 60
 +++
 
 ## Overview

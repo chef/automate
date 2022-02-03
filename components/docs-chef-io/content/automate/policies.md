@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Policies"
     identifier = "automate/users/policies.md Policies"
     parent = "automate/users"
-    weight = 90
+    weight = 50
 +++
 
 ## Overview
