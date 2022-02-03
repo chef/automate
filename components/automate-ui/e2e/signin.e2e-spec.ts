@@ -45,7 +45,7 @@ describe('Signin Process', () => {
         username: 'kilgore@kilgore.trout',
         groups: ['authors'],
         id_token: valid_id_token,
-        telemetry_enabled: null
+        telemetry_enabled: true
       };
       const actual = browser.executeScript(
         'return window.localStorage.getItem(\'chef-automate-user\');')
