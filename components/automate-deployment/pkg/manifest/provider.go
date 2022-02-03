@@ -243,12 +243,6 @@ func getCompatibleManifestVersion(ctx context.Context, version, channel string, 
 	}
 }
 
-func GetMinCurrentVersion(ctx context.Context, channel,
-	version string, versionsURLFmt string) (compVersion string, err error) {
-	versionsURL := fmt.Sprintf(versionsURLFmt, channel)
-	return GetMinimumCurrentManifestVersion(ctx, version, channel, versionsURL)
-}
-
 func GetMinimumCurrentManifestVersion(ctx context.Context, version, channel string, optionalURL ...string) (compVersion string, err error) {
 	//get the list of all versions on ascending order
 	allVersions, err := GetAllVersions(ctx, channel, optionalURL...)
@@ -383,7 +377,7 @@ func findNextMajorVersionForSemantic(currentMajor string, list []string) (int, s
 func GetAllVersions(ctx context.Context, channel string, optionalURL ...string) ([]string, error) {
 	var url string
 	//optionalURL is only for testing, used to override the actual url with mockurl
-	if len(optionalURL) > 0 {
+	if len(optionalURL) > 0 && optionalURL[0] != "" {
 		url = optionalURL[0]
 	} else {
 		url = fmt.Sprintf(automateVersionsURLFmt, channel)

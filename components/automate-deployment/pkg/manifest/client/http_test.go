@@ -16,24 +16,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 )
 
-var versions = `
-[
-  "20180207073354",
-  "20180207073355",
-  "20181207131525",
-  "20211201164433",
-  "20211220104140",
-  "20220113145751",
-  "20220113154113",
-  "1.0.0",
-  "1.1.9",
-  "1.2.1",
-  "2.0.0",
-  "2.1.2",
-  "2.3.5",
-  "3.4.5"
-]
-`
 var goodV1Manifest = `
 {
   "schema_version": "1",
@@ -57,21 +39,12 @@ var goodSemManifest = `
 
 func TestGetCurrentManifest(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasSuffix(r.RequestURI, "versions.json") {
-			fmt.Fprintln(w, versions)
-		} else {
-			fmt.Fprintln(w, goodSemManifest)
-		}
+		fmt.Fprintln(w, goodSemManifest)
 	}))
 	defer ts.Close()
 
-	testVersionsFmt := fmt.Sprintf("%s/%%s/versions.json", ts.URL)
 	testFmt := fmt.Sprintf("%s/%%s", ts.URL)
-	client := client.NewHTTPClient(
-		client.LatestSemanticURLFormat(testFmt),
-		client.VersionsURLFormat(testVersionsFmt),
-		client.NoVerify(true),
-	)
+	client := client.NewHTTPClient(client.LatestSemanticURLFormat(testFmt), client.NoVerify(true))
 	manifest, err := client.GetCurrentManifest(context.Background(), "current")
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(manifest.Packages))
@@ -90,23 +63,17 @@ func TestGetBackCompatable(t *testing.T) {
 		if strings.Contains(r.URL.String(), "latest_semver.json") {
 			w.WriteHeader(http.StatusNotFound)
 		}
-		if strings.HasSuffix(r.RequestURI, "versions.json") {
-			fmt.Fprintln(w, versions)
-		} else if strings.Contains(r.URL.String(), "latest.json") {
+		if strings.Contains(r.URL.String(), "latest.json") {
 			fmt.Fprintln(w, goodV1Manifest)
 		}
 	}))
 	defer ts.Close()
 
-	testVersionsFmt := fmt.Sprintf("%s/%%s/versions.json", ts.URL)
 	testSemVerFmt := fmt.Sprintf("%s/%%s/latest_semver.json", ts.URL)
 	testFmt := fmt.Sprintf("%s/%%s/latest.json", ts.URL)
-	client := client.NewHTTPClient(
-		client.LatestSemanticURLFormat(testSemVerFmt),
+	client := client.NewHTTPClient(client.LatestSemanticURLFormat(testSemVerFmt),
 		client.LatestURLFormat(testFmt),
-		client.VersionsURLFormat(testVersionsFmt),
-		client.NoVerify(true),
-	)
+		client.NoVerify(true))
 	manifest, err := client.GetCurrentManifest(context.Background(), "current")
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(manifest.Packages))
@@ -122,22 +89,12 @@ func TestGetBackCompatable(t *testing.T) {
 
 func TestGetManifest(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasSuffix(r.RequestURI, "versions.json") {
-			fmt.Fprintln(w, versions)
-		} else {
-			fmt.Fprintln(w, goodV1Manifest)
-		}
+		fmt.Fprintln(w, goodV1Manifest)
 	}))
 	defer ts.Close()
 
-	testVersionsFmt := fmt.Sprintf("%s/%%s/versions.json", ts.URL)
 	testFmt := fmt.Sprintf("%s/%%s", ts.URL)
-	client := client.NewHTTPClient(
-		client.URLFormat(testFmt),
-		client.VersionsURLFormat(testVersionsFmt),
-		client.NoVerify(true),
-	)
-
+	client := client.NewHTTPClient(client.URLFormat(testFmt), client.NoVerify(true))
 	manifest, err := client.GetManifest(context.Background(), "20180207073355")
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(manifest.Packages))
@@ -223,20 +180,14 @@ aiqMAJ9eLFYKiyyXe0nJekBdvUPfVoxYGwCfcTkOHvDPo1UFsOeh0QppYDkTnjE=
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasSuffix(r.RequestURI, ".asc") {
 				w.Write([]byte(manifestSignature))
-			} else if strings.HasSuffix(r.RequestURI, "versions.json") {
-				fmt.Fprintln(w, versions)
 			} else {
 				w.Write([]byte(chefSignedManifest))
 			}
 		}))
 		defer ts.Close()
 
-		testVersionsFmt := fmt.Sprintf("%s/%%s/versions.json", ts.URL)
 		testFmt := fmt.Sprintf("%s/%%s", ts.URL)
-		client := client.NewHTTPClient(
-			client.LatestSemanticURLFormat(testFmt),
-			client.VersionsURLFormat(testVersionsFmt),
-		)
+		client := client.NewHTTPClient(client.LatestSemanticURLFormat(testFmt))
 		_, err := client.GetCurrentManifest(context.Background(), "current")
 		require.NoError(t, err)
 	})

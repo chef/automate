@@ -722,9 +722,7 @@ func (d *deployer) bootstrap() {
 
 	d.writer.Title("Bootstrapping Chef Automate")
 	d.writer.Body("Fetching Release Manifest")
-
-	channel := d.mergedCfg.Deployment.V1.Svc.Channel.GetValue()
-	m, err := d.manifestProvider.GetCurrentManifest(d.ctx, channel)
+	m, err := d.manifestProvider.GetCurrentManifest(d.ctx, d.mergedCfg.Deployment.V1.Svc.Channel.GetValue())
 	if err != nil {
 		d.err = status.Annotate(err, status.PackageInstallError)
 		return
