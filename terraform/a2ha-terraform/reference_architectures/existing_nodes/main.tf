@@ -16,6 +16,7 @@ module "system-tuning-automate" {
 }
 
 module "system-tuning-chef_server" {
+  count = length(setsubtract(var.existing_chef_server_private_ips, var.existing_automate_private_ips))
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
@@ -42,6 +43,7 @@ module "system-tuning-elasticsearch" {
 }
 
 module "system-tuning-postgresql" {
+  count = length(setsubtract(var.existing_elasticsearch_private_ips, var.existing_postgresql_private_ips))
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
@@ -142,6 +144,7 @@ module "habitat-elasticsearch" {
 }
 
 module "habitat-postgresql" {
+  count = length(setsubtract(var.existing_elasticsearch_private_ips, var.existing_postgresql_private_ips))
   source                          = "./modules/habitat"
   airgap_info                     = module.airgap_bundle-postgresql.airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
@@ -189,6 +192,7 @@ module "habitat-automate" {
 }
 
 module "habitat-chef_server" {
+  count = length(setsubtract(var.existing_chef_server_private_ips, var.existing_automate_private_ips))
   source                          = "./modules/habitat"
   airgap_info                     = module.airgap_bundle-chef_server.airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
