@@ -11,6 +11,7 @@ type TestDB struct {
 	Servers   map[string]storage.Server
 	Users     map[string]storage.User
 	NeedError bool
+	Type      string
 }
 
 func (t *TestDB) GetServer(_ context.Context, id string) (storage.Server, error) {
@@ -55,7 +56,38 @@ func (t *TestDB) GetOrg(ctx context.Context, orgID string, serverID string) (sto
 }
 
 func (t *TestDB) GetOrgs(ctx context.Context, serverID string) ([]storage.Org, error) {
-	panic("implement me")
+	var x []storage.Org
+	if t.NeedError {
+		return x, errors.New("failed to fetch Orgs")
+	}
+	if t.Type == "Insert" {
+		return x, nil
+	}
+	if t.Type == "Update" {
+		org2 := storage.Org{
+			ID:   "org2",
+			Name: "Org",
+		}
+		x = append(x, org2)
+		return x, nil
+	}
+	if t.Type == "Delete" {
+		org2 := storage.Org{
+			ID:   "org2",
+			Name: "Org",
+		}
+		x = append(x, org2)
+		return x, nil
+	}
+	if t.Type == "Skip" {
+		org3 := storage.Org{
+			ID:   "org3",
+			Name: "Org 3",
+		}
+		x = append(x, org3)
+		return x, nil
+	}
+	return x, nil
 }
 
 func (t *TestDB) StoreOrg(ctx context.Context, id string, name string, adminUser string, adminKey string, serverID string, projects []string) (storage.Org, error) {
