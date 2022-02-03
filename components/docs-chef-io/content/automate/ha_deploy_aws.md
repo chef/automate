@@ -25,18 +25,22 @@ This page explains the procedure to deploy Chef Automate High Availability (HA) 
 1. Connect your [Bastion host to your AWS instance](( {{< relref "ha_aws_ssh_connect_bastion.md" >}} )).
 1. Create an [AWS Identity and Access Management IAM user](( {{< relref "ha_iam_user.md" >}} )).
 1. Create the certificate for the Chef Automate and Chef Server load balancers.
-<!-- 1. [Create the certificates](( {{< relref "ha_cert_selfsign.md" >}} )) for security and authentication purposes. _optional_ -->
-<!-- 1. [Rotate the certificates](( {{< relref "ha_cert_rotaion.md" >}} )) if the certificates are expired or compromised. _optional_ -->
+<!-- 1. [Create the certificates](( {{< relref "ha_cert_selfsign.md" >}} )) for security and authentication purposes. _optional_ 
+1. [Rotate the certificates](( {{< relref "ha_cert_rotaion.md" >}} )) if the certificates are expired or compromised. _optional_  -->
 1. Enable *dnshostname* in VPC, which determines whether the VPC supports assigning public DNS hostnames to instances with public IP addresses.
 1. Execute [AWS Deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )) to provision the Chef Automate HA on your cloud  network infrastructure.
 
 {{< note >}}
 
-A DNS hostname uniquely names a computer and consists of a host name and a domain name. DNS servers resolve DNS hostnames to their corresponding IP addresses. To set up DNS in your VPC, ensure that DNS hostnames and DNS resolution are both enabled in your VPC. Refer [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/set-up-vpc-dns.html) page.
+A DNS hostname uniquely names a computer and consists of a host name and a domain name. DNS servers resolve DNS hostnames to their
+corresponding IP addresses. To set up DNS in your VPC, ensure that DNS hostnames and DNS resolution are both enabled in your VPC.
 
-If the DNS attributes, *enableDnsSupport* and *enableDnsHostnames* are true, instances in the VPC is set with public DNS hostnames. The default for these attributes are `false` when the VPC is a default VPC or the VPC is created using the VPC console wizard.
+Refer [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/set-up-vpc-dns.html) page.
 
-{{ < note/>}}
+If the DNS attributes, *enableDnsSupport* and *enableDnsHostnames* are true, instances in the VPC is set with public DNS hostnames.
+The default for these attributes are `false` when the VPC is a default VPC or the VPC is created using the VPC console wizard.
+
+{{ < /note >}}
 
 1. Execute the [Chef Automate HA deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )).
 

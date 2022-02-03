@@ -42,5 +42,5 @@ Virtual machine is required for either of the Chef Automate HA deployment types 
 - AWS instance type: *t2.medium*
 - Memory: Minimum of 4GB
 - Hard Disk Space - 100 GB
-- SSH: VPC to Port 22, publicly accessible. 
+- SSH: VPC to Port 22, publicly accessible
 - [Setup Virtual Private Cloud (VPC) in AWS](( {{< relref "ha_vpc_setup.md" >}}))

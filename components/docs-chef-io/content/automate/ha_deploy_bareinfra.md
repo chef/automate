@@ -37,8 +37,8 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 - Ensure you have [Chef Automate utility](( {{< relref "ha_auto_install.md" >}})) installed, else download and install the latest version.
 - Servers provisioned and accessible through SSH from each other.
 - Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch.
-<!-- - [Create the certificates](( {{< relref "ha_cert_selfsign.md" >}} )) for security and authentication purposes. _optional_ -->
-<!-- - [Rotate the certificates](( {{< relref "ha_cert_rotaion.md" >}} )) if the certificates are expired or compromised. _optional_ -->
+<!-- - [Create the certificates](( {{< relref "ha_cert_selfsign.md" >}} )) for security and authentication purposes. _optional_ 
+- [Rotate the certificates](( {{< relref "ha_cert_rotaion.md" >}} )) if the certificates are expired or compromised. _optional_ -->
 
 ## Deployment Procedure on Bare Infrastructure
 
@@ -77,7 +77,7 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
    - Add load balancer certificate details for automate and chef-server. For example, as shown below:
 
       <!-- automate_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e"
-      <!-- chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e" --> -->
+      chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e" -->
 
       {{< figure src="/images/automate/ha_bare_lb.png" alt="Load Balancer Details">}}
 
@@ -89,7 +89,7 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 {{< figure src="/images/automate/ha_bare_chef_automate_complete.png" alt="Chef Automate Bare Infra Deployment Confirmation">}}
 
-1. Create a *uid* or *gid* for HAB user. Habitat automatically sets a uid and gid for the HAB user. You can override it if required or you can leave the field *habitat_uid_gid=""* blank. _optional_
+1. Create a *uid* or *gid* for HAB user. Habitat automatically sets a uid and gid for the HAB user. You can override it if required or you can leave the field *habitat_uid_gid=""* blank. *optional*
 
 1. Type the command, `./scripts/credentials set postgresql -auto` and press **Enter**. This command rotates the credentials for Postgresql.
 
