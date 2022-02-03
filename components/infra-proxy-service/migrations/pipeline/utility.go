@@ -138,6 +138,7 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 	var orgList []Org
 	orgDatabaseMap := createDatabaseOrgsMap(orgsInDB)
 	var orgJson OrgJson
+	log.Info("Comparing the organisations from database and backup file for insert,update and skip action")
 	//For insert, update and skip action
 	for _, org := range orgsInFiles {
 		orgInfo, valuePresent := orgDatabaseMap[org.Name()]
@@ -156,12 +157,14 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 			orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Insert))
 		}
 	}
+	log.Info("Completed comparing the organisations from database and backup file for insert,update and skip action")
 	return orgList
 }
 
 func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []storage.Org) []Org {
 	var orgList []Org
 	orgFilesMap := createFileOrgsMap(orgsInFiles)
+	log.Info("Comparing the organisations from database and backup file for delete action")
 	//For delete action by comparing database orgs with file orgs
 	for _, org := range orgsInDB {
 		_, valuePresent := orgFilesMap[org.ID]
@@ -169,6 +172,7 @@ func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []s
 			orgList = append(orgList, createOrgStructForAction(org.ID, org.Name, Delete))
 		}
 	}
+	log.Info("Completed comparing the organisations from database and backup file for delete action")
 	return orgList
 }
 
