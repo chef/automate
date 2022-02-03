@@ -34,7 +34,7 @@ func init() {
 }
 
 var cleanupCmd = &cobra.Command{
-	Use:   "clean-infra",
+	Use:   "clean-up",
 	Short: "Clean existing infrastructure of Automate HA",
 	Long:  "Clean existing infrastructure of automate HA",
 	Annotations: map[string]string{
