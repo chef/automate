@@ -95,15 +95,18 @@
             </ul>
           </div>
           <div class="summary-body last">
+            <span class="migrationSlider-link" data-cy="open-migration-slider">
+              <a
+                data-cy="migration-slider-link"
+                (click)="migrationSlider.slidePanel()"
+                >Preview Migration</a>
+            </span>
             <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
               <chef-button id="sync-button" class="sync-button" secondary data-cy="sync-org-and-users" (click)="upload.slidePanel()">
                 <img alt="sync-button" src="/assets/img/sync_arrow.png" class="img-inline"/>
                 <span>Sync Org and Users</span>
               </chef-button>
             </app-authorized>
-              <chef-button class="migrationSlider-button" secondary (click)="migrationSlider.slidePanel()">
-                <span>migrationSlider</span>
-              </chef-button>
           </div>
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
@@ -313,7 +316,11 @@
         (updateWebuiKeyClicked)="updateWebuiKey()">
       </app-update-web-uikey-slider>
       <app-migration-slider
-        #migrationSlider>
+        #migrationSlider
+        [migrationID]="migrationID"
+        [previewData]="previewData"
+        (migrationPreview)="migrationPreview()"
+        (cancelMigration)="cancelMigration()">
       </app-migration-slider>
     </main>
   </div>

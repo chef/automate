@@ -11,52 +11,80 @@
   <div class="sidenav-body">
     <div class="flex-container">
         <div class="meta-box">
-          <p>We have found 4 users on the Chef Server server_1 and 2 orgs to be migrated, skipped and Updated . 
-            You have the option to choose which users to migrate.</p>
-        </div>
-      <form [formGroup]="migrationForm">
-        <div class="input-margin">
-          <div id="migration-table-container">
-            <chef-table>
-              <chef-thead>
-                <chef-tr>
-                  <chef-th class="no-border first"></chef-th>
-                  <chef-th class="no-border middle">Chef Server User</chef-th>
-                  <chef-th class="no-border middle">Automate User</chef-th>
-                  <chef-th class="no-border middle"></chef-th>
-                  <chef-th class="no-border last"></chef-th>
-                </chef-tr>
-              </chef-thead>
-              <chef-tbody>
-                <chef-tr >
-                  <chef-td class="first">
-                    <chef-checkbox (change)="selectedUser($event)" [checked]="checkedUser"></chef-checkbox>
-                  </chef-td>
-                  <chef-td class="middle">
-                    Chef Server User
-                  </chef-td>
-                  <chef-td class="middle">
-                     Automate User
-                  </chef-td>
-                  <chef-td class="middle">
-                    <input
-                      chefInput
-                      firstFocus
-                      formControlName="name"
-                      type="text"
-                      (keyup)="handleNameInput($event)"
-                      autocomplete="off" />
-                  </chef-td>
-                  <chef-td class="last">
-                    <p class="warning-msg">Warning. User already exists in Automate. This will overwrite this users IAM settings.</p>
-                  </chef-td>
-                </chef-tr>
-              </chef-tbody>
-            </chef-table>
+          <h3>You have the option to choose which users to migrate</h3>
+          <div class="meta-wrapper">
+            <div class="summary-body">
+              <p>We have found <span class="heading">Orgs</span> to be migrated, skipped and Updated . </p>
+              <ul>
+                <li>
+                  <span>Migrated Orgs</span>
+                  <span>2</span>
+                </li>
+                <li>
+                  <span>Skipped Orgs</span>
+                  <span>0</span>
+                </li>
+                <li>
+                  <span>Updated Orgs</span>
+                  <span>0</span>
+                </li>
+              </ul>
+            </div>
+            <div class="summary-body">
+              <p>We have found <span class="heading">Users</span> to be migrated.</p>
+              <ul>
+                <li>
+                  <span>Users</span>
+                  <span>4</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
+      <form [formGroup]="migrationForm">
+        <div id="migration-table-container">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="no-border first">
+                  <chef-checkbox (change)="selectedAllUsers($event)"></chef-checkbox>
+                </chef-th>
+                <chef-th class="no-border middle">Chef Server User</chef-th>
+                <chef-th class="no-border middle">Automate User</chef-th>
+                <chef-th class="no-border middle"></chef-th>
+                <chef-th class="no-border last"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr >
+                <chef-td class="first">
+                  <chef-checkbox (change)="selectedUser($event)" [checked]="checkedUser"></chef-checkbox>
+                </chef-td>
+                <chef-td class="middle">
+                  Chef Server User
+                </chef-td>
+                <chef-td class="middle">
+                    Automate User
+                </chef-td>
+                <chef-td class="middle">
+                  <input 
+                    *ngIf="isLDPUser && isEditable"
+                    chefInput
+                    firstFocus
+                    formControlName="name"
+                    type="text"
+                    (keyup)="handleNameInput($event)"
+                    autocomplete="off" />
+                </chef-td>
+                <chef-td class="last">
+                  <p class="warning-msg" *ngIf="isLDPUser && isEditable">Warning. User already exists in Automate. This will overwrite this users IAM settings.</p>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
+        </div>
         <div id="button-bar">
-          <chef-button id="cancel-migration-slider" tertiary [disabled]="migrating" (click)="closeMigrationSlider()">
+          <chef-button id="cancel-migration-slider" tertiary [disabled]="migrating" (click)="cancelMigrationclicked()">
             Cancel
           </chef-button>
           <chef-button primary data-cy="migration-button" id="migration-button" (click)="migrationFile();">
