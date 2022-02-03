@@ -13,15 +13,16 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/openpgp"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
 )
 
 const (
+	defaultChannel                = "current"
 	defaultSemanticManifestURLFmt = "https://packages.chef.io/manifests/%s/automate/latest_semver.json"
 	defaultLatestManifestURLFmt   = "https://packages.chef.io/manifests/%s/automate/latest.json"
 	defaultManifestURLFmt         = "https://packages.chef.io/manifests/automate/%s.json"
+	defaultVersionsURLFmt         = "https://packages.chef.io/manifests/%s/automate/versions.json"
 	packagesChefIOSigAsc          = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.12 (Darwin)
 Comment: GPGTools - http://gpgtools.org
@@ -76,6 +77,7 @@ type HTTP struct {
 	latestManifestURLFmt         string
 	latestSemanticManifestURLFmt string
 	manifestURLFmt               string
+	versionsURLFmt               string
 	noVerify                     bool
 }
 
@@ -104,6 +106,10 @@ func NewHTTPClient(options ...Opt) *HTTP {
 		c.manifestURLFmt = defaultManifestURLFmt
 	}
 
+	if c.versionsURLFmt == "" {
+		c.versionsURLFmt = defaultVersionsURLFmt
+	}
+
 	// We allow skipping manifest verification if needed by setting this environment
 	// variable. Set it only if you must
 	//Todo(milestone) -- For milestone we cannot skip
@@ -124,6 +130,13 @@ func LatestURLFormat(urlFormat string) Opt {
 func LatestSemanticURLFormat(urlFormat string) Opt {
 	return func(c *HTTP) {
 		c.latestSemanticManifestURLFmt = urlFormat
+	}
+}
+
+//VersionsURLFormat - the url that holds the list of automate versions
+func VersionsURLFormat(urlFormat string) Opt {
+	return func(c *HTTP) {
+		c.versionsURLFmt = urlFormat
 	}
 }
 
@@ -233,10 +246,6 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 	if err != nil {
 		return nil, err
 	}
-
-	//Todo(milestone) Append min compatible version needed to upgrade for the current manifest
-
-	m.HartOverrides = []habpkg.Hart{}
 
 	return m, nil
 }

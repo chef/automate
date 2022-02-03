@@ -351,7 +351,7 @@ func (creator *InstallBundleCreator) writeManifest(m *manifest.A2) error {
 	return nil
 }
 
-func (creator *InstallBundleCreator) loadManifest() (*manifest.A2, error) {
+func (creator *InstallBundleCreator) loadManifest(optionalURL ...string) (*manifest.A2, error) {
 	var manifestProvider manifest.ReleaseManifestProvider
 	manifestProvider = client.NewDefaultClient(creator.manifestFile)
 
@@ -359,10 +359,25 @@ func (creator *InstallBundleCreator) loadManifest() (*manifest.A2, error) {
 		manifestProvider = manifest.NewLocalHartManifestProvider(manifestProvider, creator.hartifactsPath, creator.overrideOrigin)
 	}
 
+	var m *manifest.A2
+	var err error
+	ctx := context.Background()
 	if creator.version != "" {
-		return manifestProvider.GetManifest(context.Background(), creator.version)
+		m, err = manifestProvider.GetManifest(ctx, creator.version)
+	} else {
+		m, err = manifestProvider.GetCurrentManifest(ctx, creator.channel)
 	}
-	return manifestProvider.GetCurrentManifest(context.Background(), creator.channel)
+	if err != nil {
+		return m, err
+	}
+
+	minCurrentVersion, err := manifest.GetMinimumCurrentManifestVersion(ctx, creator.version, creator.channel, optionalURL...)
+	if err != nil {
+		return nil, err
+	}
+	m.MinCompatibleVer = minCurrentVersion
+	m.HartOverrides = []habpkg.Hart{}
+	return m, nil
 }
 
 func (creator *InstallBundleCreator) downloadHab(m *manifest.A2, progress InstallBundleCreatorProgress) error {
