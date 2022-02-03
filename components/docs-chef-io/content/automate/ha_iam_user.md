@@ -15,13 +15,13 @@ gh_repo = "automate"
 
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
 
-In order to run the terraform scripts, you need an IAM user with following permissions:
+To run the terraform scripts, you need an IAM user with the following permissions:
 
 - AdministratorAccess
 - AmazonAPIGatewayAdministrator
 - AmazonS3FullAccess
 
-These permissions can either be directly added to the user or can be added via IAM Group.
+These permissions can either be directly added to the user or via IAM Group.
 
 {{< note >}}
 
@@ -34,7 +34,7 @@ Once we have an AWS account, we’ll need to create an IAM user to programmatica
 ## Creating an IAM User
 
 1. Navigate to your AWS account.
-1. Select *IAM* from the list of services from AWS console. The *IAM dashboard* screen appears.
+1. Select *IAM* from the list of services from the AWS console. The *IAM dashboard* screen appears.
 
 {{< figure src="/images/automate/ha_aws_iam.png" alt="AWS IAM Dashboard">}}
 
@@ -48,7 +48,7 @@ Once we have an AWS account, we’ll need to create an IAM user to programmatica
 
 {{< figure src="/images/automate/ha_aws_iam_paccess.png" alt="AWS IAM User - Programmetic Access">}}
 
-  This is the sign-in name for AWS. If you want to add multiple users, choose Add another user for each additional user and type their user names. You can add up to 10 users at one time.
+  This is the sign-in name for AWS. If you want to add multiple users, choose to Add another user for each additional user and type their user names. You can add up to 10 users at one time.
 
   This account will be used by your AWS CLI and will be connecting to the AWS API directly by not using the Management Console.
 
@@ -72,6 +72,6 @@ Once we have an AWS account, we’ll need to create an IAM user to programmatica
 {{< figure src="/images/automate/ha_aws_iam_user_created.png" alt="AWS IAM User Created with Access Key">}}
 1. Take a note of the Access key ID and Secret access key.
 
-Now let’s configure our AWS CLI so we can deploy our applications from our command line.
+Now let’s configure our AWS CLI to deploy our applications from our command line.
 
-Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating a IAM users through CLI and API methods.
+Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating an IAM user through CLI and API methods.

@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 <!-- !-- Chef gonna give storage calculator for customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page?? -->
 
-This page explains the procedure to deploy Chef Automate High Availability (HA) in your network premises/ infrastructure using Amazon Web Services (AWS). To deploy Chef Automate HA, execute the following steps in the listed order:
+This page explains how to deploy Chef Automate High Availability (HA) in your network premises/ infrastructure using Amazon Web Services (AWS). To deploy Chef Automate HA, execute the following steps in the listed order:
 
 1. Set up the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_system_requirements.md" >}} )).
 1. Obtain an AWS account or if you already have one, sign on to your AWS account.
@@ -25,7 +25,7 @@ This page explains the procedure to deploy Chef Automate High Availability (HA) 
 1. Connect your [Bastion host to your AWS instance](( {{< relref "ha_aws_ssh_connect_bastion.md" >}} )).
 1. Create an [AWS Identity and Access Management IAM user](( {{< relref "ha_iam_user.md" >}} )).
 1. Create the certificate for the Chef Automate and Chef Server load balancers.
-1. Create the certificates for security and authentication purposes. _optional_ 
+1. Create the certificates for security and authentication purposes. _optional_
 1. Rotate the certificates if the certificates are expired or compromised. _optional_
 1. Enable *dnshostname* in VPC, which determines whether the VPC supports assigning public DNS hostnames to instances with public IP addresses.
 1. Execute [AWS Deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )) to provision the Chef Automate HA on your cloud  network infrastructure.
@@ -52,13 +52,13 @@ The Chef Automate HA deployment using AWS creates the following network resource
 
 - Three instances for PostgreSQL node.
 
-- One instance for Chef Automate server. However, based on your requirements we can add more instances for Chef Automate server.
+- One instance for Chef Automate server. However, based on your requirements, we can add more instances for the Chef Automate server.
 
-- One instance for Chef Infra Server each. However, based on your requirements we can add more instances for Chef Infra server.
+- One instance for Chef Infra Server each. However, based on your requirements, we can add more instances for the Chef Infra server.
 
 {{< figure src="/images/automate/ha_aws_resources1.png" alt="Chef Automate HA ElasticSearch and PostgreSQL Instances">}}
 
-- Two load balancers and two respective target groups. One each for Chef Automate server and Chef Infra server.
+- Two load balancers and two respective target groups. One each for the Chef Automate server and Chef Infra server.
 
 {{< figure src="/images/automate/ha_aws_resources2.png" alt="Chef Automate HA Load Balancers and Target Groups">}}
 

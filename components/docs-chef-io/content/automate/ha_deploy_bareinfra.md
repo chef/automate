@@ -20,7 +20,7 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 - Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch nodes.
 - Obtain Bastion host server details from your system administrator. Ensure this server has the [needed requirements](( {{< relref "ha_bastion.md#Bastion Host Requirements for On-Premise Deployment" >}} )) included.
 - Obtain the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_system_requirements.md" >}} )).
-- All VMs must expose the port 22 for SSH. You may need to open certain port across the VMs to establish the communication, which are:
+- All VMs must expose port 22 for SSH. You may need to open certain ports across the VMs to establish the communication, which are:
 
    | Component                                | Port                    |
    | :--------------------------------------: | :---------------------: |
@@ -50,13 +50,13 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 1. Open the `config.toml` file in any editor and do the following:
 
-   - Specify on-premise IPs, list of IP address for the cluster separated by comma.
+   - Specify on-premise IPs, list of IP addresses for the cluster separated by comma.
 
-   - Specify public IPs for the virtual machines. In case, you dont have them, provide private IPs. The `config.toml` configuration file generates with default settings.
+   - Specify public IPs for the virtual machines. In case you do not have them, provide private IPs. The `config.toml` configuration file generates with default settings.
 
 1. Type the command, `cat config.toml` and press **Enter** to view the generated configuration file.
 
-1. Type the command, `./chef-automate deploy config.toml` and press **Enter**. This command creates deployment workspace (*/hab/a2_deploy_workspace*), downloads Habitat, and establish cluster provisioning in your workspace.
+1. Type the command, `./chef-automate deploy config.toml` and press **Enter**. This command creates deployment workspace (*/hab/a2_deploy_workspace*), downloads Habitat, and establishes cluster provisioning in your workspace.
 
 {{< figure src="/images/automate/ha_bare_chef_automate_config.png" alt="Chef Automate Bare Infra Deployment">}}
 
@@ -66,7 +66,7 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 1. Type the command, `cd /hab/a2_deploy_workspace` and press **Enter**. This command sets up the initial workspace directory and changes the working directory to Chef Automate workspace configured.
 
-1. Make the following changes in `config.toml` file by opening the file in a editor. For example, `vi config.toml`.
+1. Make the following changes in `config.toml` file by opening the file in an editor. For example, `vi config.toml`.
 
    - Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in bastion host.
    - Ensure `ssh_key_pair_name` and `ssh key file path` have same value.
@@ -76,10 +76,10 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
    - Ensure the instance type supports the respective AWS region.
    - Add load balancer certificate details for automate and chef-server. For example, as shown below:
 
-      <!-- automate_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e"
-      chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e" -->
+<!-- automate_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e"
+chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e" -->
 
-      {{< figure src="/images/automate/ha_bare_lb.png" alt="Load Balancer Details">}}
+   {{< figure src="/images/automate/ha_bare_lb.png" alt="Load Balancer Details">}}
 
    - Setup the secrets management key and the required passwords. The default location for the secrets key and secret storage is set in the *config.toml* file. The default location for the key is `/etc/chef-automate/secrets.key` and the secret store file is in `/hab/a2_deploy_workspace/secrets.json`.
 
@@ -103,6 +103,6 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 {{< note >}}
 
-You can clear the Bare metal deployment workspace as per your requirements.
+You can clear the Bare-metal deployment workspace as per your requirements.
 
 {{< /note >}}

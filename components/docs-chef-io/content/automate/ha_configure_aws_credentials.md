@@ -13,11 +13,11 @@ gh_repo = "automate"
     weight = 280
 +++
 
-In order to trigger the Amazon Web Services (AWS) deployment, you need to setup the AWS credentials on the bastion host. 
+You need to setup the AWS credentials on the bastion host to trigger the Amazon Web Services (AWS) deployment.
 
 Follow these steps to do so:
 
-1. Navigate to AWS console.
+1. Navigate to the AWS console.
 
 1. Select the user profile created and make a note of the access key and secret key of the user.
 

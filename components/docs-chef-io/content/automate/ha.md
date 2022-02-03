@@ -24,7 +24,7 @@ Thus, HA is designed to avoid loss of service by reducing or managing failures a
 
 ## What are High Availability (HA) clusters?
 
-A **cluster** is a group of inter-connected computers that work together to perform intensive tasks.  In a cluster, each computer is referred to as a "node".
+A **cluster** is a group of inter-connected computers that work together to perform intensive tasks. In a cluster, each computer is referred to as a "node".
 
 **HA clusters** are servers grouped to operate as a single, unified system supporting server applications that can be reliably utilized with a minimum amount of downtime. They are also called **failover clusters** as they share the same storage but use a different network and can run the same workloads of the primary system they support. HA clusters are tested regularly to confirm nodes are always in operational mode.
 
@@ -82,7 +82,7 @@ Chef Automate HA promotes the DR cluster through regular backup and restores mea
 
 #### Failover System
 
-Chef Automate HA enables the ability of the system to continue functioning even after the failure of one or more servers. A part of HA failover, the client applications can continue to operate with minimal downtime, which refers to the ability for client connections to migrate from one server to another in the event of server failure. 
+Chef Automate HA enables the ability of the system to continue functioning even after the failure of one or more servers. A part of HA failover, the client applications can continue to operate with minimal downtime, which refers to the ability for client connections to migrate from one server to another in the event of server failure.
 
 Chef Automate Cluster allows you to minimize downtime by utilizing redundant systems in case of a failure or maintenance. It includes HA capabilities for Automate web services and the associated database services, which are:
 
