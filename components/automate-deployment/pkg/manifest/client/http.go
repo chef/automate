@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/openpgp"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
 )
@@ -79,7 +78,6 @@ type HTTP struct {
 	latestSemanticManifestURLFmt string
 	manifestURLFmt               string
 	versionsURLFmt               string
-	Channel                      string
 	noVerify                     bool
 }
 
@@ -112,10 +110,6 @@ func NewHTTPClient(options ...Opt) *HTTP {
 		c.versionsURLFmt = defaultVersionsURLFmt
 	}
 
-	if c.Channel == "" {
-		c.Channel = defaultChannel
-	}
-
 	// We allow skipping manifest verification if needed by setting this environment
 	// variable. Set it only if you must
 	//Todo(milestone) -- For milestone we cannot skip
@@ -143,13 +137,6 @@ func LatestSemanticURLFormat(urlFormat string) Opt {
 func VersionsURLFormat(urlFormat string) Opt {
 	return func(c *HTTP) {
 		c.versionsURLFmt = urlFormat
-	}
-}
-
-//Channel - the url that holds the list of automate versions
-func Channel(channel string) Opt {
-	return func(c *HTTP) {
-		c.Channel = channel
 	}
 }
 
@@ -259,13 +246,6 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 	if err != nil {
 		return nil, err
 	}
-
-	minCurrentVersion, err := manifest.GetMinCurrentVersion(ctx, c.Channel, m.Version(), c.versionsURLFmt)
-	if err != nil {
-		return nil, err
-	}
-	m.MinCompatibleVer = minCurrentVersion
-	m.HartOverrides = []habpkg.Hart{}
 
 	return m, nil
 }

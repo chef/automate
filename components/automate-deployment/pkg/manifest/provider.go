@@ -246,10 +246,10 @@ func getCompatibleManifestVersion(ctx context.Context, version, channel string, 
 func GetMinCurrentVersion(ctx context.Context, channel,
 	version string, versionsURLFmt string) (compVersion string, err error) {
 	versionsURL := fmt.Sprintf(versionsURLFmt, channel)
-	return getMinimumCurrentManifestVersion(ctx, version, channel, versionsURL)
+	return GetMinimumCurrentManifestVersion(ctx, version, channel, versionsURL)
 }
 
-func getMinimumCurrentManifestVersion(ctx context.Context, version, channel string, optionalURL ...string) (compVersion string, err error) {
+func GetMinimumCurrentManifestVersion(ctx context.Context, version, channel string, optionalURL ...string) (compVersion string, err error) {
 	//get the list of all versions on ascending order
 	allVersions, err := GetAllVersions(ctx, channel, optionalURL...)
 	if err != nil {
