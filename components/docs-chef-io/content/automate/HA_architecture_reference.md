@@ -52,7 +52,7 @@ The backend and frontend clusters comprise **four** different servers with HA mo
 
 {{ note >}}
 
-Elastic Search internally manages the communication and backup, and  does not follow any leader-follower stratery.
+Elastic Search internally manages the communication and backup, and  does not follow any leader-follower strategy.
 
 {{ /note >}}
 
