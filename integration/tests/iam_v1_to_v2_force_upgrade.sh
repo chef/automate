@@ -29,6 +29,9 @@ OLD_VERSION=20190501153509
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${OLD_VERSION}.json"
 
+jq() {
+    hab pkg exec core/jq-static jq "$@"
+}
 
 do_deploy() {
     #shellcheck disable=SC2154
