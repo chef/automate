@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 310
 +++
 
-A key pair consists of a public key that AWS stores, and a private key file that you store. Together, they allow you to connect to your instance securely. This page explains the procedure to establish the comnection between your bastion host and AWS account.
+A key pair consists of a public key that AWS stores, and a private key file that you store. Together, they allow you to connect to your instance securely. This page explains the procedure to establish the connection between your bastion host and AWS account.
 
 1. Navigate to the AWS Management Console.
 1. Select Instances > EC2 option from the left menu.

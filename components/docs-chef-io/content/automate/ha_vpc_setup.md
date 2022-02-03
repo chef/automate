@@ -128,7 +128,9 @@ Refer [select correct CIDR block](https://www.calculator.net/ip-subnet-calculato
 {{< /note >}}
 
 ### Example config.toml file with VPC and CIDR Values
-    
-    region = "ap-south-1"
-    aws_vpc_id  = "vpc-8d1390e5"
-    aws_cidr_block_addr  = "172.31.128.0"
+
+```ruby
+region = "ap-south-1"
+aws_vpc_id  = "vpc-8d1390e5"
+aws_cidr_block_addr  = "172.31.128.0"
+```
