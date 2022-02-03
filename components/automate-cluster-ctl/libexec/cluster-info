@@ -40,7 +40,7 @@ class AutomateClusterInfo < AutomateCluster::Command
                       multiline: true,
                       padding: [0,0,0,0],
                       alignments: [:right, :left],
-                      column_widths: 200,
+                      width: 150,
                       resize: true)
   end
 end
