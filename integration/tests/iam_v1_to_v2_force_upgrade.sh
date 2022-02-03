@@ -49,3 +49,31 @@ do_deploy() {
         --skip-preflight \
         --debug
 }
+
+do_upgrade() {
+
+    log_info "Downloading channel manifests"
+    download_manifest_version "dev" "$test_manifest_dir/dev.json" "20220131135806"
+    download_manifest_version "acceptance" "$test_manifest_dir/acceptance.json" "20220121191356"
+    download_manifest_version "current" "$test_manifest_dir/current.json" "20220121191356"
+    log_info "Creating build.json"
+    create_manifest "$test_manifest_milestone_dir/build.json"
+
+    local release target_manifest
+    #shellcheck disable=SC2154
+    target_manifest="$test_manifest_dir/build.json"
+    release=$(jq -r .build <"$target_manifest")
+    if [[ -z "$release" ]]
+    then
+        log_error "could not get release"
+        return 1
+    fi
+
+    curl -vv --insecure "https://packages.chef.io/set/$release" -X POST -d @"$target_manifest"
+    log_info "Upgrading to $release"
+    # Uncomment once the --version flag is on dev
+    # chef-automate upgrade run --version "$release"
+    chef-automate dev grpcurl deployment-service -- \
+        chef.automate.domain.deployment.Deployment.Upgrade -d "{\"version\": \"$release\"}"
+    wait_for_upgrade "false"
+}
