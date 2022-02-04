@@ -145,6 +145,9 @@ type InstallBundleCreator struct {
 	// For development
 	hartifactsPath string
 	overrideOrigin string
+
+	//only for testing
+	optionalURL string
 }
 
 // InstallBundleCreatorOpt are functional options for the InstallBundleCreator
@@ -359,10 +362,24 @@ func (creator *InstallBundleCreator) loadManifest() (*manifest.A2, error) {
 		manifestProvider = manifest.NewLocalHartManifestProvider(manifestProvider, creator.hartifactsPath, creator.overrideOrigin)
 	}
 
+	var m *manifest.A2
+	var err error
+	ctx := context.Background()
 	if creator.version != "" {
-		return manifestProvider.GetManifest(context.Background(), creator.version)
+		m, err = manifestProvider.GetManifest(ctx, creator.version)
+	} else {
+		m, err = manifestProvider.GetCurrentManifest(ctx, creator.channel)
 	}
-	return manifestProvider.GetCurrentManifest(context.Background(), creator.channel)
+	if err != nil {
+		return m, err
+	}
+
+	minCurrentVersion, err := manifest.GetMinimumCurrentManifestVersion(ctx, m.Version(), creator.channel, creator.optionalURL)
+	if err != nil {
+		return nil, err
+	}
+	m.MinCompatibleVer = minCurrentVersion
+	return m, nil
 }
 
 func (creator *InstallBundleCreator) downloadHab(m *manifest.A2, progress InstallBundleCreatorProgress) error {
