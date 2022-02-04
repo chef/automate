@@ -60,7 +60,7 @@ do_upgrade() {
     download_manifest_version "acceptance" "$test_manifest_dir/acceptance.json" "20220121191356"
     download_manifest_version "current" "$test_manifest_dir/current.json" "20220121191356"
     log_info "Creating build.json"
-    create_manifest "$test_manifest_milestone_dir/build.json"
+    create_manifest "$test_manifest_dir/build.json"
 
     local release target_manifest
     #shellcheck disable=SC2154
