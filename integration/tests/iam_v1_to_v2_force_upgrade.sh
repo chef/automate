@@ -54,6 +54,13 @@ do_deploy() {
         --debug
 }
 
+# By default, do_prepare_upgrade will replace the latest manifest.
+# We don't want that. Instead, we want to test we can grab a specific release
+do_prepare_upgrade() {
+    #shellcheck disable=SC2154
+    mv -f "$test_tmp_hartifacts_path"/* "$test_hartifacts_path/" || true
+}
+
 do_upgrade() {
 
     local release target_manifest
