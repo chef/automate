@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
 	"io"
 	"os"
 	"path"
@@ -31,7 +32,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		stream.SendAndClose(res)
 		return err
 	}
-	log.Info("Starting with migration phase with the upload filei for migration id: ", migrationId)
+	log.Info("Starting with migration phase with the upload file for migration id: ", migrationId)
 	_, err = s.service.Migration.StartMigration(ctx, migrationId, serverId)
 	fileData := bytes.Buffer{}
 	s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
@@ -81,6 +82,8 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		return err
 	}
 
+	pipelineResult := pipeline.Result{Meta: pipeline.Meta{ZipFile: fileName}}
+	s.phaseOnePipeline.Run(pipelineResult)
 	return nil
 }
 
