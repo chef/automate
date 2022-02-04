@@ -1864,9 +1864,37 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 				nextManifestVersion = compVersion
 			}
 		}
+	} else {
+		m, err := s.releaseManifestProvider.RefreshManifest(ctx, channel)
+		if err != nil {
+			return nil, err
+		}
+		nextManifestVersion = m.Version()
+
+		//compare minimum compatible version with current version, i.e current version should be greater than or equal than min compatible version
+		minCompVersion := m.MinCompatibleVer
+		if minCompVersion != "" {
+			if !isCompatibleForAirgap(currentRelease, minCompVersion) {
+				return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q. The compatible version is %q", nextManifestVersion, currentRelease, minCompVersion)
+			}
+		}
+
+		//check for upgrade or degrade, we should not allow degrading
+		if isDegrade(currentRelease, nextManifestVersion) {
+			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", nextManifestVersion, currentRelease)
+		}
+
+		//check the upgrade is major or not, and if the upgrade is major user should provide --major flag.
+		if isMajorUpgrade(currentRelease, nextManifestVersion) && !req.IsMajorUpgrade {
+			return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade airgap --major` to further upgrade")
+		}
 	}
 
 	if req.Version != "" {
+		if airgap.AirgapInUse() {
+			return nil, status.Errorf(codes.InvalidArgument, "specifying a version is not allowed in airgap mode, please use `chef-automate upgrade run --airgap-bundle`")
+		}
+
 		if nextManifestVersion != req.Version && !isCompatible(currentRelease, req.Version, nextManifestVersion) {
 			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", req.Version, currentRelease)
 		}
@@ -1888,7 +1916,13 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 
 // Upgrade requests the deployment-service pulls down the latest manifest and applies it
 func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.UpgradeResponse, error) {
-	if !s.HasConfiguredDeployment() {
+
+	validatedResp, err := s.IsValidUpgrade(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	/*if !s.HasConfiguredDeployment() {
 		return nil, ErrorNotConfigured
 	}
 
@@ -1935,18 +1969,13 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 		}
 
 		nextManifestVersion = req.Version
+	}*/
 
-		// TODO(ssd) 2018-09-13: We are not currently
-		// requiring that the version passed is actually in
-		// the channel they have configured. Should we?
-	}
-	m, err = s.releaseManifestProvider.GetManifest(ctx, nextManifestVersion)
+	m, err := s.releaseManifestProvider.GetManifest(ctx, validatedResp.TargetVersion)
 	/*} else {
 		//m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
 		//Todo(milestone) in airgap, get the manifest and perform the compatibility check.
 	}*/
-
-	//Todo(milestone) incase of airgap find out the upgrade is major or minor
 
 	_, ok := err.(*manifest.NoSuchManifestError)
 	if ok {
@@ -1980,10 +2009,64 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 	}
 
 	return &api.UpgradeResponse{
-		PreviousVersion: currentRelease,
+		PreviousVersion: validatedResp.CurrentVersion,
 		NextVersion:     m.Version(),
 		TaskId:          task.ID.String(),
 	}, nil
+}
+
+//isDegrade return true, if the v2 is previous version of v1
+func isDegrade(v1, v2 string) bool {
+	_, isV1Sem := manifest.IsSemVersionFmt(v1)
+	_, isV2Sem := manifest.IsSemVersionFmt(v2)
+
+	if !isV1Sem && !isV2Sem && v1 > v2 {
+		return true
+	}
+	if isV1Sem && isV2Sem && !manifest.IsCompareSemVersions(v1, v2) {
+		return true
+	}
+
+	if isV1Sem && !isV2Sem {
+		return true
+	}
+	return false
+}
+
+// IsMajorUpgrade returns true if the v2 is next major upgrade of v1 else return false
+func isMajorUpgrade(v1, v2 string) bool {
+	v1Major, isV1Sem := manifest.IsSemVersionFmt(v1)
+	v2Major, isV2Sem := manifest.IsSemVersionFmt(v2)
+
+	if !isV1Sem && isV2Sem {
+		return true
+	}
+
+	if isV1Sem && isV2Sem && v1Major != v2Major {
+		return true
+	}
+
+	return false
+}
+
+//isCompatibleForAirgap will return true if the current version is greater than or equal to min compatible version
+func isCompatibleForAirgap(current, minCompatibleVer string) bool {
+	_, isCurrentSem := manifest.IsSemVersionFmt(current)
+	_, isMinCompSem := manifest.IsSemVersionFmt(minCompatibleVer)
+
+	if !isCurrentSem && !isMinCompSem {
+		return current >= minCompatibleVer
+	}
+
+	if isCurrentSem && isMinCompSem {
+		return manifest.IsCompareSemVersions(minCompatibleVer, current)
+	}
+
+	//if minCompatibleVer is in timestampversion and current version is semantic version - we need to allow the upgrade
+	if !isMinCompSem && isCurrentSem {
+		return true
+	}
+	return false
 }
 
 func isCompatible(current, givenVersion, maxPossibleVersion string) bool {

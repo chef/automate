@@ -449,3 +449,219 @@ func TestIsCompatibleForConverge(t *testing.T) {
 		})
 	}
 }
+
+func TestIsCompatibleForAirgap(t *testing.T) {
+	tests := []struct {
+		name             string
+		currentVersion   string
+		minCompatibleVer string
+		isCompatible     bool
+	}{
+		{
+			name:             "timestampversion,timestampversion_equal_success",
+			currentVersion:   "20220112175624",
+			minCompatibleVer: "20220112175624",
+			isCompatible:     true,
+		},
+		{
+			name:             "timestampversion,timestampversion_success",
+			currentVersion:   "20220112175624",
+			minCompatibleVer: "20220112175620",
+			isCompatible:     true,
+		},
+		{
+			name:             "timestampversion,timestampversion_success",
+			currentVersion:   "20220112175624",
+			minCompatibleVer: "20220112175628",
+			isCompatible:     false,
+		},
+		{
+			name:             "timestampversion,semanticversion",
+			currentVersion:   "20220112175624",
+			minCompatibleVer: "22.0.1",
+			isCompatible:     false,
+		},
+		{
+			name:             "semanticversion,timestampversion",
+			currentVersion:   "22.0.1",
+			minCompatibleVer: "20220112175624",
+			isCompatible:     true,
+		},
+		{
+			name:             "semanticversion,semanticversion",
+			currentVersion:   "22.0.1",
+			minCompatibleVer: "22.0.0",
+			isCompatible:     true,
+		},
+		{
+			name:             "semanticversion,semanticversion_success",
+			currentVersion:   "23.12.14",
+			minCompatibleVer: "22.10.14",
+			isCompatible:     true,
+		},
+		{
+			name:             "semanticversion,semanticversion_success_1",
+			currentVersion:   "22.10.14",
+			minCompatibleVer: "22.9.14",
+			isCompatible:     true,
+		},
+		{
+			name:             "semanticversion,semanticversion_success_2",
+			currentVersion:   "22.10.14",
+			minCompatibleVer: "22.10.8",
+			isCompatible:     true,
+		},
+		{
+			name:             "semanticversion,semanticversion_fail",
+			currentVersion:   "22.10.14",
+			minCompatibleVer: "23.12.14",
+			isCompatible:     false,
+		},
+		{
+			name:             "semanticversion,semanticversion_fail_1",
+			currentVersion:   "22.10.9",
+			minCompatibleVer: "22.10.15",
+			isCompatible:     false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := isCompatibleForAirgap(tc.currentVersion, tc.minCompatibleVer)
+			assert.Equal(t, tc.isCompatible, result)
+		})
+	}
+}
+
+func TestIsDegrade(t *testing.T) {
+	tests := []struct {
+		name      string
+		v1        string
+		v2        string
+		isDegrade bool
+	}{
+		{
+			name:      "timestamp,timestamp_success",
+			v1:        "20220110000009",
+			v2:        "20220110000000",
+			isDegrade: true,
+		},
+		{
+			name:      "timestamp,timestamp_equal",
+			v1:        "20220110000009",
+			v2:        "20220110000009",
+			isDegrade: false,
+		},
+		{
+			name:      "timestamp,timestamp_fail",
+			v1:        "20220110000000",
+			v2:        "20220110000009",
+			isDegrade: false,
+		},
+		{
+			name:      "timestamp,semantic_fail",
+			v1:        "20220110000000",
+			v2:        "22.0.1",
+			isDegrade: false,
+		},
+		{
+			name:      "semantic,timestamp",
+			v1:        "22.0.1",
+			v2:        "20220110000000",
+			isDegrade: true,
+		},
+		{
+			name:      "semantic,semantic_patch",
+			v1:        "22.4.10",
+			v2:        "22.4.9",
+			isDegrade: true,
+		},
+		{
+			name:      "semantic,semantic_patch_fail",
+			v1:        "22.4.9",
+			v2:        "22.4.10",
+			isDegrade: false,
+		},
+		{
+			name:      "semantic,semantic_minor",
+			v1:        "22.4.10",
+			v2:        "22.3.10",
+			isDegrade: true,
+		},
+		{
+			name:      "semantic,semantic_minor_fail",
+			v1:        "22.3.10",
+			v2:        "22.4.10",
+			isDegrade: false,
+		},
+		{
+			name:      "semantic,semantic_major",
+			v1:        "23.3.10",
+			v2:        "22.3.10",
+			isDegrade: true,
+		},
+		{
+			name:      "semantic,semantic_major_fail",
+			v1:        "22.3.10",
+			v2:        "23.3.10",
+			isDegrade: false,
+		},
+		{
+			name:      "semantic,semantic_major_equal",
+			v1:        "22.3.10",
+			v2:        "22.3.10",
+			isDegrade: false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := isDegrade(tc.v1, tc.v2)
+			assert.Equal(t, tc.isDegrade, result)
+		})
+	}
+}
+
+func TestIsMajorUpgrade(t *testing.T) {
+	tests := []struct {
+		name           string
+		v1             string
+		v2             string
+		isMajorUpgrade bool
+	}{
+		{
+			name:           "timestamp,timestamp",
+			v1:             "20220110000000",
+			v2:             "20220110000009",
+			isMajorUpgrade: false,
+		},
+		{
+			name:           "timestamp,semantic",
+			v1:             "20220110000000",
+			v2:             "21.2.0",
+			isMajorUpgrade: true,
+		},
+		{
+			name:           "semantic,timestamp",
+			v1:             "21.2.0",
+			v2:             "20220110000000",
+			isMajorUpgrade: false,
+		},
+		{
+			name:           "semantic,semantic_success",
+			v1:             "21.2.0",
+			v2:             "22.10.0",
+			isMajorUpgrade: true,
+		},
+		{
+			name:           "semantic,semantic_fail",
+			v1:             "21.2.0",
+			v2:             "21.8.0",
+			isMajorUpgrade: false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := isMajorUpgrade(tc.v1, tc.v2)
+			assert.Equal(t, tc.isMajorUpgrade, result)
+		})
+	}
+}
