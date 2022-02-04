@@ -137,14 +137,13 @@ module "habitat-elasticsearch" {
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
-  peer_ips = concat(
+  peer_ips = setunion(
     var.existing_elasticsearch_private_ips,
     var.existing_postgresql_private_ips
   )
 }
 
 module "habitat-postgresql" {
-  count = length(setsubtract(var.existing_elasticsearch_private_ips, var.existing_postgresql_private_ips))
   source                          = "./modules/habitat"
   airgap_info                     = module.airgap_bundle-postgresql.airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
@@ -163,7 +162,7 @@ module "habitat-postgresql" {
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
-  peer_ips = concat(
+  peer_ips = setunion(
     var.existing_elasticsearch_private_ips,
     var.existing_postgresql_private_ips
   )
@@ -335,6 +334,7 @@ module "automate" {
 }
 
 module "chef_server" {
+  count = length(setsubtract(var.existing_chef_server_private_ips, var.existing_automate_private_ips))
   source                          = "./modules/automate"
   airgap_info                     = module.airgap_bundle-chef_server.airgap_info
   automate_admin_email            = var.automate_admin_email
