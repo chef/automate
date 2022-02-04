@@ -92,7 +92,11 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if strings.TrimSpace(oldPgVersion) == OLD_PG_VERSION {
-		writer.Title("Cleanup")
+		writer.Title(
+			"----------------------------------------------\n" +
+				"Cleanup \n" +
+				"----------------------------------------------",
+		)
 		if ClearDataCmdFlags.data == "" {
 			return errors.New("data flag is required")
 		} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
@@ -157,7 +161,11 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 }
 
 func vacuumDb() {
-	writer.Title("vacuum db")
+	writer.Title(
+		"----------------------------------------------\n" +
+			"vacuum db \n" +
+			"----------------------------------------------",
+	)
 	os.Setenv("PGPORT", PGPORT)
 	os.Setenv("PGHOST", PGHOST)
 	os.Setenv("PGUSER", PGUSER)
@@ -208,7 +216,11 @@ func cleanUp() error {
 }
 
 func chefAutomateStop() {
-	writer.Title("Chef-automate stop")
+	writer.Title(
+		"----------------------------------------------\n" +
+			"Chef-automate stop \n" +
+			"----------------------------------------------",
+	)
 	args := []string{
 		"stop",
 	}
@@ -227,7 +239,11 @@ func chefAutomateStop() {
 }
 
 func chefAutomateStatus() {
-	writer.Title("Chef-automate status")
+	writer.Title(
+		"----------------------------------------------\n" +
+			"Chef-automate status \n" +
+			"----------------------------------------------",
+	)
 	args := []string{
 		"status",
 		"--wait-for-healthy",
@@ -240,8 +256,11 @@ func chefAutomateStatus() {
 }
 
 func removeAndReplacePgdata13() {
-
-	writer.Title("remove and replace pgdata13 directory")
+	writer.Title(
+		"----------------------------------------------\n" +
+			"pgdata13 initDb \n" +
+			"----------------------------------------------",
+	)
 	argsToRemove := []string{
 		"-rf",
 		NEW_PG_DATA_DIR,
@@ -255,7 +274,11 @@ func removeAndReplacePgdata13() {
 }
 
 func chefAutomateStart() {
-	writer.Title("Chef-automate start")
+	writer.Title(
+		"----------------------------------------------\n" +
+			"Chef-automate start \n" +
+			"----------------------------------------------",
+	)
 
 	args := []string{
 		"start",
@@ -269,7 +292,11 @@ func chefAutomateStart() {
 }
 
 func executePgdata13ShellScript() {
-	writer.Title("execute pgdata13 shell script")
+	writer.Title(
+		"----------------------------------------------\n" +
+			"execute pgdata13 shell script \n" +
+			"----------------------------------------------",
+	)
 	args := []string{
 		"./scripts/pgdata13.sh",
 	}
@@ -285,7 +312,11 @@ func executePgdata13ShellScript() {
 }
 
 func checkUpdateMigration(check bool) {
-	writer.Title(" migration from: 9.6 to: 13")
+	writer.Title(
+		"----------------------------------------------\n" +
+			"migration from: 9.6 to: 13 \n" +
+			"----------------------------------------------",
+	)
 
 	os.Unsetenv("PGHOST")
 
