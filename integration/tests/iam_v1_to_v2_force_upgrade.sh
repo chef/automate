@@ -10,6 +10,7 @@
 #shellcheck disable=SC2034
 test_name="iam_v1_force_upgrade_to_v2"
 test_upgrades=true
+test_upgrades_ms=true
 test_upgrade_strategy="none"
 
 # a2-iam-v1-integration verifies default policy permissions on an IAM v1 system
@@ -54,13 +55,6 @@ do_deploy() {
 }
 
 do_upgrade() {
-
-    log_info "Downloading channel manifests"
-    download_manifest_version "dev" "$test_manifest_dir/dev.json" "20220131135806"
-    download_manifest_version "acceptance" "$test_manifest_dir/acceptance.json" "20220121191356"
-    download_manifest_version "current" "$test_manifest_dir/current.json" "20220121191356"
-    log_info "Creating build.json"
-    create_manifest "$test_manifest_dir/build.json"
 
     local release target_manifest
     #shellcheck disable=SC2154
