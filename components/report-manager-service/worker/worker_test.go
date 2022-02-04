@@ -25,6 +25,7 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/go-gorp/gorp"
 	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/lifecycle"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -466,6 +467,8 @@ type mockObjStore struct {
 	ForPresignedGetObjectFail bool
 	ForCSVExporter            bool
 	ForObjectNotAvailable     bool
+	ForSetBucketLifeCycleFail bool
+	ForGetBucketLifeCycleFail bool
 }
 
 func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
@@ -560,6 +563,22 @@ func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts mi
 	return nil
 }
 
+func (m mockObjStore) SetBucketLifecycle(ctx context.Context, bucketName string, config *lifecycle.Configuration) error {
+	assert.Equal(m.T, "reqID123", bucketName)
+	if m.ForSetBucketLifeCycleFail {
+		return fmt.Errorf("error in setting the bucket lifecycle configurations")
+	}
+	return nil
+}
+
+func (m mockObjStore) GetBucketLifecycle(ctx context.Context, bucketName string) (*lifecycle.Configuration, error) {
+	assert.Equal(m.T, "reqID123", bucketName)
+	if m.ForGetBucketLifeCycleFail {
+		return nil, fmt.Errorf("error in getting the bucket lifecycle configurations")
+	}
+	return nil, nil
+}
+
 func (m mockObjStore) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (u *url.URL, err error) {
 	assert.Equal(m.T, "reqID123", bucketName)
 	if m.ForCSVExporter {
@@ -608,6 +627,8 @@ func TestRun(t *testing.T) {
 		isPresignedGetObjectFail        bool
 		isCSVExporter                   bool
 		isObjectNotAvailableInDataStore bool
+		isSetBucketLifeCycleFail        bool
+		isGetBucketLifeCycleFail        bool
 	}{
 		{
 			name:          "testRun_Success",
@@ -669,6 +690,16 @@ func TestRun(t *testing.T) {
 			isObjectNotAvailableInDataStore: true,
 			expectedError:                   "",
 		},
+		{
+			name:                     "testRun_Bucket_Lifecycle_Failed",
+			isSetBucketLifeCycleFail: true,
+			expectedError:            "",
+		},
+		{
+			name:                     "testRun_Get_Bucket_Lifecycle_Failed",
+			isGetBucketLifeCycleFail: true,
+			expectedError:            "",
+		},
 	}
 
 	for _, tc := range tests {
@@ -692,6 +723,8 @@ func TestRun(t *testing.T) {
 					ForPresignedGetObjectFail: tc.isPresignedGetObjectFail,
 					ForCSVExporter:            tc.isCSVExporter,
 					ForObjectNotAvailable:     tc.isObjectNotAvailableInDataStore,
+					ForSetBucketLifeCycleFail: tc.isSetBucketLifeCycleFail,
+					ForGetBucketLifeCycleFail: tc.isGetBucketLifeCycleFail,
 				},
 				ObjBucketName:             "testBucket",
 				ComplianceReportingClient: complianceReportingClient,

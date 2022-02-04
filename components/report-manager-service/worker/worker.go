@@ -25,6 +25,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/lifecycle"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -246,6 +247,38 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 			err = errors.Wrap(err, "error in creating a bucket in objectstore")
 			logrus.WithError(err).Error()
 			return nil, err
+		}
+	}
+
+	//Getting the bucket lifecycle configurations
+	lifecycles, err := t.ObjStoreClient.GetBucketLifecycle(ctx, job.RequestToProcess.RequestorId)
+
+	if lifecycles == nil && err.Error() == "The lifecycle configuration does not exist" {
+		config := lifecycle.NewConfiguration()
+		config.Rules = []lifecycle.Rule{
+			{
+				ID:     "expire-bucket",
+				Status: "Enabled",
+				Expiration: lifecycle.Expiration{
+					Days: 1,
+				},
+			},
+		}
+		//Setting the lifecycle configurations
+		err = t.ObjStoreClient.SetBucketLifecycle(ctx, job.RequestToProcess.RequestorId, config)
+		if err != nil {
+			return nil, err
+		}
+
+	} else {
+		if lifecycles != nil && lifecycles.Rules[0].Expiration.IsNull() {
+			lifecycles.Rules[0].Expiration = lifecycle.Expiration{
+				Days: 1,
+			}
+			err = t.ObjStoreClient.SetBucketLifecycle(ctx, job.RequestToProcess.RequestorId, lifecycles)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/lifecycle"
 )
 
 type ObjectStore interface {
@@ -22,6 +23,10 @@ type ObjectStore interface {
 	PresignedGetObject(ctx context.Context, bucketName, objectName string, expires time.Duration, reqParams url.Values) (*url.URL, error)
 
 	StatObject(ctx context.Context, bucketName string, objectName string, opts minio.GetObjectOptions) (minio.ObjectInfo, error)
+
+	SetBucketLifecycle(ctx context.Context, bucketName string, config *lifecycle.Configuration) error
+
+	GetBucketLifecycle(ctx context.Context, bucketName string) (*lifecycle.Configuration, error)
 }
 
 type ReportManagerObjStore struct {
@@ -51,4 +56,12 @@ func (rmc ReportManagerObjStore) PresignedGetObject(ctx context.Context, bucketN
 
 func (rmc ReportManagerObjStore) StatObject(ctx context.Context, bucketName string, objectName string, opts minio.GetObjectOptions) (minio.ObjectInfo, error) {
 	return rmc.ObjStoreClient.StatObject(ctx, bucketName, objectName, opts)
+}
+
+func (rmc ReportManagerObjStore) SetBucketLifecycle(ctx context.Context, bucketName string, config *lifecycle.Configuration) error {
+	return rmc.ObjStoreClient.SetBucketLifecycle(ctx, bucketName, config)
+}
+
+func (rmc ReportManagerObjStore) GetBucketLifecycle(ctx context.Context, bucketName string) (*lifecycle.Configuration, error) {
+	return rmc.ObjStoreClient.GetBucketLifecycle(ctx, bucketName)
 }
