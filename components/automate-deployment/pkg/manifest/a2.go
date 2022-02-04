@@ -15,12 +15,12 @@ type ReleaseManifest interface {
 
 // An A2 manifest specifies the expected contents of a build
 type A2 struct {
-	Build         string          `json:"build"`
-	BuildSHA      string          `json:"build_sha"`
-	Packages      []habpkg.HabPkg `json:"packages"`
-	HartOverrides []habpkg.Hart   `json:"hart_overrides"`
-	SemVersion    string          `json:"version"`
-	//Todo(milestone): add a field to hold min compatable version to upgrade for this release.
+	Build            string          `json:"build"`
+	BuildSHA         string          `json:"build_sha"`
+	Packages         []habpkg.HabPkg `json:"packages"`
+	HartOverrides    []habpkg.Hart   `json:"hart_overrides"`
+	SemVersion       string          `json:"version"`
+	MinCompatibleVer string          `json:"min_compatible_ver"`
 }
 
 // PackageForServiceName returns a Package for the named service
