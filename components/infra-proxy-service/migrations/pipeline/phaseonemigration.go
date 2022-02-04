@@ -51,7 +51,7 @@ func ParseOrg() PhaseOnePipelineProcessor {
 }
 
 func parseOrg(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting parse orgs pipeline")
+	fmt.Println("Starting to parse_orgs pipeline")
 
 	out := make(chan PipelineData, 100)
 
@@ -65,7 +65,7 @@ func parseOrg(result <-chan PipelineData) <-chan PipelineData {
 			}
 			fmt.Println("after write")
 		}
-		fmt.Println("CLosing orgs pipeline")
+		fmt.Println("CLosing parse_orgs pipeline")
 		close(out)
 	}()
 	return out
@@ -79,12 +79,12 @@ func ParseUser() PhaseOnePipelineProcessor {
 }
 
 func parseUser(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting parse user pipeline")
+	fmt.Println("Starting to parse_user pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to parsing users...")
+		fmt.Println("Processing to parse_user...")
 		for res := range result {
 			select {
 			case out <- res:
@@ -92,7 +92,7 @@ func parseUser(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing parseUser")
+		fmt.Println("Closing parse_user")
 		close(out)
 	}()
 
@@ -107,12 +107,12 @@ func ConflictingUsers() PhaseOnePipelineProcessor {
 }
 
 func conflictingUsers(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting conflicting user check pipeline")
+	fmt.Println("Starting to conflicting_user check pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to check conflicting users...")
+		fmt.Println("Processing to conflicting_user users...")
 
 		for res := range result {
 			select {
@@ -121,7 +121,7 @@ func conflictingUsers(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing conflictUser")
+		fmt.Println("Closing conflicting_user")
 		close(out)
 
 	}()
@@ -137,12 +137,12 @@ func OrgMembers() PhaseOnePipelineProcessor {
 }
 
 func orgMembers(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting org user check pipeline")
+	fmt.Println("Starting to org_user check pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to check org users association...")
+		fmt.Println("Processing to check org_user association...")
 		for res := range result {
 			select {
 			case out <- res:
@@ -150,7 +150,7 @@ func orgMembers(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing orgmember")
+		fmt.Println("Closing org_user association check")
 		close(out)
 
 	}()
@@ -166,12 +166,12 @@ func AdminUsers() PhaseOnePipelineProcessor {
 }
 
 func adminUsers(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting org admin user check pipeline")
+	fmt.Println("Starting org admin_users check ")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to to check admin users...")
+		fmt.Println("Processing to to check admin_users...")
 		for res := range result {
 			select {
 			case out <- res:
@@ -179,7 +179,7 @@ func adminUsers(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing adminUsers")
+		fmt.Println("Closing admin_users")
 		close(out)
 
 	}()
