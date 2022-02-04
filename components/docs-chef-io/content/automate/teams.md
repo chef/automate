@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Teams"
-    identifier = "automate/settings/teams.md Teams"
-    parent = "automate/settings"
+    identifier = "automate/users/teams.md Teams"
+    parent = "automate/users"
     weight = 70
 +++
 
