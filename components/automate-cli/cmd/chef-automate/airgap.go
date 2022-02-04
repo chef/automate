@@ -31,16 +31,9 @@ type airgapFlags struct {
 }
 
 func (f airgapFlags) validateArgs() error {
-	if f.manifestPath != "" && f.channel != "" {
-		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a manifest.json and a release channel")
-	}
 
 	if f.manifestPath != "" && f.version != "" {
 		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a manifest.json and a version")
-	}
-
-	if f.channel != "" && f.version != "" {
-		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a channel and a version")
 	}
 
 	if f.hartifactsPath != "" && f.overrideOrigin == "" {
