@@ -72,7 +72,7 @@ module "airgap_bundle-elasticsearch" {
 
 module "airgap_bundle-postgresql" {
   source            = "./modules/airgap_bundle"
-  archive_disk_info = module.system-tuning-postgresql.archive_disk_info
+  archive_disk_info = length(setsubtract(var.existing_elasticsearch_private_ips, var.existing_postgresql_private_ips)) == 0 ? module.system-tuning-elasticsearch.archive_disk_info: module.system-tuning-postgresql.archive_disk_info
   instance_count    = length(var.existing_postgresql_private_ips)
   private_ips       = var.existing_postgresql_private_ips
   bundle_files = [{
@@ -103,7 +103,7 @@ module "airgap_bundle-automate" {
 
 module "airgap_bundle-chef_server" {
   source            = "./modules/airgap_bundle"
-  archive_disk_info = module.system-tuning-chef_server.archive_disk_info
+  archive_disk_info = length(setsubtract(var.existing_chef_server_private_ips, var.existing_automate_private_ips)) == 0 ? module.system-tuning-automate.archive_disk_info:module.system-tuning-chef_server.archive_disk_info
   instance_count    = length(var.existing_chef_server_private_ips)
   private_ips       = var.existing_chef_server_private_ips
   bundle_files = [{
@@ -144,6 +144,7 @@ module "habitat-elasticsearch" {
 }
 
 module "habitat-postgresql" {
+  count = length(setsubtract(var.existing_elasticsearch_private_ips, var.existing_postgresql_private_ips))
   source                          = "./modules/habitat"
   airgap_info                     = module.airgap_bundle-postgresql.airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
@@ -243,7 +244,7 @@ module "postgresql" {
   backend_aib_local_file          = var.backend_aib_local_file
   elasticsearch_listen_port       = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.existing_elasticsearch_private_ips
-  habitat_info                    = module.habitat-postgresql.habitat_info
+  habitat_info                    = length(setsubtract(var.existing_elasticsearch_private_ips, var.existing_postgresql_private_ips)) == 0 ? module.habitat-elasticsearch.habitat_info:module.habitat-postgresql.habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
@@ -350,7 +351,7 @@ module "chef_server" {
   backend_aib_local_file          = var.backend_aib_local_file
   frontend_aib_dest_file          = var.frontend_aib_dest_file
   frontend_aib_local_file         = var.frontend_aib_local_file
-  habitat_info                    = module.habitat-chef_server.habitat_info
+  habitat_info                    = length(setsubtract(var.existing_chef_server_private_ips, var.existing_automate_private_ips)) == 0 ? module.habitat-automate.habitat_info: module.habitat-chef_server.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   elasticsearch_listen_port       = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.existing_elasticsearch_private_ips
