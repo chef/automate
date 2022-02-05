@@ -49,5 +49,5 @@ do_deploy() {
 
 do_upgrade() {
     do_upgrade_default
-    chef-automate post-major-upgrade clear-data --data=PG -y
+    chef-automate post-major-upgrade migrate --data=PG -y
 }
