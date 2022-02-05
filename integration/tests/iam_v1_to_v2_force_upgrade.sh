@@ -73,6 +73,11 @@ do_upgrade() {
         return 1
     fi
 
-    chef-automate upgrade run --version "$release"
+    curl -vv --insecure "https://packages.chef.io/set/$release" -X POST -d @"$target_manifest"
+    log_info "Upgrading to $release"
+    # Uncomment once the --version flag is on dev
+    # chef-automate upgrade run --version "$release"
+    chef-automate dev grpcurl deployment-service -- \
+        chef.automate.domain.deployment.Deployment.Upgrade -d "{\"version\": \"$release\"}"
     wait_for_upgrade "false"
 }

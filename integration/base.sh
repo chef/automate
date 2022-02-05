@@ -156,7 +156,7 @@ do_build_default() {
         download_manifest_version "acceptance" "$test_manifest_dir/acceptance.json" "20220121191356"
         download_manifest_version "current" "$test_manifest_dir/current.json" "20220121191356"
         log_info "Creating build.json"
-        download_manifest_version "dev" "$test_manifest_dir/build.json" "20220131135806"
+        download_manifest_version "current" "$test_manifest_dir/build.json" "20220121191356"
     fi
 
     log_info "Building Tools"
