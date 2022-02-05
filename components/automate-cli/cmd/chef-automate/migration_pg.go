@@ -24,7 +24,7 @@ var migrateDataCmdFlags = struct {
 }{}
 
 var ClearDataCmdFlags = struct {
-	data string
+	data       string
 	autoAccept bool
 }{}
 
@@ -225,8 +225,8 @@ func checkUpdateMigration(check bool) {
 	args := []string{
 		"--old-datadir=/hab/svc/automate-postgresql/data/pgdata",
 		"--new-datadir=/hab/svc/automate-postgresql/data/pgdata13",
-		"--old-bindir=/hab/pkgs/core/postgresql/9.6.21/20211016180117/bin",
-		"--new-bindir=/hab/pkgs/core/postgresql13/13.5/20220120092917/bin",
+		"--old-bindir=/hab/pkgs/core/postgresql/9.6.21/20220110171136/bin",
+		"--new-bindir=/hab/pkgs/core/postgresql13/13.5/20220205150659/bin",
 		"--check",
 		"-U",
 		"automate",
