@@ -389,6 +389,7 @@ func executeAutomateCommandAsync(command string, args []string, helpDocs string,
 
 	err = c.Start()
 	if err != nil {
+		fmt.Println(":::::", err)
 		return status.Wrap(err, status.CommandExecutionError, helpDocs)
 	}
 	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)

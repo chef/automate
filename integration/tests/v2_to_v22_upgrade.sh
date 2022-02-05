@@ -48,7 +48,11 @@ do_deploy() {
 }
 
 do_upgrade() {
+    local previous_umask
+    previous_umask=$(umask)
+    umask 022
     do_upgrade_default
     find / -name pg_upgrade
     chef-automate post-major-upgrade migrate --data=PG -y
+    umask "$previous_umask"
 }
