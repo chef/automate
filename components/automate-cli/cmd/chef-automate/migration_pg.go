@@ -31,7 +31,7 @@ var ClearDataCmdFlags = struct {
 }{}
 
 const (
-	AUTOMATE_PG_MIGRATE_LOG_DIR = "/src"
+	AUTOMATE_PG_MIGRATE_LOG_DIR = "/tmp"
 	OLD_PG_VERSION              = "9.6"
 	NEW_PG_VERSION              = "13.5"
 	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
