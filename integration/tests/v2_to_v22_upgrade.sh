@@ -49,5 +49,6 @@ do_deploy() {
 
 do_upgrade() {
     do_upgrade_default
+    find / -name pg_upgrade
     chef-automate post-major-upgrade migrate --data=PG -y
 }
