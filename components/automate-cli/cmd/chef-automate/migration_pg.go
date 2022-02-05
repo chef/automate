@@ -44,7 +44,7 @@ const (
 	PGSSLCERT                   = "/hab/svc/automate-postgresql/config/server.crt"
 	PGSSLKEY                    = "/hab/svc/automate-postgresql/config/server.key"
 	PGSSLROOTCERT               = "/hab/svc/automate-postgresql/config/root.crt"
-	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.21/20211016180117/bin"
+	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.11/20200319211920/bin"
 	NEW_BIN_DIR                 = "/hab/pkgs/core/postgresql13/13.5/20220120092917/bin"
 )
 
