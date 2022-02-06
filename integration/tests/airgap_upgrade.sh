@@ -44,4 +44,6 @@ do_deploy() {
 
 do_upgrade() {
     run_upgrade update.aib
+    find / -name pg_upgrade
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
 }

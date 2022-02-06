@@ -42,6 +42,7 @@ EOF
 do_upgrade() {
   test_detect_broken_packages=false
   do_upgrade_default
+  find / -name pg_upgrade
   sudo chef-automate post-major-upgrade migrate --data=PG -y
 }
 

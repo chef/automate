@@ -76,6 +76,7 @@ EOF
 
 do_upgrade() {
     do_upgrade_default
+    find / -name pg_upgrade
     sudo chef-automate post-major-upgrade migrate --data=PG -y
     do_backup_default
 

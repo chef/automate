@@ -54,6 +54,7 @@ do_upgrade() {
     previous_umask=$(umask)
     umask 022
     do_upgrade_default
+    find / -name pg_upgrade
     sudo chef-automate post-major-upgrade migrate --data=PG -y
     umask "$previous_umask"
 }
