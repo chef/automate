@@ -176,7 +176,7 @@ func vacuumDb() {
 	os.Setenv("PGSSLROOTCERT", PGSSLROOTCERT)
 
 	args := []string{
-		"./analyze_new_cluster.sh",
+		AUTOMATE_PG_MIGRATE_LOG_DIR + "/analyze_new_cluster.sh",
 	}
 
 	err := executeCommand("/bin/sh", args, "")
