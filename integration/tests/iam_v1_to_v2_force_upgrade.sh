@@ -11,7 +11,7 @@
 test_name="iam_v1_force_upgrade_to_v2"
 test_upgrades=true
 test_upgrade_strategy="none"
-
+test_upgrade_begin_manifest="current.json"
 # a2-iam-v1-integration verifies default policy permissions on an IAM v1 system
 test_deploy_inspec_profiles=(a2-iam-v1-integration)
 
@@ -29,9 +29,6 @@ OLD_VERSION=20190501153509
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${OLD_VERSION}.json"
 
-jq() {
-    hab pkg exec core/jq-static jq "$@"
-}
 
 do_deploy() {
     #shellcheck disable=SC2154
