@@ -17,9 +17,8 @@ test_upgrade_strategy="none"
 # (which now includes only IAM v2 APIs)
 # a2-iam-legacy-integration verifies that migrated v1 legacy policies persisted 
 # and their permissions are enforced
-test_upgrade_inspec_profiles=(a2-deploy-integration a2-iam-legacy-integration)
-
-# Note: we can't run diagnostics AND inspec, so skip diagnostics
+test_upgrade_inspec_profiles=(a2-deploy-integration)
+# The inspec tests don't pass if the diagnostics are run
 test_skip_diagnostics=true
 
 # on this version, Automate had upgrade-to-v2 and the first three v2 data migrations
