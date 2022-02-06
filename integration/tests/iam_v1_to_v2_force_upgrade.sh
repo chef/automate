@@ -11,7 +11,6 @@
 test_name="iam_v1_force_upgrade_to_v2"
 test_upgrades=true
 test_upgrade_strategy="none"
-test_upgrade_begin_manifest="current.json"
 # a2-iam-v1-integration verifies default policy permissions on an IAM v1 system
 test_deploy_inspec_profiles=(a2-iam-v1-integration)
 
@@ -48,4 +47,12 @@ do_deploy() {
         --accept-terms-and-mlsa \
         --skip-preflight \
         --debug
+}
+
+# By default, do_prepare_upgrade will replace the latest manifest.
+# We don't want that. Instead, we want to test we can grab a specific release
+do_prepare_upgrade() {
+    #shellcheck disable=SC2154
+    download_manifest "current" "$test_manifest_dir/current.json"
+    set_test_manifest "current.json"
 }
