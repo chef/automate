@@ -58,6 +58,16 @@ do_prepare_upgrade() {
 }
 
 do_upgrade() {
+    local previous_umask
+    previous_umask=$(umask)
+    umask 022
+    do_upgrade_default
+    find / -name pg_upgrade
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
+    umask "$previous_umask"
+}
+
+do_upgrade() {
     local release target_manifest
     #shellcheck disable=SC2154
     target_manifest="$test_manifest_dir/build.json"
@@ -75,6 +85,7 @@ do_upgrade() {
     chef-automate dev grpcurl deployment-service -- \
         chef.automate.domain.deployment.Deployment.Upgrade -d "{\"version\": \"$release\"}"
     wait_for_upgrade "false"
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
 }
 
 do_test_upgrade() {

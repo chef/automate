@@ -44,3 +44,13 @@ do_deploy() {
 
     "${cli_bin}" iam upgrade-to-v2 --skip-policy-migration
 }
+
+do_upgrade() {
+    local previous_umask
+    previous_umask=$(umask)
+    umask 022
+    do_upgrade_default
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
+    umask "$previous_umask"
+}
+

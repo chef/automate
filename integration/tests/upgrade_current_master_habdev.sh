@@ -19,3 +19,12 @@ do_prepare_upgrade() {
     do_prepare_upgrade_default
     set_test_manifest "build-habdev.json"
 }
+
+do_upgrade() {
+    local previous_umask
+    previous_umask=$(umask)
+    umask 022
+    do_upgrade_default
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
+    umask "$previous_umask"
+}

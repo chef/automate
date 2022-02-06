@@ -56,3 +56,12 @@ do_deploy() {
     # this migrates v1 legacy policies
     "${cli_bin}" iam upgrade-to-v2 
 }
+
+do_upgrade() {
+    local previous_umask
+    previous_umask=$(umask)
+    umask 022
+    do_upgrade_default
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
+    umask "$previous_umask"
+}

@@ -524,77 +524,77 @@ steps:
         linux:
           privileged: true
 
-  # - label: "iam v1 to v2 force-upgrade (diagnostics only)"
-  #   command:
-  #     - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     secrets:
-  #       A2_LICENSE:
-  #         path: secret/a2/license
-  #         field: license
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "iam v1 to v2 force-upgrade (diagnostics only)"
+    command:
+      - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "iam v2 with no legacy policies force-upgrade to v2"
-  #   command:
-  #     - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     secrets:
-  #       A2_LICENSE:
-  #         path: secret/a2/license
-  #         field: license
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "iam v2 with no legacy policies force-upgrade to v2"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
-  #   command:
-  #     - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     secrets:
-  #       A2_LICENSE:
-  #         path: secret/a2/license
-  #         field: license
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "iam v2 with legacy policies force upgrade to v2"
-  #   command:
-  #     - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     secrets:
-  #       A2_LICENSE:
-  #         path: secret/a2/license
-  #         field: license
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "iam v2 with legacy policies force upgrade to v2"
+    command:
+      - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "a1migration"
-  #   command:
-  #     - integration/run_test integration/tests/a1migration.sh
-  #   timeout_in_minutes: 30
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         single-use: true
-  #         privileged: true
+  - label: "a1migration"
+    command:
+      - integration/run_test integration/tests/a1migration.sh
+    timeout_in_minutes: 30
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
 
-  # - label: "airgap a1migration"
-  #   command:
-  #     - integration/run_test integration/tests/airgap_a1migration.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         single-use: true
-  #         privileged: true
+  - label: "airgap a1migration"
+    command:
+      - integration/run_test integration/tests/airgap_a1migration.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
 
   # - label: "product"
   #   command:
@@ -624,14 +624,14 @@ steps:
   #       linux:
   #         privileged: true
 
-  # - label: "airgap upgrade"
-  #   command:
-  #     - integration/run_test integration/tests/airgap_upgrade.sh
-  #   timeout_in_minutes: 30
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "airgap upgrade"
+    command:
+      - integration/run_test integration/tests/airgap_upgrade.sh
+    timeout_in_minutes: 30
+    expeditor:
+      executor:
+        linux:
+          privileged: true
   # - label: "airgap ow upgrade"
   #   command:
   #     - integration/run_test integration/tests/airgap_ow_upgrade.sh
@@ -738,79 +738,79 @@ steps:
   #         single-use: true
   #         privileged: true
 
-  # - label: "upgrade dev -> master"
-  #   command:
-  #     - integration/run_test integration/tests/upgrade.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "upgrade dev -> master"
+    command:
+      - integration/run_test integration/tests/upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "upgrade acceptance -> master"
-  #   command:
-  #     - integration/run_test integration/tests/upgrade_acceptance_master.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "upgrade acceptance -> master"
+    command:
+      - integration/run_test integration/tests/upgrade_acceptance_master.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "upgrade current -> master"
-  #   command:
-  #     - integration/run_test integration/tests/upgrade_current_master.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "upgrade current -> master"
+    command:
+      - integration/run_test integration/tests/upgrade_current_master.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "upgrade current -> master (with latest hab)"
-  #   command:
-  #     - integration/run_test integration/tests/upgrade_current_master_habdev.sh
-  #   timeout_in_minutes: 25
-  #   soft_fail: true
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "upgrade current -> master (with latest hab)"
+    command:
+      - integration/run_test integration/tests/upgrade_current_master_habdev.sh
+    timeout_in_minutes: 25
+    soft_fail: true
+    expeditor:
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "manual upgrade current -> master"
-  #   command:
-  #     - integration/run_test integration/tests/manual_upgrade.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "manual upgrade current -> master"
+    command:
+      - integration/run_test integration/tests/manual_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "deep upgrades"
-  #   command:
-  #     - integration/run_test integration/tests/deep_upgrade.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "deep upgrades"
+    command:
+      - integration/run_test integration/tests/deep_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          privileged: true
 
-  # - label: "deep migrate upgrade"
-  #   command:
-  #     - integration/run_test integration/tests/migrate_upgrade.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         single-use: true
-  #         privileged: true
+  - label: "deep migrate upgrade"
+    command:
+      - integration/run_test integration/tests/migrate_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
 
-  # - label: "deep upgrade backup restore"
-  #   command:
-  #     - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
-  #   timeout_in_minutes: 35
-  #   expeditor:
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "deep upgrade backup restore"
+    command:
+      - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          privileged: true
 
   # - label: "backups"
   #   command:

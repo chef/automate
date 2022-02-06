@@ -52,3 +52,21 @@ do_deploy() {
 
     "${cli_bin}" iam upgrade-to-v2 --skip-policy-migration
 }
+
+# # By default, do_prepare_upgrade will replace the latest manifest.
+# # We don't want that. Instead, we want to test we can grab a specific release
+# do_prepare_upgrade() {
+#     do_prepare_upgrade_default
+#     #shellcheck disable=SC2154
+#     download_manifest "current" "$test_manifest_dir/current.json"
+#     set_test_manifest "current.json"
+# }
+
+do_upgrade() {
+    local previous_umask
+    previous_umask=$(umask)
+    umask 022
+    do_upgrade_default
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
+    umask "$previous_umask"
+}

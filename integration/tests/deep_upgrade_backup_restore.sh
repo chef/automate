@@ -76,6 +76,7 @@ EOF
 
 do_upgrade() {
     do_upgrade_default
+    sudo chef-automate post-major-upgrade migrate --data=PG -y
     do_backup_default
 
     #shellcheck disable=SC2154
