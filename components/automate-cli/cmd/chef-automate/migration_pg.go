@@ -23,6 +23,7 @@ var migrateDataCmdFlags = struct {
 	check      bool
 	data       string
 	autoAccept bool
+	oldBin     string
 }{}
 
 var ClearDataCmdFlags = struct {
@@ -83,6 +84,7 @@ func newMigratePgCmd() *cobra.Command {
 	migratePgCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
 	migratePgCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
 	migratePgCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
+	migratePgCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.oldBin, "old-bin", OLD_BIN_DIR, "old-bin")
 	return migratePgCmd
 }
 
@@ -142,7 +144,7 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 			}
 
 			executePgdata13ShellScript()
-			checkUpdateMigration(migrateDataCmdFlags.check)
+			checkUpdateMigration(migrateDataCmdFlags.check, migrateDataCmdFlags.oldBin)
 			chefAutomateStart()
 			chefAutomateStatus()
 			if !migrateDataCmdFlags.check {
@@ -311,7 +313,7 @@ func executePgdata13ShellScript() {
 	checkErrorForCommand(c)
 }
 
-func checkUpdateMigration(check bool) {
+func checkUpdateMigration(check bool, old_bin string) {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"migration from: 9.6 to: 13 \n" +
@@ -319,11 +321,6 @@ func checkUpdateMigration(check bool) {
 	)
 
 	os.Unsetenv("PGHOST")
-
-	var old_bin = OLD_BIN_DIR
-	if os.Getenv("OLD_BIN_DIR") != "" {
-		old_bin = os.Getenv("OLD_BIN_DIR")
-	}
 
 	writer.Title("Checking for pg_upgrade")
 	args := []string{

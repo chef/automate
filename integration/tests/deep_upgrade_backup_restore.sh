@@ -77,7 +77,7 @@ EOF
 do_upgrade() {
     do_upgrade_default
     find / -name pg_upgrade
-    OLD_BIN_DIR="/hab/pkgs/core/postgresql/9.6.11/20190305213451/bin" sudo chef-automate post-major-upgrade migrate --data=PG -y
+    sudo chef-automate post-major-upgrade migrate --data=PG --old-bin=/hab/pkgs/core/postgresql/9.6.11/20190305213451/bin -y
     do_backup_default
 
     #shellcheck disable=SC2154
