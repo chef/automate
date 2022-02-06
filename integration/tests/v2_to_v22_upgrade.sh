@@ -17,7 +17,7 @@ test_upgrade_strategy="none"
 # (which now includes only IAM v2 APIs)
 # a2-iam-legacy-integration verifies that migrated v1 legacy policies persisted 
 # and their permissions are enforced
-test_upgrade_inspec_profiles=(a2-deploy-integration)
+test_upgrade_inspec_profiles=(a2-deploy-integration a2-iam-no-legacy-integration)
 # The inspec tests don't pass if the diagnostics are run
 test_skip_diagnostics=true
 
