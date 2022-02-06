@@ -320,11 +320,16 @@ func checkUpdateMigration(check bool) {
 
 	os.Unsetenv("PGHOST")
 
+	var old_bin = OLD_BIN_DIR
+	if os.Getenv("OLD_BIN_DIR") != "" {
+		old_bin = os.Getenv("OLD_BIN_DIR")
+	}
+
 	writer.Title("Checking for pg_upgrade")
 	args := []string{
 		"--old-datadir=" + OLD_PG_DATA_DIR,
 		"--new-datadir=" + NEW_PG_DATA_DIR,
-		"--old-bindir=" + OLD_BIN_DIR,
+		"--old-bindir=" + old_bin,
 		"--new-bindir=" + NEW_BIN_DIR,
 		"--check",
 		"-U",

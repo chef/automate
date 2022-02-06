@@ -50,6 +50,6 @@ do_upgrade() {
     umask 022
     do_upgrade_default
     find / -name pg_upgrade
-    sudo chef-automate post-major-upgrade migrate --data=PG -y
+    OLD_BIN_DIR="/hab/pkgs/core/postgresql/9.6.11/20190305213451/bin" sudo chef-automate post-major-upgrade migrate --data=PG -y
     umask "$previous_umask"
 }
