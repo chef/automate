@@ -329,25 +329,19 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 			}).Debug("Found hart override")
 		}
 
-		if enableExternalPg {
-			if service.Name() == constants.AutomatePGService {
+		if service.Name() == constants.AutomatePGService {
+			if enableExternalPg {
 				service.DeploymentState = deployment.Removed
-			}
-		} else {
-			if service.Name() == constants.AutomatePGService && service.DeploymentState == deployment.Removed {
+			} else if service.DeploymentState == deployment.Removed {
 				service.DeploymentState = deployment.Running
-
 			}
 		}
 
-		if enableExternalES {
-			if service.Name() == constants.AutomateESService {
+		if service.Name() == constants.AutomateSearchService {
+			if enableExternalES {
 				service.DeploymentState = deployment.Removed
-			}
-		} else {
-			if service.Name() == constants.AutomateESService && service.DeploymentState == deployment.Removed {
+			} else if service.DeploymentState == deployment.Removed {
 				service.DeploymentState = deployment.Running
-
 			}
 		}
 
@@ -902,30 +896,7 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 
 	//To remove internal services from health check in case External ES or PG is enabled
 
-	servicesToSkip := make([]string, 0, len(serviceList))
-
-	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
-	if enableExternalPg {
-		logctx.Debug("External PG is enabled.")
-		servicesToSkip = append(servicesToSkip, constants.AutomatePGService)
-	}
-	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
-
-	if enableExternalEs {
-		logctx.Debug("External ES is enabled.")
-		servicesToSkip = append(servicesToSkip, constants.AutomateESService)
-	}
-	if len(servicesToSkip) > 0 {
-		for i, v := range serviceList {
-			for _, x := range servicesToSkip {
-				if x == v {
-					logctx.Debug("Removed service " + x + " from Health Check")
-					serviceList = append(serviceList[:i], serviceList[i+1:]...)
-					break
-				}
-			}
-		}
-	}
+	serviceList = skipServicesForHealthCheck(serviceList, s, logctx)
 
 	var status *api.ServiceStatus
 	e.Phase(api.Running, events.CheckingServiceHealth)
@@ -963,6 +934,34 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 	e.PhaseStep(api.CompleteOk, events.CheckingServiceHealth, "all services healthy", "")
 	e.Phase(api.CompleteOk, events.CheckingServiceHealth)
 	logctx.Debug("all services healthy")
+}
+
+func skipServicesForHealthCheck(serviceList []string, s *errDeployer, logctx *logrus.Entry) []string {
+	servicesToSkip := make([]string, 0, len(serviceList))
+
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	if enableExternalPg {
+		logctx.Debug("External PG is enabled.")
+		servicesToSkip = append(servicesToSkip, constants.AutomatePGService)
+	}
+	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+
+	if enableExternalEs {
+		logctx.Debug("External ES is enabled.")
+		servicesToSkip = append(servicesToSkip, constants.AutomateSearchService)
+	}
+	if len(servicesToSkip) > 0 {
+		for i, v := range serviceList {
+			for _, x := range servicesToSkip {
+				if x == v {
+					logctx.Debug("Removed service " + x + " from Health Check")
+					serviceList = append(serviceList[:i], serviceList[i+1:]...)
+					break
+				}
+			}
+		}
+	}
+	return serviceList
 }
 
 func (s *server) Ping(context.Context, *api.PingRequest) (*api.PingResponse, error) {
