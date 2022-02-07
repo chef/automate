@@ -196,7 +196,7 @@ func (c *cachingReleaseManifestProvider) GetCompatibleVersion(ctx context.Contex
 
 func getCompatibleManifestVersion(ctx context.Context, version, channel string, optionalURL ...string) (isMinorAvailable, isMajorAvailable bool, compVersion string, err error) {
 	//get the list of all versions on ascending order
-	allVersions, err := GetAllVersions(ctx, channel, optionalURL[0])
+	allVersions, err := GetAllVersions(ctx, channel, optionalURL...)
 	if err != nil {
 		return false, false, "", errors.Wrap(err, fmt.Sprintf("error in getting the versions from %s channel", channel))
 	}

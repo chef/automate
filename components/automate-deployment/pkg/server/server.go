@@ -116,6 +116,9 @@ const (
 	// The default size of "chunks" for gRPC calls that return
 	// large streams of data.
 	defaultChunkSize = 2 << 17 // 256k
+
+	// The environmental variable to track the upgrade is major or not
+	isUpgradeMajorEnv = "IS_MAJOR_UPGRADE"
 )
 
 var (
@@ -1167,13 +1170,33 @@ func (s *server) shouldFetchManifest() bool {
 	return s.deployment.CurrentReleaseManifest == nil || s.deployment.Config.Deployment.GetV1().GetSvc().GetUpgradeStrategy().GetValue() != "none"
 }
 
+//isCompatibleForConverge checks the converge from v1 to v2 is possible or not
+func (s *server) isCompatibleForConverge(v1, v2 string) bool {
+	if v1 == v2 {
+		return true
+	}
+	v1Major, isV1SemFmt := manifest.IsSemVersionFmt(v1)
+	v2Major, isV2SemFmt := manifest.IsSemVersionFmt(v2)
+
+	if isV1SemFmt != isV2SemFmt || v1Major != v2Major {
+		return false
+	}
+	if (!isV1SemFmt && !isV2SemFmt && v1 < v2) || (isV1SemFmt && isV2SemFmt && manifest.IsCompareSemVersions(v1, v2)) {
+		return true
+	}
+
+	return false
+}
+
 // nextManifest returns the next A2 manifest that we should use.  This
 // is either the manifest currently in use or the latest manifest on
 // the configured channel. If neither are available, an error is
 // returned.
 func (s *server) nextManifest() (*manifest.A2, error) {
 	if s.shouldFetchManifest() {
-		nextManifest, err := s.releaseManifestProvider.GetCurrentManifest(context.Background(), s.deployment.Channel())
+		ctx := context.Background()
+		currentVersion := s.deployment.CurrentReleaseManifest.Version()
+		_, _, nextVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), currentVersion)
 		if err != nil {
 			logrus.WithError(err).Error("Could not fetch manifest")
 			if s.deployment.CurrentReleaseManifest == nil {
@@ -1191,16 +1214,27 @@ func (s *server) nextManifest() (*manifest.A2, error) {
 		// explicitly upgraded to a manifest that is newer
 		// than what is the channel, we keep using our current
 		// manifest until the channel catches up.
-		if s.deployment.CurrentReleaseManifest != nil && nextManifest.Version() < s.deployment.CurrentReleaseManifest.Version() {
-			logrus.Infof("Most recent manifest on channel %q (%s) is older than current manifest (%s), ignoring",
-				s.deployment.Channel(),
-				nextManifest.Version(),
-				s.deployment.CurrentReleaseManifest.Version())
+		if s.deployment.CurrentReleaseManifest != nil && s.isCompatibleForConverge(s.deployment.CurrentReleaseManifest.Version(), nextVersion) {
+			m, err := s.releaseManifestProvider.GetManifest(ctx, nextVersion)
+			if err != nil {
+				logrus.WithError(err).Error("Could not fetch manifest")
+				if s.deployment.CurrentReleaseManifest == nil {
+					return nil, errors.New("Release manifest not available")
+				}
 
-			return s.deployment.CurrentReleaseManifest, nil
+				// Continue with last manifest even in the
+				// case of an error because we still want to
+				// converge
+				logrus.Info("Continuing converge with last known manifest")
+				return s.deployment.CurrentReleaseManifest, nil
+			}
+			return m, nil
 		}
 
-		return nextManifest, nil
+		logrus.Infof("Next upgradable manifest on channel %q (%s) is not compatible with current manifest (%s), ignoring",
+			s.deployment.Channel(),
+			nextVersion,
+			s.deployment.CurrentReleaseManifest.Version())
 	}
 
 	return s.deployment.CurrentReleaseManifest, nil
@@ -1237,6 +1271,7 @@ func (s *server) convergeDeployment() error {
 			"next_manifest":    nextVersion,
 		})
 		if nextVersion > currentVersion {
+			//Todo(milestone) modify the comparision logic, should not use simple less than or greater than
 			logctx.Info("Starting converge with UPDATED manifest")
 		} else if nextVersion < currentVersion {
 			// We should not see this because of the current implementation of
@@ -1310,6 +1345,7 @@ func (s *server) doConverge(
 	eDeploy.startConverge(task, sink)
 	go func() {
 		defer sender.TaskComplete()
+		defer os.Setenv(isUpgradeMajorEnv, "false")
 
 		eDeploy.waitForConverge(task)
 		// TODO: We need some way to know that the hab supervisor has called
@@ -1795,6 +1831,61 @@ func (s *server) ManifestVersion(ctx context.Context, d *api.ManifestVersionRequ
 	}, nil
 }
 
+func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*api.ValidatedUpgradeResponse, error) {
+	if !s.HasConfiguredDeployment() {
+		return nil, ErrorNotConfigured
+	}
+
+	var currentRelease = ""
+	s.deployment.Lock()
+	if s.deployment.CurrentReleaseManifest != nil {
+		currentRelease = s.deployment.CurrentReleaseManifest.Version()
+	}
+	channel := s.deployment.Channel()
+	s.deployment.Unlock()
+
+	nextManifestVersion := currentRelease
+	if !airgap.AirgapInUse() { //internet connected machine
+		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, channel, currentRelease)
+		if err != nil {
+			return nil, err
+		}
+
+		if !req.IsMajorUpgrade { //normal upgrade
+			if isMinorAvailable {
+				nextManifestVersion = compVersion
+			} else if isMajorAvailable {
+				return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --major` to further upgrade")
+			}
+		} else { //major upgrade
+			if isMinorAvailable {
+				return nil, status.Errorf(codes.InvalidArgument, "minor/patch version is available, please use `chef-automate upgrade run`")
+			} else if isMajorAvailable {
+				nextManifestVersion = compVersion
+			}
+		}
+	}
+
+	if req.Version != "" {
+		if nextManifestVersion != req.Version && !isCompatible(currentRelease, req.Version, nextManifestVersion) {
+			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", req.Version, currentRelease)
+		}
+
+		nextManifestVersion = req.Version
+	}
+
+	major, isSemFormat := manifest.IsSemVersionFmt(nextManifestVersion)
+	resp := &api.ValidatedUpgradeResponse{
+		CurrentVersion: currentRelease,
+		TargetVersion:  nextManifestVersion,
+	}
+	if isSemFormat {
+		resp.TargetMajor = major
+	}
+
+	return resp, nil
+}
+
 // Upgrade requests the deployment-service pulls down the latest manifest and applies it
 func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.UpgradeResponse, error) {
 	if !s.HasConfiguredDeployment() {
@@ -1857,14 +1948,16 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 
 	//Todo(milestone) incase of airgap find out the upgrade is major or minor
 
-	//Todo(milestone) implement a process to present checklist
-
 	_, ok := err.(*manifest.NoSuchManifestError)
 	if ok {
 		return nil, status.Errorf(codes.NotFound, errors.Wrap(err, "No manifest for the specified version or channel could be found").Error())
 	}
 	if err != nil {
 		return nil, err
+	}
+
+	if req.IsMajorUpgrade {
+		os.Setenv(isUpgradeMajorEnv, "true")
 	}
 
 	s.deployment.Lock()
@@ -1921,7 +2014,7 @@ func isCompatible(current, givenVersion, maxPossibleVersion string) bool {
 		if !isGivenVSem || !isMaxPossibleSem { // given version is in time stamp version or max possible version is in timestamp version
 			return false
 		}
-		if givenMajor == maxPossibleMajor {
+		if manifest.IsCompareSemVersions(current, givenVersion) && givenMajor == maxPossibleMajor {
 			return manifest.IsCompareSemVersions(givenVersion, maxPossibleVersion)
 		}
 	}
