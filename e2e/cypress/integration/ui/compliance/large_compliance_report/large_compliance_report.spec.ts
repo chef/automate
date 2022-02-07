@@ -24,7 +24,7 @@ describe('login the app', () => {
       it('is data exist for download', function() {
         cy.get('[data-cy=nodes-tab]').then(($anchor) => {
           const dataLabel = $anchor.text().trim();
-          if(dataLabel.indexOf('0 Nodes') === 0 || dataLabel.indexOf('Nodes') === 0) {
+          if (dataLabel.indexOf('0 Nodes') === 0 || dataLabel.indexOf('Nodes') === 0) {
             expect(isDataloaded).to.equal(false);
           } else {
             isDataloaded = true;
@@ -52,8 +52,8 @@ describe('login the app', () => {
             method: 'POST',
             url: '/api/v0/compliance/reporting/reportmanager/export',
             body: {
-                "type": "csv",
-                "filters": []
+                'type': 'csv',
+                'filters': []
             }
           }).then((resp) => {
             if (resp.status === 200 && resp.statusText === 'OK') {
@@ -63,7 +63,7 @@ describe('login the app', () => {
             }
           });
         });
-  
+
         it('response status 200', function () {
           if (isDataloaded && isLargeReportingEnabled) {
             expect(apiStatus).to.equal('success');
@@ -87,7 +87,7 @@ describe('login the app', () => {
             }
           });
         });
-  
+
         it('response status 200', function () {
           if (isLargeReportingEnabled) {
             expect(apiStatus).to.equal('success');
@@ -105,7 +105,7 @@ describe('login the app', () => {
               method: 'POST',
               url: '/api/v0/compliance/reporting/reportmanager/export'
           }).as('acknowledgement');
-          
+
           cy.get('[data-cy=download-dropdown]').click().then(() => {
             cy.get('[data-cy=download-csv]').click().then(() => {
               cy.wait('@acknowledgement')
@@ -153,7 +153,7 @@ describe('login the app', () => {
               cy.get('[data-cy=download-report-list]').then(($table) => {
                 if ($table.find('.csv').length > 0) {
                   cy.get('.csv').then(($csv) => {
-                    if($csv.find('.success-status').length > 0) {
+                    if ($csv.find('.success-status').length > 0) {
                       cy.server();
                       cy.route({
                         method: 'GET',
@@ -176,5 +176,5 @@ describe('login the app', () => {
       });
 
     });
-  });    
+  });
 });
