@@ -164,23 +164,23 @@
       "type": "object",
       "properties": {
         "orgs_to_migrate": {
-          "type": "string",
-          "format": "int64",
+          "type": "integer",
+          "format": "int32",
           "title": "Number of orgs to migrate"
         },
         "orgs_to_skip": {
-          "type": "string",
-          "format": "int64",
+          "type": "integer",
+          "format": "int32",
           "title": "Number of orgs to skip"
         },
         "orgs_to_update": {
-          "type": "string",
-          "format": "int64",
+          "type": "integer",
+          "format": "int32",
           "title": "Number of orgs to update"
         },
         "orgs_to_delete": {
-          "type": "string",
-          "format": "int64",
+          "type": "integer",
+          "format": "int32",
           "title": "Number of orgs to delete"
         },
         "users": {

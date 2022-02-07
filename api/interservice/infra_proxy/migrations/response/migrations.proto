@@ -37,13 +37,13 @@ message GetStagedDataResponse {
 
 message StagedData {
   // Number of orgs to migrate
-  int64 orgs_to_migrate =1;
+  int32 orgs_to_migrate =1;
   // Number of orgs to skip
-  int64 orgs_to_skip =2;
+  int32 orgs_to_skip =2;
   // Number of orgs to update
-  int64 orgs_to_update =3;
+  int32 orgs_to_update =3;
   // Number of orgs to delete
-  int64 orgs_to_delete =4;
+  int32 orgs_to_delete =4;
   // Users
   repeated user users =5;
 }
