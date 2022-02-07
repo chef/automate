@@ -12,6 +12,6 @@ const (
 )
 
 const (
-	AutomatePGService = "automate-postgresql"
-	AutomateESService = "automate-elasticsearch"
+	AutomatePGService     = "automate-postgresql"
+	AutomateSearchService = "automate-elasticsearch"
 )
