@@ -275,14 +275,14 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 
 	//If lifecycles are set
 	if lifecycles != nil {
-		flag := false
-		for i := range lifecycles.Rules {
-			if !lifecycles.Rules[i].Expiration.IsNull() {
-				flag = true
+		isExpirationEnabled := false
+		for _, rule := range lifecycles.Rules {
+			if !rule.Expiration.IsNull() {
+				isExpirationEnabled = true
 				break
 			}
 		}
-		if !flag {
+		if !isExpirationEnabled {
 			newRule := lifecycle.Rule{
 				ID:     "expire-bucket",
 				Status: "Enabled",

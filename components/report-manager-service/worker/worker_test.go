@@ -570,6 +570,9 @@ func (m mockObjStore) SetBucketLifecycle(ctx context.Context, bucketName string,
 		assert.Equal(m.T, 1, len(config.Rules))
 		assert.Equal(m.T, "expire-bucket", config.Rules[0].ID)
 	}
+	if m.ForSetBucketLifeCycleFail {
+		return fmt.Errorf("error in setting the bucket lifecycle configurations")
+	}
 
 	return nil
 }
@@ -594,8 +597,7 @@ func (m mockObjStore) GetBucketLifecycle(ctx context.Context, bucketName string)
 			ID:     "expire-bucket",
 			Status: "Enabled",
 		}
-		config.Rules = append(config.Rules, newRule)
-		return config, nil
+		config.Rules = []lifecycle.Rule{newRule}
 	}
 	return config, nil
 }
@@ -713,11 +715,6 @@ func TestRun(t *testing.T) {
 			expectedError:                   "",
 		},
 		{
-			name:                     "testRun_Set_Bucket_Lifecycle_Failed",
-			isSetBucketLifeCycleFail: true,
-			expectedError:            "",
-		},
-		{
 			name:                     "testRun_Get_Bucket_Lifecycle_Failed",
 			isGetBucketLifeCycleFail: true,
 			expectedError:            "",
@@ -726,6 +723,12 @@ func TestRun(t *testing.T) {
 			name:                           "testRun_Get_Bucket_Lifecycle_Without_Expiry",
 			isBucketLifeCycleWithoutExpiry: true,
 			expectedError:                  "",
+		},
+		{
+			name:                           "testRun_Set_Bucket_Lifecycle_false",
+			isBucketLifeCycleWithoutExpiry: true,
+			isSetBucketLifeCycleFail:       true,
+			expectedError:                  "error in setting the bucket lifecycle configurations",
 		},
 	}
 
