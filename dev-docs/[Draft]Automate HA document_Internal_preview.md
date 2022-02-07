@@ -727,7 +727,7 @@ bucket name (bucket = "bucket-name" and name = "bucket-name")
 	
 After putting contents in automate.toml file, we need to execute below command. This command will also trigger the deployment. 
 
-`./chef-automate patch configs/automate.toml`
+`./chef-automate config patch configs/automate.toml`
 
 Back-up configurations to be done after deploying cluster
 
