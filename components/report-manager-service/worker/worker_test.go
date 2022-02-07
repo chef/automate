@@ -457,18 +457,19 @@ func (t *CerealTask) GetMetadata() cereal.TaskMetadata {
 }
 
 type mockObjStore struct {
-	T                         *testing.T
-	ForGetObjectFailure       bool
-	ForPutObjectFailure       bool
-	ForUnmarshallFailure      bool
-	IsBucketExisted           bool
-	ForBucketExistenceFail    bool
-	ForMakeBucketFail         bool
-	ForPresignedGetObjectFail bool
-	ForCSVExporter            bool
-	ForObjectNotAvailable     bool
-	ForSetBucketLifeCycleFail bool
-	ForGetBucketLifeCycleFail bool
+	T                               *testing.T
+	ForGetObjectFailure             bool
+	ForPutObjectFailure             bool
+	ForUnmarshallFailure            bool
+	IsBucketExisted                 bool
+	ForBucketExistenceFail          bool
+	ForMakeBucketFail               bool
+	ForPresignedGetObjectFail       bool
+	ForCSVExporter                  bool
+	ForObjectNotAvailable           bool
+	ForSetBucketLifeCycleFail       bool
+	ForGetBucketLifeCycleFail       bool
+	ForBucketLifeCycleWithoutExpiry bool
 }
 
 func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
@@ -565,18 +566,41 @@ func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts mi
 
 func (m mockObjStore) SetBucketLifecycle(ctx context.Context, bucketName string, config *lifecycle.Configuration) error {
 	assert.Equal(m.T, "reqID123", bucketName)
-	if m.ForSetBucketLifeCycleFail {
-		return fmt.Errorf("error in setting the bucket lifecycle configurations")
+	if m.ForGetBucketLifeCycleFail {
+		assert.Equal(m.T, 1, len(config.Rules))
+		assert.Equal(m.T, "expire-bucket", config.Rules[0].ID)
 	}
+
 	return nil
 }
 
 func (m mockObjStore) GetBucketLifecycle(ctx context.Context, bucketName string) (*lifecycle.Configuration, error) {
 	assert.Equal(m.T, "reqID123", bucketName)
 	if m.ForGetBucketLifeCycleFail {
-		return nil, fmt.Errorf("error in getting the bucket lifecycle configurations")
+		return nil, fmt.Errorf("The lifecycle configuration does not exist")
 	}
-	return nil, nil
+	config := lifecycle.NewConfiguration()
+	config.Rules = []lifecycle.Rule{
+		{
+			ID:     "expire-bucket",
+			Status: "Enabled",
+			Expiration: lifecycle.Expiration{
+				Days: 1,
+			},
+		},
+	}
+	if m.ForBucketLifeCycleWithoutExpiry {
+		newRule := lifecycle.Rule{
+			ID:     "expire-bucket2",
+			Status: "Enabled",
+			Expiration: lifecycle.Expiration{
+				Days: 1,
+			},
+		}
+		config.Rules = append(config.Rules, newRule)
+		return config, nil
+	}
+	return config, nil
 }
 
 func (m mockObjStore) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (u *url.URL, err error) {
@@ -629,6 +653,7 @@ func TestRun(t *testing.T) {
 		isObjectNotAvailableInDataStore bool
 		isSetBucketLifeCycleFail        bool
 		isGetBucketLifeCycleFail        bool
+		isBucketLifeCycleWithoutExpiry  bool
 	}{
 		{
 			name:          "testRun_Success",
@@ -691,7 +716,7 @@ func TestRun(t *testing.T) {
 			expectedError:                   "",
 		},
 		{
-			name:                     "testRun_Bucket_Lifecycle_Failed",
+			name:                     "testRun_Set_Bucket_Lifecycle_Failed",
 			isSetBucketLifeCycleFail: true,
 			expectedError:            "",
 		},
@@ -699,6 +724,11 @@ func TestRun(t *testing.T) {
 			name:                     "testRun_Get_Bucket_Lifecycle_Failed",
 			isGetBucketLifeCycleFail: true,
 			expectedError:            "",
+		},
+		{
+			name:                           "testRun_Get_Bucket_Lifecycle_Without_Expiry",
+			isBucketLifeCycleWithoutExpiry: true,
+			expectedError:                  "",
 		},
 	}
 
@@ -713,18 +743,19 @@ func TestRun(t *testing.T) {
 
 			task := worker.GenerateReportTask{
 				ObjStoreClient: mockObjStore{
-					T:                         t,
-					ForGetObjectFailure:       tc.isDataStoreGetError,
-					ForPutObjectFailure:       tc.isDataStorePutError,
-					ForUnmarshallFailure:      tc.isUnmarshalError,
-					IsBucketExisted:           tc.isBucketExisted,
-					ForBucketExistenceFail:    tc.isBucketExistenceCheckFail,
-					ForMakeBucketFail:         tc.isCreateBucketFail,
-					ForPresignedGetObjectFail: tc.isPresignedGetObjectFail,
-					ForCSVExporter:            tc.isCSVExporter,
-					ForObjectNotAvailable:     tc.isObjectNotAvailableInDataStore,
-					ForSetBucketLifeCycleFail: tc.isSetBucketLifeCycleFail,
-					ForGetBucketLifeCycleFail: tc.isGetBucketLifeCycleFail,
+					T:                               t,
+					ForGetObjectFailure:             tc.isDataStoreGetError,
+					ForPutObjectFailure:             tc.isDataStorePutError,
+					ForUnmarshallFailure:            tc.isUnmarshalError,
+					IsBucketExisted:                 tc.isBucketExisted,
+					ForBucketExistenceFail:          tc.isBucketExistenceCheckFail,
+					ForMakeBucketFail:               tc.isCreateBucketFail,
+					ForPresignedGetObjectFail:       tc.isPresignedGetObjectFail,
+					ForCSVExporter:                  tc.isCSVExporter,
+					ForObjectNotAvailable:           tc.isObjectNotAvailableInDataStore,
+					ForSetBucketLifeCycleFail:       tc.isSetBucketLifeCycleFail,
+					ForGetBucketLifeCycleFail:       tc.isGetBucketLifeCycleFail,
+					ForBucketLifeCycleWithoutExpiry: tc.isBucketLifeCycleWithoutExpiry,
 				},
 				ObjBucketName:             "testBucket",
 				ComplianceReportingClient: complianceReportingClient,

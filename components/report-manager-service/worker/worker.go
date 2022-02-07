@@ -269,12 +269,27 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 		if err != nil {
 			return nil, err
 		}
+	} else if err != nil {
+		return nil, err
+	}
 
-	} else {
-		if lifecycles != nil && lifecycles.Rules[0].Expiration.IsNull() {
-			lifecycles.Rules[0].Expiration = lifecycle.Expiration{
-				Days: 1,
+	if lifecycles != nil {
+		flag := false
+		for i := 0; i < len(lifecycles.Rules); i++ {
+			if !lifecycles.Rules[i].Expiration.IsNull() {
+				flag = true
+				break
 			}
+		}
+		if !flag {
+			newRule := lifecycle.Rule{
+				ID:     "expire-bucket2",
+				Status: "Enabled",
+				Expiration: lifecycle.Expiration{
+					Days: 1,
+				},
+			}
+			lifecycles.Rules = append(lifecycles.Rules, newRule)
 			err = t.ObjStoreClient.SetBucketLifecycle(ctx, job.RequestToProcess.RequestorId, lifecycles)
 			if err != nil {
 				return nil, err
