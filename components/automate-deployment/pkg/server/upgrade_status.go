@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"os"
+	"strconv"
 
 	"github.com/pkg/errors"
 
@@ -30,28 +32,59 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 	}
 
 	response := &api.UpgradeStatusResponse{}
-	latestManifest, err := s.releaseManifestProvider.GetCurrentManifest(ctx, s.deployment.Channel())
-	if err != nil {
-		return response, err
-	}
-
-	desiredManifest := s.deployment.CurrentReleaseManifest
-	if s.shouldFetchManifest() {
-		if desiredManifest == nil || latestManifest.Version() > desiredManifest.Version() {
-			desiredManifest = latestManifest
-		}
-	}
-
-	response.LatestAvailableVersion = latestManifest.Version()
-	response.DesiredVersion = desiredManifest.Version()
-	response.IsAirgapped = airgap.AirgapInUse()
-	response.IsConvergeDisable = (s.convergeLoop != nil && !s.convergeLoop.IsRunning()) || s.convergeDisabled()
-
 	if s.deployment.CurrentReleaseManifest == nil {
 		response.CurrentVersion = ""
 	} else {
 		response.CurrentVersion = s.deployment.CurrentReleaseManifest.Version()
 	}
+
+	var latestManifest *manifest.A2
+	if response.CurrentVersion != "" {
+		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), response.CurrentVersion)
+		if err != nil {
+			return response, err
+		}
+
+		response.LatestAvailableVersion = compVersion
+		latestManifest, err = s.releaseManifestProvider.GetManifest(ctx, compVersion)
+		if err != nil {
+			return response, err
+		}
+
+		var isMajorUpgrade bool
+		env := os.Getenv(isUpgradeMajorEnv)
+		if env == "" {
+			isMajorUpgrade = false
+		} else {
+			var err error
+			isMajorUpgrade, err = strconv.ParseBool(env)
+			if err != nil {
+				return response, err
+			}
+		}
+
+		if isMajorAvailable && isMajorUpgrade || isMinorAvailable {
+			response.IsConvergeCompatable = true
+		}
+
+	} else {
+		var err error
+		latestManifest, err = s.releaseManifestProvider.GetCurrentManifest(ctx, s.deployment.Channel())
+		if err != nil {
+			return response, err
+		}
+		response.LatestAvailableVersion = latestManifest.Version()
+	}
+
+	desiredManifest := s.deployment.CurrentReleaseManifest
+	if s.shouldFetchManifest() {
+		if desiredManifest == nil || s.isCompatibleForConverge(desiredManifest.Version(), response.LatestAvailableVersion) {
+			desiredManifest = latestManifest
+		}
+	}
+	response.DesiredVersion = desiredManifest.Version()
+	response.IsAirgapped = airgap.AirgapInUse()
+	response.IsConvergeDisable = (s.convergeLoop != nil && !s.convergeLoop.IsRunning()) || s.convergeDisabled()
 
 	// TODO(ssd) 2018-02-06: This address now exists in a few
 	// places, would be nice to make it configurable and refer to
@@ -110,6 +143,7 @@ func detectUpgradingServices(a2Manifest *manifest.A2,
 			//
 			// Our standard data format of YYYYMMDDHHMMSS
 			// is lexicographically sortable.
+			//Todo(milestone) recheck the below comparision logic for semantic versioning format
 			if svc.Pkg.Release < deploymentService.Release() {
 				upgradingService := makeUpgradingService(&svc, deploymentService)
 				ret = append(ret, upgradingService)
