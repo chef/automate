@@ -3,6 +3,7 @@ package testDB
 import (
 	"context"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
+	"github.com/pkg/errors"
 )
 
 type MigrationDB struct {
@@ -39,15 +40,36 @@ func (m MigrationDB) FailedUnzip(ctx context.Context, migrationId, serverId, mes
 }
 
 func (m MigrationDB) StartOrgParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) CompleteOrgParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) FailedOrgParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) StartUsersParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
@@ -151,7 +173,14 @@ func (m MigrationDB) CompleteMigration(ctx context.Context, migrationId, serverI
 }
 
 func (m MigrationDB) FailedMigration(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) CancelMigration(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
