@@ -294,3 +294,29 @@ func (s *MigrationServer) StoreStagedData(ctx context.Context, migrationId strin
 
 	return nil
 }
+
+// ConfirmPreview trigger the preview pipline
+func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreview) (*response.ConfirmPreview, error) {
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	migrationStage, err := s.service.Migration.GetMigrationStage(ctx, req.MigrationId)
+	if err != nil {
+		return nil, err
+	}
+
+	// call pipeline function to trigger the phase 2 pipeline
+	s.phaseTwoPipeline.Run(migrationStage.StagedData)
+
+	return &response.ConfirmPreview{
+		MigrationId: req.MigrationId,
+	}, nil
+}
