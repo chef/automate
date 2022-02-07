@@ -591,11 +591,8 @@ func (m mockObjStore) GetBucketLifecycle(ctx context.Context, bucketName string)
 	}
 	if m.ForBucketLifeCycleWithoutExpiry {
 		newRule := lifecycle.Rule{
-			ID:     "expire-bucket2",
+			ID:     "expire-bucket",
 			Status: "Enabled",
-			Expiration: lifecycle.Expiration{
-				Days: 1,
-			},
 		}
 		config.Rules = append(config.Rules, newRule)
 		return config, nil

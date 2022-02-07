@@ -275,7 +275,7 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 
 	if lifecycles != nil {
 		flag := false
-		for i := 0; i < len(lifecycles.Rules); i++ {
+		for i := range lifecycles.Rules {
 			if !lifecycles.Rules[i].Expiration.IsNull() {
 				flag = true
 				break
@@ -283,7 +283,7 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 		}
 		if !flag {
 			newRule := lifecycle.Rule{
-				ID:     "expire-bucket2",
+				ID:     "expire-bucket",
 				Status: "Enabled",
 				Expiration: lifecycle.Expiration{
 					Days: 1,
