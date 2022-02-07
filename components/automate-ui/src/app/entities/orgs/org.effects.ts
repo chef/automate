@@ -33,6 +33,9 @@ import {
   CancelMigration,
   CancelMigrationSuccess,
   CancelMigrationFailure,
+  GetPreviewData,
+  GetPreviewDataSuccess,
+  GetPreviewDataFailure,
   OrgActionTypes
 } from './org.actions';
 
@@ -222,5 +225,25 @@ export class OrgEffects {
           type: Type.error,
           message: `Could not cancel migration: ${msg || payload.error}`
         });
+    })));
+
+  getPreviewData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.GET_PREVIEW_DATA),
+      mergeMap(({ payload:  { migration_id } }: GetPreviewData) =>
+        this.requests.getPreviewData(migration_id).pipe(
+          map((resp) => new GetPreviewDataSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new GetPreviewDataFailure(error)))))));
+
+  getPreviewDataFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.GET_PREVIEW_DATA_FAILURE),
+      map(({ payload }: GetPreviewDataFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get preview data: ${msg || payload.error}`
+      });
     })));
 }

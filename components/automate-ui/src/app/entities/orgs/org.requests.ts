@@ -8,7 +8,8 @@ import {
   OrgSuccessPayload,
   CreateOrgPayload,
   UploadSuccessPayload,
-  CancelSuccessPayload
+  CancelSuccessPayload,
+  PreviewSuccessPayload
 } from './org.actions';
 
 @Injectable()
@@ -49,5 +50,10 @@ export class OrgRequests {
     : Observable<CancelSuccessPayload> {
     return this.http.get<CancelSuccessPayload>(
       `${env.infra_proxy_url}/servers/${server_id}/migrations/cancel_migration/${migration_id}`);
+  }
+
+  public getPreviewData(migration_id: string): Observable<PreviewSuccessPayload> {
+    return this.http.get<PreviewSuccessPayload>(`
+    ${env.infra_proxy_url}/servers/migrations/staged_data/${migration_id}`);
   }
 }

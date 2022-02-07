@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { Org, UploadFile } from './org.model';
+import { Org, UploadFile, PreviewData } from './org.model';
 
 export enum OrgActionTypes {
   GET_ALL                  = 'ORGS::GET_ALL',
@@ -24,7 +24,10 @@ export enum OrgActionTypes {
   UPLOAD_FAILURE           = 'ORGS::UPLOAD::FAILURE',
   CANCEL_MIGRATION         = 'ORGS::CANCEL::MIGRATION',
   CANCEL_MIGRATION_SUCCESS = 'ORGS::CANCEL::MIGRATION::SUCCESS',
-  CANCEL_MIGRATION_FAILURE = 'ORGS::CANCEL::MIGRATION::FAILURE'
+  CANCEL_MIGRATION_FAILURE = 'ORGS::CANCEL::MIGRATION::FAILURE',
+  GET_PREVIEW_DATA         = 'ORGS::GET_PREVIEW_DATA',
+  GET_PREVIEW_DATA_SUCCESS = 'ORGS::GET_PREVIEW_DATA::SUCCESS',
+  GET_PREVIEW_DATA_FAILURE = 'ORGS::GET_PREVIEW_DATA::FAILURE'
 }
 
 export interface OrgSuccessPayload {
@@ -176,6 +179,28 @@ export class CancelMigrationFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface PreviewSuccessPayload {
+  PreviewData: PreviewData[];
+}
+
+export class GetPreviewData implements Action {
+  readonly type = OrgActionTypes.GET_PREVIEW_DATA;
+
+  constructor(public payload: { migration_id: string}) {}
+}
+
+export class GetPreviewDataSuccess implements Action {
+  readonly type = OrgActionTypes.GET_PREVIEW_DATA_SUCCESS;
+
+  constructor(public payload: PreviewSuccessPayload) {}
+}
+
+export class GetPreviewDataFailure implements Action {
+  readonly type = OrgActionTypes.GET_PREVIEW_DATA_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) {}
+}
+
 export type OrgActions =
   | GetOrgs
   | GetOrgsSuccess
@@ -197,4 +222,7 @@ export type OrgActions =
   | UploadZipFailure
   | CancelMigration
   | CancelMigrationSuccess
-  | CancelMigrationFailure;
+  | CancelMigrationFailure
+  | GetPreviewData
+  | GetPreviewDataSuccess
+  | GetPreviewDataFailure;

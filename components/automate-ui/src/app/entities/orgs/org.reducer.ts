@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { OrgActionTypes, OrgActions, UploadSuccessPayload } from './org.actions';
+import { OrgActionTypes, OrgActions, UploadSuccessPayload, PreviewSuccessPayload } from './org.actions';
 import { Org } from './org.model';
 
 export interface OrgEntityState extends EntityState<Org> {
@@ -16,6 +16,8 @@ export interface OrgEntityState extends EntityState<Org> {
   uploadStatus: EntityStatus;
   uploadDetails: UploadSuccessPayload;
   cancelStatus: EntityStatus;
+  previewStatus: EntityStatus;
+  previewData: PreviewSuccessPayload;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -26,6 +28,7 @@ const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 const UPLOAD_STATUS = 'uploadStatus';
 const CANCEL_STATUS = 'cancelStatus';
+const PREVIEW_STATUS = 'previewStatus';
 
 export const orgEntityAdapter: EntityAdapter<Org> = createEntityAdapter<Org>();
 
@@ -39,7 +42,8 @@ export const OrgEntityInitialState: OrgEntityState =
     updateStatus: EntityStatus.notLoaded,
     uploadStatus: EntityStatus.notLoaded,
     uploadDetails: null,
-    cancelStatus: EntityStatus.notLoaded
+    cancelStatus: EntityStatus.notLoaded,
+    previewData: null
   });
 
 export function orgEntityReducer(
@@ -126,6 +130,18 @@ export function orgEntityReducer(
 
     case OrgActionTypes.CANCEL_MIGRATION_FAILURE:
       return set(CANCEL_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.GET_PREVIEW_DATA:
+      return set(PREVIEW_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.GET_PREVIEW_DATA_SUCCESS:
+      return pipe(
+        set('previewData', action.payload),
+        set(PREVIEW_STATUS, EntityStatus.loadingSuccess)
+      )(state) as OrgEntityState;
+
+    case OrgActionTypes.GET_PREVIEW_DATA_FAILURE:
+      return set(PREVIEW_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

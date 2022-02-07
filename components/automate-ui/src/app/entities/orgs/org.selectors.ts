@@ -60,3 +60,14 @@ export const cancelStatus = createSelector(
   orgState,
   (state) => state.cancelStatus
 );
+
+export const previewStatus = createSelector(
+  orgState,
+  (state) => state.previewStatus
+);
+
+
+export const previewData = createSelector(
+  orgState,
+  (state) => state.previewData
+);
