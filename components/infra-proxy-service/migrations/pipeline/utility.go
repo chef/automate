@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/chef/automate/api/interservice/authz"
 	"io/ioutil"
 	"os"
 	"path"
@@ -13,7 +14,7 @@ import (
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
-func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, res Result) (Result, error) {
+func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, authzProjectClient authz.ProjectsServiceClient, res Result) (Result, error) {
 	var err error
 	var msg string
 	var totalSucceeded, totalSkipped, totalFailed int64
@@ -23,7 +24,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	}
 	log.Info("Starting the organisation migration phase for migration id: ", res.Meta.MigrationID)
 	for _, org := range res.ParsedResult.Orgs {
-		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID)
+		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID, authzProjectClient)
 		if err != nil {
 			totalFailed++
 			msg = err.Error()
@@ -50,12 +51,17 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 }
 
 // StoreOrg stores a single Org into DB
-func StoreOrg(ctx context.Context, st storage.Storage, org Org, serverID string) (error, ActionOps) {
+func StoreOrg(ctx context.Context, st storage.Storage, org Org, serverID string, authzProjectClient authz.ProjectsServiceClient) (error, ActionOps) {
 	var actionTaken ActionOps
 	var err error
 	switch org.ActionOps {
 	case Insert:
-		_, err = st.StoreOrg(ctx, org.Name, org.FullName, "", "", serverID, nil)
+		projects, err := createProjectFromOrgIdAndServerID(ctx, serverID, org.Name, authzProjectClient)
+		if err != nil {
+			log.Errorf("Unable to create project for serverid: %s", serverID)
+			return err, actionTaken
+		}
+		_, err = st.StoreOrg(ctx, org.Name, org.FullName, "", "", serverID, projects)
 		actionTaken = Insert
 	case Delete:
 		_, err = st.DeleteOrg(ctx, org.Name, serverID)
@@ -66,6 +72,23 @@ func StoreOrg(ctx context.Context, st storage.Storage, org Org, serverID string)
 	default:
 	}
 	return err, actionTaken
+}
+
+//function to create a new iam project for each client
+func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, orgId string, authzProjectClient authz.ProjectsServiceClient) ([]string, error) {
+
+	newProject := &authz.CreateProjectReq{
+		Name:         serverId + "_" + orgId,
+		Id:           serverId + "_" + orgId,
+		SkipPolicies: false,
+	}
+
+	projectID, err := authzProjectClient.CreateProject(ctx, newProject)
+	if err != nil {
+		return nil, err
+	}
+
+	return []string{projectID.Project.Name}, nil
 }
 
 func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result Result) (Result, error) {
