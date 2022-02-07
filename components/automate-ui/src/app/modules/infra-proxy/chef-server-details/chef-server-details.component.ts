@@ -96,6 +96,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public migrationID: string;
   public migrationStatus: MigrationStatus;
   public migrationStatusPercentage: number;
+  public stepsCompleted: string
   public totalMigrationSteps = 13;
   public migrationStepValue: number;
   public migrationfailed = false;
@@ -226,8 +227,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.orgsListLoading = false;
       this.closeCreateModal();
       this.isServerLoaded = true;
+      this.migrationLoading = false;
       if (this.server.migration_id !== '') {
         this.migrationStarted = true;
+        this.getMigrationStatus(this.server.migration_id);
       }
     });
 
@@ -318,7 +321,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     }, 1000);
 
-    interval(200000).subscribe(() => {
+    interval(50000).subscribe(() => {
       if (this.migrationStarted) {
         this.getMigrationStatus(this.server.migration_id);
       }
@@ -421,6 +424,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
               this.migrationCompleted = true;
               this.migrationInProgress = false;
             }
+            this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13'
           } else {
             this.migrationfailed = true;
           }
@@ -478,5 +482,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       formData: formData
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
+    this.migrationStarted = true;
   }
 }

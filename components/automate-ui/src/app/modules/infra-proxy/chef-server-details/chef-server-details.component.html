@@ -48,7 +48,14 @@
                 <span *ngIf="migrationCompleted || migrationfailed || migrationLoading" class="heading">Last Migration Status </span>
                 <!-- Completed and Failed status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value"><span class="status-icon-completed"></span><span class="status-text">Completed</span></span>                
-                <span *ngIf="!migrationLoading && migrationStarted && migrationfailed" class="server-entity-value"><span class="status-icon-failed"></span><span class="status-text">Failed</span></span>
+                <span *ngIf="!migrationLoading && migrationStarted && migrationfailed" class="server-entity-value" id="status-failed">
+                  <span class="status-icon-failed"></span>
+                  <chef-tooltip  class="visible" for='error-show-button' style="--tooltip-color: #F9DBEA;left: 1395.05px;top: 280.766px;font-size: 10px;color: #ba1e6a;">
+                    <img src="../../../../assets/img/warning.png" alt="warning" />
+                    Migration failed, migration step not completed!
+                  </chef-tooltip>
+                  <span class="status-text" id='error-show-button' >Failed</span>
+                </span>
                 <!-- in progress status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress" class="heading">Sync In Progress </span>
                 <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress" class="server-entity-value svg-block">
@@ -65,7 +72,7 @@
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                   </svg>
-                  <span>{{currentMigrationPercent()}}% Completed</span>
+                  <span>{{stepsCompleted}} Steps Completed</span>
                 </span>
                 <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
                 <span *ngIf="!migrationStarted" class="server-entity-value">--</span>

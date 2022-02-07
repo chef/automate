@@ -263,13 +263,6 @@ export class ServerEffects {
         catchError((error: HttpErrorResponse) =>
           observableOf(new GetMigrationStatusFailure(error)))))));
 
-  GetMigrationStatusSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(ServerActionTypes.GET_MIGRATION_STATUS_SUCCESS),
-    map(() => new CreateNotification({
-    type: Type.info,
-    message: 'Migration status updated.'
-  }))));
-
   GetMigrationStatusFailure$ = createEffect(() => this.actions$.pipe(
     ofType(ServerActionTypes.GET_MIGRATION_STATUS_FAILURE),
     map(({ payload }: GetMigrationStatusFailure) => {
