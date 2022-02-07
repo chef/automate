@@ -273,6 +273,7 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 		return nil, err
 	}
 
+	//If lifecycles are set
 	if lifecycles != nil {
 		flag := false
 		for i := range lifecycles.Rules {
