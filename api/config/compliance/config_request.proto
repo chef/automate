@@ -36,13 +36,18 @@ message ConfigRequest {
 			reserved 8;
 			reserved 9;
 			Agent agent = 10;
-			chef.automate.infra.config.Proxy proxy = 11;
+			Proxy proxy = 11;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10121, protocol: "grpc" } ];
 				google.protobuf.StringValue external_fqdn = 7;
 				google.protobuf.Int32Value message_buffer_size = 8;
+			}
+
+			message Proxy {
+				google.protobuf.StringValue connection_string = 1;
+				google.protobuf.StringValue no_proxy_string = 2;
 			}
 
 			message Profiles {

@@ -19,6 +19,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/secrets"
 )
 
@@ -38,6 +39,11 @@ const (
 	tlsCrt              = "/hab/svc/automate-cs-nginx/config/service.crt"
 	tlsKey              = "/hab/svc/automate-cs-nginx/config/service.key"
 	tlsCA               = "/hab/svc/automate-cs-nginx/config/root_ca.crt"
+	erchefSvcName       = "automate-cs-oc-erchef"
+	erchefDBName        = "automate-cs-oc-erchef"
+	bifrostSvcName      = "automate-cs-oc-bifrost"
+	bifrostDBName       = "automate-cs-oc-bifrost"
+	automateSvcPath     = "/hab/svc/"
 )
 
 // These paths are injected at BUILD time based on our dependencies to
@@ -163,6 +169,36 @@ func (c passthrough) Run(args []string) error {
 		bifrostSuperuserID = string(bifrostSecData)
 	}
 
+	svcPath := automateSvcPath
+	// svc path can be overridden with SVC_PATH env variable in the format: "/hab/svc/"
+	if path := os.Getenv("SVC_PATH"); path != "" {
+		svcPath = path
+	}
+
+	erchefDB, err := platform_config.PGURIFromEnvironmentWithParams(erchefDBName, erchefSvcName, svcPath+erchefSvcName, "")
+	if err != nil {
+		logrus.WithError(err).Error("could not create pg connection url for erchef")
+	}
+	if erchefDB == "" {
+		erchefDB = erchefDBURI
+	}
+
+	bifrostDB, err := platform_config.PGURIFromEnvironmentWithParams(bifrostDBName, bifrostSvcName, svcPath+bifrostSvcName, "")
+	if err != nil {
+		logrus.WithError(err).Error("could not create pg connection url for bifrost")
+	}
+	if bifrostDB == "" {
+		bifrostDB = bifrostDBURI
+	}
+
+	// incase user wants to overide the uri
+	if erchefDBEnv := os.Getenv("CSC_ERCHEF_DB_URI"); erchefDBEnv != "" {
+		erchefDB = erchefDBEnv
+	}
+	if bifrostDBEnv := os.Getenv("CSC_BIFROST_DB_URI"); bifrostDBEnv != "" {
+		bifrostDB = bifrostDBEnv
+	}
+
 	// chef-server-ctl has been modified to take all necessary
 	// config via environment variables. All CSC_ variables are
 	// chef-server-ctl specific configuration.
@@ -171,8 +207,8 @@ func (c passthrough) Run(args []string) error {
 		fmt.Sprintf("CSC_LB_URL=%s", lbURL),
 		fmt.Sprintf("CSC_BIFROST_SUPERUSER_ID=%s", bifrostSuperuserID),
 		fmt.Sprintf("CSC_BIFROST_URL=%s", bifrostURL),
-		fmt.Sprintf("CSC_BIFROST_DB_URI=%s", bifrostDBURI),
-		fmt.Sprintf("CSC_ERCHEF_DB_URI=%s", erchefDBURI),
+		fmt.Sprintf("CSC_BIFROST_DB_URI=%s", bifrostDB),
+		fmt.Sprintf("CSC_ERCHEF_DB_URI=%s", erchefDB),
 		fmt.Sprintf("CSC_ERCHEF_REINDEX_SCRIPT=%s", erchefReindexScript),
 		fmt.Sprintf("CSC_KNIFE_CONFIG_FILE=%s", knifeConfigFile),
 		fmt.Sprintf("CSC_TLS_KEY=%s", tlsKey),
