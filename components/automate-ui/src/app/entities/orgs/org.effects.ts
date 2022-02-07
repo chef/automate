@@ -30,6 +30,9 @@ import {
   UploadZipSuccess,
   UploadZipFailure,
   UploadSuccessPayload,
+  CancelMigration,
+  CancelMigrationSuccess,
+  CancelMigrationFailure,
   OrgActionTypes
 } from './org.actions';
 
@@ -191,6 +194,33 @@ export class OrgEffects {
           type: Type.error,
           message: `Could not upload file: ${msg || payload.error}`
         });
-      })));
+    })));
 
+  cancelMigration$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CANCEL_MIGRATION),
+      mergeMap(({ payload:  { server_id, migration_id } }: CancelMigration) =>
+        this.requests.cancelMigration(server_id, migration_id).pipe(
+          map((resp) => new CancelMigrationSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new CancelMigrationFailure(error)))))));
+
+  cancelMigrationSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CANCEL_MIGRATION_SUCCESS),
+      map((_) => new CreateNotification({
+      type: Type.info,
+      message: 'Cancelled migration.'
+    }))));
+
+  cancelMigrationFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CANCEL_MIGRATION_FAILURE),
+      map(({ payload }: CancelMigrationFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not cancel migration: ${msg || payload.error}`
+        });
+    })));
 }

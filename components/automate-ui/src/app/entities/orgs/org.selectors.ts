@@ -55,3 +55,8 @@ export const uploadDetails = createSelector(
   orgState,
   (state) => state.uploadDetails
 );
+
+export const cancelStatus = createSelector(
+  orgState,
+  (state) => state.cancelStatus
+);

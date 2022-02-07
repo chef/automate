@@ -15,6 +15,7 @@ export interface OrgEntityState extends EntityState<Org> {
   deleteStatus: EntityStatus;
   uploadStatus: EntityStatus;
   uploadDetails: UploadSuccessPayload;
+  cancelStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -24,6 +25,7 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 const UPLOAD_STATUS = 'uploadStatus';
+const CANCEL_STATUS = 'cancelStatus';
 
 export const orgEntityAdapter: EntityAdapter<Org> = createEntityAdapter<Org>();
 
@@ -36,8 +38,8 @@ export const OrgEntityInitialState: OrgEntityState =
     deleteStatus: EntityStatus.notLoaded,
     updateStatus: EntityStatus.notLoaded,
     uploadStatus: EntityStatus.notLoaded,
-    uploadDetails: null
-
+    uploadDetails: null,
+    cancelStatus: EntityStatus.notLoaded
   });
 
 export function orgEntityReducer(
@@ -115,6 +117,15 @@ export function orgEntityReducer(
 
     case OrgActionTypes.UPLOAD_FAILURE:
       return set(UPLOAD_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.CANCEL_MIGRATION:
+      return set(CANCEL_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.CANCEL_MIGRATION_SUCCESS:
+      return set(CANCEL_STATUS, EntityStatus.loadingSuccess, state);
+
+    case OrgActionTypes.CANCEL_MIGRATION_FAILURE:
+      return set(CANCEL_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

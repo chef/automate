@@ -34,7 +34,7 @@ import {
   ValidateWebUIKey
   // , GetUsers
 } from 'app/entities/servers/server.actions';
-import { GetOrgs, CreateOrg, DeleteOrg, UploadZip } from 'app/entities/orgs/org.actions';
+import { GetOrgs, CreateOrg, DeleteOrg, UploadZip, CancelMigration } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   createStatus,
@@ -43,7 +43,8 @@ import {
   getAllStatus as getAllOrgsForServerStatus,
   deleteStatus as deleteOrgStatus,
   uploadStatus,
-  uploadDetails
+  uploadDetails,
+  cancelStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { SyncOrgUsersSliderComponent } from '../sync-org-users-slider/sync-org-users-slider.component';
@@ -120,6 +121,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     12: 'Migrating user permissions',
     13: 'Migration Completed'
   };
+  public previewData;
+  public cancelMigrationInProgress = false;
+  public canceMigrationSuccessful = false;
+  public isCancelled = false;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
@@ -316,6 +321,17 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.store.select(cancelStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.cancelMigrationInProgress && !pending(state)))
+    .subscribe((state) => {
+      this.cancelMigrationInProgress = false;
+      this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.canceMigrationSuccessful) {
+        this.isCancelled = true;
+      }
+    });
+
     setTimeout(() => {
       if (this.isServerLoaded) {
         this.validateWebUIKey(this.server);
@@ -475,7 +491,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateWebUIKey(webuikey));
   }
 
-  // upload zip slider functions
+  // upload zip slider function
   public uploadZipFile(file: File): void {
     const formData: FormData = new FormData();
     if (file) {
@@ -488,5 +504,20 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UploadZip( uploadZipPayload ));
     this.migrationStarted = true;
     this.getMigrationStatus(this.server.migration_id);
+  }
+
+  // cancel migration function
+  public cancelMigration(migration_id: string): void {
+    console.log('migrationId', migration_id);
+    const payload = {
+      server_id : this.server.id,
+      migration_id : migration_id
+    };
+    this.store.dispatch(new CancelMigration(payload));
+  }
+
+  // migraion preview function
+  public migrationPreview() {
+
   }
 }
