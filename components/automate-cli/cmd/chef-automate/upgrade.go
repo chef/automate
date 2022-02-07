@@ -248,7 +248,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	switch resp.State {
 	case api.UpgradeStatusResponse_IDLE:
 		switch {
-		//Todo(milestone) - update the comparision logic of current version and latest available version
+		//Todo(milestone) - update the comparison logic of current version and latest available version
 		case resp.CurrentVersion != "" && resp.CurrentVersion < resp.LatestAvailableVersion:
 			writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
 				resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
