@@ -119,3 +119,9 @@ type User struct {
 	// IsAdmin (user is admin or not)
 	IsAdmin bool `json:"is_admin"`
 }
+
+type OrgJson struct {
+	Name     string `json:"name"`
+	FullName string `json:"full_name"`
+	Guid     string `json:"guid"`
+}
