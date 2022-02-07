@@ -2,8 +2,10 @@ package pipeline
 
 import (
 	"context"
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/testDB"
+	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"reflect"
 	"testing"
@@ -11,25 +13,40 @@ import (
 
 func TestStoreOrg(t *testing.T) {
 	type args struct {
-		ctx      context.Context
-		st       storage.Storage
-		org      Org
-		serverID string
+		ctx       context.Context
+		st        storage.Storage
+		org       Org
+		serverID  string
+		authzMock *authz.MockProjectsServiceClient
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  error
-		want1 ActionOps
+		name             string
+		errorFromProject bool
+		args             args
+		want             error
+		want1            ActionOps
 	}{
-		{name: "Test Delete Org", args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: Org{Name: "org3", FullName: "Org 1", ActionOps: Delete}, serverID: "server1"}, want: nil, want1: Delete},
-		{name: "Test Store Org", args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: Org{Name: "org2", FullName: "Org 2", ActionOps: Insert}, serverID: "server1"}, want: nil, want1: Insert},
-		{name: "Test Edit Org", args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: Org{Name: "org3", FullName: "Org 3", ActionOps: Update}, serverID: "server1"}, want: nil, want1: Update},
+		{name: "Test Delete Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: Org{Name: "org3", FullName: "Org 1", ActionOps: Delete}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: nil, want1: Delete},
+		{name: "Test Store Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: Org{Name: "org2", FullName: "Org 2", ActionOps: Insert}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: nil, want1: Insert},
+		{name: "Test Edit Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: Org{Name: "org3", FullName: "Org 3", ActionOps: Update}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: nil, want1: Update},
+		{name: "Test Create Project Error", errorFromProject: true, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: Org{Name: "org3", FullName: "Org 3", ActionOps: Insert}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: errors.New("Project already exists"), want1: 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := StoreOrg(tt.args.ctx, tt.args.st, tt.args.org, tt.args.serverID)
-			if !reflect.DeepEqual(got, tt.want) {
+			projectResponse := &authz.CreateProjectResp{
+				Project: &authz.Project{
+					Id:     "testId",
+					Name:   "test_name",
+					Status: "test_status",
+				},
+			}
+			if tt.errorFromProject {
+				tt.args.authzMock.EXPECT().CreateProject(tt.args.ctx, gomock.Any(), gomock.Any()).Return(nil, errors.New("Project already exists"))
+			} else {
+				tt.args.authzMock.EXPECT().CreateProject(tt.args.ctx, gomock.Any(), gomock.Any()).Return(projectResponse, nil)
+			}
+			got, got1 := StoreOrg(tt.args.ctx, tt.args.st, tt.args.org, tt.args.serverID, tt.args.authzMock)
+			if got != nil && got.Error() != tt.want.Error() {
 				t.Errorf("StoreOrg() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
