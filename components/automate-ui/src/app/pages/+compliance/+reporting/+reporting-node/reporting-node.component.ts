@@ -280,6 +280,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   getFilterCount(report: any) {
+    if (!(report && (typeof report === 'object') && report.controls)) {
+      return 0;
+    }
     switch (this.activeStatusFilter) {
       case ('failed'):
         return report.controls.failed.total;
