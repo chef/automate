@@ -81,7 +81,6 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	if err != nil {
 		log.Errorf("Failed to open the folder for the file path %s : %s", orgPath, err.Error())
 		mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
-		mst.FailedMigration(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
@@ -90,14 +89,12 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	if err != nil {
 		log.Errorf("Failed to read the files for the file path %s : %s", orgPath, err.Error())
 		mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
-		mst.FailedMigration(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 	orgsPresentInDB, err := st.GetOrgs(ctx, result.Meta.ServerID)
 	if err != nil {
 		log.Errorf("Failed to read orgs from database for %s:%s", result.Meta.ServerID, err.Error())
 		mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
-		mst.FailedMigration(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
