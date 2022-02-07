@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/chef/automate/components/infra-proxy-service/constants"
+	//"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 

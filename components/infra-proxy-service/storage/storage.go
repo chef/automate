@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 )
 
 // Storage is the interface provided by our various storage backends.
@@ -134,11 +136,11 @@ type Migration struct {
 	UpdatedTimestamp time.Time `json:"updated_timestamp"`
 }
 type MigrationStage struct {
-	ID          string      `json:"id"`
-	MigrationID string      `json:"migration_id"`
-	ParsedData  interface{} `json:"parsed_data"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
+	ID          string                `json:"id"`
+	MigrationID string                `json:"migration_id"`
+	ParsedData  pipeline.ParsedResult `json:"parsed_data"`
+	CreatedAt   time.Time             `json:"created_at"`
+	UpdatedAt   time.Time             `json:"updated_at"`
 }
 
 type MigrationStatus struct {
