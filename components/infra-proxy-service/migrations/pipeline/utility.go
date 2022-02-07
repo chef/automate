@@ -125,8 +125,10 @@ func createDatabaseOrgsMap(orgs []storage.Org) map[string]string {
 func createFileOrgsMap(orgs []os.FileInfo) map[string]string {
 	orgMap := make(map[string]string)
 	for _, s := range orgs {
-		orgMap[s.Name()] = ""
-		//No value required for comparison
+		if s.IsDir() {
+			orgMap[s.Name()] = ""
+			//No value required for comparison
+		}
 	}
 	return orgMap
 }
@@ -138,20 +140,22 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 	log.Info("Comparing the organisations from database and backup file for insert,update and skip action")
 	//For insert, update and skip action
 	for _, org := range orgsInFiles {
-		orgInfo, valuePresent := orgDatabaseMap[org.Name()]
-		orgJson = openOrgFolder(org, orgPath)
-		if valuePresent {
-			if orgJson.FullName != orgInfo {
-				//Update org in the result actions
-				orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Update))
-			} else {
-				//Skip org action if full names are not equal
-				orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Skip))
+		if org.IsDir() {
+			orgInfo, valuePresent := orgDatabaseMap[org.Name()]
+			orgJson = openOrgFolder(org, orgPath)
+			if valuePresent {
+				if orgJson.FullName != orgInfo {
+					//Update org in the result actions
+					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Update))
+				} else {
+					//Skip org action if full names are not equal
+					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Skip))
 
+				}
+			} else {
+				//Insert org action if not present in database
+				orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Insert))
 			}
-		} else {
-			//Insert org action if not present in database
-			orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Insert))
 		}
 	}
 	log.Info("Completed comparing the organisations from database and backup file for insert,update and skip action")
