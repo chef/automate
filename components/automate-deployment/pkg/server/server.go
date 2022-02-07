@@ -1271,7 +1271,7 @@ func (s *server) convergeDeployment() error {
 			"next_manifest":    nextVersion,
 		})
 		if nextVersion > currentVersion {
-			//Todo(milestone) modify the comparision logic, should not use simple less than or greater than
+			//Todo(milestone) modify the comparison logic, should not use simple less than or greater than
 			logctx.Info("Starting converge with UPDATED manifest")
 		} else if nextVersion < currentVersion {
 			// We should not see this because of the current implementation of
