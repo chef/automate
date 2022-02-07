@@ -41,7 +41,7 @@
                 </span>
               </li>
               <li>
-                <span class="heading">Org &amp; User last synced</span>
+                <span class="heading">last sync date</span>
                 <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
               </li>
               <li>
@@ -49,12 +49,12 @@
                 <!-- Completed and Failed status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value"><span class="status-icon-completed"></span><span class="status-text">Completed</span></span>                
                 <span *ngIf="!migrationLoading && migrationStarted && migrationfailed" class="server-entity-value" id="status-failed">
-                  <span class="status-icon-failed"></span>
-                  <chef-tooltip  class="visible" for='error-show-button' style="--tooltip-color: #F9DBEA;left: 1395.05px;top: 280.766px;font-size: 10px;color: #ba1e6a;">
+                  <chef-tooltip position='bottom' class="visible" for='error-show-button' style="--tooltip-color: #F9DBEA;left: 1395.05px;top: 280.766px;font-size: 10px;color: #ba1e6a;">
                     <img src="../../../../assets/img/warning.png" alt="warning" />
                     Migration failed, migration step not completed!
                   </chef-tooltip>
-                  <span class="status-text" id='error-show-button' >Failed</span>
+                  <span class="status-icon-failed" id='error-show-button'></span>
+                  <span class="status-text">Failed</span>
                 </span>
                 <!-- in progress status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress" class="heading">Sync In Progress </span>
