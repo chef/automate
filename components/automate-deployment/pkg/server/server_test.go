@@ -345,6 +345,20 @@ func TestIsCompatible(t *testing.T) {
 			isCompatible:       true,
 		},
 		{
+			name:               "semVersion,semVersion,semVersion_fail_back_minor",
+			currentVersion:     "22.4.0",
+			givenVersion:       "22.2.0",
+			maxPossibleVersion: "23.4.0",
+			isCompatible:       false,
+		},
+		{
+			name:               "semVersion,semVersion,semVersion_fail_major",
+			currentVersion:     "22.0.0",
+			givenVersion:       "22.5.0",
+			maxPossibleVersion: "23.0.0",
+			isCompatible:       false,
+		},
+		{
 			name:               "semVersion,semVersion,semVersion_fail_minor",
 			currentVersion:     "22.0.0",
 			givenVersion:       "22.4.0",
@@ -362,6 +376,75 @@ func TestIsCompatible(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			result := isCompatible(tc.currentVersion, tc.givenVersion, tc.maxPossibleVersion)
+			assert.Equal(t, tc.isCompatible, result)
+		})
+	}
+}
+
+func TestIsCompatibleForConverge(t *testing.T) {
+	mockTarget := new(target.MockTarget)
+	svr := testServer(mockTarget)
+	svr.serverConfig = &Config{}
+
+	tests := []struct {
+		name           string
+		currentVersion string
+		nextVersion    string
+		isCompatible   bool
+	}{
+		{
+			name:           "timestamp,timestamp_valid",
+			currentVersion: "20220110173839",
+			nextVersion:    "20220112175624",
+			isCompatible:   true,
+		},
+		{
+			name:           "timestamp,timestamp_equal",
+			currentVersion: "20220110173839",
+			nextVersion:    "20220110173839",
+			isCompatible:   true,
+		},
+		{
+			name:           "timestamp,timestamp_invalid",
+			currentVersion: "20220118173839",
+			nextVersion:    "20220112175624",
+			isCompatible:   false,
+		},
+		{
+			name:           "timestamp,semversion",
+			currentVersion: "20220110173839",
+			nextVersion:    "22.3.5",
+			isCompatible:   false,
+		},
+		{
+			name:           "semversion,timestamp",
+			currentVersion: "22.3.5",
+			nextVersion:    "20220110173839",
+			isCompatible:   false,
+		},
+		{
+			name:           "semversion,semversion_same_major_valid",
+			currentVersion: "22.3.5",
+			nextVersion:    "22.3.12",
+			isCompatible:   true,
+		},
+		{
+			name:           "semversion,semversion_same_major_invalid",
+			currentVersion: "22.3.12",
+			nextVersion:    "22.3.5",
+			isCompatible:   false,
+		},
+		{
+			name:           "semversion,semversion_different_major",
+			currentVersion: "22.3.12",
+			nextVersion:    "24.0.0",
+			isCompatible:   false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := svr.isCompatibleForConverge(tc.currentVersion, tc.nextVersion)
 			assert.Equal(t, tc.isCompatible, result)
 		})
 	}
