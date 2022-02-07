@@ -1884,10 +1884,18 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", nextManifestVersion, currentRelease)
 		}
 
-		//check the upgrade is major or not, and if the upgrade is major user should provide --major flag.
-		if isMajorUpgrade(currentRelease, nextManifestVersion) && !req.IsMajorUpgrade {
-			return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade airgap --major` to further upgrade")
+		isActualMajorUpgrade := isMajorUpgrade(currentRelease, nextManifestVersion)
+
+		//check the upgrade is major or not, and if the upgrade is minor/patch, user should not provide --major flag
+		if !isActualMajorUpgrade && req.IsMajorUpgrade {
+			return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --airgap-bundle` to further upgrade")
 		}
+
+		//check the upgrade is major or not, and if the upgrade is major user should provide --major flag.
+		if isActualMajorUpgrade && !req.IsMajorUpgrade {
+			return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --major --airgap-bundle` to further upgrade")
+		}
+
 	}
 
 	if req.Version != "" {
