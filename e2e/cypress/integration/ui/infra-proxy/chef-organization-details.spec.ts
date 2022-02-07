@@ -6,8 +6,8 @@ describe('chef server', () => {
   const serverName = 'chef manage';
   const orgID = 'demoorg';
   const orgName = 'demoorg';
-  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
-  const serverIP = '18-117-112-129';
+  const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
+  // const serverIP = '18-117-112-129';
   const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const tabNames = [
@@ -34,7 +34,7 @@ describe('chef server', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP,
+          // ip_address: serverIP,
           webui_key: webuiKey
         }
       }).then((resp) => {

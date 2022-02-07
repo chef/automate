@@ -4,10 +4,18 @@ describe('chef server', () => {
   const serverName = `${cypressPrefix} server ${now}`;
   const generatedServerID = serverName.split(' ').join('-');
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
-  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
-  const serverIP = '18-117-112-129';
-  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
-
+  // const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
+  // const serverIP = '18-117-112-129';
+  // const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
+ 
+  const serverID = 'cs';
+  // const serverName = 'cs';
+  const orgID = 'demoorg';
+  const orgName = 'demoorg';
+  const serverFQDN = 'ec2-18-219-27-165.us-east-2.compute.amazonaws.com';
+  const serverIP = '18-219-27-165';
+  const webuiKey = '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEA5uYiYBuxNaTrnIuZ5Tr74eWgZlKU1QOhMxR7MzDlaOgJHYXg\n8w7XLDLnADC38tVfM5/2JXDjKkVJoFHGsRxpuUETBJdyUOJ4+t4SjDnuuTS1MT/g\nN6fkTweUpVhmde+btN8paqbM92iVTuD+24X4weV+HDrR2wt9CTY2L/5cjLTTbCbP\nfclGl5ZlUFMxhb+86V73RXtwJRXJP97Sl8Y+Srd1reQgyea/sUyia8wEa+vah6Ki\nTV8csillBAXAqoOYnZ/mCKIqIAq24ZS3MiIcj789asR1CkttU+AjJzMN3N/1aemN\nz77tqNjo3m/jBegE35RnGNYazKQciCOXI22ZjwIDAQABAoIBAGrwcUFT8gonXNw/\nJ8KsQ9aG9HgPjVDvAmzW8oxt/AJPXVFoHRxVZkDZPnWvGrMEMbiGQIlstDlyp7vx\nw/VpdGnRgs5gmhhuG5wM2EhL2I28pKKvs9fzEWGs4CKIQ8QhelsV9Gep40o/DM/g\nkwj3DpQ3BuZqM6Ggu4NVsVkfFJwxjnPf7j2gTS/Xx0YkqQhBEEpLtgCEPM3fL3GL\n6kNRlH080l4nWui+2Wrfk6pcKa+xff2QJ/7vaG1KQJYmHy4XkIJnmDznUhjSj+uC\nEgoIEd/yI2GluLvzQXu1OqPevzWhCGE3VcIjJqvu+MgZQblqx2GwyIbtBsCDO22Y\nqC3aLwkCgYEA9l+eMKEdnLi+e6ulknK6WQcZ8zfSSmQSqCV3e413CYZ01FaE5fuP\nUEpnL6mP07kBRuujiPJQxcXX/xbiWOVj+tgO8VJOiSUnU1/r/XgKsl9Ztp2Zyn3m\nRLBfXAm4LGgAeLjSUP786Oi3viybXrrY74arc2uAwGGV6YUmGk9PXMUCgYEA7+u6\n8iCI/hm9LPTYRWdcdYq081oYzcBwVM5vTasDj/dM/8LbwAe0LvnrX3ZJne4WoWpe\nebkM8eKfGBOGOY7NOh1hkViRj3PpclDvd069zakdF4HIKUX+8TxFrVtKSozzRfxz\nqJc6zgeG86le1DV/RFaOMv6IPSFmknqGnpGwKkMCgYARIZLxVLKnbB0qokPQDBQz\nDpBaXh5MN+soL/q/55VIX0YOYbm5+CT98z57jPHISgvxr37ejeLZ7ajYPvIcNk8e\naRmY5B074g56+KeDJ26u+nxVe13vO5PgYNcwoihhRhYKTueo5CIX296y5Y0kKB/f\nf+C6FNaOCfsPkseUesFM9QKBgHG/8gKaKllPGsIV0/QT7WJNQT2fmeLzOk77EQph\n6m53capRWJ7TCDq9gzrfekfGejRNmj1b3ydPqt5fY2QmsGa9R2UB+QFqk2P/u4l1\na8f2RjS+84eeCCGX0fE/NxnhefXUm4FzMg48w18DDlLOimh8IS9MPou9KkSIkwrb\nSArBAoGAe+/H4SRILQHbDZLQT42T5yEQDFHoyBACFRTvpSFDmtH8xf1PypCGg/2a\nU1XNFs402Ka6X79p0quPSlo2U6zO1BquqHImJrdITilBZYL+hFT2naeIroNIrsp+\nrKVnGCtqvJrDXz6P84ff4ho3POgSi2jDMmarmIDkoJZOa5TMR+4=\n-----END RSA PRIVATE KEY-----';
+  const generatedOrgID = orgName.split(' ').join('-');
   before(() => {
     cy.adminLogin('/infrastructure/chef-servers').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
