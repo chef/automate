@@ -80,10 +80,10 @@ function workflow_download_and_load_A1_data {
 
   log_line "Restoring data base from backup $(green "$db_backup.sql")"
   postgresql_load_env
-  install_if_missing core/postgresql psql;
+  install_if_missing core/postgresql13 psql;
   psql -c "DROP DATABASE IF EXISTS $DBNAME"
   psql -c "CREATE DATABASE $DBNAME"
-  install_if_missing core/postgresql pg_restore;
+  install_if_missing core/postgresql13 pg_restore;
   pg_restore -d $DBNAME --no-owner "$db_backup.sql"
   psql $DBNAME -c '\dt'
   rm -f "$db_backup.sql"
