@@ -289,6 +289,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 			return result, err
 		}
 	}
+
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
 	r.Close()
 	return result, nil
