@@ -285,29 +285,25 @@ img {
   position: absolute;
   margin-top: 0px;
 
-  &::before {
-    font-family: "Material Icons";
-    content: "\E86C";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
-    color: #3864F1;
-    padding-right: 0.5em;
-    font-size: 17px;
-  }
+  // &::before {
+  //   font-family: "Material Icons";
+  //   content: "\E86C";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
+  //   color: #3864F1;
+  //   padding-right: 0.5em;
+  //   font-size: 17px;
+  // }
 }
 .status-icon-failed {
   position: absolute;
   margin-top: 0px;
 
-  &::before {
-    font-family: "Material Icons";
-    content: "\e000";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
-    color: #E0408A;
-    padding-right: 0.5em;
-    font-size: 17px;
-  }
-}
-
-.status-text {
-  margin-left: 25px;
+  // &::before {
+  //   font-family: "Material Icons";
+  //   content: "\e000";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
+  //   color: #E0408A;
+  //   padding-right: 0.5em;
+  //   font-size: 17px;
+  // }
 }
 
 .preview-link {
