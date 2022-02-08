@@ -230,17 +230,17 @@ func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 		}
 		err := <-done
 		if err != nil {
-			MigrationError(err, st, ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
+			MigrationError(err, st, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 			log.Println("received error")
 		}
 		log.Println("received done")
 	}()
 }
 
-func MigrationError(err error, st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string, totalSucceeded, totalSkipped, totalFailed int64) {
-	st.FailedMigration(ctx, migrationId, serviceId, err.Error(), totalSucceeded, totalSkipped, totalFailed)
+func MigrationError(err error, st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {
+	st.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 }
 
-func MigrationSuccess(st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string, totalSucceeded, totalSkipped, totalFailed int64) {
-	st.CompleteMigration(ctx, migrationId, serviceId, totalSucceeded, totalSkipped, totalFailed)
+func MigrationSuccess(st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {
+	st.CompleteMigration(ctx, migrationId, serviceId, 0, 0, 0)
 }
