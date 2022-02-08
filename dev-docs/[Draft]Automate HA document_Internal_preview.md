@@ -640,6 +640,73 @@ After that patch the config. This will trigger the deployment also.
 
 `./chef-automate config patch automate.toml`
 
+### Pre-backup configuration for Object storage (Non AWS)
+
+This section provide pre-backup configuration required in case we plan to backup our data on object storage system(Other than AWS S3) like Minio, non AWS S3.
+A) Steps to set key/secret using commands mentioned below :
+Login to all the elastic-search nodes and perform below steps on all the ES nodes.
+1.1 export ES_PATH_CONF="/hab/svc/automate-ha-elasticsearch/config"
+
+1.2 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.access_key
+
+      (It will ask to enter key, please enter your key)
+
+1.3 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.secret_key
+
+      (It will ask to enter secret, please enter your key)
+
+1.4 chown hab:hab /hab/svc/automate-ha-elasticsearch/config/elasticsearch.keystore
+
+    (Setting hab:hab permission)
+
+1.5 curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin  (Command to load the above setting)
+This is expected. After running command 1.5 on 3rd node, this will be the final output-
+```
+{
+  "_nodes" : {
+    "total" : 3,
+    "successful" : 3,
+    "failed" : 0
+  },
+  "cluster_name" : "chef-insights",
+  "nodes" : {
+    "lenRTrZ1QS2uv_vJIwL-kQ" : {
+      "name" : "lenRTrZ"
+    },
+    "Us5iBo4_RoaeojySjWpr9A" : {
+      "name" : "Us5iBo4"
+    },
+    "qtz7KseqSlGm2lEm0BiUEg" : {
+     "name" : "qtz7Kse"
+    }
+  }
+}
+```
+
+B) To override the existing default endpoint:
+
+1) Login to one of the elastic search instance and run the below command on that (You will need root access to run the command):
+```
+source /hab/sup/default/SystemdEnvironmentFile.sh
+automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml
+```
+2) Edit the created es_config.toml file and add the following settings to the end of the file.
+Note: If credentials have never been rotated this file may be empty.
+```
+[es_yaml.s3.client.default]
+ endpoint = "<Bloomberg S3 endpoint, e.g. bloomberg.s3.com>"
+```
+3) Use below command to apply the updated es_config.toml changes, this only needs to be done once:
+Note: This will trigger a restart of the Elasticsearch services on each server.
+```
+hab config apply automate-ha-elasticsearch.default $(date '+%s') es_config.toml
+```
+4) After that run command :
+```
+journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
+```
+And watch for a message about Elasticsearch going from RED /YELLOW to GREEN (screenshot).
+
 ### Pre backup Configuration for s3 backup 
 In order to run the terraform scripts, we need an IAM user with proper permissions. All the required permissions are mentioned in the next section. We need to make sure that we have the access key id and secret access key for the user. If not, then regenerate a new access key and keep it handy.
 
