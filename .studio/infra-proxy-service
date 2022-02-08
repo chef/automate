@@ -25,6 +25,14 @@ function infra_service_integration() {
   log_line "Finished loading chef repo..."
 }
 
+document "infra_service_migration_integration" <<DOC
+  Runs the integration tests for the infra_service_migration_integration
+DOC
+function infra_service_migration_integration() {
+  # Go based integration tests
+  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test -run TestStorageStagedDataLoadSampleData -v "github.com/chef/automate/components/infra-proxy-service/integration_test"
+}
+
 document "infra_service_load_test_data" <<DOC
   run the infra service's integration tests with data.
 

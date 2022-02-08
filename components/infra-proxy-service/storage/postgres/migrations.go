@@ -260,8 +260,8 @@ func (p *postgres) GetMigrationStatus(ctx context.Context, migrationId string) (
 
 //StoreMigrationStage Inserts an entry to the migration_stage
 // To use this function, make sure that you should pass the serialized parsed data in []byte
-func (p *postgres) StoreMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (storage.MigrationStage, error) {
-	return p.insertMigrationStage(ctx, migrationId, parsedData)
+func (p *postgres) StoreMigrationStage(ctx context.Context, migrationId string, stagedData interface{}) (storage.MigrationStage, error) {
+	return p.insertMigrationStage(ctx, migrationId, stagedData)
 }
 
 //GetMigrationStage Get entry to the migration_stage
@@ -275,12 +275,12 @@ func (p *postgres) DeleteMigrationStage(ctx context.Context, migrationId string)
 }
 
 //insertMigrationStage Inserts an entry to the migration_stage
-func (p *postgres) insertMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (storage.MigrationStage, error) {
+func (p *postgres) insertMigrationStage(ctx context.Context, migrationId string, StoreMigrationStage interface{}) (storage.MigrationStage, error) {
 
 	var m storage.MigrationStage
 	var mByte []byte
 	var ok bool
-	if mByte, ok = parsedData.([]byte); !ok {
+	if mByte, ok = StoreMigrationStage.([]byte); !ok {
 		return m, errors.New("Cannot parse the data")
 	}
 	query := "SELECT insert_migration_stage($1, $2)"
