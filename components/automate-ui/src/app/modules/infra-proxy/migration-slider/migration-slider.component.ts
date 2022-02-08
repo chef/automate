@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Utilities } from 'app/helpers/utilities/utilities';
@@ -9,7 +9,7 @@ import { User } from '../../../entities/orgs/org.model';
   templateUrl: './migration-slider.component.html',
   styleUrls: ['./migration-slider.component.scss']
 })
-export class MigrationSliderComponent implements OnInit {
+export class MigrationSliderComponent {
   @Input() migrationID: string;
   @Input() isPreview: boolean;
   @Input() previewData;
@@ -28,10 +28,6 @@ export class MigrationSliderComponent implements OnInit {
     this.migrationForm = this.fb.group({
       name: ['']
     });
-  }
-
-  ngOnInit(): void {
-      this.usersData = this.previewData?.users;
   }
 
   closeMigrationSlider() {
@@ -58,8 +54,7 @@ export class MigrationSliderComponent implements OnInit {
 
   selectedAllUsers(event: any) {
     const checked = event.target.checked;
-    console.log(checked);
-    // this.users.forEach(item => item.selected = checked);
+    this.previewData.users.forEach(item => item.selected = checked);
   }
 
   selectedUser(value: boolean) {

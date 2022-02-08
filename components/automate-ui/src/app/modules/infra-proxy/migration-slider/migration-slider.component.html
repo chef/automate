@@ -36,14 +36,14 @@
               <ul>
                 <li>
                   <span>Users</span>
-                  <span>{{usersData?.length || 0}}</span>
+                  <span>{{previewData?.users.length || 0}}</span>
                 </li>
               </ul>
             </div>
           </div>
         </div>
       <form [formGroup]="migrationForm">
-        <div id="migration-table-container" *ngIf="usersData?.length > 0">
+        <div id="migration-table-container" *ngIf="previewData?.users.length > 0">
           <chef-table>
             <chef-thead>
               <chef-tr>
@@ -69,13 +69,13 @@
                 </chef-td>
                 <chef-td class="middle">
                   <input 
-                    *ngIf="(user.connector === 'ldap') && user.is_conflicting"
+                    *ngIf="(user.connector === 'ldap')"
                     chefInput
-                    firstFocus
                     formControlName="name"
                     type="text"
+                    [(ngModel)]="user.automate_username"
                     (keyup)="handleNameInput($event)"
-                    [disabled]= "user.is_conflicting"
+                    [attr.disabled]= "!user.is_conflicting"
                     autocomplete="off" />
                 </chef-td>
                 <chef-td class="last">

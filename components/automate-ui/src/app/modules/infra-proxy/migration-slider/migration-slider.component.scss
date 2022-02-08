@@ -97,8 +97,14 @@
       .middle {
         width: 30%;
 
-        input {
+        input[type="text"] {
           height: 35px;
+
+          &:ng-reflect-is-disabled {
+            opacity: 0.5;
+            background-color: $chef-grey;
+            border: none;
+          }
         }
       }
     }
