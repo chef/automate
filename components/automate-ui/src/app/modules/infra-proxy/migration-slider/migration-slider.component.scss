@@ -100,7 +100,7 @@
         input[type="text"] {
           height: 35px;
 
-          &:ng-reflect-is-disabled {
+          &:disabled {
             opacity: 0.5;
             background-color: $chef-grey;
             border: none;
