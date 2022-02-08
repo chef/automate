@@ -233,6 +233,7 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 // Unzip will decompress a zip file and sets the UnzipFolder
 func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var fpath string
+	destination := "/hab/svc/infra-proxy-service/data"
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
 		log.Errorf("cannot open reader: %s.", err)
@@ -241,7 +242,8 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 
 	for _, file := range reader.File {
-		fpath = filepath.Join("/hab/svc/infra-proxy-service/data", file.Name)
+
+		fpath = filepath.Join(destination, file.Name)
 
 		if file.FileInfo().IsDir() {
 			os.MkdirAll(fpath, os.ModePerm)
