@@ -3,10 +3,15 @@ package pipeline
 import (
 	"context"
 	"fmt"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
 type PipelineData struct {
-	Result Result
+	Result pipeline.Result
 	Done   chan<- error
 	Ctx    context.Context
 }
@@ -214,8 +219,9 @@ func SetupPhaseOnePipeline() PhaseOnePipleine {
 	return PhaseOnePipleine{in: c}
 }
 
-func (p *PhaseOnePipleine) Run(result Result) {
+func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 	go func() {
+		var st storage.MigrationStorage
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		done := make(chan error)
@@ -224,8 +230,17 @@ func (p *PhaseOnePipleine) Run(result Result) {
 		}
 		err := <-done
 		if err != nil {
-			fmt.Println("received error")
+			MigrationError(err, st, ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
+			log.Println("received error")
 		}
-		fmt.Println("received done")
+		log.Println("received done")
 	}()
+}
+
+func MigrationError(err error, st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string, totalSucceeded, totalSkipped, totalFailed int64) {
+	st.FailedMigration(ctx, migrationId, serviceId, err.Error(), totalSucceeded, totalSkipped, totalFailed)
+}
+
+func MigrationSuccess(st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string, totalSucceeded, totalSkipped, totalFailed int64) {
+	st.CompleteMigration(ctx, migrationId, serviceId, totalSucceeded, totalSkipped, totalFailed)
 }

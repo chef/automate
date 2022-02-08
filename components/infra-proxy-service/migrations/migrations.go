@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
@@ -34,9 +34,9 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		return err
 	}
 	log.Info("Starting with migration phase with the upload file for migration id: ", migrationId)
-	_, err = s.Service.Migration.StartMigration(ctx, migrationId, serverId)
+	_, err = s.service.Migration.StartMigration(ctx, migrationId, serverId)
 	fileData := bytes.Buffer{}
-	s.Service.Migration.StartFileUpload(ctx, migrationId, serverId)
+	s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
 	for {
 		req, err := stream.Recv()
 
@@ -74,7 +74,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		MigrationId: migrationId,
 		Success:     true,
 	}
-	s.Service.Migration.CompleteFileUpload(ctx, migrationId, serverId, 0, 0, 0)
+	s.service.Migration.CompleteFileUpload(ctx, migrationId, serverId, 0, 0, 0)
 	log.Info("File successfully uploaded in the directory for the requested file for migration id: ", migrationId)
 	err = stream.SendAndClose(res)
 	if err != nil {
@@ -104,7 +104,7 @@ func (s *MigrationServer) GetMigrationStatus(ctx context.Context, req *request.G
 		return nil, err
 	}
 
-	migration, err := s.Service.Migration.GetMigrationStatus(ctx, req.MigrationId)
+	migration, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)
 	if err != nil {
 		return nil, err
 	}
@@ -150,9 +150,9 @@ func createMigrationId() (string, error) {
 //handleErrorForUploadFileAndMigration handles the error for the file upload
 func handleErrorForUploadFileAndMigration(err error, migrationId string, serviceId string, s *MigrationServer, ctx context.Context) *response.UploadZipFileResponse {
 	response := createResponseWithErrors(err, migrationId)
-	s.Service.Migration.FailedFileUpload(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
+	s.service.Migration.FailedFileUpload(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	//ToDo to add the Failed migration status as well
-	s.Service.Migration.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
+	s.service.Migration.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	return response
 
 }
@@ -181,7 +181,7 @@ func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.Canc
 	}
 
 	// Cancellation is allowed for a running pipeline only if the parsing is done but the data commitment is yet to be performed
-	currentMigrationPhase, err := s.Service.Migration.GetMigrationStatus(ctx, req.MigrationId)
+	currentMigrationPhase, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)
 	if currentMigrationPhase.MigrationStatusID != int64(constants.CreatePreview) {
 		return nil, fmt.Errorf("cancellation is not allowed when migration is not in Create Preview State: %s", req.MigrationId)
 	}
@@ -190,21 +190,21 @@ func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.Canc
 	folderPath := path.Join("/hab/svc/infra-proxy-service/data", req.MigrationId)
 	err = os.RemoveAll(folderPath)
 	if err != nil {
-		s.Service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
 		return nil, err
 	}
 
 	// Clear up the stage table
-	_, err = s.Service.Migration.DeleteMigrationStage(ctx, req.MigrationId)
+	_, err = s.service.Migration.DeleteMigrationStage(ctx, req.MigrationId)
 	if err != nil {
-		s.Service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
 		return nil, err
 	}
 
 	// Update the migration status
-	_, err = s.Service.Migration.CancelMigration(ctx, req.MigrationId, req.ServerId, 0, 0, 0)
+	_, err = s.service.Migration.CancelMigration(ctx, req.MigrationId, req.ServerId, 0, 0, 0)
 	if err != nil {
-		s.Service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
 		return nil, err
 	}
 

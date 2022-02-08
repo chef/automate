@@ -3,6 +3,11 @@ package pipeline
 import (
 	"context"
 	"fmt"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
 type PhaseTwoPipleine struct {
@@ -167,9 +172,10 @@ func SetupPhaseTwoPipeline() PhaseTwoPipleine {
 	return PhaseTwoPipleine{in: c}
 }
 
-func (p *PhaseTwoPipleine) Run(result Result) {
+func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
 	status := make(chan string)
 	go func() {
+		var st storage.MigrationStorage
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		done := make(chan error)
@@ -178,9 +184,11 @@ func (p *PhaseTwoPipleine) Run(result Result) {
 		}
 		err := <-done
 		if err != nil {
-			fmt.Println("received error")
+			MigrationError(err, st, ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
+			log.Println("received error")
 		}
-		fmt.Println("received done")
+		MigrationSuccess(st, ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
+		log.Println("received done")
 		status <- "Done"
 	}()
 	<-status

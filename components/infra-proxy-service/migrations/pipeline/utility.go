@@ -14,12 +14,13 @@ import (
 
 	"github.com/chef/automate/api/interservice/authz"
 
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	log "github.com/sirupsen/logrus"
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
-func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, authzProjectClient authz.ProjectsServiceClient, res Result) (Result, error) {
+func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, authzProjectClient authz.ProjectsServiceClient, res pipeline.Result) (pipeline.Result, error) {
 	var err error
 	var msg string
 	var totalSucceeded, totalSkipped, totalFailed int64
@@ -35,7 +36,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 			msg = err.Error()
 			continue
 		}
-		if org.ActionOps == Skip {
+		if org.ActionOps == pipeline.Skip {
 			totalSkipped++
 			continue
 		}
@@ -56,24 +57,24 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 }
 
 // StoreOrg stores a single Org into DB
-func StoreOrg(ctx context.Context, st storage.Storage, org Org, serverID string, authzProjectClient authz.ProjectsServiceClient) (error, ActionOps) {
-	var actionTaken ActionOps
+func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverID string, authzProjectClient authz.ProjectsServiceClient) (error, pipeline.ActionOps) {
+	var actionTaken pipeline.ActionOps
 	var err error
 	switch org.ActionOps {
-	case Insert:
+	case pipeline.Insert:
 		projects, err := createProjectFromOrgIdAndServerID(ctx, serverID, org.Name, authzProjectClient)
 		if err != nil {
 			log.Errorf("Unable to create project for serverid: %s", serverID)
 			return err, actionTaken
 		}
 		_, err = st.StoreOrg(ctx, org.Name, org.FullName, "", "", serverID, projects)
-		actionTaken = Insert
-	case Delete:
+		actionTaken = pipeline.Insert
+	case pipeline.Delete:
 		_, err = st.DeleteOrg(ctx, org.Name, serverID)
-		actionTaken = Delete
-	case Update:
+		actionTaken = pipeline.Delete
+	case pipeline.Update:
 		_, err = st.EditOrg(ctx, org.Name, org.FullName, "", serverID, nil)
-		actionTaken = Update
+		actionTaken = pipeline.Update
 	default:
 	}
 	return err, actionTaken
@@ -96,7 +97,7 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 	return []string{projectID.Project.Name}, nil
 }
 
-func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result Result) (Result, error) {
+func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var err error
 	log.Info("Starting with organisation parsing phase for migration id: ", result.Meta.MigrationID)
 	_, err = mst.StartOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
@@ -161,10 +162,10 @@ func createFileOrgsMap(orgs []os.FileInfo) map[string]string {
 	return orgMap
 }
 
-func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPath string) []Org {
-	var orgList []Org
+func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPath string) []pipeline.Org {
+	var orgList []pipeline.Org
 	orgDatabaseMap := createDatabaseOrgsMap(orgsInDB)
-	var orgJson OrgJson
+	var orgJson pipeline.OrgJson
 	log.Info("Comparing the organisations from database and backup file for insert,update and skip action")
 	//For insert, update and skip action
 	for _, org := range orgsInFiles {
@@ -174,15 +175,15 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 			if valuePresent {
 				if orgJson.FullName != orgInfo {
 					//Update org in the result actions
-					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Update))
+					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, pipeline.Update))
 				} else {
 					//Skip org action if full names are not equal
-					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Skip))
+					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, pipeline.Skip))
 
 				}
 			} else {
 				//Insert org action if not present in database
-				orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, Insert))
+				orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, pipeline.Insert))
 			}
 		}
 	}
@@ -190,23 +191,23 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 	return orgList
 }
 
-func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []storage.Org) []Org {
-	var orgList []Org
+func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []storage.Org) []pipeline.Org {
+	var orgList []pipeline.Org
 	orgFilesMap := createFileOrgsMap(orgsInFiles)
 	log.Info("Comparing the organisations from database and backup file for delete action")
 	//For delete action by comparing database orgs with file orgs
 	for _, org := range orgsInDB {
 		_, valuePresent := orgFilesMap[org.ID]
 		if !valuePresent {
-			orgList = append(orgList, createOrgStructForAction(org.ID, org.Name, Delete))
+			orgList = append(orgList, createOrgStructForAction(org.ID, org.Name, pipeline.Delete))
 		}
 	}
 	log.Info("Completed comparing the organisations from database and backup file for delete action")
 	return orgList
 }
 
-func openOrgFolder(org os.FileInfo, fileLocation string) OrgJson {
-	var orgJson OrgJson
+func openOrgFolder(org os.FileInfo, fileLocation string) pipeline.OrgJson {
+	var orgJson pipeline.OrgJson
 	jsonPath := path.Join(fileLocation, org.Name(), "org.json")
 	jsonFile, err := os.Open(jsonPath)
 	// if we os.Open returns an error then handle it
@@ -222,15 +223,15 @@ func openOrgFolder(org os.FileInfo, fileLocation string) OrgJson {
 	return orgJson
 }
 
-func createOrgStructForAction(orgId string, orgName string, ops ActionOps) Org {
-	return Org{
+func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionOps) pipeline.Org {
+	return pipeline.Org{
 		Name:      orgId,
 		FullName:  orgName,
 		ActionOps: ops,
 	}
 }
 
-func Unzip(ctx context.Context, mst storage.MigrationStorage, result Result) (Result, error) {
+func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var fpath string
 	r, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 type MigrationServer struct {
-	Service          *service.Service
+	service          *service.Service
 	phaseOnePipeline pipeline.PhaseOnePipleine
 }
 
@@ -14,7 +14,7 @@ type MigrationServer struct {
 func NewMigrationServer(service *service.Service) *MigrationServer {
 	c := pipeline.SetupPhaseOnePipeline()
 	return &MigrationServer{
-		Service:          service,
+		service:          service,
 		phaseOnePipeline: c,
 	}
 }
