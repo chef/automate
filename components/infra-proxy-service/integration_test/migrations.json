@@ -1,0 +1,98 @@
+{
+    "meta": {
+        "server_id":"local_dev",
+        "migration_id": "1234"
+    },
+    "parsed_result": {
+        "orgs": [
+            {
+                "name":"org1",
+                "full_name":"org1_infra",
+                "action_ops":1
+            },
+            {
+                "name":"org2",
+                "full_name":"org2_infra",
+                "action_ops":2
+            },
+            {
+                "name":"org3",
+                "full_name":"org3_infra",
+                "action_ops":3
+            },
+            {
+                "name":"org4",
+                "full_name":"org4_infra",
+                "action_ops":4
+            },
+            {
+                "name":"org5",
+                "full_name":"org5_infra",
+                "action_ops":1
+            }
+        ],
+        "users":[
+            {
+                "username":"test1",
+			    "email":"abc1@gmail.com"	,
+		        "display_name":"test1",
+		        "first_name":"first1",
+			    "last_name":"last1",
+			    "middle_name":"middle1",
+			    "automate_username":"test1",
+			    "connector":"local",
+			    "is_conflicting":true,
+			    "is_admin":true
+            },
+            {
+                "username":"test2",
+			    "email":"abc2@gmail.com"	,
+		        "display_name":"test2",
+		        "first_name":"first2",
+			    "last_name":"last2",
+			    "middle_name":"middle2",
+			    "automate_username":"testldap2",
+			    "connector":"ldap",
+			    "is_conflicting":false,
+			    "is_admin":false
+            },
+            {
+                "username":"test3",
+			    "email":"abc3@gmail.com"	,
+		        "display_name":"test3",
+		        "first_name":"first3",
+			    "last_name":"last3",
+			    "middle_name":"middle3",
+			    "automate_username":"test3",
+			    "connector":"local",
+			    "is_conflicting":false,
+			    "is_admin":true
+            },
+            {
+                "username":"test4",
+			    "email":"abc4@gmail.com"	,
+		        "display_name":"test4",
+		        "first_name":"first4",
+			    "last_name":"last4",
+			    "middle_name":"middle4",
+			    "automate_username":"test4",
+			    "connector":"local",
+			    "is_conflicting":false,
+			    "is_admin":false
+            },
+            {
+                "username":"test5",
+			    "email":"abc5@gmail.com"	,
+		        "display_name":"test5",
+		        "first_name":"first5",
+			    "last_name":"last5",
+			    "middle_name":"middle5",
+			    "automate_username":"test5",
+			    "connector":"local",
+			    "is_conflicting":false,
+			    "is_admin":false
+            }
+        ],
+        "orgs_users_associations":[]
+    }
+}
