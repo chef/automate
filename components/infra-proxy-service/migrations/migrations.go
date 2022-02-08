@@ -240,13 +240,13 @@ func (s *MigrationServer) GetStagedData(ctx context.Context, req *request.GetSta
 
 	return &response.GetStagedDataResponse{
 		MigrationId: migrationStage.MigrationID,
-		StagedData:  getStagedData(migrationStage.ParsedData),
+		StagedData:  getStagedData(migrationStage.StagedData),
 	}, nil
 }
 
-func getStagedData(parsedResult pipeline_model.ParsedResult) *response.StagedData {
+func getStagedData(stagedResult pipeline_model.Result) *response.StagedData {
 	stageData := &response.StagedData{}
-	for _, org := range parsedResult.Orgs {
+	for _, org := range stagedResult.ParsedResult.Orgs {
 		switch org.ActionOps {
 		case pipeline_model.Insert:
 			stageData.OrgsToMigrate++
@@ -260,7 +260,7 @@ func getStagedData(parsedResult pipeline_model.ParsedResult) *response.StagedDat
 		}
 	}
 	users := []*response.User{}
-	for _, user := range parsedResult.Users {
+	for _, user := range stagedResult.ParsedResult.Users {
 		users = append(users, getStagedUser(user))
 	}
 	stageData.Users = users
