@@ -138,7 +138,7 @@ type Migration struct {
 type MigrationStage struct {
 	ID          string          `json:"id"`
 	MigrationID string          `json:"migration_id"`
-	StagedData  pipeline.Result `json:"staged_data"`
+	StagedData  pipeline.Result `json:"parsed_data"`
 	CreatedAt   time.Time       `json:"created_at"`
 	UpdatedAt   time.Time       `json:"updated_at"`
 }
