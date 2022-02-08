@@ -20,18 +20,20 @@ func TestMigrations(t *testing.T) {
 	_, serviceRef, _, close, _, _ := test.SetupInfraProxyService(ctx, t)
 	infraMigrationMockClient := infra_migrations.NewMockInfraProxyMigrationClient(gomock.NewController(t))
 
+	var migrationID = "Fake id"
+
 	defer close()
 
 	t.Run("GetMigrationStatus", func(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
 
 		res := &response.GetMigrationStatusResponse{
-			MigrationId:     "Fake id",
+			MigrationId:     migrationID,
 			MigrationType:   "Migration Completed",
 			MigrationStatus: "Failed",
 		}
 		req := request.GetMigrationStatusRequest{
-			MigrationId: "Fake id",
+			MigrationId: migrationID,
 		}
 		t.Run("when a migration id which exist in migration table is submitted, then return the latest status.", func(t *testing.T) {
 			infraMigrationMockClient.EXPECT().GetMigrationStatus(gomock.Any(), req, gomock.Any()).Return(res, nil)
@@ -48,7 +50,7 @@ func TestMigrations(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
 
 		res := &response.GetStagedDataResponse{
-			MigrationId: "Fake id",
+			MigrationId: migrationID,
 			StagedData: &response.StagedData{
 				OrgsToMigrate: 2,
 				OrgsToSkip:    1,
@@ -71,7 +73,7 @@ func TestMigrations(t *testing.T) {
 			},
 		}
 		req := request.GetStagedDataRequest{
-			MigrationId: "Fake id",
+			MigrationId: migrationID,
 		}
 		t.Run("when a migration id which exist in staged table is submitted, then return the staged data", func(t *testing.T) {
 			infraMigrationMockClient.EXPECT().GetStagedData(gomock.Any(), req, gomock.Any()).Return(res, nil)
