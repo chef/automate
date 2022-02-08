@@ -241,7 +241,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 
 	for _, file := range reader.File {
-		fpath = filepath.Join("", file.Name)
+		fpath = filepath.Join("/hab/svc/infra-proxy-service/data", file.Name)
 
 		if file.FileInfo().IsDir() {
 			os.MkdirAll(fpath, os.ModePerm)
