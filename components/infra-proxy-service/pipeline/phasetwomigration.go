@@ -182,10 +182,10 @@ func (p *PhaseTwoPipleine) Run(result Result) {
 		}
 		err := <-done
 		if err != nil {
-			MigrationError(err, ms, ctx, "", "", 0, 0, 0)
+			MigrationError(err, ms, ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
 			log.Println("received error")
 		}
-		MigrationSuccess(ms, ctx, "migrationId", "serviceId", 0, 0, 0)
+		MigrationSuccess(ms, ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
 		log.Println("received done")
 		status <- "Done"
 	}()

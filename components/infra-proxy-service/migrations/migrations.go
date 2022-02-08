@@ -8,12 +8,11 @@ import (
 	"os"
 	"path"
 
-	"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
-
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"
+	"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	"github.com/gofrs/uuid"
 	log "github.com/sirupsen/logrus"

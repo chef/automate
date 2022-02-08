@@ -1,12 +1,16 @@
 package pipeline
 
 import (
+	"archive/zip"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	log "github.com/sirupsen/logrus"
@@ -200,4 +204,69 @@ func createOrgStructForAction(orgId string, orgName string, ops ActionOps) Org {
 		FullName:  orgName,
 		ActionOps: ops,
 	}
+}
+
+func Unzip(ctx context.Context, mst storage.MigrationStorage, result Result) (Result, error) {
+	var fpath string
+	r, err := zip.OpenReader(result.Meta.ZipFile)
+	if err != nil {
+		log.Errorf("cannot open reader: %s.", err)
+		mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
+		return result, err
+	}
+	defer r.Close()
+
+	for _, f := range r.File {
+		fpath = filepath.Join("", f.Name)
+
+		// Checking for any invalid file paths
+		if !strings.HasPrefix(fpath, filepath.Clean("backup")+string(os.PathSeparator)) {
+			log.Errorf("invalid path: %s.")
+			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "invalid path", 0, 0, 0)
+		}
+
+		// filenames = append(filenames, fpath)
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(fpath, os.ModePerm)
+			continue
+		}
+
+		// Creating the files in the target directory
+		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
+			log.Errorf("cannot create directory: %s. ", err)
+			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create directory", 0, 0, 0)
+			return result, err
+		}
+
+		// The created file will be stored in
+		// outFile with permissions to write &/or truncate
+		outFile, err := os.OpenFile(fpath,
+			os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
+			f.Mode())
+		if err != nil {
+			log.Errorf("cannot create a file: %s.", err)
+			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create a file", 0, 0, 0)
+			return result, err
+		}
+
+		rc, err := f.Open()
+		if err != nil {
+			log.Errorf("cannot open file")
+			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open file", 0, 0, 0)
+			return result, err
+		}
+
+		_, err = io.Copy(outFile, rc)
+
+		outFile.Close()
+		rc.Close()
+
+		if err != nil {
+			log.Errorf("cannot copy a file")
+			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy a file", 0, 0, 0)
+			return result, err
+		}
+	}
+	result.Meta.UnzipFolder = fpath
+	return result, nil
 }
