@@ -49,7 +49,7 @@
                 <!-- Completed and Failed status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value"><span class="status-icon-completed"></span><span class="status-text">Completed</span></span>                
                 <span *ngIf="!migrationLoading && migrationStarted && migrationfailed" class="server-entity-value" id="status-failed">
-                  <chef-tooltip position='bottom' class="visible" for='error-show-button' style="--tooltip-color: #F9DBEA;left: 1395.05px;top: 280.766px;font-size: 10px;color: #ba1e6a;">
+                  <chef-tooltip position='bottom' class="visible tooltip" for='error-show-button'>
                     <img src="../../../../assets/img/warning.png" alt="warning" />
                     Migration failed, migration step not completed!
                   </chef-tooltip>
