@@ -67,6 +67,9 @@ func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverI
 			return err, actionTaken
 		}
 		_, err = st.StoreOrg(ctx, org.Name, org.FullName, "", "", serverID, projects)
+		if err != nil {
+			log.Errorf("Unable to insert org for server id: %s", serverID)
+		}
 		actionTaken = pipeline.Insert
 	case pipeline.Delete:
 		_, err = st.DeleteOrg(ctx, org.Name, serverID)
@@ -108,21 +111,21 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	folder, err := os.Open(orgPath)
 	if err != nil {
 		log.Errorf("Failed to open the folder for the file path %s : %s", orgPath, err.Error())
-		mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
-	defer folder.Close()
 	orgNames, err := folder.Readdir(0)
 	if err != nil {
 		log.Errorf("Failed to read the files for the file path %s : %s", orgPath, err.Error())
-		mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
+	_ = folder.Close()
 	orgsPresentInDB, err := st.GetOrgs(ctx, result.Meta.ServerID)
 	if err != nil {
 		log.Errorf("Failed to read orgs from database for %s:%s", result.Meta.ServerID, err.Error())
-		mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
@@ -130,7 +133,7 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 
 	result.ParsedResult.Orgs = append(result.ParsedResult.Orgs, deleteOrgsIfNotPresentInCurrentFile(orgNames, orgsPresentInDB)...)
 
-	mst.CompleteOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
+	_, err = mst.CompleteOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
 	if err != nil {
 		log.Errorf("Failed to update the complete status while parsing for migration id %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
@@ -215,10 +218,9 @@ func openOrgFolder(org os.FileInfo, fileLocation string) pipeline.OrgJson {
 	}
 	log.Info("Successfully opened the file at location", jsonPath)
 	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	json.Unmarshal(byteValue, &orgJson)
-
+	_ = json.Unmarshal(byteValue, &orgJson)
+	_ = jsonFile.Close()
 	return orgJson
 }
 
