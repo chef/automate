@@ -1257,6 +1257,7 @@ After that do deploy again using below command
 	terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 	
 ```
+- Start thhe deployment again
 	
 # Cert rotation with large CA cert file
 	
