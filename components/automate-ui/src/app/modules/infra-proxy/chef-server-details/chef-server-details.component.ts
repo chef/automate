@@ -34,7 +34,14 @@ import {
   ValidateWebUIKey
   // , GetUsers
 } from 'app/entities/servers/server.actions';
-import { GetOrgs, CreateOrg, DeleteOrg, UploadZip, CancelMigration } from 'app/entities/orgs/org.actions';
+import {
+  GetOrgs,
+  CreateOrg,
+  DeleteOrg,
+  UploadZip,
+  CancelMigration,
+  GetPreviewData
+} from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   createStatus,
@@ -44,7 +51,9 @@ import {
   deleteStatus as deleteOrgStatus,
   uploadStatus,
   uploadDetails,
-  cancelStatus
+  cancelStatus,
+  previewStatus,
+  previewData
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { SyncOrgUsersSliderComponent } from '../sync-org-users-slider/sync-org-users-slider.component';
@@ -121,10 +130,14 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     12: 'Migrating user permissions',
     13: 'Migration Completed'
   };
-  public previewData;
+
+  public migration_id: string;
   public cancelMigrationInProgress = false;
   public canceMigrationSuccessful = false;
   public isCancelled = false;
+
+  public previewDataLoaded =  false;
+  public previewData;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
@@ -238,6 +251,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.migrationStarted = true;
         this.getMigrationStatus(this.server.migration_id);
       }
+      this.migration_id = this.server.migration_id;
     });
 
     combineLatest([
@@ -313,7 +327,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (uploadStatusSt === EntityStatus.loadingSuccess && !isNil(uploadDetailsState)) {
         // show migration slider
         this.isUploaded = true;
-        this.migrationID = uploadDetailsState.migrationId;
+        this.migration_id = uploadDetailsState.migrationId;
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
@@ -329,6 +343,18 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.canceMigrationSuccessful) {
         this.isCancelled = true;
+      }
+    });
+
+    combineLatest([
+      this.store.select(previewStatus),
+      this.store.select(previewData)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([previewStatusSt, previewState]) => {
+      if (previewStatusSt === EntityStatus.loadingSuccess && !isNil(previewState)) {
+        this.previewData = previewState;
+      } else if (previewStatusSt === EntityStatus.loadingFailure) {
+        this.previewDataLoaded = false;
       }
     });
 
@@ -516,8 +542,11 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new CancelMigration(payload));
   }
 
-  // migraion preview function
+  // get migraion preview function
   public migrationPreview() {
-
+    const payload = {
+      migration_id: this.migration_id
+    };
+    this.store.dispatch(new GetPreviewData(payload));
   }
 }
