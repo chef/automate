@@ -96,7 +96,7 @@ type Org struct {
 	FullName string `json:"full_name"`
 
 	// ActionOps for Insert Skip Update and Delete
-	ActionOps ActionOps `json:"guid"`
+	ActionOps ActionOps `json:"action_ops"`
 }
 
 type User struct {
