@@ -30,8 +30,8 @@ steps:
   #     executor:
   #       docker:
 
-  # license scout requires github account access because we currently
-  # rely on at least 2 private repositories.
+  # # license scout requires github account access because we currently
+  # # rely on at least 2 private repositories.
   # - label: license scout
   #   command:
   #     # here we reuse the license_scout.sh script used by expeditor to publish the manifest
@@ -117,7 +117,7 @@ steps:
   #           "--exclude", "*.spec.ts",
   #           "--config", "/go/src/github.com/chef/automate/.semgrep",
   #           "/go/src/github.com/chef/automate"
-          # ]
+  #         ]
 
   # - label: ":semgrep: Security"
   #   command:
@@ -142,6 +142,32 @@ steps:
   # directive. All tests below this wait either require build assets
   # or take a long time.
   - wait
+
+  - label: "v2 to v22 upgrade"
+  command:
+    - integration/run_test integration/tests/v2_to_v22_upgrade.sh
+  timeout_in_minutes: 25
+  expeditor:
+    secrets:
+      A2_LICENSE:
+        path: secret/a2/license
+        field: license
+    executor:
+      linux:
+        privileged: true
+
+  - label: "v2 run and test upgrade"
+  command:
+    - integration/run_test integration/tests/v2_run_and_test_upgrade.sh
+  timeout_in_minutes: 25
+  expeditor:
+    secrets:
+      A2_LICENSE:
+        path: secret/a2/license
+        field: license
+    executor:
+      linux:
+        privileged: true
 
   # - label: "automate-load-balancer"
   #   command:
@@ -888,16 +914,3 @@ steps:
   #     executor:
   #       linux:
   #         privileged: true
-
-  - label: "v2 to v22 upgrade"
-  command:
-    - integration/run_test integration/tests/v2_to_v22_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
