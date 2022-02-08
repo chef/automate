@@ -98,8 +98,8 @@
             <span class="migrationSlider-link" data-cy="open-migration-slider">
               <a
                 data-cy="migration-slider-link"
-                (click)="migrationSlider.slidePanel()"
-                >Preview Migration</a>
+                (click)="migrationSlider.slidePanel(); getPreviewData()"
+                >Take action</a>
             </span>
             <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
               <chef-button id="sync-button" class="sync-button" secondary data-cy="sync-org-and-users" (click)="upload.slidePanel()">
@@ -318,6 +318,7 @@
       <app-migration-slider
         #migrationSlider
         [migrationID]="migration_id"
+        [isPreview]="isPreview"
         [previewData]="previewData"
         (migrationPreview)="migrationPreview()"
         (cancelMigration)="cancelMigration($event)">

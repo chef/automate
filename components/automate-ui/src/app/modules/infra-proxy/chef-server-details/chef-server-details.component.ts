@@ -138,6 +138,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public previewDataLoaded =  false;
   public previewData;
+  public isPreview = false;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
@@ -352,7 +353,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([previewStatusSt, previewState]) => {
       if (previewStatusSt === EntityStatus.loadingSuccess && !isNil(previewState)) {
-        this.previewData = previewState;
+        this.previewData = previewState.staged_data;
+        this.isPreview = true;
       } else if (previewStatusSt === EntityStatus.loadingFailure) {
         this.previewDataLoaded = false;
       }
@@ -543,6 +545,14 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   // get migraion preview function
+  public getPreviewData() {
+    const payload = {
+      // migration_id: this.migration_id
+      migration_id: '1234'
+    };
+    this.store.dispatch(new GetPreviewData(payload));
+  }
+
   public migrationPreview() {
     const payload = {
       migration_id: this.migration_id

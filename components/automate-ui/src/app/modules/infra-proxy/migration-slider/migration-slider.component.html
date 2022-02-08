@@ -1,4 +1,5 @@
 <div data-cy="migration-slider" ngClass="{slide : isSlideOpen1}">
+  <chef-loading-spinner *ngIf="!isPreview" size="50" fixed></chef-loading-spinner>
   <div class="sidenav-header">
     <chef-button class="back-button" secondary (click)="closeMigrationSlider()" data-cy="back-button">
       <chef-icon>arrow_back</chef-icon>
@@ -18,15 +19,15 @@
               <ul>
                 <li>
                   <span>Migrated Orgs</span>
-                  <span>2</span>
+                  <span>{{previewData?.orgs_to_migrate}}</span>
                 </li>
                 <li>
                   <span>Skipped Orgs</span>
-                  <span>0</span>
+                  <span>{{previewData?.orgs_to_skip}}</span>
                 </li>
                 <li>
                   <span>Updated Orgs</span>
-                  <span>0</span>
+                  <span>{{previewData?.orgs_to_update}}</span>
                 </li>
               </ul>
             </div>
@@ -35,14 +36,14 @@
               <ul>
                 <li>
                   <span>Users</span>
-                  <span>4</span>
+                  <span>{{usersData?.length || 0}}</span>
                 </li>
               </ul>
             </div>
           </div>
         </div>
       <form [formGroup]="migrationForm">
-        <div id="migration-table-container">
+        <div id="migration-table-container" *ngIf="usersData?.length > 0">
           <chef-table>
             <chef-thead>
               <chef-tr>
@@ -56,40 +57,43 @@
               </chef-tr>
             </chef-thead>
             <chef-tbody>
-              <chef-tr >
+              <chef-tr *ngFor="let user of previewData.users">
                 <chef-td class="first">
                   <chef-checkbox (change)="selectedUser($event)" [checked]="checkedUser"></chef-checkbox>
                 </chef-td>
                 <chef-td class="middle">
-                  Chef Server User
+                  {{user.username}}
                 </chef-td>
                 <chef-td class="middle">
-                    Automate User
+                    {{user.automate_username}}
                 </chef-td>
                 <chef-td class="middle">
                   <input 
-                    *ngIf="isLDPUser && isEditable"
+                    *ngIf="(user.connector === 'ldap') && user.is_conflicting"
                     chefInput
                     firstFocus
                     formControlName="name"
                     type="text"
                     (keyup)="handleNameInput($event)"
+                    [disabled]= "user.is_conflicting"
                     autocomplete="off" />
                 </chef-td>
                 <chef-td class="last">
-                  <p class="warning-msg" *ngIf="isLDPUser && isEditable">Warning. User already exists in Automate. This will overwrite this users IAM settings.</p>
+                  <p class="warning-msg"
+                   *ngIf="(user.connector === 'ldap') && user.is_conflicting">
+                   Warning. User already exists in Automate. This will overwrite this users IAM settings.
+                  </p>
                 </chef-td>
               </chef-tr>
             </chef-tbody>
           </chef-table>
         </div>
         <div id="button-bar">
-          <chef-button id="cancel-migration-slider" tertiary [disabled]="migrating" (click)="cancelMigrationclicked()">
-            Cancel
+          <chef-button id="cancel-migration-slider" tertiary [disabled]="!isPreview" (click)="cancelMigrationclicked()">
+            Cancel Migration
           </chef-button>
-          <chef-button primary data-cy="migration-button" id="migration-button" (click)="migrationFile();">
-            <chef-loading-spinner *ngIf="migrating"></chef-loading-spinner>
-            <span *ngIf="!migrating">confirm</span>
+          <chef-button primary [disabled]="!isPreview" data-cy="migration-button" id="migration-button" (click)="migrationFile()">
+            <span *ngIf="isPreview">confirm Migration</span>
           </chef-button>
         </div>
       </form>

@@ -1,24 +1,24 @@
-import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Utilities } from 'app/helpers/utilities/utilities';
+import { User } from '../../../entities/orgs/org.model';
 
 @Component({
   selector: 'app-migration-slider',
   templateUrl: './migration-slider.component.html',
   styleUrls: ['./migration-slider.component.scss']
 })
-export class MigrationSliderComponent {
+export class MigrationSliderComponent implements OnInit {
   @Input() migrationID: string;
+  @Input() isPreview: boolean;
   @Input() previewData;
   @Output() migrationPreview = new EventEmitter();
   @Output() cancelMigration = new EventEmitter();
 
-  public migrating = false;
   public checkedUser = false;
-  public isLDPUser = true;
-  public isEditable = true;
   public migrationForm: FormGroup;
+  public usersData: User[];
 
   @HostBinding('class.active') isSlideOpen1 = false;
 
@@ -28,6 +28,10 @@ export class MigrationSliderComponent {
     this.migrationForm = this.fb.group({
       name: ['']
     });
+  }
+
+  ngOnInit(): void {
+      this.usersData = this.previewData?.users;
   }
 
   closeMigrationSlider() {

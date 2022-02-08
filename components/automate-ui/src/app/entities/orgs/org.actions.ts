@@ -180,6 +180,7 @@ export class CancelMigrationFailure implements Action {
 }
 
 export interface PreviewSuccessPayload {
+  staged_data: any;
   PreviewData: PreviewData[];
 }
 
