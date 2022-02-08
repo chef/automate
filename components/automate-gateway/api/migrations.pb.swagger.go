@@ -14,6 +14,37 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/infra/servers/migrations/staged_data/{migration_id}": {
+      "get": {
+        "operationId": "InfraProxyMigration_GetStagedData",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.GetStagedDataResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "migration_id",
+            "description": "Migration ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxyMigration"
+        ]
+      }
+    },
     "/api/v0/infra/servers/migrations/status/{migration_id}": {
       "get": {
         "operationId": "InfraProxyMigration_GetMigrationStatus",
@@ -21,7 +52,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.GetMigrationStatus"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.GetMigrationStatusResponse"
             }
           },
           "default": {
@@ -52,7 +83,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponce"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponse"
             }
           },
           "default": {
@@ -85,7 +116,7 @@ func init() {
     }
   },
   "definitions": {
-    "chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponce": {
+    "chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -102,7 +133,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.migrations.response.GetMigrationStatus": {
+    "chef.automate.api.infra_proxy.migrations.response.GetMigrationStatusResponse": {
       "type": "object",
       "properties": {
         "migration_id": {
@@ -116,6 +147,98 @@ func init() {
         "migration_status": {
           "type": "string",
           "title": "Migration status"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.GetStagedDataResponse": {
+      "type": "object",
+      "properties": {
+        "migration_id": {
+          "type": "string",
+          "description": "Migration ID."
+        },
+        "staged_data": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.StagedData",
+          "title": "Staged data"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.StagedData": {
+      "type": "object",
+      "properties": {
+        "orgs_to_migrate": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to migrate"
+        },
+        "orgs_to_skip": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to skip"
+        },
+        "orgs_to_update": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to update"
+        },
+        "orgs_to_delete": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to delete"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.user"
+          },
+          "title": "Users"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.user": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "title": "User's username"
+        },
+        "email": {
+          "type": "string",
+          "title": "User's email ID"
+        },
+        "display_name": {
+          "type": "string",
+          "title": "User's display name"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User's first name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User's last name"
+        },
+        "middle_name": {
+          "type": "string",
+          "title": "User's middle name"
+        },
+        "automate_username": {
+          "type": "string",
+          "title": "User's username in automate"
+        },
+        "connector": {
+          "type": "string",
+          "title": "Local or ldap user"
+        },
+        "is_conflicting": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "IsConflicting for user's existance in db"
+        },
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "user is admin or not"
         }
       }
     },
