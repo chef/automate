@@ -269,11 +269,14 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 
 	var fpath string
+<<<<<<< HEAD
 	_, err := mst.StartUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID)
 	if err != nil {
 		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
 	}
 
+=======
+>>>>>>> 7e478e2c8 (PR Commect fixed)
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
 		log.Errorf("cannot open reader: %s.", err)
@@ -285,9 +288,14 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 
 	for _, file := range reader.File {
+<<<<<<< HEAD
 
 		fpath = filepath.Join(filepath.Dir(result.Meta.ZipFile), file.Name)
 
+=======
+		fpath = filepath.Join("", file.Name)
+
+>>>>>>> 7e478e2c8 (PR Commect fixed)
 		if file.FileInfo().IsDir() {
 			os.MkdirAll(fpath, os.ModePerm)
 			continue
@@ -337,9 +345,12 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
 	reader.Close()
+<<<<<<< HEAD
 	_, err = mst.CompleteUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
 	if err != nil {
 		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
 	}
+=======
+>>>>>>> 7e478e2c8 (PR Commect fixed)
 	return result, nil
 }
