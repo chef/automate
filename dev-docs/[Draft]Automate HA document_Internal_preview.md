@@ -1312,7 +1312,7 @@ After that do deploy again using below command
 **Follow below steps to perform clean up of deployed Automate HA infrastructure: **
 - Run below commands on all the instances/nodes of Automate HA infrastructure (Automate, Server, 3 instance of Postgres, 3 instances of Elastic search)
 	- `rm -rf /hab`
-	-  `cd /var/tmp && rm frontend-* && backend-*`
+	-  `cd /var/tmp && rm -f frontend-* && rm -f backend-*`
 	-  `sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}')`
 
 - Run  `rm -rf /hab` on Bastion node
