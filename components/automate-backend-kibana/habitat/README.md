@@ -1,4 +1,4 @@
-#  Automate-Backend-Kibana
+#  Automate-ha-Kibana
 
 This is a wrapper package of core/kibana for Chef Automate Backend.
 

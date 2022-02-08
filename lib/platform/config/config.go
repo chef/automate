@@ -59,8 +59,43 @@ func ConfigFromEnvironment() (*Config, error) {
 	return &platformConfig, nil
 }
 
+func ConfigFromParams(svcName, svcPath, svcDBUser string) (*Config, error) {
+
+	if svcName == "" || svcPath == "" {
+		return nil, ErrNoPlatformEnvironment
+	}
+	platformConfigPath := path.Join(svcPath, "config", "_a2_platform.json")
+	f, err := os.Open(platformConfigPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not read %s", platformConfigPath)
+	}
+	defer f.Close() // nolint: errcheck
+
+	platformConfig := Config{
+		Config:    &platform.Config{},
+		SvcDBUser: svcDBUser,
+	}
+	unmarshaler := jsonpb.Unmarshaler{
+		AllowUnknownFields: true,
+	}
+
+	if err := unmarshaler.Unmarshal(f, platformConfig.Config); err != nil {
+		return nil, errors.Wrapf(err, "Could not decode %s", platformConfigPath)
+	}
+
+	return &platformConfig, nil
+}
+
 func PGURIFromEnvironment(database string) (string, error) {
 	platformConfig, err := ConfigFromEnvironment()
+	if err != nil {
+		return "", err
+	}
+	return platformConfig.GetPGURI(database)
+}
+
+func PGURIFromEnvironmentWithParams(database, svc, path, svcDBUser string) (string, error) {
+	platformConfig, err := ConfigFromParams(svc, path, svcDBUser)
 	if err != nil {
 		return "", err
 	}

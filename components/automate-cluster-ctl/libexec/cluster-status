@@ -116,7 +116,7 @@ class AutomateClusterStatus < AutomateCluster::Command
     sprintf("%02dh %02dm %02ds", hours, minutes, seconds)
   end
 
-  def render_status(header, data, **opts)
+  def render_status(header, data, opts = {})
     case format
     when 'text'
       puts '' # intentionally left blank
@@ -136,8 +136,8 @@ class AutomateClusterStatus < AutomateCluster::Command
     puts services.to_json
   end
 
-  def render_fancy_table(headers, data, **opts)
-    opts.merge!({ multiline: true, padding: [0,1,0,1], alignments: [:left, :left]})
+  def render_fancy_table(headers, data, opts = {})
+    opts.merge!({ multiline: true, padding: [0,1,0,1], alignments: [:left, :left], width: 100})
 
     table = TTY::Table.new(headers, data)
     puts table.render(:ascii, opts)

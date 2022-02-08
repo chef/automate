@@ -7,14 +7,14 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "IAM Actions"
-    parent = "automate/authorization"
-    identifier = "automate/authorization/iam_actions.md IAM Actions"
+    parent = "automate/users/authorization"
+    identifier = "automate/users/authorization/iam_actions.md IAM Actions"
     weight = 30
 +++
 
 Reference the chart on this page when creating a *Role* to know which action grants access to what page in the browser.
 
-*IAM Action* lists the associated action or actions required to access that page in the browser. 
+*IAM Action* lists the associated action or actions required to access that page in the browser.
 Use `*` in these actions to give broad permissions to perform all associated actions such as get, list, create, delete, etc.
 Specify the action to restrict user access to the specific action.
 

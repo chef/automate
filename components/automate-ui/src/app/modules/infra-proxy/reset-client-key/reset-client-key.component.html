@@ -1,4 +1,4 @@
-<chef-modal [visible]="visible" (closeModal)="closeCreateModal()" class="reset-client-modal">
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()" [ngClass]="[ isReset ? 'reset-modal' : 'reset-client-modal'] ">
   <div class="flex-container">
     <div *ngIf="!isReset" class="reset-div">
       <div class="left-box">
@@ -27,8 +27,7 @@
       <h2 slot="title">Reset Client</h2>
       <div class="detail">
         <div class="icon-wrap"><i></i></div>
-        <p>The key has been reset. This key is not stored by the Chef Infra server, so please make <br/>
-          sure to copy or download it somewhere safe.</p>
+        <p>The key has been reset. This key is not stored by the Chef Infra <br/>server, so please make sure to copy or download it somewhere <br/>safe.</p>
       </div>
       <div class="key-tab-body">
         <chef-snippet [code]="privateKey" lang="json"></chef-snippet>

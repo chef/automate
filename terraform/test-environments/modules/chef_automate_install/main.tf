@@ -6,6 +6,7 @@ provider "aws" {
 provider "vault" {
   address   = "https://vault.es.chef.co"
   namespace = "releng"
+  version   = "2.24.1"
 }
 
 data "vault_generic_secret" "wildcard_chef" {

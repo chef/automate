@@ -42,7 +42,7 @@ chef-table-new {
   }
 }
 
-chef-loading-spinner {
+chef-loading-spinner.spinner {
   display: block;
   margin: 100px auto;
   width: 100px;
@@ -74,22 +74,14 @@ img {
     height: 55px;
   }
 
-  .full-screen-spinner {
-    display: flex;
-    margin: auto;
-    background-color: $chef-white;
-    opacity: 0.7;
-    height: 136vh;
-    padding-bottom: 40vh;
-    width: calc(100% + 70px);
-    margin-top: -20px;
-    position: absolute;
-    top: 0;
-    left: -35px;
-    bottom: 0;
-    right: 0;
+  .wrapper {
+    position: relative;
   }
 
+  .full-screen-spinner {
+    margin: -34px;
+    margin-top: -20px;
+  }
 }
 
 ::ng-deep .mat-select-panel .mat-option {

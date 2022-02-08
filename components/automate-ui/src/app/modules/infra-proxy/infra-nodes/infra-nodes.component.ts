@@ -49,10 +49,10 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public nodeListState: { items: InfraNode[], total: number };
   public nodesListLoading = true;
   public authFailure = false;
-  public searching = false;
+  public loading = false;
   public searchValue = '';
   public currentPage = 1;
-  public per_page = 9;
+  public per_page = 100;
   public total: number;
   public nodeToDelete: InfraNode;
   public deleteModalVisible = false;
@@ -108,7 +108,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
         this.nodes = NodesState?.items;
         this.total = NodesState?.total;
         this.nodesListLoading = false;
-        this.searching = false;
+        this.loading = false;
         this.deleting = false;
       } else if (getNodesSt === EntityStatus.loadingFailure) {
         this.nodesListLoading = false;
@@ -120,7 +120,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.searching = true;
+        this.loading = true;
         if (this.nodes.length === 0 &&
           this.currentPage !== 1) {
           this.currentPage = this.currentPage - 1;
@@ -131,10 +131,10 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
 
   searchNodes(currentText: string) {
     this.currentPage = 1;
-    this.searching = true;
+    this.loading = true;
     this.searchValue = currentText;
     if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
-      this.searching = false;
+      this.loading = false;
       this.nodes.length = 0;
       this.total = 0;
     } else {
@@ -144,7 +144,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
 
   onPageChange(event: number): void {
     this.currentPage = event;
-    this.searching = true;
+    this.loading = true;
     this.getNodesData();
   }
 
@@ -211,7 +211,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   }
 
   public deleteNode(): void {
-    this.searching = true;
+    this.loading = true;
     this.closeDeleteModal();
     this.store.dispatch(new DeleteNode({
       server_id: this.serverId, org_id: this.orgId, name: this.nodeToDelete.name
@@ -329,5 +329,12 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
         value: value.name
       });
     }
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.loading = true;
+    this.currentPage = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.getNodesData();
   }
 }

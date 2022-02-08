@@ -1,4 +1,4 @@
-# automate-backend-curator-module
+# automate-HA-curator-module
 
 Terraform Module
 

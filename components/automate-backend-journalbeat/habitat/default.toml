@@ -3,7 +3,7 @@ level = "warning"
 to_files = "false"
 
 [journalbeat]
-registry_file = "/hab/svc/automate-backend-journalbeat/data/registry"
+registry_file = "/hab/svc/automate-ha-journalbeat/data/registry"
 
 #=========================== Journalbeat inputs ================================
 
@@ -21,7 +21,7 @@ hosts = [
 
 [setup]
 [setup.template]
-fields = "/hab/svc/automate-backend-journalbeat/config/fields.yml"
+fields = "/hab/svc/automate-ha-journalbeat/config/fields.yml"
 
 #============================== Processors =====================================
 
@@ -32,10 +32,10 @@ fields = "/hab/svc/automate-backend-journalbeat/config/fields.yml"
 [[processors]]
   [processors.dissect]
   target_prefix = "hab"
-  tokenizer = "automate-backend-%{service}.default%{status}): %{log_message}"
+  tokenizer = "automate-ha-%{service}.default%{status}): %{log_message}"
     [processors.dissect.when]
       [processors.dissect.when.regexp]
-      message = "^automate-backend-.*"
+      message = "^automate-ha-.*"
 
 [[processors]]
   [processors.drop_event]

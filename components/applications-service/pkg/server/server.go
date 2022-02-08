@@ -599,3 +599,61 @@ func toProtoTimestamp(t *time.Time) *timestamp.Timestamp {
 	}
 	return ts
 }
+
+func (s *ApplicationsServer) UpdateTelemetryReported(ctx context.Context, req *applications.UpdateTelemetryReportedRequest) (*applications.UpdateTelemetryReportedResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	err := s.storageClient.UpdateTelemetryReported(ctx, req.LastTelemetryReportedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &applications.UpdateTelemetryReportedResponse{}, nil
+}
+
+//GetServicesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (app *ApplicationsServer) GetServicesUsageCount(ctx context.Context,
+	e *applications.GetServicesUsageCountRequest) (*applications.GetServicesUsageCountResponse, error) {
+
+	var count int64
+	// var lastTelemetryReportedAt time.Time
+	// Get last telemetry reported date from postgres
+	telemetry, err := app.storageClient.GetTelemetry(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var daysSinceLastPost int
+	if telemetry.LastTelemetryReportedAt.IsZero() {
+		daysSinceLastPost = 15
+	} else {
+		daysSinceLastPost = DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+	}
+
+	if daysSinceLastPost > 0 {
+		count, err = app.storageClient.GetUniqueServicesFromPostgres(int64(daysSinceLastPost), telemetry.LastTelemetryReportedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &applications.GetServicesUsageCountResponse{
+		TotalServices:     count,
+		DaysSinceLastPost: int64(daysSinceLastPost),
+	}, nil
+}
+
+// DaysBetween get the calendar days between two timestamp
+func DaysBetween(fromTime, toTime time.Time) int {
+	if fromTime.After(toTime) {
+		fromTime, toTime = toTime, fromTime
+	}
+
+	days := -fromTime.YearDay()
+	for year := fromTime.Year(); year < toTime.Year(); year++ {
+		days += time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay()
+	}
+	days += toTime.YearDay()
+
+	return days
+}

@@ -1,12 +1,14 @@
 name: chef-automate ssh
-synopsis: Set Ssh env for automate HA.
+synopsis: SSH into Automate HA servers
 usage: chef-automate ssh [flags]
-description: Set up automate ha clusterSsh
+description: SSH into Automate HA servers
 options:
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for ssh
+- name: hostname
+  usage: Automate ha server name to ssh
 inherited_options:
 - name: debug
   shorthand: d

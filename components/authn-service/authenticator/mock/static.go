@@ -3,9 +3,10 @@
 package mock
 
 import (
-	"github.com/chef/automate/api/interservice/id_token"
 	"net/http"
 	"net/url"
+
+	"github.com/chef/automate/api/interservice/id_token"
 
 	"go.uber.org/zap"
 
@@ -44,6 +45,10 @@ type localStaticRequestor struct {
 
 func (r *staticRequestor) Subject() string {
 	return "user:" + r.connID + ":" + r.userID
+}
+
+func (r *staticRequestor) Requestor() string {
+	return r.userID
 }
 
 func (r *staticRequestor) Teams() []string {

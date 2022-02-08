@@ -12,6 +12,11 @@ export const {
   selectEntities: credentialEntities
 } = nodeCredentialEntityAdapter.getSelectors(nodeCredentialState);
 
+export const totalNodeCredential = createSelector(
+  nodeCredentialState,
+  (state) => state.total
+);
+
 export const nodeCredentialStatus = createSelector(
   nodeCredentialState,
   (state) => state.nodeCredentialsStatus

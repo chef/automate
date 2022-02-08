@@ -1522,10 +1522,10 @@ func (t *LocalTarget) HabCache() depot.HabCache {
 }
 
 func (t *LocalTarget) InstallAutomateBackendDeployment(ctx context.Context, c *dc.ConfigRequest, m manifest.ReleaseManifest) error {
-	pkg := manifest.InstallableFromManifest(m, "automate-backend-deployment")
+	pkg := manifest.InstallableFromManifest(m, "automate-ha-deployment")
 	if pkg == nil {
-		logrus.Info("(HA) unable to find automate-backend-deployment package in manifest")
-		return errors.New("automate-backend-deployment (HA) was not found in the manifest")
+		logrus.Info("(HA) unable to find automate-ha-deployment package in manifest")
+		return errors.New("automate-ha-deployment (HA) was not found in the manifest")
 	}
 	output, err := t.InstallPackage(ctx, pkg, c.GetV1().GetSvc().GetChannel().GetValue())
 	if err != nil {

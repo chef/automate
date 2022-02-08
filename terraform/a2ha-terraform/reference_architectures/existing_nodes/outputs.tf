@@ -26,20 +26,8 @@ output "postgresql_private_ips" {
   value = formatlist("%s", var.existing_postgresql_private_ips)
 }
 
-output "automate_public_ips" {
-  value = formatlist("%s", var.existing_automate_ips)
-}
-
-output "chef_server_public_ips" {
-  value = formatlist("%s", var.existing_chef_server_ips)
-}
-
 output "elasticsearch_public_ips" {
   value = formatlist("%s", var.existing_elasticsearch_ips)
-}
-
-output "postgresql_public_ips" {
-  value = formatlist("%s", var.existing_postgresql_ips)
 }
 
 output "automate_ssh" {
@@ -47,7 +35,7 @@ output "automate_ssh" {
     "ssh -i %s %s@%s",
     var.ssh_key_file,
     var.ssh_user,
-    var.existing_automate_ips,
+    var.existing_automate_private_ips,
   )
 }
 
@@ -56,7 +44,7 @@ output "chef_server_ssh" {
     "ssh -i %s %s@%s",
     var.ssh_key_file,
     var.ssh_user,
-    var.existing_chef_server_ips,
+    var.existing_chef_server_private_ips,
   )
 }
 
@@ -65,7 +53,7 @@ output "postgresql_ssh" {
     "ssh -i %s %s@%s",
     var.ssh_key_file,
     var.ssh_user,
-    var.existing_postgresql_ips,
+    var.existing_postgresql_private_ips,
   )
 }
 

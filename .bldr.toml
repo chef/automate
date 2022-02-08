@@ -422,6 +422,7 @@ paths = [
   "components/automate-deployment/*",
   "components/automate-grpc/*",
   "components/es-sidecar-service/*",
+  "components/local-user-service/*",
   "lib/cereal/*",
   "lib/config/*",
   "lib/db/*",
@@ -890,8 +891,13 @@ paths = [
 plan_path = "components/automate-cs-nginx"
 paths = [
   "components/automate-cs-nginx/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
   "lib/io/*",
+  "lib/platform/config/*",
+  "lib/proxy/*",
   "lib/secrets/*",
+  "lib/stringutils/*",
   "lib/user/*"
 ]
 
@@ -1115,76 +1121,82 @@ paths = [
   "lib/version/*"
 ]
 
-[automate-backend-elasticsearch]
+[automate-ha-elasticsearch]
 plan_path = "components/automate-backend-elasticsearch"
 paths = [
   "components/automate-backend-elasticsearch/*"
 ]
 
-[automate-backend-metricbeat]
+[automate-ha-metricbeat]
 plan_path = "components/automate-backend-metricbeat"
 paths = [
   "components/automate-backend-metricbeat/*"
 ]
 
-[automate-backend-journalbeat]
+[automate-ha-journalbeat]
 plan_path = "components/automate-backend-journalbeat"
 paths = [
   "components/automate-backend-journalbeat/*"
 ]
 
-[automate-backend-haproxy]
+[automate-ha-haproxy]
 plan_path = "components/automate-backend-haproxy"
 paths = [
   "components/automate-backend-haproxy/*"
 ]
 
-[automate-backend-kibana]
+[automate-ha-kibana]
 plan_path = "components/automate-backend-kibana"
 paths = [
   "components/automate-backend-kibana/*"
 ]
 
-[automate-backend-elasticsidecar]
+[automate-ha-elasticsidecar]
 plan_path = "components/automate-backend-elasticsidecar"
 paths = [
   "components/automate-backend-elasticsidecar/*"
 ]
 
-[automate-backend-curator]
+[automate-ha-curator]
 plan_path = "components/automate-backend-curator"
 paths = [
   "components/automate-backend-curator/*"
 ]
 
-[automate-backend-postgresql]
+[automate-ha-postgresql]
 plan_path = "components/automate-backend-postgresql"
 paths = [
   "components/automate-backend-postgresql/*"
 ]
 
-[automate-backend-ctl]
+[automate-ha-ctl]
 plan_path = "components/automate-backend-ctl"
 paths = [
   "components/automate-backend-ctl/*"
 ]
 
-[automate-backend-deployment]
+[automate-ha-deployment]
 plan_path = "components/automate-backend-deployment"
 paths = [
   "components/automate-backend-deployment/*"
 ]
 
-[automate-backend-pgleaderchk]
-plan_path = "components/automate-backend-pgleaderchk"
+[automate-ha-pgleaderchk]
+plan_path = "components/automate-ha-pgleaderchk"
 paths = [
-  "components/automate-backend-pgleaderchk/*"
+  "components/automate-ha-pgleaderchk/*"
 ]
 
-[automate-cluster-ctl]
+[automate-ha-cluster-ctl]
 plan_path = "components/automate-cluster-ctl"
 paths = [
   "components/automate-cluster-ctl/*"
+]
+
+[automate-netcat]
+plan_path = "components/automate-netcat"
+paths = [
+  "components/automate-netcat/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

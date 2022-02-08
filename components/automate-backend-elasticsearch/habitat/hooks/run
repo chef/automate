@@ -2,6 +2,9 @@
 
 exec 2>&1
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 
 half_mem=$(echo $(( $(free -m | grep Mem | awk '{print $2}') / 2 )))
 if [ $half_mem -lt 26624 ]; then heapsize=$half_mem; heapsize+=m;else heapsize=26624m; fi

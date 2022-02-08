@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-debug
 pkg_description="Use utilities for operating and debugging Chef Automate"
 pkg_origin=chef

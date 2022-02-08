@@ -136,7 +136,7 @@ rsync -a --keep-dirlinks ${tmp_path}/aib_workspace/hab /
 export LOGCMD='>>${tmp_path}/svc-load.log 2>&1'
 
 # For frontend and backend nodes
-for pkg in /hab/cache/artifacts/{core-hab,*automate-backend-ctl,chef-automate-cli}*hart; do
+for pkg in /hab/cache/artifacts/{core-hab,*automate-ha-ctl,chef-automate-cli}*hart; do
   export pkg
   bash -c 'eval hab pkg install --force --binlink --binlink-dir /bin $pkg "$LOGCMD"' || true
 done
@@ -148,7 +148,7 @@ if [ $NO_SERVICE = true ]; then
 fi
 
 # Exclusively for backend nodes
-for pkg in /hab/cache/artifacts/chef-automate-backend*hart; do
+for pkg in /hab/cache/artifacts/chef-automate-ha*hart; do
   export pkg
   bash -c 'eval hab pkg install --force --binlink --binlink-dir /bin $pkg "$LOGCMD"' || true
 done

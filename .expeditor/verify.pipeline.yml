@@ -1,7 +1,7 @@
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
-  HAB_BLDR_CHANNEL: "stable2021-q2"
-  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable2021-q2"
+  HAB_BLDR_CHANNEL: "stable"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
 
 expeditor:
   defaults:
@@ -76,7 +76,7 @@ steps:
     expeditor:
       executor:
         docker:
-          
+
   - label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
     commands:
       - gem install bundler:1.16.6
@@ -195,7 +195,7 @@ steps:
       - scripts/install_golang.sh
       - scripts/setup_buildkite_pg.sh cereal_test
       - cd lib
-      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit cereal_integration
+      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH GODEBUG=x509ignoreCN=0 make lint unit cereal_integration
     timeout_in_minutes: 10
     retry:
       automatic:

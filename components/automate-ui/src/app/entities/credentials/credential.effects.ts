@@ -8,7 +8,8 @@ import {
   CredentialActionTypes,
   SearchCredentials,
   SearchCredentialsSuccess,
-  SearchCredentialsFailure
+  SearchCredentialsFailure,
+  CredentialsSearchSuccessPayload
 } from './credential.actions';
 import { CredentialRequests } from './credential.requests';
 import { CreateNotification } from '../notifications/notification.actions';
@@ -26,7 +27,9 @@ export class CredentialEffects {
     ofType(CredentialActionTypes.SEARCH),
     mergeMap((action: SearchCredentials) =>
               this.requests.search(action.payload).pipe(
-              map(({secrets}) => new SearchCredentialsSuccess(secrets)),
+              map(
+                (payload: CredentialsSearchSuccessPayload) =>
+                  new SearchCredentialsSuccess(payload)),
               catchError((error: HttpErrorResponse) => of(new SearchCredentialsFailure(error)))))));
 
   searchCredentialsFailure$ = createEffect(() =>

@@ -27,6 +27,55 @@ type Backend struct {
 	client      *elastic.Client
 }
 
+func (es *Backend) createBulkRequestUpsertNodeInfo(
+	mapping mappings.Mapping,
+	ID string,
+	runDateTime time.Time,
+) elastic.BulkableRequest {
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+
+	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
+
+	return elastic.NewBulkUpdateRequest().
+		Index(mapping.Index).
+		Type(mapping.Type).
+		Id(ID).
+		Script(script).
+		Upsert(map[string]interface{}{
+			"node_uuid": ID,
+			"first_run": runDateTime,
+			"last_run":  runDateTime,
+		}).
+		RetryOnConflict(3)
+}
+
+// This method will support adding a document with a specified id
+func (es *Backend) upsertNodeRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+
+	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
+
+	_, err := es.client.Update().
+		Index(mapping.Index).
+		Type(mapping.Type).
+		Id(id).
+		Script(script).
+		Upsert(map[string]interface{}{
+			"node_uuid": id,
+			"first_run": runDateTime,
+			"last_run":  runDateTime,
+		}).
+		Do(ctx)
+
+	return err
+}
+
+func (es *Backend) InsertNodeRunDateInfo(ctx context.Context, nodeInfo backend.Run) error {
+	mapping := mappings.NodeRunInfo
+	err := es.upsertNodeRunInfo(ctx, mapping, nodeInfo.EntityUuid, nodeInfo.EndTime)
+	return err
+}
+
 func New(esURL string) (*Backend, error) {
 	client, err := elastic.NewClient(
 		// In the future we will need to create a custom http.Client to pass headers.
@@ -117,7 +166,6 @@ func (es *Backend) addDataToTimeseriesIndex(ctx context.Context,
 	data interface{}) error {
 
 	index := mapping.IndexTimeseriesFmt(date)
-
 	// Wrapping the ES query to measure
 	f := func() error {
 		// Add a document on a particular index and let elasticsearch generate flake id

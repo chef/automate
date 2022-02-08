@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/chef/automate/api/interservice/id_token"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/chef/automate/api/interservice/id_token"
 
 	"go.uber.org/zap"
 
@@ -46,6 +47,10 @@ type apiClient struct {
 
 func (a *apiClient) Subject() string {
 	return "token:" + a.id
+}
+
+func (a *apiClient) Requestor() string {
+	return a.id
 }
 
 func (a *apiClient) Teams() []string {

@@ -1,5 +1,5 @@
 name: chef-automate init-config-ha
-synopsis: Initialize default config for HA
+synopsis: Initialize default config for Automate HA
 usage: chef-automate init-config-ha [flags]
 description: |
   Initialized default configuration for HA and save it to a file.

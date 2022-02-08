@@ -1,4 +1,4 @@
-# automate-backend-journalbeat-module
+# automate-ha-journalbeat-module
 
 Terraform Module
 

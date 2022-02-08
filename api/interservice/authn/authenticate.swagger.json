@@ -49,6 +49,9 @@
             "type": "string"
           },
           "description": "Only human users have teams. The teams are provided either by the external\nIdP (in which case they're extracted from the id_token; TODO), or, for local\nusers, by teams-service (TODO)."
+        },
+        "requestor": {
+          "type": "string"
         }
       }
     },

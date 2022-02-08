@@ -61,14 +61,14 @@ directories:
   - ./components/automate-backend-metricbeat
   - ./components/automate-backend-postgresql
   - ./components/automate-backend-deployment
-  - ./components/automate-backend-pgleaderchk
+  - ./components/automate-ha-pgleaderchk
 
 habitat:
   channel_for_origin:
     - origin: chef
       channel: dev
     - origin: core
-      channel: stable2021-q2
+      channel: stable
 allowed_licenses:
   - 0BSD
   - Apache-1.0
@@ -294,6 +294,9 @@ fallbacks:
     - name: github.com/shirou/w32
       license_id: w32-Authors
       license_content: https://raw.githubusercontent.com/shirou/w32/master/LICENSE
+    - name: golang.org/x/crypto
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/crypto/master/LICENSE
 
   habitat:
     - name: chef/mlsa
@@ -303,6 +306,9 @@ fallbacks:
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/ruby26
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
+    - name: core/ruby27
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/cacerts
@@ -454,6 +460,10 @@ exceptions:
       reason:  Exception made by Chef Legal
     - name: core/systemd
       reason:  Exception made by Chef Legal
+    - name: core/ruby30
+      reason: Ruby license (previously shipped in Automate 1)
+    - name: core/ruby27
+      reason:  Exception made for chef server upgrade
 
 
   ruby:

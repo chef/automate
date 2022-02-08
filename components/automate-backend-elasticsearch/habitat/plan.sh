@@ -1,22 +1,20 @@
 # shellcheck disable=SC2148
 UPSTREAM_PKG_IDENT="chef/elasticsearch-odfe/0.10.1.2"
-pkg_name="automate-backend-elasticsearch"
+pkg_name="automate-ha-elasticsearch"
 pkg_description="Wrapper package for elasticsearch-odfe"
 pkg_origin="chef"
 vendor_origin="chef"
-pkg_version="1.0.28"
+pkg_version="6.8.6"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   chef/mlsa
   core/bash
-  core/procps-ng
   core/openssl
+  core/procps-ng
   "${UPSTREAM_PKG_IDENT}"
 )
-
-
 pkg_lib_dirs=(lib)
 
 pkg_exports=(

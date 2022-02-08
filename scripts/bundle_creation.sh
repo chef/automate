@@ -1,7 +1,6 @@
 #!/bin/bash
 # Set -x to enable debugging
 set -eEuo pipefail
-export AUTOMATE_BIN_URL="https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip"
 export BANNER="
 This script takes a manifest.json and outputs a tarball of
 all packages therein including their transitive dependencies. It accomplishes
@@ -16,19 +15,22 @@ The following arguments are available:
 "
 export DOCKER_IMAGE="chefes/lita-worker"
 # Some sane defaults
-export CHEF_AUTOMATE_BIN_PATH="/tmp/chef-automate"
+export CHEF_AUTOMATE_BIN_PATH="/usr/bin/chef-automate"
 export WORKSPACE_PATH="/tmp/workspace"
+export HAB_LICENSE=accept-no-persist
 # These are required args so we ensure they are not given a default value
 export BUNDLE_TYPE=
 export BACKENDAIB_TFVARS=
 export FRONTENDAIB_TFVARS=
 export TARBALL_PATH=
-export MANIFEST_PATH="manifest.json"
+export CHANNEL=current
 TEMP_DIR=/tmp
 export TEMP_BUNDLE_FILE=$TEMP_DIR/bundle.aib.$$.$RANDOM
 export TEMP_TAR_FILE=$TEMP_DIR/my.aib.$$.$RANDOM
 export MANIFEST_TFVARS="terraform/a2ha_manifest.auto.tfvars"
 export BACKENDAIB=
+export PACKAGES_INFO="/tmp/packages.info"
+
 # Helper Functions
 echo_env() {
     echo "=============================================="
@@ -36,14 +38,11 @@ echo_env() {
     echo "Script Path:               ${ABSOLUTE_PATH}"
     echo "Repo Path:                 ${REPO_PATH}"
     echo "Output tarball:            ${TARBALL_PATH}"
-    echo "Download chef-automate to: ${CHEF_AUTOMATE_BIN_PATH}"
     echo "Workspace:                 ${WORKSPACE_PATH}"
     echo "Backend Tarball PAth:      ${BACKENDAIB}"
     echo "=============================================="
 }
-download_automate_cli() {
-  hab pkg exec core/curl curl -s "${AUTOMATE_BIN_URL}" | gunzip - > "${CHEF_AUTOMATE_BIN_PATH}" && chmod +x "${CHEF_AUTOMATE_BIN_PATH}"
-}
+
 usage() {
   echo "${BANNER}"
   exit 1
@@ -82,28 +81,31 @@ trap clean_up SIGHUP SIGINT SIGTERM ERR
 airgap_bundle_create() {
   original_aib_path="${TEMP_BUNDLE_FILE}"
   args=('airgap' 'bundle' 'create')
+  args+=('-c' "${CHANNEL}")
   args+=("${original_aib_path}")
   # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
     if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
-          cat "${original_aib_path}" > ${TARBALL_PATH}
+          cat "${original_aib_path}" > "${TARBALL_PATH}"
           outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
           bname=$(basename "${outfile}")
-          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > ${FRONTENDAIB_TFVARS}
-          echo "frontend_aib_local_file = \"${bname}\"" >> ${FRONTENDAIB_TFVARS}
+          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > "${FRONTENDAIB_TFVARS}"
+          echo "frontend_aib_local_file = \"${bname}\"" >> "${FRONTENDAIB_TFVARS}"
     fi
 
     if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
-          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
+          # getting packges info from airgap bundle       
+          ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${original_aib_path} > ${PACKAGES_INFO}
+          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > "${BACKENDAIB}"
           # this removes the magic header from the .aib
           # making it usable with the tar command
           rm -f ${TEMP_TAR_FILE}    
           outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
           backend_name=$(basename "${outfile_backend}")
-          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
-          echo "backend_aib_local_file = \"${backend_name}\"" >> ${BACKENDAIB_TFVARS}
+          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > "${BACKENDAIB_TFVARS}" 
+          echo "backend_aib_local_file = \"${backend_name}\"" >> "${BACKENDAIB_TFVARS}"
     fi
     rm -f "${original_aib_path}"
   else
@@ -112,47 +114,31 @@ airgap_bundle_create() {
     exit 1
   fi
   
-  if [ -f "${MANIFEST_PATH}" ]; then
-    create_manifest_auto_tfvars
-  else
-    hardcode_manifest_auto_tfvars
-  fi
+    #Create Manifest auto_tfvars
+    if [ "$BUNDLE_TYPE" != "upgradefrontends" ]
+    then
+       create_manifest_auto_tfvars
+    fi
+
 }
 
 exec_linux() {
-  download_automate_cli
   airgap_bundle_create
 }
 
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
   cat >"${MANIFEST_TFVARS}" <<EOL
-  $(echo "pgleaderchk_pkg_ident =$(grep "automate-backend-pgleaderchk" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "postgresql_pkg_ident =$(grep "automate-backend-postgresql" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "proxy_pkg_ident = $(grep "automate-backend-haproxy" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "journalbeat_pkg_ident = $(grep "automate-backend-journalbeat" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "metricbeat_pkg_ident = $(grep "automate-backend-metricbeat" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "kibana_pkg_ident = $(grep "automate-backend-kibana" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "elasticsearch_pkg_ident = $(grep "automate-backend-elasticsearch" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "elasticsidecar_pkg_ident = $(grep "automate-backend-elasticsidecar" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "curator_pkg_ident = $(grep "automate-backend-curator" ${MANIFEST_PATH})" | sed 's/,*$//g')
+  pgleaderchk_pkg_ident = " $(grep "automate-ha-pgleaderchk" ${PACKAGES_INFO})"
+  postgresql_pkg_ident = " $(grep "automate-ha-postgresql" ${PACKAGES_INFO})" 
+  proxy_pkg_ident = " $(grep "automate-ha-haproxy" ${PACKAGES_INFO})"
+  journalbeat_pkg_ident = " $(grep "automate-ha-journalbeat" ${PACKAGES_INFO})"
+  metricbeat_pkg_ident = " $(grep "automate-ha-metricbeat" ${PACKAGES_INFO})"
+  kibana_pkg_ident = " $(grep "automate-ha-kibana" ${PACKAGES_INFO})"
+  elasticsearch_pkg_ident = " $(grep "automate-ha-elasticsearch" ${PACKAGES_INFO})"
+  elasticsidecar_pkg_ident = " $(grep "automate-ha-elasticsidecar" ${PACKAGES_INFO})"
+  curator_pkg_ident = " $(grep "automate-ha-curator" ${PACKAGES_INFO})"
 EOL
-}
-
-hardcode_manifest_auto_tfvars(){
-    # We are hardcoding this value as of now for a2ha_manifest.auto.tfvars, because when we will be moving this in automate repo there will be automate manifest file so 
-   # from that file we will be creating the a2ha_manifest.auto.tfvars like we are doing in elif section 
-    echo "
-    pgleaderchk_pkg_ident    = \"chef/automate-backend-pgleaderchk/1.0.22/20201118194223\"
-    postgresql_pkg_ident     = \"chef/automate-backend-postgresql/1.0.22/20201118194223\"
-    proxy_pkg_ident          = \"chef/automate-backend-haproxy/1.0.22/20201118194223\"
-    journalbeat_pkg_ident    = \"chef/automate-backend-journalbeat/1.0.22/20201118194223\"
-    metricbeat_pkg_ident     = \"chef/automate-backend-metricbeat/1.0.22/20201118194223\"
-    kibana_pkg_ident         = \"chef/automate-backend-kibana/1.0.22/20201118194223\"
-    elasticsearch_pkg_ident  = \"chef/automate-backend-elasticsearch/1.0.22/20201118194201\"
-    elasticsidecar_pkg_ident = \"chef/automate-backend-elasticsidecar/1.0.22/20201118194223\"
-    curator_pkg_ident        = \"chef/automate-backend-curator/1.0.22/20201118193951\"
-   " > ${MANIFEST_TFVARS}
 }
 
 exec_docker() {
@@ -164,7 +150,7 @@ exec_docker() {
   else
     args+=('-m' '/workspace/manifest.json')
   fi
-  touch ${TARBALL_PATH}
+  touch "${TARBALL_PATH}"
   docker run --rm -it \
     --env="ORIGINAL_TARBALL=${TARBALL_PATH}" \
     --volume "${REPO_PATH}":/workspace:ro \
@@ -189,11 +175,8 @@ do_tasks() {
 if [ $# -eq 0 ]; then
   usage
 fi
-while getopts ":b:d:t:w:o:h:v:q:" opt; do
+while getopts ":b:t:w:o:h:v:q:c:" opt; do
   case "${opt}" in
-    d)
-      export CHEF_AUTOMATE_BIN_PATH=${OPTARG}
-      ;;
     w)
       export WORKSPACE_PATH=${OPTARG}
       ;;
@@ -211,6 +194,9 @@ while getopts ":b:d:t:w:o:h:v:q:" opt; do
       ;;
     q)
       export BACKENDAIB_TFVARS=${OPTARG}
+      ;;
+    c)
+      export CHANNEL=${OPTARG}
       ;;
     h)
       usage

@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Disclosure Panel and Banner"
-    parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/disclosure_panel_and_banner.md Disclosure Panel and Banner"
-    weight = 60
+    parent = "automate/configure"
+    identifier = "automate/configure/disclosure_panel_and_banner.md Disclosure Panel and Banner"
+    weight = 30
 +++
 
 Customize your Chef Automate installation with a **Disclosure Panel** to add critical information about your unique environment on the sign-in page and a **Banner** at the top of every page to highlight important information.

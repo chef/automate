@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -18,6 +19,7 @@ import (
 	"github.com/chef/automate/api/external/compliance/reporting"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
+	generator "github.com/chef/automate/components/automate-cli/pkg/reportgenerator"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	tslib "github.com/chef/automate/lib/grpc/timestamp"
@@ -55,6 +57,54 @@ var licenseUsageCmd = &cobra.Command{
 	Hidden: true,
 }
 
+var uniqueNodeCounterCmd = &cobra.Command{
+	Use:   "uniqNodeRunReport",
+	Short: "Generates the unique count of reported Infra Client nodes on hourly basis between the time duration",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		validateArgs()
+		startTime, _ := convertStringToTime(CommandFlags.StartTime)
+		endTime, _ := convertStringToTime(CommandFlags.EndTime)
+		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		return nil
+	},
+}
+
+var nodeUsageCommand = &cobra.Command{
+	Use:   "nodeRunReport",
+	Short: "Generates daily Infra Client Run reports for a span of time duration",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		validateArgs()
+		startTime, _ := convertStringToTime(CommandFlags.StartTime)
+		endTime, _ := convertStringToTime(CommandFlags.EndTime)
+		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		return nil
+	},
+}
+
+var complianceUniqueResourceCounterCmd = &cobra.Command{
+	Use:   "complianceResourceRunCount",
+	Short: "Generates the unique count of reported Compliance scans on hourly basis between the time duration",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		validateArgs()
+		startTime, _ := convertStringToTime(CommandFlags.StartTime)
+		endTime, _ := convertStringToTime(CommandFlags.EndTime)
+		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		return nil
+	},
+}
+
+var complianceResourceUsageCmd = &cobra.Command{
+	Use:   "complianceResourceRunReport",
+	Short: "Generates daily Infra Client Run reports for a span of time duration",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		validateArgs()
+		startTime, _ := convertStringToTime(CommandFlags.StartTime)
+		endTime, _ := convertStringToTime(CommandFlags.EndTime)
+		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		return nil
+	},
+}
+
 var noLicenseAppliedMsg = `
 A license has not been associated with this installation of Chef
 Automate. Please contact sales@chef.io to request a Chef Automate
@@ -73,6 +123,11 @@ License ID:      %s
 Expiration Date: %s
 
 `
+
+var startTimeFormat = "start time of the report in yyyy-mm-dd format"
+var endTimeFormat = "end time of the report in yyyy-mm-dd format"
+var hostnameES = "hostname of the ES host"
+var portES = "port of the ES host"
 
 type usageResult struct {
 	StartTimestamp   string           `json:"start_timestamp"`
@@ -299,10 +354,67 @@ func getScanInfo(hourAgo *tspb.Timestamp) ([]*scanNode, error) {
 	return scanJobNodes, nil
 }
 
+var CommandFlags = struct {
+	StartTime  string
+	EndTime    string
+	ESHostname string
+	ESPort     string
+}{}
+
+func validateArgs() {
+	if CommandFlags.StartTime == "" {
+		fmt.Println("Start Time needs to be mentioned")
+		os.Exit(1)
+	}
+	s, err := convertStringToTime(CommandFlags.StartTime)
+	if err != nil {
+		fmt.Println("The start time has to be in yyyy-mm-dd format")
+		os.Exit(1)
+	}
+	if CommandFlags.EndTime == "" {
+		CommandFlags.EndTime = time.Now().Format(time.RFC3339)
+	}
+	e, err := convertStringToTime(CommandFlags.EndTime)
+	if err != nil {
+		fmt.Println("The start time has to be in yyyy-mm-dd format")
+		os.Exit(1)
+	}
+
+	if e.Before(s) {
+		fmt.Println("End time cannot be before start time")
+		os.Exit(1)
+	}
+}
+
+func convertStringToTime(timeStr string) (time.Time, error) {
+	// return time.Parse(time.RFC3339, fmt.Sprintf("%sT00:00:00.00Z", timeStr))
+	return time.Parse("2006-01-02", timeStr)
+}
+
 func init() {
 	RootCmd.AddCommand(licenseCmd)
 	licenseCmd.AddCommand(licenseStatusCmd)
 	licenseCmd.AddCommand(licenseApplyCmd)
 	licenseCmd.AddCommand(licenseUsageCmd)
+	licenseCmd.AddCommand(uniqueNodeCounterCmd)
+	licenseCmd.AddCommand(nodeUsageCommand)
+	licenseCmd.AddCommand(complianceUniqueResourceCounterCmd)
+	licenseCmd.AddCommand(complianceResourceUsageCmd)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", portES)
 	licenseApplyCmd.Flags().BoolVarP(&licenseCmdFlags.forceSet, "force", "f", false, "Force set license")
 }

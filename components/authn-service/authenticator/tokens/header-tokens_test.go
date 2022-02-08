@@ -134,6 +134,9 @@ func TestTokenAuthWithBackend(t *testing.T) {
 				if got, want := actual.Subject(), d.subject; got != want {
 					t.Errorf("requestor.Subject() got!=want: got %v, want %v", got, want)
 				}
+				if got, want := actual.Requestor(), tokenID; got != want {
+					t.Errorf("requestor.Requestor() got!=want: got %v, want %v", got, want)
+				}
 			}
 		})
 	}

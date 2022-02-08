@@ -1,6 +1,7 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
 #shellcheck disable=SC2039
+#stable channel
 
 pkg_name=applications-load-gen
 pkg_description="Applications Load Generator"

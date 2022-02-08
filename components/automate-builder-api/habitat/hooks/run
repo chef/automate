@@ -4,6 +4,9 @@ exec 2>&1
 
 set -e
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 export HOME="{{pkg.svc_data_path}}"
 
 export RUST_LOG="{{cfg.log.level}},{{strJoin cfg.log.scoped_levels ","}}"
@@ -17,8 +20,10 @@ render-template config.toml "{{pkg.svc_var_path}}/etc/config.toml" \
   --conf "{{pkg.svc_config_path}}/config.json"
 
 export DBNAME="{{cfg.datastore.database}}"
+export USERNAME="{{cfg.datastore.user}}"
 pg-helper ensure-service-database "$DBNAME"
-pg-helper fix-permissions "$DBNAME"
+pg-helper fix-permissions "$USERNAME"
+pg-helper alter-role --superuser=true "$USERNAME"
 
 if ! ls {{pkg.svc_data_path}}/keys/bldr-*; then
   echo "generating bldr key"

@@ -102,10 +102,11 @@ func ConvertZipToTarGz(zipPath string, tarPath string) error {
 		}
 		folder := files[0].Name()
 		tmpPath = path.Join(tmpPath, folder)
-		// ensure we have access to the folder
-		if err := chModAll(tmpPath); err != nil {
-			return err
-		}
+	}
+
+	// ensure we have access to the folder
+	if err := chModAll(tmpPath); err != nil {
+		return err
 	}
 
 	err = inspec.Archive(tmpPath, tarPath)

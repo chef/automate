@@ -148,8 +148,8 @@ func TestHandleResources(t *testing.T) {
 	Id3 := "/subscription/123456/resources/resource-name-3"
 	filter := common.Filter{Key: "FilterKey", Values: []string{"FilterVal"}}
 	filters := []*common.Filter{&filter}
-	res := make(map[string][]resources.GenericResource)
-	res["region"] = []resources.GenericResource{
+	res := make(map[string][]resources.GenericResourceExpanded)
+	res["region"] = []resources.GenericResourceExpanded{
 		{ID: &Id},
 		{ID: &Id2},
 		{ID: &Id3},
@@ -165,11 +165,11 @@ func TestHandleExcludedResources(t *testing.T) {
 	Id := "/subscription/123456/resources/resource-name"
 	Id2 := "/subscription/123456/resources/resource-name-2"
 	Id3 := "/subscription/123456/resources/resource-name-3"
-	excludedResources := []resources.GenericResource{
+	excludedResources := []resources.GenericResourceExpanded{
 		{ID: &Id},
 		{ID: &Id2},
 	}
-	resources := []resources.GenericResource{
+	resources := []resources.GenericResourceExpanded{
 		{ID: &Id},
 		{ID: &Id2},
 		{ID: &Id3},

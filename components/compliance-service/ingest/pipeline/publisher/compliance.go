@@ -21,7 +21,7 @@ func StoreCompliance(client *ingestic.ESClient, numberOfPublishers int) message.
 		out := make(chan message.Compliance, 100)
 
 		for i := 0; i < numberOfPublishers; i++ {
-			storeCompliance(in, out, client, i)
+			go storeCompliance(in, out, client, i)
 		}
 
 		return out
@@ -29,52 +29,51 @@ func StoreCompliance(client *ingestic.ESClient, numberOfPublishers int) message.
 }
 
 func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance, client *ingestic.ESClient, number int) {
-	go func() {
-		for msg := range in {
-			// Finish the ingestion if we have a DeadlineExceeded or Canceled context
-			err := msg.Ctx.Err()
-			if err != nil {
-				errCode := codes.Unknown
-				if err == context.DeadlineExceeded {
-					errCode = codes.DeadlineExceeded
-				}
-				msg.FinishProcessingCompliance(status.Errorf(errCode, "Error ingesting report %s: %s", msg.Report.ReportUuid, err.Error()))
-				continue
+	for msg := range in {
+		// Finish the ingestion if we have a DeadlineExceeded or Canceled context
+		err := msg.Ctx.Err()
+		if err != nil {
+			errCode := codes.Unknown
+			if err == context.DeadlineExceeded {
+				errCode = codes.DeadlineExceeded
 			}
-
-			var megaErr error
-			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Publishing Compliance Report")
-
-			errChannels := make([]<-chan error, 0)
-			for _, profile := range msg.InspecProfiles {
-				// Only add the profile to the metadata store if it's missing
-				if _, ok := msg.Shared.EsProfilesMissingMeta[profile.Sha256]; ok {
-					errChannels = append(errChannels, insertInspecProfile(msg, profile, client))
-				} else {
-					logrus.Debugf("storeCompliance: meta for profile %s already exists, no need to insert", profile.Sha256)
-				}
-			}
-			errChannels = append(errChannels, insertInspecSummary(msg, client))
-			errChannels = append(errChannels, insertInspecReport(msg, client))
-
-			for err := range merge(errChannels...) {
-				if err != nil {
-					if megaErr != nil {
-						megaErr = fmt.Errorf(err.Error() + " " + megaErr.Error())
-					} else {
-						megaErr = err
-					}
-				}
-			}
-			if megaErr != nil {
-				msg.FinishProcessingCompliance(status.Errorf(codes.Internal, megaErr.Error()))
-			} else {
-				message.Propagate(out, &msg)
-			}
-			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Published Compliance Report")
+			msg.FinishProcessingCompliance(status.Errorf(errCode, "Error ingesting report %s: %s", msg.Report.ReportUuid, err.Error()))
+			continue
 		}
-		close(out)
-	}()
+
+		var megaErr error
+		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Publishing Compliance Report")
+
+		errChannels := make([]<-chan error, 0)
+		for _, profile := range msg.InspecProfiles {
+			// Only add the profile to the metadata store if it's missing
+			if _, ok := msg.Shared.EsProfilesMissingMeta[profile.Sha256]; ok {
+				errChannels = append(errChannels, insertInspecProfile(msg, profile, client))
+			} else {
+				logrus.Debugf("storeCompliance: meta for profile %s already exists, no need to insert", profile.Sha256)
+			}
+		}
+		errChannels = append(errChannels, insertInspecSummary(msg, client))
+		errChannels = append(errChannels, insertInspecReport(msg, client))
+		errChannels = append(errChannels, insertInspecReportRunInfo(msg, client))
+
+		for err := range merge(errChannels...) {
+			if err != nil {
+				if megaErr != nil {
+					megaErr = fmt.Errorf(err.Error() + " " + megaErr.Error())
+				} else {
+					megaErr = err
+				}
+			}
+		}
+		if megaErr != nil {
+			msg.FinishProcessingCompliance(status.Errorf(codes.Internal, megaErr.Error()))
+		} else {
+			message.Propagate(out, &msg)
+		}
+		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Published Compliance Report")
+	}
+	close(out)
 }
 
 func insertInspecSummary(msg message.Compliance, client *ingestic.ESClient) <-chan error {
@@ -101,6 +100,24 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient) <-cha
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
 		start := time.Now()
 		err := client.InsertInspecReport(msg.Ctx, msg.Report.ReportUuid, msg.Shared.EndTime, msg.InspecReport)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_report object")
+			out <- err
+		} else {
+			out <- nil
+		}
+		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
+		close(out)
+	}()
+	return out
+}
+
+func insertInspecReportRunInfo(msg message.Compliance, client *ingestic.ESClient) <-chan error {
+	out := make(chan error)
+	go func() {
+		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
+		start := time.Now()
+		err := client.InsertComplianceRunInfo(msg.Ctx, msg.Report.ReportUuid, msg.Shared.EndTime)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_report object")
 			out <- err

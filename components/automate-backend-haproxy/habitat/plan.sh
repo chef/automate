@@ -1,12 +1,14 @@
 # shellcheck disable=SC2148
+# stable channel
+
 UPSTREAM_PKG_IDENT="core/haproxy"
-pkg_name="automate-backend-haproxy"
+pkg_name="automate-ha-haproxy"
 pkg_description="Wrapper package for core/haproxy"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_version="1.0.28"
+pkg_version="2.2.14"
 pkg_build_deps=("${UPSTREAM_PKG_IDENT}")
 pkg_deps=(
   chef/mlsa

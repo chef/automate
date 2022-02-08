@@ -1,11 +1,13 @@
-pkg_name=automate-cluster-ctl
+#stable channel
+
+pkg_name=automate-ha-cluster-ctl
 pkg_description="A package for automate-cluster-ctl for the A2 HA Backend."
 pkg_origin=chef
-pkg_version="1.0.28"
+pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_deps=(
-  core/ruby26
+  core/ruby30
   chef/inspec
   core/aws-cli
   core/bash
@@ -71,13 +73,14 @@ do_clean() {
 do_install() {
   build_line "Copying automate-cluster-ctl files"
   pushd "$HAB_CACHE_SRC_PATH/$pkg_dirname/"
+    mkdir -p $pkg_prefix/inspec
     cp -r lib $pkg_prefix/
     cp -r libexec $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-smoke $pkg_prefix/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-smoke $pkg_prefix/inspec/
     cp -r templates $pkg_prefix/
     cp -r vendor $pkg_prefix/
   popd
@@ -91,7 +94,7 @@ do_unpack() {
 }
 
 do_setup_environment() {
-  export GEM_HOME="$pkg_prefix/vendor/bundle/ruby/2.6.0"
+  export GEM_HOME="$pkg_prefix/vendor/bundle/ruby/3.0.0"
   export GEM_PATH="$GEM_HOME"
 
   set_runtime_env GEM_HOME "$GEM_HOME"
