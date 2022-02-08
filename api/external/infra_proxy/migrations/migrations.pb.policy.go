@@ -10,7 +10,7 @@ import (
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.migrations.InfraProxyMigration/GetMigrationStatus", "infra:infraServers", "infra:infraServers:get", "GET", "/api/v0/infra/servers/migrations/status/{migration_id}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.GetMigrationStatus); ok {
+		if m, ok := input.(*request.GetMigrationStatusRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "migration_id":
@@ -28,6 +28,19 @@ func init() {
 				switch want {
 				case "server_id":
 					return m.ServerId
+				case "migration_id":
+					return m.MigrationId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.migrations.InfraProxyMigration/GetStagedData", "infra:infraServers:migrations:{migration_id}", "infra:infraServers:get", "GET", "/api/v0/infra/servers/migrations/staged_data/{migration_id}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.GetStagedDataRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
 				case "migration_id":
 					return m.MigrationId
 				default:

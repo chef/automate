@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
 	"io"
 	"os"
 	"path"
@@ -13,6 +12,9 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"
+	"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
+	pipeline_model "github.com/chef/automate/components/infra-proxy-service/pipeline"
+
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	"github.com/gofrs/uuid"
 	log "github.com/sirupsen/logrus"
@@ -88,7 +90,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 }
 
 // GetMigrationStatus fetch migration status against migration id
-func (s *MigrationServer) GetMigrationStatus(ctx context.Context, req *request.GetMigrationStatus) (*response.GetMigrationStatus, error) {
+func (s *MigrationServer) GetMigrationStatus(ctx context.Context, req *request.GetMigrationStatusRequest) (*response.GetMigrationStatusResponse, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -108,7 +110,7 @@ func (s *MigrationServer) GetMigrationStatus(ctx context.Context, req *request.G
 		return nil, err
 	}
 
-	return &response.GetMigrationStatus{
+	return &response.GetMigrationStatusResponse{
 		MigrationId:     migration.MigrationID,
 		MigrationType:   migration.MigrationType,
 		MigrationStatus: migration.MigrationStatus,
@@ -167,7 +169,7 @@ func createResponseWithErrors(err error, migrationId string) *response.UploadZip
 }
 
 // CancelMigration cancle the ongoing migration
-func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.CancelMigrationRequest) (*response.CancelMigrationResponce, error) {
+func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.CancelMigrationRequest) (*response.CancelMigrationResponse, error) {
 	// Validate all request fields are required
 	err := validation.New(validation.Options{
 		Target:          "server",
@@ -209,8 +211,85 @@ func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.Canc
 
 	errors := []string{err.Error()}
 
-	return &response.CancelMigrationResponce{
+	return &response.CancelMigrationResponse{
 		Success: true,
 		Errors:  errors,
 	}, nil
+}
+
+// GetStagedData fetch parsed data from db
+func (s *MigrationServer) GetStagedData(ctx context.Context, req *request.GetStagedDataRequest) (*response.GetStagedDataResponse, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	migrationStage, err := s.service.Migration.GetMigrationStage(ctx, req.MigrationId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.GetStagedDataResponse{
+		MigrationId: migrationStage.MigrationID,
+		StagedData:  getStagedData(migrationStage.StagedData),
+	}, nil
+}
+
+func getStagedData(stagedResult pipeline_model.Result) *response.StagedData {
+	stageData := &response.StagedData{}
+	for _, org := range stagedResult.ParsedResult.Orgs {
+		switch org.ActionOps {
+		case pipeline_model.Insert:
+			stageData.OrgsToMigrate++
+		case pipeline_model.Delete:
+			stageData.OrgsToDelete++
+		case pipeline_model.Update:
+			stageData.OrgsToUpdate++
+		case pipeline_model.Skip:
+			stageData.OrgsToSkip++
+		default:
+		}
+	}
+	users := []*response.User{}
+	for _, user := range stagedResult.ParsedResult.Users {
+		users = append(users, getStagedUser(user))
+	}
+	stageData.Users = users
+	return stageData
+}
+
+func getStagedUser(user pipeline_model.User) *response.User {
+	stagedUser := &response.User{}
+	stagedUser.Username = user.Username
+	stagedUser.Email = user.Email
+	stagedUser.DisplayName = user.DisplayName
+	stagedUser.FirstName = user.FirstName
+	stagedUser.LastName = user.LastName
+	stagedUser.MiddleName = user.MiddleName
+	stagedUser.AutomateUsername = user.AutomateUsername
+	stagedUser.Connector = user.Connector
+	stagedUser.IsConflicting = user.IsConflicting
+	stagedUser.IsAdmin = user.IsAdmin
+	return stagedUser
+}
+
+// StoreStagedData stores staged data in db
+// This function is used for the sample storage of staged data
+func (s *MigrationServer) StoreStagedData(ctx context.Context, migrationId string, stagedData interface{}) error {
+
+	_, err := s.service.Migration.StoreMigrationStage(ctx, migrationId, stagedData)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
