@@ -249,12 +249,12 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	case api.UpgradeStatusResponse_IDLE:
 		switch {
 		//Todo(milestone) - update the comparison logic of current version and latest available version
-		case resp.CurrentVersion != "" && resp.CurrentVersion < resp.LatestAvailableVersion:
-			writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
-				resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
 				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
+			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
+				writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
+					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
 			}
