@@ -45,7 +45,7 @@
                 <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
               </li>
               <li>
-                <span *ngIf="migrationCompleted || migrationfailed || migrationLoading" class="heading">Last Migration Status </span>
+                <span *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted" class="heading">Last Migration Status </span>
                 <!-- Completed and Failed status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value"><span class="status-icon-completed"></span><span class="status-text">Completed</span></span>                
                 <span *ngIf="!migrationLoading && migrationStarted && migrationfailed" class="server-entity-value" id="status-failed">
@@ -73,6 +73,11 @@
                     />
                   </svg>
                   <span>{{stepsCompleted}} Steps Completed</span>
+                  <span *ngIf="true"><a
+                    data-cy="show-preview"
+                    class="preview-link"
+                    >Click to Preview</a>
+                  </span>
                 </span>
                 <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
                 <span *ngIf="!migrationStarted" class="server-entity-value">--</span>

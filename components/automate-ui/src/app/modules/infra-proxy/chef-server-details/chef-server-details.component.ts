@@ -104,6 +104,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public migrationInProgress = false;
   public migrationLoading = true;
   public migrationStarted = false;
+  public migrationIsInPreview = false;
   public migrationSteps: Record<string, string> = {
     1: 'Migration started',
     2: 'Upload of zip file',
@@ -425,6 +426,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
               this.migrationInProgress = false;
             }
             this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13'
+            if (migration_type == 'Creating Preview') {
+              this.migrationIsInPreview = true;
+            }
           } else {
             this.migrationfailed = true;
           }
@@ -483,5 +487,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
     this.migrationStarted = true;
+    this.getMigrationStatus(this.server.migration_id)
   }
 }
