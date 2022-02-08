@@ -26,7 +26,7 @@ message Chunk {
   // Stream pointer
   int64 position = 2;
 }
-message GetMigrationStatus {
+message GetMigrationStatusRequest {
   // Migration ID.
   string migration_id = 1;
 }
@@ -36,4 +36,9 @@ message CancelMigrationRequest {
   string server_id = 1;
   // Migration ID
   string migration_id = 2; 
+}
+
+message GetStagedDataRequest {
+  // Migration ID
+  string migration_id = 1; 
 }

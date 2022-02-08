@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/chef/automate/components/infra-proxy-service/config"
+	"github.com/chef/automate/components/infra-proxy-service/migrations"
+
 	"github.com/chef/automate/components/infra-proxy-service/server"
 )
 
@@ -15,8 +17,9 @@ var (
 	// ```
 	// res, err := infraProxy.GetOrgs(ctx, &req)
 	// ```
-	infraProxy *server.Server
-	ctx        = context.Background()
+	infraProxy          *server.Server
+	infraProxyMigration *migrations.MigrationServer
+	ctx                 = context.Background()
 )
 
 type Suite struct{}
@@ -31,6 +34,12 @@ func (s *Suite) GlobalSetup() error {
 	var err error
 	// set global infraProxy
 	infraProxy, err = newInfraProxyServer()
+	if err != nil {
+		return err
+	}
+
+	// set global infraProxyMigration
+	infraProxyMigration, err = newInfraProxyMigrationServer()
 	if err != nil {
 		return err
 	}
@@ -61,6 +70,18 @@ func newInfraProxyServer() (*server.Server, error) {
 	}
 
 	gRPC := server.NewServer(service)
+
+	return gRPC, nil
+}
+
+// newInfraProxyMigrationServer initializes a InfraProxyMigrationServer with the default config
+func newInfraProxyMigrationServer() (*migrations.MigrationServer, error) {
+	service, err := config.ConfigFromViper(cFile)
+	if err != nil {
+		return nil, err
+	}
+
+	gRPC := migrations.NewMigrationServer(service)
 
 	return gRPC, nil
 }
