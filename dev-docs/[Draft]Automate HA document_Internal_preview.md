@@ -647,17 +647,11 @@ A) Steps to set key/secret using commands mentioned below :
 Login to all the elastic-search nodes and perform below steps on all the ES nodes.
 1.1 export ES_PATH_CONF="/hab/svc/automate-ha-elasticsearch/config"
 
-1.2 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.access_key
+1.2 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.access_key (It will ask to enter key, please enter your key)
 
-      (It will ask to enter key, please enter your key)
+1.3 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.secret_key (It will ask to enter secret, please enter your key)
 
-1.3 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.secret_key
-
-      (It will ask to enter secret, please enter your key)
-
-1.4 chown hab:hab /hab/svc/automate-ha-elasticsearch/config/elasticsearch.keystore
-
-    (Setting hab:hab permission)
+1.4 chown hab:hab /hab/svc/automate-ha-elasticsearch/config/elasticsearch.keystore (Setting hab:hab permission)
 
 1.5 curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin  (Command to load the above setting)
 This is expected. After running command 1.5 on 3rd node, this will be the final output-
