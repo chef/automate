@@ -3,15 +3,16 @@
 pkg_name="automate-postgresql"
 pkg_description="Wrapper package for core/postgresql"
 pkg_origin="chef"
-pkg_version="9.6.24"
+pkg_version="13.5.0"
 vendor_origin="core"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
+pg_version="13.5"
 pkg_deps=(
   core/coreutils
   chef/mlsa
-  ${vendor_origin}/postgresql/${pkg_version}
+  ${vendor_origin}/postgresql13/${pg_version}
 )
 
 pkg_exports=(

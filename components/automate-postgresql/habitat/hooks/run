@@ -26,7 +26,7 @@ ensure_dir_ownership
 ensure_key_ownership
 
 echo "Starting PostgreSQL"
-export PGDATA={{pkg.svc_data_path}}/pgdata
+export PGDATA={{pkg.svc_data_path}}/pgdata13
 
 pidfile="$PGDATA/postmaster.pid"
 if [ -f  "$pidfile" ]; then
@@ -49,6 +49,10 @@ if [ -f  "$pidfile" ]; then
     rm "$pidfile"
   fi
 fi
+
+# if [[ "$BUILDKITE" = "true" ]]; then
+#   echo "dynamic_shared_memory_type = 'mmap'" >> {{pkg.svc_config_path}}/postgresql.conf
+# fi
 
 exec postgres \
   -c config_file={{pkg.svc_config_path}}/postgresql.conf
