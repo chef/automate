@@ -230,20 +230,20 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 	}
 }
 
+// Unzip will decompress a zip file and sets the UnzipFolder
 func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var fpath string
-	r, err := zip.OpenReader(result.Meta.ZipFile)
+	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
 		log.Errorf("cannot open reader: %s.", err)
 		mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
 		return result, err
 	}
 
-	for _, f := range r.File {
-		fpath = filepath.Join("", f.Name)
+	for _, file := range reader.File {
+		fpath = filepath.Join("", file.Name)
 
-		// filenames = append(filenames, fpath)
-		if f.FileInfo().IsDir() {
+		if file.FileInfo().IsDir() {
 			os.MkdirAll(fpath, os.ModePerm)
 			continue
 		}
@@ -259,21 +259,21 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		// outFile with permissions to write &/or truncate
 		outFile, err := os.OpenFile(fpath,
 			os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
-			f.Mode())
+			file.Mode())
 		if err != nil {
 			log.Errorf("cannot create a file: %s.", err)
 			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create a file", 0, 0, 0)
 			return result, err
 		}
 
-		rc, err := f.Open()
+		readClose, err := file.Open()
 		if err != nil {
 			log.Errorf("cannot open file")
 			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open file", 0, 0, 0)
 			return result, err
 		}
 
-		_, err = io.Copy(outFile, rc)
+		_, err = io.Copy(outFile, readClose)
 		if err != nil {
 			log.Errorf("cannot copy file")
 			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy file", 0, 0, 0)
@@ -281,7 +281,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		}
 
 		outFile.Close()
-		rc.Close()
+		readClose.Close()
 
 		if err != nil {
 			log.Errorf("cannot copy a file")
@@ -291,6 +291,6 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
-	r.Close()
+	reader.Close()
 	return result, nil
 }
