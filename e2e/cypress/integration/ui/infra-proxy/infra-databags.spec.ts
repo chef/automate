@@ -7,7 +7,6 @@ describe('infra databag', () => {
   const orgID = 'demoorg';
   const orgName = 'demoorg';
   const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
-  const serverIP = '18-117-112-129';
   const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const databagName = `${cypressPrefix}-databag-${now}-1`;
@@ -27,7 +26,7 @@ describe('infra databag', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP,
+          ip_address: '',
           webui_key: webuiKey
         }
       }).then((resp) => {
