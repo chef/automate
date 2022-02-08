@@ -27,6 +27,12 @@ type Meta struct {
 
 	// UnzipFolder for unzipped folder's location
 	UnzipFolder string `json:"unzip_folder"`
+
+	// Chef Infra Server ID
+	ServerID string `json:"server_id"`
+
+	// Migration ID
+	MigrationID string `json:"migration_id"`
 }
 
 type StageResult struct {
@@ -90,7 +96,7 @@ type Org struct {
 	FullName string `json:"full_name"`
 
 	// ActionOps for Insert Skip Update and Delete
-	ActionOps ActionOps `json:"guid"`
+	ActionOps ActionOps `json:"action_ops"`
 }
 
 type User struct {
@@ -112,4 +118,10 @@ type User struct {
 
 	// IsAdmin (user is admin or not)
 	IsAdmin bool `json:"is_admin"`
+}
+
+type OrgJson struct {
+	Name     string `json:"name"`
+	FullName string `json:"full_name"`
+	Guid     string `json:"guid"`
 }
