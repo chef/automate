@@ -1243,6 +1243,18 @@ After that do deploy again using below command
 
 - Run  `rm -rf /hab` on Bastion node
 
+### How to resolve bootstrap.abb scp error
+
+- Go to this directory 
+	`cd /hab/a2_deploy_workspace/terraform/`
+- Run the below command:
+	`terraform taint module.bootstrap_automate.null_resource.automate_pre[0]`
+	`terraform taint module.bootstrap_automate.null_resource.automate_pre[1]`
+	`terraform taint module.bootstrap_automate.null_resource.automate_pre[2]`
+	`terraform taint module.bootstrap_automate.null_resource.automate_post[0]`
+	`terraform taint module.bootstrap_automate.null_resource.automate_post[1]`
+	`terraform taint module.bootstrap_automate.null_resource.automate_post[2]`
+	
 # Cert rotation with large CA cert file
 	
 ### Elastic Search cert rotation
