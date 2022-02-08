@@ -117,7 +117,7 @@ steps:
   #           "--exclude", "*.spec.ts",
   #           "--config", "/go/src/github.com/chef/automate/.semgrep",
   #           "/go/src/github.com/chef/automate"
-          ]
+          # ]
 
   # - label: ":semgrep: Security"
   #   command:
