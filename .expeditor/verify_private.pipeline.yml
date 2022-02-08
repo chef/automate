@@ -14,9 +14,9 @@ expeditor:
         workdir: /go/src/github.com/chef/automate
 
 steps:
-  # Building hugo currently depends on a github token
-  #     https://github.com/chef/chef-hugo-theme
-  # which is currently private.
+#   # Building hugo currently depends on a github token
+#   #     https://github.com/chef/chef-hugo-theme
+#   # which is currently private.
   # - label: lint hugo site
   #   command:
   #     - .expeditor/buildkite/hugo_lint.sh
@@ -30,8 +30,8 @@ steps:
   #     executor:
   #       docker:
 
-  # # license scout requires github account access because we currently
-  # # rely on at least 2 private repositories.
+  # license scout requires github account access because we currently
+  # rely on at least 2 private repositories.
   # - label: license scout
   #   command:
   #     # here we reuse the license_scout.sh script used by expeditor to publish the manifest
@@ -142,32 +142,6 @@ steps:
   # directive. All tests below this wait either require build assets
   # or take a long time.
   - wait
-
-  - label: "v2 to v22 upgrade"
-  command:
-    - integration/run_test integration/tests/v2_to_v22_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
-
-  - label: "v2 run and test upgrade"
-  command:
-    - integration/run_test integration/tests/v2_run_and_test_upgrade.sh
-  timeout_in_minutes: 25
-  expeditor:
-    secrets:
-      A2_LICENSE:
-        path: secret/a2/license
-        field: license
-    executor:
-      linux:
-        privileged: true
 
   # - label: "automate-load-balancer"
   #   command:
@@ -524,18 +498,31 @@ steps:
   #       linux:
   #         privileged: true
 
-  # - label: "iam v1 to v2 force-upgrade"
-  #   command:
-  #     - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
-  #   timeout_in_minutes: 25
-  #   expeditor:
-  #     secrets:
-  #       A2_LICENSE:
-  #         path: secret/a2/license
-  #         field: license
-  #     executor:
-  #       linux:
-  #         privileged: true
+  - label: "v2 to v22 upgrade"
+    command:
+      - integration/run_test integration/tests/v2_to_v22_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "v2 run and test upgrade"
+    command:
+      - integration/run_test integration/tests/v2_run_and_test_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
 
   # - label: "iam v1 to v2 force-upgrade (diagnostics only)"
   #   command:
@@ -914,3 +901,4 @@ steps:
   #     executor:
   #       linux:
   #         privileged: true
+
