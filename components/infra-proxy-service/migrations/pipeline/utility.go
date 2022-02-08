@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/chef/automate/api/interservice/authz"
 
@@ -239,16 +238,9 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
 		return result, err
 	}
-	defer r.Close()
 
 	for _, f := range r.File {
 		fpath = filepath.Join("", f.Name)
-
-		// Checking for any invalid file paths
-		if !strings.HasPrefix(fpath, filepath.Clean("backup")+string(os.PathSeparator)) {
-			log.Errorf("invalid path: %s.")
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "invalid path", 0, 0, 0)
-		}
 
 		// filenames = append(filenames, fpath)
 		if f.FileInfo().IsDir() {
@@ -282,6 +274,11 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		}
 
 		_, err = io.Copy(outFile, rc)
+		if err != nil {
+			log.Errorf("cannot copy file")
+			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy file", 0, 0, 0)
+			return result, err
+		}
 
 		outFile.Close()
 		rc.Close()
@@ -292,6 +289,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 			return result, err
 		}
 	}
-	result.Meta.UnzipFolder = fpath
+	result.Meta.UnzipFolder = filepath.Dir(fpath)
+	r.Close()
 	return result, nil
 }
