@@ -1873,10 +1873,10 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 
 		//compare minimum compatible version with current version, i.e current version should be greater than or equal than min compatible version
 		minCompVersion := m.MinCompatibleVer
-		if minCompVersion != "" {
-			if !isCompatibleForAirgap(currentRelease, minCompVersion) {
-				return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q. The compatible version is %q", nextManifestVersion, currentRelease, minCompVersion)
-			}
+		if minCompVersion == "" {
+			return nil, status.Error(codes.InvalidArgument, "mandatory minimum compatable version is missing")
+		} else if !isCompatibleForAirgap(currentRelease, minCompVersion) {
+			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q. The compatible version is %q", nextManifestVersion, currentRelease, minCompVersion)
 		}
 
 		//check for upgrade or degrade, we should not allow degrading
@@ -1930,60 +1930,7 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 		return nil, err
 	}
 
-	/*if !s.HasConfiguredDeployment() {
-		return nil, ErrorNotConfigured
-	}
-
-	var currentRelease = ""
-	s.deployment.Lock()
-	if s.deployment.CurrentReleaseManifest != nil {
-		currentRelease = s.deployment.CurrentReleaseManifest.Version()
-	}
-	channel := s.deployment.Channel()
-	s.deployment.Unlock()
-
-	var m *manifest.A2
-	var err error
-
-	nextManifestVersion := currentRelease
-	if !airgap.AirgapInUse() { //internet connected machine
-		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, channel, currentRelease)
-		if err != nil {
-			return nil, err
-		}
-
-		if !req.IsMajorUpgrade { //normal upgrade
-			if isMinorAvailable {
-				nextManifestVersion = compVersion
-			} else if isMajorAvailable {
-				return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --major` to further upgrade")
-			}
-		} else { //major upgrade
-			if isMinorAvailable {
-				return nil, status.Errorf(codes.InvalidArgument, "minor/patch version is available, please use `chef-automate upgrade run`")
-			} else if isMajorAvailable {
-				nextManifestVersion = compVersion
-			}
-		}
-	}
-
-	if req.Version != "" {
-		if airgap.AirgapInUse() {
-			return nil, status.Errorf(codes.InvalidArgument, "specifying a version is not allowed in airgap mode, please use `chef-automate upgrade run --airgap-bundle`")
-		}
-
-		if !isCompatible(currentRelease, req.Version, nextManifestVersion) {
-			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", req.Version, currentRelease)
-		}
-
-		nextManifestVersion = req.Version
-	}*/
-
 	m, err := s.releaseManifestProvider.GetManifest(ctx, validatedResp.TargetVersion)
-	/*} else {
-		//m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
-		//Todo(milestone) in airgap, get the manifest and perform the compatibility check.
-	}*/
 
 	_, ok := err.(*manifest.NoSuchManifestError)
 	if ok {
