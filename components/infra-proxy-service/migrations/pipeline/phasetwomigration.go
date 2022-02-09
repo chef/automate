@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"fmt"
 
 	log "github.com/sirupsen/logrus"
 
@@ -23,19 +22,19 @@ func PopulateOrgs() PhaseTwoPipelineProcessor {
 }
 
 func populateOrgs(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting populateOrgs routine")
+	log.Info("Starting populateOrgs routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
-			fmt.Println("Processing to populateOrgs...")
+			log.Info("Processing to populateOrgs...")
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing populateOrgs routine")
+		log.Info("Closing populateOrgs routine")
 		close(out)
 	}()
 	return out
@@ -49,19 +48,19 @@ func CreateProject() PhaseTwoPipelineProcessor {
 }
 
 func createProject(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting CreateProject routine")
+	log.Info("Starting CreateProject routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
-			fmt.Println("Processing to createProject...")
+			log.Info("Processing to createProject...")
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing CreateProject routine")
+		log.Info("Closing CreateProject routine")
 		close(out)
 	}()
 	return out
@@ -75,19 +74,19 @@ func PopulateUsers() PhaseTwoPipelineProcessor {
 }
 
 func populateUsers(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting PopulateUsers routine")
+	log.Info("Starting PopulateUsers routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
-			fmt.Println("Processing to populateUsers...")
+			log.Info("Processing to populateUsers...")
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing PopulateUsers routine")
+		log.Info("Closing PopulateUsers routine")
 		close(out)
 	}()
 	return out
@@ -101,19 +100,19 @@ func PopulateORGUser() PhaseTwoPipelineProcessor {
 }
 
 func populateORGUser(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting PopulateORGUser routine")
+	log.Info("Starting PopulateORGUser routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
-			fmt.Println("Processing to populateORGUser...")
+			log.Info("Processing to populateORGUser...")
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing PopulateORGUser routine")
+		log.Info("Closing PopulateORGUser routine")
 		close(out)
 	}()
 	return out
@@ -127,26 +126,26 @@ func PopulateMembersPolicy() PhaseTwoPipelineProcessor {
 }
 
 func populateMembersPolicy(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting PopulateMembersPolicy routine")
+	log.Info("Starting PopulateMembersPolicy routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
-			fmt.Println("Processing to populateMembersPolicy...")
+			log.Info("Processing to populateMembersPolicy...")
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing PopulateMembersPolicy routine")
+		log.Info("Closing PopulateMembersPolicy routine")
 		close(out)
 	}()
 	return out
 }
 
 func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineProcessor) {
-	fmt.Println("Pipeline started...")
+	log.Info("Pipeline started...")
 	status := make(chan string)
 	go func() {
 		for _, pipe := range pipes {
@@ -174,22 +173,18 @@ func SetupPhaseTwoPipeline() PhaseTwoPipleine {
 }
 
 func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
-	status := make(chan string)
-	go func() {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-		done := make(chan error)
-		select {
-		case p.in <- PipelineData{Result: result, Done: done, Ctx: ctx}:
-		}
-		err := <-done
-		if err != nil {
-			MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
-			log.Errorf("Phase two pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
-		}
-		MigrationSuccess(Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
-		log.Println("received done")
-		status <- "Done"
-	}()
-	<-status
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error)
+	select {
+	case p.in <- PipelineData{Result: result, Done: done, Ctx: ctx}:
+	}
+	err := <-done
+	if err != nil {
+		MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+		log.Errorf("Phase two pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
+	}
+	MigrationSuccess(Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+	log.Info("received done")
+
 }
