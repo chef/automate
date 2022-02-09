@@ -3,20 +3,9 @@ describe('chef server details', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'infra';
   const serverName = `${cypressPrefix} server ${now}`;
-  const updatedServerName = `${cypressPrefix} updated server ${now}`;
   const serverID = serverName.split(' ').join('-');
-  const customServerID = `${cypressPrefix}-custom-id-${now}`;
-  const orgID = 'demoorg';
-  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
-  const serverIP = '18-117-112-129';
-  const orgName = `${cypressPrefix} org ${now}`;
-  const generatedOrgID = orgName.split(' ').join('-');
-  const customOrgID = `${cypressPrefix}-custom-id-${now}`;
-  const adminUser = 'test_admin_user';
+  const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
   const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
-
-  // using dummy admin key value for creating the org
-  const adminKey = 'Dummy--admin--key';
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -31,7 +20,7 @@ describe('chef server details', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP,
+          ip_address: '',
           webui_key: webuiKey
         }
       });
