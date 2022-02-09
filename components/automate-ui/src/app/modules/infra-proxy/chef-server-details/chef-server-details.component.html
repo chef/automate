@@ -10,16 +10,20 @@
       </chef-breadcrumbs>
       <chef-page-header>
         <div class="meta-box">
+          <p class="chef-server-info-text">CHEF SERVER INFORMATION</p>
           <div class="summary-body first">
-            <chef-heading data-cy="page-title">{{ server?.name }}</chef-heading>
             <ul>
               <li>
                 <span class="heading">FQDN</span>
-                <span data-cy="node-env">{{ server?.fqdn }}</span>
+                <span class="server-entity-value" data-cy="node-env">{{ server?.fqdn }}</span>
               </li>
               <li>
                 <span class="heading">IP Address</span>
-                <span>{{ server?.ip_address }}</span>
+                <span class="server-entity-value">{{ server?.ip_address === '' ? '--' : server?.ip_address }}</span>
+              </li>
+              <li>
+                <span class="heading"></span>
+                <span class="server-entity-value"></span>
               </li>
             </ul>
           </div>
@@ -27,20 +31,66 @@
             <ul>
               <li>
                 <span class="heading">Web UI Key</span>
-                <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
-                <span *ngIf="(isValid && !validating)" data-cy="valid-webui-key" class="webUIKeyStatus">Valid</span>
-                <img *ngIf="(!isValid && !validating)" src="../../../../assets/img/warning.png" alt="warning" />
-                <span *ngIf="(!isValid && !validating)" class="invalidStatus">Invalid</span>
-                <span class="update-link" data-cy="open-WebKey-slider">
-                  <a
-                  data-cy="update-web-ui-key"
-                  (click)="webUIKeySlider.slidePanel()"
-                  >Update</a>
+                <span class="server-entity-value">
+                  <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
+                  <span *ngIf="(isValid && !validating)" data-cy="valid-webui-key" class="webUIKeyStatus">Valid</span>
+                  <img *ngIf="(!isValid && !validating)" src="../../../../assets/img/warning.png" alt="warning" />
+                  <span *ngIf="(!isValid && !validating)" class="invalidStatus">Invalid</span>
+                  <span class="update-link" data-cy="open-WebKey-slider">
+                    <a
+                    data-cy="update-web-ui-key"
+                    (click)="webUIKeySlider.slidePanel()"
+                    >Update</a>
+                  </span>
                 </span>
               </li>
               <li>
-                <span class="heading">Org &amp; User last synced</span>
-                <span>Thu, Feb 04, 12:00:00 UTC</span>
+                <span class="heading">last sync date</span>
+                <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
+              </li>
+              <li>
+                <span *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted" class="heading">Last Migration Status </span>
+                <!-- Completed status -->
+                <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value">
+                  <img src='../../../../assets/img/completed.png' alt="info" />
+                  <span>Completed</span>
+                </span>
+
+                <!-- Failed status -->
+                <span *ngIf="!migrationLoading && migrationStarted && migrationfailed" class="server-entity-value" id="status-failed">
+                  <chef-tooltip position='bottom' class="visible tooltip" for='error-show-button'>
+                    <img src='../../../../assets/img/failed.png' alt="warning" />
+                    Migration failed, migration step not completed!
+                  </chef-tooltip>
+                  <img id='error-show-button' src='../../../../assets/img/failed.png' alt="info" />
+                  <span>Failed</span>
+                </span>
+
+                <!-- in progress status -->
+                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress" class="heading">Sync In Progress </span>
+                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress" class="server-entity-value svg-block">
+                  <svg viewBox="0 0 36 36" class="circular-chart single-chart blue">
+                    <path class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path class="circle"
+                      [attr.stroke-dasharray]="currentMigrationProcess()"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <span>{{stepsCompleted}} Steps Completed</span>
+                  <span *ngIf="migrationIsInPreview"><a
+                    data-cy="show-preview"
+                    class="preview-link"
+                    >Click to Preview</a>
+                  </span>
+                </span>
+                <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
+                <span *ngIf="!migrationStarted" class="server-entity-value">--</span>
               </li>
             </ul>
           </div>

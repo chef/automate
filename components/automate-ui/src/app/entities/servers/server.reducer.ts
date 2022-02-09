@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { pipe, set, unset } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { ServerActionTypes, ServerActions } from './server.actions';
-import { Server, User } from './server.model';
+import { MigrationStatus, Server, User } from './server.model';
 import { ValidateWebUIKeyResponse } from './server.requests';
 
 export interface ServerEntityState extends EntityState<Server> {
@@ -18,6 +18,8 @@ export interface ServerEntityState extends EntityState<Server> {
   updateWebUIKeyStatus: EntityStatus;
   getvalidateWebUIKeyStatus: ValidateWebUIKeyResponse;
   validateWebUIKeyStatus: EntityStatus;
+  getMigrationStatus: MigrationStatus;
+  migrationStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS             = 'getAllStatus';
@@ -29,6 +31,7 @@ const DELETE_STATUS              = 'deleteStatus';
 const GET_USERS_STATUS           = 'getUsersStatus';
 const UPDATE_WEB_UI_KEY_STATUS   = 'updateWebUIKeyStatus';
 const VALIDATE_WEB_UI_KEY_STATUS = 'validateWebUIKeyStatus';
+const GET_MIGRATION_STATUS       = 'migrationStatus';
 
 export const serverEntityAdapter: EntityAdapter<Server> = createEntityAdapter<Server>();
 
@@ -44,7 +47,9 @@ export const ServerEntityInitialState: ServerEntityState =
     getUsersStatus: EntityStatus.notLoaded,
     updateWebUIKeyStatus: EntityStatus.notLoaded,
     getvalidateWebUIKeyStatus: null,
-    validateWebUIKeyStatus: EntityStatus.notLoaded
+    validateWebUIKeyStatus: EntityStatus.notLoaded,
+    getMigrationStatus: null,
+    migrationStatus: EntityStatus.notLoaded
   });
 
 export function serverEntityReducer(
@@ -170,6 +175,19 @@ export function serverEntityReducer(
 
     case ServerActionTypes.VALIDATE_WEB_UI_KEY_FAILURE:
       return set(VALIDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingFailure, state);
+
+    case ServerActionTypes.GET_MIGRATION_STATUS:
+      return set(GET_MIGRATION_STATUS, EntityStatus.loading, state);
+
+    case ServerActionTypes.GET_MIGRATION_STATUS_SUCCESS:
+      return pipe(
+        set(GET_MIGRATION_STATUS, EntityStatus.loadingSuccess),
+        set('getMigrationStatus', action.payload || {})
+      )(state) as ServerEntityState;
+
+    case ServerActionTypes.GET_MIGRATION_STATUS_FAILURE:
+      return set(GET_MIGRATION_STATUS, EntityStatus.loadingFailure, state);
+
   }
 
   return state;
