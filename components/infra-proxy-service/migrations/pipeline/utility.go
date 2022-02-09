@@ -264,7 +264,10 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
 		log.Errorf("cannot open reader: %s.", err)
-		mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
+		_, err := mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
+		if err != nil {
+			log.Errorf("Failed to update status in DB: %s", err)
+		}
 		return result, err
 	}
 
