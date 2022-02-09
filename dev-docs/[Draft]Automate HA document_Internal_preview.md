@@ -904,14 +904,14 @@ Your current version should be less than the latest version to perform the upgra
 
 1.Login to machine which has internet, and run below command:
 
-    1.1 Download chef-automate cli using below command. 
+  1.1 Download chef-automate cli using below command. 
 
   `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate`
 
-    (This will provide us with the latest available automate CLI)
+  (This will provide us with the latest available automate CLI)
    
-    1.2 `./chef-automate airgap bundle create`
-      (This will provide us with the latest available automate bundle)
+  1.2 `./chef-automate airgap bundle create`
+     (This will provide us with the latest available automate bundle)
 
 2. Now copy newly downloaded airgap bundle and chef-automate cli on your non-internet environment that we have downloaded using above two steps. You can use scp to copy. 
 
