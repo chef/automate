@@ -10,7 +10,6 @@ import (
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authz"
 
-	"github.com/chef/automate/components/infra-proxy-service/migrations/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -34,8 +33,8 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 	if err != nil {
 		return nil, err
 	}
-	pipeline.Storage = p
-	pipeline.Mig = pObj
+	//pipeline.Storage = p
+	//pipeline.Mig = pObj
 	return &Service{
 		Logger:      l,
 		ConnFactory: connFactory,
