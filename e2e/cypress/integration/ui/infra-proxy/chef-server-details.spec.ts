@@ -5,9 +5,7 @@ describe('chef server details', () => {
   const serverName = `${cypressPrefix} server ${now}`;
   const updatedServerName = `${cypressPrefix} updated server ${now}`;
   const serverID = serverName.split(' ').join('-');
-  const customServerID = `${cypressPrefix}-custom-id-${now}`;
-  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
-  const serverIP = '18-117-112-129';
+  const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
   const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   const orgName = `${cypressPrefix} org ${now}`;
   const generatedOrgID = orgName.split(' ').join('-');
@@ -30,7 +28,7 @@ describe('chef server details', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP,
+          ip_address: '',
           webui_key: webuiKey
         }
       });
@@ -237,7 +235,7 @@ describe('chef server details', () => {
       cy.get('app-notification.info chef-icon').click({ multiple: true });
     });
 
-    it('can update the server', () => {
+    xit('can update the server', () => {
       cy.get('[data-cy=update-server-name]').clear().type(updatedServerName);
       cy.get('chef-select').contains('FQDN').click();
       cy.get('chef-select chef-option').contains('IP Address').click();

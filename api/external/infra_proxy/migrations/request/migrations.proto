@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/api/external/infra_proxy/migration
 
 message UploadZipFileRequest {
   //Chef infra server id for the file
-  string serverId =1;
+  string server_id =1;
   //Chunk of the data in bytes
   Chunk chunk = 2;
   //Metadata for the request
@@ -16,7 +16,7 @@ message Metadata {
   //Migration File name
   string name = 1;
   //Content type of the request
-  string contentType =2;
+  string content_type=2;
 }
 
 // Zip content in byte form.

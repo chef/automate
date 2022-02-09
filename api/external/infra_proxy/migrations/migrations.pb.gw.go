@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
-func request_InfraProxyMigration_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_InfraProxyMigrationService_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.GetMigrationStatusRequest
 	var metadata runtime.ServerMetadata
 
@@ -59,7 +59,7 @@ func request_InfraProxyMigration_GetMigrationStatus_0(ctx context.Context, marsh
 
 }
 
-func local_request_InfraProxyMigration_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_InfraProxyMigrationService_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.GetMigrationStatusRequest
 	var metadata runtime.ServerMetadata
 
@@ -86,7 +86,7 @@ func local_request_InfraProxyMigration_GetMigrationStatus_0(ctx context.Context,
 
 }
 
-func request_InfraProxyMigration_CancelMigration_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_InfraProxyMigrationService_CancelMigration_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.CancelMigrationRequest
 	var metadata runtime.ServerMetadata
 
@@ -124,7 +124,7 @@ func request_InfraProxyMigration_CancelMigration_0(ctx context.Context, marshale
 
 }
 
-func local_request_InfraProxyMigration_CancelMigration_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_InfraProxyMigrationService_CancelMigration_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.CancelMigrationRequest
 	var metadata runtime.ServerMetadata
 
@@ -162,7 +162,7 @@ func local_request_InfraProxyMigration_CancelMigration_0(ctx context.Context, ma
 
 }
 
-func request_InfraProxyMigration_GetStagedData_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_InfraProxyMigrationService_GetStagedData_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.GetStagedDataRequest
 	var metadata runtime.ServerMetadata
 
@@ -189,7 +189,7 @@ func request_InfraProxyMigration_GetStagedData_0(ctx context.Context, marshaler 
 
 }
 
-func local_request_InfraProxyMigration_GetStagedData_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_InfraProxyMigrationService_GetStagedData_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.GetStagedDataRequest
 	var metadata runtime.ServerMetadata
 
@@ -216,7 +216,7 @@ func local_request_InfraProxyMigration_GetStagedData_0(ctx context.Context, mars
 
 }
 
-func request_InfraProxyMigration_ConfirmPreview_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.ConfirmPreview
 	var metadata runtime.ServerMetadata
 
@@ -254,7 +254,7 @@ func request_InfraProxyMigration_ConfirmPreview_0(ctx context.Context, marshaler
 
 }
 
-func local_request_InfraProxyMigration_ConfirmPreview_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.ConfirmPreview
 	var metadata runtime.ServerMetadata
 
@@ -292,12 +292,12 @@ func local_request_InfraProxyMigration_ConfirmPreview_0(ctx context.Context, mar
 
 }
 
-// RegisterInfraProxyMigrationHandlerServer registers the http handlers for service InfraProxyMigration to "mux".
-// UnaryRPC     :call InfraProxyMigrationServer directly.
+// RegisterInfraProxyMigrationServiceHandlerServer registers the http handlers for service InfraProxyMigrationService to "mux".
+// UnaryRPC     :call InfraProxyMigrationServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-func RegisterInfraProxyMigrationHandlerServer(ctx context.Context, mux *runtime.ServeMux, server InfraProxyMigrationServer) error {
+func RegisterInfraProxyMigrationServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server InfraProxyMigrationServiceServer) error {
 
-	mux.Handle("GET", pattern_InfraProxyMigration_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -306,18 +306,18 @@ func RegisterInfraProxyMigrationHandlerServer(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_InfraProxyMigration_GetMigrationStatus_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_InfraProxyMigrationService_GetMigrationStatus_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigration_CancelMigration_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_CancelMigration_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -326,18 +326,18 @@ func RegisterInfraProxyMigrationHandlerServer(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_InfraProxyMigration_CancelMigration_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_InfraProxyMigrationService_CancelMigration_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_CancelMigration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_CancelMigration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigration_GetStagedData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_GetStagedData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -346,18 +346,18 @@ func RegisterInfraProxyMigrationHandlerServer(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_InfraProxyMigration_GetStagedData_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_InfraProxyMigrationService_GetStagedData_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_GetStagedData_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_GetStagedData_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigration_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -366,23 +366,23 @@ func RegisterInfraProxyMigrationHandlerServer(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_InfraProxyMigration_ConfirmPreview_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_InfraProxyMigrationService_ConfirmPreview_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_ConfirmPreview_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_ConfirmPreview_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterInfraProxyMigrationHandlerFromEndpoint is same as RegisterInfraProxyMigrationHandler but
+// RegisterInfraProxyMigrationServiceHandlerFromEndpoint is same as RegisterInfraProxyMigrationServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterInfraProxyMigrationHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterInfraProxyMigrationServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -402,23 +402,23 @@ func RegisterInfraProxyMigrationHandlerFromEndpoint(ctx context.Context, mux *ru
 		}()
 	}()
 
-	return RegisterInfraProxyMigrationHandler(ctx, mux, conn)
+	return RegisterInfraProxyMigrationServiceHandler(ctx, mux, conn)
 }
 
-// RegisterInfraProxyMigrationHandler registers the http handlers for service InfraProxyMigration to "mux".
+// RegisterInfraProxyMigrationServiceHandler registers the http handlers for service InfraProxyMigrationService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterInfraProxyMigrationHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterInfraProxyMigrationHandlerClient(ctx, mux, NewInfraProxyMigrationClient(conn))
+func RegisterInfraProxyMigrationServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterInfraProxyMigrationServiceHandlerClient(ctx, mux, NewInfraProxyMigrationServiceClient(conn))
 }
 
-// RegisterInfraProxyMigrationHandlerClient registers the http handlers for service InfraProxyMigration
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "InfraProxyMigrationClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "InfraProxyMigrationClient"
+// RegisterInfraProxyMigrationServiceHandlerClient registers the http handlers for service InfraProxyMigrationService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "InfraProxyMigrationServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "InfraProxyMigrationServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "InfraProxyMigrationClient" to call the correct interceptors.
-func RegisterInfraProxyMigrationHandlerClient(ctx context.Context, mux *runtime.ServeMux, client InfraProxyMigrationClient) error {
+// "InfraProxyMigrationServiceClient" to call the correct interceptors.
+func RegisterInfraProxyMigrationServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client InfraProxyMigrationServiceClient) error {
 
-	mux.Handle("GET", pattern_InfraProxyMigration_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -427,18 +427,18 @@ func RegisterInfraProxyMigrationHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_InfraProxyMigration_GetMigrationStatus_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_InfraProxyMigrationService_GetMigrationStatus_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigration_CancelMigration_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_CancelMigration_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -447,18 +447,18 @@ func RegisterInfraProxyMigrationHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_InfraProxyMigration_CancelMigration_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_InfraProxyMigrationService_CancelMigration_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_CancelMigration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_CancelMigration_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigration_GetStagedData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_GetStagedData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -467,18 +467,18 @@ func RegisterInfraProxyMigrationHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_InfraProxyMigration_GetStagedData_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_InfraProxyMigrationService_GetStagedData_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_GetStagedData_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_GetStagedData_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigration_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_InfraProxyMigrationService_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -487,14 +487,14 @@ func RegisterInfraProxyMigrationHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_InfraProxyMigration_ConfirmPreview_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_InfraProxyMigrationService_ConfirmPreview_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxyMigration_ConfirmPreview_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxyMigrationService_ConfirmPreview_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -502,21 +502,21 @@ func RegisterInfraProxyMigrationHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_InfraProxyMigration_GetMigrationStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "migrations", "status", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxyMigrationService_GetMigrationStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "migrations", "status", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxyMigration_CancelMigration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v0", "infra", "servers", "server_id", "migrations", "cancel_migration", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxyMigrationService_CancelMigration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v0", "infra", "servers", "server_id", "migrations", "cancel_migration", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxyMigration_GetStagedData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "migrations", "staged_data", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxyMigrationService_GetStagedData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v0", "infra", "servers", "migrations", "staged_data", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxyMigration_ConfirmPreview_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v0", "infra", "servers", "server_id", "migrations", "confirm_preview", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxyMigrationService_ConfirmPreview_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v0", "infra", "servers", "server_id", "migrations", "confirm_preview", "migration_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_InfraProxyMigration_GetMigrationStatus_0 = runtime.ForwardResponseMessage
+	forward_InfraProxyMigrationService_GetMigrationStatus_0 = runtime.ForwardResponseMessage
 
-	forward_InfraProxyMigration_CancelMigration_0 = runtime.ForwardResponseMessage
+	forward_InfraProxyMigrationService_CancelMigration_0 = runtime.ForwardResponseMessage
 
-	forward_InfraProxyMigration_GetStagedData_0 = runtime.ForwardResponseMessage
+	forward_InfraProxyMigrationService_GetStagedData_0 = runtime.ForwardResponseMessage
 
-	forward_InfraProxyMigration_ConfirmPreview_0 = runtime.ForwardResponseMessage
+	forward_InfraProxyMigrationService_ConfirmPreview_0 = runtime.ForwardResponseMessage
 )
