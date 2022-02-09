@@ -96,7 +96,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public migrationID: string;
   public migrationStatus: MigrationStatus;
   public migrationStatusPercentage: number;
-  public stepsCompleted: string
+  public stepsCompleted: string;
   public totalMigrationSteps = 13;
   public migrationStepValue: number;
   public migrationfailed = false;
@@ -425,8 +425,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
               this.migrationCompleted = true;
               this.migrationInProgress = false;
             }
-            this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13'
-            if (migration_type == 'Creating Preview') {
+            this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
+            if (migration_type === 'Creating Preview') {
               this.migrationIsInPreview = true;
             }
           } else {
@@ -487,6 +487,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
     this.migrationStarted = true;
-    this.getMigrationStatus(this.server.migration_id)
+    this.getMigrationStatus(this.server.migration_id);
   }
 }

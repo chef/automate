@@ -10,8 +10,8 @@
       </chef-breadcrumbs>
       <chef-page-header>
         <div class="meta-box">
+          <p class="chef-server-info-text">CHEF SERVER INFORMATION</p>
           <div class="summary-body first">
-            <chef-heading data-cy="page-title">{{ server?.name }}</chef-heading>
             <ul>
               <li>
                 <span class="heading">FQDN</span>
@@ -20,6 +20,10 @@
               <li>
                 <span class="heading">IP Address</span>
                 <span class="server-entity-value">{{ server?.ip_address === '' ? '--' : server?.ip_address }}</span>
+              </li>
+              <li>
+                <span class="heading"></span>
+                <span class="server-entity-value"></span>
               </li>
             </ul>
           </div>
@@ -79,7 +83,7 @@
                     />
                   </svg>
                   <span>{{stepsCompleted}} Steps Completed</span>
-                  <span *ngIf="true"><a
+                  <span *ngIf="migrationIsInPreview"><a
                     data-cy="show-preview"
                     class="preview-link"
                     >Click to Preview</a>

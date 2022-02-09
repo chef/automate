@@ -18,7 +18,7 @@ chef-page-header {
     padding: 0 1em;
 
     &.first {
-      width: 40%;
+      width: 39%;
 
       .heading {
         display: inline-block;
@@ -32,7 +32,7 @@ chef-page-header {
     }
 
     &.middle {
-      width: 45%;
+      width: 46%;
 
       .heading {
         display: inline-block;
@@ -95,7 +95,7 @@ chef-page-header {
 
     .sync-button {
       float: right;
-      margin-bottom: -16px;
+      margin-bottom: 62px;
 
       .img-inline {
         width: 17px;
@@ -284,26 +284,11 @@ img {
 .status-icon-completed {
   position: absolute;
   margin-top: 0px;
-
-  // &::before {
-  //   font-family: "Material Icons";
-  //   content: "\E86C";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
-  //   color: #3864F1;
-  //   padding-right: 0.5em;
-  //   font-size: 17px;
-  // }
 }
+
 .status-icon-failed {
   position: absolute;
   margin-top: 0px;
-
-  // &::before {
-  //   font-family: "Material Icons";
-  //   content: "\e000";  // circle-check icon - https://material.io/resources/icons/?icon=check_circle&style=baseline
-  //   color: #E0408A;
-  //   padding-right: 0.5em;
-  //   font-size: 17px;
-  // }
 }
 
 .preview-link {
@@ -316,4 +301,8 @@ img {
   top: 280.766px;
   font-size: 10px;
   color: #ba1e6a;
+}
+
+.chef-server-info-text {
+  margin-left: 14px;
 }
