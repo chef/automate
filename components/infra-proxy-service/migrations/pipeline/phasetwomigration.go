@@ -146,6 +146,7 @@ func populateMembersPolicy(result <-chan PipelineData) <-chan PipelineData {
 
 func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineProcessor) {
 	log.Info("Pipeline started...")
+
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -157,6 +158,7 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 
 	}()
 	
+
 }
 
 func SetupPhaseTwoPipeline() PhaseTwoPipleine {
