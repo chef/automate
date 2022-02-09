@@ -3,10 +3,20 @@ package pipeline
 import (
 	"context"
 	"fmt"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
+)
+
+var (
+	Storage storage.Storage
+	Mig     storage.MigrationStorage
 )
 
 type PipelineData struct {
-	Result Result
+	Result pipeline.Result
 	Done   chan<- error
 	Ctx    context.Context
 }
@@ -189,7 +199,7 @@ func adminUsers(result <-chan PipelineData) <-chan PipelineData {
 
 func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProcessor) {
 	fmt.Println("Pipeline started...")
-
+	status := make(chan string)
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -198,7 +208,9 @@ func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProc
 		for s := range source {
 			s.Done <- nil
 		}
+		status <- "Done"
 	}()
+	<-status
 }
 
 func SetupPhaseOnePipeline() PhaseOnePipleine {
@@ -214,7 +226,8 @@ func SetupPhaseOnePipeline() PhaseOnePipleine {
 	return PhaseOnePipleine{in: c}
 }
 
-func (p *PhaseOnePipleine) Run(result Result) {
+func (p *PhaseOnePipleine) Run(result pipeline.Result) {
+	status := make(chan string)
 	go func() {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -224,8 +237,25 @@ func (p *PhaseOnePipleine) Run(result Result) {
 		}
 		err := <-done
 		if err != nil {
-			fmt.Println("received error")
+			MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+			log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
 		}
-		fmt.Println("received done")
+		log.Println("received done")
+		status <- "Done"
 	}()
+	<-status
+}
+
+func MigrationError(err error, st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {
+	_, err = st.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
+	if err != nil {
+		log.Errorf("received error while updating for migration id %s: %s", migrationId, err)
+	}
+}
+
+func MigrationSuccess(st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {
+	_, err := st.CompleteMigration(ctx, migrationId, serviceId, 0, 0, 0)
+	if err != nil {
+		log.Errorf("received error while updating for migration id %s: %s", migrationId, err)
+	}
 }
