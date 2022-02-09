@@ -12,8 +12,6 @@ import (
 	"path/filepath"
 
 	"github.com/chef/automate/api/interservice/authz"
-
-	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 
 	"github.com/chef/automate/components/infra-proxy-service/storage"
