@@ -13,31 +13,31 @@ import (
 	reflect "reflect"
 )
 
-// MockInfraProxyMigrationClient is a mock of InfraProxyMigrationClient interface
-type MockInfraProxyMigrationClient struct {
+// MockInfraProxyMigrationServiceClient is a mock of InfraProxyMigrationServiceClient interface
+type MockInfraProxyMigrationServiceClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockInfraProxyMigrationClientMockRecorder
+	recorder *MockInfraProxyMigrationServiceClientMockRecorder
 }
 
-// MockInfraProxyMigrationClientMockRecorder is the mock recorder for MockInfraProxyMigrationClient
-type MockInfraProxyMigrationClientMockRecorder struct {
-	mock *MockInfraProxyMigrationClient
+// MockInfraProxyMigrationServiceClientMockRecorder is the mock recorder for MockInfraProxyMigrationServiceClient
+type MockInfraProxyMigrationServiceClientMockRecorder struct {
+	mock *MockInfraProxyMigrationServiceClient
 }
 
-// NewMockInfraProxyMigrationClient creates a new mock instance
-func NewMockInfraProxyMigrationClient(ctrl *gomock.Controller) *MockInfraProxyMigrationClient {
-	mock := &MockInfraProxyMigrationClient{ctrl: ctrl}
-	mock.recorder = &MockInfraProxyMigrationClientMockRecorder{mock}
+// NewMockInfraProxyMigrationServiceClient creates a new mock instance
+func NewMockInfraProxyMigrationServiceClient(ctrl *gomock.Controller) *MockInfraProxyMigrationServiceClient {
+	mock := &MockInfraProxyMigrationServiceClient{ctrl: ctrl}
+	mock.recorder = &MockInfraProxyMigrationServiceClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockInfraProxyMigrationClient) EXPECT() *MockInfraProxyMigrationClientMockRecorder {
+func (m *MockInfraProxyMigrationServiceClient) EXPECT() *MockInfraProxyMigrationServiceClientMockRecorder {
 	return m.recorder
 }
 
 // GetMigrationStatus mocks base method
-func (m *MockInfraProxyMigrationClient) GetMigrationStatus(ctx context.Context, in *request.GetMigrationStatusRequest, opts ...grpc.CallOption) (*response.GetMigrationStatusResponse, error) {
+func (m *MockInfraProxyMigrationServiceClient) GetMigrationStatus(ctx context.Context, in *request.GetMigrationStatusRequest, opts ...grpc.CallOption) (*response.GetMigrationStatusResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -50,14 +50,14 @@ func (m *MockInfraProxyMigrationClient) GetMigrationStatus(ctx context.Context, 
 }
 
 // GetMigrationStatus indicates an expected call of GetMigrationStatus
-func (mr *MockInfraProxyMigrationClientMockRecorder) GetMigrationStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceClientMockRecorder) GetMigrationStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMigrationStatus", reflect.TypeOf((*MockInfraProxyMigrationClient)(nil).GetMigrationStatus), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMigrationStatus", reflect.TypeOf((*MockInfraProxyMigrationServiceClient)(nil).GetMigrationStatus), varargs...)
 }
 
 // CancelMigration mocks base method
-func (m *MockInfraProxyMigrationClient) CancelMigration(ctx context.Context, in *request.CancelMigrationRequest, opts ...grpc.CallOption) (*response.CancelMigrationResponse, error) {
+func (m *MockInfraProxyMigrationServiceClient) CancelMigration(ctx context.Context, in *request.CancelMigrationRequest, opts ...grpc.CallOption) (*response.CancelMigrationResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -70,14 +70,14 @@ func (m *MockInfraProxyMigrationClient) CancelMigration(ctx context.Context, in 
 }
 
 // CancelMigration indicates an expected call of CancelMigration
-func (mr *MockInfraProxyMigrationClientMockRecorder) CancelMigration(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceClientMockRecorder) CancelMigration(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelMigration", reflect.TypeOf((*MockInfraProxyMigrationClient)(nil).CancelMigration), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelMigration", reflect.TypeOf((*MockInfraProxyMigrationServiceClient)(nil).CancelMigration), varargs...)
 }
 
 // GetStagedData mocks base method
-func (m *MockInfraProxyMigrationClient) GetStagedData(ctx context.Context, in *request.GetStagedDataRequest, opts ...grpc.CallOption) (*response.GetStagedDataResponse, error) {
+func (m *MockInfraProxyMigrationServiceClient) GetStagedData(ctx context.Context, in *request.GetStagedDataRequest, opts ...grpc.CallOption) (*response.GetStagedDataResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -90,14 +90,14 @@ func (m *MockInfraProxyMigrationClient) GetStagedData(ctx context.Context, in *r
 }
 
 // GetStagedData indicates an expected call of GetStagedData
-func (mr *MockInfraProxyMigrationClientMockRecorder) GetStagedData(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceClientMockRecorder) GetStagedData(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStagedData", reflect.TypeOf((*MockInfraProxyMigrationClient)(nil).GetStagedData), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStagedData", reflect.TypeOf((*MockInfraProxyMigrationServiceClient)(nil).GetStagedData), varargs...)
 }
 
 // ConfirmPreview mocks base method
-func (m *MockInfraProxyMigrationClient) ConfirmPreview(ctx context.Context, in *request.ConfirmPreview, opts ...grpc.CallOption) (*response.ConfirmPreview, error) {
+func (m *MockInfraProxyMigrationServiceClient) ConfirmPreview(ctx context.Context, in *request.ConfirmPreview, opts ...grpc.CallOption) (*response.ConfirmPreview, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
@@ -110,37 +110,37 @@ func (m *MockInfraProxyMigrationClient) ConfirmPreview(ctx context.Context, in *
 }
 
 // ConfirmPreview indicates an expected call of ConfirmPreview
-func (mr *MockInfraProxyMigrationClientMockRecorder) ConfirmPreview(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceClientMockRecorder) ConfirmPreview(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConfirmPreview", reflect.TypeOf((*MockInfraProxyMigrationClient)(nil).ConfirmPreview), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConfirmPreview", reflect.TypeOf((*MockInfraProxyMigrationServiceClient)(nil).ConfirmPreview), varargs...)
 }
 
-// MockInfraProxyMigrationServer is a mock of InfraProxyMigrationServer interface
-type MockInfraProxyMigrationServer struct {
+// MockInfraProxyMigrationServiceServer is a mock of InfraProxyMigrationServiceServer interface
+type MockInfraProxyMigrationServiceServer struct {
 	ctrl     *gomock.Controller
-	recorder *MockInfraProxyMigrationServerMockRecorder
+	recorder *MockInfraProxyMigrationServiceServerMockRecorder
 }
 
-// MockInfraProxyMigrationServerMockRecorder is the mock recorder for MockInfraProxyMigrationServer
-type MockInfraProxyMigrationServerMockRecorder struct {
-	mock *MockInfraProxyMigrationServer
+// MockInfraProxyMigrationServiceServerMockRecorder is the mock recorder for MockInfraProxyMigrationServiceServer
+type MockInfraProxyMigrationServiceServerMockRecorder struct {
+	mock *MockInfraProxyMigrationServiceServer
 }
 
-// NewMockInfraProxyMigrationServer creates a new mock instance
-func NewMockInfraProxyMigrationServer(ctrl *gomock.Controller) *MockInfraProxyMigrationServer {
-	mock := &MockInfraProxyMigrationServer{ctrl: ctrl}
-	mock.recorder = &MockInfraProxyMigrationServerMockRecorder{mock}
+// NewMockInfraProxyMigrationServiceServer creates a new mock instance
+func NewMockInfraProxyMigrationServiceServer(ctrl *gomock.Controller) *MockInfraProxyMigrationServiceServer {
+	mock := &MockInfraProxyMigrationServiceServer{ctrl: ctrl}
+	mock.recorder = &MockInfraProxyMigrationServiceServerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockInfraProxyMigrationServer) EXPECT() *MockInfraProxyMigrationServerMockRecorder {
+func (m *MockInfraProxyMigrationServiceServer) EXPECT() *MockInfraProxyMigrationServiceServerMockRecorder {
 	return m.recorder
 }
 
 // GetMigrationStatus mocks base method
-func (m *MockInfraProxyMigrationServer) GetMigrationStatus(arg0 context.Context, arg1 *request.GetMigrationStatusRequest) (*response.GetMigrationStatusResponse, error) {
+func (m *MockInfraProxyMigrationServiceServer) GetMigrationStatus(arg0 context.Context, arg1 *request.GetMigrationStatusRequest) (*response.GetMigrationStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMigrationStatus", arg0, arg1)
 	ret0, _ := ret[0].(*response.GetMigrationStatusResponse)
@@ -149,13 +149,13 @@ func (m *MockInfraProxyMigrationServer) GetMigrationStatus(arg0 context.Context,
 }
 
 // GetMigrationStatus indicates an expected call of GetMigrationStatus
-func (mr *MockInfraProxyMigrationServerMockRecorder) GetMigrationStatus(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceServerMockRecorder) GetMigrationStatus(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMigrationStatus", reflect.TypeOf((*MockInfraProxyMigrationServer)(nil).GetMigrationStatus), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMigrationStatus", reflect.TypeOf((*MockInfraProxyMigrationServiceServer)(nil).GetMigrationStatus), arg0, arg1)
 }
 
 // CancelMigration mocks base method
-func (m *MockInfraProxyMigrationServer) CancelMigration(arg0 context.Context, arg1 *request.CancelMigrationRequest) (*response.CancelMigrationResponse, error) {
+func (m *MockInfraProxyMigrationServiceServer) CancelMigration(arg0 context.Context, arg1 *request.CancelMigrationRequest) (*response.CancelMigrationResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CancelMigration", arg0, arg1)
 	ret0, _ := ret[0].(*response.CancelMigrationResponse)
@@ -164,13 +164,13 @@ func (m *MockInfraProxyMigrationServer) CancelMigration(arg0 context.Context, ar
 }
 
 // CancelMigration indicates an expected call of CancelMigration
-func (mr *MockInfraProxyMigrationServerMockRecorder) CancelMigration(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceServerMockRecorder) CancelMigration(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelMigration", reflect.TypeOf((*MockInfraProxyMigrationServer)(nil).CancelMigration), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelMigration", reflect.TypeOf((*MockInfraProxyMigrationServiceServer)(nil).CancelMigration), arg0, arg1)
 }
 
 // GetStagedData mocks base method
-func (m *MockInfraProxyMigrationServer) GetStagedData(arg0 context.Context, arg1 *request.GetStagedDataRequest) (*response.GetStagedDataResponse, error) {
+func (m *MockInfraProxyMigrationServiceServer) GetStagedData(arg0 context.Context, arg1 *request.GetStagedDataRequest) (*response.GetStagedDataResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStagedData", arg0, arg1)
 	ret0, _ := ret[0].(*response.GetStagedDataResponse)
@@ -179,13 +179,13 @@ func (m *MockInfraProxyMigrationServer) GetStagedData(arg0 context.Context, arg1
 }
 
 // GetStagedData indicates an expected call of GetStagedData
-func (mr *MockInfraProxyMigrationServerMockRecorder) GetStagedData(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceServerMockRecorder) GetStagedData(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStagedData", reflect.TypeOf((*MockInfraProxyMigrationServer)(nil).GetStagedData), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStagedData", reflect.TypeOf((*MockInfraProxyMigrationServiceServer)(nil).GetStagedData), arg0, arg1)
 }
 
 // ConfirmPreview mocks base method
-func (m *MockInfraProxyMigrationServer) ConfirmPreview(arg0 context.Context, arg1 *request.ConfirmPreview) (*response.ConfirmPreview, error) {
+func (m *MockInfraProxyMigrationServiceServer) ConfirmPreview(arg0 context.Context, arg1 *request.ConfirmPreview) (*response.ConfirmPreview, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConfirmPreview", arg0, arg1)
 	ret0, _ := ret[0].(*response.ConfirmPreview)
@@ -194,7 +194,7 @@ func (m *MockInfraProxyMigrationServer) ConfirmPreview(arg0 context.Context, arg
 }
 
 // ConfirmPreview indicates an expected call of ConfirmPreview
-func (mr *MockInfraProxyMigrationServerMockRecorder) ConfirmPreview(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockInfraProxyMigrationServiceServerMockRecorder) ConfirmPreview(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConfirmPreview", reflect.TypeOf((*MockInfraProxyMigrationServer)(nil).ConfirmPreview), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConfirmPreview", reflect.TypeOf((*MockInfraProxyMigrationServiceServer)(nil).ConfirmPreview), arg0, arg1)
 }

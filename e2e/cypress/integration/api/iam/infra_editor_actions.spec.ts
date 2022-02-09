@@ -198,7 +198,7 @@ describe('Infra Editor Policy', () => {
             assert.equal(resp.status, 403);
         });
     });
-  
+
     it('create infra server post returns 403 when infraServers create actions is denied', () => {
         cy.request({
             headers: { 'api-token': withInfraEditorActionToken },
@@ -239,5 +239,5 @@ describe('Infra Editor Policy', () => {
         }).then((resp) => {
             assert.equal(resp.status, 403);
         });
-    })
+    });
 });

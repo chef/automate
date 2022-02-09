@@ -7,7 +7,9 @@ import {
   OrgsSuccessPayload,
   OrgSuccessPayload,
   CreateOrgPayload,
-  UploadSuccessPayload
+  UploadSuccessPayload,
+  CancelSuccessPayload,
+  PreviewSuccessPayload
 } from './org.actions';
 
 @Injectable()
@@ -42,5 +44,16 @@ export class OrgRequests {
   public uploadZip(formData: FormData): Observable<UploadSuccessPayload> {
     return this.http.post<UploadSuccessPayload>
     (`${env.infra_proxy_url}/servers/migrations/upload`, formData);
+  }
+
+  public cancelMigration(server_id: string, migration_id: string)
+    : Observable<CancelSuccessPayload> {
+    return this.http.get<CancelSuccessPayload>(
+      `${env.infra_proxy_url}/servers/${server_id}/migrations/cancel_migration/${migration_id}`);
+  }
+
+  public getPreviewData(migration_id: string): Observable<PreviewSuccessPayload> {
+    return this.http.get<PreviewSuccessPayload>(`
+    ${env.infra_proxy_url}/servers/migrations/staged_data/${migration_id}`);
   }
 }
