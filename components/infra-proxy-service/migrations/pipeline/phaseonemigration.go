@@ -39,7 +39,11 @@ func unzip(result <-chan PipelineData) <-chan PipelineData {
 	go func() {
 
 		for res := range result {
-			res.Result.Meta.UnzipFolder = "backup"
+			result, err := Unzip(res.Ctx, Mig, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -67,6 +71,11 @@ func parseOrg(result <-chan PipelineData) <-chan PipelineData {
 	go func() {
 		log.Info("Processing to parse orgs...")
 		for res := range result {
+			result, err := ParseOrgs(res.Ctx, Storage, Mig, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
