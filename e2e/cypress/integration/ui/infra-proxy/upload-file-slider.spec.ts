@@ -4,8 +4,7 @@ describe('chef server details', () => {
   const cypressPrefix = 'infra';
   const serverName = `${cypressPrefix} server ${now}`;
   const serverID = serverName.split(' ').join('-');
-  const serverFQDN = 'https://ec2-18-117-112-129.us-east-2.compute.amazonaws.com';
-  const serverIP = '18-117-112-129';
+  const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
   const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
 
   before(() => {
@@ -21,7 +20,7 @@ describe('chef server details', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP,
+          ip_address: '',
           webui_key: webuiKey
         }
       });

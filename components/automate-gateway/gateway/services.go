@@ -329,7 +329,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
 
-	pb_infra_proxy_migrations.RegisterInfraProxyMigrationServer(grpcServer, handler_infra_proxy_migration.NewInfraProxyMigrationHandler(infraProxyMigrationClient))
+	pb_infra_proxy_migrations.RegisterInfraProxyMigrationServiceServer(grpcServer, handler_infra_proxy_migration.NewInfraProxyMigrationHandler(infraProxyMigrationClient))
 
 	userSettingsClient, err := clients.UserSettingsClient()
 	if err != nil {
@@ -384,7 +384,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"data-lifecycle":           pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
 		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
 		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
-		"infra-proxy-migrations":   pb_infra_proxy_migrations.RegisterInfraProxyMigrationHandlerFromEndpoint,
+		"infra-proxy-migrations":   pb_infra_proxy_migrations.RegisterInfraProxyMigrationServiceHandlerFromEndpoint,
 		"user-settings":            pb_user_settings.RegisterUserSettingsServiceHandlerFromEndpoint,
 	})
 }
@@ -1020,7 +1020,7 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := infra_proxy.UploadZipFileRequest{
+	request := infra_proxy.UploadFileRequest{
 		ServerId: serverId,
 		Meta: &infra_proxy.Metadata{
 			ContentType: cType,
@@ -1054,7 +1054,7 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 			log.Fatal("cannot read chunk to buffer: ", err)
 		}
 
-		request := infra_proxy.UploadZipFileRequest{
+		request := infra_proxy.UploadFileRequest{
 			ServerId: serverId,
 			Chunk:    &infra_proxy.Chunk{Data: buffer[:n]},
 			Meta: &infra_proxy.Metadata{
