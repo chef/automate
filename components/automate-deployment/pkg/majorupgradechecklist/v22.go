@@ -1,7 +1,10 @@
 package majorupgradechecklist
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -25,7 +28,9 @@ const (
 		 This should return: Automate is up-to-date`
 
 	run_pg_data_migrate = `Migrate Data from PG 9.6 to PG 13.5 using this command: 
-		   $ chef-automate post-major-upgrade migrate --pg-data`
+		   $ ` + run_pg_data_migrate_cmd
+
+	run_pg_data_migrate_cmd = `chef-automate post-major-upgrade migrate --data=pg`
 
 	run_chef_automate_status = `Check all services are running using: 
 		   $ chef-automate status`
@@ -33,30 +38,48 @@ const (
 	check_ui = `Check Automate UI everything is running and all data is visible.`
 
 	run_pg_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running: 
-		   $ chef-automate post-major-upgrade clear-data --pg-data`
+		   $ ` + run_pg_data_cleanup_cmd
 
+	run_pg_data_cleanup_cmd         = `chef-automate post-major-upgrade clear-data --pg-data`
 	v22_post_checklist_confirmation = `*In case of any errors, please refer to docs.chef.io and release notes for this version.*
 	Now, upgrade will start, Please confirm to continue...`
 )
 
-type V22ChecklistInspector struct {
+var postChecklist = []PostCheckList{
+	{
+		Msg:        run_pg_data_migrate,
+		Cmd:        run_pg_data_migrate_cmd,
+		IsExecuted: false,
+	}, {
+		Msg:        run_pg_data_cleanup,
+		Cmd:        run_pg_data_cleanup_cmd,
+		IsExecuted: false,
+	},
+}
+
+type V22ChecklistManager struct {
 	writer  cli.FormatWriter
 	version string
 }
 
-func NewV22ChecklistInspector(writer cli.FormatWriter, version string) *V22ChecklistInspector {
-	return &V22ChecklistInspector{
+func NewV22ChecklistManager(writer cli.FormatWriter, version string) *V22ChecklistManager {
+	return &V22ChecklistManager{
 		writer:  writer,
 		version: version,
 	}
 }
-
-func (ci *V22ChecklistInspector) RunChecklist() error {
-	checklists := []Checklist{
+func prechecklist() []Checklist {
+	return []Checklist{
 		downTimeCheck(),
 		backupCheck(),
-		v22PostChecklist(),
 	}
+}
+
+func (ci *V22ChecklistManager) RunChecklist() error {
+
+	checklists := []Checklist{}
+	checklists = append(checklists, prechecklist()...)
+	checklists = append(checklists, ci.showPostChecklist(), promptUpgradeContinue())
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
@@ -75,12 +98,20 @@ func (ci *V22ChecklistInspector) RunChecklist() error {
 	return nil
 }
 
-func (ci *V22ChecklistInspector) GetPostChecklists() ([]string, error) {
-	return getPostChecklist(), nil
-}
+func (ci *V22ChecklistManager) showPostChecklist() Checklist {
+	return Checklist{
+		Name:        "Show_Post_Checklist",
+		Description: "Show Post Checklist",
+		TestFunc: func(h ChecklistHelper) error {
+			for _, item := range postChecklist {
+				if !item.IsExecuted {
+					h.Writer.Println(item.Msg)
+				}
+			}
+			return nil
+		},
+	}
 
-func getPostChecklist() []string {
-	return []string{run_chef_automate_upgrade_status, run_pg_data_migrate, run_chef_automate_status, check_ui, run_pg_data_cleanup}
 }
 
 func downTimeCheck() Checklist {
@@ -121,15 +152,11 @@ func backupCheck() Checklist {
 	}
 }
 
-func v22PostChecklist() Checklist {
+func promptUpgradeContinue() Checklist {
 	return Checklist{
 		Name:        "post_checklist",
 		Description: "display post checklist and ask for final confirmation",
 		TestFunc: func(h ChecklistHelper) error {
-			h.Writer.Title("Post Upgrade Steps:")
-			for _, item := range getPostChecklist() {
-				h.Writer.Println(item)
-			}
 			resp, err := h.Writer.Confirm(v22_post_checklist_confirmation)
 			if err != nil {
 				h.Writer.Error(err.Error())
@@ -143,3 +170,22 @@ func v22PostChecklist() Checklist {
 		},
 	}
 }
+
+func (ci *V22ChecklistManager) CreateJsonFile() error {
+	params := PerPostChecklist{}
+	params.PostChecklist = append(params.PostChecklist, postChecklist...)
+	var buffer bytes.Buffer
+	data, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+	buffer.Write(data)
+	buffer.WriteString("\n")
+	err = ioutil.WriteFile("test.json", buffer.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// read and update the json file
