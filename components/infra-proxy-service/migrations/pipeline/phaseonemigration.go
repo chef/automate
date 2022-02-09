@@ -238,7 +238,7 @@ func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 		err := <-done
 		if err != nil {
 			MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
-			log.Errorf("received error for migration id %s: %s", result.Meta.MigrationID, err)
+			log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
 		}
 		log.Println("received done")
 		status <- "Done"
@@ -249,13 +249,13 @@ func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 func MigrationError(err error, st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {
 	_, err = st.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	if err != nil {
-		log.Errorf("received error for migration id %s: %s", migrationId, err)
+		log.Errorf("received error while updating for migration id %s: %s", migrationId, err)
 	}
 }
 
 func MigrationSuccess(st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {
 	_, err := st.CompleteMigration(ctx, migrationId, serviceId, 0, 0, 0)
 	if err != nil {
-		log.Errorf("received error for migration id %s: %s", migrationId, err)
+		log.Errorf("received error while updating for migration id %s: %s", migrationId, err)
 	}
 }
