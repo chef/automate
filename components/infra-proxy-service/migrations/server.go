@@ -8,13 +8,17 @@ import (
 type MigrationServer struct {
 	service          *service.Service
 	phaseOnePipeline pipeline.PhaseOnePipleine
+	phaseTwoPipeline pipeline.PhaseTwoPipleine
 }
 
 // NewMigrationServer returns an infra-proxy migration server
 func NewMigrationServer(service *service.Service) *MigrationServer {
-	c := pipeline.SetupPhaseOnePipeline()
+	phaseOnePipeline := pipeline.SetupPhaseOnePipeline()
+	phaseTwoPipeline := pipeline.SetupPhaseTwoPipeline()
+
 	return &MigrationServer{
 		service:          service,
-		phaseOnePipeline: c,
+		phaseOnePipeline: phaseOnePipeline,
+		phaseTwoPipeline: phaseTwoPipeline,
 	}
 }
