@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
@@ -27,19 +28,19 @@ type PhaseOnePipleine struct {
 type PhaseOnePipelineProcessor func(<-chan PipelineData) <-chan PipelineData
 
 // ParseOrg returns PhaseOnePipelineProcessor
-func UnzipSrc() PhaseOnePipelineProcessor {
+func UnzipSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return unzip(result)
+		return unzip(result, service)
 	}
 }
 
-func unzip(result <-chan PipelineData) <-chan PipelineData {
+func unzip(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting unzip pipeline")
 	out := make(chan PipelineData, 100)
 	go func() {
 
 		for res := range result {
-			result, err := Unzip(res.Ctx, Mig, res.Result)
+			result, err := Unzip(res.Ctx, service.Migration, res.Result)
 			if err != nil {
 				return
 			}
@@ -218,10 +219,10 @@ func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProc
 	}()
 }
 
-func SetupPhaseOnePipeline() PhaseOnePipleine {
+func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 	c := make(chan PipelineData, 100)
 	migrationPipeline(c,
-		UnzipSrc(),
+		UnzipSrc(service),
 		ParseOrg(),
 		ParseUser(),
 		ConflictingUsers(),
