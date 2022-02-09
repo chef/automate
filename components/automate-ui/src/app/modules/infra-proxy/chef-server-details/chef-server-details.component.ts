@@ -262,6 +262,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.migrationStarted = true;
         this.getMigrationStatus(this.migration_id);
       }
+      this.migration_id = this.server.migration_id;
     });
 
     combineLatest([
@@ -610,5 +611,28 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       migration_id: migrationID
     };
     this.store.dispatch(new ConfirmPreview(payload));
+  }
+
+  // cancel migration function
+  public cancelMigration(migration_id: string): void {
+    console.log('migrationId', migration_id);
+    const payload = {
+      server_id : this.server.id,
+      migration_id : migration_id
+    };
+    this.store.dispatch(new CancelMigration(payload));
+  }
+
+  // get migraion preview function
+  public getPreviewData() {
+    const payload = {
+      // migration_id: this.migration_id
+      migration_id: '1234'
+    };
+    this.store.dispatch(new GetPreviewData(payload));
+  }
+
+  public migrationPreview() {
+    console.log();
   }
 }

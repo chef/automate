@@ -7,14 +7,10 @@ import {
   OrgsSuccessPayload,
   OrgSuccessPayload,
   CreateOrgPayload,
-<<<<<<< HEAD
   UploadSuccessPayload,
   CancelSuccessPayload,
   PreviewSuccessPayload,
   ConfirmSuccessPayload
-=======
-  UploadSuccessPayload
->>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 } from './org.actions';
 
 @Injectable()
@@ -50,7 +46,6 @@ export class OrgRequests {
     return this.http.post<UploadSuccessPayload>
     (`${env.infra_proxy_url}/servers/migrations/upload`, formData);
   }
-<<<<<<< HEAD
 
   public cancelMigration(server_id: string, migration_id: string)
     : Observable<CancelSuccessPayload> {
@@ -68,6 +63,4 @@ export class OrgRequests {
     return this.http.get<ConfirmSuccessPayload>(
       `${env.infra_proxy_url}/servers/${server_id}/migrations/confirm_preview/${migration_id}`);
   }
-=======
->>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
 }

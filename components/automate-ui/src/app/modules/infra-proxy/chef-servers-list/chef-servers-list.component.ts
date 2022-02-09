@@ -70,13 +70,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       ]]
     });
     this.webUIKeyForm = this.fb.group({
-<<<<<<< HEAD
       webui_key: ['', [Validators.required]]
-=======
-      webui_key: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK)
-      ]]
->>>>>>> d8e13829d (WebUI key into add chef-server slider (#6357))
     });
   }
 

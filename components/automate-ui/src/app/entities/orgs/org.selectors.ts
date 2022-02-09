@@ -55,7 +55,6 @@ export const uploadDetails = createSelector(
   orgState,
   (state) => state.uploadDetails
 );
-<<<<<<< HEAD
 
 export const cancelStatus = createSelector(
   orgState,
@@ -76,5 +75,3 @@ export const confirmPreviewStatus = createSelector(
   orgState,
   (state) => state.confirmPreviewStatus
 );
-=======
->>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))

@@ -163,7 +163,6 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 		}
 
 	}()
-
 }
 
 func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipleine {

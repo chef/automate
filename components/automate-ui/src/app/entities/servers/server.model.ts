@@ -5,7 +5,6 @@ export interface Server {
   ip_address: string;
   orgs_count?: number;
   webui_key?: string;
-<<<<<<< HEAD
   migration_id?: string;
   migration_type?: string;
   migration_status?: string;
@@ -30,8 +29,6 @@ export interface MigrationStatus {
   migration_id: string;
   migration_type: string;
   migration_status: string;
-=======
->>>>>>> d8e13829d (WebUI key into add chef-server slider (#6357))
 }
 
 export interface User {

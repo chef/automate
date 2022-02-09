@@ -7,11 +7,12 @@ import (
 	"fmt"
 
 	"errors"
-	"github.com/chef/automate/api/interservice/local_user"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/chef/automate/api/interservice/local_user"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"

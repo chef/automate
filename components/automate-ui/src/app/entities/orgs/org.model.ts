@@ -9,7 +9,6 @@ export interface Org {
 export interface UploadFile {
   formData: FormData;
 }
-<<<<<<< HEAD
 
 export interface PreviewData {
   migration_id: string;
@@ -34,5 +33,3 @@ export interface User {
   is_conflicting: boolean;
   is_admin: boolean;
 }
-=======
->>>>>>> d5e176b0b (Stalwart 32 upload slider functionality (#6654))
