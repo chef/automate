@@ -24,4 +24,115 @@
       margin-left: 0;
     }
   }
+
+  .sidenav-body {
+    .meta-box {
+      border: 0.5px solid $chef-key-tab;
+      border-radius: 4px;
+      margin-bottom: 1.5em;
+      padding: 1em 2em 1em;
+      background: $chef-white;
+
+      h3 {
+        font-size: 18px;
+        line-height: 27px;
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
+
+      .meta-wrapper {
+        display: flex;
+
+        .summary-body {
+          width: 50%;
+          font-size: 13px;
+
+          p {
+            height: 6vh;
+
+            .heading {
+              font-weight: bold;
+            }
+          }
+
+          ul {
+            color: $chef-primary-dark;
+            list-style: none;
+            padding: 0;
+
+            li {
+              display: flex;
+              margin-bottom: 5px;
+
+              span {
+                font-size: 13px;
+                line-height: 21px;
+                letter-spacing: 0.2px;
+
+                &:first-child {
+                  width: 50%;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    #migration-table-container {
+      margin-bottom: 6vh;
+
+      .no-border {
+        background-color: $chef-white;
+      }
+
+      chef-td {
+        padding: 6px 14px;
+      }
+
+      .first {
+        width: 5%;
+      }
+
+      .middle {
+        width: 30%;
+
+        input[type="text"] {
+          height: 35px;
+
+          &:disabled {
+            opacity: 0.5;
+            background-color: $chef-grey;
+            border: none;
+          }
+        }
+      }
+    }
+
+    .warning-msg {
+      margin-bottom: 0;
+      line-height: 21px;
+      letter-spacing: 0.2px;
+
+      &::before {
+        display: inline-block;
+        content: '';
+        background: url('/assets/img/warning.png');
+        width: 11px;
+        height: 13.5px;
+        background-size: 11px 13.5px;
+        margin-right: 7px;
+      }
+    }
+
+    ::ng-deep chef-checkbox .check-wrap {
+      min-width: 15px;
+      width: 15px;
+      height: 15px;
+    }
+
+    #button-bar {
+      text-align: right;
+    }
+  }
 }

@@ -90,7 +90,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	}
 	log.Info("File successfully saved in the directory for the requested file for migration id: ", migrationId)
 
-	res := &response.UploadZipFileResponse{
+	res := &response.UploadFileResponse{
 		MigrationId: migrationId,
 		Success:     true,
 	}
@@ -168,7 +168,7 @@ func createMigrationId() (string, error) {
 }
 
 //handleErrorForUploadFileAndMigration handles the error for the file upload
-func handleErrorForUploadFileAndMigration(err error, migrationId string, serviceId string, s *MigrationServer, ctx context.Context) *response.UploadZipFileResponse {
+func handleErrorForUploadFileAndMigration(err error, migrationId string, serviceId string, s *MigrationServer, ctx context.Context) *response.UploadFileResponse {
 	response := createResponseWithErrors(err, migrationId)
 	_, _ = s.service.Migration.FailedFileUpload(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	//ToDo to add the Failed migration status as well
@@ -178,9 +178,9 @@ func handleErrorForUploadFileAndMigration(err error, migrationId string, service
 }
 
 //createResponseWithErrors created a response with errors
-func createResponseWithErrors(err error, migrationId string) *response.UploadZipFileResponse {
+func createResponseWithErrors(err error, migrationId string) *response.UploadFileResponse {
 	errors := []string{err.Error()}
-	return &response.UploadZipFileResponse{
+	return &response.UploadFileResponse{
 		Success:     false,
 		MigrationId: migrationId,
 		Errors:      errors,
@@ -189,16 +189,6 @@ func createResponseWithErrors(err error, migrationId string) *response.UploadZip
 
 // CancelMigration cancle the ongoing migration
 func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.CancelMigrationRequest) (*response.CancelMigrationResponse, error) {
-	// Validate all request fields are required
-	err := validation.New(validation.Options{
-		Target:          "server",
-		Request:         *req,
-		RequiredDefault: true,
-	}).Validate()
-
-	if err != nil {
-		return nil, err
-	}
 
 	// Cancellation is allowed for a running pipeline only if the parsing is done but the data commitment is yet to be performed
 	currentMigrationPhase, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)

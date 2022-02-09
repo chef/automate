@@ -1,4 +1,5 @@
 <div data-cy="migration-slider" ngClass="{slide : isSlideOpen1}">
+  <chef-loading-spinner *ngIf="!isPreview" size="50" fixed></chef-loading-spinner>
   <div class="sidenav-header">
     <chef-button class="back-button" secondary (click)="closeMigrationSlider()" data-cy="back-button">
       <chef-icon>arrow_back</chef-icon>
@@ -10,18 +11,89 @@
   </div>
   <div class="sidenav-body">
     <div class="flex-container">
-      <form>
-        <div class="input-margin">
-
+        <div class="meta-box">
+          <h3>You have the option to choose which users to migrate</h3>
+          <div class="meta-wrapper">
+            <div class="summary-body">
+              <p>We have found <span class="heading">Orgs</span> to be migrated, skipped and Updated . </p>
+              <ul>
+                <li>
+                  <span>Migrated Orgs</span>
+                  <span>{{previewData?.orgs_to_migrate}}</span>
+                </li>
+                <li>
+                  <span>Skipped Orgs</span>
+                  <span>{{previewData?.orgs_to_skip}}</span>
+                </li>
+                <li>
+                  <span>Updated Orgs</span>
+                  <span>{{previewData?.orgs_to_update}}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="summary-body">
+              <p>We have found <span class="heading">Users</span> to be migrated.</p>
+              <ul>
+                <li>
+                  <span>Users</span>
+                  <span>{{previewData?.users.length || 0}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <form [formGroup]="migrationForm">
+        <div id="migration-table-container" *ngIf="previewData?.users.length > 0">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="no-border first">
+                  <chef-checkbox (change)="selectedAllUsers($event)"></chef-checkbox>
+                </chef-th>
+                <chef-th class="no-border middle">Chef Server User</chef-th>
+                <chef-th class="no-border middle">Automate User</chef-th>
+                <chef-th class="no-border middle"></chef-th>
+                <chef-th class="no-border last"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let user of previewData.users">
+                <chef-td class="first">
+                  <chef-checkbox (change)="selectedUser($event)" [checked]="checkedUser"></chef-checkbox>
+                </chef-td>
+                <chef-td class="middle">
+                  {{user.username}}
+                </chef-td>
+                <chef-td class="middle">
+                    {{user.automate_username}}
+                </chef-td>
+                <chef-td class="middle">
+                  <input 
+                    *ngIf="(user.connector === 'ldap')"
+                    chefInput
+                    formControlName="name"
+                    type="text"
+                    [(ngModel)]="user.automate_username"
+                    (keyup)="handleNameInput($event)"
+                    [attr.disabled]= "!user.is_conflicting"
+                    autocomplete="off" />
+                </chef-td>
+                <chef-td class="last">
+                  <p class="warning-msg"
+                   *ngIf="(user.connector === 'ldap') && user.is_conflicting">
+                   Warning. User already exists in Automate. This will overwrite this users IAM settings.
+                  </p>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
         </div>
         <div id="button-bar">
-          <chef-button id="cancel-migration-slider" tertiary [disabled]="migrating" (click)="closeMigrationSlider()">
-            Cancel
+          <chef-button id="cancel-migration-slider" tertiary [disabled]="!isPreview" (click)="cancelMigrationclicked()">
+            Cancel Migration
           </chef-button>
-          <chef-button primary data-cy="migration-button" id="migration-button" (click)="migrationFile();">
-            <chef-loading-spinner *ngIf="migrating"></chef-loading-spinner>
-            <span *ngIf="!migrating">Continue</span>
-            <span *ngIf="migrating">Uploading File ...</span>
+          <chef-button primary [disabled]="!isPreview" data-cy="migration-button" id="migration-button" (click)="migrationFile()">
+            <span *ngIf="isPreview">confirm Migration</span>
           </chef-button>
         </div>
       </form>
