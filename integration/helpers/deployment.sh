@@ -206,5 +206,5 @@ download_manifest_version() {
     local version="$1"
     local dst="$3"
 
-    curl "https://packages.chef.io/manifests/$channel/automate/$version.json" > "$dst"
+    curl -k "https://packages.chef.io/manifests/$channel/automate/$version.json" > "$dst"
 }
