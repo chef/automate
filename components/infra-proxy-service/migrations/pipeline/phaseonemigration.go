@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"fmt"
 
 	log "github.com/sirupsen/logrus"
 
@@ -35,7 +34,7 @@ func UnzipSrc() PhaseOnePipelineProcessor {
 }
 
 func unzip(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting unzip pipeline")
+	log.Info("Starting unzip pipeline")
 	out := make(chan PipelineData, 100)
 	go func() {
 
@@ -47,7 +46,7 @@ func unzip(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing unzip")
+		log.Info("Closing unzip")
 		close(out)
 	}()
 	return out
@@ -61,21 +60,21 @@ func ParseOrg() PhaseOnePipelineProcessor {
 }
 
 func parseOrg(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting to parse_orgs pipeline")
+	log.Info("Starting to parse_orgs pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to parse orgs...")
+		log.Info("Processing to parse orgs...")
 		for res := range result {
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
-			fmt.Println("after write")
+			log.Info("after write")
 		}
-		fmt.Println("CLosing parse_orgs pipeline")
+		log.Info("CLosing parse_orgs pipeline")
 		close(out)
 	}()
 	return out
@@ -89,12 +88,12 @@ func ParseUser() PhaseOnePipelineProcessor {
 }
 
 func parseUser(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting to parse_user pipeline")
+	log.Info("Starting to parse_user pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to parse_user...")
+		log.Info("Processing to parse_user...")
 		for res := range result {
 			select {
 			case out <- res:
@@ -102,7 +101,7 @@ func parseUser(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing parse_user")
+		log.Info("Closing parse_user")
 		close(out)
 	}()
 
@@ -117,12 +116,12 @@ func ConflictingUsers() PhaseOnePipelineProcessor {
 }
 
 func conflictingUsers(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting to conflicting_user check pipeline")
+	log.Info("Starting to conflicting_user check pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to conflicting_user users...")
+		log.Info("Processing to conflicting_user users...")
 
 		for res := range result {
 			select {
@@ -131,7 +130,7 @@ func conflictingUsers(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing conflicting_user")
+		log.Info("Closing conflicting_user")
 		close(out)
 
 	}()
@@ -147,12 +146,12 @@ func OrgMembers() PhaseOnePipelineProcessor {
 }
 
 func orgMembers(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting to org_user check pipeline")
+	log.Info("Starting to org_user check pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to check org_user association...")
+		log.Info("Processing to check org_user association...")
 		for res := range result {
 			select {
 			case out <- res:
@@ -160,7 +159,7 @@ func orgMembers(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing org_user association check")
+		log.Info("Closing org_user association check")
 		close(out)
 
 	}()
@@ -176,12 +175,12 @@ func AdminUsers() PhaseOnePipelineProcessor {
 }
 
 func adminUsers(result <-chan PipelineData) <-chan PipelineData {
-	fmt.Println("Starting org admin_users check ")
+	log.Info("Starting org admin_users check ")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		fmt.Println("Processing to to check admin_users...")
+		log.Info("Processing to to check admin_users...")
 		for res := range result {
 			select {
 			case out <- res:
@@ -189,7 +188,7 @@ func adminUsers(result <-chan PipelineData) <-chan PipelineData {
 				res.Done <- nil
 			}
 		}
-		fmt.Println("Closing admin_users")
+		log.Info("Closing admin_users")
 		close(out)
 
 	}()
@@ -198,7 +197,7 @@ func adminUsers(result <-chan PipelineData) <-chan PipelineData {
 }
 
 func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProcessor) {
-	fmt.Println("Pipeline started...")
+	log.Info("Pipeline started...")
 	status := make(chan string)
 	go func() {
 		for _, pipe := range pipes {
@@ -227,23 +226,18 @@ func SetupPhaseOnePipeline() PhaseOnePipleine {
 }
 
 func (p *PhaseOnePipleine) Run(result pipeline.Result) {
-	status := make(chan string)
-	go func() {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-		done := make(chan error)
-		select {
-		case p.in <- PipelineData{Result: result, Done: done, Ctx: ctx}:
-		}
-		err := <-done
-		if err != nil {
-			MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
-			log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
-		}
-		log.Println("received done")
-		status <- "Done"
-	}()
-	<-status
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error)
+	select {
+	case p.in <- PipelineData{Result: result, Done: done, Ctx: ctx}:
+	}
+	err := <-done
+	if err != nil {
+		MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+		log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
+	}
+	log.Info("received done")
 }
 
 func MigrationError(err error, st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {

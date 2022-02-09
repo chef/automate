@@ -89,3 +89,18 @@ func getStagedUser(user *infra_res.User) *gwres.User {
 	stagedUser.IsAdmin = user.IsAdmin
 	return stagedUser
 }
+
+// ConfirmPreview trigger the pipline function
+func (a *InfraProxyMigrationServer) ConfirmPreview(ctx context.Context, r *gwreq.ConfirmPreview) (*gwres.ConfirmPreview, error) {
+	req := &infra_req.ConfirmPreview{
+		MigrationId: r.MigrationId,
+	}
+	res, err := a.migrationClient.ConfirmPreview(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.ConfirmPreview{
+		MigrationId: res.MigrationId,
+	}, nil
+}

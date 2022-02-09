@@ -8,8 +8,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/chef/automate/components/infra-proxy-service/pipeline"
-
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
@@ -32,13 +30,24 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	if err != nil {
 		log.WithError(err).Error("Unable to create migration id")
 		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-		stream.SendAndClose(res)
+		errStream := stream.SendAndClose(res)
+		if errStream != nil {
+			log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+		}
 		return err
 	}
 	log.Info("Starting with migration phase with the upload file for migration id: ", migrationId)
 	_, err = s.service.Migration.StartMigration(ctx, migrationId, serverId)
+	if err != nil {
+		log.Errorf("Unable to insert the migration status Start Migration for  migration id : %s", migrationId)
+		return err
+	}
 	fileData := bytes.Buffer{}
-	s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
+	_, err = s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
+	if err != nil {
+		log.Errorf("Unable to insert the migration status Start File upload for  migration id : %s", migrationId)
+		return err
+	}
 	for {
 		req, err := stream.Recv()
 
@@ -49,7 +58,10 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		if err != nil {
 			log.Errorf("Failed to upload file for migration id %s : %s", migrationId, err.Error())
 			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-			stream.SendAndClose(res)
+			errStream := stream.SendAndClose(res)
+			if errStream != nil {
+				log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+			}
 			return err
 		}
 
@@ -58,7 +70,10 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		if err != nil {
 			log.Errorf("Failed to upload file for migration id %s : %s", migrationId, err.Error())
 			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-			stream.SendAndClose(res)
+			errStream := stream.SendAndClose(res)
+			if errStream != nil {
+				log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+			}
 			return err
 		}
 	}
@@ -67,7 +82,10 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	if err != nil {
 		log.Errorf("Failed to save uploaded file for migration id %s : %s", migrationId, err.Error())
 		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-		stream.SendAndClose(res)
+		errStream := stream.SendAndClose(res)
+		if errStream != nil {
+			log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+		}
 		return err
 	}
 	log.Info("File successfully saved in the directory for the requested file for migration id: ", migrationId)
@@ -76,7 +94,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		MigrationId: migrationId,
 		Success:     true,
 	}
-	s.service.Migration.CompleteFileUpload(ctx, migrationId, serverId, 0, 0, 0)
+	_, _ = s.service.Migration.CompleteFileUpload(ctx, migrationId, serverId, 0, 0, 0)
 	log.Info("File successfully uploaded in the directory for the requested file for migration id: ", migrationId)
 	err = stream.SendAndClose(res)
 	if err != nil {
@@ -85,8 +103,8 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		return err
 	}
 
-	pipelineResult := pipeline.Result{Meta: pipeline.Meta{ZipFile: fileName}}
-	s.phaseOnePipeline.Run(pipelineResult)
+	pipelineResult := pipeline_model.Result{Meta: pipeline_model.Meta{ZipFile: fileName}}
+	go s.phaseOnePipeline.Run(pipelineResult)
 	return nil
 }
 
@@ -152,9 +170,9 @@ func createMigrationId() (string, error) {
 //handleErrorForUploadFileAndMigration handles the error for the file upload
 func handleErrorForUploadFileAndMigration(err error, migrationId string, serviceId string, s *MigrationServer, ctx context.Context) *response.UploadZipFileResponse {
 	response := createResponseWithErrors(err, migrationId)
-	s.service.Migration.FailedFileUpload(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
+	_, _ = s.service.Migration.FailedFileUpload(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	//ToDo to add the Failed migration status as well
-	s.service.Migration.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
+	_, _ = s.service.Migration.FailedMigration(ctx, migrationId, serviceId, err.Error(), 0, 0, 0)
 	return response
 
 }
@@ -192,21 +210,21 @@ func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.Canc
 	folderPath := path.Join("/hab/svc/infra-proxy-service/data", req.MigrationId)
 	err = os.RemoveAll(folderPath)
 	if err != nil {
-		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		_, _ = s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
 		return nil, err
 	}
 
 	// Clear up the stage table
 	_, err = s.service.Migration.DeleteMigrationStage(ctx, req.MigrationId)
 	if err != nil {
-		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		_, _ = s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
 		return nil, err
 	}
 
 	// Update the migration status
 	_, err = s.service.Migration.CancelMigration(ctx, req.MigrationId, req.ServerId, 0, 0, 0)
 	if err != nil {
-		s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
+		_, _ = s.service.Migration.FailedCancelMigration(ctx, req.MigrationId, req.ServerId, err.Error(), 0, 0, 0)
 		return nil, err
 	}
 
@@ -293,4 +311,30 @@ func (s *MigrationServer) StoreStagedData(ctx context.Context, migrationId strin
 	}
 
 	return nil
+}
+
+// ConfirmPreview trigger the preview pipline
+func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreview) (*response.ConfirmPreview, error) {
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	migrationStage, err := s.service.Migration.GetMigrationStage(ctx, req.MigrationId)
+	if err != nil {
+		return nil, err
+	}
+
+	// call pipeline function to trigger the phase 2 pipeline
+	go s.phaseTwoPipeline.Run(migrationStage.StagedData)
+
+	return &response.ConfirmPreview{
+		MigrationId: req.MigrationId,
+	}, nil
 }
