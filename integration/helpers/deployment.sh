@@ -42,14 +42,14 @@ run_upgrade() {
     # a manifest rebuild with the run command.
     if [ -z "$airgap_artifact_path" ]; then
         ERROR=$(chef-automate upgrade run 2>&1 >/dev/null)
-        if echo "${ERROR}" | grep 'chef-automate upgrade run --major';; then
+        if echo "${ERROR}" | grep 'chef-automate upgrade run --major'; then
             chef-automate upgrade run --major
         else
             echo failed
         fi
     else
         ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null)
-        if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle';; then
+        if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle'; then
             chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path"
         else
             echo failed
