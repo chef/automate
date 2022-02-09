@@ -14,6 +14,12 @@ gh_repo = "automate"
 
 This guide covers upgrading services used by Chef Automate.
 
+{{< warning >}}
+
+None of this content indicates support for designing/installing custom topologies not managed by Chef products and not already covered in the docs. 
+
+{{< /warning >}}
+
 ## Upgrade Amazon RDS for PostgreSQL
 
 Amazon Web Services Relational Database Service (AWS RDS) should upgrade by Monday, January 17. Amazon is automatically migrating all AWS RDS customers from PostgreSQL from 9.6 to 13 starting Tuesday, January 18, 2022.
