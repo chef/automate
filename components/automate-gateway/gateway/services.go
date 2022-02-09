@@ -976,7 +976,7 @@ func (s *Server) UploadZipFile(w http.ResponseWriter, r *http.Request) {
 	var cType, fileName, serverId string
 	var content bytes.Buffer
 	file, metaData, err := r.FormFile("file")
-	serverId = r.FormValue("serverId")
+	serverId = r.FormValue("server_id")
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
