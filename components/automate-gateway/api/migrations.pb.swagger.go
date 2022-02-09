@@ -116,7 +116,7 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/migrations/confirm_preview/{migration_id}": {
       "get": {
-        "operationId": "InfraProxyMigration_ConfirmPreview",
+        "operationId": "InfraProxyMigrationService_ConfirmPreview",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -148,7 +148,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxyMigration"
+          "InfraProxyMigrationService"
         ]
       }
     }
