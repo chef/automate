@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 
 	"github.com/chef/automate/api/interservice/authz"
-
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	log "github.com/sirupsen/logrus"
 )
@@ -142,6 +142,31 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	log.Info("Successfully completed the organisation parsing phase for migration id: ", result.Meta.MigrationID)
 	return result, nil
 
+}
+
+//CreatePreview Stores the staged data in db
+func CreatePreview(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+	log.Info("Starting with create preview phase for migration id: ", result.Meta.MigrationID)
+
+	_, err := mst.StartCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID)
+	if err != nil {
+		log.Errorf("Failed to update the status for create preview for the migration id  %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+	_, err = mst.StoreMigrationStage(ctx, result.Meta.MigrationID, result)
+	if err != nil {
+		log.Errorf("Failed to store the staged data %s : %s ", result.Meta.MigrationID, err.Error())
+		_, _ = mst.FailedCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		return result, err
+	}
+	_, err = mst.CompleteCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
+	if err != nil {
+		log.Errorf("Failed to update the complete status while creating preview for migration id %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+	log.Info("Successfully completed the create preview phase for migration id: ", result.Meta.MigrationID)
+
+	return result, nil
 }
 
 func createDatabaseOrgsMap(orgs []storage.Org) map[string]string {
