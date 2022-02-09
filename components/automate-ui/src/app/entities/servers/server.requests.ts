@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { mapKeys, snakeCase } from 'lodash/fp';
 
 import { environment as env } from 'environments/environment';
-import { Server, User, WebUIKey } from './server.model';
+import { MigrationStatus, Server, User, WebUIKey } from './server.model';
 import { CreateServerPayload, ServerSuccessPayload } from './server.actions';
 
 export interface ServersResponse {
@@ -63,5 +63,9 @@ export class ServerRequests {
   public validateWebUIKey(payload: Server): Observable<ValidateWebUIKeyResponse> {
     return this.http.post<ValidateWebUIKeyResponse>
     (`${env.infra_proxy_url}/servers/validate`, payload);
+  }
+
+  public getMigrationStatus(migration_id: string): Observable<MigrationStatus> {
+    return this.http.get<MigrationStatus>(`${env.infra_proxy_url}/servers/migrations/status/${migration_id}`);
   }
 }
