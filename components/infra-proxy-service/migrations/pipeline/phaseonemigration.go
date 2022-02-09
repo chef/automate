@@ -241,6 +241,7 @@ func adminUsers(result <-chan PipelineData) <-chan PipelineData {
 
 func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProcessor) {
 	log.Info("Pipeline started...")
+
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -249,7 +250,9 @@ func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProc
 		for s := range source {
 			s.Done <- nil
 		}
+
 	}()
+
 }
 
 func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
