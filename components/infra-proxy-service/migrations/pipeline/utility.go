@@ -257,7 +257,12 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 
 // Unzip will decompress a zip file and sets the UnzipFolder
 func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+
 	var fpath string
+	_, err := mst.StartUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID)
+	if err != nil {
+		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
+	}
 
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
