@@ -83,9 +83,11 @@
                     />
                   </svg>
                   <span>{{stepsCompleted}} Steps Completed</span>
-                  <span *ngIf="migrationIsInPreview"><a
+                  <span *ngIf="migrationIsInPreview" class="migrationSlider-link">
+                    <a
                     data-cy="show-preview"
                     class="preview-link"
+                    (click)="migrationSlider.slidePanel(); getPreviewData()"
                     >Click to Preview</a>
                   </span>
                 </span>
@@ -309,6 +311,14 @@
         [updatingWebuiKey]="updatingWebuiKey"
         (updateWebuiKeyClicked)="updateWebuiKey()">
       </app-update-web-uikey-slider>
+      <app-migration-slider
+        #migrationSlider
+        [migrationID]="migration_id"
+        [isPreview]="isPreview"
+        [previewData]="previewData"
+        (migrationPreview)="migrationPreview()"
+        (cancelMigration)="cancelMigration($event)">
+      </app-migration-slider>
     </main>
   </div>
 </div>
