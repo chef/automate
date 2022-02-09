@@ -25,21 +25,21 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type UploadZipFileRequest struct {
+type UploadFileRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	//Chef infra server id for the file
-	ServerId string `protobuf:"bytes,1,opt,name=serverId,proto3" json:"serverId,omitempty" toml:"serverId,omitempty" mapstructure:"serverId,omitempty"`
+	ServerId string `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty" toml:"server_id,omitempty" mapstructure:"server_id,omitempty"`
 	//Chunk of the data in bytes
 	Chunk *Chunk `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty" toml:"chunk,omitempty" mapstructure:"chunk,omitempty"`
 	//Metadata for the request
 	Meta *Metadata `protobuf:"bytes,3,opt,name=meta,proto3" json:"meta,omitempty" toml:"meta,omitempty" mapstructure:"meta,omitempty"`
 }
 
-func (x *UploadZipFileRequest) Reset() {
-	*x = UploadZipFileRequest{}
+func (x *UploadFileRequest) Reset() {
+	*x = UploadFileRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_interservice_infra_proxy_migrations_request_migrations_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -47,13 +47,13 @@ func (x *UploadZipFileRequest) Reset() {
 	}
 }
 
-func (x *UploadZipFileRequest) String() string {
+func (x *UploadFileRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadZipFileRequest) ProtoMessage() {}
+func (*UploadFileRequest) ProtoMessage() {}
 
-func (x *UploadZipFileRequest) ProtoReflect() protoreflect.Message {
+func (x *UploadFileRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_interservice_infra_proxy_migrations_request_migrations_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -65,26 +65,26 @@ func (x *UploadZipFileRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadZipFileRequest.ProtoReflect.Descriptor instead.
-func (*UploadZipFileRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use UploadFileRequest.ProtoReflect.Descriptor instead.
+func (*UploadFileRequest) Descriptor() ([]byte, []int) {
 	return file_interservice_infra_proxy_migrations_request_migrations_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UploadZipFileRequest) GetServerId() string {
+func (x *UploadFileRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
 	return ""
 }
 
-func (x *UploadZipFileRequest) GetChunk() *Chunk {
+func (x *UploadFileRequest) GetChunk() *Chunk {
 	if x != nil {
 		return x.Chunk
 	}
 	return nil
 }
 
-func (x *UploadZipFileRequest) GetMeta() *Metadata {
+func (x *UploadFileRequest) GetMeta() *Metadata {
 	if x != nil {
 		return x.Meta
 	}
@@ -99,7 +99,7 @@ type Metadata struct {
 	//Migration File name
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 	//Content type of the request
-	ContentType string `protobuf:"bytes,2,opt,name=contentType,proto3" json:"contentType,omitempty" toml:"contentType,omitempty" mapstructure:"contentType,omitempty"`
+	ContentType string `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty" toml:"content_type,omitempty" mapstructure:"content_type,omitempty"`
 }
 
 func (x *Metadata) Reset() {
@@ -488,7 +488,7 @@ func file_interservice_infra_proxy_migrations_request_migrations_proto_rawDescGZ
 
 var file_interservice_infra_proxy_migrations_request_migrations_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_interservice_infra_proxy_migrations_request_migrations_proto_goTypes = []interface{}{
-	(*UploadZipFileRequest)(nil),      // 0: chef.automate.domain.infra_proxy.migrations.request.UploadZipFileRequest
+	(*UploadFileRequest)(nil),         // 0: chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest
 	(*Metadata)(nil),                  // 1: chef.automate.domain.infra_proxy.migrations.request.Metadata
 	(*Chunk)(nil),                     // 2: chef.automate.domain.infra_proxy.migrations.request.Chunk
 	(*GetMigrationStatusRequest)(nil), // 3: chef.automate.domain.infra_proxy.migrations.request.GetMigrationStatusRequest
@@ -497,8 +497,8 @@ var file_interservice_infra_proxy_migrations_request_migrations_proto_goTypes = 
 	(*ConfirmPreview)(nil),            // 6: chef.automate.domain.infra_proxy.migrations.request.ConfirmPreview
 }
 var file_interservice_infra_proxy_migrations_request_migrations_proto_depIdxs = []int32{
-	2, // 0: chef.automate.domain.infra_proxy.migrations.request.UploadZipFileRequest.chunk:type_name -> chef.automate.domain.infra_proxy.migrations.request.Chunk
-	1, // 1: chef.automate.domain.infra_proxy.migrations.request.UploadZipFileRequest.meta:type_name -> chef.automate.domain.infra_proxy.migrations.request.Metadata
+	2, // 0: chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest.chunk:type_name -> chef.automate.domain.infra_proxy.migrations.request.Chunk
+	1, // 1: chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest.meta:type_name -> chef.automate.domain.infra_proxy.migrations.request.Metadata
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -513,7 +513,7 @@ func file_interservice_infra_proxy_migrations_request_migrations_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_interservice_infra_proxy_migrations_request_migrations_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UploadZipFileRequest); i {
+			switch v := v.(*UploadFileRequest); i {
 			case 0:
 				return &v.state
 			case 1:
