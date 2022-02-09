@@ -59,9 +59,11 @@ describe('WarningBannerComponent', () => {
   });
 
   it('should load variables on initialization', () => {
-    expect(component.bannerMessage).toBe(Configs.Message);
-    expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`);
-    expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`);
+    if (!component.showManualUpgradeContent) {
+      expect(component.bannerMessage).toBe(Configs.Message);
+      expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`);
+      expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`);
+    }
   });
 
 });
