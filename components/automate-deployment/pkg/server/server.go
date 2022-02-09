@@ -36,12 +36,14 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/persistence"
@@ -1354,6 +1356,24 @@ func (s *server) doConverge(
 		// before hab has applied all changes.
 		eDeploy.ensureStatus(context.Background(), s.deployment.NotSkippedServiceNames(), s.ensureStatusTimeout)
 		errHandler(eDeploy.err)
+		// json file
+
+		if os.Getenv(isUpgradeMajorEnv) == "true" {
+
+			var writer *cli.Writer
+			ci, err := majorupgradechecklist.NewChecklistManager(writer, s.deployment.CurrentReleaseManifest.Version(), "")
+			if err != nil {
+				return
+			}
+
+			err = ci.CreateJsonFile()
+			if err != nil {
+				return
+			}
+
+
+			// create post checklist file
+		}
 	}()
 
 	return task, nil

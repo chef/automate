@@ -120,7 +120,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if upgradeRunCmdFlags.isMajorUpgrade {
-		ci, err := majorupgradechecklist.NewChecklistInspector(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
 		if err != nil {
 			return status.Wrap(
 				err,
