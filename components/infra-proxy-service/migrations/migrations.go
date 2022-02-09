@@ -8,8 +8,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/chef/automate/components/infra-proxy-service/pipeline"
-
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
@@ -42,11 +40,13 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	_, err = s.service.Migration.StartMigration(ctx, migrationId, serverId)
 	if err != nil {
 		log.Errorf("Unable to insert the migration status Start Migration for  migration id : %s", migrationId)
+		return err
 	}
 	fileData := bytes.Buffer{}
 	_, err = s.service.Migration.StartFileUpload(ctx, migrationId, serverId)
 	if err != nil {
 		log.Errorf("Unable to insert the migration status Start File upload for  migration id : %s", migrationId)
+		return err
 	}
 	for {
 		req, err := stream.Recv()
@@ -104,7 +104,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	}
 
 	pipelineResult := pipeline_model.Result{Meta: pipeline_model.Meta{ZipFile: fileName}}
-	s.phaseOnePipeline.Run(pipelineResult)
+	go s.phaseOnePipeline.Run(pipelineResult)
 	return nil
 }
 
@@ -332,7 +332,7 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	}
 
 	// call pipeline function to trigger the phase 2 pipeline
-	s.phaseTwoPipeline.Run(migrationStage.StagedData)
+	go s.phaseTwoPipeline.Run(migrationStage.StagedData)
 
 	return &response.ConfirmPreview{
 		MigrationId: req.MigrationId,
