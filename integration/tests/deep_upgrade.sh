@@ -39,6 +39,12 @@ Environment=CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION=true
 EOF
 }
 
+do_prepare_upgrade() {
+  # use latest current here
+  download_manifest_version "current" "20220121191356" "$test_manifest_dir/20220121191356.json"
+  set_test_manifest "20220121191356.json"
+}
+
 do_upgrade() {
   test_detect_broken_packages=false
   do_upgrade_default

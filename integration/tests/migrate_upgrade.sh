@@ -50,6 +50,9 @@ do_deploy() {
 }
 
 do_prepare_upgrade() {
+    # use latest current here
+    download_manifest_version "current" "20220121191356" "$test_manifest_dir/20220121191356.json"
+    set_test_manifest "20220121191356.json"
     # The a1stub test harness in the old version of A2 does not clean up the A1 version
     # manifest it creates.
     rm -f /opt/delivery/version-manifest.txt
