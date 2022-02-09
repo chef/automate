@@ -2,6 +2,7 @@ package testDB
 
 import (
 	"context"
+
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/pkg/errors"
 )
@@ -109,15 +110,36 @@ func (m MigrationDB) FailedPermissionParsing(ctx context.Context, migrationId, s
 }
 
 func (m MigrationDB) StartCreatePreview(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) CompleteCreatePreview(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) FailedCreatePreview(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) StartOrgMigration(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
@@ -192,7 +214,14 @@ func (m MigrationDB) FailedCancelMigration(ctx context.Context, migrationId, ser
 }
 
 func (m MigrationDB) StoreMigrationStage(ctx context.Context, migrationId string, parsedData interface{}) (storage.MigrationStage, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.MigrationStage{}, errors.New("Failed to insert staged data")
+	}
+	return storage.MigrationStage{
+		ID:          "1",
+		MigrationID: "mig1",
+	}, nil
+
 }
 
 func (m MigrationDB) GetMigrationStage(ctx context.Context, migrationId string) (storage.MigrationStage, error) {
