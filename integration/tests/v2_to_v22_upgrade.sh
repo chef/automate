@@ -13,9 +13,9 @@ test_name="iam_force_upgrade_from_v2_to_v22_with_legacy"
 test_upgrades=true
 test_upgrade_strategy="none"
 
-# a2-iam-no-legacy-integration verifies permissions on an IAM v2 system 
+# a2-iam-no-legacy-integration verifies permissions on an IAM v2 system
 # without v1 legacy policies
-test_deploy_inspec_profiles=(a2-deploy-smoke)
+test_deploy_inspec_profiles=(a2-deploy-smoke a2-migrate-from-v1-integration)
 
 # a2-deploy-integration verifies that the system is up and all APIs work correctly
 # (which now includes only IAM v2 APIs)

@@ -43,16 +43,17 @@ run_upgrade() {
     if [ -z "$airgap_artifact_path" ]; then
         ERROR=$(chef-automate upgrade run 2>&1 >/dev/null)
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major'; then
+            echo "major normal upgrade"
             chef-automate upgrade run --major
         else
-            echo failed
+            echo "regular normal upgrade"
         fi
     else
         ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null)
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle'; then
             chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path"
         else
-            echo failed
+            echo "regular normal upgrade"
         fi
     fi
 
