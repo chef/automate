@@ -842,7 +842,7 @@ Start all Chef Automate and Chef Infra Server front-end nodes.
 `sudo systemctl start chef-automate`
 
 
-##S3 Restore
+## S3 Restore
 
 Check status of all Chef Automate and Chef Infra Server front-end nodes. 
 `chef-automate status`
