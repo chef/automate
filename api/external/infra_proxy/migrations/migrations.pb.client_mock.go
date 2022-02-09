@@ -96,6 +96,26 @@ func (mr *MockInfraProxyMigrationClientMockRecorder) GetStagedData(ctx, in inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStagedData", reflect.TypeOf((*MockInfraProxyMigrationClient)(nil).GetStagedData), varargs...)
 }
 
+// ConfirmPreview mocks base method
+func (m *MockInfraProxyMigrationClient) ConfirmPreview(ctx context.Context, in *request.ConfirmPreview, opts ...grpc.CallOption) (*response.ConfirmPreview, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ConfirmPreview", varargs...)
+	ret0, _ := ret[0].(*response.ConfirmPreview)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ConfirmPreview indicates an expected call of ConfirmPreview
+func (mr *MockInfraProxyMigrationClientMockRecorder) ConfirmPreview(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConfirmPreview", reflect.TypeOf((*MockInfraProxyMigrationClient)(nil).ConfirmPreview), varargs...)
+}
+
 // MockInfraProxyMigrationServer is a mock of InfraProxyMigrationServer interface
 type MockInfraProxyMigrationServer struct {
 	ctrl     *gomock.Controller
@@ -162,4 +182,19 @@ func (m *MockInfraProxyMigrationServer) GetStagedData(arg0 context.Context, arg1
 func (mr *MockInfraProxyMigrationServerMockRecorder) GetStagedData(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStagedData", reflect.TypeOf((*MockInfraProxyMigrationServer)(nil).GetStagedData), arg0, arg1)
+}
+
+// ConfirmPreview mocks base method
+func (m *MockInfraProxyMigrationServer) ConfirmPreview(arg0 context.Context, arg1 *request.ConfirmPreview) (*response.ConfirmPreview, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ConfirmPreview", arg0, arg1)
+	ret0, _ := ret[0].(*response.ConfirmPreview)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ConfirmPreview indicates an expected call of ConfirmPreview
+func (mr *MockInfraProxyMigrationServerMockRecorder) ConfirmPreview(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConfirmPreview", reflect.TypeOf((*MockInfraProxyMigrationServer)(nil).ConfirmPreview), arg0, arg1)
 }
