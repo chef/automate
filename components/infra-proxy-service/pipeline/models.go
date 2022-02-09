@@ -113,7 +113,7 @@ type User struct {
 	// Connector ldap user
 	Connector string `json:"connector"`
 
-	// IsConflicting for user's existance in db
+	// IsConflicting for user's existence in db
 	IsConflicting bool `json:"is_conflicting"`
 
 	// IsAdmin (user is admin or not)
