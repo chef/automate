@@ -5,17 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
+	log "github.com/sirupsen/logrus"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
-
-	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/infra-proxy-service/pipeline"
-
-	"github.com/chef/automate/components/infra-proxy-service/storage"
-	log "github.com/sirupsen/logrus"
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
@@ -242,10 +239,11 @@ func openOrgFolder(org os.FileInfo, fileLocation string) pipeline.OrgJson {
 		fmt.Println(err)
 	}
 	log.Info("Successfully opened the file at location", jsonPath)
+	defer func() {
+		_ = jsonFile.Close()
+	}()
 	// defer the closing of our jsonFile so that we can parse it later on
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	_ = json.Unmarshal(byteValue, &orgJson)
-	_ = jsonFile.Close()
+	_ = json.NewDecoder(jsonFile).Decode(&orgJson)
 	return orgJson
 }
 

@@ -3,9 +3,9 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.migrations.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/migrations/request";
 
-message UploadZipFileRequest{
+message UploadFileRequest{
   //Chef infra server id for the file
-  string serverId =1;
+  string server_id =1;
   //Chunk of the data in bytes
   Chunk chunk = 2;
   //Metadata for the request
@@ -16,7 +16,7 @@ message Metadata{
   //Migration File name
   string name = 1;
   //Content type of the request
-  string contentType =2;
+  string content_type =2;
 }
 
 // Zip content in byte form.

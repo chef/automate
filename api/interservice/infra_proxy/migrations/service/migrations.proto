@@ -9,7 +9,7 @@ import "google/api/annotations.proto";
 
 service MigrationDataService{
 
-  rpc UploadFile (stream chef.automate.domain.infra_proxy.migrations.request.UploadZipFileRequest) returns (chef.automate.domain.infra_proxy.migrations.response.UploadZipFileResponse) {};
+  rpc UploadFile (stream chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest) returns (chef.automate.domain.infra_proxy.migrations.response.UploadFileResponse) {};
   rpc GetMigrationStatus (chef.automate.domain.infra_proxy.migrations.request.GetMigrationStatusRequest) returns (chef.automate.domain.infra_proxy.migrations.response.GetMigrationStatusResponse) {};
   rpc CancelMigration (chef.automate.domain.infra_proxy.migrations.request.CancelMigrationRequest) returns (chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponse) {};
   rpc GetStagedData (chef.automate.domain.infra_proxy.migrations.request.GetStagedDataRequest) returns (chef.automate.domain.infra_proxy.migrations.response.GetStagedDataResponse) {};
