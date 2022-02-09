@@ -32,6 +32,9 @@ func TestStoreOrg(t *testing.T) {
 		{name: "Test Store Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: pipeline.Org{Name: "org2", FullName: "Org 2", ActionOps: pipeline.Insert}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: nil, want1: pipeline.Insert},
 		{name: "Test Edit Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: pipeline.Org{Name: "org3", FullName: "Org 3", ActionOps: pipeline.Update}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: nil, want1: pipeline.Update},
 		{name: "Test Create Project Error", errorFromProject: true, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: pipeline.Org{Name: "org3", FullName: "Org 3", ActionOps: pipeline.Insert}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: errors.New("Project already exists"), want1: 0},
+		{name: "Test Error from Delete Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: pipeline.Org{Name: "org3", FullName: "Org 1", ActionOps: pipeline.Delete}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: errors.New("failed to delete org"), want1: pipeline.Delete},
+		{name: "Test Error from Store Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{}, org: pipeline.Org{Name: "org2", FullName: "Org 2", ActionOps: pipeline.Insert}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: errors.New("failed to store org"), want1: pipeline.Insert},
+		{name: "Test Error from Edit Org", errorFromProject: false, args: args{ctx: context.Background(), st: &testDB.TestDB{NeedError: true}, org: pipeline.Org{Name: "org3", FullName: "Org 3", ActionOps: pipeline.Update}, serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t))}, want: errors.New("failed to edit org"), want1: pipeline.Update},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -94,5 +97,35 @@ func TestParseOrg(t *testing.T) {
 
 		})
 
+	}
+}
+
+func TestCreatePreview(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		st     storage.Storage
+		mst    storage.MigrationStorage
+		result pipeline.Result
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantError error
+		want1     pipeline.Result
+	}{
+		{name: "Test Create preview", args: args{ctx: context.Background(), st: &testDB.TestDB{}, mst: &testDB.MigrationDB{}, result: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "Org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}}, wantError: nil, want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "Org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}},
+		{name: "Test Error from staged database", args: args{ctx: context.Background(), st: &testDB.TestDB{NeedError: true}, mst: &testDB.MigrationDB{}, result: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "Org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}}, wantError: errors.New("Failed to insert staged data"), want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "Org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}},
+		{name: "Test Error from Status database", args: args{ctx: context.Background(), st: &testDB.TestDB{}, mst: &testDB.MigrationDB{NeedError: true}, result: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "Org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}}, wantError: errors.New("Failed to update status"), want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "Org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := CreatePreview(tt.args.ctx, tt.args.st, tt.args.mst, tt.args.result)
+			if err != nil && err.Error() != tt.wantError.Error() {
+				t.Errorf("CreatePreview() err = %v, want %v", err, tt.wantError)
+			}
+			if !reflect.DeepEqual(got, tt.want1) {
+				t.Errorf("CreatePreview() got = %v, want %v", got, tt.want1)
+			}
+		})
 	}
 }
