@@ -189,16 +189,6 @@ func createResponseWithErrors(err error, migrationId string) *response.UploadFil
 
 // CancelMigration cancle the ongoing migration
 func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.CancelMigrationRequest) (*response.CancelMigrationResponse, error) {
-	// Validate all request fields are required
-	// err := validation.New(validation.Options{
-	// 	Target:          "server",
-	// 	Request:         *req,
-	// 	RequiredDefault: true,
-	// }).Validate()
-
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	// Cancellation is allowed for a running pipeline only if the parsing is done but the data commitment is yet to be performed
 	currentMigrationPhase, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)
