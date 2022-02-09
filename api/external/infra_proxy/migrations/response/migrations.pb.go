@@ -484,6 +484,54 @@ func (x *User) GetIsAdmin() bool {
 	return false
 }
 
+type ConfirmPreview struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Migration ID
+	MigrationId string `protobuf:"bytes,1,opt,name=migration_id,json=migrationId,proto3" json:"migration_id,omitempty"`
+}
+
+func (x *ConfirmPreview) Reset() {
+	*x = ConfirmPreview{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_infra_proxy_migrations_response_migrations_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConfirmPreview) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfirmPreview) ProtoMessage() {}
+
+func (x *ConfirmPreview) ProtoReflect() protoreflect.Message {
+	mi := &file_external_infra_proxy_migrations_response_migrations_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfirmPreview.ProtoReflect.Descriptor instead.
+func (*ConfirmPreview) Descriptor() ([]byte, []int) {
+	return file_external_infra_proxy_migrations_response_migrations_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ConfirmPreview) GetMigrationId() string {
+	if x != nil {
+		return x.MigrationId
+	}
+	return ""
+}
+
 var File_external_infra_proxy_migrations_response_migrations_proto protoreflect.FileDescriptor
 
 var file_external_infra_proxy_migrations_response_migrations_proto_rawDesc = []byte{
@@ -560,12 +608,15 @@ var file_external_infra_proxy_migrations_response_migrations_proto_rawDesc = []b
 	0x63, 0x74, 0x69, 0x6e, 0x67, 0x18, 0x09, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0d, 0x69, 0x73, 0x43,
 	0x6f, 0x6e, 0x66, 0x6c, 0x69, 0x63, 0x74, 0x69, 0x6e, 0x67, 0x12, 0x19, 0x0a, 0x08, 0x69, 0x73,
 	0x5f, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x69, 0x73,
-	0x41, 0x64, 0x6d, 0x69, 0x6e, 0x42, 0x47, 0x5a, 0x45, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
-	0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x69,
-	0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x6d, 0x69, 0x67, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x41, 0x64, 0x6d, 0x69, 0x6e, 0x22, 0x33, 0x0a, 0x0e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x72, 0x6d,
+	0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x12, 0x21, 0x0a, 0x0c, 0x6d, 0x69, 0x67, 0x72, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x6d,
+	0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x42, 0x47, 0x5a, 0x45, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72,
+	0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f,
+	0x6d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -580,7 +631,7 @@ func file_external_infra_proxy_migrations_response_migrations_proto_rawDescGZIP(
 	return file_external_infra_proxy_migrations_response_migrations_proto_rawDescData
 }
 
-var file_external_infra_proxy_migrations_response_migrations_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_external_infra_proxy_migrations_response_migrations_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_external_infra_proxy_migrations_response_migrations_proto_goTypes = []interface{}{
 	(*UploadZipFileResponse)(nil),      // 0: chef.automate.api.infra_proxy.migrations.response.UploadZipFileResponse
 	(*GetMigrationStatusResponse)(nil), // 1: chef.automate.api.infra_proxy.migrations.response.GetMigrationStatusResponse
@@ -588,6 +639,7 @@ var file_external_infra_proxy_migrations_response_migrations_proto_goTypes = []i
 	(*GetStagedDataResponse)(nil),      // 3: chef.automate.api.infra_proxy.migrations.response.GetStagedDataResponse
 	(*StagedData)(nil),                 // 4: chef.automate.api.infra_proxy.migrations.response.StagedData
 	(*User)(nil),                       // 5: chef.automate.api.infra_proxy.migrations.response.user
+	(*ConfirmPreview)(nil),             // 6: chef.automate.api.infra_proxy.migrations.response.ConfirmPreview
 }
 var file_external_infra_proxy_migrations_response_migrations_proto_depIdxs = []int32{
 	4, // 0: chef.automate.api.infra_proxy.migrations.response.GetStagedDataResponse.staged_data:type_name -> chef.automate.api.infra_proxy.migrations.response.StagedData
@@ -677,6 +729,18 @@ func file_external_infra_proxy_migrations_response_migrations_proto_init() {
 				return nil
 			}
 		}
+		file_external_infra_proxy_migrations_response_migrations_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ConfirmPreview); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -684,7 +748,7 @@ func file_external_infra_proxy_migrations_response_migrations_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_external_infra_proxy_migrations_response_migrations_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

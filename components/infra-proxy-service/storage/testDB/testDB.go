@@ -25,10 +25,10 @@ func (t *TestDB) GetServer(_ context.Context, id string) (storage.Server, error)
 }
 
 func (t *TestDB) GetServers(ctx context.Context) ([]storage.Server, error) {
+	x := make([]storage.Server, 10)
 	if t.NeedError {
-		return []storage.Server{}, errors.New("failed to fetch Server")
+		return x, errors.New("failed to fetch Server")
 	}
-	var x []storage.Server
 	for _, v := range t.Servers {
 		x = append(x, v)
 	}
