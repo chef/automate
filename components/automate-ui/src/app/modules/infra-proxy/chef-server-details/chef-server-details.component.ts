@@ -34,7 +34,14 @@ import {
   ValidateWebUIKey
   // , GetUsers
 } from 'app/entities/servers/server.actions';
-import { GetOrgs, CreateOrg, DeleteOrg, UploadZip } from 'app/entities/orgs/org.actions';
+import {
+  GetOrgs,
+  CreateOrg,
+  DeleteOrg,
+  UploadZip,
+  CancelMigration,
+  GetPreviewData
+} from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   createStatus,
@@ -43,7 +50,10 @@ import {
   getAllStatus as getAllOrgsForServerStatus,
   deleteStatus as deleteOrgStatus,
   uploadStatus,
-  uploadDetails
+  uploadDetails,
+  cancelStatus,
+  previewStatus,
+  previewData
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -121,6 +131,15 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     12: 'Migrating user permissions',
     13: 'Migration Completed'
   };
+
+  public migration_id: string;
+  public cancelMigrationInProgress = false;
+  public canceMigrationSuccessful = false;
+  public isCancelled = false;
+
+  public previewDataLoaded =  false;
+  public previewData;
+  public isPreview = false;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
@@ -234,6 +253,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.migrationStarted = true;
         this.getMigrationStatus(this.server.migration_id);
       }
+      this.migration_id = this.server.migration_id;
     });
 
     combineLatest([
@@ -309,11 +329,35 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (uploadStatusSt === EntityStatus.loadingSuccess && !isNil(uploadDetailsState)) {
         // show migration slider
         this.isUploaded = true;
-        this.migrationID = uploadDetailsState.migrationId;
+        this.migration_id = uploadDetailsState.migrationId;
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
         this.upload.closeUploadSlider();
+      }
+    });
+
+    this.store.select(cancelStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.cancelMigrationInProgress && !pending(state)))
+    .subscribe((state) => {
+      this.cancelMigrationInProgress = false;
+      this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.canceMigrationSuccessful) {
+        this.isCancelled = true;
+      }
+    });
+
+    combineLatest([
+      this.store.select(previewStatus),
+      this.store.select(previewData)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([previewStatusSt, previewState]) => {
+      if (previewStatusSt === EntityStatus.loadingSuccess && !isNil(previewState)) {
+        this.previewData = previewState.staged_data;
+        this.isPreview = true;
+      } else if (previewStatusSt === EntityStatus.loadingFailure) {
+        this.previewDataLoaded = false;
       }
     });
 
@@ -477,7 +521,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateWebUIKey(webuikey));
   }
 
-  // upload zip slider functions
+  // upload zip slider function
   public uploadZipFile(file: File): void {
     const formData: FormData = new FormData();
     if (file) {
@@ -490,5 +534,28 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UploadZip( uploadZipPayload ));
     this.migrationStarted = true;
     this.getMigrationStatus(this.server.migration_id);
+  }
+
+  // cancel migration function
+  public cancelMigration(migration_id: string): void {
+    console.log('migrationId', migration_id);
+    const payload = {
+      server_id : this.server.id,
+      migration_id : migration_id
+    };
+    this.store.dispatch(new CancelMigration(payload));
+  }
+
+  // get migraion preview function
+  public getPreviewData() {
+    const payload = {
+      // migration_id: this.migration_id
+      migration_id: '1234'
+    };
+    this.store.dispatch(new GetPreviewData(payload));
+  }
+
+  public migrationPreview() {
+    console.log();
   }
 }
