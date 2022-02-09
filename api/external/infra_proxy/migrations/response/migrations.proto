@@ -8,7 +8,7 @@ message UploadZipFileResponse {
   // Success responce for zip upload.
   bool success = 1;
   // Migration ID
-  string migrationId = 2;
+  string migration_id = 2;
   // Error data in case of failure.
   repeated string errors = 3;
 }
@@ -46,10 +46,10 @@ message StagedData {
   // Number of orgs to delete
   int32 orgs_to_delete =4;
   // Users
-  repeated user users =5;
+  repeated User users =5;
 }
 
-message user {
+message User {
   // User's username
   string  username =1;
   // User's email ID

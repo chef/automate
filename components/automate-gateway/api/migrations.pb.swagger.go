@@ -16,7 +16,7 @@ func init() {
   "paths": {
     "/api/v0/infra/servers/migrations/staged_data/{migration_id}": {
       "get": {
-        "operationId": "InfraProxyMigration_GetStagedData",
+        "operationId": "InfraProxyMigrationService_GetStagedData",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -41,13 +41,13 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxyMigration"
+          "InfraProxyMigrationService"
         ]
       }
     },
     "/api/v0/infra/servers/migrations/status/{migration_id}": {
       "get": {
-        "operationId": "InfraProxyMigration_GetMigrationStatus",
+        "operationId": "InfraProxyMigrationService_GetMigrationStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -72,13 +72,13 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxyMigration"
+          "InfraProxyMigrationService"
         ]
       }
     },
     "/api/v0/infra/servers/{server_id}/migrations/cancel_migration/{migration_id}": {
       "get": {
-        "operationId": "InfraProxyMigration_CancelMigration",
+        "operationId": "InfraProxyMigrationService_CancelMigration",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -110,13 +110,13 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxyMigration"
+          "InfraProxyMigrationService"
         ]
       }
     },
     "/api/v0/infra/servers/{server_id}/migrations/confirm_preview/{migration_id}": {
       "get": {
-        "operationId": "InfraProxyMigration_ConfirmPreview",
+        "operationId": "InfraProxyMigrationService_ConfirmPreview",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -148,7 +148,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxyMigration"
+          "InfraProxyMigrationService"
         ]
       }
     }
@@ -236,13 +236,13 @@ func init() {
         "users": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.user"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.User"
           },
           "title": "Users"
         }
       }
     },
-    "chef.automate.api.infra_proxy.migrations.response.user": {
+    "chef.automate.api.infra_proxy.migrations.response.User": {
       "type": "object",
       "properties": {
         "username": {
