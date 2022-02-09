@@ -306,3 +306,12 @@ img {
 .chef-server-info-text {
   margin-left: 14px;
 }
+.migrationSlider-link {
+  padding-left: 10px;
+  text-decoration: underline;
+  float: right;
+
+  a {
+    cursor: pointer;
+  }
+}
