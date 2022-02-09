@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { Server , User, WebUIKey } from './server.model';
+import { MigrationStatus, Server , User, WebUIKey } from './server.model';
 import { ValidateWebUIKeyResponse } from './server.requests';
 
 export enum ServerActionTypes {
@@ -29,7 +29,10 @@ export enum ServerActionTypes {
   VALIDATE_WEB_UI_KEY            = 'SERVER::VALIDATE_WEB_UI_KEY',
   VALIDATE_WEB_UI_KEY_SUCCESS    = 'SERVER::VALIDATE_WEB_UI_KEY::SUCCESS',
   VALIDATE_WEB_UI_KEY_SUCCESS_NOT= 'SERVER::VALIDATE_WEB_UI_KEY::SUCCESS_NOT',
-  VALIDATE_WEB_UI_KEY_FAILURE    = 'SERVER::VALIDATE_WEB_UI_KEY::FAILURE'
+  VALIDATE_WEB_UI_KEY_FAILURE    = 'SERVER::VALIDATE_WEB_UI_KEY::FAILURE',
+  GET_MIGRATION_STATUS           = 'SERVER::GET_MIGRATION_STATUS',
+  GET_MIGRATION_STATUS_SUCCESS   = 'SERVER::GET_MIGRATION_STATUS::SUCCESS',
+  GET_MIGRATION_STATUS_FAILURE   = 'SERVER::GET_MIGRATION_STATUS::FAILURE'
 }
 
 
@@ -199,6 +202,24 @@ export class ValidateWebUIKeyFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class GetMigrationStatus implements Action {
+  readonly type = ServerActionTypes.GET_MIGRATION_STATUS;
+
+  constructor(public payload: string) { }
+}
+
+export class GetMigrationStatusSuccess implements Action {
+  readonly type = ServerActionTypes.GET_MIGRATION_STATUS_SUCCESS;
+
+  constructor(public payload: MigrationStatus) { }
+}
+
+export class GetMigrationStatusFailure implements Action {
+  readonly type = ServerActionTypes.GET_MIGRATION_STATUS_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServerActions =
   | GetServers
   | GetServersSuccess
@@ -224,4 +245,8 @@ export type ServerActions =
   | ValidateWebUIKey
   | ValidateWebUIKeySuccess
   | ValidateWebUIKeySuccessNot
-  | ValidateWebUIKeyFailure;
+  | ValidateWebUIKeyFailure
+  | GetMigrationStatus
+  | GetMigrationStatusSuccess
+  | GetMigrationStatusFailure;
+
