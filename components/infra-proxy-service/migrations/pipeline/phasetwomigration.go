@@ -7,7 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
-	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
 type PhaseTwoPipleine struct {
@@ -148,7 +147,7 @@ func populateMembersPolicy(result <-chan PipelineData) <-chan PipelineData {
 
 func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineProcessor) {
 	fmt.Println("Pipeline started...")
-
+	status := make(chan string)
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -157,7 +156,9 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 		for s := range source {
 			s.Done <- nil
 		}
+		status <- "Done"
 	}()
+	<-status
 }
 
 func SetupPhaseTwoPipeline() PhaseTwoPipleine {
@@ -175,7 +176,6 @@ func SetupPhaseTwoPipeline() PhaseTwoPipleine {
 func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
 	status := make(chan string)
 	go func() {
-		var st storage.MigrationStorage
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		done := make(chan error)
@@ -184,10 +184,10 @@ func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
 		}
 		err := <-done
 		if err != nil {
-			MigrationError(err, st, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+			MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 			log.Println("received error")
 		}
-		MigrationSuccess(st, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+		MigrationSuccess(Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Println("received done")
 		status <- "Done"
 	}()

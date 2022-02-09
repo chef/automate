@@ -6,14 +6,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/infra-proxy-service/config"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
-	"github.com/chef/automate/components/infra-proxy-service/storage/postgres"
-	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
-	"github.com/chef/automate/lib/grpc/secureconn"
-	"github.com/chef/automate/lib/logger"
+)
+
+var (
+	Storage storage.Storage
+	Mig     storage.MigrationStorage
 )
 
 type PipelineData struct {
@@ -200,7 +199,7 @@ func adminUsers(result <-chan PipelineData) <-chan PipelineData {
 
 func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProcessor) {
 	fmt.Println("Pipeline started...")
-
+	status := make(chan string)
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -209,7 +208,9 @@ func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProc
 		for s := range source {
 			s.Done <- nil
 		}
+		status <- "Done"
 	}()
+	<-status
 }
 
 func SetupPhaseOnePipeline() PhaseOnePipleine {
@@ -226,8 +227,8 @@ func SetupPhaseOnePipeline() PhaseOnePipleine {
 }
 
 func (p *PhaseOnePipleine) Run(result pipeline.Result) {
+	status := make(chan string)
 	go func() {
-		_, mst, _ := migrationStorage()
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		done := make(chan error)
@@ -236,11 +237,13 @@ func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 		}
 		err := <-done
 		if err != nil {
-			MigrationError(err, mst, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+			MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 			log.Errorf("received error")
 		}
 		log.Println("received done")
+		status <- "Done"
 	}()
+	<-status
 }
 
 func MigrationError(err error, st storage.MigrationStorage, ctx context.Context, migrationId, serviceId string) {
@@ -255,30 +258,4 @@ func MigrationSuccess(st storage.MigrationStorage, ctx context.Context, migratio
 	if err != nil {
 		log.Errorf("received error for migration id %s: %s", migrationId, err)
 	}
-}
-
-func migrationStorage() (storage.Storage, storage.MigrationStorage, error) {
-	cfg := config.Service{}
-
-	l, err := logger.NewLogger("", log.ErrorLevel.String())
-	if err != nil {
-		log.Errorf("couldn't initialize logger: %s", err)
-	}
-	migrationConfig := migration.Config{}
-	serviceCerts, err := cfg.ReadCerts()
-	if err != nil {
-		log.Errorf("Could not read certs: %s", err)
-	}
-	connFactory := secureconn.NewFactory(*serviceCerts)
-
-	authzConn, err := connFactory.Dial("authz-service", cfg.AuthzAddress)
-	if err != nil {
-		log.Errorf("failed to dial authz-service at: %s", cfg.AuthzAddress)
-	}
-	authzClient := authz.NewAuthorizationServiceClient(authzConn)
-	st, mst, err := postgres.New(l, migrationConfig, authzClient)
-	if err != nil {
-		log.Errorf("failed to get storage and migration storage: %s", err)
-	}
-	return st, mst, err
 }
