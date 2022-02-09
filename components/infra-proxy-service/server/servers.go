@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"github.com/prometheus/common/log"
 	"io/ioutil"
 
 	"github.com/chef/automate/api/external/common/query"
@@ -178,6 +179,9 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
 	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
+	if err != nil {
+		log.Errorf("Unable to fetch migration status for server id:%s", req.Id)
+	}
 	resp := &response.GetServer{
 		Server: fromStorageServerWithMigrationDetails(server, migration),
 	}
