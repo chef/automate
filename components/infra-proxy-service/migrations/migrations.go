@@ -78,7 +78,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		}
 	}
 
-	err = saveFile(migrationId, fileName, fileData)
+	folderpath, err := saveFile(migrationId, fileName, fileData)
 	if err != nil {
 		log.Errorf("Failed to save uploaded file for migration id %s : %s", migrationId, err.Error())
 		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
@@ -103,7 +103,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		return err
 	}
 
-	pipelineResult := pipeline_model.Result{Meta: pipeline_model.Meta{ZipFile: fileName}}
+	pipelineResult := pipeline_model.Result{Meta: pipeline_model.Meta{ZipFile: folderpath, MigrationID: migrationId, ServerID: serverId}}
 	go s.phaseOnePipeline.Run(pipelineResult)
 	return nil
 }
@@ -137,24 +137,24 @@ func (s *MigrationServer) GetMigrationStatus(ctx context.Context, req *request.G
 }
 
 // Takes up file name from service.MigrationDataService_UploadFileServer.MigrationId and creates the file in the same directory
-func saveFile(migrationId string, filename string, fileData bytes.Buffer) error {
+func saveFile(migrationId string, filename string, fileData bytes.Buffer) (string, error) {
 	folderPath := path.Join("/hab/svc/infra-proxy-service/data", migrationId)
 	err := os.Mkdir(folderPath, 0777)
 	if err != nil {
 		log.WithError(err).Error("Unable to create directory for migration id", migrationId)
-		return err
+		return "", err
 	}
 	filePath := path.Join(folderPath, filename)
 	file, err := os.Create(filePath)
 	if err != nil {
 		log.WithError(err).Error("Unable to create zipped file for migration id", migrationId)
-		return err
+		return "", err
 	}
 	_, err = fileData.WriteTo(file)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return filePath, nil
 
 }
 
