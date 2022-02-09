@@ -71,3 +71,13 @@ export const validateWebUIKeyStatus = createSelector(
   serverState,
   (state) => state.validateWebUIKeyStatus
 );
+
+export const getMigrationStatus = createSelector(
+  serverState,
+  (state) => state.getMigrationStatus
+);
+
+export const migrationStatus = createSelector(
+  serverState,
+  (state) => state.migrationStatus
+);
