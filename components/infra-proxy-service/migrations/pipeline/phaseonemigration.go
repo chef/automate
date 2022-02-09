@@ -238,7 +238,7 @@ func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 		err := <-done
 		if err != nil {
 			MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
-			log.Errorf("received error")
+			log.Errorf("received error for migration id %s: %s", result.Meta.MigrationID, err)
 		}
 		log.Println("received done")
 		status <- "Done"
