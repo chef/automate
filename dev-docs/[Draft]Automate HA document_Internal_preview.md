@@ -888,31 +888,45 @@ And in case, if you want to just update bundles but not deploy it. you can use s
  `chef-automate upgrade run --upgrade-backends --skip-deploy`
  
 
-# Upgrade with airgap
+# Automate Upgrade - Airgapped environment 
 
-using below command it will upgrade both frontend and backends with airgap
+**Note:** Currently in Automate HA only Automate frontend nodes (Automate and server) upgrades are allowed. No Backend nodes(PG, ES) upgrades are allowed using the commands.
 
+Check the current version of Automate using below command:
+   Login to Automate instance and run the below command:
+   `chef-automate version`
+   
+It will output the automate and CLI version. Take the automate version and check with the current automate version using this link (https://docs.chef.io/release_notes_automate/)
+
+Your current version should be less than the latest version to perform the upgrade.
+
+**Follow below steps to upgrade frontend with Airgapped bundle:**
+
+1.Login to machine which has internet, and run below command:
+
+    1.1 Download chef-automate cli using below command. 
+
+  `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate`
+
+    (This will provide us with the latest available automate CLI)
+   
+    1.2 `./chef-automate airgap bundle create`
+      (This will provide us with the latest available automate bundle)
+
+2. Now copy newly downloaded airgap bundle and chef-automate cli on your non-internet environment that we have downloaded using above two steps. You can use scp to copy. 
+
+`scp -i your-private-key.pem airgap-bundle.aib user@destination-ip-addess-172-32-0-1:airgap-bundle.aib scp -i your-private-key.pem chef-automate user@destination-ip-addess-172-32-0-1:chef-automate`
+
+3. Login to non-internet bastion host and run below command:
 `chef-automate upgrade run --airgap-bundle </path/to/arigap-bundle>`
 
-**To upgrade only frontends**
+This command will trigger upgrade and will receive logs for the same. On completion of the upgrade, we will receive output with all the Automate HA instance details.
 
-Using this below command it will upgrade only frontend bundles from airgap file and deploy it.
+4. Login to Automate instance and run the version command:
+  `chef-automate version`
+  
+The output will provide the upgraded versionb details. Ideally it should be the latest version which is available here.  (https://docs.chef.io/release_notes_automate/)
 
- `chef-automate upgrade run --upgrade-frontends --airgap-bundle </path/to/airgap-bundle>`
-
- And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag 
-
- `chef-automate upgrade run --upgrade-frontends --airgap-bundle </path/to/airgap-bundle> --skip-deploy`
- 
- **To upgrade only backends**
-
-Using this below command it will upgrade only backend bundles from airgap file and deploy it.
-
- `chef-automate upgrade run --upgrade-backends --airgap-bundle </path/to/airgap-bundle>`
-
-And in case, if you want to just update bundles but not deploy it. you can use skip-deploy flag 
-
- `chef-automate upgrade run --upgrade-backends --airgap-bundle </path/to/airgap-bundle> --skip-deploy`
 
 # Migration
 ## Chef server (HA- backend) to Automate HA
