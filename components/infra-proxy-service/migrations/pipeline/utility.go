@@ -147,7 +147,7 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 }
 
 //CreatePreview Stores the staged data in db
-func CreatePreview(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result Result) (Result, error) {
+func CreatePreview(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("Starting with create preview phase for migration id: ", result.Meta.MigrationID)
 
 	_, err := mst.StartCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID)
