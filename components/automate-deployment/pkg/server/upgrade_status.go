@@ -31,7 +31,9 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 		return nil, ErrorNotConfigured
 	}
 
-	response := &api.UpgradeStatusResponse{}
+	response := &api.UpgradeStatusResponse{
+		IsAirgapped: airgap.AirgapInUse(),
+	}
 	if s.deployment.CurrentReleaseManifest == nil {
 		response.CurrentVersion = ""
 	} else {
@@ -39,7 +41,7 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 	}
 
 	var latestManifest *manifest.A2
-	if response.CurrentVersion != "" {
+	if response.CurrentVersion != "" && !response.IsAirgapped {
 		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), response.CurrentVersion)
 		if err != nil {
 			return response, err
@@ -83,7 +85,6 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 		}
 	}
 	response.DesiredVersion = desiredManifest.Version()
-	response.IsAirgapped = airgap.AirgapInUse()
 	response.IsConvergeDisable = (s.convergeLoop != nil && !s.convergeLoop.IsRunning()) || s.convergeDisabled()
 
 	// TODO(ssd) 2018-02-06: This address now exists in a few
