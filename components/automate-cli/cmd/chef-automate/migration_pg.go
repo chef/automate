@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -30,8 +29,10 @@ var ClearDataCmdFlags = struct {
 	autoAccept bool
 }{}
 
+var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220120092917/bin"
+
 const (
-	AUTOMATE_PG_MIGRATE_LOG_DIR = "/src"
+	AUTOMATE_PG_MIGRATE_LOG_DIR = "/tmp"
 	OLD_PG_VERSION              = "9.6"
 	NEW_PG_VERSION              = "13.5"
 	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
@@ -45,7 +46,6 @@ const (
 	PGSSLKEY                    = "/hab/svc/automate-postgresql/config/server.key"
 	PGSSLROOTCERT               = "/hab/svc/automate-postgresql/config/root.crt"
 	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.21/20211016180117/bin"
-	NEW_BIN_DIR                 = "/hab/pkgs/core/postgresql13/13.5/20220120092917/bin"
 )
 
 func init() {
@@ -117,37 +117,31 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 
 func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 
-	if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
-		_, err := promptCheckList(
-			"it will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
-		)
-		if err != nil {
-			return err
-		}
-	}
-
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
+
+		if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
+			err := promptCheckList(
+				"it will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
+			)
+			if err != nil {
+				return err
+			}
+		}
+
 		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
 		if err != nil {
 			return err
 		}
 
 		if strings.TrimSpace(oldPgVersion) == OLD_PG_VERSION {
-			chefAutomateStop()
-			existDir, _ := dirExists(NEW_PG_DATA_DIR)
-			if existDir {
-				removeAndReplacePgdata13()
+
+			err = pgMigrateExecutor()
+			if err != nil {
+				return err
 			}
 
-			executePgdata13ShellScript()
-			checkUpdateMigration(migrateDataCmdFlags.check)
-			chefAutomateStart()
-			chefAutomateStatus()
-			if !migrateDataCmdFlags.check {
-				vacuumDb()
-			}
 		} else {
 			return errors.New(
 				"pg migration will only support 9.6 pg version for now, your pg version is: " + string(oldPgVersion),
@@ -160,7 +154,73 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func vacuumDb() {
+func pgMigrateExecutor() error {
+	err := getLatestPgPath()
+	if err != nil {
+		return err
+	}
+
+	existDir, err := dirExists(NEW_PG_DATA_DIR)
+	if err != nil {
+		return err
+	}
+
+	err = chefAutomateStop()
+	if err != nil {
+		return err
+	}
+
+	if existDir {
+		err = removeAndReplacePgdata13()
+		if err != nil {
+			return err
+		}
+	}
+
+	err = executePgdata13ShellScript()
+	if err != nil {
+		return err
+	}
+
+	err = checkUpdateMigration(migrateDataCmdFlags.check)
+	if err != nil {
+		return err
+	}
+	err = chefAutomateStart()
+	if err != nil {
+		return err
+	}
+	err = chefAutomateStatus()
+	if err != nil {
+		return err
+	}
+
+	if !migrateDataCmdFlags.check && err == nil {
+		err = vacuumDb()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+func getLatestPgPath() error {
+	latestPgPath := "find /hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq"
+	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	output := string(cmd)
+	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
+		output = output[:len(output)-10]
+		NEW_BIN_DIR = output
+	} else {
+		return fmt.Errorf("latest version %s not found", NEW_PG_VERSION)
+	}
+	return nil
+}
+
+func vacuumDb() error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"vacuum db \n" +
@@ -176,21 +236,20 @@ func vacuumDb() {
 	os.Setenv("PGSSLROOTCERT", PGSSLROOTCERT)
 
 	args := []string{
-		"./analyze_new_cluster.sh",
+		"/temp/analyze_new_cluster.sh",
 	}
 
 	err := executeCommand("/bin/sh", args, "")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		return err
 	}
-
+	return nil
 }
 
 func cleanUp() error {
 
 	if !migrateDataCmdFlags.autoAccept {
-		_, err := promptCheckList(
+		err := promptCheckList(
 			"Are you sure do you want to delete old pg-data\n" +
 				"This will delete all the data (pg 9.6) and will not be able to recover it.\n" +
 				"Press y to agree, n to disagree? [y/n]")
@@ -201,9 +260,9 @@ func cleanUp() error {
 
 	args := []string{
 		"-rf",
-		"./analyze_new_cluster.sh",
-		"./delete_old_cluster.sh",
-		"./pgmigrate.log",
+		"/temp/analyze_new_cluster.sh",
+		"/temp/delete_old_cluster.sh",
+		"/temp/pgmigrate.log",
 	}
 	err := executeCommand("rm", args, "")
 	if err != nil {
@@ -215,7 +274,7 @@ func cleanUp() error {
 	return nil
 }
 
-func chefAutomateStop() {
+func chefAutomateStop() error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"Chef-automate stop \n" +
@@ -226,19 +285,22 @@ func chefAutomateStop() {
 	}
 
 	err := executeCommand("chef-automate", args, "")
+
 	if err != nil {
+
 		if err.Error() == "exit status 99" { // exit status 99 means already stopped
 			writer.Warn("chef-automate already stopped")
 		} else {
 			writer.Fail("chef-automate stop failed")
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
+			return err
 		}
+
 	}
+	return nil
 
 }
 
-func chefAutomateStatus() {
+func chefAutomateStatus() error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"Chef-automate status \n" +
@@ -250,12 +312,12 @@ func chefAutomateStatus() {
 	}
 	err := executeCommand("chef-automate", args, "")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		return err
 	}
+	return nil
 }
 
-func removeAndReplacePgdata13() {
+func removeAndReplacePgdata13() error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"pgdata13 initDb \n" +
@@ -268,12 +330,12 @@ func removeAndReplacePgdata13() {
 
 	err := executeCommand("rm", argsToRemove, "")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		return err
 	}
+	return nil
 }
 
-func chefAutomateStart() {
+func chefAutomateStart() error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"Chef-automate start \n" +
@@ -286,12 +348,12 @@ func chefAutomateStart() {
 
 	err := executeCommand("chef-automate", args, "")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		return err
 	}
+	return nil
 }
 
-func executePgdata13ShellScript() {
+func executePgdata13ShellScript() error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"execute pgdata13 shell script \n" +
@@ -305,13 +367,17 @@ func executePgdata13ShellScript() {
 	uid, gid, err := lookupUser("hab")
 	if err != nil {
 		fmt.Printf("failed fetching hab uid and gid: %s\n", err.Error())
-		return
+		return err
 	}
 	c.SysProcAttr.Credential = &syscall.Credential{Uid: uint32(uid), Gid: uint32(gid)}
-	checkErrorForCommand(c)
+	err = checkErrorForCommand(c)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func checkUpdateMigration(check bool) {
+func checkUpdateMigration(check bool) error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"migration from: 9.6 to: 13 \n" +
@@ -321,6 +387,7 @@ func checkUpdateMigration(check bool) {
 	os.Unsetenv("PGHOST")
 
 	writer.Title("Checking for pg_upgrade")
+
 	args := []string{
 		"--old-datadir=" + OLD_PG_DATA_DIR,
 		"--new-datadir=" + NEW_PG_DATA_DIR,
@@ -339,10 +406,12 @@ func checkUpdateMigration(check bool) {
 		NEW_BIN_DIR+"/pg_upgrade",
 		args,
 		"",
-		"./pgmigrate.log")
+		AUTOMATE_PG_MIGRATE_LOG_DIR+"/"+"pgmigrate.log")
+
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
+	return nil
 }
 
 func executeCommand(command string, args []string, workingDir string) error {
@@ -423,13 +492,13 @@ func removeIndex(s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
 }
 
-func checkErrorForCommand(executable *exec.Cmd) {
+func checkErrorForCommand(executable *exec.Cmd) error {
 	out, err := executable.Output()
 	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+		return err
 	}
 	fmt.Println(string(out))
+	return nil
 }
 
 func dirExists(path string) (bool, error) {
@@ -444,15 +513,15 @@ func dirExists(path string) (bool, error) {
 }
 
 // prompt checklist
-func promptCheckList(message string) (string, error) {
+func promptCheckList(message string) error {
 	response, err := writer.Prompt(message)
 	if err != nil {
-		return "", err
+		return err
 	}
-	if !strings.Contains(response, "y") {
-		return "", errors.New("canceled")
+	if !strings.Contains(strings.ToUpper(response), "Y") {
+		return errors.New("canceled")
 	}
-	return response, err
+	return nil
 }
 
 // check pg version
