@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -105,26 +106,28 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
-		Version:        upgradeRunCmdFlags.version,
-		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
-	})
+	// validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
+	// 	Version:        upgradeRunCmdFlags.version,
+	// 	IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+	// })
 
-	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to start upgrade failed",
-		)
-	}
+	// if err != nil {
+	// 	return status.Wrap(
+	// 		err,
+	// 		status.DeploymentServiceCallError,
+	// 		"Request to start upgrade failed",
+	// 	)
+	// }
 
-	if validatedResp.CurrentVersion == validatedResp.TargetVersion {
-		writer.Println("Chef Automate up-to-date")
-		return nil
-	}
+	// if validatedResp.CurrentVersion == validatedResp.TargetVersion {
+	// 	writer.Println("Chef Automate up-to-date")
+	// 	return nil
+	// }
 
-	if upgradeRunCmdFlags.isMajorUpgrade {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
+	fmt.Println(upgradeRunCmdFlags.isMajorUpgrade)
+
+	if !upgradeRunCmdFlags.isMajorUpgrade {
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -161,6 +164,48 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		//            into this calculation
 		writer.Println("Chef Automate up-to-date")
 	}
+
+	if !upgradeRunCmdFlags.isMajorUpgrade {
+		fmt.Println("Creating new file")
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to start upgrade failed",
+			)
+		}
+		err = ci.CreatePostChecklistFile()
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"unable to create checklist file",
+			)
+		}
+
+		err, val := ci.ReadPostChecklistFile("migrate_pg")
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"unable to read checklist file",
+			)
+		}
+		fmt.Println(val)
+
+		err = ci.UpdatePostChecklistFile("migrate_pg")
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"unable to update checklist file",
+			)
+		}
+	}
+	// can we create a new file here?
+
+	fmt.Println(resp.NextVersion, resp.PreviousVersion)
 
 	// TODO(jaym): stream back events
 	// The reason for this is because our streaming

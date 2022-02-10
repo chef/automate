@@ -1361,10 +1361,12 @@ func (s *server) doConverge(
 		// we can run into cases where we check the status of the services
 		// before hab has applied all changes.
 		eDeploy.ensureStatus(context.Background(), s.deployment.NotSkippedServiceNames(), s.ensureStatusTimeout)
+	
 		errHandler(eDeploy.err)
 		// json file
-
-		if os.Getenv(isUpgradeMajorEnv) == "true" {
+		fmt.Println(os.Getenv(isUpgradeMajorEnv))
+		if os.Getenv(isUpgradeMajorEnv) == "false" {
+			fmt.Println("inside")
 
 			var writer *cli.Writer
 			ci, err := majorupgradechecklist.NewChecklistManager(writer, s.deployment.CurrentReleaseManifest.Version(), "")
@@ -1372,11 +1374,10 @@ func (s *server) doConverge(
 				return
 			}
 
-			err = ci.CreateJsonFile()
+			err = ci.CreatePostChecklistFile()
 			if err != nil {
 				return
 			}
-
 
 			// create post checklist file
 		}
@@ -1985,6 +1986,8 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 	errHandler := deployErrorHandler(sender)
 	sink := newEventAdapter(sender)
 	task, err := s.doConverge(operation, sender, sink, errHandler)
+	// can we ceate file
+	fmt.Println("Hello, world! do converge")
 	if err != nil {
 		return nil, err
 	}
