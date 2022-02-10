@@ -824,7 +824,8 @@ To create a new backup run chef-automate backup create from a Chef-Automate fron
 
 `./chef-automate backup create`
 
-## EFS Restore
+## Restore
+
 Check status of all Chef Automate and Chef Infra Server front-end nodes.
 
 `chef-automate status`
