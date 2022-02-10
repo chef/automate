@@ -1,6 +1,8 @@
 package majorupgradechecklist
 
 import (
+	"fmt"
+
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
@@ -8,7 +10,9 @@ import (
 
 type ChecklistManager interface {
 	RunChecklist() error
-	CreateJsonFile() error
+	CreatePostChecklistFile() error
+	ReadPostChecklistFile(id string) (error, bool)
+	UpdatePostChecklistFile(id string) error
 }
 
 type PerCheckList struct {
@@ -17,6 +21,7 @@ type PerCheckList struct {
 }
 
 type PostCheckList struct {
+	Id         string `json:"id"`
 	Msg        string `json:"msg"`
 	Cmd        string `json:"cmd"`
 	IsExecuted bool   `json:"is_executor"`
@@ -34,6 +39,7 @@ func NewChecklistManager(writer cli.FormatWriter, version, major string) (Checkl
 		resp, _ := manifest.IsSemVersionFmt(version)
 		major = resp
 	}
+	fmt.Println(major)
 
 	switch major {
 	case "2":

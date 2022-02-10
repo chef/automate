@@ -47,10 +47,12 @@ const (
 
 var postChecklist = []PostCheckList{
 	{
+		Id:         "migrate_pg",
 		Msg:        run_pg_data_migrate,
 		Cmd:        run_pg_data_migrate_cmd,
 		IsExecuted: false,
 	}, {
+		Id:         "clean_up",
 		Msg:        run_pg_data_cleanup,
 		Cmd:        run_pg_data_cleanup_cmd,
 		IsExecuted: false,
@@ -171,7 +173,7 @@ func promptUpgradeContinue() Checklist {
 	}
 }
 
-func (ci *V22ChecklistManager) CreateJsonFile() error {
+func (ci *V22ChecklistManager) CreatePostChecklistFile() error {
 	params := PerPostChecklist{}
 	params.PostChecklist = append(params.PostChecklist, postChecklist...)
 	var buffer bytes.Buffer
@@ -182,6 +184,48 @@ func (ci *V22ChecklistManager) CreateJsonFile() error {
 	buffer.Write(data)
 	buffer.WriteString("\n")
 	err = ioutil.WriteFile("test.json", buffer.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ci *V22ChecklistManager) ReadPostChecklistFile(id string) (error, bool) {
+	byteValue, _ := ioutil.ReadFile("test.json")
+	params := PerPostChecklist{}
+
+	json.Unmarshal(byteValue, &params)
+	fmt.Println(params)
+
+	for _, v := range params.PostChecklist {
+		if v.Id == id {
+			return nil, v.IsExecuted
+		}
+	}
+	return nil, false
+}
+
+func (ci *V22ChecklistManager) UpdatePostChecklistFile(id string) error {
+	byteValue, _ := ioutil.ReadFile("test.json")
+	params := PerPostChecklist{}
+
+	json.Unmarshal(byteValue, &params)
+
+	for _, v := range params.PostChecklist {
+		if v.Id == id {
+			v.IsExecuted = true
+			fmt.Println(v, "Hellow")
+		}
+	}
+
+	fmt.Println(params, "params")
+
+	data, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(data), "is_executor")
+	err = ioutil.WriteFile("test.json", data, 0644)
 	if err != nil {
 		return err
 	}
