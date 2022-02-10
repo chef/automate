@@ -1,5 +1,5 @@
 +++
-title = "Deployment Procedure using AWS Cloud"
+title = "AWS Cloud Deployment Procedure"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Deployment Procedure using AWS Cloud"
+    title = "AWS Cloud Deployment Procedure"
     parent = "automate/install"
-    identifier = "automate/install/ha_aws_deploy_steps.md Deployment Procedure using AWS Cloud"
+    identifier = "automate/install/ha_aws_deploy_steps.md AWS Cloud Deployment Procedure"
     weight = 350
 +++
 
