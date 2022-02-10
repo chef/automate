@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/stats"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 )
 
 //GetStatsSummary - Report #16
@@ -315,7 +316,7 @@ func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelem
 	boolQuery := elastic.NewBoolQuery().
 		Must(rangeQueryThreshold)
 
-	count, err := client.Count("comp-1-run-info").Query(boolQuery).Do(context.Background())
+	count, err := client.Count(mappings.IndexNameComplianceRunInfo).Query(boolQuery).Do(context.Background())
 	if err != nil {
 		return 0, err
 	}
