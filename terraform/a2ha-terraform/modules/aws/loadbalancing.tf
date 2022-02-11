@@ -3,6 +3,15 @@ data "aws_elb_service_account" "main" {}
 resource "aws_s3_bucket" "elb_logs" {
   bucket = "a2ha-elb-bucket"
   force_destroy = true
+}
+
+resource "aws_s3_bucket_acl" "elb_bucket_acl" {
+  bucket = aws_s3_bucket.elb_logs.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
+  bucket = aws_s3_bucket.elb_logs.id
 
   policy = <<EOF
 {
@@ -21,11 +30,6 @@ resource "aws_s3_bucket" "elb_logs" {
   "Version": "2012-10-17"
 }
 EOF
-}
-
-resource "aws_s3_bucket_acl" "elb_bucket_acl" {
-  bucket = aws_s3_bucket.elb_logs.id
-  acl    = "private"
 }
 
 /////////////////////////
