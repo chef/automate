@@ -77,6 +77,29 @@ func (u *userMgmtClient) CreateUser(ctx context.Context,
 	return response.Id, true, nil
 }
 
+func (u *userMgmtClient) CreateUserWithHashPassword(ctx context.Context,
+	name, email, password string) (userID string, wasCreated bool, err error) {
+
+	response, err := u.localUsersClient.CreateUser(ctx, &local_user.CreateUserReq{
+		Name:     name,
+		Email:    email,
+		Password: password,
+	})
+
+	if err != nil {
+		if isAlreadyExists(err) {
+			userResp, getErr := u.localUsersClient.GetUser(ctx, &local_user.Email{
+				Email: email})
+			if getErr != nil {
+				return "", false, getErr
+			}
+			return userResp.Id, false, nil
+		}
+		return "", false, err
+	}
+	return response.Id, true, nil
+}
+
 func (u *userMgmtClient) AddUserToAdminTeam(ctx context.Context, userID string) error {
 	adminsTeam, err := u.teamsClient.GetTeam(ctx,
 		// (tc) By convention, this is the admins team name string and will properly be

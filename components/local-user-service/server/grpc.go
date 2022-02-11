@@ -140,6 +140,44 @@ func (s *Server) CreateUser(ctx context.Context, req *local_user.CreateUserReq) 
 	return toUserResp(us), nil
 }
 
+func (s *Server) CreateUserWithHashPassword(ctx context.Context, req *local_user.CreateUserReq) (*local_user.User, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	err := validateUserInputs(req.Name, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.validator.Validate(req.Password); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, constants.PasswordValidationErrorFormat, err)
+	}
+
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	user := users.UserWithHashedPass{
+		ShowUser: users.ShowUser{
+			ID:    id.String(),
+			Name:  req.Name,
+			Email: req.Email,
+		},
+		HashedPass: []byte(req.Password),
+	}
+
+	us, err := s.users.CreateUserWithHashedPass(ctx, user)
+	if err != nil {
+		if _, ok := errors.Cause(err).(*users.AlreadyExistsError); ok {
+			return nil, status.Error(codes.AlreadyExists, err.Error())
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return toUserResp(us), nil
+}
+
 // DeleteUser deletes user from dex
 func (s *Server) DeleteUser(ctx context.Context, req *local_user.Email) (*local_user.DeleteUserResp, error) {
 	ctx, cancel := context.WithCancel(ctx)

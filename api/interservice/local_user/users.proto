@@ -87,6 +87,7 @@ service UsersMgmtService {
   rpc GetUsers (GetUsersReq) returns (Users) {};
   rpc GetUser (Email) returns (User) {};
   rpc CreateUser (CreateUserReq) returns (User) {};
+  rpc CreateUserWithHashPassword (CreateUserReq) returns (User) {};
   rpc DeleteUser (Email) returns (DeleteUserResp) {};
   rpc UpdateUser (UpdateUserReq) returns (User) {};
   rpc UpdateSelf (UpdateSelfReq) returns (User) {};

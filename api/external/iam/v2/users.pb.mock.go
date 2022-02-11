@@ -30,13 +30,14 @@ func NewUsersServerMockWithoutValidation() *UsersServerMock {
 // UsersServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type UsersServerMock struct {
-	validateRequests bool
-	CreateUserFunc   func(context.Context, *request.CreateUserReq) (*response.CreateUserResp, error)
-	ListUsersFunc    func(context.Context, *request.ListUsersReq) (*response.ListUsersResp, error)
-	GetUserFunc      func(context.Context, *request.GetUserReq) (*response.GetUserResp, error)
-	DeleteUserFunc   func(context.Context, *request.DeleteUserReq) (*response.DeleteUserResp, error)
-	UpdateUserFunc   func(context.Context, *request.UpdateUserReq) (*response.UpdateUserResp, error)
-	UpdateSelfFunc   func(context.Context, *request.UpdateSelfReq) (*response.UpdateSelfResp, error)
+	validateRequests               bool
+	CreateUserFunc                 func(context.Context, *request.CreateUserReq) (*response.CreateUserResp, error)
+	CreateUserWithHashPasswordFunc func(context.Context, *request.CreateUserReq) (*response.CreateUserResp, error)
+	ListUsersFunc                  func(context.Context, *request.ListUsersReq) (*response.ListUsersResp, error)
+	GetUserFunc                    func(context.Context, *request.GetUserReq) (*response.GetUserResp, error)
+	DeleteUserFunc                 func(context.Context, *request.DeleteUserReq) (*response.DeleteUserResp, error)
+	UpdateUserFunc                 func(context.Context, *request.UpdateUserReq) (*response.UpdateUserResp, error)
+	UpdateSelfFunc                 func(context.Context, *request.UpdateSelfReq) (*response.UpdateSelfResp, error)
 }
 
 func (m *UsersServerMock) CreateUser(ctx context.Context, req *request.CreateUserReq) (*response.CreateUserResp, error) {
@@ -49,6 +50,18 @@ func (m *UsersServerMock) CreateUser(ctx context.Context, req *request.CreateUse
 		return f(ctx, req)
 	}
 	return nil, status.Error(codes.Internal, "mock: 'CreateUser' not implemented")
+}
+
+func (m *UsersServerMock) CreateUserWithHashPassword(ctx context.Context, req *request.CreateUserReq) (*response.CreateUserResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.CreateUserWithHashPasswordFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'CreateUserWithHashPassword' not implemented")
 }
 
 func (m *UsersServerMock) ListUsers(ctx context.Context, req *request.ListUsersReq) (*response.ListUsersResp, error) {
@@ -114,6 +127,7 @@ func (m *UsersServerMock) UpdateSelf(ctx context.Context, req *request.UpdateSel
 // Reset resets all overridden functions
 func (m *UsersServerMock) Reset() {
 	m.CreateUserFunc = nil
+	m.CreateUserWithHashPasswordFunc = nil
 	m.ListUsersFunc = nil
 	m.GetUserFunc = nil
 	m.DeleteUserFunc = nil

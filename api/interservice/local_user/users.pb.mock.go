@@ -28,13 +28,14 @@ func NewUsersMgmtServiceServerMockWithoutValidation() *UsersMgmtServiceServerMoc
 // UsersMgmtServiceServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type UsersMgmtServiceServerMock struct {
-	validateRequests bool
-	GetUsersFunc     func(context.Context, *GetUsersReq) (*Users, error)
-	GetUserFunc      func(context.Context, *Email) (*User, error)
-	CreateUserFunc   func(context.Context, *CreateUserReq) (*User, error)
-	DeleteUserFunc   func(context.Context, *Email) (*DeleteUserResp, error)
-	UpdateUserFunc   func(context.Context, *UpdateUserReq) (*User, error)
-	UpdateSelfFunc   func(context.Context, *UpdateSelfReq) (*User, error)
+	validateRequests               bool
+	GetUsersFunc                   func(context.Context, *GetUsersReq) (*Users, error)
+	GetUserFunc                    func(context.Context, *Email) (*User, error)
+	CreateUserFunc                 func(context.Context, *CreateUserReq) (*User, error)
+	CreateUserWithHashPasswordFunc func(context.Context, *CreateUserReq) (*User, error)
+	DeleteUserFunc                 func(context.Context, *Email) (*DeleteUserResp, error)
+	UpdateUserFunc                 func(context.Context, *UpdateUserReq) (*User, error)
+	UpdateSelfFunc                 func(context.Context, *UpdateSelfReq) (*User, error)
 }
 
 func (m *UsersMgmtServiceServerMock) GetUsers(ctx context.Context, req *GetUsersReq) (*Users, error) {
@@ -71,6 +72,18 @@ func (m *UsersMgmtServiceServerMock) CreateUser(ctx context.Context, req *Create
 		return f(ctx, req)
 	}
 	return nil, status.Error(codes.Internal, "mock: 'CreateUser' not implemented")
+}
+
+func (m *UsersMgmtServiceServerMock) CreateUserWithHashPassword(ctx context.Context, req *CreateUserReq) (*User, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.CreateUserWithHashPasswordFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'CreateUserWithHashPassword' not implemented")
 }
 
 func (m *UsersMgmtServiceServerMock) DeleteUser(ctx context.Context, req *Email) (*DeleteUserResp, error) {
@@ -114,6 +127,7 @@ func (m *UsersMgmtServiceServerMock) Reset() {
 	m.GetUsersFunc = nil
 	m.GetUserFunc = nil
 	m.CreateUserFunc = nil
+	m.CreateUserWithHashPasswordFunc = nil
 	m.DeleteUserFunc = nil
 	m.UpdateUserFunc = nil
 	m.UpdateSelfFunc = nil

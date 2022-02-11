@@ -26,6 +26,23 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Users/CreateUserWithHashPassword", "iam:users", "iam:users:create", "POST", "/apis/iam/v2/users/hash", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.CreateUserReq); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "name":
+					return m.Name
+				case "password":
+					return m.Password
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.iam.v2.Users/ListUsers", "iam:users", "iam:users:list", "GET", "/apis/iam/v2/users", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})

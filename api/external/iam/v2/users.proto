@@ -59,7 +59,43 @@ service Users {
     option (chef.automate.api.iam.policy).action = "iam:users:create";
   };
 
-  /*
+	rpc CreateUserWithHashPassword (CreateUserReq) returns (CreateUserResp) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "users";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"name": "Display Name", "id": "username001rulez", "password": "aSafePassword"}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+		option (google.api.http) = {
+			post: "/apis/iam/v2/users/hash"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy).resource = "iam:users";
+		option (chef.automate.api.iam.policy).action = "iam:users:create";
+	};
+
+
+	/*
   List all users
 
   Lists all local users.
