@@ -112,6 +112,8 @@ func SetupInfraProxyService(ctx context.Context,
 
 	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
+	authzProjectClient := authz.NewProjectsServiceClient(authzConn)
+
 	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
 
 	l, err := logger.NewLogger("text", "debug")
@@ -120,7 +122,7 @@ func SetupInfraProxyService(ctx context.Context,
 	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	require.NoError(t, err)
 
-	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient)
+	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient)
 
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)
