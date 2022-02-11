@@ -58,13 +58,13 @@ func unzip(result <-chan PipelineData, service *service.Service) <-chan Pipeline
 }
 
 // ParseOrg returns PhaseOnePipelineProcessor
-func ParseOrg() PhaseOnePipelineProcessor {
+func ParseOrg(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return parseOrg(result)
+		return parseOrg(result, service)
 	}
 }
 
-func parseOrg(result <-chan PipelineData) <-chan PipelineData {
+func parseOrg(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting to parse_orgs pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -72,7 +72,40 @@ func parseOrg(result <-chan PipelineData) <-chan PipelineData {
 	go func() {
 		log.Info("Processing to parse orgs...")
 		for res := range result {
-			result, err := ParseOrgs(res.Ctx, Storage, Mig, res.Result)
+			result, err := ParseOrgs(res.Ctx, service.Storage, service.Migration, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
+			select {
+			case out <- res:
+			case <-res.Ctx.Done():
+				res.Done <- nil
+			}
+			log.Info("after write")
+		}
+		log.Info("CLosing parse_orgs pipeline")
+		close(out)
+	}()
+	return out
+}
+
+// ParseOrg returns PhaseOnePipelineProcessor
+func CreatePrevewPipeline(service *service.Service) PhaseOnePipelineProcessor {
+	return func(result <-chan PipelineData) <-chan PipelineData {
+		return createPrevewPipeline(result, service)
+	}
+}
+
+func createPrevewPipeline(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+	log.Info("Starting to parse_orgs pipeline")
+
+	out := make(chan PipelineData, 100)
+
+	go func() {
+		log.Info("Processing to parse orgs...")
+		for res := range result {
+			result, err := CreatePreview(res.Ctx, service.Storage, service.Migration, res.Result)
 			if err != nil {
 				return
 			}
@@ -223,11 +256,12 @@ func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 	c := make(chan PipelineData, 100)
 	migrationPipeline(c,
 		UnzipSrc(service),
-		ParseOrg(),
-		ParseUser(),
-		ConflictingUsers(),
-		OrgMembers(),
-		AdminUsers(),
+		ParseOrg(service),
+		CreatePrevewPipeline(service),
+		// ParseUser(),
+		// ConflictingUsers(),
+		// OrgMembers(),
+		// AdminUsers(),
 	)
 	return PhaseOnePipleine{in: c}
 }
