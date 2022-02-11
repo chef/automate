@@ -11,7 +11,7 @@ import (
 type ChecklistManager interface {
 	RunChecklist() error
 	CreatePostChecklistFile() error
-	ReadPostChecklistFile(id string) (error, bool)
+	ReadPostChecklistFile() ([]string, error)
 	UpdatePostChecklistFile(id string) error
 }
 
@@ -29,6 +29,7 @@ type PostCheckList struct {
 
 type PerPostChecklist struct {
 	PostChecklist []PostCheckList `json:"post_checklist"`
+	IsExecuted    bool            `json:"is_executor"`
 }
 
 //NewChecklistManager returns the checklist inspector for given major release

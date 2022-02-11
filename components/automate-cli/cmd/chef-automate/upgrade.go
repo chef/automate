@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -160,47 +161,42 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		writer.Println("Chef Automate up-to-date")
 	}
 
-	if !upgradeRunCmdFlags.isMajorUpgrade {
-		fmt.Println("Creating new file")
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to start upgrade failed",
-			)
-		}
-		err = ci.CreatePostChecklistFile()
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"unable to create checklist file",
-			)
-		}
-
-		err, val := ci.ReadPostChecklistFile("migrate_pg")
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"unable to read checklist file",
-			)
-		}
-		fmt.Println(val)
-
-		err = ci.UpdatePostChecklistFile("migrate_pg")
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"unable to update checklist file",
-			)
-		}
+	// if !upgradeRunCmdFlags.isMajorUpgrade {
+	// 	fmt.Println("Creating new file")
+	ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to start upgrade failed",
+		)
 	}
+
+	val, err := ci.ReadPostChecklistFile()
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"unable to read checklist file",
+		)
+	}
+
+	for i, check := range val {
+		writer.Body(strconv.Itoa(i+1) + "." + check)
+	}
+
+	// err = ci.UpdatePostChecklistFile("migrate_pg")
+	// if err != nil {
+	// 	return status.Wrap(
+	// 		err,
+	// 		status.DeploymentServiceCallError,
+	// 		"unable to update checklist file",
+	// 	)
+	// }
+	// }
 	// can we create a new file here?
 
-	fmt.Println(resp.NextVersion, resp.PreviousVersion)
+	// fmt.Println(resp.NextVersion, resp.PreviousVersion)
 
 	// TODO(jaym): stream back events
 	// The reason for this is because our streaming
