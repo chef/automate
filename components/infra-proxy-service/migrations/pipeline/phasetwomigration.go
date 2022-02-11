@@ -161,10 +161,10 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 
 }
 
-func SetupPhaseTwoPipeline() PhaseTwoPipleine {
+func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipleine {
 	c := make(chan PipelineData, 100)
 	migrationTwoPipeline(c,
-		PopulateOrgs(),
+		PopulateOrgs(service),
 		CreateProject(),
 		PopulateUsers(),
 		PopulateORGUser(),
