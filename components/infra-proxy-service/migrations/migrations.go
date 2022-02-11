@@ -104,7 +104,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	}
 
 	pipelineResult := pipeline_model.Result{Meta: pipeline_model.Meta{ZipFile: folderpath, MigrationID: migrationId, ServerID: serverId}}
-	go s.phaseOnePipeline.Run(pipelineResult)
+	go s.phaseOnePipeline.Run(pipelineResult, s.service)
 	return nil
 }
 
@@ -322,7 +322,7 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	}
 
 	// call pipeline function to trigger the phase 2 pipeline
-	go s.phaseTwoPipeline.Run(migrationStage.StagedData)
+	go s.phaseTwoPipeline.Run(migrationStage.StagedData, s.service)
 
 	return &response.ConfirmPreview{
 		MigrationId: req.MigrationId,

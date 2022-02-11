@@ -152,7 +152,7 @@ func populateMembersPolicy(result <-chan PipelineData) <-chan PipelineData {
 }
 
 func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineProcessor) {
-	log.Info("Pipeline started...")
+	log.Info("Phase two pipeline started...")
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -178,7 +178,7 @@ func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipleine {
 	return PhaseTwoPipleine{in: c}
 }
 
-func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
+func (p *PhaseTwoPipleine) Run(result pipeline.Result, service *service.Service) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error)
@@ -187,10 +187,10 @@ func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
 	}
 	err := <-done
 	if err != nil {
-		MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+		MigrationError(err, service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Errorf("Phase two pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
 	}
-	MigrationSuccess(Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+	MigrationSuccess(service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 	log.Info("received done")
 
 }

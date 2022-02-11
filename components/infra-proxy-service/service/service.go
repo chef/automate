@@ -34,8 +34,7 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 	if err != nil {
 		return nil, err
 	}
-	//pipeline.Storage = p
-	//pipeline.Mig = pObj
+
 	return &Service{
 		Logger:             l,
 		ConnFactory:        connFactory,
