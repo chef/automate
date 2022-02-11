@@ -10,11 +10,6 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
-var (
-	Storage storage.Storage
-	Mig     storage.MigrationStorage
-)
-
 type PipelineData struct {
 	Result pipeline.Result
 	Done   chan<- error
@@ -239,7 +234,6 @@ func adminUsers(result <-chan PipelineData) <-chan PipelineData {
 
 func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProcessor) {
 	log.Info("Pipeline started...")
-
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -248,9 +242,7 @@ func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProc
 		for s := range source {
 			s.Done <- nil
 		}
-
 	}()
-
 }
 
 func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
@@ -267,7 +259,7 @@ func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 	return PhaseOnePipleine{in: c}
 }
 
-func (p *PhaseOnePipleine) Run(result pipeline.Result) {
+func (p *PhaseOnePipleine) Run(result pipeline.Result, service *service.Service) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error)
@@ -276,7 +268,7 @@ func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 	}
 	err := <-done
 	if err != nil {
-		MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+		MigrationError(err, service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
 	}
 	log.Info("received done")
