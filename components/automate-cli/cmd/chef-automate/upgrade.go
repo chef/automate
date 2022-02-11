@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -121,8 +120,6 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	// 	return nil
 	// }
 
-	fmt.Println(upgradeRunCmdFlags.isMajorUpgrade)
-
 	if !upgradeRunCmdFlags.isMajorUpgrade {
 		ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
 		if err != nil {
@@ -160,43 +157,6 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		//            into this calculation
 		writer.Println("Chef Automate up-to-date")
 	}
-
-	// if !upgradeRunCmdFlags.isMajorUpgrade {
-	// 	fmt.Println("Creating new file")
-	ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
-	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to start upgrade failed",
-		)
-	}
-
-	val, err := ci.ReadPostChecklistFile()
-	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"unable to read checklist file",
-		)
-	}
-
-	for i, check := range val {
-		writer.Body(strconv.Itoa(i+1) + "." + check)
-	}
-
-	// err = ci.UpdatePostChecklistFile("migrate_pg")
-	// if err != nil {
-	// 	return status.Wrap(
-	// 		err,
-	// 		status.DeploymentServiceCallError,
-	// 		"unable to update checklist file",
-	// 	)
-	// }
-	// }
-	// can we create a new file here?
-
-	// fmt.Println(resp.NextVersion, resp.PreviousVersion)
 
 	// TODO(jaym): stream back events
 	// The reason for this is because our streaming
@@ -305,6 +265,28 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
 			}
+		}
+
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to status upgrade failed",
+			)
+		}
+
+		resp, err := ci.ReadPostChecklistFile()
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"unable to read checklist file",
+			)
+		}
+
+		for index, msg := range resp {
+			writer.Body(strconv.Itoa(index+1) + "." + msg)
 		}
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
