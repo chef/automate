@@ -43,17 +43,9 @@ func (p *Server) CreateUser(
 	return &pb_resp.CreateUserResp{User: convert(resp)}, nil
 }
 
-// CreateUserWithHashPassword creates a new user.
+// CreateUserWithHashPassword creates a new user for password
 func (p *Server) CreateUserWithHashPassword(
 	ctx context.Context, in *pb_req.CreateUserReq) (*pb_resp.CreateUserResp, error) {
-
-	// Note: This is where we're mapping data models: externally, an IAM
-	// user has two properties: an ID (what they login with, equivalent to
-	// their username), and a display name (called "name") here.
-	// What l-u-s gets as Name will be the name, what it gets as Email will
-	// be what the user logs in with. When processing, l-u-s will also give
-	// user an ID (auto-generated UUID4), but that's kept internal.
-
 	resp, err := p.users.CreateUserWithHashPassword(ctx, &local_user.CreateUserReq{
 		Name:     in.Name,
 		Email:    in.Id,
@@ -62,8 +54,6 @@ func (p *Server) CreateUserWithHashPassword(
 	if err != nil {
 		return nil, err
 	}
-
-	// See note above -- the reverse mapping applies.
 	return &pb_resp.CreateUserResp{User: convert(resp)}, nil
 }
 
