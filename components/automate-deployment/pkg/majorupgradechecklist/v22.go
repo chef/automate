@@ -189,31 +189,48 @@ func (ci *V22ChecklistManager) CreatePostChecklistFile() error {
 	}
 	return nil
 }
+func (ci *V22ChecklistManager) ReadPostChecklistById(id string) (bool, error) {
+	ChecklistId_Found := false
+	res, err := ReadJsonFile()
+	if err != nil {
+		return false, err
+	}
+	for i := 0; i < len(res.PostChecklist); i++ {
 
-func (ci *V22ChecklistManager) ReadPostChecklistFile() ([]string, error) {
-	var postCmdList []string
+		if res.PostChecklist[i].Id == id {
+			ChecklistId_Found = res.PostChecklist[i].IsExecuted
+			break
+
+		}
+	}
+	return ChecklistId_Found, nil
+}
+
+func ReadJsonFile() (*PerPostChecklist, error) {
 	// postCmdList := []string{}
 	byteValue, err := ioutil.ReadFile("test.json")
 	if err != nil {
 		return nil, err
 	}
 	params := PerPostChecklist{}
-	fmt.Println(params)
-	fmt.Println(string(byteValue))
 
 	err = json.Unmarshal(byteValue, &params)
-	fmt.Println(params)
-
+	if err != nil {
+		return nil, err
+	}
+	return &params, nil
+}
+func (ci *V22ChecklistManager) ReadPostChecklistFile() ([]string, error) {
+	var postCmdList []string
+	res, err := ReadJsonFile()
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println(params.PostChecklist[1].IsExecuted)
-	if !params.IsExecuted {
-		for i := 0; i < len(params.PostChecklist); i++ {
-			fmt.Println(params.PostChecklist[i].IsExecuted, params.PostChecklist[i].Id)
-			if !params.PostChecklist[i].IsExecuted {
-				postCmdList = append(postCmdList, params.PostChecklist[i].Msg)
+	if !res.IsExecuted {
+		for i := 0; i < len(res.PostChecklist); i++ {
+			if !res.PostChecklist[i].IsExecuted {
+				postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
 			}
 		}
 	}

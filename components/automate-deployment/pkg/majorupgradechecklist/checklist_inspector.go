@@ -12,6 +12,7 @@ type ChecklistManager interface {
 	RunChecklist() error
 	CreatePostChecklistFile() error
 	ReadPostChecklistFile() ([]string, error)
+	ReadPostChecklistById(id string) (bool, error)
 	UpdatePostChecklistFile(id string) error
 }
 
