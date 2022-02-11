@@ -316,7 +316,7 @@
         [migrationID]="migration_id"
         [isPreview]="isPreview"
         [previewData]="previewData"
-        (migrationPreview)="migrationPreview()"
+        (migrationPreview)="migrationPreview($event)"
         (cancelMigration)="cancelMigration($event)">
       </app-migration-slider>
     </main>

@@ -40,7 +40,8 @@ import {
   DeleteOrg,
   UploadZip,
   CancelMigration,
-  GetPreviewData
+  GetPreviewData,
+  ConfirmPreview
 } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -255,7 +256,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.migrationStarted = true;
         this.getMigrationStatus(this.migration_id);
       }
-      
     });
 
     combineLatest([
@@ -554,7 +554,11 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetPreviewData(payload));
   }
 
-  public migrationPreview() {
-    console.log();
+  public migrationPreview(migrationID: string) {
+    const payload = {
+      server_id: this.server.id,
+      migration_id: migrationID
+    };
+    this.store.dispatch(new ConfirmPreview(payload));
   }
 }
