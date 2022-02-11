@@ -2,29 +2,30 @@ data "aws_elb_service_account" "main" {}
 
 resource "aws_s3_bucket" "elb_logs" {
   bucket = "a2ha-elb-bucket"
-  acl    = "private"
   force_destroy = true
 
   policy = <<EOF
 {
-  "Id": "Policy",
-  "Version": "2012-10-17",
+  "Id": "Policy1446577137248",
   "Statement": [
     {
-      "Action": [
-        "s3:PutObject"
-      ],
+      "Action": "s3:PutObject",
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::a2ha-elb-bucket/AWSLogs/*",
       "Principal": {
-        "AWS": [
-          "${data.aws_elb_service_account.main.arn}"
-        ]
-      }
+        "AWS": "${data.aws_elb_service_account.main.arn}"
+      },
+      "Resource": "arn:aws:s3:::a2ha-elb-bucket/AWSLogs/*",
+      "Sid": "Stmt1446575236270"
     }
-  ]
+  ],
+  "Version": "2012-10-17"
 }
 EOF
+}
+
+resource "aws_s3_bucket_acl" "elb_bucket_acl" {
+  bucket = aws_s3_bucket.elb_logs.id
+  acl    = "private"
 }
 
 /////////////////////////
