@@ -138,7 +138,7 @@ export class UpdateOrgFailure implements Action {
 
 export interface UploadSuccessPayload {
   success: boolean;
-  migrationId: string;
+  migration_id: string;
 }
 
 export class UploadZip implements Action {

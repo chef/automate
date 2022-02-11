@@ -54,7 +54,8 @@ import {
   uploadDetails,
   cancelStatus,
   previewStatus,
-  previewData
+  previewData,
+  confirmPreviewStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { SyncOrgUsersSliderComponent } from '../sync-org-users-slider/sync-org-users-slider.component';
@@ -140,6 +141,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public previewDataLoaded =  false;
   public previewData;
   public isPreview = false;
+  public confirmPreviewSuccessful = false;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
@@ -252,7 +254,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.migrationLoading = false;
       this.migration_id = '';
       this.migration_id = this.server.migration_id;
-      if (this.migration_id !== '') {
+      if (this.migration_id !== undefined) {
         this.migrationStarted = true;
         this.getMigrationStatus(this.migration_id);
       }
@@ -331,7 +333,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (uploadStatusSt === EntityStatus.loadingSuccess && !isNil(uploadDetailsState)) {
         // show migration slider
         this.isUploaded = true;
-        this.migration_id = uploadDetailsState.migrationId;
+        this.migration_id = uploadDetailsState?.migration_id;
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
@@ -347,6 +349,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.canceMigrationSuccessful) {
         this.isCancelled = true;
+        this.migrationIsInPreview = false;
       }
     });
 
@@ -360,6 +363,16 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.isPreview = true;
       } else if (previewStatusSt === EntityStatus.loadingFailure) {
         this.previewDataLoaded = false;
+      }
+    });
+
+    this.store.select(confirmPreviewStatus).pipe(
+      takeUntil(this.isDestroyed),
+    filter(state => this.cancelMigrationInProgress && !pending(state)))
+    .subscribe((state) => {
+      this.confirmPreviewSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.confirmPreviewSuccessful) {
+        this.migrationIsInPreview = false;
       }
     });
 
@@ -554,7 +567,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetPreviewData(payload));
   }
 
-  public migrationPreview(migrationID: string) {
+  public confirmPreview(migrationID: string) {
     const payload = {
       server_id: this.server.id,
       migration_id: migrationID
