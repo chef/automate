@@ -91,39 +91,6 @@ func parseOrg(result <-chan PipelineData, service *service.Service) <-chan Pipel
 }
 
 // ParseOrg returns PhaseOnePipelineProcessor
-// func CreatePrevewPipeline(service *service.Service) PhaseOnePipelineProcessor {
-// 	return func(result <-chan PipelineData) <-chan PipelineData {
-// 		return createPrevewPipeline(result, service)
-// 	}
-// }
-
-// func createPrevewPipeline(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
-// 	log.Info("Starting to parse_orgs pipeline")
-
-// 	out := make(chan PipelineData, 100)
-
-// 	go func() {
-// 		log.Info("Processing to parse orgs...")
-// 		for res := range result {
-// 			result, err := ParseOrgs(res.Ctx, service.Storage, service.Migration, res.Result)
-// 			if err != nil {
-// 				return
-// 			}
-// 			res.Result = result
-// 			select {
-// 			case out <- res:
-// 			case <-res.Ctx.Done():
-// 				res.Done <- nil
-// 			}
-// 			log.Info("after write")
-// 		}
-// 		log.Info("CLosing parse_orgs pipeline")
-// 		close(out)
-// 	}()
-// 	return out
-// }
-
-// ParseOrg returns PhaseOnePipelineProcessor
 func CreatePrevewPipeline(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
 		return createPrevewPipeline(result, service)
