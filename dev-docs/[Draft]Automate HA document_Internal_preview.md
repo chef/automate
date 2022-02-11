@@ -955,20 +955,27 @@ Install the habitat package for knife-ec-backup
 
 Generate a knife tidy server report to examine stale nodes and unused cookbooks
 
-`hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60`
+`hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>`
 
+`pivotal`: pivotal is the name of user.
 
+`path of pivotal` : Path where user's pem file is stored.
+
+E.g. hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
+	
 --node-threshold NUM\_DAYS    Maximum number of days since last checking before node is considered stale 
 
 Initiate a backup of your Chef Server data
 
-`hab pkg exec chef/knife-ec-backup knife ec backup -c /etc/opscode/chef-server.rb backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem --with-user-sql --with-key-sql`
+`hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem --with-user-sql --with-key-sql -s <chef server URL>`
+
+E.g. hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem --with-user-sql --with-key-sql -s https://chef.io
 
 `--with-user-sql` This is required to correctly handle user passwords and to ensure user-specific association groups are not duplicated.
 
 `--with-key-sql` is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key and sometimes users will generate and assigned additional keys to give additional users access to an account but still be able to lock them out later without removing everyones access.
 
-Run knife tidy server cleans to delete unused data from the reports above.
+Optional : This step is optional if you want to clean unused data from reports run the below command else skip this step.
 
 `hab pkg exec chef/knife-ec-backup knife tidy server clean --backup-path /path/to/an-ec-backup`
 
@@ -988,7 +995,7 @@ Install the habitat package for knife-ec-backup
 
 Restore the backup 
 
-`hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes   --concurrency 1  --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/14.1.0/20210225010004/omnibus-ctl/spec/fixtures/pivotal.rb`
+`hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes   --concurrency 1  --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb`
 
 ## Existing A2HA to Automate HA
 
