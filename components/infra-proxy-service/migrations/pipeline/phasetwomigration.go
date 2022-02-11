@@ -2,7 +2,7 @@ package pipeline
 
 import (
 	"context"
-
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
@@ -15,19 +15,20 @@ type PhaseTwoPipleine struct {
 type PhaseTwoPipelineProcessor func(<-chan PipelineData) <-chan PipelineData
 
 // PopulateOrgs returns PhaseTwoPipelineProcessor
-func PopulateOrgs() PhaseTwoPipelineProcessor {
+func PopulateOrgs(service *service.Service) PhaseTwoPipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return populateOrgs(result)
+		return populateOrgs(result, service)
 	}
 }
 
-func populateOrgs(result <-chan PipelineData) <-chan PipelineData {
+func populateOrgs(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting populateOrgs routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
 			log.Info("Processing to populateOrgs...")
+			StoreOrgs(res.Ctx, service.Storage, service.Migration, service.AuthzProjectClient, res.Result)
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -106,6 +107,7 @@ func populateORGUser(result <-chan PipelineData) <-chan PipelineData {
 	go func() {
 		for res := range result {
 			log.Info("Processing to populateORGUser...")
+
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -156,7 +158,7 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 		}
 
 	}()
-	
+
 }
 
 func SetupPhaseTwoPipeline() PhaseTwoPipleine {

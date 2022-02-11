@@ -19,16 +19,17 @@ import (
 
 // Service holds the internal state and configuration of the Infra proxy service.
 type Service struct {
-	Logger      logger.Logger
-	ConnFactory *secureconn.Factory
-	Storage     storage.Storage
-	Migration   storage.MigrationStorage
-	Secrets     secrets.SecretsServiceClient
+	Logger             logger.Logger
+	ConnFactory        *secureconn.Factory
+	Storage            storage.Storage
+	Migration          storage.MigrationStorage
+	Secrets            secrets.SecretsServiceClient
+	AuthzProjectClient authz.ProjectsServiceClient
 }
 
 // Start returns an instance of Service that connects to a postgres storage backend.
 func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secureconn.Factory, secretsClient secrets.SecretsServiceClient,
-	authzClient authz.AuthorizationServiceClient) (*Service, error) {
+	authzClient authz.AuthorizationServiceClient, authzProjectClient authz.ProjectsServiceClient) (*Service, error) {
 	p, pObj, err := postgres.New(l, migrationsConfig, authzClient)
 	if err != nil {
 		return nil, err
@@ -36,11 +37,12 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 	//pipeline.Storage = p
 	//pipeline.Mig = pObj
 	return &Service{
-		Logger:      l,
-		ConnFactory: connFactory,
-		Storage:     p,
-		Migration:   pObj,
-		Secrets:     secretsClient,
+		Logger:             l,
+		ConnFactory:        connFactory,
+		Storage:            p,
+		Migration:          pObj,
+		Secrets:            secretsClient,
+		AuthzProjectClient: authzProjectClient,
 	}, nil
 }
 
