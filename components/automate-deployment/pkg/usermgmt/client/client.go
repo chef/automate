@@ -87,14 +87,6 @@ func (u *userMgmtClient) CreateUserWithHashPassword(ctx context.Context,
 	})
 
 	if err != nil {
-		if isAlreadyExists(err) {
-			userResp, getErr := u.localUsersClient.GetUser(ctx, &local_user.Email{
-				Email: email})
-			if getErr != nil {
-				return "", false, getErr
-			}
-			return userResp.Id, false, nil
-		}
 		return "", false, err
 	}
 	return response.Id, true, nil
