@@ -4,7 +4,7 @@ import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest, interval } from 'rxjs';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck, take, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -237,7 +237,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         !isNil(serverState) &&
         !isNil(allOrgsState)),
       takeUntil(this.isDestroyed)
-    ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
+    ).pipe(take(1))
+    .subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
       this.server = { ...ServerState };
       this.orgs = allOrgsState;
       this.updateServerForm.controls['name'].setValue(this.server.name);
@@ -248,11 +249,13 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.closeCreateModal();
       this.isServerLoaded = true;
       this.migrationLoading = false;
-      if (this.server.migration_id !== '') {
-        this.migrationStarted = true;
-        this.getMigrationStatus(this.server.migration_id);
-      }
+      this.migration_id = '';
       this.migration_id = this.server.migration_id;
+      if (this.migration_id !== '') {
+        this.migrationStarted = true;
+        this.getMigrationStatus(this.migration_id);
+      }
+      
     });
 
     combineLatest([
@@ -368,7 +371,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
     interval(50000).subscribe(() => {
       if (this.migrationStarted) {
-        this.getMigrationStatus(this.server.migration_id);
+        this.getMigrationStatus(this.migration_id);
       }
     });
   }
@@ -536,7 +539,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   // cancel migration function
   public cancelMigration(migration_id: string): void {
-    console.log('migrationId', migration_id);
     const payload = {
       server_id : this.server.id,
       migration_id : migration_id
@@ -547,8 +549,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   // get migraion preview function
   public getPreviewData() {
     const payload = {
-      // migration_id: this.migration_id
-      migration_id: '1234'
+      migration_id: this.migration_id
     };
     this.store.dispatch(new GetPreviewData(payload));
   }
