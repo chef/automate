@@ -2,8 +2,8 @@ package pipeline
 
 import (
 	"context"
-	"github.com/chef/automate/components/data-feed-service/service"
 
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
@@ -22,14 +22,18 @@ func PopulateOrgs(service *service.Service) PhaseTwoPipelineProcessor {
 	}
 }
 
-func populateOrgs(result <-chan PipelineData) <-chan PipelineData {
+func populateOrgs(result <-chan PipelineData,service *service.Service) <-chan PipelineData {
 	log.Info("Starting populateOrgs routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
 			log.Info("Processing to populateOrgs...")
-			StoreOrgs(res.Ctx, service.Storage, service.Migration, service.AuthzProjectClient, res.Result)
+			result, err := StoreOrgs(res.Ctx, service.Storage, service.Migration, service.AuthzProjectClient, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
