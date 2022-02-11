@@ -55,6 +55,8 @@ ami_filter_name = ""
 ami_filter_virt_type = ""
 ami_filter_owner = ""
 ami_id = ""
+# Enabale/Disable load balancer logs
+lb_access_logs = "false"
 automate_server_instance_type = "t3.medium"
 chef_server_instance_type = "t3.medium"
 elasticsearch_server_instance_type = "m5.large"

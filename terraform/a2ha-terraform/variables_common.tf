@@ -223,10 +223,6 @@ variable "rsync_files" {
   description = "An ordered array of SRC1,DST1,SRC2,DST2 file pairs. SRC is relative to the terraform/transfer_files directory"
 }
 
-variable "s3_bucket_name_lb_access" {
-  default     = ""
-}
-
 variable "teams_port" {
   default = 10128
 }

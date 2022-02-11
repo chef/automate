@@ -158,10 +158,6 @@ variable "proxy_listen_port" {
   default = 7432
 }
 
-variable "s3_bucket_name_lb_access" {
-  default     = ""
-}
-
 variable "ssh_user_sudo_password" {
   default = ""
 }

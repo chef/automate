@@ -98,7 +98,6 @@ module AutomateCluster
       default :cidr_block_addr, " "
       default :ssh_key_pair_name
       default :lb_access_logs, 'false'
-      default :s3_bucket_name_lb_access, ''
       default :ami_filter_name
       default :ami_filter_virt_type
       default :ami_filter_owner

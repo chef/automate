@@ -133,6 +133,9 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	if len(a.config.Aws.Config.SSHKeyPairName) < 1 {
 		errorList.PushBack("Invalid or empty aws ssh_key_pair_name")
 	}
+	if len(a.config.Aws.Config.LBAccessLogs) < 1 {
+		errorList.PushBack("Invalid or empty aws lb_access_logs")
+	}
 	if len(a.config.Aws.Config.AutomateServerInstanceType) < 1 {
 		errorList.PushBack("Invalid or empty aws automate_server_instance_type")
 	}

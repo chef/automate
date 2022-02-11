@@ -129,6 +129,8 @@ aws do
   vpc_id "{{ .Aws.Config.AwsVpcId }}"
   cidr_block_addr "{{ .Aws.Config.AwsCidrBlockAddr }}"
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
+  ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
+  lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
   ### Filter settings default to CentOS if left blank
   {{ if .Aws.Config.AmiFilterName }} ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ else }} # ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ end }}
   ### Filter settings default to CentOS if left blank
