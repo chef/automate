@@ -45,7 +45,7 @@ export class MigrationSliderComponent {
 
   migrationFile() {
     this.toggleSlide();
-    this.migrationPreview.emit(this.migrationForm);
+    this.migrationPreview.emit(this.migrationID);
   }
 
   slidePanel() {
