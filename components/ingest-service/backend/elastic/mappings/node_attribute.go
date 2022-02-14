@@ -50,7 +50,6 @@ var NodeAttribute = Mapping{
 	Properties: fmt.Sprintf(`{ %s }`, attrProps),
 	Mapping: fmt.Sprintf(`
 	{
-		"index_patterns": ["node-attribute"],
 		"settings": {
 			"number_of_shards": 5,
 			"index": {

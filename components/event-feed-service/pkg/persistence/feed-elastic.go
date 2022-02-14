@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -39,6 +40,7 @@ type ElasticFeedStore struct {
 // InitializeStore runs the necessary initialization processes to make elasticsearch usable
 // by creating the indices and aliases for documents to be added
 func (efs ElasticFeedStore) InitializeStore(ctx context.Context) error {
+	fmt.Println("&*&*&*&*&*&*&*&*&*& Calling initalize event feed store. &*&*&*&*&*&*&*&*&*&*&*&*&*&*&")
 	if !efs.initialized {
 		err := efs.createOrUpdateStore(ctx, Feeds)
 		if err != nil {
@@ -624,6 +626,9 @@ func (efs ElasticFeedStore) createEndTime(endDate string, loc *time.Location) (t
 }
 
 func (efs ElasticFeedStore) createOrUpdateStore(ctx context.Context, esMap Mapping) error {
+	fmt.Println("$$#$#$#$#$#$$ Checking Index existes for ######E#$#$#$")
+	fmt.Println(esMap)
+	fmt.Println("===================================================")
 	exists, err := efs.storeExists(ctx, esMap.Index)
 	if err != nil {
 		return err
@@ -641,6 +646,9 @@ func (efs ElasticFeedStore) createStore(ctx context.Context, indexName string, m
 	_, err := efs.client.CreateIndex(indexName).Body(mapping).Do(ctx)
 
 	if err != nil {
+		fmt.Println("$$#$#$#$#$#$$ EVENTFEED CREATION ERROR ######E#$#$#$")
+		fmt.Println(err)
+		fmt.Println("===================================================")
 		return errors.Wrapf(err, "creating index %s", indexName)
 	}
 
@@ -651,6 +659,9 @@ func (efs ElasticFeedStore) updateMapping(ctx context.Context, esMap Mapping) er
 	_, err := efs.client.PutMapping().Index(esMap.Index).BodyString(esMap.Properties).Do(ctx)
 
 	if err != nil {
+		fmt.Println("$$#$#$#$#$#$$ EVENTFEED UPDATE ERROR ######E#$#$#$")
+		fmt.Println(err)
+		fmt.Println("===================================================")
 		return errors.Wrapf(err, "updating index mappings for %s", esMap.Index)
 	}
 
@@ -661,8 +672,15 @@ func (efs ElasticFeedStore) storeExists(ctx context.Context, indexName string) (
 	exists, err := efs.client.IndexExists().Index([]string{indexName}).Do(ctx)
 
 	if err != nil {
+		fmt.Println("$$#$#$#$#$#$$ Checking Index existes ERROR ######E#$#$#$")
+		fmt.Println(err)
+		fmt.Println("===================================================")
 		return exists, errors.Wrapf(err, "determining index '%s' existence", indexName)
 	}
+
+	fmt.Println("$$#$#$#$#$#$$ Checking Index existes boolean for ######E#$#$#$")
+	fmt.Println(exists)
+	fmt.Println("===================================================")
 
 	return exists, nil
 }

@@ -590,7 +590,6 @@ var NodeState = Mapping{
 	Properties: fmt.Sprintf(`{ %s }`, nodeProps),
 	Mapping: fmt.Sprintf(`
 	{
-		"index_patterns": ["node-state"],
 		"settings": {
 			"number_of_shards": 5,
 			"index": {
