@@ -1289,7 +1289,39 @@ Execute  belo command from bastion from any location.
 sed  -i 's/deployment/aws/' /hab/a2\_deploy\_workspace/terraform/.tf\_arch
 
 sed  -i 's/architecture "deployment"/architecture "aws"/' /hab/a2\_deploy\_workspace/a2ha.rb
+	
 
+### Error : Could not determine bucket region, request cancelled
+	
+![image](https://user-images.githubusercontent.com/65227203/153855824-889f50a0-4a01-4614-beb1-e9252e1cfb44.png)
+
+**How to resolve:** If you are using onprem s3 for backup and your are facing issues with restror then just attach s3-endpoint with s3 restore command.
+	
+`chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "<URL>"`
+	
+	
+### Error : How to troubleshoot backup-restore issue
+	
+![image](https://user-images.githubusercontent.com/65227203/153858880-247202e4-01c3-4f21-875c-c45903a21b1d.png)
+
+**How to resolve:** Check the logs using below command.
+	
+   chef-automate debug set-log-level deployment-service debug
+
+### Error : Hab user access error, Please update the permission
+	
+![image](https://user-images.githubusercontent.com/65227203/153858444-6acaafae-0c6f-4969-9ad0-71c684abadce.png)
+
+**How to resolve:** Execute the below command
+	
+sudo chef-automate backup fix-repo-permissions <path>
+	
+### Error : ./scripts/credentials set ssl, If this command is taking more time to print logs.
+
+**How to resolve:** Press ctrl + c and export hab license
+	then execute  ./scripts/credentials set ssl
+	
+	
 ### Other Errors: 
 
 After running the following deployment command, the deployment repeatedly fails due to UnhealthyStatusError (refer screenshot)
