@@ -192,7 +192,7 @@ func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.Canc
 
 	// Cancellation is allowed for a running pipeline only if the parsing is done but the data commitment is yet to be performed
 	currentMigrationPhase, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)
-	if currentMigrationPhase.MigrationStatusID != int64(constants.CreatePreview) {
+	if currentMigrationPhase.MigrationTypeID != int64(constants.CreatePreview) {
 		return nil, fmt.Errorf("cancellation is not allowed when migration is not in Create Preview State: %s", req.MigrationId)
 	}
 
