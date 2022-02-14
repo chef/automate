@@ -521,7 +521,14 @@ func (phase *RunningPhase) Run(writer *eventWriter) error {
 }
 
 func configWriteRequiresReload(pkg habpkg.Installable) bool {
-	return pkg.Name() == postgresqlServiceName || pkg.Name() == elasticsearchServiceName
+	//Adding ESGateway and PGGateway as well to the list, to resolve the issue with the service restarts
+	//while switching from internal to external and vice-versa. Althoough, the services were restarting
+	//for PG, it has been added here as a false-safe so that in the future if the services that have
+	//store the PG information in the _a2_plafrm.json file and have a direct dependency on PG will restart
+	//even if we remove the dependency in the future. Adding the GW to the list will ensure that the
+	//mitigation is executed for the GW as well, therefore restarting all the required services.
+
+	return pkg.Name() == postgresqlServiceName || pkg.Name() == elasticsearchServiceName || pkg.Name() == esGatewayServiceName || pkg.Name() == pgGatewayServiceName
 }
 
 func configOutOfDate(step runningPhaseStep) (bool, error) {
