@@ -103,6 +103,11 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 		Do(context.Background())
 	if err != nil {
 		fmt.Println("##################################")
+		if searchResult != nil {
+			fmt.Println("############### ------- ERROR DETAILS ------ ###################")
+			fmt.Println(searchResult.Error)
+			fmt.Println("############### ------- ERROR DETAILS END ------ ###################")
+		}
 		fmt.Println(err)
 		fmt.Println("##################################")
 		return nil, err
