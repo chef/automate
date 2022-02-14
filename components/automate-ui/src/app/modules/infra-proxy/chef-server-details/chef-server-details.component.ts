@@ -105,7 +105,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public uploadZipForm: FormGroup;
   public isUploaded = false;
-  public migrationID: string;
   public migrationStatus: MigrationStatus;
   public migrationStatusPercentage: number;
   public stepsCompleted: string;
@@ -117,6 +116,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public migrationLoading = true;
   public migrationStarted = false;
   public migrationIsInPreview = false;
+  public migration_type: string;
   public migrationSteps: Record<string, string> = {
     1: 'Migration started',
     2: 'Upload of zip file',
@@ -254,7 +254,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.migrationLoading = false;
       this.migration_id = '';
       this.migration_id = this.server.migration_id;
-      if (this.migration_id !== undefined) {
+      this.migration_type = this.server.migration_type;
+      if (this.migration_id !== '') {
         this.migrationStarted = true;
         this.getMigrationStatus(this.migration_id);
       }
@@ -383,7 +384,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     }, 1000);
 
     interval(50000).subscribe(() => {
-      if (this.migrationStarted) {
+      if (this.migrationStarted && this.migration_type !== 'Completed') {
         this.getMigrationStatus(this.migration_id);
       }
     });
@@ -473,10 +474,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       .subscribe(([migrationSt, getMigrationState]) => {
         if (migrationSt === EntityStatus.loadingSuccess && !isNil(getMigrationState)) {
           this.migrationStatus = getMigrationState;
-          const migration_type = this.migrationStatus.migration_type;
+          this.migration_type = this.migrationStatus.migration_type;
           const migration_status = this.migrationStatus.migration_status;
           if (migration_status === 'Completed' ) {
-            this.migrationStepValue = this.getKeyByValue(this.migrationSteps, migration_type);
+            this.migrationStepValue = this.getKeyByValue(this.migrationSteps, this.migration_type);
             this.migrationStatusPercentage =
               Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
             this.migrationInProgress = true;
@@ -486,7 +487,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
               this.migrationInProgress = false;
             }
             this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
-            if (migration_type === 'Creating Preview') {
+            if (this.migration_type === 'Creating Preview') {
               this.migrationIsInPreview = true;
             }
           } else {

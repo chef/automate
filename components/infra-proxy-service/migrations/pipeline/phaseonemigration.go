@@ -78,7 +78,7 @@ func parseOrg(result <-chan PipelineData, service *service.Service) <-chan Pipel
 				res.Done <- nil
 			}
 		}
-		log.Info("CLosing parse_orgs pipeline")
+		log.Info("Closing parse_orgs pipeline")
 		close(out)
 	}()
 	return out
