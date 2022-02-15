@@ -1365,7 +1365,7 @@ func (s *server) doConverge(
 		errHandler(eDeploy.err)
 		// json file
 		fmt.Println(os.Getenv(isUpgradeMajorEnv))
-		if os.Getenv(isUpgradeMajorEnv) == "false" {
+		if os.Getenv(isUpgradeMajorEnv) == "true" {
 			var writer *cli.Writer
 			ci, err := majorupgradechecklist.NewChecklistManager(writer, s.deployment.CurrentReleaseManifest.Version(), "")
 			if err != nil {

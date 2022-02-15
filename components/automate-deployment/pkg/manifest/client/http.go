@@ -20,8 +20,8 @@ import (
 
 const (
 	defaultSemanticManifestURLFmt = "http://ec2-3-108-10-133.ap-south-1.compute.amazonaws.com:8080/manifests/%s/automate/latest_semver.json" // change to mock url
-	defaultLatestManifestURLFmt   = "http://ec2-3-108-10-133.ap-south-1.compute.amazonaws.com:8080/manifests/%s/automate/latest.json" // mock url
-	defaultManifestURLFmt         = "http://ec2-3-108-10-133.ap-south-1.compute.amazonaws.com:8080/manifests/automat/%s.json"// mock url
+	defaultLatestManifestURLFmt   = "http://ec2-3-108-10-133.ap-south-1.compute.amazonaws.com:8080/manifests/%s/automate/latest.json"        // mock url
+	defaultManifestURLFmt         = "http://ec2-3-108-10-133.ap-south-1.compute.amazonaws.com:8080/manifests/automate/%s.json"               // mock url
 	packagesChefIOSigAsc          = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.12 (Darwin)
 Comment: GPGTools - http://gpgtools.org
