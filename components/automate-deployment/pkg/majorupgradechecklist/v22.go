@@ -55,6 +55,7 @@ var postChecklist = []PostCheckList{
 		Id:         "clean_up",
 		Msg:        run_pg_data_cleanup,
 		Cmd:        run_pg_data_cleanup_cmd,
+		Optional:   true,
 		IsExecuted: false,
 	},
 }
@@ -183,7 +184,7 @@ func (ci *V22ChecklistManager) CreatePostChecklistFile() error {
 	}
 	buffer.Write(data)
 	buffer.WriteString("\n")
-	err = ioutil.WriteFile("test.json", buffer.Bytes(), 0644)
+	err = ioutil.WriteFile("/hab/svc/deployment-service/var/upgrade_metadata.json", buffer.Bytes(), 0644)
 	if err != nil {
 		return err
 	}
@@ -207,8 +208,7 @@ func (ci *V22ChecklistManager) ReadPostChecklistById(id string) (bool, error) {
 }
 
 func ReadJsonFile() (*PerPostChecklist, error) {
-	// postCmdList := []string{}
-	byteValue, err := ioutil.ReadFile("test.json")
+	byteValue, err := ioutil.ReadFile("/hab/svc/deployment-service/var/upgrade_metadata.json")
 	if err != nil {
 		return nil, err
 	}
@@ -222,19 +222,26 @@ func ReadJsonFile() (*PerPostChecklist, error) {
 }
 func (ci *V22ChecklistManager) ReadPostChecklistFile() ([]string, error) {
 	var postCmdList []string
+	var showPostChecklist = false
 	res, err := ReadJsonFile()
 	if err != nil {
 		return nil, err
 	}
 
-	if !res.IsExecuted {
+	for i := 0; i < len(res.PostChecklist); i++ {
+		if !res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted {
+			showPostChecklist = true
+			break
+		}
+	}
+
+	if showPostChecklist == true {
 		for i := 0; i < len(res.PostChecklist); i++ {
 			if !res.PostChecklist[i].IsExecuted {
 				postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
 			}
 		}
 	}
-
 	return postCmdList, nil
 }
 

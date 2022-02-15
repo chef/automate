@@ -1,8 +1,6 @@
 package majorupgradechecklist
 
 import (
-	"fmt"
-
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
@@ -25,12 +23,12 @@ type PostCheckList struct {
 	Id         string `json:"id"`
 	Msg        string `json:"msg"`
 	Cmd        string `json:"cmd"`
+	Optional   bool   `json:"optional"`
 	IsExecuted bool   `json:"is_executor"`
 }
 
 type PerPostChecklist struct {
 	PostChecklist []PostCheckList `json:"post_checklist"`
-	IsExecuted    bool            `json:"is_executor"`
 }
 
 //NewChecklistManager returns the checklist inspector for given major release
@@ -41,7 +39,6 @@ func NewChecklistManager(writer cli.FormatWriter, version, major string) (Checkl
 		resp, _ := manifest.IsSemVersionFmt(version)
 		major = resp
 	}
-	fmt.Println(major)
 
 	switch major {
 	case "2":
