@@ -342,7 +342,7 @@ func (phase *SelfUpgradePhase) Run(writer *eventWriter) error {
 	if err != nil {
 		return errors.Wrapf(err, "Could not parse deployment-service release %s", desiredReleaseStr)
 	}
-	//Todo(milestone) check if this code involves in upgrade process, if so modify the below comparison
+
 	if curRel < desRel {
 		// only upgrade if the release is newer. this is a safety net for
 		// the following situation: customers upgrading from a version of a2
