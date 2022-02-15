@@ -264,6 +264,8 @@ export class ChefSessionService implements CanActivate {
         this.httpHandler.get(signinURL, httpOptions).subscribe(
           () => {
           // HTTP redirect 303
+          // html file response from dex cannot be parsed here it errors out,
+          // on successful response redirect is handled in error block.
           },
           (e) => {
             if(e.status === 200) {
