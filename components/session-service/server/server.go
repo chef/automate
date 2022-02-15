@@ -429,7 +429,15 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	*u = *s.signInURL
 
-	u.Fragment = fmt.Sprintf("id_token=%s&state=%s", rawIDToken, clientState)
+	cookie := &http.Cookie{
+		Name:  "id_token",
+		Value: rawIDToken,
+		Path:  "/",
+	}
+
+	http.SetCookie(w, cookie)
+
+	u.Fragment = fmt.Sprintf("state=%s", clientState)
 	http.Redirect(w, r, u.String(), http.StatusSeeOther)
 }
 
@@ -741,9 +749,12 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) connectorIDFromRequest(r *http.Request) string {
-	token := r.FormValue("id_token_hint")
-	if token == "" { // ignore errors, we just use this as a hint
-		s.log.Error("no id_token_hint")
+	// token := r.FormValue("id_token_hint")
+	token, err := util.ExtractBearerToken(r)
+	s.log.Error("no id_token_hint: %s", token)
+	fmt.Println(token, "token extracted")
+	if err != nil { // ignore errors, we just use this as a hint
+		s.log.Error("no id_token_hint: %s", err)
 		return ""
 	}
 	// Note(sr): The way the verifier is set up, this allows for expired tokens --

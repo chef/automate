@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { IDToken, Jwt } from 'app/helpers/jwt/jwt';
+import { CookieService } from 'ngx-cookie';
 
 @Component({
   selector: 'app-signin',
@@ -17,7 +18,8 @@ export class SigninComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private session: ChefSessionService
+    private session: ChefSessionService,
+    private cookieService: CookieService
   ) { }
 
   ngOnInit() {
@@ -29,8 +31,11 @@ export class SigninComponent implements OnInit {
         return;
       }
       let state: string;
-      [this.idToken, state] = this.idTokenAndStateFromFragment(fragment);
+      [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
+      let val = this.cookieService.get('i_token');
+      console.log(this.idToken, state, val, "idToken returned, state val")
       if (this.idToken === null) {
+        console.log(this.idToken, state, "idToken error, state")
         this.error = true;
         return;
       }
@@ -43,8 +48,13 @@ export class SigninComponent implements OnInit {
 
       this.error = false;
       this.setSession();
+      this.deleteIdTokenFromCookie();
       this.router.navigateByUrl(this.path);
     });
+  }
+
+  deleteIdTokenFromCookie(): void {
+    this.cookieService.remove('id_token');
   }
 
   setSession(): void {
@@ -76,9 +86,12 @@ export class SigninComponent implements OnInit {
     return path;
   }
 
-  idTokenAndStateFromFragment(fragment: string): [string | null, string | null] {
+  idTokenAndStateFromCookieAndFragment(fragment: string): [string | null, string | null] {
     // Note: we only get an ID token and state now, so we match from ^ to $
-    const matches = fragment.match('^id_token=([^&]+)&state=([^&]*)$');
-    return matches ? [matches[1], matches[2]] : [null, null];
+    const state_match = fragment.match('^state=([^&]*)$');
+    const id_token_match = this.cookieService.get('id_token');
+    const id_token = id_token_match ? id_token_match : null;
+    const state = state_match ? state_match[1] : null;
+    return [id_token,state];
   }
 }

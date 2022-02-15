@@ -249,16 +249,33 @@ export class ChefSessionService implements CanActivate {
       if (ui_signout) {
         this.blacklistIdToken(this.id_token);
       }
-      this.deleteSession();
       url = url || this.currentPath();
       // note: url will end up url-encoded in this string (magic)
       let signinURL: string;
+      signinURL = `/session/new?state=${url}`;
+
       if (!noHint && this.user && this.user.id_token) {
-        signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
+        const httpOptions = {
+          headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.id_token}`
+          })
+        };
+        this.httpHandler.get(signinURL, httpOptions).subscribe(
+          () => {
+          // HTTP redirect 303
+          },
+          (e) => {
+            if(e.status === 200) {
+              window.location.href = e.url;
+            } else {
+              window.location.href = signinURL;
+            }
+          });
       } else {
-        signinURL = `/session/new?state=${url}`;
+        window.location.href = signinURL;
       }
-      window.location.href = signinURL;
+      this.deleteSession();
   }
 
   storeTelemetryPreference(isOptedIn: boolean): void {
@@ -296,7 +313,7 @@ export class ChefSessionService implements CanActivate {
     function timerIncrement() {
       idleTime = idleTime + 1;
       if (idleTime === idleTimeout + 1) {
-          this.logout('/', true);
+          this.logout('/', false);
       }
     }
   }
