@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest, interval } from 'rxjs';
+import { Subject, combineLatest, interval, Subscription } from 'rxjs';
 import { filter, pluck, take, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
@@ -144,6 +144,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public confirmPreviewSuccessful = false;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
+  mySubscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -335,6 +336,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         // show migration slider
         this.isUploaded = true;
         this.migration_id = uploadDetailsState?.migration_id;
+        this.migrationStarted = true;
+        this.getMigrationStatus(this.migration_id);
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
@@ -369,7 +372,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(confirmPreviewStatus).pipe(
       takeUntil(this.isDestroyed),
-    filter(state => this.cancelMigrationInProgress && !pending(state)))
+    filter(state => this.migrationIsInPreview && !pending(state)))
     .subscribe((state) => {
       this.confirmPreviewSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.confirmPreviewSuccessful) {
@@ -383,8 +386,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     }, 1000);
 
-    interval(50000).subscribe(() => {
-      if (this.migrationStarted && this.migration_type !== 'Completed') {
+    this.mySubscription = interval(50000).subscribe(() => {
+      if (this.migrationStarted && this.migration_type !== 'Migration Completed') {
         this.getMigrationStatus(this.migration_id);
       }
     });
@@ -482,16 +485,23 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
               Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
             this.migrationInProgress = true;
             this.migrationLoading = false;
-            if (this.migrationStatusPercentage.toFixed(0) === '100') {
-              this.migrationCompleted = true;
-              this.migrationInProgress = false;
-            }
+            // if (this.migrationStatusPercentage.toFixed(0) === '100') {
+            //   this.migrationCompleted = true;
+            //   this.migrationInProgress = false;
+            // }
             this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
             if (this.migration_type === 'Creating Preview') {
               this.migrationIsInPreview = true;
             }
+            if(this.migration_type === 'Migration Completed') {
+              this.mySubscription.unsubscribe();
+              this.migrationCompleted = true;
+              this.migrationInProgress = false;
+              this.migrationfailed = false;
+            }
           } else {
             this.migrationfailed = true;
+            this.migrationCompleted = false;
           }
         }
       });
