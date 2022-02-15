@@ -36,32 +36,41 @@
 
 .heading-actions {
   position: relative;
+  display: flex;
+  flex-direction: row;
 
-  .download {
+  .checkin-select, .download-select {
+    position: relative;
+    margin-left: 5px;
+
+    &-dropdown {
     position: absolute;
     right: 0;
-    width: 114px;
+    width: 100%;
+    z-index: 1;
 
-    chef-button {
-      margin: 0;
-      font-size: 14px;
-      text-align: center;
-      padding: 5px 0;
-      border-bottom: 1px solid $chef-grey;
-      width: 100%;
-      color: inherit;
-
-      button {
+      chef-button {
         margin: 0;
-        padding: 0;
-      }
+        font-size: 14px;
+        text-align: center;
+        padding: 5px 0;
+        border-bottom: 1px solid $chef-grey;
+        width: 100%;
+        color: inherit;
+        background-color: $chef-white;
 
-      &:hover {
-        cursor: pointer;
-      }
+        button {
+          margin: 0;
+          padding: 0;
+        }
 
-      &:last-child {
-        border-bottom: none;
+        &:hover {
+          cursor: pointer;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
       }
     }
   }
