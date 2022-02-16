@@ -40,7 +40,7 @@ const (
 	run_pg_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running: 
 		   $ ` + run_pg_data_cleanup_cmd
 
-	run_pg_data_cleanup_cmd         = `chef-automate post-major-upgrade clear-data --pg-data`
+	run_pg_data_cleanup_cmd        = `chef-automate post-major-upgrade clear-data --pg-data`
 	v3_post_checklist_confirmation = `*In case of any errors, please refer to docs.chef.io and release notes for this version.*
 	Now, upgrade will start, Please confirm to continue...`
 )
@@ -220,6 +220,7 @@ func ReadJsonFile() (*PerPostChecklist, error) {
 	}
 	return &params, nil
 }
+
 func (ci *V3ChecklistManager) ReadPostChecklistFile() ([]string, error) {
 	var postCmdList []string
 	var showPostChecklist = false
@@ -267,4 +268,3 @@ func (ci *V3ChecklistManager) UpdatePostChecklistFile(id string) error {
 	}
 	return nil
 }
-

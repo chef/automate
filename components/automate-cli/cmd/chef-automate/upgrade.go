@@ -125,7 +125,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if upgradeRunCmdFlags.isMajorUpgrade {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, "")
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -277,7 +277,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, "2.0.1", "")
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, resp.CurrentVersion, "")
 		if err != nil {
 			return status.Wrap(
 				err,
