@@ -68,7 +68,10 @@
 [Security and firewall](#security-and-firewall) 
 - [Incoming frontends network traffic](#incoming-frontends-network-traffic) 
 - [Incoming Elastic-search backend network traffic](#incoming-elastic-search-backend-network-traffic) 
-- [Incoming PostgreSQL backend network traffic](#incoming-postgreSQL-backend-network-traffic) 
+- [Incoming PostgreSQL backend network traffic](#incoming-postgreSQL-backend-network-traffic)
+ 
+
+- [Logs and Service health check commands](#logs-and-service-health-check-commands) 
 
 [Troubleshooting guide](#troubleshooting-guide)
 - [Restore issues](#restore-issues) 
@@ -1261,6 +1264,19 @@ elasticsearch-backends <=> postgres-backends
 TCP/UDP 9638 - This allows Habitat to communicate configuration changes between all backend nodes
 
 TCP 9631 - This allows the Habitat API to be reachable from services on all backend nodes
+
+# Logs and service health check commands
+
+## Commands to check logs
+Ssh into the node where you have to to check logs and execute the below command.
+
+`journalctl -f`
+  
+## Command to check Service health
+Ssh into the node where you have to check health of services and execute the below command.
+
+ `hab svc status`
+
 
 # Troubleshooting guide 
 
