@@ -123,44 +123,6 @@ func init() {
         ]
       }
     },
-    "/apis/iam/v2/users/hash": {
-      "post": {
-        "operationId": "Users_CreateUserWithHashPassword",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateUserResp"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateUserReq"
-            }
-          }
-        ],
-        "tags": [
-          "users"
-        ],
-        "x-code-samples": [
-          {
-            "lang": "JSON",
-            "source": "{\"name\": \"Display Name\", \"id\": \"username001rulez\", \"password\": \"aSafePassword\"}"
-          }
-        ]
-      }
-    },
     "/apis/iam/v2/users/{id}": {
       "get": {
         "summary": "Get a user",
@@ -291,6 +253,11 @@ func init() {
         "password": {
           "type": "string",
           "description": "Password for user. Used to sign in."
+        },
+        "is_hashed": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "boolean for if hash password there"
         }
       },
       "required": [

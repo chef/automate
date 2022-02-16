@@ -34,26 +34,13 @@ func (p *Server) CreateUser(
 		Name:     in.Name,
 		Email:    in.Id,
 		Password: in.Password,
+		IsHashed: in.IsHashed,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	// See note above -- the reverse mapping applies.
-	return &pb_resp.CreateUserResp{User: convert(resp)}, nil
-}
-
-// CreateUserWithHashPassword creates a new user for password
-func (p *Server) CreateUserWithHashPassword(
-	ctx context.Context, in *pb_req.CreateUserReq) (*pb_resp.CreateUserResp, error) {
-	resp, err := p.users.CreateUserWithHashPassword(ctx, &local_user.CreateUserReq{
-		Name:     in.Name,
-		Email:    in.Id,
-		Password: in.Password,
-	})
-	if err != nil {
-		return nil, err
-	}
 	return &pb_resp.CreateUserResp{User: convert(resp)}, nil
 }
 
