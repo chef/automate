@@ -12,6 +12,7 @@ aws_tags    = {
 <% if config.aws.ssh_key_pair_name %>
 aws_ssh_key_pair_name = "<%= config.aws.ssh_key_pair_name %>"
 <% end %>
+setup_managed_services = <%= config.aws.setup_managed_services %>
 <% if config.aws.ami_filter_name %>
 ami_filter_name = "<%= config.aws.ami_filter_name %>"
 <% end %>

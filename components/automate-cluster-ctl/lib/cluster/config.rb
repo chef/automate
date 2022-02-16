@@ -97,6 +97,7 @@ module AutomateCluster
       default :vpc_id, " "
       default :cidr_block_addr, " "
       default :ssh_key_pair_name
+      default :setup_managed_services, false
       default :ami_filter_name
       default :ami_filter_virt_type
       default :ami_filter_owner

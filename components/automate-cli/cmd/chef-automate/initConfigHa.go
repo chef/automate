@@ -69,6 +69,7 @@ type AwsConfigToml struct {
 			AwsVpcId                        string `toml:"aws_vpc_id"`
 			AwsCidrBlockAddr                string `toml:"aws_cidr_block_addr"`
 			SSHKeyPairName                  string `toml:"ssh_key_pair_name"`
+			SetupManagedServices            bool   `toml:"setup_managed_services"`
 			AmiFilterName                   string `toml:"ami_filter_name"`
 			AmiFilterVirtType               string `toml:"ami_filter_virt_type"`
 			AmiFilterOwner                  string `toml:"ami_filter_owner"`

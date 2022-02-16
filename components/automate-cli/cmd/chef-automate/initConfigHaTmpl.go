@@ -51,6 +51,7 @@ aws_vpc_id  = ""
 aws_cidr_block_addr  = ""
 # ssh key pair name in AWS to access instances
 ssh_key_pair_name = "A2HA"
+setup_managed_services = false
 ami_filter_name = ""
 ami_filter_virt_type = ""
 ami_filter_owner = ""
