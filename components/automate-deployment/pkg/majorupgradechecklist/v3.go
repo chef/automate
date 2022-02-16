@@ -41,7 +41,7 @@ const (
 		   $ ` + run_pg_data_cleanup_cmd
 
 	run_pg_data_cleanup_cmd         = `chef-automate post-major-upgrade clear-data --pg-data`
-	v22_post_checklist_confirmation = `*In case of any errors, please refer to docs.chef.io and release notes for this version.*
+	v3_post_checklist_confirmation = `*In case of any errors, please refer to docs.chef.io and release notes for this version.*
 	Now, upgrade will start, Please confirm to continue...`
 )
 
@@ -60,13 +60,13 @@ var postChecklist = []PostCheckList{
 	},
 }
 
-type V22ChecklistManager struct {
+type V3ChecklistManager struct {
 	writer  cli.FormatWriter
 	version string
 }
 
-func NewV22ChecklistManager(writer cli.FormatWriter, version string) *V22ChecklistManager {
-	return &V22ChecklistManager{
+func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3ChecklistManager {
+	return &V3ChecklistManager{
 		writer:  writer,
 		version: version,
 	}
@@ -78,7 +78,7 @@ func prechecklist() []Checklist {
 	}
 }
 
-func (ci *V22ChecklistManager) RunChecklist() error {
+func (ci *V3ChecklistManager) RunChecklist() error {
 
 	checklists := []Checklist{}
 	checklists = append(checklists, prechecklist()...)
@@ -101,7 +101,7 @@ func (ci *V22ChecklistManager) RunChecklist() error {
 	return nil
 }
 
-func (ci *V22ChecklistManager) showPostChecklist() Checklist {
+func (ci *V3ChecklistManager) showPostChecklist() Checklist {
 	return Checklist{
 		Name:        "Show_Post_Checklist",
 		Description: "Show Post Checklist",
@@ -160,7 +160,7 @@ func promptUpgradeContinue() Checklist {
 		Name:        "post_checklist",
 		Description: "display post checklist and ask for final confirmation",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm(v22_post_checklist_confirmation)
+			resp, err := h.Writer.Confirm(v3_post_checklist_confirmation)
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
@@ -174,7 +174,7 @@ func promptUpgradeContinue() Checklist {
 	}
 }
 
-func (ci *V22ChecklistManager) CreatePostChecklistFile() error {
+func (ci *V3ChecklistManager) CreatePostChecklistFile() error {
 	params := PerPostChecklist{}
 	params.PostChecklist = append(params.PostChecklist, postChecklist...)
 	var buffer bytes.Buffer
@@ -190,7 +190,7 @@ func (ci *V22ChecklistManager) CreatePostChecklistFile() error {
 	}
 	return nil
 }
-func (ci *V22ChecklistManager) ReadPostChecklistById(id string) (bool, error) {
+func (ci *V3ChecklistManager) ReadPostChecklistById(id string) (bool, error) {
 	ChecklistId_Found := false
 	res, err := ReadJsonFile()
 	if err != nil {
@@ -220,7 +220,7 @@ func ReadJsonFile() (*PerPostChecklist, error) {
 	}
 	return &params, nil
 }
-func (ci *V22ChecklistManager) ReadPostChecklistFile() ([]string, error) {
+func (ci *V3ChecklistManager) ReadPostChecklistFile() ([]string, error) {
 	var postCmdList []string
 	var showPostChecklist = false
 	res, err := ReadJsonFile()
@@ -245,7 +245,7 @@ func (ci *V22ChecklistManager) ReadPostChecklistFile() ([]string, error) {
 	return postCmdList, nil
 }
 
-func (ci *V22ChecklistManager) UpdatePostChecklistFile(id string) error {
+func (ci *V3ChecklistManager) UpdatePostChecklistFile(id string) error {
 	byteValue, _ := ioutil.ReadFile("test.json")
 	params := PerPostChecklist{}
 
@@ -268,4 +268,3 @@ func (ci *V22ChecklistManager) UpdatePostChecklistFile(id string) error {
 	return nil
 }
 
-// read and update the json file
