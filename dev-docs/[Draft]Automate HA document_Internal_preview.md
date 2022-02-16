@@ -68,10 +68,7 @@
 [Security and firewall](#security-and-firewall) 
 - [Incoming frontends network traffic](#incoming-frontends-network-traffic) 
 - [Incoming Elastic-search backend network traffic](#incoming-elastic-search-backend-network-traffic) 
-- [Incoming PostgreSQL backend network traffic](#incoming-postgreSQL-backend-network-traffic)
- 
-
-- [Logs and Service health check commands](#logs-and-service-health-check-commands) 
+- [Incoming PostgreSQL backend network traffic](#incoming-postgreSQL-backend-network-traffic) 
 
 [Troubleshooting guide](#troubleshooting-guide)
 - [Restore issues](#restore-issues) 
@@ -1265,19 +1262,6 @@ TCP/UDP 9638 - This allows Habitat to communicate configuration changes between 
 
 TCP 9631 - This allows the Habitat API to be reachable from services on all backend nodes
 
-# Logs and service health check commands
-
-## Commands to check logs
-Ssh into the node where you have to to check logs and execute the below command.
-
-`journalctl -f`
-  
-## Command to check Service health
-Ssh into the node where you have to check health of services and execute the below command.
-
- `hab svc status`
-
-
 # Troubleshooting guide 
 
 ## Restore issues
@@ -1300,21 +1284,48 @@ Command : chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\
 
 How to Resolve:
 
-Execute  belo command from bastion from any location.
+Execute  below command from bastion from any location.
 
 sed  -i 's/deployment/aws/' /hab/a2\_deploy\_workspace/terraform/.tf\_arch
 
 sed  -i 's/architecture "deployment"/architecture "aws"/' /hab/a2\_deploy\_workspace/a2ha.rb
+	
+
+### Error : Could not determine bucket region, request cancelled
+
+![image](https://user-images.githubusercontent.com/65227203/153855824-889f50a0-4a01-4614-beb1-e9252e1cfb44.png)
+
+**How to resolve:** If you are using onprem s3 for backup and your are facing issues with restror then just attach s3-endpoint with s3 restore command.
+
+`chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "<URL>"`
+
+
+### Error : How to troubleshoot backup-restore issue
+
+![image](https://user-images.githubusercontent.com/65227203/153858880-247202e4-01c3-4f21-875c-c45903a21b1d.png)
+
+**How to resolve:** Check the logs using below command.
+
+   chef-automate debug set-log-level deployment-service debug
+
+### Error : Hab user access error, Please update the permission
+
+![image](https://user-images.githubusercontent.com/65227203/153858444-6acaafae-0c6f-4969-9ad0-71c684abadce.png)
+
+**How to resolve:** Execute the below command
+
+sudo chef-automate backup fix-repo-permissions <path>
+
+### Error : ./scripts/credentials set ssl, If this command is taking more time to print logs.
+
+**How to resolve:** Press ctrl + c and export hab license
+	then execute  ./scripts/credentials set ssl
 
 ### Other Errors: 
 
 After running the following deployment command, the deployment repeatedly fails due to UnhealthyStatusError (refer screenshot)
 
 (./chef-automate deploy config.toml)Those error can occur during deployment time.
-
-
-
-
 
 
 In this above all cases, do the things below.
