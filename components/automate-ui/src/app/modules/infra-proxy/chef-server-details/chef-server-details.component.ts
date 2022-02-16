@@ -142,6 +142,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public previewData;
   public isPreview = false;
   public confirmPreviewSuccessful = false;
+  public confirmPreviewsubmit = false;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
   mySubscription: Subscription;
@@ -347,13 +348,22 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(cancelStatus).pipe(
       takeUntil(this.isDestroyed),
-      filter(state => this.cancelMigrationInProgress && !pending(state)))
+      filter(state => !pending(state)))
     .subscribe((state) => {
-      this.cancelMigrationInProgress = false;
+      this.cancelMigrationInProgress = true;
       this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.canceMigrationSuccessful) {
         this.isCancelled = true;
         this.migrationIsInPreview = false;
+        this.migrationCompleted = false;
+        this.migrationInProgress = false;
+        this.migrationfailed = true;
+      } else {
+        this.isCancelled = false;
+        this.migrationIsInPreview = true;
+        this.migrationCompleted = false;
+        this.migrationInProgress = true;
+        this.migrationfailed = false;
       }
     });
 
@@ -377,6 +387,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.confirmPreviewSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.confirmPreviewSuccessful) {
         this.migrationIsInPreview = false;
+        this.confirmPreviewsubmit = true;
+      } else {
+        this.confirmPreviewsubmit = false;
       }
     });
 
@@ -490,7 +503,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
             //   this.migrationInProgress = false;
             // }
             this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
-            if (this.migration_type === 'Creating Preview') {
+            if (this.migration_type === 'Creating Preview'
+              && this.confirmPreviewsubmit === false
+              && this.isCancelled === false) {
               this.migrationIsInPreview = true;
             }
             if(this.migration_type === 'Migration Completed') {
@@ -579,6 +594,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   public confirmPreview(migrationID: string) {
+    this.confirmPreviewsubmit = true;
     const payload = {
       server_id: this.server.id,
       migration_id: migrationID
