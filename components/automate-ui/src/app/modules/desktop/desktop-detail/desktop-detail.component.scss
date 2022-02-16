@@ -35,19 +35,19 @@
 }
 
 .heading-actions {
-  position: relative;
   display: flex;
   flex-direction: row;
+  position: relative;
 
   .checkin-select, .download-select {
-    position: relative;
     margin-left: 5px;
+    position: relative;
 
     &-dropdown {
-    position: absolute;
-    right: 0;
-    width: 100%;
-    z-index: 1;
+      position: absolute;
+      right: 0;
+      width: 100%;
+      z-index: 1;
 
       chef-button {
         margin: 0;

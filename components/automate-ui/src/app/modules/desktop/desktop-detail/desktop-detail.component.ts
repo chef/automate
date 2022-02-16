@@ -50,7 +50,7 @@ export class DesktopDetailComponent {
   ) {}
 
   updateCheckInDays(value) {
-    this.toggleCheckInPeriodDropdown()
+    this.toggleCheckInPeriodDropdown();
     this.checkInNumDays = value;
     this.checkInNumDaysChanged.emit(value);
   }
