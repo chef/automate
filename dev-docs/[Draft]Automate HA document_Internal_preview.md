@@ -70,7 +70,7 @@
 - [Incoming Elastic-search backend network traffic](#incoming-elastic-search-backend-network-traffic) 
 - [Incoming PostgreSQL backend network traffic](#incoming-postgreSQL-backend-network-traffic) 
 
-[Logs and services health check](#logs-and-services-health-check)
+[Logs and service health check](#logs-and-service-health-check)
 
 [Troubleshooting guide](#troubleshooting-guide)
 - [Restore issues](#restore-issues) 
@@ -1263,7 +1263,7 @@ TCP/UDP 9638 - This allows Habitat to communicate configuration changes between 
 
 TCP 9631 - This allows the Habitat API to be reachable from services on all backend nodes
 
-# Logs and services health check
+# Logs and service health check
 
 ## Commands to check logs
 
@@ -1284,8 +1284,9 @@ journalctl --follow --unit chef-automate
 
 ```bash
 journactl --follow --unit chef-automate | grep ingest.service
+```
 
-## Command to check logs
+## Command to check Service health
 
 Ssh into the node where you have to check health of services and execute the below command.
 
