@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/storage/testDB"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStoreOrg(t *testing.T) {
@@ -128,4 +130,27 @@ func TestCreatePreview(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetUsersForBackup(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		st     storage.Storage
+		mst    storage.MigrationStorage
+		result pipeline.Result
+	}
+
+	arg := args{
+		ctx: context.Background(),
+		st:  &testDB.TestDB{},
+		mst: &testDB.MigrationDB{},
+		result: pipeline.Result{
+			Meta: pipeline.Meta{
+				UnzipFolder: "/Users/pappuk/Downloads/backup",
+			},
+		},
+	}
+	result, err := GetUsersForBackup(arg.ctx, arg.st, arg.mst, arg.result)
+	require.NoError(t, err)
+	fmt.Println(result)
 }

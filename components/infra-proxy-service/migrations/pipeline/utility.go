@@ -5,14 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"path"
+	"path/filepath"
+
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	log "github.com/sirupsen/logrus"
-	"io"
-	"os"
-	"path"
-	"path/filepath"
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
@@ -340,4 +342,61 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
 	}
 	return result, nil
+}
+
+func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
+
+	keyDumpByte, err := ioutil.ReadFile(file)
+	if err != nil {
+		log.Printf("error while reading file: %+v\n", err)
+		return result, err
+	}
+
+	var keyDumps []pipeline.KeyDump
+	if err := json.Unmarshal(keyDumpByte, &keyDumps); err != nil {
+		log.Printf("error while unmarshaling key dump: %+v\n", err)
+		return result, err
+	}
+
+	users := KeyDumpTOUser(keyDumps)
+	for _, user := range users {
+		usr, err := st.GetUserByUsername(ctx, user.Username, "")
+		if err != nil {
+			log.Printf("error while running get query by username: %+v\n", err)
+		}
+
+		// The users in Automate if unchanged in server side should be skipped
+
+		// The users in Automate updated in Chef Server side should be updated
+
+		// The users in Automate deleted from Chef Server should be deleted from Chef Server association including all the orgs/policies.
+
+		//The new users of Chef Server should be added to Automate
+
+		fmt.Printf("->: %+v\n ", user)
+	}
+	return pipeline.Result{}, nil
+}
+
+// Clean serialized_object
+// Polulate Users struct
+func KeyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
+	var users []pipeline.User
+	for _, kd := range keyDump {
+		sec := map[string]string{}
+		if err := json.Unmarshal([]byte(kd.SerializedObject), &sec); err != nil {
+			panic(err)
+		}
+		user := pipeline.User{
+			Username:    kd.Username,
+			Email:       kd.Email,
+			DisplayName: sec["display_name"],
+			FirstName:   sec["first_name"],
+			LastName:    sec["last_name"],
+			MiddleName:  sec["middle_name"],
+		}
+		users = append(users, user)
+	}
+	return users
 }

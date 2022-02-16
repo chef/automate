@@ -26,6 +26,7 @@ type Storage interface {
 
 	InsertUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	GetUser(ctx context.Context, id string) (User, error)
+	GetUserByUsername(context.Context, string, string) (User, error)
 	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	DeleteUser(ctx context.Context, id string) (User, error)
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)

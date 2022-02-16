@@ -132,3 +132,27 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 	}
 	return users, nil
 }
+
+func (p *postgres) GetUserByUsername(ctx context.Context, username string, serverID string) (storage.User, error) {
+	return p.getUserByUsername(ctx, p.db, username, serverID)
+}
+
+func (p *postgres) getUserByUsername(ctx context.Context, q querier, username string, serverID string) (storage.User, error) {
+	var user storage.User
+	err := q.QueryRowContext(ctx,
+		`SELECT 
+		u.id, u.server_id, 
+		u.infra_server_username, 
+		u.credential_id, 
+		u.connector,
+		u.automate_user_id, 
+		u.is_server_admin,
+		u.created_at, u.updated_at
+		FROM users u
+		WHERE u.infra_server_username = $1 AND u.server_id`, username, serverID).
+		Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector, &user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return storage.User{}, p.processError(err)
+	}
+	return user, nil
+}
