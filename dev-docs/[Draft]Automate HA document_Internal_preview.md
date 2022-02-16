@@ -70,6 +70,8 @@
 - [Incoming Elastic-search backend network traffic](#incoming-elastic-search-backend-network-traffic) 
 - [Incoming PostgreSQL backend network traffic](#incoming-postgreSQL-backend-network-traffic) 
 
+[Logs and services health check](#logs-and-services-health-check)
+
 [Troubleshooting guide](#troubleshooting-guide)
 - [Restore issues](#restore-issues) 
     - [Error: Database is being accessed by other users](#error:-database-is-being-accessed-by-other-users) 
@@ -1036,8 +1038,7 @@ E.g For secret service `cat /hab/svc/secrets-service/data/secrets\_key`
 
 # Performance benchmarking
 # Certificates renewal
-
-# Certificate rotation using openssl
+# Crtificate rotation using openssl
 
 execute this command from /hab/a2_deploy_workspace. This command will create a skeleton of certificate. 
 
@@ -1261,6 +1262,34 @@ elasticsearch-backends <=> postgres-backends
 TCP/UDP 9638 - This allows Habitat to communicate configuration changes between all backend nodes
 
 TCP 9631 - This allows the Habitat API to be reachable from services on all backend nodes
+
+# Logs and services health check
+
+## Commands to check logs
+
+All Automate and Backend service logs are available via `journalctl` from each node. Each log line is prepended with the service name that generated the output. To view service logs use the following commands
+
+* Backend logs can be viewed in `journalctl` under the `hab-sup` unit file:
+
+```bash
+journalctl --follow --unit hab-sup
+```
+
+* Chef/Automate frontends logs are viewed in `journalctl` under the `chef-automate` unit file:
+
+```bash
+journalctl --follow --unit chef-automate
+```
+* Use `grep` to filter out logs for a single service, for example to view the `ingest` logs on an Automate frontend:
+
+```bash
+journactl --follow --unit chef-automate | grep ingest.service
+
+## Command to check logs
+
+Ssh into the node where you have to check health of services and execute the below command.
+
+`hab svc status`
 
 # Troubleshooting guide 
 
