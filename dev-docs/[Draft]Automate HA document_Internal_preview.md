@@ -1278,12 +1278,12 @@ All Automate and Backend service logs are available via `journalctl` from each n
 
 e.g. `journalctl --follow --unit hab-sup | grep 'automate-ha-elasticsearch'`
 
- * To view frontend (chef-automate and chef-server instances) logs, execute below command
+ * To view frontend (chef-automate and chef-server instances) logs, execute below command.
    This will show logs related to frontend nodes
  
  `journalctl --follow --unit chef-automate`
 
-* Use `grep` to filter out logs for a single service, for example to view the `ingest` logs on an Automate frontend:
+* Use `grep` to filter out logs for a single service, for example to view the `ingest` logs on an Automate frontend.
 
 e.g. `journactl --follow --unit chef-automate | grep ingest.service`
 
