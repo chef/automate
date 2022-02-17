@@ -63,7 +63,7 @@ Post Upgrade Steps:
 
 var postChecklistEmbedded = []PostCheckList{
 	{
-		Id:         "upgrade status",
+		Id:         "upgrade_status",
 		Msg:        run_chef_automate_upgrade_status,
 		Cmd:        run_chef_automate_upgrade_status_cmd,
 		Optional:   true,
@@ -74,7 +74,7 @@ var postChecklistEmbedded = []PostCheckList{
 		Cmd:        run_pg_data_migrate_cmd,
 		IsExecuted: false,
 	}, {
-		Id:         "check ui",
+		Id:         "check_ui",
 		Msg:        ui_check,
 		Cmd:        "",
 		Optional:   true,
@@ -90,13 +90,13 @@ var postChecklistEmbedded = []PostCheckList{
 
 var postChecklistExternal = []PostCheckList{
 	{
-		Id:         "patch new config",
+		Id:         "patch_new_config",
 		Msg:        patch_new_conf,
 		Cmd:        patch_new_conf_cmd,
 		Optional:   true,
 		IsExecuted: false,
 	}, {
-		Id:         "upgrade status",
+		Id:         "upgrade_status",
 		Msg:        run_chef_automate_upgrade_status,
 		Cmd:        run_chef_automate_upgrade_status_cmd,
 		Optional:   true,
@@ -108,7 +108,7 @@ var postChecklistExternal = []PostCheckList{
 		Optional:   true,
 		IsExecuted: false,
 	}, {
-		Id:         "check ui",
+		Id:         "check_ui",
 		Msg:        ui_check,
 		Cmd:        "",
 		Optional:   true,
