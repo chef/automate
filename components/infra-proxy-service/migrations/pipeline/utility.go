@@ -418,7 +418,6 @@ func MapUsers(serverUser []pipeline.User, automateUser []storage.User) []pipelin
 						serverCleanUser = append(serverCleanUser, sUser)
 
 					} else {
-						fmt.Println("Update: ", sUser.Username, ", ", sUser.Email)
 						sUser.ActionOps = 4
 						serverCleanUser = append(serverCleanUser, sUser)
 					}
