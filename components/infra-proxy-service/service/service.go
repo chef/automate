@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/chef/automate/api/interservice/local_user"
 	"reflect"
 
 	"google.golang.org/grpc/codes"
@@ -25,16 +26,16 @@ type Service struct {
 	Migration          storage.MigrationStorage
 	Secrets            secrets.SecretsServiceClient
 	AuthzProjectClient authz.ProjectsServiceClient
+	LocalUser          local_user.UsersMgmtServiceClient
 }
 
 // Start returns an instance of Service that connects to a postgres storage backend.
 func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secureconn.Factory, secretsClient secrets.SecretsServiceClient,
-	authzClient authz.AuthorizationServiceClient, authzProjectClient authz.ProjectsServiceClient) (*Service, error) {
+	authzClient authz.AuthorizationServiceClient, authzProjectClient authz.ProjectsServiceClient, localUserClient local_user.UsersMgmtServiceClient) (*Service, error) {
 	p, pObj, err := postgres.New(l, migrationsConfig, authzClient)
 	if err != nil {
 		return nil, err
 	}
-
 	return &Service{
 		Logger:             l,
 		ConnFactory:        connFactory,
@@ -42,6 +43,7 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 		Migration:          pObj,
 		Secrets:            secretsClient,
 		AuthzProjectClient: authzProjectClient,
+		LocalUser:          localUserClient,
 	}, nil
 }
 

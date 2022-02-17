@@ -4,9 +4,7 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
-
-	"errors"
-
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -15,6 +13,7 @@ import (
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
+	"github.com/chef/automate/api/interservice/local_user"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -247,7 +246,7 @@ func openOrgFolder(org os.FileInfo, fileLocation string) pipeline.OrgJson {
 	jsonFile, err := os.Open(jsonPath)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Errorf("Unable to open the file at location : %s", jsonPath)
+		fmt.Println(err)
 	}
 	log.Info("Successfully opened the file at location", jsonPath)
 	defer func() {
@@ -569,4 +568,21 @@ func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]stri
 	}
 	return orgAdminsMap
 
+}
+
+func checkUsersExists(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
+	for _, user := range result.ParsedResult.Users {
+		userExists, _ := checkUserExist(ctx, localUserClient, user)
+		user.IsConflicting = userExists
+	}
+	return result, nil
+}
+
+func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) (bool, error) {
+	_, err := localUserClient.GetUser(ctx, &local_user.Email{Email: user.AutomateUsername})
+	if err != nil {
+		log.Errorf("Unable to fetch user")
+		return false, nil
+	}
+	return true, nil
 }

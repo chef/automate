@@ -2,6 +2,8 @@ package pipeline
 
 import (
 	"context"
+	"github.com/chef/automate/api/interservice/local_user"
+	"github.com/chef/automate/components/local-user-service/users"
 	"reflect"
 	"testing"
 
@@ -214,5 +216,49 @@ func TestUserOrgAssociation(t *testing.T) {
 			}
 
 		})
+	}
+}
+
+func TestUserExists(t *testing.T) {
+	type args struct {
+		ctx             context.Context
+		localUserClient *local_user.MockUsersMgmtServiceClient
+		User            pipeline.User
+		ErrorType       string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantError error
+		want1     bool
+	}{
+		{name: "Test User Exists", args: args{ctx: context.Background(), localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), User: pipeline.User{AutomateUsername: "user1234", Username: "user1234"}}, wantError: nil, want1: true},
+		{name: "Test New User", args: args{ctx: context.Background(), localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), User: pipeline.User{AutomateUsername: "user1234", Username: "user1234"}, ErrorType: "No user record"}, wantError: errors.New("No user record found"), want1: false},
+		{name: "Test No User Found Error", args: args{ctx: context.Background(), localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), User: pipeline.User{AutomateUsername: "user1234", Username: "user1234"}, ErrorType: "Not Found"}, wantError: &users.NotFoundError{}, want1: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantError != nil {
+				if tt.args.ErrorType == "Not Found" {
+					tt.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(nil, &users.NotFoundError{})
+				}
+				if tt.args.ErrorType == "No user record" {
+					tt.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(nil, errors.New("No user record"))
+				}
+			} else {
+				userResponse := &local_user.User{Id: "user1234", Name: "user1234"}
+				tt.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(userResponse, nil)
+			}
+
+			got, gotError := checkUserExist(tt.args.ctx, tt.args.localUserClient, tt.args.User)
+			if gotError != nil && gotError.Error() != tt.wantError.Error() {
+				//t.Errorf("StoreOrg() got = %v, want %v", got, tt.want)
+			}
+			if got != tt.want1 {
+				t.Errorf("checkUserExists() got1 = %v, want %v", got, tt.want1)
+			}
+
+		})
+
 	}
 }

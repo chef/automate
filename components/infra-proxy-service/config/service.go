@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/chef/automate/api/interservice/local_user"
 	"net/url"
 	"os"
 
@@ -20,15 +21,16 @@ import (
 
 // Service config options
 type Service struct {
-	GRPC            string `mapstructure:"grpc"`
-	LogFormat       string `mapstructure:"log-format"`
-	LogLevel        string `mapstructure:"log-level"`
-	certs.TLSConfig `mapstructure:"tls"`
-	PGURL           string `mapstructure:"pg_url"`
-	Database        string `mapstructure:"database"`
-	MigrationsPath  string `mapstructure:"migrations-path"`
-	AuthzAddress    string `mapstructure:"authz-address"`
-	SecretsAddress  string `mapstructure:"secrets-address"`
+	GRPC             string `mapstructure:"grpc"`
+	LogFormat        string `mapstructure:"log-format"`
+	LogLevel         string `mapstructure:"log-level"`
+	certs.TLSConfig  `mapstructure:"tls"`
+	PGURL            string `mapstructure:"pg_url"`
+	Database         string `mapstructure:"database"`
+	MigrationsPath   string `mapstructure:"migrations-path"`
+	AuthzAddress     string `mapstructure:"authz-address"`
+	SecretsAddress   string `mapstructure:"secrets-address"`
+	LocalUserAddress string `mapstructure:"local-user-address"`
 }
 
 // ConfigFromViper returns a Service instance from the current viper config
@@ -100,7 +102,15 @@ func ConfigFromViper(configFile string) (*service.Service, error) {
 	// gets secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient)
+	localUserConn, err := connFactory.Dial("local-user-service", cfg.LocalUserAddress)
+	if err != nil {
+		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
+	}
+
+	//Local user service client
+	localUserClient := local_user.NewUsersMgmtServiceClient(localUserConn)
+
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient,localUserClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/chef/automate/api/interservice/local_user"
 	"net/url"
 	"os"
 
@@ -35,6 +36,7 @@ func serve(cmd *cobra.Command, args []string) {
 	cmd.PersistentFlags().StringP("migrations-path", "m", "", "migrations path")
 	cmd.PersistentFlags().StringP("authz-address", "a", "", "authz-service GRPC address")
 	cmd.PersistentFlags().StringP("secrets-address", "s", "", "secrets-service GRPC address")
+	cmd.PersistentFlags().StringP("local-user-address", "l", "", "local-user-service GRPC address")
 
 	viper.SetConfigFile(args[0])
 	if err := viper.ReadInConfig(); err != nil {
@@ -99,8 +101,16 @@ func serve(cmd *cobra.Command, args []string) {
 	// get secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient)
+	localUserConn, err := connFactory.Dial("local-user-service", cfg.LocalUserAddress)
 	if err != nil {
+		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
+	}
+
+	//Local user service client
+	localUserClient := local_user.NewUsersMgmtServiceClient(localUserConn)
+
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient,localUserClient)
+		if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}
 
