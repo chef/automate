@@ -247,22 +247,21 @@ func (ci *V3ChecklistManager) ReadPostChecklistFile() ([]string, error) {
 }
 
 func (ci *V3ChecklistManager) UpdatePostChecklistFile(id string) error {
-	byteValue, _ := ioutil.ReadFile("test.json")
-	params := PerPostChecklist{}
-
-	json.Unmarshal(byteValue, &params)
-
-	for i, v := range params.PostChecklist {
-		if v.Id == id {
-			params.PostChecklist[i].IsExecuted = true
-		}
-	}
-
-	data, err := json.Marshal(params)
+	res, err := ReadJsonFile()
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("test.json", data, 0644)
+	for i, v := range res.PostChecklist {
+		if v.Id == id {
+			res.PostChecklist[i].IsExecuted = true
+		}
+	}
+
+	data, err := json.Marshal(res)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("/hab/svc/deployment-service/var/upgrade_metadata.json", data, 0644)
 	if err != nil {
 		return err
 	}
