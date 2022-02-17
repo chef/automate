@@ -34,6 +34,7 @@ func (p *Server) CreateUser(
 		Name:     in.Name,
 		Email:    in.Id,
 		Password: in.Password,
+		IsHashed: in.IsHashed,
 	})
 	if err != nil {
 		return nil, err
