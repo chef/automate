@@ -263,6 +263,8 @@ func (m *CreateUserReq) Validate() error {
 
 	// no validation rules for Password
 
+	// no validation rules for IsHashed
+
 	return nil
 }
 

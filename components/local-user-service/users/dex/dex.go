@@ -102,12 +102,17 @@ func (s *state) GetPassword(ctx context.Context, email string) (*users.UserWithH
 }
 
 func (s *state) CreateUser(ctx context.Context, user users.User) (*users.ShowUser, error) {
+	var hashedPass []byte
+	var err error
 	// hashes user's password string
-	hashedPass, err := s.HashPassword(user.Password)
-	if err != nil {
-		return nil, errors.Wrap(err, "create password")
+	if user.IsHashed {
+		hashedPass = []byte(user.Password)
+	} else {
+		hashedPass, err = s.HashPassword(user.Password)
+		if err != nil {
+			return nil, errors.Wrap(err, "create password")
+		}
 	}
-
 	// creates password request
 	createReq := &api.CreatePasswordReq{
 		Password: &api.Password{
