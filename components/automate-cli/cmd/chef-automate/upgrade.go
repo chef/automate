@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -277,27 +278,31 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, resp.CurrentVersion, "")
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to status upgrade failed",
-			)
+		_, isMajorVersion := manifest.IsSemVersionFmt(resp.CurrentVersion)
+		if isMajorVersion {
+			ci, err := majorupgradechecklist.NewChecklistManager(writer, resp.CurrentVersion, "")
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to status upgrade failed",
+				)
+			}
+
+			resp, err := ci.ReadPostChecklistFile()
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"unable to read checklist file",
+				)
+			}
+
+			for index, msg := range resp {
+				writer.Body(strconv.Itoa(index+1) + "." + msg)
+			}
 		}
 
-		resp, err := ci.ReadPostChecklistFile()
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"unable to read checklist file",
-			)
-		}
-
-		for index, msg := range resp {
-			writer.Body(strconv.Itoa(index+1) + "." + msg)
-		}
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
 		if resp.DesiredVersion != "" {
