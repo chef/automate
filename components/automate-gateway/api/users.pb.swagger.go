@@ -253,6 +253,11 @@ func init() {
         "password": {
           "type": "string",
           "description": "Password for user. Used to sign in."
+        },
+        "is_hashed": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "boolean for if hash password there"
         }
       },
       "required": [

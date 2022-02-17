@@ -33,6 +33,8 @@ message CreateUserReq {
 
   // Note: password validation happens in the service's handler
   string password = 4;
+  // hashed password provided
+  bool is_hashed = 5;
 }
 
 message UpdateUserReq {

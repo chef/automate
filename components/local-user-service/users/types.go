@@ -19,6 +19,7 @@ type User struct {
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
+	IsHashed bool   `json:"is_hashed" binding:"required"`
 }
 
 // ShowUser does not have the password field so we don't accidentally expose it
