@@ -1307,15 +1307,23 @@ Below are a few frequently encountered issues in Restore and steps on how to res
 
 ### Error: Database is being accessed by other users
 
-**Reason behind error:** 
+**Reason behind error:** Some services may be still in running state and are referring to the database, while restore service is trying to drop the database. Please check if all the front end and backend services are stopped. 
 
-**Steps to resolve:** Some services may be still in running state and are referring to the database, while restore service is trying to drop the database. Please check if all the front end and backend services are stopped.
+**Steps to resolve:**  Execute below command on all frontend and backend nodes
+
+  SSH into frontend node  and execute below command.
+
+  `chef-automate status`
+  
+   SSH into backend node and execute below command.
+
+  `hab svc status`
 
 ### Error: Cached artifact not found in offline mode
 
 **Reason behind error:**
 
-**Steps to resolve:** In case of this error, we need to use the --airgap-bundle option along with the restore command. Please find the name of the airgap bundle from the path /var/tmp. the airgap bundle file would be something like frontend-20210908093242.aib
+**Steps to resolve:** to resolve this error,We have to use --airgap-bundle option along with the restore command. Please find the name of the airgap bundle from the path /var/tmp. the airgap bundle file would be something like frontend-20210908093242.aib
 
 Command : `chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --patch-config </path/to/patch.toml> --skip-preflight --s3-access-key "Access\_Key" --s3-secret-key "Secret\_Key" --airgap-bundle /var/tmp/<airgap-bundle>`
 
