@@ -244,8 +244,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   // url: UI route to go back to when the (next) signin process has succeeded
-  // noHint: for the sign in, don't try to skip the method selection
-  logout(url?: string, noHint?: boolean, ui_signout?: boolean): void {
+  logout(url?: string, ui_signout?: boolean): void {
       if (ui_signout) {
         this.blacklistIdToken(this.id_token);
       }
@@ -253,31 +252,9 @@ export class ChefSessionService implements CanActivate {
       // note: url will end up url-encoded in this string (magic)
       let signinURL: string;
       signinURL = `/session/new?state=${url}`;
-
-      if (!noHint && this.user && this.user.id_token) {
-        const httpOptions = {
-          headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.id_token}`
-          })
-        };
-        this.httpHandler.get(signinURL, httpOptions).subscribe(
-          () => {
-          // HTTP redirect 303
-          // html file response from dex cannot be parsed here it errors out,
-          // on successful response redirect is handled in error block.
-          },
-          (e) => {
-            if(e.status === 200) {
-              window.location.href = e.url;
-            } else {
-              window.location.href = signinURL;
-            }
-          });
-      } else {
-        window.location.href = signinURL;
-      }
       this.deleteSession();
+
+      window.location.href = signinURL;
   }
 
   storeTelemetryPreference(isOptedIn: boolean): void {
@@ -315,7 +292,7 @@ export class ChefSessionService implements CanActivate {
     function timerIncrement() {
       idleTime = idleTime + 1;
       if (idleTime === idleTimeout + 1) {
-          this.logout('/', false);
+          this.logout('/');
       }
     }
   }

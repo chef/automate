@@ -90,7 +90,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.chefSessionService.logout('/', false, true /* don't skip signin method selection */);
+    this.chefSessionService.logout('/', true);
   }
 
   showWelcomeModal() {
