@@ -1355,7 +1355,7 @@ Error description : "Unable to access file or directory with the hab user: The '
 **How to resolve:** Press ctrl + c and export hab license
 	then execute  ./scripts/credentials set ssl
 	
-### To check logs while doing backup or restore, set log-level debug using below command and again execute jornalctl command.
+### To check logs while doing backup or restore, set log-level debug using below command and again execute journalctl command.
 
    `chef-automate debug set-log-level deployment-service debug`
 	
