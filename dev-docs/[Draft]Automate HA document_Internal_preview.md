@@ -1343,7 +1343,7 @@ Error description : Unable to restore backup: Listing backups failed: RequestErr
 
 ![image](https://user-images.githubusercontent.com/65227203/153858444-6acaafae-0c6f-4969-9ad0-71c684abadce.png)
 
-Error description : "Unable to access file or directory with the hab user: The 'hab' user does not have read/write/exec permissions on the backup repository"
+Error description : "Unable to access file or directory with the hab user: The 'hab' user does not have read/write/exec permissions on the backup repository",
 	            You are getting this error because proper permission is not added to the user.
 	
 **How to resolve:** Execute the below command to grant permission to user.
