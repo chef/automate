@@ -18,6 +18,8 @@ message CreateUserReq {
   string name = 2;
   // Password for user. Used to sign in.
   string password = 3;
+  //boolean for if hash password there
+  bool is_hashed = 4;
 }
 
 message ListUsersReq {}
