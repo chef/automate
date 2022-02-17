@@ -29,7 +29,7 @@ Keep access key ID and secret access key handy. Refer [access key](https://docs.
 
 {{< /note >}}
 
-Once we have an AWS account, we’ll need to create an IAM user to programmatically interact with it and to configure our AWS CLI (command-line interface). Amazon IAM enables you to manage users and user permissions in AWS. You can create one or more IAM users in your AWS account. You might create an IAM user for someone who needs access to your AWS console, or when you have a new application that needs to make API calls to AWS. This is to add an extra layer of security to your AWS account.
+Once we have an AWS account, we'll need to create an IAM user to programmatically interact with it and to configure our AWS CLI (command-line interface). Amazon IAM enables you to manage users and user permissions in AWS. You can create one or more IAM users in your AWS account. You might create an IAM user for someone who needs access to your AWS console, or when you have a new application that needs to make API calls to AWS. This is to add an extra layer of security to your AWS account.
 
 ## Creating an IAM User
 
@@ -70,8 +70,9 @@ Once we have an AWS account, we’ll need to create an IAM user to programmatica
 1. Download and save the *Secret access key*.
 
 {{< figure src="/images/automate/ha_aws_iam_user_created.png" alt="AWS IAM User Created with Access Key">}}
+
 1. Take a note of the Access key ID and Secret access key.
 
-Now let’s configure our AWS CLI to deploy our applications from our command line.
+Now let's configure our AWS CLI to deploy our applications from our command line.
 
 Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating an IAM user through CLI and API methods.
