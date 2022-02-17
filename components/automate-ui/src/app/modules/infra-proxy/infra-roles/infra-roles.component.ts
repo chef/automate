@@ -26,6 +26,7 @@ import {
 } from 'app/entities/recipes/recipe.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import { Regex } from 'app/helpers/auth/regex';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export interface AvailableType {
   name: string;
@@ -63,7 +64,8 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {  }
 
   ngOnInit() {
@@ -111,6 +113,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     } else {
       this.getRolesData();
     }
+    this.telemetryService.track('InfraServer_Roles_Search');
   }
 
   onPageChange(event: number): void {
@@ -146,6 +149,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public startRoleDelete(role: InfraRole): void {
     this.roleToDelete = role;
     this.deleteModalVisible = true;
+    this.telemetryService.track('InfraServer_Roles_Delete ');
   }
 
   public deleteRole(): void {
