@@ -149,7 +149,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public startRoleDelete(role: InfraRole): void {
     this.roleToDelete = role;
     this.deleteModalVisible = true;
-    this.telemetryService.track('InfraServer_Roles_Delete ');
   }
 
   public deleteRole(): void {
@@ -157,6 +156,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteRole({
       server_id: this.serverId, org_id: this.orgId, name: this.roleToDelete.name
     }));
+    this.telemetryService.track('InfraServer_Roles_Delete ');
   }
 
   public closeDeleteModal(): void {
