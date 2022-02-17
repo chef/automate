@@ -189,8 +189,7 @@ func (ci *V3ChecklistManager) showPostChecklist(postCheck []PostCheckList) Check
 						h.Writer.Println(post_upgrade_header)
 						displayed = true
 					}
-					h.Writer.Println(fmt.Sprintf("%d", i+1) + ") " + item.Msg)
-					h.Writer.Println("")
+					h.Writer.Println(fmt.Sprintf("%d", i+1) + ") " + item.Msg + "\n")
 				}
 			}
 			return nil

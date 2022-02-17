@@ -289,9 +289,8 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 					"unable to read checklist file",
 				)
 			}
-
 			for index, msg := range resp {
-				writer.Body(strconv.Itoa(index+1) + "." + msg)
+				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
 			}
 		}
 
