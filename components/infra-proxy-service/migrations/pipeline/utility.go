@@ -357,7 +357,7 @@ func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pip
 }
 
 func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeline.Result) ([]pipeline.OrgsUsersAssociations, error) {
-	orgUserAssociations := make([]pipeline.OrgsUsersAssociations, len(result.ParsedResult.Orgs))
+	orgUserAssociations := make([]pipeline.OrgsUsersAssociations, 0)
 	var userAssociations []pipeline.UserAssociation
 	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
 	for _, org := range result.ParsedResult.Orgs {
@@ -384,7 +384,7 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 }
 
 func createInsertUserAssociationFromMemberJson(memberJson pipeline.MemberJson) []pipeline.UserAssociation {
-	userAssociation := make([]pipeline.UserAssociation, len(memberJson))
+	userAssociation := make([]pipeline.UserAssociation, 0)
 	for _, user := range memberJson {
 		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Insert})
 	}
