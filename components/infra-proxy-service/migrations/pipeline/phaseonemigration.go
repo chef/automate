@@ -25,11 +25,11 @@ type PhaseOnePipelineProcessor func(<-chan PipelineData) <-chan PipelineData
 // ParseOrg returns PhaseOnePipelineProcessor
 func UnzipSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return unzip(result, service)
+		return unzipSrc(result, service)
 	}
 }
 
-func unzip(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting unzip pipeline")
 	out := make(chan PipelineData, 100)
 	go func() {

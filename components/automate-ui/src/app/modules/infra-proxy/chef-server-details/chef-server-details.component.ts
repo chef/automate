@@ -106,7 +106,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public uploadZipForm: FormGroup;
   public isUploaded = false;
   public migrationStatus: MigrationStatus;
-  public migrationStatusPercentage: number;
+  public migrationStatusPercentage = 0;
   public stepsCompleted: string;
   public totalMigrationSteps = 13;
   public migrationStepValue: number;
@@ -338,10 +338,17 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.isUploaded = true;
         this.migration_id = uploadDetailsState?.migration_id;
         this.migrationStarted = true;
+        this.migrationLoading = false;
+        this.migrationIsInPreview = false;
+        this.migrationCompleted = false;
+        this.migrationInProgress = true;
+        this.migrationfailed = false;
+        this.isCancelled = false;
         this.getMigrationStatus(this.migration_id);
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
+        this.migrationfailed = true;
         this.upload.closeUploadSlider();
       }
     });
@@ -498,6 +505,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
               Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
             this.migrationInProgress = true;
             this.migrationLoading = false;
+            this.migrationfailed = false;
             // if (this.migrationStatusPercentage.toFixed(0) === '100') {
             //   this.migrationCompleted = true;
             //   this.migrationInProgress = false;
@@ -508,7 +516,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
               && this.isCancelled === false) {
               this.migrationIsInPreview = true;
             }
-            if(this.migration_type === 'Migration Completed') {
+            if (this.migration_type === 'Migration Completed') {
               this.mySubscription.unsubscribe();
               this.migrationCompleted = true;
               this.migrationInProgress = false;
@@ -517,6 +525,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
           } else {
             this.migrationfailed = true;
             this.migrationCompleted = false;
+            this.mySubscription.unsubscribe();
           }
         }
       });
@@ -531,9 +540,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     return `${this.migrationStatusPercentage.toFixed(0)}, 100`;
   }
 
-  public currentMigrationPercent() {
-    return this.migrationStatusPercentage.toFixed(0);
-  }
+  // public currentMigrationPercent() {
+  //   return this.migrationStatusPercentage.toFixed(0);
+  // }
 
   saveServer(): void {
     this.saveSuccessful = false;
@@ -573,7 +582,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
     this.migrationStarted = true;
-    this.getMigrationStatus(this.server.migration_id);
   }
 
   // cancel migration function
