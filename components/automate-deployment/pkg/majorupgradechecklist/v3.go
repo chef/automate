@@ -8,6 +8,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/pkg/errors"
 )
 
@@ -177,6 +178,11 @@ func promptUpgradeContinue() Checklist {
 func (ci *V3ChecklistManager) CreatePostChecklistFile() error {
 	params := PerPostChecklist{}
 	params.PostChecklist = append(params.PostChecklist, postChecklist...)
+	version, is_major_version := manifest.IsSemVersionFmt(ci.version)
+	if is_major_version {
+		params.Version = version
+	}
+
 	var buffer bytes.Buffer
 	data, err := json.Marshal(params)
 	if err != nil {
@@ -229,21 +235,26 @@ func (ci *V3ChecklistManager) ReadPostChecklistFile() ([]string, error) {
 		return nil, err
 	}
 
-	for i := 0; i < len(res.PostChecklist); i++ {
-		if !res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted {
-			showPostChecklist = true
-			break
-		}
-	}
-
-	if showPostChecklist == true {
+	if ci.version == res.Version {
 		for i := 0; i < len(res.PostChecklist); i++ {
-			if !res.PostChecklist[i].IsExecuted {
-				postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+			if !res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted {
+				showPostChecklist = true
+				break
 			}
 		}
+
+		if showPostChecklist == true {
+			for i := 0; i < len(res.PostChecklist); i++ {
+				if !res.PostChecklist[i].IsExecuted {
+					postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+				}
+			}
+		}
+		return postCmdList, nil
 	}
-	return postCmdList, nil
+
+	return nil, errors.Errorf("Failed to read checklist since version didn't match")
+
 }
 
 func (ci *V3ChecklistManager) UpdatePostChecklistFile(id string) error {
