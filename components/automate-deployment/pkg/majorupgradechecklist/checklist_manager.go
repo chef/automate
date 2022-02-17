@@ -28,6 +28,7 @@ type PostCheckList struct {
 }
 
 type PerPostChecklist struct {
+	Version       string          `json:"version"`
 	PostChecklist []PostCheckList `json:"post_checklist"`
 }
 
@@ -36,8 +37,10 @@ type PerPostChecklist struct {
 func NewChecklistManager(writer cli.FormatWriter, version, major string) (ChecklistManager, error) {
 
 	if major == "" {
-		resp, _ := manifest.IsSemVersionFmt(version)
-		major = resp
+		resp, is_major_version := manifest.IsSemVersionFmt(version)
+		if is_major_version {
+			major = resp
+		}
 	}
 
 	switch major {
