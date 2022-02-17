@@ -347,8 +347,6 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("starting with user parseing phase for migration id: ", result.Meta.MigrationID)
 
-	// var mappedUsers []pipeline.User
-
 	_, err := mst.StartUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
 	if err != nil {
 		log.Error("failed to update the status for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
@@ -372,14 +370,13 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.Migr
 
 	serverUsers := keyDumpTOUser(keyDumps)
 	automateUsers, err := st.GetUsers(ctx, result.Meta.ServerID)
-	if err := json.Unmarshal(keyDumpByte, &keyDumps); err != nil {
-		log.Error("failed to unmarshal for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
+	if err != nil {
+		log.Error("failed to read keydump file for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
 		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	mappedUsers := MapUsers(serverUsers, automateUsers)
-
 	result.ParsedResult.Users = mappedUsers
 	return result, nil
 }
@@ -406,29 +403,34 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 }
 
 func MapUsers(serverUser []pipeline.User, automateUser []storage.User) []pipeline.User {
-
+	var serverCleanUser []pipeline.User
 	for _, aUser := range automateUser {
 		if !IsExisting(serverUser, aUser.InfraServerUsername) {
-			serverUser = append(serverUser, pipeline.User{
+			serverCleanUser = append(serverCleanUser, pipeline.User{
 				Username:  aUser.InfraServerUsername,
 				ActionOps: 3,
 			})
 		} else {
 			for _, sUser := range serverUser {
 				if sUser.Username == aUser.InfraServerUsername {
-					if sUser.FirstName != aUser.FirstName || sUser.Email != aUser.Email {
-						sUser.ActionOps = 4
-					} else {
+					if sUser.FirstName == aUser.FirstName && sUser.Email == aUser.Email {
 						sUser.ActionOps = 2
+						serverCleanUser = append(serverCleanUser, sUser)
+
+					} else {
+						fmt.Println("Update: ", sUser.Username, ", ", sUser.Email)
+						sUser.ActionOps = 4
+						serverCleanUser = append(serverCleanUser, sUser)
 					}
 
 				} else {
 					sUser.ActionOps = 1
+					serverCleanUser = append(serverCleanUser, sUser)
 				}
 			}
 		}
 	}
-	return serverUser
+	return serverCleanUser
 }
 
 func IsExisting(users []pipeline.User, user string) bool {
