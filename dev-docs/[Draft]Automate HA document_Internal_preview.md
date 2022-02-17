@@ -1267,28 +1267,36 @@ TCP 9631 - This allows the Habitat API to be reachable from services on all back
 
 ## Commands to check logs
 
-All Automate and Backend service logs are available via `journalctl` from each node. Each log line is prepended with the service name that generated the output. To view service logs use the following commands
+All Automate and Backend service logs are available via `journalctl` from each node. Each log line is prepended with the service name that generated the output. 
+ 
+ * To view backend logs, execute below command
+   This will show logs related to all hab services.
+ 
+`journalctl --follow --unit hab-sup`
 
-* Backend logs can be viewed in `journalctl` under the `hab-sup` unit file:
+ * To filter out logs related to specific service use grep command.
 
-```bash
-journalctl --follow --unit hab-sup
-```
+e.g. `journalctl --follow --unit hab-sup | grep 'automate-ha-elasticsearch'`
 
-* Chef/Automate frontends logs are viewed in `journalctl` under the `chef-automate` unit file:
+ * To view frontend (chef-automate and chef-server instances) logs, execute below command
+   This will show logs related to frontend nodes
+ 
+ `journalctl --follow --unit chef-automate`
 
-```bash
-journalctl --follow --unit chef-automate
-```
 * Use `grep` to filter out logs for a single service, for example to view the `ingest` logs on an Automate frontend:
 
-```bash
-journactl --follow --unit chef-automate | grep ingest.service
-```
+e.g. `journactl --follow --unit chef-automate | grep ingest.service`
+
 
 ## Command to check Service health
 
-Ssh into the node where you have to check health of services and execute the below command.
+### Frontend nodes
+Ssh into frontend node  and execute below command.
+
+`chef-automate status`
+
+### Backend nodes
+Ssh into backend node and execute below command.
 
 `hab svc status`
 
@@ -1324,32 +1332,34 @@ sed  -i 's/architecture "deployment"/architecture "aws"/' /hab/a2\_deploy\_works
 ### Error : Could not determine bucket region, request cancelled
 
 ![image](https://user-images.githubusercontent.com/65227203/153855824-889f50a0-4a01-4614-beb1-e9252e1cfb44.png)
+ 
+Error description : Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"
 
-**How to resolve:** If you are using onprem s3 for backup and your are facing issues with restror then just attach s3-endpoint with s3 restore command.
+**How to resolve:** If you are using onprem s3 for backup and your are facing issues with restore then attach s3-endpoint with s3 restore command.
 
 `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "<URL>"`
-
-
-### Error : How to troubleshoot backup-restore issue
-
-![image](https://user-images.githubusercontent.com/65227203/153858880-247202e4-01c3-4f21-875c-c45903a21b1d.png)
-
-**How to resolve:** Check the logs using below command.
-
-   chef-automate debug set-log-level deployment-service debug
 
 ### Error : Hab user access error, Please update the permission
 
 ![image](https://user-images.githubusercontent.com/65227203/153858444-6acaafae-0c6f-4969-9ad0-71c684abadce.png)
 
-**How to resolve:** Execute the below command
+Error description : "Unable to access file or directory with the hab user: The 'hab' user does not have read/write/exec permissions on the backup repository"
+	            You are getting this error because proper permission is not added to the user.
+	
+**How to resolve:** Execute the below command to grant permission to user.
 
-sudo chef-automate backup fix-repo-permissions <path>
+`sudo chef-automate backup fix-repo-permissions <path>`
 
 ### Error : ./scripts/credentials set ssl, If this command is taking more time to print logs.
 
 **How to resolve:** Press ctrl + c and export hab license
 	then execute  ./scripts/credentials set ssl
+	
+### To check logs while doing backup or restore, set log-level debug using below command and again execute jornalctl command.
+
+   `chef-automate debug set-log-level deployment-service debug`
+	
+    `journalctl --follow --unit chef-automate`
 
 ### Other Errors: 
 
