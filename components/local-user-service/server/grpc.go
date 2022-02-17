@@ -127,6 +127,7 @@ func (s *Server) CreateUser(ctx context.Context, req *local_user.CreateUserReq) 
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
+		IsHashed: req.IsHashed,
 	}
 
 	us, err := s.users.CreateUser(ctx, newUser)
