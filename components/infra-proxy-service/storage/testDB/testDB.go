@@ -136,6 +136,6 @@ func (t *TestDB) GetAutomateInfraServerUsers(ctx context.Context, serverId strin
 	panic("implement me")
 }
 
-func (t *TestDB) GetUserByUsername(ctx context.Context, username string) (storage.User, error) {
+func (t *TestDB) GetUsers(ctx context.Context, serverID string) ([]storage.User, error) {
 	panic("implement me")
 }

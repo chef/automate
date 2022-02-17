@@ -345,43 +345,47 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 }
 
 func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+	log.Info("starting with user parseing phase for migration id: ", result.Meta.MigrationID)
+
+	// var mappedUsers []pipeline.User
+
+	_, err := mst.StartUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
+	if err != nil {
+		log.Error("failed to update the status for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
 	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
 
 	keyDumpByte, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Printf("error while reading file: %+v\n", err)
+		log.Error("failed to read keydump file for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
+		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	var keyDumps []pipeline.KeyDump
 	if err := json.Unmarshal(keyDumpByte, &keyDumps); err != nil {
-		log.Printf("error while unmarshaling key dump: %+v\n", err)
+		log.Error("failed to unmarshal for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
+		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
-	users := KeyDumpTOUser(keyDumps)
-	for _, user := range users {
-		usr, err := st.GetUserByUsername(ctx, user.Username, "")
-		if err != nil {
-			log.Printf("error while running get query by username: %+v\n", err)
-		}
-
-		// The users in Automate if unchanged in server side should be skipped
-
-		// The users in Automate updated in Chef Server side should be updated
-
-		// The users in Automate deleted from Chef Server should be deleted from Chef Server association including all the orgs/policies.
-
-		//The new users of Chef Server should be added to Automate
-
-		fmt.Printf("->: %+v\n ", user)
+	serverUsers := keyDumpTOUser(keyDumps)
+	automateUsers, err := st.GetUsers(ctx, "")
+	if err := json.Unmarshal(keyDumpByte, &keyDumps); err != nil {
+		log.Error("failed to unmarshal for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
+		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		return result, err
 	}
-	return pipeline.Result{}, nil
+
+	mappedUsers := MapUsers(serverUsers, automateUsers)
+
+	result.ParsedResult.Users = mappedUsers
+	return result, nil
 }
 
-// Clean serialized_object
-// Polulate Users struct
-func KeyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
+// Clean serialized_object and Polulate Users struct
+func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 	var users []pipeline.User
 	for _, kd := range keyDump {
 		sec := map[string]string{}
@@ -399,4 +403,34 @@ func KeyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 		users = append(users, user)
 	}
 	return users
+}
+
+func MapUsers(serverUser []pipeline.User, automateUser []storage.User) []pipeline.User {
+
+	for _, aUser := range automateUser {
+		if !IsExisting(serverUser, aUser.InfraServerUsername) {
+			serverUser = append(serverUser, pipeline.User{
+				Username:  aUser.InfraServerUsername,
+				ActionOps: 3,
+			})
+		} else {
+			for _, sUser := range serverUser {
+				if sUser.Username == aUser.InfraServerUsername {
+					sUser.ActionOps = 4
+				} else {
+					sUser.ActionOps = 1
+				}
+			}
+		}
+	}
+	return serverUser
+}
+
+func IsExisting(users []pipeline.User, user string) bool {
+	for _, v := range users {
+		if user == v.Username {
+			return true
+		}
+	}
+	return false
 }
