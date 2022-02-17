@@ -9,6 +9,11 @@ CREATE TABLE IF NOT EXISTS users (
   infra_server_username     TEXT NOT NULL DEFAULT '',
   connector                 TEXT NOT NULL DEFAULT 'local',
   automate_user_id          TEXT NOT NULL DEFAULT '',
+  email                     TEXT NOT NULL DEFAULT '',
+  display_name              TEXT NOT NULL DEFAULT '',
+  first_name                TEXT NOT NULL DEFAULT '',
+  last_name                 TEXT NOT NULL DEFAULT '',
+  middle_name               TEXT NOT NULL DEFAULT '',
   created_at                TIMESTAMPTZ NOT NULL,
   updated_at                TIMESTAMPTZ NOT NULL,
   CONSTRAINT infra_server_username_server_id_key

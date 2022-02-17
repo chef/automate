@@ -137,5 +137,5 @@ func (t *TestDB) GetAutomateInfraServerUsers(ctx context.Context, serverId strin
 }
 
 func (t *TestDB) GetUsers(ctx context.Context, serverID string) ([]storage.User, error) {
-	panic("implement me")
+	return nil, nil
 }

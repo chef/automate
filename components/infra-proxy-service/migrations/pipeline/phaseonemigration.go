@@ -117,13 +117,13 @@ func createPrevewPipeline(result <-chan PipelineData, service *service.Service) 
 }
 
 // ParseUser returns PhaseOnePipelineProcessor
-func ParseUser() PhaseOnePipelineProcessor {
+func ParseUser(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return parseUser(result)
+		return parseUser(result, service)
 	}
 }
 
-func parseUser(result <-chan PipelineData) <-chan PipelineData {
+func parseUser(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting to parse_user pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -131,6 +131,11 @@ func parseUser(result <-chan PipelineData) <-chan PipelineData {
 	go func() {
 		log.Info("Processing to parse_user...")
 		for res := range result {
+			result, err := GetUsersForBackup(res.Ctx, service.Storage, service.Migration, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -251,7 +256,7 @@ func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 		UnzipSrc(service),
 		ParseOrg(service),
 		CreatePrevewPipeline(service),
-		// ParseUser(),
+		ParseUser(service),
 		// ConflictingUsers(),
 		// OrgMembers(),
 		// AdminUsers(),

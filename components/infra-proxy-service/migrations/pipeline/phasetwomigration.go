@@ -170,10 +170,10 @@ func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipleine {
 	c := make(chan PipelineData, 100)
 	migrationTwoPipeline(c,
 		PopulateOrgs(service),
-		CreateProject(),
-		PopulateUsers(),
-		PopulateORGUser(),
-		PopulateMembersPolicy(),
+		// CreateProject(),
+		// PopulateUsers(),
+		// PopulateORGUser(),
+		// PopulateMembersPolicy(),
 	)
 	return PhaseTwoPipleine{in: c}
 }

@@ -371,7 +371,7 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.Migr
 	}
 
 	serverUsers := keyDumpTOUser(keyDumps)
-	automateUsers, err := st.GetUsers(ctx, "")
+	automateUsers, err := st.GetUsers(ctx, result.Meta.ServerID)
 	if err := json.Unmarshal(keyDumpByte, &keyDumps); err != nil {
 		log.Error("failed to unmarshal for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
 		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
@@ -416,7 +416,12 @@ func MapUsers(serverUser []pipeline.User, automateUser []storage.User) []pipelin
 		} else {
 			for _, sUser := range serverUser {
 				if sUser.Username == aUser.InfraServerUsername {
-					sUser.ActionOps = 4
+					if sUser.FirstName != aUser.FirstName || sUser.Email != aUser.Email {
+						sUser.ActionOps = 4
+					} else {
+						sUser.ActionOps = 2
+					}
+
 				} else {
 					sUser.ActionOps = 1
 				}

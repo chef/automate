@@ -141,15 +141,12 @@ func TestGetUsersForBackup(t *testing.T) {
 	}
 
 	arg := args{
-		ctx: context.Background(),
-		st:  &testDB.TestDB{},
-		mst: &testDB.MigrationDB{},
-		result: pipeline.Result{
-			Meta: pipeline.Meta{
-				UnzipFolder: "/Users/pappuk/Downloads/backup",
-			},
-		},
+		ctx:    context.Background(),
+		st:     &testDB.TestDB{},
+		mst:    &testDB.MigrationDB{},
+		result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "/Users/pappuk/Downloads/backup", ServerID: "server1", MigrationID: "mig1"}},
 	}
+	// got, err := GetUsersForBackup(tt.args.ctx, tt.args.st, tt.args.mst, tt.args.result)
 	result, err := GetUsersForBackup(arg.ctx, arg.st, arg.mst, arg.result)
 	require.NoError(t, err)
 	fmt.Println(result)
