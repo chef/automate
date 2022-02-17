@@ -343,7 +343,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 }
 
 func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pipeline.Result) (pipeline.Result, error) {
-	log.Info("Starting with the parsing org user association for migration is :%s", result.Meta.MigrationID)
+	log.Info("Starting with the parsing org user association for migration id :", result.Meta.MigrationID)
 	var orgUserAssociations []pipeline.OrgsUsersAssociations
 	var err error
 	orgUserAssociations, err = getActionForOrgUsers(ctx, st, result)
@@ -352,16 +352,16 @@ func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pip
 		return result, err
 	}
 	result.ParsedResult.OrgsUsers = append(result.ParsedResult.OrgsUsers, orgUserAssociations...)
-	log.Info("Completed with the parsing org user association for migration is :%s", result.Meta.MigrationID)
+	log.Info("Completed with the parsing org user association for migration id :", result.Meta.MigrationID)
 	return result, nil
 }
 
 func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeline.Result) ([]pipeline.OrgsUsersAssociations, error) {
-	var orgUserAssociations []pipeline.OrgsUsersAssociations
+	orgUserAssociations := make([]pipeline.OrgsUsersAssociations, len(result.ParsedResult.Orgs))
 	var userAssociations []pipeline.UserAssociation
 	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
 	for _, org := range result.ParsedResult.Orgs {
-		log.Info("Getting actions for org:%s and migration id %s", org.Name, result.Meta.MigrationID)
+		log.Info("Getting actions for org id", org.Name)
 		memberJson := openOrgUser(org.Name, orgPath)
 		if org.ActionOps == pipeline.Insert {
 			userAssociations = append(userAssociations, createInsertUserAssociationFromMemberJson(memberJson)...)
@@ -384,7 +384,7 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 }
 
 func createInsertUserAssociationFromMemberJson(memberJson pipeline.MemberJson) []pipeline.UserAssociation {
-	var userAssociation []pipeline.UserAssociation
+	userAssociation := make([]pipeline.UserAssociation, len(memberJson))
 	for _, user := range memberJson {
 		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Insert})
 	}
@@ -392,7 +392,7 @@ func createInsertUserAssociationFromMemberJson(memberJson pipeline.MemberJson) [
 }
 
 func createDeleteUserAssociationFromMemberJson(orgUsers []storage.OrgUser) []pipeline.UserAssociation {
-	var userAssociation []pipeline.UserAssociation
+	userAssociation := make([]pipeline.UserAssociation, len(orgUsers))
 	for _, user := range orgUsers {
 		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, ActionOps: pipeline.Insert})
 	}
