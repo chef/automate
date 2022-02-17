@@ -85,13 +85,13 @@ func parseOrg(result <-chan PipelineData, service *service.Service) <-chan Pipel
 }
 
 // ParseOrg returns PhaseOnePipelineProcessor
-func CreatePrevewPipeline(service *service.Service) PhaseOnePipelineProcessor {
+func CreatePreviewPipeline(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return createPrevewPipeline(result, service)
+		return createPreviewPipeline(result, service)
 	}
 }
 
-func createPrevewPipeline(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+func createPreviewPipeline(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting to preview pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -250,7 +250,7 @@ func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 	migrationPipeline(c,
 		UnzipSrc(service),
 		ParseOrg(service),
-		CreatePrevewPipeline(service),
+		CreatePreviewPipeline(service),
 		// ParseUser(),
 		// ConflictingUsers(),
 		// OrgMembers(),
