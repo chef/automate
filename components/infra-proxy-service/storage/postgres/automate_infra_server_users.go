@@ -132,3 +132,30 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 	}
 	return users, nil
 }
+
+//GetAutomateOrgUsers: .Fetches all the users for a org
+func (p *postgres) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]storage.OrgUser, error) {
+	var orgUsers []storage.OrgUser
+	rows, err := p.db.QueryContext(ctx,
+		`select ou.org_id,u.infra_server_username  from org_users ou join users u on u.id=ou.user_id  join orgs o on o.id=ou.org_id where org_id=$1`, orgId)
+	if err != nil {
+		return []storage.OrgUser{}, p.processError(err)
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.logger.Warnf("Failed to close database rows for org users: %s", err.Error())
+		}
+	}()
+
+	for rows.Next() {
+		orgUser := storage.OrgUser{}
+		if err := rows.Scan(&orgUser.OrgId, &orgUser.InfraServerUsername); err != nil {
+			return nil, err
+		}
+		orgUsers = append(orgUsers, orgUser)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
+	return orgUsers, nil
+}

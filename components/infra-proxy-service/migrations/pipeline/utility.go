@@ -341,3 +341,120 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 	return result, nil
 }
+
+func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pipeline.Result) (pipeline.Result, error) {
+	log.Info("Starting with the parsing org user association for migration is :%s", result.Meta.MigrationID)
+	var orgUserAssociations []pipeline.OrgsUsersAssociations
+	var err error
+	orgUserAssociations, err = getActionForOrgUsers(ctx, st, result)
+	if err != nil {
+		log.Errorf("Unable to parse org user association for migration id : %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+	result.ParsedResult.OrgsUsers = append(result.ParsedResult.OrgsUsers, orgUserAssociations...)
+	log.Info("Completed with the parsing org user association for migration is :%s", result.Meta.MigrationID)
+	return result, nil
+}
+
+func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeline.Result) ([]pipeline.OrgsUsersAssociations, error) {
+	var orgUserAssociations []pipeline.OrgsUsersAssociations
+	var userAssociations []pipeline.UserAssociation
+	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
+	for _, org := range result.ParsedResult.Orgs {
+		log.Info("Getting actions for org:%s and migration id %s", org.Name, result.Meta.MigrationID)
+		memberJson := openOrgUser(org.Name, orgPath)
+		if org.ActionOps == pipeline.Insert {
+			userAssociations = append(userAssociations, createInsertUserAssociationFromMemberJson(memberJson)...)
+		} else {
+			orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
+			if err != nil {
+				log.Errorf("Unable to fetch Users for org %s : %s", org.Name, err.Error())
+				return nil, err
+			}
+			if org.ActionOps == pipeline.Delete {
+				userAssociations = append(userAssociations, createDeleteUserAssociationFromMemberJson(orgUsersInDb)...)
+			} else {
+				userAssociations = append(userAssociations, insertActionForOrgUsers(orgUsersInDb, memberJson)...)
+				userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, memberJson)...)
+			}
+		}
+		orgUserAssociations = append(orgUserAssociations, pipeline.OrgsUsersAssociations{OrgName: org, Users: userAssociations})
+	}
+	return orgUserAssociations, nil
+}
+
+func createInsertUserAssociationFromMemberJson(memberJson pipeline.MemberJson) []pipeline.UserAssociation {
+	var userAssociation []pipeline.UserAssociation
+	for _, user := range memberJson {
+		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Insert})
+	}
+	return userAssociation
+}
+
+func createDeleteUserAssociationFromMemberJson(orgUsers []storage.OrgUser) []pipeline.UserAssociation {
+	var userAssociation []pipeline.UserAssociation
+	for _, user := range orgUsers {
+		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, ActionOps: pipeline.Insert})
+	}
+	return userAssociation
+}
+
+func insertActionForOrgUsers(orgUsers []storage.OrgUser, userMemberJson pipeline.MemberJson) []pipeline.UserAssociation {
+	var userAssociation []pipeline.UserAssociation
+	orgUserMapDB := createMapForOrgUsersInDB(orgUsers)
+	for _, user := range userMemberJson {
+		_, valuePresent := orgUserMapDB[user.User.Username]
+		if valuePresent {
+			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Skip})
+		} else {
+			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Insert})
+		}
+	}
+	return userAssociation
+}
+
+func deleteActionForOrgUses(orgUsers []storage.OrgUser, userMemberJson pipeline.MemberJson) []pipeline.UserAssociation {
+	var userAssociation []pipeline.UserAssociation
+	orgUserJsonMap := createMapForOrgUsersInJson(userMemberJson)
+	for _, user := range orgUsers {
+		_, valuePresent := orgUserJsonMap[user.InfraServerUsername]
+		if !valuePresent {
+			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, ActionOps: pipeline.Delete})
+		}
+	}
+
+	return userAssociation
+}
+
+func createMapForOrgUsersInDB(orgUsers []storage.OrgUser) map[string]string {
+	orgUsersMap := make(map[string]string)
+	for _, s := range orgUsers {
+		orgUsersMap[s.InfraServerUsername] = ""
+	}
+	return orgUsersMap
+}
+
+func createMapForOrgUsersInJson(userMemberJson pipeline.MemberJson) map[string]string {
+	orgUsersMap := make(map[string]string)
+	for _, s := range userMemberJson {
+		orgUsersMap[s.User.Username] = ""
+	}
+	return orgUsersMap
+}
+
+func openOrgUser(orgName string, fileLocation string) pipeline.MemberJson {
+	var orgJson pipeline.MemberJson
+	jsonPath := path.Join(fileLocation, orgName, "members.json")
+	jsonFile, err := os.Open(jsonPath)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+	}
+	log.Info("Successfully opened the file at location", jsonPath)
+	defer func() {
+		_ = jsonFile.Close()
+	}()
+	// defer the closing of our jsonFile so that we can parse it later on
+	_ = json.NewDecoder(jsonFile).Decode(&orgJson)
+	return orgJson
+}

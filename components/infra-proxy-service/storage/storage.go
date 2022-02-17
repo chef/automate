@@ -29,6 +29,7 @@ type Storage interface {
 	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	DeleteUser(ctx context.Context, id string) (User, error)
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
+	GetAutomateOrgUsers(ctx context.Context, orgId string) ([]OrgUser, error)
 }
 
 type MigrationStorage interface {
@@ -121,6 +122,11 @@ type User struct {
 	IsServerAdmin       bool
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
+}
+
+type OrgUser struct {
+	OrgId               string
+	InfraServerUsername string
 }
 
 type Migration struct {

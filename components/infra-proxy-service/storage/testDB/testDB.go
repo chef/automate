@@ -134,3 +134,22 @@ func (t *TestDB) DeleteUser(ctx context.Context, id string) (storage.User, error
 func (t *TestDB) GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]storage.User, error) {
 	panic("implement me")
 }
+
+func (t *TestDB) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]storage.OrgUser, error) {
+	var x []storage.OrgUser
+	if t.NeedError {
+		return x, errors.New("failed to fetch Orgs")
+	}
+	if t.Type == "Insert" {
+		return x, nil
+	}
+	if t.Type == "Skip" || t.Type == "Delete" {
+		x = append(x, storage.OrgUser{
+			OrgId: orgId, InfraServerUsername: "user1",
+		})
+		x = append(x, storage.OrgUser{
+			OrgId: orgId, InfraServerUsername: "user2",
+		})
+	}
+	return x, nil
+}
