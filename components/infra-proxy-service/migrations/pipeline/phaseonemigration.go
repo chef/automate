@@ -53,13 +53,13 @@ func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan Pipel
 }
 
 // ParseOrg returns PhaseOnePipelineProcessor
-func ParseOrg(service *service.Service) PhaseOnePipelineProcessor {
+func ParseOrgSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return parseOrg(result, service)
+		return parseOrgSrc(result, service)
 	}
 }
 
-func parseOrg(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+func parseOrgSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting to parse_orgs pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -85,13 +85,13 @@ func parseOrg(result <-chan PipelineData, service *service.Service) <-chan Pipel
 }
 
 // ParseOrg returns PhaseOnePipelineProcessor
-func CreatePreviewPipeline(service *service.Service) PhaseOnePipelineProcessor {
+func CreatePreviewSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return createPreviewPipeline(result, service)
+		return createPreviewSrc(result, service)
 	}
 }
 
-func createPreviewPipeline(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+func createPreviewSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting to preview pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -117,13 +117,13 @@ func createPreviewPipeline(result <-chan PipelineData, service *service.Service)
 }
 
 // ParseUser returns PhaseOnePipelineProcessor
-func ParseUser() PhaseOnePipelineProcessor {
+func ParseUserSrc() PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return parseUser(result)
+		return parseUserSrc(result)
 	}
 }
 
-func parseUser(result <-chan PipelineData) <-chan PipelineData {
+func parseUserSrc(result <-chan PipelineData) <-chan PipelineData {
 	log.Info("Starting to parse_user pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -249,8 +249,8 @@ func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 	c := make(chan PipelineData, 100)
 	migrationPipeline(c,
 		UnzipSrc(service),
-		ParseOrg(service),
-		CreatePreviewPipeline(service),
+		ParseOrgSrc(service),
+		CreatePreviewSrc(service),
 		// ParseUser(),
 		// ConflictingUsers(),
 		// OrgMembers(),
