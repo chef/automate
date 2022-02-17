@@ -148,9 +148,8 @@ func (ci *V3ChecklistManager) RunChecklist() error {
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckList
-	isExt := isExternalPG()
 
-	if isExt {
+	if isExternalPG() {
 		dbType = "External"
 		postcheck = postChecklistExternal
 		checklists = append(checklists, preChecklist(externalPGUpgradeCheck)...)
