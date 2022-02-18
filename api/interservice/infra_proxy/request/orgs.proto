@@ -8,10 +8,6 @@ message CreateOrg {
     string id = 1;
     // Chef organization name.
     string name = 2;
-    // Chef organization admin user.
-    string admin_user = 3;
-    // Chef organization admin key.
-    string admin_key = 4;
     // Chef Infra Server ID.
     string server_id = 5;
     // List of projects this chef organization belongs to. May be empty.

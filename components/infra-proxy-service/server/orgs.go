@@ -30,20 +30,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, err
 	}
 
-	newSecret := &secrets.Secret{
-		Name: "infra-proxy-service-admin-key",
-		Type: "chef-server",
-		Data: []*query.Kv{
-			{Key: "key", Value: req.AdminKey},
-		},
-	}
-
-	secretID, err := s.service.Secrets.Create(ctx, newSecret)
-	if err != nil {
-		return nil, err
-	}
-
-	org, err := s.service.Storage.StoreOrg(ctx, req.Id, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
+	org, err := s.service.Storage.StoreOrg(ctx, req.Id, req.Name, "", "", req.ServerId, req.Projects)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
@@ -126,9 +113,11 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
-	_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.CredentialID})
-	if err != nil {
-		return nil, err
+	if org.CredentialID != "" {
+		_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.CredentialID})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &response.DeleteOrg{
@@ -183,23 +172,25 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
-	if err != nil {
-		return nil, err
-	}
+	if org.CredentialID != "" {
+		secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
+		if err != nil {
+			return nil, err
+		}
 
-	newSecret := &secrets.Secret{
-		Id:   secret.GetId(),
-		Name: "infra-proxy-service-admin-key",
-		Type: "chef-server",
-		Data: []*query.Kv{
-			{Key: "key", Value: req.AdminKey},
-		},
-	}
+		newSecret := &secrets.Secret{
+			Id:   secret.GetId(),
+			Name: "infra-proxy-service-admin-key",
+			Type: "chef-server",
+			Data: []*query.Kv{
+				{Key: "key", Value: req.AdminKey},
+			},
+		}
 
-	_, err = s.service.Secrets.Update(ctx, newSecret)
-	if err != nil {
-		return nil, err
+		_, err = s.service.Secrets.Update(ctx, newSecret)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	org, err = s.service.Storage.TouchOrg(ctx, req.Id, req.ServerId)
