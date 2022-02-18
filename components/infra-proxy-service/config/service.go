@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"github.com/chef/automate/api/interservice/local_user"
 	"net/url"
 	"os"
+
+	"github.com/chef/automate/api/interservice/local_user"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"

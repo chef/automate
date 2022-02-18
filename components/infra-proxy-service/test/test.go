@@ -123,9 +123,13 @@ func SetupInfraProxyService(ctx context.Context,
 	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	require.NoError(t, err)
 
+<<<<<<< HEAD
 	localUserClient := local_users_api.NewMockUsersMgmtServiceClient(gomock.NewController(t))
 
 	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient, localUserClient)
+=======
+	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient)
+>>>>>>> 96b07290c (Feature/testing pipeline (#6704))
 
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)

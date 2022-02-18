@@ -2,8 +2,9 @@ package service
 
 import (
 	"fmt"
-	"github.com/chef/automate/api/interservice/local_user"
 	"reflect"
+
+	"github.com/chef/automate/api/interservice/local_user"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

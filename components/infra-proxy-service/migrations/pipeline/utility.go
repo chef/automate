@@ -270,7 +270,6 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 
 // Unzip will decompress a zip file and sets the UnzipFolder
 func Unzip(ctx context.Context, result pipeline.Result) (pipeline.Result, error) {
-
 	var fpath string
 
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
