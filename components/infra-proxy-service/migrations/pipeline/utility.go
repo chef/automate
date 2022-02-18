@@ -393,7 +393,7 @@ func createInsertUserAssociationFromMemberJson(memberJson pipeline.MemberJson) [
 func createDeleteUserAssociationFromMemberJson(orgUsers []storage.OrgUser) []pipeline.UserAssociation {
 	userAssociation := make([]pipeline.UserAssociation, len(orgUsers))
 	for _, user := range orgUsers {
-		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, ActionOps: pipeline.Insert})
+		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, ActionOps: pipeline.Delete})
 	}
 	return userAssociation
 }
