@@ -537,7 +537,7 @@ This command will check some firewall rules and ports before deployment of a2-ha
 
 To validate infrastructure there is 2 things. First if your environment is airgapped means no internet environment then you have to provide config.toml full path, hab-utitlity and netcat pkg in below command as an argument 
 
-    How to run this command?? 
+How to run this command?? 
 ```
     ./chef-automate validate-ha-infrastructure /path/to/config.toml /path/to/hab.tar.gz /path/to/netcat.hart
 ```
