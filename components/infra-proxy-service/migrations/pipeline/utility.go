@@ -290,14 +290,14 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		fpath = filepath.Join(filepath.Dir(result.Meta.ZipFile), file.Name)
 
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(fpath, os.ModePerm)
+			_ = os.MkdirAll(fpath, os.ModePerm)
 			continue
 		}
 
 		// Creating the files in the target directory
 		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
 			log.Errorf("cannot create directory: %s. ", err)
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create directory", 0, 0, 0)
+			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create directory", 0, 0, 0)
 			return result, err
 		}
 
@@ -308,36 +308,36 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 			file.Mode())
 		if err != nil {
 			log.Errorf("cannot create a file: %s.", err)
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create a file", 0, 0, 0)
+			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create a file", 0, 0, 0)
 			return result, err
 		}
 
 		readClose, err := file.Open()
 		if err != nil {
 			log.Errorf("cannot open file")
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open file", 0, 0, 0)
+			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open file", 0, 0, 0)
 			return result, err
 		}
 
 		_, err = io.Copy(outFile, readClose)
 		if err != nil {
 			log.Errorf("cannot copy file")
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy file", 0, 0, 0)
+			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy file", 0, 0, 0)
 			return result, err
 		}
 
-		outFile.Close()
-		readClose.Close()
+		_ = outFile.Close()
+		_ = readClose.Close()
 
 		if err != nil {
 			log.Errorf("cannot copy a file")
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy a file", 0, 0, 0)
+			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy a file", 0, 0, 0)
 			return result, err
 		}
 	}
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
-	reader.Close()
+	_ = reader.Close()
 	_, err = mst.CompleteUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
 	if err != nil {
 		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
@@ -576,30 +576,30 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.Migr
 
 	_, err := mst.StartUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
 	if err != nil {
-		log.Error("failed to update the status for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
+		log.Errorf("failed to update the status for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
 	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
 
 	keyDumpByte, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Error("failed to read keydump file for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
-		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		log.Errorf("failed to read keydump file for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+		_, _ = mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	var keyDumps []pipeline.KeyDump
 	if err := json.Unmarshal(keyDumpByte, &keyDumps); err != nil {
-		log.Error("failed to unmarshal for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
-		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		log.Errorf("failed to unmarshal for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+		_, _ = mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	serverUsers := keyDumpTOUser(keyDumps)
 	automateUsers, err := st.GetUsers(ctx, result.Meta.ServerID)
 	if err != nil {
-		log.Error("failed to read keydump file for user parsing for the migration id: %s, error : %s", result.Meta.MigrationID, err.Error())
-		mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		log.Errorf("failed to get users form db for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+		_, _ = mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
@@ -614,7 +614,7 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 	for _, kd := range keyDump {
 		sec := map[string]string{}
 		if err := json.Unmarshal([]byte(kd.SerializedObject), &sec); err != nil {
-			panic(err)
+			log.Errorf("failed to pasre user's first, middle and last name: %s", err.Error())
 		}
 		user := pipeline.User{
 			Username:    kd.Username,
@@ -640,7 +640,8 @@ func MapUsers(serverUser []pipeline.User, automateUser []storage.User) []pipelin
 		} else {
 			for _, sUser := range serverUser {
 				if sUser.Username == aUser.InfraServerUsername {
-					if sUser.FirstName == aUser.FirstName && sUser.Email == aUser.Email {
+					if sUser.FirstName == aUser.FirstName && sUser.Email == aUser.Email && sUser.DisplayName == aUser.DisplayName &&
+						sUser.LastName == aUser.LastName && sUser.MiddleName == aUser.MiddleName {
 						sUser.ActionOps = 2
 						serverCleanUser = append(serverCleanUser, sUser)
 
