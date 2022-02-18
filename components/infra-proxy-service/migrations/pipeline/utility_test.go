@@ -133,6 +133,27 @@ func TestCreatePreview(t *testing.T) {
 	}
 }
 
+func TestGetUsersForBackup(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		st     storage.Storage
+		mst    storage.MigrationStorage
+		result pipeline.Result
+	}
+
+	arg := args{
+		ctx:    context.Background(),
+		st:     &testDB.TestDB{},
+		mst:    &testDB.MigrationDB{},
+		result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "/Users/pappuk/Downloads/backup", ServerID: "server1", MigrationID: "mig1"}},
+	}
+
+	res, err := GetUsersForBackup(arg.ctx, arg.st, arg.mst, arg.result)
+	require.NoError(t, err)
+	require.NotNil(t, res)
+
+}
+
 func TestValidateZip(t *testing.T) {
 	type args struct {
 		name        string

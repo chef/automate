@@ -3,7 +3,6 @@ package testDB
 import (
 	"context"
 	"errors"
-
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
@@ -134,6 +133,10 @@ func (t *TestDB) DeleteUser(ctx context.Context, id string) (storage.User, error
 
 func (t *TestDB) GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]storage.User, error) {
 	panic("implement me")
+}
+
+func (t *TestDB) GetUsers(ctx context.Context, serverID string) ([]storage.User, error) {
+	return nil, nil
 }
 
 func (t *TestDB) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]storage.OrgUser, error) {

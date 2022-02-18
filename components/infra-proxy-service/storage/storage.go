@@ -26,6 +26,7 @@ type Storage interface {
 
 	InsertUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	GetUser(ctx context.Context, id string) (User, error)
+	GetUsers(context.Context, string) ([]User, error)
 	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	DeleteUser(ctx context.Context, id string) (User, error)
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
@@ -118,6 +119,11 @@ type User struct {
 	InfraServerUsername string
 	CredentialID        string
 	Connector           string
+	Email               string
+	DisplayName         string
+	FirstName           string
+	LastName            string
+	MiddleName          string
 	AutomateUserID      string
 	IsServerAdmin       bool
 	CreatedAt           time.Time
