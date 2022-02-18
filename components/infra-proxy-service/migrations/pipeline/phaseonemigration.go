@@ -6,12 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
-)
-
-var (
-	Storage storage.Storage
-	Mig     storage.MigrationStorage
 )
 
 type PipelineData struct {
@@ -27,19 +23,23 @@ type PhaseOnePipleine struct {
 type PhaseOnePipelineProcessor func(<-chan PipelineData) <-chan PipelineData
 
 // ParseOrg returns PhaseOnePipelineProcessor
-func UnzipSrc() PhaseOnePipelineProcessor {
+func UnzipSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return unzip(result)
+		return unzipSrc(result, service)
 	}
 }
 
-func unzip(result <-chan PipelineData) <-chan PipelineData {
+func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting unzip pipeline")
 	out := make(chan PipelineData, 100)
 	go func() {
 
 		for res := range result {
-			res.Result.Meta.UnzipFolder = "backup"
+			result, err := Unzip(res.Ctx, service.Migration, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -53,13 +53,13 @@ func unzip(result <-chan PipelineData) <-chan PipelineData {
 }
 
 // ParseOrg returns PhaseOnePipelineProcessor
-func ParseOrg() PhaseOnePipelineProcessor {
+func ParseOrgSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return parseOrg(result)
+		return parseOrgSrc(result, service)
 	}
 }
 
-func parseOrg(result <-chan PipelineData) <-chan PipelineData {
+func parseOrgSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting to parse_orgs pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -67,27 +67,63 @@ func parseOrg(result <-chan PipelineData) <-chan PipelineData {
 	go func() {
 		log.Info("Processing to parse orgs...")
 		for res := range result {
+			result, err := ParseOrgs(res.Ctx, service.Storage, service.Migration, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
-			log.Info("after write")
 		}
-		log.Info("CLosing parse_orgs pipeline")
+		log.Info("Closing parse_orgs pipeline")
+		close(out)
+	}()
+	return out
+}
+
+// ParseOrg returns PhaseOnePipelineProcessor
+func CreatePreviewSrc(service *service.Service) PhaseOnePipelineProcessor {
+	return func(result <-chan PipelineData) <-chan PipelineData {
+		return createPreviewSrc(result, service)
+	}
+}
+
+func createPreviewSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+	log.Info("Starting to preview pipeline")
+
+	out := make(chan PipelineData, 100)
+
+	go func() {
+		log.Info("Processing to preview pipeline...")
+		for res := range result {
+			result, err := CreatePreview(res.Ctx, service.Storage, service.Migration, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
+			select {
+			case out <- res:
+			case <-res.Ctx.Done():
+				res.Done <- nil
+			}
+		}
+		log.Info("CLosing preview pipeline")
 		close(out)
 	}()
 	return out
 }
 
 // ParseUser returns PhaseOnePipelineProcessor
-func ParseUser() PhaseOnePipelineProcessor {
+func ParseUserSrc() PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return parseUser(result)
+		return parseUserSrc(result)
 	}
 }
 
-func parseUser(result <-chan PipelineData) <-chan PipelineData {
+func parseUserSrc(result <-chan PipelineData) <-chan PipelineData {
 	log.Info("Starting to parse_user pipeline")
 
 	out := make(chan PipelineData, 100)
@@ -209,20 +245,21 @@ func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProc
 	}()
 }
 
-func SetupPhaseOnePipeline() PhaseOnePipleine {
+func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 	c := make(chan PipelineData, 100)
 	migrationPipeline(c,
-		UnzipSrc(),
-		ParseOrg(),
-		ParseUser(),
-		ConflictingUsers(),
-		OrgMembers(),
-		AdminUsers(),
+		UnzipSrc(service),
+		ParseOrgSrc(service),
+		CreatePreviewSrc(service),
+		// ParseUser(),
+		// ConflictingUsers(),
+		// OrgMembers(),
+		// AdminUsers(),
 	)
 	return PhaseOnePipleine{in: c}
 }
 
-func (p *PhaseOnePipleine) Run(result pipeline.Result) {
+func (p *PhaseOnePipleine) Run(result pipeline.Result, service *service.Service) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error)
@@ -231,7 +268,7 @@ func (p *PhaseOnePipleine) Run(result pipeline.Result) {
 	}
 	err := <-done
 	if err != nil {
-		MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+		MigrationError(err, service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
 	}
 	log.Info("received done")

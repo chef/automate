@@ -27,7 +27,10 @@ export enum OrgActionTypes {
   CANCEL_MIGRATION_FAILURE = 'ORGS::CANCEL::MIGRATION::FAILURE',
   GET_PREVIEW_DATA         = 'ORGS::GET_PREVIEW_DATA',
   GET_PREVIEW_DATA_SUCCESS = 'ORGS::GET_PREVIEW_DATA::SUCCESS',
-  GET_PREVIEW_DATA_FAILURE = 'ORGS::GET_PREVIEW_DATA::FAILURE'
+  GET_PREVIEW_DATA_FAILURE = 'ORGS::GET_PREVIEW_DATA::FAILURE',
+  CONFIRM_PREVIEW          = 'ORGS::CONFIRM_PREVIEW',
+  CONFIRM_PREVIEW_SUCCESS  = 'ORGS::CONFIRM_PREVIEW::SUCCESS',
+  CONFIRM_PREVIEW_FAILURE  = 'ORGS::CONFIRM_PREVIEW::FAILURE'
 }
 
 export interface OrgSuccessPayload {
@@ -135,7 +138,7 @@ export class UpdateOrgFailure implements Action {
 
 export interface UploadSuccessPayload {
   success: boolean;
-  migrationId: string;
+  migration_id: string;
 }
 
 export class UploadZip implements Action {
@@ -202,6 +205,28 @@ export class GetPreviewDataFailure implements Action {
   constructor(public payload: HttpErrorResponse) {}
 }
 
+export interface ConfirmSuccessPayload {
+  migration_id: string;
+}
+
+export class ConfirmPreview implements Action {
+  readonly type = OrgActionTypes.CONFIRM_PREVIEW;
+
+  constructor(public payload: { server_id: string, migration_id: string}) { }
+}
+
+export class ConfirmPreviewSuccess implements Action {
+  readonly type = OrgActionTypes.CONFIRM_PREVIEW_SUCCESS;
+
+  constructor(public payload: ConfirmSuccessPayload) { }
+}
+
+export class ConfirmPreviewFailure implements Action {
+  readonly type = OrgActionTypes.CONFIRM_PREVIEW_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type OrgActions =
   | GetOrgs
   | GetOrgsSuccess
@@ -226,4 +251,7 @@ export type OrgActions =
   | CancelMigrationFailure
   | GetPreviewData
   | GetPreviewDataSuccess
-  | GetPreviewDataFailure;
+  | GetPreviewDataFailure
+  | ConfirmPreview
+  | ConfirmPreviewSuccess
+  | ConfirmPreviewFailure;

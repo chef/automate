@@ -78,7 +78,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		}
 	}
 
-	err = saveFile(migrationId, fileName, fileData)
+	folderpath, err := saveFile(migrationId, fileName, fileData)
 	if err != nil {
 		log.Errorf("Failed to save uploaded file for migration id %s : %s", migrationId, err.Error())
 		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
@@ -103,8 +103,8 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		return err
 	}
 
-	pipelineResult := pipeline_model.Result{Meta: pipeline_model.Meta{ZipFile: fileName}}
-	go s.phaseOnePipeline.Run(pipelineResult)
+	pipelineResult := pipeline_model.Result{Meta: pipeline_model.Meta{ZipFile: folderpath, MigrationID: migrationId, ServerID: serverId}}
+	go s.phaseOnePipeline.Run(pipelineResult, s.service)
 	return nil
 }
 
@@ -137,24 +137,24 @@ func (s *MigrationServer) GetMigrationStatus(ctx context.Context, req *request.G
 }
 
 // Takes up file name from service.MigrationDataService_UploadFileServer.MigrationId and creates the file in the same directory
-func saveFile(migrationId string, filename string, fileData bytes.Buffer) error {
+func saveFile(migrationId string, filename string, fileData bytes.Buffer) (string, error) {
 	folderPath := path.Join("/hab/svc/infra-proxy-service/data", migrationId)
 	err := os.Mkdir(folderPath, 0777)
 	if err != nil {
 		log.WithError(err).Error("Unable to create directory for migration id", migrationId)
-		return err
+		return "", err
 	}
 	filePath := path.Join(folderPath, filename)
 	file, err := os.Create(filePath)
 	if err != nil {
 		log.WithError(err).Error("Unable to create zipped file for migration id", migrationId)
-		return err
+		return "", err
 	}
 	_, err = fileData.WriteTo(file)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return filePath, nil
 
 }
 
@@ -192,7 +192,10 @@ func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.Canc
 
 	// Cancellation is allowed for a running pipeline only if the parsing is done but the data commitment is yet to be performed
 	currentMigrationPhase, err := s.service.Migration.GetMigrationStatus(ctx, req.MigrationId)
-	if currentMigrationPhase.MigrationStatusID != int64(constants.CreatePreview) {
+	if err != nil {
+		return nil, err
+	}
+	if currentMigrationPhase.MigrationTypeID != int64(constants.CreatePreview) {
 		return nil, fmt.Errorf("cancellation is not allowed when migration is not in Create Preview State: %s", req.MigrationId)
 	}
 
@@ -218,11 +221,12 @@ func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.Canc
 		return nil, err
 	}
 
-	errors := []string{err.Error()}
+	//TODO: Remove errors array from response, as we are not using it
+	//errors := []string{err.Error()}
 
 	return &response.CancelMigrationResponse{
 		Success: true,
-		Errors:  errors,
+		Errors:  []string{},
 	}, nil
 }
 
@@ -306,15 +310,15 @@ func (s *MigrationServer) StoreStagedData(ctx context.Context, migrationId strin
 // ConfirmPreview trigger the preview pipline
 func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreview) (*response.ConfirmPreview, error) {
 	// Validate all request fields are required
-	err := validation.New(validation.Options{
-		Target:          "server",
-		Request:         *req,
-		RequiredDefault: true,
-	}).Validate()
+	// err := validation.New(validation.Options{
+	// 	Target:          "server",
+	// 	Request:         *req,
+	// 	RequiredDefault: true,
+	// }).Validate()
 
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	migrationStage, err := s.service.Migration.GetMigrationStage(ctx, req.MigrationId)
 	if err != nil {
@@ -322,7 +326,7 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	}
 
 	// call pipeline function to trigger the phase 2 pipeline
-	go s.phaseTwoPipeline.Run(migrationStage.StagedData)
+	go s.phaseTwoPipeline.Run(migrationStage.StagedData, s.service)
 
 	return &response.ConfirmPreview{
 		MigrationId: req.MigrationId,

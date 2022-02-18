@@ -2,6 +2,7 @@
 @import '../infra_shared/slide-panel';
 
 :host {
+  z-index: 100;
   width: 50%;
   padding: 32px 0;
 }
