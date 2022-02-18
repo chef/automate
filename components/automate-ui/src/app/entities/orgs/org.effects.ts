@@ -36,6 +36,9 @@ import {
   GetPreviewData,
   GetPreviewDataSuccess,
   GetPreviewDataFailure,
+  ConfirmPreview,
+  ConfirmPreviewSuccess,
+  ConfirmPreviewFailure,
   OrgActionTypes
 } from './org.actions';
 
@@ -245,5 +248,33 @@ export class OrgEffects {
         type: Type.error,
         message: `Could not get preview data: ${msg || payload.error}`
       });
+    })));
+
+  confirmPreview$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CONFIRM_PREVIEW),
+      mergeMap(({ payload:  { server_id, migration_id } }: ConfirmPreview) =>
+        this.requests.confirmPreview(server_id, migration_id).pipe(
+          map((resp) => new ConfirmPreviewSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new ConfirmPreviewFailure(error)))))));
+
+  confirmPreviewSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CONFIRM_PREVIEW_SUCCESS),
+      map((_) => new CreateNotification({
+      type: Type.info,
+      message: 'Confirm preview successful.'
+    }))));
+
+  confirmPreviewFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CONFIRM_PREVIEW_FAILURE),
+      map(({ payload }: ConfirmPreviewFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not confirm preview: ${msg || payload.error}`
+        });
     })));
 }
