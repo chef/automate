@@ -18,6 +18,7 @@ export interface OrgEntityState extends EntityState<Org> {
   cancelStatus: EntityStatus;
   previewStatus: EntityStatus;
   previewData: PreviewSuccessPayload;
+  confirmPreviewStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -29,6 +30,7 @@ const UPDATE_STATUS = 'updateStatus';
 const UPLOAD_STATUS = 'uploadStatus';
 const CANCEL_STATUS = 'cancelStatus';
 const PREVIEW_STATUS = 'previewStatus';
+const CONFIRM_PREVIEW_STATUS = 'confirmPreviewStatus';
 
 export const orgEntityAdapter: EntityAdapter<Org> = createEntityAdapter<Org>();
 
@@ -43,7 +45,8 @@ export const OrgEntityInitialState: OrgEntityState =
     uploadStatus: EntityStatus.notLoaded,
     uploadDetails: null,
     cancelStatus: EntityStatus.notLoaded,
-    previewData: null
+    previewData: null,
+    confirmPreviewStatus: EntityStatus.notLoaded
   });
 
 export function orgEntityReducer(
@@ -142,6 +145,15 @@ export function orgEntityReducer(
 
     case OrgActionTypes.GET_PREVIEW_DATA_FAILURE:
       return set(PREVIEW_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.CONFIRM_PREVIEW:
+      return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.CONFIRM_PREVIEW_SUCCESS:
+      return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loadingSuccess, state);
+
+    case OrgActionTypes.CONFIRM_PREVIEW_FAILURE:
+      return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

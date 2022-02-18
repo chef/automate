@@ -2,7 +2,7 @@
 @import "../infra_shared/slide-panel.scss";
 
 :host {
-  z-index: 2;
+  z-index: 101;
   width: 80%;
   box-shadow: 0 35.8px 140.2px $chef-gulf-blue;
   padding: 25px;
