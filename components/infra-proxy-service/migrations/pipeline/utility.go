@@ -337,6 +337,9 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
+
+	_ = reader.Close()
+
 	_ = reader.Close()
 	_, err = mst.CompleteUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
 	if err != nil {
@@ -574,11 +577,6 @@ func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]stri
 func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("starting with user parseing phase for migration id: ", result.Meta.MigrationID)
 
-	_, err := mst.StartUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	if err != nil {
-		log.Errorf("failed to update the status for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
-	}
 	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
 
 	keyDumpByte, err := ioutil.ReadFile(file)
@@ -602,8 +600,13 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.Migr
 		_, _ = mst.FailedUsersParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
+	var mappedUsers []pipeline.User
+	checked := map[string]bool{}
 
-	mappedUsers := MapUsers(serverUsers, automateUsers)
+	mappedUsers = append(mappedUsers, SkipUpdateUser(serverUsers, automateUsers, checked)...)
+	mappedUsers = append(mappedUsers, DeleteUser(serverUsers, automateUsers, checked)...)
+	mappedUsers = append(mappedUsers, InsertUser(serverUsers, checked)...)
+
 	result.ParsedResult.Users = mappedUsers
 	return result, nil
 }
@@ -629,44 +632,75 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 	return users
 }
 
-func MapUsers(serverUser []pipeline.User, automateUser []storage.User) []pipeline.User {
-	var serverCleanUser []pipeline.User
-	for _, aUser := range automateUser {
-		if !IsExisting(serverUser, aUser.InfraServerUsername) {
-			serverCleanUser = append(serverCleanUser, pipeline.User{
-				Username:  aUser.InfraServerUsername,
-				ActionOps: 3,
-			})
-		} else {
-			for _, sUser := range serverUser {
-				if sUser.Username == aUser.InfraServerUsername {
-					if sUser.FirstName == aUser.FirstName && sUser.Email == aUser.Email && sUser.DisplayName == aUser.DisplayName &&
-						sUser.LastName == aUser.LastName && sUser.MiddleName == aUser.MiddleName {
-						sUser.ActionOps = 2
-						serverCleanUser = append(serverCleanUser, sUser)
+func SkipUpdateUser(serverUser []pipeline.User, automateUser []storage.User, checked map[string]bool) []pipeline.User {
+	var parsedUsers []pipeline.User
 
-					} else {
-						sUser.ActionOps = 4
-						serverCleanUser = append(serverCleanUser, sUser)
-					}
+	for _, aUser := range automateUser {
+
+		for _, sUser := range serverUser {
+			if checked[sUser.Username] {
+				continue
+			}
+
+			if sUser.Username == "pivotal" {
+				sUser.ActionOps = pipeline.Skip
+				parsedUsers = append(parsedUsers, sUser)
+				checked[sUser.Username] = true
+
+			} else if aUser.InfraServerUsername == sUser.Username {
+				if aUser.InfraServerUsername == sUser.Username && aUser.Email == sUser.Email {
+					sUser.ActionOps = pipeline.Skip
+					parsedUsers = append(parsedUsers, sUser)
+					checked[sUser.Username] = true
 
 				} else {
-					sUser.ActionOps = 1
-					serverCleanUser = append(serverCleanUser, sUser)
+					sUser.ActionOps = pipeline.Update
+					parsedUsers = append(parsedUsers, sUser)
+					checked[sUser.Username] = true
 				}
 			}
 		}
 	}
-	return serverCleanUser
+	return parsedUsers
 }
 
-func IsExisting(users []pipeline.User, user string) bool {
+func DeleteUser(serverUser []pipeline.User, automateUser []storage.User, checked map[string]bool) []pipeline.User {
+	var parsedUsers []pipeline.User
+
+	for _, aUser := range automateUser {
+		if !IfDeleted(serverUser, aUser.InfraServerUsername) {
+			parsedUsers = append(parsedUsers, pipeline.User{
+				Username:  aUser.InfraServerUsername,
+				ActionOps: pipeline.Delete,
+			})
+			checked[aUser.InfraServerUsername] = true
+		}
+
+	}
+	return parsedUsers
+}
+func IfDeleted(users []pipeline.User, user string) bool {
 	for _, v := range users {
 		if user == v.Username {
 			return true
 		}
 	}
 	return false
+}
+
+func InsertUser(serverUser []pipeline.User, checked map[string]bool) []pipeline.User {
+	var parsedUsers []pipeline.User
+
+	for _, user := range serverUser {
+		if checked[user.Username] {
+			continue
+		}
+		user.ActionOps = pipeline.Insert
+		parsedUsers = append(parsedUsers, user)
+		checked[user.Username] = true
+	}
+
+	return parsedUsers
 }
 
 func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) (bool, error) {
