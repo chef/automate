@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
@@ -244,7 +243,7 @@ func openOrgFolder(org os.FileInfo, fileLocation string) pipeline.OrgJson {
 	jsonFile, err := os.Open(jsonPath)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		fmt.Println(err)
+		log.Errorf("Unable to open the file at location : %s", jsonPath)
 	}
 	log.Info("Successfully opened the file at location", jsonPath)
 	defer func() {
@@ -448,7 +447,7 @@ func openOrgUser(orgName string, fileLocation string) pipeline.MemberJson {
 	jsonFile, err := os.Open(jsonPath)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		fmt.Println(err)
+		log.Errorf("Unable to open file at the location : %s", jsonPath)
 	}
 	log.Info("Successfully opened the file at location", jsonPath)
 	defer func() {
