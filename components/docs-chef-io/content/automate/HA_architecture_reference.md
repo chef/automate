@@ -1,5 +1,9 @@
 +++
+<<<<<<< HEAD
 title = "High Availability (HA) Architecture"
+=======
+title = "HA Reference Architecture"
+>>>>>>> dk/automate-hadoc
 
 draft = false
 
