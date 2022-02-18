@@ -403,7 +403,7 @@ func getAllVersions(ctx context.Context, url string) ([]string, error) {
 		return []string{}, errors.Errorf("Unexpected HTTP response from %s: %s", url, response.Status)
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := ioutil.ReadAll(response.Body) // nosemgrep
 	if err != nil {
 		return []string{}, errors.Wrap(err, fmt.Sprintf("error in reading the response of the endpoint %s", url))
 	}
