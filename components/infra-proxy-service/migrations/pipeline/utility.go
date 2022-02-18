@@ -632,6 +632,7 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 	return users
 }
 
+// SkipUpdateUser
 func SkipUpdateUser(serverUser []pipeline.User, automateUser []storage.User, checked map[string]bool) []pipeline.User {
 	var parsedUsers []pipeline.User
 
