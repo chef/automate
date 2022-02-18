@@ -144,7 +144,6 @@ func detectUpgradingServices(a2Manifest *manifest.A2,
 			//
 			// Our standard data format of YYYYMMDDHHMMSS
 			// is lexicographically sortable.
-			//Todo(milestone) recheck the below comparison logic for semantic versioning format
 			if svc.Pkg.Release < deploymentService.Release() {
 				upgradingService := makeUpgradingService(&svc, deploymentService)
 				ret = append(ret, upgradingService)

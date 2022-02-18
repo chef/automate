@@ -1231,7 +1231,7 @@ func (s *server) nextManifest() (*manifest.A2, error) {
 			return m, nil
 		}
 
-		logrus.Infof("Next upgradable manifest on channel %q (%s) is not compatible with current manifest (%s), ignoring",
+		logrus.Infof("The next available version %s in channel %q requires a manual upgrade with --major flag from the current version %s. Thus, ignoring auto-upgrade",
 			s.deployment.Channel(),
 			nextVersion,
 			s.deployment.CurrentReleaseManifest.Version())
@@ -1855,11 +1855,11 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 			if isMinorAvailable {
 				nextManifestVersion = compVersion
 			} else if isMajorAvailable {
-				return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --major` to further upgrade")
+				return nil, status.Errorf(codes.FailedPrecondition, "This is a Major upgrade. Please use `--major` flag in the above command")
 			}
 		} else { //major upgrade
 			if isMinorAvailable {
-				return nil, status.Errorf(codes.InvalidArgument, "minor/patch version is available, please use `chef-automate upgrade run`")
+				return nil, status.Errorf(codes.FailedPrecondition, "The next upgradable version is not a major version upgrade, please run the upgrade command without `--major` flag")
 			} else if isMajorAvailable {
 				nextManifestVersion = compVersion
 			}
@@ -1874,26 +1874,26 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 		//compare minimum compatible version with current version, i.e current version should be greater than or equal than min compatible version
 		minCompVersion := m.MinCompatibleVer
 		if minCompVersion == "" {
-			return nil, status.Error(codes.InvalidArgument, "mandatory minimum compatable version is missing")
+			return nil, status.Error(codes.FailedPrecondition, "The minimum compatible version field is missing in the manifest, please create a bundle with the latest automate-cli")
 		} else if !isCompatibleForAirgap(currentRelease, minCompVersion) {
-			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q. The compatible version is %q", nextManifestVersion, currentRelease, minCompVersion)
+			return nil, status.Errorf(codes.FailedPrecondition, "The version specified %q is not compatible with the current version %q. Please first upgrade to the minimum compatible version %q", nextManifestVersion, currentRelease, minCompVersion)
 		}
 
 		//check for upgrade or degrade, we should not allow degrading
 		if isDegrade(currentRelease, nextManifestVersion) {
-			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", nextManifestVersion, currentRelease)
+			return nil, status.Errorf(codes.InvalidArgument, "The version specified %q is older than the current version %q", nextManifestVersion, currentRelease)
 		}
 
 		isActualMajorUpgrade := isMajorUpgrade(currentRelease, nextManifestVersion)
 
 		//check the upgrade is major or not, and if the upgrade is minor/patch, user should not provide --major flag
 		if !isActualMajorUpgrade && req.IsMajorUpgrade {
-			return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --airgap-bundle` to further upgrade")
+			return nil, status.Errorf(codes.FailedPrecondition, "The next upgradable version is not a major version upgrade, please run the upgrade command without `--major` flag")
 		}
 
 		//check the upgrade is major or not, and if the upgrade is major user should provide --major flag.
 		if isActualMajorUpgrade && !req.IsMajorUpgrade {
-			return nil, status.Errorf(codes.InvalidArgument, "please use `chef-automate upgrade run --major --airgap-bundle` to further upgrade")
+			return nil, status.Errorf(codes.FailedPrecondition, "This is a Major upgrade. Please use `--major` flag in the above command")
 		}
 
 	}
@@ -1904,7 +1904,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 		}
 
 		if nextManifestVersion != req.Version && !isCompatible(currentRelease, req.Version, nextManifestVersion) {
-			return nil, status.Errorf(codes.OutOfRange, "the version specified %q is not compatible for the current version %q", req.Version, currentRelease)
+			return nil, status.Errorf(codes.InvalidArgument, "The specified version %q is not compatible with the current version %q. The current version can be upgraded to %q", req.Version, currentRelease, nextManifestVersion)
 		}
 
 		nextManifestVersion = req.Version

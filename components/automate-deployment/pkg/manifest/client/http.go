@@ -234,11 +234,7 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 		return nil, err
 	}
 
-	//Todo(milestone) Append min compatible version needed to upgrade for the current manifest
-
 	m.HartOverrides = []habpkg.Hart{}
 
 	return m, nil
 }
-
-//Todo(milestone) method to find min compatible version needed to upgrade.

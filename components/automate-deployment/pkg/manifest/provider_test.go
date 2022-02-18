@@ -172,25 +172,25 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 			version:           "20220113154113",
 			isMinorAvailable:  false,
 			isMajorAvailable:  true,
-			compatibleVersion: "1.2.1",
+			compatibleVersion: "3.2.1",
 			isError:           false,
 			errorString:       "",
 		},
 		{
 			input:             "set1",
-			version:           "1.0.0",
+			version:           "3.0.0",
 			isMinorAvailable:  true,
 			isMajorAvailable:  false,
-			compatibleVersion: "1.2.1",
+			compatibleVersion: "3.2.1",
 			isError:           false,
 			errorString:       "",
 		},
 		{
 			input:             "set1",
-			version:           "1.2.1",
+			version:           "3.2.1",
 			isMinorAvailable:  false,
 			isMajorAvailable:  true,
-			compatibleVersion: "2.1.2",
+			compatibleVersion: "4.1.2",
 			isError:           false,
 			errorString:       "",
 		},
@@ -199,25 +199,25 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 			version:           "20220113154113",
 			isMinorAvailable:  false,
 			isMajorAvailable:  true,
-			compatibleVersion: "1.0.0",
+			compatibleVersion: "3.0.0",
 			isError:           false,
 			errorString:       "",
 		},
 		{
 			input:             "set2",
-			version:           "1.0.0",
+			version:           "3.0.0",
 			isMinorAvailable:  false,
 			isMajorAvailable:  false,
-			compatibleVersion: "1.0.0",
+			compatibleVersion: "3.0.0",
 			isError:           false,
 			errorString:       "",
 		},
 		{
 			input:             "set3",
-			version:           "1.0.0",
+			version:           "3.0.0",
 			isMinorAvailable:  false,
 			isMajorAvailable:  true,
-			compatibleVersion: "2.0.0",
+			compatibleVersion: "4.0.0",
 			isError:           false,
 			errorString:       "",
 		},
@@ -232,10 +232,10 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 		},
 		{
 			input:             "set5",
-			version:           "1.0.0",
+			version:           "3.0.0",
 			isMinorAvailable:  true,
 			isMajorAvailable:  false,
-			compatibleVersion: "1.2.5",
+			compatibleVersion: "3.2.5",
 			isError:           false,
 			errorString:       "",
 		},
@@ -271,8 +271,8 @@ func TestGetMinCurrentVersion(t *testing.T) {
 	}{
 		{
 			input:             "set1",
-			version:           "2.1.2",
-			compatibleVersion: "1.2.1",
+			version:           "4.1.2",
+			compatibleVersion: "3.2.1",
 			isError:           false,
 			errorString:       "",
 		},
@@ -285,21 +285,21 @@ func TestGetMinCurrentVersion(t *testing.T) {
 		},
 		{
 			input:             "set1",
-			version:           "3.4.5",
-			compatibleVersion: "2.1.2",
+			version:           "5.4.5",
+			compatibleVersion: "4.1.2",
 			isError:           false,
 			errorString:       "",
 		},
 		{
 			input:             "set1",
-			version:           "1.0.0",
+			version:           "3.0.0",
 			compatibleVersion: "20220113154113",
 			isError:           false,
 			errorString:       "",
 		},
 		{
 			input:             "set1",
-			version:           "1.2.1",
+			version:           "3.2.1",
 			compatibleVersion: "20220113154113",
 			isError:           false,
 			errorString:       "",
@@ -313,15 +313,15 @@ func TestGetMinCurrentVersion(t *testing.T) {
 		},
 		{
 			input:             "set2",
-			version:           "1.0.0",
+			version:           "3.0.0",
 			compatibleVersion: "20220113154113",
 			isError:           false,
 			errorString:       "",
 		},
 		{
 			input:             "set3",
-			version:           "2.0.0",
-			compatibleVersion: "1.0.0",
+			version:           "4.0.0",
+			compatibleVersion: "3.0.0",
 			isError:           false,
 			errorString:       "",
 		},
@@ -334,8 +334,8 @@ func TestGetMinCurrentVersion(t *testing.T) {
 		},
 		{
 			input:             "set5",
-			version:           "1.2.5",
-			compatibleVersion: "1.0.0",
+			version:           "3.2.5",
+			compatibleVersion: "3.0.0",
 			isError:           false,
 			errorString:       "",
 		},
@@ -371,10 +371,10 @@ func TestGetAllVersions(t *testing.T) {
 		} else if param[0] == "set2" {
 			resp = []string{
 				"20220113154113",
-				"22.0.0",
-				"22.2.6",
-				"23.2.4",
-				"22.2.16",
+				"3.0.0",
+				"3.2.6",
+				"4.2.4",
+				"3.2.16",
 			}
 		}
 
@@ -393,7 +393,7 @@ func TestGetAllVersions(t *testing.T) {
 		},
 		{
 			input:  "set2",
-			output: []string{"20220113154113", "22.0.0", "22.2.6", "22.2.16", "23.2.4"},
+			output: []string{"20220113154113", "3.0.0", "3.2.6", "3.2.16", "4.2.4"},
 		},
 	}
 
@@ -418,23 +418,23 @@ func compatibleVerServer() *httptest.Server {
 				"20211220104140",
 				"20220113145751",
 				"20220113154113",
-				"1.0.0",
-				"1.1.9",
-				"1.2.1",
-				"2.0.0",
-				"2.1.2",
-				"3.4.5",
+				"3.0.0",
+				"3.1.9",
+				"3.2.1",
+				"4.0.0",
+				"4.1.2",
+				"5.4.5",
 			}
 		} else if param[0] == "set2" {
 			resp = []string{
 				"20220113154113",
-				"1.0.0",
+				"3.0.0",
 			}
 		} else if param[0] == "set3" {
 			resp = []string{
 				"20220113154113",
-				"1.0.0",
-				"2.0.0",
+				"3.0.0",
+				"4.0.0",
 			}
 		} else if param[0] == "set4" {
 			resp = []string{
@@ -447,8 +447,8 @@ func compatibleVerServer() *httptest.Server {
 			}
 		} else if param[0] == "set5" {
 			resp = []string{
-				"1.0.0",
-				"1.2.5",
+				"3.0.0",
+				"3.2.5",
 			}
 		}
 		bytes, _ := json.Marshal(resp)
