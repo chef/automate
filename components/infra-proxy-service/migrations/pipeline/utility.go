@@ -150,7 +150,15 @@ func CreatePreview(ctx context.Context, st storage.Storage, mst storage.Migratio
 		log.Errorf("Failed to update the status for create preview for the migration id  %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
-	_, err = mst.StoreMigrationStage(ctx, result.Meta.MigrationID, result)
+
+	resultByte, err := json.Marshal(result)
+	if err != nil {
+		log.Errorf("Failed to marshal the staged data for the migration id %s : %s", result.Meta.MigrationID, err.Error())
+		_, _ = mst.FailedCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
+		return result, err
+	}
+
+	_, err = mst.StoreMigrationStage(ctx, result.Meta.MigrationID, resultByte)
 	if err != nil {
 		log.Errorf("Failed to store the staged data %s : %s ", result.Meta.MigrationID, err.Error())
 		_, _ = mst.FailedCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
@@ -257,12 +265,20 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 
 // Unzip will decompress a zip file and sets the UnzipFolder
 func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+
 	var fpath string
+	_, err := mst.StartUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID)
+	if err != nil {
+		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
+	}
 
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
 		log.Errorf("cannot open reader: %s.", err)
-		mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
+		_, err := mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
+		if err != nil {
+			log.Errorf("Failed to update status in DB: %s", err)
+		}
 		return result, err
 	}
 
@@ -319,5 +335,9 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
 	reader.Close()
+	_, err = mst.CompleteUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
+	if err != nil {
+		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
+	}
 	return result, nil
 }
