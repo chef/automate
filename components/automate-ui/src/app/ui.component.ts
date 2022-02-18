@@ -87,7 +87,8 @@ export class UIComponent implements OnInit, AfterViewChecked {
       localStorage.setItem('manual-upgrade-banner', this.booleanToString(true));
       this.showBanner = true;
     } else {
-      this.showBanner = this.stringToBoolean(bannerStorage);
+      // this.showBanner = this.stringToBoolean(bannerStorage);
+      this.showBanner = this.stringToBoolean('false');
     }
     this.store.dispatch(new CreateNotification({
       type: Type.error,
