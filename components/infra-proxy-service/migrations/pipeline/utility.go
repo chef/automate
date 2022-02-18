@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/chef/automate/api/interservice/local_user"
-
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -292,7 +292,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		fpath = filepath.Join(filepath.Dir(result.Meta.ZipFile), file.Name)
 
 		if file.FileInfo().IsDir() {
-			err = os.MkdirAll(fpath, os.ModePerm)
+			_ = os.MkdirAll(fpath, os.ModePerm)
 			continue
 		}
 
@@ -706,5 +706,3 @@ func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtSer
 	}
 	return true
 }
-
-
