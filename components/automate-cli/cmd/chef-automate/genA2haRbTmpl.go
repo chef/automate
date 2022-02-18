@@ -130,6 +130,16 @@ aws do
   cidr_block_addr "{{ .Aws.Config.AwsCidrBlockAddr }}"
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
   setup_managed_services {{ .Aws.Config.SetupManagedServices }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ else }}#managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ else }}#managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ else }}#managed_elasticsearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ else }}#managed_elasticsearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_rds_instance_url "{{ .Aws.Config.RDSInstanceUrl }}" {{ else }}#managed_rds_instance_url "{{ .Aws.Config.RDSInstanceUrl }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_rds_superuser_username "{{ .Aws.Config.RDSSuperUserName }}" {{ else }}#managed_rds_superuser_username "{{ .Aws.Config.RDSSuperUserName }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_rds_superuser_password "{{ .Aws.Config.RDSSuperUserPassword }}" {{ else }}#managed_rds_superuser_password "{{ .Aws.Config.RDSSuperUserPassword }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_rds_dbuser_username "{{ .Aws.Config.RDSDBUserName }}" {{ else }}#managed_rds_dbuser_username "{{ .Aws.Config.RDSDBUserName }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_rds_dbuser_password "{{ .Aws.Config.RDSDBUserPassword }}" {{ else }}#managed_rds_dbuser_password "{{ .Aws.Config.RDSDBUserPassword }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_rds_certificate "{{ .Aws.Config.RDSCertificate }}" {{ else }}#managed_rds_certificate "{{ .Aws.Config.RDSCertificate }}" {{ end }}
   ### Filter settings default to CentOS if left blank
   {{ if .Aws.Config.AmiFilterName }} ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ else }} # ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ end }}
   ### Filter settings default to CentOS if left blank
