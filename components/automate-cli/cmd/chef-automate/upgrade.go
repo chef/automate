@@ -86,7 +86,6 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
 	}
-	//Todo(milestone) check if upgradeRunCmdFlags.version is compatible with current version.
 
 	if offlineMode {
 		writer.Title("Installing airgap install bundle")
@@ -253,8 +252,11 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			if resp.IsAirgapped {
 				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
 			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
-				writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
+				writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
 					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+				if !resp.IsConvergeCompatable {
+					writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
+				}
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
 			}
@@ -271,23 +273,13 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			if resp.IsAirgapped {
 				writer.Titlef("Automate is upgrading to airgap bundle %s", resp.DesiredVersion)
 			} else {
-				if !resp.IsConvergeCompatable {
-					writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
-						resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
-				} else {
-					writer.Titlef("Automate is upgrading to %s", resp.DesiredVersion)
-				}
+				writer.Titlef("Automate is upgrading to %s", resp.DesiredVersion)
 			}
 		} else {
 			if resp.IsAirgapped {
 				writer.Titlef("Automate is upgrading to airgap bundle %s", resp.LatestAvailableVersion)
 			} else {
-				if !resp.IsConvergeCompatable {
-					writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
-						resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
-				} else {
-					writer.Titlef("Automate is upgrading to %s", resp.LatestAvailableVersion)
-				}
+				writer.Titlef("Automate is upgrading to %s", resp.LatestAvailableVersion)
 			}
 		}
 
@@ -371,7 +363,7 @@ func init() {
 		&upgradeRunCmdFlags.isMajorUpgrade,
 		"major",
 		false,
-		"will be used for major upgrade")
+		"This flag is only needed for major version upgrades")
 
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
