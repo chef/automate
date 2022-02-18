@@ -191,7 +191,7 @@ Refer to ServiceNow's [Discovery](https://docs.servicenow.com/bundle/paris-it-op
 
 You can associate a single user with more than one roles.
 
-#### Role x_chef_automate.admin
+### Role x_chef_automate.admin
 
 You can assign the `x_chef_automate.admin` role to a user other than a System Administrator to allow another user to manage the application properties and logs.
 
@@ -296,21 +296,21 @@ The System Administrator authorization includes access to the tasks in the **Adm
 
 The **Admin** role grants user access to the:
 
-* Chef incidents menu
-* Client runs menu item
-* Chef InSpec scans menu item
-* Properties menu item
-* Support menu item
-* Logs menu item
+- Chef incidents menu
+- Client runs menu item
+- Chef InSpec scans menu item
+- Properties menu item
+- Support menu item
+- Logs menu item
 
 ### Role `x_chef_incident.user`
 
 The `x_chef_incident.user` role is suitable for those users who require application access without administration rights. The role grants a user access to the:
 
-* Chef Incidents menu
-* Chef Infra Client runs menu item
-* Chef InSpec scans menu item
-* Support menu item
+- Chef Incidents menu
+- Chef Infra Client runs menu item
+- Chef InSpec scans menu item
+- Support menu item
 
 {{< note >}}
 
@@ -322,7 +322,7 @@ Client run and Chef InSpec scan records are linked to incidents and is appropria
 
 The `x_chef_incident.api` role is suitable for users responsible for integrating the Chef Automate data into ServiceNow. We recommend creating a new user specifically for this role. The Chef Automate Incident App requires the API role to set up communication with Chef Automate.
 
-## Incident App Propertie
+## Incident App Properties
 
 `x_chef_incident.association`
 : Used to associate a Chef Infra Client run record with an Incident record. The possible values are: `cookbook` and `node`. Default: `cookbook`.
@@ -376,3 +376,76 @@ The ServiceNow app deletes these records of the corresponding closed incidents, 
 `x_chef_incident.logging.verbosity`
 
 : Used to debug the data in ServiceNow. Enables the selected logging level and is visible in logs. The possible values are `debug`, `warn`, `info`, and `error`. Default: `error`.
+
+<!-- ## Event Creation App Roles
+
+You can associate a single user with more than one role.
+
+### Role `x_chef_event.admin`
+
+You can assign the `x_chef_event.admin` role to a user other than a System Administrator to manage the application properties and logs.
+
+The System Administrator authorization includes access to the tasks in the **Admin** role.
+
+The **Admin** role grants user access to the following:
+
+- Chef Events menu
+- Client Infra Client Run Alerts menu item
+- Chef InSpec scans Alerts menu item
+- Client Infra Client Runs
+- Chef InSpec scans
+- Properties menu item
+- Support menu item
+- Logs menu item
+
+### Role `x_chef_event.chef_inspec_scans_user`
+
+The `x_chef_event.chef_inspec_scans_user` role provides a user access to applications. It does not provide administration privileges. Client run and Chef InSpec scan records are linked to events, and is appropriate to assign this role to users who manage events in ServiceNow.
+
+This role grants a user access to the:
+
+- Chef Events menu
+- Chef Infra scans Alerts menu item
+- Chef InSpec scans menu item
+- Support menu item
+
+### Role x_chef_event.api
+
+The `x_chef_event.api` role is:
+
+- Required to set up the Event Creation App with Chef Automate.
+- Necessary for users integrating Chef Automate and ServiceNow.
+- The best practice is to create a user for this role.
+
+suitable for users responsible for integrating the Chef Automate data into ServiceNow. We recommend creating a new user specifically for this role. The Chef Automate Event Creation App requires the API role to set up communication with Chef Automate.
+
+### Event Creation App Properties
+
+`x_chef_event.client_run_message_key`
+: Used to associate a Chef Infra client run record with an event record. Possible values: `cookbook` and `node`. Default: `cookbook`.
+
+Set the value to `cookbook` to create an event for the failed cookbook. This associates all failing Chef Infra client runs with this cookbook failure with the event. `cookbook` is the default value because the number of cookbooks is independent of the number of nodes in any system. The message key description of the event provides information about the failure.
+
+TODO: [Chef Events Client Runs page] data not available
+
+The **Chef Infra Client Run Alerts** tab of the alerts displays the associated client run events. Setting the value to `node` creates an event for each failed node. All failing Chef Infra client runs for a node associated with the corresponding event. The message key description of the event provides information about the run failure for a node.
+
+![Chef Events Client Run Alerts page](/images/automate/sn_event_clientrun_alerts.png)
+
+`x_chef_event.inspec_scan_message_key`
+
+: Used to associate a Chef InSpec scan record with an event record. Possible values: `profile` and `node`. Default: `profile`.
+
+Set the value to `profile` to create an event for the failed chef InSpec compliance profile with a message value. This associate all failing Chef InSpec compliance scans with the corresponding alerts. `profile` is the default value because the number of cookbooks is independent of the number of nodes in any system. The message key description of the event provides information about the failure.
+
+![Chef Events InSpec Scans page](/images/automate/sn_event_inspecscans.png)
+
+The **Chef InSpec Scan Alerts** tab of the event displays the associated Chef InSpec scans. Setting the value to `node` creates an event for each failed node. All failing Chef InSpec scans for a node associated with the corresponding event. The message key description of the event indicates the failed node.
+
+![Chef Events InSpec Scan Alerts page](/images/automate/sn_event_inspecscans_alerts.png)
+
+`x_chef_events.logging.enabled`
+
+: Set to `Yes` to enable logging and `No` to disable it. Once enabled, authorized users can view the logs at **Chef Events** > **Logs** and **System logs** > **Application logs**. Default: `No`.
+
+![Chef Events Properties page](/images/automate/sn_event_app_properties.png) -->
