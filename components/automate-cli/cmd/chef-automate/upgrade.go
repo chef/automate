@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -70,21 +71,17 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 	offlineMode := upgradeRunCmdFlags.airgap != ""
 
+	// check if it is in HA mode
+	if isA2HARBFileExist() {
+		return runAutomateHAFlow(args, offlineMode)
+	}
+
 	if airgap.AirgapInUse() && !offlineMode {
 		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
 	}
 
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
-	}
-	// check if it is in HA mode
-	if isA2HARBFileExist() {
-
-		if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
-			return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
-		}
-
-		return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
 	}
 
 	if offlineMode {
@@ -122,6 +119,62 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	// stuff breaks when deployment-service is restarted. Until that's fixed,
 	// it would be pointless to try to stream the events.
 	return nil
+}
+
+func runAutomateHAFlow(args []string, offlineMode bool) error {
+	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
+		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
+	}
+	response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(response, "y") {
+		return errors.New("canceled upgrade")
+	}
+
+	if offlineMode {
+		writer.Title("Installing airgap install bundle")
+		airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
+		if err != nil {
+			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
+		}
+		if upgradeRunCmdFlags.upgradefrontends {
+			err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		} else if upgradeRunCmdFlags.upgradebackends {
+			err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		} else {
+			err := moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+			if err != nil {
+				return err
+			}
+		}
+		args = append(args, "-y")
+		if upgradeRunCmdFlags.skipDeploy {
+			return nil
+		}
+
+	} else {
+		if upgradeRunCmdFlags.upgradefrontends {
+			args = append(args, "--upgrade-frontends", "-y")
+		}
+		if upgradeRunCmdFlags.upgradebackends {
+			args = append(args, "--upgrade-backends", "-y")
+		}
+		if upgradeRunCmdFlags.upgradeairgapbundles {
+			args = append(args, "--upgrade-airgap-bundles", "-y")
+		}
+		if upgradeRunCmdFlags.skipDeploy {
+			args = append(args, "--skip-deploy")
+		}
+	}
+	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc)
 }
 
 func statusUpgradeCmd(cmd *cobra.Command, args []string) error {

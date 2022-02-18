@@ -19,7 +19,7 @@
     },
     "license": {
       "name": "Apache 2.0",
-      "url": "https://github.com/chef/automate/blob/master/LICENSE"
+      "url": "https://github.com/chef/automate/blob/main/LICENSE"
     },
     "version": "version not set",
     "x-logo": {
@@ -762,6 +762,60 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.applications.ServicesStatsRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/applications/telemetry/services/count": {
+      "get": {
+        "tags": [
+          "ApplicationsService"
+        ],
+        "operationId": "ApplicationsService_GetServicesUsageCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.GetServicesUsageCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/applications/telemetry/services/count/updated": {
+      "put": {
+        "tags": [
+          "ApplicationsService"
+        ],
+        "operationId": "ApplicationsService_UpdateTelemetryReported",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.UpdateTelemetryReportedRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.UpdateTelemetryReportedResponse"
             }
           },
           "default": {
@@ -1530,6 +1584,63 @@
         }
       }
     },
+    "/api/v0/cfgmgmt/telemetry/nodes/count": {
+      "get": {
+        "description": "Returns the count of unique nodes with lastRun in a given time.\nThe time duration can be between the last time Telemetry data sent and the day before the current date.\nIf the duration < 15 days --> 15 days\nduration > 15 days --> duration\nAuthorization Action:\n```\niam:introspect:getAll\n```",
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "summary": "GetNodesUsageCount",
+        "operationId": "ConfigMgmt_GetNodesUsageCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.GetNodesUsageCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/cfgmgmt/telemetry/nodes/count/updated": {
+      "put": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "summary": "UpdateTelemetryReported\nAcknowledge API  to updates the last client run telemetry reported date in postgres\nAuthorization Action:\n```\niam:introspect:getAll\n```",
+        "operationId": "ConfigMgmt_UpdateTelemetryReported",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.UpdateTelemetryReportedRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.UpdateTelemetryReportedResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/compliance/market/read/{name}/version/{version}": {
       "get": {
         "description": "Show the details of an un-installed profile using the profile name and version.\nin the UI, these are the profiles under the \"Available\" tab.\nThese profiles are created and maintained by Chef, shipped with Chef Automate.\n\n\nAuthorization Action:\n```\ncompliance:marketProfiles:get\n```",
@@ -2123,6 +2234,64 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Failures"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/compliance/reporting/stats/nodes/count": {
+      "get": {
+        "description": "Returns the count of unique nodes with lastRun in a given time.\nThe time duration can be between the last time Telemetry data sent and the day before the current date.\nIf the duration < 15 days --> 15 days\nduration > 15 days --> duration\n\nAuthorization Action:\n```\niam:introspect:getAll\n```",
+        "tags": [
+          "StatsService"
+        ],
+        "summary": "GetNodesUsageCount",
+        "operationId": "StatsService_GetNodesUsageCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.GetNodesUsageCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/compliance/reporting/stats/nodes/count/updated": {
+      "put": {
+        "description": "Acknowledge API  to updates the last complaince telemetry reported date in postgres\n\nAuthorization Action:\n```\niam:introspect:getAll\n```",
+        "tags": [
+          "StatsService"
+        ],
+        "summary": "UpdateTelemetryReported",
+        "operationId": "StatsService_UpdateTelemetryReported",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedResponse"
             }
           },
           "default": {
@@ -2931,6 +3100,28 @@
         }
       }
     },
+    "/api/v0/datafeed/config": {
+      "get": {
+        "tags": [
+          "DatafeedService"
+        ],
+        "operationId": "DatafeedService_GlobalDataFeedConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.GlobalDataFeedConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/datafeed/destination": {
       "post": {
         "tags": [
@@ -2952,6 +3143,44 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.AddDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/datafeed/destination/enable/{id}": {
+      "patch": {
+        "tags": [
+          "DatafeedService"
+        ],
+        "operationId": "DatafeedService_EnableDestination",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationEnableRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
             }
           },
           "default": {
@@ -3498,6 +3727,36 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/server_status": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetServerStatus",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Server FQDN.",
+            "name": "fqdn",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServerStatus"
             }
           },
           "default": {
@@ -5503,6 +5762,96 @@
         }
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}/revisions": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetPolicyfileRevisions",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef Organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Policyfile name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileRevisions"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetPolicygroup",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef Organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Policygroup name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policygroup"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "tags": [
@@ -5830,6 +6179,83 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetOrgUsersList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef Organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgUsers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/users": {
+      "post": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetServerUsersList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ServerUsers"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ServerUsers"
             }
           },
           "default": {
@@ -9458,6 +9884,21 @@
         }
       }
     },
+    "chef.automate.api.applications.GetServicesUsageCountResponse": {
+      "type": "object",
+      "properties": {
+        "days_since_last_post": {
+          "type": "string",
+          "format": "int64",
+          "title": "number of days since telematics was last posted"
+        },
+        "total_services": {
+          "type": "string",
+          "format": "int64",
+          "title": "unique services count in a duration"
+        }
+      }
+    },
     "chef.automate.api.applications.HealthCheckResult": {
       "type": "object",
       "title": "HealthCheckResult aggregates the stdout output, stderr output and process\nexit status of a habitat health check",
@@ -9818,6 +10259,19 @@
     "chef.automate.api.applications.UpdateDisconnectedServicesConfigRes": {
       "type": "object"
     },
+    "chef.automate.api.applications.UpdateTelemetryReportedRequest": {
+      "type": "object",
+      "title": "Telemetry",
+      "properties": {
+        "last_telemetry_reported_at": {
+          "type": "string",
+          "title": "last application service telemetry reported date"
+        }
+      }
+    },
+    "chef.automate.api.applications.UpdateTelemetryReportedResponse": {
+      "type": "object"
+    },
     "chef.automate.api.cds.request.Credentials": {
       "type": "object",
       "properties": {
@@ -10034,6 +10488,15 @@
         "SCM_WEB_TYPE_GITHUB"
       ]
     },
+    "chef.automate.api.cfgmgmt.request.UpdateTelemetryReportedRequest": {
+      "type": "object",
+      "properties": {
+        "last_telemetry_reported_at": {
+          "type": "string",
+          "title": "last client run telemetry reported date"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.CheckInCounts": {
       "type": "object",
       "properties": {
@@ -10222,6 +10685,21 @@
           "items": {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
           }
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.GetNodesUsageCountResponse": {
+      "type": "object",
+      "properties": {
+        "days_since_last_post": {
+          "type": "string",
+          "format": "int64",
+          "title": "number of days since telematics was last posted"
+        },
+        "node_cnt": {
+          "type": "string",
+          "format": "int64",
+          "title": "unique nodes count in a duration"
         }
       }
     },
@@ -10905,6 +11383,9 @@
           }
         }
       }
+    },
+    "chef.automate.api.cfgmgmt.response.UpdateTelemetryReportedResponse": {
+      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.ValueCount": {
       "type": "object",
@@ -11738,6 +12219,21 @@
         }
       }
     },
+    "chef.automate.api.compliance.reporting.stats.v1.GetNodesUsageCountResponse": {
+      "type": "object",
+      "properties": {
+        "days_since_last_post": {
+          "type": "string",
+          "format": "int64",
+          "title": "number of days since telematics was last posted"
+        },
+        "node_cnt": {
+          "type": "string",
+          "format": "int64",
+          "title": "unique nodes count in a duration"
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.stats.v1.ListFilter": {
       "type": "object",
       "properties": {
@@ -12164,6 +12660,18 @@
         }
       }
     },
+    "chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedRequest": {
+      "type": "object",
+      "properties": {
+        "last_telemetry_reported_at": {
+          "type": "string",
+          "title": "last complaince telemetry reported date"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedResponse": {
+      "type": "object"
+    },
     "chef.automate.api.compliance.reporting.v1.Attribute": {
       "type": "object",
       "properties": {
@@ -12221,10 +12729,7 @@
         },
         "tags": {
           "description": "Metadata defined on the control in key-value format.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "type": "string"
         },
         "title": {
           "description": "The compact description of the control.",
@@ -13843,17 +14348,50 @@
     "chef.automate.api.data_lifecycle.SetServicesConfigResponse": {
       "type": "object"
     },
+    "chef.automate.api.datafeed.AWS": {
+      "type": "object",
+      "properties": {
+        "access_key": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "secret_access_key": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.AddDestinationRequest": {
       "type": "object",
       "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         },
         "name": {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
           "type": "string"
         },
         "url": {
@@ -13864,14 +14402,30 @@
     "chef.automate.api.datafeed.AddDestinationResponse": {
       "type": "object",
       "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         },
         "name": {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
           "type": "string"
         },
         "url": {
@@ -13882,14 +14436,30 @@
     "chef.automate.api.datafeed.DeleteDestinationResponse": {
       "type": "object",
       "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         },
         "name": {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
           "type": "string"
         },
         "url": {
@@ -13900,9 +14470,22 @@
     "chef.automate.api.datafeed.GetDestinationResponse": {
       "type": "object",
       "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         },
         "name": {
           "type": "string"
@@ -13910,7 +14493,51 @@
         "secret": {
           "type": "string"
         },
+        "services": {
+          "type": "string"
+        },
         "url": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.datafeed.GlobalDataFeedConfigResponse": {
+      "type": "object",
+      "properties": {
+        "accepted_status_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "cidr_filter": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disable_cidr_filter": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "feed_interval": {
+          "type": "string"
+        },
+        "node_batch_size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_nodes_only": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "chef.automate.api.datafeed.Header": {
+      "type": "object",
+      "properties": {
+        "value": {
           "type": "string"
         }
       }
@@ -13937,6 +14564,30 @@
         }
       }
     },
+    "chef.automate.api.datafeed.SecretIdWithExtraPrams": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
+        },
+        "services": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.TestDestinationResponse": {
       "type": "object",
       "properties": {
@@ -13949,8 +14600,17 @@
     "chef.automate.api.datafeed.URLValidationRequest": {
       "type": "object",
       "properties": {
+        "aws": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.AWS"
+        },
+        "header": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.Header"
+        },
         "secret_id": {
           "$ref": "#/definitions/chef.automate.api.datafeed.SecretId"
+        },
+        "secret_id_with_addon": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.SecretIdWithExtraPrams"
         },
         "url": {
           "type": "string"
@@ -13960,16 +14620,44 @@
         }
       }
     },
+    "chef.automate.api.datafeed.UpdateDestinationEnableRequest": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.UpdateDestinationRequest": {
       "type": "object",
       "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "id": {
           "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         },
         "name": {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
           "type": "string"
         },
         "url": {
@@ -13980,14 +14668,30 @@
     "chef.automate.api.datafeed.UpdateDestinationResponse": {
       "type": "object",
       "properties": {
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "id": {
           "type": "string",
           "format": "int64"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         },
         "name": {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
           "type": "string"
         },
         "url": {
@@ -16568,6 +17272,23 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.ServerUsers": {
+      "type": "object",
+      "properties": {
+        "admin_key": {
+          "description": "Chef Infra server admin key.",
+          "type": "string"
+        },
+        "admin_name": {
+          "description": "Chef Infra server admin name.",
+          "type": "string"
+        },
+        "server_id": {
+          "description": "Chef Infra Server ID.",
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.UpdateDataBagItem": {
       "type": "object",
       "properties": {
@@ -17307,6 +18028,19 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.DepedenciesData": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "cookbook name.",
+          "type": "string"
+        },
+        "version": {
+          "description": "cookbook version.",
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.Environment": {
       "type": "object",
       "properties": {
@@ -17436,6 +18170,30 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.GetServerStatus": {
+      "type": "object",
+      "properties": {
+        "keygen": {
+          "type": "object",
+          "title": "Chef Server Keygem",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "status": {
+          "type": "string",
+          "title": "Chef Server Status"
+        },
+        "upstreams": {
+          "type": "object",
+          "title": "Chef Server Upstream",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.GetServers": {
       "type": "object",
       "properties": {
@@ -17445,6 +18203,19 @@
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
           }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.GroupPolicy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Policyfile name.",
+          "type": "string"
+        },
+        "revision_id": {
+          "description": "Policyfile Revision ID.",
+          "type": "string"
         }
       }
     },
@@ -17647,6 +18418,18 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.OrgUsers": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "title": "Users list",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UsersListItem"
+          }
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.Policyfile": {
       "type": "object",
       "properties": {
@@ -17704,6 +18487,13 @@
           "items": {
             "type": "string"
           }
+        },
+        "solution_dependecies": {
+          "description": "Solution Dependencies versions.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SolutionDependencies"
+          }
         }
       }
     },
@@ -17724,6 +18514,27 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.PolicyfileRevision": {
+      "type": "object",
+      "properties": {
+        "revision_id": {
+          "type": "string",
+          "title": "policyfile revision"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.PolicyfileRevisions": {
+      "type": "object",
+      "properties": {
+        "revisions": {
+          "description": "Policyfile revisions.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileRevision"
+          }
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.Policyfiles": {
       "type": "object",
       "properties": {
@@ -17733,6 +18544,26 @@
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
           }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Policygroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Policygroup name.",
+          "type": "string"
+        },
+        "policies": {
+          "description": "Policygroup policyfiles.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GroupPolicy"
+          }
+        },
+        "uri": {
+          "description": "policygroup uri.",
+          "type": "string"
         }
       }
     },
@@ -17946,6 +18777,38 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.ServerUsers": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "title": "Users list",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UsersListItem"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.SolutionDependencies": {
+      "type": "object",
+      "properties": {
+        "dependencies": {
+          "type": "array",
+          "title": "cookbook dependencies",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DepedenciesData"
+          }
+        },
+        "name": {
+          "description": "cookbook name.",
+          "type": "string"
+        },
+        "version": {
+          "description": "cookbook version.",
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.SourceOptions": {
       "type": "object",
       "properties": {
@@ -18021,6 +18884,27 @@
         "server": {
           "description": "Chef Infra Server.",
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.UsersListItem": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "User email"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User first name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User Last name"
+        },
+        "username": {
+          "type": "string",
+          "title": "User username"
         }
       }
     },

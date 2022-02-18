@@ -25,4 +25,3 @@ output "elasticsearch_public_ips" {
 output "postgresql_private_ips" {
   value = formatlist("%s", module.aws.postgresql_private_ips)
 }
-

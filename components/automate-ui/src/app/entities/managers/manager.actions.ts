@@ -36,7 +36,8 @@ export enum ManagerActionTypes {
   UPDATE_FAILURE        = 'MANAGER::UPDATE::FAILURE',
   NAV_LIST              = 'MANAGER::NAV::LIST',
   NAV_DETAIL            = 'MANAGER::NAV::DETAIL',
-  NAV_EDIT              = 'MANAGER::NAV::EDIT'
+  NAV_EDIT              = 'MANAGER::NAV::EDIT',
+  FIRST_LOAD            = 'MANAGER::FIRST_LOAD'
 }
 
 export interface ManagersSearchPayload {
@@ -121,6 +122,11 @@ export interface ManagerSearchNodesSuccessPayload {
   nodes: any[];
   total: number;
 }
+
+export interface ManagerSearchNodesFailurePayload {
+  managerId: string;
+  error: HttpErrorResponse;
+}
 export class ManagerSearchNodesSuccess implements Action {
   readonly type = ManagerActionTypes.SEARCH_NODES_SUCCESS;
   constructor(public payload: ManagerSearchNodesSuccessPayload) {}
@@ -128,7 +134,7 @@ export class ManagerSearchNodesSuccess implements Action {
 
 export class ManagerSearchNodesFailure implements Action {
   readonly type = ManagerActionTypes.SEARCH_NODES_FAILURE;
-  constructor(public payload: HttpErrorResponse) {}
+  constructor(public payload: ManagerSearchNodesFailurePayload) {}
 }
 
 export interface ManagerAllNodesPayload {
@@ -145,6 +151,10 @@ export interface ManagerAllNodesSuccessPayload {
   nodes: any[];
   total: number;
 }
+export interface ManagerAllNodesFailurePayload {
+  managerId: string;
+  error: HttpErrorResponse;
+}
 export class ManagerAllNodesSuccess implements Action {
   readonly type = ManagerActionTypes.ALL_NODES_SUCCESS;
   constructor(public payload: ManagerAllNodesSuccessPayload) {}
@@ -152,7 +162,7 @@ export class ManagerAllNodesSuccess implements Action {
 
 export class ManagerAllNodesFailure implements Action {
   readonly type = ManagerActionTypes.ALL_NODES_FAILURE;
-  constructor(public payload: HttpErrorResponse) {}
+  constructor(public payload: ManagerAllNodesFailurePayload) {}
 }
 
 export interface ManagerSearchFieldsPayload {
@@ -169,6 +179,11 @@ export interface ManagerSearchFieldsSuccessPayload {
   field: string;
   fields: string[];
 }
+
+export interface ManagerSearchFieldsFailurePayload {
+  managerId: string;
+  error: HttpErrorResponse;
+}
 export class ManagerSearchFieldsSuccess implements Action {
   readonly type = ManagerActionTypes.SEARCH_FIELDS_SUCCESS;
   constructor(public payload: ManagerSearchFieldsSuccessPayload) {}
@@ -176,7 +191,7 @@ export class ManagerSearchFieldsSuccess implements Action {
 
 export class ManagerSearchFieldsFailure implements Action {
   readonly type = ManagerActionTypes.SEARCH_FIELDS_FAILURE;
-  constructor(public payload: HttpErrorResponse) {}
+  constructor(public payload: ManagerSearchFieldsFailurePayload) {}
 }
 
 export class GetManager implements Action {
@@ -286,6 +301,11 @@ export class NavManagerEdit implements Action {
   constructor(public payload: NavManagerEditPayload) {}
 }
 
+export class FirstLoad implements Action {
+  readonly type = ManagerActionTypes.FIRST_LOAD;
+  constructor() {}
+}
+
 export type ManagerActions =
   | ManagersSearch
   | ManagersSearchSuccess
@@ -300,8 +320,10 @@ export type ManagerActions =
   | ManagerSearchNodesSuccess
   | ManagerAllNodes
   | ManagerAllNodesSuccess
+  | ManagerAllNodesFailure
   | ManagerSearchFields
   | ManagerSearchFieldsSuccess
+  | ManagerSearchFieldsFailure
   | GetManager
   | GetManagerSuccess
   | GetManagerFailure
@@ -316,4 +338,5 @@ export type ManagerActions =
   | UpdateManagerFailure
   | NavManagerDetail
   | NavManagerList
-  | NavManagerEdit;
+  | NavManagerEdit
+  | FirstLoad;

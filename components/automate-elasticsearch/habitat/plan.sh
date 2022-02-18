@@ -1,15 +1,16 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name="automate-elasticsearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="6.8.14"
+pkg_version="6.8.23"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_source="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${pkg_version}.tar.gz"
-pkg_shasum=edcf3e951b91fcfb4a7bc0a0f2a58bce74c741dfd64c84c46d9777d75079d5c0
+pkg_shasum=424af91f838f9e5f13e0292f97cbd6333535450291a621d761bd479dfc2dff78
 
 pkg_build_deps=(
   core/patchelf
@@ -52,6 +53,7 @@ do_build() {
 }
 
 do_install() {
+
   cd "$HAB_CACHE_SRC_PATH/elasticsearch-${pkg_version}"
   install -vDm644 README.textile "${pkg_prefix}/README.textile"
   install -vDm644 LICENSE.txt "${pkg_prefix}/LICENSE.txt"

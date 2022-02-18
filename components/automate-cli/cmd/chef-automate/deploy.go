@@ -212,11 +212,11 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 			)
 		}
 		if len(deployCmdFlags.channel) > 0 && (deployCmdFlags.channel == "dev" || deployCmdFlags.channel == "current") {
-			writer.Printf("deploying with channel : %s \n" + deployCmdFlags.channel)
+			writer.Printf("deploying with channel : %s \n", deployCmdFlags.channel)
 			args = append(args, "--"+deployCmdFlags.channel)
 			return deployer.doDeployWork(args)
 		} else if len(deployCmdFlags.channel) == 0 {
-			writer.Printf("deploying with default channel")
+			writer.Printf("deploying with default channel \n")
 			return deployer.doDeployWork(args)
 		} else {
 			return status.Wrap(derr, status.ConfigError, invalidChannelName)

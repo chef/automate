@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-ha-cluster-ctl
 pkg_description="A package for automate-cluster-ctl for the A2 HA Backend."
 pkg_origin=chef
@@ -71,13 +73,14 @@ do_clean() {
 do_install() {
   build_line "Copying automate-cluster-ctl files"
   pushd "$HAB_CACHE_SRC_PATH/$pkg_dirname/"
+    mkdir -p $pkg_prefix/inspec
     cp -r lib $pkg_prefix/
     cp -r libexec $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-smoke $pkg_prefix/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-smoke $pkg_prefix/inspec/
     cp -r templates $pkg_prefix/
     cp -r vendor $pkg_prefix/
   popd

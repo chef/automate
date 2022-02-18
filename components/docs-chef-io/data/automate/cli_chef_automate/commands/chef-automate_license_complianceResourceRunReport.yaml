@@ -1,0 +1,35 @@
+name: chef-automate license complianceResourceRunReport
+synopsis: |
+  Generates daily Infra Client Run reports for a span of time duration
+usage: chef-automate license complianceResourceRunReport [flags]
+options:
+- name: end_time
+  shorthand: e
+  usage: end time of the report in yyyy-mm-dd format
+- name: es_hostname
+  shorthand: "n"
+  default_value: localhost
+  usage: hostname of the ES host
+- name: es_port
+  shorthand: p
+  default_value: "10141"
+  usage: port of the ES host
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for complianceResourceRunReport
+- name: start_time
+  shorthand: s
+  usage: start time of the report in yyyy-mm-dd format
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate license - Chef Automate license management

@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 # Instead of wrapping the core/openjdk11 package, we're using our own so that
 # we don't need to depend on ALSA or FreeType, which have non-compatible licenses.
@@ -8,10 +9,10 @@ pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_name=automate-openjdk
 # Release archive https://jdk.java.net/archive/
-pkg_version=11.0.12+7
-pkg_source=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.12%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.12_7.tar.gz
-pkg_shasum=8770f600fc3b89bf331213c7aa21f8eedd9ca5d96036d1cd48cb2748a3dbefd2
-pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.12_7.tar.gz
+pkg_version=11.0.13+8
+pkg_source=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.13%2B8/OpenJDK11U-jdk_x64_linux_hotspot_11.0.13_8.tar.gz
+pkg_shasum=3b1c0c34be4c894e64135a454f2d5aaa4bd10aea04ec2fa0c0efe6bb26528e30
+pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.13_8.tar.gz
 pkg_dirname="jdk-${pkg_version}"
 pkg_license=("GPL-2.0-with-classpath-exception")
 pkg_description=('AdoptOpenJDK binaries are created from the unmodified source code at OpenJDK.')
@@ -45,6 +46,7 @@ do_build() {
 }
 
 do_install() {
+
   pushd "${pkg_prefix}" || return 1
   rsync -avz "${source_dir}/" .
 

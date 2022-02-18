@@ -6,8 +6,8 @@ const haAwsConfigTemplate = `
 # successfully create a new Chef Automate HA instances with default settings.
 
 [architecture.aws]
-secrets_key_file = "secrets.json"
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "aws"
 workspace_path = "/hab/a2_deploy_workspace"
 # ssh user name for ssh login to instance like default user for centos will centos or for red-hat will be ec2-user
@@ -85,7 +85,7 @@ const haExistingNodesConfigTemplate = `
 
 [architecture.existing_infra]
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-secrets_store_file = "secrets.json"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
 workspace_path = "/hab/a2_deploy_workspace"
 ssh_user = "centos"
@@ -104,7 +104,7 @@ backup_mount = "/mnt/automate_backups"
 [automate.config]
 # admin_password = ""
 # automate load balancer fqdn IP or path
-# fqdn = ""
+fqdn = ""
 instance_count = "1"
 # teams_port = ""
 config_file = "configs/automate.toml"
@@ -119,13 +119,10 @@ instance_count = "3"
 instance_count = "3"
 
 [existing_infra.config]
-automate_ips = []
 automate_private_ips = []
-chef_server_ips = []
 chef_server_private_ips = []
 elasticsearch_ips = []
 elasticsearch_private_ips = []
-postgresql_ips = []
 postgresql_private_ips = []
 `
 

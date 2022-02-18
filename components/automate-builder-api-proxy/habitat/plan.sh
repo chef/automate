@@ -1,6 +1,8 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2039
 #shellcheck disable=SC2154
+#stable channel
+
 
 pkg_name="automate-builder-api-proxy"
 pkg_origin="chef"
@@ -16,7 +18,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # We need to pin here to get a build from unstable
-  "habitat/builder-api-proxy/8997/20200812161534"
+  habitat/builder-api-proxy
 )
 
 pkg_build_deps=(

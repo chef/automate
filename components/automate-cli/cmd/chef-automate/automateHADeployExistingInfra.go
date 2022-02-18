@@ -24,7 +24,7 @@ func (e *existingInfra) doDeployWork(args []string) error {
 	if err != nil {
 		return err
 	}
-	err = executeSecretsInitCommand(e.config.Architecture.ConfigInitials.SecretsStoreFile)
+	err = executeSecretsInitCommand(e.config.Architecture.ConfigInitials.SecretsKeyFile)
 	if err != nil {
 		return err
 	}
@@ -93,27 +93,22 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.Postgresql.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty postgres-sql instance_count")
 	}
-	if len(e.config.ExistingInfra.Config.AutomateIps) < 1 {
-		errorList.PushBack("Invalid or empty automate Ips")
-	}
+
 	if len(e.config.ExistingInfra.Config.AutomatePrivateIps) < 1 {
 		errorList.PushBack("Invalid or empty automate_private_ips")
 	}
-	if len(e.config.ExistingInfra.Config.ChefServerIps) < 1 {
-		errorList.PushBack("Invalid or empty chef_server_ips")
-	}
+
 	if len(e.config.ExistingInfra.Config.ChefServerPrivateIps) < 1 {
 		errorList.PushBack("Invalid or empty chef_server_private_ips")
 	}
 	if len(e.config.ExistingInfra.Config.ElasticsearchIps) < 1 {
 		errorList.PushBack("Invalid or empty elasticsearch_ips")
 	}
+
 	if len(e.config.ExistingInfra.Config.ElasticsearchPrivateIps) < 1 {
 		errorList.PushBack("Invalid or empty elasticsearch_private_ips")
 	}
-	if len(e.config.ExistingInfra.Config.PostgresqlIps) < 1 {
-		errorList.PushBack("Invalid or empty postgresql_ips")
-	}
+
 	if len(e.config.ExistingInfra.Config.PostgresqlPrivateIps) < 1 {
 		errorList.PushBack("Invalid or empty postgresql_private_ips")
 	}
@@ -124,21 +119,10 @@ func (e *existingInfra) validateConfigFields() *list.List {
 func (e *existingInfra) validateIPs() *list.List {
 	const notValidErrorString = "is not valid"
 	errorList := list.New()
-	for _, element := range e.config.ExistingInfra.Config.AutomateIps {
-		if checkIPAddress(element) != nil {
-			errorList.PushBack("Automate Ip " + element + notValidErrorString)
-		}
-	}
 
 	for _, element := range e.config.ExistingInfra.Config.AutomatePrivateIps {
 		if checkIPAddress(element) != nil {
 			errorList.PushBack("Automate private Ip " + element + notValidErrorString)
-		}
-	}
-
-	for _, element := range e.config.ExistingInfra.Config.ChefServerIps {
-		if checkIPAddress(element) != nil {
-			errorList.PushBack("chef server Ip " + element + notValidErrorString)
 		}
 	}
 
@@ -157,12 +141,6 @@ func (e *existingInfra) validateIPs() *list.List {
 	for _, element := range e.config.ExistingInfra.Config.ElasticsearchPrivateIps {
 		if checkIPAddress(element) != nil {
 			errorList.PushBack("elastic search private Ip " + element + notValidErrorString)
-		}
-	}
-
-	for _, element := range e.config.ExistingInfra.Config.PostgresqlIps {
-		if checkIPAddress(element) != nil {
-			errorList.PushBack("postgresql Ip " + element + notValidErrorString)
 		}
 	}
 

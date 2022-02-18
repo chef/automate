@@ -11,8 +11,8 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   chef/mlsa
   core/bash
-  core/procps-ng
   core/openssl
+  core/procps-ng
   "${UPSTREAM_PKG_IDENT}"
 )
 pkg_lib_dirs=(lib)

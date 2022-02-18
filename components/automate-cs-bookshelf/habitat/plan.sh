@@ -1,12 +1,13 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2039
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name="automate-cs-bookshelf"
 pkg_description="Wrapper package for chef/bookshelf"
 pkg_origin="chef"
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.4.4"
+pkg_version="14.11.36"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -15,7 +16,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/bookshelf/14.4.4/20210520120637"
+  "${vendor_origin}/bookshelf/14.11.36/20211227114241"
 )
 
 pkg_binds=(

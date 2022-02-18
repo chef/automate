@@ -47,7 +47,7 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
 	runDateTimeAsString := runDateTime.Format(time.RFC3339)
 
-	script := elastic.NewScript(fmt.Sprintf("ctx._source.last_run = '%s'", runDateTimeAsString))
+	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
 
 	_, err := backend.client.Update().
 		Index(mapping.Index).

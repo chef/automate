@@ -145,13 +145,10 @@ type ExistingInfraConfigToml struct {
 	} `toml:"postgresql"`
 	ExistingInfra struct {
 		Config struct {
-			AutomateIps             []string `toml:"automate_ips"`
 			AutomatePrivateIps      []string `toml:"automate_private_ips"`
-			ChefServerIps           []string `toml:"chef_server_ips"`
 			ChefServerPrivateIps    []string `toml:"chef_server_private_ips"`
 			ElasticsearchIps        []string `toml:"elasticsearch_ips"`
 			ElasticsearchPrivateIps []string `toml:"elasticsearch_private_ips"`
-			PostgresqlIps           []string `toml:"postgresql_ips"`
 			PostgresqlPrivateIps    []string `toml:"postgresql_private_ips"`
 		} `toml:"config"`
 	} `toml:"existing_infra"`
@@ -176,7 +173,7 @@ func init() {
 
 var initConfigHACmd = &cobra.Command{
 	Use:   "init-config-ha",
-	Short: "Initialize default config for HA",
+	Short: "Initialize default config for Automate HA",
 	Long:  "Initialized default configuration for HA and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,

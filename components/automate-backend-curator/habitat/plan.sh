@@ -1,4 +1,6 @@
 # shellcheck disable=SC2148
+# stable channel
+
 UPSTREAM_PKG_IDENT="core/curator"
 pkg_name="automate-ha-curator"
 pkg_description="Wrapper package for core/curator"

@@ -100,9 +100,9 @@ module AutomateCluster
         def hab_config_apply(args = {})
           service = args[:service_name]
           leader = utils.pg_hab_elected_leader
-          utils.backend_logger.info "Querying Habitat for existing automate-backend-#{service} Gossip Layer Config on #{leader}.."
+          utils.backend_logger.info "Querying Habitat for existing automate-ha-#{service} Gossip Layer Config on #{leader}.."
           script = bash_script <<~SCRIPT
-            /bin/hab pkg exec chef/automate-backend-ctl automate-backend-ctl applied --svc=automate-backend-#{service} \
+            /bin/hab pkg exec chef/automate-ha-ctl automate-backend-ctl applied --svc=automate-ha-#{service} \
             | grep -v "DEBUG\\|INFO\\|WARN\\|ERROR\\|FATAL" 2>&1
           SCRIPT
           local_script_file = Tempfile.new('script')
@@ -220,7 +220,7 @@ module AutomateCluster
             # kill any existing stuck reconfigure hooks
             pkill -9 reconfigure || true
             [ -s #{remote_patch_filename} ] && cat #{remote_patch_filename} | /bin/hab config \
-            apply automate-backend-#{service}.default #{Time.now.to_i}
+            apply automate-ha-#{service}.default #{Time.now.to_i}
             rm -f #{remote_patch_filename}
           SCRIPT
           local_script_file = Tempfile.new('script')
@@ -322,7 +322,7 @@ module AutomateCluster
           local_script_file.close
           remote_script_filename = remote_filename
 
-          frontends = utils.automate_public_ips + utils.chef_server_public_ips
+          frontends = utils.automate_private_ips + utils.chef_server_private_ips
           frontends.each do |frontend|
             conn = utils.train(frontend, opts).connection
             conn.wait_until_ready

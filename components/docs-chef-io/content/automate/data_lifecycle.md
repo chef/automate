@@ -16,7 +16,7 @@ Data Lifecycle manages the retention of events, service groups, Chef Infra Clien
 Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in Elasticsearch or PostgreSQL.
 Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
-## Data Lifecycle UI
+## Data Lifecycle
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
@@ -62,14 +62,25 @@ To see the data lifecycle job statuses, configure jobs, or run jobs requires an 
 
 To see the combined status and configuration for all data lifecycle jobs, you can use the global status endpoint:
 
+These examples use the Unix/Linux [`curl` command](https://man7.org/linux/man-pages/man1/curl.1.html) with the options:
+
+| Short Option | Long Option  | Definition                                                                                         |
+|--------------|--------------|---------------------------------------------------------------------------------------------------|
+| -s           | --silent     | Silent or quiet mode, does not show progress meter or error messages.                             |
+| -S           | --show-error | When used with -s, --silent, it makes curl show an error message if it fails.                     |
+| -k           | --insecure   | Instructs curl to proceed and operate even for server connections otherwise considered insecure.  |
+| -H           | --header     | Sends a header with the request. In this case, the header is your API token.                      |
+
+`curl -s -S` shows errors but does not show the progress meter:
+
 ```bash
-curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
+curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
 ```
 
 To see individual statuses by data type, you can access the data type sub-status endpoints:
 
 ```bash
-curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
+curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
 ```
 
 Swap `event-feed` for `infra` or `compliance` or `services` to see their corresponding jobs.
@@ -188,7 +199,7 @@ You cannot read the data on the `status` endpoint, change some values, and feed 
 Save the JSON file as `config.json` in the current working directory:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
+curl -s -S -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
 ```
 
 If you wish to configure a specific endpoint, you can specify the `job_settings` for that data type and configure it using data types sub-resource.
@@ -222,7 +233,7 @@ For example, if you want to configure compliance settings, create a smaller JSON
 And update the specific endpoint using the `compliance` sub-resource:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/compliance/config
+curl -s -S -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/compliance/config
 ```
 
 #### Job Settings
@@ -238,7 +249,7 @@ Infra node lifecycle jobs have the following options:
 
 Purge jobs have the following options:
 
-* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage backend before purging occurs.
+* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage before purging occurs.
   * `elasticsearch` (array) - An array of Elasticsearch purge policies
     * `disabled` (bool) - True or false if this job is enabled.
     * `policy_name` (string) - The name of the purge policy you wish to update.
@@ -389,13 +400,13 @@ As with `status` and `configure`, you can run data lifecycle jobs globally acros
 To run all data lifecycle jobs, run the following command:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
+curl -s -S -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
 ```
 
 To run jobs for a specific data type, you can make the request to the sub-resource:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
+curl -s -S -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
 ```
 
 Swap `infra` for `event-feed` or `compliance` to run their corresponding jobs.

@@ -147,7 +147,7 @@ describe('infra node list', () => {
         });
       });
 
-      it('can change page and load data according to page', () => {
+      xit('can change page and load data according to page', () => {
         const page = 3;
         cy.get('[data-cy=nodes-table-container] chef-th').contains('Node');
         cy.get('[data-cy=nodes-table-container] chef-th').contains('Platform');

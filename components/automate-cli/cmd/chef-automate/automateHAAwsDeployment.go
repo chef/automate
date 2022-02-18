@@ -6,7 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/local-user-service/password"
 	ptoml "github.com/pelletier/go-toml"
+	"github.com/pkg/errors"
 )
 
 type awsDeployment struct {
@@ -35,14 +37,17 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 	if err != nil {
 		return err
 	}
-	err = executeSecretsInitCommand(a.config.Architecture.ConfigInitials.SecretsStoreFile)
+	err = executeSecretsInitCommand(a.config.Architecture.ConfigInitials.SecretsKeyFile)
 	if err != nil {
 		return err
 	}
 	writer.Printf("provisioning infra for automate HA \n\n\n\n")
 	args = args[1:]
 	args = append(args, "-y")
-	return executeAutomateClusterCtlCommandAsync("provision", args, provisionInfraHelpDocs)
+	if isA2HARBFileExist() {
+		return executeAutomateClusterCtlCommandAsync("provision", args, provisionInfraHelpDocs)
+	}
+	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }
 
 func (a *awsDeployment) generateConfig() error {
@@ -90,6 +95,16 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 	}
 	if len(a.config.Architecture.ConfigInitials.BackupMount) < 1 {
 		errorList.PushBack("Invalid or empty backup_mount")
+	}
+	if len(a.config.Automate.Config.AdminPassword) > 0 {
+		val, err := password.NewValidator()
+		if err != nil {
+			errorList.PushBack(err.Error())
+		}
+		passvalErr := val.Validate(a.config.Automate.Config.AdminPassword)
+		if passvalErr != nil {
+			errorList.PushBack(passvalErr.Error())
+		}
 	}
 	if len(a.config.Automate.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty automate instance_count")

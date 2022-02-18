@@ -7,7 +7,7 @@ class Md5Tests < Assert::Context
   harness = BackendUtils::Common.new(true)
 
   test 'PostgreSQL table md5sum with leader reboot' do
-    host_ips = harness.postgresql_public_ips
+    host_ips = harness.postgresql_private_ips
     harness.ping_until_alive(host_ips)
     leader = harness.pg_promoted_leader
     original_hashsum = harness.pg_md5(leader)
@@ -21,7 +21,7 @@ class Md5Tests < Assert::Context
   end
 
   test 'PostgreSQL replica table md5sum' do
-    host_ips = harness.postgresql_public_ips
+    host_ips = harness.postgresql_private_ips
     harness.ping_until_alive(host_ips)
     leader = harness.pg_promoted_leader
     original_hashsum = harness.pg_md5(leader)

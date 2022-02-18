@@ -1,7 +1,6 @@
 #!/bin/bash
 # Set -x to enable debugging
 set -eEuo pipefail
-export AUTOMATE_BIN_URL="https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip"
 export BANNER="
 This script takes a manifest.json and outputs a tarball of
 all packages therein including their transitive dependencies. It accomplishes
@@ -16,8 +15,9 @@ The following arguments are available:
 "
 export DOCKER_IMAGE="chefes/lita-worker"
 # Some sane defaults
-export CHEF_AUTOMATE_BIN_PATH="/tmp/chef-automate"
+export CHEF_AUTOMATE_BIN_PATH="/usr/bin/chef-automate"
 export WORKSPACE_PATH="/tmp/workspace"
+export HAB_LICENSE=accept-no-persist
 # These are required args so we ensure they are not given a default value
 export BUNDLE_TYPE=
 export BACKENDAIB_TFVARS=
@@ -38,14 +38,11 @@ echo_env() {
     echo "Script Path:               ${ABSOLUTE_PATH}"
     echo "Repo Path:                 ${REPO_PATH}"
     echo "Output tarball:            ${TARBALL_PATH}"
-    echo "Download chef-automate to: ${CHEF_AUTOMATE_BIN_PATH}"
     echo "Workspace:                 ${WORKSPACE_PATH}"
     echo "Backend Tarball PAth:      ${BACKENDAIB}"
     echo "=============================================="
 }
-download_automate_cli() {
-  hab pkg exec core/curl curl -s "${AUTOMATE_BIN_URL}" | gunzip - > "${CHEF_AUTOMATE_BIN_PATH}" && chmod +x "${CHEF_AUTOMATE_BIN_PATH}"
-}
+
 usage() {
   echo "${BANNER}"
   exit 1
@@ -90,25 +87,25 @@ airgap_bundle_create() {
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
     if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
-          cat "${original_aib_path}" > ${TARBALL_PATH}
+          cat "${original_aib_path}" > "${TARBALL_PATH}"
           outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
           bname=$(basename "${outfile}")
-          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > ${FRONTENDAIB_TFVARS}
-          echo "frontend_aib_local_file = \"${bname}\"" >> ${FRONTENDAIB_TFVARS}
+          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > "${FRONTENDAIB_TFVARS}"
+          echo "frontend_aib_local_file = \"${bname}\"" >> "${FRONTENDAIB_TFVARS}"
     fi
 
     if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
           # getting packges info from airgap bundle       
           ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${original_aib_path} > ${PACKAGES_INFO}
-          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
+          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > "${BACKENDAIB}"
           # this removes the magic header from the .aib
           # making it usable with the tar command
           rm -f ${TEMP_TAR_FILE}    
           outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
           backend_name=$(basename "${outfile_backend}")
-          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
-          echo "backend_aib_local_file = \"${backend_name}\"" >> ${BACKENDAIB_TFVARS}
+          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > "${BACKENDAIB_TFVARS}" 
+          echo "backend_aib_local_file = \"${backend_name}\"" >> "${BACKENDAIB_TFVARS}"
     fi
     rm -f "${original_aib_path}"
   else
@@ -118,12 +115,14 @@ airgap_bundle_create() {
   fi
   
     #Create Manifest auto_tfvars
-    create_manifest_auto_tfvars
+    if [ "$BUNDLE_TYPE" != "upgradefrontends" ]
+    then
+       create_manifest_auto_tfvars
+    fi
 
 }
 
 exec_linux() {
-  download_automate_cli
   airgap_bundle_create
 }
 
@@ -176,11 +175,8 @@ do_tasks() {
 if [ $# -eq 0 ]; then
   usage
 fi
-while getopts ":b:d:t:w:o:h:v:q:c:" opt; do
+while getopts ":b:t:w:o:h:v:q:c:" opt; do
   case "${opt}" in
-    d)
-      export CHEF_AUTOMATE_BIN_PATH=${OPTARG}
-      ;;
     w)
       export WORKSPACE_PATH=${OPTARG}
       ;;

@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-ha-deployment
 pkg_description="A wrapper package for setting up a deployment workstation for the A2 HA Backend."
 pkg_origin=chef
@@ -20,6 +22,7 @@ pkg_deps=(
   core/curl
   core/rsync
   core/terraform
+  core/busybox-static
   chef/automate-ha-cluster-ctl
 )
 
@@ -83,6 +86,9 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../scripts/cert.sh $pkg_prefix/workspace/scripts/
   cp -r $PLAN_CONTEXT/../../../certs $pkg_prefix/workspace/ 
   cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/deployment-makefile/Makefile $pkg_prefix/workspace/
+  cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/How-to-destroy-infra.md $pkg_prefix/workspace/terraform/
+  cp -r $PLAN_CONTEXT/.terraform $pkg_prefix/workspace/terraform/.terraform
+  cp -r $PLAN_CONTEXT/.terraform.lock.hcl $pkg_prefix/workspace/terraform/
 
   # make sure no state is copied over
   rm -f $pkg_prefix/workspace/terraform/*.tfstate
@@ -95,8 +101,6 @@ do_install() {
   rm -f $pkg_prefix/workspace/terraform/variables.tf
   rm -f $pkg_prefix/workspace/terraform/outputs.tf
   rm -f $pkg_prefix/workspace/terraform/versions.tf
-
-  rm -rf $pkg_prefix/workspace/terraform/.terraform
   rm -f $pkg_prefix/workspace/backups
 }
 

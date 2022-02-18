@@ -12,17 +12,17 @@ import (
 )
 
 // BuildChefRun Builds the publishers
-func BuildChefRunDateInfo(client backend.Client, numberOfPublishers int) message.ChefRunPipe {
-	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
-		out := make(chan message.ChefRun, 100)
-
-		for i := 0; i < numberOfPublishers; i++ {
-			go ChefRunDateInfo(in, client, out, i)
-		}
-
-		return out
-	}
-}
+//func BuildChefRunDateInfo(client backend.Client, numberOfPublishers int) message.ChefRunPipe {
+//	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
+//		out := make(chan message.ChefRun, 100)
+//
+//		for i := 0; i < numberOfPublishers; i++ {
+//			go ChefRunDateInfo(in, client, out, i)
+//		}
+//
+//		return out
+//	}
+//}
 
 // ChefRunDateInfo The Chef run publisher pipe. This stores the chef run date information in the datastore.
 func ChefRunDateInfo(in <-chan message.ChefRun, client backend.Client, out chan<- message.ChefRun, number int) {

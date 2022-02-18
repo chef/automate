@@ -40,7 +40,7 @@ func newGatherLogsCmd() *cobra.Command {
 		Short: "Gather system diagnostics and logs",
 		Long:  "Collect system diagnostics and logs from Chef Automate and other services",
 		RunE:  runGatherLogsCmd,
-		Args:  cobra.RangeArgs(0, 1),
+		Args:  cobra.RangeArgs(0, 3),
 	}
 
 	gatherLogsCmd.Flags().BoolVarP(
@@ -116,7 +116,7 @@ var gatherLogsCmdFlags = struct {
 
 func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
-		return executeAutomateClusterCtlCommand("gather-logs", args, gatherLogsHelpDoc)
+		return executeAutomateClusterCtlCommandAsync("gather-logs", args, gatherLogsHelpDoc)
 	}
 	// Ensure we can write to any user given log locations
 	overridePath := ""

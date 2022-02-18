@@ -4,8 +4,8 @@
 
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
-  HAB_BLDR_CHANNEL: "stable2021-q2"
-  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable2021-q2"
+  HAB_BLDR_CHANNEL: "stable"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
 
 expeditor:
   defaults:
@@ -76,6 +76,7 @@ steps:
       - cd components/license-control-service
       - make lint test
     timeout_in_minutes: 10
+    soft_fail: true
     retry:
       automatic:
         limit: 1
@@ -565,7 +566,7 @@ steps:
   - label: "a1migration"
     command:
       - integration/run_test integration/tests/a1migration.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 30
     expeditor:
       executor:
         linux:

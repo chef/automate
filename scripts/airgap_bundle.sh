@@ -112,10 +112,10 @@ airgap_bundle_create() {
       # this removes the magic header from the .aib
       # making it usable with the tar command
       # https://github.com/chef/a2/blob/4c51540f822d7ddcb32d192bc7dbf33803789a8e/components/automate-deployment/pkg/airgap/bundle_creator.go#L3
-      tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${TARBALL_PATH}
+      tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > "${TARBALL_PATH}"
       rm -f ${TEMP_TAR_FILE}
     else
-      cat "${original_aib_path}" > ${TARBALL_PATH}
+      cat "${original_aib_path}" > "${TARBALL_PATH}"
     fi
     rm -f "${original_aib_path}"
     outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
@@ -149,7 +149,7 @@ exec_docker() {
   else
     args+=('-m' '/workspace/manifest.json')
   fi
-  touch ${TARBALL_PATH}
+  touch "${TARBALL_PATH}"
   docker run --rm -it \
     --env="ORIGINAL_TARBALL=${TARBALL_PATH}" \
     --volume "${REPO_PATH}":/workspace:ro \

@@ -181,8 +181,8 @@ func init() {
 
 var sshCommand = &cobra.Command{
 	Use:   "ssh",
-	Short: "ssh into automate HA servers",
-	Long:  "ssh into automate HA servers",
+	Short: "SSH into Automate HA servers",
+	Long:  "SSH into Automate HA servers",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
@@ -190,6 +190,9 @@ var sshCommand = &cobra.Command{
 }
 
 func runSshCommand(cmd *cobra.Command, args []string) error {
+	if !isA2HARBFileExist() {
+		return errors.New(AUTOMATE_HA_INVALID_BASTION)
+	}
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return err
@@ -211,7 +214,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	}
 	var sshString string = sshStrings[i-1]
 	sshTokens := strings.Split(sshString, " ")
-	return executeShellCommand(sshTokens[0], sshTokens[1:])
+	return executeShellCommand(sshTokens[0], sshTokens[1:], "")
 }
 
 func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {

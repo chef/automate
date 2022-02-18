@@ -47,7 +47,6 @@ func NewChefRunPipeline(client backend.Client, authzClient authz.ProjectsService
 			publisher.BuildBulkRunPublisher(client, chefIngestRunPipelineConfig.MaxNumberOfBundledMsgs),
 			chefIngestRunPipelineConfig.NumberOfPublishers,
 			chefIngestRunPipelineConfig.MaxNumberOfBundledMsgs),
-		publisher.BuildChefRunDateInfo(client, chefIngestRunPipelineConfig.NumberOfPublishers),
 		processor.CountRuns(&counter),
 	)
 

@@ -422,6 +422,7 @@ paths = [
   "components/automate-deployment/*",
   "components/automate-grpc/*",
   "components/es-sidecar-service/*",
+  "components/local-user-service/*",
   "lib/cereal/*",
   "lib/config/*",
   "lib/db/*",
@@ -890,8 +891,13 @@ paths = [
 plan_path = "components/automate-cs-nginx"
 paths = [
   "components/automate-cs-nginx/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
   "lib/io/*",
+  "lib/platform/config/*",
+  "lib/proxy/*",
   "lib/secrets/*",
+  "lib/stringutils/*",
   "lib/user/*"
 ]
 
@@ -1185,6 +1191,12 @@ paths = [
 plan_path = "components/automate-cluster-ctl"
 paths = [
   "components/automate-cluster-ctl/*"
+]
+
+[automate-netcat]
+plan_path = "components/automate-netcat"
+paths = [
+  "components/automate-netcat/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

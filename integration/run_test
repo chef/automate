@@ -84,11 +84,12 @@ else
 fi
 
 workdir="/go/src/github.com/chef/automate"
+CURR_DIR=$(pwd)
 
 docker_run_args=(
         "--detach"
         "--env" "CI"
-        "--env" "HOST_PWD=$PWD"
+        "--env" "HOST_PWD=$CURR_DIR"
         "--env" "HAB_ORIGIN=$HAB_ORIGIN"
         "--env" "HAB_STUDIO_SUP=false"
         "--env" "HAB_NONINTERACTIVE=true"
@@ -118,7 +119,7 @@ docker_run_args=(
         "--tmpfs=/var/tmp:rw,noexec,nosuid"
         "--tmpfs=/dev/shm:rw,noexec,nosuid"
         "--tty"
-        "--volume" "$PWD:$workdir"
+        "--volume" "$CURR_DIR:$workdir"
         # I have no idea why our container doesn't like it when
         # we try to mount docker.sock in the default place. Removing
         # the privileged flag makes it work.

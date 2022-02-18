@@ -1,7 +1,7 @@
 name: chef-automate info
-synopsis: InFo about automate HA
+synopsis: Info about Automate HA
 usage: chef-automate info [flags]
-description: Info for automate HA cluster
+description: Info for Automate HA cluster
 options:
 - name: help
   shorthand: h

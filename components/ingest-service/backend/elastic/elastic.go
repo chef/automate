@@ -27,11 +27,33 @@ type Backend struct {
 	client      *elastic.Client
 }
 
+func (es *Backend) createBulkRequestUpsertNodeInfo(
+	mapping mappings.Mapping,
+	ID string,
+	runDateTime time.Time,
+) elastic.BulkableRequest {
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+
+	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
+
+	return elastic.NewBulkUpdateRequest().
+		Index(mapping.Index).
+		Type(mapping.Type).
+		Id(ID).
+		Script(script).
+		Upsert(map[string]interface{}{
+			"node_uuid": ID,
+			"first_run": runDateTime,
+			"last_run":  runDateTime,
+		}).
+		RetryOnConflict(3)
+}
+
 // This method will support adding a document with a specified id
 func (es *Backend) upsertNodeRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
 	runDateTimeAsString := runDateTime.Format(time.RFC3339)
 
-	script := elastic.NewScript(fmt.Sprintf("ctx._source.last_run = '%s'", runDateTimeAsString))
+	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
 
 	_, err := es.client.Update().
 		Index(mapping.Index).

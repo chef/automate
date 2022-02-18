@@ -65,7 +65,7 @@ class AutomateClusterWorkspaceSetup < AutomateCluster::SubCommand
     end if workspace_needs_updating?
 
     wait_while "Applying workspace bundle #{bundle} to #{workspace.path}" do
-      so = shellout!("tar xvfz #{bundle} -C #{workspace.path}")
+      so = shellout!("/usr/bin/tar xvfz #{bundle} -C #{workspace.path}")
       !so.error?
     end if bundle
 
@@ -90,8 +90,8 @@ class AutomateClusterWorkspaceSetup < AutomateCluster::SubCommand
     if !bundle && upgrade_package?
       # save this out cause it will change when we upgrade the package
       force_workspace_chdir = inside_workspace_symlink?
-      pkg = ['chef/automate-backend-deployment', version].compact.join('/')
-      wait_while "Updating #{term.green("automate-backend-deployment")} habitat package" do
+      pkg = ['chef/automate-ha-deployment', version].compact.join('/')
+      wait_while "Updating #{term.green("automate-ha-deployment")} habitat package" do
         so = shellout!("hab pkg install #{pkg} --channel #{channel} --binlink --force")
         !so.error?
       end
@@ -194,7 +194,7 @@ class AutomateClusterWorkspaceExport < AutomateCluster::SubCommand
   end
 
   def create_tar(workingdir, dest)
-    cmd = ['tar', '-czf', dest, '*'].join(' ')
+    cmd = ['/usr/bin/tar', '-czf', dest, '*'].join(' ')
     so = shellout!(cmd, cwd: workingdir)
 
     if so.error?

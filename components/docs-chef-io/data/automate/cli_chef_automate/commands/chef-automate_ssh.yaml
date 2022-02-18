@@ -1,7 +1,7 @@
 name: chef-automate ssh
-synopsis: ssh into automate HA servers
+synopsis: SSH into Automate HA servers
 usage: chef-automate ssh [flags]
-description: ssh into automate HA servers
+description: SSH into Automate HA servers
 options:
 - name: help
   shorthand: h

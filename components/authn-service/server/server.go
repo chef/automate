@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/textproto"
 	"net/url"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
@@ -193,16 +194,31 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 			tokenID = existingID
 		}
 
-		_, err := policiesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
-			Id:      IngestPolicyID,
-			Members: []string{fmt.Sprintf("token:%s", tokenID)},
-		})
-		if err != nil {
+		/*
+			Below code is only execute when you add token in config at the time of deployment
+			Adding the sleep, is just the tempory solution, this might work
+		*/
+		var policyAssigned bool = false
+		for i := 4; i > 0; i-- {
+			_, err = policiesClient.AddPolicyMembers(ctx, &authz.AddPolicyMembersReq{
+				Id:      IngestPolicyID,
+				Members: []string{fmt.Sprintf("token:%s", tokenID)},
+			})
+			if err != nil {
+				policyAssigned = false
+			} else {
+				s.logger.Debug("exiting for loop")
+				policyAssigned = true
+				break
+			}
+			s.logger.Debug(fmt.Sprintf(" Adding the sleep for %d seconds ", i))
+			time.Sleep(time.Duration(3) * time.Second)
+		}
+		if !policyAssigned {
 			s.logger.Warn(errors.Wrap(err, "there was an error granting the legacy data collector token ingest access").Error())
 			s.logger.Warn(fmt.Sprintf("please manually add token with ID %q to the policy with ID %q", tokenID, IngestPolicyID))
 		}
 	}
-
 	return s, nil
 }
 

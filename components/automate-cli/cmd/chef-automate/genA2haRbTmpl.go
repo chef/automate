@@ -7,7 +7,8 @@ architecture "{{ .Architecture.ConfigInitials.Architecture }}"
 workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
-# sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}"
+{{ if .Architecture.ConfigInitials.SudoPassword }} sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ else }} # sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ end }}
+
 # logging_monitoring_management "true"
 # ew_elk "false"
 # existing_elk "false"
@@ -17,18 +18,18 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # existing_elk_username ""
 # existing_elk_password ""
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
-# habitat_uid_gid ""
+{{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
 ### Automate frontend node related settings                 ###
 ###############################################################
 automate do
-  # admin_password "{{ .Automate.Config.AdminPassword }}"
+  {{ if .Automate.Config.AdminPassword }} admin_password "{{ .Automate.Config.AdminPassword }}" {{ else }} # admin_password "{{ .Automate.Config.AdminPassword }}" {{ end }}
   ### Leave commented out if using AWS infrastructure
-  # fqdn "{{ .Automate.Config.Fqdn }}"
+  {{ if .Automate.Config.Fqdn }} fqdn "{{ .Automate.Config.Fqdn }}" {{ else }} # fqdn "{{ .Automate.Config.Fqdn }}" {{ end }}
   instance_count {{ .Automate.Config.InstanceCount }}
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.
-  # teams_port "{{ .Automate.Config.TeamsPort }}"
+  {{ if .Automate.Config.TeamsPort }} teams_port "{{ .Automate.Config.TeamsPort }}" {{ else }} # teams_port "{{ .Automate.Config.TeamsPort }}" {{ end }}
   config_file "{{ .Automate.Config.ConfigFile }}"
 end
 
@@ -57,13 +58,10 @@ end
 ### Only applies when using an existing node architecture   ###
 ###############################################################
 existing_nodes do
-  automate_ips [{{ range $index, $element := .ExistingInfra.Config.AutomateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   automate_private_ips [{{ range $index, $element := .ExistingInfra.Config.AutomatePrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
-  chef_server_ips [{{ range $index, $element := .ExistingInfra.Config.ChefServerIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   chef_server_private_ips [{{ range $index, $element := .ExistingInfra.Config.ChefServerPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   elasticsearch_ips [{{ range $index, $element := .ExistingInfra.Config.ElasticsearchIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   elasticsearch_private_ips [{{ range $index, $element := .ExistingInfra.Config.ElasticsearchPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
-  postgresql_ips [{{ range $index, $element := .ExistingInfra.Config.PostgresqlIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   postgresql_private_ips [{{ range $index, $element := .ExistingInfra.Config.PostgresqlPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
 end
 `
@@ -75,29 +73,29 @@ architecture "{{ .Architecture.ConfigInitials.Architecture }}"
 workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
+backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
+{{ if .Architecture.ConfigInitials.SudoPassword }} sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ else }} # sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ end }}
 # logging_monitoring_management "true"
 # new_elk "false"
 # existing_elk "false"
-backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
-# sudo_password ""
 # existing_elk_instance_ip ""
 # existing_elk_port ""
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
-# habitat_uid_gid ""
+{{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
 ### Automate frontend node related settings                 ###
 ###############################################################
 automate do
   instance_count {{ .Automate.Config.InstanceCount }}
   config_file "{{ .Automate.Config.ConfigFile }}"
-  # admin_password "{{ .Automate.Config.AdminPassword }}"
+  {{ if .Automate.Config.AdminPassword }} admin_password "{{ .Automate.Config.AdminPassword }}" {{ else }} # admin_password "{{ .Automate.Config.AdminPassword }}" {{ end }}
   ### Leave commented out if using AWS infrastructure
-  # fqdn "{{ .Automate.Config.Fqdn }}"
+  {{ if .Automate.Config.Fqdn }} fqdn "{{ .Automate.Config.Fqdn }}" {{ else }} # fqdn "{{ .Automate.Config.Fqdn }}" {{ end }}
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.
-  # teams_port "{{ .Automate.Config.TeamsPort }}"
+  {{ if .Automate.Config.TeamsPort }} teams_port "{{ .Automate.Config.TeamsPort }}" {{ else }} # teams_port "{{ .Automate.Config.TeamsPort }}" {{ end }}
 end
 
 ###############################################################
@@ -132,13 +130,13 @@ aws do
   cidr_block_addr "{{ .Aws.Config.AwsCidrBlockAddr }}"
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
   ### Filter settings default to CentOS if left blank
-  # ami_filter_name "{{ .Aws.Config.AmiFilterName }}"
+  {{ if .Aws.Config.AmiFilterName }} ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ else }} # ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ end }}
   ### Filter settings default to CentOS if left blank
-  # ami_filter_virt_type "{{ .Aws.Config.AmiFilterVirtType }}"
+  {{ if .Aws.Config.AmiFilterVirtType }} ami_filter_virt_type "{{ .Aws.Config.AmiFilterVirtType }}" {{ else }} # ami_filter_virt_type "{{ .Aws.Config.AmiFilterVirtType }}" {{ end }}
   ### Filter settings default to CentOS if left blank
-  # ami_filter_owner "{{ .Aws.Config.AmiFilterOwner }}"
+  {{ if .Aws.Config.AmiFilterOwner }} ami_filter_owner "{{ .Aws.Config.AmiFilterOwner }}" {{ else }} # ami_filter_owner "{{ .Aws.Config.AmiFilterOwner }}" {{ end }}
   ### Overrides ami filter search features
-  # ami_id "{{ .Aws.Config.AmiID }}"
+  {{ if .Aws.Config.AmiID }} ami_id "{{ .Aws.Config.AmiID }}" {{ else }} # ami_id "{{ .Aws.Config.AmiID }}" {{ end }}
   ### EC2 instance type to use for Automate frontends, minimum >2G of RAM for test, 8G for prod
   automate_server_instance_type "{{ .Aws.Config.AutomateServerInstanceType }}"
   ### EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod
@@ -164,11 +162,11 @@ aws do
   postgresql_ebs_volume_size "{{ .Aws.Config.PostgresqlEbsVolumeSize }}"
   postgresql_ebs_volume_type "{{ .Aws.Config.PostgresqlEbsVolumeType }}"
   ### DEPRECATED: AWS Tag: Contact email to apply to AWS insfrastructure tags
-  # contact "{{ .Aws.Config.XContact }}"
+  {{ if .Aws.Config.XContact }} contact "{{ .Aws.Config.XContact }}" {{ else }} # contact "{{ .Aws.Config.XContact }}" {{ end }}
   ### DEPRECATED: AWS Tag: Department name to apply to AWS insfrastructure tags
-  # dept "{{ .Aws.Config.XDept }}"
+  {{ if .Aws.Config.XDept }} dept "{{ .Aws.Config.XDept }}" {{ else }} # dept "{{ .Aws.Config.XDept }}" {{ end }}
   ### DEPRECATED: AWS Tag: Project name to apply to AWS insfrastructure tags
-  # project "{{ .Aws.Config.XProject }}"
+  {{ if .Aws.Config.XProject }} project "{{ .Aws.Config.XProject }}" {{ else }}  project "{{ .Aws.Config.XProject }}" {{ end }}
   tags({"X-Contact"=>"{{ .Aws.Config.XContact }}", "X-Dept"=>"{{ .Aws.Config.XDept }}", "X-Project"=>"{{ .Aws.Config.XProject }}"})
 end
 `
