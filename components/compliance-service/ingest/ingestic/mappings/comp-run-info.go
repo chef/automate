@@ -9,7 +9,8 @@ var ComplianceRunInfo = Mapping{
     "index_patterns": ["` + IndexNameComplianceRunInfo + `"],
     "settings": {
       "index": {
-        "refresh_interval": "1s"
+        "refresh_interval": "1s",
+        "number_of_shards": "5"
       }
     },
     "mappings": {

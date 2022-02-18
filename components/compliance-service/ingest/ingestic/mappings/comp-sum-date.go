@@ -53,7 +53,8 @@ var ComplianceSumDate = Mapping{
         }
       },
       "index": {
-        "refresh_interval": "1s"
+        "refresh_interval": "1s",
+        "number_of_shards": "5"
       }
     },
     "mappings": {
