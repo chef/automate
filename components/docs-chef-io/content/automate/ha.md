@@ -8,7 +8,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "Deployment Workflows"
     parent = "automate/install"
-    identifier = "automate/install/ha_workflow.md Deployment Workflows"
+    identifier = "automate/install/ha.md Deployment Workflows"
     weight = 230
 +++
 
