@@ -46,6 +46,7 @@ func TestOrgs(t *testing.T) {
 	}
 	secretWithID := newSecret
 	secretWithID.Id = "fake id"
+	fqdn := "a2-dev.test"
 
 	t.Run("CreateOrg", func(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
@@ -56,7 +57,7 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "a2-dev.test",
+			Fqdn:      fqdn,
 			IpAddress: "",
 			WebuiKey:  webuiKey,
 		})
@@ -194,7 +195,7 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "a2-dev.test",
+			Fqdn:      fqdn,
 			IpAddress: "",
 			WebuiKey:  webuiKey,
 		})
@@ -433,7 +434,7 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "a2-dev.test",
+			Fqdn:      fqdn,
 			IpAddress: "",
 			WebuiKey:  webuiKey,
 		})
@@ -532,7 +533,7 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "a2-dev.test",
+			Fqdn:      fqdn,
 			IpAddress: "",
 			WebuiKey:  webuiKey,
 		})
@@ -836,7 +837,7 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "a2-dev.test",
+			Fqdn:      fqdn,
 			IpAddress: "",
 			WebuiKey:  webuiKey,
 		})
@@ -982,7 +983,7 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "chef-infra-server",
 			Name:      "Chef Infra Server",
-			Fqdn:      "a2-dev.test",
+			Fqdn:      fqdn,
 			IpAddress: "",
 			WebuiKey:  webuiKey,
 		})

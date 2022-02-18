@@ -23,7 +23,6 @@ func TestServers(t *testing.T) {
 	ctx := context.Background()
 	_, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
 	cl := infra_proxy.NewInfraProxyServiceClient(conn)
-	//infraMockClient := infra.NewMockInfraProxyClient(gomock.NewController(t))
 
 	defer close()
 	webuiKeyPath := "/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
@@ -44,6 +43,7 @@ func TestServers(t *testing.T) {
 	}
 	secretWithID := newSecret
 	secretWithID.Id = "fake id"
+	fqdn := "a2-dev.test"
 
 	t.Run("CreateServer", func(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
@@ -54,7 +54,7 @@ func TestServers(t *testing.T) {
 			req := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			}
@@ -75,7 +75,7 @@ func TestServers(t *testing.T) {
 				req := &request.CreateServer{
 					Id:        "chef-infra-server",
 					Name:      "Chef infra server",
-					Fqdn:      "a2-dev.test",
+					Fqdn:      fqdn,
 					IpAddress: "0.0.0.0",
 				}
 				resp, err := cl.CreateServer(ctx, req)
@@ -88,7 +88,7 @@ func TestServers(t *testing.T) {
 
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			})
@@ -103,7 +103,7 @@ func TestServers(t *testing.T) {
 			req1 := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			}
@@ -115,7 +115,7 @@ func TestServers(t *testing.T) {
 			req2 := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "New chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			}
@@ -128,7 +128,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server name is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			})
@@ -141,7 +141,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "New chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -153,7 +153,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "New chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  "fake webui key",
 			})
@@ -176,7 +176,7 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			})
@@ -186,7 +186,7 @@ func TestServers(t *testing.T) {
 			resp2, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server2",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "",
 				WebuiKey:  webuiKey,
 			})
@@ -209,7 +209,7 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			})
@@ -263,7 +263,7 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			})
@@ -292,7 +292,7 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			})
@@ -331,7 +331,7 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "",
 				WebuiKey:  webuiKey,
 			})
@@ -360,7 +360,7 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "",
 				WebuiKey:  webuiKey,
 			})
@@ -420,7 +420,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			})
@@ -430,7 +430,7 @@ func TestServers(t *testing.T) {
 			updateReq := &request.UpdateServer{
 				Id:        resp.Server.Id,
 				Name:      "new-infra-server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 			}
 
@@ -446,7 +446,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "",
 				Name:      "new-infra-server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -457,7 +457,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server ID for the server to update is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Name:      "chef-infra-server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -468,7 +468,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server name for the server to update is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "chef-infra-server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -480,7 +480,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "no-chef-infra-server-id",
 				Name:      "chef-infra-server",
-				Fqdn:      "a2-dev.test",
+				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -494,7 +494,7 @@ func TestServers(t *testing.T) {
 		t.Run("when a valid webui key, return valid true", func(t *testing.T) {
 			resp, err := cl.ValidateWebuiKey(ctx, &request.ValidateWebuiKey{
 				Id:       "",
-				Fqdn:     "a2-dev.test",
+				Fqdn:     fqdn,
 				WebuiKey: webuiKey,
 			})
 
@@ -517,7 +517,7 @@ func TestServers(t *testing.T) {
 		resp, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "chef-infra-server",
 			Name:      "Chef infra server",
-			Fqdn:      "a2-dev.test",
+			Fqdn:      fqdn,
 			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,
 		})
