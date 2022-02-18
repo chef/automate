@@ -293,7 +293,6 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 
 		if file.FileInfo().IsDir() {
 			err = os.MkdirAll(fpath, os.ModePerm)
-			log.Errorf("cannot create dir for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			continue
 		}
 
