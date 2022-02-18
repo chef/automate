@@ -227,7 +227,9 @@ func (p *postgres) GetActiveMigration(ctx context.Context, serverId string) (sto
 			  from migration m 
 			  join migration_type t on m.type_id=t.id 
 			  join migration_status s on m.status_id=s.id 
-			  and t.id <= 5000 and m.server_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY`
+			  and m.type_id = (select type_id from migration where server_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY)
+			  and m.type_id<5000
+			  and m.server_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY`
 	err := p.db.QueryRowContext(ctx,
 		query, serverId).
 		Scan(&m.MigrationID, &m.MigrationType, &m.MigrationStatus)
@@ -246,7 +248,7 @@ func (p *postgres) GetMigrationStatus(ctx context.Context, migrationId string) (
 			  from migration m 
 			  join migration_type t on m.type_id=t.id 
 			  join migration_status s on m.status_id=s.id 
-			  and t.id <= 5000 and m.migration_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY`
+			  and t.id <= 6000 and m.migration_id=$1 order by updated_timestamp desc FETCH FIRST ROW ONLY`
 	err := p.db.QueryRowContext(ctx,
 		query, migrationId).
 		Scan(&m.MigrationID, &m.MigrationType, &m.MigrationStatus, &m.MigrationTypeID, &m.MigrationStatusID)

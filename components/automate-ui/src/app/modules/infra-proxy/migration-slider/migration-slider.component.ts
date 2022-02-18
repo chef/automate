@@ -13,7 +13,7 @@ export class MigrationSliderComponent {
   @Input() migrationID: string;
   @Input() isPreview: boolean;
   @Input() previewData;
-  @Output() migrationPreview = new EventEmitter();
+  @Output() confirmPreview = new EventEmitter();
   @Output() cancelMigration = new EventEmitter();
 
   public checkedUser = false;
@@ -43,9 +43,9 @@ export class MigrationSliderComponent {
     this.isSlideOpen1 = !this.isSlideOpen1;
   }
 
-  migrationFile() {
+  confirmPreviewData() {
     this.toggleSlide();
-    this.migrationPreview.emit(this.migrationForm);
+    this.confirmPreview.emit(this.migrationID);
   }
 
   slidePanel() {

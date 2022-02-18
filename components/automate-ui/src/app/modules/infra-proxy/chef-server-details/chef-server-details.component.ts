@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest, interval } from 'rxjs';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { Subject, combineLatest, interval, Subscription } from 'rxjs';
+import { filter, pluck, take, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -40,7 +40,8 @@ import {
   DeleteOrg,
   UploadZip,
   CancelMigration,
-  GetPreviewData
+  GetPreviewData,
+  ConfirmPreview
 } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -53,7 +54,8 @@ import {
   uploadDetails,
   cancelStatus,
   previewStatus,
-  previewData
+  previewData,
+  confirmPreviewStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -104,9 +106,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public uploadZipForm: FormGroup;
   public isUploaded = false;
-  public migrationID: string;
   public migrationStatus: MigrationStatus;
-  public migrationStatusPercentage: number;
+  public migrationStatusPercentage = 0;
   public stepsCompleted: string;
   public totalMigrationSteps = 13;
   public migrationStepValue: number;
@@ -116,6 +117,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public migrationLoading = true;
   public migrationStarted = false;
   public migrationIsInPreview = false;
+  public migration_type: string;
   public migrationSteps: Record<string, string> = {
     1: 'Migration started',
     2: 'Upload of zip file',
@@ -140,8 +142,11 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public previewDataLoaded =  false;
   public previewData;
   public isPreview = false;
+  public confirmPreviewSuccessful = false;
+  public confirmPreviewsubmit = false;
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
+  mySubscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -238,7 +243,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         !isNil(serverState) &&
         !isNil(allOrgsState)),
       takeUntil(this.isDestroyed)
-    ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
+    ).pipe(take(1))
+    .subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
       this.server = { ...ServerState };
       this.orgs = allOrgsState;
       this.updateServerForm.controls['name'].setValue(this.server.name);
@@ -249,11 +255,13 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.closeCreateModal();
       this.isServerLoaded = true;
       this.migrationLoading = false;
-      if (this.server.migration_id !== '') {
-        this.migrationStarted = true;
-        this.getMigrationStatus(this.server.migration_id);
-      }
+      this.migration_id = '';
       this.migration_id = this.server.migration_id;
+      this.migration_type = this.server.migration_type;
+      if (this.migration_id !== '') {
+        this.migrationStarted = true;
+        this.getMigrationStatus(this.migration_id);
+      }
     });
 
     combineLatest([
@@ -329,22 +337,41 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (uploadStatusSt === EntityStatus.loadingSuccess && !isNil(uploadDetailsState)) {
         // show migration slider
         this.isUploaded = true;
-        this.migration_id = uploadDetailsState.migrationId;
+        this.migration_id = uploadDetailsState?.migration_id;
+        this.migrationStarted = true;
+        this.migrationLoading = false;
+        this.migrationIsInPreview = false;
+        this.migrationCompleted = false;
+        this.migrationInProgress = true;
+        this.migrationfailed = false;
+        this.isCancelled = false;
+        this.getMigrationStatus(this.migration_id);
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
+        this.migrationfailed = true;
         this.upload.closeUploadSlider();
       }
     });
 
     this.store.select(cancelStatus).pipe(
       takeUntil(this.isDestroyed),
-      filter(state => this.cancelMigrationInProgress && !pending(state)))
+      filter(state => !pending(state)))
     .subscribe((state) => {
-      this.cancelMigrationInProgress = false;
+      this.cancelMigrationInProgress = true;
       this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.canceMigrationSuccessful) {
         this.isCancelled = true;
+        this.migrationIsInPreview = false;
+        this.migrationCompleted = false;
+        this.migrationInProgress = false;
+        this.migrationfailed = true;
+      } else {
+        this.isCancelled = false;
+        this.migrationIsInPreview = true;
+        this.migrationCompleted = false;
+        this.migrationInProgress = true;
+        this.migrationfailed = false;
       }
     });
 
@@ -361,15 +388,28 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.store.select(confirmPreviewStatus).pipe(
+      takeUntil(this.isDestroyed),
+    filter(state => this.migrationIsInPreview && !pending(state)))
+    .subscribe((state) => {
+      this.confirmPreviewSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.confirmPreviewSuccessful) {
+        this.migrationIsInPreview = false;
+        this.confirmPreviewsubmit = true;
+      } else {
+        this.confirmPreviewsubmit = false;
+      }
+    });
+
     setTimeout(() => {
       if (this.isServerLoaded) {
         this.validateWebUIKey(this.server);
       }
     }, 1000);
 
-    interval(50000).subscribe(() => {
-      if (this.migrationStarted) {
-        this.getMigrationStatus(this.server.migration_id);
+    this.mySubscription = interval(50000).subscribe(() => {
+      if (this.migrationStarted && this.migration_type !== 'Migration Completed') {
+        this.getMigrationStatus(this.migration_id);
       }
     });
   }
@@ -459,24 +499,35 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       .subscribe(([migrationSt, getMigrationState]) => {
         if (migrationSt === EntityStatus.loadingSuccess && !isNil(getMigrationState)) {
           this.migrationStatus = getMigrationState;
-          const migration_type = this.migrationStatus.migration_type;
+          this.migration_type = this.migrationStatus.migration_type;
           const migration_status = this.migrationStatus.migration_status;
           if (migration_status === 'Completed' ) {
-            this.migrationStepValue = this.getKeyByValue(this.migrationSteps, migration_type);
+            this.migrationStepValue = this.getKeyByValue(this.migrationSteps, this.migration_type);
             this.migrationStatusPercentage =
               Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
             this.migrationInProgress = true;
             this.migrationLoading = false;
-            if (this.migrationStatusPercentage.toFixed(0) === '100') {
+            this.migrationfailed = false;
+            // if (this.migrationStatusPercentage.toFixed(0) === '100') {
+            //   this.migrationCompleted = true;
+            //   this.migrationInProgress = false;
+            // }
+            this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
+            if (this.migration_type === 'Creating Preview'
+              && this.confirmPreviewsubmit === false
+              && this.isCancelled === false) {
+              this.migrationIsInPreview = true;
+            }
+            if (this.migration_type === 'Migration Completed') {
+              this.mySubscription.unsubscribe();
               this.migrationCompleted = true;
               this.migrationInProgress = false;
-            }
-            this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
-            if (migration_type === 'Creating Preview') {
-              this.migrationIsInPreview = true;
+              this.migrationfailed = false;
             }
           } else {
             this.migrationfailed = true;
+            this.migrationCompleted = false;
+            this.mySubscription.unsubscribe();
           }
         }
       });
@@ -491,9 +542,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     return `${this.migrationStatusPercentage.toFixed(0)}, 100`;
   }
 
-  public currentMigrationPercent() {
-    return this.migrationStatusPercentage.toFixed(0);
-  }
+  // public currentMigrationPercent() {
+  //   return this.migrationStatusPercentage.toFixed(0);
+  // }
 
   saveServer(): void {
     this.saveSuccessful = false;
@@ -533,12 +584,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
     this.migrationStarted = true;
-    this.getMigrationStatus(this.server.migration_id);
   }
 
   // cancel migration function
   public cancelMigration(migration_id: string): void {
-    console.log('migrationId', migration_id);
     const payload = {
       server_id : this.server.id,
       migration_id : migration_id
@@ -549,13 +598,17 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   // get migraion preview function
   public getPreviewData() {
     const payload = {
-      // migration_id: this.migration_id
-      migration_id: '1234'
+      migration_id: this.migration_id
     };
     this.store.dispatch(new GetPreviewData(payload));
   }
 
-  public migrationPreview() {
-    console.log();
+  public confirmPreview(migrationID: string) {
+    this.confirmPreviewsubmit = true;
+    const payload = {
+      server_id: this.server.id,
+      migration_id: migrationID
+    };
+    this.store.dispatch(new ConfirmPreview(payload));
   }
 }

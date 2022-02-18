@@ -30,6 +30,7 @@ func (a *InfraProxyMigrationServer) GetMigrationStatus(ctx context.Context, r *g
 func (a *InfraProxyMigrationServer) CancelMigration(ctx context.Context, r *gwreq.CancelMigrationRequest) (*gwres.CancelMigrationResponse, error) {
 	req := &infra_req.CancelMigrationRequest{
 		MigrationId: r.MigrationId,
+		ServerId:    r.ServerId,
 	}
 	res, err := a.migrationClient.CancelMigration(ctx, req)
 	if err != nil {
