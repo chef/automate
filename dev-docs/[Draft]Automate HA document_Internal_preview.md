@@ -533,8 +533,42 @@ config_file = "configs/automate.toml"
 
 
 # Validation
-Validation command work is in progress. This command will internally call a set of scripts and trigger the checks for required firewalls and security settings. This is a pre-deployment step.
+This command will check some firewall rules and ports before deployment of a2-ha-backend. 
 
+To validate infrastructure there is 2 things. First if your environment is airgapped means no internet environment then you have to provide config.toml full path, hab-utitlity and netcat pkg in below command as an argument 
+
+    How to run this command?? 
+```
+    ./chef-automate validate-ha-infrastructure /path/to/config.toml /path/to/hab.tar.gz /path/to/netcat.hart
+```
+Above command looks llike this. 
+```
+./chef-automate validate-ha-infrastructure /root/config.toml /root/hab-x86_64-linux.tar.gz /hab/cache/artifact/core-netcat-<version>.hart 
+```
+How to download hab-x86_64-linux.tar.gz?? 
+
+Ans: `sudo wget https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz`
+
+ 
+
+How to download and provide core-netcat-<version>.hart? 
+
+Ans: First install above hab pkg in your internet environement using following commands. 
+
+    `sudo tar -xvzf /tmp/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1` 
+
+    `export HAB_LICENSE=accept-no-persist` 
+
+    `hab pkg install core/netcat -bf` 
+
+    `ls -dtr1 /hab/cache/artifacts/core-netcat-*` 
+
+This ls command will give a netcate pkg. Provide full path in argument. 
+
+ 
+Now second scenario is Internet environment. In that case you have to provide only config.toml path 
+
+`./chef-automate validate-ha-infrastructure /path/to/config.toml`
 # Installation
 `./chef-automate deploy  <path to config.toml>`
 
