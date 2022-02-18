@@ -3,8 +3,9 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"github.com/prometheus/common/log"
 	"io/ioutil"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
