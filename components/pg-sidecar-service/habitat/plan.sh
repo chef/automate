@@ -25,6 +25,7 @@ pkg_deps=(
   core/postgresql-client/9.6.11/20190305213520
   core/sqitch_pg/3.7.4/20190305225225
 )
+
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
