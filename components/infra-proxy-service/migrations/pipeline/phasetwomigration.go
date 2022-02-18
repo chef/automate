@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
@@ -15,19 +16,24 @@ type PhaseTwoPipleine struct {
 type PhaseTwoPipelineProcessor func(<-chan PipelineData) <-chan PipelineData
 
 // PopulateOrgs returns PhaseTwoPipelineProcessor
-func PopulateOrgs() PhaseTwoPipelineProcessor {
+func PopulateOrgs(service *service.Service) PhaseTwoPipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return populateOrgs(result)
+		return populateOrgs(result, service)
 	}
 }
 
-func populateOrgs(result <-chan PipelineData) <-chan PipelineData {
+func populateOrgs(result <-chan PipelineData,service *service.Service) <-chan PipelineData {
 	log.Info("Starting populateOrgs routine")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
 			log.Info("Processing to populateOrgs...")
+			result, err := StoreOrgs(res.Ctx, service.Storage, service.Migration, service.AuthzProjectClient, res.Result)
+			if err != nil {
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -106,6 +112,7 @@ func populateORGUser(result <-chan PipelineData) <-chan PipelineData {
 	go func() {
 		for res := range result {
 			log.Info("Processing to populateORGUser...")
+
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -145,7 +152,7 @@ func populateMembersPolicy(result <-chan PipelineData) <-chan PipelineData {
 }
 
 func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineProcessor) {
-	log.Info("Pipeline started...")
+	log.Info("Phase two pipeline started...")
 	go func() {
 		for _, pipe := range pipes {
 			source = pipe(source)
@@ -156,22 +163,22 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 		}
 
 	}()
-	
+
 }
 
-func SetupPhaseTwoPipeline() PhaseTwoPipleine {
+func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipleine {
 	c := make(chan PipelineData, 100)
 	migrationTwoPipeline(c,
-		PopulateOrgs(),
-		CreateProject(),
-		PopulateUsers(),
-		PopulateORGUser(),
-		PopulateMembersPolicy(),
+		PopulateOrgs(service),
+		// CreateProject(),
+		// PopulateUsers(),
+		// PopulateORGUser(),
+		// PopulateMembersPolicy(),
 	)
 	return PhaseTwoPipleine{in: c}
 }
 
-func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
+func (p *PhaseTwoPipleine) Run(result pipeline.Result, service *service.Service) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error)
@@ -180,10 +187,10 @@ func (p *PhaseTwoPipleine) Run(result pipeline.Result) {
 	}
 	err := <-done
 	if err != nil {
-		MigrationError(err, Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+		MigrationError(err, service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Errorf("Phase two pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
 	}
-	MigrationSuccess(Mig, ctx, result.Meta.MigrationID, result.Meta.ServerID)
+	MigrationSuccess(service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 	log.Info("received done")
 
 }
