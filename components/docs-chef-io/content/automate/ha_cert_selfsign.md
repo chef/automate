@@ -1,7 +1,7 @@
 +++
 title = "Self Sign Certificates"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

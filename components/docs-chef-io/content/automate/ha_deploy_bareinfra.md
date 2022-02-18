@@ -1,7 +1,7 @@
 +++
 title = "Bare Metal Deployment Procedure"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

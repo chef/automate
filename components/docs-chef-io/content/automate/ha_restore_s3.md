@@ -1,7 +1,7 @@
 +++
 title = "Restoring the S3 Backed-up Data"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

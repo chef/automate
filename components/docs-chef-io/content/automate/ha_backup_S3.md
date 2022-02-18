@@ -1,7 +1,7 @@
 +++
 title = "Taking Backup with Amazon S3 Bucket"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

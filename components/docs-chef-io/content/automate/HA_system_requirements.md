@@ -1,7 +1,7 @@
 +++
 title = "High Availability - System and Software Requirements"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
