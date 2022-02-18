@@ -66,8 +66,12 @@ export const previewStatus = createSelector(
   (state) => state.previewStatus
 );
 
-
 export const previewData = createSelector(
   orgState,
   (state) => state.previewData
+);
+
+export const confirmPreviewStatus = createSelector(
+  orgState,
+  (state) => state.confirmPreviewStatus
 );
