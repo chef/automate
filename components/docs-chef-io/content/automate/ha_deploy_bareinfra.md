@@ -37,7 +37,7 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 - Ensure you have [Chef Automate utility](( {{< relref "ha_auto_install.md" >}})) installed, else download and install the latest version.
 - Servers provisioned and accessible through SSH from each other.
 - Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch.
-- Create the certificates for security and authentication purposes. _optional_ 
+- Create the certificates for security and authentication purposes. _optional_
 - Rotate the certificates if the certificates are expired or compromised. _optional_
 
 ## Deployment Procedure on Bare Infrastructure
@@ -96,6 +96,10 @@ chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificat
 1. Type the command, `./scripts/credentials set elasticsearch -auto` and press **Enter**. This command rotates the credentials for ElasticSearch.
 
 1. Type the command, `chef-automate test -full` and press **Enter**. This command runs smoke tests on the setup.
+
+<!-- The default location for the secrets key and secret storage is set in the config file. The default location for the key is /etc/chef-automate/secrets.key and the secret store file is in /hab/a2_deploy_workspace/secrets.json -->
+
+<!-- The default location for the secrets key and secret storage is set in the config file. The default location for the key is /etc/chef-automate/secrets.key and the secret store file is in /hab/a2_deploy_workspace/secrets.json -->
 
 <!-- The default location for the secrets key and secret storage is set in the config file. The default location for the key is /etc/chef-automate/secrets.key and the secret store file is in /hab/a2_deploy_workspace/secrets.json -->
 

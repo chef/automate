@@ -1,5 +1,5 @@
 +++
-title = "High Availability (HA) Architecture"
+title = "High Availability - System and Software Requirements"
 
 draft = false
 
@@ -7,19 +7,20 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "High Availability (HA) Architecture"
+    title = "High Availability - System and Software Requirements"
     parent = "automate/install"
-    identifier = "automate/install/ha_architecture_reference.md High Availability (HA) Architecture"
-    weight = 220
+    identifier = "automate/install/ha_system_requirements.md High Availability - System and Software Requirements"
+    weight = 240
 +++
 
-This section includes Chef Automate High Availability (HA) high-level reference architecture that interacts with the HA backend components on different providers or environments.
+This section lists the recommended operating systems requirements, virtual machine instances requirements, and VPC requirements for implementing Chef Automate High Availability (HA) for your network infrastructure or systems or applications or services.
 
 ## Architecture Reference
 
 The following Chef Automate HA architecture diagram shows the components involved in the Chef Automate HA that works on the **Leader-Follower** strategy. We are creating the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch for Chef Automate HA.
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
+
 
 All application service, secret, recovery, data are stored in the Postgress. Compliance and client-run data that are generated on a time to time basis and requiring data to be accessible in real-time are stored in Elastic search. The Load balancer distributes to each of the automate components.
 
@@ -28,6 +29,9 @@ All application service, secret, recovery, data are stored in the Postgress. Com
 **Kibana** is an open-source, web-based data visualization and analytical tool that allows you to explore, visualize, and build a dashboard over the log data massed in Elasticsearch clusters. It is a part of the Elastic Stack and integrates with Elasticsearch. The **Kibana** **Dashboard** is a collection of charts, graphs, metrics, searches, and maps in a single pane and provides at-a-glance insights into data from multiple perspectives enabling you to drill down into the details.
 
 ### Automate Clusters
+=======
+All application service, secret, recovery, data are stored in the Postgress. Compliance and client run data that are generated on time to time basis and requiring data to be accessible in real-time are stored in Elastic search. Load balancer distributes to each of the automate components.
+>>>>>>> a77f9ed1 (Netlify error fixes)
 
 The Chef Automate HA architecture involves two different clusters part of the main cluster, which are:
 
