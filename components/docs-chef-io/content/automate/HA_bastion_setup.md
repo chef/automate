@@ -56,8 +56,3 @@ Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinf
 - Setup Virtual Private Cloud (VPC) in AWS
 
 Refer [Chef Automate HA Deployment using AWS]({{< relref "ha_deploy_aws.md" >}}) section for building an bastion host and Chef Automate HA deployment procedure using AWS.
-=======
-Refer [Chef Automate HA Deployment using AWS]({{< relref "ha_deploy_aws_deploy.md" >}}) section for building an bastion host and Chef Automate HA deployment procedure using AWS.
->>>>>>> 12c6b48e (Chef Automate HA Writeup - Final 2nd Draft)
-=======
->>>>>>> 3f16683a (netlify error fixes wrt bastion setup file)
