@@ -1,14 +1,10 @@
 package majorupgradechecklist
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/pkg/errors"
 )
@@ -317,110 +313,3 @@ func promptUpgradeContinue() Checklist {
 	}
 }
 
-func (ci *V3ChecklistManager) CreatePostChecklistFile() error {
-	params := PerPostChecklist{}
-	if isExternalPG() {
-		params.PostChecklist = append(params.PostChecklist, postChecklistExternal...)
-	} else {
-		params.PostChecklist = append(params.PostChecklist, postChecklistEmbedded...)
-	}
-	version, is_major_version := manifest.IsSemVersionFmt(ci.version)
-	if is_major_version {
-		params.Version = version
-	}
-
-	var buffer bytes.Buffer
-	data, err := json.Marshal(params)
-	if err != nil {
-		return err
-	}
-	buffer.Write(data)
-	buffer.WriteString("\n")
-	err = ioutil.WriteFile("/hab/svc/deployment-service/var/upgrade_metadata.json", buffer.Bytes(), 0644)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-func (ci *V3ChecklistManager) ReadPostChecklistById(id string) (bool, error) {
-	ChecklistId_Found := false
-	res, err := ReadJsonFile()
-	if err != nil {
-		return false, err
-	}
-	for i := 0; i < len(res.PostChecklist); i++ {
-
-		if res.PostChecklist[i].Id == id {
-			ChecklistId_Found = res.PostChecklist[i].IsExecuted
-			break
-
-		}
-	}
-	return ChecklistId_Found, nil
-}
-
-func ReadJsonFile() (*PerPostChecklist, error) {
-	byteValue, err := ioutil.ReadFile("/hab/svc/deployment-service/var/upgrade_metadata.json")
-	if err != nil {
-		return nil, err
-	}
-	params := PerPostChecklist{}
-
-	err = json.Unmarshal(byteValue, &params)
-	if err != nil {
-		return nil, err
-	}
-	return &params, nil
-}
-
-func (ci *V3ChecklistManager) ReadPostChecklistFile() ([]string, error) {
-	var postCmdList []string
-	var showPostChecklist = false
-	res, err := ReadJsonFile()
-	if err != nil {
-		return nil, err
-	}
-
-	if ci.version == res.Version {
-		for i := 0; i < len(res.PostChecklist); i++ {
-			if !res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted {
-				showPostChecklist = true
-				break
-			}
-		}
-
-		if showPostChecklist == true {
-			for i := 0; i < len(res.PostChecklist); i++ {
-				if !res.PostChecklist[i].IsExecuted {
-					postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
-				}
-			}
-		}
-		return postCmdList, nil
-	}
-
-	return nil, errors.Errorf("Failed to read checklist since version didn't match")
-
-}
-
-func (ci *V3ChecklistManager) UpdatePostChecklistFile(id string) error {
-	res, err := ReadJsonFile()
-	if err != nil {
-		return err
-	}
-	for i, v := range res.PostChecklist {
-		if v.Id == id {
-			res.PostChecklist[i].IsExecuted = true
-		}
-	}
-
-	data, err := json.Marshal(res)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("/hab/svc/deployment-service/var/upgrade_metadata.json", data, 0644)
-	if err != nil {
-		return err
-	}
-	return nil
-}

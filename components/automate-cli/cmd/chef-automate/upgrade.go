@@ -280,16 +280,8 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 		_, isMajorVersion := manifest.IsSemVersionFmt(resp.CurrentVersion)
 		if isMajorVersion {
-			ci, err := majorupgradechecklist.NewChecklistManager(writer, resp.CurrentVersion, "")
-			if err != nil {
-				return status.Wrap(
-					err,
-					status.DeploymentServiceCallError,
-					"Request to status upgrade failed",
-				)
-			}
-
-			resp, err := ci.ReadPostChecklistFile()
+			ci := majorupgradechecklist.NewCRUDChecklist(resp.CurrentVersion)
+			resp, err := ci.ReadPendingPostChecklistFile()
 			if err != nil {
 				return status.Wrap(
 					err,

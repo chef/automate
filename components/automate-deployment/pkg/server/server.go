@@ -36,7 +36,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
@@ -1366,12 +1365,7 @@ func (s *server) doConverge(
 		// json file
 		fmt.Println(os.Getenv(isUpgradeMajorEnv))
 		if os.Getenv(isUpgradeMajorEnv) == "true" {
-			var writer *cli.Writer
-			ci, err := majorupgradechecklist.NewChecklistManager(writer, s.deployment.CurrentReleaseManifest.Version(), "")
-			if err != nil {
-				return
-			}
-
+			ci := majorupgradechecklist.NewCRUDChecklist(s.deployment.CurrentReleaseManifest.Version())
 			err = ci.CreatePostChecklistFile()
 			if err != nil {
 				return
