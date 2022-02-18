@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS migration_status (
 CREATE TABLE IF NOT EXISTS migration (
   id                               SERIAL PRIMARY KEY,
   migration_id                     TEXT NOT NULL,
-  server_id                        TEXT NOT NULL references servers(id) ON DELETE RESTRICT,
+  server_id                        TEXT NOT NULL references servers(id) ON DELETE CASCADE,
   type_id                          int NOT NULL references migration_type(id) ON DELETE RESTRICT,
   status_id                        int NOT NULL references migration_status(id) ON DELETE RESTRICT,
   total_succeeded                  int NOT NULL DEFAULT 0,
