@@ -1321,7 +1321,6 @@ Below are a few frequently encountered issues in Restore and steps on how to res
 
 ### Error: Cached artifact not found in offline mode
 
-**Reason behind error:**
 
 **Steps to resolve:** to resolve this error,We have to use --airgap-bundle option along with the restore command. Please find the name of the airgap bundle from the path /var/tmp. the airgap bundle file would be something like frontend-20210908093242.aib
 
@@ -1344,7 +1343,6 @@ Execute  below command from bastion from any location.
  
 **Error message:** Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"
 
-**Reason behind error:**
 
 **Steps to resolve:** If you are using onprem s3 for backup and your are facing issues with restore then attach s3-endpoint with s3 restore command.
 
@@ -1364,9 +1362,8 @@ Execute  below command from bastion from any location.
 
 ### Error : ./scripts/credentials set ssl, If this command is taking more time to print logs.
 
-**Reason behind error:** 
 
-**How to resolve:** Press ctrl + c and export hab license
+**Steps to resolve:** Press ctrl + c and export hab license
 	then execute  ./scripts/credentials set ssl
 	
 ### To check logs while doing backup or restore, set log-level debug using below command and again execute journalctl command.
