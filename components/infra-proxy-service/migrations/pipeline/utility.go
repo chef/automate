@@ -643,26 +643,42 @@ func SkipUpdateUser(serverUser []pipeline.User, automateUser []storage.User, che
 				continue
 			}
 
-			if sUser.Username == "pivotal" {
-				sUser.ActionOps = pipeline.Skip
-				parsedUsers = append(parsedUsers, sUser)
-				checked[sUser.Username] = true
-
-			} else if aUser.InfraServerUsername == sUser.Username {
-				if aUser.InfraServerUsername == sUser.Username && aUser.Email == sUser.Email {
-					sUser.ActionOps = pipeline.Skip
-					parsedUsers = append(parsedUsers, sUser)
-					checked[sUser.Username] = true
-
-				} else {
-					sUser.ActionOps = pipeline.Update
-					parsedUsers = append(parsedUsers, sUser)
-					checked[sUser.Username] = true
-				}
+			checkedUser := SkipUpdateUserCheck(sUser, aUser, checked)
+			emptyVal := pipeline.User{}
+			if checkedUser != emptyVal {
+				parsedUsers = append(parsedUsers, checkedUser)
 			}
 		}
 	}
 	return parsedUsers
+}
+
+func SkipUpdateUserCheck(sUser pipeline.User, aUser storage.User, checked map[string]bool) pipeline.User {
+	// parsedUsers := pipeline.User{}
+
+	if checked[sUser.Username] {
+		return pipeline.User{}
+	}
+	if sUser.Username == "pivotal" {
+		sUser.ActionOps = pipeline.Skip
+		checked[sUser.Username] = true
+		return sUser
+
+	} else if aUser.InfraServerUsername == sUser.Username {
+		if aUser.InfraServerUsername == sUser.Username && aUser.Email == sUser.Email {
+			sUser.ActionOps = pipeline.Skip
+			// parsedUsers = append(parsedUsers, sUser)
+			checked[sUser.Username] = true
+			return sUser
+
+		} else {
+			sUser.ActionOps = pipeline.Update
+			// parsedUsers = append(parsedUsers, sUser)
+			checked[sUser.Username] = true
+			return sUser
+		}
+	}
+	return pipeline.User{}
 }
 
 func DeleteUser(serverUser []pipeline.User, automateUser []storage.User, checked map[string]bool) []pipeline.User {
