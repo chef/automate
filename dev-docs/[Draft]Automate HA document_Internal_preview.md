@@ -1344,7 +1344,7 @@ Below are a few frequently encountered issues in Restore and steps on how to res
 
 ### Error: Database is being accessed by other users
 
-**Reason behind error:** Some services may be still in running state and are referring to the database, while restore service is trying to drop the database. Please check if all the front end and backend services are stopped. 
+**Reason behind error:** Some services are still in running state and they are referring to the database, while restore service is trying to drop the database. Please check if all the front end and backend services are stopped. 
 
 **Steps to resolve:**  Execute below command on all frontend and backend nodes
 
@@ -1358,7 +1358,7 @@ Below are a few frequently encountered issues in Restore and steps on how to res
 
 ### Error: Cached artifact not found in offline mode
 
-**Reason behind error:** This error usually comes in airgap environment,When a packge will try to pull any dpendency from internet in that case this error will come.
+**Reason behind error:** This error usually comes in airgap environment, When a packge will try to pull any dpendency from internet in that case this error will come.
 
 **Steps to resolve:** To resolve this error,We have to use --airgap-bundle option along with the restore command. Please find the name of the airgap bundle from the path /var/tmp. the airgap bundle file would be something like frontend-20210908093242.aib
 
