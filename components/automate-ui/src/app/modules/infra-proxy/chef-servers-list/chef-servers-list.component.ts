@@ -19,6 +19,7 @@ import {
   saveError
 } from 'app/entities/servers/server.selectors';
 import { CreateServer, GetServers, DeleteServer } from 'app/entities/servers/server.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-chef-servers-list',
@@ -43,7 +44,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.chefServersLoading = true;
 
@@ -137,6 +139,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       ip_address: this.ipForm.controls['ip_address'].value?.trim() || ''
     };
     this.store.dispatch(new CreateServer(server));
+    this.telemetryService.track('InfraServer_Add_Chef_InfraServer');
   }
 
   private resetCreateModal(): void {
