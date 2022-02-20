@@ -1307,6 +1307,9 @@ All Automate and Backend service logs are available via `journalctl` from each n
    This will show logs related to all hab services.
  
     `journalctl --follow --unit hab-sup`
+    
+    * --unit command=UNIT Show logs from the specified unit
+    * --follow Command =Follow the journal
 
  * To filter out logs related to specific service use grep command.
 
@@ -1320,7 +1323,7 @@ All Automate and Backend service logs are available via `journalctl` from each n
 * Use `grep` to filter out logs for a single service, for example to view the `ingest` logs on an Automate frontend.
 
     e.g. `journactl --follow --unit chef-automate | grep ingest.service`
-
+    
 
 ## Command to check Service health
 
@@ -1355,12 +1358,15 @@ Below are a few frequently encountered issues in Restore and steps on how to res
 
 ### Error: Cached artifact not found in offline mode
 
+**Reason behind error:** This error usually comes in airgap environment,When a packge will try to pull any dpendency from internet in that case this error will come.
 
-**Steps to resolve:** to resolve this error,We have to use --airgap-bundle option along with the restore command. Please find the name of the airgap bundle from the path /var/tmp. the airgap bundle file would be something like frontend-20210908093242.aib
+**Steps to resolve:** To resolve this error,We have to use --airgap-bundle option along with the restore command. Please find the name of the airgap bundle from the path /var/tmp. the airgap bundle file would be something like frontend-20210908093242.aib
 
 Command : `chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --patch-config </path/to/patch.toml> --skip-preflight --s3-access-key "Access\_Key" --s3-secret-key "Secret\_Key" --airgap-bundle /var/tmp/<airgap-bundle>`
 
 ### Error: Existing arch does not match the requested one.
+
+**Reason behind error:** When you have already done aws provisioning and again you are trying to run `automate-cluster-ctl provision` command,in that case this error will come.
 
 **Steps to Resolve:**
 
@@ -1376,7 +1382,6 @@ Execute  below command from bastion from any location.
 ![image](https://user-images.githubusercontent.com/65227203/153855824-889f50a0-4a01-4614-beb1-e9252e1cfb44.png)
  
 **Error message:** Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"
-
 
 **Steps to resolve:** If you are using onprem s3 for backup and your are facing issues with restore then attach s3-endpoint with s3 restore command.
 
@@ -1396,6 +1401,7 @@ Execute  below command from bastion from any location.
 
 ### Error : ./scripts/credentials set ssl, If this command is taking more time to print logs.
 
+**Reason behind error:** This command has got stuck, as it was not able to find hab license.                               
 
 **Steps to resolve:** Press ctrl + c and export hab license
 	then execute  ./scripts/credentials set ssl
