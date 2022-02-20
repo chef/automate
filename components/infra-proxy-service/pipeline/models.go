@@ -33,6 +33,9 @@ type Meta struct {
 
 	// Migration ID
 	MigrationID string `json:"migration_id"`
+
+	// To check whether zip file extracted successfully
+	IsValid bool `json:"is_valid"`
 }
 
 type StageResult struct {

@@ -5,14 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/infra-proxy-service/pipeline"
-	"github.com/chef/automate/components/infra-proxy-service/storage"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
+	log "github.com/sirupsen/logrus"
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
@@ -339,5 +340,18 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	if err != nil {
 		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
 	}
+	return result, nil
+}
+
+func ValidateZip(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+	unzipFolder := result.Meta.UnzipFolder
+
+	_, err := os.Stat(unzipFolder + "/organizations")
+	if err != nil {
+		log.Errorf("Failed to validate unzip folder for migration id %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+
+	result.Meta.IsValid = true
 	return result, nil
 }
