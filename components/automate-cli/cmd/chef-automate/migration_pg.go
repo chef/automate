@@ -14,14 +14,16 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
 
 var migrateDataCmdFlags = struct {
-	check      bool
-	data       string
-	autoAccept bool
+	check        bool
+	data         string
+	autoAccept   bool
+	forceExecute bool
 }{}
 
 var ClearDataCmdFlags = struct {
@@ -69,7 +71,6 @@ func newRemovePgDatadirCmd() *cobra.Command {
 	}
 	removePgDatadirCmd.PersistentFlags().StringVar(&ClearDataCmdFlags.data, "data", "", "data")
 	removePgDatadirCmd.PersistentFlags().BoolVarP(&ClearDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
-
 	return removePgDatadirCmd
 }
 
@@ -83,6 +84,7 @@ func newMigratePgCmd() *cobra.Command {
 	migratePgCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
 	migratePgCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
 	migratePgCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
+	migratePgCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "fore-execute")
 	return migratePgCmd
 }
 
@@ -120,34 +122,66 @@ func runMigratePgCmd(cmd *cobra.Command, args []string) error {
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
-
-		if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
-			err := promptCheckList(
-				"it will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, "")
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to start upgrade failed",
 			)
-			if err != nil {
-				return err
-			}
 		}
 
-		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
+		isExecuted, err := ci.ReadPostChecklistById("migrate_pg")
 		if err != nil {
 			return err
 		}
 
-		if strings.TrimSpace(oldPgVersion) == OLD_PG_VERSION {
+		if isExecuted {
+			fmt.Println(migrateDataCmdFlags.forceExecute)
+			if migrateDataCmdFlags.forceExecute {
+				isExecuted = false
+			} else {
+				err := promptCheckList(
+					"migrate_pg is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
+				)
+				if err != nil {
+					return err
+				} else {
+					isExecuted = false
+				}
+			}
+		}
 
-			err = pgMigrateExecutor()
+		if !isExecuted {
+			if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
+				err := promptCheckList(
+					"it will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
+				)
+				if err != nil {
+					return err
+				}
+			}
+
+			oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
 			if err != nil {
 				return err
 			}
 
-		} else {
-			return errors.New(
-				"pg migration will only support 9.6 pg version for now, your pg version is: " + string(oldPgVersion),
-			)
-		}
+			if strings.TrimSpace(oldPgVersion) == OLD_PG_VERSION {
 
+				err = pgMigrateExecutor()
+				if err != nil {
+					return err
+				} else {
+					ci.UpdatePostChecklistFile("migrate_pg")
+				}
+
+			} else {
+				return errors.New(
+					"pg migration will only support 9.6 pg version for now, your pg version is: " + string(oldPgVersion),
+				)
+			}
+		}
 	} else {
 		return errors.New("please provide valid input for data flag")
 	}
