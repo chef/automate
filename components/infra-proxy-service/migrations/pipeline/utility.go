@@ -292,7 +292,8 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		fpath = filepath.Join(filepath.Dir(result.Meta.ZipFile), file.Name)
 
 		if file.FileInfo().IsDir() {
-			_ = os.MkdirAll(fpath, os.ModePerm)
+			err = os.MkdirAll(fpath, os.ModePerm)
+			log.Errorf("cannot create dir for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			continue
 		}
 
@@ -663,8 +664,11 @@ func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, autom
 				sUser.ActionOps = pipeline.Insert
 				parsedUsers = append(parsedUsers, sUser)
 			}
+
 		}
+
 	}
+
 	return parsedUsers
 }
 func skipOrUpdate(autoMap map[string]storage.User, sUser pipeline.User) pipeline.User {
