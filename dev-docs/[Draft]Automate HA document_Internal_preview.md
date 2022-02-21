@@ -1383,7 +1383,11 @@ Execute  below command from bastion from any location.
  
 **Error message:** Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"
 
-**Steps to resolve:** If you are using onprem s3 for backup and your are facing issues with restore then attach s3-endpoint with s3 restore command.
+**Reason behind error:** Automate instance is not able to find s3 bucket.
+
+**Steps to resolve:** Make sure that access key, secret key and endpoints are correct.
+
+  If you are using onprem s3 for backup and your are facing issues with restore then attach s3-endpoint with s3 restore command.
 
  `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "<URL>"`
 
