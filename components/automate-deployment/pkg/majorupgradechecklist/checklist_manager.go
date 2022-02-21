@@ -25,7 +25,7 @@ type PostCheckList struct {
 	Msg        string `json:"msg"`
 	Cmd        string `json:"cmd"`
 	Optional   bool   `json:"optional"`
-	IsExecuted bool   `json:"is_executor"`
+	IsExecuted bool   `json:"is_executed"`
 }
 
 type PerPostChecklist struct {
