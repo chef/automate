@@ -85,9 +85,9 @@ export class SigninComponent implements OnInit {
   idTokenAndStateFromCookieAndFragment(fragment: string): [string | null, string | null] {
     // Note: we only get an ID token and state now, so we match from ^ to $
     const state_match = fragment.match('^state=([^&]*)$');
-    const id_token_match = `; ${document.cookie}`.match(`;\\s*id_token=([^;]+)`);
+    const id_token_match = `; ${document.cookie}`.match(';\\s*id_token=([^;]+)');
     const id_token = id_token_match ? id_token_match[1] : null;
     const state = state_match ? state_match[1] : null;
-    return [id_token,state];
+    return [id_token, state];
   }
 }
