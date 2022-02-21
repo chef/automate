@@ -2,9 +2,10 @@ package pipeline
 
 import (
 	"context"
-	"github.com/chef/automate/api/interservice/local_user"
 	"reflect"
 	"testing"
+
+	"github.com/chef/automate/api/interservice/local_user"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
@@ -133,27 +134,39 @@ func TestCreatePreview(t *testing.T) {
 }
 
 func TestGetUsersForBackup(t *testing.T) {
+	// backupFolderDefault := "../../testdata/skipBackup"
 	type args struct {
 		ctx             context.Context
 		st              storage.Storage
 		localUserClient *local_user.MockUsersMgmtServiceClient
 		result          pipeline.Result
 	}
-
-	arg := args{
-		ctx:             context.Background(),
-		st:              &testDB.TestDB{},
-		localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)),
-		result:          pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/backup", ServerID: "server1", MigrationID: "mig1"}},
+	tests := []struct {
+		name      string
+		args      args
+		wantError error
+		want1     pipeline.ActionOps
+	}{
+		{name: "Test Insert User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Insert"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/insertBackup/", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Insert},
+		{name: "Test Update User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Update"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/updateBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Update},
+		{name: "Test Delete User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Delete"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/deleteBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Delete},
+		{name: "Test Skip User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Skip"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/skipBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Skip},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	res, err := GetUsersForBackup(arg.ctx, arg.st, arg.localUserClient, arg.result)
-	//userResponse := &local_user.User{Id: "user1234", Name: "user1234"}
-	//t.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(userResponse, nil)
-	require.NoError(t, err)
-	require.True(t, len(res.ParsedResult.Users) > 0)
-	require.NotEmpty(t, res)
-	require.NotEmpty(t, res.ParsedResult.Users)
+			res, err := GetUsersForBackup(tt.args.ctx, tt.args.st, tt.args.localUserClient, tt.args.result)
+			require.NoError(t, err)
+			require.Equal(t, err, tt.wantError)
+
+			for _, usr := range res.ParsedResult.Users {
+				require.Equal(t, usr.ActionOps, tt.want1)
+			}
+
+		})
+
+	}
 }
 
 func TestValidateZip(t *testing.T) {

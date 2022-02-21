@@ -269,21 +269,13 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 }
 
 // Unzip will decompress a zip file and sets the UnzipFolder
-func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+func Unzip(ctx context.Context, result pipeline.Result) (pipeline.Result, error) {
 
 	var fpath string
-	_, err := mst.StartUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	if err != nil {
-		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
-	}
 
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
-		log.Errorf("cannot open reader: %s.", err)
-		_, err := mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
-		if err != nil {
-			log.Errorf("Failed to update status in DB: %s", err)
-		}
+		log.Errorf("cannot open reader migration id: %s, %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
 
@@ -299,8 +291,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 
 		// Creating the files in the target directory
 		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
-			log.Errorf("cannot create directory: %s. ", err)
-			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create directory", 0, 0, 0)
+			log.Errorf("cannot create directory for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 
@@ -310,22 +301,19 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 			os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
 			file.Mode())
 		if err != nil {
-			log.Errorf("cannot create a file: %s.", err)
-			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create a file", 0, 0, 0)
+			log.Errorf("cannot create a file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 
 		readClose, err := file.Open()
 		if err != nil {
-			log.Errorf("cannot open file")
-			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open file", 0, 0, 0)
+			log.Errorf("cannot open file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 
 		_, err = io.Copy(outFile, readClose)
 		if err != nil {
-			log.Errorf("cannot copy file")
-			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy file", 0, 0, 0)
+			log.Errorf("cannot copy file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 
@@ -333,18 +321,14 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		_ = readClose.Close()
 
 		if err != nil {
-			log.Errorf("cannot copy a file")
-			_, _ = mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy a file", 0, 0, 0)
+			log.Errorf("cannot copy a file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 	}
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
 	_ = reader.Close()
-	_, err = mst.CompleteUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
-	if err != nil {
-		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
-	}
+
 	return result, nil
 }
 
@@ -575,7 +559,7 @@ func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]stri
 }
 
 func GetUsersForBackup(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
-	log.Info("starting with user parseing phase for migration id: ", result.Meta.MigrationID)
+	log.Info("starting with user parsing phase for migration id: ", result.Meta.MigrationID)
 
 	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
 
@@ -629,19 +613,19 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 }
 
 func automateMap(automateUser []storage.User) map[string]storage.User {
-	autoMap := map[string]storage.User{}
+	automateMap := map[string]storage.User{}
 	for _, auser := range automateUser {
-		autoMap[auser.InfraServerUsername] = auser
+		automateMap[auser.InfraServerUsername] = auser
 	}
-	return autoMap
+	return automateMap
 }
 
 func serverMap(server []pipeline.User) map[string]pipeline.User {
-	autoMap := map[string]pipeline.User{}
+	serverMap := map[string]pipeline.User{}
 	for _, auser := range server {
-		autoMap[auser.Username] = auser
+		serverMap[auser.Username] = auser
 	}
-	return autoMap
+	return serverMap
 }
 
 func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, automateUser []storage.User, localUserClient local_user.UsersMgmtServiceClient) []pipeline.User {
@@ -658,8 +642,7 @@ func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, autom
 			}
 		} else {
 			if sUser.Username == "pivotal" {
-				sUser.ActionOps = pipeline.Skip
-				parsedUsers = append(parsedUsers, sUser)
+				continue
 			} else {
 				sUser.ActionOps = pipeline.Insert
 				parsedUsers = append(parsedUsers, sUser)
@@ -688,9 +671,9 @@ func skipOrUpdate(autoMap map[string]storage.User, sUser pipeline.User) pipeline
 }
 func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipeline.User {
 	var parsedUsers []pipeline.User
-	autoMap := serverMap(serverUser)
+	serverMap := serverMap(serverUser)
 	for _, aUser := range automateUser {
-		if autoMap[aUser.InfraServerUsername].Username == "" {
+		if serverMap[aUser.InfraServerUsername].Username == "" {
 			parsedUsers = append(parsedUsers, pipeline.User{
 				Username:  aUser.InfraServerUsername,
 				ActionOps: pipeline.Delete,
