@@ -25,8 +25,8 @@
           </chef-button>
             <chef-dropdown class='checkin-select-dropdown' [visible]="checkInPeriodDropdownVisible">
               <chef-click-outside omit="download-dropdown-toggle" (clickOutside)="closeCheckInPeriodDropdown()">
-                <chef-button tertiary (click)="updateCheckInDays(this.twoWeekNumDays)">Last 2 Weeks</chef-button>
-                <chef-button tertiary (click)="updateCheckInDays(this.fourWeekNumDays)">Last 4 Weeks</chef-button>
+                <chef-button tertiary [ngClass]="{'selected': this.checkInNumDays === this.twoWeekNumDays}" (click)="updateCheckInDays(this.twoWeekNumDays)">Last 2 Weeks</chef-button>
+                <chef-button tertiary [ngClass]="{'selected': this.checkInNumDays === this.fourWeekNumDays}" (click)="updateCheckInDays(this.fourWeekNumDays)">Last 4 Weeks</chef-button>
               </chef-click-outside>
             </chef-dropdown>
         </div>

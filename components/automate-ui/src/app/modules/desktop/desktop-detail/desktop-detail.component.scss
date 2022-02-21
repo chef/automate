@@ -59,13 +59,19 @@
         color: inherit;
         background-color: $chef-white;
 
+        &.selected {
+          background-color: #3864F2;
+          color: #FFFFFF;
+        }
+
         button {
           margin: 0;
           padding: 0;
         }
 
-        &:hover {
+        &:not(.selected):hover {
           cursor: pointer;
+          background-color: #DEE5FD;
         }
 
         &:last-child {
