@@ -144,7 +144,6 @@ func TestMain(t *testing.T) {
 		// capture that id_token
 		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
 			id_token, err := resp.Request.Cookie("id_token")
-			fmt.Println(id_token.Value, "id_token")
 			require.NoError(t, err)
 			idToken = id_token.Value
 
@@ -188,7 +187,6 @@ func TestMain(t *testing.T) {
 		// capture that id_token
 		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
 			id_token, err := resp.Request.Cookie("id_token")
-			fmt.Println(id_token.Value, "id_token")
 			require.NoError(t, err)
 			idToken = id_token.Value
 		}
@@ -230,7 +228,6 @@ func TestMain(t *testing.T) {
 		// capture that id_token
 		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
 			id_token, err := resp.Request.Cookie("id_token")
-			fmt.Println(id_token.Value, "id_token")
 			require.NoError(t, err)
 			oldIDToken = id_token.Value
 		}
