@@ -163,6 +163,10 @@ variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
 
+variable "setup_managed_services" {
+  default = false
+}
+
 variable "ssh_key_file" {
 }
 
