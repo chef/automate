@@ -137,7 +137,7 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 func (p *postgres) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]storage.OrgUser, error) {
 	var orgUsers []storage.OrgUser
 	rows, err := p.db.QueryContext(ctx,
-		`select ou.org_id,u.infra_server_username  from org_users ou join users u on u.id=ou.user_id  join orgs o on o.id=ou.org_id where org_id=$1`, orgId)
+		`select ou.org_id,ou.is_admin,u.infra_server_username  from org_users ou join users u on u.id=ou.user_id  join orgs o on o.id=ou.org_id where org_id=$1`, orgId)
 	if err != nil {
 		return []storage.OrgUser{}, p.processError(err)
 	}
@@ -149,7 +149,7 @@ func (p *postgres) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]sto
 
 	for rows.Next() {
 		orgUser := storage.OrgUser{}
-		if err := rows.Scan(&orgUser.OrgId, &orgUser.InfraServerUsername); err != nil {
+		if err := rows.Scan(&orgUser.OrgId, &orgUser.IsAdmin, &orgUser.InfraServerUsername); err != nil {
 			return nil, err
 		}
 		orgUsers = append(orgUsers, orgUser)

@@ -4,14 +4,15 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
-	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/infra-proxy-service/pipeline"
-	"github.com/chef/automate/components/infra-proxy-service/storage"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
+	log "github.com/sirupsen/logrus"
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
@@ -341,6 +342,7 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	return result, nil
 }
 
+// ParseOrgUserAssociation  sync the automate org users with chef server org users
 func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("Starting with the parsing org user association for migration id :", result.Meta.MigrationID)
 	var orgUserAssociations []pipeline.OrgsUsersAssociations
@@ -361,20 +363,24 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
 	for _, org := range result.ParsedResult.Orgs {
 		log.Info("Getting actions for org id", org.Name)
-		memberJson := openOrgUser(org.Name, orgPath)
+		chefServerOrgUsers, err := getChefServerOrgUsers(org.Name, orgPath)
+		if err != nil {
+			log.Errorf("Unable to get the chef server organisation users %s ", err)
+			return nil, err
+		}
 		if org.ActionOps == pipeline.Insert {
-			userAssociations = append(userAssociations, createInsertUserAssociationFromMemberJson(memberJson)...)
+			userAssociations = append(userAssociations, createInsertUserAssociation(chefServerOrgUsers)...)
 		} else {
 			orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
 			if err != nil {
-				log.Errorf("Unable to fetch Users for org %s : %s", org.Name, err.Error())
+				log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
 				return nil, err
 			}
 			if org.ActionOps == pipeline.Delete {
-				userAssociations = append(userAssociations, createDeleteUserAssociationFromMemberJson(orgUsersInDb)...)
+				userAssociations = append(userAssociations, createDeleteUserAssociation(chefServerOrgUsers)...)
 			} else {
-				userAssociations = append(userAssociations, insertActionForOrgUsers(orgUsersInDb, memberJson)...)
-				userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, memberJson)...)
+				userAssociations = append(userAssociations, insertOrUpdateActionForOrgUsers(orgUsersInDb, chefServerOrgUsers)...)
+				userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, chefServerOrgUsers)...)
 			}
 		}
 		orgUserAssociations = append(orgUserAssociations, pipeline.OrgsUsersAssociations{OrgName: org, Users: userAssociations})
@@ -382,78 +388,150 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 	return orgUserAssociations, nil
 }
 
-func createInsertUserAssociationFromMemberJson(memberJson pipeline.MemberJson) []pipeline.UserAssociation {
+func createInsertUserAssociation(chefServerOrgUsers []pipeline.UserAssociation) []pipeline.UserAssociation {
 	userAssociation := make([]pipeline.UserAssociation, 0)
-	for _, user := range memberJson {
-		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Insert})
+	for _, user := range chefServerOrgUsers {
+		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.Username, IsAdmin: user.IsAdmin, ActionOps: pipeline.Insert})
 	}
 	return userAssociation
 }
 
-func createDeleteUserAssociationFromMemberJson(orgUsers []storage.OrgUser) []pipeline.UserAssociation {
+func createDeleteUserAssociation(chefServerOrgUsers []pipeline.UserAssociation) []pipeline.UserAssociation {
 	userAssociation := make([]pipeline.UserAssociation, 0)
-	for _, user := range orgUsers {
-		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, ActionOps: pipeline.Delete})
+	for _, user := range chefServerOrgUsers {
+		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.Username, IsAdmin: user.IsAdmin, ActionOps: pipeline.Delete})
 	}
 	return userAssociation
 }
 
-func insertActionForOrgUsers(orgUsers []storage.OrgUser, userMemberJson pipeline.MemberJson) []pipeline.UserAssociation {
+func insertOrUpdateActionForOrgUsers(orgUsers []storage.OrgUser, chefServerOrgUsers []pipeline.UserAssociation) []pipeline.UserAssociation {
 	var userAssociation []pipeline.UserAssociation
 	orgUserMapDB := createMapForOrgUsersInDB(orgUsers)
-	for _, user := range userMemberJson {
-		_, valuePresent := orgUserMapDB[user.User.Username]
+	for _, user := range chefServerOrgUsers {
+		isAdmin, valuePresent := orgUserMapDB[user.Username]
 		if valuePresent {
-			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Skip})
+			//check for the org admins
+			if user.IsAdmin != isAdmin {
+				userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.Username, IsAdmin: user.IsAdmin, ActionOps: pipeline.Update})
+			} else {
+				userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.Username, IsAdmin: user.IsAdmin, ActionOps: pipeline.Skip})
+			}
 		} else {
-			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.User.Username, ActionOps: pipeline.Insert})
+			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.Username, IsAdmin: user.IsAdmin, ActionOps: pipeline.Insert})
 		}
 	}
 	return userAssociation
 }
 
-func deleteActionForOrgUses(orgUsers []storage.OrgUser, userMemberJson pipeline.MemberJson) []pipeline.UserAssociation {
+func deleteActionForOrgUses(orgUsers []storage.OrgUser, chefServerOrgUsers []pipeline.UserAssociation) []pipeline.UserAssociation {
 	var userAssociation []pipeline.UserAssociation
-	orgUserJsonMap := createMapForOrgUsersInJson(userMemberJson)
+	orgUserJsonMap := createMapForOrgUsersInJson(chefServerOrgUsers)
 	for _, user := range orgUsers {
 		_, valuePresent := orgUserJsonMap[user.InfraServerUsername]
 		if !valuePresent {
-			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, ActionOps: pipeline.Delete})
+			userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, IsAdmin: user.IsAdmin, ActionOps: pipeline.Delete})
 		}
 	}
 
 	return userAssociation
 }
 
-func createMapForOrgUsersInDB(orgUsers []storage.OrgUser) map[string]string {
-	orgUsersMap := make(map[string]string)
+func createMapForOrgUsersInDB(orgUsers []storage.OrgUser) map[string]bool {
+	orgUsersMap := make(map[string]bool)
 	for _, s := range orgUsers {
-		orgUsersMap[s.InfraServerUsername] = ""
+		orgUsersMap[s.InfraServerUsername] = s.IsAdmin
 	}
 	return orgUsersMap
 }
 
-func createMapForOrgUsersInJson(userMemberJson pipeline.MemberJson) map[string]string {
+func createMapForOrgUsersInJson(chefServerOrgUsers []pipeline.UserAssociation) map[string]string {
 	orgUsersMap := make(map[string]string)
-	for _, s := range userMemberJson {
-		orgUsersMap[s.User.Username] = ""
+	for _, user := range chefServerOrgUsers {
+		orgUsersMap[user.Username] = ""
 	}
 	return orgUsersMap
 }
 
-func openOrgUser(orgName string, fileLocation string) pipeline.MemberJson {
-	var orgJson pipeline.MemberJson
-	jsonPath := path.Join(fileLocation, orgName, "members.json")
-	jsonFile, err := os.Open(jsonPath)
+// getChefServerOrgUsers returns the chef server organisation users from backup file
+func getChefServerOrgUsers(orgName, fileLocation string) ([]pipeline.UserAssociation, error) {
+	orgUsers := make([]pipeline.UserAssociation, 0)
+
+	members, err := getOrgMembers(orgName, fileLocation)
+	if err != nil {
+		log.Errorf("Unable to get orgnisation members %s", err)
+		return nil, err
+	}
+	admins, err := getOrgAdmins(orgName, fileLocation)
+	if err != nil {
+		log.Errorf("Unable to get orgnisation admins %s", err)
+		return nil, err
+	}
+	orgAdminMap := createMapForOrgAdminsInJson(admins)
+	for _, member := range members {
+		orgUser := pipeline.UserAssociation{}
+		if member.User.Username == "pivotal" {
+			continue
+		}
+		orgUser.Username = member.User.Username
+		_, valuePresent := orgAdminMap[member.User.Username]
+		if valuePresent {
+			orgUser.IsAdmin = true
+		}
+		orgUsers = append(orgUsers, orgUser)
+	}
+	return orgUsers, nil
+}
+
+// getOrgMembers Get the data of members.json
+func getOrgMembers(orgName, fileLocation string) ([]pipeline.MembersJson, error) {
+	var orgMembers []pipeline.MembersJson
+	usersJsonPath := path.Join(fileLocation, orgName, "members.json")
+	usersjsonFile, err := os.Open(usersJsonPath)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Errorf("Unable to open file at the location : %s", jsonPath)
+		log.Errorf("Unable to open org members file at the location : %s", usersJsonPath)
+		return nil, err
 	}
-	log.Info("Successfully opened the file at location", jsonPath)
+	log.Info("Successfully opened the org members file at location", usersJsonPath)
+	defer func() {
+		_ = usersjsonFile.Close()
+	}()
+	// defer the closing of our jsonFile so that we can parse it later on
+	err = json.NewDecoder(usersjsonFile).Decode(&orgMembers)
+	if err != nil {
+		log.Errorf("Unable to decode the org members file %s %s", usersJsonPath, err)
+		return nil, err
+	}
+	return orgMembers, nil
+}
+
+// getOrgAdmins Get the data of admins.json
+func getOrgAdmins(orgName, fileLocation string) (pipeline.AdminsJson, error) {
+	var orgAdmins pipeline.AdminsJson
+	adminJsonPath := path.Join(fileLocation, orgName, "groups", "admins.json")
+	jsonFile, err := os.Open(adminJsonPath)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		log.Errorf("Unable to open org admins file at the location : %s %s", adminJsonPath, err)
+		return pipeline.AdminsJson{}, err
+	}
+	log.Info("Successfully opened the org admins file at location", adminJsonPath)
 	defer func() {
 		_ = jsonFile.Close()
 	}()
 	// defer the closing of our jsonFile so that we can parse it later on
-	_ = json.NewDecoder(jsonFile).Decode(&orgJson)
-	return orgJson
+	err = json.NewDecoder(jsonFile).Decode(&orgAdmins)
+	if err != nil {
+		log.Errorf("Unable to decode the org admins file %s %s", adminJsonPath, err)
+		return pipeline.AdminsJson{}, err
+	}
+	return orgAdmins, nil
+}
+
+func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]string {
+	orgAdminsMap := make(map[string]string)
+	for _, username := range adminsJson.Users {
+		orgAdminsMap[username] = ""
+	}
+	return orgAdminsMap
 }

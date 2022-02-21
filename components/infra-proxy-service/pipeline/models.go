@@ -130,10 +130,15 @@ type OrgJson struct {
 	Guid     string `json:"guid"`
 }
 
-type MemberJson []struct {
-	User UserJson `json:"user"`
+type MembersJson struct {
+	User UsersJson `json:"user"`
 }
 
-type UserJson struct {
+type AdminsJson struct {
+	Name  string   `json:"name"`
+	Users []string `json:"users"`
+}
+
+type UsersJson struct {
 	Username string `json:"username"`
 }

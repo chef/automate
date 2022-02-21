@@ -126,6 +126,7 @@ type User struct {
 
 type OrgUser struct {
 	OrgId               string
+	IsAdmin             bool
 	InfraServerUsername string
 }
 
