@@ -185,27 +185,3 @@ func (p *postgres) getUsers(ctx context.Context, q querier, serverID string) ([]
 	return users, nil
 }
 
-func (p *postgres) GetUsers(ctx context.Context, serverID string) ([]storage.User, error) {
-	return p.getUsers(ctx, p.db, serverID)
-}
-
-func (p *postgres) getUsers(ctx context.Context, q querier, serverID string) ([]storage.User, error) {
-	var users []storage.User
-	rows, err := p.db.QueryContext(ctx, `SELECT u.id, u.server_id, u.infra_server_username, u.credential_id, u.connector,
-		u.automate_user_id, u.is_server_admin,u.created_at, u.updated_at FROM users u
-		WHERE u.server_id = $1`, serverID)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	for rows.Next() {
-		user := storage.User{}
-		if err := rows.Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector,
-			&user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-
-	}
-	return users, nil
-}
