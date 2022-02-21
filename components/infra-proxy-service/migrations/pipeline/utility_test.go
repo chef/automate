@@ -145,13 +145,15 @@ func TestGetUsersForBackup(t *testing.T) {
 		ctx:    context.Background(),
 		st:     &testDB.TestDB{},
 		mst:    &testDB.MigrationDB{},
-		result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testzip/backup", ServerID: "server1", MigrationID: "mig1"}},
+		result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/backup", ServerID: "server1", MigrationID: "mig1"}},
 	}
 
 	res, err := GetUsersForBackup(arg.ctx, arg.st, arg.mst, arg.result)
-	require.NoError(t, err)
-	require.NotNil(t, res)
 
+	require.NoError(t, err)
+	require.True(t, len(res.ParsedResult.Users) > 0)
+	require.NotEmpty(t, res)
+	require.NotEmpty(t, res.ParsedResult.Users)
 }
 
 func TestValidateZip(t *testing.T) {

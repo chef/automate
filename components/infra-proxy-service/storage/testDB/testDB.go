@@ -3,6 +3,7 @@ package testDB
 import (
 	"context"
 	"errors"
+
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
