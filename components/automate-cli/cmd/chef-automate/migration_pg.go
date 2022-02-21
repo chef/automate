@@ -164,8 +164,6 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 				err = pgMigrateExecutor()
 				if err != nil {
 					return err
-				} else {
-					ci.UpdatePostChecklistFile("migrate_pg")
 				}
 
 			} else {
@@ -436,6 +434,10 @@ func checkUpdateMigration(check bool) error {
 
 	if err != nil {
 		return err
+	}
+	if !check && err == nil {
+		ci := majorupgradechecklist.NewCRUDChecklist("3")
+		ci.UpdatePostChecklistFile("migrate_pg")
 	}
 	return nil
 }
