@@ -148,5 +148,6 @@ func TestValidateZip(t *testing.T) {
 
 	res, err := ValidateZip(arg.ctx, arg.st, arg.mst, arg.result)
 	require.NoError(t, err)
+	require.True(t, res.Meta.IsValid)
 	require.NotNil(t, res)
 }
