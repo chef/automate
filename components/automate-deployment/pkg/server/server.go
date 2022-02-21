@@ -1193,49 +1193,55 @@ func (s *server) isCompatibleForConverge(v1, v2 string) bool {
 // the configured channel. If neither are available, an error is
 // returned.
 func (s *server) nextManifest() (*manifest.A2, error) {
-	if s.shouldFetchManifest() {
-		ctx := context.Background()
-		currentVersion := s.deployment.CurrentReleaseManifest.Version()
-		_, _, nextVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), currentVersion)
+	if !s.shouldFetchManifest() {
+		return s.deployment.CurrentReleaseManifest, nil
+	}
+
+	ctx := context.Background()
+	var nextManifestVersion string
+	var err error
+
+	if s.deployment.CurrentReleaseManifest == nil {
+		nextManifest, err := s.releaseManifestProvider.GetCurrentManifest(context.Background(), s.deployment.Channel())
 		if err != nil {
 			logrus.WithError(err).Error("Could not fetch manifest")
 			if s.deployment.CurrentReleaseManifest == nil {
 				return nil, errors.New("Release manifest not available")
 			}
-
-			// Continue with last manifest even in the
-			// case of an error because we still want to
-			// converge
+			// Continue with last manifest even in the case of an error because we still want to converge
 			logrus.Info("Continuing converge with last known manifest")
 			return s.deployment.CurrentReleaseManifest, nil
 		}
-
-		// Never use an older manifest. If the user has
-		// explicitly upgraded to a manifest that is newer
-		// than what is the channel, we keep using our current
-		// manifest until the channel catches up.
-		if s.deployment.CurrentReleaseManifest != nil && s.isCompatibleForConverge(s.deployment.CurrentReleaseManifest.Version(), nextVersion) {
-			m, err := s.releaseManifestProvider.GetManifest(ctx, nextVersion)
-			if err != nil {
-				logrus.WithError(err).Error("Could not fetch manifest")
-				if s.deployment.CurrentReleaseManifest == nil {
-					return nil, errors.New("Release manifest not available")
-				}
-
-				// Continue with last manifest even in the
-				// case of an error because we still want to
-				// converge
-				logrus.Info("Continuing converge with last known manifest")
-				return s.deployment.CurrentReleaseManifest, nil
-			}
-			return m, nil
-		}
-
-		logrus.Infof("The next available version %s in channel %q requires a manual upgrade with --major flag from the current version %s. Thus, ignoring auto-upgrade",
-			s.deployment.Channel(),
-			nextVersion,
-			s.deployment.CurrentReleaseManifest.Version())
+		return nextManifest, nil
 	}
+
+	currentVersion := s.deployment.CurrentReleaseManifest.Version()
+	_, _, nextManifestVersion, err = s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), currentVersion)
+
+	if err != nil {
+		logrus.WithError(err).Error("Could not fetch next manifest version")
+
+		// Continue with last manifest even in the case of an error because we still want to converge
+		logrus.Info("Continuing converge with last known manifest")
+		return s.deployment.CurrentReleaseManifest, nil
+	}
+	// Never use an older manifest. If the user has explicitly upgraded to a manifest that is newer
+	// than what is the channel, we keep using our current manifest until the channel catches up.
+	if s.isCompatibleForConverge(s.deployment.CurrentReleaseManifest.Version(), nextManifestVersion) {
+		m, err := s.releaseManifestProvider.GetManifest(ctx, nextManifestVersion)
+		if err != nil {
+			logrus.WithError(err).Error("Could not fetch manifest")
+			if s.deployment.CurrentReleaseManifest == nil {
+				return nil, errors.New("Release manifest not available")
+			}
+			// Continue with last manifest even in the case of an error because we still want to converge
+			logrus.Info("Continuing converge with last known manifest")
+			return s.deployment.CurrentReleaseManifest, nil
+		}
+		return m, nil
+	}
+	logrus.Infof("The next available version %s in channel %q requires a manual upgrade with --major flag from the current version %s. Thus, ignoring auto-upgrade",
+		s.deployment.Channel(), nextManifestVersion, s.deployment.CurrentReleaseManifest.Version())
 
 	return s.deployment.CurrentReleaseManifest, nil
 }
