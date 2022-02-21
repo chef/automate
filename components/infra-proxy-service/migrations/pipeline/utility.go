@@ -673,7 +673,9 @@ func insertUpdateSkipUser(serverUser []pipeline.User, automateUser []storage.Use
 }
 func skipOrUpdate(autoMap map[string]storage.User, sUser pipeline.User) pipeline.User {
 	if autoMap[sUser.Username].InfraServerUsername == sUser.Username {
-		if autoMap[sUser.Username].InfraServerUsername == sUser.Username && autoMap[sUser.Username].Email == sUser.Email {
+		if autoMap[sUser.Username].InfraServerUsername == sUser.Username && autoMap[sUser.Username].Email == sUser.Email &&
+			autoMap[sUser.Username].DisplayName == sUser.DisplayName && autoMap[sUser.Username].FirstName == sUser.FirstName &&
+			autoMap[sUser.Username].LastName == sUser.LastName && autoMap[sUser.Username].MiddleName == sUser.MiddleName {
 			sUser.ActionOps = pipeline.Skip
 			return sUser
 
