@@ -122,14 +122,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, "")
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to start upgrade failed",
-			)
-		}
+		ci := majorupgradechecklist.NewCRUDChecklist("3")
 
 		isExecuted, err := ci.ReadPostChecklistById("migrate_pg")
 		if err != nil {
