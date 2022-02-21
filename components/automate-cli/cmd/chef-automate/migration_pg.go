@@ -51,8 +51,8 @@ const (
 )
 
 func init() {
-	migrateCmd.AddCommand(newMigratePgCmd())
-	migrateCmd.AddCommand(newRemovePgDatadirCmd())
+	migrateCmd.AddCommand(newMigrateDataCmd())
+	migrateCmd.AddCommand(newClearDataCmd())
 	RootCmd.AddCommand(migrateCmd)
 }
 
@@ -62,30 +62,30 @@ var migrateCmd = &cobra.Command{
 	Hidden: true,
 }
 
-func newRemovePgDatadirCmd() *cobra.Command {
-	var removePgDatadirCmd = &cobra.Command{
+func newClearDataCmd() *cobra.Command {
+	var clearDataCmd = &cobra.Command{
 		Use:   "clear-data",
 		Short: "Chef Automate post-major-upgrade clear-data",
 		Long:  "Chef Automate post-major-upgrade to clear old pg data",
 		RunE:  runCleanup,
 	}
-	removePgDatadirCmd.PersistentFlags().StringVar(&ClearDataCmdFlags.data, "data", "", "data")
-	removePgDatadirCmd.PersistentFlags().BoolVarP(&ClearDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
-	return removePgDatadirCmd
+	clearDataCmd.PersistentFlags().StringVar(&ClearDataCmdFlags.data, "data", "", "data")
+	clearDataCmd.PersistentFlags().BoolVarP(&ClearDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
+	return clearDataCmd
 }
 
-func newMigratePgCmd() *cobra.Command {
-	var migratePgCmd = &cobra.Command{
+func newMigrateDataCmd() *cobra.Command {
+	var migrateDataCmd = &cobra.Command{
 		Use:   "migrate",
 		Short: "Chef Automate post-major-upgrade migrate",
 		Long:  "Chef Automate migrate. migrate can be used to migrate pg or migrate es",
-		RunE:  runMigratePgCmd,
+		RunE:  runMigrateDataCmd,
 	}
-	migratePgCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
-	migratePgCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
-	migratePgCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
-	migratePgCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "fore-execute")
-	return migratePgCmd
+	migrateDataCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
+	migrateDataCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
+	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
+	migrateDataCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "fore-execute")
+	return migrateDataCmd
 }
 
 func runCleanup(cmd *cobra.Command, args []string) error {
@@ -117,7 +117,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runMigratePgCmd(cmd *cobra.Command, args []string) error {
+func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
