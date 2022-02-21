@@ -24,7 +24,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 	"github.com/chef/automate/lib/tracing"
 
-	server "github.com/chef/automate/components/infra-proxy-service/server"
+	"github.com/chef/automate/components/infra-proxy-service/server"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -125,7 +125,7 @@ func SetupInfraProxyService(ctx context.Context,
 
 	localUserClient := local_users_api.NewMockUsersMgmtServiceClient(gomock.NewController(t))
 
-	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient,authzProjectClient, localUserClient)
+	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient, localUserClient)
 
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)

@@ -22,6 +22,11 @@ port = 10130
 host = "localhost"
 port = 10131
 
+[local-user]
+host ="localhost"
+port = 9092
+
+
 [storage]
 database = "chef_infra_proxy"
 user = "chef_infra"

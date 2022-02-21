@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/chef/automate/api/interservice/local_user"
+
 	"io"
 	"io/ioutil"
 	"os"
@@ -338,9 +340,6 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
-
-	_ = reader.Close()
-
 	_ = reader.Close()
 	_, err = mst.CompleteUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
 	if err != nil {
@@ -575,7 +574,7 @@ func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]stri
 
 }
 
-func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+func GetUsersForBackup(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("starting with user parseing phase for migration id: ", result.Meta.MigrationID)
 
 	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
@@ -602,7 +601,7 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.Migr
 	var mappedUsers []pipeline.User
 
 	mappedUsers = append(mappedUsers, deleteUser(serverUsers, automateUsers)...)
-	mappedUsers = append(mappedUsers, insertUpdateSkipUser(serverUsers, automateUsers)...)
+	mappedUsers = append(mappedUsers, insertUpdateSkipUser(ctx, serverUsers, automateUsers, localUserClient)...)
 
 	result.ParsedResult.Users = mappedUsers
 	return result, nil
@@ -610,7 +609,7 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, mst storage.Migr
 
 // Clean serialized_object and Polulate Users struct
 func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
-	var users []pipeline.User
+	users := make([]pipeline.User, 0)
 	for _, kd := range keyDump {
 		sec := map[string]string{}
 		if err := json.Unmarshal([]byte(kd.SerializedObject), &sec); err != nil {
@@ -645,11 +644,12 @@ func serverMap(server []pipeline.User) map[string]pipeline.User {
 	return autoMap
 }
 
-func insertUpdateSkipUser(serverUser []pipeline.User, automateUser []storage.User) []pipeline.User {
+func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, automateUser []storage.User, localUserClient local_user.UsersMgmtServiceClient) []pipeline.User {
 	var parsedUsers []pipeline.User
 	autoMap := automateMap(automateUser)
 	for _, sUser := range serverUser {
-
+		userExists := checkUserExist(ctx, localUserClient, sUser)
+		sUser.IsConflicting = userExists
 		if autoMap[sUser.Username].InfraServerUsername != "" {
 			emptyVal := pipeline.User{}
 			returnedVal := skipOrUpdate(autoMap, sUser)
@@ -664,11 +664,8 @@ func insertUpdateSkipUser(serverUser []pipeline.User, automateUser []storage.Use
 				sUser.ActionOps = pipeline.Insert
 				parsedUsers = append(parsedUsers, sUser)
 			}
-
 		}
-
 	}
-
 	return parsedUsers
 }
 func skipOrUpdate(autoMap map[string]storage.User, sUser pipeline.User) pipeline.User {
@@ -702,13 +699,13 @@ func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipel
 	return parsedUsers
 }
 
-func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) (bool, error) {
+func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) bool {
 	_, err := localUserClient.GetUser(ctx, &local_user.Email{Email: user.AutomateUsername})
 	if err != nil {
 		log.Errorf("Unable to fetch user")
-		return false, nil
+		return false
 	}
-	return true, nil
+	return true
 }
 
 

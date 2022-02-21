@@ -135,21 +135,22 @@ func TestCreatePreview(t *testing.T) {
 
 func TestGetUsersForBackup(t *testing.T) {
 	type args struct {
-		ctx    context.Context
-		st     storage.Storage
-		mst    storage.MigrationStorage
-		result pipeline.Result
+		ctx             context.Context
+		st              storage.Storage
+		localUserClient *local_user.MockUsersMgmtServiceClient
+		result          pipeline.Result
 	}
 
 	arg := args{
-		ctx:    context.Background(),
-		st:     &testDB.TestDB{},
-		mst:    &testDB.MigrationDB{},
-		result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/backup", ServerID: "server1", MigrationID: "mig1"}},
+		ctx:             context.Background(),
+		st:              &testDB.TestDB{},
+		localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)),
+		result:          pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/backup", ServerID: "server1", MigrationID: "mig1"}},
 	}
 
-	res, err := GetUsersForBackup(arg.ctx, arg.st, arg.mst, arg.result)
-
+	res, err := GetUsersForBackup(arg.ctx, arg.st, arg.localUserClient, arg.result)
+	//userResponse := &local_user.User{Id: "user1234", Name: "user1234"}
+	//t.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(userResponse, nil)
 	require.NoError(t, err)
 	require.True(t, len(res.ParsedResult.Users) > 0)
 	require.NotEmpty(t, res)
@@ -273,10 +274,7 @@ func TestUserExists(t *testing.T) {
 				tt.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(userResponse, nil)
 			}
 
-			got, gotError := checkUserExist(tt.args.ctx, tt.args.localUserClient, tt.args.User)
-			if gotError != nil && gotError.Error() != tt.wantError.Error() {
-				//t.Errorf("StoreOrg() got = %v, want %v", got, tt.want)
-			}
+			got := checkUserExist(tt.args.ctx, tt.args.localUserClient, tt.args.User)
 			if got != tt.want1 {
 				t.Errorf("checkUserExists() got1 = %v, want %v", got, tt.want1)
 			}
