@@ -93,43 +93,43 @@ variable "elasticsearch_server_instance_type" {
   default = "m5a.large"
 }
 
-variable "managed_elasticsearch_domain_url"{
+variable "managed_elasticsearch_certificate" {
   default = ""
 }
 
-variable "managed_elasticsearch_username"{
+variable "managed_elasticsearch_domain_url" {
   default = ""
 }
 
-variable "managed_elasticsearch_user_password"{
+variable "managed_elasticsearch_user_password" {
   default = ""
 }
 
-variable "managed_elasticsearch_certificate"{
-  default = ""
-}
-
-variable "managed_rds_instance_url"{
-  default = ""
-}
-
-variable "managed_rds_superuser_username"{
-  default = ""
-}
-
-variable "managed_rds_superuser_password"{
-  default = ""
-}
-
-variable "managed_rds_dbuser_username"{
-  default = ""
-}
-
-variable "managed_rds_dbuser_password"{
+variable "managed_elasticsearch_username" {
   default = ""
 }
 
 variable "managed_rds_certificate" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_password" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_username" {
+  default = ""
+}
+
+variable "managed_rds_instance_url" {
+  default = ""
+}
+
+variable "managed_rds_superuser_password" {
+  default = ""
+}
+
+variable "managed_rds_superuser_username" {
   default = ""
 }
 
