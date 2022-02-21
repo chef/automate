@@ -130,7 +130,6 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		if isExecuted {
-			fmt.Println(migrateDataCmdFlags.forceExecute)
 			if migrateDataCmdFlags.forceExecute {
 				isExecuted = false
 			} else {
