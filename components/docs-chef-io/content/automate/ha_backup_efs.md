@@ -61,9 +61,9 @@ automate-backend-ctl applied --svc=automate-backend-elasticsearch | tail -n +2 >
 1. Edit `es_config.toml` to add the following settings at the end of the file:
 
 ```ruby
-[es_yaml.path]
-   # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
-   repo = "/mnt/automate_backups/elasticsearch"
+[es_yaml.path]   
+   # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb   
+   repo = "/mnt/automate_backups/elasticsearch" 
 ```
 
 {{< note >}}
@@ -76,8 +76,8 @@ This file may be empty if credentials are never rotated.
 
 ```ruby
 hab config apply automate-backend-elasticsearch.default $(date '+%s') es_config.toml
-hab svc status (check elasticsearch service is up or not)
-curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u admin:admin
+hab svc status (check elasticsearch service is up or not) 
+curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u admin:admin  
    # Watch for a message about Elasticsearch going from RED to GREEN
 `journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
 ```

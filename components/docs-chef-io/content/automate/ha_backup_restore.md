@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 380
 +++
 
-Computer security is the safeguarding of computer systems and data against theft, illegal access, or against any disaster. It's the method of guarding against and detecting illegal access to your computer system. Data security refers to the process of securing data from illegal access or any disaster. This process includes the following terms:
+Computer security is the safeguarding of computer systems and data against theft, illegal access, or against any disaster. It’s the method of guarding against and detecting illegal access to your computer system. Data security refers to the process of securing data from illegal access or any disaster. This process includes the following terms:
 
 - Data Backup
 - Data Restore
@@ -22,7 +22,7 @@ Computer security is the safeguarding of computer systems and data against theft
 
 Backup refers to the process of making copies of data or data files to use in the event the original data or data files are lost or destroyed.
 
-In information technology, a backup or data backup is a copy of computer data taken and stored elsewhere to restore the original after a data loss event. A backup system contains at least one copy of all data considered worth saving. The data storage requirements can be large. An information repository model may be used to provide structure to this storage. Typically, backup data includes all the data--such as documents, media files, configuration and registry files, and machine images. required to perform the workload on your server.
+In information technology, a backup or data backup is a copy of computer data taken and stored elsewhere to restore the original after a data loss event. A backup system contains at least one copy of all data considered worth saving. The data storage requirements can be large. An information repository model may be used to provide structure to this storage. Typically, backup data includes all the data – documents, media files, configuration and registry files, machine images, etc. required to perform the workload on your server.
 
 ## What is Data Restore?
 

@@ -1,5 +1,5 @@
 +++
-title = "High Availability - System and Software Requirements"
+title = "High Availability (HA) Architecture"
 
 draft = false
 
@@ -7,13 +7,13 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "High Availability - System and Software Requirements"
+    title = "High Availability (HA) Architecture"
     parent = "automate/install"
-    identifier = "automate/install/ha_system_requirements.md High Availability - System and Software Requirements"
-    weight = 240
+    identifier = "automate/install/ha_architecture_reference.md High Availability (HA) Architecture"
+    weight = 220
 +++
 
-This section lists the recommended operating systems requirements, virtual machine instances requirements, and VPC requirements for implementing Chef Automate High Availability (HA) for your network infrastructure or systems or applications or services.
+This section includes Chef Automate High Availability (HA) high-level reference architecture that interacts with the HA backend components on different providers or environments.
 
 ## Architecture Reference
 
@@ -21,7 +21,7 @@ The following Chef Automate HA architecture diagram shows the components involve
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
 
-All application service, secret, recovery, data are stored in the PostgreSQL. Compliance and client run data that are generated on time to time basis and requiring data to be accessible in real-time are stored in Elastic search. Load balancer distributes to each of the automate components.
+All application service, secret, recovery, data are stored in the Postgress. Compliance and client-run data that are generated on a time to time basis and requiring data to be accessible in real-time are stored in Elastic search. The Load balancer distributes to each of the automate components.
 
 **Journalbeat** and **Metricbeat** are common for all database instances. **Journalbeat** installed as an agent on the servers collects all the services logs and forwards them to Elasticsearch. **Metricbeat** installed on the servers periodically collects metrics from the operating system and services running on the server and sends them to the **Kibana**.
 

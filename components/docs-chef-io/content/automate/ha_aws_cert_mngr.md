@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 330
 +++
 
-This page explains how to use the AWS Certificate Manager (ACM) console to generate a public ACM certificate, which is required to create a Load Balancer (LB).
+This page explains how to use the AWS Certificate Manager (ACM) console to generate a public ACM certificate, which is required to create a Load Balancer (LB). 
 
 You can either generate a new public certificate or copy an existing Amazon Resource Name (ARN) value of the certificate of your selected region in the AWS console.
 

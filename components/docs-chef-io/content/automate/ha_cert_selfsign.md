@@ -21,7 +21,7 @@ Certificates should be rotated periodically, to ensure optimal security.
 
 ## What are Self Signed Certificates?
 
-A self signed certificate is a digital certificate that is not signed by a publicly trusted certificate authority (CA). They are created, issued, and signed by the company or developer who is responsible for the website or software being signed. The private key used in such certificate is not validated by a third party and is generally used in low-risk internal networks or in the software development phase. In addition, unlike CA-issued certificates, self-signed certificates cannot be revoked.
+A self signed certificate is a digital certificate that’s not signed by a publicly trusted certificate authority (CA). They are created, issued, and signed by the company or developer who is responsible for the website or software being signed. The private key used in such certificate is not validated by a third party and is generally used in low-risk internal networks or in the software development phase. In addition, unlike CA-issued certificates, self-signed certificates cannot be revoked.
 
 ## Certificate Creation
 
