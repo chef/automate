@@ -131,7 +131,6 @@ func TestCreatePreview(t *testing.T) {
 	}
 }
 
-
 func TestValidateZip(t *testing.T) {
 	type args struct {
 		name        string
@@ -179,11 +178,10 @@ func TestValidateZip(t *testing.T) {
 				require.True(t, res.Meta.IsValid)
 				require.NotEmpty(t, res.Meta.UnzipFolder)
 			}
-   })
-  }
+		})
+	}
 }
-          
-          
+
 func TestUserOrgAssociation(t *testing.T) {
 	deleteBackUp := "../../testdata/deleteBackup/"
 	skipBackup := "../../testdata/skipBackup/"

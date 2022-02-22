@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 
 	"errors"
-	"fmt"
 
 	"io"
 	"os"
@@ -345,7 +344,6 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	}
 	return result, nil
 }
-
 
 func ValidateZip(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var err error
