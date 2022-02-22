@@ -49,7 +49,7 @@
                 <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
               </li>
               <li>
-                <span *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted || !migrationInProgress" class="heading">Last Migration Status </span>
+                <span data-cy="lastStatus" *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted || !migrationInProgress" class="heading">Last Migration Status </span>
                 <!-- Completed status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value">
                   <img src='../../../../assets/img/completed.png' alt="info" />
