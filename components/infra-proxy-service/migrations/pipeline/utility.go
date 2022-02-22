@@ -368,7 +368,7 @@ func ValidateZip(ctx context.Context, st storage.Storage, mst storage.MigrationS
 	_, err = os.Stat(result.Meta.UnzipFolder + "/key_dump.json")
 	if err != nil {
 		log.Errorf("Failed to validate unzip folder for migration id %s : %s", result.Meta.MigrationID, err.Error())
-		return result, errors.New("cannot find keydump.json at organizations level")
+		return result, err
 	}
 
 	result.Meta.IsValid = true
