@@ -604,6 +604,7 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 			MiddleName:  sec["middle_name"],
 		}
 		user.SetConnector(kd.ExternalAuthenticationUID)
+		user.SetAutomateUsername(kd.ExternalAuthenticationUID)
 		users = append(users, *user)
 	}
 	return users
