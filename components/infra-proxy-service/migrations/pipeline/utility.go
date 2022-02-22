@@ -4,6 +4,9 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
+
+	"errors"
+
 	"io"
 	"os"
 	"path"
@@ -342,6 +345,37 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 	return result, nil
 }
 
+func ValidateZip(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+	var err error
+	foundOrg := false
+	// Find under unzip folder where org folder exists
+	if err := filepath.Walk(result.Meta.UnzipFolder, func(path string, f os.FileInfo, err error) error {
+
+		// check if base path is `organizations`
+		if filepath.Base(path) == "organizations" {
+			// reassign unzipFolder
+			foundOrg = true
+			result.Meta.UnzipFolder = filepath.Dir(path)
+		}
+		return nil
+	}); err != nil {
+		log.Errorf("Failed to find organizations folder for migration id %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+	if !foundOrg {
+		return result, errors.New("cannot find organizations folder")
+	}
+	// Check if the reassigned unzip folder contains key_dump.json
+	_, err = os.Stat(result.Meta.UnzipFolder + "/key_dump.json")
+	if err != nil {
+		log.Errorf("Failed to validate unzip folder for migration id %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+
+	result.Meta.IsValid = true
+	return result, nil
+}
+
 // ParseOrgUserAssociation  sync the automate org users with chef server org users
 func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("Starting with the parsing org user association for migration id :", result.Meta.MigrationID)
@@ -534,4 +568,5 @@ func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]stri
 		orgAdminsMap[username] = ""
 	}
 	return orgAdminsMap
+
 }
