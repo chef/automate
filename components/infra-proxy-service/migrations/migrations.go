@@ -307,7 +307,7 @@ func (s *MigrationServer) StoreStagedData(ctx context.Context, migrationId strin
 }
 
 // ConfirmPreview trigger the preview pipline
-func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreview) (*response.ConfirmPreview, error) {
+func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreviewRequest) (*response.ConfirmPreviewResponse, error) {
 	// Validate all request fields are required
 	// err := validation.New(validation.Options{
 	// 	Target:          "server",
@@ -327,7 +327,7 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	// call pipeline function to trigger the phase 2 pipeline
 	go s.phaseTwoPipeline.Run(migrationStage.StagedData, s.service)
 
-	return &response.ConfirmPreview{
+	return &response.ConfirmPreviewResponse{
 		MigrationId: req.MigrationId,
 	}, nil
 }
