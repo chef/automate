@@ -1363,7 +1363,6 @@ func (s *server) doConverge(
 
 		errHandler(eDeploy.err)
 		// json file
-		fmt.Println(os.Getenv(isUpgradeMajorEnv))
 		if os.Getenv(isUpgradeMajorEnv) == "true" {
 			ci := majorupgradechecklist.NewCRUDChecklist(s.deployment.CurrentReleaseManifest.Version())
 			err = ci.CreatePostChecklistFile()
