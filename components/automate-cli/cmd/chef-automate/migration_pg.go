@@ -34,6 +34,7 @@ var ClearDataCmdFlags = struct {
 var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220120092917/bin"
 
 const (
+	AUTOMATE_VERSION            = "3"
 	AUTOMATE_PG_MIGRATE_LOG_DIR = "/tmp"
 	OLD_PG_VERSION              = "9.6"
 	NEW_PG_VERSION              = "13.5"
@@ -122,7 +123,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
-		ci := majorupgradechecklist.NewCRUDChecklist("3")
+		ci := majorupgradechecklist.NewCRUDChecklist(AUTOMATE_VERSION)
 
 		isExecuted, err := ci.ReadPostChecklistById("migrate_pg")
 		if err != nil {
@@ -260,7 +261,7 @@ func vacuumDb() error {
 	os.Setenv("PGSSLROOTCERT", PGSSLROOTCERT)
 
 	args := []string{
-		"/temp/analyze_new_cluster.sh",
+		AUTOMATE_PG_MIGRATE_LOG_DIR + "/analyze_new_cluster.sh",
 	}
 
 	err := executeCommand("/bin/sh", args, "")
@@ -284,9 +285,9 @@ func cleanUp() error {
 
 	args := []string{
 		"-rf",
-		"/temp/analyze_new_cluster.sh",
-		"/temp/delete_old_cluster.sh",
-		"/temp/pgmigrate.log",
+		AUTOMATE_PG_MIGRATE_LOG_DIR + "/analyze_new_cluster.sh",
+		AUTOMATE_PG_MIGRATE_LOG_DIR + "delete_old_cluster.sh",
+		AUTOMATE_PG_MIGRATE_LOG_DIR + "/pgmigrate.log",
 	}
 	err := executeCommand("rm", args, "")
 	if err != nil {
@@ -436,7 +437,7 @@ func checkUpdateMigration(check bool) error {
 		return err
 	}
 	if !check && err == nil {
-		ci := majorupgradechecklist.NewCRUDChecklist("3")
+		ci := majorupgradechecklist.NewCRUDChecklist(AUTOMATE_VERSION)
 		ci.UpdatePostChecklistFile("migrate_pg")
 	}
 	return nil
@@ -547,7 +548,7 @@ func promptCheckList(message string) error {
 		return err
 	}
 	if !strings.Contains(strings.ToUpper(response), "Y") {
-		return errors.New("canceled")
+		return errors.New("cancelled")
 	}
 	return nil
 }
