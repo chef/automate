@@ -246,4 +246,62 @@ describe('chef server details', () => {
       cy.get('app-notification.info chef-icon').click({ multiple: true });
     });
   });
+
+  function getPreviewData(migration_id: string) {
+    return cy.fixture('infra-proxy/previewData.json');
+  }
+
+  function checkResponse(response: any) {
+    if (response.body.staged_data) {
+      console.log("-----------checkResponse----------",response.body);
+
+    }
+  }
+
+  describe('if migration process started', () => {
+    let isStarted = true;
+    beforeEach(() => {
+      cy.fixture('infra-proxy/migrationStatus.json').then(data => {
+        data.migrationStatus = data;
+        data.migration_type = data.migrationStatus.migration_type;
+        const migration_status = data.migrationStatus.migration_status;
+      });
+    })
+
+    it('sync in progress visible', () => {
+      const element = '[data-cy=lastStatus]';
+      cy.get('body').then((body) => {
+        
+        if (body.find(element).length > 0) {
+          isStarted = false;
+            console.log('into', isStarted)
+        }
+      });
+    })
+
+    it('preview button is not available if migration is not in create preview mode', () => {
+      if(isStarted === true) {
+        cy.get('[data-cy=sync-button]').contains('Sync In Progress');
+        cy.get('[data-cy=show-preview]').contains('Click to Preview').should('not.exist');
+      }
+    });
+
+    it('check preview is available', () => {
+      if(isStarted === true) {
+        cy.get('[data-cy=lastStatus]').then(() => {
+            cy.get('[data-cy=show-preview]').contains('Click to Preview').click();
+            getPreviewData('',).then((response) => {
+              checkResponse(response);
+            });
+            cy.get('app-chef-server-details .sidenav-header').should('exist');
+
+            cy.get('[data-cy=confirm-migration-button]').click();
+            cy.get('app-chef-server-details .sidenav-header').should('not.be.visible');
+
+            cy.get('app-notification.info').contains('Confirm preview successful.');
+            cy.get('app-notification.info chef-icon').click({ multiple: true });
+        });
+      } 
+    })
+  });
 });
