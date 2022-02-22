@@ -493,10 +493,10 @@ func getOrgMembers(orgName, fileLocation string) ([]pipeline.MembersJson, error)
 		return nil, err
 	}
 	log.Info("Successfully opened the org members file at location", usersJsonPath)
+	// defer the closing of our jsonFile so that we can parse it later on
 	defer func() {
 		_ = usersjsonFile.Close()
 	}()
-	// defer the closing of our jsonFile so that we can parse it later on
 	err = json.NewDecoder(usersjsonFile).Decode(&orgMembers)
 	if err != nil {
 		log.Errorf("Unable to decode the org members file %s %s", usersJsonPath, err)
@@ -516,10 +516,10 @@ func getOrgAdmins(orgName, fileLocation string) (pipeline.AdminsJson, error) {
 		return pipeline.AdminsJson{}, err
 	}
 	log.Info("Successfully opened the org admins file at location", adminJsonPath)
+	// defer the closing of our jsonFile so that we can parse it later on
 	defer func() {
 		_ = jsonFile.Close()
 	}()
-	// defer the closing of our jsonFile so that we can parse it later on
 	err = json.NewDecoder(jsonFile).Decode(&orgAdmins)
 	if err != nil {
 		log.Errorf("Unable to decode the org admins file %s %s", adminJsonPath, err)
