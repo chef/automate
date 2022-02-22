@@ -1,7 +1,7 @@
 +++
 title = "High Availability - System and Software Requirements"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
@@ -12,8 +12,6 @@ gh_repo = "automate"
     identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
     weight = 200
 +++
-
-## System & Software Requirements
 
 This section lists the recommended operating systems requirements, virtual machine instances requirements, and VPC requirements for implementing Chef Automate High Availability (HA) for your network infrastructure or systems or applications or services.
 

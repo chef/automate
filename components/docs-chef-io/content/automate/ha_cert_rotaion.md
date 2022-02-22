@@ -1,7 +1,7 @@
 +++
 title = "Certificate Rotation"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

@@ -1,7 +1,7 @@
 +++
 title = "IAM Users"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

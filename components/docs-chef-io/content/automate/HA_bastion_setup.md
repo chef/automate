@@ -1,7 +1,7 @@
 +++
 title = "HA Bastion Setup"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

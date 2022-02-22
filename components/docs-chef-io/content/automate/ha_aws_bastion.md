@@ -1,7 +1,7 @@
 +++
 title = "Configuring Bastion for AWS Deployment Type"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

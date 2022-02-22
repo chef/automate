@@ -1,7 +1,7 @@
 +++
 title = "VPC and CIDR Setup"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
