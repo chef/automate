@@ -211,9 +211,9 @@ func parseUserSrc(result <-chan PipelineData, service *service.Service) <-chan P
 			res.Result = result
 
 			// Update completion of parsing user
-			_, err = service.Migration.CompleteUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
+			_, err = service.Migration.CompleteUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				log.Errorf("Failed to update `CompleteUnzip` status in DB: %s :%s", result.Meta.MigrationID, err)
+				log.Errorf("Failed to update `CompleteUsersParsing` status in DB: %s :%s", result.Meta.MigrationID, err)
 			}
 
 			select {
