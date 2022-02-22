@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -345,17 +346,29 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 
 func ValidateZip(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var err error
-	unzipFolder := result.Meta.UnzipFolder
+	foundOrg := false
+	// Find under unzip folder where org folder exists
+	if err := filepath.Walk(result.Meta.UnzipFolder, func(path string, f os.FileInfo, err error) error {
 
-	_, err = os.Stat(unzipFolder + "/organizations")
-	if err != nil {
-		log.Errorf("Failed to validate unzip folder for migration id %s : %s", result.Meta.MigrationID, err.Error())
+		// check if base path is `organizations`
+		if filepath.Base(path) == "organizations" {
+			// reassign unzipFolder
+			foundOrg = true
+			result.Meta.UnzipFolder = filepath.Dir(path)
+		}
+		return nil
+	}); err != nil {
+		log.Errorf("Failed to find organizations folder for migration id %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
-	_, err = os.Stat(unzipFolder + "/key_dump.json")
+	if !foundOrg {
+		return result, errors.New("cannot find organizations folder")
+	}
+	// Check if the reassigned unzip folder contains key_dump.json
+	_, err = os.Stat(result.Meta.UnzipFolder + "/key_dump.json")
 	if err != nil {
 		log.Errorf("Failed to validate unzip folder for migration id %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
+		return result, errors.New("cannot find keydump.json at organizations level")
 	}
 
 	result.Meta.IsValid = true

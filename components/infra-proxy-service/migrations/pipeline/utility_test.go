@@ -133,21 +133,51 @@ func TestCreatePreview(t *testing.T) {
 
 func TestValidateZip(t *testing.T) {
 	type args struct {
-		ctx    context.Context
-		st     storage.Storage
-		mst    storage.MigrationStorage
-		result pipeline.Result
+		name        string
+		ctx         context.Context
+		st          storage.Storage
+		mst         storage.MigrationStorage
+		result      pipeline.Result
+		requiredErr string
 	}
 
-	arg := args{
-		ctx:    context.Background(),
-		st:     &testDB.TestDB{},
-		mst:    &testDB.MigrationDB{},
-		result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/backup", ServerID: "server1", MigrationID: "mig1"}},
+	arg := []args{
+		{
+			name:   "Validated",
+			ctx:    context.Background(),
+			st:     &testDB.TestDB{},
+			mst:    &testDB.MigrationDB{},
+			result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/backup", ServerID: "server1", MigrationID: "mig1"}},
+			// requiredErr: nil,
+		},
+		{
+			name:        "Organization not found",
+			ctx:         context.Background(),
+			st:          &testDB.TestDB{},
+			mst:         &testDB.MigrationDB{},
+			result:      pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/orgnotfound", ServerID: "server1", MigrationID: "mig1"}},
+			requiredErr: "cannot find organizations folder",
+		},
+		{
+			name:        "KeyDump not found",
+			ctx:         context.Background(),
+			st:          &testDB.TestDB{},
+			mst:         &testDB.MigrationDB{},
+			result:      pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/keydumpnotfound", ServerID: "server1", MigrationID: "mig1"}},
+			requiredErr: "cannot find keydump.json at organizations level",
+		},
 	}
 
-	res, err := ValidateZip(arg.ctx, arg.st, arg.mst, arg.result)
-	require.NoError(t, err)
-	require.True(t, res.Meta.IsValid)
-	require.NotNil(t, res)
+	for _, ar := range arg {
+		t.Run(ar.name, func(t *testing.T) {
+			res, err := ValidateZip(ar.ctx, ar.st, ar.mst, ar.result)
+			if err != nil {
+				require.EqualError(t, err, ar.requiredErr)
+			} else {
+				require.True(t, res.Meta.IsValid)
+				require.NotEmpty(t, res.Meta.UnzipFolder)
+			}
+
+		})
+	}
 }
