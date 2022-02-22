@@ -1,5 +1,6 @@
 package pipeline
 
+// Set Connector field
 func (usr *User) SetConnector(uid interface{}) {
 	if uid == nil {
 		usr.Connector = Local
@@ -8,6 +9,7 @@ func (usr *User) SetConnector(uid interface{}) {
 	}
 }
 
+// Set AutomateUsername field
 func (usr *User) SetAutomateUsername(uid interface{}) {
 	if uid == nil {
 		usr.AutomateUsername = usr.Username
