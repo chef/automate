@@ -103,7 +103,7 @@ func serve(cmd *cobra.Command, args []string) {
 
 	localUserConn, err := connFactory.Dial("local-user-service", cfg.LocalUserAddress)
 	if err != nil {
-		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
+		fail(errors.Wrapf(err, "failed to dial local-user-service at (%s)", cfg.LocalUserAddress))
 	}
 
 	//Local user service client

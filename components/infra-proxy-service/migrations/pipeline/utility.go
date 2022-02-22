@@ -687,6 +687,7 @@ func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipel
 func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) bool {
 	_, err := localUserClient.GetUser(ctx, &local_user.Email{Email: user.AutomateUsername})
 	if err != nil {
+		log.Errorf(err.Error())
 		log.Errorf("Unable to fetch user")
 		return false
 	}
