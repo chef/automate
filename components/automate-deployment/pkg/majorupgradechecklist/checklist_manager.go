@@ -49,7 +49,7 @@ func NewChecklistManager(writer cli.FormatWriter, version, major string) (PreChe
 	}
 
 	switch major {
-	case "4":
+	case "3":
 		return NewV3ChecklistManager(writer, version), nil
 	default:
 		return nil, status.Errorf(status.UpgradeError, "invalid major version")
