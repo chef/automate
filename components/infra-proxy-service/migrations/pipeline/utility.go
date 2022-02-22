@@ -371,14 +371,14 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 		if org.ActionOps == pipeline.Insert {
 			userAssociations = append(userAssociations, createInsertUserAssociation(chefServerOrgUsers)...)
 		} else {
-			orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
-			if err != nil {
-				log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
-				return nil, err
-			}
 			if org.ActionOps == pipeline.Delete {
 				userAssociations = append(userAssociations, createDeleteUserAssociation(chefServerOrgUsers)...)
 			} else {
+				orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
+				if err != nil {
+					log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
+					return nil, err
+				}
 				userAssociations = append(userAssociations, insertOrUpdateActionForOrgUsers(orgUsersInDb, chefServerOrgUsers)...)
 				userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, chefServerOrgUsers)...)
 			}
