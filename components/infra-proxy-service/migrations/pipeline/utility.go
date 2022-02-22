@@ -9,7 +9,6 @@ import (
 	"github.com/chef/automate/api/interservice/local_user"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -562,16 +561,16 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, localUserClient 
 	log.Info("starting with user parsing phase for migration id: ", result.Meta.MigrationID)
 
 	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
+	var keyDumps []pipeline.KeyDump
 
-	keyDumpByte, err := ioutil.ReadFile(file)
+	keyDumpFile, err := os.Open(file)
 	if err != nil {
-		log.Errorf("failed to read keydump file for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+		log.Errorf("failed to open keydump file for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
 
-	var keyDumps []pipeline.KeyDump
-	if err := json.Unmarshal(keyDumpByte, &keyDumps); err != nil {
-		log.Errorf("failed to unmarshal for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+	if err = json.NewDecoder(keyDumpFile).Decode(&keyDumps); err != nil {
+		log.Errorf("failed to decode keydump json for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
 

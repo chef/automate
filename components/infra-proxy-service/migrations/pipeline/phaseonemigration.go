@@ -37,7 +37,7 @@ func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan Pipel
 			// Start of Unzip pipeline
 			_, err := service.Migration.StartUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
-				log.Errorf("Failed to update status in DB: %s :%s", res.Result.Meta.MigrationID, err)
+				log.Errorf("Failed to update start 'StartUnzip' status in DB: %s :%s", res.Result.Meta.MigrationID, err)
 			}
 
 			result, err := Unzip(res.Ctx, res.Result)
@@ -45,7 +45,7 @@ func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan Pipel
 				// Failed Unzip pipeline
 				_, err := service.Migration.FailedUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
 				if err != nil {
-					log.Errorf("Failed to update status in DB: %s :%s", res.Result.Meta.MigrationID, err)
+					log.Errorf("Failed to update `FailedUnzip` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
 				}
 				return
 			}
@@ -55,7 +55,7 @@ func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan Pipel
 			// Complete Unzip pileline
 			_, err = service.Migration.CompleteUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
+				log.Errorf("Failed to update `CompleteUnzip` status in DB: %s :%s", result.Meta.MigrationID, err)
 			}
 
 			select {
@@ -195,7 +195,7 @@ func parseUserSrc(result <-chan PipelineData, service *service.Service) <-chan P
 			// Update start of parse user pipeline
 			_, err := service.Migration.StartUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
-				log.Errorf("Failed to update status in DB: %s :%s", res.Result.Meta.MigrationID, err)
+				log.Errorf("Failed to update `StartUsersParsing` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
 			}
 
 			result, err := GetUsersForBackup(res.Ctx, service.Storage, service.LocalUser, res.Result)
@@ -203,7 +203,7 @@ func parseUserSrc(result <-chan PipelineData, service *service.Service) <-chan P
 				// Update failed to parse user
 				_, err := service.Migration.FailedUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, "error parsing user", 0, 0, 0)
 				if err != nil {
-					log.Errorf("Failed to update status in DB: %s :%s", res.Result.Meta.MigrationID, err)
+					log.Errorf("Failed to update `FailedUsersParsing` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
 				}
 				return
 			}
@@ -213,7 +213,7 @@ func parseUserSrc(result <-chan PipelineData, service *service.Service) <-chan P
 			// Update completion of parsing user
 			_, err = service.Migration.CompleteUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
+				log.Errorf("Failed to update `CompleteUnzip` status in DB: %s :%s", result.Meta.MigrationID, err)
 			}
 
 			select {
