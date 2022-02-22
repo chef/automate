@@ -45,7 +45,7 @@ message GetStagedDataRequest {
   string migration_id = 1;
 }
 
-message ConfirmPreview {
+message ConfirmPreviewRequest {
   // Chef Server ID
   string server_id = 1;
   // Migration ID

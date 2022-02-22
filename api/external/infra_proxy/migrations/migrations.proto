@@ -28,7 +28,7 @@ service  InfraProxyMigrationService {
         option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
     };
 
-    rpc ConfirmPreview (infra_proxy.migrations.request.ConfirmPreview) returns (infra_proxy.migrations.response.ConfirmPreview) {
+    rpc ConfirmPreview (infra_proxy.migrations.request.ConfirmPreviewRequest) returns (infra_proxy.migrations.response.ConfirmPreviewResponse) {
         option (google.api.http).get = "/api/v0/infra/servers/{server_id}/migrations/confirm_preview/{migration_id}";
         option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:migrations:{migration_id}";
         option (chef.automate.api.iam.policy).action = "infra:infraServers:get";

@@ -71,7 +71,7 @@ message User {
   bool is_admin=10;
 }
 
-message ConfirmPreview {
+message ConfirmPreviewResponse {
   // Migration ID
   string migration_id = 1; 
 }

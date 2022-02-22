@@ -97,14 +97,14 @@ func (mr *MockInfraProxyMigrationServiceClientMockRecorder) GetStagedData(ctx, i
 }
 
 // ConfirmPreview mocks base method
-func (m *MockInfraProxyMigrationServiceClient) ConfirmPreview(ctx context.Context, in *request.ConfirmPreview, opts ...grpc.CallOption) (*response.ConfirmPreview, error) {
+func (m *MockInfraProxyMigrationServiceClient) ConfirmPreview(ctx context.Context, in *request.ConfirmPreviewRequest, opts ...grpc.CallOption) (*response.ConfirmPreviewResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ConfirmPreview", varargs...)
-	ret0, _ := ret[0].(*response.ConfirmPreview)
+	ret0, _ := ret[0].(*response.ConfirmPreviewResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -185,10 +185,10 @@ func (mr *MockInfraProxyMigrationServiceServerMockRecorder) GetStagedData(arg0, 
 }
 
 // ConfirmPreview mocks base method
-func (m *MockInfraProxyMigrationServiceServer) ConfirmPreview(arg0 context.Context, arg1 *request.ConfirmPreview) (*response.ConfirmPreview, error) {
+func (m *MockInfraProxyMigrationServiceServer) ConfirmPreview(arg0 context.Context, arg1 *request.ConfirmPreviewRequest) (*response.ConfirmPreviewResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConfirmPreview", arg0, arg1)
-	ret0, _ := ret[0].(*response.ConfirmPreview)
+	ret0, _ := ret[0].(*response.ConfirmPreviewResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

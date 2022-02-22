@@ -13,5 +13,5 @@ service MigrationDataService{
   rpc GetMigrationStatus (chef.automate.domain.infra_proxy.migrations.request.GetMigrationStatusRequest) returns (chef.automate.domain.infra_proxy.migrations.response.GetMigrationStatusResponse) {};
   rpc CancelMigration (chef.automate.domain.infra_proxy.migrations.request.CancelMigrationRequest) returns (chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponse) {};
   rpc GetStagedData (chef.automate.domain.infra_proxy.migrations.request.GetStagedDataRequest) returns (chef.automate.domain.infra_proxy.migrations.response.GetStagedDataResponse) {};
-  rpc ConfirmPreview (chef.automate.domain.infra_proxy.migrations.request.ConfirmPreview) returns (chef.automate.domain.infra_proxy.migrations.response.ConfirmPreview) {};
+  rpc ConfirmPreview (chef.automate.domain.infra_proxy.migrations.request.ConfirmPreviewRequest) returns (chef.automate.domain.infra_proxy.migrations.response.ConfirmPreviewResponse) {};
 }

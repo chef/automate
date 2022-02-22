@@ -51,7 +51,7 @@ func init() {
 		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.migrations.InfraProxyMigrationService/ConfirmPreview", "infra:infraServers:{server_id}:migrations:{migration_id}", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/migrations/confirm_preview/{migration_id}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.ConfirmPreview); ok {
+		if m, ok := input.(*request.ConfirmPreviewRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "server_id":

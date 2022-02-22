@@ -274,21 +274,6 @@ func TestUsersGRPC(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		})
-		t.Run("when user password is hashed", func(t *testing.T) {
-			req := api.CreateUserReq{
-				Id:       "",
-				Name:     "testUser",
-				Email:    "test@test.test",
-				Password: "$2a$12$IEJF1G/DuWESbXjvTmXYaOMLQpLGas9HKqypnmXnZ1G1lO5x6BTUq",
-				IsHashed: true,
-			}
-
-			us, err := cl.CreateUser(ctx, &req)
-			if assert.Nil(t, err) {
-				assert.Equal(t, us.Email, req.Email)
-				assert.Equal(t, us.Name, req.Name)
-			}
-		})
 	})
 
 	t.Run("UpdateSelf", func(t *testing.T) {

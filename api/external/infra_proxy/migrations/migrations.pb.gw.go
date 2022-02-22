@@ -217,7 +217,7 @@ func local_request_InfraProxyMigrationService_GetStagedData_0(ctx context.Contex
 }
 
 func request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyMigrationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.ConfirmPreview
+	var protoReq request.ConfirmPreviewRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -255,7 +255,7 @@ func request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, ma
 }
 
 func local_request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.ConfirmPreview
+	var protoReq request.ConfirmPreviewRequest
 	var metadata runtime.ServerMetadata
 
 	var (

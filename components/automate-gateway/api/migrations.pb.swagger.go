@@ -121,7 +121,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.ConfirmPreview"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.ConfirmPreviewResponse"
             }
           },
           "default": {
@@ -171,7 +171,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.migrations.response.ConfirmPreview": {
+    "chef.automate.api.infra_proxy.migrations.response.ConfirmPreviewResponse": {
       "type": "object",
       "properties": {
         "migration_id": {
