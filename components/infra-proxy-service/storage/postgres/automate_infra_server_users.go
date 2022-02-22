@@ -103,10 +103,8 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 		`SELECT 
 		u.id, u.server_id, 
 		u.infra_server_username, 
-		u.credential_id, 
 		u.connector,
 		u.automate_user_id, 
-		u.is_server_admin,
 		u.created_at, u.updated_at
 		FROM users u
 		WHERE u.server_id = $1`, serverId)
