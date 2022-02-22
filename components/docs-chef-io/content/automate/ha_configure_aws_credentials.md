@@ -1,7 +1,7 @@
 +++
 title = "Configuration of AWS Credential on Bastion Host"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

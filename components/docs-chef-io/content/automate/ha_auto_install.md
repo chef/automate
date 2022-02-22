@@ -1,7 +1,7 @@
 +++
 title = "Getting Started - High Availability Deployment"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

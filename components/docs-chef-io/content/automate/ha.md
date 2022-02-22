@@ -1,7 +1,7 @@
 +++
 title = "Deployment Workflows"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 [menu]

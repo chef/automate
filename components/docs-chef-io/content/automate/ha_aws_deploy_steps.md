@@ -1,7 +1,7 @@
 +++
 title = "AWS Cloud Deployment Procedure"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

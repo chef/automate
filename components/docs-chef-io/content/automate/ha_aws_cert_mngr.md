@@ -1,7 +1,7 @@
 +++
 title = "AWS Certificate Manager"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

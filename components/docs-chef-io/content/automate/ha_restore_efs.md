@@ -1,7 +1,7 @@
 +++
 title = "Restoring the EFS Backed-up Data"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

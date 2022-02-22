@@ -1,7 +1,7 @@
 +++
 title = "Taking Backup with EFS System"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

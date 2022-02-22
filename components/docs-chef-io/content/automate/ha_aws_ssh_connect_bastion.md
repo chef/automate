@@ -1,7 +1,7 @@
 +++
 title = "Establishing SSH Connection with Bastion Host"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
