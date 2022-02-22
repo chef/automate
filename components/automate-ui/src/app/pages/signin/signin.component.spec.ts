@@ -26,6 +26,11 @@ function setCookie(key: string, value: string): void {
   document.cookie = `${key}=${value}; Path=/;`;
 }
 
+function deleteIdTokenFromCookie(): void {
+  // Expire id_token cookie once it's set in localStorage
+  document.cookie = `id_token=; Path=/; Expires=${new Date().toUTCString()};`;
+}
+
 describe('SigninComponent', () => {
   let component: SigninComponent;
   let fixture: ComponentFixture<SigninComponent>;
@@ -81,9 +86,10 @@ describe('SigninComponent', () => {
 
       it('to true when id_token does not exist in cookie', () => {
         const [id_token, state] = component.idTokenAndStateFromCookieAndFragment('');
+        deleteIdTokenFromCookie();
+        fixture.detectChanges();
         expect(id_token).toEqual(null);
         expect(state).toEqual(null);
-        fixture.detectChanges();
 
         expect((component as any).error).toEqual(true);
       });
@@ -91,9 +97,9 @@ describe('SigninComponent', () => {
       it('to false when id_token exists in cookie', () => {
         setCookie(valid_id_token_key, valid_id_token);
         const [id_token, state] = component.idTokenAndStateFromCookieAndFragment('state=');
+        fixture.detectChanges();
         expect(id_token).toBe(valid_id_token);
         expect(state).toBe('');
-        fixture.detectChanges();
 
         expect((component as any).error).toEqual(false);
       });
