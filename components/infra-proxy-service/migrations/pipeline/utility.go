@@ -632,9 +632,6 @@ func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, autom
 	var parsedUsers []pipeline.User
 	autoMap := automateMap(automateUser)
 	for _, sUser := range serverUser {
-		userExists := checkUserExist(ctx, localUserClient, sUser)
-		sUser.IsConflicting = userExists
-
 		if _, ok := autoMap[sUser.Username]; ok {
 			emptyVal := pipeline.User{}
 			returnedVal := skipOrUpdate(autoMap, sUser)
@@ -645,7 +642,7 @@ func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, autom
 			if sUser.Username == "pivotal" {
 				continue
 			} else {
-				if sUser.Connector != pipeline.Local {
+				if sUser.Connector == pipeline.Local {
 					userExists := checkUserExist(ctx, localUserClient, sUser)
 					sUser.IsConflicting = userExists
 				}
