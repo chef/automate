@@ -284,7 +284,9 @@ func Unzip(ctx context.Context, result pipeline.Result) (pipeline.Result, error)
 
 		if file.FileInfo().IsDir() {
 			err = os.MkdirAll(fpath, os.ModePerm)
-			log.Errorf("cannot create dir for migration id: %s, %s", result.Meta.MigrationID, err.Error())
+			if err != nil {
+				log.Errorf("cannot create dir for migration id: %s, %s", result.Meta.MigrationID, err.Error())
+			}
 			continue
 		}
 
@@ -315,14 +317,9 @@ func Unzip(ctx context.Context, result pipeline.Result) (pipeline.Result, error)
 			log.Errorf("cannot copy file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
-
 		_ = outFile.Close()
 		_ = readClose.Close()
 
-		if err != nil {
-			log.Errorf("cannot copy a file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
-			return result, err
-		}
 	}
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
