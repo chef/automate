@@ -9,6 +9,11 @@ const (
 	Update
 )
 
+const (
+	Local = "LOCAL_USER"
+	LADP  = "LDAP_USER"
+)
+
 //
 type Result struct {
 	// Meta for Zip file info
