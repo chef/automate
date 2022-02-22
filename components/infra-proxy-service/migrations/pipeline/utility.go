@@ -633,7 +633,8 @@ func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, autom
 	for _, sUser := range serverUser {
 		userExists := checkUserExist(ctx, localUserClient, sUser)
 		sUser.IsConflicting = userExists
-		if autoMap[sUser.Username].InfraServerUsername != "" {
+
+		if _, ok := autoMap[sUser.Username]; ok {
 			emptyVal := pipeline.User{}
 			returnedVal := skipOrUpdate(autoMap, sUser)
 			if returnedVal != emptyVal {
@@ -672,7 +673,7 @@ func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipel
 	var parsedUsers []pipeline.User
 	serverMap := serverMap(serverUser)
 	for _, aUser := range automateUser {
-		if serverMap[aUser.InfraServerUsername].Username == "" {
+		if _, ok := serverMap[aUser.InfraServerUsername]; ok {
 			parsedUsers = append(parsedUsers, pipeline.User{
 				Username:  aUser.InfraServerUsername,
 				ActionOps: pipeline.Delete,
