@@ -22,7 +22,7 @@ type PhaseOnePipleine struct {
 
 type PhaseOnePipelineProcessor func(<-chan PipelineData) <-chan PipelineData
 
-// ParseOrg returns PhaseOnePipelineProcessor
+// ParseOrg unzip the backup file and returns PhaseOnePipelineProcessor
 func UnzipSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
 		return unzipSrc(result, service)
@@ -52,7 +52,7 @@ func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan Pipel
 	return out
 }
 
-// ParseOrg returns PhaseOnePipelineProcessor
+// ParseOrg parse the orgs and returns PhaseOnePipelineProcessor
 func ParseOrgSrc(service *service.Service) PhaseOnePipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
 		return parseOrgSrc(result, service)
@@ -79,6 +79,49 @@ func parseOrgSrc(result <-chan PipelineData, service *service.Service) <-chan Pi
 			}
 		}
 		log.Info("Closing parse_orgs pipeline")
+		close(out)
+	}()
+	return out
+}
+
+// ParseOrg parse the org user association and returns PhaseOnePipelineProcessor
+func ParseOrgUserAssociationSrc(service *service.Service) PhaseOnePipelineProcessor {
+	return func(result <-chan PipelineData) <-chan PipelineData {
+		return parseOrgUserAssociationSrc(result, service)
+	}
+}
+
+func parseOrgUserAssociationSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+	log.Info("Starting to parse_orgs_user_association pipeline")
+
+	out := make(chan PipelineData, 100)
+
+	go func() {
+		log.Info("Processing to parse orgs user association...")
+		for res := range result {
+			_, err := service.Migration.StartUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
+			if err != nil {
+				log.Errorf("Failed to update the status for start org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				return
+			}
+			result, err := ParseOrgUserAssociation(res.Ctx, service.Storage, res.Result)
+			if err != nil {
+				_, _ = service.Migration.FailedUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), 0, 0, 0)
+				return
+			}
+			_, err = service.Migration.CompleteUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
+			if err != nil {
+				log.Errorf("Failed to update the status for complete org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				return
+			}
+			res.Result = result
+			select {
+			case out <- res:
+			case <-res.Ctx.Done():
+				res.Done <- nil
+			}
+		}
+		log.Info("Closing parse_orgs_user_association pipeline")
 		close(out)
 	}()
 	return out
@@ -250,6 +293,7 @@ func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 	migrationPipeline(c,
 		UnzipSrc(service),
 		ParseOrgSrc(service),
+		ParseOrgUserAssociationSrc(service),
 		CreatePreviewSrc(service),
 		// ParseUser(),
 		// ConflictingUsers(),
