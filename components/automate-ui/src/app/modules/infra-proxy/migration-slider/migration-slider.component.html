@@ -92,7 +92,7 @@
           <chef-button id="cancel-migration-slider" tertiary [disabled]="!isPreview" (click)="cancelMigrationclicked()">
             Cancel Migration
           </chef-button>
-          <chef-button primary [disabled]="!isPreview" data-cy="migration-button" id="migration-button" (click)="confirmPreviewData()">
+          <chef-button primary [disabled]="!isPreview" data-cy="confirm-migration-button" id="migration-button" (click)="confirmPreviewData()">
             <span *ngIf="isPreview">confirm Migration</span>
           </chef-button>
         </div>
