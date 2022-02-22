@@ -595,7 +595,7 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 		if err := json.Unmarshal([]byte(kd.SerializedObject), &sec); err != nil {
 			log.Errorf("failed to pasre user's first, middle and last name: %s", err.Error())
 		}
-		user := pipeline.User{
+		user := &pipeline.User{
 			Username:    kd.Username,
 			Email:       kd.Email,
 			DisplayName: sec["display_name"],
@@ -604,7 +604,7 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 			MiddleName:  sec["middle_name"],
 		}
 		user.SetConnector(kd.ExternalAuthenticationUID)
-		users = append(users, user)
+		users = append(users, *user)
 	}
 	return users
 }

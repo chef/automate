@@ -1,8 +1,8 @@
 package pipeline
 
-func (usr User) SetConnector(uid interface{}) {
+func (usr *User) SetConnector(uid interface{}) {
 	if uid == nil {
-		usr.Connector = Local
+		usr.Connector = usr.Username
 	} else {
 		usr.Connector = uid.(string)
 	}
