@@ -645,6 +645,10 @@ func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, autom
 			if sUser.Username == "pivotal" {
 				continue
 			} else {
+				if sUser.Connector != pipeline.Local {
+					userExists := checkUserExist(ctx, localUserClient, sUser)
+					sUser.IsConflicting = userExists
+				}
 				sUser.ActionOps = pipeline.Insert
 				parsedUsers = append(parsedUsers, sUser)
 			}

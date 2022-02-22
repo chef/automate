@@ -10,8 +10,8 @@ const (
 )
 
 const (
-	Local = "LOCAL_USER"
-	LADP  = "LDAP_USER"
+	Local = "LOCAL"
+	LADP  = "LDAP"
 )
 
 //
