@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "SAML"
-    parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/saml.md SAML"
+    parent = "automate/users/authentication"
+    identifier = "automate/users/saml.md SAML"
     weight = 50
 +++
 
