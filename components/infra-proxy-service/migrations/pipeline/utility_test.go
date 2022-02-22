@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/storage/testDB"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStoreOrg(t *testing.T) {
@@ -130,6 +131,57 @@ func TestCreatePreview(t *testing.T) {
 	}
 }
 
+func TestValidateZip(t *testing.T) {
+	type args struct {
+		name        string
+		ctx         context.Context
+		st          storage.Storage
+		mst         storage.MigrationStorage
+		result      pipeline.Result
+		requiredErr error
+	}
+
+	arg := []args{
+		{
+			name:        "Validated",
+			ctx:         context.Background(),
+			st:          &testDB.TestDB{},
+			mst:         &testDB.MigrationDB{},
+			result:      pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/backup", ServerID: "server1", MigrationID: "mig1"}},
+			requiredErr: nil,
+		},
+		{
+			name:        "Organization not found",
+			ctx:         context.Background(),
+			st:          &testDB.TestDB{},
+			mst:         &testDB.MigrationDB{},
+			result:      pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/orgnotfound", ServerID: "server1", MigrationID: "mig1"}},
+			requiredErr: errors.New("cannot find organizations folder"),
+		},
+		{
+			name:        "KeyDump not found",
+			ctx:         context.Background(),
+			st:          &testDB.TestDB{},
+			mst:         &testDB.MigrationDB{},
+			result:      pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/keydumpnotfound", ServerID: "server1", MigrationID: "mig1"}},
+			requiredErr: errors.New("stat ../../testdata/keydumpnotfound/key_dump.json: no such file or directory"),
+		},
+	}
+
+	for _, ar := range arg {
+		t.Run(ar.name, func(t *testing.T) {
+			res, err := ValidateZip(ar.ctx, ar.st, ar.mst, ar.result)
+			if err != nil {
+				require.Equal(t, err.Error(), ar.requiredErr.Error())
+			} else {
+				require.NoError(t, err)
+				require.True(t, res.Meta.IsValid)
+				require.NotEmpty(t, res.Meta.UnzipFolder)
+			}
+		})
+	}
+}
+
 func TestUserOrgAssociation(t *testing.T) {
 	deleteBackUp := "../../testdata/deleteBackup/"
 	skipBackup := "../../testdata/skipBackup/"
@@ -160,6 +212,7 @@ func TestUserOrgAssociation(t *testing.T) {
 			if !reflect.DeepEqual(got.ParsedResult.OrgsUsers, tt.want1.ParsedResult.OrgsUsers) {
 				t.Errorf("ParseOrgUserAssociation() got = %v, want %v", got.ParsedResult.OrgsUsers, tt.want1.ParsedResult.OrgsUsers)
 			}
+
 		})
 	}
 }
