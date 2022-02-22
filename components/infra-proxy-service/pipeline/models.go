@@ -60,12 +60,16 @@ type OrgsUsersAssociations struct {
 	// Users UserAssociation slice
 	Users []UserAssociation `json:"user_association"`
 }
+
 type UserAssociation struct {
 	// Username
 	Username string `json:"username"`
 
 	// IsAdmin
 	IsAdmin bool `json:"is_admin"`
+
+	// ActionOps for Insert Skip Update and Delete for UserAssociation
+	ActionOps ActionOps `json:"action_ops"`
 }
 
 type KeyDump struct {
@@ -124,4 +128,17 @@ type OrgJson struct {
 	Name     string `json:"name"`
 	FullName string `json:"full_name"`
 	Guid     string `json:"guid"`
+}
+
+type MembersJson struct {
+	User UsersJson `json:"user"`
+}
+
+type AdminsJson struct {
+	Name  string   `json:"name"`
+	Users []string `json:"users"`
+}
+
+type UsersJson struct {
+	Username string `json:"username"`
 }
