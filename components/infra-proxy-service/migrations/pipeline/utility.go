@@ -29,7 +29,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	if err != nil {
 		return res, err
 	}
-	log.Info("Starting the organisation migration phase for migration id: ", res.Meta.MigrationID)
+	log.Info("Starting the organization migration phase for migration id: ", res.Meta.MigrationID)
 	for _, org := range res.ParsedResult.Orgs {
 		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID, authzProjectClient)
 		if err != nil {
@@ -53,7 +53,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		log.Errorf("Failed to update the status for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		return res, err
 	}
-	log.Info("Successfully completed the organisation migration phase for migration id: ", res.Meta.MigrationID)
+	log.Info("Successfully completed the organization migration phase for migration id: ", res.Meta.MigrationID)
 	return res, err
 }
 
@@ -103,7 +103,7 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 
 func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var err error
-	log.Info("Starting with organisation parsing phase for migration id: ", result.Meta.MigrationID)
+	log.Info("Starting with organization parsing phase for migration id: ", result.Meta.MigrationID)
 	_, err = mst.StartOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
 	if err != nil {
 		log.Errorf("Failed to update the status for start org parssing for the migration id path %s : %s", result.Meta.MigrationID, err.Error())
@@ -141,7 +141,7 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		return result, err
 	}
 
-	log.Info("Successfully completed the organisation parsing phase for migration id: ", result.Meta.MigrationID)
+	log.Info("Successfully completed the organization parsing phase for migration id: ", result.Meta.MigrationID)
 	return result, nil
 
 }
@@ -203,7 +203,7 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 	var orgList []pipeline.Org
 	orgDatabaseMap := createDatabaseOrgsMap(orgsInDB)
 	var orgJson pipeline.OrgJson
-	log.Info("Comparing the organisations from database and backup file for insert,update and skip action")
+	log.Info("Comparing the organizations from database and backup file for insert,update and skip action")
 	//For insert, update and skip action
 	for _, org := range orgsInFiles {
 		if org.IsDir() {
@@ -224,14 +224,14 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 			}
 		}
 	}
-	log.Info("Completed comparing the organisations from database and backup file for insert,update and skip action")
+	log.Info("Completed comparing the organizations from database and backup file for insert,update and skip action")
 	return orgList
 }
 
 func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []storage.Org) []pipeline.Org {
 	var orgList []pipeline.Org
 	orgFilesMap := createFileOrgsMap(orgsInFiles)
-	log.Info("Comparing the organisations from database and backup file for delete action")
+	log.Info("Comparing the organizations from database and backup file for delete action")
 	//For delete action by comparing database orgs with file orgs
 	for _, org := range orgsInDB {
 		_, valuePresent := orgFilesMap[org.ID]
@@ -239,7 +239,7 @@ func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []s
 			orgList = append(orgList, createOrgStructForAction(org.ID, org.Name, pipeline.Delete))
 		}
 	}
-	log.Info("Completed comparing the organisations from database and backup file for delete action")
+	log.Info("Completed comparing the organizations from database and backup file for delete action")
 	return orgList
 }
 
@@ -382,7 +382,7 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 		log.Info("Getting actions for org id", org.Name)
 		chefServerOrgUsers, err := getChefServerOrgUsers(org.Name, orgPath)
 		if err != nil {
-			log.Errorf("Unable to get the chef server organisation users %s ", err)
+			log.Errorf("Unable to get the chef server organization users %s ", err)
 			return nil, err
 		}
 		if org.ActionOps == pipeline.Insert {
@@ -469,7 +469,7 @@ func createMapForOrgUsersInJson(chefServerOrgUsers []pipeline.UserAssociation) m
 	return orgUsersMap
 }
 
-// getChefServerOrgUsers returns the chef server organisation users from backup file
+// getChefServerOrgUsers returns the chef server organization users from backup file
 func getChefServerOrgUsers(orgName, fileLocation string) ([]pipeline.UserAssociation, error) {
 	orgUsers := make([]pipeline.UserAssociation, 0)
 
