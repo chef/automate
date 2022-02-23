@@ -5,6 +5,8 @@ database = "{{cfg.storage.database}}"
 migrations-path = "{{pkg.path}}/migrations"
 authz-address = "127.0.0.1:{{cfg.authz.port}}"
 secrets-address = "127.0.0.1:{{cfg.secrets.port}}"
+local-user-address= "127.0.0.1:{{cfg.local-user.port}}"
+
 
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"
