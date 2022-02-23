@@ -203,9 +203,10 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 	}, nil
 }
 
-//GetInfraServerOrgs: Fetches the list of automate infra server organisations from the chef server and save it into the automate back end DB
+//GetInfraServerOrgs: Fetches the list of automate infra server organizations from the chef server and save it into the automate back end DB
 func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
-
+	//migrationId is not hardcoded but for reference purpose
+	migrationId := "bfc4ebe1-1256-4cf1-aab8-557edcc48658"
 	// Get chef client
 	client, err := s.getChefClient(ctx, req.ServerId)
 	if err != nil {
@@ -222,9 +223,9 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 		return nil, err
 
 	}
-	_, _ = s.service.Migration.GetMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
-	_, _ = s.service.Migration.DeleteMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
-	_, _ = s.service.Migration.GetMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
+	_, _ = s.service.Migration.GetMigrationStage(ctx, migrationId)
+	_, _ = s.service.Migration.DeleteMigrationStage(ctx, migrationId)
+	_, _ = s.service.Migration.GetMigrationStage(ctx, migrationId)
 	migration, err := s.service.Migration.StartOrgMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
 	if err != nil {
 		return nil, err
@@ -246,7 +247,7 @@ func (s *Server) getInfraServerOrgs(c *ChefClient, serverId string, migration st
 		_, _ = s.service.Migration.CompleteOrgMigration(context.Background(), migration.MigrationID, serverId, totalSucceeded, totalSkipped, totalFailed)
 	}()
 
-	// Get organisation list from chef server
+	// Get organization list from chef server
 	orgsList, err := c.client.Organizations.List()
 	if err != nil {
 		//migrationStatus = "Failed"

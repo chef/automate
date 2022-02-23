@@ -981,7 +981,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("ResetOrgAdminKey", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-			Id:        "chef-infra-server",
+			Id:        constants.TestServerId,
 			Name:      "Chef Infra Server",
 			Fqdn:      fqdn,
 			IpAddress: "",

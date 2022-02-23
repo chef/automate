@@ -298,9 +298,7 @@ func Unzip(ctx context.Context, result pipeline.Result) (pipeline.Result, error)
 
 		// The created file will be stored in
 		// outFile with permissions to write &/or truncate
-		outFile, err := os.OpenFile(fpath,
-			os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
-			file.Mode())
+		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
 			log.Errorf("cannot create a file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
