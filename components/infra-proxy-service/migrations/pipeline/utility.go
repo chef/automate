@@ -4,9 +4,10 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"errors"
-
+	"github.com/chef/automate/api/interservice/local_user"
 	"io"
 	"os"
 	"path"
@@ -247,7 +248,7 @@ func openOrgFolder(org os.FileInfo, fileLocation string) pipeline.OrgJson {
 	jsonFile, err := os.Open(jsonPath)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Errorf("Unable to open the file at location : %s", jsonPath)
+		fmt.Println(err)
 	}
 	log.Info("Successfully opened the file at location", jsonPath)
 	defer func() {
@@ -267,21 +268,13 @@ func createOrgStructForAction(orgId string, orgName string, ops pipeline.ActionO
 }
 
 // Unzip will decompress a zip file and sets the UnzipFolder
-func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
+func Unzip(ctx context.Context, result pipeline.Result) (pipeline.Result, error) {
 
 	var fpath string
-	_, err := mst.StartUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	if err != nil {
-		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
-	}
 
 	reader, err := zip.OpenReader(result.Meta.ZipFile)
 	if err != nil {
-		log.Errorf("cannot open reader: %s.", err)
-		_, err := mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
-		if err != nil {
-			log.Errorf("Failed to update status in DB: %s", err)
-		}
+		log.Errorf("cannot open reader migration id: %s, %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
 
@@ -290,14 +283,16 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 		fpath = filepath.Join(filepath.Dir(result.Meta.ZipFile), file.Name)
 
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(fpath, os.ModePerm)
+			err = os.MkdirAll(fpath, os.ModePerm)
+			if err != nil {
+				log.Errorf("cannot create dir for migration id: %s, %s", result.Meta.MigrationID, err.Error())
+			}
 			continue
 		}
 
 		// Creating the files in the target directory
 		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
-			log.Errorf("cannot create directory: %s. ", err)
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create directory", 0, 0, 0)
+			log.Errorf("cannot create directory for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 
@@ -307,41 +302,29 @@ func Unzip(ctx context.Context, mst storage.MigrationStorage, result pipeline.Re
 			os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
 			file.Mode())
 		if err != nil {
-			log.Errorf("cannot create a file: %s.", err)
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot create a file", 0, 0, 0)
+			log.Errorf("cannot create a file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 
 		readClose, err := file.Open()
 		if err != nil {
-			log.Errorf("cannot open file")
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot open file", 0, 0, 0)
+			log.Errorf("cannot open file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
 
 		_, err = io.Copy(outFile, readClose)
 		if err != nil {
-			log.Errorf("cannot copy file")
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy file", 0, 0, 0)
+			log.Errorf("cannot copy file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
 		}
+		_ = outFile.Close()
+		_ = readClose.Close()
 
-		outFile.Close()
-		readClose.Close()
-
-		if err != nil {
-			log.Errorf("cannot copy a file")
-			mst.FailedUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, "cannot copy a file", 0, 0, 0)
-			return result, err
-		}
 	}
 
 	result.Meta.UnzipFolder = filepath.Dir(fpath)
-	reader.Close()
-	_, err = mst.CompleteUnzip(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
-	if err != nil {
-		log.Errorf("Failed to update status in DB: %s :%s", result.Meta.MigrationID, err)
-	}
+	_ = reader.Close()
+
 	return result, nil
 }
 
@@ -569,4 +552,148 @@ func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]stri
 	}
 	return orgAdminsMap
 
+}
+
+//GetUsersForBackup get all the users details from back up file
+func GetUsersForBackup(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
+	log.Info("starting with user parsing phase for migration id: ", result.Meta.MigrationID)
+
+	file := path.Join(result.Meta.UnzipFolder, "key_dump.json")
+	var keyDumps []pipeline.KeyDump
+
+	keyDumpFile, err := os.Open(file)
+	if err != nil {
+		log.Errorf("failed to open keydump file for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+
+	if err = json.NewDecoder(keyDumpFile).Decode(&keyDumps); err != nil {
+		log.Errorf("failed to decode keydump json for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+
+	serverUsers := keyDumpTOUser(keyDumps)
+	automateUsers, err := st.GetAutomateInfraServerUsers(ctx, result.Meta.ServerID)
+	if err != nil {
+		log.Errorf("failed to get users form db for user parsing for the migration id: %s : %s", result.Meta.MigrationID, err.Error())
+		return result, err
+	}
+
+	var mappedUsers []pipeline.User
+
+	mappedUsers = append(mappedUsers, deleteUser(serverUsers, automateUsers)...)
+	mappedUsers = append(mappedUsers, insertUpdateSkipUser(ctx, serverUsers, automateUsers, localUserClient)...)
+
+	result.ParsedResult.Users = mappedUsers
+	return result, nil
+}
+
+// Clean serialized_object and Polulate Users struct
+func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
+	users := make([]pipeline.User, 0)
+	for _, kd := range keyDump {
+		sec := map[string]string{}
+		if err := json.Unmarshal([]byte(kd.SerializedObject), &sec); err != nil {
+			log.Errorf("failed to pasre user's first, middle and last name: %s", err.Error())
+		}
+		user := &pipeline.User{
+			Username:    kd.Username,
+			Email:       kd.Email,
+			DisplayName: sec["display_name"],
+			FirstName:   sec["first_name"],
+			LastName:    sec["last_name"],
+			MiddleName:  sec["middle_name"],
+		}
+		user.SetConnector(kd.ExternalAuthenticationUID)
+		user.SetAutomateUsername(kd.ExternalAuthenticationUID)
+		users = append(users, *user)
+	}
+	return users
+}
+
+func automateMap(automateUser []storage.User) map[string]storage.User {
+	automateMap := map[string]storage.User{}
+	for _, auser := range automateUser {
+		automateMap[auser.InfraServerUsername] = auser
+	}
+	return automateMap
+}
+
+func serverMap(server []pipeline.User) map[string]pipeline.User {
+	serverMap := map[string]pipeline.User{}
+	for _, auser := range server {
+		serverMap[auser.Username] = auser
+	}
+	return serverMap
+}
+
+func insertUpdateSkipUser(ctx context.Context, serverUser []pipeline.User, automateUser []storage.User, localUserClient local_user.UsersMgmtServiceClient) []pipeline.User {
+	var parsedUsers []pipeline.User
+	autoMap := automateMap(automateUser)
+	for _, sUser := range serverUser {
+		if _, ok := autoMap[sUser.Username]; ok {
+			emptyVal := pipeline.User{}
+			returnedVal := skipOrUpdate(autoMap, sUser)
+			if returnedVal != emptyVal {
+				parsedUsers = append(parsedUsers, returnedVal)
+			}
+		} else {
+			if sUser.Username == "pivotal" {
+				continue
+			} else {
+				if sUser.Connector == pipeline.Local {
+					userExists := checkUserExist(ctx, localUserClient, sUser)
+					sUser.IsConflicting = userExists
+				}
+				sUser.ActionOps = pipeline.Insert
+				parsedUsers = append(parsedUsers, sUser)
+			}
+
+		}
+
+	}
+
+	return parsedUsers
+}
+func skipOrUpdate(autoMap map[string]storage.User, sUser pipeline.User) pipeline.User {
+	if autoMap[sUser.Username].InfraServerUsername == sUser.Username {
+		if autoMap[sUser.Username].InfraServerUsername == sUser.Username && autoMap[sUser.Username].Email == sUser.Email &&
+			autoMap[sUser.Username].DisplayName == sUser.DisplayName && autoMap[sUser.Username].FirstName == sUser.FirstName &&
+			autoMap[sUser.Username].LastName == sUser.LastName && autoMap[sUser.Username].MiddleName == sUser.MiddleName {
+			sUser.ActionOps = pipeline.Skip
+			return sUser
+
+		} else {
+			sUser.ActionOps = pipeline.Update
+			return sUser
+		}
+	}
+	return pipeline.User{}
+}
+
+func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipeline.User {
+	var parsedUsers []pipeline.User
+	serverMap := serverMap(serverUser)
+	for _, aUser := range automateUser {
+		if _, ok := serverMap[aUser.InfraServerUsername]; ok {
+			parsedUsers = append(parsedUsers, pipeline.User{
+				Username:  aUser.InfraServerUsername,
+				ActionOps: pipeline.Delete,
+			})
+		}
+
+	}
+
+	return parsedUsers
+}
+
+//checkUserExist check user exists in the local automate or not
+func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) bool {
+	_, err := localUserClient.GetUser(ctx, &local_user.Email{Email: user.AutomateUsername})
+	if err != nil {
+		log.Errorf(err.Error())
+		log.Errorf("Unable to fetch user")
+		return false
+	}
+	return true
 }

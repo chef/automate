@@ -74,15 +74,36 @@ func (m MigrationDB) FailedOrgParsing(ctx context.Context, migrationId, serverId
 }
 
 func (m MigrationDB) StartUsersParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) CompleteUsersParsing(ctx context.Context, migrationId, serverId string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) FailedUsersParsing(ctx context.Context, migrationId, serverId, message string, totalSucceeded, totalSkipped, totalFailed int64) (storage.Migration, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.Migration{}, errors.New("Failed to update status")
+	}
+	return storage.Migration{
+		ID:       "mig1",
+		ServerID: "serverId",
+		TypeID:   100,
+	}, nil
 }
 
 func (m MigrationDB) StartUserAssociationParsing(ctx context.Context, migrationId, serverId string) (storage.Migration, error) {
