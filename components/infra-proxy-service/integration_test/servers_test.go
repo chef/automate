@@ -58,7 +58,7 @@ func TestServers(t *testing.T) {
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
 			}
-			resp, err := infraProxy.CreateServer(ctx, req)
+			resp, err := cl.CreateServer(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			assert.Equal(t, req.Id, resp.Server.Id)
