@@ -82,7 +82,7 @@ event-feed-service BINDING_MODE strict
 event-gateway REQUIRED authn-service authz-service event-service
 event-gateway BINDING_MODE strict
 event-service BINDING_MODE strict
-infra-proxy-service REQUIRED authz-service automate-pg-gateway pg-sidecar-service secrets-service
+infra-proxy-service REQUIRED authz-service automate-pg-gateway local-user-service pg-sidecar-service secrets-service
 infra-proxy-service BINDING_MODE strict
 ingest-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service config-mgmt-service event-feed-service nodemanager-service pg-sidecar-service
 ingest-service OPTIONAL es-sidecar-service

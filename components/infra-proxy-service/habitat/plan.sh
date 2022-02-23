@@ -26,6 +26,7 @@ pkg_binds=(
   [pg-sidecar-service]="port"
   [authz-service]="port"
   [secrets-service]="port"
+  [local-user-service]="port"
 )
 
 pkg_bin_dirs=(bin)
