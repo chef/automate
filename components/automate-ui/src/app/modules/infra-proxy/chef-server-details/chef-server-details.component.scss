@@ -295,6 +295,7 @@ img {
 }
 
 .tooltip {
+  @include root-prop(--tooltip-color, $chef-critical-light);
   --tooltip-color: #F9DBEA;
   left: 1395.05px;
   top: 280.766px;
