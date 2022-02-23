@@ -93,6 +93,46 @@ variable "elasticsearch_server_instance_type" {
   default = "m5a.large"
 }
 
+variable "managed_elasticsearch_certificate" {
+  default = ""
+}
+
+variable "managed_elasticsearch_domain_url" {
+  default = ""
+}
+
+variable "managed_elasticsearch_user_password" {
+  default = ""
+}
+
+variable "managed_elasticsearch_username" {
+  default = ""
+}
+
+variable "managed_rds_certificate" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_password" {
+  default = ""
+}
+
+variable "managed_rds_dbuser_username" {
+  default = ""
+}
+
+variable "managed_rds_instance_url" {
+  default = ""
+}
+
+variable "managed_rds_superuser_password" {
+  default = ""
+}
+
+variable "managed_rds_superuser_username" {
+  default = ""
+}
+
 variable "postgresql_ebs_volume_iops" {
   default = 150
 }
@@ -107,6 +147,10 @@ variable "postgresql_ebs_volume_type" {
 
 variable "postgresql_server_instance_type" {
   default = "t3a.medium"
+}
+
+variable "setup_managed_services" {
+  default = false
 }
 
 variable "ssh_key_file" {

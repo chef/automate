@@ -1,4 +1,4 @@
-#stable channel
+# stable channel
 
 pkg_name=automate-ui
 pkg_origin=chef

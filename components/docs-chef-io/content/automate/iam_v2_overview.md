@@ -6,7 +6,8 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    parent = "automate/authorization"
+    parent = "automate/users/authorization"
+    identifier = "automate/users/authorization/iam_v2_overview" 
     weight = 10
 +++
 

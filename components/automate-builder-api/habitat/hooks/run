@@ -20,8 +20,10 @@ render-template config.toml "{{pkg.svc_var_path}}/etc/config.toml" \
   --conf "{{pkg.svc_config_path}}/config.json"
 
 export DBNAME="{{cfg.datastore.database}}"
+export USERNAME="{{cfg.datastore.user}}"
 pg-helper ensure-service-database "$DBNAME"
-pg-helper fix-permissions "$DBNAME"
+pg-helper fix-permissions "$USERNAME"
+pg-helper alter-role --superuser=true "$USERNAME"
 
 if ! ls {{pkg.svc_data_path}}/keys/bldr-*; then
   echo "generating bldr key"

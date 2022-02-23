@@ -1,4 +1,4 @@
-#stable channel
+# stable channel
 
 pkg_name=automate-ui
 # Ignore this package when bind data is compiled for deployment service:

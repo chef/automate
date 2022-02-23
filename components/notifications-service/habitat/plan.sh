@@ -17,7 +17,14 @@ pkg_deps=(
 )
 pkg_build_deps=(
   core/git
-  core/erlang
+
+  # Node(kallol) 2022-01-28:
+  #
+  # We have seen failures with notification service http request
+  # with external services. This is because the erlang version was bumped to
+  # v23.2. Hence pinning the version till we have a fix.
+  core/erlang/21.3/20200825051314
+
   # NOTE(ssd) 2019-07-03: PIN PIN PIN
   #
   # elixir 1.9.0 shipped with a number of changes to how releases

@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Desktop Dashboard"
-    parent = "automate"
-    identifier = "automate/desktop.md Desktop Dashboard"
+    parent = "automate/applications"
+    identifier = "automate/applications/desktop.md Desktop Dashboard"
     weight = 50
 +++
 
@@ -22,7 +22,7 @@ Desktop information populates this dashboard after a Chef Infra Client run has e
 We recommend starting with a fresh installation of Chef Automate, Chef Infra Server, and Chef Desktop because the servers do not distinguish between the types of managed nodes when combining existing Chef Automate nodes with a new Chef Desktop installation.
 {{< /warning >}}
 
-For guidance on installing Chef Desktop, see the [installing Chef Desktop documentation](https://docs.chef.io/desktop/desktop_setup_chef/#install-chef-automate-and-chef-infra-server).
+For guidance on installing Chef Desktop, see the [installing Chef Desktop documentation](https://docs.chef.io/desktop/demonstration_setup/).
 The Desktop dashboard has no supported compliance profiles, and Chef Desktop installation includes no compliance profiles.
 
 {{< note >}}
@@ -40,7 +40,7 @@ Node counts in the _Desktop_ dashboard may include liveness agents.
 
 ### Daily Check-in
 
-The _Daily Check-in_ display shows a top-level view of daily desktop check-in statistics.  
+The _Daily Check-in_ display shows a top-level view of daily desktop check-in statistics.
 A bar graphic illustrates the proportion of desktops with `unknown` and `checked-in` statuses.
 Below the bar, boxes display counts of all desktops, desktops with an `unknown` status, and desktops with a `checked-in` status.
 `Checked-in` refers to desktops reporting into Chef Automate.
