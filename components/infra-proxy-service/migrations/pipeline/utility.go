@@ -475,12 +475,12 @@ func getChefServerOrgUsers(orgName, fileLocation string) ([]pipeline.UserAssocia
 
 	members, err := getOrgMembers(orgName, fileLocation)
 	if err != nil {
-		log.Errorf("Unable to get orgnisation members %s", err)
+		log.Errorf("Unable to get organization members %s", err)
 		return nil, err
 	}
 	admins, err := getOrgAdmins(orgName, fileLocation)
 	if err != nil {
-		log.Errorf("Unable to get orgnisation admins %s", err)
+		log.Errorf("Unable to get organization admins %s", err)
 		return nil, err
 	}
 	orgAdminMap := createMapForOrgAdminsInJson(admins)
@@ -588,13 +588,13 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, localUserClient 
 	return result, nil
 }
 
-// Clean serialized_object and Polulate Users struct
+// Clean serialized_object and Populate Users struct
 func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 	users := make([]pipeline.User, 0)
 	for _, kd := range keyDump {
 		sec := map[string]string{}
 		if err := json.Unmarshal([]byte(kd.SerializedObject), &sec); err != nil {
-			log.Errorf("failed to pasre user's first, middle and last name: %s", err.Error())
+			log.Errorf("failed to parse user's first, middle and last name: %s", err.Error())
 		}
 		user := &pipeline.User{
 			Username:    kd.Username,
@@ -613,16 +613,16 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 
 func automateMap(automateUser []storage.User) map[string]storage.User {
 	automateMap := map[string]storage.User{}
-	for _, auser := range automateUser {
-		automateMap[auser.InfraServerUsername] = auser
+	for _, aUser := range automateUser {
+		automateMap[aUser.InfraServerUsername] = aUser
 	}
 	return automateMap
 }
 
 func serverMap(server []pipeline.User) map[string]pipeline.User {
 	serverMap := map[string]pipeline.User{}
-	for _, auser := range server {
-		serverMap[auser.Username] = auser
+	for _, sUser := range server {
+		serverMap[sUser.Username] = sUser
 	}
 	return serverMap
 }
