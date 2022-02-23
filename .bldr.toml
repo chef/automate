@@ -1013,6 +1013,7 @@ paths = [
   "api/external/secrets/*",
   "api/interservice/authz/*",
   "api/interservice/infra_proxy/*",
+  "api/interservice/local_user/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/io/*",
