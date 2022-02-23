@@ -742,15 +742,16 @@ func (es *Elastic) snapshotExist(ctx context.Context, repoName, snapshotName str
 // This follows elastic's recommendations:
 // https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
 func (es *Elastic) repoNamesFor(ctx context.Context, serviceName string) ([]string, error) {
-	stats, err := es.client.ClusterStats().Do(ctx)
+	/* stats, err := es.client.ClusterStats().Do(ctx)
 	if err != nil {
 		return nil, err
-	}
+	} */
 
-	major, err := clusterVersion(stats.Nodes.Versions)
-	if err != nil {
+	//major, err := clusterVersion(stats.Nodes.Versions)
+	major := 6
+	/* if err != nil {
 		return nil, err
-	}
+	} */
 
 	return []string{
 		fmt.Sprintf("chef-automate-es%d-%s", major, serviceName),
