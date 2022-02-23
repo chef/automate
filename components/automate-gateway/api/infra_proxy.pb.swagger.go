@@ -2878,14 +2878,6 @@ func init() {
           "type": "string",
           "description": "Chef organization name."
         },
-        "admin_user": {
-          "type": "string",
-          "description": "Chef organization admin user."
-        },
-        "admin_key": {
-          "type": "string",
-          "description": "Chef organization admin key."
-        },
         "server_id": {
           "type": "string",
           "description": "Chef Infra Server ID."
