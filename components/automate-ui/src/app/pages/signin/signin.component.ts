@@ -29,7 +29,7 @@ export class SigninComponent implements OnInit {
         return;
       }
       let state: string;
-      [this.idToken, state] = this.idTokenAndStateFromFragment(fragment);
+      [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
       if (this.idToken === null) {
         this.error = true;
         return;
@@ -43,8 +43,14 @@ export class SigninComponent implements OnInit {
 
       this.error = false;
       this.setSession();
+      this.deleteIdTokenFromCookie(this.idToken);
       this.router.navigateByUrl(this.path);
     });
+  }
+
+  deleteIdTokenFromCookie(token: string): void {
+    // Expire id_token cookie once it's set in localStorage
+    document.cookie = `id_token=${token}; Path=/; Expires=${new Date().toUTCString()};`;
   }
 
   setSession(): void {
@@ -76,9 +82,12 @@ export class SigninComponent implements OnInit {
     return path;
   }
 
-  idTokenAndStateFromFragment(fragment: string): [string | null, string | null] {
+  idTokenAndStateFromCookieAndFragment(fragment: string): [string | null, string | null] {
     // Note: we only get an ID token and state now, so we match from ^ to $
-    const matches = fragment.match('^id_token=([^&]+)&state=([^&]*)$');
-    return matches ? [matches[1], matches[2]] : [null, null];
+    const state_match = fragment.match('^state=([^&]*)$');
+    const id_token_match = `; ${document.cookie}`.match(';\\s*id_token=([^;]+)');
+    const id_token = id_token_match ? id_token_match[1] : null;
+    const state = state_match ? state_match[1] : null;
+    return [id_token, state];
   }
 }

@@ -244,20 +244,16 @@ export class ChefSessionService implements CanActivate {
   }
 
   // url: UI route to go back to when the (next) signin process has succeeded
-  // noHint: for the sign in, don't try to skip the method selection
-  logout(url?: string, noHint?: boolean, ui_signout?: boolean): void {
+  logout(url?: string, ui_signout?: boolean): void {
       if (ui_signout) {
         this.blacklistIdToken(this.id_token);
       }
-      this.deleteSession();
       url = url || this.currentPath();
       // note: url will end up url-encoded in this string (magic)
       let signinURL: string;
-      if (!noHint && this.user && this.user.id_token) {
-        signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
-      } else {
-        signinURL = `/session/new?state=${url}`;
-      }
+      signinURL = `/session/new?state=${url}`;
+      this.deleteSession();
+
       window.location.href = signinURL;
   }
 
@@ -296,7 +292,7 @@ export class ChefSessionService implements CanActivate {
     function timerIncrement() {
       idleTime = idleTime + 1;
       if (idleTime === idleTimeout + 1) {
-          this.logout('/', true);
+          this.logout('/');
       }
     }
   }
