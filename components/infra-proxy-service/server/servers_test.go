@@ -54,7 +54,7 @@ func TestServers(t *testing.T) {
 		t.Run("when a valid server is submitted, creates the new server successfully", func(t *testing.T) {
 			req := &request.CreateServer{
 				Id:        "chef-infra-server",
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -88,7 +88,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server ID is missing, raise invalid argument error", func(t *testing.T) {
 
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -103,7 +103,7 @@ func TestServers(t *testing.T) {
 
 			req1 := &request.CreateServer{
 				Id:        "chef-infra-server",
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -115,7 +115,7 @@ func TestServers(t *testing.T) {
 
 			req2 := &request.CreateServer{
 				Id:        "chef-infra-server",
-				Name:      constants.TestServerName2,
+				Name:      constants.NewTestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -141,7 +141,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server webui key is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
-				Name:      constants.TestServerName2,
+				Name:      constants.NewTestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 			})
@@ -153,7 +153,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server webui key is invalid, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
-				Name:      constants.TestServerName2,
+				Name:      constants.NewTestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  "fake webui key",
@@ -176,7 +176,7 @@ func TestServers(t *testing.T) {
 		t.Run("when there are some servers in db, return all the servers successfully", func(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        constants.TestServerId,
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -186,7 +186,7 @@ func TestServers(t *testing.T) {
 
 			resp2, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server2",
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "",
 				WebuiKey:  webuiKey,
@@ -209,7 +209,7 @@ func TestServers(t *testing.T) {
 
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        constants.TestServerId,
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -263,7 +263,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server exists, return the server successfully", func(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        constants.TestServerId,
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -292,7 +292,7 @@ func TestServers(t *testing.T) {
 
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        constants.TestServerId,
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -331,7 +331,7 @@ func TestServers(t *testing.T) {
 		t.Run("when an existing server is deleted, deletes the server successfully", func(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        constants.TestServerId,
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "",
 				WebuiKey:  webuiKey,
@@ -360,7 +360,7 @@ func TestServers(t *testing.T) {
 
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        constants.TestServerId,
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "",
 				WebuiKey:  webuiKey,
@@ -420,7 +420,7 @@ func TestServers(t *testing.T) {
 		t.Run("when a valid server is submitted, updates the server successfully", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
-				Name:      constants.TestServerName1,
+				Name:      constants.TestServerName,
 				Fqdn:      fqdn,
 				IpAddress: "0.0.0.0",
 				WebuiKey:  webuiKey,
@@ -517,7 +517,7 @@ func TestServers(t *testing.T) {
 		secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 		resp, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "chef-infra-server",
-			Name:      constants.TestServerName1,
+			Name:      constants.TestServerName,
 			Fqdn:      fqdn,
 			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,

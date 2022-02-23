@@ -39,9 +39,9 @@ const (
 )
 
 const (
-	TestServerName1 = "Chef infra server"
-	TestServerName2 = "New chef infra server"
-	TestServerId    = "chef-infra-server1"
+	TestServerName    = "Chef infra server"
+	NewTestServerName = "New chef infra server"
+	TestServerId      = "chef-infra-server1"
 )
 
 const (
