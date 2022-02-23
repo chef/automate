@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/chef/automate/api/interservice/local_user"
 	"errors"
+	"github.com/chef/automate/api/interservice/local_user"
 	"io"
 	"os"
 	"path"
@@ -554,6 +554,7 @@ func createMapForOrgAdminsInJson(adminsJson pipeline.AdminsJson) map[string]stri
 
 }
 
+//GetUsersForBackup get all the users details from back up file
 func GetUsersForBackup(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("starting with user parsing phase for migration id: ", result.Meta.MigrationID)
 
@@ -669,6 +670,7 @@ func skipOrUpdate(autoMap map[string]storage.User, sUser pipeline.User) pipeline
 	}
 	return pipeline.User{}
 }
+
 func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipeline.User {
 	var parsedUsers []pipeline.User
 	serverMap := serverMap(serverUser)
@@ -685,6 +687,7 @@ func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipel
 	return parsedUsers
 }
 
+//checkUserExist check user exists in the local automate or not
 func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) bool {
 	_, err := localUserClient.GetUser(ctx, &local_user.Email{Email: user.AutomateUsername})
 	if err != nil {
