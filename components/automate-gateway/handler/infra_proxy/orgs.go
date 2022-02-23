@@ -42,12 +42,10 @@ func (a *InfraProxyServer) GetOrg(ctx context.Context, r *gwreq.GetOrg) (*gwres.
 // CreateOrg posts an org upstream
 func (a *InfraProxyServer) CreateOrg(ctx context.Context, r *gwreq.CreateOrg) (*gwres.CreateOrg, error) {
 	req := &infra_req.CreateOrg{
-		Id:        r.Id,
-		Name:      r.Name,
-		AdminUser: r.AdminUser,
-		AdminKey:  r.AdminKey,
-		ServerId:  r.ServerId,
-		Projects:  r.Projects,
+		Id:       r.Id,
+		Name:     r.Name,
+		ServerId: r.ServerId,
+		Projects: r.Projects,
 	}
 	res, err := a.client.CreateOrg(ctx, req)
 	if err != nil {
