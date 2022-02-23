@@ -33,6 +33,20 @@ function infra_service_migration_integration() {
   A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test -run TestStorageStagedDataLoadSampleData -v "github.com/chef/automate/components/infra-proxy-service/integration_test"
 }
 
+document "infra_service_server_integration" <<DOC
+  Runs the integration tests for the infra_service_server_integration
+DOC
+function infra_service_server_integration() {
+  check_if_deployinate_started || return 1;
+  export CONTAINER_HOSTNAME=localhost
+  # Setup local chef server
+  # loads data which resides in dev-docs/adding-data/infra/chef-repo
+  infra_service_load_chef_repo
+  log_line "Started loading chef repo..."
+  # Go based integration tests
+  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/server"
+}
+
 document "infra_service_load_test_data" <<DOC
   run the infra service's integration tests with data.
 
