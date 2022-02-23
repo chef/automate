@@ -182,4 +182,3 @@ func (p *postgres) getUsers(ctx context.Context, q querier, serverID string) ([]
 	}
 	return users, nil
 }
-
