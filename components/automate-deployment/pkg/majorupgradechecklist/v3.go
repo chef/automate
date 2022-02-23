@@ -113,14 +113,14 @@ var postChecklistExternal = []PostCheckListItem{
 }
 
 type V3ChecklistManager struct {
-	writer               cli.FormatWriter
-	version              string
+	writer  cli.FormatWriter
+	version string
 }
 
 func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3ChecklistManager {
 	return &V3ChecklistManager{
-		writer:               writer,
-		version:              version,
+		writer:  writer,
+		version: version,
 	}
 }
 
@@ -141,6 +141,16 @@ func isExternalPG() bool {
 		fmt.Println("error in config from environment")
 	}
 	return config.IsExternalPG()
+}
+
+func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
+	var postChecklist []PostCheckListItem
+	if isExternalPG() {
+		postChecklist = postChecklistExternal
+	} else {
+		postChecklist = postChecklistEmbedded
+	}
+	return postChecklist
 }
 
 func (ci *V3ChecklistManager) RunChecklist() error {
@@ -311,4 +321,3 @@ func promptUpgradeContinue() Checklist {
 		},
 	}
 }
-
