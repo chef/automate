@@ -7,6 +7,7 @@ import (
 
 type ChecklistManager interface {
 	RunChecklist() error
+	GetPostChecklist() []PostCheckListItem
 }
 
 func NewChecklistManager(writer cli.FormatWriter, version, major string) (ChecklistManager, error) {

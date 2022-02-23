@@ -10,6 +10,7 @@ const (
 
 type PostChecklistManager struct {
 	version string
+	ci      ChecklistManager
 }
 
 type PostCheckListItem struct {
@@ -26,23 +27,22 @@ type PostChecklist struct {
 	Seen          bool                `json:"seen"`
 }
 
-func NewPostChecklistManager(version string) PostChecklistManager {
+func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	majorVersion, _ := GetMajorVersion(version)
-
-	return PostChecklistManager{
-		version: majorVersion,
+	ci, err := NewChecklistManager(nil, version, "")
+	if err != nil {
+		return nil, err
 	}
+	return &PostChecklistManager{
+		version: majorVersion,
+		ci:      ci,
+	}, nil
 }
 
-func (ci *PostChecklistManager) CreatePostChecklistFile() error {
+func (pcm *PostChecklistManager) CreatePostChecklistFile() error {
 	params := PostChecklist{}
-	if isExternalPG() {
-		params.PostChecklist = append(params.PostChecklist, postChecklistExternal...)
-	} else {
-		params.PostChecklist = append(params.PostChecklist, postChecklistEmbedded...)
-	}
-
-	params.Version = ci.version
+	params.PostChecklist = append(params.PostChecklist, pcm.ci.GetPostChecklist()...)
+	params.Version = pcm.version
 	err := CreateJsonFile(&params, upgrade_metadata)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (ci *PostChecklistManager) CreatePostChecklistFile() error {
 	return nil
 }
 
-func (ci *PostChecklistManager) ReadPostChecklistById(id string) (bool, error) {
+func (pcm *PostChecklistManager) ReadPostChecklistById(id string) (bool, error) {
 	ChecklistId_Found := false
 	res, err := ReadJsonFile(upgrade_metadata)
 	if err != nil {
@@ -68,7 +68,7 @@ func (ci *PostChecklistManager) ReadPostChecklistById(id string) (bool, error) {
 	return ChecklistId_Found, nil
 }
 
-func (ci *PostChecklistManager) ReadPendingPostChecklistFile() ([]string, error) {
+func (pcm *PostChecklistManager) ReadPendingPostChecklistFile() ([]string, error) {
 	var postCmdList []string
 	var showPostChecklist = false
 	res, err := ReadJsonFile(upgrade_metadata)
@@ -76,7 +76,7 @@ func (ci *PostChecklistManager) ReadPendingPostChecklistFile() ([]string, error)
 		return nil, err
 	}
 
-	if res.Version == ci.version {
+	if res.Version == pcm.version {
 		if (isExternalPG() && !res.Seen) || !isExternalPG() {
 			for i := 0; i < len(res.PostChecklist); i++ {
 				if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || !res.Seen {
@@ -108,7 +108,7 @@ func (ci *PostChecklistManager) ReadPendingPostChecklistFile() ([]string, error)
 	return nil, nil
 }
 
-func (ci *PostChecklistManager) UpdatePostChecklistFile(id string) error {
+func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string) error {
 	res, err := ReadJsonFile(upgrade_metadata)
 	if err != nil {
 		return err
