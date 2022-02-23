@@ -9,6 +9,11 @@ const (
 	Update
 )
 
+const (
+	Local = "LOCAL"
+	LADP  = "LDAP"
+)
+
 //
 type Result struct {
 	// Meta for Zip file info
@@ -114,7 +119,7 @@ type User struct {
 	LastName    string `json:"last_name"`
 	MiddleName  string `json:"middle_name"`
 
-	// AutomateUsername is ldap username
+	// Local username or ldap username required for automate login
 	AutomateUsername string `json:"automate_username"`
 
 	// Connector ldap user
@@ -123,8 +128,8 @@ type User struct {
 	// IsConflicting for user's existence in db
 	IsConflicting bool `json:"is_conflicting"`
 
-	// IsAdmin (user is admin or not)
-	IsAdmin bool `json:"is_admin"`
+	// ActionOps for Insert Skip Update and Delete
+	ActionOps ActionOps `json:"action_ops"`
 }
 
 type OrgJson struct {
