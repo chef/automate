@@ -39,6 +39,12 @@ const (
 )
 
 const (
-	TestServerName = "Chef infra server"
-	TestServerId   = "chef-infra-server1"
+	TestServerName1 = "Chef infra server"
+	TestServerName2 = "New chef infra server"
+	TestServerId    = "chef-infra-server1"
+)
+
+const (
+	FailedUploadFile = "Failed to upload file for migration id: %s, error: %v"
+	InvalidServerURL = "invalid server url: %s"
 )

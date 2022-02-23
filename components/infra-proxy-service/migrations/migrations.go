@@ -51,7 +51,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		}
 
 		if err != nil {
-			errMsg := fmt.Sprintf("Failed to upload file for migration id: %s, error: %v", migrationId, err)
+			errMsg := fmt.Sprintf(constants.FailedUploadFile, migrationId, err)
 			StreamErr(err, ctx, stream, s, migrationId, serverId, errMsg)
 			return err
 		}
@@ -59,7 +59,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		chunk := req.GetChunk().Data
 		_, err = fileData.Write(chunk)
 		if err != nil {
-			errMsg := fmt.Sprintf("Failed to upload file for migration id: %s, error: %v", migrationId, err)
+			errMsg := fmt.Sprintf(constants.FailedUploadFile, migrationId, err)
 			StreamErr(err, ctx, stream, s, migrationId, serverId, errMsg)
 			return err
 		}

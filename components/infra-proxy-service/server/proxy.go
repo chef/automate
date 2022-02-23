@@ -15,6 +15,7 @@ import (
 
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 )
 
@@ -126,7 +127,7 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 
 	baseURL, err := targetURL(server.Fqdn, server.IPAddress, org.Name)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
+		return nil, status.Errorf(codes.InvalidArgument, constants.InvalidServerURL, baseURL)
 	}
 	// If using web ui key then set admin user as pivotal otherwise use org admin user
 	if isWebuiKey {
@@ -227,7 +228,7 @@ func (s *Server) createChefServerClient(ctx context.Context, serverID string, ke
 
 	baseURL, err := targetServerURL(server.Fqdn, server.IPAddress)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
+		return nil, status.Errorf(codes.InvalidArgument, constants.InvalidServerURL, baseURL)
 	}
 
 	client, err := NewChefClient(&ChefConfig{
@@ -246,7 +247,7 @@ func (s *Server) createCSClientWithFqdn(ctx context.Context, fqdn string, key st
 
 	baseURL, err := targetServerURL(fqdn, "")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
+		return nil, status.Errorf(codes.InvalidArgument, constants.InvalidServerURL, baseURL)
 	}
 
 	client, err := NewChefClient(&ChefConfig{

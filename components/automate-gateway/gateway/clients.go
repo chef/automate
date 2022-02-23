@@ -43,6 +43,8 @@ import (
 
 var ErrNoConnectionConfigured = errors.New("Client not configured")
 
+const ConnectionName = "infra-proxy-service"
+
 // grpcServices are gRPC backend services that we'll connect to to build clients
 var grpcServices = []string{
 	"applications-service",
@@ -448,7 +450,7 @@ func (c *clientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient
 }
 
 func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error) {
-	conn, err := c.connectionByName("infra-proxy-service")
+	conn, err := c.connectionByName(ConnectionName)
 	if err != nil {
 		return nil, err
 	}
@@ -456,7 +458,7 @@ func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyServiceClient
 }
 
 func (c *clientsFactory) InfraProxyMigrationClient() (infra_proxy_migration.MigrationDataServiceClient, error) {
-	conn, err := c.connectionByName("infra-proxy-service")
+	conn, err := c.connectionByName(ConnectionName)
 	if err != nil {
 		return nil, err
 	}
