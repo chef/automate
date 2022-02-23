@@ -15,7 +15,6 @@ import (
 	secrets "github.com/chef/automate/api/external/secrets"
 	request "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
-	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
