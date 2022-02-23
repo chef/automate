@@ -13,3 +13,4 @@ database: chef_infra_proxy
 migrations-path: /src/components/infra-proxy-service/storage/postgres/migration/sql/
 authz-address: "0.0.0.0:10130"
 secrets-address: "0.0.0.0:10131"
+local-user-address: "0.0.0.0:9092"

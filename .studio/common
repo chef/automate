@@ -28,6 +28,8 @@ function compile_client_mocks() {
       mockgen_debug -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
       mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest
+      mockgen_debug -source local_user/users.pb.go -destination local_user/users.pb.client_mock.go -package local_user -self_package github.com/chef/automate/api/interservice/local_user
+
       # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt and event_feed because of
       # an issue with source-mode's ability to parse interfaces from the
       # grpc package. Details here:
