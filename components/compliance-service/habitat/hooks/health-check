@@ -29,6 +29,9 @@ response=$(grpcurl -max-time 2 \
   127.0.0.1:{{cfg.service.port}} \
   chef.automate.domain.compliance.version.VersionService.Version 2>&1)
 
+echo ":::this is response:::"
+echo $response
+
 parse_result=$(echo "$response" | jq -r .name)
 
 rc=3
