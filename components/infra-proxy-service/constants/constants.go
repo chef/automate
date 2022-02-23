@@ -37,3 +37,8 @@ const (
 	Completed
 	Failed
 )
+
+const (
+	TestServerName = "Chef infra server"
+	TestServerId   = "chef-infra-server1"
+)

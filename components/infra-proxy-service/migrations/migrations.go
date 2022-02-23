@@ -29,11 +29,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	migrationId, err := createMigrationId()
 	if err != nil {
 		log.WithError(err).Error("Unable to create migration id")
-		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-		errStream := stream.SendAndClose(res)
-		if errStream != nil {
-			log.Errorf(constants.FailedSendAndCloseStream, migrationId, err.Error())
-		}
+		StreamErr(err, ctx, stream, s, migrationId, serverId, "Unable to create migration id")
 		return err
 	}
 	log.Info("Starting with migration phase with the upload file for migration id: ", migrationId)
@@ -50,42 +46,28 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	}
 	for {
 		req, err := stream.Recv()
-
 		if err == io.EOF {
 			break
 		}
 
 		if err != nil {
-			log.Errorf("Failed to upload file for migration id %s : %s", migrationId, err.Error())
-			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-			errStream := stream.SendAndClose(res)
-			if errStream != nil {
-				log.Errorf(constants.FailedSendAndCloseStream, migrationId, err.Error())
-			}
+			errMsg := fmt.Sprintf("Failed to upload file for migration id: %s, error: %v", migrationId, err)
+			StreamErr(err, ctx, stream, s, migrationId, serverId, errMsg)
 			return err
 		}
 
 		chunk := req.GetChunk().Data
 		_, err = fileData.Write(chunk)
 		if err != nil {
-			log.Errorf("Failed to upload file for migration id %s : %s", migrationId, err.Error())
-			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-			errStream := stream.SendAndClose(res)
-			if errStream != nil {
-				log.Errorf(constants.FailedSendAndCloseStream, migrationId, err.Error())
-			}
+			errMsg := fmt.Sprintf("Failed to upload file for migration id: %s, error: %v", migrationId, err)
+			StreamErr(err, ctx, stream, s, migrationId, serverId, errMsg)
 			return err
 		}
 	}
 
 	folderpath, err := saveFile(migrationId, fileName, fileData)
 	if err != nil {
-		log.Errorf("Failed to save uploaded file for migration id %s : %s", migrationId, err.Error())
-		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
-		errStream := stream.SendAndClose(res)
-		if errStream != nil {
-			log.Errorf(constants.FailedSendAndCloseStream, migrationId, err.Error())
-		}
+		StreamErr(err, ctx, stream, s, migrationId, serverId, "Failed to save uploaded file")
 		return err
 	}
 	log.Info("File successfully saved in the directory for the requested file for migration id: ", migrationId)
@@ -330,4 +312,13 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	return &response.ConfirmPreview{
 		MigrationId: req.MigrationId,
 	}, nil
+}
+
+func StreamErr(err error, ctx context.Context, stream service.MigrationDataService_UploadFileServer, migServer *MigrationServer, migrationId, serverId, errMsg string) {
+	log.Errorf(errMsg)
+	res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, migServer, ctx)
+	errStream := stream.SendAndClose(res)
+	if errStream != nil {
+		log.Errorf(errMsg)
+	}
 }
