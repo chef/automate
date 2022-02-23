@@ -437,7 +437,7 @@ func checkUpdateMigration(check bool) error {
 		return err
 	}
 	if !check && err == nil {
-		ci := majorupgradechecklist.NewCRUDChecklist(AUTOMATE_VERSION)
+		ci := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
 		ci.UpdatePostChecklistFile("migrate_pg")
 	}
 	return nil
