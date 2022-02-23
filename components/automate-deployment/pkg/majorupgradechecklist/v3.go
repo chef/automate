@@ -57,7 +57,7 @@ Post Upgrade Steps:
 `
 )
 
-var postChecklistEmbedded = []PostCheckList{
+var postChecklistEmbedded = []PostCheckListItem{
 	{
 		Id:         "upgrade_status",
 		Msg:        run_chef_automate_upgrade_status,
@@ -84,7 +84,7 @@ var postChecklistEmbedded = []PostCheckList{
 	},
 }
 
-var postChecklistExternal = []PostCheckList{
+var postChecklistExternal = []PostCheckListItem{
 	{
 		Id:         "patch_new_config",
 		Msg:        patch_new_conf,
@@ -113,14 +113,14 @@ var postChecklistExternal = []PostCheckList{
 }
 
 type V3ChecklistManager struct {
-	writer  cli.FormatWriter
-	version string
+	writer               cli.FormatWriter
+	version              string
 }
 
 func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3ChecklistManager {
 	return &V3ChecklistManager{
-		writer:  writer,
-		version: version,
+		writer:               writer,
+		version:              version,
 	}
 }
 
@@ -147,7 +147,7 @@ func (ci *V3ChecklistManager) RunChecklist() error {
 
 	var dbType string
 	checklists := []Checklist{}
-	var postcheck []PostCheckList
+	var postcheck []PostCheckListItem
 
 	if isExternalPG() {
 		dbType = "External"
@@ -158,7 +158,7 @@ func (ci *V3ChecklistManager) RunChecklist() error {
 		postcheck = postChecklistEmbedded
 		checklists = append(checklists, preChecklist(diskSpaceCheck)...)
 	}
-	checklists = append(checklists, ci.showPostChecklist(postcheck), promptUpgradeContinue())
+	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
@@ -177,13 +177,13 @@ func (ci *V3ChecklistManager) RunChecklist() error {
 	return nil
 }
 
-func (ci *V3ChecklistManager) showPostChecklist(postCheck []PostCheckList) Checklist {
+func showPostChecklist(postCheck *[]PostCheckListItem) Checklist {
 	return Checklist{
 		Name:        "Show_Post_Checklist",
 		Description: "Show Post Checklist",
 		TestFunc: func(h ChecklistHelper) error {
 			displayed := false
-			for i, item := range postCheck {
+			for i, item := range *postCheck {
 				if !item.IsExecuted {
 					if !displayed {
 						h.Writer.Println(post_upgrade_header)

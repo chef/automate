@@ -126,7 +126,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if upgradeRunCmdFlags.isMajorUpgrade {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, "")
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -280,7 +280,10 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 		_, isMajorVersion := manifest.IsSemVersionFmt(resp.CurrentVersion)
 		if isMajorVersion {
-			ci := majorupgradechecklist.NewCRUDChecklist(resp.CurrentVersion)
+			ci := majorupgradechecklist.NewPostChecklistManager(resp.CurrentVersion)
+			if err != nil {
+				return err
+			}
 			resp, err := ci.ReadPendingPostChecklistFile()
 			if err != nil {
 				return status.Wrap(
