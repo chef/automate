@@ -306,7 +306,7 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 	logrus.Debugln("Is External PG enabled : ", enableExternalPg)
 
 	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
-	logrus.Debugln("Is External PG enabled : ", enableExternalES)
+	logrus.Debugln("Is External ES enabled : ", enableExternalES)
 
 	for i, service := range expectedServices {
 		var convergeState converge.ServiceConvergeState
