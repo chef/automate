@@ -118,6 +118,11 @@ type User struct {
 	InfraServerUsername string
 	CredentialID        string
 	Connector           string
+	Email               string
+	DisplayName         string
+	FirstName           string
+	LastName            string
+	MiddleName          string
 	AutomateUserID      string
 	IsServerAdmin       bool
 	CreatedAt           time.Time
