@@ -180,3 +180,9 @@ variable "tags" {
 variable "tmp_path" {
   default = "/var/tmp"
 }
+
+variable "private_custom_subnets"{
+}
+
+variable "public_custom_subnets"{
+}

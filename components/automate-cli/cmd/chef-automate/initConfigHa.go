@@ -35,6 +35,7 @@ type AwsConfigToml struct {
 			ExistingElkUsername         string `toml:"existing_elk_username"`
 			ExistingElkPassword         string `toml:"existing_elk_password"`
 			BackupMount                 string `toml:"backup_mount"`
+			EFSCreation                 string `toml:"efs_creation"`
 			HabitatUIDGid               string `toml:"habitat_uid_gid"`
 		} `toml:"aws"`
 	} `toml:"architecture"`
@@ -68,6 +69,8 @@ type AwsConfigToml struct {
 			Region                          string `toml:"region"`
 			AwsVpcId                        string `toml:"aws_vpc_id"`
 			AwsCidrBlockAddr                string `toml:"aws_cidr_block_addr"`
+			PrivateCustomSubnets            string `toml:"private_custom_subnet"`
+            PublicCustomSubnets             string `toml:"public_custom_subnet"`
 			SSHKeyPairName                  string `toml:"ssh_key_pair_name"`
 			SetupManagedServices            bool   `toml:"setup_managed_services"`
 			ElasticsearchDomainUrl          string `toml:"managed_elasticsearch_domain_url"`

@@ -211,6 +211,7 @@ resource "aws_security_group_rule" "egress_allow_443_tcp_all" {
   security_group_id = aws_security_group.base_linux.id
 }
 
+<<<<<<< HEAD
 resource "aws_security_group_rule" "egress_allow_5601_tcp_all" {
   type              = "egress"
   from_port         = 5601
@@ -319,3 +320,5 @@ resource "aws_security_group_rule" "ingress_efs_nfs_2049" {
   security_group_id        = aws_security_group.efs_mount.id
   source_security_group_id = aws_security_group.base_linux.id
 }
+=======
+>>>>>>> chore: AutomateHA subnet changes

@@ -163,3 +163,17 @@ variable "ssh_user" {
 variable "sudo_cmd" {
   default = "sudo"
 }
+
+variable "efs_creation" {
+  default = "false"
+}
+
+variable "private_custom_subnets" {
+  default = []
+  type = list
+}
+
+variable "public_custom_subnets" {
+  default = []
+  type = list
+}
