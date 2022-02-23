@@ -21,6 +21,7 @@ ssh_key_file = "~/.ssh/A2HA.pem"
 # existing_elk_username ""
 # existing_elk_password ""
 backup_mount = "/mnt/automate_backups"
+efs_creation = "false"
 
 [automate.config]
 # admin_password = ""
