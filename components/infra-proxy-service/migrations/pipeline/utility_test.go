@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/chef/automate/api/interservice/local_user"
+
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
@@ -13,6 +15,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
+
+var insertBackup = "./../testdata/insertBackup/"
 
 func TestStoreOrg(t *testing.T) {
 	type args struct {
@@ -77,7 +81,7 @@ func TestParseOrg(t *testing.T) {
 		wantError error
 		want1     pipeline.ActionOps
 	}{
-		{name: "Test Insert Org", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Insert"}, mst: &testDB.MigrationDB{}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/insertBackup/", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Insert},
+		{name: "Test Insert Org", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Insert"}, mst: &testDB.MigrationDB{}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: insertBackup, ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Insert},
 		{name: "Test Update Org", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Update"}, mst: &testDB.MigrationDB{}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/updateBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Update},
 		{name: "Test Delete Org", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Delete"}, mst: &testDB.MigrationDB{}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/deleteBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Delete},
 		{name: "Test Skip Org", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Skip"}, mst: &testDB.MigrationDB{}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: backupFolderDefault, ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Skip},
@@ -128,6 +132,42 @@ func TestCreatePreview(t *testing.T) {
 				t.Errorf("CreatePreview() got = %v, want %v", got, tt.want1)
 			}
 		})
+	}
+}
+
+func TestGetUsersForBackup(t *testing.T) {
+	// backupFolderDefault := "../../testdata/skipBackup"
+	type args struct {
+		ctx             context.Context
+		st              storage.Storage
+		localUserClient *local_user.MockUsersMgmtServiceClient
+		result          pipeline.Result
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantError error
+		want1     pipeline.ActionOps
+	}{
+		{name: "Test Insert User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Insert"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: insertBackup, ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Insert},
+		{name: "Test Update User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Update"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/updateBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Update},
+		{name: "Test Delete User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Delete"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/deleteBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Delete},
+		{name: "Test Skip User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Skip"}, localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/skipBackup", ServerID: "server1", MigrationID: "mig1"}}}, wantError: nil, want1: pipeline.Skip},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			res, err := GetUsersForBackup(tt.args.ctx, tt.args.st, tt.args.localUserClient, tt.args.result)
+			require.NoError(t, err)
+			require.Equal(t, err, tt.wantError)
+
+			for _, usr := range res.ParsedResult.Users {
+				require.Equal(t, usr.ActionOps, tt.want1)
+			}
+
+		})
+
 	}
 }
 
@@ -196,7 +236,7 @@ func TestUserOrgAssociation(t *testing.T) {
 		wantError error
 		want1     pipeline.Result
 	}{
-		{name: "Test Insert Org User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Insert"}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: "../../testdata/insertBackup/", ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}}, wantError: nil, want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}, OrgsUsers: []pipeline.OrgsUsersAssociations{{OrgName: pipeline.Org{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}, Users: []pipeline.UserAssociation{{Username: "user1", IsAdmin: true, ActionOps: pipeline.Insert}, {Username: "user2", IsAdmin: false, ActionOps: pipeline.Insert}}}}}}},
+		{name: "Test Insert Org User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Insert"}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: insertBackup, ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}}}}, wantError: nil, want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}}, OrgsUsers: []pipeline.OrgsUsersAssociations{{OrgName: pipeline.Org{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Insert}, Users: []pipeline.UserAssociation{{Username: "user1", IsAdmin: true, ActionOps: pipeline.Insert}, {Username: "user2", IsAdmin: false, ActionOps: pipeline.Insert}}}}}}},
 		{name: "Test Skip Org and Insert Org User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Insert"}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: skipBackup, ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org3", FullName: "Org1_infra", ActionOps: pipeline.Skip}}}}}, wantError: nil, want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org3", FullName: "Org1_infra", ActionOps: pipeline.Skip}}, OrgsUsers: []pipeline.OrgsUsersAssociations{{OrgName: pipeline.Org{Name: "org3", FullName: "Org1_infra", ActionOps: pipeline.Skip}, Users: []pipeline.UserAssociation{{Username: "user1", IsAdmin: false, ActionOps: pipeline.Insert}, {Username: "user2", IsAdmin: true, ActionOps: pipeline.Insert}}}}}}},
 		{name: "Test Skip or Update Org User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Skip"}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: skipBackup, ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org3", FullName: "Org1_infra", ActionOps: pipeline.Skip}}}}}, wantError: nil, want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Skip}}, OrgsUsers: []pipeline.OrgsUsersAssociations{{OrgName: pipeline.Org{Name: "org3", FullName: "Org1_infra", ActionOps: pipeline.Skip}, Users: []pipeline.UserAssociation{{Username: "user1", IsAdmin: false, ActionOps: pipeline.Skip}, {Username: "user2", IsAdmin: true, ActionOps: pipeline.Update}}}}}}},
 		{name: "Test Delete Org User", args: args{ctx: context.Background(), st: &testDB.TestDB{Type: "Delete"}, result: pipeline.Result{Meta: pipeline.Meta{UnzipFolder: deleteBackUp, ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Delete}}}}}, wantError: nil, want1: pipeline.Result{Meta: pipeline.Meta{ServerID: "server1", MigrationID: "mig1"}, ParsedResult: pipeline.ParsedResult{Orgs: []pipeline.Org{{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Delete}}, OrgsUsers: []pipeline.OrgsUsersAssociations{{OrgName: pipeline.Org{Name: "org1", FullName: "Org1_infra", ActionOps: pipeline.Delete}, Users: []pipeline.UserAssociation{{Username: "user1", IsAdmin: true, ActionOps: pipeline.Delete}}}}}}},
@@ -214,5 +254,43 @@ func TestUserOrgAssociation(t *testing.T) {
 			}
 
 		})
+	}
+}
+
+func TestUserExists(t *testing.T) {
+	noUserRecord := "No user record found"
+	type args struct {
+		ctx             context.Context
+		localUserClient *local_user.MockUsersMgmtServiceClient
+		User            pipeline.User
+		ErrorType       string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantError error
+		want1     bool
+	}{
+		{name: "Test User Exists", args: args{ctx: context.Background(), localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), User: pipeline.User{AutomateUsername: "user1234", Username: "user1234"}}, wantError: nil, want1: true},
+		{name: "Test New User", args: args{ctx: context.Background(), localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), User: pipeline.User{AutomateUsername: "user1234", Username: "user1234"}, ErrorType: noUserRecord}, wantError: errors.New(noUserRecord), want1: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.wantError != nil {
+				if tt.args.ErrorType == noUserRecord {
+					tt.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(nil, errors.New(noUserRecord))
+				}
+			} else {
+				userResponse := &local_user.User{Id: "user1234", Name: "user1234"}
+				tt.args.localUserClient.EXPECT().GetUser(tt.args.ctx, gomock.Any(), gomock.Any()).Return(userResponse, nil)
+			}
+
+			got := checkUserExist(tt.args.ctx, tt.args.localUserClient, tt.args.User)
+			if got != tt.want1 {
+				t.Errorf("checkUserExists() got1 = %v, want %v", got, tt.want1)
+			}
+
+		})
+
 	}
 }

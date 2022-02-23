@@ -291,7 +291,6 @@ func getStagedUser(user pipeline_model.User) *response.User {
 	stagedUser.AutomateUsername = user.AutomateUsername
 	stagedUser.Connector = user.Connector
 	stagedUser.IsConflicting = user.IsConflicting
-	stagedUser.IsAdmin = user.IsAdmin
 	return stagedUser
 }
 

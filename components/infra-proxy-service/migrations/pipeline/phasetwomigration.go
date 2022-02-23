@@ -22,7 +22,7 @@ func PopulateOrgs(service *service.Service) PhaseTwoPipelineProcessor {
 	}
 }
 
-func populateOrgs(result <-chan PipelineData,service *service.Service) <-chan PipelineData {
+func populateOrgs(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
 	log.Info("Starting populateOrgs routine")
 	out := make(chan PipelineData, 100)
 
