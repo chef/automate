@@ -133,7 +133,42 @@ func (t *TestDB) DeleteUser(ctx context.Context, id string) (storage.User, error
 }
 
 func (t *TestDB) GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]storage.User, error) {
-	panic("implement me")
+	var x []storage.User
+	if t.NeedError {
+		return x, errors.New("failed to fetch users")
+	}
+	if t.Type == "Insert" {
+		return x, nil
+	}
+	if t.Type == "Update" {
+		user := storage.User{
+			InfraServerUsername: "kallol",
+			Email:               "kallol@progress.com",
+		}
+		x = append(x, user)
+		return x, nil
+	}
+	if t.Type == "Delete" {
+		user := storage.User{
+			InfraServerUsername: "davetweetliuve",
+			Email:               "mail@dave.augustus",
+		}
+		x = append(x, user)
+		return x, nil
+	}
+	if t.Type == "Skip" {
+		user := storage.User{
+			InfraServerUsername: "other-user2",
+			Email:               "otheruser2@email.com",
+		}
+		x = append(x, user)
+		return x, nil
+	}
+	return x, nil
+}
+
+func (t *TestDB) GetUsers(ctx context.Context, serverID string) ([]storage.User, error) {
+	return nil, nil
 }
 
 func (t *TestDB) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]storage.OrgUser, error) {
