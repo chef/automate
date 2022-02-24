@@ -26,10 +26,8 @@ if [[ ! -f "$erl_cookie" ]]; then
     (umask 077 && head -c256 /dev/urandom | sha512sum | cut -d' ' -f1 > "$erl_cookie")
     chmod 400 "$erl_cookie"
 fi
-previous_umask=$(umask)
-umask 022
-chmod +x {{pkg.path}}/bin/*
-chmod +x {{pkg.path}}/releases/1.0.0/elixir
-umask "$previous_umask"
+
+su -- root -c 'chmod +x {{pkg.path}}/bin/*'
+su -- root -c 'chmod +x {{pkg.path}}/releases/1.0.0/elixir'
 
 exec "{{pkg.path}}/bin/notifications" start
