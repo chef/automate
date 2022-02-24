@@ -441,9 +441,9 @@ List of VM with public and private IP. Public-ip is only mandatory for Ela
 |Elasticsearch (transport)|**9300**|
 |Kibana |**5601**|
 
-Configuration 	 
+## Configuration 	 
 
-----------------
+
 Setup configuration file for HA Deployment on existing infrastructure(On-prem)
 `./chef-automate init-config-ha existing_infra`
 
