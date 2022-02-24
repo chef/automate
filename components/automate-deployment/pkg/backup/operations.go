@@ -172,7 +172,7 @@ func (p *PathCopyOperation) Backup(backupCtx Context, om ObjectManifest, progCha
 		"src_path":  p.SrcPath,
 		"operation": "path_copy",
 		"action":    "backup",
-		"deadline":  backupCtxDeadline,
+		"deadline":  backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -380,7 +380,7 @@ func (p *PathCopyOperation) Delete(backupCtx Context) error {
 		"base_path": basePath,
 		"operation": "path_copy",
 		"action":    "delete",
-		"deadline":  backupCtxDeadline,
+		"deadline":  backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 	deleteObjs, _, err := backupCtx.bucket.List(backupCtx.ctx, basePath, false)
 	if err != nil {
@@ -428,7 +428,7 @@ func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verif
 		"base_path":  basePath,
 		"operation":  "path_copy",
 		"action":     "restore",
-		"deadline":   backupCtxDeadline,
+		"deadline":   backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -522,7 +522,7 @@ func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, p
 		"backup_id": backupCtx.backupTask.TaskID(),
 		"operation": "metadata_writer",
 		"action":    "backup",
-		"deadline":  backupCtxDeadline,
+		"deadline":  backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	writer, err := backupCtx.bucket.NewWriter(backupCtx.ctx, objectName)
@@ -574,7 +574,7 @@ func (m *MetadataWriterOperation) Delete(backupCtx Context) error {
 		"object_path": objectPath,
 		"operation":   "metadata_writer",
 		"action":      "delete",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
@@ -654,7 +654,7 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 		"object_name": objectName,
 		"operation":   "command_execute",
 		"action":      "backup",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	err = c.cmdExecutor.Run(cmdToExec[0],
@@ -767,7 +767,7 @@ func (c *CommandExecuteOperation) Delete(backupCtx Context) error {
 		"object_path": objectPath,
 		"operation":   "command_execute",
 		"action":      "delete",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
@@ -825,7 +825,7 @@ func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, v
 		"object_name": objectName,
 		"operation":   "database_dump",
 		"action":      "restore",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := verifier.ObjectValid(objectName); err != nil {
@@ -875,7 +875,7 @@ func (d *DatabaseDumpOperation) Delete(backupCtx Context) error {
 		"object_path": objectPath,
 		"operation":   "database_dump",
 		"action":      "delete",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
@@ -909,7 +909,7 @@ func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, 
 		"multi_index_spec": esop.MultiIndexSpec,
 		"operation":        "elasticsearch_snapshot",
 		"action":           "backup",
-		"deadline":         backupCtxDeadline,
+		"deadline":         backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -950,7 +950,7 @@ func (esop *ElasticsearchOperation) Restore(backupCtx Context, serviceName strin
 		"service_name": esop.ServiceName,
 		"operation":    "elasticsearch_snapshot",
 		"action":       "restore",
-		"deadline":     backupCtxDeadline,
+		"deadline":     backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -994,7 +994,7 @@ func (esop *ElasticsearchOperation) Delete(backupCtx Context) error {
 		"service_name": esop.ServiceName,
 		"operation":    "elasticsearch_snapshot",
 		"action":       "delete",
-		"deadline":     backupCtxDeadline,
+		"deadline":     backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	conn, err := backupCtx.connFactory.DialContext(backupCtx.ctx, "es-sidecar-service", backupCtx.esSidecarInfo.Address())
@@ -1150,7 +1150,7 @@ func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, p
 		"object_name": objectName,
 		"operation":   "database_dump_v2",
 		"action":      "backup",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	// TODO(ssd) 2018-04-16: Pass the progress bar and context
@@ -1201,7 +1201,7 @@ func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string,
 		"object_name": objectName,
 		"operation":   "database_dump_v2",
 		"action":      "restore",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := verifier.ObjectValid(objectName); err != nil {
@@ -1251,7 +1251,7 @@ func (d *DatabaseDumpOperationV2) Delete(backupCtx Context) error {
 		"object_path": objectPath,
 		"operation":   "database_dump_v2",
 		"action":      "delete",
-		"deadline":    backupCtxDeadline,
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
