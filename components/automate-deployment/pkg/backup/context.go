@@ -272,10 +272,18 @@ func (ctx Context) writeMetadataChecksums() (string, error) {
 }
 
 func (ctx Context) writeStringToBlob(storageKey string, str string) error {
-	// ctx.ctx gets canceled if the backup errors. Using it means we can never
-	// correctly write out a failed status
-	writeCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// ctx.ctx gets canceled if the backup errors.
+	// Using it means we can never correctly write out a failed status so make a new context
+	// Remote mounts such as CIFS, NFS etc may be slow so allow plenty of time for completion
+	writeCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
+
+	writeCtxDeadline, _ := writeCtx.Deadline()
+	logrus.WithFields(logrus.Fields{
+		"backup_id":   ctx.backupTask.TaskID(),
+		"storage_key": storageKey,
+		"deadline":    writeCtxDeadline,
+	}).Info("writeStringToBlob starting")
 
 	w, err := ctx.bucket.NewWriter(writeCtx, storageKey)
 	if err != nil {
@@ -291,6 +299,12 @@ func (ctx Context) writeStringToBlob(storageKey string, str string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Failed to commit %s", storageKey)
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"backup_id":   ctx.backupTask.TaskID(),
+		"storage_key": storageKey,
+		"deadline":    writeCtxDeadline,
+	}).Info("writeStringToBlob completed")
 
 	return nil
 }
