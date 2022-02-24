@@ -20,8 +20,15 @@
 
   [services.postgresql]
   ips = ${postgresql_ips}
+  managed_rds_certificate        = "${managed_rds_certificate}"
+  managed_rds_dbuser_password    = "${managed_rds_dbuser_password}"
+  managed_rds_dbuser_username    = "${managed_rds_dbuser_username}"
+  managed_rds_instance_url       = "${managed_rds_instance_url}"
+  managed_rds_superuser_password = "${managed_rds_superuser_password}"
+  managed_rds_superuser_username = "${managed_rds_superuser_username}"
   sup_port = 9631
   svc_group = "default"
   svc_name = "automate-ha-postgresql"
   svc_port = ${proxy_listen_port}
   ssl = ${postgresql_ssl_enable}
+  setup_managed_services = ${setup_managed_services}
