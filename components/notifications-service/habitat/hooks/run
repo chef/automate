@@ -27,11 +27,4 @@ if [[ ! -f "$erl_cookie" ]]; then
     chmod 400 "$erl_cookie"
 fi
 
-exit
-chown -R hab:hab {{pkg.path}}/bin/
-chmod +x {{pkg.path}}/bin/*
-chown -R {{pkg.path}}/releases/1.0.0/elixir
-chmod +x {{pkg.path}}/releases/1.0.0/elixir
-su hab
-
 exec "{{pkg.path}}/bin/notifications" start

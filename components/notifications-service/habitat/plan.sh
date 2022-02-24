@@ -101,6 +101,8 @@ do_build() {
   fix_interpreter "${TARGET}/releases/*/libexec/commands/*.sh" core/coreutils bin/env
   fix_interpreter "${TARGET}/bin/*.sh" core/coreutils bin/env
   fix_interpreter "${TARGET}/bin/notifications" core/coreutils bin/env
+  chmod +x ${TARGET}/bin/*
+  chmod +x ${TARGET}/releases/*/*
 }
 
 do_install() {
