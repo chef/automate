@@ -312,7 +312,7 @@ func Unzip(ctx context.Context, result pipeline.Result) (pipeline.Result, error)
 			return result, err
 		}
 
-		_, err = io.Copy(outFile, readClose)
+		_, err = io.CopyN(outFile, readClose, 32*1024)
 		if err != nil {
 			log.Errorf("cannot copy file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err

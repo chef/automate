@@ -254,7 +254,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.closeCreateModal();
       this.isServerLoaded = true;
       this.migrationLoading = false;
-      this.migration_id = '';
       this.migration_id = this.server.migration_id;
       this.migration_type = this.server.migration_type;
       if (this.migration_id !== '') {
