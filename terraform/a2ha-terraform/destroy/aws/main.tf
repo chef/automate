@@ -47,7 +47,7 @@ module "aws" {
 
 module "efs" {
   source                           = "../../modules/efs"
-  efs_creation                     = "true"
+  efs_creation                     = var.efs_creation
   private_subnets                  = module.aws.private_subnets
   private_custom_subnets           = var.private_custom_subnets
   ssh_key_file                     = var.ssh_key_file
