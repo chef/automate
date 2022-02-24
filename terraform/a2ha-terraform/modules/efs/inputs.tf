@@ -45,6 +45,10 @@ variable "private_subnets" {
   default = []
 }
 
+variable "private_custom_subnets" {
+  default = []
+}
+
 variable "ssh_key_file" {
 }
 
