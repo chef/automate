@@ -500,36 +500,24 @@ elasticsearch_private_ips = ["172.31.192.119","172.31.192.132","172.31.192.210"]
 postgresql_private_ips = ["172.31.192.30","172.31.192.36","172.31.192.57"]
 ```
 
-### mandatory fields in config.toml for existing_nodes
-
-secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-
-`Path to secrets key file`
-
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-
-`Path to secrets json`
-
-architecture = "existing_nodes"
+### Mandatory fields in config.toml for existing_nodes
 
 `This will come according to architecture for which you are deploying`
 
-ssh_user = "centos"
+```architecture = "existing_nodes"```
 
 `ssh user to conect to your nodes`
 
-ssh_key_file = "/home/ubuntu/a2ha-london.pem"
+ ```ssh_user = "centos"```
 
 `Path to ssh key file`
-
-fqdn = ""
+ ```ssh_key_file = "/home/ubuntu/a2ha-london.pem"```
 
 `automate load balancer fqdn IP or if there is 1 instance can use IP of that automate machine`
-
-config_file = "configs/automate.toml"
+ ```fqdn = ""```
 
 `Config file location of automate, where we can give additional config for automate`
-
+ ```config_file = "configs/automate.toml"```
 
 
 # Validation
