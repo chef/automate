@@ -39,9 +39,6 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		return errors.Wrap(err, "starting TCP listener")
 	}
 
-	fmt.Println("$$#$#$#$#$#$$ EVENTFEED MIGRATION ESCLIENT ######E#$#$#$")
-	fmt.Println(c.ElasticSearchURL)
-	fmt.Println("===================================================")
 	esClient, err := elastic.NewClient(
 		elastic.SetURL(c.ElasticSearchURL),
 		elastic.SetSniff(false),
@@ -56,9 +53,6 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 
 	err = migrator.InitializeStore()
 	if err != nil {
-		fmt.Println("$$#$#$#$#$#$$ EVENTFEED MIGRATION ERROR ######E#$#$#$")
-		fmt.Println(err)
-		fmt.Println("===================================================")
 		return errors.Wrap(err, "initializing elasticsearch")
 	}
 

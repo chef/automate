@@ -41,20 +41,15 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-	fmt.Println("##################################")
 	b, _ := json.Marshal(source)
 	fmt.Println(string(b))
-	fmt.Println("&#*$(#**$(#$*(#$*(#$ INDEX NAME ($#)($)#($#)($) :::::    " + queryInfo.esIndex)
-	fmt.Println("##################################")
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
-		fmt.Println("##################################")
 		fmt.Println(err)
-		fmt.Println("##################################")
 		return nil, err
 	}
 	fmt.Println(searchResult)
@@ -90,26 +85,19 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-	fmt.Println("##################################")
 	fmt.Println(source)
 	b, _ := json.Marshal(source)
 	fmt.Println(string(b))
-	fmt.Println("&#*$(#**$(#$*(#$*(#$ INDEX NAME ($#)($)#($#)($) :::::    " + queryInfo.esIndex)
-	fmt.Println("##################################")
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
-		fmt.Println("##################################")
 		if searchResult != nil {
-			fmt.Println("############### ------- ERROR DETAILS ------ ###################")
 			fmt.Println(searchResult.Error)
-			fmt.Println("############### ------- ERROR DETAILS END ------ ###################")
 		}
 		fmt.Println(err)
-		fmt.Println("##################################")
 		return nil, err
 	}
 	fmt.Println(searchResult)
@@ -146,21 +134,15 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-	fmt.Println("##################################")
-	fmt.Println(source)
 	b, _ := json.Marshal(source)
 	fmt.Println(string(b))
-	fmt.Println("&#*$(#**$(#$*(#$*(#$ INDEX NAME ($#)($)#($#)($) :::::    " + queryInfo.esIndex)
-	fmt.Println("##################################")
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
-		fmt.Println("##################################")
 		fmt.Println(err)
-		fmt.Println("##################################")
 		return nil, err
 	}
 	fmt.Println(searchResult)
@@ -211,21 +193,15 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-	fmt.Println("##################################")
-	fmt.Println(source)
 	b, _ := json.Marshal(source)
 	fmt.Println(string(b))
-	fmt.Println("&#*$(#**$(#$*(#$*(#$ INDEX NAME ($#)($)#($#)($) :::::    " + queryInfo.esIndex)
-	fmt.Println("##################################")
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
-		fmt.Println("##################################")
 		fmt.Println(err)
-		fmt.Println("##################################")
 		return failures, err
 	}
 	fmt.Println(searchResult)
