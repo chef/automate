@@ -21,7 +21,28 @@
 <% end %>
 
   [global.v1.external.postgresql]
-<% if svc_configs[:postgresql] -%>
+  <% if services[:postgresql][:setup_managed_services] ==true -%>
+    enable = true
+    nodes = <%= "#{services[:postgresql][:managed_rds_instance_url]}" %>
+
+  [global.v1.external.postgresql.ssl]
+    enable = <%= services[:postgresql][:ssl] %>
+    root_cert = """<%= svc_configs[:postgresql][:managed_rds_certificate] -%>"""
+
+  [global.v1.external.postgresql.auth]
+    scheme = "password"
+
+  [global.v1.external.postgresql.auth.password.superuser]
+    username = "<%= svc_configs[:postgresql][:managed_rds_superuser_username] -%>"
+    password = "<%= svc_configs[:postgresql][:managed_rds_superuser_password] -%>"
+
+  [global.v1.external.postgresql.auth.password.dbuser]
+    username = "<%= svc_configs[:postgresql][:managed_rds_dbuser_username] -%>"
+    password = "<%= svc_configs[:postgresql][:managed_rds_dbuser_password] -%>"
+
+  [global.v1.external.postgresql.backup]
+    enable = true
+<% elsif svc_configs[:postgresql] && services[:postgresql][:setup_managed_services] ==false -%>
     enable = true
     nodes = <%= services[:postgresql][:ips].map { |ip| "#{ip}:#{services[:postgresql][:svc_port]}" } %>
 
