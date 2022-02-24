@@ -40,8 +40,6 @@ module "aws" {
   postgresql_server_instance_type    = var.postgresql_server_instance_type
   proxy_listen_port                  = var.proxy_listen_port
   source                             = "../../modules/aws"
-  s3_bucket_name_lb_access           = var.s3_bucket_name_lb_access
-  lb_access_logs                     = var.lb_access_logs
   tags                               = var.aws_tags
 }
 
