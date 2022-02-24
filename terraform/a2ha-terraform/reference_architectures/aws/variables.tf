@@ -153,10 +153,6 @@ variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
 
-variable "setup_managed_services" {
-  default = false
-}
-
 variable "private_custom_subnets" {
   default = []
   type    = list(string)
@@ -165,6 +161,10 @@ variable "private_custom_subnets" {
 variable "public_custom_subnets" {
   default = []
   type    = list(string)
+}
+
+variable "setup_managed_services" {
+  default = false
 }
 
 variable "ssh_key_file" {
