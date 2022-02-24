@@ -114,7 +114,7 @@ locals {
 }
 
 resource "aws_instance" "chef_automate_postgresql" {
-  count = var.postgresql_instance_count
+  count                       = var.setup_managed_services ? 0 : var.postgresql_instance_count
 
   ami                         = local.ami
   instance_type               = var.postgresql_server_instance_type
