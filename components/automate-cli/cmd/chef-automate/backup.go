@@ -96,7 +96,7 @@ func init() {
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3SessionToken, "s3-session-token", "", "The S3 session token when assuming an IAM role")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.gcsCredentialsPath, "gcs-credentials-path", "", "The path to the GCP service account json file")
 
-	createBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.createWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
+	createBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.createWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
 
 	listBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.listWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 
@@ -117,12 +117,12 @@ func init() {
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.airgap, "airgap-bundle", "", "The artifact to use for an air-gapped installation")
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.yes, "yes", "", false, "Agree to all prompts")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.sha256, "sha256", "", "The SHA256 checksum of the backup")
-	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
+	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.patchConfigPath, "patch-config", "", "Path to patch config if required")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.setConfigPath, "set-config", "", "Path to set config if required")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
-	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 120, "How long to wait for a operation to complete before raising an error")
+	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 43200, "How long to wait for a operation to complete before raising an error")
 
 	if !isDevMode() {
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("override-origin")
