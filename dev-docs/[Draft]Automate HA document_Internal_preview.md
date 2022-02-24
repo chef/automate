@@ -444,7 +444,7 @@ List of VM with public and private IP. Public-ip is only mandatory for Ela
 Configuration 	 
 
 ----------------
-Setup configuration file for HA Deployment on AWs 
+Setup configuration file for HA Deployment on existing infrastructure(On-prem)
 `./chef-automate init-config-ha existing_infra`
 
 This will create configuration for deployment on existing nodes. Config.toml is the config file where you need to make changes for any change in Automate HA 
