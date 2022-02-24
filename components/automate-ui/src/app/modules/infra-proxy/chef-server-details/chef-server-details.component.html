@@ -46,18 +46,18 @@
               </li>
               <li>
                 <span class="heading">last sync date</span>
-                <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
+                <span class="server-entity-value">--</span>
               </li>
               <li>
                 <span data-cy="lastStatus" *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted || !migrationInProgress" class="heading">Last Migration Status </span>
                 <!-- Completed status -->
-                <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value">
+                <span *ngIf="migrationCompleted" class="server-entity-value">
                   <img src='../../../../assets/img/completed.png' alt="info" />
                   <span>Completed</span>
                 </span>
 
                 <!-- Failed status -->
-                <span *ngIf="!migrationLoading && migrationStarted && migrationfailed && !migrationInProgress" class="server-entity-value" id="status-failed">
+                <span *ngIf="migrationfailed" class="server-entity-value" id="status-failed">
                   <chef-tooltip position='bottom' class="tooltip" for='error-show-button'>
                     <img src='../../../../assets/img/failed.png' alt="warning" />
                     Migration failed, migration step not completed!
@@ -66,9 +66,20 @@
                   <span>Failed</span>
                 </span>
 
+                <!-- Cancelled Status-->
+                <span *ngIf="isCancelled" class="server-entity-value" id="status-failed">
+                  <chef-tooltip position='bottom' class="tooltip" for='cancelled-show-button'>
+                    <img src='../../../../assets/img/cancelled.png' alt="warning" />
+                    Last migration cancelled!
+                  </chef-tooltip>
+                  <img id='cancelled-show-button' src='../../../../assets/img/cancelled.png' alt="info" />
+                  <span>Cancelled</span>
+                </span>
+
+
                 <!-- in progress status -->
                 <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress && !migrationfailed && !migrationCompleted" class="heading" data-cy="sync-button">Sync In Progress </span>
-                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress && !migrationfailed && !migrationCompleted" class="server-entity-value svg-block">
+                <span *ngIf="migrationInProgress" class="server-entity-value svg-block">
                   <svg viewBox="0 0 36 36" class="circular-chart single-chart blue">
                     <path class="circle-bg"
                       d="M18 2.0845
@@ -92,7 +103,7 @@
                   </span>
                 </span>
                 <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
-                <span *ngIf="!migrationStarted" class="server-entity-value">--</span>
+                <span *ngIf="!migrationStarted && !migrationCompleted" class="server-entity-value">--</span>
               </li>
             </ul>
           </div>
