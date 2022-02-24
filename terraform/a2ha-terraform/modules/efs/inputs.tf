@@ -41,11 +41,11 @@ variable "postgresql_private_ips" {
   default = []
 }
 
-variable "private_subnets" {
+variable "private_custom_subnets" {
   default = []
 }
 
-variable "private_custom_subnets" {
+variable "private_subnets" {
   default = []
 }
 
