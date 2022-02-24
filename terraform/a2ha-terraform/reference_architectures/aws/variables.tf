@@ -159,12 +159,12 @@ variable "setup_managed_services" {
 
 variable "private_custom_subnets" {
   default = []
-  type = list(string)
+  type    = list(string)
 }
 
 variable "public_custom_subnets" {
   default = []
-  type = list(string)
+  type    = list(string)
 }
 
 variable "ssh_key_file" {
