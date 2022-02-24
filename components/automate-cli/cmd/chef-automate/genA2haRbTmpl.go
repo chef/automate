@@ -129,8 +129,8 @@ aws do
   region "{{ .Aws.Config.Region }}"
   vpc_id "{{ .Aws.Config.AwsVpcId }}"
   cidr_block_addr "{{ .Aws.Config.AwsCidrBlockAddr }}"
-  private_custom_subnets "{{ .Aws.Config.PrivateCustomSubnets }}"
-  public_custom_subnets "{{ .Aws.Config.PublicCustomSubnets }}"
+  private_custom_subnets [{{ range $index, $element := .Aws.Config.PrivateCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  public_custom_subnets [{{ range $index, $element := .Aws.Config.PublicCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
   ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
   lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
