@@ -154,8 +154,14 @@ variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
 
+variable "private_custom_subnets"{
+}
+
 variable "proxy_listen_port" {
   default = 7432
+}
+
+variable "public_custom_subnets"{
 }
 
 variable "setup_managed_services" {
@@ -179,10 +185,4 @@ variable "tags" {
 
 variable "tmp_path" {
   default = "/var/tmp"
-}
-
-variable "private_custom_subnets"{
-}
-
-variable "public_custom_subnets"{
 }
