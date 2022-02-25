@@ -158,6 +158,10 @@ variable "proxy_listen_port" {
   default = 7432
 }
 
+variable "setup_managed_services" {
+  default = false
+}
+
 variable "ssh_user_sudo_password" {
   default = ""
 }

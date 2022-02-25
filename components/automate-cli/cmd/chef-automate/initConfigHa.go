@@ -69,6 +69,17 @@ type AwsConfigToml struct {
 			AwsVpcId                        string `toml:"aws_vpc_id"`
 			AwsCidrBlockAddr                string `toml:"aws_cidr_block_addr"`
 			SSHKeyPairName                  string `toml:"ssh_key_pair_name"`
+			SetupManagedServices            bool   `toml:"setup_managed_services"`
+			ElasticsearchDomainUrl          string `toml:"managed_elasticsearch_domain_url"`
+			ElasticsearchUsername           string `toml:"managed_elasticsearch_username"`
+			ElasticsearchUserPassword       string `toml:"managed_elasticsearch_user_password"`
+			ElasticsearchCertificate        string `toml:"managed_elasticsearch_certificate"`
+			RDSInstanceUrl                  string `toml:"managed_rds_instance_url"`
+			RDSSuperUserName                string `toml:"managed_rds_superuser_username"`
+			RDSSuperUserPassword            string `toml:"managed_rds_superuser_password"`
+			RDSDBUserName                   string `toml:"managed_rds_dbuser_username"`
+			RDSDBUserPassword               string `toml:"managed_rds_dbuser_password"`
+			RDSCertificate                  string `toml:"managed_rds_certificate"`
 			AmiFilterName                   string `toml:"ami_filter_name"`
 			AmiFilterVirtType               string `toml:"ami_filter_virt_type"`
 			AmiFilterOwner                  string `toml:"ami_filter_owner"`

@@ -37,6 +37,7 @@ module "aws" {
   postgresql_listen_port             = var.postgresql_listen_port
   postgresql_server_instance_type    = var.postgresql_server_instance_type
   proxy_listen_port                  = var.proxy_listen_port
+  setup_managed_services             = var.setup_managed_services
   source                             = "./modules/aws"
   lb_access_logs                     = var.lb_access_logs
   tags                               = var.aws_tags

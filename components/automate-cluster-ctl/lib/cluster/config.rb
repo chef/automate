@@ -98,6 +98,17 @@ module AutomateCluster
       default :cidr_block_addr, " "
       default :ssh_key_pair_name
       default :lb_access_logs, 'false'
+      default :setup_managed_services, false
+      default :managed_elasticsearch_domain_url, ' '
+      default :managed_elasticsearch_username, ' '
+      default :managed_elasticsearch_user_password, ' '
+      default :managed_elasticsearch_certificate, ' '
+      default :managed_rds_instance_url, ' '
+      default :managed_rds_superuser_username, ' '
+      default :managed_rds_superuser_password, ' '
+      default :managed_rds_dbuser_username, ' '
+      default :managed_rds_dbuser_password, ' '
+      default :managed_rds_certificate, ' '
       default :ami_filter_name
       default :ami_filter_virt_type
       default :ami_filter_owner
