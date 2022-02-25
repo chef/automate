@@ -1364,8 +1364,12 @@ func (s *server) doConverge(
 		errHandler(eDeploy.err)
 		// json file
 		if os.Getenv(isUpgradeMajorEnv) == "true" {
-			ci := majorupgradechecklist.NewPostChecklistManager(s.deployment.CurrentReleaseManifest.Version())
-			err := ci.CreatePostChecklistFile()
+			var err error
+			ci, err := majorupgradechecklist.NewPostChecklistManager(s.deployment.CurrentReleaseManifest.Version())
+			if err != nil {
+				errHandler(err)
+			}
+			err = ci.CreatePostChecklistFile()
 			if err != nil {
 				errHandler(err)
 			}
@@ -1926,16 +1930,37 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 		nextManifestVersion = req.Version
 	}
 
-	major, isSemFormat := manifest.IsSemVersionFmt(nextManifestVersion)
-	resp := &api.ValidatedUpgradeResponse{
-		CurrentVersion: currentRelease,
-		TargetVersion:  nextManifestVersion,
-	}
-	if isSemFormat {
-		resp.TargetMajor = major
+	
+	var ReadPendingPostChecklist = []string{}
+	_, is_major_version := manifest.IsSemVersionFmt(currentRelease)
+	if is_major_version {
+		var err error
+
+		pcm, err := majorupgradechecklist.NewPostChecklistManager(currentRelease)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "Failed to get post checklist manager: %s", err)
+		}
+
+		ReadPendingPostChecklist, err = pcm.ReadPendingPostChecklistFile()
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "Failed to read pending post checklist: %s", err)
+		}
+
 	}
 
-	return resp, nil
+	if len(ReadPendingPostChecklist) == 0 {
+		major, isSemFormat := manifest.IsSemVersionFmt(nextManifestVersion)
+		resp := &api.ValidatedUpgradeResponse{
+			CurrentVersion: currentRelease,
+			TargetVersion:  nextManifestVersion,
+		}
+		if isSemFormat {
+			resp.TargetMajor = major
+		}
+		return resp, nil
+	} else {
+		return nil, status.Errorf(codes.FailedPrecondition, "Please complete pending post checklist from version %s",currentRelease)
+	}
 }
 
 // Upgrade requests the deployment-service pulls down the latest manifest and applies it

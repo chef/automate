@@ -77,35 +77,32 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile() ([]string, error
 	}
 
 	if res.Version == pcm.version {
-		if (isExternalPG() && !res.Seen) || !isExternalPG() {
-			for i := 0; i < len(res.PostChecklist); i++ {
-				if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || !res.Seen {
-					showPostChecklist = true
-					break
-				}
+		for i := 0; i < len(res.PostChecklist); i++ {
+			if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || (isExternalPG() && !res.Seen) {
+				showPostChecklist = true
+				break
 			}
-
-			if showPostChecklist {
-				for i := 0; i < len(res.PostChecklist); i++ {
-					if !res.PostChecklist[i].IsExecuted {
-						postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
-					}
-				}
-			}
-
-			if isExternalPG() {
-				res.Seen = true
-				err = CreateJsonFile(res, upgrade_metadata)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return postCmdList, nil
 		}
+
+		if showPostChecklist {
+			for i := 0; i < len(res.PostChecklist); i++ {
+				if !res.PostChecklist[i].IsExecuted {
+					postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+				}
+			}
+		}
+
+		if isExternalPG() {
+			res.Seen = true
+			err = CreateJsonFile(res, upgrade_metadata)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return postCmdList, nil
 	} else {
 		return nil, errors.Errorf("Failed to read checklist since version didn't match")
 	}
-	return nil, nil
 }
 
 func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string) error {

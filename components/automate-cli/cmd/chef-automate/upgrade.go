@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -124,8 +125,26 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		writer.Println("Chef Automate up-to-date")
 		return nil
 	}
+	var ReadPendingPostChecklist = []string{}
+	_, is_major_version := manifest.IsSemVersionFmt(validatedResp.CurrentVersion)
+	if is_major_version {
+		var err error
+		ci, err := majorupgradechecklist.NewPostChecklistManager(validatedResp.CurrentVersion)
+		if err != nil {
+			return err
+		}
 
-	if upgradeRunCmdFlags.isMajorUpgrade {
+		ReadPendingPostChecklist, err = ci.ReadPendingPostChecklistFile()
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"unable to read checklist file",
+			)
+		}
+	}
+
+	if upgradeRunCmdFlags.isMajorUpgrade && len(ReadPendingPostChecklist) == 0 {
 		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
 		if err != nil {
 			return status.Wrap(
@@ -265,6 +284,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
 					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
 				if !resp.IsConvergeCompatable {
+					fmt.Println(resp)
 					writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
 				}
 			} else {
@@ -280,7 +300,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 		_, isMajorVersion := manifest.IsSemVersionFmt(resp.CurrentVersion)
 		if isMajorVersion {
-			ci := majorupgradechecklist.NewPostChecklistManager(resp.CurrentVersion)
+			ci, err := majorupgradechecklist.NewPostChecklistManager(resp.CurrentVersion)
 			if err != nil {
 				return err
 			}
