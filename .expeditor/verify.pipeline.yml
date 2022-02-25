@@ -326,10 +326,10 @@ steps:
       executor:
         docker:
 
-  - label: "[unit] automate-ui"
+  - label: "[unit-test] automate-ui"
     command:
       - cd components/automate-ui
-      - npm cache clean --force && npm install && make install lint unit
+      - make install lint unit && make install lint unit
     timeout_in_minutes: 20
     retry:
       automatic:
