@@ -23,6 +23,11 @@ cp -f ${tmp_path}/elasticsearch-user.toml /hab/user/"$ES_PKG_NAME"/config/user.t
 mkdir -p /hab/user/"$ELASTICSIDECAR_PKG_NAME"/config
 cp -f ${tmp_path}/elasticsidecar.toml /hab/user/"$ELASTICSIDECAR_PKG_NAME"/config/user.toml
 
+
+mkdir -p $nfs_mount_path/elasticsearch
+chown -R hab:hab $nfs_mount_path/elasticsearch
+
+
 wait_for_aib_extraction() {
   max=20
   n=0

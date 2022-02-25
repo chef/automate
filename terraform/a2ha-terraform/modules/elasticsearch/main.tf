@@ -19,7 +19,12 @@ locals {
     elasticsearch_svc_load_args  = var.elasticsearch_svc_load_args,
     elasticsidecar_pkg_ident     = var.elasticsidecar_pkg_ident,
     elasticsidecar_svc_load_args = var.elasticsidecar_svc_load_args,
-    tmp_path                     = var.tmp_path
+    tmp_path                     = var.tmp_path,
+    nfs_mount_path               = var.nfs_mount_path
+  })
+
+  es_config_mount = templatefile("${path.module}/templates/es_config.sh.tpl", {
+    nfs_mount_path               = var.nfs_mount_path
   })
 }
 
@@ -129,6 +134,39 @@ resource "null_resource" "elasticsearch" {
       "echo \"Airgap Info: ${var.airgap_info}\nHabitat Info: ${var.habitat_info}\"",
       "chmod 0700 ${var.tmp_path}/es_provision.sh",
       "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/es_provision.sh",
+    ]
+  }
+}
+
+
+resource "null_resource" "elasticsearch" {
+  count = 1
+
+  triggers = {
+    es_user_toml_sha = sha1(local.elasticsearch_user_toml[count.index])
+    template = local.provision
+  }
+
+  connection {
+    user        = var.ssh_user
+    private_key = file(var.ssh_key_file)
+    host        = var.private_ips[count.index]
+    script_path = "${var.tmp_path}/tf_inline_script_system_elasticsearch.sh"
+  }
+
+  provisioner "file" {
+    destination = "${var.tmp_path}/es_config_mount.sh"
+    content     = local.elasticsidecar_user_toml[count.index]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      # https://github.com/hashicorp/terraform/issues/17101
+      # Until Terraform supports explicit module inter-dependencies, we create an implicit
+      # dependency by using outputs from the Habitat and Airgap modules.
+      "echo \"Airgap Info: ${var.airgap_info}\nHabitat Info: ${var.habitat_info}\"",
+      "chmod 0700 ${var.tmp_path}/es_config_mount.sh",
+      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/es_config_mount.sh",
     ]
   }
 }
