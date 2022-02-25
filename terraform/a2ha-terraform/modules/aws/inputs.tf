@@ -19,7 +19,7 @@ variable "automate_ebs_volume_size" {
 }
 
 variable "automate_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "automate_fqdn" {
@@ -76,7 +76,7 @@ variable "chef_ebs_volume_size" {
 }
 
 variable "chef_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "chef_server_instance_count" {
@@ -99,7 +99,7 @@ variable "elasticsearch_ebs_volume_size" {
 }
 
 variable "elasticsearch_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "elasticsearch_instance_count" {
@@ -116,6 +116,10 @@ variable "elasticsearch_server_instance_type" {
 
 variable "kibana_listen_port" {
   default = 5601
+}
+
+variable "lb_access_logs" {
+  default = false
 }
 
 variable "nfs_mount_path" {
@@ -135,7 +139,7 @@ variable "postgresql_ebs_volume_size" {
 }
 
 variable "postgresql_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "postgresql_instance_count" {

@@ -145,6 +145,10 @@ variable "kibana_pkg_ident" {
   default = "chef/automate-ha-kibana"
 }
 
+variable "lb_access_logs" {
+  default = false
+}
+
 variable "metricbeat_pkg_ident" {
   default = "chef/automate-ha-metricbeat"
 }

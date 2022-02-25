@@ -97,6 +97,7 @@ module AutomateCluster
       default :vpc_id, " "
       default :cidr_block_addr, " "
       default :ssh_key_pair_name
+      default :lb_access_logs, 'false'
       default :setup_managed_services, false
       default :managed_elasticsearch_domain_url, ' '
       default :managed_elasticsearch_username, ' '
@@ -120,16 +121,16 @@ module AutomateCluster
       default :chef_server_lb_certificate_arn, "arn:aws:acm:...."
       default :automate_ebs_volume_iops, "100"
       default :automate_ebs_volume_size, "50"
-      default :automate_ebs_volume_type, "gp2"
+      default :automate_ebs_volume_type, "gp3"
       default :chef_ebs_volume_iops, "100"
       default :chef_ebs_volume_size, "50"
-      default :chef_ebs_volume_type, "gp2"
+      default :chef_ebs_volume_type, "gp3"
       default :elasticsearch_ebs_volume_iops, "300"
       default :elasticsearch_ebs_volume_size, "100"
-      default :elasticsearch_ebs_volume_type, "gp2"
+      default :elasticsearch_ebs_volume_type, "gp3"
       default :postgresql_ebs_volume_iops, "150"
       default :postgresql_ebs_volume_size, "50"
-      default :postgresql_ebs_volume_type, "gp2"
+      default :postgresql_ebs_volume_type, "gp3"
 
       # tags for AWS infrastructure
       # These individual aws tag configs are deprecated in favor of the tags setting
