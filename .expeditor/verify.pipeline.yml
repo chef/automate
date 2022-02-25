@@ -329,7 +329,7 @@ steps:
   - label: "[unit] automate-ui"
     command:
       - cd components/automate-ui
-      - make install lint unit
+      - npm cache clean --force && npm install && make install lint unit
     timeout_in_minutes: 20
     retry:
       automatic:
