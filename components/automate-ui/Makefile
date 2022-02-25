@@ -27,6 +27,10 @@ test: unit e2e
 e2e:
 	npm run e2e
 
+unit:
+	npm cache clean --force
+	npm install
+	npm run test
 
 unit-all-browsers:
 	npm run test -- --browsers 'Chrome,Firefox,Safari'

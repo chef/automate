@@ -329,7 +329,7 @@ steps:
   - label: "[unit-test] automate-ui"
     command:
       - cd components/automate-ui
-      - make install lint unit && make install lint unit
+      - make install lint unit
     timeout_in_minutes: 20
     retry:
       automatic:
