@@ -18,7 +18,7 @@ class MockTelemetryService {
   track() { }
 }
 
-describe('EnvironmentsComponent', () => {
+describe('EnvironmentsComponent ', () => {
   let component: EnvironmentsComponent;
   let fixture: ComponentFixture<EnvironmentsComponent>;
   let element;
