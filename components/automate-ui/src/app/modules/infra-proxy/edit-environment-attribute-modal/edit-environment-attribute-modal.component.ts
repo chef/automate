@@ -14,6 +14,7 @@ import { UpdateEnvironment } from 'app/entities/environments/environment.action'
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { Utilities } from 'app/helpers/utilities/utilities';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export class CookbookConstraintGrid {
   id: number;
@@ -72,8 +73,8 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   constructor(
     private fb: FormBuilder,
-    private store: Store<NgrxStateAtom>
-
+    private store: Store<NgrxStateAtom>,
+    private telemetryService: TelemetryService
   ) {
     this.defaultAttributeForm = this.fb.group({
       default: ['', [Validators.required]]
@@ -212,6 +213,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
           default_attributes: JSON.parse(this.environment.default_attributes),
           override_attributes: JSON.parse(this.environment.override_attributes)
         };
+        this.telemetryService.track('InfraServer_Environments_EditConstraints');
         break;
 
       case 'Default':
@@ -221,6 +223,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
               this.defaultAttributeForm.controls['default'].value.replace(/\r?\n|\r/g, '')),
           override_attributes: JSON.parse(this.environment.override_attributes)
         };
+        this.telemetryService.track('InfraServer_Environments_EditDefault');
         break;
 
       case 'Override':
@@ -230,6 +233,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
           override_attributes: JSON.parse(
             this.overrideAttributeForm.controls['override'].value.replace(/\r?\n|\r/g, ''))
         };
+        this.telemetryService.track('InfraServer_Environments_EditOverride');
         break;
     }
     this.updatingData(environment);
