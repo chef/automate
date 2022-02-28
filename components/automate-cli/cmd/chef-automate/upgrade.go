@@ -125,26 +125,13 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		writer.Println("Chef Automate up-to-date")
 		return nil
 	}
-	var ReadPendingPostChecklist = []string{}
-	_, is_major_version := manifest.IsSemVersionFmt(validatedResp.CurrentVersion)
-	if is_major_version {
-		var err error
-		ci, err := majorupgradechecklist.NewPostChecklistManager(validatedResp.CurrentVersion)
-		if err != nil {
-			return err
-		}
 
-		ReadPendingPostChecklist, err = ci.ReadPendingPostChecklistFile()
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"unable to read checklist file",
-			)
-		}
+	pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
+	if err != nil {
+		return err
 	}
 
-	if upgradeRunCmdFlags.isMajorUpgrade && len(ReadPendingPostChecklist) == 0 {
+	if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
 		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
 		if err != nil {
 			return status.Wrap(
@@ -298,24 +285,13 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		_, isMajorVersion := manifest.IsSemVersionFmt(resp.CurrentVersion)
-		if isMajorVersion {
-			ci, err := majorupgradechecklist.NewPostChecklistManager(resp.CurrentVersion)
-			if err != nil {
-				return err
-			}
-			resp, err := ci.ReadPendingPostChecklistFile()
-			if err != nil {
-				return status.Wrap(
-					err,
-					status.DeploymentServiceCallError,
-					"unable to read checklist file",
-				)
-			}
-			for index, msg := range resp {
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+						return err
+		}
+			for index, msg := range pendingPostChecklist {
 				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
 			}
-		}
 
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
@@ -423,4 +399,28 @@ func init() {
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
 	RootCmd.AddCommand(upgradeCmd)
+}
+
+func GetPendingPostChecklist(version string) ([]string, error) {
+	var pendingPostChecklist = []string{}
+	_, is_major_version := manifest.IsSemVersionFmt(version)
+
+	if is_major_version {
+		var err error
+		pmc, err := majorupgradechecklist.NewPostChecklistManager(version)
+		if err != nil {
+			return []string{}, err
+		}
+
+		pendingPostChecklist, err = pmc.ReadPendingPostChecklistFile()
+		if err != nil {
+			return []string{}, status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"unable to read checklist file",
+			)
+		}
+		return pendingPostChecklist, nil
+	}
+	return []string{}, nil
 }
