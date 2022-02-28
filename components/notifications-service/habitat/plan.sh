@@ -23,14 +23,14 @@ pkg_build_deps=(
   # We have seen failures with notification service http request
   # with external services. This is because the erlang version was bumped to
   # v23.2. Hence pinning the version till we have a fix.
-  core/erlang
+  core/erlang/21.3/20190327152504
 
   # NOTE(ssd) 2019-07-03: PIN PIN PIN
   #
   # elixir 1.9.0 shipped with a number of changes to how releases
   # work. This appears to have broken the build. Pinning until we can
   # sort out the required changes.
-  core/elixir
+  core/elixir/1.8.0/20190327153604
   core/glibc
 )
 
@@ -101,8 +101,6 @@ do_build() {
   fix_interpreter "${TARGET}/releases/*/libexec/commands/*.sh" core/coreutils bin/env
   fix_interpreter "${TARGET}/bin/*.sh" core/coreutils bin/env
   fix_interpreter "${TARGET}/bin/notifications" core/coreutils bin/env
-  chmod +x ${TARGET}/bin/*
-  chmod +x ${TARGET}/releases/*/*
 }
 
 do_install() {

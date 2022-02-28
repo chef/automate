@@ -27,4 +27,4 @@ if [[ ! -f "$erl_cookie" ]]; then
     chmod 400 "$erl_cookie"
 fi
 
-exec "{{pkg.path}}/bin/notifications" start
+exec "{{pkg.path}}/bin/notifications" foreground
