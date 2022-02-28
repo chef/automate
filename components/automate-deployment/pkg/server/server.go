@@ -937,28 +937,24 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 }
 
 func skipServicesForHealthCheck(serviceList []string, s *errDeployer, logctx *logrus.Entry) []string {
-	servicesToSkip := make([]string, 0, len(serviceList))
+	servicesToSkip := make(map[string]bool)
 
 	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
 	if enableExternalPg {
 		logctx.Debug("External PG is enabled.")
-		servicesToSkip = append(servicesToSkip, constants.AutomatePGService)
+		servicesToSkip[constants.AutomatePGService] = true
 	}
 	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
 
 	if enableExternalEs {
 		logctx.Debug("External ES is enabled.")
-		servicesToSkip = append(servicesToSkip, constants.AutomateSearchService)
+		servicesToSkip[constants.AutomateSearchService] = true
 	}
-	if len(servicesToSkip) > 0 {
-		for i, v := range serviceList {
-			for _, x := range servicesToSkip {
-				if x == v {
-					logctx.Debug("Removed service " + x + " from Health Check")
-					serviceList = append(serviceList[:i], serviceList[i+1:]...)
-					break
-				}
-			}
+
+	for i, v := range serviceList {
+		if _, ok := servicesToSkip[v]; ok {
+			logctx.Debug("Removed service " + v + " from Health Check")
+			serviceList = append(serviceList[:i], serviceList[i+1:]...)
 		}
 	}
 	return serviceList
