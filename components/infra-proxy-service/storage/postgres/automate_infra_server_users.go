@@ -216,11 +216,11 @@ func (p *postgres) updateOrgUserAssociation(ctx context.Context, serverID, orgID
 	nowTime := time.Now()
 	err := p.db.QueryRowContext(ctx,
 		`UPDATE org_users SET 
-		is_admin = $2, 
-		updated_at= $5
-		WHERE org_id=$1 and user_id = SELECT id FROM users u WHERE u.infra_server_username=$3 and u.server_id=$4
+		is_admin = $1, 
+		updated_at= $2
+		WHERE org_id=$3 and user_id = SELECT id FROM users u WHERE u.infra_server_username=$4 and u.server_id=$5
 		RETURNING id, org_id, user_id, is_admin, created_at, updated_at`,
-		orgID, isAdmin, username, serverID, nowTime).
+		isAdmin, nowTime, orgID, username, serverID).
 		Scan(&orgUser.ID, &orgUser.OrgId, &orgUser.UserID, &orgUser.IsAdmin, &orgUser.CreatedAt, &orgUser.UpdatedAt)
 	if err != nil {
 		return storage.OrgUser{}, p.processError(err)
