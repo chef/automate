@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 Both deployment models require you to install and configure Chef Automate on your network infrastructure. You can skip this section if you already have installed the Chef Automate utility where you are planning to deploy HA.
 
-## Download and Install the Chef Automate Utility
+## Download and Install the Chef Automate HA Utility
 
 Follow these steps to install **Chef Automate** utility on the fresh server.
 
