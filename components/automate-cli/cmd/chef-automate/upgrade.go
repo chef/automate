@@ -29,6 +29,7 @@ var upgradeRunCmdFlags = struct {
 	upgradeairgapbundles bool
 	skipDeploy           bool
 	isMajorUpgrade       bool
+	versionsPath         string
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -38,6 +39,10 @@ var upgradeRunCmd = &cobra.Command{
 	RunE:  runUpgradeCmd,
 	Args:  cobra.MaximumNArgs(0),
 }
+
+var upgradeStatusCmdFlags = struct {
+	versionsPath string
+}{}
 
 var upgradeStatusCmd = &cobra.Command{
 	Use:   "status",
@@ -140,6 +145,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
 		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 	if err != nil {
 		return status.Wrap(
@@ -225,7 +231,9 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	resp, err := connection.UpgradeStatus(context.Background(), &api.UpgradeStatusRequest{})
+	resp, err := connection.UpgradeStatus(context.Background(), &api.UpgradeStatusRequest{
+		VersionsPath: upgradeStatusCmdFlags.versionsPath,
+	})
 	if err != nil {
 		return status.Wrap(
 			err,
@@ -364,6 +372,11 @@ func init() {
 		"major",
 		false,
 		"This flag is only needed for major version upgrades")
+
+	upgradeStatusCmd.PersistentFlags().StringVar(
+		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
 
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)

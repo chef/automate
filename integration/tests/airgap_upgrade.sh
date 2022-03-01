@@ -15,11 +15,17 @@ do_build() {
         hab pkg install "${test_hartifacts_path}"/*.hart
     fi
 
+    set_version_file
+    newversion=$(jq -r -c ".build"  "$test_manifest_dir/dev.json")
+    jq --arg val $newversion '. + [$val]' $versionsFile > tmp.$$.json && mv tmp.$$.json $versionsFile
+    cat $versionsFile
+
     log_info "Creating initial airgap bundle"
     #shellcheck disable=SC2154
     chef-automate airgap bundle create \
         --manifest "$test_manifest_dir/dev.json" \
         --workspace workspace \
+        --versions $versionsFile \
         bundle.aib
 
     log_info "Creating update airgap bundle"
@@ -29,6 +35,7 @@ do_build() {
         --hartifacts "${test_hartifacts_path}" \
         --override-origin "$HAB_ORIGIN" \
         --workspace workspace \
+        --versions $versionsFile \
         update.aib
 
     # Installation of the artifact should create /hab

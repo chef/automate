@@ -26,12 +26,16 @@ do_build() {
         --manifest "${DEEP_UPGRADE_PATH}" \
         bundle.aib
 
+    set_version_file
+    cat $versionsFile
+
     log_info "Creating update airgap bundle"
     #shellcheck disable=SC2154
     chef-automate airgap bundle create \
         --manifest "$test_manifest_dir/build.json" \
         --hartifacts "${test_hartifacts_path}" \
         --override-origin "$HAB_ORIGIN" \
+        --versions $versionsFile \
         update.aib
 
     # Installation of the artifact should create /hab

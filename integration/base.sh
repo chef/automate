@@ -229,6 +229,18 @@ do_test_deploy_default() {
 
 do_prepare_upgrade() {
     do_prepare_upgrade_default
+    set_version_file
+}
+
+set_version_file() {
+    hab pkg install --binlink core/jq-static
+
+    #prepare the versions.json file
+    newversion=$(jq -r -c ".build"  "$test_manifest_path")
+    echo $newversion
+    versionsFile="/tmp/versions.json"
+    echo '[]' > $versionsFile
+    jq --arg val $newversion '. + [$val]' $versionsFile > tmp.$$.json && mv tmp.$$.json $versionsFile
 }
 
 do_prepare_upgrade_default() {

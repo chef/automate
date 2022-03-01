@@ -68,7 +68,7 @@ wait_for_upgrade() {
         local upgrade_status_output
         local errcode
         errcode="0"
-        upgrade_status_output="$(chef-automate upgrade status -d 2>&1)" || errcode="$?"
+        upgrade_status_output="$(chef-automate upgrade status --versions $versionsFile -d 2>&1)" || errcode="$?"
         echo "${upgrade_status_output}"
         echo "status exit code=$errcode"
 
@@ -173,8 +173,11 @@ build_bundle() {
         fi
     fi
 
+    set_version_file
+    cat $versionsFile
+
     log_info "Creating airgap bundle"
-    chef-automate airgap bundle create "${args[@]}" "${output_path}"
+    chef-automate airgap bundle create --versions $versionsFile "${args[@]}" "${output_path}"
 }
 
 download_cli() {

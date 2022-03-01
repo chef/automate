@@ -1216,7 +1216,7 @@ func (s *server) nextManifest() (*manifest.A2, error) {
 	}
 
 	currentVersion := s.deployment.CurrentReleaseManifest.Version()
-	_, _, nextManifestVersion, err = s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), currentVersion)
+	_, _, nextManifestVersion, err = s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), currentVersion, "")
 
 	if err != nil {
 		logrus.WithError(err).Error("Could not fetch next manifest version")
@@ -1852,7 +1852,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 
 	nextManifestVersion := currentRelease
 	if !airgap.AirgapInUse() { //internet connected machine
-		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, channel, currentRelease)
+		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, channel, currentRelease, req.VersionsPath)
 		if err != nil {
 			return nil, err
 		}

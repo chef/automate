@@ -147,7 +147,8 @@ type InstallBundleCreator struct {
 	overrideOrigin string
 
 	//only for testing
-	optionalURL string
+	optionalURL  string
+	versionsPath string
 }
 
 // InstallBundleCreatorOpt are functional options for the InstallBundleCreator
@@ -165,6 +166,13 @@ func WithInstallBundleHartifactsPath(hartifactsPath string, overrideOrigin strin
 	return func(c *InstallBundleCreator) {
 		c.overrideOrigin = overrideOrigin
 		c.hartifactsPath = hartifactsPath
+	}
+}
+
+// WithInstallBundleVersionsPath sets the path to search for override versions
+func WithInstallBundleVersionsPath(versionsPath string) InstallBundleCreatorOpt {
+	return func(c *InstallBundleCreator) {
+		c.versionsPath = versionsPath
 	}
 }
 
@@ -373,7 +381,7 @@ func (creator *InstallBundleCreator) loadManifest() (*manifest.A2, error) {
 		return m, err
 	}
 
-	minCurrentVersion, err := manifest.GetMinimumCurrentManifestVersion(ctx, m.Version(), creator.channel, creator.optionalURL)
+	minCurrentVersion, err := manifest.GetMinimumCurrentManifestVersion(ctx, m.Version(), creator.channel, creator.versionsPath, creator.optionalURL)
 	if err != nil {
 		return nil, err
 	}
