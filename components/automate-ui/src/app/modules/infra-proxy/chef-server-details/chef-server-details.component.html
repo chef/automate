@@ -49,7 +49,7 @@
                 <span class="server-entity-value">--</span>
               </li>
               <li>
-                <span data-cy="lastStatus" *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted || !migrationInProgress" class="heading">Last Migration Status </span>
+                <span data-cy="lastStatus" *ngIf="migrationCompleted || migrationfailed || migrationLoading || isCancelled" class="heading">Last Migration Status </span>
                 <!-- Completed status -->
                 <span *ngIf="migrationCompleted" class="server-entity-value">
                   <img src='../../../../assets/img/completed.png' alt="info" />
@@ -78,7 +78,7 @@
 
 
                 <!-- in progress status -->
-                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress && !migrationfailed && !migrationCompleted" class="heading" data-cy="sync-button">Sync In Progress </span>
+                <span *ngIf="migrationInProgress" class="heading" data-cy="sync-button">Sync In Progress </span>
                 <span *ngIf="migrationInProgress" class="server-entity-value svg-block">
                   <svg viewBox="0 0 36 36" class="circular-chart single-chart blue">
                     <path class="circle-bg"
@@ -103,7 +103,7 @@
                   </span>
                 </span>
                 <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
-                <span *ngIf="!migrationStarted && !migrationCompleted" class="server-entity-value">--</span>
+                <span *ngIf="migrationNotRunning" class="server-entity-value">--</span>
               </li>
             </ul>
           </div>
