@@ -24,12 +24,17 @@ type Storage interface {
 	EditOrg(ctx context.Context, id string, name string, adminUser string, serverID string, projects []string) (Org, error)
 	TouchOrg(ctx context.Context, id string, serverID string) (Org, error)
 
-	InsertUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
+	InsertUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, connector, automateUserID string, isServerAdmin bool) (User, error)
 	GetUser(ctx context.Context, id string) (User, error)
-	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
+	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, connector, automateUserID string, isServerAdmin bool) (User, error)
 	DeleteUser(ctx context.Context, id string) (User, error)
+
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
 	GetAutomateOrgUsers(ctx context.Context, orgId string) ([]OrgUser, error)
+
+	StoreOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (OrgUser, error)
+	EditOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (OrgUser, error)
+	DeleteOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (OrgUser, error)
 }
 
 type MigrationStorage interface {
@@ -130,9 +135,13 @@ type User struct {
 }
 
 type OrgUser struct {
+	ID                  int
 	OrgId               string
+	UserID              int
 	IsAdmin             bool
 	InfraServerUsername string
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
 }
 
 type Migration struct {
