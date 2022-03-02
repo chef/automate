@@ -23,7 +23,15 @@
               </li>
               <li>
                 <span class="heading"></span>
-                <span class="server-entity-value"></span>
+                <span class="server-entity-value">
+                  <div>migrationNotRunning: {{migrationNotRunning}}</div>
+                  <div>migrationStarted: {{migrationStarted}}</div>
+                  <div>isCancelled: {{isCancelled}}</div>
+                  <div>migrationIsInPreview: {{migrationIsInPreview}}</div>
+                  <div>migrationCompleted: {{migrationCompleted}}</div>
+                  <div>migrationInProgress: {{migrationInProgress}}</div>
+                  <div>migrationfailed: {{migrationfailed}}</div>
+                </span>
               </li>
             </ul>
           </div>
@@ -49,7 +57,16 @@
                 <span class="server-entity-value">--</span>
               </li>
               <li>
-                <span data-cy="lastStatus" *ngIf="migrationCompleted || migrationfailed || migrationLoading || isCancelled" class="heading">Last Migration Status </span>
+                <span 
+                  data-cy="lastStatus"
+                  *ngIf="migrationCompleted
+                  || migrationfailed
+                  || migrationLoading
+                  || isCancelled
+                  || migrationNotRunning"
+                  class="heading">
+                    Last Migration Status
+                </span>
                 <!-- Completed status -->
                 <span *ngIf="migrationCompleted" class="server-entity-value">
                   <img src='../../../../assets/img/completed.png' alt="info" />
