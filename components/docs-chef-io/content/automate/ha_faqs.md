@@ -1,7 +1,7 @@
 +++
 title = "HA FAQs"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 [menu]
