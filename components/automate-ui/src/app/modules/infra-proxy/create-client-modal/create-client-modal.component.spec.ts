@@ -8,6 +8,11 @@ import { ClientKey } from 'app/entities/clients/client.model';
 import { EventEmitter } from '@angular/core';
 import { Regex } from 'app/helpers/auth/regex';
 import { using } from 'app/testing/spec-helpers';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('CreateClientModalComponent', () => {
   let component: CreateClientModalComponent;
@@ -26,6 +31,9 @@ describe('CreateClientModalComponent', () => {
         MockComponent({ selector: 'chef-checkbox', inputs: ['checked']}),
         MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
         CreateClientModalComponent
+      ],
+      providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         ReactiveFormsModule,
