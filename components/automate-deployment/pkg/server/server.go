@@ -1930,7 +1930,6 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 		nextManifestVersion = req.Version
 	}
 
-	
 	var ReadPendingPostChecklist = []string{}
 	_, is_major_version := manifest.IsSemVersionFmt(currentRelease)
 	if is_major_version {
@@ -1943,7 +1942,8 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 
 		ReadPendingPostChecklist, err = pcm.ReadPendingPostChecklistFile()
 		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, "Failed to read pending post checklist: %s", err)
+			logrus.Info("Failed to read pending post checklist:", err)
+			return nil, nil
 		}
 
 	}
@@ -1959,7 +1959,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 		}
 		return resp, nil
 	} else {
-		return nil, status.Errorf(codes.FailedPrecondition, "Please complete pending post checklist from version %s",currentRelease)
+		return nil, status.Errorf(codes.FailedPrecondition, "Please complete pending post checklist from version %s", currentRelease)
 	}
 }
 
