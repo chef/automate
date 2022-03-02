@@ -225,7 +225,6 @@ func (p *postgres) updateOrgUserAssociation(ctx context.Context, serverID, orgID
 	if err != nil {
 		return storage.OrgUser{}, p.processError(err)
 	}
-
 	return orgUser, nil
 }
 
@@ -245,6 +244,5 @@ func (p *postgres) deleteOrgUserAssociation(ctx context.Context, serverID, orgID
 	if err != nil {
 		return storage.OrgUser{}, p.processError(err)
 	}
-
 	return orgUser, nil
 }
