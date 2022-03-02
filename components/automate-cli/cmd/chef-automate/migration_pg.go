@@ -104,10 +104,10 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 			return errors.New("data flag is required")
 		} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
 			writer.Title("Deleting file created by pg_upgrade")
+			cleanUp()
 		} else {
 			return errors.New("please provide valid input for data flag")
 		}
-		cleanUp()
 
 	} else {
 		return errors.New(
@@ -123,7 +123,10 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
-		ci := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+		ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+		if err != nil {
+			return err
+		}
 
 		isExecuted, err := ci.ReadPostChecklistById("migrate_pg")
 		if err != nil {
@@ -288,6 +291,7 @@ func cleanUp() error {
 		AUTOMATE_PG_MIGRATE_LOG_DIR + "/analyze_new_cluster.sh",
 		AUTOMATE_PG_MIGRATE_LOG_DIR + "delete_old_cluster.sh",
 		AUTOMATE_PG_MIGRATE_LOG_DIR + "/pgmigrate.log",
+		"/hab/svc/automate-postgresql/data/pgdata",
 	}
 	err := executeCommand("rm", args, "")
 	if err != nil {
@@ -437,7 +441,10 @@ func checkUpdateMigration(check bool) error {
 		return err
 	}
 	if !check && err == nil {
-		ci := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+		ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+		if err != nil {
+			return err
+		}
 		ci.UpdatePostChecklistFile("migrate_pg")
 	}
 	return nil
