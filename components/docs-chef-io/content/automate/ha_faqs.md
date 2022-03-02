@@ -40,7 +40,7 @@ Then, Run `rm -rf /hab` on Bastion node.
 
 Restore command fails when the databases of the nodes are accessed by other users or services. This issue happens while the restore service is trying to drop the database when some services are still in a running state and are referring to the database.
 
-![](/images/automate/ha_faq_access.png)
+![Database Access Error](/images/automate/ha_faq_access.png)
 
 #### Resolution
 
@@ -57,11 +57,11 @@ Restore command fails when the databases of the nodes are accessed by other user
 
 The cached artifact does not exist in offline mode. This issue occurs in an airgap environment, when a package tries to pull any dependency components or details from the internet.
 
-![](/images/automate/ha_faq_cache.png)
+![Cache Artifact Error](/images/automate/ha_faq_cache.png)
 
 #### Resolution
 
-Use `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, airgap bundle file name, _frontend-20210908093242.aib_.
+Use `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, airgap bundle file name, *frontend-20210908093242.aib*.
 
 ##### Command Example
 
@@ -87,13 +87,19 @@ Execute the following command from the bastion host from any location:
 
 When Chef Automate instances could not locate S3 bucket, the following error is displayed, *Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"*
 
-![](/images/automate/ha_faq_bucket_region.png)
+![Bucket Region Error](/images/automate/ha_faq_bucket_region.png)
 
 #### Resolution
 
 Make sure that the access key, secret key, and endpoints are correct.
 
-If you are using on-premises S3 for backup and your are facing issues with restore, attach `s3-endpoint` with `s3 restore` command. For example, chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "<URL>"
+If you are using on-premises S3 for backup and your are facing issues with restore, attach `s3-endpoint` with `s3 restore` command.
+
+For example:
+
+```bash
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key" --s3-endpoint "<URL>"
+```
 
 ### Issue: HAB Access Error
 
@@ -101,7 +107,7 @@ The *hab* user does not have read, write, or executive privileges on the backup 
 
 #### Resolution
 
-Execute the following command to grant permission to the user, 
+Execute the following command to grant permission to the user,
 
 ```bash
 
@@ -121,7 +127,7 @@ Press *ctrl + c*, export HAB license, and execute `./scripts/credentials set ssl
 
 The deployment repeatedly fails due to unhealthy status when you execute the command `./chef-automate deploy config.toml`.
 
-![](/images/automate/ha_faq_deployfail.png) 
+![Deployment Error](/images/automate/ha_faq_deployfail.png)
 
 #### Resolution
 
@@ -159,7 +165,9 @@ While trying to deploy Chef Automate HA multiple times on the same infrastructur
 
 The possible error looks like as shown below:
 
+```bash
     Error running command 'scp -o StrictHostKeyChecking=no -i /root/.ssh/a2ha-hub cloud-user@<ip>5:/var/tmp/bootstrap.abb bootstrap8e143d7d.abb': exit status 1. Output: scp: /var/tmp/bootstrap.abb: No such file or directory
+```
 
 #### Resolution
 
@@ -178,4 +186,4 @@ The possible error looks like as shown below:
 	terraform taint module.bootstrap_automate.null_resource.automate_post[1]
 	terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 
-```	
+```
