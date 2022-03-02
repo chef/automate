@@ -68,5 +68,5 @@ variable "tmp_path" {
   default = "/var/tmp"
 }
 
-variable "backup_mount" {
+variable "nfs_mount_path" {
 }

@@ -131,6 +131,7 @@ module "elasticsearch" {
   metricbeat_pkg_ident         = var.metricbeat_pkg_ident
   private_ips                  = var.existing_elasticsearch_private_ips
   ssh_key_file                 = var.ssh_key_file
+  nfs_mount_path               = var.nfs_mount_path
   ssh_user                     = var.ssh_user
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
