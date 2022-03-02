@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -412,13 +413,11 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
+
 		pendingPostChecklist, err = pmc.ReadPendingPostChecklistFile()
 		if err != nil {
-			return []string{}, status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"unable to read checklist file",
-			)
+			logrus.Info("Failed to read pending post checklist:", err)
+			return []string{}, nil
 		}
 		return pendingPostChecklist, nil
 	}
