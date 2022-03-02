@@ -141,7 +141,7 @@ Do the following steps when you face this issue:
 
 ```bash
 
-rm –rf /hab && cd /var/tmp && rm –rf *
+rm –rf /hab && cd /var/tmp && rm –rf
 
 sudo kill -9 $(sudo lsof -t -i:9631)
 
