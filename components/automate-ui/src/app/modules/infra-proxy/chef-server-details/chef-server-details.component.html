@@ -24,13 +24,6 @@
               <li>
                 <span class="heading"></span>
                 <span class="server-entity-value">
-                  <div>migrationNotRunning: {{migrationNotRunning}}</div>
-                  <div>migrationStarted: {{migrationStarted}}</div>
-                  <div>isCancelled: {{isCancelled}}</div>
-                  <div>migrationIsInPreview: {{migrationIsInPreview}}</div>
-                  <div>migrationCompleted: {{migrationCompleted}}</div>
-                  <div>migrationInProgress: {{migrationInProgress}}</div>
-                  <div>migrationfailed: {{migrationfailed}}</div>
                 </span>
               </li>
             </ul>
@@ -119,8 +112,8 @@
                     >Click to Preview</a>
                   </span>
                 </span>
-                <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
-                <span *ngIf="migrationNotRunning" class="server-entity-value">--</span>
+                <span *ngIf="migrationLoading && migrationNotRunning" class="server-entity-value">Loading....</span>
+                <span *ngIf="migrationNotRunning && !migrationLoading" class="server-entity-value">--</span>
               </li>
             </ul>
           </div>

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest, interval, Subscription } from 'rxjs';
+import { Subject, combineLatest, Subscription, interval } from 'rxjs';
 import { filter, pluck, take, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
@@ -11,7 +11,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
+import { pending, EntityStatus } from 'app/entities/entities';
 import {
   getStatus,
   serverFromRoute,
@@ -131,7 +131,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public isPreview = false;
   public confirmPreviewSuccessful = false;
   public confirmPreviewsubmit = false;
-
+  public checkMigrationStatus: Subscription;
   public migrationSteps: Record<string, string> = {
     1: 'Migration started',
     2: 'Upload of zip file',
@@ -149,7 +149,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   };
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
-  mySubscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -193,6 +192,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    // validations
     this.updateServerForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
@@ -213,31 +213,12 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       file: ['', [Validators.required]]
     });
 
-    this.store.select(routeParams).pipe(
-      pluck('id'),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.id = id;
-        this.store.dispatch(new GetServer({ id }));
-        this.store.dispatch(new GetOrgs({ server_id: id }));
-        // this.store.dispatch(new GetUsers({ server_id: id }));
-      });
+    // Call to get server and orgs
+    setTimeout( () => {
+      this.getServerAndOrgs();
+    }, 5000 );
 
-    // Get server and orgs 
-    this.getServerAndOrgs();
-
-    combineLatest([
-      this.store.select(getStatus),
-      this.store.select(getAllOrgsForServerStatus)
-    ]).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe(([getServerSt, getOrgsSt]) => {
-      this.isLoading =
-        !allLoaded([getServerSt, getOrgsSt]);
-    });
-
-
+    // Get create server status
     combineLatest([
       this.store.select(createStatus),
       this.store.select(createError)
@@ -255,6 +236,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         }
       });
 
+    // Get deleted server status
     this.store.select(deleteOrgStatus).pipe(
       filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
@@ -263,6 +245,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       );
     });
 
+    // Get updated server status
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.saveInProgress && !pending(state)))
@@ -276,6 +259,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Get users status
     combineLatest([
       this.store.select(getUsersStatus),
       this.store.select(getUsers)
@@ -292,6 +276,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Get update webuikey status
     this.store.select(updateWebUIKey).pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.updatingWebuiKey && !pending(state)))
@@ -303,6 +288,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Get upload migration status
     combineLatest([
       this.store.select(uploadStatus),
       this.store.select(uploadDetails)
@@ -313,15 +299,16 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.isUploaded = true;
         this.migration_id = uploadDetailsState?.migration_id;
         this.migrationLoading = false;
-        this.getMigrationStatus(this.migration_id);
+        setTimeout(() => { this.getMigrationStatus(this.migration_id); }, 1000)
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
-        this.migrationIsFailed()
+        setTimeout(() => { this.migrationIsFailed(); }, 1000)
         this.upload.closeUploadSlider();
       }
     });
 
+    // Get cancel migration status
     this.store.select(cancelStatus).pipe(
       takeUntil(this.isDestroyed),
       filter(state => !pending(state)))
@@ -329,12 +316,13 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.cancelMigrationInProgress = true;
       this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.canceMigrationSuccessful) {
-        this.migrationIsCancelled();
+        setTimeout(() => { this.migrationIsCancelled(); }, 1000)
       } else {
-        this.migrationIsInProcess();
+        setTimeout(() => { this.migrationIsInProcess(); }, 1000)
       }
     });
 
+    //  Get preview migration status
     combineLatest([
       this.store.select(previewStatus),
       this.store.select(previewData)
@@ -348,6 +336,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Get confirm preview status
     this.store.select(confirmPreviewStatus).pipe(
     takeUntil(this.isDestroyed),
     filter(state => this.migrationIsInPreview && !pending(state)))
@@ -356,7 +345,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (this.confirmPreviewSuccessful) {
         this.confirmPreviewsubmit = true;
         this.migrationLoading = false;
-        this.migrationIsCompleted();
+        setTimeout(() => { this.migrationIsCompleted(); }, 1000)
         this.orgsListLoading = true;
         setTimeout( () => {
           this.getServerAndOrgs();
@@ -366,17 +355,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-    setTimeout(() => {
-      if (this.isServerLoaded) {
-        this.validateWebUIKey(this.server);
-      }
-    }, 1000);
+    // Get the running migration status
+    this.callToGetMigrationStatus();
 
-    this.mySubscription = interval(3000).subscribe(() => {
-      if (this.migrationStarted && this.migration_type !== 'Migration Completed') {
-        this.getMigrationStatus(this.migration_id);
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -402,7 +383,19 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.resetCreateModal();
   }
 
+  // get server and orgs
   public getServerAndOrgs(): void {
+    this.store.select(routeParams).pipe(
+      pluck('id'),
+      filter(identity),
+      takeUntil(this.isDestroyed))
+      .subscribe((id: string) => {
+        this.id = id;
+        this.store.dispatch(new GetServer({ id }));
+        this.store.dispatch(new GetOrgs({ server_id: id }));
+        // this.store.dispatch(new GetUsers({ server_id: id }));
+      });
+
     combineLatest([
       this.store.select(getStatus),
       this.store.select(getAllOrgsForServerStatus),
@@ -427,16 +420,29 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.closeCreateModal();
       this.isServerLoaded = true;
       this.migrationLoading = false;
-      this.migration_id = '';
       this.migration_id = this.server.migration_id;
       this.migration_type = this.server.migration_type;
       if (this.orgs.length > 0 ) {
         this.migrationCompleted = true;
         this.migrationNotRunning = false;
       }
+
       if (this.migration_id !== '') {
-        this.migrationProcessStarted();
+        setTimeout(() => { this.migrationProcessStarted(); }, 1000)
         this.getMigrationStatus(this.migration_id);
+      }
+
+      // Call to check the webuikey valid or not
+      setTimeout(() => {
+        if (this.isServerLoaded) {
+          this.validateWebUIKey(this.server);
+        }
+      }, 1000);
+
+      // relaod the orgs in case of orgs are not loaded
+      if ( this.migrationCompleted && this.orgs.length < 0) {
+        this.getServerAndOrgs();
+        this.migrationIsCompleted();
       }
     });
   }
@@ -505,32 +511,37 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
           this.migrationStatus = getMigrationState;
           this.migration_type = this.migrationStatus.migration_type;
           const migration_status = this.migrationStatus.migration_status;
+          this.migrationNotRunning = false;
           if (migration_status === 'Completed' || migration_status === 'In Progress') {
             this.migrationStepValue = this.getKeyByValue(this.migrationSteps, this.migration_type);
             this.migrationStatusPercentage =
               Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
-            this.migrationIsInProcess();
+            setTimeout(() => { this.migrationIsInProcess(); }, 1000)
             this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
             if (this.migration_type === 'Creating Preview'
               && this.confirmPreviewsubmit === false
               && this.isCancelled === false) {
-              this.migrationInPreview();
+              setTimeout(() => { this.migrationInPreview(); }, 1000)
             }
 
             if (this.migration_type === 'Migration Completed') {
-              this.mySubscription.unsubscribe();
-              this.migrationIsCompleted();
+              setTimeout(() => {
+                this.migrationIsCompleted();
+                this.checkMigrationStatus.unsubscribe();
+              }, 1000)
             }
 
             if (this.migration_type === 'Migration Cancelled' && this.canceMigrationSuccessful) {
-              this.mySubscription.unsubscribe();
-              this.migrationIsCancelled();
+              setTimeout(() => {
+                this.migrationIsCancelled();
+                this.checkMigrationStatus.unsubscribe();
+              }, 1000)
             }
           } 
           else {
             this.migrationfailed = true;
             this.migrationCompleted = false;
-            this.mySubscription.unsubscribe();
+            this.checkMigrationStatus.unsubscribe();
           }
         }
       });
@@ -538,7 +549,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
 
   public migrationProcessStarted() {
-    this.migrationNotRunning = false;
     this.migrationStarted = true;
     this.migrationInProgress = true;
     this.migrationIsInPreview = false;
@@ -548,6 +558,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   public migrationIsInProcess(): void {
+    this.checkMigrationStatus.unsubscribe();
+    // Get the running migration status
+    this.callToGetMigrationStatus();
+
     this.migrationStarted = true;
     this.migrationInProgress = true;
     this.migrationIsInPreview = false;
@@ -590,6 +604,14 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.migrationCompleted = false;
     this.migrationfailed = false;
     this.isCancelled = true;
+  }
+
+  public callToGetMigrationStatus() {
+    this.checkMigrationStatus = interval(4000).subscribe(() => {
+      if (this.migration_id !== '' && this.migrationStarted && this.migration_type !== 'Migration Completed') {
+        this.getMigrationStatus(this.migration_id);
+      }
+    });
   }
 
   public getKeyByValue(object: Record<string, string>, value: string) {
@@ -638,7 +660,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       formData: formData
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
-    this.migrationIsInProcess();
   }
 
   // cancel migration function
