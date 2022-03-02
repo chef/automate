@@ -23,6 +23,8 @@ cp -f ${tmp_path}/elasticsearch-user.toml /hab/user/"$ES_PKG_NAME"/config/user.t
 mkdir -p /hab/user/"$ELASTICSIDECAR_PKG_NAME"/config
 cp -f ${tmp_path}/elasticsidecar.toml /hab/user/"$ELASTICSIDECAR_PKG_NAME"/config/user.toml
 
+echo "${backup_mount}"
+
 sudo mkdir /mnt/automate_backups/elasticsearch
 sudo chown hab:hab ${backup_mount}/elasticsearch/
 

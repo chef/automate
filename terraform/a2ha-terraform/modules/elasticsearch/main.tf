@@ -20,6 +20,7 @@ locals {
     elasticsidecar_pkg_ident     = var.elasticsidecar_pkg_ident,
     elasticsidecar_svc_load_args = var.elasticsidecar_svc_load_args,
     tmp_path                     = var.tmp_path
+    backup_mount                 = var.backup_mount
   })
 }
 
