@@ -18,7 +18,7 @@ import (
 func TestMigrations(t *testing.T) {
 	ctx := context.Background()
 	_, serviceRef, _, close, _, _ := test.SetupInfraProxyService(ctx, t)
-	infraMigrationMockClient := infra_migrations.NewMockInfraProxyMigrationClient(gomock.NewController(t))
+	infraMigrationMockClient := infra_migrations.NewMockInfraProxyMigrationServiceClient(gomock.NewController(t))
 
 	var migrationID = "Fake id"
 
