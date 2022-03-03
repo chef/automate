@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -272,7 +271,6 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
 					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
 				if !resp.IsConvergeCompatable {
-					fmt.Println(resp)
 					writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
 				}
 			} else {
@@ -288,11 +286,11 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
 		if err != nil {
-						return err
+			return err
 		}
-			for index, msg := range pendingPostChecklist {
-				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
-			}
+		for index, msg := range pendingPostChecklist {
+			writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
+		}
 
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
@@ -412,7 +410,6 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 		if err != nil {
 			return []string{}, err
 		}
-
 
 		pendingPostChecklist, err = pmc.ReadPendingPostChecklistFile()
 		if err != nil {
