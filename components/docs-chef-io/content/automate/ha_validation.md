@@ -1,7 +1,7 @@
 +++
 title = "HA Validation Commands"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
@@ -39,7 +39,7 @@ ls -dtr1 /hab/cache/artifacts/core-netcat-*
 
 ```bash
 
-./chef-automate validate-ha-infrastructure /root/config.toml /root/hab-x86_64-linux.tar.gz /hab/cache/artifact/core-netcat-<version>.hart 
+./chef-automate validate-ha-infrastructure /root/config.toml /root/hab-x86_64-linux.tar.gz /hab/cache/artifact/core-netcat-<version>.hart
 
 ```
 

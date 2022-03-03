@@ -1,7 +1,7 @@
 +++
 title = "HA Health Check Commands"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 [menu]
