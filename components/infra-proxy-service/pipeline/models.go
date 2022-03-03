@@ -94,7 +94,7 @@ type KeyDump struct {
 	ExternalAuthenticationUID     interface{} `json:"external_authentication_uid"`
 	RecoveryAuthenticationEnabled interface{} `json:"recovery_authentication_enabled"`
 	Admin                         bool        `json:"admin"`
-	HashedPassword                interface{} `json:"hashed_password"`
+	HashedPassword                string      `json:"hashed_password"`
 	Salt                          interface{} `json:"salt"`
 	HashType                      interface{} `json:"hash_type"`
 }
@@ -109,6 +109,9 @@ type Org struct {
 
 	// ActionOps for Insert Skip Update and Delete
 	ActionOps ActionOps `json:"action_ops"`
+
+	//Counts for total,skipped and failed
+	Counts Counts `json:"counts"`
 }
 
 type User struct {
@@ -128,8 +131,14 @@ type User struct {
 	// IsConflicting for user's existence in db
 	IsConflicting bool `json:"is_conflicting"`
 
+	//hash password for the local user
+	HashPassword string `json:"hash_password"`
+
 	// ActionOps for Insert Skip Update and Delete
 	ActionOps ActionOps `json:"action_ops"`
+
+	//Counts for total,skipped and failed
+	Counts Counts `json:"counts"`
 }
 
 type OrgJson struct {
@@ -149,4 +158,10 @@ type AdminsJson struct {
 
 type UsersJson struct {
 	Username string `json:"username"`
+}
+
+type Counts struct {
+	Succeeded int `json :"total_succeeded"`
+	Failed    int `json:total_failed`
+	Skipped   int `json:totalsSkipped`
 }
