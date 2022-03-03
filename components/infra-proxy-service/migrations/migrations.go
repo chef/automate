@@ -332,6 +332,7 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	}, nil
 }
 
+// To avoide duplicate logs
 func ErrSendAndClose(migrationId string, err error) {
 	log.Errorf("Failed to send and close stream file for migration id %s : %s", migrationId, err.Error())
 }
