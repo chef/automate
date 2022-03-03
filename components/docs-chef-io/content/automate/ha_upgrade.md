@@ -1,7 +1,7 @@
 +++
 title = "Automate HA Upgrade"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 [menu]

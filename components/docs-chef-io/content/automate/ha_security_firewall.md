@@ -1,7 +1,7 @@
 +++
 title = "HA Security and Firewall"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
