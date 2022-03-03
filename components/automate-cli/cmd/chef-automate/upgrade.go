@@ -132,7 +132,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
 		if err != nil {
 			return status.Wrap(
 				err,

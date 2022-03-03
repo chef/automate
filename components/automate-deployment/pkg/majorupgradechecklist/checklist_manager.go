@@ -10,11 +10,9 @@ type ChecklistManager interface {
 	GetPostChecklist() []PostCheckListItem
 }
 
-func NewChecklistManager(writer cli.FormatWriter, version, major string) (ChecklistManager, error) {
+func NewChecklistManager(writer cli.FormatWriter, version string) (ChecklistManager, error) {
 
-	if major == "" {
-		major, _ = GetMajorVersion(version)
-	}
+		major, _ := GetMajorVersion(version)
 
 	switch major {
 	case "3":

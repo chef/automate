@@ -29,7 +29,7 @@ type PostChecklist struct {
 
 func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	majorVersion, _ := GetMajorVersion(version)
-	ci, err := NewChecklistManager(nil, version, "")
+	ci, err := NewChecklistManager(nil, version)
 	if err != nil {
 		return nil, err
 	}
