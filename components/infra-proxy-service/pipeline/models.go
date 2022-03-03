@@ -161,7 +161,7 @@ type UsersJson struct {
 }
 
 type Counts struct {
-	Succeeded int `json :"total_succeeded"`
-	Failed    int `json:total_failed`
-	Skipped   int `json:totalsSkipped`
+	Succeeded int `json:"total_succeeded"`
+	Failed    int `json:"total_failed"`
+	Skipped   int `json:"total_skipped"`
 }
