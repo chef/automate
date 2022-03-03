@@ -35,47 +35,45 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
 - Make sure that new major version is available by running `chef-automate upgrade status`
 - Run `chef-automate upgrade run --major` to start the upgrade process. You will be presented with upgrade information and displayed a checklist of requirements pre upgrade along with a list of steps to perform post upgrade. The steps are listed below :
 
-    ```This is a Major upgrade. 
-    In this release Embedded PostgreSQL is upgraded to version 13.5 
-    Which will need special care if you use Embedded PostgreSQL.
+    ```
+    This is a Major upgrade.
+    ========================
 
-    *Your installation is using Embedded PostgreSQL.* 
- 
-    Please confirm this check list that you have completed these steps before continuing with the Upgrade to version 22.0.1: 
+      1) In this release Embedded PostgreSQL is upgraded to version 13.5
+      2) This will need special care if you use Embedded PostgreSQL.
 
-    You had planned for a downtime: (y/N): y 
+    ===== Your installation is using Embedded PostgreSQL =====
 
-    You have taken backup of your data and is safe, preferred on other disk or location: (y/N): y 
+      Please confirm this checklist that you have taken care of these steps
+      before continuing with the Upgrade to version 3.0.0:
 
-    Ensure you have more than 60% free disk space: (y/N): y 
+    You had planned for a downtime?: (y/n)
+    y
+    You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+    y
+    Ensure you have more than 60 percent free disk space (y/n)
+    y
+    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+    y
 
-    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use: (y/N): y 
+    Post Upgrade Steps:
+    ===================
 
-    Post Upgrade Steps: 
+    1) Check the status of your upgrade using:
+        $ chef-automate upgrade status
+      This should return: Automate is up-to-date
 
-    Check the status of your upgrade using:  
+    2) Migrate Data from PG 9.6 to PG 13.5 using this command:
+        $ chef-automate post-major-upgrade migrate --data=pg
 
-          $ chef-automate upgrade status 
+    3) Check Automate UI everything is running and all data is visible
 
-        This should return: Automate is up-to-date 
+    4) If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running:
+        $ chef-automate post-major-upgrade clear-data --data=PG
 
-    Migrate Data from PG 9.6 to PG 13.5 using this command: 
+    **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-          $ chef-automate post-major-upgrade migrate --data=PG 
-
-    Check all services are running using: 
-
-          $ chef-automate status 
-
-    Check Automate UI everything is running and all data is visible. 
-
-    If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running: 
-
-          $ chef-automate post-major-upgrade clear-data --data=PG 
-
-    *In case of any errors, please refer to docs.chef.io and release notes for this version.* 
-
-    Now, upgrade will start, Please confirm to continue... (y/N): y 
+    Now, upgrade will start, Please confirm to continue... (y/n)
     ```
 - Check the status of Upgrade: 
     ```
@@ -87,23 +85,22 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
 
     Automate is up-to-date with airgap bundle (22.0.1) 
 
-    Post Upgrade Steps:  
+    Post Upgrade Steps:
+    ===================
 
-    Migrate Data from PG 9.6 to PG 13.5 using this command:  
+    1) Check the status of your upgrade using:
+        $ chef-automate upgrade status
+      This should return: Automate is up-to-date
 
-          $ chef-automate post-major-upgrade migrate --data=PG  
+    2) Migrate Data from PG 9.6 to PG 13.5 using this command:
+        $ chef-automate post-major-upgrade migrate --data=pg
 
-    Check all services are running using:  
+    3) Check Automate UI everything is running and all data is visible
 
-          $ chef-automate status  
+    4) If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running:
+        $ chef-automate post-major-upgrade clear-data --data=PG
 
-    Check Automate UI everything is running and all data is visible.  
-
-    If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running:  
-
-          $ chef-automate post-major-upgrade clear-data --data=PG  
-
-    *In case of any errors, please refer to docs.chef.io and release notes for this version.* 
+    **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
     ```
 - Migrate your data from PostgreSQL v9.6 to v13 by running command:
   `chef-automate post-major-upgrade migrate --data=PG`
@@ -121,41 +118,45 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
 - Make sure that new major version is available by running `chef-automate upgrade status`
 - Run `chef-automate upgrade run --major` to start the upgrade process. You will be presented with upgrade information and displayed a checklist of requirements pre upgrade along with a list of steps to perform post upgrade. The steps are listed below :
 
-    ```This is a Major upgrade. 
-    In this release Embedded PostgreSQL is upgraded to version 13.5 
-    Which will need special care if you use Embedded PostgreSQL.
+    ```
+    This is a Major upgrade.
+    ========================
 
-    *Your installation is using External PostgreSQL.*  
- 
-    You had planned for a downtime: (y/N): y 
+      1) In this release Embedded PostgreSQL is upgraded to version 13.5
+      2) This will need special care if you use Embedded PostgreSQL.
 
-    You have taken backup of your data and is safe, preferred on other disk or location: (y/N): y 
+    ===== Your installation is using External PostgreSQL =====
 
-    Upgrade your PostgreSQL 9.6 to 13.5 with the help of your Database Administrator: (y/N): y 
+      Please confirm this checklist that you have taken care of these steps
+      before continuing with the Upgrade to version 3.0.0:
 
-    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use: (y/N): y 
+    You had planned for a downtime?: (y/n)
+    y
+    You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+    y
+    Upgrade your PostgreSQL 9.6 to 13.5 with the help of your Database Administrator (y/n)
+    y
+    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+    y
 
-    Post Upgrade Steps: 
+    Post Upgrade Steps:
+    ===================
 
-    If your PostgreSQL Connection URL and Credential are changed then update them by putting them in config.toml and patching it in using: 
+    1) If your PostgreSQL Connection URL and Credential are changed then update them by putting them in config.toml and patching it in using:
+        $ chef-automate config patch config.toml
 
-          $ sudo chef-automate config patch config.toml 
+    2) Check the status of your upgrade using:
+        $ chef-automate upgrade status
+      This should return: Automate is up-to-date
 
-    Check the status of your upgrade using:  
+    3) Check all services are running using:
+        $ chef-automate status
 
-          $ chef-automate upgrade status 
+    4) Check Automate UI everything is running and all data is visible
 
-        This should return: Automate is up-to-date 
+    **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-    Check all services are running using: 
-
-          $ chef-automate status 
-
-    Check Automate UI everything is running and all data is visible. 
-
-    *In case of any errors, please refer to docs.chef.io and release notes for this version.* 
-
-    Now, upgrade will start, Please confirm to continue... (y/N): y 
+    Now, upgrade will start, Please confirm to continue... (y/n)
     ```
 - Check all services are running: `chef-automate status`
 - Once all the above steps are complete, major version upgrade is successful.
@@ -189,47 +190,44 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
 - Copy the CLI (chef-automate) and AIB (automate_v22.0.1.aib) to Air Gapped Machine where Chef Automate is Running. 
 - Run Upgrade On Air Gapped Machine: `sudo chef-automate upgrade run --airgap-bundle /<path>/automate_v3.x.x.aib --major `. You will be presented with upgrade information and displayed a checklist of requirements pre upgrade along with a list of steps to perform post upgrade. The steps are listed below :
     ```
-    This is a Major upgrade. 
-    In this release Embedded PostgreSQL is upgraded to version 13.5 
-    Which will need special care if you use Embedded PostgreSQL. 
+    This is a Major upgrade.
+    ========================
 
-    *Your installation is using Embedded PostgreSQL.* 
+      1) In this release Embedded PostgreSQL is upgraded to version 13.5
+      2) This will need special care if you use Embedded PostgreSQL.
 
-    Please confirm this check list that you have completed these steps before continuing with the Upgrade to version 22.0.1: 
+    ===== Your installation is using Embedded PostgreSQL =====
 
-    You had planned for a downtime: (y/N): y 
+      Please confirm this checklist that you have taken care of these steps
+      before continuing with the Upgrade to version 3.0.0:
 
-    You have taken backup of your data and is safe, preferred on other disk or location: (y/N): y 
+    You had planned for a downtime?: (y/n)
+    y
+    You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+    y
+    Ensure you have more than 60 percent free disk space (y/n)
+    y
+    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+    y
 
-    Ensure you have more than 60% free disk space: (y/N): y 
+    Post Upgrade Steps:
+    ===================
 
-    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use: (y/N): y 
+    1) Check the status of your upgrade using:
+        $ chef-automate upgrade status
+      This should return: Automate is up-to-date
 
-    Post Upgrade Steps: 
+    2) Migrate Data from PG 9.6 to PG 13.5 using this command:
+        $ chef-automate post-major-upgrade migrate --data=pg
 
-    Check the status of your upgrade using:  
+    3) Check Automate UI everything is running and all data is visible
 
-          $ chef-automate upgrade status 
+    4) If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running:
+        $ chef-automate post-major-upgrade clear-data --data=PG
 
-        This should return: Automate is up-to-date 
+    **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-    Migrate Data from PG 9.6 to PG 13.5 using this command: 
-
-          $ chef-automate post-major-upgrade migrate --data=PG 
-
-    Check all services are running using: 
-
-          $ chef-automate status 
-
-    Check Automate UI everything is running and all data is visible. 
-
-    If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running: 
-
-          $ chef-automate post-major-upgrade clear-data --data=PG  
-
-    *In case of any errors, please refer to docs.chef.io and release notes for this version.* 
-
-    Now, upgrade will start, Please confirm to continue... (y/N): y 
+    Now, upgrade will start, Please confirm to continue... (y/n)
     ```
 - Check the status of Upgrade: 
     ```
@@ -241,23 +239,22 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
 
     Automate is up-to-date with airgap bundle (22.0.1) 
 
-    Post Upgrade Steps:  
+    Post Upgrade Steps:
+    ===================
 
-    Migrate Data from PG 9.6 to PG 13.5 using this command:  
+    1) Check the status of your upgrade using:
+        $ chef-automate upgrade status
+      This should return: Automate is up-to-date
 
-          $ chef-automate post-major-upgrade migrate --data=PG  
+    2) Migrate Data from PG 9.6 to PG 13.5 using this command:
+        $ chef-automate post-major-upgrade migrate --data=pg
 
-    Check all services are running using:  
+    3) Check Automate UI everything is running and all data is visible
 
-          $ chef-automate status  
+    4) If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running:
+        $ chef-automate post-major-upgrade clear-data --data=PG
 
-    Check Automate UI everything is running and all data is visible.  
-
-    If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running:  
-
-          $ chef-automate post-major-upgrade clear-data --data=PG  
-
-    *In case of any errors, please refer to docs.chef.io and release notes for this version.* 
+    **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
     ```
 - Migrate your data from PostgreSQL v9.6 to v13 by running command:
   `chef-automate post-major-upgrade migrate --data=PG`
@@ -294,41 +291,44 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
 - Copy the CLI (chef-automate) and AIB (automate_v22.0.1.aib) to Air Gapped Machine where Chef Automate is Running. 
 - Run Upgrade On Air Gapped Machine: `sudo chef-automate upgrade run --airgap-bundle /<path>/automate_v3.x.x.aib --major `. You will be presented with upgrade information and displayed a checklist of requirements pre upgrade along with a list of steps to perform post upgrade. The steps are listed below :
     ```
-    This is a Major upgrade. 
-    In this release Embedded PostgreSQL is upgraded to version 13.5 
-    Which will need special care if you use Embedded PostgreSQL.
+    This is a Major upgrade.
+    ========================
 
-    *Your installation is using External PostgreSQL.*  
- 
-    You had planned for a downtime: (y/N): y 
+      1) In this release Embedded PostgreSQL is upgraded to version 13.5
+      2) This will need special care if you use Embedded PostgreSQL.
 
-    You have taken backup of your data and is safe, preferred on other disk or location: (y/N): y 
+    ===== Your installation is using External PostgreSQL =====
 
-    Upgrade your PostgreSQL 9.6 to 13.5 with the help of your Database Administrator: (y/N): y 
+      Please confirm this checklist that you have taken care of these steps
+      before continuing with the Upgrade to version 3.0.0:
 
-    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use: (y/N): y 
+    You had planned for a downtime?: (y/n)
+    y
+    You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+    y
+    Upgrade your PostgreSQL 9.6 to 13.5 with the help of your Database Administrator (y/n)
+    y
+    After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+    y
 
-    Post Upgrade Steps: 
+    Post Upgrade Steps:
+    ===================
 
-    If your PostgreSQL Connection URL and Credential are changed then update them by putting them in config.toml and patching it in using: 
+    1) If your PostgreSQL Connection URL and Credential are changed then update them by putting them in config.toml and patching it in using:
+        $ chef-automate config patch config.toml
 
-          $ sudo chef-automate config patch config.toml 
+    2) Check the status of your upgrade using:
+        $ chef-automate upgrade status
+      This should return: Automate is up-to-date
 
-    Check the status of your upgrade using:  
+    3) Check all services are running using:
+        $ chef-automate status
 
-          $ chef-automate upgrade status 
+    4) Check Automate UI everything is running and all data is visible
 
-        This should return: Automate is up-to-date 
+    **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-    Check all services are running using: 
-
-          $ chef-automate status 
-
-    Check Automate UI everything is running and all data is visible. 
-
-    *In case of any errors, please refer to docs.chef.io and release notes for this version.* 
-
-    Now, upgrade will start, Please confirm to continue... (y/N): y 
+    Now, upgrade will start, Please confirm to continue... (y/n)
     ```
 - Check all services are running: `chef-automate status`
 - Once all the above steps are complete, major version upgrade is successful.
