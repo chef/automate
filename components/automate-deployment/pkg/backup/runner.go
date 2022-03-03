@@ -1002,6 +1002,8 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
 
+	fmt.Println(ctx, "startBackupOperations")
+
 	r.eventChan = make(chan api.DeployEvent_Backup_Operation)
 	r.eventTerm = make(chan struct{})
 	r.errChan = make(chan error, 1)
