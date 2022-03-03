@@ -97,7 +97,7 @@ export class DesktopDetailComponent {
   }
 
   trackByFunction(_, item) {
-    return item.run_id
+    return item.run_id;
   }
 
   public close(): void {
