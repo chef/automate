@@ -294,3 +294,31 @@ func TestUserExists(t *testing.T) {
 
 	}
 }
+
+func TestCreateNewUserInAutomate(t *testing.T) {
+	type args struct {
+		ctx             context.Context
+		localUserClient *local_user.MockUsersMgmtServiceClient
+		User            pipeline.User
+		MockResult      *local_user.User
+		ErrorWant       error
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want1 error
+	}{
+		{name: "Test New User", args: args{ctx: context.Background(), localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), User: pipeline.User{AutomateUsername: "test", Username: "test", HashPassword: "okokokokokokoko"}, MockResult: &local_user.User{Name: "test", Id: "test", Email: "test@ok"}, ErrorWant: nil}, want1: nil},
+		{name: "Test Already User Exists", args: args{ctx: context.Background(), localUserClient: local_user.NewMockUsersMgmtServiceClient(gomock.NewController(t)), User: pipeline.User{AutomateUsername: "test", Username: "test", HashPassword: "okokokokokokoko"}, MockResult: nil, ErrorWant: errors.New("User already exists")}, want1: errors.New("User already exists")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.localUserClient.EXPECT().CreateUser(tt.args.ctx, gomock.Any()).Return(tt.args.MockResult, tt.args.ErrorWant)
+			got := createLocalUser(tt.args.ctx, tt.args.localUserClient, tt.args.User)
+			if got != nil && got.Error() != tt.want1.Error() {
+				t.Errorf("createLocalUser() got = %v, want %v", got, tt.want1)
+			}
+		})
+	}
+
+}
