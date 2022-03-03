@@ -16,7 +16,7 @@ type PipelineData struct {
 	Ctx    context.Context
 }
 
-type PhaseOnePipleine struct {
+type PhaseOnePipeline struct {
 	in chan<- PipelineData
 }
 
@@ -330,7 +330,7 @@ func migrationPipeline(source <-chan PipelineData, pipes ...PhaseOnePipelineProc
 	}()
 }
 
-func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
+func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipeline {
 	c := make(chan PipelineData, 100)
 	migrationPipeline(c,
 		UnzipSrc(service),
@@ -342,10 +342,10 @@ func SetupPhaseOnePipeline(service *service.Service) PhaseOnePipleine {
 		// OrgMembers(),
 		// AdminUsers(),
 	)
-	return PhaseOnePipleine{in: c}
+	return PhaseOnePipeline{in: c}
 }
 
-func (p *PhaseOnePipleine) Run(result pipeline.Result, service *service.Service) {
+func (p *PhaseOnePipeline) Run(result pipeline.Result, service *service.Service) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error)

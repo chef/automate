@@ -9,7 +9,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 )
 
-type PhaseTwoPipleine struct {
+type PhaseTwoPipeline struct {
 	in chan<- PipelineData
 }
 
@@ -166,7 +166,7 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 
 }
 
-func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipleine {
+func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipeline {
 	c := make(chan PipelineData, 100)
 	migrationTwoPipeline(c,
 		PopulateOrgs(service),
@@ -175,10 +175,10 @@ func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipleine {
 		// PopulateORGUser(),
 		// PopulateMembersPolicy(),
 	)
-	return PhaseTwoPipleine{in: c}
+	return PhaseTwoPipeline{in: c}
 }
 
-func (p *PhaseTwoPipleine) Run(result pipeline.Result, service *service.Service) {
+func (p *PhaseTwoPipeline) Run(result pipeline.Result, service *service.Service) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error)
