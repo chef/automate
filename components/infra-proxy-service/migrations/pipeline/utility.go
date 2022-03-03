@@ -7,11 +7,12 @@ import (
 	"fmt"
 
 	"errors"
-	"github.com/chef/automate/api/interservice/local_user"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/chef/automate/api/interservice/local_user"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
@@ -28,7 +29,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	if err != nil {
 		return res, err
 	}
-	log.Info("Starting the organisation migration phase for migration id: ", res.Meta.MigrationID)
+	log.Info("Starting the organization migration phase for migration id: ", res.Meta.MigrationID)
 	for _, org := range res.ParsedResult.Orgs {
 		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID, authzProjectClient)
 		if err != nil {
@@ -52,7 +53,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		log.Errorf("Failed to update the status for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		return res, err
 	}
-	log.Info("Successfully completed the organisation migration phase for migration id: ", res.Meta.MigrationID)
+	log.Info("Successfully completed the organization migration phase for migration id: ", res.Meta.MigrationID)
 	return res, err
 }
 
@@ -102,7 +103,7 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 
 func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var err error
-	log.Info("Starting with organisation parsing phase for migration id: ", result.Meta.MigrationID)
+	log.Info("Starting with organization parsing phase for migration id: ", result.Meta.MigrationID)
 	_, err = mst.StartOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
 	if err != nil {
 		log.Errorf("Failed to update the status for start org parssing for the migration id path %s : %s", result.Meta.MigrationID, err.Error())
@@ -140,7 +141,7 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 		return result, err
 	}
 
-	log.Info("Successfully completed the organisation parsing phase for migration id: ", result.Meta.MigrationID)
+	log.Info("Successfully completed the organization parsing phase for migration id: ", result.Meta.MigrationID)
 	return result, nil
 
 }
@@ -202,7 +203,7 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 	var orgList []pipeline.Org
 	orgDatabaseMap := createDatabaseOrgsMap(orgsInDB)
 	var orgJson pipeline.OrgJson
-	log.Info("Comparing the organisations from database and backup file for insert,update and skip action")
+	log.Info("Comparing the organization from database and backup file for insert,update and skip action")
 	//For insert, update and skip action
 	for _, org := range orgsInFiles {
 		if org.IsDir() {
@@ -223,14 +224,14 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 			}
 		}
 	}
-	log.Info("Completed comparing the organisations from database and backup file for insert,update and skip action")
+	log.Info("Completed comparing the organization from database and backup file for insert,update and skip action")
 	return orgList
 }
 
 func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []storage.Org) []pipeline.Org {
 	var orgList []pipeline.Org
 	orgFilesMap := createFileOrgsMap(orgsInFiles)
-	log.Info("Comparing the organisations from database and backup file for delete action")
+	log.Info("Comparing the organization from database and backup file for delete action")
 	//For delete action by comparing database orgs with file orgs
 	for _, org := range orgsInDB {
 		_, valuePresent := orgFilesMap[org.ID]
@@ -238,7 +239,7 @@ func deleteOrgsIfNotPresentInCurrentFile(orgsInFiles []os.FileInfo, orgsInDB []s
 			orgList = append(orgList, createOrgStructForAction(org.ID, org.Name, pipeline.Delete))
 		}
 	}
-	log.Info("Completed comparing the organisations from database and backup file for delete action")
+	log.Info("Completed comparing the organization from database and backup file for delete action")
 	return orgList
 }
 
@@ -382,7 +383,7 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 		log.Info("Getting actions for org id", org.Name)
 		chefServerOrgUsers, err := getChefServerOrgUsers(org.Name, orgPath)
 		if err != nil {
-			log.Errorf("Unable to get the chef server organisation users %s ", err)
+			log.Errorf("Unable to get the chef server organization users %s ", err)
 			return nil, err
 		}
 		if org.ActionOps == pipeline.Insert {
@@ -469,18 +470,18 @@ func createMapForOrgUsersInJson(chefServerOrgUsers []pipeline.UserAssociation) m
 	return orgUsersMap
 }
 
-// getChefServerOrgUsers returns the chef server organisation users from backup file
+// getChefServerOrgUsers returns the chef server organization users from backup file
 func getChefServerOrgUsers(orgName, fileLocation string) ([]pipeline.UserAssociation, error) {
 	orgUsers := make([]pipeline.UserAssociation, 0)
 
 	members, err := getOrgMembers(orgName, fileLocation)
 	if err != nil {
-		log.Errorf("Unable to get orgnisation members %s", err)
+		log.Errorf("Unable to get organization members %s", err)
 		return nil, err
 	}
 	admins, err := getOrgAdmins(orgName, fileLocation)
 	if err != nil {
-		log.Errorf("Unable to get orgnisation admins %s", err)
+		log.Errorf("Unable to get organization admins %s", err)
 		return nil, err
 	}
 	orgAdminMap := createMapForOrgAdminsInJson(admins)
@@ -588,13 +589,13 @@ func GetUsersForBackup(ctx context.Context, st storage.Storage, localUserClient 
 	return result, nil
 }
 
-// Clean serialized_object and Polulate Users struct
+// Clean serialized_object and Populate Users struct
 func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 	users := make([]pipeline.User, 0)
 	for _, kd := range keyDump {
 		sec := map[string]string{}
 		if err := json.Unmarshal([]byte(kd.SerializedObject), &sec); err != nil {
-			log.Errorf("failed to pasre user's first, middle and last name: %s", err.Error())
+			log.Errorf("failed to parse user's first, middle and last name: %s", err.Error())
 		}
 		user := &pipeline.User{
 			Username:     kd.Username,

@@ -32,7 +32,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 		errStream := stream.SendAndClose(res)
 		if errStream != nil {
-			log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+			ErrSendAndClose(migrationId, err)
 		}
 		return err
 	}
@@ -60,7 +60,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 			errStream := stream.SendAndClose(res)
 			if errStream != nil {
-				log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+				ErrSendAndClose(migrationId, err)
 			}
 			return err
 		}
@@ -72,7 +72,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 			res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 			errStream := stream.SendAndClose(res)
 			if errStream != nil {
-				log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+				ErrSendAndClose(migrationId, err)
 			}
 			return err
 		}
@@ -84,7 +84,7 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 		res := handleErrorForUploadFileAndMigration(err, migrationId, serverId, s, ctx)
 		errStream := stream.SendAndClose(res)
 		if errStream != nil {
-			log.Errorf("Failed to send and close strean file for migration id %s : %s", migrationId, err.Error())
+			ErrSendAndClose(migrationId, err)
 		}
 		return err
 	}
@@ -187,7 +187,7 @@ func createResponseWithErrors(err error, migrationId string) *response.UploadFil
 	}
 }
 
-// CancelMigration cancle the ongoing migration
+// CancelMigration cancel the ongoing migration
 func (s *MigrationServer) CancelMigration(ctx context.Context, req *request.CancelMigrationRequest) (*response.CancelMigrationResponse, error) {
 
 	// Cancellation is allowed for a running pipeline only if the parsing is done but the data commitment is yet to be performed
@@ -331,4 +331,9 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	return &response.ConfirmPreview{
 		MigrationId: req.MigrationId,
 	}, nil
+}
+
+// To avoide duplicate logs
+func ErrSendAndClose(migrationId string, err error) {
+	log.Errorf("Failed to send and close stream file for migration id %s : %s", migrationId, err.Error())
 }
