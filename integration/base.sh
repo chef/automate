@@ -240,7 +240,7 @@ set_version_file() {
     echo $newversion
     versionsFile="/tmp/versions.json"
     echo '[]' > $versionsFile
-    jq --arg val $newversion '. + [$val]' $versionsFile > tmp.$$.json && mv tmp.$$.json $versionsFile
+    jq --arg val $newversion '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
 }
 
 do_prepare_upgrade_default() {

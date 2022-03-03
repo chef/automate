@@ -27,7 +27,6 @@ do_build() {
         bundle.aib
 
     set_version_file
-    cat $versionsFile
 
     log_info "Creating update airgap bundle"
     #shellcheck disable=SC2154
@@ -35,7 +34,7 @@ do_build() {
         --manifest "$test_manifest_dir/build.json" \
         --hartifacts "${test_hartifacts_path}" \
         --override-origin "$HAB_ORIGIN" \
-        --versions $versionsFile \
+        --versions-file "$versionsFile" \
         update.aib
 
     # Installation of the artifact should create /hab

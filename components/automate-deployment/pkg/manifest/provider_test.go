@@ -347,7 +347,7 @@ func TestGetMinCurrentVersion(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.version, func(t *testing.T) {
 			url := fmt.Sprintf("%s?set=%s", ts.URL, tc.input)
-			compatibleVersion, err := GetMinimumCurrentManifestVersion(context.TODO(), tc.version, "dev", url)
+			compatibleVersion, err := GetMinimumCurrentManifestVersion(context.TODO(), tc.version, "dev", "", url)
 			if !tc.isError {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.compatibleVersion, compatibleVersion)
