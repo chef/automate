@@ -28,6 +28,7 @@ type airgapFlags struct {
 	hartsOnly      bool
 	retries        int
 	retryDelay     int
+	versionsPath   string
 }
 
 func (f airgapFlags) validateArgs() error {
@@ -111,6 +112,11 @@ func newAirgapCmd() *cobra.Command {
 	bundleCreateCmd.PersistentFlags().StringVar(
 		&airgapCmdFlags.version, "version", "",
 		"Chef Automate version to create an airgap bundle for",
+	)
+
+	bundleCreateCmd.PersistentFlags().StringVar(
+		&airgapCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
 	)
 
 	if !isDevMode() {
@@ -232,6 +238,10 @@ func runAirgapCreateInstallBundle(cmd *cobra.Command, args []string) error {
 				airgapCmdFlags.overrideOrigin,
 			),
 		)
+	}
+
+	if airgapCmdFlags.versionsPath != "" {
+		opts = append(opts, airgap.WithInstallBundleVersionsPath(airgapCmdFlags.versionsPath))
 	}
 
 	if len(args) > 0 && args[0] != "" {

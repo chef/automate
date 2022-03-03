@@ -92,6 +92,7 @@ func TestRoundTrip(t *testing.T) {
 		WithInstallBundleManifestFile(manifestFile),
 		WithInstallBundleWorkspacePath(workspaceDir),
 		WithInstallBundleOutputPath(outputFile),
+		WithInstallBundleVersionsPath(""),
 	)
 	creator.optionalURL = ts.URL //mocking for GetMinimumCurrentManifestVersion.
 

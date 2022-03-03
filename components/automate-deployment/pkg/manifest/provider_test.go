@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -244,7 +247,7 @@ func TestGetCompatibleManifestVersion(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.version, func(t *testing.T) {
 			url := fmt.Sprintf("%s?set=%s", ts.URL, tc.input)
-			isMinorAvailable, isMajorAvailable, compatibleVersion, err := getCompatibleManifestVersion(context.TODO(), tc.version, "dev", url)
+			isMinorAvailable, isMajorAvailable, compatibleVersion, err := getCompatibleManifestVersion(context.TODO(), tc.version, "dev", "", url)
 			if !tc.isError {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.isMinorAvailable, isMinorAvailable)
@@ -344,7 +347,7 @@ func TestGetMinCurrentVersion(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.version, func(t *testing.T) {
 			url := fmt.Sprintf("%s?set=%s", ts.URL, tc.input)
-			compatibleVersion, err := GetMinimumCurrentManifestVersion(context.TODO(), tc.version, "dev", url)
+			compatibleVersion, err := GetMinimumCurrentManifestVersion(context.TODO(), tc.version, "dev", "", url)
 			if !tc.isError {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.compatibleVersion, compatibleVersion)
@@ -405,6 +408,31 @@ func TestGetAllVersions(t *testing.T) {
 			assert.Equal(t, tc.output, result)
 		})
 	}
+}
+
+var versions = `
+[
+  "20180319150121",
+  "20220209045542",
+  "3.5.6",
+  "3.0.0", 
+  "20180322085330",
+  "20220121191356"
+]
+`
+
+func TestGetAllVersionsFromPath(t *testing.T) {
+	dir, err := ioutil.TempDir("", "VersionsFromFileTest")
+	assert.NoError(t, err, "creating temporary dir")
+	defer os.RemoveAll(dir)
+	filename := path.Join(dir, "versions.json")
+	err = ioutil.WriteFile(filename, []byte(versions), 0700)
+	assert.NoError(t, err, "writing test data")
+
+	resp, err := GetAllVersions(context.Background(), "", filename)
+	assert.NoError(t, err, "getting all versions")
+	assert.Equal(t, []string{"20180319150121", "20180322085330", "20220121191356", "20220209045542", "3.0.0", "3.5.6"}, resp)
+
 }
 
 func compatibleVerServer() *httptest.Server {

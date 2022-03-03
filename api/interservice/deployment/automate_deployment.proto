@@ -186,7 +186,9 @@ message ServiceVersionsRequest {}
 
 message SystemLogsRequest {}
 
-message UpgradeStatusRequest {}
+message UpgradeStatusRequest {
+	string versions_path = 1;
+}
 
 message UpgradeStatusResponse {
 	UpgradeState state = 1;
@@ -659,6 +661,7 @@ message CancelBackupResponse {
 message UpgradeRequest {
 	string version = 1;
 	bool is_major_upgrade = 2;
+	string versions_path = 3;
 }
 
 message UpgradeResponse {

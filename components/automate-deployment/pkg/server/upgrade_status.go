@@ -26,7 +26,7 @@ import (
 // I think this should get a lot more simple as we integrate the
 // converger. In that world we can potentially have a function that
 // takes an expected state and tells us if it is true or not.
-func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest) (*api.UpgradeStatusResponse, error) {
+func (s *server) UpgradeStatus(ctx context.Context, req *api.UpgradeStatusRequest) (*api.UpgradeStatusResponse, error) {
 	if !s.HasConfiguredDeployment() {
 		return nil, ErrorNotConfigured
 	}
@@ -42,7 +42,8 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 
 	var latestManifest *manifest.A2
 	if response.CurrentVersion != "" && !response.IsAirgapped {
-		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx, s.deployment.Channel(), response.CurrentVersion)
+		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx,
+			s.deployment.Channel(), response.CurrentVersion, req.VersionsPath)
 		if err != nil {
 			return response, err
 		}
