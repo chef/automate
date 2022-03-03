@@ -7,8 +7,8 @@ import (
 
 type MigrationServer struct {
 	service          *service.Service
-	phaseOnePipeline pipeline.PhaseOnePipleine
-	phaseTwoPipeline pipeline.PhaseTwoPipleine
+	phaseOnePipeline pipeline.PhaseOnePipeline
+	phaseTwoPipeline pipeline.PhaseTwoPipeline
 }
 
 // NewMigrationServer returns an infra-proxy migration server
