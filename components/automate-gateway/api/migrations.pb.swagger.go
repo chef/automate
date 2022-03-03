@@ -286,6 +286,10 @@ func init() {
           "type": "boolean",
           "format": "boolean",
           "title": "user is admin or not"
+        },
+        "hash_password": {
+          "type": "string",
+          "title": "Local user hashed password"
         }
       }
     },

@@ -88,6 +88,7 @@ func getStagedUser(user *infra_res.User) *gwres.User {
 	stagedUser.Connector = user.Connector
 	stagedUser.IsConflicting = user.IsConflicting
 	stagedUser.IsAdmin = user.IsAdmin
+	stagedUser.HashPassword = user.HashPassword
 	return stagedUser
 }
 

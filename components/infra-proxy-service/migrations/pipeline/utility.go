@@ -597,15 +597,17 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 			log.Errorf("failed to pasre user's first, middle and last name: %s", err.Error())
 		}
 		user := &pipeline.User{
-			Username:    kd.Username,
-			Email:       kd.Email,
-			DisplayName: sec["display_name"],
-			FirstName:   sec["first_name"],
-			LastName:    sec["last_name"],
-			MiddleName:  sec["middle_name"],
+			Username:     kd.Username,
+			Email:        kd.Email,
+			DisplayName:  sec["display_name"],
+			FirstName:    sec["first_name"],
+			LastName:     sec["last_name"],
+			MiddleName:   sec["middle_name"],
+			HashPassword: kd.HashedPassword,
 		}
 		user.SetConnector(kd.ExternalAuthenticationUID)
 		user.SetAutomateUsername(kd.ExternalAuthenticationUID)
+
 		users = append(users, *user)
 	}
 	return users
@@ -696,4 +698,42 @@ func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtSer
 		return false
 	}
 	return true
+}
+
+//createLocalUser Function for reference, will be removed after PopulateUsers Method
+func createLocalUsers(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
+	log.Info("Starting with creating local users in automate for migration id:  ", result.Meta.MigrationID)
+	var totalSucceeded, totalSkipped, totalFailed int64
+	var err error
+	for _, user := range result.ParsedResult.Users {
+		if user.Connector == pipeline.Local && user.ActionOps == pipeline.Insert && !user.IsConflicting {
+			err = createLocalUser(ctx, localUserClient, user)
+			if err != nil {
+				totalFailed++
+				continue
+			}
+		}
+		if user.ActionOps == pipeline.Skip {
+			totalSkipped++
+			continue
+		}
+		totalSucceeded++
+	}
+	log.Info("Starting with creating local users in automate for migration id:  ", result.Meta.MigrationID)
+	return result, err
+}
+
+func createLocalUser(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) error {
+	_, err := localUserClient.CreateUser(ctx, &local_user.CreateUserReq{
+		Name:     user.DisplayName,
+		Id:       user.AutomateUsername,
+		Password: user.HashPassword,
+		Email:    user.AutomateUsername,
+		IsHashed: true,
+	})
+	if err != nil {
+		log.Errorf("Unable to create user in Automate for user : %s with error %s", user.AutomateUsername, err.Error())
+		return err
+	}
+	return nil
 }
