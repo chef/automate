@@ -7,6 +7,11 @@ import { EventEmitter } from '@angular/core';
 import { EditInfraRoleModalComponent } from './edit-infra-role-modal.component';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('EditInfraRoleModalComponent', () => {
   let component: EditInfraRoleModalComponent;
@@ -26,6 +31,7 @@ describe('EditInfraRoleModalComponent', () => {
         EditInfraRoleModalComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         HttpClient, HttpHandler
       ],
       imports: [

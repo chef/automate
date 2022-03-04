@@ -429,7 +429,15 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	*u = *s.signInURL
 
-	u.Fragment = fmt.Sprintf("id_token=%s&state=%s", rawIDToken, clientState)
+	cookie := &http.Cookie{
+		Name:  "id_token",
+		Value: rawIDToken,
+		Path:  "/",
+	}
+
+	http.SetCookie(w, cookie)
+
+	u.Fragment = fmt.Sprintf("state=%s", clientState)
 	http.Redirect(w, r, u.String(), http.StatusSeeOther)
 }
 
@@ -726,9 +734,6 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	s.log.Debugf("stored relayState %s", relayState)
 
 	opts := []oauth2.AuthCodeOption{}
-	if connectorID := s.connectorIDFromRequest(r); connectorID != "" {
-		opts = append(opts, oauth2.SetAuthURLParam("connector_id", connectorID))
-	}
 	authCodeURL := s.client.AuthCodeURL(relayState, opts...)
 
 	if err := sess.PutBool(w, aliveKey, true); err != nil {
@@ -738,32 +743,6 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, authCodeURL, http.StatusSeeOther)
-}
-
-func (s *Server) connectorIDFromRequest(r *http.Request) string {
-	token := r.FormValue("id_token_hint")
-	if token == "" { // ignore errors, we just use this as a hint
-		s.log.Error("no id_token_hint")
-		return ""
-	}
-	// Note(sr): The way the verifier is set up, this allows for expired tokens --
-	// so, this wouldn't fail unless we're given something that is not a JWT at all.
-	idToken, err := s.client.Verify(r.Context(), token)
-	if err != nil {
-		s.log.Errorf("failed to verify id_token_hint: %v", err)
-		return ""
-	}
-	var claims struct {
-		Federated struct {
-			ConnectorID string `json:"connector_id"`
-		} `json:"federated_claims"`
-	}
-	err = idToken.Claims(&claims)
-	if err != nil {
-		s.log.Errorf("failed to read claims from id_token_hint: %v", err)
-		return ""
-	}
-	return claims.Federated.ConnectorID
 }
 
 func httpError(w http.ResponseWriter, code int) {

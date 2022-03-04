@@ -12,6 +12,7 @@ import { Utilities } from 'app/helpers/utilities/utilities';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
 import { ResetKey } from 'app/entities/clients/client.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-reset-client-key',
@@ -37,7 +38,8 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit() {
@@ -103,6 +105,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
       'name': this.name
     };
     this.store.dispatch(new ResetKeyClient(payload));
+    this.telemetryService.track('InfraServer_Clients_ResetKey');
   }
 
   downloadKey(): void {
@@ -114,6 +117,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
 
     const blob = new Blob([template], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, this.name + '.pem');
+    this.telemetryService.track('InfraServer_Clients_Download_ResetKey');
   }
 
 }
