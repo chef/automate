@@ -1,5 +1,5 @@
 +++
-title = "High Availability Provisioning Using AWS"
+title = "AWS Deployment"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "High Availability Provisioning Using AWS"
+    title = "AWS Deployment"
     parent = "automate/install"
-    identifier = "automate/install/ha_deploy_aws.md High Availability Provisioning Using AWS"
+    identifier = "automate/install/ha_deploy_aws.md AWS Deployment"
     weight = 240
 +++
 
