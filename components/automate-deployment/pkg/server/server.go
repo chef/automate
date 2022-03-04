@@ -42,6 +42,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/persistence"
@@ -1359,7 +1360,20 @@ func (s *server) doConverge(
 		// we can run into cases where we check the status of the services
 		// before hab has applied all changes.
 		eDeploy.ensureStatus(context.Background(), s.deployment.NotSkippedServiceNames(), s.ensureStatusTimeout)
+
 		errHandler(eDeploy.err)
+		// json file
+		if os.Getenv(isUpgradeMajorEnv) == "true" {
+			var err error
+			ci, err := majorupgradechecklist.NewPostChecklistManager(s.deployment.CurrentReleaseManifest.Version())
+			if err != nil {
+				errHandler(err)
+			}
+			err = ci.CreatePostChecklistFile()
+			if err != nil {
+				errHandler(err)
+			}
+		}
 	}()
 
 	return task, nil
@@ -1916,16 +1930,37 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 		nextManifestVersion = req.Version
 	}
 
-	major, isSemFormat := manifest.IsSemVersionFmt(nextManifestVersion)
-	resp := &api.ValidatedUpgradeResponse{
-		CurrentVersion: currentRelease,
-		TargetVersion:  nextManifestVersion,
-	}
-	if isSemFormat {
-		resp.TargetMajor = major
+	var ReadPendingPostChecklist = []string{}
+	_, is_major_version := manifest.IsSemVersionFmt(currentRelease)
+	if is_major_version {
+		var err error
+
+		pcm, err := majorupgradechecklist.NewPostChecklistManager(currentRelease)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "Failed to get post checklist manager: %s", err)
+		}
+
+		ReadPendingPostChecklist, err = pcm.ReadPendingPostChecklistFile()
+		if err != nil {
+			logrus.Info("Failed to read pending post checklist:", err)
+			return nil, nil
+		}
+
 	}
 
-	return resp, nil
+	if len(ReadPendingPostChecklist) == 0 {
+		major, isSemFormat := manifest.IsSemVersionFmt(nextManifestVersion)
+		resp := &api.ValidatedUpgradeResponse{
+			CurrentVersion: currentRelease,
+			TargetVersion:  nextManifestVersion,
+		}
+		if isSemFormat {
+			resp.TargetMajor = major
+		}
+		return resp, nil
+	} else {
+		return nil, status.Errorf(codes.FailedPrecondition, "Please complete pending post checklist from version %s", currentRelease)
+	}
 }
 
 // Upgrade requests the deployment-service pulls down the latest manifest and applies it

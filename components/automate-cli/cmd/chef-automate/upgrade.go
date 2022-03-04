@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -13,6 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -123,8 +126,13 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if upgradeRunCmdFlags.isMajorUpgrade {
-		ci, err := majorupgradechecklist.NewChecklistInspector(writer, validatedResp.TargetVersion, validatedResp.TargetMajor)
+	pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
+	if err != nil {
+		return err
+	}
+
+	if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -275,6 +283,18 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
 			}
 		}
+
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		if len(pendingPostChecklist) > 0 {
+			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
+			for index, msg := range pendingPostChecklist {
+				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
+			}
+		}
+
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
 		if resp.DesiredVersion != "" {
@@ -381,4 +401,25 @@ func init() {
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
 	RootCmd.AddCommand(upgradeCmd)
+}
+
+func GetPendingPostChecklist(version string) ([]string, error) {
+
+	_, is_major_version := manifest.IsSemVersionFmt(version)
+
+	if is_major_version {
+		var err error
+		pmc, err := majorupgradechecklist.NewPostChecklistManager(version)
+		if err != nil {
+			return []string{}, err
+		}
+
+		pendingPostChecklist, err := pmc.ReadPendingPostChecklistFile()
+		if err != nil {
+			logrus.Info("Failed to read pending post checklist:", err)
+			return []string{}, nil
+		}
+		return pendingPostChecklist, nil
+	}
+	return []string{}, nil
 }
