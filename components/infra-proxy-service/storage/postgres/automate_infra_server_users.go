@@ -9,27 +9,30 @@ import (
 )
 
 // InsertUser saves a user to the DB.
-func (p *postgres) InsertUser(ctx context.Context, id, serverId, infraServerUsername, credentialId, connector, automateUserId string, isServerAdmin bool) (storage.User, error) {
-	var user storage.User
+func (p *postgres) InsertUser(ctx context.Context, user storage.User) (storage.User, error) {
+	var rtnUser storage.User
 	nowTime := time.Now()
 	err := p.db.QueryRowContext(ctx,
 		`INSERT INTO users (
-		id, server_id, 
+		server_id, 
 		infra_server_username, 
-		credential_id, 
 		connector, 
 		automate_user_id,
-		is_server_admin,
+		first_name,
+		last_name,
+		email,
+		middle_name,
+		display_name,
 		created_at,updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)
-		RETURNING id, server_id, infra_server_username, credential_id, connector, automate_user_id, is_server_admin, created_at, updated_at`,
-		id, serverId, infraServerUsername, credentialId, connector, automateUserId, isServerAdmin, nowTime).
-		Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector, &user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10 )
+		RETURNING id, server_id, infra_server_username, connector, automate_user_id, first_name, last_name, email, middle_name, display_name, created_at, updated_at`,
+		user.ServerID, user.InfraServerUsername, user.Connector, user.AutomateUserID, user.FirstName, user.LastName, user.Email, user.MiddleName, user.DisplayName, nowTime).
+		Scan(&rtnUser.ID, &rtnUser.ServerID, &rtnUser.InfraServerUsername, &rtnUser.Connector, &rtnUser.AutomateUserID, &rtnUser.FirstName, &rtnUser.LastName, &rtnUser.Email, &rtnUser.MiddleName, &rtnUser.DisplayName, &rtnUser.CreatedAt, &rtnUser.UpdatedAt)
 	if err != nil {
 		return storage.User{}, p.processError(err)
 	}
 
-	return user, nil
+	return rtnUser, nil
 }
 
 // GetUser fetches a user by ID.
@@ -43,14 +46,17 @@ func (p *postgres) getUser(ctx context.Context, q querier, id string) (storage.U
 		`SELECT 
 		u.id, u.server_id, 
 		u.infra_server_username, 
-		u.credential_id, 
 		u.connector,
 		u.automate_user_id, 
-		u.is_server_admin,
+		u.first_name,
+		u.last_name,
+		u.email,
+		u.middle_name,
+		u.display_name,
 		u.created_at, u.updated_at
 		FROM users u
 		WHERE u.id = $1`, id).
-		Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector, &user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt)
+		Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.Connector, &user.AutomateUserID, &user.FirstName, &user.LastName, &user.Email, &user.MiddleName, &user.DisplayName, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return storage.User{}, p.processError(err)
 	}
@@ -58,42 +64,45 @@ func (p *postgres) getUser(ctx context.Context, q querier, id string) (storage.U
 }
 
 // EditUser does a full update on a database server
-func (p *postgres) EditUser(ctx context.Context, id, serverId, infraServerUsername, credentialId, connector, automateUserId string, isServerAdmin bool) (storage.User, error) {
-	var user storage.User
+func (p *postgres) EditUser(ctx context.Context, user storage.User) (storage.User, error) {
+	var returnUser storage.User
 	nowTime := time.Now()
 	err := p.db.QueryRowContext(ctx,
 		`UPDATE users SET 
-		server_id = $2, 
-		infra_server_username = $3, 
-		credential_id = $4, 
+		server_id = $3, 
+		infra_server_username = $4, 
 		connector = $5, 
 		automate_user_id = $6,
-		is_server_admin= $7, 
-		updated_at= $8
-		WHERE id = $1
-		RETURNING id, server_id, infra_server_username, credential_id, connector, automate_user_id, is_server_admin, created_at, updated_at`,
-		id, serverId, infraServerUsername, credentialId, connector, automateUserId, isServerAdmin, nowTime).
-		Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector, &user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt)
+		first_name = $7,
+		last_name = $8,
+		email = $9,
+		middle_name = $10,
+		display_name = $11,
+		updated_at= $12
+		WHERE server_id = $1 AND infra_server_username = $2
+		RETURNING id, server_id, infra_server_username, connector, automate_user_id, first_name, last_name, email, middle_name, display_name, created_at, updated_at`,
+		user.ID, user.ServerID, user.InfraServerUsername, user.Connector, user.AutomateUserID, user.FirstName, user.LastName, user.Email, user.MiddleName, user.DisplayName, nowTime).
+		Scan(&returnUser.ID, &returnUser.ServerID, &returnUser.InfraServerUsername, &returnUser.Connector, &returnUser.AutomateUserID, &returnUser.FirstName, &returnUser.LastName, &returnUser.Email, &returnUser.MiddleName, &returnUser.DisplayName, &returnUser.CreatedAt, &returnUser.UpdatedAt)
 	if err != nil {
 		return storage.User{}, p.processError(err)
 	}
 
-	return user, nil
+	return returnUser, nil
 }
 
 // DeleteServer deletes a user from the DB.
-func (p *postgres) DeleteUser(ctx context.Context, id string) (storage.User, error) {
-	var user storage.User
+func (p *postgres) DeleteUser(ctx context.Context, user storage.User) (storage.User, error) {
+	var returnUser storage.User
 	err := p.db.QueryRowContext(ctx,
-		`DELETE FROM users WHERE id = $1
-		RETURNING id, server_id, infra_server_username, credential_id, connector, automate_user_id, is_server_admin, created_at, updated_at`,
-		id).
-		Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector, &user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt)
+		`DELETE FROM users WHERE server_id = $1 AND infra_server_username = $2
+		RETURNING id, server_id, infra_server_username, connector, automate_user_id, first_name, last_name, email, middle_name, display_name, created_at, updated_at`,
+		user.ServerID, user.InfraServerUsername).
+		Scan(&returnUser.ID, &returnUser.ServerID, &returnUser.InfraServerUsername, &returnUser.Connector, &returnUser.AutomateUserID, &returnUser.FirstName, &returnUser.LastName, &returnUser.Email, &returnUser.MiddleName, &returnUser.DisplayName, &returnUser.CreatedAt, &returnUser.UpdatedAt)
 	if err != nil {
 		return storage.User{}, p.processError(err)
 	}
 
-	return user, nil
+	return returnUser, nil
 }
 
 //GetAutomateInfraServerUsers: fetches server users from the DB as an array.
@@ -105,6 +114,11 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 		u.infra_server_username, 
 		u.connector,
 		u.automate_user_id, 
+		u.first_name,
+		u.last_name,
+		u.email,
+		u.middle_name,
+		u.display_name,
 		u.created_at, u.updated_at
 		FROM users u
 		WHERE u.server_id = $1`, serverId)
@@ -120,7 +134,7 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 	for rows.Next() {
 		user := storage.User{}
 		if err := rows.Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.Connector,
-			&user.AutomateUserID, &user.CreatedAt, &user.UpdatedAt); err != nil {
+			&user.AutomateUserID, &user.FirstName, &user.LastName, &user.Email, &user.MiddleName, &user.DisplayName, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -173,7 +187,7 @@ func (p *postgres) getUsers(ctx context.Context, q querier, serverID string) ([]
 
 	for rows.Next() {
 		user := storage.User{}
-		if err := rows.Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector,
+		if err := rows.Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.Connector,
 			&user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			return nil, err
 		}

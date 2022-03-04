@@ -760,4 +760,66 @@ func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID s
 	default:
 	}
 	return err, actionTaken
+// StoreUsers reads the Result struct and populate the users table
+func StoreUsers(ctx context.Context, st storage.Storage, res pipeline.Result) (pipeline.Result, error) {
+	var err error
+	var totalSucceeded, totalSkipped, totalFailed int64
+
+	for _, user := range res.ParsedResult.Users {
+		_, err = StoreUser(ctx, st, user, res.Meta.ServerID)
+		if err != nil {
+			totalFailed++
+			continue
+		}
+		if user.ActionOps == pipeline.Skip {
+			totalSkipped++
+			continue
+		}
+		totalSucceeded++
+	}
+	if len(res.ParsedResult.Users) == int(totalFailed) {
+		log.Errorf("Failed to migrate user for migration id %s : %s", res.Meta.MigrationID, err.Error())
+		return res, err
+	}
+
+	// Set the count for total Skipped, Inserted and Deleted Users
+	res.ParsedResult.UsersCount = pipeline.Counts{
+		Succeeded: int(totalSucceeded),
+		Failed:    int(totalFailed),
+		Skipped:   int(totalSkipped),
+	}
+
+	log.Info("Successfully completed the user migration phase for migration id: ", res.Meta.MigrationID)
+	return res, err
+}
+
+// StoreUser stores a single User into DB
+func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serverID string) (pipeline.ActionOps, error) {
+	var actionTaken pipeline.ActionOps
+	var err error
+
+	storageUser := storage.User{
+		ServerID:            serverID,
+		InfraServerUsername: user.Username,
+		Connector:           user.Connector,
+		Email:               user.Email,
+		DisplayName:         user.DisplayName,
+		FirstName:           user.FirstName,
+		LastName:            user.LastName,
+		MiddleName:          user.MiddleName,
+		AutomateUserID:      user.AutomateUsername,
+	}
+	switch user.ActionOps {
+	case pipeline.Insert:
+		_, err = st.InsertUser(ctx, storageUser)
+		actionTaken = pipeline.Insert
+	case pipeline.Delete:
+		_, err = st.DeleteUser(ctx, storageUser)
+		actionTaken = pipeline.Delete
+	case pipeline.Update:
+		_, err = st.EditUser(ctx, storageUser)
+		actionTaken = pipeline.Update
+	default:
+	}
+	return actionTaken, err
 }
