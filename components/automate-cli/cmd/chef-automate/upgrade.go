@@ -289,14 +289,11 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		if len(pendingPostChecklist) > 0 {
-			writer.Println(`
-			Post Upgrade Steps:
-			===================`)
+			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
 			for index, msg := range pendingPostChecklist {
 				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
 			}
 		}
-
 
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.

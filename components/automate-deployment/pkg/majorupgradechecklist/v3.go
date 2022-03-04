@@ -51,7 +51,7 @@ Now, upgrade will start, Please confirm to continue...`
 	patch_new_conf_cmd = `chef-automate config patch config.toml`
 	patch_new_conf     = `If your PostgreSQL Connection URL and Credential are changed then update them by putting them in config.toml and patching it in using:
      $ chef-automate config patch config.toml`
-	post_upgrade_header = `
+	POST_UPGRADE_HEADER = `
 Post Upgrade Steps:
 ===================
 `
@@ -197,7 +197,7 @@ func showPostChecklist(postCheck *[]PostCheckListItem) Checklist {
 			for i, item := range *postCheck {
 				if !item.IsExecuted {
 					if !displayed {
-						h.Writer.Println(post_upgrade_header)
+						h.Writer.Println(POST_UPGRADE_HEADER)
 						displayed = true
 					}
 					h.Writer.Println(fmt.Sprintf("%d", i+1) + ") " + item.Msg + "\n")
