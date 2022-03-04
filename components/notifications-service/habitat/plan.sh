@@ -33,7 +33,6 @@ pkg_build_deps=(
   core/elixir/1.8.0/20190327153604
   core/glibc
 )
-
 pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
