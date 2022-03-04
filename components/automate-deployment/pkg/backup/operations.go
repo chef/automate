@@ -635,10 +635,6 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 		return errors.Wrapf(err, "failed to create writer for %s", objectName)
 	}
 
-	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
-
-	fmt.Println(backupCtxDeadline, "CommandExecuteOperation")
-
 	logrus.WithFields(logrus.Fields{
 		"name":        c.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
@@ -886,9 +882,6 @@ var _ Operation = &ElasticsearchOperation{}
 // Backup backs up indices in ES
 func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, progChan chan OperationProgress) error {
 	backupID := backupCtx.backupTask.TaskID()
-	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
-
-	fmt.Println(backupCtxDeadline, "backupCtxDeadline")
 
 	log := logrus.WithFields(logrus.Fields{
 		"backup_id":        backupID,

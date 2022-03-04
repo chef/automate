@@ -273,6 +273,10 @@ func (r *Runner) DeleteBackups(ctx context.Context, dep *deployment.Deployment, 
 	defer cancel()
 
 	var err error
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(2 * time.Hour)
+	}
 
 	r.lockedDeployment = dep
 	defer r.unlockDeployment()
@@ -302,6 +306,7 @@ func (r *Runner) DeleteBackups(ctx context.Context, dep *deployment.Deployment, 
 			WithContextConnFactory(r.connFactory),
 			WithContextReleaseManifest(r.releaseManifest),
 			WithContextBuilderMinioLocationSpec(r.builderMinioLocationSpec),
+			WithContextDeadline(deadline),
 		)
 
 		// don't verify the contents of the backup we are just going to delete
@@ -633,6 +638,7 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 		WithContextConnFactory(r.connFactory),
 		WithContextReleaseManifest(r.releaseManifest),
 		WithContextBuilderMinioLocationSpec(r.builderMinioLocationSpec),
+		WithContextDeadline(deadline),
 	)
 
 	// Build a slice of services that we wish to restore
@@ -1002,8 +1008,6 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
 
-	fmt.Println(ctx, "startBackupOperations")
-
 	r.eventChan = make(chan api.DeployEvent_Backup_Operation)
 	r.eventTerm = make(chan struct{})
 	r.errChan = make(chan error, 1)
@@ -1031,6 +1035,7 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 		WithContextConnFactory(r.connFactory),
 		WithContextReleaseManifest(r.releaseManifest),
 		WithContextBuilderMinioLocationSpec(r.builderMinioLocationSpec),
+		WithContextDeadline(deadline),
 	)
 
 	// Start the event publisher

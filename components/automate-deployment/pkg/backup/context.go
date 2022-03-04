@@ -3,7 +3,6 @@ package backup
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"go.uber.org/multierr"
@@ -102,6 +101,14 @@ func WithContextBackupLocationSpecification(locationSpec LocationSpecification) 
 	}
 }
 
+func WithContextDeadline(deadline time.Time) ContextOpt {
+	return func(c *Context) {
+		newCtx, cancel := context.WithDeadline(c.ctx, deadline)
+		defer cancel()
+		c.ctx = newCtx
+	}
+}
+
 // WithContextRestoreLocationSpecification configures the backup restore remote location
 func WithContextBackupRestoreLocationSpecification(locationSpec LocationSpecification) ContextOpt {
 	return func(ctx *Context) {
@@ -141,7 +148,6 @@ func WithContextBackupRestoreTask(task *api.BackupRestoreTask) ContextOpt {
 // WithContextCtx :shrug: configures the context's context...
 func WithContextCtx(ctx2 context.Context) ContextOpt {
 	return func(ctx *Context) {
-		fmt.Println(ctx, "ctxxxWithContextCtx")
 		ctx.ctx = ctx2
 	}
 }
@@ -156,10 +162,6 @@ func WithContextConnFactory(connFactory *secureconn.Factory) ContextOpt {
 // WithContextEsSidecarInfo configures the EsSidecar connection info
 func WithContextEsSidecarInfo(esSidecarInfo ESSidecarConnInfo) ContextOpt {
 	return func(ctx *Context) {
-		// deadline, ok := ctx.Deadline()
-		// ctx, cancel := context.WithDeadline(context.Background(), deadline)
-		// defer cancel()
-		fmt.Println(ctx, "ctxxx")
 		ctx.esSidecarInfo = esSidecarInfo
 	}
 }
