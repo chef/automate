@@ -139,6 +139,7 @@ func isExternalPG() bool {
 	config, err := platform_config.ConfigFromParams("pg-sidecar-service", "/hab/svc/pg-sidecar-service", "")
 	if err != nil {
 		fmt.Println("error in config from environment")
+		return false
 	}
 	return config.IsExternalPG()
 }

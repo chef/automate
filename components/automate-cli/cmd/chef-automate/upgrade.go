@@ -401,7 +401,7 @@ func init() {
 }
 
 func GetPendingPostChecklist(version string) ([]string, error) {
-	var pendingPostChecklist = []string{}
+
 	_, is_major_version := manifest.IsSemVersionFmt(version)
 
 	if is_major_version {
@@ -411,7 +411,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, err = pmc.ReadPendingPostChecklistFile()
+		pendingPostChecklist, err := pmc.ReadPendingPostChecklistFile()
 		if err != nil {
 			logrus.Info("Failed to read pending post checklist:", err)
 			return []string{}, nil

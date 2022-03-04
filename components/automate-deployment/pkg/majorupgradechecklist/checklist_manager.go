@@ -12,7 +12,7 @@ type ChecklistManager interface {
 
 func NewChecklistManager(writer cli.FormatWriter, version string) (ChecklistManager, error) {
 
-		major, _ := GetMajorVersion(version)
+	major, _ := GetMajorVersion(version)
 
 	switch major {
 	case "3":
