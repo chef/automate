@@ -6,7 +6,7 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA High Availability (HA) Overview"
+    title = "High Availability (HA) Overview"
     parent = "automate/install"
     identifier = "automate/install/ha.md High Availability (HA) Overview"
     weight = 200

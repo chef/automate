@@ -1,7 +1,7 @@
 +++
 title = "High Availability Provisioning Using AWS"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

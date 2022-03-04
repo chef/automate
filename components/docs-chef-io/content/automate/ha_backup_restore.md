@@ -1,7 +1,7 @@
 +++
 title = "Backups and Restore"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
