@@ -1,7 +1,7 @@
 +++
 title = "Reference Topics"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "Reference Topics"
     parent = "automate/install/ha"
-    identifier = "automate/install/ha_common.md Reference Topics"
+    identifier = "automate/install/ha_vpc_setup.md Reference Topics"
     weight = 90
 +++
 

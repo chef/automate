@@ -1,7 +1,7 @@
 +++
 title = "Bastion Host"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

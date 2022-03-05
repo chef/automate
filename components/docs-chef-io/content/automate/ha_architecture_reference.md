@@ -1,15 +1,15 @@
 +++
-title = "Architecture and Components"
+title = "High Availability Architecture"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Architecture and Components"
+    title = "High Availability Architecture"
     parent = "automate/install/ha"
-    identifier = "automate/install/ha_architecture_reference.md Architecture and Components"
+    identifier = "automate/install/ha_architecture_reference.md High Availability Architecture"
     weight = 20
 +++
 
