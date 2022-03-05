@@ -1,14 +1,14 @@
 +++
 title = "Bastion Host"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "Bastion Host"
-    parent = "automate/install//high_availability"
+    parent = "automate/install"
     identifier = "automate/install/ha_bastion.md Bastion Host"
     weight = 230
 +++

@@ -1,14 +1,14 @@
 +++
-title = "Upgrade Procedure"
+title = "Automate HA Upgrade"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Upgrade Procedure"
-    parent = "automate/install//high_availability"
-    identifier = "automate/install/ha_upgrade.md Upgrade Procedure"
+    title = "Automate HA Upgrade"
+    parent = "automate/install"
+    identifier = "automate/install/ha_upgrade.md Automate HA Upgrade"
     weight = 270
 +++
 
