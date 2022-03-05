@@ -1,14 +1,14 @@
 +++
-title = "Automate HA Upgrade"
+title = "Upgrade"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Automate HA Upgrade"
+    title = "Upgrade"
     parent = "automate/install/ha"
-    identifier = "automate/install/ha_upgrade.md Automate HA Upgrade"
+    identifier = "automate/install/ha_upgrade.md Upgrade"
     weight = 80
 +++
 
