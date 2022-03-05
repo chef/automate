@@ -8,7 +8,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Reference Topics"
-    parent = "automate/install"
+    parent = "automate/install//high_availability"
     identifier = "automate/install/ha_common.md Reference Topics"
     weight = 280
 +++

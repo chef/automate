@@ -8,7 +8,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "On-premises Deployment"
-    parent = "automate/install"
+    parent = "automate/install//high_availability"
     identifier = "automate/install/ha_deploy_bareinfra.md On-premises Deployment"
     weight = 250
 +++

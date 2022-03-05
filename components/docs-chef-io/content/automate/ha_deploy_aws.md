@@ -8,7 +8,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "AWS Deployment"
-    parent = "automate/install"
+    parent = "automate/install//high_availability"
     identifier = "automate/install/ha_deploy_aws.md AWS Deployment"
     weight = 240
 +++
