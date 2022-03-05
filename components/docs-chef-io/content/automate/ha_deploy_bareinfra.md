@@ -1,15 +1,15 @@
 +++
-title = "On-premises Deployment"
+title = "Bare Metal Deployment Procedure"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-premises Deployment"
+    title = "Bare Metal Deployment Procedure"
     parent = "automate/install/ha"
-    identifier = "automate/install/ha_deploy_bareinfra.md On-premises Deployment"
+    identifier = "automate/install/ha_deploy_bareinfra.md Bare Metal Deployment Procedure"
     weight = 60
 +++
 
