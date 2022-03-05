@@ -7,7 +7,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Upgrade Procedure"
-    parent = "automate/install"
+    parent = "automate/install//high_availability"
     identifier = "automate/install/ha_upgrade.md Upgrade Procedure"
     weight = 270
 +++
