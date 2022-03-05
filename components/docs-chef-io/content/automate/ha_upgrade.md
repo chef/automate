@@ -1,7 +1,7 @@
 +++
 title = "Upgrade Procedure"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 [menu]
