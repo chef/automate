@@ -1,7 +1,7 @@
 +++
 title = "Architecture and Components"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

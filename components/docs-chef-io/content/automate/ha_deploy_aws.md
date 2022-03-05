@@ -1,7 +1,7 @@
 +++
 title = "AWS Deployment"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 

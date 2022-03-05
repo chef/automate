@@ -1,7 +1,7 @@
 +++
 title = "On-premises Deployment"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
