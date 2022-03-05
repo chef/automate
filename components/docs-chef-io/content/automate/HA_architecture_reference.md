@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Architecture and Components"
-    parent = "automate/install//high_availability"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_architecture_reference.md Architecture and Components"
-    weight = 210
+    weight = 20
 +++
 
 This page explains the Chef Automate High Availability (HA) architecture, system requirements, and lists the HA components with their purpose.

@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "High Availability"
     parent = "automate/install"
     identifier = "automate/install/ha.md High Availability"
-    weight = 200
+    weight = 10
 +++
 
 **High availability (HA)** refers to a system or application (such as a network, a server array, or cluster) that offers a high level of operational performance and quality over a relevant time with maximum potential uptime and accessibility for the content stored on it.

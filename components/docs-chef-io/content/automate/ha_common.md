@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Reference Topics"
-    parent = "automate/install//high_availability"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_common.md Reference Topics"
-    weight = 280
+    weight = 90
 +++
 
 This page details the topics that are common to Chef Automate High Availability (HA) deployment models and aid you in deploying it in your network infrastructure.

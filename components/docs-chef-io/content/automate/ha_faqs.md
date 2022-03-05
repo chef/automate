@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "FAQs"
-    parent = "automate/install//high_availability"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_faq.md FAQs"
-    weight = 290
+    weight = 100
 +++
 
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) feature and the steps to resolve them. In addition, this page also lists the health check commands.
