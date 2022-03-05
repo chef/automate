@@ -1,14 +1,14 @@
 +++
-title = "High Availability (HA) Overview"
+title = "High Availability"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA High Availability (HA) Overview"
+    title = "High Availability"
     parent = "automate/install"
-    identifier = "automate/install/ha.md High Availability (HA) Overview"
+    identifier = "automate/install/ha.md High Availability"
     weight = 200
 +++
 
