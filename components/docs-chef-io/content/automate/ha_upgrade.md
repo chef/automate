@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Automate HA Upgrade"
-    parent = "automate/install"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_upgrade.md Automate HA Upgrade"
-    weight = 270
+    weight = 80
 +++
 
 This page lists the commands that aid in upgrading the Chef Automate High Availability (HA) frontend and backend clusters in your network infrastructure.

@@ -1,7 +1,7 @@
 +++
 title = "Backups and Restore"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
@@ -9,8 +9,8 @@ gh_repo = "automate"
   [menu.automate]
     title = "Backups and Restore"
     identifier = "automate/install/ha_backup_restore.md Backups and Restore"
-    parent = "automate/install"
-    weight = 260
+    parent = "automate/install/ha"
+    weight = 70
 +++
 
 Computer security is the safeguarding of computer systems and data against theft, illegal access, or any disaster. It's the method of guarding against and detecting illegal access to your computer system. Data security refers to the process of securing data from illegal access or any disaster. This process includes the following terms:

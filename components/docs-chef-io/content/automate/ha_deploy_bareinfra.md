@@ -1,16 +1,16 @@
 +++
 title = "Bare Metal Deployment Procedure"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "Bare Metal Deployment Procedure"
-    parent = "automate/install"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_deploy_bareinfra.md Bare Metal Deployment Procedure"
-    weight = 250
+    weight = 60
 +++
 
 This section explains the Bare Metal Infrastructure Deployment (existing_node) to support Chef Automate High Availability (HA) in your network premises/ infrastructure.

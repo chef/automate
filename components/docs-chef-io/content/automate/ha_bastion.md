@@ -1,16 +1,16 @@
 +++
 title = "Bastion Host"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "Bastion Host"
-    parent = "automate/install"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_bastion.md Bastion Host"
-    weight = 230
+    weight = 40
 +++
 
 A [Bastion Host](https://en.wikipedia.org/wiki/Bastion_host#:~:text=A%20bastion%20host%20is%20a,the%20threat%20to%20the%20computer.) is a special-purpose computer or server on a network specifically designed and configured to withstand attacks. This serve type generally hosts a single application or process, for example, a proxy server or load balancer. All other services are limited to reduce the threat to the computer.

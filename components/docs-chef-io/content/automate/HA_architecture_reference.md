@@ -1,16 +1,16 @@
 +++
 title = "High Availability Architecture"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "High Availability Architecture"
-    parent = "automate/install"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_architecture_reference.md High Availability Architecture"
-    weight = 210
+    weight = 20
 +++
 
 This page explains the Chef Automate High Availability (HA) architecture, system requirements, and lists the HA components with their purpose.
