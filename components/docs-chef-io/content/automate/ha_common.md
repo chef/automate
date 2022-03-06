@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Reference Topics"
-    parent = "automate/install/ha"
-    identifier = "automate/install/ha_vpc_setup.md Reference Topics"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha_vpc_setup.md Reference Topics"
     weight = 90
 +++
 

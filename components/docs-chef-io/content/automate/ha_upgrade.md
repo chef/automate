@@ -7,8 +7,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Automate HA Upgrade"
-    parent = "automate/install/ha"
-    identifier = "automate/install/ha_upgrade.md Automate HA Upgrade"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha_upgrade.md Automate HA Upgrade"
     weight = 80
 +++
 
