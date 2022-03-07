@@ -668,29 +668,6 @@ func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtSer
 	return true
 }
 
-//createLocalUser Function for reference, will be removed after PopulateUsers Method
-func createLocalUsers(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
-	log.Info("Starting with creating local users in automate for migration id:  ", result.Meta.MigrationID)
-	var totalSucceeded, totalSkipped, totalFailed int64
-	var err error
-	for _, user := range result.ParsedResult.Users {
-		if user.Connector == pipeline.Local && user.ActionOps == pipeline.Insert && !user.IsConflicting {
-			err = createLocalUser(ctx, localUserClient, user)
-			if err != nil {
-				totalFailed++
-				continue
-			}
-		}
-		if user.ActionOps == pipeline.Skip {
-			totalSkipped++
-			continue
-		}
-		totalSucceeded++
-	}
-	log.Info("Starting with creating local users in automate for migration id:  ", result.Meta.MigrationID)
-	return result, err
-}
-
 func createLocalUser(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) error {
 	_, err := localUserClient.CreateUser(ctx, &local_user.CreateUserReq{
 		Name:     user.DisplayName,
@@ -761,12 +738,12 @@ func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID s
 	}
 	return err, actionTaken
 // StoreUsers reads the Result struct and populate the users table
-func StoreUsers(ctx context.Context, st storage.Storage, res pipeline.Result) (pipeline.Result, error) {
+func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, res pipeline.Result) (pipeline.Result, error) {
 	var err error
 	var totalSucceeded, totalSkipped, totalFailed int64
 
 	for _, user := range res.ParsedResult.Users {
-		_, err = StoreUser(ctx, st, user, res.Meta.ServerID)
+		_, err = StoreUser(ctx, st, user, res.Meta.ServerID, localUserClient)
 		if err != nil {
 			totalFailed++
 			continue
@@ -794,7 +771,7 @@ func StoreUsers(ctx context.Context, st storage.Storage, res pipeline.Result) (p
 }
 
 // StoreUser stores a single User into DB
-func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serverID string) (pipeline.ActionOps, error) {
+func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serverID string, localUserClient local_user.UsersMgmtServiceClient) (pipeline.ActionOps, error) {
 	var actionTaken pipeline.ActionOps
 	var err error
 
@@ -811,6 +788,12 @@ func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serv
 	}
 	switch user.ActionOps {
 	case pipeline.Insert:
+		if user.Connector == pipeline.Local && user.ActionOps == pipeline.Insert && !user.IsConflicting {
+			err = createLocalUser(ctx, localUserClient, user)
+			if err != nil {
+				return actionTaken, err
+			}
+		}
 		_, err = st.InsertUser(ctx, storageUser)
 		actionTaken = pipeline.Insert
 	case pipeline.Delete:
