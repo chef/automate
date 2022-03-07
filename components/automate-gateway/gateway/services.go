@@ -463,7 +463,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		var content bytes.Buffer
 		file, _, err := r.FormFile("file")
 		if err != nil {
-			log.Errorf("Recived error while getting file from request : %s", err.Error())
+			log.Errorf("Received error while getting file from request : %s", err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
