@@ -103,7 +103,7 @@ func WithContextBackupLocationSpecification(locationSpec LocationSpecification) 
 
 func WithContextDeadline(deadline time.Time) ContextOpt {
 	return func(c *Context) {
-		newCtx, _ := context.WithDeadline(c.ctx, deadline)
+		newCtx := context.WithValue(c.ctx, "deadline", deadline)
 		c.ctx = newCtx
 	}
 }
