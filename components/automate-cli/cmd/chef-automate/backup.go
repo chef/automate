@@ -238,7 +238,6 @@ func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
 		time.Duration(backupCmdFlags.createWaitTimeout)*time.Second,
 		writer,
 	)
-
 	if err != nil {
 		return err
 	}
