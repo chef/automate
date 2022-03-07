@@ -743,13 +743,13 @@ func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_u
 	var totalSucceeded, totalSkipped, totalFailed int64
 
 	for _, user := range res.ParsedResult.Users {
+		if user.ActionOps == pipeline.Skip {
+			totalSkipped++
+			continue
+		}
 		_, err = StoreUser(ctx, st, user, res.Meta.ServerID, localUserClient)
 		if err != nil {
 			totalFailed++
-			continue
-		}
-		if user.ActionOps == pipeline.Skip {
-			totalSkipped++
 			continue
 		}
 		totalSucceeded++
@@ -759,7 +759,6 @@ func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_u
 		res.ParsedResult.UsersCount.Counts(int(totalSucceeded), int(totalFailed), int(totalSkipped))
 		return res, err
 	}
-
 	// Set the count for total Skipped, Inserted and Deleted Users
 	res.ParsedResult.UsersCount.Counts(int(totalSucceeded), int(totalFailed), int(totalSkipped))
 
@@ -783,7 +782,7 @@ func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serv
 		MiddleName:          user.MiddleName,
 		AutomateUserID:      user.AutomateUsername,
 	}
-	switch user.ActionOps {
+	switch actionTaken = user.ActionOps; user.ActionOps {
 	case pipeline.Insert:
 		if user.Connector == pipeline.Local {
 			err = createLocalUser(ctx, localUserClient, user)
@@ -792,13 +791,10 @@ func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serv
 			}
 		}
 		_, err = st.InsertUser(ctx, storageUser)
-		actionTaken = pipeline.Insert
 	case pipeline.Delete:
 		_, err = st.DeleteUser(ctx, storageUser)
-		actionTaken = pipeline.Delete
 	case pipeline.Update:
 		_, err = st.EditUser(ctx, storageUser)
-		actionTaken = pipeline.Update
 	default:
 	}
 	return actionTaken, err

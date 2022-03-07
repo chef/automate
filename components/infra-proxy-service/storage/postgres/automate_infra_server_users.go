@@ -10,7 +10,7 @@ import (
 
 // InsertUser saves a user to the DB.
 func (p *postgres) InsertUser(ctx context.Context, user storage.User) (storage.User, error) {
-	var rtnUser storage.User
+	var returnUser storage.User
 	nowTime := time.Now()
 	err := p.db.QueryRowContext(ctx,
 		`INSERT INTO users (
@@ -27,12 +27,12 @@ func (p *postgres) InsertUser(ctx context.Context, user storage.User) (storage.U
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10 )
 		RETURNING id, server_id, infra_server_username, connector, automate_user_id, first_name, last_name, email, middle_name, display_name, created_at, updated_at`,
 		user.ServerID, user.InfraServerUsername, user.Connector, user.AutomateUserID, user.FirstName, user.LastName, user.Email, user.MiddleName, user.DisplayName, nowTime).
-		Scan(&rtnUser.ID, &rtnUser.ServerID, &rtnUser.InfraServerUsername, &rtnUser.Connector, &rtnUser.AutomateUserID, &rtnUser.FirstName, &rtnUser.LastName, &rtnUser.Email, &rtnUser.MiddleName, &rtnUser.DisplayName, &rtnUser.CreatedAt, &rtnUser.UpdatedAt)
+		Scan(&returnUser.ID, &returnUser.ServerID, &returnUser.InfraServerUsername, &returnUser.Connector, &returnUser.AutomateUserID, &returnUser.FirstName, &returnUser.LastName, &returnUser.Email, &returnUser.MiddleName, &returnUser.DisplayName, &returnUser.CreatedAt, &returnUser.UpdatedAt)
 	if err != nil {
 		return storage.User{}, p.processError(err)
 	}
 
-	return rtnUser, nil
+	return returnUser, nil
 }
 
 // GetUser fetches a user by ID.
