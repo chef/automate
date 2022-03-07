@@ -767,7 +767,7 @@ func StoreOrgsUsersAssociation(ctx context.Context, st storage.Storage, result p
 			}
 		}
 	}
-	if int64(len(result.ParsedResult.OrgsUsers)) == result.ParsedResult.OrgsUsersAssociationsCount.Failed {
+	if result.ParsedResult.OrgsUsersAssociationsCount.Succeeded == 0 && result.ParsedResult.OrgsUsersAssociationsCount.Failed != 0 {
 		return result, err
 	}
 	log.Info("Completed with the storing org user association for migration id :", result.Meta.MigrationID)
@@ -786,16 +786,13 @@ func createMapForUsers(users []pipeline.User) map[string]string {
 func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID string, orgID string, orgUserAssociation pipeline.UserAssociation) (error, pipeline.ActionOps) {
 	var actionTaken pipeline.ActionOps
 	var err error
-	switch orgUserAssociation.ActionOps {
+	switch actionTaken = orgUserAssociation.ActionOps; orgUserAssociation.ActionOps {
 	case pipeline.Insert:
 		_, err = st.StoreOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
-		actionTaken = pipeline.Insert
 	case pipeline.Delete:
 		_, err = st.DeleteOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
-		actionTaken = pipeline.Delete
 	case pipeline.Update:
 		_, err = st.EditOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
-		actionTaken = pipeline.Update
 	default:
 	}
 	return err, actionTaken

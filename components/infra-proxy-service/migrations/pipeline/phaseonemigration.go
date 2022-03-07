@@ -120,16 +120,19 @@ func parseOrgUserAssociationSrc(result <-chan PipelineData, service *service.Ser
 			_, err := service.Migration.StartUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
 				log.Errorf("Failed to update the status for start org user association parsing for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				res.Done <- err
 				return
 			}
 			result, err := ParseOrgUserAssociation(res.Ctx, service.Storage, res.Result)
 			if err != nil {
 				_, _ = service.Migration.FailedUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), 0, 0, 0)
+				res.Done <- err
 				return
 			}
 			_, err = service.Migration.CompleteUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
 				log.Errorf("Failed to update the status for complete org user association parsing for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				res.Done <- err
 				return
 			}
 			res.Result = result

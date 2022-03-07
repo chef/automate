@@ -31,6 +31,7 @@ func populateOrgs(result <-chan PipelineData, service *service.Service) <-chan P
 			log.Info("Processing to populateOrgs...")
 			result, err := StoreOrgs(res.Ctx, service.Storage, service.Migration, service.AuthzProjectClient, res.Result)
 			if err != nil {
+				res.Done <- err
 				return
 			}
 			res.Result = result
@@ -115,16 +116,19 @@ func populateOrgsUsersAssociation(result <-chan PipelineData, service *service.S
 			_, err := service.Migration.StartAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
 				log.Errorf("Failed to update the status for start org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				res.Done <- err
 				return
 			}
 			result, err := StoreOrgsUsersAssociation(res.Ctx, service.Storage, res.Result)
 			if err != nil {
 				_, _ = service.Migration.FailedAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
+				res.Done <- err
 				return
 			}
 			_, err = service.Migration.CompleteAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
 			if err != nil {
 				log.Errorf("Failed to update the status for complete org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				res.Done <- err
 				return
 			}
 			res.Result = result
@@ -204,8 +208,7 @@ func (p *PhaseTwoPipeline) Run(result pipeline.Result, service *service.Service)
 	if err != nil {
 		MigrationError(err, service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Errorf("Phase two pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
+		return
 	}
 	MigrationSuccess(service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	log.Info("received done")
-
 }
