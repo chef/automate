@@ -754,9 +754,9 @@ func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_u
 		}
 		totalSucceeded++
 	}
-	if len(res.ParsedResult.Users) == int(totalFailed) {
+
+	if res.ParsedResult.UsersCount.Succeeded == 0 && res.ParsedResult.UsersCount.Failed != 0 {
 		log.Errorf("Failed to migrate user for migration id %s : %s", res.Meta.MigrationID, err.Error())
-		res.ParsedResult.UsersCount.Counts(int(totalSucceeded), int(totalFailed), int(totalSkipped))
 		return res, err
 	}
 	// Set the count for total Skipped, Inserted and Deleted Users
