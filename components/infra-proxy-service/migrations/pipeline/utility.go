@@ -583,16 +583,16 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 
 func automateMap(automateUser []storage.User) map[string]storage.User {
 	automateMap := map[string]storage.User{}
-	for _, auser := range automateUser {
-		automateMap[auser.InfraServerUsername] = auser
+	for _, aUser := range automateUser {
+		automateMap[aUser.InfraServerUsername] = aUser
 	}
 	return automateMap
 }
 
 func serverMap(server []pipeline.User) map[string]pipeline.User {
 	serverMap := map[string]pipeline.User{}
-	for _, auser := range server {
-		serverMap[auser.Username] = auser
+	for _, sUser := range server {
+		serverMap[sUser.Username] = sUser
 	}
 	return serverMap
 }
@@ -645,7 +645,7 @@ func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipel
 	var parsedUsers []pipeline.User
 	serverMap := serverMap(serverUser)
 	for _, aUser := range automateUser {
-		if _, ok := serverMap[aUser.InfraServerUsername]; ok {
+		if _, ok := serverMap[aUser.InfraServerUsername]; !ok {
 			parsedUsers = append(parsedUsers, pipeline.User{
 				Username:  aUser.InfraServerUsername,
 				ActionOps: pipeline.Delete,

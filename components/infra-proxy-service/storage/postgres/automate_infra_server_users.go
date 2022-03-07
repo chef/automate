@@ -81,7 +81,7 @@ func (p *postgres) EditUser(ctx context.Context, user storage.User) (storage.Use
 		updated_at= $12
 		WHERE server_id = $1 AND infra_server_username = $2
 		RETURNING id, server_id, infra_server_username, connector, automate_user_id, first_name, last_name, email, middle_name, display_name, created_at, updated_at`,
-		user.ID, user.ServerID, user.InfraServerUsername, user.Connector, user.AutomateUserID, user.FirstName, user.LastName, user.Email, user.MiddleName, user.DisplayName, nowTime).
+		user.ServerID, user.InfraServerUsername, user.ServerID, user.InfraServerUsername, user.Connector, user.AutomateUserID, user.FirstName, user.LastName, user.Email, user.MiddleName, user.DisplayName, nowTime).
 		Scan(&returnUser.ID, &returnUser.ServerID, &returnUser.InfraServerUsername, &returnUser.Connector, &returnUser.AutomateUserID, &returnUser.FirstName, &returnUser.LastName, &returnUser.Email, &returnUser.MiddleName, &returnUser.DisplayName, &returnUser.CreatedAt, &returnUser.UpdatedAt)
 	if err != nil {
 		return storage.User{}, p.processError(err)
