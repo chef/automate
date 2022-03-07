@@ -31,14 +31,14 @@ func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 	}
 	log.Info("Starting the organization migration phase for migration id: ", res.Meta.MigrationID)
 	for _, org := range res.ParsedResult.Orgs {
+		if org.ActionOps == pipeline.Skip {
+			totalSkipped++
+			continue
+		}
 		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID, authzProjectClient)
 		if err != nil {
 			totalFailed++
 			msg = err.Error()
-			continue
-		}
-		if org.ActionOps == pipeline.Skip {
-			totalSkipped++
 			continue
 		}
 		totalSucceeded++
@@ -752,14 +752,14 @@ func StoreOrgsUsersAssociation(ctx context.Context, st storage.Storage, result p
 	for _, orgUsers := range result.ParsedResult.OrgsUsers {
 		for _, orgUserAssociation := range orgUsers.Users {
 			if _, keyPresent := selectedUsersMap[orgUserAssociation.Username]; keyPresent {
+				if orgUserAssociation.ActionOps == pipeline.Skip {
+					result.ParsedResult.OrgsUsersAssociationsCount.Skipped++
+					continue
+				}
 				err, _ = storeOrgUserAssociation(ctx, st, result.Meta.ServerID, orgUsers.OrgName.Name, orgUserAssociation)
 				if err != nil {
 					log.Errorf("Failed to migrate org user %s of org %s for migration id %s : %s", orgUserAssociation.Username, orgUsers.OrgName.Name, result.Meta.MigrationID, err.Error())
 					result.ParsedResult.OrgsUsersAssociationsCount.Failed++
-					continue
-				}
-				if orgUserAssociation.ActionOps == pipeline.Skip {
-					result.ParsedResult.OrgsUsersAssociationsCount.Skipped++
 					continue
 				}
 				result.ParsedResult.OrgsUsersAssociationsCount.Succeeded++
