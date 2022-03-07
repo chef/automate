@@ -119,7 +119,7 @@ func parseOrgUserAssociationSrc(result <-chan PipelineData, service *service.Ser
 		for res := range result {
 			_, err := service.Migration.StartUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
-				log.Errorf("Failed to update the status for start org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				log.Errorf("Failed to update the status for start org user association parsing for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
 				return
 			}
 			result, err := ParseOrgUserAssociation(res.Ctx, service.Storage, res.Result)
@@ -129,7 +129,7 @@ func parseOrgUserAssociationSrc(result <-chan PipelineData, service *service.Ser
 			}
 			_, err = service.Migration.CompleteUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				log.Errorf("Failed to update the status for complete org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				log.Errorf("Failed to update the status for complete org user association parsing for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
 				return
 			}
 			res.Result = result
@@ -190,8 +190,8 @@ func parseUserSrc(result <-chan PipelineData, service *service.Service) <-chan P
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		log.Info("Processing to parse_user...")
 		for res := range result {
+			log.Info("Processing to parse_user...")
 			// Update start of parse user pipeline
 			_, err := service.Migration.StartUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {

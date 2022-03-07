@@ -377,26 +377,30 @@ func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pip
 
 func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeline.Result) ([]pipeline.OrgsUsersAssociations, error) {
 	orgUserAssociations := make([]pipeline.OrgsUsersAssociations, 0)
-	var userAssociations []pipeline.UserAssociation
 	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
 	for _, org := range result.ParsedResult.Orgs {
+		var userAssociations []pipeline.UserAssociation
 		log.Info("Getting actions for org id", org.Name)
-		chefServerOrgUsers, err := getChefServerOrgUsers(org.Name, orgPath)
-		if err != nil {
-			log.Errorf("Unable to get the chef server organization users %s ", err)
-			return nil, err
+		var chefServerOrgUsers []pipeline.UserAssociation
+		// check whether org directory exist or not
+		if _, err := os.Stat(path.Join(orgPath, org.Name)); !os.IsNotExist(err) {
+			chefServerOrgUsers, err = getChefServerOrgUsers(org.Name, orgPath)
+			if err != nil {
+				log.Errorf("Unable to get the chef server organization users %s ", err)
+				return nil, err
+			}
 		}
 		if org.ActionOps == pipeline.Insert {
 			userAssociations = append(userAssociations, createInsertUserAssociation(chefServerOrgUsers)...)
 		} else {
+			orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
+			if err != nil {
+				log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
+				return nil, err
+			}
 			if org.ActionOps == pipeline.Delete {
-				userAssociations = append(userAssociations, createDeleteUserAssociation(chefServerOrgUsers)...)
+				userAssociations = append(userAssociations, createDeleteUserAssociation(orgUsersInDb)...)
 			} else {
-				orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
-				if err != nil {
-					log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
-					return nil, err
-				}
 				userAssociations = append(userAssociations, insertOrUpdateActionForOrgUsers(orgUsersInDb, chefServerOrgUsers)...)
 				userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, chefServerOrgUsers)...)
 			}
@@ -414,10 +418,10 @@ func createInsertUserAssociation(chefServerOrgUsers []pipeline.UserAssociation) 
 	return userAssociation
 }
 
-func createDeleteUserAssociation(chefServerOrgUsers []pipeline.UserAssociation) []pipeline.UserAssociation {
+func createDeleteUserAssociation(orgUsersInDb []storage.OrgUser) []pipeline.UserAssociation {
 	userAssociation := make([]pipeline.UserAssociation, 0)
-	for _, user := range chefServerOrgUsers {
-		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.Username, IsAdmin: user.IsAdmin, ActionOps: pipeline.Delete})
+	for _, user := range orgUsersInDb {
+		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, IsAdmin: user.IsAdmin, ActionOps: pipeline.Delete})
 	}
 	return userAssociation
 }
@@ -737,4 +741,61 @@ func createLocalUser(ctx context.Context, localUserClient local_user.UsersMgmtSe
 		return err
 	}
 	return nil
+}
+
+// StoreOrgsUsersAssociation  populate the users association with orgs based on the actions
+func StoreOrgsUsersAssociation(ctx context.Context, st storage.Storage, result pipeline.Result) (pipeline.Result, error) {
+	log.Info("Starting with the storing org user association for migration id :", result.Meta.MigrationID)
+
+	var err error
+	selectedUsersMap := createMapForUsers(result.ParsedResult.Users)
+	for _, orgUsers := range result.ParsedResult.OrgsUsers {
+		for _, orgUserAssociation := range orgUsers.Users {
+			if _, keyPresent := selectedUsersMap[orgUserAssociation.Username]; keyPresent {
+				err, _ = storeOrgUserAssociation(ctx, st, result.Meta.ServerID, orgUsers.OrgName.Name, orgUserAssociation)
+				if err != nil {
+					log.Errorf("Failed to migrate org user %s of org %s for migration id %s : %s", orgUserAssociation.Username, orgUsers.OrgName.Name, result.Meta.MigrationID, err.Error())
+					result.ParsedResult.OrgsUsersAssociationsCount.Failed++
+					continue
+				}
+				if orgUserAssociation.ActionOps == pipeline.Skip {
+					result.ParsedResult.OrgsUsersAssociationsCount.Skipped++
+					continue
+				}
+				result.ParsedResult.OrgsUsersAssociationsCount.Succeeded++
+			}
+		}
+	}
+	if int64(len(result.ParsedResult.OrgsUsers)) == result.ParsedResult.OrgsUsersAssociationsCount.Failed {
+		return result, err
+	}
+	log.Info("Completed with the storing org user association for migration id :", result.Meta.MigrationID)
+	return result, nil
+}
+
+func createMapForUsers(users []pipeline.User) map[string]string {
+	usersMap := make(map[string]string)
+	for _, user := range users {
+		usersMap[user.Username] = ""
+	}
+	return usersMap
+}
+
+// storeOrgUserAssociation stores a single Org user into DB
+func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID string, orgID string, orgUserAssociation pipeline.UserAssociation) (error, pipeline.ActionOps) {
+	var actionTaken pipeline.ActionOps
+	var err error
+	switch orgUserAssociation.ActionOps {
+	case pipeline.Insert:
+		_, err = st.StoreOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
+		actionTaken = pipeline.Insert
+	case pipeline.Delete:
+		_, err = st.DeleteOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
+		actionTaken = pipeline.Delete
+	case pipeline.Update:
+		_, err = st.EditOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
+		actionTaken = pipeline.Update
+	default:
+	}
+	return err, actionTaken
 }

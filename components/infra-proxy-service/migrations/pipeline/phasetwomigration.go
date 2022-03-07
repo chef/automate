@@ -98,28 +98,43 @@ func populateUsers(result <-chan PipelineData) <-chan PipelineData {
 	return out
 }
 
-// PopulateORGUser returns PhaseTwoPipelineProcessor
-func PopulateORGUser() PhaseTwoPipelineProcessor {
+// PopulateOrgsUsersAssociationSrc populate the org user association in DB and returns PhaseTwoPipelineProcessor
+func PopulateOrgsUsersAssociationSrc(service *service.Service) PhaseTwoPipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return populateORGUser(result)
+		return populateOrgsUsersAssociation(result, service)
 	}
 }
 
-func populateORGUser(result <-chan PipelineData) <-chan PipelineData {
-	log.Info("Starting PopulateORGUser routine")
+func populateOrgsUsersAssociation(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+	log.Info("Starting to populate_orgs_user_association pipeline")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
-			log.Info("Processing to populateORGUser...")
-
+			log.Info("Processing to populate orgs users association...")
+			_, err := service.Migration.StartAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
+			if err != nil {
+				log.Errorf("Failed to update the status for start org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				return
+			}
+			result, err := StoreOrgsUsersAssociation(res.Ctx, service.Storage, res.Result)
+			if err != nil {
+				_, _ = service.Migration.FailedAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
+				return
+			}
+			_, err = service.Migration.CompleteAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
+			if err != nil {
+				log.Errorf("Failed to update the status for complete org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				return
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
 		}
-		log.Info("Closing PopulateORGUser routine")
+		log.Info("Closing populate_orgs_user_association pipeline")
 		close(out)
 	}()
 	return out
@@ -172,7 +187,7 @@ func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipeline {
 		PopulateOrgs(service),
 		// CreateProject(),
 		// PopulateUsers(),
-		// PopulateORGUser(),
+		PopulateOrgsUsersAssociationSrc(service),
 		// PopulateMembersPolicy(),
 	)
 	return PhaseTwoPipeline{in: c}
