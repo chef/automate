@@ -108,7 +108,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	/*validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
+	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
 		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
 	})
@@ -148,7 +148,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				"Request to start upgrade failed",
 			)
 		}
-	}*/
+	}
 
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
