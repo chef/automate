@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Bare Metal Deployment Procedure"
-    parent = "automate/install/ha"
-    identifier = "automate/install/ha_deploy_bareinfra.md Bare Metal Deployment Procedure"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha_deploy_bareinfra.md Bare Metal Deployment Procedure"
     weight = 60
 +++
 
