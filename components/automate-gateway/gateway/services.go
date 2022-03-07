@@ -446,6 +446,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var fileData []byte
 	var cType, profileName, profileVersion string
 	contentTypeString := strings.Split(r.Header.Get("Content-type"), ";")
+	log.Info("Content type string for profileCreateHandler received is ", contentTypeString)
 	switch contentTypeString[0] {
 	case "application/json", "application/json+lax":
 		cType = r.Header.Get("Content-type")
@@ -462,6 +463,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		var content bytes.Buffer
 		file, _, err := r.FormFile("file")
 		if err != nil {
+			log.Errorf("Received error while getting file from request : %s", err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -475,6 +477,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 		fileData = content.Bytes()
 		cType = r.URL.Query().Get("contentType")
+		log.Info("File successfully read from the request")
 	default: // no match
 		http.Error(w, "invalid content-type header", http.StatusBadRequest)
 		return
@@ -491,6 +494,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Info("Request successfully authenticated and authorised for the resource  ", resource)
+
 	profilesClient, err := s.clientsFactory.ComplianceProfilesServiceClient()
 	if err != nil {
 		http.Error(w, "grpc service for compliance unavailable", http.StatusServiceUnavailable)
@@ -502,6 +507,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	log.Info("Request stream created for profile create handler with profile name ", profileName)
 
 	request := profiles.ProfilePostRequest{
 		Owner: owner,
@@ -517,6 +524,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	log.Info("Request successfully sent to backend service")
+
 	reply, err := stream.CloseAndRecv()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -527,6 +536,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	log.Info("Response successfully received from the stream")
 	w.Write(data) // nolint: errcheck
 }
 
@@ -970,6 +981,7 @@ func init() {
 }
 
 func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
+	log.Info("Authentication request for the resource", resource)
 	subjects := []string{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
@@ -998,6 +1010,7 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 		}
 	}
 	if len(subjects) < 1 {
+		log.Info("Length of subjects is less than 1 for the resource")
 		authnClient, err := s.clientsFactory.AuthenticationClient()
 		if err != nil {
 			return nil, errors.Wrap(err, "authn-service unavailable")
@@ -1005,11 +1018,13 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
 
-		ctx = context.WithValue(ctx, "requestorID", authnResp.Requestor)
-
 		if err != nil {
+			log.Errorf("User not authenticated to perform the action: %s", err.Error())
 			return nil, errors.Wrap(err, "authn-service error")
 		}
+
+		log.Info("User authenticated to perform the action", action)
+		ctx = context.WithValue(ctx, "requestorID", authnResp.Requestor)
 
 		subjects = append(authnResp.Teams, authnResp.Subject)
 	}
@@ -1032,10 +1047,12 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 			action, resource, projects, subjects, err.Error())
 	}
 	if authorized {
+		log.Info("User authorized for the action", action)
 		// Note: if we need all the auth info, use auth_context.NewOutgoingContext
 		return auth_context.NewOutgoingProjectsContext(newCtx), nil
 	}
 
+	log.Info("User not authorized for the action", action)
 	return nil, errors.Errorf("unauthorized: members %q cannot perform action %q on resource %q filtered by projects %q",
 		subjects, action, resource, projects)
 }
