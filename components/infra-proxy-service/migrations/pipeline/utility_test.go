@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -353,6 +354,122 @@ func TestStoreOrgUserAssociation(t *testing.T) {
 			}
 			if got1 != tt.want1 {
 				t.Errorf("storeOrgUserAssociation() got1 = %v, want %v", got1, tt.want1)
+func TestStoreUser(t *testing.T) {
+	type args struct {
+		ctx       context.Context
+		st        storage.Storage
+		user      pipeline.User
+		serverID  string
+		authzMock *authz.MockProjectsServiceClient
+	}
+	tests := []struct {
+		name             string
+		errorFromProject bool
+		args             args
+		want             error
+		want1            pipeline.ActionOps
+	}{
+		{
+			name:             "Test Delete User",
+			errorFromProject: false,
+			args: args{
+				ctx:       context.Background(),
+				st:        &testDB.TestDB{},
+				user:      pipeline.User{Username: "user1", Email: "user1@user.com", ActionOps: pipeline.Delete},
+				serverID:  "server1",
+				authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t)),
+			},
+			want:  nil,
+			want1: pipeline.Delete,
+		},
+		{
+			name:             "Test Store User",
+			errorFromProject: false,
+			args: args{
+				ctx:       context.Background(),
+				st:        &testDB.TestDB{},
+				user:      pipeline.User{Username: "user2", Email: "user2@user.com", ActionOps: pipeline.Insert},
+				serverID:  "server1",
+				authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t)),
+			},
+			want:  nil,
+			want1: pipeline.Insert,
+		},
+		{
+			name:             "Test Edit User",
+			errorFromProject: false,
+			args: args{
+				ctx:       context.Background(),
+				st:        &testDB.TestDB{},
+				user:      pipeline.User{Username: "user3", Email: "user3@user.com", ActionOps: pipeline.Update},
+				serverID:  "server1",
+				authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t)),
+			},
+			want:  nil,
+			want1: pipeline.Update,
+		},
+		{
+			name:             "Test Error from Delete User",
+			errorFromProject: false,
+			args: args{
+				ctx:       context.Background(),
+				st:        &testDB.TestDB{},
+				user:      pipeline.User{Username: "user4", Email: "user4@user.com", ActionOps: pipeline.Delete},
+				serverID:  "server1",
+				authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t)),
+			},
+			want:  errors.New("failed to delete user"),
+			want1: pipeline.Delete,
+		},
+		{
+			name:             "Test Error from Store Org",
+			errorFromProject: false,
+			args: args{
+				ctx:       context.Background(),
+				st:        &testDB.TestDB{},
+				user:      pipeline.User{Username: "user5", Email: "user5@user.com", ActionOps: pipeline.Insert},
+				serverID:  "server1",
+				authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t)),
+			},
+			want:  errors.New("failed to store user"),
+			want1: pipeline.Insert,
+		},
+		{
+			name:             "Test Error from Edit User",
+			errorFromProject: false,
+			args: args{
+				ctx:      context.Background(),
+				st:       &testDB.TestDB{NeedError: true},
+				user:     pipeline.User{Username: "user6", Email: "user6@user.com", ActionOps: pipeline.Update},
+				serverID: "server1", authzMock: authz.NewMockProjectsServiceClient(gomock.NewController(t)),
+			},
+			want:  errors.New("failed to edit user"),
+			want1: pipeline.Update,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			projectResponse := &authz.CreateProjectResp{
+				Project: &authz.Project{
+					Id:     "testId",
+					Name:   "test_name",
+					Status: "test_status",
+				},
+			}
+			if tt.errorFromProject {
+				tt.args.authzMock.EXPECT().CreateProject(tt.args.ctx, gomock.Any(), gomock.Any()).Return(nil, errors.New("Project already exists"))
+			} else {
+				tt.args.authzMock.EXPECT().CreateProject(tt.args.ctx, gomock.Any(), gomock.Any()).Return(projectResponse, nil)
+			}
+			actionOps, err := StoreUser(tt.args.ctx, tt.args.st, tt.args.user, tt.args.serverID)
+			fmt.Println(tt.name)
+			fmt.Println(actionOps, "and", tt.want1)
+			fmt.Println("-------------------------------------------------------")
+			if err != nil && err.Error() != tt.want.Error() {
+				t.Errorf("StoreOrg() got = %v, want %v", err, tt.want)
+			}
+			if actionOps != tt.want1 {
+				t.Errorf("StoreOrg() got1 = %v, want %v", actionOps, tt.want1)
 			}
 		})
 
