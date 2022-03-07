@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -422,7 +421,7 @@ func TestStoreUser(t *testing.T) {
 			want1: pipeline.Delete,
 		},
 		{
-			name:             "Test Error from Store Org",
+			name:             "Test Error from Store User",
 			errorFromProject: false,
 			args: args{
 				ctx:       context.Background(),
@@ -449,27 +448,12 @@ func TestStoreUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			projectResponse := &authz.CreateProjectResp{
-				Project: &authz.Project{
-					Id:     "testId",
-					Name:   "test_name",
-					Status: "test_status",
-				},
-			}
-			if tt.errorFromProject {
-				tt.args.authzMock.EXPECT().CreateProject(tt.args.ctx, gomock.Any(), gomock.Any()).Return(nil, errors.New("Project already exists"))
-			} else {
-				tt.args.authzMock.EXPECT().CreateProject(tt.args.ctx, gomock.Any(), gomock.Any()).Return(projectResponse, nil)
-			}
 			actionOps, err := StoreUser(tt.args.ctx, tt.args.st, tt.args.user, tt.args.serverID)
-			fmt.Println(tt.name)
-			fmt.Println(actionOps, "and", tt.want1)
-			fmt.Println("-------------------------------------------------------")
 			if err != nil && err.Error() != tt.want.Error() {
-				t.Errorf("StoreOrg() got = %v, want %v", err, tt.want)
+				t.Errorf("StoreUser() got = %v, want %v", err, tt.want)
 			}
 			if actionOps != tt.want1 {
-				t.Errorf("StoreOrg() got1 = %v, want %v", actionOps, tt.want1)
+				t.Errorf("StoreUser() got1 = %v, want %v", actionOps, tt.want1)
 			}
 		})
 
