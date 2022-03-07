@@ -392,18 +392,19 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 		}
 		if org.ActionOps == pipeline.Insert {
 			userAssociations = append(userAssociations, createInsertUserAssociation(chefServerOrgUsers)...)
+			orgUserAssociations = append(orgUserAssociations, pipeline.OrgsUsersAssociations{OrgName: org, Users: userAssociations})
+			continue
+		}
+		orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
+		if err != nil {
+			log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
+			return nil, err
+		}
+		if org.ActionOps == pipeline.Delete {
+			userAssociations = append(userAssociations, createDeleteUserAssociation(orgUsersInDb)...)
 		} else {
-			orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
-			if err != nil {
-				log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
-				return nil, err
-			}
-			if org.ActionOps == pipeline.Delete {
-				userAssociations = append(userAssociations, createDeleteUserAssociation(orgUsersInDb)...)
-			} else {
-				userAssociations = append(userAssociations, insertOrUpdateActionForOrgUsers(orgUsersInDb, chefServerOrgUsers)...)
-				userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, chefServerOrgUsers)...)
-			}
+			userAssociations = append(userAssociations, insertOrUpdateActionForOrgUsers(orgUsersInDb, chefServerOrgUsers)...)
+			userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, chefServerOrgUsers)...)
 		}
 		orgUserAssociations = append(orgUserAssociations, pipeline.OrgsUsersAssociations{OrgName: org, Users: userAssociations})
 	}
