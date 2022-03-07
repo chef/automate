@@ -785,7 +785,7 @@ func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serv
 	}
 	switch user.ActionOps {
 	case pipeline.Insert:
-		if user.Connector == pipeline.Local && user.ActionOps == pipeline.Insert && !user.IsConflicting {
+		if user.Connector == pipeline.Local {
 			err = createLocalUser(ctx, localUserClient, user)
 			if err != nil {
 				return actionTaken, err
