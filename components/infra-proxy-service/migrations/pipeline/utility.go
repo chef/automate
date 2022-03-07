@@ -749,10 +749,12 @@ func StoreOrgsUsersAssociation(ctx context.Context, st storage.Storage, result p
 	log.Info("Starting with the storing org user association for migration id :", result.Meta.MigrationID)
 
 	var err error
+	var totalUsers int64
 	selectedUsersMap := createMapForUsers(result.ParsedResult.Users)
 	for _, orgUsers := range result.ParsedResult.OrgsUsers {
 		for _, orgUserAssociation := range orgUsers.Users {
 			if _, keyPresent := selectedUsersMap[orgUserAssociation.Username]; keyPresent {
+				totalUsers++
 				if orgUserAssociation.ActionOps == pipeline.Skip {
 					result.ParsedResult.OrgsUsersAssociationsCount.Skipped++
 					continue
@@ -767,7 +769,7 @@ func StoreOrgsUsersAssociation(ctx context.Context, st storage.Storage, result p
 			}
 		}
 	}
-	if result.ParsedResult.OrgsUsersAssociationsCount.Succeeded == 0 && result.ParsedResult.OrgsUsersAssociationsCount.Failed != 0 {
+	if totalUsers == result.ParsedResult.OrgsUsersAssociationsCount.Failed {
 		return result, err
 	}
 	log.Info("Completed with the storing org user association for migration id :", result.Meta.MigrationID)
