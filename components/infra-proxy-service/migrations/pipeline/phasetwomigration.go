@@ -101,11 +101,26 @@ func populateUsers(result <-chan PipelineData, service *service.Service) <-chan 
 
 	go func() {
 		for res := range result {
-			log.Info("Processing to populateUsers...")
-			result, err := StoreUsers(res.Ctx, service.Storage, res.Result)
+			// Start user migration
+			_, err := service.Migration.StartUserMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
+				log.Errorf("Failed to update `StartUserMigration` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
 				return
 			}
+
+			result, err := StoreUsers(res.Ctx, service.Storage, res.Result)
+			if err != nil {
+				// Failed user migration
+				_, _ = service.Migration.FailedUserMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, "cannot migrate users", 0, 0, 0)
+				return
+			}
+			// Successful user migration
+			_, err = service.Migration.CompleteUserMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
+			if err != nil {
+				log.Errorf("Failed to update `CompleteUserMigration` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
+				return
+			}
+
 			res.Result = result
 			select {
 			case out <- res:
