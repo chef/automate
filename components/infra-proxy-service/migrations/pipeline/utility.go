@@ -756,15 +756,12 @@ func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_u
 	}
 	if len(res.ParsedResult.Users) == int(totalFailed) {
 		log.Errorf("Failed to migrate user for migration id %s : %s", res.Meta.MigrationID, err.Error())
+		res.ParsedResult.UsersCount.Counts(int(totalSucceeded), int(totalFailed), int(totalSkipped))
 		return res, err
 	}
 
 	// Set the count for total Skipped, Inserted and Deleted Users
-	res.ParsedResult.UsersCount = pipeline.Counts{
-		Succeeded: int(totalSucceeded),
-		Failed:    int(totalFailed),
-		Skipped:   int(totalSkipped),
-	}
+	res.ParsedResult.UsersCount.Counts(int(totalSucceeded), int(totalFailed), int(totalSkipped))
 
 	log.Info("Successfully completed the user migration phase for migration id: ", res.Meta.MigrationID)
 	return res, err

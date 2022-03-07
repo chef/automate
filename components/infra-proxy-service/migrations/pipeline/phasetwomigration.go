@@ -111,8 +111,14 @@ func populateUsers(result <-chan PipelineData, service *service.Service) <-chan 
 			result, err := StoreUsers(res.Ctx, service.Storage, service.LocalUser, res.Result)
 			if err != nil {
 				// Failed user migration
-				_, _ = service.Migration.FailedUserMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, "cannot migrate users", 0, 0, 0)
-				return
+				success := int64(result.ParsedResult.UsersCount.Succeeded)
+				skipped := int64(result.ParsedResult.UsersCount.Skipped)
+				failed := int64(result.ParsedResult.UsersCount.Failed)
+				_, err = service.Migration.FailedUserMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, "cannot migrate users", success, skipped, failed)
+				if err != nil {
+					log.Errorf("Failed to update `FailedUserMigration` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
+					return
+				}
 			}
 			// Successful user migration
 			_, err = service.Migration.CompleteUserMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
