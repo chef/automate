@@ -9,7 +9,7 @@ options:
   usage: help for create
 - name: wait-timeout
   shorthand: t
-  default_value: "7200"
+  default_value: "43200"
   usage: |
     How long to wait for a operation to complete before raising an error
 inherited_options:

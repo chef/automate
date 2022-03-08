@@ -52,5 +52,6 @@ see_also:
 - uninstall - Uninstall Chef Automate
 - upgrade - upgrade automate to the latest version
 - validate-ha-infrastructure - Validate existing infrastructure of Automate HA
+- validate-ha-infrastructure - Validate existing infrastructure of Automate HA
 - version - Show CLI version
 - workspace - Set workspace env for Automate HA.
