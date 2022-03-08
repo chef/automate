@@ -27,10 +27,12 @@ resource "null_resource" "token" {
 }
 
 resource "null_resource" "create_chef_server" {
-  for_each = toset(var.chef_ips)
+  count = length(var.chef_ips)
   provisioner "local-exec" {
-     command = "bash create-chef-server.sh ${var.automate_fqdn} ${each.key}   > out.txt "
+     command = "bash create-chef-server.sh  ${var.automate-fqdn} ${var.chef_ips[count.index]} ${count.index}   > out.txt "
   }
  depends_on = [null_resource.token]
 }
+
+
 
