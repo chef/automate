@@ -39,6 +39,9 @@ import {
   ConfirmPreview,
   ConfirmPreviewSuccess,
   ConfirmPreviewFailure,
+  CheckUser,
+  CheckUserSuccess,
+  CheckUserFailure,
   OrgActionTypes
 } from './org.actions';
 
@@ -277,4 +280,30 @@ export class OrgEffects {
           message: `Could not confirm preview: ${msg || payload.error}`
         });
     })));
+
+  CheckUser = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CHECK_USER),
+      mergeMap(({ payload:  { user } }: CheckUser) =>
+        this.requests.checkUser(user).pipe(
+          map((resp) => new CheckUserSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new CheckUserFailure(error)))))));
+
+  CheckUserSuccess = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CHECK_USER_SUCCESS),
+      map(({}: ConfirmPreviewFailure) => {
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not use this user name`
+      });
+    })));
+
+  // CheckUserFailure = createEffect(() =>
+  // this.actions$.pipe(
+  //   ofType(OrgActionTypes.CHECK_USER_FAILURE),
+  //   map((_) => new CreateNotification({
+  //     type: Type.info,
+  //     message: 'Confirm preview successful.'})));
 }

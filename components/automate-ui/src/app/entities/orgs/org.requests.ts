@@ -10,7 +10,8 @@ import {
   UploadSuccessPayload,
   CancelSuccessPayload,
   PreviewSuccessPayload,
-  ConfirmSuccessPayload
+  ConfirmSuccessPayload,
+  CheckUserPayload
 } from './org.actions';
 
 @Injectable()
@@ -62,5 +63,11 @@ export class OrgRequests {
   : Observable<ConfirmSuccessPayload> {
     return this.http.get<ConfirmSuccessPayload>(
       `${env.infra_proxy_url}/servers/${server_id}/migrations/confirm_preview/${migration_id}`);
+  }
+
+  public checkUser(user: string): Observable<CheckUserPayload> {
+    return this.http.get<CheckUserPayload>(
+      `https://a2-dev.test/apis/iam/v2/users/${user}`
+    )
   }
 }
