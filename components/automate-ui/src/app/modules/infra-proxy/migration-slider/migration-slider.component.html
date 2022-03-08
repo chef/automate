@@ -73,6 +73,7 @@
                     chefInput
                     formControlName="{{user.automate_username}}"
                     type="text"
+                    [attr.disabled]= "!user.is_conflicting"
                     (blur)="handleName($event, i)"
                     autocomplete="off" />
                 </chef-td>
