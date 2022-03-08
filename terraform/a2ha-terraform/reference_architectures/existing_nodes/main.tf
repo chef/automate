@@ -263,3 +263,16 @@ module "chef_server" {
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
 }
+
+module "token_generation" {
+  source                        = "./modules/token_generation"
+  private_ips                     = var.existing_automate_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.fe_sudo_password
+  sudo_cmd                        = var.sudo_cmd
+  automate_fqdn                   = var.automate_fqdn
+  chef_ips                        = var.existing_chef_server_private_ips
+  
+  depends_on = [module.chef_server]
+}
