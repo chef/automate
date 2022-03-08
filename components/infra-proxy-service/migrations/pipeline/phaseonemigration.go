@@ -34,30 +34,30 @@ func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan Pipel
 	out := make(chan PipelineData, 100)
 	go func() {
 		for res := range result {
+			log.Info("Processing to unzip the file...")
 			// Start of Unzip pipeline
 			_, err := service.Migration.StartUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
-				log.Errorf("Failed to update start 'StartUnzip' status in DB: %s :%s", res.Result.Meta.MigrationID, err)
-			}
-
-			result, err := Unzip(res.Ctx, res.Result)
-			if err != nil {
-				// Failed Unzip pipeline
-				_, err := service.Migration.FailedUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, "cannot open zipfile", 0, 0, 0)
-				if err != nil {
-					log.Errorf("Failed to update `FailedUnzip` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
-				}
+				log.Errorf("Failed to update start 'StartUnzip' status in DB for migration id : %s :%s", res.Result.Meta.MigrationID, err)
+				res.Done <- err
 				return
 			}
-
-			res.Result = result
-
+			result, err := Unzip(res.Ctx, res.Result)
+			if err != nil {
+				log.Errorf("Failed to unzip the file for migration ID: %s :%s", res.Result.Meta.MigrationID, err)
+				// Failed Unzip pipeline
+				_, _ = service.Migration.FailedUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), 0, 0, 0)
+				res.Done <- err
+				return
+			}
 			// Complete Unzip pileline
 			_, err = service.Migration.CompleteUnzip(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				log.Errorf("Failed to update `CompleteUnzip` status in DB: %s :%s", result.Meta.MigrationID, err)
+				log.Errorf("Failed to update `CompleteUnzip` status in DB for migration id : %s :%s", result.Meta.MigrationID, err)
+				res.Done <- err
+				return
 			}
-
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -83,10 +83,27 @@ func parseOrgSrc(result <-chan PipelineData, service *service.Service) <-chan Pi
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		log.Info("Processing to parse orgs...")
 		for res := range result {
+			log.Info("Processing to parse orgs...")
+			_, err := service.Migration.StartOrgParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
+			if err != nil {
+				log.Errorf("Failed to update start 'StartOrgParsing' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err)
+				res.Done <- err
+				return
+			}
 			result, err := ParseOrgs(res.Ctx, service.Storage, service.Migration, res.Result)
 			if err != nil {
+				log.Errorf("Failed to parse orgs for migration ID: %s :%s", res.Result.Meta.MigrationID, err)
+				// Failed parse org pipeline
+				_, _ = service.Migration.FailedOrgParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), 0, 0, 0)
+				res.Done <- err
+				return
+			}
+			// Complete org parsing pipeline
+			_, err = service.Migration.CompleteOrgParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
+			if err != nil {
+				log.Errorf("Failed to update `CompleteOrgParsing` status in DB for migration id: %s :%s", result.Meta.MigrationID, err)
+				res.Done <- err
 				return
 			}
 			res.Result = result
@@ -115,11 +132,11 @@ func parseOrgUserAssociationSrc(result <-chan PipelineData, service *service.Ser
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		log.Info("Processing to parse orgs user association...")
 		for res := range result {
+			log.Info("Processing to parse orgs user association...")
 			_, err := service.Migration.StartUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
-				log.Errorf("Failed to update the status for start org user association parsing for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				log.Errorf("Failed to update `StartUserAssociationParsing` status in DB for migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
 				res.Done <- err
 				return
 			}
@@ -131,7 +148,7 @@ func parseOrgUserAssociationSrc(result <-chan PipelineData, service *service.Ser
 			}
 			_, err = service.Migration.CompleteUserAssociationParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				log.Errorf("Failed to update the status for complete org user association parsing for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				log.Errorf("Failed to update `CompleteUserAssociationParsing` status in DB for migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
 				res.Done <- err
 				return
 			}
@@ -156,15 +173,29 @@ func CreatePreviewSrc(service *service.Service) PhaseOnePipelineProcessor {
 }
 
 func createPreviewSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
-	log.Info("Starting to preview pipeline")
+	log.Info("Starting to craete preview pipeline")
 
 	out := make(chan PipelineData, 100)
 
 	go func() {
-		log.Info("Processing to preview pipeline...")
 		for res := range result {
+			log.Info("Processing to create preview pipeline...")
+			_, err := service.Migration.StartCreatePreview(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
+			if err != nil {
+				log.Errorf("Failed to update `StartCreatePreview` status in DB for migration id %s :%s", res.Result.Meta.MigrationID, err)
+				res.Done <- err
+				return
+			}
 			result, err := CreatePreview(res.Ctx, service.Storage, service.Migration, res.Result)
 			if err != nil {
+				_, _ = service.Migration.FailedCreatePreview(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), 0, 0, 0)
+				res.Done <- err
+				return
+			}
+			_, err = service.Migration.CompleteCreatePreview(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
+			if err != nil {
+				log.Errorf("Failed to update `CompleteCreatePreview` status in DB for migration id %s : %s", result.Meta.MigrationID, err.Error())
+				res.Done <- err
 				return
 			}
 			res.Result = result
@@ -198,26 +229,26 @@ func parseUserSrc(result <-chan PipelineData, service *service.Service) <-chan P
 			// Update start of parse user pipeline
 			_, err := service.Migration.StartUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
-				log.Errorf("Failed to update `StartUsersParsing` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
-			}
-
-			result, err := GetUsersForBackup(res.Ctx, service.Storage, service.LocalUser, res.Result)
-			if err != nil {
-				// Update failed to parse user
-				_, err := service.Migration.FailedUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, "error parsing user", 0, 0, 0)
-				if err != nil {
-					log.Errorf("Failed to update `FailedUsersParsing` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
-				}
+				log.Errorf("Failed to update `StartUsersParsing` status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err)
+				res.Done <- err
 				return
 			}
-
-			res.Result = result
-
+			result, err := GetUsersForBackup(res.Ctx, service.Storage, service.LocalUser, res.Result)
+			if err != nil {
+				log.Errorf("Failed to parse users for migration ID: %s :%s", res.Result.Meta.MigrationID, err)
+				// Update failed to parse user
+				_, _ = service.Migration.FailedUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), 0, 0, 0)
+				res.Done <- err
+				return
+			}
 			// Update completion of parsing user
 			_, err = service.Migration.CompleteUsersParsing(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				log.Errorf("Failed to update `CompleteUsersParsing` status in DB: %s :%s", result.Meta.MigrationID, err)
+				log.Errorf("Failed to update `CompleteUsersParsing` status in DB for migration id: %s :%s", result.Meta.MigrationID, err)
+				res.Done <- err
+				return
 			}
+			res.Result = result
 
 			select {
 			case out <- res:

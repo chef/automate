@@ -21,36 +21,24 @@ import (
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
-func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, authzProjectClient authz.ProjectsServiceClient, res pipeline.Result) (pipeline.Result, error) {
+func StoreOrgs(ctx context.Context, st storage.Storage, authzProjectClient authz.ProjectsServiceClient, res pipeline.Result) (pipeline.Result, error) {
 	var err error
-	var msg string
-	var totalSucceeded, totalSkipped, totalFailed int64
-	_, err = mst.StartOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID)
-	if err != nil {
-		return res, err
-	}
+
 	log.Info("Starting the organization migration phase for migration id: ", res.Meta.MigrationID)
 	for _, org := range res.ParsedResult.Orgs {
 		if org.ActionOps == pipeline.Skip {
-			totalSkipped++
+			res.ParsedResult.OrgsCount.Skipped++
 			continue
 		}
 		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID, authzProjectClient)
 		if err != nil {
-			totalFailed++
-			msg = err.Error()
+			res.ParsedResult.OrgsCount.Failed++
 			continue
 		}
-		totalSucceeded++
+		res.ParsedResult.OrgsCount.Succeeded++
 	}
-	if len(res.ParsedResult.Orgs) == int(totalFailed) {
+	if len(res.ParsedResult.Orgs) == int(res.ParsedResult.OrgsCount.Failed) {
 		log.Errorf("Failed to migrate orgs for migration id %s : %s", res.Meta.MigrationID, err.Error())
-		_, _ = mst.FailedOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, msg, totalSucceeded, totalSkipped, totalFailed)
-		return res, err
-	}
-	_, err = mst.CompleteOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, totalSucceeded, totalSkipped, totalFailed)
-	if err != nil {
-		log.Errorf("Failed to update the status for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		return res, err
 	}
 	log.Info("Successfully completed the organization migration phase for migration id: ", res.Meta.MigrationID)
@@ -104,42 +92,29 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var err error
 	log.Info("Starting with organization parsing phase for migration id: ", result.Meta.MigrationID)
-	_, err = mst.StartOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	if err != nil {
-		log.Errorf("Failed to update the status for start org parssing for the migration id path %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
-	}
+
 	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
 	folder, err := os.Open(orgPath)
 	if err != nil {
 		log.Errorf("Failed to open the folder for the file path %s : %s", orgPath, err.Error())
-		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	orgNames, err := folder.Readdir(0)
 	if err != nil {
 		log.Errorf("Failed to read the files for the file path %s : %s", orgPath, err.Error())
-		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 	_ = folder.Close()
 	orgsPresentInDB, err := st.GetOrgs(ctx, result.Meta.ServerID)
 	if err != nil {
 		log.Errorf("Failed to read orgs from database for %s:%s", result.Meta.ServerID, err.Error())
-		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	result.ParsedResult.Orgs = append(result.ParsedResult.Orgs, insertOrUpdateOrg(orgNames, orgsPresentInDB, orgPath)...)
 
 	result.ParsedResult.Orgs = append(result.ParsedResult.Orgs, deleteOrgsIfNotPresentInCurrentFile(orgNames, orgsPresentInDB)...)
-
-	_, err = mst.CompleteOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
-	if err != nil {
-		log.Errorf("Failed to update the complete status while parsing for migration id %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
-	}
 
 	log.Info("Successfully completed the organization parsing phase for migration id: ", result.Meta.MigrationID)
 	return result, nil
@@ -150,28 +125,15 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 func CreatePreview(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("Starting with create preview phase for migration id: ", result.Meta.MigrationID)
 
-	_, err := mst.StartCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	if err != nil {
-		log.Errorf("Failed to update the status for create preview for the migration id  %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
-	}
-
 	resultByte, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal the staged data for the migration id %s : %s", result.Meta.MigrationID, err.Error())
-		_, _ = mst.FailedCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	_, err = mst.StoreMigrationStage(ctx, result.Meta.MigrationID, resultByte)
 	if err != nil {
 		log.Errorf("Failed to store the staged data %s : %s ", result.Meta.MigrationID, err.Error())
-		_, _ = mst.FailedCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
-		return result, err
-	}
-	_, err = mst.CompleteCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
-	if err != nil {
-		log.Errorf("Failed to update the complete status while creating preview for migration id %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
 	log.Info("Successfully completed the create preview phase for migration id: ", result.Meta.MigrationID)

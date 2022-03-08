@@ -15,8 +15,8 @@ type PhaseTwoPipeline struct {
 
 type PhaseTwoPipelineProcessor func(<-chan PipelineData) <-chan PipelineData
 
-// PopulateOrgs returns PhaseTwoPipelineProcessor
-func PopulateOrgs(service *service.Service) PhaseTwoPipelineProcessor {
+// PopulateOrgsSrc populate the orgs based on actions and returns PhaseTwoPipelineProcessor
+func PopulateOrgsSrc(service *service.Service) PhaseTwoPipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
 		return populateOrgs(result, service)
 	}
@@ -29,11 +29,26 @@ func populateOrgs(result <-chan PipelineData, service *service.Service) <-chan P
 	go func() {
 		for res := range result {
 			log.Info("Processing to populateOrgs...")
-			result, err := StoreOrgs(res.Ctx, service.Storage, service.Migration, service.AuthzProjectClient, res.Result)
+			_, err := service.Migration.StartOrgMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
+				log.Errorf("Failed to update start 'StartOrgMigration' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err)
 				res.Done <- err
 				return
 			}
+			result, err := StoreOrgs(res.Ctx, service.Storage, service.AuthzProjectClient, res.Result)
+			if err != nil {
+				log.Errorf("Failed to populate orgs for migration id: %s :%s", res.Result.Meta.MigrationID, err)
+				_, _ = service.Migration.FailedOrgMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
+				res.Done <- err
+				return
+			}
+			_, err = service.Migration.CompleteOrgMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
+			if err != nil {
+				log.Errorf("Failed to update start 'CompleteOrgMigration' status in DB for migration id: %s : %s", res.Result.Meta.MigrationID, err.Error())
+				res.Done <- err
+				return
+			}
+
 			res.Result = result
 			select {
 			case out <- res:
@@ -115,19 +130,20 @@ func populateOrgsUsersAssociation(result <-chan PipelineData, service *service.S
 			log.Info("Processing to populate orgs users association...")
 			_, err := service.Migration.StartAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
 			if err != nil {
-				log.Errorf("Failed to update the status for start org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				log.Errorf("Failed to update start 'StartAssociation' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
 				res.Done <- err
 				return
 			}
 			result, err := StoreOrgsUsersAssociation(res.Ctx, service.Storage, res.Result)
 			if err != nil {
+				log.Errorf("Failed to store org users association for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
 				_, _ = service.Migration.FailedAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
 				res.Done <- err
 				return
 			}
 			_, err = service.Migration.CompleteAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
 			if err != nil {
-				log.Errorf("Failed to update the status for complete org user association for the migration id %s : %s", res.Result.Meta.MigrationID, err.Error())
+				log.Errorf("Failed to update start 'CompleteAssociation' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
 				res.Done <- err
 				return
 			}
@@ -188,7 +204,7 @@ func migrationTwoPipeline(source <-chan PipelineData, pipes ...PhaseTwoPipelineP
 func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipeline {
 	c := make(chan PipelineData, 100)
 	migrationTwoPipeline(c,
-		PopulateOrgs(service),
+		PopulateOrgsSrc(service),
 		// CreateProject(),
 		// PopulateUsers(),
 		PopulateOrgsUsersAssociationSrc(service),

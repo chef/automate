@@ -53,6 +53,9 @@ type ParsedResult struct {
 	// Orgs array
 	Orgs []Org `json:"orgs"`
 
+	//Counts for total,skipped and failed orgs
+	OrgsCount Counts `json:"orgs_count"`
+
 	// Users array
 	Users []User `json:"users"`
 
