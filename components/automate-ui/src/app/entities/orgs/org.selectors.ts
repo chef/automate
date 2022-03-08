@@ -79,4 +79,4 @@ export const confirmPreviewStatus = createSelector(
 export const checkUserStatus = createSelector(
   orgState,
   (state) => state.checkUserStatus
-)
+);

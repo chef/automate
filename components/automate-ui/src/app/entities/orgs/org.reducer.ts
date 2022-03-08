@@ -157,15 +157,15 @@ export function orgEntityReducer(
 
     case OrgActionTypes.CONFIRM_PREVIEW_FAILURE:
       return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loadingFailure, state);
-      
+
     case OrgActionTypes.CHECK_USER:
-      return set(CHECK_USER_STATUS,EntityStatus.loading ,state);
+      return set(CHECK_USER_STATUS, EntityStatus.loading, state);
 
     case OrgActionTypes.CHECK_USER_SUCCESS:
-        return set(CHECK_USER_STATUS,EntityStatus.loadingSuccess ,state);
+        return set(CHECK_USER_STATUS, EntityStatus.loadingSuccess, state);
 
     case OrgActionTypes.CHECK_USER_FAILURE:
-      return set(CHECK_USER_STATUS,EntityStatus.loadingFailure ,state);
+      return set(CHECK_USER_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

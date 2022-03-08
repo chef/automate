@@ -3,7 +3,9 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Utilities } from 'app/helpers/utilities/utilities';
 import { User } from '../../../entities/orgs/org.model';
-// import { CheckUser } from '../../../entities/orgs/org.actions';
+import { CheckUser } from '../../../entities/orgs/org.actions';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 
 @Component({
   selector: 'app-migration-slider',
@@ -22,22 +24,22 @@ export class MigrationSliderComponent implements OnChanges {
   public usersData: User[];
 
   @HostBinding('class.active') isSlideOpen1 = false;
-  store: any;
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private store: Store<NgrxStateAtom>
   ) {
     this.migrationForm = this.fb.group({});
   }
 
   ngOnChanges() {
-    let group={};
-    if(this.previewData) {
-      this.previewData.users.forEach((input_template: { automate_username: string | number; })=>{
-        group[input_template.automate_username]=new FormControl('');  
-      })
+    const group = {};
+    if (this.previewData) {
+      this.previewData.users.forEach((input_template: { automate_username: string | number; }) => {
+        group[input_template.automate_username] = new FormControl('');
+      });
     }
-    this.migrationForm = new FormGroup(group)
+    this.migrationForm = new FormGroup(group);
   }
 
   closeMigrationSlider() {
@@ -78,8 +80,11 @@ export class MigrationSliderComponent implements OnChanges {
     }
   }
 
-  handleName(event: KeyboardEvent ,i: number): void {
-    console.log((event.target as HTMLInputElement).value, i);
-    // this.store.dispatch(new CheckUser(event.target as HTMLInputElement).value);
+  handleName(event: KeyboardEvent, i: number): void {
+    console.log(typeof ((event.target as HTMLInputElement).value), i);
+    const payload = {
+      user: (event.target as HTMLInputElement).value
+    };
+    this.store.dispatch(new CheckUser(payload));
   }
 }

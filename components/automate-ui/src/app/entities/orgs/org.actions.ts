@@ -231,7 +231,11 @@ export class ConfirmPreviewFailure implements Action {
 }
 
 export interface CheckUserPayload {
-
+  user: {
+    name: string;
+    id: string;
+    membership_id: string;
+  };
 }
 
 export class CheckUser implements Action {

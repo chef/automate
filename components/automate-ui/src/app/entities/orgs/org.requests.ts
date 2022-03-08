@@ -68,6 +68,6 @@ export class OrgRequests {
   public checkUser(user: string): Observable<CheckUserPayload> {
     return this.http.get<CheckUserPayload>(
       `https://a2-dev.test/apis/iam/v2/users/${user}`
-    )
+    );
   }
 }

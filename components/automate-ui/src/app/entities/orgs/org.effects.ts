@@ -293,15 +293,8 @@ export class OrgEffects {
   CheckUserSuccess = createEffect(() =>
     this.actions$.pipe(
       ofType(OrgActionTypes.CHECK_USER_SUCCESS),
-      map((_) => new CreateNotification({
+      map(({ payload:  { user } }) => new CreateNotification({
         type: Type.error,
-        message: `Could not use this user name`
+        message: `Could not use ${user} user name.`
     }))));
-
-  // CheckUserFailure = createEffect(() =>
-  // this.actions$.pipe(
-  //   ofType(OrgActionTypes.CHECK_USER_FAILURE),
-  //   map((_) => new CreateNotification({
-  //     type: Type.info,
-  //     message: 'Confirm preview successful.'})));
 }
