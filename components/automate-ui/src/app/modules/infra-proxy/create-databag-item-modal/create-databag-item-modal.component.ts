@@ -26,6 +26,7 @@ import {
   DataBagItemPayload,
   GetDataBagItems
 } from 'app/entities/data-bags/data-bag-details.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-databag-item-modal',
@@ -55,7 +56,8 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.createForm = this.fb.group({
       itemId: ['', [Validators.required,
@@ -152,6 +154,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new CreateDataBagItem({dataBagItem}));
+    this.telemetryService.track('InfraServer_Databags_Details_Create');
   }
 
   private resetCreateModal(): void {

@@ -19,7 +19,11 @@ import { By } from '@angular/platform-browser';
 import { GetDataBagItemsSuccess, DeleteDataBagItemSuccess } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBagItems } from 'app/entities/data-bags/data-bags.model';
 import { DataBagsDetailsComponent } from './data-bags-details.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
+class MockTelemetryService {
+  track() { }
+}
 
 const declarations: any[] = [
   MockComponent({ selector: 'chef-icon' }),
@@ -73,6 +77,7 @@ describe('DataBagsDetailsComponent', () => {
     TestBed.configureTestingModule({
       declarations: declarations,
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [
