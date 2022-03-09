@@ -1,5 +1,5 @@
 +++
-title = "Destroying Chef Automate HA Infrastructure"
+title = "Destroying Infrastructure"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Destroying Chef Automate HA Infrastructure"
-    parent = "automate/install"
-    identifier = "automate/install/ha_destroy.md Destroying Chef Automate HA Infrastructure"
+    title = "Destroying Infrastructure"
+    parent = "automate/install/high_availability/common_features"
+    identifier = "automate/install/high_availability/common_features/ha_destroy.md Destroying Infrastructure"
     weight = 370
 +++
 

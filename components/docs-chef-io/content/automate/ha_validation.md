@@ -1,5 +1,5 @@
 +++
-title = "HA Validation Commands"
+title = "Validation Commands"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA Validation Commands"
-    parent = "automate/install"
-    identifier = "automate/install/ha_validation.md HA Validation Commands"
+    title = "Validation Commands"
+    parent = "automate/install/high_availability/common_features"
+    identifier = "automate/install/high_availability/common_features/ha_validation.md Validation Commands"
     weight = 200
 +++
 

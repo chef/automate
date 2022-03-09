@@ -1,14 +1,14 @@
 +++
-title = "HA Health Check Commands"
+title = "Health Check Commands"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA Health Check Commands"
-    parent = "automate/install"
-    identifier = "automate/install/ha_healthcheck.md HA Health Check Commands"
+    title = "Health Check Commands"
+    parent = "automate/install/high_availability/common_features"
+    identifier = "automate/install/high_availability/common_features/ha_healthcheck.md Health Check Commands"
     weight = 230
 +++
 

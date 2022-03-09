@@ -1,15 +1,15 @@
 +++
 title = "IAM Users"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "IAM Users"
-    parent = "automate/install"
-    identifier = "automate/install/ha_iam_user.md IAM Users"
+    parent = "automate/install/high_availability/aws_deployment"
+    identifier = "automate/install/high_availability/aws_deployment/ha_iam_user.md IAM Users"
     weight = 320
 +++
 

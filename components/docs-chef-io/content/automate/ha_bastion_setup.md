@@ -1,15 +1,15 @@
 +++
 title = "HA Bastion Setup"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "HA Bastion Setup"
-    parent = "automate/install"
-    identifier = "automate/install/ha_bastion_setup.md HA Bastion Setup"
+    parent = "automate/install/high_availability/on_premise_deployment/"
+    identifier = "automate/install/high_availability/on_premise_deployment/ha_bastion_setup.md HA Bastion Setup"
     weight = 200
 +++
 

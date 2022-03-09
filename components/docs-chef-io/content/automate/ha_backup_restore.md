@@ -1,15 +1,15 @@
 +++
-title = "Backups and Restore"
+title = "Backup and Restore"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Backups and Restore"
-    identifier = "automate/install/ha_backup_restore.md Backups and Restore"
-    parent = "automate/install"
+    title = "Backup and Restore"
+    identifier = "automate/install/high_availability/backup_and_restore/ha_backup_restore.md Backup and Restore"
+    parent = "automate/installhigh_availability/backup_and_restore"
     weight = 380
 +++
 

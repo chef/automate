@@ -1,7 +1,7 @@
 +++
 title = "System and Software Requirements"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

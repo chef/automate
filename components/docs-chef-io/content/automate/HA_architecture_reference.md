@@ -1,7 +1,7 @@
 +++
 title = "High Availability Architecture"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

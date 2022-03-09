@@ -1,15 +1,15 @@
 +++
 title = "VPC and CIDR Setup"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "VPC and CIDR Setup"
-    parent = "automate/install"
-    identifier = "automate/install/ha_vpc_setup.md VPC and CIDR Setup"
+    parent = "automate/install/high_availability/aws_deployment"
+    identifier = "automate/install/high_availability/aws_deployment/ha_vpc_setup.md VPC and CIDR Setup"
     weight = 290
 +++
 
