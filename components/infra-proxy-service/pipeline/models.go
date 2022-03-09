@@ -11,7 +11,7 @@ const (
 
 const (
 	Local = "LOCAL"
-	LADP  = "LDAP"
+	LDAP  = "LDAP"
 )
 
 //
@@ -58,6 +58,9 @@ type ParsedResult struct {
 
 	// Users array
 	Users []User `json:"users"`
+
+	//Counts for total Skipped, Inserted and Deleted Users
+	UsersCount Counts `json:"users_count"`
 
 	// OrgsUsers for Orgs and Users associations
 	OrgsUsers []OrgsUsersAssociations `json:"orgs_users_associations"`
@@ -142,9 +145,6 @@ type User struct {
 
 	// ActionOps for Insert Skip Update and Delete
 	ActionOps ActionOps `json:"action_ops"`
-
-	//Counts for total,skipped and failed
-	Counts Counts `json:"counts"`
 }
 
 type OrgJson struct {
