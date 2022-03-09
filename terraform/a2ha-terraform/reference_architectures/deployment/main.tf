@@ -231,7 +231,7 @@ module "elasticsearch" {
   ssh_user                     = var.ssh_user
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
-  nfs_mount_path               = var.nfs_mount_path
+  # nfs_mount_path               = var.nfs_mount_path
 }
 
 module "postgresql" {
