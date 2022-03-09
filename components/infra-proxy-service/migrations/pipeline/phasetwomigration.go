@@ -159,20 +159,20 @@ func populateOrgsUsersAssociation(result <-chan PipelineData, service *service.S
 			if err != nil {
 				log.Errorf("Failed to update start 'StartAssociation' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
 				res.Done <- err
-				return
+				continue
 			}
 			result, err := StoreOrgsUsersAssociation(res.Ctx, service.Storage, res.Result)
 			if err != nil {
 				log.Errorf("Failed to store org users association for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
 				_, _ = service.Migration.FailedAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
 				res.Done <- err
-				return
+				continue
 			}
 			_, err = service.Migration.CompleteAssociation(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
 			if err != nil {
 				log.Errorf("Failed to update start 'CompleteAssociation' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
 				res.Done <- err
-				return
+				continue
 			}
 			res.Result = result
 			select {

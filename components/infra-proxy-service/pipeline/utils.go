@@ -17,9 +17,3 @@ func (usr *User) SetAutomateUsername(uid interface{}) {
 		usr.AutomateUsername = uid.(string)
 	}
 }
-
-func (useCt Counts) Counts(Succeeded, Failed, Skipped int64) {
-	useCt.Succeeded = Succeeded
-	useCt.Failed = Failed
-	useCt.Skipped = Skipped
-}

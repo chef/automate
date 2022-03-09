@@ -742,27 +742,24 @@ func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID s
 // StoreUsers reads the Result struct and populate the users table
 func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, res pipeline.Result) (pipeline.Result, error) {
 	var err error
-	var totalSucceeded, totalSkipped, totalFailed int64
 
 	for _, user := range res.ParsedResult.Users {
 		if user.ActionOps == pipeline.Skip {
-			totalSkipped++
+			res.ParsedResult.UsersCount.Skipped++
 			continue
 		}
 		_, err = StoreUser(ctx, st, user, res.Meta.ServerID, localUserClient)
 		if err != nil {
-			totalFailed++
+			res.ParsedResult.UsersCount.Failed++
 			continue
 		}
-		totalSucceeded++
+		res.ParsedResult.UsersCount.Succeeded++
 	}
 
-	if res.ParsedResult.UsersCount.Succeeded == 0 && res.ParsedResult.UsersCount.Failed != 0 {
+	if len(res.ParsedResult.Users) == int(res.ParsedResult.UsersCount.Failed) {
 		log.Errorf("Failed to migrate user for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		return res, err
 	}
-	// Set the count for total Skipped, Inserted and Deleted Users
-	res.ParsedResult.UsersCount.Counts(totalSucceeded, totalFailed, totalSkipped)
 
 	log.Info("Successfully completed the user migration phase for migration id: ", res.Meta.MigrationID)
 	return res, err
