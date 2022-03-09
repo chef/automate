@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Establishing SSH Connection with Bastion Host"
     parent = "automate/install/high_availability/aws_deployment"
     identifier = "automate/install/high_availability/aws_deployment/ha_aws_ssh_connect_bastion.md Establishing SSH Connection with Bastion Host"
-    weight = 310
+    weight = 240
 +++
 
 This page explains the procedure to establish the connection between your bastion host and an AWS account. A key pair consists of a public key that AWS stores and a private key file you store. Together, they allow you to connect to your instance securely.

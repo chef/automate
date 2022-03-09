@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA Bastion Setup"
     parent = "automate/install/high_availability/on_premise_deployment/"
     identifier = "automate/install/high_availability/on_premise_deployment/ha_bastion_setup.md HA Bastion Setup"
-    weight = 200
+    weight = 210
 +++
 
 ## Bastion Host

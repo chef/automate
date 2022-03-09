@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Validation Commands"
     parent = "automate/install/high_availability/common_features"
     identifier = "automate/install/high_availability/common_features/ha_validation.md Validation Commands"
-    weight = 200
+    weight = 210
 +++
 
 This page elaborates the validation procedure that checks the firewall rules and ports before Chef Automate High Availability (HA) backend cluster deployment in your network infrastructure.
