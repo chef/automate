@@ -5,7 +5,7 @@ func (usr *User) SetConnector(uid interface{}) {
 	if uid == nil {
 		usr.Connector = Local
 	} else {
-		usr.Connector = LADP
+		usr.Connector = LDAP
 	}
 }
 

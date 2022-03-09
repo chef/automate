@@ -116,20 +116,29 @@ func (t *TestDB) TouchOrg(ctx context.Context, id string, serverID string) (stor
 	panic("implement me")
 }
 
-func (t *TestDB) InsertUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (storage.User, error) {
-	panic("implement me")
+func (t *TestDB) InsertUser(ctx context.Context, user storage.User) (storage.User, error) {
+	if t.NeedError {
+		return storage.User{}, errors.New("failed to store user")
+	}
+	return user, nil
 }
 
 func (t *TestDB) GetUser(ctx context.Context, id string) (storage.User, error) {
 	panic("implement me")
 }
 
-func (t *TestDB) EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (storage.User, error) {
-	panic("implement me")
+func (t *TestDB) EditUser(ctx context.Context, user storage.User) (storage.User, error) {
+	if t.NeedError {
+		return storage.User{}, errors.New("failed to edit user")
+	}
+	return user, nil
 }
 
-func (t *TestDB) DeleteUser(ctx context.Context, id string) (storage.User, error) {
-	panic("implement me")
+func (t *TestDB) DeleteUser(ctx context.Context, user storage.User) (storage.User, error) {
+	if t.NeedError {
+		return storage.User{}, errors.New("failed to delete user")
+	}
+	return storage.User{ID: "1"}, nil
 }
 
 func (t *TestDB) GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]storage.User, error) {
