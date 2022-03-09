@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Taking Backup with Amazon S3 Bucket"
     identifier = "automate/install/high_availability/backup_and_restore/ha_backup_s3.md Taking Backup with Amazon S3 Bucket"
     parent = "automate/install/high_availability/backup_and_restore"
-    weight = 390
+    weight = 210
 +++
 
 This page explains how to take backup for External Elastic Search (ES) and Postgres-Sql to the Amazon S3 bucket.

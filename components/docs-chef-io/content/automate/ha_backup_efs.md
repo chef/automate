@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Taking Backup with EFS System"
     identifier = "automate/install/high_availability/backup_and_restore/ha_backup_efs.md Taking Backup with EFS System"
     parent = "automate/install/high_availability/backup_and_restore"
-    weight = 400
+    weight = 220
 +++
 
 This page explains how to take backup for External Elastic Search (ES) and Postgres-Sql on External File-System (EFS). You can take the backup on EFS system through DNS or IP.

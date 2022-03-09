@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Getting Started"
     parent = "automate/install/high_availability/introduction"
     identifier = "automate/install/high_availability/introduction/ha_auto_install.md Getting Started"
-    weight = 260
+    weight = 270
 +++
 
 Both deployment models require installing and configuring the Chef Automate High Availability (HA) on your network infrastructure. You can skip this section if you already have installed the Chef Automate utility where you are planning to deploy HA.

@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "FAQs"
     parent = "automate/install/high_availability/faqs"
     identifier = "automate/install/high_availability/faqs/ha_faq.md FAQs"
-    weight = 460
+    weight = 200
 +++
 
 itle = "Chef Automate High Availability"

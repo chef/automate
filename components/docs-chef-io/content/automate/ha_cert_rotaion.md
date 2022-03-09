@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Certificate Rotation"
     parent = "automate/install/high_availability/certificates"
     identifier = "automate/install/high_availability/certificates/ha_cert_rotaion.md Certificate Rotation"
-    weight = 340
+    weight = 220
 +++
 
 ## What are Certificates?

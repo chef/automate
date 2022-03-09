@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Restoring the S3 Backed-up Data"
     identifier = "automate/install/high_availability/backup_and_restore/ha_restore_efs.md Restoring the S3 Backed-up Data"
     parent = "automate/install/high_availability/backup_and_restore"
-    weight = 410
+    weight = 230
 +++
 
 This page includes the procedure to restore backed-up data of the Chef Automate High Availability [HA] using EFS [External File System].

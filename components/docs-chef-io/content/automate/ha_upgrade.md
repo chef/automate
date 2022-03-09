@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Common Features"
     parent = "automate/install/high_availability/common_features"
     identifier = "automate/install/high_availability/common_features/ha_upgrade.md Automate Common Features"
-    weight = 230
+    weight = 200
 +++
 
 itle = "Chef Automate High Availability"
