@@ -123,6 +123,7 @@ func newAirgapCmd() *cobra.Command {
 		for _, flagName := range []string{
 			"override-origin",
 			"hartifacts",
+			"versions-file",
 		} {
 			err := bundleCreateCmd.PersistentFlags().MarkHidden(flagName)
 			if err != nil {

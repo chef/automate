@@ -398,6 +398,13 @@ func init() {
 		"Path to versions.json",
 	)
 
+	if !isDevMode() {
+		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+	}
+
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
 	RootCmd.AddCommand(upgradeCmd)
