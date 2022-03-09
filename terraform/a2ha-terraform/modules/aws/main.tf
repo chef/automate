@@ -1,6 +1,6 @@
 provider "aws" {
-  region                   = var.aws_region
-  profile                  = var.aws_profile
+  region  = var.aws_region
+  profile = var.aws_profile
 }
 
 resource "random_id" "random" {
@@ -91,7 +91,7 @@ resource "aws_route_table_association" "publicsubnet" {
 
 resource "aws_efs_file_system" "backups" {
   creation_token = "${var.tag_name}_${random_id.random.hex}_efsfs"
-  encrypted = true
+  encrypted      = true
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efsfs"))
 }
@@ -114,7 +114,7 @@ locals {
 }
 
 resource "aws_instance" "chef_automate_postgresql" {
-  count                       = var.setup_managed_services ? 0 : var.postgresql_instance_count
+  count = var.setup_managed_services ? 0 : var.postgresql_instance_count
 
   ami                         = local.ami
   instance_type               = var.postgresql_server_instance_type
@@ -159,11 +159,11 @@ resource "aws_instance" "chef_automate_postgresql" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_efs_mount_target.backups, aws_route_table.default]
 }
 
 resource "aws_instance" "chef_automate_elasticsearch" {
-  count = var.elasticsearch_instance_count
+  count = var.setup_managed_services ? 0 : var.elasticsearch_instance_count
 
   ami                         = local.ami
   instance_type               = var.elasticsearch_server_instance_type
@@ -206,7 +206,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_efs_mount_target.backups, aws_route_table.default]
 }
 
 resource "aws_instance" "chef_automate" {
@@ -253,7 +253,7 @@ resource "aws_instance" "chef_automate" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_efs_mount_target.backups, aws_route_table.default]
 }
 
 resource "aws_instance" "chef_server" {
@@ -300,5 +300,5 @@ resource "aws_instance" "chef_server" {
     ]
   }
 
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_efs_mount_target.backups, aws_route_table.default]
 }

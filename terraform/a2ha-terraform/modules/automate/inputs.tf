@@ -74,7 +74,7 @@ variable "managed_elasticsearch_user_password" {
   default = ""
 }
 
-variable "managed_elasticsearch_username" { 
+variable "managed_elasticsearch_username" {
   default = ""
 }
 

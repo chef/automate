@@ -7,6 +7,7 @@
   automate_dc_token = "${automate_dc_token}"
   automate_role = "${automate_role}"
   channel = "current"
+  setup_managed_services = ${setup_managed_services}
   upgrade_strategy = "none"
   teams_port = ${teams_port}
 
@@ -17,6 +18,10 @@
   svc_group = "default"
   svc_name = "automate-ha-elasticsearch"
   svc_port = ${elasticsearch_listen_port}
+  managed_elasticsearch_certificate = "${managed_elasticsearch_certificate}"
+  managed_elasticsearch_domain_url = "${managed_elasticsearch_domain_url}"
+  managed_elasticsearch_user_password = "${managed_elasticsearch_user_password}"
+  managed_elasticsearch_username = "${managed_elasticsearch_username}"
 
   [services.postgresql]
   ips = ${postgresql_ips}

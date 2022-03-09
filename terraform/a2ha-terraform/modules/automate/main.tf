@@ -2,27 +2,31 @@ locals {
   automate_custom_config = "${var.tmp_path}/automate_custom_config.toml"
 
   connector_toml = templatefile("${path.module}/templates/connector.toml.tpl", {
-    automate_fqdn                  = var.automate_fqdn,
-    automate_admin_email           = var.automate_admin_email,
-    automate_admin_username        = var.automate_admin_username,
-    automate_admin_password        = var.automate_admin_password,
-    automate_custom_config         = local.automate_custom_config,
-    automate_dc_token              = var.automate_dc_token,
-    automate_role                  = var.automate_role,
-    elasticsearch_ips              = jsonencode(formatlist("%s", var.elasticsearch_private_ips)),
-    elasticsearch_listen_port      = var.elasticsearch_listen_port,
-    managed_rds_certificate        = var.managed_rds_certificate,
-    managed_rds_dbuser_password    = var.managed_rds_dbuser_password,
-    managed_rds_dbuser_username    = var.managed_rds_dbuser_username,
-    managed_rds_instance_url       = var.managed_rds_instance_url,
-    managed_rds_superuser_password = var.managed_rds_superuser_password,
-    managed_rds_superuser_username = var.managed_rds_superuser_username,
-    postgresql_ips                 = jsonencode(formatlist("%s", var.postgresql_private_ips)),
-    postgresql_ssl_enable          = var.postgresql_ssl_enable ? "true" : "false",
-    proxy_listen_port              = var.proxy_listen_port,
-    setup_managed_services         = var.setup_managed_services,
-    teams_port                     = var.teams_port,
-    tmp_path                       = var.tmp_path,
+    automate_fqdn                       = var.automate_fqdn,
+    automate_admin_email                = var.automate_admin_email,
+    automate_admin_username             = var.automate_admin_username,
+    automate_admin_password             = var.automate_admin_password,
+    automate_custom_config              = local.automate_custom_config,
+    automate_dc_token                   = var.automate_dc_token,
+    automate_role                       = var.automate_role,
+    elasticsearch_ips                   = jsonencode(formatlist("%s", var.elasticsearch_private_ips)),
+    elasticsearch_listen_port           = var.elasticsearch_listen_port,
+    managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate,
+    managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url,
+    managed_elasticsearch_user_password = var.managed_elasticsearch_user_password,
+    managed_elasticsearch_username      = var.managed_elasticsearch_username,
+    managed_rds_certificate             = var.managed_rds_certificate,
+    managed_rds_dbuser_password         = var.managed_rds_dbuser_password,
+    managed_rds_dbuser_username         = var.managed_rds_dbuser_username,
+    managed_rds_instance_url            = var.managed_rds_instance_url,
+    managed_rds_superuser_password      = var.managed_rds_superuser_password,
+    managed_rds_superuser_username      = var.managed_rds_superuser_username,
+    postgresql_ips                      = jsonencode(formatlist("%s", var.postgresql_private_ips)),
+    postgresql_ssl_enable               = var.postgresql_ssl_enable ? "true" : "false",
+    proxy_listen_port                   = var.proxy_listen_port,
+    setup_managed_services              = var.setup_managed_services,
+    teams_port                          = var.teams_port,
+    tmp_path                            = var.tmp_path,
   })
 
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {
@@ -77,8 +81,8 @@ resource "null_resource" "automate" {
   }
 
   triggers = {
-    connector_toml_sha = sha1(local.connector_toml)
-    template = local.provision
+    connector_toml_sha         = sha1(local.connector_toml)
+    template                   = local.provision
     automate_custom_config_sha = sha1(var.automate_config)
   }
 
