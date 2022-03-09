@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Bastion Host"
     parent = "automate/install/high_availability/introduction"
     identifier = "automate/install/high_availability/introduction/ha_bastion.md Bastion Host"
-    weight = 260
+    weight = 250
 +++
 
 A [Bastion Host](https://en.wikipedia.org/wiki/Bastion_host#:~:text=A%20bastion%20host%20is%20a,the%20threat%20to%20the%20computer.) is a special-purpose computer or server on a network specifically designed and configured to withstand attacks. This serve type generally hosts a single application or process, for example, a proxy server or load balancer. All other services are limited to reduce the threat to the computer.
@@ -25,7 +25,7 @@ The bastion hosts provide secure access to Linux instances located in the privat
 
 The Virtual machine is required for either of the Chef Automate HA deployment types to trigger the deployment, which is actually a bastion host. This section explains the bastion host requirements and configurations for the two deployment modes of the Chef Automate HA.
 
-### Bastion Host Requirements for On-Premise Deployment
+### Bastion Host Prerequisites for On-Premise Deployment
 
 - Bastion Server/host IP address
 - Instance type: 2 vCPU
@@ -34,7 +34,9 @@ The Virtual machine is required for either of the Chef Automate HA deployment ty
 - Hard Disk Space - 100 GB
 - Ports to be publicly accessible: 22 and 9631
 
-### Bastion Host Requirements for AWS (Amazon Web Services)
+Refer [On-premises Deployment Model](( {{< relref "ha_deploy_bareinfra.md" >}} )) page for the deployment procedure.
+
+### Bastion Host Prerequisites for AWS (Amazon Web Services) Deployment
 
 - [AWS Credential configured on your bastion host](( {{< relref "ha_configure_aws_credentials.md" >}} )).
 - Create the certificate for the DNS
@@ -44,3 +46,5 @@ The Virtual machine is required for either of the Chef Automate HA deployment ty
 - Hard Disk Space - 100 GB
 - SSH: VPC to Port 22, publicly accessible
 - [Setup Virtual Private Cloud (VPC) in AWS](( {{< relref "ha_vpc_setup.md" >}}))
+
+Refer [AWS Deployment Model](( {{< relref "ha_deploy_aws.md" >}} )) page for building an bastion host and Chef Automate HA deployment procedure using AWS.

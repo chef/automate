@@ -12,11 +12,6 @@ gh_repo = "automate"
     weight = 200
 +++
 
-itle = "Chef Automate High Availability"
-    parent = "automate/install/high_availability/introduction"
-    identifier = "automate/install/high_availability/introduction/ha.md Chef Automate High Availability"
-    weight = 200
-
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) Restore feature and the steps to resolve them.
 
 ## Frequently Asked Questions

@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Deployment Workflows"
     parent = "automate/install/high_availability/introduction"
     identifier = "automate/install/high_availability/introduction/ha_workflow.md Deployment Workflows"
-    weight = 240
+    weight = 230
 +++
 
 This page includes the two types of Chef Automate High Availability (HA) Workflows in words and infographic format.
