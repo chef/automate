@@ -16,5 +16,5 @@ then
    echo "Chef server "$2" is already added to chef_automate UI"
 else
    add_chef_server $1 $2 $3
-   echo "This chef-server $2 is added to UI" >> chef_server_list
+   echo "This chef-server $2 is added to UI" >> /var/tmp/chef_server_list
 fi
