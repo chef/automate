@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "High Availability Architecture"
     parent = "automate/install/high_availability/introduction"
     identifier = "automate/install/high_availability/introduction/ha_architecture_reference.md High Availability Architecture"
-    weight = 230
+    weight = 220
 +++
 
 The following Chef Automate HA architecture diagram shows the Chef Automate HA components that works on the **Leader-Follower** strategy. This architecture includes the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch.
