@@ -9,12 +9,12 @@ resource "null_resource" "token" {
 
   provisioner "file" {
     destination = "${var.tmp_path}/create-api-token.sh"
-    source = "${path.module}/create-api-token.sh"
+    source = "${path.module}/files/create-api-token.sh"
   }
 
   provisioner "file" {
     destination = "${var.tmp_path}/create-chef-server.sh"
-    source = "${path.module}/create-chef-server.sh"
+    source = "${path.module}/files/create-chef-server.sh"
   }
   
 
