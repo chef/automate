@@ -1,15 +1,15 @@
 +++
-title = "Backup with EFS System"
+title = "Taking Backup with EFS System"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Backup with EFS System"
-    identifier = "automate/install/ha_backup_efs.md Backup with EFS System"
-    parent = "automate/install"
+    title = "Taking Backup with EFS System"
+    identifier = "automate/install/high_availability/backup_and_restore/ha_backup_efs.md Taking Backup with EFS System"
+    parent = "automate/install/high_availability/backup_and_restore"
     weight = 400
 +++
 

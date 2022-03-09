@@ -1,15 +1,15 @@
 +++
 title = "Restoring the S3 Backed-up Data"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "Restoring the S3 Backed-up Data"
-    identifier = "automate/install/ha_restore_efs.md Restoring the S3 Backed-up Data"
-    parent = "automate/install"
+    identifier = "automate/install/high_availability/backup_and_restore/ha_restore_efs.md Restoring the S3 Backed-up Data"
+    parent = "automate/install/high_availability/backup_and_restore"
     weight = 410
 +++
 

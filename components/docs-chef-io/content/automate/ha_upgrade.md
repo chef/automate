@@ -1,16 +1,23 @@
 +++
-title = "Automate HA Upgrade"
+title = "Common Features"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Automate HA Upgrade"
-    parent = "automate/install"
-    identifier = "automate/install/ha_upgrade.md Automate HA Upgrade"
+    title = "Common Features"
+    parent = "automate/install/high_availability/common_features"
+    identifier = "automate/install/high_availability/common_features/ha_upgrade.md Automate Common Features"
     weight = 230
 +++
+
+itle = "Chef Automate High Availability"
+    parent = "automate/install"
+    identifier = "automate/install/high_availability/introduction/ha.md Chef Automate High Availability"
+    weight = 200
+
+
 
 This page lists the commands that aid in upgrading the Chef Automate High Availability (HA) frontend and backend clusters in your network infrastructure.
 

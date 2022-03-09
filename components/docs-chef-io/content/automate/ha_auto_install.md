@@ -1,7 +1,7 @@
 +++
 title = "Getting Started"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 

@@ -1,15 +1,15 @@
 +++
 title = "Configuration of AWS Credential on Bastion Host"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "Configuration of AWS Credential on Bastion Host"
-    parent = "automate/install"
-    identifier = "automate/install/ha_configure_aws_credentials.md Configuration of AWS Credential on Bastion Host"
+    parent = "automate/install/high_availability/aws_deployment"
+    identifier = "automate/install/high_availability/aws_deployment/ha_configure_aws_credentials.md Configuration of AWS Credential on Bastion Host"
     weight = 280
 +++
 

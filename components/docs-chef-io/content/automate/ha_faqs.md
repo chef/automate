@@ -1,16 +1,21 @@
 +++
-title = "HA FAQs"
+title = "FAQs"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA FAQs"
-    parent = "automate/install"
-    identifier = "automate/install/ha_faq.md HA FAQs"
+    title = "FAQs"
+    parent = "automate/install/high_availability/faqs"
+    identifier = "automate/install/high_availability/faqs/ha_faq.md FAQs"
     weight = 460
 +++
+
+itle = "Chef Automate High Availability"
+    parent = "automate/install/high_availability/introduction"
+    identifier = "automate/install/high_availability/introduction/ha.md Chef Automate High Availability"
+    weight = 200
 
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) Restore feature and the steps to resolve them.
 

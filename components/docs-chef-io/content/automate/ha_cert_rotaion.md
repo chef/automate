@@ -1,15 +1,15 @@
 +++
 title = "Certificate Rotation"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "Certificate Rotation"
-    parent = "automate/install"
-    identifier = "automate/install/ha_cert_rotaion.md Certificate Rotation"
+    parent = "automate/install/high_availability/certificates"
+    identifier = "automate/install/high_availability/certificates/ha_cert_rotaion.md Certificate Rotation"
     weight = 340
 +++
 

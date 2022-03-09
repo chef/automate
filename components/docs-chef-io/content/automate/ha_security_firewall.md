@@ -1,5 +1,5 @@
 +++
-title = "HA Security and Firewall"
+title = "Security and Firewall"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA Security and Firewall"
-    parent = "automate/install"
-    identifier = "automate/install/ha_security_firewall.md HA Security and Firewall"
+    title = "Security and Firewall"
+    parent = "automate/install/high_availability/common_features"
+    identifier = "automate/install/high_availability/common_features/ha_security_firewall.md Security and Firewall"
     weight = 450
 +++
 
