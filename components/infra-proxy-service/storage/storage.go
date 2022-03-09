@@ -24,10 +24,10 @@ type Storage interface {
 	EditOrg(ctx context.Context, id string, name string, adminUser string, serverID string, projects []string) (Org, error)
 	TouchOrg(ctx context.Context, id string, serverID string) (Org, error)
 
-	InsertUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, connector, automateUserID string, isServerAdmin bool) (User, error)
+	InsertUser(ctx context.Context, user User) (User, error)
 	GetUser(ctx context.Context, id string) (User, error)
-	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, connector, automateUserID string, isServerAdmin bool) (User, error)
-	DeleteUser(ctx context.Context, id string) (User, error)
+	EditUser(ctx context.Context, user User) (User, error)
+	DeleteUser(ctx context.Context, user User) (User, error)
 
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
 	GetAutomateOrgUsers(ctx context.Context, orgId string) ([]OrgUser, error)
@@ -121,7 +121,6 @@ type User struct {
 	ID                  string
 	ServerID            string
 	InfraServerUsername string
-	CredentialID        string
 	Connector           string
 	Email               string
 	DisplayName         string
