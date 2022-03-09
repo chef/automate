@@ -1,14 +1,14 @@
 +++
-title = "High Availability"
+title = "Chef Automate High Availability"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "High Availability"
-    parent = "automate/install"
-    identifier = "automate/install/ha.md High Availability"
+    title = "Chef Automate High Availability"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha.md Chef Automate High Availability"
     weight = 10
 +++
 
@@ -20,7 +20,7 @@ HA simply means the application remains available with no interruption. We achie
 
 Thus, HA is designed to avoid loss of service by reducing or managing failures and minimizing unscheduled downtime (when your system or network is not available for use or is unresponsive) that happens due to power outages or failure of a component.
 
-*This para required* \-- ? "Availability" includes two periods of time: how much time a service is accessible and how much time the system needs to respond to user requests. When it comes to measuring availability, several factors are salient. These include recovery time and both scheduled and unscheduled maintenance periods. Typically, availability as a whole is expressed as a percentage of uptime defined by service level agreements (SLAs). A score of 100 percent characterizes a system that never fails or experiences zero downtime by being 100% operational.
+"Availability" includes two periods of time: how much time a service is accessible and how much time the system needs to respond to user requests. When it comes to measuring availability, several factors are salient. These include recovery time and both scheduled and unscheduled maintenance periods. Typically, availability as a whole is expressed as a percentage of uptime defined by service level agreements (SLAs). A score of 100 percent characterizes a system that never fails or experiences zero downtime by being 100% operational.
 
 ## What are High Availability (HA) clusters?
 

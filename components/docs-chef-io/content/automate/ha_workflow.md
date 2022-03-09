@@ -1,14 +1,14 @@
 +++
 title = "Deployment Workflows"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Deployment Workflows"
-    parent = "automate/install/ha"
-    identifier = "automate/install/ha_workflow.md Deployment Workflows"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha_workflow.md Deployment Workflows"
     weight = 30
 +++
 

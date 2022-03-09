@@ -1,14 +1,14 @@
 +++
 title = "FAQs"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "FAQs"
-    parent = "automate/install/ha"
-    identifier = "automate/install/ha_faq.md FAQs"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha_faq.md FAQs"
     weight = 100
 +++
 
@@ -141,7 +141,7 @@ Do the following steps when you face this issue:
 
 ```bash
 
-rm -rf /hab && cd /var/tmp && rm -rf
+rm –rf /hab && cd /var/tmp && rm –rf
 
 sudo kill -9 $(sudo lsof -t -i:9631)
 

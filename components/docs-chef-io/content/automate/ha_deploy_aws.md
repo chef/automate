@@ -1,15 +1,15 @@
 +++
-title = "AWS Deployment"
+title = "High Availability Provisioning Using AWS"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "AWS Deployment"
-    parent = "automate/install/ha"
-    identifier = "automate/install/ha_deploy_aws.md AWS Deployment"
+    title = "High Availability Provisioning Using AWS"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha_deploy_aws.md High Availability Provisioning Using AWS"
     weight = 50
 +++
 
@@ -97,7 +97,7 @@ Follow these steps to deploy Chef Automate High Availability (HA) on AWS (Amazon
    - Enter the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes the value `1`.
    - Ensure not to change the cluster number value as `1` for PostgreSQL and ElasticSearch.
    - Ensure the instance type supports the respective AWS region, volume type, size, and iops.
-  
+
     {{< figure src="/images/automate/ha_aws_lb.png" alt="Load Balancer Details">}}
 
     {{< figure src="/images/automate/ha_aws_lb1.png" alt="Load Balancer and DNS Details in AWS">}}

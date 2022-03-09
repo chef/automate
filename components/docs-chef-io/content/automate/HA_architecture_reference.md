@@ -1,15 +1,15 @@
 +++
-title = "Architecture and Components"
+title = "High Availability Architecture"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Architecture and Components"
-    parent = "automate/install/ha"
-    identifier = "automate/install/ha_architecture_reference.md Architecture and Components"
+    title = "High Availability Architecture"
+    parent = "automate/install/high_availability"
+    identifier = "automate/install/high_availability/ha_architecture_reference.md High Availability Architecture"
     weight = 20
 +++
 
@@ -50,11 +50,11 @@ The backend and frontend clusters comprise **four** different servers with HA mo
 
 <!-- ! -- These four components reside in a VPC under one network in AWS. Every node sits on a specific machine irrespective of a database. Single database for all three nodes of automate. -->
 
-{{ note >}}
+{{< note >}}
 
 Elastic Search internally manages the communication and backup and does not follow any leader-follower strategy.
 
-{{ /note >}}
+{{< /note >}}
 
 ### Deployment Methods
 
