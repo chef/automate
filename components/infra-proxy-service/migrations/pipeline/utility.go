@@ -21,36 +21,24 @@ import (
 )
 
 // StoreOrgs reads the Result struct and populate the orgs table
-func StoreOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, authzProjectClient authz.ProjectsServiceClient, res pipeline.Result) (pipeline.Result, error) {
+func StoreOrgs(ctx context.Context, st storage.Storage, authzProjectClient authz.ProjectsServiceClient, res pipeline.Result) (pipeline.Result, error) {
 	var err error
-	var msg string
-	var totalSucceeded, totalSkipped, totalFailed int64
-	_, err = mst.StartOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID)
-	if err != nil {
-		return res, err
-	}
+
 	log.Info("Starting the organization migration phase for migration id: ", res.Meta.MigrationID)
 	for _, org := range res.ParsedResult.Orgs {
+		if org.ActionOps == pipeline.Skip {
+			res.ParsedResult.OrgsCount.Skipped++
+			continue
+		}
 		err, _ = StoreOrg(ctx, st, org, res.Meta.ServerID, authzProjectClient)
 		if err != nil {
-			totalFailed++
-			msg = err.Error()
+			res.ParsedResult.OrgsCount.Failed++
 			continue
 		}
-		if org.ActionOps == pipeline.Skip {
-			totalSkipped++
-			continue
-		}
-		totalSucceeded++
+		res.ParsedResult.OrgsCount.Succeeded++
 	}
-	if len(res.ParsedResult.Orgs) == int(totalFailed) {
+	if len(res.ParsedResult.Orgs) == int(res.ParsedResult.OrgsCount.Failed) {
 		log.Errorf("Failed to migrate orgs for migration id %s : %s", res.Meta.MigrationID, err.Error())
-		_, _ = mst.FailedOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, msg, totalSucceeded, totalSkipped, totalFailed)
-		return res, err
-	}
-	_, err = mst.CompleteOrgMigration(ctx, res.Meta.MigrationID, res.Meta.ServerID, totalSucceeded, totalSkipped, totalFailed)
-	if err != nil {
-		log.Errorf("Failed to update the status for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		return res, err
 	}
 	log.Info("Successfully completed the organization migration phase for migration id: ", res.Meta.MigrationID)
@@ -104,42 +92,29 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	var err error
 	log.Info("Starting with organization parsing phase for migration id: ", result.Meta.MigrationID)
-	_, err = mst.StartOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	if err != nil {
-		log.Errorf("Failed to update the status for start org parssing for the migration id path %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
-	}
+
 	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
 	folder, err := os.Open(orgPath)
 	if err != nil {
 		log.Errorf("Failed to open the folder for the file path %s : %s", orgPath, err.Error())
-		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	orgNames, err := folder.Readdir(0)
 	if err != nil {
 		log.Errorf("Failed to read the files for the file path %s : %s", orgPath, err.Error())
-		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 	_ = folder.Close()
 	orgsPresentInDB, err := st.GetOrgs(ctx, result.Meta.ServerID)
 	if err != nil {
 		log.Errorf("Failed to read orgs from database for %s:%s", result.Meta.ServerID, err.Error())
-		_, _ = mst.FailedOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	result.ParsedResult.Orgs = append(result.ParsedResult.Orgs, insertOrUpdateOrg(orgNames, orgsPresentInDB, orgPath)...)
 
 	result.ParsedResult.Orgs = append(result.ParsedResult.Orgs, deleteOrgsIfNotPresentInCurrentFile(orgNames, orgsPresentInDB)...)
-
-	_, err = mst.CompleteOrgParsing(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
-	if err != nil {
-		log.Errorf("Failed to update the complete status while parsing for migration id %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
-	}
 
 	log.Info("Successfully completed the organization parsing phase for migration id: ", result.Meta.MigrationID)
 	return result, nil
@@ -150,28 +125,15 @@ func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationSto
 func CreatePreview(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
 	log.Info("Starting with create preview phase for migration id: ", result.Meta.MigrationID)
 
-	_, err := mst.StartCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID)
-	if err != nil {
-		log.Errorf("Failed to update the status for create preview for the migration id  %s : %s", result.Meta.MigrationID, err.Error())
-		return result, err
-	}
-
 	resultByte, err := json.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal the staged data for the migration id %s : %s", result.Meta.MigrationID, err.Error())
-		_, _ = mst.FailedCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
 		return result, err
 	}
 
 	_, err = mst.StoreMigrationStage(ctx, result.Meta.MigrationID, resultByte)
 	if err != nil {
 		log.Errorf("Failed to store the staged data %s : %s ", result.Meta.MigrationID, err.Error())
-		_, _ = mst.FailedCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, err.Error(), 0, 0, 0)
-		return result, err
-	}
-	_, err = mst.CompleteCreatePreview(ctx, result.Meta.MigrationID, result.Meta.ServerID, 0, 0, 0)
-	if err != nil {
-		log.Errorf("Failed to update the complete status while creating preview for migration id %s : %s", result.Meta.MigrationID, err.Error())
 		return result, err
 	}
 	log.Info("Successfully completed the create preview phase for migration id: ", result.Meta.MigrationID)
@@ -377,29 +339,34 @@ func ParseOrgUserAssociation(ctx context.Context, st storage.Storage, result pip
 
 func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeline.Result) ([]pipeline.OrgsUsersAssociations, error) {
 	orgUserAssociations := make([]pipeline.OrgsUsersAssociations, 0)
-	var userAssociations []pipeline.UserAssociation
 	orgPath := path.Join(result.Meta.UnzipFolder, "organizations")
 	for _, org := range result.ParsedResult.Orgs {
+		var userAssociations []pipeline.UserAssociation
 		log.Info("Getting actions for org id", org.Name)
-		chefServerOrgUsers, err := getChefServerOrgUsers(org.Name, orgPath)
-		if err != nil {
-			log.Errorf("Unable to get the chef server organization users %s ", err)
-			return nil, err
+		var chefServerOrgUsers []pipeline.UserAssociation
+		// check whether org directory exist or not
+		if _, err := os.Stat(path.Join(orgPath, org.Name)); !os.IsNotExist(err) {
+			chefServerOrgUsers, err = getChefServerOrgUsers(org.Name, orgPath)
+			if err != nil {
+				log.Errorf("Unable to get the chef server organization users %s ", err)
+				return nil, err
+			}
 		}
 		if org.ActionOps == pipeline.Insert {
 			userAssociations = append(userAssociations, createInsertUserAssociation(chefServerOrgUsers)...)
+			orgUserAssociations = append(orgUserAssociations, pipeline.OrgsUsersAssociations{OrgName: org, Users: userAssociations})
+			continue
+		}
+		orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
+		if err != nil {
+			log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
+			return nil, err
+		}
+		if org.ActionOps == pipeline.Delete {
+			userAssociations = append(userAssociations, createDeleteUserAssociation(orgUsersInDb)...)
 		} else {
-			if org.ActionOps == pipeline.Delete {
-				userAssociations = append(userAssociations, createDeleteUserAssociation(chefServerOrgUsers)...)
-			} else {
-				orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
-				if err != nil {
-					log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
-					return nil, err
-				}
-				userAssociations = append(userAssociations, insertOrUpdateActionForOrgUsers(orgUsersInDb, chefServerOrgUsers)...)
-				userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, chefServerOrgUsers)...)
-			}
+			userAssociations = append(userAssociations, insertOrUpdateActionForOrgUsers(orgUsersInDb, chefServerOrgUsers)...)
+			userAssociations = append(userAssociations, deleteActionForOrgUses(orgUsersInDb, chefServerOrgUsers)...)
 		}
 		orgUserAssociations = append(orgUserAssociations, pipeline.OrgsUsersAssociations{OrgName: org, Users: userAssociations})
 	}
@@ -414,10 +381,10 @@ func createInsertUserAssociation(chefServerOrgUsers []pipeline.UserAssociation) 
 	return userAssociation
 }
 
-func createDeleteUserAssociation(chefServerOrgUsers []pipeline.UserAssociation) []pipeline.UserAssociation {
+func createDeleteUserAssociation(orgUsersInDb []storage.OrgUser) []pipeline.UserAssociation {
 	userAssociation := make([]pipeline.UserAssociation, 0)
-	for _, user := range chefServerOrgUsers {
-		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.Username, IsAdmin: user.IsAdmin, ActionOps: pipeline.Delete})
+	for _, user := range orgUsersInDb {
+		userAssociation = append(userAssociation, pipeline.UserAssociation{Username: user.InfraServerUsername, IsAdmin: user.IsAdmin, ActionOps: pipeline.Delete})
 	}
 	return userAssociation
 }
@@ -737,4 +704,60 @@ func createLocalUser(ctx context.Context, localUserClient local_user.UsersMgmtSe
 		return err
 	}
 	return nil
+}
+
+// StoreOrgsUsersAssociation  populate the users association with orgs based on the actions
+func StoreOrgsUsersAssociation(ctx context.Context, st storage.Storage, result pipeline.Result) (pipeline.Result, error) {
+	log.Info("Starting with the storing org user association for migration id :", result.Meta.MigrationID)
+
+	var err error
+	var totalUsers int64
+	selectedUsersMap := createMapForUsers(result.ParsedResult.Users)
+	for _, orgUsers := range result.ParsedResult.OrgsUsers {
+		for _, orgUserAssociation := range orgUsers.Users {
+			if _, keyPresent := selectedUsersMap[orgUserAssociation.Username]; keyPresent {
+				totalUsers++
+				if orgUserAssociation.ActionOps == pipeline.Skip {
+					result.ParsedResult.OrgsUsersAssociationsCount.Skipped++
+					continue
+				}
+				err, _ = storeOrgUserAssociation(ctx, st, result.Meta.ServerID, orgUsers.OrgName.Name, orgUserAssociation)
+				if err != nil {
+					log.Errorf("Failed to migrate org user %s of org %s for migration id %s : %s", orgUserAssociation.Username, orgUsers.OrgName.Name, result.Meta.MigrationID, err.Error())
+					result.ParsedResult.OrgsUsersAssociationsCount.Failed++
+					continue
+				}
+				result.ParsedResult.OrgsUsersAssociationsCount.Succeeded++
+			}
+		}
+	}
+	if totalUsers == result.ParsedResult.OrgsUsersAssociationsCount.Failed {
+		return result, err
+	}
+	log.Info("Completed with the storing org user association for migration id :", result.Meta.MigrationID)
+	return result, nil
+}
+
+func createMapForUsers(users []pipeline.User) map[string]string {
+	usersMap := make(map[string]string)
+	for _, user := range users {
+		usersMap[user.Username] = ""
+	}
+	return usersMap
+}
+
+// storeOrgUserAssociation stores a single Org user into DB
+func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID string, orgID string, orgUserAssociation pipeline.UserAssociation) (error, pipeline.ActionOps) {
+	var actionTaken pipeline.ActionOps
+	var err error
+	switch actionTaken = orgUserAssociation.ActionOps; orgUserAssociation.ActionOps {
+	case pipeline.Insert:
+		_, err = st.StoreOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
+	case pipeline.Delete:
+		_, err = st.DeleteOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
+	case pipeline.Update:
+		_, err = st.EditOrgUserAssociation(ctx, serverID, orgID, orgUserAssociation.Username, orgUserAssociation.IsAdmin)
+	default:
+	}
+	return err, actionTaken
 }
