@@ -1,14 +1,14 @@
 +++
-title = "HA FAQs"
+title = "FAQs"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA FAQs"
+    title = "FAQs"
     parent = "automate/install/high_availability"
-    identifier = "automate/install/high_availability/ha_faq.md HA FAQs"
+    identifier = "automate/install/high_availability/ha_faq.md FAQs"
     weight = 100
 +++
 
