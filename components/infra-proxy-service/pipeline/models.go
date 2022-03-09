@@ -53,11 +53,17 @@ type ParsedResult struct {
 	// Orgs array
 	Orgs []Org `json:"orgs"`
 
+	//Counts for total,skipped and failed orgs
+	OrgsCount Counts `json:"orgs_count"`
+
 	// Users array
 	Users []User `json:"users"`
 
 	// OrgsUsers for Orgs and Users associations
 	OrgsUsers []OrgsUsersAssociations `json:"orgs_users_associations"`
+
+	//Counts for total,skipped and failed orgs users associations
+	OrgsUsersAssociationsCount Counts `json:"orgs_users_associations_count"`
 }
 
 // OrgsUsersAssociations
@@ -161,7 +167,7 @@ type UsersJson struct {
 }
 
 type Counts struct {
-	Succeeded int `json:"total_succeeded"`
-	Failed    int `json:"total_failed"`
-	Skipped   int `json:"total_skipped"`
+	Succeeded int64 `json:"total_succeeded"`
+	Failed    int64 `json:"total_failed"`
+	Skipped   int64 `json:"total_skipped"`
 }
