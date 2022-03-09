@@ -264,14 +264,14 @@ module "chef_server" {
   teams_port                      = var.teams_port
 }
 
-module "token_generation" {
-  source                        = "./modules/token_generation"
+module "add_chef_server_to_a2_ui" {
+  source                        = "./modules/add_chef_server_to_a2_ui"
   private_ips                     = var.existing_automate_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
-  automate_fqdn                   = var.automate_fqdn
+  automate-fqdn                   = var.automate_fqdn
   chef_ips                        = var.existing_chef_server_private_ips
   
   depends_on = [module.chef_server]
