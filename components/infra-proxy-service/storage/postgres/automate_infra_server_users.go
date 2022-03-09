@@ -119,8 +119,8 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 
 	for rows.Next() {
 		user := storage.User{}
-		if err := rows.Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector,
-			&user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.Connector,
+			&user.AutomateUserID, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -147,7 +147,7 @@ func (p *postgres) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]sto
 
 	for rows.Next() {
 		orgUser := storage.OrgUser{}
-		if err := rows.Scan(&orgUser.OrgId, &orgUser.IsAdmin, &orgUser.InfraServerUsername); err != nil {
+		if err := rows.Scan(&orgUser.OrgID, &orgUser.IsAdmin, &orgUser.InfraServerUsername); err != nil {
 			return nil, err
 		}
 		orgUsers = append(orgUsers, orgUser)
@@ -196,10 +196,10 @@ func (p *postgres) insertOrgUserAssociation(ctx context.Context, serverID, orgID
 		org_id, user_id, 
 		is_admin, 
 		created_at,updated_at)
-		VALUES ($1, SELECT id from users where infra_server_username=$2 and server_id=$3, $4, $5, $5)
+		VALUES ($1, (SELECT id from users where infra_server_username=$2 and server_id=$3), $4, $5, $5)
 		RETURNING id, org_id, user_id, is_admin, created_at, updated_at`,
 		orgID, username, serverID, isAdmin, nowTime).
-		Scan(&orgUser.ID, &orgUser.OrgId, &orgUser.UserID, &orgUser.IsAdmin, &orgUser.CreatedAt, &orgUser.UpdatedAt)
+		Scan(&orgUser.ID, &orgUser.OrgID, &orgUser.UserID, &orgUser.IsAdmin, &orgUser.CreatedAt, &orgUser.UpdatedAt)
 	if err != nil {
 		return storage.OrgUser{}, p.processError(err)
 	}
@@ -218,10 +218,10 @@ func (p *postgres) updateOrgUserAssociation(ctx context.Context, serverID, orgID
 		`UPDATE org_users SET 
 		is_admin = $1, 
 		updated_at= $2
-		WHERE org_id=$3 and user_id = SELECT id FROM users u WHERE u.infra_server_username=$4 and u.server_id=$5
+		WHERE org_id=$3 and user_id = (SELECT id FROM users u WHERE u.infra_server_username=$4 and u.server_id=$5)
 		RETURNING id, org_id, user_id, is_admin, created_at, updated_at`,
 		isAdmin, nowTime, orgID, username, serverID).
-		Scan(&orgUser.ID, &orgUser.OrgId, &orgUser.UserID, &orgUser.IsAdmin, &orgUser.CreatedAt, &orgUser.UpdatedAt)
+		Scan(&orgUser.ID, &orgUser.OrgID, &orgUser.UserID, &orgUser.IsAdmin, &orgUser.CreatedAt, &orgUser.UpdatedAt)
 	if err != nil {
 		return storage.OrgUser{}, p.processError(err)
 	}
@@ -237,10 +237,10 @@ func (p *postgres) deleteOrgUserAssociation(ctx context.Context, serverID, orgID
 	var orgUser storage.OrgUser
 	err := p.db.QueryRowContext(ctx,
 		`DELETE FROM org_users 
-		WHERE org_id=$1 and user_id = SELECT id FROM users u WHERE u.infra_server_username=$2 and u.server_id=$3
+		WHERE org_id=$1 and user_id = (SELECT id FROM users u WHERE u.infra_server_username=$2 and u.server_id=$3)
 		RETURNING id, org_id, user_id, is_admin, created_at, updated_at`,
 		orgID, username, serverID).
-		Scan(&orgUser.ID, &orgUser.OrgId, &orgUser.UserID, &orgUser.IsAdmin, &orgUser.CreatedAt, &orgUser.UpdatedAt)
+		Scan(&orgUser.ID, &orgUser.OrgID, &orgUser.UserID, &orgUser.IsAdmin, &orgUser.CreatedAt, &orgUser.UpdatedAt)
 	if err != nil {
 		return storage.OrgUser{}, p.processError(err)
 	}

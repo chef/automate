@@ -322,3 +322,39 @@ func TestCreateNewUserInAutomate(t *testing.T) {
 	}
 
 }
+
+func TestStoreOrgUserAssociation(t *testing.T) {
+	type args struct {
+		ctx                context.Context
+		st                 storage.Storage
+		serverID           string
+		orgID              string
+		orgUserAssociation pipeline.UserAssociation
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  error
+		want1 pipeline.ActionOps
+	}{
+		{name: "Test Delete Org user association", args: args{ctx: context.Background(), st: &testDB.TestDB{}, orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: false, ActionOps: pipeline.Delete}, serverID: "server1", orgID: "org1"}, want: nil, want1: pipeline.Delete},
+		{name: "Test Store Org user association", args: args{ctx: context.Background(), st: &testDB.TestDB{}, orgUserAssociation: pipeline.UserAssociation{Username: "user2", IsAdmin: true, ActionOps: pipeline.Insert}, serverID: "server1", orgID: "org1"}, want: nil, want1: pipeline.Insert},
+		{name: "Test Edit Org user association", args: args{ctx: context.Background(), st: &testDB.TestDB{}, orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: true, ActionOps: pipeline.Update}, serverID: "server1", orgID: "org1"}, want: nil, want1: pipeline.Update},
+		{name: "Test Error from Delete Org user association", args: args{ctx: context.Background(), st: &testDB.TestDB{NeedError: true}, orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: false, ActionOps: pipeline.Delete}, serverID: "server1", orgID: "org1"}, want: errors.New("failed to delete org user association"), want1: pipeline.Delete},
+		{name: "Test Error from Store Org user association", args: args{ctx: context.Background(), st: &testDB.TestDB{NeedError: true}, orgUserAssociation: pipeline.UserAssociation{Username: "user2", IsAdmin: true, ActionOps: pipeline.Insert}, serverID: "server1", orgID: "org1"}, want: errors.New("failed to store org user association"), want1: pipeline.Insert},
+		{name: "Test Error from Edit Org user association", args: args{ctx: context.Background(), st: &testDB.TestDB{NeedError: true}, orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: true, ActionOps: pipeline.Update}, serverID: "server1", orgID: "org1"}, want: errors.New("failed to edit org user association"), want1: pipeline.Update},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, got1 := storeOrgUserAssociation(tt.args.ctx, tt.args.st, tt.args.serverID, tt.args.orgID, tt.args.orgUserAssociation)
+			if got != nil && got.Error() != tt.want.Error() {
+				t.Errorf("storeOrgUserAssociation() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("storeOrgUserAssociation() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+
+	}
+}
