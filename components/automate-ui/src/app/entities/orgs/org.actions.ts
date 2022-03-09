@@ -30,7 +30,10 @@ export enum OrgActionTypes {
   GET_PREVIEW_DATA_FAILURE = 'ORGS::GET_PREVIEW_DATA::FAILURE',
   CONFIRM_PREVIEW          = 'ORGS::CONFIRM_PREVIEW',
   CONFIRM_PREVIEW_SUCCESS  = 'ORGS::CONFIRM_PREVIEW::SUCCESS',
-  CONFIRM_PREVIEW_FAILURE  = 'ORGS::CONFIRM_PREVIEW::FAILURE'
+  CONFIRM_PREVIEW_FAILURE  = 'ORGS::CONFIRM_PREVIEW::FAILURE',
+  CHECK_USER               = 'ORGS::CHECK_USER',
+  CHECK_USER_SUCCESS       = 'ORGS::CHECK_USER::SUCCESS',
+  CHECK_USER_FAILURE       = 'ORGS::CHECK_USER::FAILURE'
 }
 
 export interface OrgSuccessPayload {
@@ -227,6 +230,32 @@ export class ConfirmPreviewFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface CheckUserPayload {
+  user: {
+    name: string;
+    id: string;
+    membership_id: string;
+  };
+}
+
+export class CheckUser implements Action {
+  readonly type = OrgActionTypes.CHECK_USER;
+
+  constructor(public payload: { user: string}) { }
+}
+
+export class CheckUserSuccess implements Action {
+  readonly type = OrgActionTypes.CHECK_USER_SUCCESS;
+
+  constructor(public paylode: CheckUserPayload) { }
+}
+
+export class CheckUserFailure implements Action {
+  readonly type = OrgActionTypes.CHECK_USER_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type OrgActions =
   | GetOrgs
   | GetOrgsSuccess
@@ -254,4 +283,7 @@ export type OrgActions =
   | GetPreviewDataFailure
   | ConfirmPreview
   | ConfirmPreviewSuccess
-  | ConfirmPreviewFailure;
+  | ConfirmPreviewFailure
+  | CheckUser
+  | CheckUserSuccess
+  | CheckUserFailure;
