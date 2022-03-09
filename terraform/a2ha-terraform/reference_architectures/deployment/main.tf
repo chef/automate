@@ -218,6 +218,7 @@ module "habitat-chef_server" {
 
 module "elasticsearch" {
   source                       = "./modules/elasticsearch"
+  count                        = var.setup_managed_services ? 0 : 1
   airgap_info                  = var.setup_managed_services ? "" : module.airgap_bundle-elasticsearch.airgap_info
   backend_aib_dest_file        = var.backend_aib_dest_file
   backend_aib_local_file       = var.backend_aib_local_file
