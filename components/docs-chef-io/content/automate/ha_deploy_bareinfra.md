@@ -1,5 +1,5 @@
 +++
-title = "On-premise Deployment Model"
+title = "On-Premises Deployment Model"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On-premise Deployment Model"
+    title = "On-Premises Deployment Model"
     parent = "automate/install"
-    identifier = "automate/install/install/high_availability/on_premise_deployment/ha_deploy_bareinfra.md On-premise Deployment Model"
+    identifier = "automate/install/install/high_availability/on_premises_deployment/ha_deploy_bareinfra.md On-Premises Deployment Model"
     weight = 200
 +++
 
