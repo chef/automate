@@ -1369,7 +1369,7 @@ func (s *server) doConverge(
 			if err != nil {
 				errHandler(err)
 			}
-			err = ci.CreatePostChecklistFile()
+			err = ci.CreatePostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 			if err != nil {
 				errHandler(err)
 			}
@@ -1940,10 +1940,9 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 			return nil, status.Errorf(codes.InvalidArgument, "Failed to get post checklist manager: %s", err)
 		}
 
-		ReadPendingPostChecklist, err = pcm.ReadPendingPostChecklistFile()
+		ReadPendingPostChecklist, err = pcm.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 		if err != nil {
-			logrus.Info("Failed to read pending post checklist:", err)
-			return nil, nil
+			return nil, err
 		}
 
 	}
