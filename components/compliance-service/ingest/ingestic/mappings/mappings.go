@@ -30,7 +30,7 @@ const (
 	ComplianceCurrentTimeSeriesIndicesVersion = "7"
 	//ComplianceCurrentProfilesIndicesVersion allows us to know, for any version of compliance, what level we are at with our profiles and profiles-mappings indices
 	ComplianceCurrentProfilesIndicesVersion = "3"
-	ComplianceCurrentRunInfoVersion         = "1"
+	ComplianceCurrentRunInfoVersion         = "2"
 
 	compAndVersionTimeSeries = "comp-" + ComplianceCurrentTimeSeriesIndicesVersion
 	compAndVersionProfiles   = "comp-" + ComplianceCurrentProfilesIndicesVersion

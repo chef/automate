@@ -8,6 +8,11 @@ import { EditInfraNodeModalComponent } from './edit-infra-node-modal.component';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { UpdateNodeSuccess } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('EditInfraNodeModalComponent', () => {
   let component: EditInfraNodeModalComponent;
@@ -28,6 +33,7 @@ describe('EditInfraNodeModalComponent', () => {
         EditInfraNodeModalComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         HttpClient, HttpHandler
       ],
       imports: [

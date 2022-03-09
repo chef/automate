@@ -72,7 +72,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
 	c.V1.Sys.Ngx.Http.SslCiphers = w.String(ac.InternalCipherSuite)
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
-	c.V1.Sys.Ngx.Http.ProxyReadTimeout = w.Int32(600)
+	c.V1.Sys.Ngx.Http.ProxyReadTimeout = w.Int32(7200)
 	c.V1.Sys.Ngx.Http.ProxySendTimeout = w.Int32(600)
 	c.V1.Sys.Ngx.Http.ProxySetHeaderHost = w.String("$http_host")
 

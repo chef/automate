@@ -460,7 +460,7 @@ func TestCallbackHandler(t *testing.T) {
 			resp := w.Result()
 
 			require.Equal(t, http.StatusSeeOther, resp.StatusCode)
-			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState))
+			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#state=%s", clientState))
 
 			// this process gives us a new session id, so we just check that the old one
 			// is no more, and find new one
@@ -525,7 +525,7 @@ func TestCallbackHandler(t *testing.T) {
 			resp := w.Result()
 
 			require.Equal(t, http.StatusSeeOther, resp.StatusCode)
-			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState))
+			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#state=%s", clientState))
 
 			// this process gives us a new session id, so we just check that the old one
 			// is no more, and find new one
@@ -585,7 +585,7 @@ func TestCallbackHandler(t *testing.T) {
 			resp := w.Result()
 
 			require.Equal(t, http.StatusSeeOther, resp.StatusCode)
-			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState1))
+			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#state=%s", clientState1))
 
 			// this process gives us a new session id, so we just check that the old one
 			// is no more, and find new one

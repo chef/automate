@@ -12,6 +12,18 @@ aws_tags    = {
 <% if config.aws.ssh_key_pair_name %>
 aws_ssh_key_pair_name = "<%= config.aws.ssh_key_pair_name %>"
 <% end %>
+
+setup_managed_services = <%= config.aws.setup_managed_services %>
+managed_elasticsearch_domain_url = "<%= config.aws.managed_elasticsearch_domain_url %>"
+managed_elasticsearch_username = "<%= config.aws.managed_elasticsearch_username %>"
+managed_elasticsearch_user_password = "<%= config.aws.managed_elasticsearch_user_password %>"
+managed_elasticsearch_certificate = "<%= config.aws.managed_elasticsearch_certificate %>"
+managed_rds_instance_url = "<%= config.aws.managed_rds_instance_url %>"
+managed_rds_superuser_username = "<%= config.aws.managed_rds_superuser_username %>"
+managed_rds_superuser_password = "<%= config.aws.managed_rds_superuser_password %>"
+managed_rds_dbuser_username = "<%= config.aws.managed_rds_dbuser_username %>"
+managed_rds_dbuser_password = "<%= config.aws.managed_rds_dbuser_password %>"
+managed_rds_certificate = "<%= config.aws.managed_rds_certificate %>"
 <% if config.aws.ami_filter_name %>
 ami_filter_name = "<%= config.aws.ami_filter_name %>"
 <% end %>
@@ -23,6 +35,9 @@ ami_filter_owner = "<%= config.aws.ami_filter_owner %>"
 <% end %>
 <% if config.aws.ami_id %>
 aws_ami_id = "<%= config.aws.ami_id %>"
+<% end %>
+<% if config.aws.lb_access_logs %>
+lb_access_logs = "<%= config.aws.lb_access_logs %>"
 <% end %>
 <% if config.aws.automate_lb_certificate_arn %>
 automate_lb_certificate_arn = "<%= config.aws.automate_lb_certificate_arn %>"

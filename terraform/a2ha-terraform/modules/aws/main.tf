@@ -1,7 +1,6 @@
 provider "aws" {
-  region                  = var.aws_region
-  profile                 = var.aws_profile
-  shared_credentials_file = "~/.aws/credentials"
+  region                   = var.aws_region
+  profile                  = var.aws_profile
 }
 
 resource "random_id" "random" {
@@ -92,6 +91,7 @@ resource "aws_route_table_association" "publicsubnet" {
 
 resource "aws_efs_file_system" "backups" {
   creation_token = "${var.tag_name}_${random_id.random.hex}_efsfs"
+  encrypted = true
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efsfs"))
 }
