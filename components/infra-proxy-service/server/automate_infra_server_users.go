@@ -33,7 +33,6 @@ func fromStorageAutomateInfraServerUser(u storage.User) *response.AutomateInfraS
 		Id:                  u.ID,
 		ServerId:            u.ServerID,
 		InfraServerUsername: u.InfraServerUsername,
-		CredentialId:        u.CredentialID,
 		Connector:           u.Connector,
 		AutomateUserId:      u.AutomateUserID,
 		IsServerAdmin:       u.IsServerAdmin,

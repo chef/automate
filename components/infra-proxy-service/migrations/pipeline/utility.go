@@ -583,16 +583,16 @@ func keyDumpTOUser(keyDump []pipeline.KeyDump) []pipeline.User {
 
 func automateMap(automateUser []storage.User) map[string]storage.User {
 	automateMap := map[string]storage.User{}
-	for _, auser := range automateUser {
-		automateMap[auser.InfraServerUsername] = auser
+	for _, aUser := range automateUser {
+		automateMap[aUser.InfraServerUsername] = aUser
 	}
 	return automateMap
 }
 
 func serverMap(server []pipeline.User) map[string]pipeline.User {
 	serverMap := map[string]pipeline.User{}
-	for _, auser := range server {
-		serverMap[auser.Username] = auser
+	for _, sUser := range server {
+		serverMap[sUser.Username] = sUser
 	}
 	return serverMap
 }
@@ -645,7 +645,7 @@ func deleteUser(serverUser []pipeline.User, automateUser []storage.User) []pipel
 	var parsedUsers []pipeline.User
 	serverMap := serverMap(serverUser)
 	for _, aUser := range automateUser {
-		if _, ok := serverMap[aUser.InfraServerUsername]; ok {
+		if _, ok := serverMap[aUser.InfraServerUsername]; !ok {
 			parsedUsers = append(parsedUsers, pipeline.User{
 				Username:  aUser.InfraServerUsername,
 				ActionOps: pipeline.Delete,
@@ -666,29 +666,6 @@ func checkUserExist(ctx context.Context, localUserClient local_user.UsersMgmtSer
 		return false
 	}
 	return true
-}
-
-//createLocalUser Function for reference, will be removed after PopulateUsers Method
-func createLocalUsers(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, result pipeline.Result) (pipeline.Result, error) {
-	log.Info("Starting with creating local users in automate for migration id:  ", result.Meta.MigrationID)
-	var totalSucceeded, totalSkipped, totalFailed int64
-	var err error
-	for _, user := range result.ParsedResult.Users {
-		if user.Connector == pipeline.Local && user.ActionOps == pipeline.Insert && !user.IsConflicting {
-			err = createLocalUser(ctx, localUserClient, user)
-			if err != nil {
-				totalFailed++
-				continue
-			}
-		}
-		if user.ActionOps == pipeline.Skip {
-			totalSkipped++
-			continue
-		}
-		totalSucceeded++
-	}
-	log.Info("Starting with creating local users in automate for migration id:  ", result.Meta.MigrationID)
-	return result, err
 }
 
 func createLocalUser(ctx context.Context, localUserClient local_user.UsersMgmtServiceClient, user pipeline.User) error {
@@ -760,4 +737,64 @@ func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID s
 	default:
 	}
 	return err, actionTaken
+}
+
+// StoreUsers reads the Result struct and populate the users table
+func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, res pipeline.Result) (pipeline.Result, error) {
+	var err error
+
+	for _, user := range res.ParsedResult.Users {
+		if user.ActionOps == pipeline.Skip {
+			res.ParsedResult.UsersCount.Skipped++
+			continue
+		}
+		_, err = StoreUser(ctx, st, user, res.Meta.ServerID, localUserClient)
+		if err != nil {
+			res.ParsedResult.UsersCount.Failed++
+			continue
+		}
+		res.ParsedResult.UsersCount.Succeeded++
+	}
+
+	if len(res.ParsedResult.Users) == int(res.ParsedResult.UsersCount.Failed) {
+		log.Errorf("Failed to migrate user for migration id %s : %s", res.Meta.MigrationID, err.Error())
+		return res, err
+	}
+
+	log.Info("Successfully completed the user migration phase for migration id: ", res.Meta.MigrationID)
+	return res, err
+}
+
+// StoreUser stores a single User into DB
+func StoreUser(ctx context.Context, st storage.Storage, user pipeline.User, serverID string, localUserClient local_user.UsersMgmtServiceClient) (pipeline.ActionOps, error) {
+	var actionTaken pipeline.ActionOps
+	var err error
+
+	storageUser := storage.User{
+		ServerID:            serverID,
+		InfraServerUsername: user.Username,
+		Connector:           user.Connector,
+		Email:               user.Email,
+		DisplayName:         user.DisplayName,
+		FirstName:           user.FirstName,
+		LastName:            user.LastName,
+		MiddleName:          user.MiddleName,
+		AutomateUserID:      user.AutomateUsername,
+	}
+	switch actionTaken = user.ActionOps; user.ActionOps {
+	case pipeline.Insert:
+		if user.Connector == pipeline.Local {
+			err = createLocalUser(ctx, localUserClient, user)
+			if err != nil {
+				return actionTaken, err
+			}
+		}
+		_, err = st.InsertUser(ctx, storageUser)
+	case pipeline.Delete:
+		_, err = st.DeleteUser(ctx, storageUser)
+	case pipeline.Update:
+		_, err = st.EditUser(ctx, storageUser)
+	default:
+	}
+	return actionTaken, err
 }
