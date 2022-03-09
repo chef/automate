@@ -75,3 +75,8 @@ export const confirmPreviewStatus = createSelector(
   orgState,
   (state) => state.confirmPreviewStatus
 );
+
+export const checkUserStatus = createSelector(
+  orgState,
+  (state) => state.checkUserStatus
+);

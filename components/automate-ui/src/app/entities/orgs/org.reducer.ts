@@ -19,6 +19,7 @@ export interface OrgEntityState extends EntityState<Org> {
   previewStatus: EntityStatus;
   previewData: PreviewSuccessPayload;
   confirmPreviewStatus: EntityStatus;
+  checkUserStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -31,6 +32,7 @@ const UPLOAD_STATUS = 'uploadStatus';
 const CANCEL_STATUS = 'cancelStatus';
 const PREVIEW_STATUS = 'previewStatus';
 const CONFIRM_PREVIEW_STATUS = 'confirmPreviewStatus';
+const CHECK_USER_STATUS = 'checkUserStatus';
 
 export const orgEntityAdapter: EntityAdapter<Org> = createEntityAdapter<Org>();
 
@@ -46,7 +48,8 @@ export const OrgEntityInitialState: OrgEntityState =
     uploadDetails: null,
     cancelStatus: EntityStatus.notLoaded,
     previewData: null,
-    confirmPreviewStatus: EntityStatus.notLoaded
+    confirmPreviewStatus: EntityStatus.notLoaded,
+    checkUserStatus: EntityStatus.notLoaded
   });
 
 export function orgEntityReducer(
@@ -154,6 +157,15 @@ export function orgEntityReducer(
 
     case OrgActionTypes.CONFIRM_PREVIEW_FAILURE:
       return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.CHECK_USER:
+      return set(CHECK_USER_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.CHECK_USER_SUCCESS:
+        return set(CHECK_USER_STATUS, EntityStatus.loadingSuccess, state);
+
+    case OrgActionTypes.CHECK_USER_FAILURE:
+      return set(CHECK_USER_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;
