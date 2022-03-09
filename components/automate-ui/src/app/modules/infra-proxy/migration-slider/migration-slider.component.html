@@ -57,7 +57,7 @@
               </chef-tr>
             </chef-thead>
             <chef-tbody>
-              <chef-tr *ngFor="let user of previewData.users">
+              <chef-tr *ngFor="let user of previewData.users; let i = index;">
                 <chef-td class="first">
                   <chef-checkbox (change)="selectedUser($event)" [checked]="checkedUser"></chef-checkbox>
                 </chef-td>
@@ -69,13 +69,12 @@
                 </chef-td>
                 <chef-td class="middle">
                   <input 
-                    *ngIf="(user.connector === 'ldap')"
+                    *ngIf="(user.connector === 'LOCAL')"
                     chefInput
-                    formControlName="name"
+                    formControlName="{{user.automate_username}}"
                     type="text"
-                    [(ngModel)]="user.automate_username"
-                    (keyup)="handleNameInput($event)"
                     [attr.disabled]= "!user.is_conflicting"
+                    (blur)="handleName($event, i)"
                     autocomplete="off" />
                 </chef-td>
                 <chef-td class="last">
