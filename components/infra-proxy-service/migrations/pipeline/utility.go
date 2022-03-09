@@ -737,6 +737,8 @@ func storeOrgUserAssociation(ctx context.Context, st storage.Storage, serverID s
 	default:
 	}
 	return err, actionTaken
+}
+
 // StoreUsers reads the Result struct and populate the users table
 func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_user.UsersMgmtServiceClient, res pipeline.Result) (pipeline.Result, error) {
 	var err error
@@ -760,7 +762,7 @@ func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_u
 		return res, err
 	}
 	// Set the count for total Skipped, Inserted and Deleted Users
-	res.ParsedResult.UsersCount.Counts(int(totalSucceeded), int(totalFailed), int(totalSkipped))
+	res.ParsedResult.UsersCount.Counts(totalSucceeded, totalFailed, totalSkipped)
 
 	log.Info("Successfully completed the user migration phase for migration id: ", res.Meta.MigrationID)
 	return res, err

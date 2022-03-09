@@ -353,6 +353,12 @@ func TestStoreOrgUserAssociation(t *testing.T) {
 			}
 			if got1 != tt.want1 {
 				t.Errorf("storeOrgUserAssociation() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+
+	}
+}
+
 func TestStoreUser(t *testing.T) {
 	type args struct {
 		ctx             context.Context

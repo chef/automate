@@ -89,7 +89,7 @@ func createProject(result <-chan PipelineData) <-chan PipelineData {
 }
 
 // PopulateUsers returns PhaseTwoPipelineProcessor
-func PopulateUsers(service *service.Service) PhaseTwoPipelineProcessor {
+func PopulateUsersSrc(service *service.Service) PhaseTwoPipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
 		return populateUsers(result, service)
 	}
@@ -123,8 +123,8 @@ func populateUsers(result <-chan PipelineData, service *service.Service) <-chan 
 			// Successful user migration
 			_, err = service.Migration.CompleteUserMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, 0, 0, 0)
 			if err != nil {
-				res.Done <- err
 				log.Errorf("Failed to update `CompleteUserMigration` status in DB: %s :%s", res.Result.Meta.MigrationID, err)
+				res.Done <- err
 				return
 			}
 
@@ -232,9 +232,7 @@ func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipeline {
 	c := make(chan PipelineData, 100)
 	migrationTwoPipeline(c,
 		PopulateOrgsSrc(service),
-		PopulateUsers(service),
-		// CreateProject(),
-		// PopulateUsers(),
+		PopulateUsersSrc(service),
 		PopulateOrgsUsersAssociationSrc(service),
 		// PopulateMembersPolicy(),
 	)
