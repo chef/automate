@@ -181,16 +181,37 @@ func (t *TestDB) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]stora
 	}
 	if t.Type == "Skip" {
 		x = append(x, storage.OrgUser{
-			OrgId: orgId, InfraServerUsername: "user1",
+			OrgID: orgId, InfraServerUsername: "user1",
 		})
 		x = append(x, storage.OrgUser{
-			OrgId: orgId, InfraServerUsername: "user2",
+			OrgID: orgId, InfraServerUsername: "user2",
 		})
 	}
 	if t.Type == "Delete" {
 		x = append(x, storage.OrgUser{
-			OrgId: orgId, InfraServerUsername: "user1",
+			OrgID: orgId, InfraServerUsername: "user1",
 		})
 	}
 	return x, nil
+}
+
+func (t *TestDB) StoreOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (storage.OrgUser, error) {
+	if t.NeedError {
+		return storage.OrgUser{}, errors.New("failed to store org user association")
+	}
+	return storage.OrgUser{ID: 1, OrgID: orgID, UserID: 1, IsAdmin: isAdmin, InfraServerUsername: username}, nil
+}
+
+func (t *TestDB) EditOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (storage.OrgUser, error) {
+	if t.NeedError {
+		return storage.OrgUser{}, errors.New("failed to edit org user association")
+	}
+	return storage.OrgUser{ID: 1, OrgID: orgID, UserID: 1, IsAdmin: isAdmin, InfraServerUsername: username}, nil
+}
+
+func (t *TestDB) DeleteOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (storage.OrgUser, error) {
+	if t.NeedError {
+		return storage.OrgUser{}, errors.New("failed to delete org user association")
+	}
+	return storage.OrgUser{ID: 2, OrgID: orgID, UserID: 2, IsAdmin: isAdmin, InfraServerUsername: username}, nil
 }

@@ -136,7 +136,7 @@ type User struct {
 
 type OrgUser struct {
 	ID                  int
-	OrgId               string
+	OrgID               string
 	UserID              int
 	IsAdmin             bool
 	InfraServerUsername string
