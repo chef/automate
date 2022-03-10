@@ -61,6 +61,7 @@ var deployCmdFlags = struct {
 	enableWorkflow                  bool
 	products                        []string
 	bootstrapBundlePath             string
+	userAuth            bool
 }{}
 
 // deployCmd represents the new command
@@ -168,6 +169,12 @@ func newDeployCmd() *cobra.Command {
 		"bootstrap-bundle",
 		"",
 		"Path to bootstrap bundle")
+	cmd.PersistentFlags().BoolVarP(
+		&deployCmdFlags.userAuth,
+		"yes",
+		"y",
+		false,
+		"Do not prompt for confirmation; accept defaults and continue")
 
 	if !isDevMode() {
 		for _, flagName := range []string{
@@ -223,6 +230,10 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 	writer.Printf("Automate deployment non HA mode proceeding...")
+	writer.Printf("deployCmdFlags.confirmationFromUser: ", deployCmdFlags.userAuth )
+	// if deployCmdFlags.confirmationFromUser {
+  //   deployCmdFlags.acceptMLSA = deployCmdFlags.confirmationFromUser
+  // }
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
