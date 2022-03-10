@@ -1,7 +1,6 @@
 package majorupgradechecklist
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -105,10 +104,10 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExt
 				logrus.Info("Failed to update pending post checklist for external database:", err)
 			}
 		}
-		return postCmdList, nil
 	} else {
-		return nil, errors.Errorf("Failed to read checklist since version didn't match")
+		logrus.Info("Failed to read checklist since version didn't match")
 	}
+	return postCmdList, nil
 }
 
 func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string, path string) error {
