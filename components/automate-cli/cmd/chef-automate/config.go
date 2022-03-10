@@ -130,13 +130,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 
 		if !configCmdFlags.acceptMLSA {
-			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
-			this command will deploy that new airgap bundle with patching of configuration. 
-			Press y to agree, n to to disagree? [y/n]`)
+			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, this command will deploy that new airgap bundle with patching of configuration. Press y to agree, n to to disagree? [y/n]`)
 			if err != nil {
 				return err
 			}
-			
+
 			if !strings.Contains(response, "y") {
 				return errors.New("canceled Patching")
 			}
