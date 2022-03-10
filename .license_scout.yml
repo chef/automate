@@ -298,7 +298,7 @@ fallbacks:
       license_id: MIT
       license_content: https://raw.githubusercontent.com/go-ldap/ldap/master/LICENSE
     - name: github.com/tinylib/msgp
-      license_id: Go-Authors
+      license_id: MIT
       license_content: https://raw.githubusercontent.com/tinylib/msgp/master/LICENSE
     - name: golang.org/x/crypto
       license_id: BSD-3-Clause
