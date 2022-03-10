@@ -59,7 +59,7 @@ module "system-tuning-postgresql" {
 module "airgap_bundle-elasticsearch" {
   source            = "./modules/airgap_bundle"
   count             = var.setup_managed_services ? 0 : 1
-  archive_disk_info = module.system-tuning-elasticsearch.archive_disk_info
+  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-elasticsearch.archive_disk_info
   instance_count    = var.elasticsearch_instance_count
   private_ips       = var.elasticsearch_private_ips
   bundle_files = [{
@@ -149,7 +149,7 @@ module "habitat-elasticsearch" {
 module "habitat-postgresql" {
   count                           = var.setup_managed_services ? 0 : 1
   source                          = "./modules/habitat"
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql.airgap_infoo
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql.airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key
@@ -296,6 +296,12 @@ module "bootstrap_automate" {
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
   managed_elasticsearch_user_password = var.managed_elasticsearch_user_password
   managed_elasticsearch_username      = var.managed_elasticsearch_username
+  managed_rds_instance_url            = var.managed_rds_instance_url
+  managed_rds_superuser_username      = var.managed_rds_superuser_username
+  managed_rds_superuser_password      = var.managed_rds_superuser_password
+  managed_rds_dbuser_username         = var.managed_rds_dbuser_username
+  managed_rds_dbuser_password         = var.managed_rds_dbuser_password
+  managed_rds_certificate             = var.managed_rds_certificate
   postgresql_private_ips              = var.postgresql_private_ips
   postgresql_ssl_enable               = var.postgresql_ssl_enable
   private_ips                         = slice(var.automate_private_ips, 0, 1)
@@ -332,6 +338,12 @@ module "automate" {
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
   managed_elasticsearch_user_password = var.managed_elasticsearch_user_password
   managed_elasticsearch_username      = var.managed_elasticsearch_username
+  managed_rds_instance_url            = var.managed_rds_instance_url
+  managed_rds_superuser_username      = var.managed_rds_superuser_username
+  managed_rds_superuser_password      = var.managed_rds_superuser_password
+  managed_rds_dbuser_username         = var.managed_rds_dbuser_username
+  managed_rds_dbuser_password         = var.managed_rds_dbuser_password
+  managed_rds_certificate             = var.managed_rds_certificate
   postgresql_private_ips              = var.postgresql_private_ips
   postgresql_ssl_enable               = var.postgresql_ssl_enable
   private_ips = slice(
@@ -372,6 +384,12 @@ module "chef_server" {
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
   managed_elasticsearch_user_password = var.managed_elasticsearch_user_password
   managed_elasticsearch_username      = var.managed_elasticsearch_username
+  managed_rds_instance_url            = var.managed_rds_instance_url
+  managed_rds_superuser_username      = var.managed_rds_superuser_username
+  managed_rds_superuser_password      = var.managed_rds_superuser_password
+  managed_rds_dbuser_username         = var.managed_rds_dbuser_username
+  managed_rds_dbuser_password         = var.managed_rds_dbuser_password
+  managed_rds_certificate             = var.managed_rds_certificate
   postgresql_private_ips              = var.postgresql_private_ips
   postgresql_ssl_enable               = var.postgresql_ssl_enable
   private_ips                         = var.chef_server_private_ips
