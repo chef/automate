@@ -188,7 +188,6 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if err != nil {
 			return err
 		}
-		
 		if !strings.Contains(response, "y") {
 			return errors.New("canceled upgrade")
 		}

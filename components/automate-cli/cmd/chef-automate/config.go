@@ -18,7 +18,7 @@ import (
 var configCmdFlags = struct {
 	overwriteFile bool
 	timeout       int64
-	acceptMLSA		bool
+	acceptMLSA    bool
 }{}
 
 func init() {
