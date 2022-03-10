@@ -61,7 +61,7 @@ var deployCmdFlags = struct {
 	enableWorkflow                  bool
 	products                        []string
 	bootstrapBundlePath             string
-	userAuth            						bool 				// Defining new key for user's MLSA to add '-y' flag
+	userAuth                        bool
 }{}
 
 // deployCmd represents the new command
