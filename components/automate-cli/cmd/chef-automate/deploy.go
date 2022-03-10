@@ -233,9 +233,6 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 	writer.Printf("Automate deployment non HA mode proceeding...")
-	// if deployCmdFlags.confirmationFromUser {
-  //   deployCmdFlags.acceptMLSA = deployCmdFlags.confirmationFromUser
-  // }
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
