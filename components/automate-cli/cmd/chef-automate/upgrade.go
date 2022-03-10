@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -26,6 +27,7 @@ var upgradeRunCmdFlags = struct {
 	upgradebackends      bool
 	upgradeairgapbundles bool
 	skipDeploy           bool
+	acceptMLSA           bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -125,13 +127,17 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 	}
-	response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
-	if err != nil {
-		return err
-	}
-	if !strings.Contains(response, "y") {
-		return errors.New("canceled upgrade")
-	}
+
+	if !upgradeRunCmdFlags.acceptMLSA {
+		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		if err != nil {
+			return err
+		}
+		
+		if !strings.Contains(response, "y") {
+			return errors.New("canceled upgrade")
+		}
+	} 
 
 	if offlineMode {
 		writer.Title("Installing airgap install bundle")
@@ -312,6 +318,12 @@ func init() {
 		"skip-deploy",
 		false,
 		"will only upgrade and not deploy the bundle")
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.acceptMLSA,
+		"yes",
+		"y",
+		false,
+		"Do not prompt for confirmation; accept defaults and continue")
 
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
