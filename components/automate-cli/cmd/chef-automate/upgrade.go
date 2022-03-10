@@ -136,7 +136,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if !strings.Contains(response, "y") {
 			return errors.New("canceled upgrade")
 		}
-  }
+	}
 
 	if offlineMode {
 		writer.Title("Installing airgap install bundle")

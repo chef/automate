@@ -219,8 +219,8 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 			)
 		}
 		if deployCmdFlags.userAuth {
-      deployCmdFlags.acceptMLSA = deployCmdFlags.userAuth
-    }
+			deployCmdFlags.acceptMLSA = deployCmdFlags.userAuth
+		}
 		if len(deployCmdFlags.channel) > 0 && (deployCmdFlags.channel == "dev" || deployCmdFlags.channel == "current") {
 			writer.Printf("deploying with channel : %s \n", deployCmdFlags.channel)
 			args = append(args, "--"+deployCmdFlags.channel)
