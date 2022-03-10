@@ -218,6 +218,9 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 				"Merging command flag overrides into Chef Automate config failed",
 			)
 		}
+		if deployCmdFlags.userAuth {
+    	deployCmdFlags.acceptMLSA = deployCmdFlags.userAuth
+  	}
 		if len(deployCmdFlags.channel) > 0 && (deployCmdFlags.channel == "dev" || deployCmdFlags.channel == "current") {
 			writer.Printf("deploying with channel : %s \n", deployCmdFlags.channel)
 			args = append(args, "--"+deployCmdFlags.channel)
@@ -230,9 +233,6 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 	writer.Printf("Automate deployment non HA mode proceeding...")
-	// if deployCmdFlags.confirmationFromUser {
-  //   deployCmdFlags.acceptMLSA = deployCmdFlags.confirmationFromUser
-  // }
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
