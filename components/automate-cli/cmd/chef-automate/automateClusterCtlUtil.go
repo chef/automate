@@ -132,7 +132,6 @@ func tailFile(logFilePath string, executed chan struct{}) {
 
 func bootstrapEnv(dm deployManager) error {
 
-	writer.Printf("deployCmdFlags.confirmationFromUser: %s \n", deployCmdFlags.userAuth )
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
