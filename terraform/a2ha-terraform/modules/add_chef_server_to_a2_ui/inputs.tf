@@ -1,3 +1,11 @@
+variable "automate-fqdn" {
+  default = ""
+}
+
+variable "chef_ips" {
+  default = [] 
+}
+
 variable "private_ips" {
   default = []
 }
@@ -16,10 +24,3 @@ variable "sudo_cmd" {
   default = "sudo"
 }
 
-variable "chef_ips" {
-  default = [] 
-}
-
-variable "automate-fqdn" {
-  default = ""
-}
