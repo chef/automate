@@ -3,55 +3,57 @@ package mappings
 // ComplianceProfiles mapping used to create the `compliance-profiles` index
 var ComplianceProfiles = Mapping{
 	Index:      IndexNameProf,
-	Type:       DocType,
 	Timeseries: false,
 	Mapping: `
-{
-  "template": "` + IndexNameProf + `",
-  "settings": {
-    "index": {
-      "refresh_interval": "1s"
-    },
-    "analysis": {
-      "analyzer": {
-        "autocomplete": {
-          "tokenizer": "autocomplete_tokenizer",
-          "filter": [
-            "lowercase"
-          ]
-        }
+  {
+    "index_patterns": ["` + IndexNameProf + `"],
+    "settings": {
+      "index": {
+        "refresh_interval": "1s",
+        "number_of_shards": "5"
       },
-      "tokenizer": {
-        "autocomplete_tokenizer": {
-          "type": "edge_ngram",
-          "min_gram": 2,
-          "max_gram": 20,
-          "token_chars": [
-            "letter",
-            "digit"
-          ]
-        }
-      },
-      "normalizer": {
-        "case_insensitive": {
-          "type": "custom",
-          "char_filter": [],
-          "filter": ["lowercase", "asciifolding"]
+      "analysis": {
+        "analyzer": {
+          "autocomplete": {
+            "tokenizer": "autocomplete_tokenizer",
+            "filter": [
+              "lowercase"
+            ]
+          }
+        },
+        "tokenizer": {
+          "autocomplete_tokenizer": {
+            "type": "edge_ngram",
+            "min_gram": 2,
+            "max_gram": 20,
+            "token_chars": [
+              "letter",
+              "digit"
+            ]
+          }
+        },
+        "normalizer": {
+          "case_insensitive": {
+            "type": "custom",
+            "char_filter": [],
+            "filter": [
+              "lowercase",
+              "asciifolding"
+            ]
+          }
         }
       }
-    }
-  },
-  "mappings": {
-    "` + DocType + `": {
+    },
+    "mappings": {
       "properties": {
         "name": {
           "type": "keyword",
           "fields": {
-			"lower": {
-			  "normalizer": "case_insensitive",
-			  "type": "keyword"
-			}
-		  }
+            "lower": {
+              "normalizer": "case_insensitive",
+              "type": "keyword"
+            }
+          }
         },
         "title": {
           "type": "keyword",
@@ -206,6 +208,5 @@ var ComplianceProfiles = Mapping{
       }
     }
   }
-}
 	`,
 }

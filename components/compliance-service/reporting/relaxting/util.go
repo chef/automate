@@ -2,6 +2,7 @@ package relaxting
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,9 +11,9 @@ import (
 	"time"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
@@ -64,11 +65,16 @@ func (backend *ES2Backend) getHttpClient() *http.Client {
 
 func (backend *ES2Backend) ES2Client() (*elastic.Client, error) {
 	//this is now a singleton as per best practice as outlined in the comment section of the elastic.NewClient
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 	once.Do(func() {
 		esClient, err = elastic.NewClient(
-			elastic.SetHttpClient(backend.getHttpClient()),
+			elastic.SetHttpClient(client),
 			elastic.SetURL(backend.ESUrl),
 			elastic.SetSniff(false),
+			elastic.SetBasicAuth("admin", "admin"),
 		)
 	})
 	return esClient, err

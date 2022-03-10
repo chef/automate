@@ -6,12 +6,12 @@ import (
 	"net"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	libgrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
