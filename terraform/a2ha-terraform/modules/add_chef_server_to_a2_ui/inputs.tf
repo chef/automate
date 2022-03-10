@@ -23,4 +23,3 @@ variable "ssh_user_sudo_password" {
 variable "sudo_cmd" {
   default = "sudo"
 }
-
