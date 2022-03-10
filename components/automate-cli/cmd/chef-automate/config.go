@@ -18,6 +18,7 @@ import (
 var configCmdFlags = struct {
 	overwriteFile bool
 	timeout       int64
+	acceptMLSA		bool
 }{}
 
 func init() {
@@ -26,6 +27,8 @@ func init() {
 	configCmd.AddCommand(setConfigCmd)
 
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "o", false, "Overwrite existing config.toml")
+
+	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "yes", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
 
@@ -125,16 +128,20 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		then automate cluster ctl deploy will patch the config to automate
 	*/
 	if isA2HARBFileExist() {
-		response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
-		this command will deploy that new airgap bundle with patching of configuration. 
-		Press y to agree, n to to disagree? [y/n]`)
-		if err != nil {
-			return err
+
+		if !configCmdFlags.acceptMLSA {
+			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
+			this command will deploy that new airgap bundle with patching of configuration. 
+			Press y to agree, n to to disagree? [y/n]`)
+			if err != nil {
+				return err
+			}
+			
+			if !strings.Contains(response, "y") {
+				return errors.New("canceled Patching")
+			}
 		}
 
-		if !strings.Contains(response, "y") {
-			return errors.New("canceled Patching")
-		}
 		input, err := ioutil.ReadFile(args[0])
 		if err != nil {
 			return nil
