@@ -17,7 +17,7 @@ This section lists the Chef Automate High Availability (HA) components and their
 
 ## Automate-ha-cluster-ctl
 
-Provides commands such as `automate-cluster-ctl provision/deploy`, which is installed via automate-backend-deployment.
+Provides commands such as `automate-cluster-ctl provision/deploy` which is installed via automate-backend-deployment.
 
 ## Automate-ha-ctl
 
