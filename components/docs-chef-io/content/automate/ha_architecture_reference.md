@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 220
 +++
 
-The following Chef Automate HA architecture diagram shows the Chef Automate HA components that works on the **Leader-Follower** strategy. This architecture includes the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch.
+The following Chef Automate HA architecture diagram shows the Chef Automate HA components that work on the **Leader-Follower** strategy. This architecture includes the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch.
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
 
@@ -44,7 +44,7 @@ The backend and frontend clusters comprise **four** different servers with HA mo
 3. Elasticsearch - an open-source search and analytics engine based on Apache Lucene, built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and is used for indexing purposes.
 4. PostgreSQL - an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
 
-<!-- ! -- These four components reside in a VPC under one network in AWS. Every node sits on a specific machine irrespective of a database. Single database for all three nodes of automate. -->
+<!-- ! -- These four components reside in a VPC under one network in AWS. Every node sits on a specific machine irrespective of a database. Single database for all three nodes of Chef Automate. -->
 
 {{< note >}}
 
@@ -60,9 +60,9 @@ Chef Automate High Availability (HA) supports two types of deployment, which are
 
 AWS is a comprehensive, evolving cloud computing platform provided by Amazon that includes a mixture of infrastructure as a service (IaaS), platform as a service (PaaS), and packaged software as a service (SaaS) offerings. AWS services can offer an organization tools such as compute power, database storage, and content delivery services. Learn more @ <https://aws.amazon.com/what-is-cloud-computing/>.
 
-The entire Chef Automate HA infrastructure is built into the AWS cloud in AWS deployment. A standard **Terraform** script handles AWS deployment if you choose AWS as a reference architecture. This deployment terraform script first sets up all the prerequisites like creating an EC2, load balancer, security groups, subnets. Ensure you have given the existing **VPCID** for security purposes, and you have created the **CIDR** block manually based on respective **VPC**.
+In AWS deployment, the entire Chef Automate HA infrastructure is built into the AWS cloud. A standard **Terraform** script handles AWS deployment if you choose AWS as a reference architecture. This deployment terraform script first sets up all the prerequisites like creating an EC2, load balancer, security groups, subnets. Ensure you have given the existing **VPCID** for security purposes, and you have created the **CIDR** block manually based on respective **VPC**.
 
-Its a standard cloud service. Later, a series of configurations and installations follows:
+It is a standard cloud service. Later, a series of configurations and installations follows:
 
 - installing Chef Automate into the Chef Automate instances
 - installing Chef Infra Server in all chef-server instances
@@ -76,7 +76,7 @@ A **Bare Metal computer** is generally without any software (OS or applications)
 
 In cloud computing, a bare-metal server is a non-shared computer dedicated to one customer. It generally implies a non-virtual machine (VM) environment. The difference between bare metal servers and cloud servers is that a cloud server is a virtual machine while the bare metal server is a physical machine identified within a data center.
 
-Bare Metal deployments are installations of operating systems to targets that either have no operating system installed or must be re-installed without preserving any existing data or settings. You can install and manage Chef Automate HA by creating profiles for bare metal deployments.
+Bare Metal deployments are installations of operating systems to targets that either has no operating system installed or must be re-installed without preserving any existing data or settings. You can install and manage Chef Automate HA by creating profiles for bare metal deployments.
 
 Some customers already have basic network infrastructure with VMs, networks, load balancers in their environment. This environment can be on-premises or in the cloud, and the respective organizations might not want to provide access to create items like VMs. In such cases, IPs of their instances are used to set up Chef Automate HA on their network premises.
 
