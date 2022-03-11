@@ -497,6 +497,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "jayvikramsharma/automate-opensearch",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -613,7 +617,8 @@ var ProductMetadataJSON = `
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway"
+        "chef/event-gateway",
+        "jayvikramsharma/automate-opensearch"
       ],
       "packages": null,
       "dependencies": [

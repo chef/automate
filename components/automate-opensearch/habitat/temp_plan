@@ -1,0 +1,85 @@
+pkg_name="automate-opensearch"
+pkg_description="Wrapper package for core/opensearch"
+pkg_origin="chef"
+pkg_version="1.2.3"
+pkg_maintainer="Chef Software Inc. <support@chef.io>"
+pkg_license=("Chef-MLSA")
+pkg_upstream_url="https://www.chef.io/automate"
+pkg_source="https://artifacts.opensearch.org/releases/bundle/opensearch/${pkg_version}/opensearch-${pkg_version}-linux-x64.tar.gz"
+#           https://artifacts.opensearch.org/releases/plugins/repository-s3/1.0.0/repository-s3-1.0.0-rc1.zip
+pkg_dirname="opensearch-${pkg_version}"
+pkg_shasum=a594ac2808e6e476d647e47e45e837fba3e21671285ce39b2cee1c32d5e6887d
+#f8a933e19fd43141be8bde21422ba8a8c2b407ed
+## that's how we calculate shasum
+## /usr/bin/shasum ~/Desktop/opensearch/opensearch-1.2.3-linux-x64.tar.gz
+
+pkg_build_deps=(
+  core/patchelf
+)
+pkg_deps=(
+  core/coreutils
+  core/glibc
+  core/zlib
+  chef/mlsa
+  core/curl # health_check
+  chef/automate-openjdk
+  chef/automate-platform-tools
+)
+pkg_bin_dirs=(es/bin)
+pkg_lib_dirs=(lib)
+
+pkg_exports=(
+  [http-host]=network.host
+  [http-port]=network.port
+  [transport-port]=transport.port
+  [deprecated_external_es]=deprecated.external_es
+  [deprecated_backup_location]=path.repo
+  [disable]=disable
+)
+
+pkg_binds=(
+  [backup-gateway]="port"
+)
+## Open search : Red Hat Enterprise Linux 7, 8; CentOS 7, 8; Amazon Linux 2; Ubuntu 16.04, 18.04, 20.04
+#pkg_exposes=(http-port transport-port)
+
+
+do_download() {
+    #do_default_download
+    #wget $pkg_source
+    return 0
+}
+
+do_build() {
+  return 0
+}
+
+do_install() {
+  # copying executable to system 
+  cp -r bin ${pkg_prefix}/es/
+    cp README.md ${pkg_prefix}/es/
+    cp LICENSE.txt ${pkg_prefix}/es/
+    cp -r logs ${pkg_prefix}/es/
+    cp NOTICE.txt ${pkg_prefix}/es/
+    cp -r lib ${pkg_prefix}/es/
+    cp -r jdk ${pkg_prefix}/es/
+    cp -r modules ${pkg_prefix}/es/
+    cp opensearch-tar-install.sh ${pkg_prefix}/es/
+    cp -r performance-analyzer-rca ${pkg_prefix}/es/
+    cp -r plugins ${pkg_prefix}/es/
+    cp manifest.yml ${pkg_prefix}/es/
+    cp -r config ${pkg_prefix}/es/
+
+    chown -R root:hab ${pkg_prefix}
+    
+    # intalling plugin for aws-s3
+    echo "y" | ${pkg_prefix}/es/bin/opensearch-plugin install repository-s3
+    # installing plugin for google cloud storage
+    echo "y" | ${pkg_prefix}/es/bin/opensearch-plugin install repository-gcs
+
+    
+}
+
+do_strip() {
+  return 0
+}

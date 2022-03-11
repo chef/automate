@@ -59,6 +59,7 @@
     "chef/automate-ha-postgresql",
     "chef/automate-ha-cluster-ctl",
     "chef/automate-netcat",
+    "jayvikramsharma/automate-opensearch",
     "core/rsync"
   ],
 
@@ -95,6 +96,7 @@
       "type": "base",
       "services": [
         "chef/automate-elasticsearch",
+        "jayvikramsharma/automate-opensearch",
         "chef/automate-es-gateway",
         "chef/es-sidecar-service"
       ]
@@ -154,7 +156,8 @@
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway"
+        "chef/event-gateway",
+        "jayvikramsharma/automate-opensearch"
       ]
     },
     {

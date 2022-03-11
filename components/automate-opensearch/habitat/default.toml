@@ -1,0 +1,369 @@
+# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+#
+# If you are modifying this file, you almost surely also want to
+# modify pkg/es/config_request.go. The DefaultConfigRequest() function
+# sets all of the real defaults.
+#
+# The duplication is necessary currently since our tests and studio
+# require automate-elasticsearh be launchable without the deployment
+# service.
+#
+# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+[cluster]
+  #
+  # Use a descriptive name for your cluster:
+  #
+  name = "automate-opensearch"
+
+  [cluster.routing.allocation]
+    #
+    # How many concurrent shard recoveries are allowed to happen on a node.
+    # Defaults to 2.
+    #
+    node_concurrent_recoveries = "2"
+    #
+    # While the recovery of replicas happens over the network, the recovery of
+    # an unassigned primary after node restart uses data from the local disk.
+    # These should be fast so more initial primary recoveries can happen in
+    # parallel on the same node. Defaults to 4.
+    #
+    node_initial_primaries_recoveries = "4"
+    #
+    # Allows to perform a check to prevent allocation of multiple instances of
+    # the same shard on a single host, based on host name and host address.
+    # Defaults to false, meaning that no check is performed by default. This
+    # setting only applies if multiple nodes are started on the same machine.
+    #
+    same_shard_host = "false"
+    #
+    # https://www.elastic.co/guide/en/elasticsearch/reference/2.3/allocation-awareness.html
+    #
+    awareness_attributes = ""
+#
+# ------------------------------------ Node ------------------------------------
+#
+[node]
+  # Use a descriptive name for the node:
+  #
+  name = ""
+  #
+  # Add custom attributes to the node:
+  #
+  # node.rack: r1
+  #
+  rack_id = ""
+  zone    = ""
+  #
+  # Disable starting multiple nodes on a single system:
+  #
+  max_local_storage_nodes = 1
+  #
+  # Configure node as master-only, master-eligible, data-only, or client
+  # (https://www.elastic.co/guide/en/elasticsearch/reference/2.3/modules-node.html#master-node)
+  # Default is master-eligible (master and data are both "true")
+  #
+  master = true
+  data   = true
+
+#
+# ----------------------------------- Paths ------------------------------------
+#
+[path]
+  #
+  # Path to directory where to store the data (separate multiple locations by comma):
+  #
+  data =    ""
+  #
+  # Path to log files:
+  #
+  logs =    "logs"
+  #
+  # Path to backup repository
+  repo = ""
+
+#
+# ----------------------------------- Indices ----------------------------------
+#
+[indices]
+  [indices.recovery]
+    max_bytes_per_sec  =            "20mb"
+
+  [indices.fielddata]
+    #
+    # The max size of the field data cache, eg 30% of node heap space, or an absolute
+    # value, eg 12GB. Defaults to unbounded.
+    #
+    cache_size =                   ""
+
+  [indices.breaker]
+    #
+    # Starting limit for overall parent breaker, defaults to 70% of JVM heap.
+    #
+    total_limit =                    "70%"
+    #
+    # Limit for fielddata breaker, defaults to 60% of JVM heap.
+    #
+    fielddata_limit =                "60%"
+    #
+    # A constant that all field data estimations are multiplied with to determine a
+    # final estimation. Defaults to 1.03
+    #
+    fielddata_overhead =             "1.03"
+    #
+    # Limit for request breaker, defaults to 40% of JVM heap.
+    #
+    request_limit =                  "40%"
+    #
+    # A constant that all request estimations are multiplied with to determine a
+    # final estimation. Defaults to 1.
+    #
+    request_overhead =               "1"
+
+#
+# ----------------------------------- Memory -----------------------------------
+#
+[bootstrap]
+  # Lock the memory on startup:
+  #
+  memory_lock = "true"
+  #
+  # Make sure that the heap size is set to about half the memory available
+  # on the system and that the owner of the process is allowed to use this
+  # limit.
+  #
+  # Elasticsearch performs poorly when the system is swapping the memory.
+  #
+
+#
+# ---------------------------------- Network -----------------------------------
+#
+[network]
+  #
+  # Set the bind address to a specific IP (IPv4 or IPv6):
+  #
+  # host =  "_site_"
+  #
+  # Set a custom port for HTTP:
+  #
+  port = 9200
+  #
+  # For more information, see the documentation at:
+  # <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
+
+[transport]
+  port = 9300
+
+#
+# --------------------------------- Discovery ----------------------------------
+#
+[discovery]
+  # Pass an initial list of hosts to perform discovery when new node is started:
+  # The default list of hosts is ["127.0.0.1", "[::1]"]
+  #
+  ping_unicast_hosts = "[]"
+  #
+  # Prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
+  #
+  minimum_master_nodes = 1
+  #
+  # For more information, see the documentation at:
+  # <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery.html>
+  #
+  zen_fd_ping_timeout = "30s"
+
+#
+# ---------------------------------- Gateway -----------------------------------
+#
+[gateway]
+  #
+  # Block initial recovery after a full cluster restart until N nodes are started:
+  #
+  recover_after_nodes   = ""
+  #
+  # The number of (data or master) nodes that are expected to be in the cluster.
+  # Recovery of local shards will start as soon as the expected number of nodes
+  # have joined the cluster. Defaults to 0
+  #
+  expected_nodes        = "0"
+  #
+  # The number of master nodes that are expected to be in the cluster. Recovery
+  # of local shards will start as soon as the expected number of master nodes
+  # have joined the cluster. Defaults to 0
+  #
+  expected_master_nodes = "0"
+  #
+  # The number of data nodes that are expected to be in the cluster. Recovery of
+  # local shards will start as soon as the expected number of data nodes have
+  # joined the cluster. Defaults to 0
+  #
+  expected_data_nodes   = "0"
+  #
+  # If the expected number of nodes is not achieved, the recovery process waits
+  # for the configured amount of time before trying to recover regardless.
+  # Defaults to 5m if one of the expected_nodes settings is configured.
+  #
+  recover_after_time    = ""
+  #
+  # For more information, see the documentation at:
+  # <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-gateway.html>
+  #
+
+#
+# ---------------------------------- Various -----------------------------------
+#
+[action]
+  #
+  # Require explicit names when deleting indices:
+  #
+  destructive_requires_name  = "true"
+
+# ======================== Elasticsearch Logger Configuration =========================
+[logger]
+  level = "info"
+
+# ======================== Elasticsearch Plugins Configuration =========================
+[plugins]
+  cloud_aws_signer = ""
+
+# ======================== Runtime Configuration =========================
+[runtime]
+  max_open_files = ""
+  max_locked_memory = "unlimited"
+  es_startup_sleep_time = ""
+  es_java_opts = ""
+  heapsize = "1g"
+
+[deprecated]
+external_es = false
+
+
+# Fill these in in your user.toml to override automatic SSL Cert generation
+[opendistro_ssl]
+
+# root pem cert that signed the two cert/key pairs below
+rootCA = """-----BEGIN CERTIFICATE-----
+MIIDnTCCAoWgAwIBAgIJAIfV5Bn17FIuMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRow
+GAYDVQQKDBFDaGVmIFNvZnR3YXJlIEluYzETMBEGA1UEAwwKY2hlZnJvb3RjYTAe
+Fw0xOTA1MjkxOTIxMTRaFw0yOTA1MjYxOTIxMTRaMGUxCzAJBgNVBAYTAlVTMRMw
+EQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRowGAYDVQQKDBFD
+aGVmIFNvZnR3YXJlIEluYzETMBEGA1UEAwwKY2hlZnJvb3RjYTCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBAK9Wz4TINtE4AwUx56YGIE+8ceeJn3A3PAiH
+HCukwxEQ5bMloRejCMDftMttW7dcMYVAJIc5eST2UdNgDsknsI+pXA0pYsII9Zdh
+UNzHisAISn+NGReQ6WgrkbbZe3sMZ2Cer+uBfJC9xaefw+u9u8Y2lDCIAcpgQ6dB
+1aZM4GQgQk5187ur2wIAzyH9R1GI+YkiUgp0qNly1yqk/wZXKvZStVlmVcOylg/M
+YSkD290kZLmfyzhstfUIGXH7bN5VYuM6K08wn1yqLDDVMlkGDVN7jpaiaS+b0goq
+Cc1QkDpcU4Kt7ddU4bnHP9XmY0htGbfW7vR8+5028suj+kuGb5UCAwEAAaNQME4w
+HQYDVR0OBBYEFLY+eWTH4oNaN6Ki2zbkimO68WLWMB8GA1UdIwQYMBaAFLY+eWTH
+4oNaN6Ki2zbkimO68WLWMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB
+AATwZZuDw3lb7EC7/14EWR5kke4mGpn4PVpsPffV2/6xkh7JGFjJUPA+s37VtJ1F
+UoulL7lVsNcGYpuZdwnjEDcBfbtyoiz54z50DkuuSI8JREiXjq3ITw0UUCGjMR2X
+dbA1KYSWTDM28YuJeUCgK0u8tB1kdygcORHMLmR0KG7NJvFFXv5iT34XpdgSEZWC
+L9wNRG5gHo42r/Wfhk6N+BZm3Cax7glsbotCGUq+8fzxHp0EzE6Bu8+GhCnISNHG
+4kYI75qH04NxFr8n0rBFK5crOHFbvoKnk8JALFkyJ/8U83fRkN2acXdwQ7Kv4bg6
+0VblmlLHieFP9mO6eDqNRGA=
+-----END CERTIFICATE-----"""
+
+# Certificate used for admin actions against https://9200
+admin_cert   = """-----BEGIN CERTIFICATE-----
+MIIDRTCCAi0CCQCq5i+UCFN1WzANBgkqhkiG9w0BAQsFADBlMQswCQYDVQQGEwJV
+UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UE
+CgwRQ2hlZiBTb2Z0d2FyZSBJbmMxEzARBgNVBAMMCmNoZWZyb290Y2EwHhcNMTkw
+NTI5MTkyODMyWhcNMjkwNTI2MTkyODMyWjBkMQswCQYDVQQGEwJVUzETMBEGA1UE
+CAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hlZiBT
+b2Z0d2FyZSBJbmMxEjAQBgNVBAMMCWNoZWZhZG1pbjCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBALO59Y+JGsZxkAW8+3ZsZ5YO/LehWnn3yhIci4cEnEnZ
+2c6qRMUBtmNRZfIcJcckgE8VhzOlFf4mTevLC3aqhe6Ec1+DBo7xSiOn3CVkqp3Y
+yAmS2g0+zTl0civJXh80nY6kZvqvdZRF9vmGwZFO9M8B68SnjO/ShhYxaguOxC0m
+P/4zVvcMXALrQxzz8BhPC1g8jQriBkkXU8rkv7F0zOrQqFJvR3u3cvnJzlXNrUTs
+yfxpyQ/8yux8FY9xHCPvO0WDQ9zig5bt+ILUceHpGw/IXi3039iOSjYRN2z/Ez9u
+NYYl7RJs6PkNxZWk8nDa8j6z8ilpjkAOuACelpWALVcCAwEAATANBgkqhkiG9w0B
+AQsFAAOCAQEAnpO0cqxcnHrEEY5mFibsU6SvRLTB0yEo+ED5mrKPDaoSkfV1zbQv
+zPzqZM27FLu/GZP4HiuUwPn0/ZYv/RsppxFNwGFIzXuZUd9sYiB2rcnG9OAc7AIo
+c+xTrwTeTGzgUFzY8FEfs9EaPC/FDEahaUHuwByiWZExVpaHJF6Cg5RsStI6T4kP
+TH5jfy8/fsQu4xwDqlczPiqm0PSWfEVyryWMzHbsWvFgNjj07kaIbMbqZjtifYnw
+1Bk2Nr/MVJ7KeacjNEGlLmpPGLY8z+miMlMEepClqulW/6Ptwy2PyvGs8Sj5sqFH
+B9qwJW30GBvjZj5eEgyE9waea3v4oVrcPA==
+-----END CERTIFICATE-----"""
+
+# the private key associated with the above pem cert
+admin_key    = """-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCzufWPiRrGcZAF
+vPt2bGeWDvy3oVp598oSHIuHBJxJ2dnOqkTFAbZjUWXyHCXHJIBPFYczpRX+Jk3r
+ywt2qoXuhHNfgwaO8Uojp9wlZKqd2MgJktoNPs05dHIryV4fNJ2OpGb6r3WURfb5
+hsGRTvTPAevEp4zv0oYWMWoLjsQtJj/+M1b3DFwC60Mc8/AYTwtYPI0K4gZJF1PK
+5L+xdMzq0KhSb0d7t3L5yc5Vza1E7Mn8ackP/MrsfBWPcRwj7ztFg0Pc4oOW7fiC
+1HHh6RsPyF4t9N/Yjko2ETds/xM/bjWGJe0SbOj5DcWVpPJw2vI+s/IpaY5ADrgA
+npaVgC1XAgMBAAECggEAYowBwJ195/fW776K54lTVy2KlqnLsXsT+tBaFUOK6teg
+HTixkpB40IaObq3ObR5vmG2Gf+PyZjPcoADqnTutSnanyGRQ0Uouy9Q72ukSwJBg
+RxeVppOb9fgKrkWw7U1tYwx0Rtq0jwO6A2JHewSfKW61N1Rj7BA0Y7Deo825dcNL
+Bkq/bsauM/PUjw43+5NVMtAkhKqVyTERgUnof89dBqKjYj9EAjueW0StxgHgq3nv
+TnNhnn+deUN3juUGPaTNrxXldTNsqajmQDeDY8lKtNZn3ab4TSc1EEq0lwVP0qIp
+RPHo/EkwBir5kDDEr4jtbvSLAYFFXZAbiV3/xkozWQKBgQDe36jRi7e3T3Lq2o3Y
+556v3v2uazl3ZrHgdGc+OEHwSWEeOe63flV/LX/iJVD6xHq+djM15RwHGVaIgCEG
+dEoeKXBuB6rMjSyUjWvot6RBrtI1xJWHp1sbIw7m1Rx4uPFQTIBkczeXT/LcPy33
+wnhKJxTc7A1MtPjeQZSMwmKeKwKBgQDOcIv59reuVdUUvTmNHWNHDFMguncX2foP
+DRbJZFc1ozZDNoZuSF9KeBVIhLHolZ0W8PYGKAp9gUHMgNuSNy2inRz0X2b2UAlb
+hBFOOB7GbZWdqii2CREk3K7qUPzy/cHvPaCs9bwd2j06xU3nPNp18LmFMyDdSBwI
+kZlDzfyDhQKBgQCfIIGgW2locElUdYchfv5GA6iMh/IX1jLaV0H/opsxvLKiqipO
+yNyyWQIdrRcMdIxOwIX/zP0d9HFcNF9gBFeHAX9MkBzav1E9H1wUZEnau79KtHku
+yca6sWVKWo5hg2qIMpbZIYpndqWnq1ReuXK5Pv4eXkuAoRWvWpN9jKxs0QKBgQDM
+vRhGJycScrPqZqS+TIgafaGwEt5sPFXhOYUA5VAMtTrqvBflJkfDjoblLh1X45Ix
+n3cQsgN9Z4U/cgjR4YGUBigiQL/Xx5cQOVIEdmonN6WsAYdwyltDaM7dOsczovIE
++OTyxJ/2J2yUbfwOOu8bC0yjSwrsC0kqQmRzt8YZFQKBgQCws4tgpiRMGeTD8q0F
+sCW8cUnXm4VlpWWLNlP2B+9Sylr1N7cnIeRmE3IRX0KQSHf2xZcUgw3S+M5EPH5C
+0zn2opFyG2Ylv/81NuYJFuq4wuzyvYbg6zkeWrqS9OTznj6gZAu0q4++4o4rEBZb
+Hze/nF2wg5KZauv0eOy64chmkA==
+-----END PRIVATE KEY-----"""
+
+# Certificate used for intracluster ssl on port 9300
+ssl_cert    = """-----BEGIN CERTIFICATE-----
+MIIDRDCCAiwCCQCq5i+UCFN1WjANBgkqhkiG9w0BAQsFADBlMQswCQYDVQQGEwJV
+UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UE
+CgwRQ2hlZiBTb2Z0d2FyZSBJbmMxEzARBgNVBAMMCmNoZWZyb290Y2EwHhcNMTkw
+NTI5MTkyODE5WhcNMjkwNTI2MTkyODE5WjBjMQswCQYDVQQGEwJVUzETMBEGA1UE
+CAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hlZiBT
+b2Z0d2FyZSBJbmMxETAPBgNVBAMMCGNoZWZub2RlMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAs3/oNBNb2X8OIyXM7rsTk9uiJFP7+HGrFvFHtXPcTDW1
+JDs3q0D74/VWUR+3jtv+4ycEsEw4xZd0LUivRBuRS8ppju7mTdBYu4faUT97lbDj
+N2/EiAXHn5K2fMd8LlJQsIrsmS21JhdfO/U0tTHxDvPUs2LmUZPxikRyHoGkrwXP
+I+YIJh6Lh+MBgTYj76zAP1RP6orkWgN72rOOdaWNrfoXQ0aRU7uI55AbukB/0HOj
+wjs1bk9ynWzkxMZkRVh/IM/weSGpXX23VHacMy1hjokC/DBroLiNf/e52+E0A5zV
+5D64iNr1edhqNuECSwQxET9uID0Ng2Loh9ElK13DvwIDAQABMA0GCSqGSIb3DQEB
+CwUAA4IBAQAKv3jUlljcnDXXXLSdzB/vbfbPXhuBltR93jTEfFAhgsP/Q41tGxaC
+MYAXJZtnnmxdZ4Dl+pX8/eQ3ZMmwC0xAGia44qf08468KwfIndQbr8HicAOc20US
+RV+WZWwJYi1fiWOdofIGF4s0ribcXq7vM95KWN8nBodiW/ckPnDOlrLb8J/z6mLv
+5Cl3DWGfo0nQr0RxL/ZDYl72+2ZuWXy6d1Ps1NHB/u9AHtTG8nK39Th7KCUjutwA
+QeGqnZ9y5OSkTAaVVtyFrnK8BLmBNrfmzedKjc8sXBsI6Ue2tgMHe2ISDBPYY06m
+oq6fKOM1/QcmyFKgkDr04EGUbuh3ibUc
+-----END CERTIFICATE-----"""
+
+# the private key associated with the above pem cert
+ssl_key     = """-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCzf+g0E1vZfw4j
+JczuuxOT26IkU/v4casW8Ue1c9xMNbUkOzerQPvj9VZRH7eO2/7jJwSwTDjFl3Qt
+SK9EG5FLymmO7uZN0Fi7h9pRP3uVsOM3b8SIBcefkrZ8x3wuUlCwiuyZLbUmF187
+9TS1MfEO89SzYuZRk/GKRHIegaSvBc8j5ggmHouH4wGBNiPvrMA/VE/qiuRaA3va
+s451pY2t+hdDRpFTu4jnkBu6QH/Qc6PCOzVuT3KdbOTExmRFWH8gz/B5IaldfbdU
+dpwzLWGOiQL8MGuguI1/97nb4TQDnNXkPriI2vV52Go24QJLBDERP24gPQ2DYuiH
+0SUrXcO/AgMBAAECggEAa1Aj9cZBGmXggNjfjTZg/PvJEyj2slDatYuokG3lHdba
+JgAVRxhBv8Z0RWnN5uXVm94+6luXcWIbvdr/lZtZoVMxCpf/LjRKaEtPFVX7v8GS
+BhmXCK9T6i3fVfg5YMQro3BbBTUTYOOGNyVgzpc+A+94kYqmIc1uEXjcNSrS1yOD
+2TtHd84ZCMvEXg7wFqbR4jLhpKvvynX7RM9bfCTQqpsmlZgcSrHHJXYQEfr35ZeC
+V3ZFwuvjgDoJL2/tdkeX7YRylrma/H9pIS5wbhCdr2CcOx0iJMkTPlyCEhEvDzwy
++5jrddeEQqptUciD9wE4qR/JhMGEbUngeq4lcD1jQQKBgQDn3GSKb/sLaaLBPAJA
+e0Zu0FlT7ziEjhs1ZdUnGCBG4zZgPRqH39NWCFeTILmgSauTZE23ME5+eXrBaSQM
+K4iNGzyEnKNBhSes3ITT4X63gjkb2EifIcI39trOb5GhqEZntewqFJJGNanBeFz5
+lBiBNRXvOEunYpX3NI8ykvRtnwKBgQDGL/hmuZ+/c2aGXagY6rAUumG6oJOtIl7M
+u8ueArSlzbMKG/vYMiTisBdgspjBxJul0h0n1OqtYPsc4uv+WfrsWYhQLt7R6ewk
+0mn6/eSOdmfbuJRISROk+8agC7AJHK1PAnY8r3/tVFr8AmIZZ6opcDVD8RBa03H2
+GQfwofi14QKBgG4hUBw1jl/gYC86qrMoGs9d5WAp24WS3jeh0/oKyqIBIH3b6DMr
+zH0r3zUCMUmCVJ3g4c0mg9ItL3KY10d0khq8GiW/JQhlD/Bamjjt/bt6flfMhsoX
+ReJBPbMaaWkIvdBbJ/7g4I26xZQg8MCXaIBOz8ldywmJmUPfUjkqdjFvAoGADW4I
+viVL/vQ5+Vb1YiLdJbpvju78stnGZMdBCAcU6Ltkq4Wz7jWPrFDUdLgFg/PnvDfd
+w+o4sOEGgzGZXlYIm+WBSDW04bKhTul3RwvXZhP9+7SpT7CsBR0Om5/PIP7xe44m
+JvyZhaKWu8cJkMEmlcJFycHXIuB7M3sEv7iqGuECgYB/CNwS2MovDeyt8o9Ka6he
+5pnnSqf0b/an1Tc8rUt3mpv9mDCHRgV7WQc+lZ0f1UHHf/EWXCU2ahfBNQuoLUDi
+fQFkUxCFH9wYmMoeBvZJYUBtYSiOoVdN1lEIDwjpTc2WnVwB1iuXCB5laVXSPaKI
+xtbi72PUsHClCAhAS0tv9w==
+-----END PRIVATE KEY-----"""

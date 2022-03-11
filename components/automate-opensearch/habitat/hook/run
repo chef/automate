@@ -23,8 +23,14 @@ export ES_TMPDIR="{{pkg.svc_var_path}}/tmp"
 export ES_PATH_CONF="{{pkg.svc_config_path}}"
 
 # Initialize the secrets keystore and trusted certs ca keystore
+# Initialize the secrets keystore and trusted certs ca keystore
 source {{pkg.svc_config_path}}/init_keystore
+source {{pkg.svc_config_path}}/init_ca
 #source {{pkg.svc_config_path}}/init_ca
+
+echo "========================= KDLFDLFKELKFLDFLDKFLKLDKFLFKDL =========================="
+executing opensearch
+echo "========================= KDLFDLFKELKFLDFLDKFLKLDKFLFKDL =========================="
 
 exec opensearch
 {{~/if}}
