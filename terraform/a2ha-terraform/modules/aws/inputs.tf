@@ -122,6 +122,10 @@ variable "lb_access_logs" {
   default = false
 }
 
+variable "s3_bucketName_for_logs" {
+  default = "lb_logs"  
+}
+
 variable "nfs_mount_path" {
   default = "/mnt/automate_backups"
 }

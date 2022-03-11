@@ -39,6 +39,9 @@ aws_ami_id = "<%= config.aws.ami_id %>"
 <% if config.aws.lb_access_logs %>
 lb_access_logs = "<%= config.aws.lb_access_logs %>"
 <% end %>
+<% if config.aws.s3_bucketName_for_logs %>
+s3_bucketName_for_logs = "<%= config.aws.s3_bucketName_for_logs %>"
+<% end %>
 <% if config.aws.automate_lb_certificate_arn %>
 automate_lb_certificate_arn = "<%= config.aws.automate_lb_certificate_arn %>"
 <% end %>

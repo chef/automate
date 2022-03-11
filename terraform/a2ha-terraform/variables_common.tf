@@ -149,6 +149,10 @@ variable "lb_access_logs" {
   default = false
 }
 
+variable "s3_bucketName_for_logs" {
+  default = "lb_logs"
+}
+
 variable "metricbeat_pkg_ident" {
   default = "chef/automate-ha-metricbeat"
 }

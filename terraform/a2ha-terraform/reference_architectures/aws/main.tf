@@ -40,6 +40,7 @@ module "aws" {
   setup_managed_services             = var.setup_managed_services
   source                             = "./modules/aws"
   lb_access_logs                     = var.lb_access_logs
+  s3_bucketName_for_logs             = var.s3_bucketName_for_logs
   tags                               = var.aws_tags
 }
 

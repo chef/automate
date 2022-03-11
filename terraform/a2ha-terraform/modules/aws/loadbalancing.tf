@@ -1,17 +1,21 @@
 data "aws_elb_service_account" "main" {}
 
 resource "aws_s3_bucket" "elb_logs" {
-  bucket = "a2ha-elb-bucket"
+  count = var.lb_access_logs == "true" ? 1 : 0
+  bucket = var.s3_bucketName_for_logs
   force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "elb_bucket_acl" {
-  bucket = aws_s3_bucket.elb_logs.id
+  bucket = aws_s3_bucket.elb_logs[0].id
   acl    = "private"
+  depends_on = [
+    aws_s3_bucket.elb_logs
+  ]
 }
 
 resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
-  bucket = aws_s3_bucket.elb_logs.id
+  bucket = aws_s3_bucket.elb_logs[0].id
 
   policy = <<EOF
 {
@@ -30,6 +34,9 @@ resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
   "Version": "2012-10-17"
 }
 EOF
+depends_on = [
+  aws_s3_bucket_acl.elb_bucket_acl
+]
 }
 
 /////////////////////////
@@ -42,7 +49,7 @@ resource "aws_alb" "automate_lb" {
   subnets            = aws_subnet.public.*.id
   tags               = var.tags
   access_logs {
-    bucket           = aws_s3_bucket.elb_logs.bucket
+    bucket           = aws_s3_bucket.elb_logs[0].bucket
     enabled          = var.lb_access_logs
   }
 }
