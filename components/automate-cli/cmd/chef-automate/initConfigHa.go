@@ -85,7 +85,7 @@ type AwsConfigToml struct {
 			AmiFilterOwner                  string `toml:"ami_filter_owner"`
 			AmiID                           string `toml:"ami_id"`
 			LBAccessLogs                    string `toml:"lb_access_logs"`
-			s3_bucketName_for_logs          string `toml:"s3_bucketName_for_logs"`
+			S3BucketNameForLogs             string `toml:"s3_bucketName_for_logs"`
 			AutomateServerInstanceType      string `toml:"automate_server_instance_type"`
 			ChefServerInstanceType          string `toml:"chef_server_instance_type"`
 			ElasticsearchServerInstanceType string `toml:"elasticsearch_server_instance_type"`

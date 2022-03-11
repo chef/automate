@@ -131,7 +131,7 @@ aws do
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
   ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucketName_for_logs otherwise make it false
   lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
-  s3_bucketName_for_logs "{{.Aws.Config.s3_bucketName_for_logs }}"
+  s3_bucketName_for_logs "{{ .Aws.Config.S3BucketNameForLogs }}"
   setup_managed_services {{ .Aws.Config.SetupManagedServices }}
   {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ else }}#managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ else }}#managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ end }}
