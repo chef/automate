@@ -55,6 +55,7 @@ describe('WarningBannerComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WarningBannerComponent);
     component = fixture.componentInstance;
+    component.showManualUpgradeContent = false;
     fixture.detectChanges();
   });
 
@@ -62,22 +63,10 @@ describe('WarningBannerComponent', () => {
     expect(component).toBeDefined();
   });
 
-  it('should have variables undefined before initialization', () => {
-    expect(component.bannerMessage).toBeUndefined();
-    expect(component.bannerBackgroundColor).toBeUndefined();
-    expect(component.bannerTextColor).toBeUndefined();
-  });
-
-  it('should define variables after initialization', () => {
-    component.showManualUpgradeContent = true;
-    if (component.showManualUpgradeContent) {
-      component.bannerMessage = Configs.Message;
-      component.bannerBackgroundColor = `#${Configs.BackgroundColor}`;
-      component.bannerTextColor = `#${Configs.TextColor}`;
-      expect(component.bannerMessage).toBe(Configs.Message);
-      expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`);
-      expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`);
-    }
+  it('should have variables on initialization', () => {
+    expect(component.bannerMessage).toBe(Configs.Message);
+    expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`);
+    expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`);
   });
 
 });
