@@ -62,6 +62,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MigrationSliderComponent } from './migration-slider/migration-slider.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { OrgUsersComponent } from './org-users/org-users.component';
 import { PaginatorComponent } from './paginator/paginator.component';
 import { SelectBoxModule } from './select-box/src/public_api';
 import { SyncOrgUsersSliderComponent } from './sync-org-users-slider/sync-org-users-slider.component';
@@ -110,6 +111,7 @@ import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-
     MigrationSliderComponent,
     OrgDetailsComponent,
     OrgEditComponent,
+    OrgUsersComponent,
     PaginationComponent,
     PaginatorComponent,
     PolicyFilesComponent,

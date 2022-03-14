@@ -51,6 +51,9 @@
           <app-tab tabTitle="Policy Groups" #policyGroups_tab  [active]="policyGroupsTab">
             <app-policy-groups *ngIf="policyGroups_tab.active" [serverId]="serverId" [orgId]="orgId" (resetKeyRedirection)="resetAdminKeyRedirection($event)"></app-policy-groups>
           </app-tab>
+          <app-tab tabTitle="Users" #users_tab [active]="usersTab">
+            <app-org-users *ngIf="users_tab.active" [serverId]="serverId" [orgId]="orgId" (resetKeyRedirection)="resetAdminKeyRedirection($event)"></app-org-users>
+          </app-tab>
           <app-tab *ngIf="chefInfraViewsFeatureFlagOn" tabTitle="Details" #details_tab [active]="false">
             <app-org-edit *ngIf="details_tab.active" [serverId]="serverId" [orgId]="orgId"></app-org-edit> 
           </app-tab>
