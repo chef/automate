@@ -57,6 +57,7 @@ do_build() {
 }
 
 do_install() {
+  #rm -f "${pkg_prefix}/config/opensearch.yml"
   #install -vDm644 "${HAB_CACHE_SRC_PATH}/opensearch-${OPENSEARCH_VERSION}/README.textile" "${pkg_prefix}/README.textile"
   install -vDm644 "${HAB_CACHE_SRC_PATH}/opensearch-${OPENSEARCH_VERSION}/LICENSE.txt" "${pkg_prefix}/LICENSE.txt"
   install -vDm644 "${HAB_CACHE_SRC_PATH}/opensearch-${OPENSEARCH_VERSION}/NOTICE.txt" "${pkg_prefix}/NOTICE.txt"
@@ -66,14 +67,18 @@ do_install() {
 
   fix_interpreter "${pkg_prefix}/bin/*" core/bash bin/bash
     # intalling plugin for aws-s3
-    echo "y" | opensearch-plugin install repository-s3
+    ### echo "y" | opensearch-plugin install repository-s3
     # installing plugin for google cloud storage
-    echo "y" | opensearch-plugin install repository-gcs
+    ### echo "y" | opensearch-plugin install repository-gcs
     # mkdir -p {{pkg.svc_config_path}}
     # cp "${pkg_svc_config_path}/root-ca.pem" "${pkg_prefix}/config/"
     # cp "${pkg_svc_config_path}/esnode-key.pem" "${pkg_prefix}/config/"
     # cp "${pkg_svc_config_path}/esnode.pem" "${pkg_prefix}/config/"
-    # chmod 777 -R "${pkg_prefix}/"
+    chmod 777 -R "${pkg_prefix}/"
+    mkdir "${pkg_prefix}/config/certificates"
+    $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert-1.sh "${pkg_prefix}/config/"
+    ls -ltrh
+    #cp "habitat/config/opensearch.yml" "${pkg_prefix}/config/"
     # su hab -c "sh ${pkg_prefix}/bin/opensearch"
     #chmod 755 "${pkg_prefix}/securityadmin_demo.sh"
     #su hab -c "sh ${pkg_prefix}/securityadmin_demo.sh"

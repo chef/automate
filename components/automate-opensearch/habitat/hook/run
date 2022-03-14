@@ -29,7 +29,7 @@ source {{pkg.svc_config_path}}/init_ca
 #source {{pkg.svc_config_path}}/init_ca
 
 echo "========================= KDLFDLFKELKFLDFLDKFLKLDKFLFKDL =========================="
-executing opensearch
+echo "executing opensearch"
 echo "========================= KDLFDLFKELKFLDFLDKFLKLDKFLFKDL =========================="
 
 exec opensearch

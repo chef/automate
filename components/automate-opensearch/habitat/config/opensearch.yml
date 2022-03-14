@@ -98,18 +98,18 @@ gateway.recover_after_nodes: {{cfg.gateway.recover_after_nodes}}
 #
 action.destructive_requires_name: true #{{cfg.action.destructive_requires_name}}
 
-plugins.security.ssl.transport.pemcert_filepath: certificates/odfe-node.pem
-plugins.security.ssl.transport.pemkey_filepath: certificates/odfe-admin.pem
-plugins.security.ssl.transport.pemtrustedcas_filepath: certificates/MyRootCA.pem
+plugins.security.ssl.transport.pemcert_filepath: certificates/node1.pem
+plugins.security.ssl.transport.pemkey_filepath: certificates/node1-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: certificates/root-ca.pem
 plugins.security.ssl.transport.enforce_hostname_verification: false
 plugins.security.ssl.http.enabled: false
-plugins.security.ssl.http.pemcert_filepath: certificates/odfe-node.pem
-plugins.security.ssl.http.pemkey_filepath: certificates/odfe-admin.pem
-plugins.security.ssl.http.pemtrustedcas_filepath: certificates/MyRootCA.pem
+plugins.security.ssl.http.pemcert_filepath: certificates/node1.pem
+plugins.security.ssl.http.pemkey_filepath: certificates/node1-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: certificates/root-ca.pem
 plugins.security.allow_unsafe_democertificates: true
 plugins.security.allow_default_init_securityindex: true
 plugins.security.authcz.admin_dn:
-  - CN=kirk,OU=client,O=client,L=test, C=de
+  - CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US
 
 plugins.security.audit.type: internal_opensearch
 plugins.security.enable_snapshot_restore_privilege: true
