@@ -39,6 +39,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public clientsTab = false;
   public policyFilesTab = false;
   public policyGroupsTab = false;
+  public usersTab = false;
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -88,6 +89,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('policyGroups')) {
           this.resetTabs();
           this.policyGroupsTab = true;
+        } else if (path.includes('users')) {
+          this.resetTabs();
+          this.usersTab = true;
         }
       });
 
@@ -188,6 +192,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     this.clientsTab = false;
     this.nodesTab = false;
     this.policyGroupsTab = false;
+    this.usersTab = false;
   }
 
   ngOnDestroy(): void {
