@@ -10,6 +10,9 @@ import { AppConfigService } from './services/app-config/app-config.service';
 import { GetUserPreferences } from './services/user-preferences/user-preferences.actions';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
 import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
+import { isNull } from 'lodash';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 
 @Component({
   selector: 'app-ui',
@@ -77,5 +80,32 @@ export class UIComponent implements OnInit, AfterViewChecked {
     if (this.chefSessionService.connector && this.userPrefsService.uiSettings.isTimeformatExist) {
       this.store.dispatch(new GetUserPreferences());
     }
+
+    // manual upgrade banner
+    const bannerStorage = localStorage.getItem('manual-upgrade-banner');
+    if (isNull(bannerStorage)) {
+      localStorage.setItem('manual-upgrade-banner', this.booleanToString(true));
+      this.showBanner = true;
+    } else {
+      this.showBanner = this.stringToBoolean(bannerStorage);
+    }
+    this.showBanner = this.stringToBoolean('false');
+    this.store.dispatch(new CreateNotification({
+      type: Type.error,
+      message: 'License Update: your current license is expiring soon.'
+    }));
+  }
+
+  closeBanner() {
+    localStorage.setItem('manual-upgrade-banner', this.booleanToString(false));
+    this.showBanner = false;
+  }
+
+  private booleanToString(bool: boolean): string {
+    return bool ? 'true' : 'false';
+  }
+
+  private stringToBoolean(boolString: string): boolean {
+    return boolString === 'true';
   }
 }

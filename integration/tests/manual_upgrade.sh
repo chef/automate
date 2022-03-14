@@ -68,6 +68,10 @@ do_upgrade() {
         return 1
     fi
 
+    set_version_file
+    #shellcheck disable=SC2154
+    jq --arg val "$release" '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
+
     curl -vv --insecure "https://packages.chef.io/set/$release" -X POST -d @"$target_manifest"
     log_info "Upgrading to $release"
     # Uncomment once the --version flag is on dev
@@ -88,7 +92,7 @@ do_test_upgrade() {
     fi
 
     # Make sure the release is correct
-    chef-automate upgrade status
-    chef-automate upgrade status | grep "Automate is up-to-date ($release)"
+    chef-automate upgrade status --versions-file "$versionsFile"
+    chef-automate upgrade status --versions-file "$versionsFile" | grep "Automate is up-to-date ($release)"
     do_test_upgrade_default
 }
