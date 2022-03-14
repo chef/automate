@@ -9,6 +9,9 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for run
+- name: major
+  default_value: "false"
+  usage: This flag is only needed for major version upgrades
 - name: skip-deploy
   default_value: "false"
   usage: will only upgrade and not deploy the bundle
