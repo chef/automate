@@ -13,6 +13,7 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
+  //Will variable add type at time of API integration
   public users;
   public usersListLoading = false;
   public authFailure = false;
