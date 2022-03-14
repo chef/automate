@@ -14,21 +14,21 @@
 #
 # Use a descriptive name for your cluster:
 #
-cluster.name: {{cfg.cluster.name}}
+cluster.name: automate-opensearch
 #
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
-{{#if cfg.node.name ~}}
-node.name: {{cfg.node.name}}
-{{/if ~}}
+#{{#if cfg.node.name ~}}
+# node.name: {{cfg.node.name}}
+# {{/if ~}}
 #
 # Add custom attributes to the node:
 #
-{{#if cfg.node.rack_id ~}}
-node.attr.rack: {{cfg.node.rack_id}}
-{{/if ~}}
+# {{#if cfg.node.rack_id ~}}
+# node.attr.rack: {{cfg.node.rack_id}}
+# {{/if ~}}
 #
 # ----------------------------------- Paths ------------------------------------
 #
@@ -56,9 +56,9 @@ bootstrap.memory_lock: true #{{cfg.bootstrap.memory_lock}}
 #
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
-{{#if cfg.network.host ~}}
+# {{#if cfg.network.host ~}}
 network.host: {{cfg.network.host}}
-{{/if ~}}
+# {{/if ~}}
 #
 # Set a custom port for HTTP:
 #
@@ -71,14 +71,14 @@ http.port: {{cfg.network.port}}
 # Pass an initial list of hosts to perform discovery when this node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-{{#if bind.automate-elasticsearch ~}}
-discovery.seed_hosts: [{{#each bind.automate-elasticsearch.members ~}} "{{sys.ip}}", {{/each ~}}]
-{{else ~}}
-discovery.seed_hosts: {{cfg.discovery.ping_unicast_hosts}}
+# {{#if bind.automate-elasticsearch ~}}
+# discovery.seed_hosts: [{{#each bind.automate-elasticsearch.members ~}} "{{sys.ip}}", {{/each ~}}]
+# {{else ~}}
+# discovery.seed_hosts: {{cfg.discovery.ping_unicast_hosts}}
 #
 # Bootstrap the cluster using an initial set of master-eligible nodes:
 #
-cluster.initial_master_nodes: {{cfg.discovery.minimum_master_nodes}}
+# cluster.initial_master_nodes: {{cfg.discovery.minimum_master_nodes}}
 #
 # For more information, consult the discovery and cluster formation module documentation.
 #
@@ -86,9 +86,9 @@ cluster.initial_master_nodes: {{cfg.discovery.minimum_master_nodes}}
 #
 # Block initial recovery after a full cluster restart until N nodes are started:
 #
-{{#if cfg.gateway.recover_after_nodes ~}}
-gateway.recover_after_nodes: {{cfg.gateway.recover_after_nodes}}
-{{/if ~}}
+# {{#if cfg.gateway.recover_after_nodes ~}}
+# gateway.recover_after_nodes: {{cfg.gateway.recover_after_nodes}}
+# {{/if ~}}
 #
 # For more information, consult the gateway module documentation.
 #

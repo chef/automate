@@ -11,9 +11,9 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Apache-2.0")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_build_deps=(
+  core/maven
   core/coreutils
   core/git
-  core/maven
   core/openjdk11
   core/openssl
   core/zip
@@ -74,7 +74,8 @@ do_install() {
     # cp "${pkg_svc_config_path}/root-ca.pem" "${pkg_prefix}/config/"
     # cp "${pkg_svc_config_path}/esnode-key.pem" "${pkg_prefix}/config/"
     # cp "${pkg_svc_config_path}/esnode.pem" "${pkg_prefix}/config/"
-    chmod 777 -R "${pkg_prefix}/"
+    #chmod 777 -R "${pkg_prefix}/"
+    chown -RL root:hab "${pkg_prefix}/"
     mkdir "${pkg_prefix}/config/certificates"
     $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert-1.sh "${pkg_prefix}/config/"
     ls -ltrh
