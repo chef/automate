@@ -127,7 +127,6 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 	}
-
 	if !upgradeRunCmdFlags.acceptMLSA {
 		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
 		if err != nil {
@@ -137,7 +136,6 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 			return errors.New("canceled upgrade")
 		}
 	}
-
 	if offlineMode {
 		writer.Title("Installing airgap install bundle")
 		airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
