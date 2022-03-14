@@ -15,11 +15,11 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
 
   //Will variable add type at time of API integration
   public users;
-  public usersListLoading = false;
-  public authFailure = false;
-  public loading = false;
-  public current_page = 1;
-  public per_page = 100;
+  public usersListLoading: boolean = false;
+  public authFailure: boolean = false;
+  public loading: boolean = false;
+  public current_page:number = 1;
+  public per_page:number = 100;
   public total: number;
   private isDestroyed = new Subject<boolean>();
 
