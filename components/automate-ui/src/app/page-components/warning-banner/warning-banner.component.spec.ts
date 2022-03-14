@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WarningBannerComponent } from './warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { MockComponent } from 'ng2-mock-component';
 
 
 enum Configs {
@@ -40,7 +41,10 @@ describe('WarningBannerComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [WarningBannerComponent],
+      declarations: [
+        WarningBannerComponent,
+        MockComponent({ selector: 'chef-icon' })
+      ],
       imports: [HttpClientTestingModule],
       providers: [
         {provide: AppConfigService, useClass: MockAppConfigService}
@@ -58,8 +62,18 @@ describe('WarningBannerComponent', () => {
     expect(component).toBeDefined();
   });
 
-  it('should load variables on initialization', () => {
-    if (!component.showManualUpgradeContent) {
+  it('should have variables undefined before initialization', () => {
+    expect(component.bannerMessage).toBeUndefined();
+    expect(component.bannerBackgroundColor).toBeUndefined();
+    expect(component.bannerTextColor).toBeUndefined();
+  });
+
+  it('should define variables after initialization', () => {
+    component.showManualUpgradeContent = true;
+    if (component.showManualUpgradeContent) {
+      component.bannerMessage = Configs.Message;
+      component.bannerBackgroundColor = `#${Configs.BackgroundColor}`;
+      component.bannerTextColor = `#${Configs.TextColor}`;
       expect(component.bannerMessage).toBe(Configs.Message);
       expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`);
       expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`);
