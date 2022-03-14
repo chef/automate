@@ -7,14 +7,13 @@ resource "aws_s3_bucket" "elb_logs" {
 }
 
 resource "aws_s3_bucket_acl" "elb_bucket_acl" {
+  count = var.lb_access_logs == "true" ? 1 : 0
   bucket = aws_s3_bucket.elb_logs[0].id
   acl    = "private"
-  depends_on = [
-    aws_s3_bucket.elb_logs
-  ]
 }
 
 resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
+  count = var.lb_access_logs == "true" ? 1 : 0
   bucket = aws_s3_bucket.elb_logs[0].id
 
   policy = <<EOF
@@ -34,9 +33,6 @@ resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
   "Version": "2012-10-17"
 }
 EOF
-depends_on = [
-  aws_s3_bucket_acl.elb_bucket_acl
-]
 }
 
 /////////////////////////
@@ -48,10 +44,10 @@ resource "aws_alb" "automate_lb" {
   security_groups    = [aws_security_group.load_balancer.id]
   subnets            = aws_subnet.public.*.id
   tags               = var.tags
-  access_logs {
-    bucket           = aws_s3_bucket.elb_logs[0].bucket
-    enabled          = var.lb_access_logs
-  }
+   access_logs {
+     bucket           = var.s3_bucketName_for_logs
+     enabled          = var.lb_access_logs
+   }
 }
 
 resource "aws_alb_target_group" "automate_tg" {
