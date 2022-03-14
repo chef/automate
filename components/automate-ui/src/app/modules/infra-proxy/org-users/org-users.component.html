@@ -1,0 +1,38 @@
+<section class="users">
+  <chef-loading-spinner class="spinner" *ngIf="usersListLoading" size="50"></chef-loading-spinner>
+  <app-empty-state *ngIf="authFailure" moduleTitle="users" (resetKeyRedirection)="resetKeyTabRedirection($event)">
+  </app-empty-state>
+  <ng-container *ngIf="!usersListLoading && !authFailure">
+    <div class="wrapper">
+      <div class="search-create-container">
+        <app-paginator [length]="total" [pageSize]="per_page" [pageIndex]="current_page"
+          (changePage)="onUpdatePage($event)"></app-paginator>
+      </div>
+      <chef-table>
+        <chef-thead>
+          <chef-tr class="no_border_tr">
+            <chef-th class="no_border_th">Chef Server User Name</chef-th>
+            <chef-th class="no_border_th">Automate Name</chef-th>
+            <chef-th class="no_border_th">Email</chef-th>
+            <chef-th class="no_border_th three-dot-column"></chef-th>
+          </chef-tr>
+        </chef-thead>
+        <chef-tbody>
+          <chef-tr>
+            <chef-td>User Name</chef-td>
+            <chef-td>Automate Name</chef-td>
+            <chef-td>automatename@email.com</chef-td>
+            <chef-td class="three-dot-column">
+              <mat-select panelClass="chef-control-menu">
+                <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey()">Reset PEM Key</mat-option>
+              </mat-select>
+            </chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+      <app-page-picker *ngIf="!loading" class="users-list-paging" [total]="total" [perPage]="per_page"
+        [page]="current_page" (pageChanged)="onPageChange($event)">
+      </app-page-picker>
+    </div>
+  </ng-container>
+</section>
