@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Getting Started"
-    parent = "automate/install/high_availability/introduction"
-    identifier = "automate/install/high_availability/introduction/ha_auto_install.md Getting Started"
+    parent = "automate/deploy_high_availability/introduction"
+    identifier = "automate/deploy_high_availability/introduction/ha_auto_install.md Getting Started"
     weight = 260
 +++
 

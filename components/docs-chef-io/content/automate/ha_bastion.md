@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Bastion Host"
-    parent = "automate/install/high_availability/introduction"
-    identifier = "automate/install/high_availability/introduction/ha_bastion.md Bastion Host"
+    parent = "automate/deploy_high_availability/introduction"
+    identifier = "automate/deploy_high_availability/introduction/ha_bastion.md Bastion Host"
     weight = 250
 +++
 

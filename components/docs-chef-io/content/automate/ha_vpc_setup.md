@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "VPC and CIDR Setup"
-    parent = "automate/install/high_availability/aws_deployment"
-    identifier = "automate/install/high_availability/aws_deployment/ha_vpc_setup.md VPC and CIDR Setup"
+    parent = "automate/deploy_high_availability/aws_deployment"
+    identifier = "automate/deploy_high_availability/aws_deployment/ha_vpc_setup.md VPC and CIDR Setup"
     weight = 220
 +++
 

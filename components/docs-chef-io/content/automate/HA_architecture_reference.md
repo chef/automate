@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "High Availability Architecture"
-    parent = "automate/install/high_availability/introduction"
-    identifier = "automate/install/high_availability/introduction/ha_architecture_reference.md High Availability Architecture"
+    parent = "automate/deploy_high_availability/introduction"
+    identifier = "automate/deploy_high_availability/introduction/ha_architecture_reference.md High Availability Architecture"
     weight = 220
 +++
 

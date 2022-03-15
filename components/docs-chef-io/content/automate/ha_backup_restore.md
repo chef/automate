@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Backup and Restore"
-    identifier = "automate/install/high_availability/backup_and_restore/ha_backup_restore.md Backup and Restore"
-    parent = "automate/install/high_availability/backup_and_restore"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore.md Backup and Restore"
+    parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 200
 +++
 

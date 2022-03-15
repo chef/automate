@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "AWS Certificate Manager"
-    parent = "automate/install/high_availability/certificates"
-    identifier = "automate/install/high_availability/certificates/ha_aws_cert_mngr.md AWS Certificate Manager"
+    parent = "automate/deploy_high_availability/certificates"
+    identifier = "automate/deploy_high_availability/certificates/ha_aws_cert_mngr.md AWS Certificate Manager"
     weight = 200
 +++
 

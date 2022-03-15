@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Security and Firewall"
-    parent = "automate/install/high_availability/common_features"
-    identifier = "automate/install/high_availability/common_features/ha_security_firewall.md Security and Firewall"
+    parent = "automate/deploy_high_availability/common_features"
+    identifier = "automate/deploy_high_availability/common_features/ha_security_firewall.md Security and Firewall"
     weight = 240
 +++
 

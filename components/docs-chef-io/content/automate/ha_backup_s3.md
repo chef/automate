@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Taking Backup with Amazon S3 Bucket"
-    identifier = "automate/install/high_availability/backup_and_restore/ha_backup_s3.md Taking Backup with Amazon S3 Bucket"
-    parent = "automate/install/high_availability/backup_and_restore"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_s3.md Taking Backup with Amazon S3 Bucket"
+    parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 210
 +++
 

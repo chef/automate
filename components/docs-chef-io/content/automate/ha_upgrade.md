@@ -7,8 +7,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Common Features"
-    parent = "automate/install/high_availability/common_features"
-    identifier = "automate/install/high_availability/common_features/ha_upgrade.md Automate Common Features"
+    parent = "automate/deploy_high_availability/common_features"
+    identifier = "automate/deploy_high_availability/common_features/ha_upgrade.md Automate Common Features"
     weight = 200
 +++
 
