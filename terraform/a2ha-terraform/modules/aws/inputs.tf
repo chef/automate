@@ -123,7 +123,11 @@ variable "lb_access_logs" {
 }
 
 variable "s3_bucketName_for_logs" {
-  default = "lb_logs"  
+  default = "lblogs"  
+}
+
+variable "log_bucket" {
+  default = ""
 }
 
 variable "nfs_mount_path" {

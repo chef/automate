@@ -24,6 +24,7 @@ managed_rds_superuser_password = "<%= config.aws.managed_rds_superuser_password 
 managed_rds_dbuser_username = "<%= config.aws.managed_rds_dbuser_username %>"
 managed_rds_dbuser_password = "<%= config.aws.managed_rds_dbuser_password %>"
 managed_rds_certificate = "<%= config.aws.managed_rds_certificate %>"
+s3_bucketName_for_logs = "<%= config.aws.s3_bucketName_for_logs %>"
 <% if config.aws.ami_filter_name %>
 ami_filter_name = "<%= config.aws.ami_filter_name %>"
 <% end %>
@@ -38,9 +39,6 @@ aws_ami_id = "<%= config.aws.ami_id %>"
 <% end %>
 <% if config.aws.lb_access_logs %>
 lb_access_logs = "<%= config.aws.lb_access_logs %>"
-<% end %>
-<% if config.aws.s3_bucketName_for_logs %>
-s3_bucketName_for_logs = "<%= config.aws.s3_bucketName_for_logs %>"
 <% end %>
 <% if config.aws.automate_lb_certificate_arn %>
 automate_lb_certificate_arn = "<%= config.aws.automate_lb_certificate_arn %>"

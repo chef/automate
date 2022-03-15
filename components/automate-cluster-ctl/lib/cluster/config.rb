@@ -98,7 +98,7 @@ module AutomateCluster
       default :cidr_block_addr, " "
       default :ssh_key_pair_name
       default :lb_access_logs, 'false'
-      default :s3_bucketName_for_logs, 'lb_logs'
+      default :s3_bucketName_for_logs, 'lblogs'
       default :setup_managed_services, false
       default :managed_elasticsearch_domain_url, ' '
       default :managed_elasticsearch_username, ' '

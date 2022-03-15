@@ -63,7 +63,7 @@ ami_filter_owner = ""
 ami_id = ""
 # Enabale/Disable load balancer logs
 lb_access_logs = "false"
-s3_bucketName_for_logs = "lb_logs"
+s3_bucketName_for_logs = "lblogs"
 automate_server_instance_type = "t3.medium"
 chef_server_instance_type = "t3.medium"
 elasticsearch_server_instance_type = "m5.large"
