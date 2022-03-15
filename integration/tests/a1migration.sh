@@ -46,7 +46,7 @@ do_test_deploy() {
     chef_server_migration_smoke_tests
     ## skipping status test because of the missing file in automate - /etc/opscode/chef-server-running.json 
     ## adding smoke tag or else all the test will be considered skipping only the status test
-    PATH="/hab/bin:/bin" chef-server-ctl test
+    PATH="/hab/bin:/bin" chef-server-ctl test --smoke --skip-status
 
     workflow_server_migration_smoke_tests
 }
