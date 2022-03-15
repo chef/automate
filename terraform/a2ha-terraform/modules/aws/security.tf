@@ -293,12 +293,12 @@ resource "aws_security_group_rule" "egress_allow_5432_tcp_all" {
 }
 
 resource "aws_security_group_rule" "egress_efs_nfs_2049" {
-  type                     = "egress"
-  from_port                = 2049
-  to_port                  = 2049
-  protocol                 = "tcp"
-  cidr_blocks              = ["0.0.0.0/0"]
-  security_group_id        = aws_security_group.base_linux.id
+  type              = "egress"
+  from_port         = 2049
+  to_port           = 2049
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
 }
 
 resource "aws_security_group_rule" "egress_allow_22_tcp_all" {

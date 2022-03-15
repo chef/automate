@@ -5,19 +5,19 @@ locals {
 }
 
 resource "aws_s3_bucket" "elb_logs" {
-  count = var.lb_access_logs == "true" ? 1 : 0
-  bucket = local.log_bucket
+  count         = var.lb_access_logs == "true" ? 1 : 0
+  bucket        = local.log_bucket
   force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "elb_bucket_acl" {
-  count = var.lb_access_logs == "true" ? 1 : 0
+  count  = var.lb_access_logs == "true" ? 1 : 0
   bucket = local.log_bucket
   acl    = "private"
 }
 
 resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
-  count = var.lb_access_logs == "true" ? 1 : 0
+  count  = var.lb_access_logs == "true" ? 1 : 0
   bucket = local.log_bucket
   policy = <<EOF
 {
@@ -47,10 +47,10 @@ resource "aws_alb" "automate_lb" {
   security_groups    = [aws_security_group.load_balancer.id]
   subnets            = aws_subnet.public.*.id
   tags               = var.tags
-   access_logs {
-     bucket           = local.log_bucket
-     enabled          = var.lb_access_logs
-   }
+  access_logs {
+    bucket  = local.log_bucket
+    enabled = var.lb_access_logs
+  }
 }
 
 resource "aws_alb_target_group" "automate_tg" {

@@ -175,7 +175,7 @@ variable "sudo_cmd" {
 }
 
 variable "s3_bucketName_for_logs" {
-  default = "lblogs"  
+  default = "lblogs"
 }
 
 variable "tag_name" {
