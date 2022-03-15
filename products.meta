@@ -56,6 +56,7 @@
     "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
     "chef/automate-elasticsearch",
+    "chef/automate-supermarket-nginx",
     "core/rsync"
   ],
 
@@ -175,6 +176,15 @@
         "chef/automate-cs-oc-bifrost",
         "chef/automate-cs-oc-erchef",
         "chef/automate-cs-nginx"
+      ]
+    },
+    {
+      "name": "chef-supermarket",
+      "type": "product",
+      "aliases": ["supermarket"],
+      "dependencies": ["core","postgresql"],
+      "services": [
+        "chef/automate-supermarket-nginx"
       ]
     },
     {

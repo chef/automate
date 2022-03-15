@@ -657,6 +657,22 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
+      "name": "chef-supermarket",
+      "aliases": [
+        "supermarket"
+      ],
+      "type": "product",
+      "services": [
+        "chef/automate-supermarket-nginx"
+      ],
+      "packages": null,
+      "dependencies": [
+        "core",
+        "postgresql"
+      ],
+      "hidden": false
+    },
+    {
       "name": "workflow",
       "aliases": null,
       "type": "product",

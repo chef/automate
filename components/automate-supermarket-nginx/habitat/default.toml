@@ -1,0 +1,58 @@
+cache.enabled         = false
+redirect_to_canonical = true
+daemon_disable        = true
+multi_accept          = false
+event                 = ""
+event_enabled         = false
+log_x_forwarded_for   = false
+disable_access_log    = false
+sendfile              = "on"
+keepalive             = true
+keepalive_timeout     = 65
+
+server_names_hash_bucket_size = 64
+types_hash_max_size           = 2048
+types_hash_bucket_size        = 64
+proxy_read_timeout            = ""
+client_body_buffer_size       = ""
+client_max_body_size          = "250m"
+
+log_directory = ""
+
+[rate_limiting]
+enabled   = false
+zone_name = ""
+backoff   = ""
+limit     = ""
+
+[gzip]
+enabled      = true
+http_version = "1.0"
+comp_level   = 2
+proxied      = "any"
+vary         = "off"
+buffers      = ""
+disable      = 'MSIE [1-6]\.'
+min_length   = 1000
+types        = ["text/plain", "text/css", "application/x-javascript", "text/xml", "application/xml", "application/rss+xml", "application/atom+xml", "text/javascript", "application/javascript", "application/json"]
+
+[worker]
+user          = 'supermarket'
+group         = 'supermarket'
+connections   = 1024
+processes     = 2
+rlimit_nofile = ''
+
+[fips]
+enabled = false
+ciphers = "FIPS@STRENGTH:!aNULL:!eNULL"
+
+[ssl]
+enabled         = false
+certificate     = ""
+certificate_key = ""
+dhparam         = ""
+ciphers         = "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
+protocols       = "TLSv1.2"
+session_cache   = "shared:SSL:4m"
+session_timeout = "5m"
