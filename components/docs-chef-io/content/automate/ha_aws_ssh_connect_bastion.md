@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Establishing SSH Connection with Bastion Host"
-    parent = "automate/install/high_availability/aws_deployment"
-    identifier = "automate/install/high_availability/aws_deployment/ha_aws_ssh_connect_bastion.md Establishing SSH Connection with Bastion Host"
+    parent = "automate/deploy_high_availability/aws_deployment"
+    identifier = "automate/deploy_high_availability/aws_deployment/ha_aws_ssh_connect_bastion.md Establishing SSH Connection with Bastion Host"
     weight = 240
 +++
 

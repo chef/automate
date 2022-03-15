@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Taking Backup with EFS System"
-    identifier = "automate/install/high_availability/backup_and_restore/ha_backup_efs.md Taking Backup with EFS System"
-    parent = "automate/install/high_availability/backup_and_restore"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_efs.md Taking Backup with EFS System"
+    parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 220
 +++
 

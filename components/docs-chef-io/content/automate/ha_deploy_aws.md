@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "AWS Deployment Model"
-    parent = "automate/install/high_availability/aws_deployment"
-    identifier = "automate/install/high_availability/aws_deployment/ha_deploy_aws.md AWS Deployment Model"
+    parent = "automate/deploy_high_availability/aws_deployment"
+    identifier = "automate/deploy_high_availability/aws_deployment/ha_deploy_aws.md AWS Deployment Model"
     weight = 200
 +++
 

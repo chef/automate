@@ -7,8 +7,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Health Check Commands"
-    parent = "automate/install/high_availability/common_features"
-    identifier = "automate/install/high_availability/common_features/ha_healthcheck.md Health Check Commands"
+    parent = "automate/deploy_high_availability/common_features"
+    identifier = "automate/deploy_high_availability/common_features/ha_healthcheck.md Health Check Commands"
     weight = 230
 +++
 

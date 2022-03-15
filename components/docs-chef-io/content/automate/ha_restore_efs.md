@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Restoring the EFS Backed-up Data"
-    identifier = "automate/install/high_availability/backup_and_restore/ha_restore_efs.md Restoring the EFS Backed-up Data"
-    parent = "automate/install/high_availability/backup_and_restore"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_restore_efs.md Restoring the EFS Backed-up Data"
+    parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 240
 +++
 
