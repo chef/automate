@@ -52,4 +52,6 @@ You can download and bundle the software included in a specific Chef Automate re
 
   At the end of the deployment process you will see, `Deploy complete`.
 
-The deployment process writes login credentials to the `automate-credentials.toml` in your current working directory.
+  The deployment process writes login credentials to the `automate-credentials.toml` in your current working directory.
+
+1. Navigate to `https://automate.example.com` in a browser and log in to Chef Automate with the credentials provided in *automate-credentials.toml*. Once you log in, Chef Automate prompts you for a license.
