@@ -209,6 +209,7 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 	if derr != nil {
 		return status.Wrap(derr, status.ConfigError, invalidConfig)
 	}
+	var acceptMLSA = deployCmdFlags.acceptMLSA
 	if deployer != nil {
 		conf := new(dc.AutomateConfig)
 		if err := mergeFlagOverrides(conf); err != nil {
@@ -232,6 +233,7 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 			return status.Wrap(derr, status.ConfigError, invalidChannelName)
 		}
 	}
+	deployCmdFlags.acceptMLSA = acceptMLSA
 	writer.Printf("Automate deployment non HA mode proceeding...")
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
