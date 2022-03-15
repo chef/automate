@@ -1,6 +1,7 @@
 package majorupgradechecklist
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/sirupsen/logrus"
 )
 
@@ -106,6 +107,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExt
 		}
 	} else {
 		logrus.Info("Failed to read checklist since version didn't match")
+		return postCmdList, status.Errorf(status.UpgradeError, "Failed to read checklist since version didn't match")
 	}
 	return postCmdList, nil
 }
