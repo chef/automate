@@ -59,7 +59,7 @@ log "Finished installing Automate UI dependencies"
 
 log_section_start "Installing Elixir dependencies"
 pushd components/notifications-service/server
-  git config --global url."https://github.com/".insteadof git@github.com:
+  git config --global url."https://github.com/".insteadOf git://github.com/
   log "git config updated"
   log "Print mix.lock file:"
   cat mix.lock
