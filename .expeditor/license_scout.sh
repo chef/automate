@@ -59,6 +59,7 @@ log "Finished installing Automate UI dependencies"
 
 log_section_start "Installing Elixir dependencies"
 pushd components/notifications-service/server
+  git config --global url."https://github.com/".insteadof git@github.com:
   mix local.hex --force
   mix deps.get
 popd
