@@ -320,6 +320,44 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/org/{org_id}/automateinfraorgusers": {
+      "get": {
+        "operationId": "InfraProxy_GetAutomateInfraOrgUsersList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Automate Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Automate Infra Org ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
         "operationId": "InfraProxy_GetOrgs",
@@ -3334,6 +3372,73 @@ func init() {
         "webui_key": {
           "type": "string",
           "title": "Optional Chef Server Webui Key"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraOrgUsersListItem"
+          },
+          "title": "Automate infra org users list"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraOrgUsersListItem": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "User id"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "User server id"
+        },
+        "org_id": {
+          "type": "string",
+          "description": "Automate Infra Org ID."
+        },
+        "infra_server_username": {
+          "type": "string",
+          "title": "User infra server username"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User first name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User last name"
+        },
+        "email_id": {
+          "type": "string",
+          "title": "User email id"
+        },
+        "middle_name": {
+          "type": "string",
+          "title": "User middle name"
+        },
+        "display_name": {
+          "type": "string",
+          "title": "User display name"
+        },
+        "connector": {
+          "type": "string",
+          "title": "User connector"
+        },
+        "automate_user_id": {
+          "type": "string",
+          "title": "User automate user id"
+        },
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "User is org admin or not"
         }
       }
     },
