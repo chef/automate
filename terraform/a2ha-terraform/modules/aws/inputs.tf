@@ -174,7 +174,7 @@ variable "sudo_cmd" {
   default = "sudo"
 }
 
-variable "s3_bucketName_for_logs" {
+variable "aws_s3_bucketName_for_logs" {
   default = "lblogs"
 }
 

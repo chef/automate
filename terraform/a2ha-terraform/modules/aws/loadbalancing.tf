@@ -1,7 +1,7 @@
 data "aws_elb_service_account" "main" {}
 
 locals {
-  log_bucket = "${var.s3_bucketName_for_logs}-${random_id.random.hex}"
+  log_bucket = "${var.aws_s3_bucketName_for_logs}-${random_id.random.hex}"
 }
 
 resource "aws_s3_bucket" "elb_logs" {
