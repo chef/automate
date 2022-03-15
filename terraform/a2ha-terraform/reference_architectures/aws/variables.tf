@@ -164,10 +164,10 @@ variable "sudo_cmd" {
   default = "sudo"
 }
 
-variable "lb_access_logs" {
-  default = "false"
-}
-
 variable "s3_bucketName_for_logs" {
   default = "lblogs"
+}
+
+variable "lb_access_logs" {
+  default = "false"
 }
