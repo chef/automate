@@ -93,6 +93,11 @@ variable "elasticsearch_server_instance_type" {
   default = "m5a.large"
 }
 
+
+variable "lb_access_logs" {
+  default = "false"
+}
+
 variable "managed_elasticsearch_certificate" {
   default = ""
 }
@@ -166,8 +171,4 @@ variable "sudo_cmd" {
 
 variable "s3_bucketName_for_logs" {
   default = "lblogs"
-}
-
-variable "lb_access_logs" {
-  default = "false"
 }

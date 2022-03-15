@@ -122,10 +122,6 @@ variable "lb_access_logs" {
   default = false
 }
 
-variable "s3_bucketName_for_logs" {
-  default = "lblogs"  
-}
-
 variable "log_bucket" {
   default = ""
 }
@@ -176,6 +172,10 @@ variable "ssh_user_sudo_password" {
 
 variable "sudo_cmd" {
   default = "sudo"
+}
+
+variable "s3_bucketName_for_logs" {
+  default = "lblogs"  
 }
 
 variable "tag_name" {
