@@ -1,12 +1,12 @@
 # shellcheck disable=SC2148
 # stable channel
 
-UPSTREAM_PKG_IDENT="chef/kibana-odfe/0.10.0.4"
+UPSTREAM_PKG_IDENT="chef/kibana-odfe/0.10.1.1"
 pkg_name="automate-ha-kibana"
 pkg_description="Wrapper package for chef/kibana"
 pkg_origin="chef"
 vendor_origin="chef"
-pkg_version="6.8.6"
+pkg_version="6.8.23"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
