@@ -109,6 +109,7 @@ var file_external_infra_proxy_infra_proxy_proto_rawDesc = []byte{
 	0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x69, 0x61, 0x6d,
 	0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x32, 0xa1, 0x8b, 0x01, 0x0a, 0x0a, 0x49, 0x6e, 0x66, 0x72, 0x61, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x32, 0x80, 0x8b, 0x01, 0x0a, 0x0a, 0x49, 0x6e, 0x66, 0x72, 0x61, 0x50, 0x72, 0x6f,
 	0x78, 0x79, 0x12, 0xc7, 0x01, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72,
 	0x73, 0x12, 0x31, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
 	0x65, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78,
@@ -1338,6 +1339,140 @@ var file_external_infra_proxy_infra_proxy_proto_goTypes = []interface{}{
 	(*response.ServerUsers)(nil),              // 105: chef.automate.api.infra_proxy.response.ServerUsers
 	(*response.AutomateInfraServerUsers)(nil), // 106: chef.automate.api.infra_proxy.response.AutomateInfraServerUsers
 	(*response.AutomateInfraOrgUsers)(nil),    // 107: chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers
+	0x65, 0x74, 0x12, 0xa1, 0x02, 0x0a, 0x17, 0x52, 0x65, 0x73, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x72,
+	0x61, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x55, 0x73, 0x65, 0x72, 0x4b, 0x65, 0x79, 0x12, 0x41,
+	0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x72,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x52, 0x65, 0x73, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x72,
+	0x61, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x55, 0x73, 0x65, 0x72, 0x4b, 0x65, 0x79, 0x52, 0x65,
+	0x71, 0x1a, 0x42, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
+	0x65, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78,
+	0x79, 0x2e, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x52, 0x65, 0x73, 0x65, 0x74,
+	0x49, 0x6e, 0x66, 0x72, 0x61, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x55, 0x73, 0x65, 0x72, 0x4b,
+	0x65, 0x79, 0x52, 0x65, 0x73, 0x22, 0x7f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x39, 0x22, 0x37, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x76, 0x30, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x2f, 0x73, 0x65, 0x72,
+	0x76, 0x65, 0x72, 0x73, 0x2f, 0x7b, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x7d,
+	0x2f, 0x75, 0x73, 0x65, 0x72, 0x2f, 0x7b, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65,
+	0x7d, 0x2f, 0x75, 0x73, 0x65, 0x72, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x03, 0x3a, 0x01, 0x2a, 0x8a,
+	0xb5, 0x18, 0x14, 0x0a, 0x12, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x3a, 0x69, 0x6e, 0x66, 0x72, 0x61,
+	0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x73, 0x8a, 0xb5, 0x18, 0x1b, 0x12, 0x19, 0x69, 0x6e, 0x66,
+	0x72, 0x61, 0x3a, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x73, 0x3a,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x33, 0x5a, 0x31, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61,
+	0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f,
+	0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
+}
+
+var file_external_infra_proxy_infra_proxy_proto_goTypes = []interface{}{
+	(*request.GetServers)(nil),                  // 0: chef.automate.api.infra_proxy.request.GetServers
+	(*request.GetServerStatus)(nil),             // 1: chef.automate.api.infra_proxy.request.GetServerStatus
+	(*request.ValidateWebuiKey)(nil),            // 2: chef.automate.api.infra_proxy.request.ValidateWebuiKey
+	(*request.UpdateWebuiKey)(nil),              // 3: chef.automate.api.infra_proxy.request.UpdateWebuiKey
+	(*request.GetServer)(nil),                   // 4: chef.automate.api.infra_proxy.request.GetServer
+	(*request.CreateServer)(nil),                // 5: chef.automate.api.infra_proxy.request.CreateServer
+	(*request.UpdateServer)(nil),                // 6: chef.automate.api.infra_proxy.request.UpdateServer
+	(*request.DeleteServer)(nil),                // 7: chef.automate.api.infra_proxy.request.DeleteServer
+	(*request.GetOrgs)(nil),                     // 8: chef.automate.api.infra_proxy.request.GetOrgs
+	(*request.GetOrg)(nil),                      // 9: chef.automate.api.infra_proxy.request.GetOrg
+	(*request.CreateOrg)(nil),                   // 10: chef.automate.api.infra_proxy.request.CreateOrg
+	(*request.UpdateOrg)(nil),                   // 11: chef.automate.api.infra_proxy.request.UpdateOrg
+	(*request.DeleteOrg)(nil),                   // 12: chef.automate.api.infra_proxy.request.DeleteOrg
+	(*request.ResetOrgAdminKey)(nil),            // 13: chef.automate.api.infra_proxy.request.ResetOrgAdminKey
+	(*request.GetInfraServerOrgs)(nil),          // 14: chef.automate.api.infra_proxy.request.GetInfraServerOrgs
+	(*request.Cookbooks)(nil),                   // 15: chef.automate.api.infra_proxy.request.Cookbooks
+	(*request.CookbookVersions)(nil),            // 16: chef.automate.api.infra_proxy.request.CookbookVersions
+	(*request.Cookbook)(nil),                    // 17: chef.automate.api.infra_proxy.request.Cookbook
+	(*request.CookbookFileContent)(nil),         // 18: chef.automate.api.infra_proxy.request.CookbookFileContent
+	(*request.Roles)(nil),                       // 19: chef.automate.api.infra_proxy.request.Roles
+	(*request.Role)(nil),                        // 20: chef.automate.api.infra_proxy.request.Role
+	(*request.ExpandedRunList)(nil),             // 21: chef.automate.api.infra_proxy.request.ExpandedRunList
+	(*request.CreateRole)(nil),                  // 22: chef.automate.api.infra_proxy.request.CreateRole
+	(*request.UpdateRole)(nil),                  // 23: chef.automate.api.infra_proxy.request.UpdateRole
+	(*request.Clients)(nil),                     // 24: chef.automate.api.infra_proxy.request.Clients
+	(*request.Client)(nil),                      // 25: chef.automate.api.infra_proxy.request.Client
+	(*request.CreateClient)(nil),                // 26: chef.automate.api.infra_proxy.request.CreateClient
+	(*request.ClientKey)(nil),                   // 27: chef.automate.api.infra_proxy.request.ClientKey
+	(*request.DataBags)(nil),                    // 28: chef.automate.api.infra_proxy.request.DataBags
+	(*request.DataBagItems)(nil),                // 29: chef.automate.api.infra_proxy.request.DataBagItems
+	(*request.DataBagItem)(nil),                 // 30: chef.automate.api.infra_proxy.request.DataBagItem
+	(*request.CreateDataBag)(nil),               // 31: chef.automate.api.infra_proxy.request.CreateDataBag
+	(*request.CreateDataBagItem)(nil),           // 32: chef.automate.api.infra_proxy.request.CreateDataBagItem
+	(*request.DataBag)(nil),                     // 33: chef.automate.api.infra_proxy.request.DataBag
+	(*request.UpdateDataBagItem)(nil),           // 34: chef.automate.api.infra_proxy.request.UpdateDataBagItem
+	(*request.Environments)(nil),                // 35: chef.automate.api.infra_proxy.request.Environments
+	(*request.Environment)(nil),                 // 36: chef.automate.api.infra_proxy.request.Environment
+	(*request.CreateEnvironment)(nil),           // 37: chef.automate.api.infra_proxy.request.CreateEnvironment
+	(*request.UpdateEnvironment)(nil),           // 38: chef.automate.api.infra_proxy.request.UpdateEnvironment
+	(*request.Nodes)(nil),                       // 39: chef.automate.api.infra_proxy.request.Nodes
+	(*request.Node)(nil),                        // 40: chef.automate.api.infra_proxy.request.Node
+	(*request.NodeDetails)(nil),                 // 41: chef.automate.api.infra_proxy.request.NodeDetails
+	(*request.UpdateNodeAttributes)(nil),        // 42: chef.automate.api.infra_proxy.request.UpdateNodeAttributes
+	(*request.NodeExpandedRunList)(nil),         // 43: chef.automate.api.infra_proxy.request.NodeExpandedRunList
+	(*request.UpdateNodeTags)(nil),              // 44: chef.automate.api.infra_proxy.request.UpdateNodeTags
+	(*request.UpdateNodeEnvironment)(nil),       // 45: chef.automate.api.infra_proxy.request.UpdateNodeEnvironment
+	(*request.Policyfiles)(nil),                 // 46: chef.automate.api.infra_proxy.request.Policyfiles
+	(*request.Policyfile)(nil),                  // 47: chef.automate.api.infra_proxy.request.Policyfile
+	(*request.DeletePolicyfile)(nil),            // 48: chef.automate.api.infra_proxy.request.DeletePolicyfile
+	(*request.PolicyfileRevisions)(nil),         // 49: chef.automate.api.infra_proxy.request.PolicyfileRevisions
+	(*request.Policygroup)(nil),                 // 50: chef.automate.api.infra_proxy.request.Policygroup
+	(*request.OrgUsers)(nil),                    // 51: chef.automate.api.infra_proxy.request.OrgUsers
+	(*request.ServerUsers)(nil),                 // 52: chef.automate.api.infra_proxy.request.ServerUsers
+	(*request.AutomateInfraServerUsers)(nil),    // 53: chef.automate.api.infra_proxy.request.AutomateInfraServerUsers
+	(*request.ResetInfraServerUserKeyReq)(nil),  // 54: chef.automate.api.infra_proxy.request.ResetInfraServerUserKeyReq
+	(*response.GetServers)(nil),                 // 55: chef.automate.api.infra_proxy.response.GetServers
+	(*response.GetServerStatus)(nil),            // 56: chef.automate.api.infra_proxy.response.GetServerStatus
+	(*response.ValidateWebuiKey)(nil),           // 57: chef.automate.api.infra_proxy.response.ValidateWebuiKey
+	(*response.UpdateWebuiKey)(nil),             // 58: chef.automate.api.infra_proxy.response.UpdateWebuiKey
+	(*response.GetServer)(nil),                  // 59: chef.automate.api.infra_proxy.response.GetServer
+	(*response.CreateServer)(nil),               // 60: chef.automate.api.infra_proxy.response.CreateServer
+	(*response.UpdateServer)(nil),               // 61: chef.automate.api.infra_proxy.response.UpdateServer
+	(*response.DeleteServer)(nil),               // 62: chef.automate.api.infra_proxy.response.DeleteServer
+	(*response.GetOrgs)(nil),                    // 63: chef.automate.api.infra_proxy.response.GetOrgs
+	(*response.GetOrg)(nil),                     // 64: chef.automate.api.infra_proxy.response.GetOrg
+	(*response.CreateOrg)(nil),                  // 65: chef.automate.api.infra_proxy.response.CreateOrg
+	(*response.UpdateOrg)(nil),                  // 66: chef.automate.api.infra_proxy.response.UpdateOrg
+	(*response.DeleteOrg)(nil),                  // 67: chef.automate.api.infra_proxy.response.DeleteOrg
+	(*response.ResetOrgAdminKey)(nil),           // 68: chef.automate.api.infra_proxy.response.ResetOrgAdminKey
+	(*response.GetInfraServerOrgs)(nil),         // 69: chef.automate.api.infra_proxy.response.GetInfraServerOrgs
+	(*response.Cookbooks)(nil),                  // 70: chef.automate.api.infra_proxy.response.Cookbooks
+	(*response.CookbookVersions)(nil),           // 71: chef.automate.api.infra_proxy.response.CookbookVersions
+	(*response.Cookbook)(nil),                   // 72: chef.automate.api.infra_proxy.response.Cookbook
+	(*response.CookbookFileContent)(nil),        // 73: chef.automate.api.infra_proxy.response.CookbookFileContent
+	(*response.Roles)(nil),                      // 74: chef.automate.api.infra_proxy.response.Roles
+	(*response.Role)(nil),                       // 75: chef.automate.api.infra_proxy.response.Role
+	(*response.ExpandedRunList)(nil),            // 76: chef.automate.api.infra_proxy.response.ExpandedRunList
+	(*response.RoleEnvironments)(nil),           // 77: chef.automate.api.infra_proxy.response.RoleEnvironments
+	(*response.Clients)(nil),                    // 78: chef.automate.api.infra_proxy.response.Clients
+	(*response.Client)(nil),                     // 79: chef.automate.api.infra_proxy.response.Client
+	(*response.CreateClient)(nil),               // 80: chef.automate.api.infra_proxy.response.CreateClient
+	(*response.ResetClient)(nil),                // 81: chef.automate.api.infra_proxy.response.ResetClient
+	(*response.DataBags)(nil),                   // 82: chef.automate.api.infra_proxy.response.DataBags
+	(*response.DataBagItems)(nil),               // 83: chef.automate.api.infra_proxy.response.DataBagItems
+	(*response.DataBagItem)(nil),                // 84: chef.automate.api.infra_proxy.response.DataBagItem
+	(*response.CreateDataBag)(nil),              // 85: chef.automate.api.infra_proxy.response.CreateDataBag
+	(*response.CreateDataBagItem)(nil),          // 86: chef.automate.api.infra_proxy.response.CreateDataBagItem
+	(*response.DataBag)(nil),                    // 87: chef.automate.api.infra_proxy.response.DataBag
+	(*response.UpdateDataBagItem)(nil),          // 88: chef.automate.api.infra_proxy.response.UpdateDataBagItem
+	(*response.Environments)(nil),               // 89: chef.automate.api.infra_proxy.response.Environments
+	(*response.Environment)(nil),                // 90: chef.automate.api.infra_proxy.response.Environment
+	(*response.EnvironmentRecipesList)(nil),     // 91: chef.automate.api.infra_proxy.response.EnvironmentRecipesList
+	(*response.Nodes)(nil),                      // 92: chef.automate.api.infra_proxy.response.Nodes
+	(*response.DeleteNode)(nil),                 // 93: chef.automate.api.infra_proxy.response.DeleteNode
+	(*response.Node)(nil),                       // 94: chef.automate.api.infra_proxy.response.Node
+	(*response.UpdateNodeAttributes)(nil),       // 95: chef.automate.api.infra_proxy.response.UpdateNodeAttributes
+	(*response.NodeExpandedRunList)(nil),        // 96: chef.automate.api.infra_proxy.response.NodeExpandedRunList
+	(*response.UpdateNodeTags)(nil),             // 97: chef.automate.api.infra_proxy.response.UpdateNodeTags
+	(*response.UpdateNodeEnvironment)(nil),      // 98: chef.automate.api.infra_proxy.response.UpdateNodeEnvironment
+	(*response.Policyfiles)(nil),                // 99: chef.automate.api.infra_proxy.response.Policyfiles
+	(*response.Policyfile)(nil),                 // 100: chef.automate.api.infra_proxy.response.Policyfile
+	(*response.DeletePolicyfile)(nil),           // 101: chef.automate.api.infra_proxy.response.DeletePolicyfile
+	(*response.PolicyfileRevisions)(nil),        // 102: chef.automate.api.infra_proxy.response.PolicyfileRevisions
+	(*response.Policygroup)(nil),                // 103: chef.automate.api.infra_proxy.response.Policygroup
+	(*response.OrgUsers)(nil),                   // 104: chef.automate.api.infra_proxy.response.OrgUsers
+	(*response.ServerUsers)(nil),                // 105: chef.automate.api.infra_proxy.response.ServerUsers
+	(*response.AutomateInfraServerUsers)(nil),   // 106: chef.automate.api.infra_proxy.response.AutomateInfraServerUsers
+	(*response.ResetInfraServerUserKeyRes)(nil), // 107: chef.automate.api.infra_proxy.response.ResetInfraServerUserKeyRes
 }
 var file_external_infra_proxy_infra_proxy_proto_depIdxs = []int32{
 	0,   // 0: chef.automate.api.infra_proxy.InfraProxy.GetServers:input_type -> chef.automate.api.infra_proxy.request.GetServers
@@ -1402,6 +1537,7 @@ var file_external_infra_proxy_infra_proxy_proto_depIdxs = []int32{
 	52,  // 59: chef.automate.api.infra_proxy.InfraProxy.GetServerUsersList:input_type -> chef.automate.api.infra_proxy.request.ServerUsers
 	53,  // 60: chef.automate.api.infra_proxy.InfraProxy.GetAutomateInfraServerUsersList:input_type -> chef.automate.api.infra_proxy.request.AutomateInfraServerUsers
 	54,  // 61: chef.automate.api.infra_proxy.InfraProxy.GetAutomateInfraOrgUsersList:input_type -> chef.automate.api.infra_proxy.request.AutomateInfraOrgUsers
+	54,  // 61: chef.automate.api.infra_proxy.InfraProxy.ResetInfraServerUserKey:input_type -> chef.automate.api.infra_proxy.request.ResetInfraServerUserKeyReq
 	55,  // 62: chef.automate.api.infra_proxy.InfraProxy.GetServers:output_type -> chef.automate.api.infra_proxy.response.GetServers
 	56,  // 63: chef.automate.api.infra_proxy.InfraProxy.GetServerStatus:output_type -> chef.automate.api.infra_proxy.response.GetServerStatus
 	57,  // 64: chef.automate.api.infra_proxy.InfraProxy.ValidateWebuiKey:output_type -> chef.automate.api.infra_proxy.response.ValidateWebuiKey
@@ -1464,6 +1600,7 @@ var file_external_infra_proxy_infra_proxy_proto_depIdxs = []int32{
 	105, // 121: chef.automate.api.infra_proxy.InfraProxy.GetServerUsersList:output_type -> chef.automate.api.infra_proxy.response.ServerUsers
 	106, // 122: chef.automate.api.infra_proxy.InfraProxy.GetAutomateInfraServerUsersList:output_type -> chef.automate.api.infra_proxy.response.AutomateInfraServerUsers
 	107, // 123: chef.automate.api.infra_proxy.InfraProxy.GetAutomateInfraOrgUsersList:output_type -> chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers
+	107, // 123: chef.automate.api.infra_proxy.InfraProxy.ResetInfraServerUserKey:output_type -> chef.automate.api.infra_proxy.response.ResetInfraServerUserKeyRes
 	62,  // [62:124] is the sub-list for method output_type
 	0,   // [0:62] is the sub-list for method input_type
 	0,   // [0:0] is the sub-list for extension type_name
@@ -1569,6 +1706,7 @@ type InfraProxyClient interface {
 	GetServerUsersList(ctx context.Context, in *request.ServerUsers, opts ...grpc.CallOption) (*response.ServerUsers, error)
 	GetAutomateInfraServerUsersList(ctx context.Context, in *request.AutomateInfraServerUsers, opts ...grpc.CallOption) (*response.AutomateInfraServerUsers, error)
 	GetAutomateInfraOrgUsersList(ctx context.Context, in *request.AutomateInfraOrgUsers, opts ...grpc.CallOption) (*response.AutomateInfraOrgUsers, error)
+	ResetInfraServerUserKey(ctx context.Context, in *request.ResetInfraServerUserKeyReq, opts ...grpc.CallOption) (*response.ResetInfraServerUserKeyRes, error)
 }
 
 type infraProxyClient struct {
@@ -2128,9 +2266,9 @@ func (c *infraProxyClient) GetAutomateInfraServerUsersList(ctx context.Context, 
 	return out, nil
 }
 
-func (c *infraProxyClient) GetAutomateInfraOrgUsersList(ctx context.Context, in *request.AutomateInfraOrgUsers, opts ...grpc.CallOption) (*response.AutomateInfraOrgUsers, error) {
-	out := new(response.AutomateInfraOrgUsers)
-	err := c.cc.Invoke(ctx, "/chef.automate.api.infra_proxy.InfraProxy/GetAutomateInfraOrgUsersList", in, out, opts...)
+func (c *infraProxyClient) ResetInfraServerUserKey(ctx context.Context, in *request.ResetInfraServerUserKeyReq, opts ...grpc.CallOption) (*response.ResetInfraServerUserKeyRes, error) {
+	out := new(response.ResetInfraServerUserKeyRes)
+	err := c.cc.Invoke(ctx, "/chef.automate.api.infra_proxy.InfraProxy/ResetInfraServerUserKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2201,6 +2339,7 @@ type InfraProxyServer interface {
 	GetServerUsersList(context.Context, *request.ServerUsers) (*response.ServerUsers, error)
 	GetAutomateInfraServerUsersList(context.Context, *request.AutomateInfraServerUsers) (*response.AutomateInfraServerUsers, error)
 	GetAutomateInfraOrgUsersList(context.Context, *request.AutomateInfraOrgUsers) (*response.AutomateInfraOrgUsers, error)
+	ResetInfraServerUserKey(context.Context, *request.ResetInfraServerUserKeyReq) (*response.ResetInfraServerUserKeyRes, error)
 }
 
 // UnimplementedInfraProxyServer can be embedded to have forward compatible implementations.
@@ -2392,6 +2531,9 @@ func (*UnimplementedInfraProxyServer) GetAutomateInfraServerUsersList(context.Co
 }
 func (*UnimplementedInfraProxyServer) GetAutomateInfraOrgUsersList(context.Context, *request.AutomateInfraOrgUsers) (*response.AutomateInfraOrgUsers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAutomateInfraOrgUsersList not implemented")
+}
+func (*UnimplementedInfraProxyServer) ResetInfraServerUserKey(context.Context, *request.ResetInfraServerUserKeyReq) (*response.ResetInfraServerUserKeyRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetInfraServerUserKey not implemented")
 }
 
 func RegisterInfraProxyServer(s *grpc.Server, srv InfraProxyServer) {
@@ -3496,20 +3638,20 @@ func _InfraProxy_GetAutomateInfraServerUsersList_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _InfraProxy_GetAutomateInfraOrgUsersList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(request.AutomateInfraOrgUsers)
+func _InfraProxy_ResetInfraServerUserKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.ResetInfraServerUserKeyReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(InfraProxyServer).GetAutomateInfraOrgUsersList(ctx, in)
+		return srv.(InfraProxyServer).ResetInfraServerUserKey(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.api.infra_proxy.InfraProxy/GetAutomateInfraOrgUsersList",
+		FullMethod: "/chef.automate.api.infra_proxy.InfraProxy/ResetInfraServerUserKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InfraProxyServer).GetAutomateInfraOrgUsersList(ctx, req.(*request.AutomateInfraOrgUsers))
+		return srv.(InfraProxyServer).ResetInfraServerUserKey(ctx, req.(*request.ResetInfraServerUserKeyReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3763,8 +3905,8 @@ var _InfraProxy_serviceDesc = grpc.ServiceDesc{
 			Handler:    _InfraProxy_GetAutomateInfraServerUsersList_Handler,
 		},
 		{
-			MethodName: "GetAutomateInfraOrgUsersList",
-			Handler:    _InfraProxy_GetAutomateInfraOrgUsersList_Handler,
+			MethodName: "ResetInfraServerUserKey",
+			Handler:    _InfraProxy_ResetInfraServerUserKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

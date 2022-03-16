@@ -5540,9 +5540,17 @@ func local_request_InfraProxy_GetAutomateInfraServerUsersList_0(ctx context.Cont
 
 }
 
-func request_InfraProxy_GetAutomateInfraOrgUsersList_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.AutomateInfraOrgUsers
+func request_InfraProxy_ResetInfraServerUserKey_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.ResetInfraServerUserKeyReq
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -5562,25 +5570,33 @@ func request_InfraProxy_GetAutomateInfraOrgUsersList_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
 	}
 
-	val, ok = pathParams["org_id"]
+	val, ok = pathParams["user_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_name")
 	}
 
-	protoReq.OrgId, err = runtime.String(val)
+	protoReq.UserName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_name", err)
 	}
 
-	msg, err := client.GetAutomateInfraOrgUsersList(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ResetInfraServerUserKey(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_InfraProxy_GetAutomateInfraOrgUsersList_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.AutomateInfraOrgUsers
+func local_request_InfraProxy_ResetInfraServerUserKey_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.ResetInfraServerUserKeyReq
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -5600,18 +5616,18 @@ func local_request_InfraProxy_GetAutomateInfraOrgUsersList_0(ctx context.Context
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "server_id", err)
 	}
 
-	val, ok = pathParams["org_id"]
+	val, ok = pathParams["user_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_name")
 	}
 
-	protoReq.OrgId, err = runtime.String(val)
+	protoReq.UserName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_name", err)
 	}
 
-	msg, err := server.GetAutomateInfraOrgUsersList(ctx, &protoReq)
+	msg, err := server.ResetInfraServerUserKey(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -6841,7 +6857,7 @@ func RegisterInfraProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxy_GetAutomateInfraOrgUsersList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_InfraProxy_ResetInfraServerUserKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -6850,14 +6866,14 @@ func RegisterInfraProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_InfraProxy_GetAutomateInfraOrgUsersList_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_InfraProxy_ResetInfraServerUserKey_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxy_GetAutomateInfraOrgUsersList_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxy_ResetInfraServerUserKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -8122,7 +8138,7 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxy_GetAutomateInfraOrgUsersList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_InfraProxy_ResetInfraServerUserKey_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -8131,14 +8147,14 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_InfraProxy_GetAutomateInfraOrgUsersList_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_InfraProxy_ResetInfraServerUserKey_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_InfraProxy_GetAutomateInfraOrgUsersList_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_InfraProxy_ResetInfraServerUserKey_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -8268,11 +8284,7 @@ var (
 
 	pattern_InfraProxy_GetAutomateInfraServerUsersList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v0", "infra", "servers", "server_id", "automateinfraserverusers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetAutomateInfraOrgUsersList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "org", "org_id", "users"}, "", runtime.AssumeColonVerbOpt(true)))
-)
-
 var (
-	forward_InfraProxy_GetServers_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_GetServerStatus_0 = runtime.ForwardResponseMessage
 
@@ -8394,5 +8406,5 @@ var (
 
 	forward_InfraProxy_GetAutomateInfraServerUsersList_0 = runtime.ForwardResponseMessage
 
-	forward_InfraProxy_GetAutomateInfraOrgUsersList_0 = runtime.ForwardResponseMessage
+	forward_InfraProxy_ResetInfraServerUserKey_0 = runtime.ForwardResponseMessage
 )

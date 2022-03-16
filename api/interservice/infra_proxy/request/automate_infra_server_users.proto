@@ -14,3 +14,7 @@ message AutomateInfraOrgUsers {
     // Automate Infra Org ID.
     string org_id = 2;
 }
+message ResetInfraServerUserKeyReq {
+    string user_name = 1;
+    string server_id = 2;
+}
