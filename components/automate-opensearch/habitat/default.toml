@@ -145,13 +145,13 @@
   #
   # Set a custom port for HTTP:
   #
-  port = 9200
+  # port = 9200
   #
   # For more information, see the documentation at:
   # <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
 
 [transport]
-  port = 9300
+ # port = 9300
 
 #
 # --------------------------------- Discovery ----------------------------------
@@ -235,3 +235,24 @@
 
 [deprecated]
 external_es = false
+
+plugins.security.ssl.transport.pemcert_filepath: node.pem
+plugins.security.ssl.transport.pemkey_filepath: node-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: root-ca.pem
+plugins.security.ssl.transport.enforce_hostname_verification: false
+plugins.security.ssl.http.enabled: false
+plugins.security.ssl.http.pemcert_filepath: node.pem
+plugins.security.ssl.http.pemkey_filepath: node-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
+plugins.security.allow_default_init_securityindex: true
+plugins.security.authcz.admin_dn:
+  - CN=A,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA
+plugins.security.nodes_dn:
+  - 'CN=N,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA'
+plugins.security.audit.type: internal_opensearch
+plugins.security.enable_snapshot_restore_privilege: true
+plugins.security.check_snapshot_restore_write_privileges: true
+plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+cluster.routing.allocation.disk.threshold_enabled: false
+opendistro_security.audit.config.disabled_rest_categories: NONE
+opendistro_security.audit.config.disabled_transport_categories: NONE
