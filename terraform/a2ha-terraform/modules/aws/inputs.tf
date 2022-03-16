@@ -54,6 +54,10 @@ variable "aws_region" {
   description = "The name of the selected AWS region / datacenter."
 }
 
+variable "aws_s3_bucketName_for_logs" {
+  default = "lblogs"
+}
+
 variable "aws_ssh_key_file" {
 }
 
@@ -62,10 +66,6 @@ variable "aws_ssh_key_pair_name" {
 
 variable "aws_ssh_user" {
   default = "centos"
-}
-
-variable "aws_s3_bucketName_for_logs" {
-  default = "lblogs"
 }
 
 variable "aws_vpc_id" {
