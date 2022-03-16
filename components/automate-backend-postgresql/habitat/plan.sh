@@ -1,12 +1,12 @@
 # shellcheck disable=SC2148
 # stable channel
 
-UPSTREAM_PKG_IDENT="core/postgresql11/11.11"
+UPSTREAM_PKG_IDENT="core/postgresql13/13.5"
 pkg_name="automate-ha-postgresql"
-pkg_description="Wrapper package for core/postgresql11"
+pkg_description="Wrapper package for core/postgresql13"
 pkg_origin="chef"
 vendor_origin="chef"
-pkg_version="11.11.0"
+pkg_version="13.5"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
