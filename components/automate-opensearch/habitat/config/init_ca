@@ -1,0 +1,17 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# importcert won't replace an already existing certificate,
+# so we delete and recreate the store on startup
+rm -f "{{pkg.svc_var_path}}/ca.jks"
+
+{{pkgPathFor "chef/automate-openjdk"}}/bin/keytool -importcert \
+  -trustcacerts \
+  -file {{pkg.svc_config_path}}/root_ca.crt \
+  -alias chefautomaterootca \
+  -keystore {{pkg.svc_var_path}}/ca.jks \
+  -storepass "changeit" \
+  -noprompt
+
+chown hab:hab {{pkg.svc_var_path}}/ca.jks
