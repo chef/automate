@@ -23,6 +23,7 @@ import (
 
 	es "github.com/chef/automate/api/config/elasticsearch"
 	license_control "github.com/chef/automate/api/config/license_control"
+	oss "github.com/chef/automate/api/config/opensearch"
 	global "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/lib/platform/command"
@@ -213,6 +214,18 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 			V1: &es.ConfigRequest_V1{
 				Sys: &es.ConfigRequest_V1_System{
 					Runtime: &es.ConfigRequest_V1_Runtime{
+						Heapsize: w.String(c.ESHeapSize),
+					},
+				},
+			},
+		},
+	})
+
+	cfg.OverrideConfigValues(&AutomateConfig{ // nolint: errcheck
+		Opensearch: &oss.ConfigRequest{
+			V1: &oss.ConfigRequest_V1{
+				Sys: &oss.ConfigRequest_V1_System{
+					Runtime: &oss.ConfigRequest_V1_Runtime{
 						Heapsize: w.String(c.ESHeapSize),
 					},
 				},

@@ -91,3 +91,4 @@ automate-ha-deployment components/automate-backend-deployment
 automate-ha-pgleaderchk components/automate-ha-pgleaderchk
 automate-ha-cluster-ctl components/automate-cluster-ctl
 automate-netcat components/automate-netcat
+automate-opensearch components/automate-opensearch
