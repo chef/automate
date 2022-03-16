@@ -95,14 +95,14 @@ message ConfigRequest {
 
 		message Network {
 			google.protobuf.StringValue host = 1;
-			google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10141, protocol: "http" } ];
+			google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10168, protocol: "http" } ];
 		}
 
 		message Transport {
 			reserved 1;
 			// the transport port is actually a range of ports
 			// e.g. 9300-9400
-			google.protobuf.StringValue port = 2 [ (chef.automate.api.port) = { name: "transport", default: 10142, protocol: "es" } ];
+			google.protobuf.StringValue port = 2 [ (chef.automate.api.port) = { name: "transport", default: 10169, protocol: "es" } ];
 		}
 
 		message Discovery {

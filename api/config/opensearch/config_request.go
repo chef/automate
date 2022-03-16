@@ -84,11 +84,11 @@ func DefaultConfigRequest() *ConfigRequest {
 	sys.Bootstrap.MemoryLock = w.Bool(false)
 
 	// network
-	sys.Network.Port = w.Int32(10141) // user.toml override
+	sys.Network.Port = w.Int32(10168) // user.toml override
 	sys.Network.Host = w.String("")
 
 	// transport
-	sys.Transport.Port = w.String("10142") // user.toml override
+	sys.Transport.Port = w.String("10169") // user.toml override
 
 	// discovery
 	sys.Discovery.ZenFdPingTimeout = w.String("30s")
