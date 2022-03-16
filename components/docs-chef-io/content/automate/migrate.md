@@ -70,14 +70,15 @@ The Chef Automate upgrade process requires connectivity to the internet to insta
 The standard Chef Automate installation requires current versions for Chrome, Edge, or Firefox browsers.
 If you filter internet access via proxy or by other means, you must ensure the following domains are accessible:
 
-* `packages.chef.io`
-* `licensing.chef.io`
-* `raw.githubusercontent.com`
-* `api.bintray.com`
 * `bldr.habitat.sh`
-* `akamai.bintray.com`
-* `dl.bintray.com`
-* `bintray.com`
+* `downloads.chef.io`
+* `github.com`
+* `licensing.chef.io`
+* `packages.chef.io`
+* `raw.githubusercontent.com`
+* `localhost`
+* `127.0.0.1`
+* `0.0.0.0`
 
 #### Proxies
 
