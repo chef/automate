@@ -46,18 +46,17 @@ func TestReadPostChecklistById(t *testing.T) {
 
 func TestReadPendingPostChecklistFile(t *testing.T) {
 	// get pending post checklist from the file if major version is valid,
-	// and there should be no error if file doesn't exist and 
+	// and there should be no error if file doesn't exist and
 	pcm, err := NewPostChecklistManager("3.0.0")
 	assert.NoError(t, err)
 	res, err := pcm.ReadPendingPostChecklistFile(FILE_NAME, false)
 	assert.NoError(t, err)
 	assert.NotEqual(t, []string{}, res)
-
 	res, err = pcm.ReadPendingPostChecklistFile(UPGRADE_METADATA, false)
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(res))
 
-	// if version is invalid and we have right path for the file 
+	// if version is invalid and we have right path for the file
 	// then return error
 	pcm, err = NewPostChecklistManager("100.0.0")
 	assert.Error(t, err)
