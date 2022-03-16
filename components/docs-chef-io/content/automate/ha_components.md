@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 210
 +++
 
-This section lists the Chef Automate High Availability (HA) components and their purpose.
+This section lists the **Chef Automate High Availability (HA)** components and their purpose.
 
 ## Automate-ha-cluster-ctl
 
