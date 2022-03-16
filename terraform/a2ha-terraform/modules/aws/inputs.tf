@@ -32,16 +32,6 @@ variable "automate_instance_count" {
 variable "automate_lb_certificate_arn" {
 }
 
-variable "automate_fqdn" {
-}
-
-variable "automate_instance_count" {
-  default = 1
-}
-
-variable "automate_lb_certificate_arn" {
-}
-
 variable "automate_server_instance_type" {
   default = "t3a.medium"
 }
