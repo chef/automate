@@ -17,12 +17,6 @@ The following Chef Automate HA architecture diagram shows the Chef Automate HA c
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
 
-**PostgreSQL** stores all application service, secret, recovery, and data. **Elastic Search** stores compliance and client-run data and requires these data to be accessible in real-time. A Load balancer distributes to each of the Chef Automate components.
-
-**Journalbeat** and **Metricbeat** are common for all database instances. **Journalbeat** installed as an agent on the servers collects all the services logs and forwards them to Elasticsearch. **Metricbeat** installed on the servers periodically collects metrics from the operating system and services running on the server and sends them to the **Kibana**.
-
-**Kibana** is an open-source, web-based data visualization and analytical tool that allows you to explore, visualize, and build a dashboard over the log data massed in Elasticsearch clusters. Kibana is a part of the Elastic Stack and integrates with Elasticsearch. The **Kibana Dashboard** is a collection of charts, graphs, metrics, searches, and maps in a single pane and provides at-a-glance insights into data from different perspectives enabling you to drill down into the details.
-
 ## Chef Automate Clusters
 
 The Chef Automate HA architecture involves the following clusters part of the main cluster, which are:
@@ -45,6 +39,14 @@ The backend and frontend clusters comprise **four** different servers with HA mo
 4. PostgreSQL - an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
 
 <!-- ! -- These four components reside in a VPC under one network in AWS. Every node sits on a specific machine irrespective of a database. Single database for all three nodes of Chef Automate. -->
+
+**PostgreSQL** stores all application service, secret, recovery, and data. 
+
+**Elastic Search** stores compliance and client-run data and requires these data to be accessible in real-time. A Load balancer distributes to each of the Chef Automate components.
+
+**Journalbeat** and **Metricbeat** are common for all database instances. **Journalbeat** installed as an agent on the servers collects all the services logs and forwards them to Elasticsearch. **Metricbeat** installed on the servers periodically collects metrics from the operating system and services running on the server and sends them to the **Kibana**.
+
+**Kibana** is an open-source, web-based data visualization and analytical tool that allows you to explore, visualize, and build a dashboard over the log data massed in Elasticsearch clusters. Kibana is a part of the Elastic Stack and integrates with Elasticsearch. The **Kibana Dashboard** is a collection of charts, graphs, metrics, searches, and maps in a single pane and provides at-a-glance insights into data from different perspectives enabling you to drill down into the details.
 
 {{< note >}}
 

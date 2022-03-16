@@ -34,7 +34,7 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
 Let us assume that the shared filesystem is mounted to `/mnt/automate_backups`. Now, follow these steps to configure the Chef Automate High Availability (HA) to register the snapshot locations with Elasticsearch:
 
-1. Enter the `mount /mnt/automate_backups` command to ensure the shared file system exists on all Elasticsearch servers.
+1. Execute the `mount /mnt/automate_backups` command to ensure the shared file system exists on all Elasticsearch servers.
 
 1. Create Elasticsearch sub-directory and set permissions by executing the following commands:
 
@@ -45,7 +45,7 @@ sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 
 {{< note >}}
 
-If the network is mounted correctly, you need to perform this step on a single Elasticsearch server.
+If the network appropriately mounted, you need to perform this step on a single Elasticsearch server.
 
 {{< /note >}}
 
@@ -102,6 +102,6 @@ You can perform this application only once, which triggers a restart of the Elas
    path = "/mnt/automate_backups/backups"
 ```
 
-1. Enter the `./chef-automate config patch automate.toml` command to apply the patch configuration to the Chef Automate HA servers. This command also triggers the deployment.
+1. Execute the `./chef-automate config patch automate.toml` command to apply the patch configuration to the Chef Automate HA servers. This command also triggers the deployment.
 
-1. Enter the `chef-automate backup create` command from a Chef Automate front-end node to create a backup.
+1. Execute the `chef-automate backup create` command from a Chef Automate front-end node to create a backup.

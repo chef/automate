@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 270
 +++
 
-An airgapped host means it has no direct inbound or outbound access to internet connectivity. To install or upgrade Chef Automate on an airgapped host, you must create an Airgap Installation Bundle, `.aib` on an internet-connected host and then transfer both the Airgap installation bundle and the chef-automate binary that you used to create it to the airgapped host for use.
+An airgapped host means it has no direct inbound or outbound access to internet connectivity. You must create an Airgap Installation Bundle,`.aib` on an internet-connected host, to install or upgrade Chef Automate on an airgapped host. Then, transfer both the Airgap installation bundle and the chef-automate binary that you used to create it to the airgapped host for use.
 
 ## License
 
@@ -34,23 +34,23 @@ You can download and bundle the software included in a specific Chef Automate re
 
 1. Execute `scp -i your-private-key.pem airgap-bundle.aib user@destination-ip-addess-172-32-0-1:airgap-bundle.aib scp -i your-private-key.pem chef-automate user@destination-ip-addess-172-32-0-1:chef-automate` command. It copies the airgap bundle and the chef-automate cli on your non-internet environment.
 
-1. Execute `chmod +x chef-automate` command. It provides then executable permision to chef-automate cli. 
+1. Execute `chmod +x chef-automate` command. It provides then executable permision to chef-automate cli.
 
 1. Login to your non-internet instance where you have copied airgap bundle.
 
 1. Generate `config.toml` using command `./chef-automate init-config-ha existing_infra`.
 
 1. Open `config.toml` in your preferred editor.
- 
+
 1. Specify following details, `ssh_user`, `ssh_key_file`, `fqdn`, `instance_count`, `automate_private_ip` and other IPs. See [Configuring Chef Automate](https://docs.chef.io/automate/configuration/) for more information on configuration settings.
 
 1. Set **SElinux** configuration as *enforcing* to *permissive* in all the nodes if your instance is `Redhat`. To do so, execute the command `sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config` and SSH (login securely) into your instance where you want to set the *SElinux config.Reboot*.
 
 1. Deploy the airgap bundle using the command `./chef-automate deploy </path/to/config.toml> --airgap-bundle </path/to/airgap-bundle>`, where you need to provide the path of the `cofig.toml` and `arirgap bundle` files in </path/to/config.toml> and </path/to/airgap-bundle>.
 
-  Deploying Chef Automate takes ten minutes for a clean install. At the command prompt, accept the terms of service with a `y`, The installer then performs a series of pre-flight checks. Any unsuccessful checks offer information for resolving issues or skipping the check. After resolving any pre-flight issues, run the deploy command again.
+  Deploying Chef Automate takes ten minutes for a clean install. At the command prompt, accept the terms of service with a `y`. The installer then performs a series of pre-flight checks. Any unsuccessful checks offer information for resolving issues or skipping the check. After resolving any pre-flight issues, run the deploy command.
 
-  At the end of the deployment process you will see, `Deploy complete`.
+  At the end of the deployment process, you will see, `Deploy complete`.
 
   The deployment process writes login credentials to the `automate-credentials.toml` in your current working directory.
 

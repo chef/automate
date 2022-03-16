@@ -17,11 +17,11 @@ Both deployment models require installing and configuring the Chef Automate High
 
 ## Download and Install the Chef Automate Utility
 
-Follow these steps to install **Chef Automate** utility on the fresh server.
+Follow these steps to install the **Chef Automate** utility on the fresh server.
 
-- Open **Command Prompt** and navigate to your preferred location.
+1. Open Command Prompt and navigate to your preferred location.
 
-- Enter the `curl` and `gunzip` commands together, `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate` and press **Enter**.
+1. Execute the `curl` and `gunzip` commands together, `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate` .
 
   The command downloads the Chef Automate utility package in .zip format and installs the utility by providing the execute permission to the Chef Automate file.
 

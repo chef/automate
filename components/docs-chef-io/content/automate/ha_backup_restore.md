@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 200
 +++
 
-Computer security is the safeguarding of computer systems and data against theft, illegal access, or any disaster. It's the method of guarding against and detecting illegal access to your computer system. Data security refers to the process of securing data from illegal access or any disaster. This process includes the following terms:
+Computer security is safeguarding computer systems and data against theft, illegal access, or any disaster. It's the method of guarding against and detecting illegal access to your computer system. Data security refers to the process of securing data from illegal access or any disaster. This process includes the following terms:
 
 - Data Backup
 - Data Restore
@@ -36,7 +36,7 @@ The key difference between backup and recovery is that the backup process is how
 
 ## What are Chef Automate High Availability (HA) Backups?
 
-The Elastic Search, Postgres, and Chef Automate Server data and configurations can be backed up manually. There is no automated backup procedure built-in Chef Automate CLI that periodically backups the data.
+The Elastic Search, Postgres, and Chef Automate Server data and configurations can be backed up manually. The built-in Chef Automate CLI has no automated backup procedure that periodically backups the data.
 
 ## Backup Types
 

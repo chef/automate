@@ -28,8 +28,8 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 - Configure AWS credentials and generate access key ID and secret access key.
 - Create an IAM user in your AWS account to access the S3 bucket.
 - Provide `AdministratorAccess`, `APIGatewayAdministrator` (for AWS, AmazonAPIGatewayAdministrator), `S3FullAccess` (for AWS, AmazonS3FullAccess)permissions to IAM user.
-- Add the IAM role to the IAM user.
-- Create an IAM policy to be associated with an IAM role. On Elasticsearch Access Policy, associate the ARN to the resource section of your bucket.
+- Add the **IAM role** to the IAM user.
+- Create an **IAM policy** to be associated with an IAM role. On Elasticsearch Access Policy, associate the ARN to the resource section of your bucket.
 - Ensure the Chef Automate has basic [permissions](https://docs.chef.io/automate/backup/#aws-s3-permissions) to run backup operation.
 - Ensure the statuses of Chef Automate services are up and running. You can check the status by typing the command, `sudo chef-automate status`.
 - Create `.toml` file.
@@ -62,23 +62,13 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
   # name of an s3 client configuration you create in your elasticsearch.yml
 
-  # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
-
-  # for full documentation on how to configure client settings on your
-
-  # Elasticsearch nodes
+  # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html for complete documentation on how to configure client settings on your Elasticsearch nodes
 
   client = "default"
 
 [global.v1.external.elasticsearch.backup.s3.settings]
 
-    ## The meaning of these settings is documented in the S3 Repository Plugin
-
-    ## documentation. See the following links:
-
-    ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
-
-
+    ## The meaning of these settings is documented in the S3 Repository Plugin documentation. See the following links: https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
 
     ## Backup repo settings
 
@@ -126,21 +116,13 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
     endpoint = "https://s3.amazonaws.com"
 
-    # base_path (optional):  The path within the bucket where backups should be stored
-
-    # If base_path is not set, backups will be stored at the root of the bucket.
+    # base_path (optional):  The path within the bucket where backups should be stored. If base_path is not set, backups will be stored at the root of the bucket.
 
     base_path = "automate"
 
 [global.v1.backups.s3.credentials]
 
-    # Optionally, AWS credentials may be provided. If these are not provided, IAM instance
-
-    # credentials will be used. It's also possible for these to be read through the standard
-
-    # AWS environment variables or through the shared AWS config files.
-
-    # Use the credentials obtained from here [AWS-Credential](https://github.com/chef/automate-as-saas/wiki/Bastion-Setup#aws-credentials)
+    # Optionally, AWS credentials may be provided. If these are not provided, IAM instance credentials will be used. It's also possible for these to be read through the standard AWS environment variables or through the shared AWS config files. Use the credentials obtained from here [AWS-Credential](https://github.com/chef/automate-as-saas/wiki/Bastion-Setup#aws-credentials)
 
     access_key = "AKIARUQHMSKHGYTUJ&UI"
 

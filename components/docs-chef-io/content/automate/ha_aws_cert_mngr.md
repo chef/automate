@@ -13,11 +13,6 @@ gh_repo = "automate"
     weight = 200
 +++
 
-title = "Chef Automate High Availability"
-    parent = "automate/install"
-    identifier = "automate/install/high_availability/introduction/ha.md Chef Automate High Availability"
-    weight = 200
-
 This page explains how to use the **AWS Certificate Manager (ACM)** console to generate a public ACM certificate to create a Load Balancer (LB).
 
 You can either generate a new public certificate or copy an existing Amazon Resource Name (ARN) value of the certificate of your selected region in the AWS console.
@@ -32,7 +27,7 @@ Follow these steps if you want to request an ACM public certificate:
 
 1. Open the [ACM console](https://console.aws.amazon.com/acm/home).
 
-1. Select your region from the top-right corner of the console.
+1. Select your **region** from the top-right corner of the console.
 
 1. Select **Request a certificate**.
 
