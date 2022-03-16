@@ -50,7 +50,7 @@ var _ Operation = &testOperation{}
 
 // Backup executes a backup specification.
 func (t *testOperation) Backup(backupCtx Context, _ ObjectManifest, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -151,7 +151,7 @@ func (r *RsyncExclude) RsyncArgs() (flag, matcher string) {
 // Backup backs up a path using the defined fields on the struct and publishes
 // progress events to the progress channel.
 func (p *PathCopyOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -165,12 +165,14 @@ func (p *PathCopyOperation) Backup(backupCtx Context, om ObjectManifest, progCha
 
 	src := fmt.Sprintf("%s/", p.SrcPath)
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	log := logrus.WithFields(logrus.Fields{
 		"name":      p.Name,
 		"backup_id": backupCtx.backupTask.TaskID(),
 		"src_path":  p.SrcPath,
 		"operation": "path_copy",
 		"action":    "backup",
+		"deadline":  backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -371,12 +373,14 @@ func (p *PathCopyOperation) Delete(backupCtx Context) error {
 
 	basePath := path.Join(path.Join(p.ObjectName...), "/")
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":      p.Name,
 		"backup_id": backupCtx.backupTask.TaskID(),
 		"base_path": basePath,
 		"operation": "path_copy",
 		"action":    "delete",
+		"deadline":  backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 	deleteObjs, _, err := backupCtx.bucket.List(backupCtx.ctx, basePath, false)
 	if err != nil {
@@ -399,7 +403,7 @@ func (p *PathCopyOperation) Delete(backupCtx Context) error {
 // Restore restores a path using the defined fields on the struct and publishes
 // progress events to the progress channel.
 func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -416,6 +420,7 @@ func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verif
 
 	dstPath := p.SrcPath
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	log := logrus.WithFields(logrus.Fields{
 		"name":       p.Name,
 		"backup_id":  backupCtx.backupTask.TaskID(),
@@ -423,6 +428,7 @@ func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verif
 		"base_path":  basePath,
 		"operation":  "path_copy",
 		"action":     "restore",
+		"deadline":   backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -483,7 +489,7 @@ var _ Operation = &MetadataWriterOperation{}
 
 // Backup executes a backup specification.
 func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -510,11 +516,13 @@ func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, p
 
 	objectName := path.Join(path.Join(m.ObjectName...), metadataFileBaseName)
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":      m.Spec.Name,
 		"backup_id": backupCtx.backupTask.TaskID(),
 		"operation": "metadata_writer",
 		"action":    "backup",
+		"deadline":  backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	writer, err := backupCtx.bucket.NewWriter(backupCtx.ctx, objectName)
@@ -558,12 +566,15 @@ func (m *MetadataWriterOperation) Delete(backupCtx Context) error {
 	}
 
 	objectPath := path.Join(path.Join(m.ObjectName...), metadataFileBaseName)
+
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        m.Spec.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
 		"object_path": objectPath,
 		"operation":   "metadata_writer",
 		"action":      "delete",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
@@ -601,7 +612,7 @@ type Cmd struct {
 
 // Backup executes a backup specification.
 func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -635,6 +646,7 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 		return errors.Wrapf(err, "failed to create writer for %s", objectName)
 	}
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        c.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
@@ -642,6 +654,7 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 		"object_name": objectName,
 		"operation":   "command_execute",
 		"action":      "backup",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	err = c.cmdExecutor.Run(cmdToExec[0],
@@ -676,7 +689,7 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 
 // Restore executes a backup specification.
 func (c *CommandExecuteOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -747,12 +760,14 @@ func (c *CommandExecuteOperation) Delete(backupCtx Context) error {
 
 	objectPath := path.Join(path.Join(c.ObjectName...), c.Cmd.Name)
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        c.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
 		"object_path": objectPath,
 		"operation":   "command_execute",
 		"action":      "delete",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
@@ -787,7 +802,7 @@ func (d *DatabaseDumpOperation) Backup(backupCtx Context, om ObjectManifest, pro
 
 // Restore executes a backup operation.
 func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -801,6 +816,7 @@ func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, v
 
 	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.sql", d.Name))
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
@@ -809,6 +825,7 @@ func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, v
 		"object_name": objectName,
 		"operation":   "database_dump",
 		"action":      "restore",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := verifier.ObjectValid(objectName); err != nil {
@@ -851,12 +868,14 @@ func (d *DatabaseDumpOperation) Delete(backupCtx Context) error {
 
 	objectPath := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.sql", d.Name))
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
 		"object_path": objectPath,
 		"operation":   "database_dump",
 		"action":      "delete",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
@@ -883,12 +902,14 @@ var _ Operation = &ElasticsearchOperation{}
 func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, progChan chan OperationProgress) error {
 	backupID := backupCtx.backupTask.TaskID()
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	log := logrus.WithFields(logrus.Fields{
 		"backup_id":        backupID,
 		"service_name":     esop.ServiceName,
 		"multi_index_spec": esop.MultiIndexSpec,
 		"operation":        "elasticsearch_snapshot",
 		"action":           "backup",
+		"deadline":         backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -922,12 +943,14 @@ func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, 
 func (esop *ElasticsearchOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
 	backupID := backupCtx.restoreTask.Backup.TaskID()
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	log := logrus.WithFields(logrus.Fields{
 		"backup_id":    backupID,
 		"restore_id":   backupCtx.restoreTask.TaskID(),
 		"service_name": esop.ServiceName,
 		"operation":    "elasticsearch_snapshot",
 		"action":       "restore",
+		"deadline":     backupCtxDeadline.Format(time.RFC3339),
 	})
 	log.Info("Running backup operation")
 
@@ -965,11 +988,13 @@ func (esop *ElasticsearchOperation) Delete(backupCtx Context) error {
 
 	backupID := backupCtx.backupTask.TaskID()
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"backup_id":    backupID,
 		"service_name": esop.ServiceName,
 		"operation":    "elasticsearch_snapshot",
 		"action":       "delete",
+		"deadline":     backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	conn, err := backupCtx.connFactory.DialContext(backupCtx.ctx, "es-sidecar-service", backupCtx.esSidecarInfo.Address())
@@ -1091,7 +1116,7 @@ var _ Operation = &DatabaseDumpOperation{}
 
 // Backup executes a backup operation.
 func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -1118,12 +1143,14 @@ func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, p
 		UseCustomFormat:   true,
 	}
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
 		"object_name": objectName,
 		"operation":   "database_dump_v2",
 		"action":      "backup",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	// TODO(ssd) 2018-04-16: Pass the progress bar and context
@@ -1152,7 +1179,7 @@ func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, p
 
 // Restore executes a backup operation.
 func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
+	// Make sure the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
 		return backupCtx.ctx.Err()
@@ -1166,6 +1193,7 @@ func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string,
 
 	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
@@ -1173,6 +1201,7 @@ func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string,
 		"object_name": objectName,
 		"operation":   "database_dump_v2",
 		"action":      "restore",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := verifier.ObjectValid(objectName); err != nil {
@@ -1215,12 +1244,14 @@ func (d *DatabaseDumpOperationV2) Delete(backupCtx Context) error {
 
 	objectPath := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
 
+	backupCtxDeadline, _ := backupCtx.ctx.Deadline()
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
 		"backup_id":   backupCtx.backupTask.TaskID(),
 		"object_path": objectPath,
 		"operation":   "database_dump_v2",
 		"action":      "delete",
+		"deadline":    backupCtxDeadline.Format(time.RFC3339),
 	}).Info("Running backup operation")
 
 	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {

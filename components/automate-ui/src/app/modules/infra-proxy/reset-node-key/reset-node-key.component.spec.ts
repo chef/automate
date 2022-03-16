@@ -9,6 +9,11 @@ import { HttpStatus } from 'app/types/types';
 import { ResetKeyClientSuccess,
   ResetKeySuccessPayload,
   ResetKeyClientFailure } from 'app/entities/clients/client.action';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ResetNodeKeyComponent', () => {
   let component: ResetNodeKeyComponent;
@@ -21,6 +26,9 @@ describe('ResetNodeKeyComponent', () => {
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-loading-spinner'}),
         ResetNodeKeyComponent ],
+        providers: [
+          { provide: TelemetryService, useClass: MockTelemetryService }
+        ],
         imports: [
           StoreModule.forRoot(ngrxReducers, { runtimeChecks })
         ]

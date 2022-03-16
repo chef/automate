@@ -37,10 +37,6 @@ output "automate_private_ips" {
   value = aws_instance.chef_automate.*.private_ip
 }
 
-output "chef_server_frontend_urls" {
-  value = "https://${aws_alb.chef_server_lb.dns_name}"
-}
-
 output "chef_server_private_ips" {
   value = aws_instance.chef_server.*.private_ip
 }

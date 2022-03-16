@@ -23,16 +23,17 @@ pkg_build_deps=(
   # We have seen failures with notification service http request
   # with external services. This is because the erlang version was bumped to
   # v23.2. Hence pinning the version till we have a fix.
-  core/erlang/21.3/20200825051314
+  core/erlang/21.3/20190327152504
 
   # NOTE(ssd) 2019-07-03: PIN PIN PIN
   #
   # elixir 1.9.0 shipped with a number of changes to how releases
   # work. This appears to have broken the build. Pinning until we can
   # sort out the required changes.
-  core/elixir/1.8.0
+  core/elixir/1.8.0/20190327153604
   core/glibc
 )
+
 pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
@@ -86,6 +87,7 @@ do_prepare() {
 
 do_build() {
   pushd "${CACHE_PATH}/server" > /dev/null
+    git config --global url."https://github.com/".insteadOf git://github.com/
     MIX_ENV=habitat mix do deps.get, release
   popd > /dev/null
   TARGET="${CACHE_PATH}/server/_habitat_build/habitat/rel/notifications"

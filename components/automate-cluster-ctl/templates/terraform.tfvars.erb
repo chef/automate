@@ -36,6 +36,9 @@ ami_filter_owner = "<%= config.aws.ami_filter_owner %>"
 <% if config.aws.ami_id %>
 aws_ami_id = "<%= config.aws.ami_id %>"
 <% end %>
+<% if config.aws.lb_access_logs %>
+lb_access_logs = "<%= config.aws.lb_access_logs %>"
+<% end %>
 <% if config.aws.automate_lb_certificate_arn %>
 automate_lb_certificate_arn = "<%= config.aws.automate_lb_certificate_arn %>"
 <% end %>

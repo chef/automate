@@ -84,6 +84,7 @@ type AwsConfigToml struct {
 			AmiFilterVirtType               string `toml:"ami_filter_virt_type"`
 			AmiFilterOwner                  string `toml:"ami_filter_owner"`
 			AmiID                           string `toml:"ami_id"`
+			LBAccessLogs                    string `toml:"lb_access_logs"`
 			AutomateServerInstanceType      string `toml:"automate_server_instance_type"`
 			ChefServerInstanceType          string `toml:"chef_server_instance_type"`
 			ElasticsearchServerInstanceType string `toml:"elasticsearch_server_instance_type"`

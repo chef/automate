@@ -19,7 +19,7 @@ variable "automate_ebs_volume_size" {
 }
 
 variable "automate_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "automate_lb_certificate_arn" {
@@ -64,7 +64,7 @@ variable "chef_ebs_volume_size" {
 }
 
 variable "chef_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "chef_server_instance_type" {
@@ -88,7 +88,7 @@ variable "elasticsearch_ebs_volume_size" {
 }
 
 variable "elasticsearch_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "elasticsearch_private_ips" {
@@ -152,7 +152,7 @@ variable "postgresql_ebs_volume_size" {
 }
 
 variable "postgresql_ebs_volume_type" {
-  default = "gp2"
+  default = "gp3"
 }
 
 variable "postgresql_private_ips" {

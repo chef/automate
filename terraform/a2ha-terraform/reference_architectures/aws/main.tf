@@ -39,6 +39,7 @@ module "aws" {
   proxy_listen_port                  = var.proxy_listen_port
   setup_managed_services             = var.setup_managed_services
   source                             = "./modules/aws"
+  lb_access_logs                     = var.lb_access_logs
   tags                               = var.aws_tags
 }
 

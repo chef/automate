@@ -19,9 +19,10 @@ import (
 )
 
 const (
-	defaultLatestManifestURLFmt = "https://packages.chef.io/manifests/%s/automate/latest.json"
-	defaultManifestURLFmt       = "https://packages.chef.io/manifests/automate/%s.json"
-	packagesChefIOSigAsc        = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+	defaultSemanticManifestURLFmt = "https://packages.chef.io/manifests/%s/automate/latest_semver.json"
+	defaultLatestManifestURLFmt   = "https://packages.chef.io/manifests/%s/automate/latest.json"
+	defaultManifestURLFmt         = "https://packages.chef.io/manifests/automate/%s.json"
+	packagesChefIOSigAsc          = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.12 (Darwin)
 Comment: GPGTools - http://gpgtools.org
 	
@@ -71,10 +72,11 @@ func init() {
 // default manifests are stored on S3, but the manifestURLFmt can be
 // overridden for testing.
 type HTTP struct {
-	HTTPClient           *http.Client
-	latestManifestURLFmt string
-	manifestURLFmt       string
-	noVerify             bool
+	HTTPClient                   *http.Client
+	latestManifestURLFmt         string
+	latestSemanticManifestURLFmt string
+	manifestURLFmt               string
+	noVerify                     bool
 }
 
 // An Opt represent an option that can be passed to NewClient
@@ -90,6 +92,10 @@ func NewHTTPClient(options ...Opt) *HTTP {
 		option(c)
 	}
 
+	if c.latestSemanticManifestURLFmt == "" {
+		c.latestSemanticManifestURLFmt = defaultSemanticManifestURLFmt
+	}
+
 	if c.latestManifestURLFmt == "" {
 		c.latestManifestURLFmt = defaultLatestManifestURLFmt
 	}
@@ -100,6 +106,7 @@ func NewHTTPClient(options ...Opt) *HTTP {
 
 	// We allow skipping manifest verification if needed by setting this environment
 	// variable. Set it only if you must
+	//Todo(milestone) -- For milestone we cannot skip
 	if os.Getenv("CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION") == "true" {
 		c.noVerify = true
 	}
@@ -111,6 +118,12 @@ func NewHTTPClient(options ...Opt) *HTTP {
 func LatestURLFormat(urlFormat string) Opt {
 	return func(c *HTTP) {
 		c.latestManifestURLFmt = urlFormat
+	}
+}
+
+func LatestSemanticURLFormat(urlFormat string) Opt {
+	return func(c *HTTP) {
+		c.latestSemanticManifestURLFmt = urlFormat
 	}
 }
 
@@ -129,11 +142,24 @@ func NoVerify(noVerify bool) Opt {
 	}
 }
 
+//Todo(milestone) Add another function to check if a manifest exists
+
 // GetCurrentManifest retrieves the current manifest for the given
 // channel.
 func (c *HTTP) GetCurrentManifest(ctx context.Context, channel string) (*manifest.A2, error) {
-	url := fmt.Sprintf(c.latestManifestURLFmt, channel)
-	return c.manifestFromURL(ctx, url)
+	//try to get semantic version manifest
+	url := fmt.Sprintf(c.latestSemanticManifestURLFmt, channel)
+	m, err := c.manifestFromURL(ctx, url)
+	if err == nil {
+		return m, nil
+	}
+	if strings.Contains(err.Error(), "failed to locate manifest") {
+		//since received error in fetching semantic version, try to fetch timestamp versioned manifest
+		url = fmt.Sprintf(c.latestManifestURLFmt, channel)
+		return c.manifestFromURL(ctx, url)
+	}
+
+	return nil, err
 }
 
 // GetCurrentManifest retrieves the current manifest for the given

@@ -1,15 +1,15 @@
 +++
 title = "Deployment Workflows"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Deployment Workflows"
-    parent = "automate/install"
+    parent = "automate/install/ha"
     identifier = "automate/install/ha_workflow.md Deployment Workflows"
-    weight = 230
+    weight = 30
 +++
 
 This page includes the two types of Chef Automate High Availability (HA) Workflows in words and infographic format.
@@ -67,7 +67,7 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 
 1. Build an AWS bastion host using the **AWS EC2 instance** option.
    1. Specify instance type as t2.medium, vCPUs as 1, Memory (GiB) as 4, and Instance Storage (GB) as EBS only.
-   1. Modify **VPC** and **subnet** values as required.
+   1. Change **VPC** and **subnet** values as required.
    1. Specify 100 GB of storage in the **Size** (GiB) field.
    1. Create a new security group or Select an existing security group option. Ensure Type is SSH, Protocol is TCP, and Port Range is 22 to create rules and connections.
    1. Launch the EC2 instance.

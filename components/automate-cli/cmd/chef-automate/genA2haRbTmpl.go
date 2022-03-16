@@ -129,6 +129,8 @@ aws do
   vpc_id "{{ .Aws.Config.AwsVpcId }}"
   cidr_block_addr "{{ .Aws.Config.AwsCidrBlockAddr }}"
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
+  ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
+  lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
   setup_managed_services {{ .Aws.Config.SetupManagedServices }}
   {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ else }}#managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ else }}#managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ end }}
