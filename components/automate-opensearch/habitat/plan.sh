@@ -62,7 +62,7 @@ do_install() {
   # Elasticsearch is greedy when grabbing config files from /bin/..
   # so we need to put the untemplated config dir out of reach
   mkdir -p "${pkg_prefix}/os"
-  sudo -c cp -a ./* "${pkg_prefix}/os" hab
+  cp -a ./* "${pkg_prefix}/os"
   echo "what is HAB_CACHE_SRC_PATH : "$HAB_CACHE_SRC_PATH
   echo "what is pkg_prefix : "${pkg_prefix}
   echo "where i am : " 
@@ -78,6 +78,8 @@ do_install() {
   #export LD_RUN_PATH
   #sudo ./bin/opensearch-plugin install repository-s3
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
+  chown -RL hab:hab ${pkg_prefix}
+  chown -RL hab:hab ${pkg_prefix}/*
 }
 
 do_strip() {
