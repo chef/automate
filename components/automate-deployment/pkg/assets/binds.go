@@ -54,6 +54,8 @@ automate-ha-pgleaderchk BINDING_MODE strict
 automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
 automate-minio BINDING_MODE strict
+automate-opensearch REQUIRED backup-gateway
+automate-opensearch BINDING_MODE strict
 automate-pg-gateway REQUIRED automate-postgresql
 automate-pg-gateway BINDING_MODE relaxed
 automate-postgresql BINDING_MODE strict
