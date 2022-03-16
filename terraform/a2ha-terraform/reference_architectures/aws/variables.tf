@@ -51,6 +51,10 @@ variable "aws_region" {
 variable "aws_ssh_key_pair_name" {
 }
 
+variable "aws_s3_bucketName_for_logs" {
+  default = "lblogs"
+}
+
 variable "aws_tags" {
 }
 
@@ -166,8 +170,4 @@ variable "ssh_user" {
 
 variable "sudo_cmd" {
   default = "sudo"
-}
-
-variable "aws_s3_bucketName_for_logs" {
-  default = "lblogs"
 }
