@@ -60,4 +60,7 @@ const configTemplate = `
 #
 [elasticsearch.v1.sys.runtime]
   heapsize = "{{ .ESHeapSize }}"
+[opensearch.v1.sys.runtime]
+  heapsize = "{{ .ESHeapSize }}"
+
 `

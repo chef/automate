@@ -56,6 +56,12 @@ paths = [
   "components/automate-elasticsearch/*"
 ]
 
+[automate-opensearch]
+plan_path = "components/automate-opensearch"
+paths = [
+  "components/automate-opensearch/*"
+]
+
 [automate-postgresql]
 plan_path = "components/automate-postgresql"
 paths = [

@@ -55,6 +55,7 @@
     "chef/automate-ha-postgresql",
     "chef/automate-ha-cluster-ctl",
     "chef/automate-netcat",
+    "chef/automate-opensearch",
     "core/rsync"
   ],
 
@@ -160,6 +161,7 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
+        "chef/automate-opensearch",
         "chef/user-settings-service"
       ]
     },
