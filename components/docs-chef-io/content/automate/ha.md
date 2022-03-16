@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 **High availability (HA)** refers to a system or application (such as a network, a server array, or cluster) that offers a high level of operational performance and quality over a relevant time with maximum potential uptime and accessibility for the content stored on it. While a more basic system will be adequate to serve content to a low or medium number of users, it may include a single point of failure. This means that if one server goes down, whether due to traffic overload or any number of other issues, the entire site or application could become unavailable.
 
-HA means the application remains available with no interruption. We achieve high availability when an application continues to operate when one or more underlying components fail. For example, a router, switch, firewall, or server that fails.
+**HA** means the application remains available with no interruption. We achieve high availability when an application continues to operate when one or more underlying components fail. For example, a router, switch, firewall, or server that fails.
 
 Thus, HA is designed to avoid loss of service by reducing or managing failures and minimizing unscheduled downtime (when your system or network is not available for use or is unresponsive) that happens due to power outages or failure of a component.
 
@@ -22,7 +22,7 @@ Thus, HA is designed to avoid loss of service by reducing or managing failures a
 
 ## What are High Availability (HA) clusters?
 
-A **cluster** is a group of inter-connected computers that work together to perform intensive tasks. In a cluster, each computer is referred to as a "node".
+A **cluster** is a group of inter-connected computers that work together to perform intensive tasks. In a cluster, each computer is referred to as a `node`.
 
 **HA clusters** are servers grouped to operate as a single, unified system supporting server applications that can be reliably utilized with a minimum amount of downtime. They are also called **failover clusters** as they share the same storage but use a different network and can run the same workloads of the primary system they support. HA clusters are tested regularly to confirm nodes are always in operational mode.
 
