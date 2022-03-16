@@ -34,17 +34,17 @@ The Virtual machine is required for either of the Chef Automate HA deployment ty
 - Hard Disk Space - 100 GB
 - Ports to be publicly accessible: 22 and 9631
 
-Refer [On-premises Deployment Model](( {{< relref "ha_deploy_bareinfra.md" >}} )) page for the deployment procedure.
+Refer [On-premises Deployment Model]({{< relref "ha_deploy_bareinfra.md" >}}) page for the deployment procedure.
 
 ### Bastion Host Prerequisites for AWS (Amazon Web Services) Deployment
 
-- [AWS Credential configured on your bastion host](( {{< relref "ha_configure_aws_credentials.md" >}} )).
+- [AWS Credential configured on your bastion host]({{< relref "ha_configure_aws_credentials.md" >}}).
 - Create the certificate for the DNS
 - Operating System (OS): Bastion host with Ubuntu 20.04 or centOs-7 or RHEL-7
 - AWS instance type: *t2.medium*
 - Memory: Minimum of 4GB
 - Hard Disk Space - 100 GB
 - SSH: VPC to Port 22, publicly accessible
-- [Setup Virtual Private Cloud (VPC) in AWS](( {{< relref "ha_vpc_setup.md" >}}))
+- [Setup Virtual Private Cloud (VPC) in AWS]({{< relref "ha_vpc_setup.md" >}})
 
-Refer [AWS Deployment Model](( {{< relref "ha_deploy_aws.md" >}} )) page for building an bastion host and Chef Automate HA deployment procedure using AWS.
+Refer [AWS Deployment Model]({{< relref "ha_deploy_aws.md" >}}) page for building an bastion host and Chef Automate HA deployment procedure using AWS.

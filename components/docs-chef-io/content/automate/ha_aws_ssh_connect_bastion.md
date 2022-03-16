@@ -18,10 +18,10 @@ This page explains the procedure to establish the connection between your bastio
 1. Navigate to the AWS Management Console.
 1. Select **Instances** > **EC2** option from the left menu.
 1. Search your instance and select the corresponding Instance ID. The **AWS Console** displays the **Instance Summary** screen.
-1. Select **Connect**. The AWS console displays various methods to connect to your instance. Here, we have used the Mac system.
+1. Select **Connect**. The AWS console displays a list of methods to connect to your instance. Here, we have used the Mac system.
 1. Open an **SSH client**.
 1. Locate your private key file and navigate to that directory.
-1. Run the `chmod 400 key.pem` command (`key.pem` is the name of the key pair file name) to ensure your key is not publicly viewable.
+1. Execute the `chmod 400 key.pem` command (`key.pem` is the name of the key pair file name) to ensure your key is not publicly viewable.
 
 ![AWS EC2 Launch Status](/images/automate/ha_aws_connect.png)
 
