@@ -61,5 +61,5 @@ variable "sudo_cmd" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/home"
 }
