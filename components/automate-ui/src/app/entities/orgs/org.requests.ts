@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { Org } from './org.model';
+import { Org, PreviewData } from './org.model';
 import {
   OrgsSuccessPayload,
   OrgSuccessPayload,
@@ -59,10 +59,10 @@ export class OrgRequests {
     ${env.infra_proxy_url}/servers/migrations/staged_data/${migration_id}`);
   }
 
-  public confirmPreview(server_id: string, migration_id: string)
+  public confirmPreview(server_id: string, previewData: PreviewData)
   : Observable<ConfirmSuccessPayload> {
-    return this.http.get<ConfirmSuccessPayload>(
-      `${env.infra_proxy_url}/servers/${server_id}/migrations/confirm_preview/${migration_id}`);
+    return this.http.post<ConfirmSuccessPayload>(
+      `${env.infra_proxy_url}/servers/${server_id}/migrations/confirm_preview/${previewData.migration_id}`, previewData);
   }
 
   public checkUser(user: string): Observable<CheckUserPayload> {

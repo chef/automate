@@ -215,7 +215,7 @@ export interface ConfirmSuccessPayload {
 export class ConfirmPreview implements Action {
   readonly type = OrgActionTypes.CONFIRM_PREVIEW;
 
-  constructor(public payload: { server_id: string, migration_id: string}) { }
+  constructor(public payload: { server_id: string, previewData: PreviewData}) { }
 }
 
 export class ConfirmPreviewSuccess implements Action {
