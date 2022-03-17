@@ -209,7 +209,6 @@ func MigrateUsersPermissions(ctx context.Context, authzPolicyClient authz.Polici
 					result.ParsedResult.UserPermission.Skipped++
 					continue
 				} else {
-					fmt.Println("Doing for the org ------------------------------------", orgUsers.OrgName)
 					err, _ = MigrateUserPermission(ctx, orgUsers.OrgName, selectedUsersMap[orgUserAssociation.Username], orgUserAssociation, authzPolicyClient, result.Meta.ServerID)
 					if err != nil {
 						log.Errorf("Failed to migrate user permissions for org user %s of org %s for migration id %s : %s", orgUserAssociation.Username, orgUsers.OrgName.Name, result.Meta.MigrationID, err.Error())
