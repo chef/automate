@@ -113,9 +113,10 @@ func SetupInfraProxyService(ctx context.Context,
 
 	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
-	authzProjectClient := authz.NewProjectsServiceClient(authzConn)
-
-	authzPolicyClient := authz.NewPoliciesServiceClient(authzConn)
+	authzServiceClients := service.AuthzServiceClients{
+		AuthzPolicyClient:  authz.NewMockPoliciesServiceClient(gomock.NewController(t)),
+		AuthzProjectClient: authz.NewMockProjectsServiceClient(gomock.NewController(t)),
+	}
 
 	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
 
@@ -127,7 +128,7 @@ func SetupInfraProxyService(ctx context.Context,
 
 	localUserClient := local_users_api.NewMockUsersMgmtServiceClient(gomock.NewController(t))
 
-	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient, localUserClient, authzPolicyClient)
+	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient, authzClient, localUserClient, authzServiceClients)
 
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)

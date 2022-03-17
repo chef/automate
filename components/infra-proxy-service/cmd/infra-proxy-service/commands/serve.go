@@ -88,9 +88,10 @@ func serve(cmd *cobra.Command, args []string) {
 	}
 	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
-	authzProjectClient := authz.NewProjectsServiceClient(authzConn)
-
-	authzPolicyClient := authz.NewPoliciesServiceClient(authzConn)
+	authzServiceClients := service.AuthzServiceClients{
+		AuthzPolicyClient:  authz.NewPoliciesServiceClient(authzConn),
+		AuthzProjectClient: authz.NewProjectsServiceClient(authzConn),
+	}
 
 	if cfg.SecretsAddress == "" {
 		fail(errors.New("missing required config secrets_address"))
@@ -111,7 +112,7 @@ func serve(cmd *cobra.Command, args []string) {
 	//Local user service client
 	localUserClient := local_user.NewUsersMgmtServiceClient(localUserConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient, localUserClient, authzPolicyClient)
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, localUserClient, authzServiceClients)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

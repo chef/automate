@@ -516,18 +516,19 @@ func TestStoreUserPermission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			memebers := []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)}
 			tt.args.authzClient.EXPECT().AddPolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.AddPolicyMembersResp{
-				Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+				Members: memebers,
 			}, nil)
 			tt.args.authzClient.EXPECT().RemovePolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.RemovePolicyMembersResp{
-				Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+				Members: memebers,
 			}, nil)
 			if tt.args.NeedError {
 				tt.args.authzClient.EXPECT().AddPolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.AddPolicyMembersResp{
-					Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+					Members: memebers,
 				}, errors.New("Already exists"))
 				tt.args.authzClient.EXPECT().RemovePolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.RemovePolicyMembersResp{
-					Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+					Members: memebers,
 				}, errors.New("No Policy exists"))
 			}
 			got, got1 := MigrateUserPermission(tt.args.ctx, tt.args.org, tt.args.user, tt.args.orgUserAssociation, tt.args.authzClient, tt.args.serverID)
