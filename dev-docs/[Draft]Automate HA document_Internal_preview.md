@@ -441,7 +441,8 @@ List of VM with public and private IP. Public-ip is only mandatory for Ela
 |Elasticsearch (transport)|**9300**|
 |Kibana |**5601**|
 
-# Setup LB using Haproxy and nginx
+- For On-prem Configuration we will need to 2 Load Balancer ,one LB for chef-server and other for automate LB.
+## Setup LB using Haproxy and nginx
 
 ### Steps to install Haproxy
 
