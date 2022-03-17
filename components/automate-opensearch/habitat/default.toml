@@ -145,7 +145,7 @@
   #
   # Set a custom port for HTTP:
   #
-   port = 9201
+  port = 9201
   #
   # For more information, see the documentation at:
   # <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
