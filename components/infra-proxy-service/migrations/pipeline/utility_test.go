@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -210,7 +211,7 @@ func TestValidateZip(t *testing.T) {
 
 	for _, ar := range arg {
 		t.Run(ar.name, func(t *testing.T) {
-			res, err := ValidateZip(ar.ctx, ar.st, ar.mst, ar.result)
+			res, err := ValidateZip(ar.result)
 			if err != nil {
 				require.Equal(t, err.Error(), ar.requiredErr.Error())
 			} else {
@@ -461,6 +462,80 @@ func TestStoreUser(t *testing.T) {
 			}
 			if actionOps != tt.want1 {
 				t.Errorf("StoreUser() got1 = %v, want %v", actionOps, tt.want1)
+			}
+		})
+
+	}
+}
+
+func TestStoreUserPermission(t *testing.T) {
+	type args struct {
+		ctx                context.Context
+		st                 storage.Storage
+		serverID           string
+		orgUserAssociation pipeline.UserAssociation
+		org                pipeline.Org
+		user               pipeline.User
+		authzClient        *authz.MockPoliciesServiceClient
+		NeedError          bool
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  error
+		want1 pipeline.ActionOps
+	}{
+		{name: "Test Insert User permission for local user",
+			args: args{ctx: context.Background(),
+				st: &testDB.TestDB{}, serverID: "server1",
+				org:                pipeline.Org{Name: "org1", FullName: "org1"},
+				orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: false, ActionOps: pipeline.Insert}, user: pipeline.User{Username: "test1234", AutomateUsername: "123456", Connector: pipeline.Local}, authzClient: authz.NewMockPoliciesServiceClient(gomock.NewController(t))}, want: nil, want1: pipeline.Insert},
+		{name: "Test Delete User permission for local user",
+			args: args{ctx: context.Background(),
+				st: &testDB.TestDB{}, serverID: "server1",
+				org:                pipeline.Org{Name: "org1", FullName: "org1"},
+				orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: false, ActionOps: pipeline.Delete}, user: pipeline.User{Username: "test1234", AutomateUsername: "123456", Connector: pipeline.Local}, authzClient: authz.NewMockPoliciesServiceClient(gomock.NewController(t))}, want: nil, want1: pipeline.Delete},
+		{name: "Test Update User permission for local user",
+			args: args{ctx: context.Background(),
+				st: &testDB.TestDB{}, serverID: "server1",
+				org:                pipeline.Org{Name: "org1", FullName: "org1"},
+				orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: true, ActionOps: pipeline.Update}, user: pipeline.User{Username: "test1234", AutomateUsername: "123456", Connector: pipeline.Local}, authzClient: authz.NewMockPoliciesServiceClient(gomock.NewController(t))}, want: nil, want1: pipeline.Update},
+		{name: "Test Insert User permission for ldap user",
+			args: args{ctx: context.Background(),
+				st: &testDB.TestDB{}, serverID: "server1",
+				org:                pipeline.Org{Name: "org1", FullName: "org1"},
+				orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: true, ActionOps: pipeline.Update}, user: pipeline.User{Username: "test1234", AutomateUsername: "123456", Connector: pipeline.LDAP}, authzClient: authz.NewMockPoliciesServiceClient(gomock.NewController(t))}, want: nil, want1: pipeline.Update},
+		{name: "Test Error from User permission service for local user",
+			args: args{ctx: context.Background(),
+				st: &testDB.TestDB{}, serverID: "server1",
+				org:                pipeline.Org{Name: "org1", FullName: "org1"},
+				orgUserAssociation: pipeline.UserAssociation{Username: "user1", IsAdmin: true, ActionOps: pipeline.Insert},
+				user:               pipeline.User{Username: "test1234", AutomateUsername: "123456", Connector: pipeline.LDAP},
+				authzClient:        authz.NewMockPoliciesServiceClient(gomock.NewController(t)), NeedError: true},
+			want: errors.New("Already exists"), want1: pipeline.Insert},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.authzClient.EXPECT().AddPolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.AddPolicyMembersResp{
+				Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+			}, nil)
+			tt.args.authzClient.EXPECT().RemovePolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.RemovePolicyMembersResp{
+				Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+			}, nil)
+			if tt.args.NeedError {
+				tt.args.authzClient.EXPECT().AddPolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.AddPolicyMembersResp{
+					Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+				}, errors.New("Already exists"))
+				tt.args.authzClient.EXPECT().RemovePolicyMembers(tt.args.ctx, gomock.Any()).Return(&authz.RemovePolicyMembersResp{
+					Members: []string{fmt.Sprintf("user:%s:%s", tt.args.user.Connector, tt.args.user.AutomateUsername)},
+				}, errors.New("No Policy exists"))
+			}
+			got, got1 := MigrateUserPermission(tt.args.ctx, tt.args.org, tt.args.user, tt.args.orgUserAssociation, tt.args.authzClient, tt.args.serverID)
+			if got != nil && got.Error() != tt.want.Error() {
+				t.Errorf("storeOrgUserAssociation() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("storeOrgUserAssociation() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 

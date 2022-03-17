@@ -91,6 +91,8 @@ func ConfigFromViper(configFile string) (*service.Service, error) {
 
 	authzProjectClient := authz.NewProjectsServiceClient(authzConn)
 
+	authzPolicyClient := authz.NewPoliciesServiceClient(authzConn)
+
 	if cfg.SecretsAddress == "" {
 		fail(errors.New("missing required config secrets_address"))
 	}
@@ -110,7 +112,7 @@ func ConfigFromViper(configFile string) (*service.Service, error) {
 	//Local user service client
 	localUserClient := local_user.NewUsersMgmtServiceClient(localUserConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient, localUserClient)
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, authzProjectClient, localUserClient, authzPolicyClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}
