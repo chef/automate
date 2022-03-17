@@ -19,15 +19,15 @@
               <ul>
                 <li>
                   <span>Migrated Orgs</span>
-                  <span>{{previewData?.orgs_to_migrate}}</span>
+                  <span>{{previewData?.staged_data?.orgs_to_migrate}}</span>
                 </li>
                 <li>
                   <span>Skipped Orgs</span>
-                  <span>{{previewData?.orgs_to_skip}}</span>
+                  <span>{{previewData?.staged_data?.orgs_to_skip}}</span>
                 </li>
                 <li>
                   <span>Updated Orgs</span>
-                  <span>{{previewData?.orgs_to_update}}</span>
+                  <span>{{previewData?.staged_data?.orgs_to_update}}</span>
                 </li>
               </ul>
             </div>
@@ -36,14 +36,14 @@
               <ul>
                 <li>
                   <span>Users</span>
-                  <span>{{previewData?.users.length || 0}}</span>
+                  <span>{{previewData?.staged_data?.users.length || 0}}</span>
                 </li>
               </ul>
             </div>
           </div>
         </div>
       <form [formGroup]="migrationForm">
-        <div id="migration-table-container" *ngIf="previewData?.users.length > 0">
+        <div id="migration-table-container" *ngIf="previewData?.staged_data?.users.length > 0">
           <chef-table>
             <chef-thead>
               <chef-tr>
@@ -57,9 +57,9 @@
               </chef-tr>
             </chef-thead>
             <chef-tbody>
-              <chef-tr *ngFor="let user of previewData.users; let i = index;">
+              <chef-tr *ngFor="let user of usersData; let i = index;">
                 <chef-td class="first">
-                  <chef-checkbox (change)="selectedUser($event)" [checked]="checkedUser"></chef-checkbox>
+                  <chef-checkbox (change)="selectedUser($event)" [checked]="user.is_selected" [value]="user.username"></chef-checkbox>
                 </chef-td>
                 <chef-td class="middle">
                   {{user.username}}
@@ -69,18 +69,20 @@
                 </chef-td>
                 <chef-td class="middle">
                   <input 
-                    *ngIf="(user.connector === 'LOCAL')"
+                    *ngIf="(user.connector === 'local')"
                     chefInput
                     formControlName="{{user.automate_username}}"
                     type="text"
-                    [attr.disabled]= "!user.is_conflicting"
-                    (blur)="handleName($event, i)"
+                    attr.data-username="{{user.username}}"
+                    [attr.disabled]="!user.is_conflicting"
+                    (change)="onChangeEvent($event)"
+                    (blur)="handleName($event)"
                     autocomplete="off" />
                 </chef-td>
                 <chef-td class="last">
                   <p class="warning-msg"
-                   *ngIf="(user.connector === 'ldap') && user.is_conflicting">
-                   Warning. User already exists in Automate. This will overwrite this users IAM settings.
+                   *ngIf="(user.connector === 'local') && user.is_conflicting">
+                    Warning. User already exists in Automate. This will overwrite this users IAM settings.
                   </p>
                 </chef-td>
               </chef-tr>
