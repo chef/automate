@@ -69,7 +69,7 @@
                 </chef-td>
                 <chef-td class="middle">
                   <input 
-                    *ngIf="(user.connector === 'LOCAL')"
+                    *ngIf="(user.connector === 'local')"
                     chefInput
                     formControlName="{{user.automate_username}}"
                     type="text"
@@ -81,7 +81,7 @@
                 </chef-td>
                 <chef-td class="last">
                   <p class="warning-msg"
-                   *ngIf="(user.connector === 'LOCAL') && user.is_conflicting">
+                   *ngIf="(user.connector === 'local') && user.is_conflicting">
                     Warning. User already exists in Automate. This will overwrite this users IAM settings.
                   </p>
                 </chef-td>
