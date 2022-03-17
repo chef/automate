@@ -228,7 +228,7 @@ variable "teams_port" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/home"
 }
 
 variable "sudo_password" {
