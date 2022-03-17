@@ -43,7 +43,7 @@ import {
   GetPreviewData,
   ConfirmPreview
 } from 'app/entities/orgs/org.actions';
-import { Org } from 'app/entities/orgs/org.model';
+import { Org, User } from 'app/entities/orgs/org.model';
 import {
   createStatus,
   createError,
@@ -381,7 +381,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([previewStatusSt, previewState]) => {
       if (previewStatusSt === EntityStatus.loadingSuccess && !isNil(previewState)) {
-        this.previewData = previewState.staged_data;
+        this.previewData = previewState;
         this.isPreview = true;
       } else if (previewStatusSt === EntityStatus.loadingFailure) {
         this.previewDataLoaded = false;
@@ -508,10 +508,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
             this.migrationInProgress = true;
             this.migrationLoading = false;
             this.migrationfailed = false;
-            // if (this.migrationStatusPercentage.toFixed(0) === '100') {
-            //   this.migrationCompleted = true;
-            //   this.migrationInProgress = false;
-            // }
             this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
             if (this.migration_type === 'Creating Preview'
               && this.confirmPreviewsubmit === false
@@ -541,10 +537,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public currentMigrationProcess() {
     return `${this.migrationStatusPercentage.toFixed(0)}, 100`;
   }
-
-  // public currentMigrationPercent() {
-  //   return this.migrationStatusPercentage.toFixed(0);
-  // }
 
   saveServer(): void {
     this.saveSuccessful = false;
@@ -603,11 +595,12 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetPreviewData(payload));
   }
 
-  public confirmPreview(migrationID: string) {
+  public confirmPreview(usersData: User[]) {
     this.confirmPreviewsubmit = true;
+    this.previewData.staged_data.users = usersData;
     const payload = {
       server_id: this.server.id,
-      migration_id: migrationID
+      previewData: this.previewData
     };
     this.store.dispatch(new ConfirmPreview(payload));
   }
