@@ -32,4 +32,5 @@ export interface User {
   connector: string;
   is_conflicting: boolean;
   is_admin: boolean;
+  is_selected?: boolean;
 }

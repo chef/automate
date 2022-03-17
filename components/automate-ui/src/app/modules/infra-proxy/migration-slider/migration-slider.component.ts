@@ -22,6 +22,7 @@ export class MigrationSliderComponent implements OnChanges {
   public checkedUser = false;
   public migrationForm: FormGroup;
   public usersData: User[];
+  public selectedUsersData: User[] = [];
 
   @HostBinding('class.active') isSlideOpen1 = false;
 
@@ -35,9 +36,11 @@ export class MigrationSliderComponent implements OnChanges {
   ngOnChanges() {
     const group = {};
     if (this.previewData) {
-      this.previewData.users.forEach((input_template: { automate_username: string | number; }) => {
+      this.previewData.staged_data.users.forEach((input_template: { automate_username: string | number; }) => {
         group[input_template.automate_username] = new FormControl('');
       });
+
+      this.usersData = this.previewData.staged_data.users.map((obj: User)=> ({ ...obj, is_seleted: false }))
     }
     this.migrationForm = new FormGroup(group);
   }
@@ -53,11 +56,12 @@ export class MigrationSliderComponent implements OnChanges {
 
   toggleSlide() {
     this.isSlideOpen1 = !this.isSlideOpen1;
+    this.usersData.forEach((item: User) => item.is_selected = false);
   }
 
   confirmPreviewData() {
     this.toggleSlide();
-    this.confirmPreview.emit(this.migrationID);
+    this.confirmPreview.emit(this.selectedUsersData);
   }
 
   slidePanel() {
@@ -66,11 +70,23 @@ export class MigrationSliderComponent implements OnChanges {
 
   selectedAllUsers(event: any) {
     const checked = event.target.checked;
-    this.previewData.users.forEach((item: { selected: any; }) => item.selected = checked);
+    this.usersData.forEach((item: User) => item.is_selected = checked);
+    if (checked) {
+      this.usersData.forEach((item: User) => this.selectedUsersData.push(item))
+    } else {
+      this.selectedUsersData = []
+    }
   }
 
-  selectedUser(value: boolean) {
-    console.log(value);
+  selectedUser(event: any) {
+    const index = this.usersData.findIndex(x => x.username === event.target.value);
+    if (event.target.checked) {
+      this.selectedUsersData.push(this.usersData[index]);
+    } else {
+      this.selectedUsersData.forEach((value, index)=>{
+        if (value.username == event.target.value) this.selectedUsersData.splice(index,1);
+      });
+    }
   }
 
   handleNameInput(event: KeyboardEvent): void {
@@ -80,11 +96,18 @@ export class MigrationSliderComponent implements OnChanges {
     }
   }
 
-  handleName(event: KeyboardEvent, i: number): void {
-    console.log(typeof ((event.target as HTMLInputElement).value), i);
-    const payload = {
-      user: (event.target as HTMLInputElement).value
-    };
-    this.store.dispatch(new CheckUser(payload));
+  handleName(event: KeyboardEvent): void {
+    if ((event.target as HTMLInputElement).value !== '') {
+      const payload = {
+        user: (event.target as HTMLInputElement).value
+      };
+      this.store.dispatch(new CheckUser(payload));
+    }
+  }
+
+  onChangeEvent(event: any){
+    const username = event.target.dataset.username
+    const index = this.usersData.findIndex(x => x.username === username);
+    this.usersData[index].automate_username = event.target.value
   }
 }
