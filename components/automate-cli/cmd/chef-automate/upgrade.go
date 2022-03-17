@@ -111,6 +111,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
 		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 
 	if err != nil {
@@ -393,6 +394,11 @@ func init() {
 		false,
 		"This flag is only needed for major version upgrades")
 
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
 		"Path to versions.json",
@@ -400,6 +406,10 @@ func init() {
 
 	if !isDevMode() {
 		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+		err = upgradeRunCmd.PersistentFlags().MarkHidden("versions-file")
 		if err != nil {
 			writer.Printf("failed configuring cobra: %s\n", err.Error())
 		}
