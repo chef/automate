@@ -1,0 +1,14 @@
+opendistro_security:
+  dynamic:
+    http:
+      anonymous_auth_enabled: false
+    authc:
+      basic_internal_auth_domain:
+        http_enabled: true
+        transport_enabled: true
+        order: 4
+        http_authenticator:
+          type: basic
+          challenge: true
+        authentication_backend:
+          type: intern
