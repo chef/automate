@@ -256,8 +256,8 @@ export class OrgEffects {
   confirmPreview$ = createEffect(() =>
     this.actions$.pipe(
       ofType(OrgActionTypes.CONFIRM_PREVIEW),
-      mergeMap(({ payload:  { server_id, migration_id } }: ConfirmPreview) =>
-        this.requests.confirmPreview(server_id, migration_id).pipe(
+      mergeMap(({ payload:  { server_id, previewData } }: ConfirmPreview) =>
+        this.requests.confirmPreview(server_id, previewData).pipe(
           map((resp) => new ConfirmPreviewSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new ConfirmPreviewFailure(error)))))));
