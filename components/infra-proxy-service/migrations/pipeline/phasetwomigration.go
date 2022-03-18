@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	log "github.com/sirupsen/logrus"
@@ -186,26 +187,46 @@ func populateOrgsUsersAssociation(result <-chan PipelineData, service *service.S
 }
 
 // PopulateMembersPolicy returns PhaseTwoPipelineProcessor
-func PopulateMembersPolicy() PhaseTwoPipelineProcessor {
+func PopulateMembersPolicy(service *service.Service) PhaseTwoPipelineProcessor {
 	return func(result <-chan PipelineData) <-chan PipelineData {
-		return populateMembersPolicy(result)
+		return populateMembersPolicy(result, service)
 	}
 }
 
-func populateMembersPolicy(result <-chan PipelineData) <-chan PipelineData {
-	log.Info("Starting PopulateMembersPolicy routine")
+func populateMembersPolicy(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
+	log.Info("Starting to migrate_permission pipeline")
 	out := make(chan PipelineData, 100)
 
 	go func() {
 		for res := range result {
-			log.Info("Processing to populateMembersPolicy...")
+			log.Info("Processing to populate orgs users association...")
+			_, err := service.Migration.StartPermissionMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID)
+			if err != nil {
+				log.Errorf("Failed to update start 'StartPermissionMigration' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
+				res.Done <- err
+				continue
+			}
+			result, err := MigrateUsersPermissions(res.Ctx, service.AuthzPolicyClient, res.Result)
+			if err != nil {
+				log.Errorf("Failed to migrate org users association for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
+				_, _ = service.Migration.FailedPermissionMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, err.Error(), result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
+				res.Done <- err
+				continue
+			}
+			_, err = service.Migration.CompletePermissionMigration(res.Ctx, res.Result.Meta.MigrationID, res.Result.Meta.ServerID, result.ParsedResult.OrgsUsersAssociationsCount.Succeeded, result.ParsedResult.OrgsUsersAssociationsCount.Skipped, result.ParsedResult.OrgsUsersAssociationsCount.Failed)
+			if err != nil {
+				log.Errorf("Failed to update 'CompletePermissionMigration' status in DB for migration id: %s :%s", res.Result.Meta.MigrationID, err.Error())
+				res.Done <- err
+				continue
+			}
+			res.Result = result
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
 				res.Done <- nil
 			}
 		}
-		log.Info("Closing PopulateMembersPolicy routine")
+		log.Info("Closing migrate_user_permissions pipeline")
 		close(out)
 	}()
 	return out
@@ -232,13 +253,15 @@ func SetupPhaseTwoPipeline(service *service.Service) PhaseTwoPipeline {
 		PopulateOrgsSrc(service),
 		PopulateUsersSrc(service),
 		PopulateOrgsUsersAssociationSrc(service),
-		// PopulateMembersPolicy(),
+		PopulateMembersPolicy(service),
 	)
 	return PhaseTwoPipeline{in: c}
 }
 
-func (p *PhaseTwoPipeline) Run(result pipeline.Result, service *service.Service) {
+func (p *PhaseTwoPipeline) Run(md metadata.MD, result pipeline.Result, service *service.Service) {
 	ctx, cancel := context.WithCancel(context.Background())
+	//Adding metadata for authentication
+	ctx = metadata.NewIncomingContext(ctx, md)
 	defer cancel()
 	done := make(chan error)
 	select {
