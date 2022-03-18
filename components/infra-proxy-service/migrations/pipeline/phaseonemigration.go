@@ -42,7 +42,7 @@ func unzipSrc(result <-chan PipelineData, service *service.Service) <-chan Pipel
 				res.Done <- err
 				continue
 			}
-			result, err := Unzip(res.Ctx, res.Result)
+			result, err := Unzip(res.Result)
 			if err != nil {
 				log.Errorf("Failed to unzip the file for migration ID: %s :%s", res.Result.Meta.MigrationID, err)
 				// Failed Unzip pipeline

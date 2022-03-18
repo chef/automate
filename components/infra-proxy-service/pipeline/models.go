@@ -10,8 +10,8 @@ const (
 )
 
 const (
-	Local = "LOCAL"
-	LDAP  = "LDAP"
+	Local = "local"
+	LDAP  = "ldap"
 )
 
 //
@@ -67,6 +67,9 @@ type ParsedResult struct {
 
 	//Counts for total,skipped and failed orgs users associations
 	OrgsUsersAssociationsCount Counts `json:"orgs_users_associations_count"`
+
+	//Counts for total,skipped and failed User permission migration
+	UserPermission Counts `json:"users_permissions_count"`
 }
 
 // OrgsUsersAssociations
@@ -121,6 +124,9 @@ type Org struct {
 
 	//Counts for total,skipped and failed
 	Counts Counts `json:"counts"`
+
+	//Project for user association
+	Project string `json:"project"`
 }
 
 type User struct {
