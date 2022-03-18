@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"google.golang.org/grpc/metadata"
 	"io"
 	"os"
 	"path"
@@ -319,14 +320,14 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	// if err != nil {
 	// 	return nil, err
 	// }
-
+	md, _ := metadata.FromIncomingContext(ctx)
 	migrationStage, err := s.service.Migration.GetMigrationStage(ctx, req.MigrationId)
 	if err != nil {
 		return nil, err
 	}
 
 	// call pipeline function to trigger the phase 2 pipeline
-	go s.phaseTwoPipeline.Run(migrationStage.StagedData, s.service)
+	go s.phaseTwoPipeline.Run(md, migrationStage.StagedData, s.service)
 
 	return &response.ConfirmPreview{
 		MigrationId: req.MigrationId,
