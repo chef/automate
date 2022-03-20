@@ -58,7 +58,7 @@ message AutomateInfraOrgUsersListItem {
 }
 
 message ResetInfraServerUserKeyRes {
-    string user_id = 1;
     string user_name = 2;
-    string private_key = 3;
+    string server_id = 3;
+    string private_key = 4;
 }

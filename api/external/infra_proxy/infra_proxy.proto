@@ -384,9 +384,9 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).action = "infra:infraServersOrgs:get";
   }
   rpc ResetInfraServerUserKey(infra_proxy.request.ResetInfraServerUserKeyReq) returns (infra_proxy.response.ResetInfraServerUserKeyRes){
-    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/user/{user_name}/user";
+    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/user/{user_name}";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:create";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:list";
   };
 }
