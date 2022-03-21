@@ -20,6 +20,3 @@ resource "null_resource" "add_chef_server_fqdn_to_ui" {
   }
 
 }
-
-
-
