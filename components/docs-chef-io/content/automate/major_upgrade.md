@@ -14,6 +14,20 @@ draft = false
 
 By default, Chef Automate automatically upgrades to the latest version. Milestone versions dont automatically upgrade to the latest version. We use the `--major` flag to upgrade to the latest version if you are on a milestone version.
 
+## Prerequisites
+- Planning your downtime
+  - Since this is a major upgrade, make sure that you are moving forward with this upgrade only when you are ready to handle the downtime required for this upgrade.
+- Taking Automate Backup
+  - The new version of automate upgrades PostgreSQL version. To avoid data loss and to recover your data if any system failure happens, we recommend to take full backup of automate and store it in a safe place.
+- Running Post Upgrade Checklist
+  - After automate version is upgraded, the user data is not moved automatically. User has to run all the post-upgrade steps to migrate their data so that automate is ready to use.
+### For Embedded Postgress
+- Ensuring Free space
+  - Since data migrations happen during database upgradation, some amount of space if required for the upgrade process to happen smoothly. We recommend having atleast 60% free disk space available before the upgrade.
+### For External Postgres
+- Upgrading external PostgreSQL
+  - As in this case automate is connected to an external postgres database. The user has to manually upgrade their database service with the help of a database administrator. Please refer to this docs for [external postgres upgrade]({{< relref "postgres_external_upgrade.md" >}})
+
 ## Upgrade path for different user scenarios
 
 The new major version of chef automate upgrades the embedded Postgres database from v9.6 to v13. Since this version changes the version and migrates user data, customers will need to perform various steps to take control of the system downtimes and plan their upgrade according to their needs.
@@ -332,3 +346,8 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
     ```
 - Check all services are running: `chef-automate status`
 - Once all the above steps are complete, major version upgrade is successful.
+
+## FAQ
+
+- How to check if automate is running external Postgres?
+Run `chef-automate config show` and if `enable=true` is present in `global.v1.external.postgresql` then its connected to external postgres.
