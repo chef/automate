@@ -1140,7 +1140,7 @@ Start all Chef Automate and Chef Infra Server front-end nodes.
 
 
 ### Pre-backup configuration and setup for NFS backup
-
+  Pre-backup configurations to be done before deploying cluster.(recommended not mandaotry)
 1) Add an extra ec2 machine to your cluster.This should be under the same vpc.
 2) It should have IAM profile attached with AdministratorAccess,AmazonAPIGatewayAdministrator policies.
 3) It should be accessible from provisioner machine.
@@ -1191,7 +1191,8 @@ Start all Chef Automate and Chef Infra Server front-end nodes.
 
 
 ***********************************************************
-
+### Backup configuration and setup for NFS backup
+  backup configurations to be done after deploying cluster
 Now repeat the below steps in all the elasticsearch node:
 
 10) install nfs client by using the below command:-
