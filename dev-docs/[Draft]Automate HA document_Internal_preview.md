@@ -1235,9 +1235,11 @@ Then from any one elasticsearch instance do the following steps:
 16) Edit es_config.toml and add the following settings to the end of the file.
   Note: If credentials have never been rotated this file may be empty.
 
+   ```
    [es_yaml.path]
    # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
    repo = "/mnt/automate_backups/elasticsearch"
+   ```
 
 17) Apply updated es_config.toml config to Elasticsearch, this only needs to be done once. This will trigger a restart of the Elasticsearch services on each server.
 
@@ -1249,6 +1251,7 @@ Then from any one elasticsearch instance do the following steps:
 
 18) Add the following configuration to automate.toml(which will be present inside /hab/a2_workspace/configs/) on the provisioning host.
 
+   ```
    [global.v1.external.elasticsearch.backup]
    enable = true
    location = "fs"
@@ -1260,6 +1263,7 @@ Then from any one elasticsearch instance do the following steps:
 
    [global.v1.backups.filesystem]
    path = "/mnt/automate_backups/backups"
+   ```
 
 19) After that patch the config. This will trigger the deployment also.
 
