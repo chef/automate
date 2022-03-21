@@ -92,3 +92,18 @@ s3.client.{{ cfg.s3.client.name }}.use_throttle_retries: {{cfg.s3.client.use_thr
 s3.client.{{ cfg.s3.client.name }}.endpoint: 127.0.0.1:{{bgw.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
+
+plugins.security.ssl.http.enabled: false
+
+plugins.security.allow_default_init_securityindex: true
+plugins.security.authcz.admin_dn:
+   - CN=A,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA
+plugins.security.nodes_dn:
+   - 'CN=N,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA'
+ plugins.security.audit.type: internal_opensearch
+ plugins.security.enable_snapshot_restore_privilege: true
+ plugins.security.check_snapshot_restore_write_privileges: true
+ plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+ cluster.routing.allocation.disk.threshold_enabled: false
+ opendistro_security.audit.config.disabled_rest_categories: NONE
+ opendistro_security.audit.config.disabled_transport_categories: NONE
