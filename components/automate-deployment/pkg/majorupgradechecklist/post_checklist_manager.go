@@ -1,11 +1,12 @@
 package majorupgradechecklist
 
 import (
-	"github.com/pkg/errors"
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
 const (
-	upgrade_metadata = "/hab/svc/deployment-service/var/upgrade_metadata.json"
+	FILE_NAME        = "upgrade_metadata.json"
+	UPGRADE_METADATA = "/hab/svc/deployment-service/var/" + FILE_NAME
 )
 
 type PostChecklistManager struct {
@@ -31,7 +32,9 @@ func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	majorVersion, _ := GetMajorVersion(version)
 	ci, err := NewChecklistManager(nil, version)
 	if err != nil {
-		return nil, err
+		return &PostChecklistManager{
+			version: majorVersion,
+		}, err
 	}
 	return &PostChecklistManager{
 		version: majorVersion,
@@ -39,11 +42,11 @@ func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	}, nil
 }
 
-func (pcm *PostChecklistManager) CreatePostChecklistFile() error {
+func (pcm *PostChecklistManager) CreatePostChecklistFile(path string, isExecuted bool) error {
 	params := PostChecklist{}
-	params.PostChecklist = append(params.PostChecklist, pcm.ci.GetPostChecklist()...)
+	params.PostChecklist = append(params.PostChecklist, pcm.ci.GetPostChecklist(isExecuted)...)
 	params.Version = pcm.version
-	err := CreateJsonFile(&params, upgrade_metadata)
+	err := CreateJsonFile(&params, path)
 	if err != nil {
 		return err
 	}
@@ -51,34 +54,34 @@ func (pcm *PostChecklistManager) CreatePostChecklistFile() error {
 	return nil
 }
 
-func (pcm *PostChecklistManager) ReadPostChecklistById(id string) (bool, error) {
-	ChecklistId_Found := false
-	res, err := ReadJsonFile(upgrade_metadata)
+func (pcm *PostChecklistManager) ReadPostChecklistById(id string, path string) (bool, error) {
+	checklistIDIsFound := false
+	res, err := ReadJsonFile(path)
 	if err != nil {
-		return false, err
+		return checklistIDIsFound, err
 	}
+
 	for i := 0; i < len(res.PostChecklist); i++ {
-
 		if res.PostChecklist[i].Id == id {
-			ChecklistId_Found = res.PostChecklist[i].IsExecuted
+			checklistIDIsFound = res.PostChecklist[i].IsExecuted
 			break
-
 		}
 	}
-	return ChecklistId_Found, nil
+
+	return checklistIDIsFound, nil
 }
 
-func (pcm *PostChecklistManager) ReadPendingPostChecklistFile() ([]string, error) {
+func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExternalPG bool) ([]string, error) {
 	var postCmdList []string
 	var showPostChecklist = false
-	res, err := ReadJsonFile(upgrade_metadata)
+	res, err := ReadJsonFile(path)
 	if err != nil {
-		return nil, err
+		return postCmdList, err
 	}
 
 	if res.Version == pcm.version {
 		for i := 0; i < len(res.PostChecklist); i++ {
-			if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || (isExternalPG() && !res.Seen) {
+			if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || (isExternalPG && !res.Seen) {
 				showPostChecklist = true
 				break
 			}
@@ -92,21 +95,21 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile() ([]string, error
 			}
 		}
 
-		if isExternalPG() {
+		if isExternalPG {
 			res.Seen = true
-			err = CreateJsonFile(res, upgrade_metadata)
+			err = CreateJsonFile(res, path)
 			if err != nil {
-				return nil, err
+				return postCmdList, err
 			}
 		}
-		return postCmdList, nil
 	} else {
-		return nil, errors.Errorf("Failed to read checklist since version didn't match")
+		return postCmdList, status.Errorf(status.UpgradeError, "Failed to read checklist since version didn't match")
 	}
+	return postCmdList, nil
 }
 
-func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string) error {
-	res, err := ReadJsonFile(upgrade_metadata)
+func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string, path string) error {
+	res, err := ReadJsonFile(path)
 	if err != nil {
 		return err
 	}
@@ -116,7 +119,7 @@ func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string) error {
 		}
 	}
 
-	err = CreateJsonFile(res, upgrade_metadata)
+	err = CreateJsonFile(res, path)
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -141,7 +140,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				"Request to start upgrade failed",
 			)
 		}
-		err = ci.RunChecklist()
+		err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -431,11 +430,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, err := pmc.ReadPendingPostChecklistFile()
-		if err != nil {
-			logrus.Info("Failed to read pending post checklist:", err)
-			return []string{}, nil
-		}
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil
