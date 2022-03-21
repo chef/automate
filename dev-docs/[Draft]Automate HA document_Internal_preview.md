@@ -994,6 +994,7 @@ journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
 
 And watch for a message about Elasticsearch going from RED /YELLOW to GREEN.
 
+
 ### Pre backup Configuration for s3 backup 
 In order to run the terraform scripts, we need an IAM user with proper permissions. All the required permissions are mentioned in the next section. We need to make sure that we have the access key id and secret access key for the user. If not, then regenerate a new access key and keep it handy.
 
@@ -1135,6 +1136,158 @@ Login to same instance of Chef Automate front-end node from which backup is take
 `chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"`
 
 Start all Chef Automate and Chef Infra Server front-end nodes.
+`sudo systemctl start chef-automate`
+
+
+### Pre-backup configuration and setup for NFS backup
+
+1) Add an extra ec2 machine to your cluster.This should be under the same vpc.
+2) It should have IAM profile attached with AdministratorAccess,AmazonAPIGatewayAdministrator policies.
+3) It should be accessible from provisioner machine.
+4) ssh to this ec2(called nfs server)
+5) Install nfs client by using the below command:-
+    ```
+    sudo yum -y install nfs-utils
+    ```
+
+6) Go to the root dir Create a dir for backup i.e.
+    ```
+    sudo su -
+    mkdir backup
+    ```
+
+7) Add this dir to export list by using the below command:
+    vi /etc/exports
+    add the below content:
+    /root/backup *(rw,sync,no_root_squash,insecure)
+
+8) Export list using below command:
+    ```
+    exportfs -rav
+    ``` 
+      It will give output like "exporting *:/root/backup"
+
+9) Start the nfs server using below command:
+    ```
+    sudo service nfs start
+    ```
+      it will show the below output
+        Redirecting to /bin/systemctl status nfs.service
+
+    to check the server status
+        ```
+        sudo service nfs status
+        ```
+        it will show the below output
+        Redirecting to /bin/systemctl status nfs.service
+            ● nfs-server.service - NFS server and services
+             Loaded: loaded (/usr/lib/systemd/system/nfs-server.service; disabled; vendor preset: disabled)
+             Active: active (exited) since Thu 2022-03-17 10:13:49 UTC; 6s ago
+            Process: 15932 ExecStartPost=/bin/sh -c if systemctl -q is-active gssproxy; then systemctl reload gssproxy ; fi (code=exited, status=0/SUCCESS)
+            Process: 15915 ExecStart=/usr/sbin/rpc.nfsd $RPCNFSDARGS (code=exited, status=0/SUCCESS)
+            Process: 15913 ExecStartPre=/usr/sbin/exportfs -r (code=exited, status=0/SUCCESS)
+            Main PID: 15915 (code=exited, status=0/SUCCESS)
+             CGroup: /system.slice/nfs-server.service
+
+
+***********************************************************
+
+Now repeat the below steps in all the elasticsearch node:
+
+10) install nfs client by using the below command:-
+    ```
+    sudo yum -y install nfs-utils
+    ```
+11) ssh to elastic search node
+
+12) go to the root dir and mount the nfs file using the below command:
+
+    ```
+    sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport nfs_server_private_ip:/root/backup   /mnt/automate_backups
+    ```
+
+13) Check the mount is success or not by using
+    ```
+    df -h
+    ```
+
+
+*********************************************************
+
+Then from any one elasticsearch instance do the following steps:
+
+14) Create elasticsearch sub-directory and set permissions, this will only need to be done on a single Elasticsearch server if the network mount is correctly mounted.
+
+      ```
+      sudo mkdir /mnt/automate_backups/elasticsearch
+      sudo chown hab:hab /mnt/automate_backups/elasticsearch/
+      ```
+
+15) Configure Elasticsearch path.repo setting by SSHing to a single Elasticsearch server and using the following steps:
+
+  Export the current Elasticsearch config from the Habitat supervisor. You will need to have root access to run the following commmands
+    
+    ```
+    source /hab/sup/default/SystemdEnvironmentFile.sh
+    automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml
+    ```
+
+16) Edit es_config.toml and add the following settings to the end of the file.
+  Note: If credentials have never been rotated this file may be empty.
+
+   [es_yaml.path]
+   # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
+   repo = "/mnt/automate_backups/elasticsearch"
+
+17) Apply updated es_config.toml config to Elasticsearch, this only needs to be done once. This will trigger a restart of the Elasticsearch services on each server.
+
+    ```
+    hab config apply automate-ha-elasticsearch.default $(date '+%s') es_config.toml
+    hab svc status (check elasticsearch service is up or not)
+    ```
+
+
+18) Add the following configuration to automate.toml(which will be present inside /hab/a2_workspace/configs/) on the provisioning host.
+
+   [global.v1.external.elasticsearch.backup]
+   enable = true
+   location = "fs"
+
+   [global.v1.external.elasticsearch.backup.fs]
+   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
+   # a parent directory of the setting you configure here:
+   path = "/mnt/automate_backups/elasticsearch"
+
+   [global.v1.backups.filesystem]
+   path = "/mnt/automate_backups/backups"
+
+19) After that patch the config. This will trigger the deployment also.
+
+    ```
+    ./chef-automate config patch automate.toml
+    ```
+## Backup
+
+To create a new backup run chef-automate backup create from a Chef-Automate front-end node.
+
+`./chef-automate backup create`
+
+## Restore
+
+Check status of all Chef Automate and Chef Infra Server front-end nodes.
+
+`chef-automate status`
+
+Shutdown Chef Automate service on all front-end nodes.
+
+`sudo systemctl stop chef-automate`
+
+`Login to same instance of Chef Automate front-end node from which backup is taken run the restore command
+
+`chef-automate backup restore --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`
+
+Start all Chef Automate and Chef Infra Server front-end nodes.
+
 `sudo systemctl start chef-automate`
 
 # Upgrade
