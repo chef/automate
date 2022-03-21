@@ -350,4 +350,5 @@ Once upgraded to latest milestone version, you can now perform the major upgrade
 ## FAQ
 
 - How to check if automate is running external Postgres?
+
 Run `chef-automate config show` and if `enable=true` is present in `global.v1.external.postgresql` then its connected to external postgres.
