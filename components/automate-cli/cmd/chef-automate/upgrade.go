@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -108,9 +107,10 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	/*validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
+	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
 		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 
 	if err != nil {
@@ -140,7 +140,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				"Request to start upgrade failed",
 			)
 		}
-		err = ci.RunChecklist()
+		err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -148,7 +148,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				"Request to start upgrade failed",
 			)
 		}
-	}*/
+	}
 
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
@@ -393,6 +393,11 @@ func init() {
 		false,
 		"This flag is only needed for major version upgrades")
 
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
 		"Path to versions.json",
@@ -400,6 +405,10 @@ func init() {
 
 	if !isDevMode() {
 		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+		err = upgradeRunCmd.PersistentFlags().MarkHidden("versions-file")
 		if err != nil {
 			writer.Printf("failed configuring cobra: %s\n", err.Error())
 		}
@@ -421,11 +430,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, err := pmc.ReadPendingPostChecklistFile()
-		if err != nil {
-			logrus.Info("Failed to read pending post checklist:", err)
-			return []string{}, nil
-		}
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil
