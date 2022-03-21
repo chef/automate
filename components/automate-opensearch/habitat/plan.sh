@@ -32,7 +32,7 @@ pkg_exports=(
   [http-host]=network.host
   [http-port]=network.port
   [transport-port]=transport.port
-  #[deprecated_external_es]=deprecated.external_es
+  [deprecated_external_es]=deprecated.external_es
   [deprecated_backup_location]=path.repo
   [disable]=disable
 )
@@ -62,6 +62,7 @@ do_install() {
   # Elasticsearch is greedy when grabbing config files from /bin/..
   # so we need to put the untemplated config dir out of reach
   mkdir -p "${pkg_prefix}/os"
+  ls -ltrh 
   cp -ra ./* "${pkg_prefix}/os"
   echo "what is HAB_CACHE_SRC_PATH : "$HAB_CACHE_SRC_PATH
   echo "what is pkg_prefix : "${pkg_prefix}
@@ -89,8 +90,7 @@ do_strip() {
 
 #what is HAB_CACHE_SRC_PATH : /hab/cache/src
 #what is pkg_prefix : /hab/pkgs/punitmundra/automate-opensearch/1.2.4/20220316071211
-#where i am :
-#/hab/cache/src/opensearch-1.2.4
+#where i am : /hab/cache/src/opensearch-1.2.4
 
 # /hab/pkgs/punitmundra/automate-opensearch/1.2.4/20220316105159/os/bin/
 # /hab/svc/automate-opensearch/config/opensearch.keystore': No such file or directory
