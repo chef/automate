@@ -178,5 +178,5 @@ variable "tags" {
 }
 
 variable "tmp_path" {
-  default = "/home"
+  default = "/var/tmp"
 }
