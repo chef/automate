@@ -198,7 +198,7 @@ func (t *TestDB) GetAutomateInfraOrgUsers(ctx context.Context, serverId, orgId s
 	}
 	if t.Type == "Delete" {
 		x = append(x, storage.OrgUser{
-			OrgID: orgId, InfraServerUsername: "user1",
+			OrgID: orgId, InfraServerUsername: "user1", IsAdmin: true,
 		})
 	}
 	if t.Type == "Read" {
