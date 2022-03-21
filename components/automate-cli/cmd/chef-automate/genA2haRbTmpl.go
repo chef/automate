@@ -38,6 +38,7 @@ end
 ###############################################################
 chef_server do
   instance_count {{ .ChefServer.Config.InstanceCount }}
+  chef_lb_fqdn "{{ .Architecture.ConfigInitials.ChefLbfqdn }}"
 end
 
 ###############################################################

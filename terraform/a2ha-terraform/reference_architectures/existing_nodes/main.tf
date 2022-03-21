@@ -272,7 +272,7 @@ module "add_chef_server_to_a2_ui" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   automate-fqdn                   = var.automate_fqdn
-  chef_ips                        = var.existing_chef_server_private_ips
-  
+  chef-server-fqdn                = var.existing_chef_server_fqdn
+
   depends_on = [module.chef_server]
 }

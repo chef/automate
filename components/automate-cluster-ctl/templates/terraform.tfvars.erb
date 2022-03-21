@@ -116,6 +116,7 @@ vsphere_linux_template = "<%= config.vsphere.linux_template %>"
 <% if config.architecture == 'existing_nodes' %>
 # Existing nodes
 ################################################################################
+existing_chef_server_fqdn = "<%= config.chef_server.chef_lb_fqdn %>"
 existing_elasticsearch_ips = <%= config.existing_nodes.elasticsearch_ips %>
 existing_automate_private_ips = <%= config.existing_nodes.automate_private_ips %>
 existing_chef_server_private_ips = <%= config.existing_nodes.chef_server_private_ips %>

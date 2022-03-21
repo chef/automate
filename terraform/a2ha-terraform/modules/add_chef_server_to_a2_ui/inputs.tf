@@ -6,6 +6,10 @@ variable "chef_ips" {
   default = [] 
 }
 
+variable "chef-server-fqdn" {
+  default = ""
+}
+
 variable "private_ips" {
   default = []
 }
@@ -22,4 +26,8 @@ variable "ssh_user_sudo_password" {
 
 variable "sudo_cmd" {
   default = "sudo"
+}
+
+variable "tmp_path" {
+  default = "/var/tmp"
 }
