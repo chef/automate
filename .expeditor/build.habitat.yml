@@ -5,5 +5,6 @@ studio_secrets:
   GITHUB_TOKEN:
     account: github/chef
     field: token
+  HAB_BLDR_CHANNEL: "refresh2021q2"
   HAB_FALLBACK_CHANNEL:
-    value: "stable"
+    value: "refresh2021q2"
