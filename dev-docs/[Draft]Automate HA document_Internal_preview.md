@@ -1192,7 +1192,8 @@ Start all Chef Automate and Chef Infra Server front-end nodes.
 
 ***********************************************************
 ### Backup configuration and setup for NFS backup
-  backup configurations to be done after deploying cluster
+  Backup configurations to be done after deploying cluster
+
 Now repeat the below steps in all the elasticsearch node:
 
 10) install nfs client by using the below command:-
@@ -1227,7 +1228,7 @@ Then from any one elasticsearch instance do the following steps:
 15) Configure Elasticsearch path.repo setting by SSHing to a single Elasticsearch server and using the following steps:
 
   Export the current Elasticsearch config from the Habitat supervisor. You will need to have root access to run the following commmands
-    
+
     ```
     source /hab/sup/default/SystemdEnvironmentFile.sh
     automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml
