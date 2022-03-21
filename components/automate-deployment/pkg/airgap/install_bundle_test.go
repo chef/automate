@@ -137,7 +137,7 @@ func TestRoundTrip(t *testing.T) {
 	assert.Equal(t, "", metadataHartsOnly.HabBinPath)
 
 	shasumsAutomate := map[string]string{
-		"ba0f8b2f1bc8c6f119035dd35471b3a58404813fecdc799550373112ae33ee70": "hab/svc/deployment-service/data/airgap/manifest.json",
+		"92510240c6d0947519b4695b07e6845d7c8376f6737c0b9a65f53e0ce97fdf9c": "hab/svc/deployment-service/data/airgap/manifest.json",
 		"7d73666fd246819bd6925e7c50afeac6a6f27e2b3e970ea0e045855b7357536d": "hab/tmp/hab",
 	}
 

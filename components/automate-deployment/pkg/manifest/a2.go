@@ -15,6 +15,7 @@ type ReleaseManifest interface {
 
 // An A2 manifest specifies the expected contents of a build
 type A2 struct {
+	SchemaVersion    string          `json:"schema_version"`
 	Build            string          `json:"build"`
 	BuildSHA         string          `json:"build_sha"`
 	Packages         []habpkg.HabPkg `json:"packages"`
