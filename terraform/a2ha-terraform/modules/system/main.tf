@@ -8,6 +8,20 @@ locals {
     postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
   })
 }
+resource "null_resource" "create_temp_path" {
+
+  count = var.instance_count
+
+  connection {
+    user        = var.ssh_user
+    private_key = file(var.ssh_key_file)
+    host        = var.private_ips[count.index]
+  }
+
+  provisioner "remote-exec" {
+    inline = [ "sudo mkdir -p ${var.tmp_path}", "sudo chown -R ${var.ssh_user}:${var.ssh_user} ${var.tmp_path}" ]
+   }
+}
 
 resource "null_resource" "system_base_provisioning" {
   count = var.instance_count
@@ -39,5 +53,6 @@ resource "null_resource" "system_base_provisioning" {
       "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/tunables.sh",
     ]
   }
+
 }
 
