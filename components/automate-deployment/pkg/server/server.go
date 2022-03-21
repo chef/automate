@@ -1996,11 +1996,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 			return nil, status.Errorf(codes.InvalidArgument, "Failed to get post checklist manager: %s", err)
 		}
 
-		ReadPendingPostChecklist, err = pcm.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
-		if err != nil {
-			return nil, err
-		}
-
+		ReadPendingPostChecklist, _ = pcm.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 	}
 
 	if len(ReadPendingPostChecklist) == 0 {

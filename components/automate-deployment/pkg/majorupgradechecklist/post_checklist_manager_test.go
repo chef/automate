@@ -41,7 +41,9 @@ func TestReadPostChecklistById(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, true, res)
 	_, err = pcm.ReadPostChecklistById("migrate_pg", UPGRADE_METADATA)
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
+
 }
 
 func TestReadPendingPostChecklistFile(t *testing.T) {
@@ -53,8 +55,10 @@ func TestReadPendingPostChecklistFile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEqual(t, []string{}, res)
 	res, err = pcm.ReadPendingPostChecklistFile(UPGRADE_METADATA, false)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, 0, len(res))
+	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
+
 
 	// if version is invalid and we have right path for the file
 	// then return error
@@ -90,5 +94,6 @@ func TestUpdatePostChecklistFile(t *testing.T) {
 
 	// if the file doesn't exist, return nil (no error)
 	err = pcm.UpdatePostChecklistFile("migrate_pg", UPGRADE_METADATA)
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
 }

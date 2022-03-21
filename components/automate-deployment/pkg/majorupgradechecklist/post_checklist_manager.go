@@ -2,7 +2,6 @@ package majorupgradechecklist
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -59,17 +58,16 @@ func (pcm *PostChecklistManager) ReadPostChecklistById(id string, path string) (
 	ChecklistId_Found := false
 	res, err := ReadJsonFile(path)
 	if err != nil {
-		logrus.Info("Failed to read post checklist by id:", err)
-		return ChecklistId_Found, nil
+		return ChecklistId_Found, err
 	}
-	for i := 0; i < len(res.PostChecklist); i++ {
 
+	for i := 0; i < len(res.PostChecklist); i++ {
 		if res.PostChecklist[i].Id == id {
 			ChecklistId_Found = res.PostChecklist[i].IsExecuted
 			break
-
 		}
 	}
+
 	return ChecklistId_Found, nil
 }
 
@@ -78,8 +76,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExt
 	var showPostChecklist = false
 	res, err := ReadJsonFile(path)
 	if err != nil {
-		logrus.Info("Failed to read pending post checklist:", err)
-		return postCmdList, nil
+		return postCmdList, err
 	}
 
 	if res.Version == pcm.version {
@@ -102,11 +99,10 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExt
 			res.Seen = true
 			err = CreateJsonFile(res, path)
 			if err != nil {
-				logrus.Info("Failed to update pending post checklist for external database:", err)
+				return postCmdList, err
 			}
 		}
 	} else {
-		logrus.Info("Failed to read checklist since version didn't match")
 		return postCmdList, status.Errorf(status.UpgradeError, "Failed to read checklist since version didn't match")
 	}
 	return postCmdList, nil
@@ -115,8 +111,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExt
 func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string, path string) error {
 	res, err := ReadJsonFile(path)
 	if err != nil {
-		logrus.Info("Failed to read to update post checklist:", err)
-		return nil
+		return err
 	}
 	for i, v := range res.PostChecklist {
 		if v.Id == id {
@@ -126,7 +121,7 @@ func (pcm *PostChecklistManager) UpdatePostChecklistFile(id string, path string)
 
 	err = CreateJsonFile(res, path)
 	if err != nil {
-		logrus.Info("Failed to update post checklist:", err)
+		return err
 	}
 	return nil
 }
