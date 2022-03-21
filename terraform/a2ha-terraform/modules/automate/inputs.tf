@@ -138,5 +138,5 @@ variable "teams_port" {
 }
 
 variable "tmp_path" {
-  default = "/home"
+  default = "/var/tmp"
 }
