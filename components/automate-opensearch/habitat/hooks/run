@@ -64,6 +64,8 @@ echo {{pkg.svc_config_path}}
 echo "......................................................................."
 ls -ltrh {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh 
 echo "......................................................................."
+chmod 777 {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh
+echo "......................................................................."
 ls -ltrh {{pkg.svc_config_path}}
 echo "......................................................................."
 # /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh 
@@ -71,7 +73,7 @@ echo "......................................................................."
 echo "Inserted default securityconfig opensearch"
 
 echo "Done !!!! Executing opensearch securityadmin"
-exec opensearch
-hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9201 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
-
+#exec opensearch
+#hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9201 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
+hab pkg exec core/bash {{pkg.path}}/os/opensearch-tar-install.sh
 {{~/if}}
