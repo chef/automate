@@ -81,6 +81,10 @@ do_install() {
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
   chown -RL hab:hab ${pkg_prefix}
   chown -RL hab:hab ${pkg_prefix}/*
+  #sh ${pkg_prefix}/os/plugins/opensearch-security/tools/securityadmin.sh
+  #chmod 777 -R ${pkg_prefix}/
+  #mkdir "${pkg_prefix}/os/config/certificates"
+  #$(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "${pkg_prefix}/os/config/"
 }
 
 do_strip() {

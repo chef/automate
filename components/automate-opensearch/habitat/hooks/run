@@ -26,5 +26,50 @@ export ES_PATH_CONF="{{pkg.svc_config_path}}"
 source {{pkg.svc_config_path}}/init_keystore
 source {{pkg.svc_config_path}}/init_ca
 
+openssl genrsa -out {{pkg.svc_config_path}}/root-ca-key.pem 2048
+openssl req -new -x509 -sha256 -key {{pkg.svc_config_path}}/root-ca-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca" -out {{pkg.svc_config_path}}/root-ca.pem -days 1095
+# Admin cert
+openssl genrsa -out {{pkg.svc_config_path}}/admin-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/admin-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/admin-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/admin-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin" -out {{pkg.svc_config_path}}/admin.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/admin.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/admin.pem -days 1095
+# Node cert 1
+openssl genrsa -out {{pkg.svc_config_path}}/node1-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/node1-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/node1-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/node1-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out {{pkg.svc_config_path}}/node1.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/node1.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/node1.pem -days 1095
+# Node cert 2
+openssl genrsa -out {{pkg.svc_config_path}}/node2-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/node2-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/node2-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/node2-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out {{pkg.svc_config_path}}/node2.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/node2.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/node2.pem -days 1095
+# Client cert
+openssl genrsa -out {{pkg.svc_config_path}}/client-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/client-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/client-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/client-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefclient" -out {{pkg.svc_config_path}}/client.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/client.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/client.pem -days 1095
+# Cleanup
+rm {{pkg.svc_config_path}}/admin-key-temp.pem
+rm {{pkg.svc_config_path}}/admin.csr
+rm {{pkg.svc_config_path}}/node1-key-temp.pem
+rm {{pkg.svc_config_path}}/node1.csr
+rm {{pkg.svc_config_path}}/node2-key-temp.pem
+rm {{pkg.svc_config_path}}/node2.csr
+rm {{pkg.svc_config_path}}/client-key-temp.pem
+rm {{pkg.svc_config_path}}/client.csr
+
+echo "Executing opensearch securityadmin"
+echo "......................................................................."
+echo {{pkg.path}}
+echo "......................................................................."
+echo {{pkg.svc_config_path}}
+echo "......................................................................."
+ls -ltrh {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh 
+echo "......................................................................."
+ls -ltrh {{pkg.svc_config_path}}
+echo "......................................................................."
+.{{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9301 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
+    echo "Inserted default securityconfig opensearch"
+echo "Done !!!! Executing opensearch securityadmin"
 exec opensearch
 {{~/if}}
