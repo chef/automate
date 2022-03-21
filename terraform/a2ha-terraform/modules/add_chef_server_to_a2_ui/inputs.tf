@@ -2,12 +2,12 @@ variable "automate-fqdn" {
   default = ""
 }
 
-variable "chef_ips" {
-  default = [] 
-}
-
 variable "chef-server-fqdn" {
   default = ""
+}
+
+variable "chef_ips" {
+  default = [] 
 }
 
 variable "private_ips" {
