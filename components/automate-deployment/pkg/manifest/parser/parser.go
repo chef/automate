@@ -63,6 +63,7 @@ func parseV1Manifest(body []byte) (*manifest.A2, error) {
 	m.Build = v1.BuildT
 	m.SemVersion = v1.SemVersion
 	m.BuildSHA = v1.SHA
+	m.SchemaVersion = v1.SchemaVersion
 	m.Packages = append(v1.Packages, v1.HabPackages...)
 
 	return m, nil

@@ -150,10 +150,10 @@ func (c *HTTP) GetCurrentManifest(ctx context.Context, channel string) (*manifes
 	//try to get semantic version manifest
 	url := fmt.Sprintf(c.latestSemanticManifestURLFmt, channel)
 	m, err := c.manifestFromURL(ctx, url)
-	if err == nil {
+	if err == nil && m.SemVersion != "" && m.SchemaVersion == "2" {
 		return m, nil
 	}
-	if strings.Contains(err.Error(), "failed to locate manifest") {
+	if (m != nil && (m.SemVersion == "" || m.SchemaVersion == "1")) || strings.Contains(err.Error(), "failed to locate manifest") {
 		//since received error in fetching semantic version, try to fetch timestamp versioned manifest
 		url = fmt.Sprintf(c.latestManifestURLFmt, channel)
 		return c.manifestFromURL(ctx, url)
