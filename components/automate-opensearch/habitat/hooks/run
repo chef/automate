@@ -61,8 +61,17 @@ rm {{pkg.svc_config_path}}/client.csr
 echo "Executing opensearch securityadmin"
 echo {{pkg.path}}
 echo {{pkg.svc_config_path}}
-sh {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9301 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
-    echo "Inserted default securityconfig opensearch"
+echo "......................................................................."
+ls -ltrh {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh 
+echo "......................................................................."
+ls -ltrh {{pkg.svc_config_path}}
+echo "......................................................................."
+# /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh 
+
+echo "Inserted default securityconfig opensearch"
+
 echo "Done !!!! Executing opensearch securityadmin"
 exec opensearch
+hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9201 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
+
 {{~/if}}
