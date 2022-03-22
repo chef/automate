@@ -139,8 +139,7 @@ func TestServiceConfigureFails(t *testing.T) {
 
 // TODO ideally we will more fully test this function
 func TestServiceConfigureSucceeds(t *testing.T) {
-	testDir, _ := ioutil.TempDir("", "TestServiceConfigureFails")
-	defer os.Remove(testDir)
+	testDir := t.TempDir()
 
 	h := NewLocalTarget(false)
 	h.HabBaseDir = testDir
@@ -371,8 +370,7 @@ func TestInstallHabitat(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tgt, mockExec, finish := setupTestLocalTarget(t)
 
-			tempDir, _ := ioutil.TempDir("", "TestInstallHab")
-			defer os.Remove(tempDir)
+			tempDir := t.TempDir()
 			tgt.HabBaseDir = tempDir
 
 			tt.mockFun(t, mockExec, tempDir)
@@ -659,13 +657,10 @@ func TestLocalTarget_InstallService(t *testing.T) {
 
 func TestRemoveService(t *testing.T) {
 	tgt, mockExec, finish := setupTestLocalTarget(t)
-	tempDir, _ := ioutil.TempDir("", "TestRemoveService")
+	tempDir := t.TempDir()
 	tgt.HabBaseDir = tempDir
 
-	defer func() {
-		os.RemoveAll(tempDir)
-		finish(t)
-	}()
+	defer finish(t)
 
 	testPkgDir := filepath.Join(tempDir, "pkgs", "origin", "name")
 	os.MkdirAll(testPkgDir, os.ModePerm)
@@ -698,10 +693,8 @@ func TestRemoveServicePkgDeleteFails(t *testing.T) {
 	tgt, mockExec, finish := setupTestLocalTarget(t)
 	defer finish(t)
 
-	tempDir, _ := ioutil.TempDir("", "TestRemoveService")
+	tempDir := t.TempDir()
 	tgt.HabBaseDir = tempDir
-
-	defer os.RemoveAll(tempDir)
 
 	testPkgDir := filepath.Join(tempDir, "pkgs", "origin", "name")
 	os.MkdirAll(testPkgDir, 0400)
@@ -744,8 +737,7 @@ func TestGetUserToml(t *testing.T) {
 	pkg := habpkg.New("bar", "foo")
 
 	t.Run("returns an empty string if the file does not exist", func(t *testing.T) {
-		tempDir, _ := ioutil.TempDir("", "TestServiceConfigureFails")
-		defer os.Remove(tempDir)
+		tempDir := t.TempDir()
 
 		h := NewLocalTarget(false)
 		h.HabBaseDir = tempDir
@@ -755,8 +747,7 @@ func TestGetUserToml(t *testing.T) {
 	})
 
 	t.Run("returns the user toml if it exists", func(t *testing.T) {
-		tempDir, _ := ioutil.TempDir("", "TestServiceConfigureFails")
-		defer os.Remove(tempDir)
+		tempDir := t.TempDir()
 
 		h := NewLocalTarget(false)
 		h.HabBaseDir = tempDir

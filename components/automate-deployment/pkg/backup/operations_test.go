@@ -25,8 +25,8 @@ import (
 
 var timestamp = "20060102150405"
 
-func newTestBackupDir(desc string) (string, func()) {
-	tmpDir, _ := ioutil.TempDir("", desc)
+func newTestBackupDir(t testing.TB) string {
+	tmpDir := t.TempDir()
 	src := filepath.Join(tmpDir, "src")
 	dst := filepath.Join(tmpDir, "dst")
 	_ = os.MkdirAll(src, 0750)
@@ -34,7 +34,7 @@ func newTestBackupDir(desc string) (string, func()) {
 	_ = ioutil.WriteFile(filepath.Join(src, "a"), []byte("a contents"), 0750)
 	_ = ioutil.WriteFile(filepath.Join(src, "b"), []byte("b contents"), 0750)
 
-	return tmpDir, func() { os.RemoveAll(tmpDir) }
+	return tmpDir
 }
 
 func rsyncStdout() string {
@@ -99,8 +99,7 @@ func newTestCmd() Cmd {
 func TestPathCopyOperationBackup(t *testing.T) {
 	logrus.SetOutput(ioutil.Discard)
 	t.Run("copies files", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("copies-files")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		cmd := command.NewMockExecutor(t)
 		expectedCmd := command.ExpectedCommand{
@@ -134,8 +133,7 @@ func TestPathCopyOperationBackup(t *testing.T) {
 	})
 
 	t.Run("supports matchers", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("support-matchers")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		cmd := command.NewMockExecutor(t)
 		matchers := []RsyncMatcher{
@@ -174,8 +172,7 @@ func TestPathCopyOperationBackup(t *testing.T) {
 	})
 
 	t.Run("creates destination directory", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("creates-dst-dir")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		cmd := command.NewMockExecutor(t)
 		cmd.Expect("Output", command.ExpectedCommand{}).Return(rsyncStdout(), nil)
@@ -198,8 +195,7 @@ func TestPathCopyOperationBackup(t *testing.T) {
 	})
 
 	t.Run("publishes operation progress to the channel", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("updates-channel")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		cmd := command.NewMockExecutor(t)
 		cmd.Expect("Output", command.ExpectedCommand{}).Return(rsyncStdout(), nil)
@@ -221,8 +217,7 @@ func TestPathCopyOperationBackup(t *testing.T) {
 	})
 
 	t.Run("respects the context", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("updates-channel")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		cmd := command.NewMockExecutor(t)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -244,8 +239,7 @@ func TestPathCopyOperationBackup(t *testing.T) {
 func TestMetadataWriterOperationBackup(t *testing.T) {
 	logrus.SetOutput(ioutil.Discard)
 	t.Run("marshals metadata to metadata.json", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("writes-metadata")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 		expectedJSONPath := filepath.Join(tmpDir, timestamp, "dst", "metadata.json")
 
 		bctx := newBackupContext(tmpDir)
@@ -276,8 +270,7 @@ func TestMetadataWriterOperationBackup(t *testing.T) {
 	})
 
 	t.Run("creates destination directory", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("create-dir")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		expectedDestDir := filepath.Join(tmpDir, timestamp, "dst")
 		// remove the dst dir
@@ -297,8 +290,7 @@ func TestMetadataWriterOperationBackup(t *testing.T) {
 	})
 
 	t.Run("publishes operation progress to the channel", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("publish-progress")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		bctx := newBackupContext(tmpDir)
 		eChan := make(chan OperationProgress, 10)
@@ -318,8 +310,7 @@ func TestMetadataWriterOperationBackup(t *testing.T) {
 	})
 
 	t.Run("respects the context", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("publish-progress")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		bctx := newBackupContext(tmpDir)
@@ -382,8 +373,7 @@ func TestCommandExecuteOperationBackup(t *testing.T) {
 	logrus.SetOutput(ioutil.Discard)
 
 	t.Run("runs the command", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("runs-command")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		objectName := []string{"some-service", "dst"}
 		//expectedDstDir := filepath.Join(tmpDir, timestamp, "some-service", "dst")
@@ -422,8 +412,7 @@ func TestCommandExecuteOperationBackup(t *testing.T) {
 	})
 
 	t.Run("creates destination directory", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("creates-dest-dir")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 
 		objectName := []string{"some-service", "dst"}
 		expectedDstDir := filepath.Join(tmpDir, timestamp, "some-service", "dst")
@@ -450,8 +439,7 @@ func TestCommandExecuteOperationBackup(t *testing.T) {
 	})
 
 	t.Run("publishes operation progress to the channel", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("publishes-progress")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 		objectName := []string{"some-service", "dst"}
 		origin := "override"
 		pkg := "my-couchdb"
@@ -478,8 +466,7 @@ func TestCommandExecuteOperationBackup(t *testing.T) {
 	})
 
 	t.Run("respects the context", func(t *testing.T) {
-		tmpDir, cleanup := newTestBackupDir("publishes-progress")
-		defer cleanup()
+		tmpDir := newTestBackupDir(t)
 		dstPath := []string{tmpDir, "dst"}
 		origin := "override"
 		pkg := "my-couchdb"

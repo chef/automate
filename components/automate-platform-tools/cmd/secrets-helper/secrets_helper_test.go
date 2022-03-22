@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -29,16 +28,13 @@ type testSecretsHelper struct {
 
 func setupSecretsHelper(t *testing.T) *testSecretsHelper {
 	h := &testSecretsHelper{}
-	tmpDir, err := ioutil.TempDir("", "secrets-helper-test")
-	if err != nil {
-		t.Fatalf("Failed to create temp directory: %s", err.Error())
-	}
+	tmpDir := t.TempDir()
 
 	h.tmpDir = tmpDir
 	cmd := exec.Command("go", "build", "-o", h.BinPath(), "./secrets-helper.go")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err = cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		t.Fatalf("Failed to build secrets-helper: %s", err.Error())
 	}

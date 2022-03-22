@@ -15,16 +15,15 @@ import (
 
 var _ = fmt.Sprintf("stop bothering me")
 
-func newTmpDir() (string, func()) {
-	tmpDir, _ := ioutil.TempDir("", "statusTmpDir")
+func newTmpDir(t testing.TB) string {
+	tmpDir := t.TempDir()
 	os.MkdirAll(tmpDir, os.ModePerm)
-	return tmpDir, func() { os.RemoveAll(tmpDir) }
+	return tmpDir
 }
 
 func TestStatusDocToYamlFile(t *testing.T) {
 	t.Run("writes doc to YAML file", func(t *testing.T) {
-		tmpDir, cleanup := newTmpDir()
-		defer cleanup()
+		tmpDir := newTmpDir(t)
 
 		doc := newStatusDoc()
 		path := filepath.Join(tmpDir, "errors.yaml")
@@ -65,8 +64,7 @@ func parseResult(t *testing.T, tmpDir string) cmdDoc {
 
 func TestGenYamlTree(t *testing.T) {
 	t.Run("creates some yaml for an empty command", func(t *testing.T) {
-		tmpDir, cleanup := newTmpDir()
-		defer cleanup()
+		tmpDir := newTmpDir(t)
 
 		cmd := basicCmd()
 		err := GenYamlTree(cmd, tmpDir)
@@ -78,8 +76,7 @@ func TestGenYamlTree(t *testing.T) {
 		assert.Equal(t, "example-for-test", docFromFile.Name)
 	})
 	t.Run("includes flags in the yaml output", func(t *testing.T) {
-		tmpDir, cleanup := newTmpDir()
-		defer cleanup()
+		tmpDir := newTmpDir(t)
 
 		cmd := basicCmd()
 
@@ -109,8 +106,7 @@ func TestGenYamlTree(t *testing.T) {
 		assert.Equal(t, "default_value", actualOpt.DefaultValue)
 	})
 	t.Run("does not include hidden flags in the yaml output", func(t *testing.T) {
-		tmpDir, cleanup := newTmpDir()
-		defer cleanup()
+		tmpDir := newTmpDir(t)
 
 		cmd := basicCmd()
 

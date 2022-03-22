@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -54,11 +53,9 @@ func TestLoadMetadataVerifier(t *testing.T) {
 	t.Run("returns an error when given an incorrect SHA256 for the checksums.json file", func(t *testing.T) {
 		ctx := context.Background()
 
-		tmpDir, err := ioutil.TempDir("", "LoadMetadataVerifier-test")
-		require.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		bucket := fsBucket{basePath: tmpDir}
-		defer os.RemoveAll(tmpDir)
 
 		w, err := bucket.NewWriter(ctx, metadataChecksumsObjectName)
 		require.NoError(t, err)
@@ -97,14 +94,12 @@ func TestLoadMetadataVerifier(t *testing.T) {
 // checksum verification happens in the bucket implementations; mockBucket
 // doesn't implement the checksum verification, so we have to use a real bucket
 // implementation.
-func setupFsBucketMetadata(t *testing.T, metadataJSON []byte) (Bucket, func()) {
+func setupFsBucketMetadata(t *testing.T, metadataJSON []byte) Bucket {
 	ctx := context.Background()
 
-	tmpDir, err := ioutil.TempDir("", "LoadServiceMetadata-test")
-	require.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	bucket := fsBucket{basePath: tmpDir}
-	cleanup := func() { os.RemoveAll(tmpDir) }
 
 	w, err := bucket.NewWriter(ctx, "example/metadata.json")
 	require.NoError(t, err)
@@ -115,7 +110,7 @@ func setupFsBucketMetadata(t *testing.T, metadataJSON []byte) (Bucket, func()) {
 	err = w.Close()
 	require.NoError(t, err)
 
-	return bucket, cleanup
+	return bucket
 }
 
 func TestLoadMetadataVerification(t *testing.T) {
@@ -134,8 +129,7 @@ func TestLoadMetadataVerification(t *testing.T) {
 	// when checksums match, return metadata
 	// when checksums don't match err
 	t.Run("loads the metadata when the metadata file is successfully verified", func(t *testing.T) {
-		bucket, cleanup := setupFsBucketMetadata(t, metadataJSON)
-		defer cleanup()
+		bucket := setupFsBucketMetadata(t, metadataJSON)
 		md, err := LoadServiceMetadata(context.Background(), bucket, "example", verifier)
 		require.NoError(t, err)
 		assert.IsType(t, &Metadata{}, md)
@@ -146,8 +140,7 @@ func TestLoadMetadataVerification(t *testing.T) {
 		copy(badMetadataJSON, metadataJSON)
 		badMetadataJSON = append(badMetadataJSON, '\n')
 
-		bucket, cleanup := setupFsBucketMetadata(t, badMetadataJSON)
-		defer cleanup()
+		bucket := setupFsBucketMetadata(t, badMetadataJSON)
 		_, err := LoadServiceMetadata(context.Background(), bucket, "example", verifier)
 		require.Error(t, err)
 	})
@@ -156,8 +149,7 @@ func TestLoadMetadataVerification(t *testing.T) {
 		cksumsByName := make(map[string]string)
 		verifier := &SHA256Verifier{blobSHA256s: cksumsByName}
 
-		bucket, cleanup := setupFsBucketMetadata(t, metadataJSON)
-		defer cleanup()
+		bucket := setupFsBucketMetadata(t, metadataJSON)
 
 		_, err := LoadServiceMetadata(context.Background(), bucket, "example", verifier)
 		require.Error(t, err)

@@ -1,7 +1,6 @@
 package fileutils
 
 import (
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path"
@@ -105,12 +104,7 @@ func TestReadable(t *testing.T) {
 	})
 
 	t.Run("readable success", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "TestReadable")
-		require.NoError(t, err, "creating temporary dir")
-		defer func() {
-			os.Chmod(dir, os.FileMode(0777))
-			os.RemoveAll(dir)
-		}()
+		dir := t.TempDir()
 
 		me, err := user.Current()
 		require.NoError(t, err)
@@ -218,12 +212,7 @@ func TestWritable(t *testing.T) {
 	})
 
 	t.Run("writable success", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "TestWritable")
-		require.NoError(t, err, "creating temporary dir")
-		defer func() {
-			os.Chmod(dir, os.FileMode(0777))
-			os.RemoveAll(dir)
-		}()
+		dir := t.TempDir()
 
 		me, err := user.Current()
 		require.NoError(t, err)
@@ -373,12 +362,7 @@ func TestExecutable(t *testing.T) {
 	})
 
 	t.Run("executable success", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "TestExecutable")
-		require.NoError(t, err, "creating temporary dir")
-		defer func() {
-			os.Chmod(dir, os.FileMode(0777))
-			os.RemoveAll(dir)
-		}()
+		dir := t.TempDir()
 
 		me, err := user.Current()
 		require.NoError(t, err)
@@ -393,16 +377,14 @@ func TestExecutable(t *testing.T) {
 	})
 
 	t.Run("executable parent missing exec", func(t *testing.T) {
-		parent, err := ioutil.TempDir("", "TestExecutableParent")
-		require.NoError(t, err, "creating temporary dir")
+		parent := t.TempDir()
 		defer func() {
 			os.Chmod(parent, os.FileMode(0777))
-			os.RemoveAll(parent)
 		}()
 
 		child := path.Join(parent, "child")
 		reader := strings.NewReader("child body")
-		err = AtomicWrite(child, reader, WithAtomicWriteFileMode(0777))
+		err := AtomicWrite(child, reader, WithAtomicWriteFileMode(0777))
 		require.NoError(t, err)
 
 		// Make the parent not executable
@@ -515,12 +497,7 @@ func TestReadWritable(t *testing.T) {
 	})
 
 	t.Run("read/writable success", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "TestReadWritable")
-		require.NoError(t, err, "creating temporary dir")
-		defer func() {
-			os.Chmod(dir, os.FileMode(0777))
-			os.RemoveAll(dir)
-		}()
+		dir := t.TempDir()
 
 		me, err := user.Current()
 		require.NoError(t, err)
@@ -670,12 +647,7 @@ func TestReadWriteExecutable(t *testing.T) {
 	})
 
 	t.Run("read/write/exec success", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "TestReadWriteExecutable")
-		require.NoError(t, err, "creating temporary dir")
-		defer func() {
-			os.Chmod(dir, os.FileMode(0777))
-			os.RemoveAll(dir)
-		}()
+		dir := t.TempDir()
 
 		me, err := user.Current()
 		require.NoError(t, err)
@@ -690,16 +662,14 @@ func TestReadWriteExecutable(t *testing.T) {
 	})
 
 	t.Run("read/write/exec parent missing exec", func(t *testing.T) {
-		parent, err := ioutil.TempDir("", "TestReadWriteExecutable")
-		require.NoError(t, err, "creating temporary dir")
+		parent := t.TempDir()
 		defer func() {
 			os.Chmod(parent, os.FileMode(0777))
-			os.RemoveAll(parent)
 		}()
 
 		child := path.Join(parent, "foo")
 		reader := strings.NewReader("child body")
-		err = AtomicWrite(child, reader, WithAtomicWriteFileMode(0777))
+		err := AtomicWrite(child, reader, WithAtomicWriteFileMode(0777))
 		require.NoError(t, err)
 
 		// Make the parent not executable

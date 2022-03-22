@@ -2,7 +2,6 @@ package secrets_test
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -37,17 +36,14 @@ func TestSecretNameFromString(t *testing.T) {
 }
 
 func TestDiskSecretStore(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "secret-store-tests")
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
-	require.NoError(t, err, "failed to create temporary directory")
 	uid := os.Getuid()
 	gid := os.Getgid()
-	require.NoError(t, err, "failed to look up running user")
 	dataDir := filepath.Join(tmpDir, "data-dir")
 
 	dataStore := secrets.NewDiskStore(dataDir, uid, gid)
-	err = dataStore.Initialize()
+	err := dataStore.Initialize()
 	require.NoError(t, err, "failed to initialize")
 
 	t.Run("init creates the data directory with mode 0700", func(t *testing.T) {
