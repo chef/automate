@@ -30,7 +30,7 @@ type Storage interface {
 	DeleteUser(ctx context.Context, user User) (User, error)
 
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
-	GetAutomateOrgUsers(ctx context.Context, orgId string) ([]OrgUser, error)
+	GetAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) ([]OrgUser, error)
 
 	StoreOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (OrgUser, error)
 	EditOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (OrgUser, error)
@@ -135,10 +135,18 @@ type User struct {
 
 type OrgUser struct {
 	ID                  int
+	ServerID            string
 	OrgID               string
 	UserID              int
 	IsAdmin             bool
 	InfraServerUsername string
+	FirstName           string
+	LastName            string
+	EmailID             string
+	MiddleName          string
+	DisplayName         string
+	Connector           string
+	AutomateUserID      string
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 }
