@@ -27,6 +27,19 @@ func (s *Server) GetAutomateInfraServerUsersList(ctx context.Context, req *reque
 	}, nil
 }
 
+//GetAutomateInfraOrgUsersList: Fetches the list of automate infra org users from the DB
+func (s *Server) GetAutomateInfraOrgUsersList(ctx context.Context, req *request.AutomateInfraOrgUsers) (*response.AutomateInfraOrgUsers, error) {
+
+	usersList, err := s.service.Storage.GetAutomateInfraOrgUsers(ctx, req.ServerId, req.OrgId)
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "user")
+	}
+
+	return &response.AutomateInfraOrgUsers{
+		Users: fromStorageToListAutomateInfraOrgUsers(usersList),
+	}, nil
+}
+
 // fromStorageAutomateInfraServerUser: Create a response.AutomateInfraServerUsersListItem from a storage.User
 func fromStorageAutomateInfraServerUser(u storage.User) *response.AutomateInfraServerUsersListItem {
 	return &response.AutomateInfraServerUsersListItem{
@@ -57,4 +70,33 @@ func (s *Server) isServerExistInAutomate(ctx context.Context, serverId string) e
 		return err
 	}
 	return nil
+}
+
+// fromStorageAutomateInfraServerUser: Create a response.AutomateInfraOrgUsersListItem from a storage.User
+func fromStorageAutomateInfraOrgUser(u storage.OrgUser) *response.AutomateInfraOrgUsersListItem {
+	return &response.AutomateInfraOrgUsersListItem{
+		UserId:              int32(u.UserID),
+		ServerId:            u.ServerID,
+		OrgId:               u.OrgID,
+		InfraServerUsername: u.InfraServerUsername,
+		FirstName:           u.FirstName,
+		LastName:            u.LastName,
+		EmailId:             u.EmailID,
+		MiddleName:          u.MiddleName,
+		DisplayName:         u.DisplayName,
+		Connector:           u.Connector,
+		AutomateUserId:      u.AutomateUserID,
+		IsAdmin:             u.IsAdmin,
+	}
+}
+
+//fromStorageToListAutomateInfraOrgUsers: Create a response.AutomateInfraServerUsersListItem from an array of storage.User
+func fromStorageToListAutomateInfraOrgUsers(ul []storage.OrgUser) []*response.AutomateInfraOrgUsersListItem {
+	tl := make([]*response.AutomateInfraOrgUsersListItem, len(ul))
+
+	for i, user := range ul {
+		tl[i] = fromStorageAutomateInfraOrgUser(user)
+	}
+
+	return tl
 }
