@@ -1036,7 +1036,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetAutomateInfraOrgUsersList", "infra:infraServers:{server_id}:orgs:{org_id}:automateinfraorgusers", "infra:infraServersOrgs:get", "GET", "/api/v0/infra/servers/{server_id}/org/{org_id}/automateinfraorgusers", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetAutomateInfraOrgUsersList", "infra:infraServers:{server_id}:orgs:{org_id}:automateinfraorgusers", "infra:infraServersOrgs:get", "GET", "/api/v0/infra/servers/{server_id}/org/{org_id}/users", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.AutomateInfraOrgUsers); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

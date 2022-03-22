@@ -320,7 +320,7 @@ func init() {
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/org/{org_id}/automateinfraorgusers": {
+    "/api/v0/infra/servers/{server_id}/org/{org_id}/users": {
       "get": {
         "operationId": "InfraProxy_GetAutomateInfraOrgUsersList",
         "responses": {

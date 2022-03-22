@@ -8268,7 +8268,7 @@ var (
 
 	pattern_InfraProxy_GetAutomateInfraServerUsersList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"api", "v0", "infra", "servers", "server_id", "automateinfraserverusers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetAutomateInfraOrgUsersList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "org", "org_id", "automateinfraorgusers"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetAutomateInfraOrgUsersList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"api", "v0", "infra", "servers", "server_id", "org", "org_id", "users"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
