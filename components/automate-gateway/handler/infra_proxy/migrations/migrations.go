@@ -89,13 +89,22 @@ func getStagedUser(user *infra_res.User) *gwres.User {
 	stagedUser.IsConflicting = user.IsConflicting
 	stagedUser.IsAdmin = user.IsAdmin
 	stagedUser.HashPassword = user.HashPassword
+	stagedUser.ActionOps = user.ActionOps
 	return stagedUser
 }
 
 // ConfirmPreview trigger the pipline function
 func (a *InfraProxyMigrationServer) ConfirmPreview(ctx context.Context, r *gwreq.ConfirmPreview) (*gwres.ConfirmPreview, error) {
 	req := &infra_req.ConfirmPreview{
+		ServerId:    r.ServerId,
 		MigrationId: r.MigrationId,
+		StagedData: &infra_req.StagedData{
+			OrgsToMigrate: r.StagedData.OrgsToMigrate,
+			OrgsToSkip:    r.StagedData.OrgsToSkip,
+			OrgsToUpdate:  r.StagedData.OrgsToUpdate,
+			OrgsToDelete:  r.StagedData.OrgsToDelete,
+			Users:         getStagedUserForConfirmPreview(r.StagedData.Users),
+		},
 	}
 	res, err := a.migrationClient.ConfirmPreview(ctx, req)
 	if err != nil {
@@ -105,4 +114,25 @@ func (a *InfraProxyMigrationServer) ConfirmPreview(ctx context.Context, r *gwreq
 	return &gwres.ConfirmPreview{
 		MigrationId: res.MigrationId,
 	}, nil
+}
+
+func getStagedUserForConfirmPreview(users []*gwreq.User) []*infra_req.User {
+	usersData := []*infra_req.User{}
+	for _, user := range users {
+		stagedUser := &infra_req.User{}
+		stagedUser.Username = user.Username
+		stagedUser.Email = user.Email
+		stagedUser.DisplayName = user.DisplayName
+		stagedUser.FirstName = user.FirstName
+		stagedUser.LastName = user.LastName
+		stagedUser.MiddleName = user.MiddleName
+		stagedUser.AutomateUsername = user.AutomateUsername
+		stagedUser.Connector = user.Connector
+		stagedUser.IsConflicting = user.IsConflicting
+		stagedUser.IsAdmin = user.IsAdmin
+		stagedUser.HashPassword = user.HashPassword
+		stagedUser.ActionOps = user.ActionOps
+		usersData = append(usersData, stagedUser)
+	}
+	return usersData
 }
