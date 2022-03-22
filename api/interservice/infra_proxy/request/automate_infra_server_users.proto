@@ -7,3 +7,10 @@ message AutomateInfraServerUsers {
     // Automate Infra Server ID.
     string server_id = 1;
 }
+
+message AutomateInfraOrgUsers {
+    // Automate Infra Server ID.
+    string server_id = 1;
+    // Automate Infra Org ID.
+    string org_id = 2;
+}
