@@ -101,6 +101,14 @@
       ]
     },
     {
+      "name": "opensearch",
+      "type": "base",
+      "services": [
+        "chef/automate-opensearch",
+        "chef/automate-es-gateway"
+      ]
+    },
+    {
       "name": "cereal",
       "type": "base",
       "dependencies": ["postgresql"],
