@@ -5,15 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path"
+	"path/filepath"
+
 	"github.com/chef/automate/api/interservice/local_user"
 	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"io"
-	"os"
-	"path"
-	"path/filepath"
 )
 
 func ParseOrgs(ctx context.Context, st storage.Storage, mst storage.MigrationStorage, result pipeline.Result) (pipeline.Result, error) {
@@ -284,7 +285,7 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 			orgUserAssociations = append(orgUserAssociations, pipeline.OrgsUsersAssociations{OrgName: org, Users: userAssociations})
 			continue
 		}
-		orgUsersInDb, err := st.GetAutomateOrgUsers(ctx, org.Name)
+		orgUsersInDb, err := st.GetAutomateInfraOrgUsers(ctx, result.Meta.ServerID, org.Name)
 		if err != nil {
 			log.Errorf("Unable to fetch automate Users for org %s : %s", org.Name, err.Error())
 			return nil, err
