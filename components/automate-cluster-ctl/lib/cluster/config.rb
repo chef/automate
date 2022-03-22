@@ -71,6 +71,7 @@ module AutomateCluster
 
     config_context :chef_server do
       default :instance_count, 1
+      default :chef_lb_fqdn
     end
 
     config_context :elasticsearch do

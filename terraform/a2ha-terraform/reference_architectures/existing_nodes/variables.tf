@@ -14,6 +14,10 @@ variable "existing_chef_server_private_ips" {
   default = []
 }
 
+variable "existing_chef_server_fqdn" {
+  default = []
+}
+
 variable "existing_elasticsearch_ips" {
   default = []
 }
