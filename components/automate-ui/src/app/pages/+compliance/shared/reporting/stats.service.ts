@@ -215,7 +215,7 @@ export class StatsService {
       map(({ reports, total }) => new ReportCollection(reports, total)));
   }
 
-  downloadReport(format: string, reportQuery: ReportQuery): Observable<string> {
+  downloadReport(format: string, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/export`;
 
     // for export, we want to send the start_time as the beg of day of end time
@@ -223,7 +223,7 @@ export class StatsService {
     reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
 
     const body = { type: format, filters: this.formatFilters(reportQuery) };
-    return this.httpClient.post(url, body, { responseType: 'text' });
+    return this.httpClient.post(url, body, { responseType: 'arraybuffer' });
   }
 
   downloadNodeReport(fileFormat: reportFormat, reportQuery: ReportQuery): Observable<string> {
