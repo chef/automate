@@ -67,3 +67,6 @@ variable "sudo_cmd" {
 variable "tmp_path" {
   default = "/var/tmp"
 }
+
+variable "nfs_mount_path" {
+}
