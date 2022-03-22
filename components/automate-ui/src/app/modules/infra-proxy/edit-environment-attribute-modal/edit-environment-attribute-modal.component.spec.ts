@@ -7,6 +7,11 @@ import { EventEmitter } from '@angular/core';
 import { EditEnvironmentAttributeModalComponent } from './edit-environment-attribute-modal.component';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { Environment } from 'app/entities/environments/environment.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('EditEnvironmentAttributeModalComponent', () => {
   let component: EditEnvironmentAttributeModalComponent;
@@ -26,6 +31,7 @@ describe('EditEnvironmentAttributeModalComponent', () => {
         EditEnvironmentAttributeModalComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         HttpClient, HttpHandler
       ],
       imports: [

@@ -100,7 +100,7 @@ if ['up', 'ssh', 'destroy', 'halt'].include?(ARGV[0])
         raise "#{ENV['HOME']}/.okta_aws.toml is not defined, cannot continue. Please read README.md for an example and usage details."
       end
       puts " * You might be prompted for your Okta password now..."
-      `okta_aws "#{aws_profile}"`
+      `saml2aws login --profile chef-engineering`
     end
 
     unless File.exist?(aws_creds_file)

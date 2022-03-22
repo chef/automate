@@ -87,6 +87,7 @@ do_prepare() {
 
 do_build() {
   pushd "${CACHE_PATH}/server" > /dev/null
+    git config --global url."https://github.com/".insteadOf git://github.com/
     MIX_ENV=habitat mix do deps.get, release
   popd > /dev/null
   TARGET="${CACHE_PATH}/server/_habitat_build/habitat/rel/notifications"

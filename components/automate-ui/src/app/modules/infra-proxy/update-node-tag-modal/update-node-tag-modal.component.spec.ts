@@ -8,6 +8,11 @@ import { EventEmitter } from '@angular/core';
 import { UpdateNodeTagModalComponent } from './update-node-tag-modal.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { UpdateNodeTagsSuccess } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('UpdateNodeTagModalComponent', () => {
   let component: UpdateNodeTagModalComponent;
@@ -27,6 +32,7 @@ describe('UpdateNodeTagModalComponent', () => {
         UpdateNodeTagModalComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [

@@ -2,15 +2,19 @@ package main
 
 import (
 	"context"
+	"strconv"
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -26,6 +30,8 @@ var upgradeRunCmdFlags = struct {
 	upgradebackends      bool
 	upgradeairgapbundles bool
 	skipDeploy           bool
+	isMajorUpgrade       bool
+	versionsPath         string
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -35,6 +41,10 @@ var upgradeRunCmd = &cobra.Command{
 	RunE:  runUpgradeCmd,
 	Args:  cobra.MaximumNArgs(0),
 }
+
+var upgradeStatusCmdFlags = struct {
+	versionsPath string
+}{}
 
 var upgradeStatusCmd = &cobra.Command{
 	Use:   "status",
@@ -96,8 +106,54 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
+		Version:        upgradeRunCmdFlags.version,
+		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
+	})
+
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to start upgrade failed",
+		)
+	}
+
+	if validatedResp.CurrentVersion == validatedResp.TargetVersion {
+		writer.Println("Chef Automate up-to-date")
+		return nil
+	}
+
+	pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
+	if err != nil {
+		return err
+	}
+
+	if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to start upgrade failed",
+			)
+		}
+		err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to start upgrade failed",
+			)
+		}
+	}
+
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
-		Version: upgradeRunCmdFlags.version,
+		Version:        upgradeRunCmdFlags.version,
+		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 	if err != nil {
 		return status.Wrap(
@@ -183,7 +239,9 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	resp, err := connection.UpgradeStatus(context.Background(), &api.UpgradeStatusRequest{})
+	resp, err := connection.UpgradeStatus(context.Background(), &api.UpgradeStatusRequest{
+		VersionsPath: upgradeStatusCmdFlags.versionsPath,
+	})
 	if err != nil {
 		return status.Wrap(
 			err,
@@ -205,12 +263,16 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	switch resp.State {
 	case api.UpgradeStatusResponse_IDLE:
 		switch {
-		case resp.CurrentVersion != "" && resp.CurrentVersion < resp.LatestAvailableVersion:
-			writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
-				resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+		//Todo(milestone) - update the comparison logic of current version and latest available version
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
 				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
+			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
+				writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
+					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+				if !resp.IsConvergeCompatable {
+					writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
+				}
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
 			}
@@ -221,6 +283,18 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
 			}
 		}
+
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		if len(pendingPostChecklist) > 0 {
+			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
+			for index, msg := range pendingPostChecklist {
+				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
+			}
+		}
+
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
 		if resp.DesiredVersion != "" {
@@ -313,7 +387,51 @@ func init() {
 		false,
 		"will only upgrade and not deploy the bundle")
 
+	upgradeRunCmd.PersistentFlags().BoolVar(
+		&upgradeRunCmdFlags.isMajorUpgrade,
+		"major",
+		false,
+		"This flag is only needed for major version upgrades")
+
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
+	upgradeStatusCmd.PersistentFlags().StringVar(
+		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
+	if !isDevMode() {
+		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+		err = upgradeRunCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+	}
+
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
 	RootCmd.AddCommand(upgradeCmd)
+}
+
+func GetPendingPostChecklist(version string) ([]string, error) {
+
+	_, is_major_version := manifest.IsSemVersionFmt(version)
+
+	if is_major_version {
+		var err error
+		pmc, err := majorupgradechecklist.NewPostChecklistManager(version)
+		if err != nil {
+			return []string{}, err
+		}
+
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
+		return pendingPostChecklist, nil
+	}
+	return []string{}, nil
 }

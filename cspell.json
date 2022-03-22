@@ -1704,5 +1704,6 @@
     ],
     "enableFiletypes": [
         "markdown"
-    ]
+    ],
+    "enabled": true
 }

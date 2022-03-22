@@ -32,8 +32,10 @@ const (
 	// deleteRetryInterval is the time to sleep between retrying snapshot deletes
 	deleteInterval = 5 * time.Second
 	// maxDeleteWaitTime is the maximum amount of time we'll wait for a delete to
-	// be acknowledged
-	maxDeleteWaitTime = 10 * time.Minute
+	// be acknowledged. Since the acknowledgement doesn't come from ES (6.8.1) until
+	// the deletion is complete, and deletions can take hours in deployments with a
+	// large number of nodes or cloud targets, we need this to be quite long
+	maxDeleteWaitTime = 12 * time.Hour
 )
 
 // BackupsConfig contains settings for Es snapshot repo type and options, as

@@ -11,6 +11,11 @@ import { using } from 'app/testing/spec-helpers';
 import { PolicyGroupsComponent } from './policy-groups.component';
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyGroupsSuccess } from 'app/entities/policy-files/policy-file.action';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('PolicyGroupsComponent', () => {
   let component: PolicyGroupsComponent;
@@ -27,6 +32,7 @@ describe('PolicyGroupsComponent', () => {
         PolicyGroupsComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [

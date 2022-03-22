@@ -15,13 +15,8 @@ ssh_user = "centos"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
 # sudo_password = ""
-# logging_monitoring_management = ""
-# new_elk = ""
-# existing_elk_instance_ip ""
-# existing_elk_port ""
-# existing_elk_cert ""
-# existing_elk_username ""
-# existing_elk_password ""
+
+# DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
 
 [automate.config]
@@ -105,13 +100,8 @@ ssh_user = "centos"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
 sudo_password = ""
-# logging_monitoring_management = "{{ .LoggingMonitoringManagement }}"
-# new_elk = "{{ .NewElk }}"
-# existing_elk_instance_ip "{{ .ExistingElk }}"
-# existing_elk_port "{{ .ExistingElkPort }}"
-# existing_elk_cert "{{ .ExistingElkCert }}"
-# existing_elk_username "{{ .ExistingElkUsername }}"
-# existing_elk_password "{{ .ExistingElkPassword }}"
+
+# DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
 
 [automate.config]
