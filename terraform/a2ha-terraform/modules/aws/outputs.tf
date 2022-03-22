@@ -6,6 +6,13 @@ output "automate_fqdn" {
   value = var.automate_fqdn != "" ? var.automate_fqdn : aws_alb.automate_lb.dns_name
 }
 
+output "chef_server_frontend_urls" {
+  value = "https://${aws_alb.chef_server_lb.dns_name}"
+}
+
+output "chef_server_fqdn" {
+  value = var.chef_server_fqdn != "" ? var.chef_server_fqdn : aws_alb.chef_server_lb.dns_name
+}
 output "automate_ssh" {
   value = formatlist(
     "ssh -i %s %s@%s",

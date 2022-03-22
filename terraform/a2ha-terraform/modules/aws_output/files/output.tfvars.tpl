@@ -6,3 +6,5 @@ elasticsearch_private_ips    = [${elasticsearch_private_ips}]
 automate_fqdn                = "${automate_fqdn}"
 automate_frontend_urls       = "${automate_frontend_urls}"
 bucket_name                  = "${bucket_name}"
+chef_server_fqdn             = "${chef_server_fqdn}"
+chef_server_frontend_urls    = "${chef_server_frontend_urls}"

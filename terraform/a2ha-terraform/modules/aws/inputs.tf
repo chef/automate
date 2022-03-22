@@ -73,6 +73,12 @@ variable "chef_ebs_volume_type" {
   default = "gp3"
 }
 
+variable "chef_server_fqdn" {
+}
+
+variable "chef_server_frontend_urls" {
+}
+
 variable "chef_server_instance_count" {
   default = 1
 }

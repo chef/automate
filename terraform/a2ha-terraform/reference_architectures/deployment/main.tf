@@ -414,3 +414,16 @@ module "chef_server" {
   s3_endpoint                         = var.s3_endpoint
   bucket_name                         = var.bucket_name
 }
+
+module "add_chef_server_to_a2_ui" {
+  source                        = "./modules/add_chef_server_to_a2_ui"
+  private_ips                     = var.elasticsearch_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.fe_sudo_password
+  sudo_cmd                        = var.sudo_cmd
+  automate-fqdn                   = var.automate_fqdn
+  chef-server-fqdn                = var.chef_server_fqdn
+
+  depends_on = [module.chef_server]
+}
