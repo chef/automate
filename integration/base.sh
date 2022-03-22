@@ -447,9 +447,9 @@ __run_test() {
     do_deploy
     break_log "deploy"
 
-    log_section_start "Step do_test_deploy"
-    do_test_deploy
-    break_log "test_deploy"
+    # log_section_start "Step do_test_deploy"
+    # do_test_deploy
+    # break_log "test_deploy"
 
     if [ $test_upgrades = true ]; then
         log_section_start "Step do_prepare_upgrade"
