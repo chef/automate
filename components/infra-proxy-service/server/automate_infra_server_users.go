@@ -173,8 +173,9 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	}
 
 	return &response.ResetInfraServerUserKeyRes{
-		PrivateKey: chefKey.PrivateKey,
+		UserId:     req.UserId,
 		UserName:   req.UserName,
 		ServerId:   req.ServerId,
+		PrivateKey: chefKey.PrivateKey,
 	}, nil
 }

@@ -2758,12 +2758,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Chef Server Id",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "user_name",
+            "description": "Chef Server Username",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3112,11 +3114,17 @@ func init() {
     "chef.automate.api.infra_proxy.request.ResetInfraServerUserKeyReq": {
       "type": "object",
       "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "Chef Server User's Id"
+        },
         "user_name": {
-          "type": "string"
+          "type": "string",
+          "title": "Chef Server Username"
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "title": "Chef Server Id"
         }
       }
     },
@@ -4619,14 +4627,21 @@ func init() {
     "chef.automate.api.infra_proxy.response.ResetInfraServerUserKeyRes": {
       "type": "object",
       "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "Chef Server User's Id"
+        },
         "user_name": {
-          "type": "string"
+          "type": "string",
+          "title": "Chef Server Username"
         },
         "server_id": {
-          "type": "string"
+          "type": "string",
+          "title": "Chef Server Id"
         },
         "private_key": {
-          "type": "string"
+          "type": "string",
+          "title": "Chef Servers User's Private Key"
         }
       }
     },
