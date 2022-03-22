@@ -703,7 +703,7 @@ describe('StatsService', () => {
 
       const req = httpTestingController.expectOne(url);
       expect(req.request.method).toEqual('POST');
-      expect(req.request.responseType).toEqual('text');
+      expect(req.request.responseType).toEqual('arraybuffer');
       expect(req.request.body).toEqual({type, filters: service.formatFilters(reportQuery)});
 
       req.flush(text);
