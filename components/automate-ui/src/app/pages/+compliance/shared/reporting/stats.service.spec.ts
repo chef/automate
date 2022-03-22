@@ -694,10 +694,10 @@ describe('StatsService', () => {
         filters: filters,
         last24h: false
       };
-      const text = 'report';
+      let arraybuffer: ArrayBuffer;
 
-      service.downloadReport(type, reportQuery).subscribe(data => {
-        expect(data).toEqual(text);
+      service.downloadReport(type, reportQuery).subscribe((data: ArrayBuffer)  => {
+        expect(data).toEqual(arraybuffer);
         done();
       });
 
@@ -706,7 +706,7 @@ describe('StatsService', () => {
       expect(req.request.responseType).toEqual('arraybuffer');
       expect(req.request.body).toEqual({type, filters: service.formatFilters(reportQuery)});
 
-      req.flush(text);
+      req.flush(arraybuffer);
     });
   });
 });
