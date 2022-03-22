@@ -246,7 +246,13 @@ func (m MigrationDB) StoreMigrationStage(ctx context.Context, migrationId string
 }
 
 func (m MigrationDB) GetMigrationStage(ctx context.Context, migrationId string) (storage.MigrationStage, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.MigrationStage{}, errors.New("Failed to migrate.")
+	}
+
+	return storage.MigrationStage{
+		MigrationID: "mig1",
+	}, nil
 }
 
 func (m MigrationDB) DeleteMigrationStage(ctx context.Context, migrationId string) (storage.MigrationStage, error) {

@@ -72,6 +72,8 @@ message User {
   bool is_admin=10;
   //Local user hashed password
   string hash_password=11;
+  // Local User actionops
+  int32 action_ops=12;
 }
 
 message ConfirmPreview {

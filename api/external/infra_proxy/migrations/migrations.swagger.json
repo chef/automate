@@ -112,7 +112,7 @@
       }
     },
     "/api/v0/infra/servers/{server_id}/migrations/confirm_preview/{migration_id}": {
-      "get": {
+      "post": {
         "operationId": "InfraProxyMigrationService_ConfirmPreview",
         "responses": {
           "200": {
@@ -131,17 +131,25 @@
         "parameters": [
           {
             "name": "server_id",
-            "description": "Chef Server ID",
+            "description": "Server ID",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "migration_id",
-            "description": "Migration ID",
+            "description": "Migration ID.",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.ConfirmPreview"
+            }
           }
         ],
         "tags": [
@@ -151,6 +159,111 @@
     }
   },
   "definitions": {
+    "chef.automate.api.infra_proxy.migrations.request.ConfirmPreview": {
+      "type": "object",
+      "properties": {
+        "server_id": {
+          "type": "string",
+          "title": "Server ID"
+        },
+        "migration_id": {
+          "type": "string",
+          "description": "Migration ID."
+        },
+        "staged_data": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.StagedData",
+          "title": "Staged data"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.request.StagedData": {
+      "type": "object",
+      "properties": {
+        "orgs_to_migrate": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to migrate"
+        },
+        "orgs_to_skip": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to skip"
+        },
+        "orgs_to_update": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to update"
+        },
+        "orgs_to_delete": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to delete"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.User"
+          },
+          "title": "Users"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.request.User": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "title": "User's username"
+        },
+        "email": {
+          "type": "string",
+          "title": "User's email ID"
+        },
+        "display_name": {
+          "type": "string",
+          "title": "User's display name"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User's first name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User's last name"
+        },
+        "middle_name": {
+          "type": "string",
+          "title": "User's middle name"
+        },
+        "automate_username": {
+          "type": "string",
+          "title": "User's username in automate"
+        },
+        "connector": {
+          "type": "string",
+          "title": "Local or ldap user"
+        },
+        "is_conflicting": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "IsConflicting for user's existance in db"
+        },
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "user is admin or not"
+        },
+        "hash_password": {
+          "type": "string",
+          "title": "Local User hash password"
+        },
+        "action_ops": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Local User actionops"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponse": {
       "type": "object",
       "properties": {
@@ -287,6 +400,11 @@
         "hash_password": {
           "type": "string",
           "title": "Local user hashed password"
+        },
+        "action_ops": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Local User actionops"
         }
       }
     },
