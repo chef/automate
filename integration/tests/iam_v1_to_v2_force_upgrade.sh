@@ -25,9 +25,8 @@ test_upgrade_inspec_profiles=(a2-deploy-integration a2-iam-legacy-integration)
 test_skip_diagnostics=true
 
 # on this version, Automate had upgrade-to-v2 and the first three v2 data migrations
-OLD_VERSION=20220321144310
+OLD_VERSION=20190501153509
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
-download_manifest "dev" "$OLD_MANIFEST_DIR/20220321144310.json"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${OLD_VERSION}.json"
 
 
@@ -49,4 +48,12 @@ do_deploy() {
         --accept-terms-and-mlsa \
         --skip-preflight \
         --debug
+}
+
+do_prepare_upgrade(){
+    rm chef-automate
+    mv cli_bin chef-automate
+    chef-automate version
+    chef-automate upgrade run --help
+    do_prepare_upgrade_default
 }
