@@ -113,40 +113,42 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 
-	if err != nil && !strings.Contains(err.Error(), "unknown method IsValidUpgrade") {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to start upgrade failed",
-		)
-	}
-
-	if validatedResp.CurrentVersion == validatedResp.TargetVersion {
-		writer.Println("Chef Automate up-to-date")
-		return nil
-	}
-
-	pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
 	if err != nil {
-		return err
-	}
-
-	if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
-		if err != nil {
+		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") {
 			return status.Wrap(
 				err,
 				status.DeploymentServiceCallError,
 				"Request to start upgrade failed",
 			)
 		}
-		err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+	} else {
+		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
+			writer.Println("Chef Automate up-to-date")
+			return nil
+		}
+
+		pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
 		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to start upgrade failed",
-			)
+			return err
+		}
+
+		if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
+			err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
 		}
 	}
 
