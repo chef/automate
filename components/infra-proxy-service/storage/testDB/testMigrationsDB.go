@@ -258,5 +258,12 @@ func (m MigrationDB) GetActiveMigration(ctx context.Context, serverId string) (s
 }
 
 func (m MigrationDB) GetMigrationStatus(ctx context.Context, migrationId string) (storage.MigrationStatus, error) {
-	panic("implement me")
+	if m.NeedError {
+		return storage.MigrationStatus{}, errors.New("Failed to fetch migration status")
+	}
+	return storage.MigrationStatus{
+		MigrationID:     "mig1",
+		MigrationType:   "Creating Preview",
+		MigrationStatus: "Completed",
+	}, nil
 }
