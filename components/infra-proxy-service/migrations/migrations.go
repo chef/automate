@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"google.golang.org/grpc/metadata"
 	"io"
 	"os"
 	"path"
+
+	"google.golang.org/grpc/metadata"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
@@ -293,6 +294,7 @@ func getStagedUser(user pipeline_model.User) *response.User {
 	stagedUser.Connector = user.Connector
 	stagedUser.IsConflicting = user.IsConflicting
 	stagedUser.HashPassword = user.HashPassword
+	stagedUser.ActionOps = int32(user.ActionOps)
 	return stagedUser
 }
 
@@ -311,20 +313,24 @@ func (s *MigrationServer) StoreStagedData(ctx context.Context, migrationId strin
 // ConfirmPreview trigger the preview pipline
 func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreview) (*response.ConfirmPreview, error) {
 	// Validate all request fields are required
-	// err := validation.New(validation.Options{
-	// 	Target:          "server",
-	// 	Request:         *req,
-	// 	RequiredDefault: true,
-	// }).Validate()
+	err := validation.New(validation.Options{
+		Target:          "server",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
 
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if err != nil {
+		return nil, err
+	}
+
 	md, _ := metadata.FromIncomingContext(ctx)
+
 	migrationStage, err := s.service.Migration.GetMigrationStage(ctx, req.MigrationId)
 	if err != nil {
 		return nil, err
 	}
+
+	migrationStage.StagedData.ParsedResult.Users = SetStagedUserForConfirmPreview(req.StagedData.Users)
 
 	// call pipeline function to trigger the phase 2 pipeline
 	go s.phaseTwoPipeline.Run(md, migrationStage.StagedData, s.service)
@@ -337,4 +343,26 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 // To avoide duplicate logs
 func ErrSendAndClose(migrationId string, err error) {
 	log.Errorf("Failed to send and close stream file for migration id %s : %s", migrationId, err.Error())
+}
+
+func SetStagedUserForConfirmPreview(users []*request.User) []pipeline_model.User {
+	usersData := []pipeline_model.User{}
+
+	for _, user := range users {
+		stagedUser := pipeline_model.User{}
+		stagedUser.Username = user.Username
+		stagedUser.Email = user.Email
+		stagedUser.DisplayName = user.DisplayName
+		stagedUser.FirstName = user.FirstName
+		stagedUser.LastName = user.LastName
+		stagedUser.MiddleName = user.MiddleName
+		stagedUser.AutomateUsername = user.AutomateUsername
+		stagedUser.Connector = user.Connector
+		stagedUser.IsConflicting = user.IsConflicting
+		stagedUser.ActionOps = pipeline_model.ActionOps(user.ActionOps)
+		// stagedUser.IsAdmin = user.IsAdmin
+		stagedUser.HashPassword = user.HashPassword
+		usersData = append(usersData, stagedUser)
+	}
+	return usersData
 }

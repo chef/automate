@@ -220,6 +220,14 @@ func request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, ma
 	var protoReq request.ConfirmPreview
 	var metadata runtime.ServerMetadata
 
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	var (
 		val string
 		ok  bool
@@ -257,6 +265,14 @@ func request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, ma
 func local_request_InfraProxyMigrationService_ConfirmPreview_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyMigrationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.ConfirmPreview
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -357,7 +373,7 @@ func RegisterInfraProxyMigrationServiceHandlerServer(ctx context.Context, mux *r
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigrationService_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_InfraProxyMigrationService_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -478,7 +494,7 @@ func RegisterInfraProxyMigrationServiceHandlerClient(ctx context.Context, mux *r
 
 	})
 
-	mux.Handle("GET", pattern_InfraProxyMigrationService_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_InfraProxyMigrationService_ConfirmPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)

@@ -46,8 +46,50 @@ message GetStagedDataRequest {
 }
 
 message ConfirmPreview {
-  // Chef Server ID
+  // Server ID
   string server_id = 1;
-  // Migration ID
+  // Migration ID.
   string migration_id = 2;
+  // Staged data
+  StagedData staged_data = 3; 
+}
+
+message StagedData {
+  // Number of orgs to migrate
+  int32 orgs_to_migrate =1;
+  // Number of orgs to skip
+  int32 orgs_to_skip =2;
+  // Number of orgs to update
+  int32 orgs_to_update =3;
+  // Number of orgs to delete
+  int32 orgs_to_delete =4;
+  // Users
+  repeated User users =5;
+}
+
+message User {
+  // User's username
+  string  username =1;
+  // User's email ID
+  string email =2;
+  // User's display name
+  string display_name=3;
+  // User's first name
+  string first_name=4;
+  // User's last name
+  string last_name=5;
+  // User's middle name
+  string middle_name=6;
+  // User's username in automate
+  string automate_username =7;
+  // Local or ldap user
+  string connector=8;
+  // IsConflicting for user's existance in db
+  bool is_conflicting=9;
+  // user is admin or not
+  bool is_admin=10;
+  //Local User hash password
+  string hash_password=11;
+  // Local User actionops
+  int32 action_ops=12;
 }

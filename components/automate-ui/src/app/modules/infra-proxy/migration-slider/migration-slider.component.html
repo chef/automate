@@ -38,6 +38,10 @@
                   <span>Users</span>
                   <span>{{previewData?.staged_data?.users.length || 0}}</span>
                 </li>
+                <li>
+                  <span>Conflicting Users</span>
+                  <span>{{conflictedUsers?.length || 0}}</span>
+                </li>
               </ul>
             </div>
           </div>
@@ -48,7 +52,7 @@
             <chef-thead>
               <chef-tr>
                 <chef-th class="no-border first">
-                  <chef-checkbox (change)="selectedAllUsers($event)"></chef-checkbox>
+                  <chef-checkbox (change)="selectedAllUsers($event)" [checked]="true"></chef-checkbox>
                 </chef-th>
                 <chef-th class="no-border middle">Chef Server User</chef-th>
                 <chef-th class="no-border middle">Automate User</chef-th>
