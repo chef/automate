@@ -69,8 +69,10 @@ message User {
   bool is_conflicting=9;
   // user is admin or not
   bool is_admin=10;
-  //Local User hash password
+  // Local User hash password
   string hash_password=11;
+  // Local User actionops
+  int32 action_ops=12;
 }
 
 message ConfirmPreview {

@@ -23,7 +23,7 @@ export class MigrationSliderComponent implements OnChanges {
   public migrationForm: FormGroup;
   public usersData: User[];
   public selectedUsersData: User[] = [];
-
+  public conflictedUsers: User[] = [];
   @HostBinding('class.active') isSlideOpen1 = false;
 
   constructor(
@@ -36,11 +36,14 @@ export class MigrationSliderComponent implements OnChanges {
   ngOnChanges() {
     const group = {};
     if (this.previewData) {
-      this.previewData.staged_data.users.forEach((input_template: { automate_username: string | number; }) => {
-        group[input_template.automate_username] = new FormControl('');
+      this.previewData.staged_data.users.forEach((input_template: { automate_username: string | number, is_conflicting: boolean }) => {
+        group[input_template.automate_username] = new FormControl({value: '', disabled: !input_template.is_conflicting});
       });
 
       this.usersData = this.previewData.staged_data.users.map((obj: User)=> ({ ...obj, is_seleted: false }))
+      this.conflictedUsers = this.usersData.filter((obj: User)=> obj.is_conflicting)
+      this.usersData.forEach((item: User) => item.is_selected = true)
+      this.usersData.forEach((item: User) => this.selectedUsersData.push(item))
     }
     this.migrationForm = new FormGroup(group);
   }

@@ -30,6 +30,7 @@ export interface User {
   middle_name: string;
   automate_username: string;
   connector: string;
+  action_ops: number;
   is_conflicting: boolean;
   is_admin: boolean;
   is_selected?: boolean;
