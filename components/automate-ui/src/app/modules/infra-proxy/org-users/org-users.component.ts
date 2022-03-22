@@ -1,6 +1,15 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
-import { Subject } from 'rxjs';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { OrgUser } from '../../../entities/org-users/org-users.model';
+import { GetUsers } from '../../../entities/org-users/org-users.action';
+import { getAllStatus, orgUserList } from '../../../entities/org-users/org-users.selectors';
+import { Store } from '@ngrx/store';
+
+import { combineLatest, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { isNil } from 'lodash/fp';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
 
 @Component({
   selector: 'app-org-users',
@@ -14,7 +23,7 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
   //Will variable add type at time of API integration
-  public users;
+  public users: { orgUsers: OrgUser[] };
   public usersListLoading: boolean = false;
   public authFailure: boolean = false;
   public loading: boolean = false;
@@ -24,11 +33,29 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
 
   constructor(
+    private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {}
 
   ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
+
+    this.getOrgUsersData();
+
+    combineLatest([
+      this.store.select(getAllStatus),
+      this.store.select(orgUserList)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([getUsersSt, OrgUsersState]) => {
+      if (getUsersSt === EntityStatus.loadingSuccess && !isNil(OrgUsersState)) {
+        this.users = OrgUsersState;
+        this.usersListLoading = false;
+        this.loading = false;
+      } else if (getUsersSt === EntityStatus.loadingFailure) {
+        this.usersListLoading = false;
+        this.authFailure = true;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -38,6 +65,15 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  getOrgUsersData(): void {
+    const payload = {
+      server_id: this.serverId,
+      org_id: this.orgId
+    };
+
+    this.store.dispatch(new GetUsers(payload));
   }
 
   onPageChange(event: number): void {
