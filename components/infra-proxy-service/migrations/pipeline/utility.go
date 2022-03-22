@@ -154,7 +154,7 @@ func StoreUsers(ctx context.Context, st storage.Storage, localUserClient local_u
 	}
 
 	if len(res.ParsedResult.Users) == int(res.ParsedResult.UsersCount.Failed) {
-		log.Errorf("Failed to migrate user for migration id %s : %s", res.Meta.MigrationID, err.Error())
+		log.Errorf("Failed to migrate user for migration id %s : %s", res.Meta.MigrationID, err)
 		return res, err
 	}
 
