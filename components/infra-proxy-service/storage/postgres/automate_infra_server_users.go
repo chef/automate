@@ -145,11 +145,18 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 	return users, nil
 }
 
-//GetAutomateOrgUsers: .Fetches all the users for a org
-func (p *postgres) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]storage.OrgUser, error) {
+//GetAutomateInfraOrgUsers: .Fetches all the users for a org
+func (p *postgres) GetAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) ([]storage.OrgUser, error) {
 	var orgUsers []storage.OrgUser
 	rows, err := p.db.QueryContext(ctx,
-		`select ou.org_id,ou.is_admin,u.infra_server_username  from org_users ou join users u on u.id=ou.user_id  join orgs o on o.id=ou.org_id where org_id=$1`, orgId)
+
+		`select ou.user_id,u.server_id,u.infra_server_username,u.connector,
+			u.automate_user_id,u.first_name,u.last_name,u.email,u.middle_name,u.display_name,
+			ou.org_id,ou.is_admin
+			from users u 
+			join org_users ou on u.id=ou.user_id
+			join orgs o on o.id=ou.org_id
+			and ou.org_id=$1 and u.server_id=$2;`, orgId, serverId)
 	if err != nil {
 		return []storage.OrgUser{}, p.processError(err)
 	}
@@ -161,7 +168,9 @@ func (p *postgres) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]sto
 
 	for rows.Next() {
 		orgUser := storage.OrgUser{}
-		if err := rows.Scan(&orgUser.OrgID, &orgUser.IsAdmin, &orgUser.InfraServerUsername); err != nil {
+		if err := rows.Scan(&orgUser.UserID, &orgUser.ServerID, &orgUser.InfraServerUsername,
+			&orgUser.Connector, &orgUser.AutomateUserID, &orgUser.FirstName, &orgUser.LastName,
+			&orgUser.EmailID, &orgUser.MiddleName, &orgUser.DisplayName, &orgUser.OrgID, &orgUser.IsAdmin); err != nil {
 			return nil, err
 		}
 		orgUsers = append(orgUsers, orgUser)

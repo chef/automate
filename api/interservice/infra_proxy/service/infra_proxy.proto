@@ -100,4 +100,5 @@ service InfraProxyService {
     rpc GetOrgUsersList (chef.automate.domain.infra_proxy.request.OrgUsers) returns (chef.automate.domain.infra_proxy.response.OrgUsers) {};
     rpc GetServerUsersList (chef.automate.domain.infra_proxy.request.ServerUsers) returns (chef.automate.domain.infra_proxy.response.ServerUsers) {};
     rpc GetAutomateInfraServerUsersList (chef.automate.domain.infra_proxy.request.AutomateInfraServerUsers) returns (chef.automate.domain.infra_proxy.response.AutomateInfraServerUsers) {};
+    rpc GetAutomateInfraOrgUsersList (chef.automate.domain.infra_proxy.request.AutomateInfraOrgUsers) returns (chef.automate.domain.infra_proxy.response.AutomateInfraOrgUsers) {};
 }
