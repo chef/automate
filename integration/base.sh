@@ -258,6 +258,7 @@ do_prepare_upgrade_default() {
 }
 
 do_upgrade() {
+    chef-automate upgrade run --help
     do_upgrade_default
 }
 
