@@ -694,7 +694,7 @@ describe('StatsService', () => {
         filters: filters,
         last24h: false
       };
-      let arraybuffer: ArrayBuffer;
+      var arraybuffer: ArrayBuffer;
 
       service.downloadReport(type, reportQuery).subscribe((data: ArrayBuffer)  => {
         expect(data).toEqual(arraybuffer);
