@@ -114,7 +114,8 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	})
 
 	if err != nil {
-		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") {
+		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") &&
+			!strings.Contains(err.Error(), "Unimplemented desc = unknown service chef.automate.domain.deployment.Deployment") {
 			return status.Wrap(
 				err,
 				status.DeploymentServiceCallError,

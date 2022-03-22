@@ -49,11 +49,3 @@ do_deploy() {
         --skip-preflight \
         --debug
 }
-
-do_prepare_upgrade(){
-    rm chef-automate
-    mv cli_bin chef-automate
-    chef-automate version
-    chef-automate upgrade run --help
-    do_prepare_upgrade_default
-}
