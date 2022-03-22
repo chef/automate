@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	chef "github.com/go-chef/chef"
 	"github.com/pkg/errors"
 
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -12,7 +13,6 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
-	chef "github.com/go-chef/chef"
 )
 
 //GetAutomateInfraServerUsersList: Fetches the list of automate infra server users from the DB
