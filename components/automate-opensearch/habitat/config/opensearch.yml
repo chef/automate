@@ -1,97 +1,105 @@
+# ======================== OpenSearch Configuration =========================
+#
+# NOTE: OpenSearch comes with reasonable defaults for most settings.
+#       Before you set out to tweak and tune the configuration, make sure you
+#       understand what are you trying to accomplish and the consequences.
+#
+# The primary way of configuring a node is via this file. This template lists
+# the most important settings you may want to configure for a production cluster.
+#
+# Please consult the documentation for further information on configuration options:
+# https://www.opensearch.org
+#
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
 cluster.name: {{cfg.cluster.name}}
-
-cluster.routing.allocation.node_concurrent_recoveries: {{cfg.cluster.routing.allocation.node_concurrent_recoveries}}
-cluster.routing.allocation.node_initial_primaries_recoveries: {{cfg.cluster.routing.allocation.node_initial_primaries_recoveries}}
-cluster.routing.allocation.same_shard.host: {{cfg.cluster.routing.allocation.same_shard_host}}
-
-cluster.routing.allocation.disk.watermark.low: 1GB
-cluster.routing.allocation.disk.watermark.high: 500MB
-cluster.routing.allocation.disk.watermark.flood_stage: 250MB
-cluster.info.update.interval: 1m
-
-cluster.max_shards_per_node: {{cfg.cluster.max_shards_per_node}}
-
-{{#if cfg.cluster.routing.allocation.awareness_attributes ~}}
-cluster.routing.allocation.awareness.attributes: {{cfg.cluster.routing.allocation.awareness_attributes}}
-{{/if ~}}
-
+#
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+#node.name: node-1
 {{#if cfg.node.name ~}}
 node.name: {{cfg.node.name}}
 {{/if ~}}
-node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
-
-{{#if cfg.node.rack_id ~}}
-node.rack_id: {{cfg.node.rack_id}}
-{{/if ~}}
-{{#if cfg.node.zone ~}}
-node.zone: {{cfg.node.zone}}
-{{/if ~}}
-node.master: {{cfg.node.master}}
-node.data: {{cfg.node.data}}
-
-path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
-path.data:
+#
+# Add custom attributes to the node:
+#
+#node.attr.rack: r1
+#
+# ----------------------------------- Paths ------------------------------------
+#
+# Path to directory where to store the data (separate multiple locations by comma):
+#
+path.data: 
   - {{pkg.svc_data_path}}/{{cfg.path.data}}
   - {{pkg.svc_var_path}}
-
-{{#if cfg.path.repo ~}}
-path.repo: {{cfg.path.repo}}
-{{/if ~}}
-
-indices.recovery.max_bytes_per_sec: {{cfg.indices.recovery.max_bytes_per_sec}}
-
-{{#if cfg.indices.fielddata.cache_size ~}}
-indices.fielddata.cache.size: {{cfg.indices.fielddata.cache_size}}
-{{/if ~}}
-
-indices.breaker.total.limit: {{cfg.indices.breaker.total_limit}}
-indices.breaker.fielddata.limit: {{cfg.indices.breaker.fielddata_limit}}
-indices.breaker.fielddata.overhead: {{cfg.indices.breaker.fielddata_overhead}}
-indices.breaker.request.limit: {{cfg.indices.breaker.request_limit}}
-indices.breaker.request.overhead: {{cfg.indices.breaker.request_overhead}}
-
+#
+# Path to log files:
+#
+path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
+#
+# ----------------------------------- Memory -----------------------------------
+#
+# Lock the memory on startup:
+#
 bootstrap.memory_lock: {{cfg.bootstrap.memory_lock}}
-
+#
+# Make sure that the heap size is set to about half the memory available
+# on the system and that the owner of the process is allowed to use this
+# limit.
+#
+# OpenSearch performs poorly when the system is swapping the memory.
+#
+# ---------------------------------- Network -----------------------------------
+#
+# Set the bind address to a specific IP (IPv4 or IPv6):
+#
+#network.host: 192.168.0.1
 {{#if cfg.network.host ~}}
 network.host: {{cfg.network.host}}
 {{/if ~}}
+#
+# Set a custom port for HTTP:
+#
 http.port: {{cfg.network.port}}
-transport.tcp.port: {{cfg.transport.port}}
-discovery.zen.fd.ping_timeout: {{cfg.discovery.zen_fd_ping_timeout}}
-{{#if bind.automate-elasticsearch ~}}
-discovery.zen.ping.unicast.hosts: [{{#each bind.automate-elasticsearch.members ~}} "{{sys.ip}}", {{/each ~}}]
-{{else ~}}
-discovery.zen.ping.unicast.hosts: {{cfg.discovery.ping_unicast_hosts}}
-{{/if ~}}
-discovery.zen.minimum_master_nodes: {{cfg.discovery.minimum_master_nodes}}
-
+#
+# For more information, consult the network module documentation.
+#
+# --------------------------------- Discovery ----------------------------------
+#
+# Pass an initial list of hosts to perform discovery when this node is started:
+# The default list of hosts is ["127.0.0.1", "[::1]"]
+#
+#discovery.seed_hosts: ["host1", "host2"]
+#
+# Bootstrap the cluster using an initial set of master-eligible nodes:
+#
+#cluster.initial_master_nodes: ["node-1", "node-2"]
+#
+# For more information, consult the discovery and cluster formation module documentation.
+#
+# ---------------------------------- Gateway -----------------------------------
+#
+# Block initial recovery after a full cluster restart until N nodes are started:
+#
+#gateway.recover_after_nodes: 3
 {{#if cfg.gateway.recover_after_nodes ~}}
 gateway.recover_after_nodes: {{cfg.gateway.recover_after_nodes}}
 {{/if ~}}
-gateway.expected_nodes: {{cfg.gateway.expected_nodes}}
-gateway.expected_master_nodes: {{cfg.gateway.expected_master_nodes}}
-gateway.expected_data_nodes: {{cfg.gateway.expected_data_nodes}}
-{{#if cfg.gateway.recover_after_time ~}}
-gateway.recover_after_time: {{cfg.gateway.recover_after_time}}
-{{/if ~}}
-
+#
+# For more information, consult the gateway module documentation.
+#
+# ---------------------------------- Various -----------------------------------
+#
+# Require explicit names when deleting indices:
+#
+#action.destructive_requires_name: true
 action.destructive_requires_name: {{cfg.action.destructive_requires_name}}
 
-xpack.ml.enabled: false
-
-{{#if cfg.plugins.cloud_aws_signer ~}}
-cloud.aws.signer: {{cfg.plugins.cloud_aws_signer}}
-{{/if ~}}
-
-s3.client.{{ cfg.s3.client.name }}.protocol: https
-s3.client.{{ cfg.s3.client.name }}.read_timeout: {{cfg.s3.client.read_timeout}}
-s3.client.{{ cfg.s3.client.name }}.max_retries: {{cfg.s3.client.max_retries}}
-s3.client.{{ cfg.s3.client.name }}.use_throttle_retries: {{cfg.s3.client.use_throttle_retries}}
-{{~#eachAlive bind.backup-gateway.members as |bgw|}}
-{{~#if @last}}
-s3.client.{{ cfg.s3.client.name }}.endpoint: 127.0.0.1:{{bgw.cfg.port}}
-{{~/if}}
-{{~/eachAlive}}
+######## Start OpenSearch Security  Configuration ########
 
 plugins.security.ssl.transport.pemcert_filepath: node1.pem
 plugins.security.ssl.transport.pemkey_filepath: node1-key.pem
@@ -112,4 +120,6 @@ plugins.security.check_snapshot_restore_write_privileges: true
 plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
 plugins.security.system_indices.enabled: true
 plugins.security.system_indices.indices: [".opendistro-alerting-config", ".opendistro-alerting-alert*", ".opendistro-anomaly-results*", ".opendistro-anomaly-detector*", ".opendistro-anomaly-checkpoints", ".opendistro-anomaly-detection-state", ".opendistro-reports-*", ".opendistro-notifications-*", ".opendistro-notebooks", ".opensearch-observability", ".opendistro-asynchronous-search-response*", ".replication-metadata-store"]
-node.max_local_storage_nodes: 3
+node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
+
+######## End OpenSearch Security Configuration ########
