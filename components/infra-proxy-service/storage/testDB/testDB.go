@@ -180,10 +180,10 @@ func (t *TestDB) GetUsers(ctx context.Context, serverID string) ([]storage.User,
 	return nil, nil
 }
 
-func (t *TestDB) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]storage.OrgUser, error) {
+func (t *TestDB) GetAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) ([]storage.OrgUser, error) {
 	var x []storage.OrgUser
 	if t.NeedError {
-		return x, errors.New("failed to fetch Orgs")
+		return x, errors.New("failed to fetch Org Users")
 	}
 	if t.Type == "Insert" {
 		return x, nil
@@ -198,7 +198,12 @@ func (t *TestDB) GetAutomateOrgUsers(ctx context.Context, orgId string) ([]stora
 	}
 	if t.Type == "Delete" {
 		x = append(x, storage.OrgUser{
-			OrgID: orgId, InfraServerUsername: "user1",
+			OrgID: orgId, InfraServerUsername: "user1", IsAdmin: true,
+		})
+	}
+	if t.Type == "Read" {
+		x = append(x, storage.OrgUser{
+			UserID: 123, ServerID: serverId, OrgID: orgId, InfraServerUsername: "user1",
 		})
 	}
 	return x, nil
