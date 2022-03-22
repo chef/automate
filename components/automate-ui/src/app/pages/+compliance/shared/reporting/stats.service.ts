@@ -215,7 +215,7 @@ export class StatsService {
       map(({ reports, total }) => new ReportCollection(reports, total)));
   }
 
-  downloadReport(format: string, reportQuery: ReportQuery): Observable<any> {
+  downloadReport(format: string, reportQuery: ReportQuery): Observable<ArrayBuffer> {
     const url = `${CC_API_URL}/reporting/export`;
 
     // for export, we want to send the start_time as the beg of day of end time
