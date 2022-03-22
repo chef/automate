@@ -360,7 +360,6 @@ func SetStagedUserForConfirmPreview(users []*request.User) []pipeline_model.User
 		stagedUser.Connector = user.Connector
 		stagedUser.IsConflicting = user.IsConflicting
 		stagedUser.ActionOps = pipeline_model.ActionOps(user.ActionOps)
-		// stagedUser.IsAdmin = user.IsAdmin
 		stagedUser.HashPassword = user.HashPassword
 		usersData = append(usersData, stagedUser)
 	}

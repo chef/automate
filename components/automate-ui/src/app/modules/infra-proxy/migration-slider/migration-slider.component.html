@@ -52,7 +52,7 @@
             <chef-thead>
               <chef-tr>
                 <chef-th class="no-border first">
-                  <chef-checkbox (change)="selectedAllUsers($event)" [checked]="true"></chef-checkbox>
+                  <chef-checkbox (change)="selectedAllUsers($event)" [checked]="usersData[0].is_selected"></chef-checkbox>
                 </chef-th>
                 <chef-th class="no-border middle">Chef Server User</chef-th>
                 <chef-th class="no-border middle">Automate User</chef-th>
@@ -78,7 +78,6 @@
                     formControlName="{{user.automate_username}}"
                     type="text"
                     attr.data-username="{{user.username}}"
-                    [attr.disabled]="!user.is_conflicting"
                     (change)="onChangeEvent($event)"
                     (blur)="handleName($event)"
                     autocomplete="off" />
