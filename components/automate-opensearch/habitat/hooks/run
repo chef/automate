@@ -58,6 +58,18 @@ rm {{pkg.svc_config_path}}/node2.csr
 rm {{pkg.svc_config_path}}/client-key-temp.pem
 rm {{pkg.svc_config_path}}/client.csr
 
+
+chmod 0600 {{pkg.svc_config_path}}/root-ca.pem
+chmod 0600 {{pkg.svc_config_path}}/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/node1.pem
+chmod 0600 {{pkg.svc_config_path}}/node2.pem
+chmod 0600 {{pkg.svc_config_path}}/client.pem
+chmod 0600 {{pkg.svc_config_path}}/admin-key.pem
+chmod 0600 {{pkg.svc_config_path}}/node1-key.pem
+chmod 0600 {{pkg.svc_config_path}}/node2-key.pem
+chmod 0600 {{pkg.svc_config_path}}/client-key.pem
+
 echo "Executing opensearch securityadmin"
 echo {{pkg.path}}
 echo {{pkg.svc_config_path}}
@@ -72,8 +84,24 @@ echo "......................................................................."
 
 echo "Inserted default securityconfig opensearch"
 
+#hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.path}}/os/plugins/opensearch-security/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/admin-key.pem -nhnv
+export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
+hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/root-ca.pem -nhnv
+
 echo "Done !!!! Executing opensearch securityadmin"
 #exec opensearch
 #hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9201 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
-hab pkg exec core/bash {{pkg.path}}/os/opensearch-tar-install.sh
+#hab pkg exec core/bash {{pkg.path}}/os/opensearch-tar-install.sh
+
+#chmod +x {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh
+
+
+#Generate securityadmin_demo.sh
+# echo "#!/bin/bash" | tee securityadmin_demo.sh > /dev/null 
+
+# chmod +x {{pkg.path}}/os/securityadmin_demo.sh
+# hab pkg exec core/bash {{pkg.path}}/os/securityadmin_demo.sh
+exec opensearch
+
+
 {{~/if}}
