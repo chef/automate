@@ -1,86 +1,49 @@
-package migrations_test
+package migrations
 
 import (
 	"context"
 	"errors"
+	"reflect"
 	"testing"
 
-	"github.com/chef/automate/api/external/infra_proxy/migrations/request"
+	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 
-	"github.com/chef/automate/api/external/infra_proxy/migrations/response"
+	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 
-	"github.com/golang/mock/gomock"
-
-	infra_migrations "github.com/chef/automate/api/external/infra_proxy/migrations"
-	"github.com/chef/automate/components/infra-proxy-service/test"
+	"github.com/chef/automate/components/infra-proxy-service/service"
+	"github.com/chef/automate/components/infra-proxy-service/storage/testDB"
 )
 
-func TestMigrations(t *testing.T) {
-	ctx := context.Background()
-	_, serviceRef, _, close, _, _ := test.SetupInfraProxyService(ctx, t)
-	infraMigrationMockClient := infra_migrations.NewMockInfraProxyMigrationServiceClient(gomock.NewController(t))
+func TestGetMigrationStatus(t *testing.T) {
+	type args struct {
+		ctx       context.Context
+		server    MigrationServer
+		req       *request.GetMigrationStatusRequest
+		NeedError bool
+	}
 
-	var migrationID = "Fake id"
+	tests := []struct {
+		name      string
+		args      args
+		wantError error
+		want1     *response.GetMigrationStatusResponse
+	}{
+		{name: "Test Get migration status, should return the latest status of migration id", args: args{ctx: context.Background(), server: MigrationServer{service: &service.Service{Migration: &testDB.MigrationDB{}}}, req: &request.GetMigrationStatusRequest{MigrationId: "mig1"}}, wantError: nil, want1: &response.GetMigrationStatusResponse{MigrationId: "mig1", MigrationType: "Creating Preview", MigrationStatus: "Completed"}},
+		{name: "Test Error from Get migration status, if status is not present for migration id", args: args{ctx: context.Background(), server: MigrationServer{service: &service.Service{Migration: &testDB.MigrationDB{}}}, req: &request.GetMigrationStatusRequest{MigrationId: "mig1"}}, wantError: errors.New("Failed to fetch migration status"), want1: &response.GetMigrationStatusResponse{MigrationId: "mig1", MigrationType: "Creating Preview", MigrationStatus: "Completed"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	defer close()
-
-	t.Run("GetMigrationStatus", func(t *testing.T) {
-		test.ResetState(ctx, t, serviceRef)
-
-		res := &response.GetMigrationStatusResponse{
-			MigrationId:     migrationID,
-			MigrationType:   "Migration Completed",
-			MigrationStatus: "Failed",
-		}
-		req := request.GetMigrationStatusRequest{
-			MigrationId: migrationID,
-		}
-		t.Run("when a migration id which exist in migration table is submitted, then return the latest status.", func(t *testing.T) {
-			infraMigrationMockClient.EXPECT().GetMigrationStatus(gomock.Any(), req, gomock.Any()).Return(res, nil)
+			got, err := tt.args.server.GetMigrationStatus(tt.args.ctx, tt.args.req)
+			if err != nil && err.Error() != tt.wantError.Error() {
+				t.Errorf("GetMigrationStatus() err = %v, want %v", err, tt.wantError)
+			}
+			if !reflect.DeepEqual(got, tt.want1) {
+				t.Errorf("GetMigrationStatus() got = %v, want %v", got, tt.want1)
+			}
 
 		})
 
-		t.Run("when a migration id is not exist in migration table is submitted, then return an error", func(t *testing.T) {
-			infraMigrationMockClient.EXPECT().GetMigrationStatus(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("sql: no rows in result set"))
-
-		})
-	})
-
-	t.Run("GetStagedData", func(t *testing.T) {
-		test.ResetState(ctx, t, serviceRef)
-
-		res := &response.GetStagedDataResponse{
-			MigrationId: migrationID,
-			StagedData: &response.StagedData{
-				OrgsToMigrate: 2,
-				OrgsToSkip:    1,
-				OrgsToUpdate:  1,
-				OrgsToDelete:  1,
-				Users: []*response.User{
-					{
-						Username:         "test1",
-						Email:            "abc1@gmail.com",
-						DisplayName:      "test1",
-						FirstName:        "first1",
-						LastName:         "last1",
-						MiddleName:       "middle1",
-						AutomateUsername: "test1",
-						Connector:        "local",
-						IsConflicting:    true,
-						IsAdmin:          true,
-					},
-				},
-			},
-		}
-		req := request.GetStagedDataRequest{
-			MigrationId: migrationID,
-		}
-		t.Run("when a migration id which exist in staged table is submitted, then return the staged data", func(t *testing.T) {
-			infraMigrationMockClient.EXPECT().GetStagedData(gomock.Any(), req, gomock.Any()).Return(res, nil)
-		})
-
-		t.Run("when a migration id is not exist in staged table is submitted, then return an error", func(t *testing.T) {
-			infraMigrationMockClient.EXPECT().GetStagedData(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("sql: no rows in result set"))
-		})
-	})
+	}
 }
