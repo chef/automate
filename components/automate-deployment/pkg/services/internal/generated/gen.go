@@ -39,6 +39,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-opensearch",
+      "metadata": {
+        "name": "chef/automate-opensearch",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/automate-es-gateway",
       "metadata": null
     },
@@ -481,16 +491,6 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-opensearch",
-      "metadata": {
-        "name": "chef/automate-opensearch",
-        "data_service": true,
-        "binlinks": null,
-        "uses_platform_scaffolding": false,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -536,6 +536,18 @@ var ProductMetadataJSON = `
         "chef/automate-elasticsearch",
         "chef/automate-es-gateway",
         "chef/es-sidecar-service"
+      ],
+      "packages": null,
+      "dependencies": null,
+      "hidden": false
+    },
+    {
+      "name": "opensearch",
+      "aliases": null,
+      "type": "base",
+      "services": [
+        "chef/automate-opensearch",
+        "chef/automate-es-gateway"
       ],
       "packages": null,
       "dependencies": null,

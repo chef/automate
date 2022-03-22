@@ -145,13 +145,13 @@
   #
   # Set a custom port for HTTP:
   #
-  port = 9201
+  port = 9200
   #
   # For more information, see the documentation at:
   # <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
 
 [transport]
-  port = 9301
+  port = 9300
 
 #
 # --------------------------------- Discovery ----------------------------------
