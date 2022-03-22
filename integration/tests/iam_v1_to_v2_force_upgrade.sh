@@ -25,7 +25,7 @@ test_upgrade_inspec_profiles=(a2-deploy-integration a2-iam-legacy-integration)
 test_skip_diagnostics=true
 
 # on this version, Automate had upgrade-to-v2 and the first three v2 data migrations
-OLD_VERSION=20190501153509
+OLD_VERSION=20220321144310
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${OLD_VERSION}.json"
 
