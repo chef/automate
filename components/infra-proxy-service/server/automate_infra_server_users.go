@@ -157,7 +157,7 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	}
 
 	var chefKey chef.ChefKey
-	addReq, err := c.client.NewRequest("PUT", fmt.Sprintf("users/%s/keys", req.UserName), body)
+	addReq, err := c.client.NewRequest("POST", fmt.Sprintf("users/%s/keys", req.UserName), body)
 
 	if err != nil {
 		return nil, ParseAPIError(err)
