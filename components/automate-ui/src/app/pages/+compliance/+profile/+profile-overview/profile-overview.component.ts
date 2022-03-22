@@ -54,6 +54,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   filteredAvailableProfiles: Array<Profile> = [];
   filteredProfilesLength = 0;
   filteredAvailableProfilesLength = 0;
+  formActive = false;
 
   // shows setup page when false
   profilesEnabled = true;
@@ -109,8 +110,8 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSearchInput(event) {
-    const value = event.target.value;
+  onSearchInput(searchText) {
+    const value = searchText;
     const filter = profile => {
       return ['name', 'version', 'title'].some(key => {
         return profile[key].toLowerCase().includes(value.toLowerCase());
@@ -314,5 +315,9 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   selectTab(tabToSelect: 'installed' | 'available') {
     this.selectedTab = tabToSelect;
+  }
+
+  toggleFocus(): void {
+    this.formActive = !this.formActive;
   }
 }

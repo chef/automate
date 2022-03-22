@@ -5,11 +5,47 @@
 }
 
 .profiles-search {
-  padding: 18px 0 14px;
+  margin: 18px 0 14px;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
 
-  chef-input {
+  &.active {
+    box-shadow: 0px 0px 0px 1px $chef-primary-bright; // Mimic default outline
+  }
+
+  input {
     width: 100%;
     font-size: 14px;
+    border-radius: 4px 0px 0px 4px;
+    transition: 0s; // Remove default transition
+
+    &:focus {
+      border: 0; // Accessibility is being noted around containing form
+    }
+  }
+
+  button {
+    background: #E6EBEE;
+    width: 45px;
+    box-shadow: 0 1px 14px #E6EBEE;
+    border: 0px solid transparent;
+    border-radius: 0px 4px 4px 0px;
+    cursor: pointer;
+    font-size: 16px;
+  
+    &:focus {
+      outline: none;
+      border: 1px solid $chef-primary-bright;
+    }
+  
+    &[disabled] {
+      cursor: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
   }
 }
 
