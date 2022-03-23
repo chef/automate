@@ -106,6 +106,7 @@ import { RunlistRequests } from './entities/runlists/runlists.requests';
 import { ServerRequests } from './entities/servers/server.requests';
 import { NodeCredentialRequests } from './entities/node-credentials/node-credential.requests';
 import { OrgRequests } from './entities/orgs/org.requests';
+import { OrgUserRequests } from './entities/org-users/org-users.requests';
 import { PolicyFileRequests } from './entities/policy-files/policy-file.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { TeamRequests } from './entities/teams/team.requests';
@@ -384,6 +385,7 @@ import {
     ServerRequests,
     NodeCredentialRequests,
     OrgRequests,
+    OrgUserRequests,
     PolicyFileRequests,
     ServiceGroupsRequests,
     SessionStorageService,

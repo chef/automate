@@ -43,6 +43,7 @@ import * as nodeRunlistEntity from './entities/nodeRunlists/nodeRunlists.reducer
 import * as notificationEntity from './entities/notifications/notification.reducer';
 import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as orgEntity from './entities/orgs/org.reducer';
+import * as OrgUserEntity from './entities/org-users/org-users.reducer';
 import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
 import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
@@ -121,6 +122,7 @@ export interface NgrxStateAtom {
   notifications: notificationEntity.NotificationEntityState;
   notificationRules: NotificationRuleEntity.NotificationRuleEntityState;
   orgs: orgEntity.OrgEntityState;
+  OrgUsers: OrgUserEntity.OrgUserEntityState;
   policies: policyEntity.PolicyEntityState;
   policyFiles: policyFileEntity.PolicyFileEntityState;
   policyFileDetails: policyFileDetailsEntity.PolicyFileDetailsEntityState;
@@ -274,6 +276,7 @@ export const defaultInitialState = {
   nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialEntityInitialState,
   servers: serverEntity.ServerEntityInitialState,
   orgs: orgEntity.OrgEntityInitialState,
+  OrgUsers: OrgUserEntity.OrgUserEntityInitialState,
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
   teams: teamEntity.TeamEntityInitialState,
   desktops: desktopEntity.desktopEntityInitialState,
@@ -346,6 +349,7 @@ export const ngrxReducers = {
   runlist: runlistEntity.runlistEntityReducer,
   servers: serverEntity.serverEntityReducer,
   orgs: orgEntity.orgEntityReducer,
+  OrgUsers: OrgUserEntity.orgUserEntityReducer,
   nodeCredential: nodeCredentialEntity.nodeCredentialEntityReducer,
   nodeCredentialDetails: nodeCredentialDetailsEntity.nodeCredentialDetailsEntityReducer,
   serviceGroups: serviceGroups.serviceGroupsEntityReducer,
