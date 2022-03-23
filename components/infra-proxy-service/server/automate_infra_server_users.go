@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	chef "github.com/go-chef/chef"
-	"github.com/pkg/errors"
-
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	chef "github.com/go-chef/chef"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 //GetAutomateInfraServerUsersList: Fetches the list of automate infra server users from the DB
@@ -119,11 +120,13 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	}).Validate()
 
 	if err != nil {
+		log.Error("failed to validate: ", err)
 		return nil, err
 	}
 
 	server, err := s.service.Storage.GetServer(ctx, req.ServerId)
 	if err != nil {
+		log.Error("cannot get the server: ", err)
 		return nil, err
 	}
 	if server.CredentialID == "" {
@@ -132,10 +135,12 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	// Get web ui key from secrets service
 	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
 	if err != nil {
+		log.Error("cannot read the secret: ", err)
 		return nil, err
 	}
 	c, err := s.createChefServerClient(ctx, req.ServerId, GetAdminKeyFrom(secret), "pivotal", true)
 	if err != nil {
+		log.Error("cannot create a client: ", err)
 		return nil, err
 	}
 
@@ -143,6 +148,7 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	_, err = c.client.Users.DeleteKey(req.UserName, "default")
 	chefError, _ := chef.ChefError(err)
 	if err != nil && chefError.StatusCode() != 404 {
+		log.Error("cannot connect to the chef server: ", err)
 		return nil, ParseAPIError(err)
 	}
 
@@ -153,6 +159,7 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 		CreateKey:      true,
 	})
 	if err != nil {
+		log.Error("cannot add key to the client: ", err)
 		return nil, ParseAPIError(err)
 	}
 
@@ -160,15 +167,18 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	addReq, err := c.client.NewRequest("POST", fmt.Sprintf("users/%s/keys", req.UserName), body)
 
 	if err != nil {
+		log.Error("cannot create a request: ", err)
 		return nil, ParseAPIError(err)
 	}
 
 	res, err := c.client.Do(addReq, &chefKey)
 	if res != nil {
+		log.Error("received nil response")
 		defer res.Body.Close() //nolint:errcheck
 	}
 
 	if err != nil {
+		log.Error("error occurred while sending a request: ", err)
 		return nil, ParseAPIError(err)
 	}
 
