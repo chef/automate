@@ -56,3 +56,15 @@ message AutomateInfraOrgUsersListItem {
     // User is org admin or not
     bool is_admin=12;
 }
+
+message ResetInfraServerUserKeyRes {
+    // Chef Server User's Id
+    string user_id = 1;
+    // Chef Server Username
+    string user_name = 2;
+    // Chef Server Id
+    string server_id = 3;
+    // Chef Servers User's Private Key
+    string private_key = 4;
+}
+
