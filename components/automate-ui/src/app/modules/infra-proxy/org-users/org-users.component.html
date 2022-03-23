@@ -8,7 +8,10 @@
         <app-paginator [length]="total" [pageSize]="per_page" [pageIndex]="current_page"
           (changePage)="onUpdatePage($event)"></app-paginator>
       </div>
-      <chef-table>
+      <div class="empty-section" cy-data="empty-list" *ngIf="!loading && !users.length && current_page === 1">
+        <img alt="No preview" src="/assets/img/no_preview.gif" />
+      </div>
+      <chef-table data-cy=orgUsers-table-container>
         <chef-thead>
           <chef-tr class="no_border_tr">
             <chef-th class="no_border_th">Chef Server User Name</chef-th>
@@ -18,13 +21,13 @@
           </chef-tr>
         </chef-thead>
         <chef-tbody>
-          <chef-tr>
-            <chef-td>User Name</chef-td>
-            <chef-td>Automate Name</chef-td>
-            <chef-td>automatename@email.com</chef-td>
+          <chef-tr *ngFor="let user of users">
+            <chef-td>{{user.infra_server_username}}</chef-td>
+            <chef-td>{{user.automate_user_id}}</chef-td>
+            <chef-td>{{user.email_id}}</chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
-                <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey()">Reset PEM Key</mat-option>
+                <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey()">Reset User Key</mat-option>
               </mat-select>
             </chef-td>
           </chef-tr>
