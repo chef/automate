@@ -33,6 +33,7 @@ import { NodeCredentialEffects } from './entities/node-credentials/node-credenti
 import { NodeRunlistEffects } from './entities/nodeRunlists/nodeRunlists.effects';
 import { NotificationRuleEffects } from './entities/notification_rules/notification_rule.effects';
 import { OrgEffects } from './entities/orgs/org.effects';
+import { OrgUserEffects } from './entities/org-users/org-users.effects';
 import { PolicyEffects } from './entities/policies/policy.effects';
 import { PolicyFileEffects } from './entities/policy-files/policy-file.effects';
 import { ProfileEffects } from './entities/profiles/profile.effects';
@@ -84,6 +85,7 @@ import { UserPreferencesEffects } from './services/user-preferences/user-prefere
       NodeRunlistEffects,
       NotificationRuleEffects,
       OrgEffects,
+      OrgUserEffects,
       PolicyEffects,
       PolicyFileEffects,
       ProfileEffects,
