@@ -23,10 +23,10 @@ Chef Automate is a platform that provides an entire suite of enterprise capabili
 
 In this version, Chef Automate upgrades the embedded Postgres database from **v9.6** to **v13**. Chef Automate gets upgraded with four possible scenarios:
 
-* [Automate with Embedded PostgreSQL({{< relref "major_upgrade.md#customer-running-automate-with-embedded-pg" >}}).
-* [Automate with External PostgreSQL({{< relref "major_upgrade.md#customer-running-automate-with-external-pg" >}}).
-* [Automate in Air Gapped Environment with Embedded PostgreSQL({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-embedded-pg" >}}).
-* [Automate in Air Gapped Environment with External PostgreSQL({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-external-pg" >}})
+* [Automate with Embedded PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-with-embedded-pg" >}}).
+* [Automate with External PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-with-external-pg" >}}).
+* [Automate in Air Gapped Environment with Embedded PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-embedded-pg" >}}).
+* [Automate in Air Gapped Environment with External PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-external-pg" >}})
 
 {{< note >}} To upgrade the version of Chef Automate, upgrade your current version to the previous latest version. Run the command `chef-automate upgrade run` to upgrade the Chef Automate version. {{< /note >}}
 
@@ -50,13 +50,13 @@ To upgrade Chef Automate with Embedded Postgres, follow the steps given below:
 
 To upgrade Chef Automate with Embedded Postgres, follow the steps given below:
 
-* Upgrade your **External PostgreSQL Database** manually using Database Administrator. Click [here]({{< relref "postgres_external_upgrade.md" >}}) to refer to the external postgres upgrade documentation.
 * Check the availability of the latest version by using `chef-automate upgrade status` command.
 * Run the `chef-automate upgrade run --major` command to start the upgrade process. Once the Chef Automate gets upgraded, you will get:
   * List of upgraded information.
   * Checklist of requirements pre-upgrade.
   * List of steps to perform post-upgrade.
 
+* Upgrade your **External PostgreSQL Database** manually using Database Administrator. Click [here]({{< relref "postgres_external_upgrade.md" >}}) to refer to the external postgres upgrade documentation. In case you have configured your *Host*, *Port* or *Password* of PostgreSQL, patch the new configuration to use Chef Automate.
 * Check whether all the services are running using `chef-automate status` command. Once done, you are ready with your Chef Automate version upgrade.
 
 ### Automate in Air Gapped Environment with Embedded PostgreSQL
@@ -114,6 +114,7 @@ Once you have upgraded to the latest ongoing version, you can perform the signif
   * Checklist of requirements pre-upgrade.
   * List of steps to perform post-upgrade.
 
+* Upgrade your **External PostgreSQL Database** manually using Database Administrator. Click [here]({{< relref "postgres_external_upgrade.md" >}}) to refer to the external postgres upgrade documentation. In case you have configured your *Host*, *Port* or *Password* of PostgreSQL, patch the new configuration to use Chef Automate.
 * Check the status of the version upgrade using `$ chef-automate upgrade status` command. Once done, you are ready with your Chef Automate version upgrade.
 
 ## FAQ
