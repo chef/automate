@@ -14,3 +14,13 @@ message AutomateInfraOrgUsers {
     // Automate Infra Org ID.
     string org_id = 2;
 }
+
+message ResetInfraServerUserKeyReq {
+    // Chef Server User's Id
+    string user_id = 1;
+    // Chef Server Username
+    string user_name = 2;
+    // Chef Server Id
+    string server_id = 3;
+}
+

@@ -2,11 +2,18 @@ package server
 
 import (
 	"context"
+	"fmt"
 
+	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
+	chef "github.com/go-chef/chef"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 //GetAutomateInfraServerUsersList: Fetches the list of automate infra server users from the DB
@@ -99,4 +106,88 @@ func fromStorageToListAutomateInfraOrgUsers(ul []storage.OrgUser) []*response.Au
 	}
 
 	return tl
+}
+
+// ResetInfraServerUserKey updates the public key on the Chef Server and returns the private key
+func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.ResetInfraServerUserKeyReq) (*response.ResetInfraServerUserKeyRes, error) {
+	log.Infof("Starting to reset users key for user: %v, server id: %v", req.UserName, req.ServerId)
+
+	err := validation.New(validation.Options{
+		Target:  "user",
+		Request: *req,
+		Rules: validation.Rules{
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		log.Errorf("failed to validate for server id: %s, error: ", req.ServerId, err)
+		return nil, err
+	}
+
+	server, err := s.service.Storage.GetServer(ctx, req.ServerId)
+	if err != nil {
+		log.Error("cannot get the server for server id: %s, error: ", req.ServerId, err)
+		return nil, err
+	}
+	if server.CredentialID == "" {
+		return nil, errors.New("webui key is not available with server")
+	}
+	// Get web ui key from secrets service
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+	if err != nil {
+		log.Error("cannot read the secret for server id: %s, error: ", req.ServerId, err)
+		return nil, err
+	}
+	c, err := s.createChefServerClient(ctx, req.ServerId, GetAdminKeyFrom(secret), "pivotal", true)
+	if err != nil {
+		log.Error("cannot create a client for server id: %s, error: ", req.ServerId, err)
+		return nil, err
+	}
+
+	// Deletes the existing key
+	_, err = c.client.Users.DeleteKey(req.UserName, "default")
+	chefError, _ := chef.ChefError(err)
+	if err != nil && chefError.StatusCode() != 404 {
+		log.Error("cannot connect to the chef server for server id: %s, error: ", req.ServerId, err)
+		return nil, ParseAPIError(err)
+	}
+
+	// Add new key to existing client
+	body, err := chef.JSONReader(AccessKeyReq{
+		Name:           "default",
+		ExpirationDate: "infinity",
+		CreateKey:      true,
+	})
+	if err != nil {
+		log.Error("cannot add key to the client for server id: %s, error: ", req.ServerId, err)
+		return nil, ParseAPIError(err)
+	}
+
+	var chefKey chef.ChefKey
+	addReq, err := c.client.NewRequest("POST", fmt.Sprintf("users/%s/keys", req.UserName), body)
+
+	if err != nil {
+		log.Error("cannot create a request for server id: %s, error: ", req.ServerId, err)
+		return nil, ParseAPIError(err)
+	}
+
+	res, err := c.client.Do(addReq, &chefKey)
+	if res != nil {
+		log.Error("received nil response")
+		defer res.Body.Close() //nolint:errcheck
+	}
+
+	if err != nil {
+		log.Error("error occurred while sending a request for server id: %s, error: ", req.ServerId, err)
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.ResetInfraServerUserKeyRes{
+		UserId:     req.UserId,
+		UserName:   req.UserName,
+		ServerId:   req.ServerId,
+		PrivateKey: chefKey.PrivateKey,
+	}, nil
 }
