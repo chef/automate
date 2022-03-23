@@ -13,9 +13,9 @@ gh_repo = "automate"
     weight = 220
 +++
 
-Follow any of the step to destroy terraform or infrastructure created while deploying Chef Automate High Availability (HA) using AWS or Bare-metal model.
+Follow any of the step to destroy terraform or infrastructure created while deploying Chef Automate High Availability (HA) using AWS or on-premises model.
 
-- If the *provision-infra* command fails, execute the following command to clear the space utilized by this command before it fails, execute the command:
+- If the *provision-infra* command fails, execute the following command to clear the space utilized by this command before it fails:
 
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/;terraform destroy -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate;cd $i;done`
 
@@ -25,13 +25,13 @@ Follow any of the step to destroy terraform or infrastructure created while depl
 
 1. `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done`.
 
-- If you have deployed the Chef Automate HA successffuly and wanted to destroy the deployment part alone, execute the command:
+- If you have deployed the Chef Automate HA successfully and wanted to destroy the deployment part alone, execute the command:
 
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/;terraform destroy;cd $i;done`
 
 {{< note >}}
- 
-The deployment destroy does not remove any remote server configuration made, however it taints the terraform and thus you need to redo the configurations.
+
+The deployment destroy does not remove any remote server configuration made; however, it retains the terraform, and thus you need to redo the configurations.
 
 {{ < /note >}}
 

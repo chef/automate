@@ -15,17 +15,17 @@ gh_repo = "automate"
 
 ## What are Certificates?
 
-A security certificate is a small data file used as an Internet security technique through which the identity, authenticity and reliability of a website or Web application is established.
+A security certificate is a small data file used as an Internet security technique through which the identity, authenticity, and reliability of a website or Web application is established.
 
-Certificates should be rotated periodically, to ensure optimal security.
+Certificates should be rotated periodically to ensure optimal security.
 
 ## What are Self Signed Certificates?
 
-A self signed certificate is a digital certificate that is not signed by a publicly trusted certificate authority (CA). They are created, issued, and signed by the company or developer who is responsible for the website or software being signed. The private key used in such certificate is not validated by a third party and is generally used in low-risk internal networks or in the software development phase. In addition, unlike CA-issued certificates, self-signed certificates cannot be revoked.
+A self-signed certificate is a digital certificate that is not signed by a publicly trusted certificate authority (CA). They are created, issued, and signed by the company or developer responsible for the website or software being signed. The private key used in such a certificate is not validated by a third party and is generally used in low-risk internal networks or the software development phase. In addition, unlike CA-issued certificates, self-signed certificates cannot be revoked.
 
 ## Certificate Creation
 
-You can create a self-signed key and certificate pair with OpenSSL utility, a command line tool for creating and managing OpenSSL certificates, keys, and other files.
+You can create a self-signed key and certificate pair with **OpenSSL** utility, a command-line tool for creating and managing *OpenSSL* certificates, keys, and other files.
 
 ### Prerequisites
 
@@ -35,7 +35,7 @@ Install an *openssl* utility.
 
 1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
 
-1. Type the command, `./scripts/credentials set ssl --rotate-all`. This command creates a skeleton of certificates.
+1. Execute the command, `./scripts/credentials set ssl --rotate-all`. This command creates a skeleton of certificates.
 
 1. Copy the below *bash script* to a new file:
 
@@ -93,7 +93,7 @@ cp es_ssl_public.pem /hab/a2_deploy_workspace/certs/pg_ssl_public.pem
 
 1. Again, navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
 
-1. Execute following commands in the same order as listed to apply the generated certificates:
+1. Execute the following commands in the same order as listed to apply the generated certificates:
 
 - ./scripts/credentials set ssl --es-ssl
 - ./scripts/credentials set ssl --pg-ssl
@@ -103,4 +103,4 @@ Once the certificates are applied successfully, the following confirmation messa
 
 {{< figure src="/images/automate/ha_self_sign_certificate.png" alt="Certification Creation using openssl utility">}}
 
-1. Navigate to the Chef Automate and Chef Server instances and check the Chef Service health status. If the service is down or critical, then  wait for three to four minutes for the instances to be up.
+1. Navigate to the Chef Automate and Chef Server instances and check the Chef Service health status. If the service is down or critical, wait for three to four minutes for the instances to be up.

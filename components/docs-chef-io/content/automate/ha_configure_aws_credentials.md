@@ -17,15 +17,15 @@ You need to setup the AWS credentials on the bastion host to trigger the Amazon 
 
 Follow these steps to do so:
 
-1. Navigate to the AWS console.
+1. Navigate to the **AWS console**.
 
-1. Select the user profile created and make a note of the access key and secret key of the user.
+1. Select the user profile created and note the user's access key and secret key.
 
 1. SSH into the bastion host.
 
-1. Create a directory, `.aws` in *root* folder.
+1. Create a directory, `.aws` in the *root* folder.
 
-1. Type the command, `touch ~/.aws/credentials`.
+1. Execute the command `touch ~/.aws/credentials`.
 
 1. Create a file `credentials` in the /root/.aws directory. For example, `vi credentials`.
 

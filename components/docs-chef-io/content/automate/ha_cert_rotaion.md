@@ -15,24 +15,24 @@ gh_repo = "automate"
 
 ## What are Certificates?
 
-A security certificate is a small data file used as an Internet security technique through which the identity, authenticity and reliability of a website or Web application is established.
+A security certificate is a small data file used as an Internet security technique through which the identity, authenticity, and reliability of a website or Web application is established.
 
-Certificates should be rotated periodically, to ensure optimal security.
+Certificates should be rotated periodically to ensure optimal security.
 
 ## How is Certificate Rotation Helpful?
 
-Certificate rotation means the replacement of existing certificates with new ones when any certificate expires or based on your organization policy. A new CA authority is substituted for the old requiring a replacement of root certificate for the cluster.
+Certificate rotation means the replacement of existing certificates with new ones when any certificate expires or is based on your organization's policy. A new CA authority is substituted for the old requiring a replacement of root certificate for the cluster.
 
-The certificate rotation is also required when key for a node, client, or CA is compromised. Then, you need to modify the contents of a certificate, for example, to add another DNS name or the IP address of a load balancer through which a node can be reached.  In this case, you  would need to rotate only the node certificates.
+The certificate rotation is also required when the key for a node, client, or CA is compromised. If compromised, you need to change the contents of a certificate, for example, to add another DNS name or the IP address of a load balancer through which a node can be reached.  In this case, you would need to rotate only the node certificates.
 
 ## How to Rotate the Certificates
 
-You can generate the required certificates on your own or you can use the existing certificates of your organization. Ensure you execute all the below commands from the `cd /hab/a2_deploy_workspace` path.
+You can generate the required certificates on your own or use your organization's existing certificates. Ensure you execute all the below commands from the `cd /hab/a2_deploy_workspace` path.
 
-Follow these steps to rotate your certificates that are to be used in CheF Automate High Availability (HA):
+Follow these steps to rotate your certificates that are to be used in Chef Automate High Availability (HA):
 
 1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
-1. Type the command, `./scripts/credentials set ssl --rotate all ` and press **Enter**. This command rotates all the certificates of your organization.
+1. Execute the command, `./scripts/credentials set ssl --rotate all`. This command rotates all the certificates of your organization.
 
 {{< note >}}
 
@@ -40,9 +40,9 @@ When you run this command first time, a series of certificates are created and s
 
 {{< /note >}}
 
-1. For rotating the PostgreSQL certificates, type the command `./scripts/credentials set ssl --pg-ssl` and press **Enter**. .
+1. For rotating the PostgreSQL certificates, execute the command `./scripts/credentials set ssl --pg-ssl`.
 
-1. For rotating the elasticsearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
+1. For rotating the elasticsearch certificates, execute the command, `./scripts/credentials set ssl --es-ssl` .
 
 <!-- 4. Copy your *x.509 SSL certs* into the appropriate files in `certs/` folder. -->
 
@@ -50,16 +50,16 @@ When you run this command first time, a series of certificates are created and s
 
 <!-- - Place your intermediate CA into the `pem` file. -->
 
-1. If your organization issues certificate from an intermediate CA, then place the respective certificate after the server certificate as per order listed. For example, in `certs/pg_ssl_public.pem`, paste it as them as listed:
+1. If your organization issues a certificate from an intermediate CA, place the respective certificate after the server certificate as per order listed. For example, in `certs/pg_ssl_public.pem`, paste it as them as listed:
 
 - Server Certificate
 - Intermediate CA Certificate 1
 - Intermediate CA Certificate n
 
-1. Type the command, `./scripts/credentials set ssl` (with the appropriate options) and press **Enter**. This command deploys the nodes.
+1. Execute the command, `./scripts/credentials set ssl` (with the appropriate options). This command deploys the nodes.
 
-1. Type the command, `./scripts/credentials set ssl  --help` and press **Enter**. This command provides you information and list of commands related to certificate rotation.
+1. Type the command, `./scripts/credentials set ssl  --help`. This command provides you with information and a list of commands related to certificate rotation.
 
-1. For rotating the PostgreSQL credentials, type the command `./scripts/credentials set postgresql --auto` and press **Enter**. .
+1. For rotating the PostgreSQL credentials, execute the command `./scripts/credentials set postgresql --auto`.
 
-1. For rotating the elasticsearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
+1. For rotating the elasticsearch credentials, execute the command, `./scripts/credentials set elasticsearch --auto`.
