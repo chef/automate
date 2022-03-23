@@ -67,3 +67,4 @@ message ResetInfraServerUserKeyRes {
     // Chef Servers User's Private Key
     string private_key = 4;
 }
+

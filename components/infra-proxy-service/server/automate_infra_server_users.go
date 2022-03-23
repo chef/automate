@@ -146,6 +146,10 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 
 	// Deletes the existing key
 	_, err = c.client.Users.DeleteKey(req.UserName, "default")
+	if err != nil {
+		log.Error("cannot delete the user's key: ", err)
+		return nil, ParseAPIError(err)
+	}
 	chefError, _ := chef.ChefError(err)
 	if err != nil && chefError.StatusCode() != 404 {
 		log.Error("cannot connect to the chef server: ", err)
