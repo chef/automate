@@ -110,6 +110,8 @@ func fromStorageToListAutomateInfraOrgUsers(ul []storage.OrgUser) []*response.Au
 
 // ResetInfraServerUserKey updates the public key on the Chef Server and returns the private key
 func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.ResetInfraServerUserKeyReq) (*response.ResetInfraServerUserKeyRes, error) {
+	log.Infof("Starting to reset users key for user: %v, server id: %v", req.UserName, req.ServerId)
+
 	err := validation.New(validation.Options{
 		Target:  "user",
 		Request: *req,
@@ -120,13 +122,13 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	}).Validate()
 
 	if err != nil {
-		log.Error("failed to validate: ", err)
+		log.Errorf("failed to validate for server id: %s, error: ", req.ServerId, err)
 		return nil, err
 	}
 
 	server, err := s.service.Storage.GetServer(ctx, req.ServerId)
 	if err != nil {
-		log.Error("cannot get the server: ", err)
+		log.Error("cannot get the server for server id: %s, error: ", req.ServerId, err)
 		return nil, err
 	}
 	if server.CredentialID == "" {
@@ -135,24 +137,20 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	// Get web ui key from secrets service
 	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
 	if err != nil {
-		log.Error("cannot read the secret: ", err)
+		log.Error("cannot read the secret for server id: %s, error: ", req.ServerId, err)
 		return nil, err
 	}
 	c, err := s.createChefServerClient(ctx, req.ServerId, GetAdminKeyFrom(secret), "pivotal", true)
 	if err != nil {
-		log.Error("cannot create a client: ", err)
+		log.Error("cannot create a client for server id: %s, error: ", req.ServerId, err)
 		return nil, err
 	}
 
 	// Deletes the existing key
 	_, err = c.client.Users.DeleteKey(req.UserName, "default")
-	if err != nil {
-		log.Error("cannot delete the user's key: ", err)
-		return nil, ParseAPIError(err)
-	}
 	chefError, _ := chef.ChefError(err)
 	if err != nil && chefError.StatusCode() != 404 {
-		log.Error("cannot connect to the chef server: ", err)
+		log.Error("cannot connect to the chef server for server id: %s, error: ", req.ServerId, err)
 		return nil, ParseAPIError(err)
 	}
 
@@ -163,7 +161,7 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 		CreateKey:      true,
 	})
 	if err != nil {
-		log.Error("cannot add key to the client: ", err)
+		log.Error("cannot add key to the client for server id: %s, error: ", req.ServerId, err)
 		return nil, ParseAPIError(err)
 	}
 
@@ -171,7 +169,7 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	addReq, err := c.client.NewRequest("POST", fmt.Sprintf("users/%s/keys", req.UserName), body)
 
 	if err != nil {
-		log.Error("cannot create a request: ", err)
+		log.Error("cannot create a request for server id: %s, error: ", req.ServerId, err)
 		return nil, ParseAPIError(err)
 	}
 
@@ -182,7 +180,7 @@ func (s *Server) ResetInfraServerUserKey(ctx context.Context, req *request.Reset
 	}
 
 	if err != nil {
-		log.Error("error occurred while sending a request: ", err)
+		log.Error("error occurred while sending a request for server id: %s, error: ", req.ServerId, err)
 		return nil, ParseAPIError(err)
 	}
 
