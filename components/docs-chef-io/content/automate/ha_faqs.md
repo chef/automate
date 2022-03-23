@@ -12,13 +12,13 @@ gh_repo = "automate"
     weight = 200
 +++
 
-This page explains the frequently encountered issues in Chef Automate High Availability (HA) Restore feature and the steps to resolve them.
+This page explains the frequently encountered issues in Chef Automate High Availability (HA) functionality and the steps to resolve them.
 
 ## Frequently Asked Questions
 
 ### How to check logs while doing backup or restore?
 
-Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
+Set *log-level* debug by using the command `chef-automate debug set-log-level deployment-service debug`, and then executing the *journalctl* command, `journalctl --follow --unit chef-automate`.
 
 ### How to perform infrastructure cleanup for on-premises nodes
 
@@ -38,7 +38,7 @@ Then, Run `rm -rf /hab` on Bastion node.
 
 ### Issue: Database Accessed by Other Users
 
-Restore command fails when the databases of the nodes are accessed by other users or services. This issue happens while the restore service is trying to drop the database when some services are still in a running state and are referring to the database.
+Restore command fails when other users or services access the nodes' databases. This issue happens while the restore service is trying to drop the database when some services are still running and are referring to the database.
 
 ![Database Access Error](/images/automate/ha_faq_access.png)
 
@@ -73,7 +73,7 @@ chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --patc
 
 ### Issue: Existing Architecture does not Match with the Requested
 
-The existing architecture does not match the requested one issue occurs when you have made AWS provisioning and again you are trying to run `automate-cluster-ctl provision` command.
+The existing architecture does not match the requested one issue occurs when you have made AWS provisioning, and again you are trying to run `automate-cluster-ctl provision` command.
 
 #### Resolution
 
@@ -91,9 +91,9 @@ When Chef Automate instances could not locate S3 bucket, the following error is 
 
 #### Resolution
 
-Make sure that the access key, secret key, and endpoints are correct.
+Ensure that the access key, secret key, and endpoints are correct.
 
-If you are using on-premises S3 for backup and your are facing issues with restore, attach `s3-endpoint` with `s3 restore` command.
+If you are using on-premises S3 for backup and you are facing issues with restore, attach the `s3-endpoint` with `s3 restore` command.
 
 For example:
 
@@ -161,7 +161,7 @@ for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/;terraform destroy;cd
 
 ### Issue: bootstrap.abb scp Error
 
-While trying to deploy Chef Automate HA multiple times on the same infrastructure, the *bootstrap.abb* file is not created again as there is a state entry from past deployment that blocks the creation.
+While trying to deploy Chef Automate HA multiple times on the same infrastructure, the *bootstrap.abb* file is not created again as a state entry from past deployment blocks the creation.
 
 The possible error looks like as shown below:
 

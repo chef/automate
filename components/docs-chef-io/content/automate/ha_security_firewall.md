@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 240
 +++
 
-Chef Automate High Availability (HA) cluster requires multiple ports for the frontend and backend servers to operate effectively and reduce possible network traffic. Below it a breakdown of those ports and what needs to be open for each set of servers.
+Chef Automate High Availability (HA) cluster requires multiple ports for the frontend and backend servers to operate effectively and reduce possible network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
 
 ## Network Traffic for Incoming Frontend Nodes
 
@@ -42,7 +42,7 @@ Chef Automate High Availability (HA) cluster requires multiple ports for the fro
 | TCP 9631 | Allows Habitat API to be reachable from services on the Elasticsearch nodes |
 | Postgres backends nodes to Elasticsearch backends nodes and vice versa | |
 | TCP 9200 | Allows Metricbeats to send data to the Elasticsearch for use in Kibana. |
-| TCP/UDP 9638 | Allows Habitat to communicate configuration changes between all backend nodes. |
+| TCP/UDP 9638 | Allows Habitat to communicate configuration changes between backend nodes. |
 | TCP 9631 | Allows the Habitat API to be reachable from services on all backend nodes. |
 
 ## Network Traffic for Incoming PostgreSQL Backend Nodes
@@ -59,5 +59,5 @@ Chef Automate High Availability (HA) cluster requires multiple ports for the fro
 | TCP/UDP 9638 | Allows Habitat to communicate configuration changes between Postgres nodes. |
 | TCP 9631 | Allows the Habitat API to be reachable from services on the Postgres nodes. |
 | Elasticsearch backend nodes to Postgres backend nodes and vice versa | |
-| TCP/UDP 9638 | Allows Habitat to communicate configuration changes between all backend nodes. |
+| TCP/UDP 9638 | Allows Habitat to communicate configuration changes between backend nodes. |
 | TCP 9631 | Allows the Habitat API to be reachable from services on all backend nodes. |
