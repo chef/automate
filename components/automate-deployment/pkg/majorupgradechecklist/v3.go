@@ -135,7 +135,7 @@ func preChecklist(check checkFunc) []Checklist {
 	}
 }
 
-func isExternalPG() bool {
+func IsExternalPG() bool {
 	config, err := platform_config.ConfigFromParams("pg-sidecar-service", "/hab/svc/pg-sidecar-service", "")
 	if err != nil {
 		fmt.Println("error in config from environment")
@@ -144,9 +144,9 @@ func isExternalPG() bool {
 	return config.IsExternalPG()
 }
 
-func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
+func (ci *V3ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckListItem {
 	var postChecklist []PostCheckListItem
-	if isExternalPG() {
+	if isExternalPG {
 		postChecklist = postChecklistExternal
 	} else {
 		postChecklist = postChecklistEmbedded
@@ -154,13 +154,13 @@ func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V3ChecklistManager) RunChecklist() error {
+func (ci *V3ChecklistManager) RunChecklist(isExternalPG bool) error {
 
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
 
-	if isExternalPG() {
+	if isExternalPG {
 		dbType = "External"
 		postcheck = postChecklistExternal
 		checklists = append(checklists, preChecklist(externalPGUpgradeCheck)...)

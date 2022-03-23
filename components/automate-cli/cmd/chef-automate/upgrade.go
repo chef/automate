@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -108,47 +107,51 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	/*validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
+	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
 		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 
 	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to start upgrade failed",
-		)
-	}
-
-	if validatedResp.CurrentVersion == validatedResp.TargetVersion {
-		writer.Println("Chef Automate up-to-date")
-		return nil
-	}
-
-	pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
-	if err != nil {
-		return err
-	}
-
-	if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
-		if err != nil {
+		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") &&
+			!strings.Contains(err.Error(), "Unimplemented desc = unknown service chef.automate.domain.deployment.Deployment") {
 			return status.Wrap(
 				err,
 				status.DeploymentServiceCallError,
 				"Request to start upgrade failed",
 			)
 		}
-		err = ci.RunChecklist()
-		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to start upgrade failed",
-			)
+	} else {
+		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
+			writer.Println("Chef Automate up-to-date")
+			return nil
 		}
-	}*/
+
+		pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+
+		if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
+			err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
+		}
+	}
 
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
 		Version:        upgradeRunCmdFlags.version,
@@ -393,6 +396,11 @@ func init() {
 		false,
 		"This flag is only needed for major version upgrades")
 
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
 		"Path to versions.json",
@@ -400,6 +408,10 @@ func init() {
 
 	if !isDevMode() {
 		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+		err = upgradeRunCmd.PersistentFlags().MarkHidden("versions-file")
 		if err != nil {
 			writer.Printf("failed configuring cobra: %s\n", err.Error())
 		}
@@ -421,11 +433,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, err := pmc.ReadPendingPostChecklistFile()
-		if err != nil {
-			logrus.Info("Failed to read pending post checklist:", err)
-			return []string{}, nil
-		}
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil

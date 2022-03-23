@@ -106,7 +106,6 @@ func NewHTTPClient(options ...Opt) *HTTP {
 
 	// We allow skipping manifest verification if needed by setting this environment
 	// variable. Set it only if you must
-	//Todo(milestone) -- For milestone we cannot skip
 	if os.Getenv("CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION") == "true" {
 		c.noVerify = true
 	}
@@ -142,18 +141,16 @@ func NoVerify(noVerify bool) Opt {
 	}
 }
 
-//Todo(milestone) Add another function to check if a manifest exists
-
 // GetCurrentManifest retrieves the current manifest for the given
 // channel.
 func (c *HTTP) GetCurrentManifest(ctx context.Context, channel string) (*manifest.A2, error) {
 	//try to get semantic version manifest
 	url := fmt.Sprintf(c.latestSemanticManifestURLFmt, channel)
 	m, err := c.manifestFromURL(ctx, url)
-	if err == nil {
+	if err == nil && m.SemVersion != "" && m.SchemaVersion == "2" {
 		return m, nil
 	}
-	if strings.Contains(err.Error(), "failed to locate manifest") {
+	if (m != nil && (m.SemVersion == "" || m.SchemaVersion == "1")) || strings.Contains(err.Error(), "failed to locate manifest") {
 		//since received error in fetching semantic version, try to fetch timestamp versioned manifest
 		url = fmt.Sprintf(c.latestManifestURLFmt, channel)
 		return c.manifestFromURL(ctx, url)
