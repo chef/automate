@@ -26,7 +26,7 @@ export class OrgUserEffects {
   getUsers$ = createEffect(() =>
     this.actions$.pipe(
     ofType(OrgUsersActionTypes.GET_ALL),
-    mergeMap(({ payload: { server_id, org_id } }: GetUsers) => 
+    mergeMap(({ payload: { server_id, org_id } }: GetUsers) =>
     this.requests.OrgUserRequests(server_id, org_id).pipe(
       map((resp: UsersSuccessPayload) => new GetUsersSuccess(resp)),
       catchError((error: HttpErrorResponse) =>

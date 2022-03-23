@@ -1,7 +1,7 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { OrgUserEntityState, orgUserEntityAdapter } from './org-users.reducer';
 
-export const orgUserState = createFeatureSelector<OrgUserEntityState>('orgusers');
+export const orgUserState = createFeatureSelector<OrgUserEntityState>('OrgUsers');
 export const {
   selectAll: allUsers,
   selectEntities: userEntities

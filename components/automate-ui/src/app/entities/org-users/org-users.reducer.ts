@@ -8,7 +8,7 @@ export interface OrgUserEntityState extends EntityState<OrgUser> {
   getAllStatus: EntityStatus;
   orgUserList: {
     orgUsers: OrgUser[]
-  }
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
