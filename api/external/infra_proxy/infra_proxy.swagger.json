@@ -2735,6 +2735,52 @@
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/user/{user_name}": {
+      "put": {
+        "operationId": "InfraProxy_ResetInfraServerUserKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetInfraServerUserKeyRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Server Id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_name",
+            "description": "Chef Server Username",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ResetInfraServerUserKeyReq"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/users": {
       "post": {
         "operationId": "InfraProxy_GetServerUsersList",
@@ -3059,6 +3105,23 @@
         "override_attributes": {
           "type": "object",
           "description": "Node override attributes JSON."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.ResetInfraServerUserKeyReq": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "Chef Server User's Id"
+        },
+        "user_name": {
+          "type": "string",
+          "title": "Chef Server Username"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "Chef Server Id"
         }
       }
     },
@@ -4555,6 +4618,27 @@
         "client_key": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientKey",
           "description": "Client key detail."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ResetInfraServerUserKeyRes": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "title": "Chef Server User's Id"
+        },
+        "user_name": {
+          "type": "string",
+          "title": "Chef Server Username"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "Chef Server Id"
+        },
+        "private_key": {
+          "type": "string",
+          "title": "Chef Servers User's Private Key"
         }
       }
     },
