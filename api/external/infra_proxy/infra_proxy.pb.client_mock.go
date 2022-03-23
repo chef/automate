@@ -1276,6 +1276,26 @@ func (mr *MockInfraProxyClientMockRecorder) GetAutomateInfraOrgUsersList(ctx, in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAutomateInfraOrgUsersList", reflect.TypeOf((*MockInfraProxyClient)(nil).GetAutomateInfraOrgUsersList), varargs...)
 }
 
+// ResetInfraServerUserKey mocks base method
+func (m *MockInfraProxyClient) ResetInfraServerUserKey(ctx context.Context, in *request.ResetInfraServerUserKeyReq, opts ...grpc.CallOption) (*response.ResetInfraServerUserKeyRes, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ResetInfraServerUserKey", varargs...)
+	ret0, _ := ret[0].(*response.ResetInfraServerUserKeyRes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResetInfraServerUserKey indicates an expected call of ResetInfraServerUserKey
+func (mr *MockInfraProxyClientMockRecorder) ResetInfraServerUserKey(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetInfraServerUserKey", reflect.TypeOf((*MockInfraProxyClient)(nil).ResetInfraServerUserKey), varargs...)
+}
+
 // MockInfraProxyServer is a mock of InfraProxyServer interface
 type MockInfraProxyServer struct {
 	ctrl     *gomock.Controller
@@ -2227,4 +2247,19 @@ func (m *MockInfraProxyServer) GetAutomateInfraOrgUsersList(arg0 context.Context
 func (mr *MockInfraProxyServerMockRecorder) GetAutomateInfraOrgUsersList(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAutomateInfraOrgUsersList", reflect.TypeOf((*MockInfraProxyServer)(nil).GetAutomateInfraOrgUsersList), arg0, arg1)
+}
+
+// ResetInfraServerUserKey mocks base method
+func (m *MockInfraProxyServer) ResetInfraServerUserKey(arg0 context.Context, arg1 *request.ResetInfraServerUserKeyReq) (*response.ResetInfraServerUserKeyRes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetInfraServerUserKey", arg0, arg1)
+	ret0, _ := ret[0].(*response.ResetInfraServerUserKeyRes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ResetInfraServerUserKey indicates an expected call of ResetInfraServerUserKey
+func (mr *MockInfraProxyServerMockRecorder) ResetInfraServerUserKey(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetInfraServerUserKey", reflect.TypeOf((*MockInfraProxyServer)(nil).ResetInfraServerUserKey), arg0, arg1)
 }
