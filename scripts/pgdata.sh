@@ -1,4 +1,5 @@
 #!/hab/pkgs/core/bash/5.1/20210826055113/bin/bash
+#shellcheck disable=SC1128
 #
 shopt -s extglob
 
@@ -17,7 +18,7 @@ exec 2>&1
 #
 
 
-
+#shellcheck disable=SC1091
 source /hab/svc/automate-postgresql/config/functions.sh
 
 mkdir -p /hab/svc/automate-postgresql/config/conf.d
