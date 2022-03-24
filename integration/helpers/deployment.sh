@@ -41,9 +41,22 @@ run_upgrade() {
     # because that directory isn't watched for changes. Therefore, we'll trigger
     # a manifest rebuild with the run command.
     if [ -z "$airgap_artifact_path" ]; then
-        chef-automate upgrade run
+        ERROR=$(chef-automate upgrade run 2>&1 >/dev/null)
+        if echo "${ERROR}" | grep 'chef-automate upgrade run --major'; then
+            echo "major normal upgrade"
+            chef-automate upgrade run --major
+        else
+            echo "regular normal upgrade"
+            chef-automate upgrade run
+        fi
     else
-        chef-automate upgrade run --airgap-bundle "$airgap_artifact_path"
+        ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null)
+        if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle'; then
+            chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path"
+        else
+            echo "regular normal upgrade airgap"
+            chef-automate upgrade run --airgap-bundle "$airgap_artifact_path"
+        fi
     fi
 
     # NOTE: This is a hack
