@@ -146,7 +146,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 
 	} else {
 		return errors.New(
-			"pg migration will only support 9.6 pg version for now, your pg version is: " + string(oldPgVersion),
+			"pg migration will only support 9.6 pg version for now, your pg version is: " + oldPgVersion,
 		)
 	}
 
@@ -222,12 +222,12 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	if !migrateDataCmdFlags.skipStorageCheck {
-		err := getLatestPgPath()
-		if err != nil || migrateDataCmdFlags.skipStorageCheck {
-			return err
-		}
-	}
+	// if !migrateDataCmdFlags.skipStorageCheck {
+	// 	err := getLatestPgPath()
+	// 	if err != nil || migrateDataCmdFlags.skipStorageCheck {
+	// 		return err
+	// 	}
+	// }
 
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
@@ -602,7 +602,7 @@ func dirExists(path string) (bool, error) {
 	if err == nil {
 		return true, nil
 	}
-	if os.IsNotExist(err) {
+	if os.IsNotExist(err) { // nosemgrep
 		return false, nil
 	}
 	return false, err
@@ -622,7 +622,7 @@ func promptCheckList(message string) error {
 
 // check pg version
 func pgVersion(path string) (string, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := ioutil.ReadFile(path) // nosemgrep
 	if err != nil {
 		return "", errors.New("could not find pg_version file")
 	}
