@@ -215,7 +215,7 @@ module "elasticsearch" {
   airgap_info                  = module.airgap_bundle-elasticsearch.airgap_info
   backend_aib_dest_file        = var.backend_aib_dest_file
   backend_aib_local_file       = var.backend_aib_local_file
-  curator_pkg_ident            = var.curator_pkg_ident
+  //curator_pkg_ident            = var.curator_pkg_ident
   elasticsearch_instance_count = var.elasticsearch_instance_count
   elasticsearch_listen_port    = var.elasticsearch_listen_port
   elasticsearch_pkg_ident      = var.elasticsearch_pkg_ident
@@ -223,9 +223,9 @@ module "elasticsearch" {
   elasticsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
   elasticsidecar_svc_load_args = var.elasticsidecar_svc_load_args
   habitat_info                 = module.habitat-elasticsearch.habitat_info
-  journalbeat_pkg_ident        = var.journalbeat_pkg_ident
-  kibana_pkg_ident             = var.kibana_pkg_ident
-  metricbeat_pkg_ident         = var.metricbeat_pkg_ident
+  //journalbeat_pkg_ident        = var.journalbeat_pkg_ident
+  //kibana_pkg_ident             = var.kibana_pkg_ident
+  //metricbeat_pkg_ident         = var.metricbeat_pkg_ident
   private_ips                  = var.elasticsearch_private_ips
   ssh_key_file                 = var.ssh_key_file
   ssh_user                     = var.ssh_user
@@ -241,8 +241,8 @@ module "postgresql" {
   elasticsearch_listen_port       = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.elasticsearch_private_ips
   habitat_info                    = module.habitat-postgresql.habitat_info
-  journalbeat_pkg_ident           = var.journalbeat_pkg_ident
-  metricbeat_pkg_ident            = var.metricbeat_pkg_ident
+  //journalbeat_pkg_ident           = var.journalbeat_pkg_ident
+  //metricbeat_pkg_ident            = var.metricbeat_pkg_ident
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   pgleaderchk_pkg_ident           = var.pgleaderchk_pkg_ident
   pgleaderchk_svc_load_args       = var.pgleaderchk_svc_load_args
