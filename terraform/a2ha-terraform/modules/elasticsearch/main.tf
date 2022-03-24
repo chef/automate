@@ -24,6 +24,7 @@ locals {
 }
 
 module "journalbeat" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
@@ -42,6 +43,7 @@ module "journalbeat" {
 }
 
 module "metricbeat" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
@@ -60,6 +62,7 @@ module "metricbeat" {
 }
 
 module "kibana" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
@@ -76,6 +79,7 @@ module "kibana" {
 }
 
 module "curator" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
