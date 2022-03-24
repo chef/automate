@@ -9,7 +9,7 @@ export enum OrgUsersActionTypes {
 }
 
 export interface UsersSuccessPayload {
-  orgUsers: OrgUser[];
+  users: OrgUser[];
 }
 
 export interface UsersPayload {

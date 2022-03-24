@@ -40,7 +40,7 @@ export class OrgUserEffects {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get clients: ${msg || payload.error}`
+          message: `Could not get Org users: ${msg || payload.error}`
         });
     })));
 }

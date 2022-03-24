@@ -22,7 +22,7 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  public usersState: { orgUsers: OrgUser[] };
+  public usersState: { users: OrgUser[] };
   public users: OrgUser[] = [];
   public usersListLoading = false;
   public authFailure = false;
@@ -49,7 +49,7 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
     .subscribe(([getUsersSt, OrgUsersState]) => {
       if (getUsersSt === EntityStatus.loadingSuccess && !isNil(OrgUsersState)) {
         this.usersState = OrgUsersState;
-        this.users = this.usersState.orgUsers;
+        this.users = this.usersState.users;
         this.usersListLoading = false;
         this.loading = false;
       } else if (getUsersSt === EntityStatus.loadingFailure) {
