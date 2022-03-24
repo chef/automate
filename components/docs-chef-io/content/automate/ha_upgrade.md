@@ -1,14 +1,14 @@
 +++
-title = "Common Features"
+title = "Upgrade"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Common Features"
+    title = "Upgrade"
     parent = "automate/deploy_high_availability/common_features"
-    identifier = "automate/deploy_high_availability/common_features/ha_upgrade.md Automate Common Features"
+    identifier = "automate/deploy_high_availability/common_features/ha_upgrade.md Automate Upgrade"
     weight = 200
 +++
 
@@ -22,7 +22,7 @@ This page lists the commands that aid in upgrading the Chef Automate High Availa
 
 {{< /note >}}
 
-## Command List
+## Upgrade Procedure
 
 1. Execute the `chef-automate upgrade run --upgrade-airgap-bundles` command to upgrade the bundles and deploy it on their respective nodes.
 
