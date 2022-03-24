@@ -36,14 +36,18 @@ export class MigrationSliderComponent implements OnChanges {
   ngOnChanges() {
     const group = {};
     if (this.previewData) {
-      this.previewData.staged_data.users.forEach((input_template: { automate_username: string | number, is_conflicting: boolean }) => {
-        group[input_template.automate_username] = new FormControl({value: '', disabled: !input_template.is_conflicting});
+      this.previewData.staged_data.users.forEach(
+        (input_template: { automate_username: string | number, is_conflicting: boolean }) => {
+        group[input_template.automate_username] = new FormControl(
+          {value: '', disabled: !input_template.is_conflicting});
       });
 
-      this.usersData = this.previewData.staged_data.users.map((obj: User)=> ({ ...obj, is_seleted: false }))
-      this.conflictedUsers = this.usersData.filter((obj: User)=> obj.is_conflicting)
-      this.usersData.forEach((item: User) => item.is_selected = true)
-      this.usersData.forEach((item: User) => this.selectedUsersData.push(item))
+      this.usersData = this.previewData.staged_data.users.map(
+        (obj: User) => ({ ...obj, is_seleted: false })
+      );
+      this.conflictedUsers = this.usersData.filter((obj: User) => obj.is_conflicting);
+      this.usersData.forEach((item: User) => item.is_selected = true);
+      this.usersData.forEach((item: User) => this.selectedUsersData.push(item));
     }
     this.migrationForm = new FormGroup(group);
   }
@@ -75,9 +79,9 @@ export class MigrationSliderComponent implements OnChanges {
     const checked = event.target.checked;
     this.usersData.forEach((item: User) => item.is_selected = checked);
     if (checked) {
-      this.usersData.forEach((item: User) => this.selectedUsersData.push(item))
+      this.usersData.forEach((item: User) => this.selectedUsersData.push(item));
     } else {
-      this.selectedUsersData = []
+      this.selectedUsersData = [];
     }
   }
 
@@ -86,8 +90,10 @@ export class MigrationSliderComponent implements OnChanges {
     if (event.target.checked) {
       this.selectedUsersData.push(this.usersData[index]);
     } else {
-      this.selectedUsersData.forEach((value, index)=>{
-        if (value.username == event.target.value) this.selectedUsersData.splice(index,1);
+      this.selectedUsersData.forEach((value, i) => {
+        if (value.username === event.target.value) {
+          this.selectedUsersData.splice(i, 1);
+        }
       });
     }
   }
@@ -108,9 +114,9 @@ export class MigrationSliderComponent implements OnChanges {
     }
   }
 
-  onChangeEvent(event: any){
-    const username = event.target.dataset.username
+  onChangeEvent(event: any) {
+    const username = event.target.dataset.username;
     const index = this.usersData.findIndex(x => x.username === username);
-    this.usersData[index].automate_username = event.target.value
+    this.usersData[index].automate_username = event.target.value;
   }
 }

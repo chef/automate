@@ -11,7 +11,7 @@ export class OrgUserRequests {
 
   public OrgUserRequests(server_id: string, org_id: string)
   : Observable<UsersSuccessPayload> {
-    const url = `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/automateinfraorgusers`;
+    const url = `${env.infra_proxy_url}/servers/${server_id}/org/${org_id}/users`;
     return this.http.get<UsersSuccessPayload>(url);
   }
 }
