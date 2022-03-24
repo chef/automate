@@ -1,6 +1,6 @@
 env:
-  HAB_BLDR_CHANNEL: "refresh2021q2"
-  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "refresh2021q2"
+  HAB_BLDR_CHANNEL: "refresh2022q2"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "refresh2022q2"
 
 expeditor:
   defaults:
