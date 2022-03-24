@@ -620,7 +620,7 @@ func promptCheckList(message string) error {
 	return nil
 }
 
-// check pg version
+// check pg version from path
 func pgVersion(path string) (string, error) {
 	data, err := ioutil.ReadFile(path) // nosemgrep
 	if err != nil {
