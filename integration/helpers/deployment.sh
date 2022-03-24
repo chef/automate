@@ -45,6 +45,7 @@ run_upgrade() {
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major'; then
             echo "major normal upgrade"
             chef-automate upgrade run --major
+            chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade"
             chef-automate upgrade run
@@ -53,6 +54,7 @@ run_upgrade() {
         ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null)
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle'; then
             chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path"
+            chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade airgap"
             chef-automate upgrade run --airgap-bundle "$airgap_artifact_path"
@@ -212,4 +214,10 @@ download_version() {
     local dst="$2"
 
     curl "https://packages.chef.io/manifests/$channel/automate/versions.json" > "$dst-versions"
+download_manifest_version() {
+    local channel="$1"
+    local version="$2"
+    local dst="$3"
+
+    curl -k "https://packages.chef.io/manifests/$channel/automate/$version.json" > "$dst"
 }
