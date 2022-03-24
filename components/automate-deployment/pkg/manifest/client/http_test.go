@@ -26,17 +26,58 @@ var goodV1Manifest = `
   ]
 }`
 
+var goodSemManifest = `
+{
+  "schema_version": "2",
+  "git_sha": "a_test_sha",
+  "build": "20180207073355",
+  "version": "2.3.5",
+  "packages": [
+    "chef/teams-service/0.1.0/20180207073125"
+  ]
+}`
+
 func TestGetCurrentManifest(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, goodV1Manifest)
+		fmt.Fprintln(w, goodSemManifest)
 	}))
 	defer ts.Close()
 
 	testFmt := fmt.Sprintf("%s/%%s", ts.URL)
-	client := client.NewHTTPClient(client.LatestURLFormat(testFmt), client.NoVerify(true))
+	client := client.NewHTTPClient(client.LatestSemanticURLFormat(testFmt), client.NoVerify(true))
 	manifest, err := client.GetCurrentManifest(context.Background(), "current")
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(manifest.Packages))
+	assert.Equal(t, "2.3.5", manifest.Version())
+
+	found, pkg := manifest.PackageForServiceName("teams-service")
+	require.True(t, found)
+	assert.Equal(t, "teams-service", pkg.Name())
+	assert.Equal(t, "chef", pkg.Origin())
+	assert.Equal(t, "0.1.0", pkg.Version())
+	assert.Equal(t, "20180207073125", pkg.Release())
+}
+
+func TestGetBackCompatable(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.String(), "latest_semver.json") {
+			w.WriteHeader(http.StatusNotFound)
+		}
+		if strings.Contains(r.URL.String(), "latest.json") {
+			fmt.Fprintln(w, goodV1Manifest)
+		}
+	}))
+	defer ts.Close()
+
+	testSemVerFmt := fmt.Sprintf("%s/%%s/latest_semver.json", ts.URL)
+	testFmt := fmt.Sprintf("%s/%%s/latest.json", ts.URL)
+	client := client.NewHTTPClient(client.LatestSemanticURLFormat(testSemVerFmt),
+		client.LatestURLFormat(testFmt),
+		client.NoVerify(true))
+	manifest, err := client.GetCurrentManifest(context.Background(), "current")
+	require.NoError(t, err)
+	assert.Equal(t, 1, len(manifest.Packages))
+	assert.Equal(t, "20180207073355", manifest.Version())
 
 	found, pkg := manifest.PackageForServiceName("teams-service")
 	require.True(t, found)
@@ -146,7 +187,7 @@ aiqMAJ9eLFYKiyyXe0nJekBdvUPfVoxYGwCfcTkOHvDPo1UFsOeh0QppYDkTnjE=
 		defer ts.Close()
 
 		testFmt := fmt.Sprintf("%s/%%s", ts.URL)
-		client := client.NewHTTPClient(client.LatestURLFormat(testFmt))
+		client := client.NewHTTPClient(client.LatestSemanticURLFormat(testFmt))
 		_, err := client.GetCurrentManifest(context.Background(), "current")
 		require.NoError(t, err)
 	})
@@ -162,7 +203,7 @@ aiqMAJ9eLFYKiyyXe0nJekBdvUPfVoxYGwCfcTkOHvDPo1UFsOeh0QppYDkTnjE=
 		defer ts.Close()
 
 		testFmt := fmt.Sprintf("%s/%%s", ts.URL)
-		client := client.NewHTTPClient(client.LatestURLFormat(testFmt))
+		client := client.NewHTTPClient(client.LatestSemanticURLFormat(testFmt))
 		_, err := client.GetCurrentManifest(context.Background(), "current")
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid signature")
@@ -179,7 +220,7 @@ aiqMAJ9eLFYKiyyXe0nJekBdvUPfVoxYGwCfcTkOHvDPo1UFsOeh0QppYDkTnjE=
 		defer ts.Close()
 
 		testFmt := fmt.Sprintf("%s/%%s", ts.URL)
-		client := client.NewHTTPClient(client.LatestURLFormat(testFmt))
+		client := client.NewHTTPClient(client.LatestSemanticURLFormat(testFmt))
 		_, err := client.GetCurrentManifest(context.Background(), "current")
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "404 Not Found")

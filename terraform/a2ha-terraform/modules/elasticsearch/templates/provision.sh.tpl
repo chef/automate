@@ -23,6 +23,10 @@ cp -f ${tmp_path}/elasticsearch-user.toml /hab/user/"$ES_PKG_NAME"/config/user.t
 mkdir -p /hab/user/"$ELASTICSIDECAR_PKG_NAME"/config
 cp -f ${tmp_path}/elasticsidecar.toml /hab/user/"$ELASTICSIDECAR_PKG_NAME"/config/user.toml
 
+# Creating mount path for elasticsearch backup 
+sudo mkdir -p /mnt/automate_backups/elasticsearch
+sudo chown hab:hab /mnt/automate_backups/elasticsearch/
+
 wait_for_aib_extraction() {
   max=20
   n=0

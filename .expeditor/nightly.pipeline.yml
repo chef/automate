@@ -33,6 +33,7 @@ steps:
     env:
       HAB_ORIGIN: chef
     timeout_in_minutes: 30
+    soft_fail: true
     expeditor:
       secrets:
         A1_LICENSE:
