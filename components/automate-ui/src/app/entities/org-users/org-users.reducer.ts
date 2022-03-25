@@ -9,9 +9,17 @@ export interface OrgUserEntityState extends EntityState<OrgUser> {
   orgUserList: {
     users: OrgUser[]
   };
+  resetStatus: EntityStatus;
+  resetError: EntityStatus;
+  resetUserKey: {
+    user_key: string,
+    name: string
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const RESET_STATUS = 'resetStatus';
+const RESET_ERROR = 'resetError';
 
 export const orgUserEntityAdapter: EntityAdapter<OrgUser> =
   createEntityAdapter<OrgUser>({
@@ -39,6 +47,26 @@ export function orgUserEntityReducer(
 
     case OrgUsersActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgUsersActionTypes.RESETKEY:
+      return set(
+        RESET_STATUS,
+        EntityStatus.loading,
+        orgUserEntityAdapter.removeAll(state)
+      );
+
+    case OrgUsersActionTypes.RESETKEY_SUCCESS: {
+      return pipe (
+        set( RESET_STATUS, EntityStatus.loadingSuccess),
+        set('resetUserKey', action.payload || [])
+        ) (state) as OrgUserEntityState;
+      }
+
+    case OrgUsersActionTypes.RESETKEY_FAILURE:
+      return pipe(
+        set(RESET_STATUS, EntityStatus.loadingFailure),
+        set(RESET_ERROR, action.payload.error)
+        )( state ) as OrgUserEntityState;
 
     default:
       return state;

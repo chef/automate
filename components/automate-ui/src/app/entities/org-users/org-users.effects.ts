@@ -11,6 +11,10 @@ import {
   GetUsersSuccess,
   GetUsersFailure,
   UsersSuccessPayload,
+  ResetUserKey,
+  ResetUserKeySuccess,
+  ResetKeySuccessPayload,
+  ResetUserKeyFailure,
   OrgUsersActionTypes
 } from './org-users.action';
 
@@ -42,5 +46,35 @@ export class OrgUserEffects {
           type: Type.error,
           message: `Could not get Org users: ${msg || payload.error}`
         });
+    })));
+
+  resetUserKey$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgUsersActionTypes.RESETKEY),
+      mergeMap(( { payload: { server_id, org_id, name } }: ResetUserKey) =>
+        this.requests.resetUserKeyRequests(server_id, org_id, name).pipe(
+          map((resp: ResetKeySuccessPayload) => new ResetUserKeySuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new ResetUserKeyFailure(error)))))));
+
+  resetUserKeySuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgUsersActionTypes.RESETKEY_SUCCESS),
+      map(({ payload: { name } }: ResetUserKeySuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Successfully reset the key - ${name}.`
+        });
+    })));
+
+  resetUserKeyFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgUsersActionTypes.RESETKEY_FAILURE),
+      map(({ payload: { error } }: ResetUserKeyFailure) => {
+        const msg = error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not reset the key: ${msg || error}`
+      });
     })));
 }
