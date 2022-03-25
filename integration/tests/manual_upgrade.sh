@@ -76,7 +76,7 @@ do_upgrade() {
     #shellcheck disable=SC2154
     jq --arg val "$release" '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
 
-    curl -vv -H "Connection: close" --insecure "https://packages.chef.io/set/$release" -X POST -d @"$target_manifest"
+    curl -vv --insecure "https://packages.chef.io/set/$release" -X POST -d @"$target_manifest"
     log_info "Upgrading to $release"
     # Uncomment once the --version flag is on dev
     chef-automate upgrade run --version "$release"
