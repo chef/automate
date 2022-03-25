@@ -127,6 +127,8 @@ X-Project = ""
 
    - Setup the secret management key and the required passwords. The default location for the secrets key and secret storage is defined in the *config.toml* file. The default location for the key is `/etc/chef-automate/secrets.key`, and the secret store file is in `/hab/a2_deploy_workspace/secrets.json`.
 
+     {{< figure src="/images/automate/ha_aws_secretkeys.png" alt="AWS Access Key & Secret Access Key">}}
+
    - Specify the ARN (Amazon Resource Name) of the certificate that is used to create load balancer.
 
    - Specify *VPCID* and *CIDR* block. You can also use the default available VPC from the AWS VPC page.

@@ -36,13 +36,13 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 1. Navigate to your AWS account.
 1. Select **IAM** from the list of services from the AWS console. The **IAM dashboard** screen appears.
 
-{{< figure src="/images/automate/ha_aws_iam.png" alt="AWS IAM Dashboard">}}
+  {{< figure src="/images/automate/ha_aws_iam.png" alt="AWS IAM Dashboard">}}
 
 1. Select **Users** from the **Access management** menu on the left.
 1. Select **Add Users**. The **Set User Details** screen appears.
 1. Enter the user name for the new user and other necessary details.
 
-{{< figure src="/images/automate/ha_aws_iam_user.png" alt="AWS IAM User Creation">}}
+  {{< figure src="/images/automate/ha_aws_iam_user.png" alt="AWS IAM User Creation">}}
 
 1. Check the **Access key - Programmatic access** option under the **Select AWS access type** section.
 
@@ -74,6 +74,6 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 
 1. Take a note of the Access key ID and Secret access key.
 
-Now, let's configure the AWS CLI to deploy our applications from the command line.
+  Now, let's configure the AWS CLI to deploy our applications from the command line.
 
-Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating an IAM user through CLI and API methods.
+  Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating an IAM user through CLI and API methods.

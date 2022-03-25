@@ -34,4 +34,6 @@ Where the *--unit* displays the logs from the specified unit, and *--follow* mea
 
 - Execute the command, `hab svc status`, to SSH the backend node.
 
-- Execute the command, `hab svc status`, to verify the health of any services on a node,
+- Execute the command, `hab svc status`, to verify the health of any services on a node.
+
+ {{< figure src="/images/automate/ha_status.png" alt="HA Nodes Status">}}

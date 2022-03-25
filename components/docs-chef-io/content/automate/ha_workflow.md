@@ -16,6 +16,8 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 
 ## Bare Infra Deployment
 
+![On-Premises Deployment Workflow](/images/automate/ha_bare_infra_deploy.png)
+
 1. Set the software and hardware requirements.
 1. Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the **Chef Automate** , **Chef Server** , **Postgres** , and **Elasticsearch** nodes.
 1. Obtain Bastion host server details from your system administrator.
@@ -51,6 +53,8 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 1. Deploy and provision the Chef Automate HA.
 
 ## AWS Deployment
+
+![AWS Deployment Workflow](/images/automate/ha_aws_deploy.png)
 
 1. Set the software and hardware requirements.
 1. Access or obtain an AWS account.

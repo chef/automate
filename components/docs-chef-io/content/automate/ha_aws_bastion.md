@@ -44,6 +44,8 @@ Follow these steps to add a bastion host to your Linux environment on AWS cloud,
 
 Or launch an EC2 instance, which is available and already defined.
 
+{{< figure src="/images/automate/ha_aws_launchinstances.png" alt="AWS EC2 Instances">}}
+
 1. Select **Review and Launch** button.
 1. Review all the details and select the **Launch** button. The AWS console prompts you to either create an existing SSH key pair, or use a previously established pair.
 

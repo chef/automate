@@ -22,7 +22,7 @@ This page explains how to deploy Chef Automate High Availability (HA) in your ne
 Based on the number of nodes, the virtual machine requirements for AWS deployment are as follows:
 
 | Instance          | Type         | RAM                                                   | Volume Size         | Volume Type | Volume iops |
-| :---------------: | :----------: | :---------------------------------------------------: | :-----------------: | :---------: | :---------: |
+| :---------------  | :----------  | :---------------------------------------------------  | :-----------------  | :---------  | :---------  |
 | PostgreSQL        | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 150 |
 | Elasticsearch     | m5.large     | 8 GB RAM for test and 16 GB for production. vCPU - 2. | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 300 |
 | Chef Automate     | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 100 |
@@ -61,7 +61,7 @@ Refer [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/se
 
 If the DNS attributes, **enableDnsSupport** and **enableDnsHostnames** are true, instances in the VPC are set with public DNS hostnames. The default for these attributes is `false` when the VPC is a default VPC, or the VPC is created using the VPC console wizard.
 
-{{ < /note >}}
+{{< /note >}}
 
 1. Execute the [Chef Automate HA deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )).
 

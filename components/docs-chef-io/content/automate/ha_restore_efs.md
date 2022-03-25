@@ -23,4 +23,8 @@ This page includes the procedure to restore backed-up data of the Chef Automate 
 
 1. Execute the restore command `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
 
+{{< figure src="/images/automate/ha_restore.png" alt="Restore">}}
+
 1. Start all Chef Automate and Chef Infra Server front-end nodes by executing the command `sudo systemctl start chef-automate`.
+
+{{< figure src="/images/automate/ha_restore_success.png" alt="Restore Success">}}

@@ -37,11 +37,13 @@ Follow these steps if you want to request an ACM public certificate:
 
 1. In the **Domain names** section, enter your domain name. You can use a fully qualified domain name (FQDN), such as `www.example.com`, or a bare domain name such as `example.com`.
 
-Before ACM issues a certificate, it validates that you own or control the domain names in your certificate request. You can use either email validation or DNS validation.
+  Before ACM issues a certificate, it validates that you own or control the domain names in your certificate request. You can use either email validation or DNS validation.
 
 1. In the **Select validation method** section, select either *DNS validation* or *Email validation*.
 
 1. From the **Tags** page, you can optionally tag your certificate. Tags are key-value pairs that serve as metadata for identifying and organizing AWS resources.
+
+  {{< figure src="/images/automate/ha_cert.png" alt="Certificates">}}
 
 1. Select **Request**. The console returns you to your certificate list after processing the request, where your new certificate displays with status, *Pending validation*.
 

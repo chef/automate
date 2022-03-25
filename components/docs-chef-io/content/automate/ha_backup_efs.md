@@ -105,3 +105,5 @@ You can perform this application only once, which triggers a restart of the Elas
 1. Execute the `./chef-automate config patch automate.toml` command to apply the patch configuration to the Chef Automate HA servers. This command also triggers the deployment.
 
 1. Execute the `chef-automate backup create` command from a Chef Automate front-end node to create a backup.
+
+{{< figure src="/images/automate/ha_backup_success.png" alt="EFS Backup">}}
