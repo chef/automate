@@ -87,6 +87,70 @@ message External {
     SSL ssl = 5;
   }
 
+message Opensearch {
+    message Backup {
+      message FsSettings {
+        message OptionalSettings {
+          google.protobuf.StringValue max_snapshot_bytes_per_sec = 1;
+          google.protobuf.StringValue max_restore_bytes_per_sec = 2;
+        }
+        google.protobuf.StringValue path = 1;
+        OptionalSettings settings = 2;
+      }
+
+      message S3Settings {
+        google.protobuf.StringValue bucket = 1;
+        google.protobuf.StringValue client = 2;
+        google.protobuf.StringValue base_path = 3;
+        chef.automate.infra.config.Backups.S3.Opensearch settings = 4; // optional settings
+      }
+
+      message GCSSettings {
+        google.protobuf.StringValue bucket = 1;
+        google.protobuf.StringValue client = 2;
+        google.protobuf.StringValue base_path = 3;
+        chef.automate.infra.config.Backups.GCS.Opensearch settings = 4; // optional settings
+      }
+
+      google.protobuf.BoolValue enable = 1;
+      google.protobuf.StringValue location = 2;
+      FsSettings fs = 3;
+      S3Settings s3 = 4;
+      GCSSettings gcs = 5;
+    }
+
+    message Authentication {
+      message BasicAuth {
+        google.protobuf.StringValue username = 1;
+        google.protobuf.StringValue password = 2;
+      }
+      message AwsOpensearchAuth {
+        // Authentication for Aws ES must provide a user and password for basic
+        // auth. access_key and secret_key can be optionally specified. They are
+        // needed for making snapshot repos, but if not provided, we can use the
+        // instance creds.
+        google.protobuf.StringValue username = 1;
+        google.protobuf.StringValue password = 2;
+        google.protobuf.StringValue access_key = 3;
+        google.protobuf.StringValue secret_key = 4;
+      }
+      google.protobuf.StringValue scheme = 1;
+      BasicAuth basic_auth = 2;
+      AwsOpensearchAuth aws_os = 3;
+    }
+
+    message SSL {
+      google.protobuf.StringValue root_cert = 1;
+      google.protobuf.StringValue server_name = 2;
+      google.protobuf.StringValue root_cert_file = 3;
+    }
+
+    google.protobuf.BoolValue enable = 1;
+    repeated google.protobuf.StringValue nodes = 2;
+    Backup backup = 3;
+    Authentication auth = 4;
+    SSL ssl = 5;
+  }
   message Postgresql {
     message Backup { google.protobuf.BoolValue enable = 1; }
 
@@ -138,6 +202,7 @@ message External {
   Elasticsearch elasticsearch = 1;
   Postgresql postgresql = 2;
   Automate automate = 3;
+  Opensearch opensearch = 4;
 }
 
 message Mlsa { google.protobuf.BoolValue accept = 1; }
@@ -171,7 +236,7 @@ message Backups {
     Elasticsearch es = 2;
     Bucket bucket = 3;
     SSL ssl = 4;
-
+    Opensearch os = 5;
     message AWSCredentials {
       google.protobuf.StringValue access_key = 1;
       google.protobuf.StringValue secret_key = 2;
@@ -199,6 +264,27 @@ message Backups {
       google.protobuf.StringValue role_arn = 15;
     }
 
+message Opensearch {
+      // Backup repo settings
+      google.protobuf.BoolValue compress = 2;
+      google.protobuf.BoolValue server_side_encryption = 3;
+      google.protobuf.StringValue buffer_size = 4;
+      google.protobuf.StringValue canned_acl = 5;
+      google.protobuf.StringValue storage_class = 6;
+      // Snapshot settings
+      google.protobuf.StringValue max_snapshot_bytes_per_sec = 7;
+      google.protobuf.StringValue max_restore_bytes_per_sec = 8;
+      google.protobuf.StringValue chunk_size = 9;
+      // S3 client settings
+      google.protobuf.StringValue read_timeout = 10;
+      google.protobuf.Int32Value max_retries = 11;
+      google.protobuf.BoolValue use_throttle_retries = 12;
+      google.protobuf.StringValue protocol = 13;
+      // Aws Opensearch
+      google.protobuf.StringValue region = 14;
+      google.protobuf.StringValue role_arn = 15;
+    }
+
     message Bucket {
       google.protobuf.StringValue endpoint = 1;
       google.protobuf.StringValue base_path = 2;
@@ -212,10 +298,23 @@ message Backups {
     GCPCredentials credentials = 1;
     Elasticsearch es = 2;
     Bucket bucket = 3;
-
+    Opensearch os = 4;
     message GCPCredentials { google.protobuf.StringValue json = 1; }
 
     message Elasticsearch {
+      // Backup repo settings
+      google.protobuf.BoolValue compress = 2;
+      google.protobuf.BoolValue application_name = 3;
+      // Snapshot settings
+      google.protobuf.StringValue max_snapshot_bytes_per_sec = 4;
+      google.protobuf.StringValue max_restore_bytes_per_sec = 5;
+      google.protobuf.StringValue chunk_size = 6;
+      // GCS client settings
+      google.protobuf.StringValue read_timeout = 7;
+      google.protobuf.BoolValue connect_timeout = 8;
+    }
+
+    message Opensearch {  
       // Backup repo settings
       google.protobuf.BoolValue compress = 2;
       google.protobuf.BoolValue application_name = 3;
