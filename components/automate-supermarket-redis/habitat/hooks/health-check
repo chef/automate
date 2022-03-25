@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+curlOpts="-X GET -sS --fail --max-time 2"
+curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/service.crt"
+curlOpts="$curlOpts --key {{pkg.svc_config_path}}/service.key"
+curlOpts="$curlOpts --cacert {{pkg.svc_config_path}}/root_ca.crt"
+curlOpts="$curlOpts --resolve automate-cs-oc-bifrost:{{cfg.network.port}}:127.0.0.1"
+curlOpts="$curlOpts --noproxy automate-cs-oc-bifrost"
+# shellcheck disable=SC2086
+output=$({{pkgPathFor "core/curl"}}/bin/curl $curlOpts "https://automate-cs-oc-bifrost:{{cfg.network.port}}/_status")
+res=$?
+if [ "0" != "$res" ]; then
+    echo "health check curl command returned exit code ${res}:"
+    echo "$output"
+    exit 2
+fi

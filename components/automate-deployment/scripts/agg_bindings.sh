@@ -31,7 +31,7 @@ bindings() {
       (
         declare -A pkg_binds
         declare -A pkg_binds_optional
-        local chef_automate_hab_binding_mode="strict"
+        local chef_automate_hab_binding_mode="relaxed"
         local chef_automate_dev_only_pkg=false
         #shellcheck disable=SC1090
         source "${component_path}/habitat/plan.sh";
