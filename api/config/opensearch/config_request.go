@@ -140,8 +140,8 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 // SetGlobalConfig injects global configuration overrides
 func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	// Handle external configuration
-	if g.GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue() {
-		// Disable deploying automate-elasticsearch when we're using external es
+	if g.GetV1().GetExternal().GetOpensearch().GetEnable().GetValue() {
+		// Disable deploying automate-opensearch when we're using external es
 		c.V1.Sys.Disable = w.Bool(true)
 
 		return
@@ -150,13 +150,13 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	if b := g.GetV1().GetBackups(); b != nil {
 		if b.GetFilesystem() != nil {
 			// If backups are configured to use a filesystem location make sure
-			// that the path is specified in the repo, otherwise Elasticsearch
+			// that the path is specified in the repo, otherwise Opensearch
 			// will not be able to access the directory.
 			c.V1.Sys.Path.Repo = b.GetFilesystem().GetPath()
 
 			if !c.GetV1().GetSys().GetNode().GetData().GetValue() {
 				c.V1.Sys.Deprecated = &ConfigRequest_V1_Deprecated{
-					ExternalEs: w.Bool(true),
+					ExternalOs: w.Bool(true),
 				}
 			}
 		}
@@ -187,13 +187,13 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 const (
 	// ESHeapMinGB is the minimum amount of memory in GB we will
 	// recommend for ES Heap
-	ESHeapMinGB = 1
+	OSHeapMinGB = 1
 	// ESHeapMaxGB is the maximum amount of memory in GB we will
 	// recommend for ES Heap
-	ESHeapMaxGB = 16
+	OSHeapMaxGB = 16
 	// ESHeapPortion is the proportion of system memory we
 	// recommend for ES Heap
-	ESHeapPortion = 0.25
+	OSHeapPortion = 0.25
 	// KBPerGB is the number of KB in a GB, used for conversions
 	KBPerGB = 1048576
 )
@@ -207,13 +207,13 @@ func defaultHeapSize() string {
 }
 
 // RecommendedHeapSizeGB returns the recommended size of the
-// Elasticsearch heap settings. The returned value is in Gigabytes.
+// Opeensearch heap settings. The returned value is in Gigabytes.
 func RecommendedHeapSizeGB(sysMemKB int) int {
-	recommend := int(math.Round((float64(sysMemKB) * ESHeapPortion) / KBPerGB))
-	if recommend < ESHeapMinGB {
-		return ESHeapMinGB
-	} else if recommend > ESHeapMaxGB {
-		return ESHeapMaxGB
+	recommend := int(math.Round((float64(sysMemKB) * OSHeapPortion) / KBPerGB))
+	if recommend < OSHeapMinGB {
+		return OSHeapMinGB
+	} else if recommend > OSHeapMaxGB {
+		return OSHeapMaxGB
 	} else {
 		return recommend
 	}

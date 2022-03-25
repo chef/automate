@@ -194,7 +194,7 @@ message ConfigRequest {
 		}
 
 		message Deprecated {
-				google.protobuf.BoolValue external_es = 1;
+				google.protobuf.BoolValue external_os = 1;
 		}
 	}
 }
