@@ -49,6 +49,7 @@ type InitConfig struct {
 	ProxyPassword   string
 	NoProxy         []string
 	ESHeapSize      string
+	OSHeapSize      string
 }
 
 // NewInitConfig returns a new instance of InitConfig with default values
@@ -72,6 +73,14 @@ func InitialFQDN(fqdn string) InitConfigOpt {
 func ESMem(mem string) InitConfigOpt {
 	return func(c *InitConfig) error {
 		c.ESHeapSize = mem
+		return nil
+	}
+}
+
+// OSMem sets the ES heap size for the generated configuration
+func OSMem(mem string) InitConfigOpt {
+	return func(c *InitConfig) error {
+		c.OSHeapSize = mem
 		return nil
 	}
 }
@@ -134,6 +143,9 @@ func GenerateInitConfig(channel string, upgradeStrategy string, opts ...InitConf
 		cfg.ESHeapSize = esHeapSize()
 	}
 
+	if cfg.OSHeapSize == "" {
+		cfg.OSHeapSize = osHeapSize()
+	}
 	return cfg, nil
 }
 
@@ -226,7 +238,7 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 			V1: &oss.ConfigRequest_V1{
 				Sys: &oss.ConfigRequest_V1_System{
 					Runtime: &oss.ConfigRequest_V1_Runtime{
-						Heapsize: w.String(c.ESHeapSize),
+						Heapsize: w.String(c.OSHeapSize),
 					},
 				},
 			},
@@ -267,6 +279,14 @@ func esHeapSize() string {
 		sysMem = 0
 	}
 	return fmt.Sprintf("%dg", es.RecommendedHeapSizeGB(sysMem))
+}
+
+func osHeapSize() string {
+	sysMem, err := sys.SystemMemoryKB()
+	if err != nil {
+		sysMem = 0
+	}
+	return fmt.Sprintf("%dg", oss.RecommendedHeapSizeGB(sysMem))
 }
 
 // GeneratePassword generates a random password. This function an be
