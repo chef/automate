@@ -1,14 +1,25 @@
-opendistro_security:
+_meta:
+  type: "config"
+  config_version: 2
+
+config:
   dynamic:
     http:
-      anonymous_auth_enabled: false
+      xff:
+        enabled: true
+        internalProxies: '.*' # the nginx proxy
     authc:
-      basic_internal_auth_domain:
+      proxy_auth_domain:
         http_enabled: true
         transport_enabled: true
-        order: 4
+        order: 0
         http_authenticator:
-          type: basic
-          challenge: true
+          type: proxy
+          #type: extended-proxy
+          challenge: false
+          config:
+            user_header: "x-proxy-user"
+            roles_header: "x-proxy-roles"
+            #attr_header_prefix: "x-proxy-ext-"
         authentication_backend:
-          type: intern
+          type: noop
