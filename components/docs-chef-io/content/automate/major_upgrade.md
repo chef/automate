@@ -20,15 +20,14 @@ Please choose following upgrade journey based on your current version of chef au
 
 | Your Current Version | Upgrade To |
 | -------------------- | ---------- |
-|`Any version before 2022012400000`|`2022012400000`|
-|`on 2022012400000`|`3.0.1`|
-|`3.0.1`|`4.0.1`|
+| Any version before 2022012400000| 2022012400000|
+| on 2022012400000| 3.0.1|
+| 3.0.1| 4.0.1|
 
-For example, if today you are on version 2021201164433. Then your Upgrade Journey should be:
-1.Mannual upgrade to 2022012400000.
-2.Then mannual upgrade to 3.0.1.
+For example, if today you are on version 2021201164433. Then your Upgrade Journey should be:<br />
+1.Mannual upgrade to 2022012400000.<br />
+2.Then mannual upgrade to 3.0.1.<br />
 3.Then mannual upgrade to 4.0.1.
-
 
 ## Prerequisites
 
