@@ -14,6 +14,22 @@ draft = false
 
 Chef Automate is a platform that provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically, but you cannot directly upgrade to any major version of Chef Automate. Use the `--major` flag to upgrade from the latest to a major version. This section will talk about the major version upgrade of Chef Automate with its possible scenarios.
 
+## Upgrade Journey
+
+Please choose following upgrade journey based on your current version of chef automate.All these upgrades are mannual upgrades.
+
+| Your Current Version | Upgrade To |
+| -------------------- | ---------- |
+|`Any version before 2022012400000`|`2022012400000`|
+|`on 2022012400000`|`3.0.1`|
+|`3.0.1`|`4.0.1`|
+
+For example, if today you are on version 2021201164433. Then your Upgrade Journey should be:
+1.Mannual upgrade to 2022012400000.
+2.Then mannual upgrade to 3.0.1.
+3.Then mannual upgrade to 4.0.1.
+
+
 ## Prerequisites
 
 * **Plan your downtime**: This upgrade comes with downtime. So before upgrading, set the environment to handle the downtime.
