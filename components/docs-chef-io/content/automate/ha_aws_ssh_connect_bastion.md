@@ -25,7 +25,7 @@ This page explains the procedure to establish the connection between your bastio
 
 ![AWS EC2 Launch Status](/images/automate/ha_aws_connect.png)
 
-{{< figure src="/images/automate/ha-aws-launch-status.png" alt="AWS EC2 Launch Status">}}
+{{< figure src="/images/automate/ha_aws_launch_status.png" alt="AWS EC2 Launch Status">}}
 
 1. Connect to your instance using its public DNS. For example, `ssh -i "doc-bastion.pem" ubuntu@ec2-3-24-212-25.ap-southeast-2.compute.amazonaws.com`.
 1. Select `yes` when the terminal prompts you to connect.
@@ -36,4 +36,4 @@ This completes the SSH connection to the AWS EC2 instance.
 
 By default, you can log on as a Ubuntu user. You can switch to *root* access using the `sudo` command.
 
-Refer ![mounting the file system on the EC2 instance and testing](https://docs.aws.amazon.com/efs/latest/ug/wt1-test.html) for detailed information.
+Refer [Mounting the file system on the EC2 instance and testing](https://docs.aws.amazon.com/efs/latest/ug/wt1-test.html) for detailed information.

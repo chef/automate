@@ -23,7 +23,7 @@ This section explains the Bare Metal (on-premises) Infrastructure Deployment (ex
 - All VMs must expose port 22 for SSH. You may need to open certain ports across the VMs to establish the communication, which are:
 
    | Component                                | Port                    |
-   | :--------------------------------------: | :---------------------: |
+   | :--------------------------------------  | :---------------------  |
    | Habitat gossip (UDP)                     |     9638                |
    | Habitat http API                         |     9631                |
    | PostgreSQL                               |     5432                |
