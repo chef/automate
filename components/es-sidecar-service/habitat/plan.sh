@@ -17,7 +17,7 @@ pkg_binds=(
 )
 
 pkg_binds_optional=(
-  [automate-elasticsearch]="deprecated_external_es"
+  [automate-opensearch]="deprecated_external_es"
 )
 pkg_exports=(
   [port]=service.port
