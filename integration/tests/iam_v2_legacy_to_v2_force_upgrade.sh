@@ -56,3 +56,9 @@ do_deploy() {
     # this migrates v1 legacy policies
     "${cli_bin}" iam upgrade-to-v2 
 }
+
+do_prepare_upgrade() {
+  # use latest current here
+  download_manifest_version "current" "20220121191356" "$test_manifest_dir/20220121191356.json"
+  set_test_manifest "20220121191356.json"
+}
