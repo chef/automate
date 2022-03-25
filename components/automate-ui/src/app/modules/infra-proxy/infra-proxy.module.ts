@@ -68,6 +68,7 @@ import { SelectBoxModule } from './select-box/src/public_api';
 import { SyncOrgUsersSliderComponent } from './sync-org-users-slider/sync-org-users-slider.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-web-uikey-slider.component';
+import { ResetUserKeyComponent } from './reset-user-key/reset-user-key.component';
 
 @NgModule({
   declarations: [
@@ -125,7 +126,8 @@ import { UpdateWebUIKeySliderComponent } from './update-web-uikey-slider/update-
     RevisionIdComponent,
     SyncOrgUsersSliderComponent,
     UpdateNodeTagModalComponent,
-    UpdateWebUIKeySliderComponent
+    UpdateWebUIKeySliderComponent,
+    ResetUserKeyComponent
   ],
   imports: [
     CommonModule,
