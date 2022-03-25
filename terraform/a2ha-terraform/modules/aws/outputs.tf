@@ -53,3 +53,22 @@ output "elasticsearch_private_ips" {
   value = aws_instance.chef_automate_elasticsearch.*.private_ip
 }
 
+output "random_id" {
+  value = random_id.random.hex
+}
+
+output "subnet_id" {
+  value = aws_subnet.default.*.id
+}
+
+output "mount_id" {
+  value = aws_security_group.efs_mount.id
+}
+
+output "tag_name" {
+  value = var.tag_name
+}
+
+output "tags" {
+   value = var.tags  
+}

@@ -43,6 +43,32 @@ module "aws" {
   tags                               = var.aws_tags
 }
 
+module "efs" {
+  source = "./modules/efs"
+#  count = var.bucket_config_efs == "true" ? 1 : 0
+  automate_private_ips      = module.aws.automate_private_ips
+  chef_server_private_ips   = module.aws.chef_server_private_ips
+  postgresql_private_ips    = module.aws.postgresql_private_ips
+  elasticsearch_private_ips = module.aws.elasticsearch_private_ips
+  random_id                 = module.aws.random_id
+  aws_region                         = var.aws_region
+  aws_ssh_key_file                   = var.ssh_key_file
+  aws_ssh_key_pair_name              = var.aws_ssh_key_pair_name
+  aws_ssh_user                       = var.ssh_user
+  tag_name                           = var.tag_name
+  subnet_id                          = module.aws.subnet_id
+  mount_id                           = module.aws.mount_id
+
+  depends_on = [module.aws]
+}
+
+# module "s3" {
+#   source = "./modules/s3"
+#   count = var.bucket_config_s3 == "true" ? 1 : 0
+#   random_id = module.aws.random_id
+
+# }
+
 module "aws-output" {
   source                    = "./modules/aws_output"
   automate_private_ips      = module.aws.automate_private_ips
