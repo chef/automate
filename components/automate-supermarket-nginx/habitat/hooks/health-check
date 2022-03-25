@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+curlOpts="-sS --fail --max-time 2"
+curlOpts="$curlOpts --resolve automate-supermarket-nginx:{{cfg.service.port}}:127.0.0.1"
+curlOpts="$curlOpts --noproxy automate-supermarket-nginx"
+curlOpts="$curlOpts --cacert {{pkg.svc_config_path}}/root_ca.crt"
+curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/service.crt"
+curlOpts="$curlOpts --key {{pkg.svc_config_path}}/service.key"
+
+# This gets routed to erchef which does a "deep" health check
+# shellcheck disable=SC2086
+output=$({{pkgPathFor "core/curl"}}/bin/curl $curlOpts "https://automate-supermarket-nginx:{{cfg.service.port}}/_status")
+res=$?
+if [ "0" != "$res" ]; then
+    echo "health check curl command returned exit code ${res}:"
+    echo "$output"
+    exit 2
+fi

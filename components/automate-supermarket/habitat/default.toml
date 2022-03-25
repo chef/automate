@@ -1,0 +1,119 @@
+backtrace       = 0
+sentry_url      = ""
+statsd_port     = -1
+rails_env       = "production"
+robots_disallow = ""
+robots_allow    = "/"
+secret_key_base = "9ee6f4446cc66e1398d4fe265f8714fcc46f7516aec5684fa2c3940e62c0329b597680e19a466ca5820eca9f0df99190331a"
+rack_env        = "production"
+lang            = "en_US.UTF-8"
+
+[app]
+chef_server_url             = "https://api.chef.io"
+rpm_signing_passphrase      = ''
+owners_can_remove_artifacts = true
+enforce_privacy             = false
+api_item_limit              = 100
+fqdn                        = 'localhost'
+fqdn_sanitized              = ''
+from_email                  = ''
+google_analytics_id         = ''
+segment_write_key           = ''
+log_level                   = 'info'
+serve_static_files          = true
+cookbook                    = '' # ????
+port                        = 3000
+rails_log_to_stdout         = true
+preload_app                 = true
+worker_timeout              = 15
+worker_processes            = 2
+air_gapped_flag             = "false"
+features                    = ["tools", "gravatar"]
+user                        = "supermarket"
+group                       = "supermarket"
+log_directory               = ""
+var_directory               = ""
+protocol                    = "https"
+allowed_host                = "localhost"
+
+
+[nginx]
+force_ssl = true
+port      = 4000
+ssl_port  = 4000
+
+[app.announcement]
+banner_enabled = false
+text           = ""
+
+[new_relic]
+enabled     = false
+license_key = ''
+app_name    = 'Supermarket'
+
+[urls]
+#chef_domain        = "chef.io"
+#progress_domain    = "progress.com"
+#chef_www_url       = "https://www.chef.io"
+#progress_www_url   = "https://www.progress.com"
+#chef_status_url    = "https://status.chef.io"
+#chef_blog_url      = "https://blog.chef.io/"
+#chef_docs_url      = "https://docs.chef.io"
+#chef_downloads_url = "https://downloads.chef.io"
+#learn_chef_url     = "https://learn.chef.io"
+#chef_training_url  = "https://www.chef.io/training"
+
+[fips]
+enabled      = false
+openssl      = 0
+omnibus_mode = ''
+
+[fieri]
+url                  = 'http://localhost:3000/fieri/jobs'
+supermarket_endpoint =  'http://localhost:3000'
+key                  = ''
+foodcritic_tags      = ''
+foodcritic_fail_tags = ''
+
+[db]
+host       = "localhost"
+name       = "supermarket"
+user       = "supermarket"
+password   = "supermarket"
+port       = 15432
+extensions = ['plpgsql', 'pg_trgm']
+
+[datadog]
+tracer_enabled = false
+app_name       = "rails_app"
+
+[github]
+key                  = ""
+secret               = ""
+option_site          = ""
+option_authorize_url = ""
+access_token_url     = ""
+enterprise_url       = ""
+access_token         = ""
+url                  = "https://github.com/"
+
+[oauth2]
+verify_ssl = false
+url        = ""
+app_id     = ""
+secret     = ""
+
+[redis]
+host     = 'localhost'
+port     = 16379
+database = '0/supermarket'
+jobq_url = ''
+
+[s3]
+access_key_id     = ""
+secret_access_key = ""
+region            = ""
+bucket_name       = ""
+cdn_url           = ""
+private_objects   = true
+path              = ""

@@ -663,7 +663,7 @@ var ProductMetadataJSON = `
       ],
       "type": "product",
       "services": [
-        "chef/automate-supermarket-nginx"
+        "chef/automate-supermarket-redis"
       ],
       "packages": null,
       "dependencies": [

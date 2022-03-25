@@ -51,6 +51,10 @@ automate-pg-gateway BINDING_MODE relaxed
 automate-postgresql BINDING_MODE strict
 automate-prometheus OPTIONAL applications-service automate-gateway
 automate-prometheus BINDING_MODE relaxed
+automate-supermarket OPTIONAL automate-postgresql automate-supermarket-redis
+automate-supermarket BINDING_MODE strict
+automate-supermarket-nginx REQUIRED rails
+automate-supermarket-nginx BINDING_MODE relaxed
 automate-ui BINDING_MODE strict
 automate-workflow-nginx REQUIRED automate-workflow-server
 automate-workflow-nginx BINDING_MODE strict
