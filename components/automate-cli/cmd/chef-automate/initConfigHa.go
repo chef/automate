@@ -35,6 +35,8 @@ type AwsConfigToml struct {
 			ExistingElkUsername         string `toml:"existing_elk_username"`
 			ExistingElkPassword         string `toml:"existing_elk_password"`
 			BackupMount                 string `toml:"backup_mount"`
+			BackupConfig                string `toml:"backup_config"`
+			S3BucketName                string `toml:"s3_bucketName"`
 			HabitatUIDGid               string `toml:"habitat_uid_gid"`
 		} `toml:"aws"`
 	} `toml:"architecture"`

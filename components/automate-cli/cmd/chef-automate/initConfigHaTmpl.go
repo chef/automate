@@ -16,8 +16,12 @@ ssh_user = "centos"
 ssh_key_file = "~/.ssh/A2HA.pem"
 # sudo_password = ""
 
+backup_config = ""
+s3_bucketName = "chef-automate-ha"
+
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
+
 
 [automate.config]
 # admin_password = ""
