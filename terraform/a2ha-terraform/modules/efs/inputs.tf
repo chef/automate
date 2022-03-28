@@ -66,4 +66,5 @@ variable "mount_id" {
 }
 
 variable "subnet_id" {
+  default = []
 }

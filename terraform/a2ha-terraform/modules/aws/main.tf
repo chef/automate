@@ -89,19 +89,19 @@ resource "aws_route_table_association" "publicsubnet" {
   route_table_id = aws_route_table.default.id
 }
 
-resource "aws_efs_file_system" "backups" {
-  creation_token = "${var.tag_name}_${random_id.random.hex}_efsfs"
-  encrypted = true
+# resource "aws_efs_file_system" "backups" {
+#   creation_token = "${var.tag_name}_${random_id.random.hex}_efsfs"
+#   encrypted = true
 
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efsfs"))
-}
+#   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efsfs"))
+# }
 
-resource "aws_efs_mount_target" "backups" {
-  count           = 3
-  file_system_id  = aws_efs_file_system.backups.id
-  subnet_id       = element(aws_subnet.default.*.id, count.index)
-  security_groups = [aws_security_group.efs_mount.id]
-}
+# resource "aws_efs_mount_target" "backups" {
+#   count           = 3
+#   file_system_id  = aws_efs_file_system.backups.id
+#   subnet_id       = element(aws_subnet.default.*.id, count.index)
+#   security_groups = [aws_security_group.efs_mount.id]
+# }
 
 locals {
   ami = length(var.aws_ami_id) > 0 ? var.aws_ami_id : data.aws_ami.image.id
