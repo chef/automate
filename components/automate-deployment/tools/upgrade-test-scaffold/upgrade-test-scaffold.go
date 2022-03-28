@@ -96,7 +96,7 @@ for the 'serve' command to work as expected.
 		Use:   "serve MANIFEST_FILE PID_FILE",
 		Short: "Start small HTTPS server to serve the given manifest.",
 		Run:   serve,
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 	}
 
 	rootCmd.AddCommand(setupCmd)
