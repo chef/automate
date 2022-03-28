@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -133,6 +134,10 @@ func writePidFile(pidFile string) error {
 func serve(cmd *cobra.Command, args []string) {
 	manifestPath := args[0]
 	pidFile := args[1]
+	var versionPath string
+	if len(args) >= 3 {
+		versionPath = args[2]
+	}
 	logrus.Info("======== DEEP UPGRADE SCAFFOLD =======")
 	logrus.Infof("Using manifest file %s", manifestPath)
 	logrus.Infof("Using pid file %s", pidFile)
@@ -186,8 +191,8 @@ func serve(cmd *cobra.Command, args []string) {
 
 	http.HandleFunc("/manifests/current/automate/latest.json", ServeLatestManifest(manifestPath, manifestMap))
 	http.HandleFunc("/manifests/dev/automate/latest.json", ServeLatestManifest(manifestPath, manifestMap))
-	http.HandleFunc("/manifests/current/automate/versions.json", ServeVersions(manifestMap))
-	http.HandleFunc("/manifests/dev/automate/versions.json", ServeVersions(manifestMap))
+	http.HandleFunc("/manifests/current/automate/versions.json", ServeVersions(versionPath, manifestMap))
+	http.HandleFunc("/manifests/dev/automate/versions.json", ServeVersions(versionPath, manifestMap))
 	http.HandleFunc("/manifests/automate/", ServeManifest("/manifests/automate/", manifestMap))
 
 	http.HandleFunc("/set/", func(w http.ResponseWriter, req *http.Request) {
@@ -387,18 +392,26 @@ func ServeManifest(prefix string, manifests map[string]string) func(w http.Respo
 	}
 }
 
-func ServeVersions(manifests map[string]string) func(w http.ResponseWriter, req *http.Request) {
+func ServeVersions(versionPath string, manifests map[string]string) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		logrus.Error("Print manifest values:")
 		versions := []string{}
+		b, err := ioutil.ReadFile(versionPath)
+		if err == nil {
+			err = json.Unmarshal(b, &versions)
+			if err != nil {
+				logrus.WithError(err).Error("could not read versions file", versionPath)
+			}
+		}
 		if len(manifests) > 0 {
 			for k := range manifests {
 				versions = append(versions, k)
-				logrus.Error(fmt.Sprintf("#%v", manifests))
+				logrus.Error(fmt.Sprintf("#%v", k))
 			}
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, err := io.WriteString(w, fmt.Sprint(versions))
+		versionByte, err := json.Marshal(versions)
+		_, err = io.WriteString(w, string(versionByte))
 		if err != nil {
 			logrus.WithError(err).Error("error copying manifest to client")
 		}
