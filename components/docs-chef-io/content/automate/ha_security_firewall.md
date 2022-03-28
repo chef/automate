@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Security and Firewall"
-    parent = "automate/deploy_high_availability/common_features"
-    identifier = "automate/deploy_high_availability/common_features/ha_security_firewall.md Security and Firewall"
-    weight = 240
+    parent = "automate/deploy_high_availability/ha_system_requirements"
+    identifier = "automate/deploy_high_availability/ha_system_requirements/ha_security_firewall.md Security and Firewall"
+    weight = 210
 +++
 
 Chef Automate High Availability (HA) cluster requires multiple ports for the frontend and backend servers to operate effectively and reduce possible network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
