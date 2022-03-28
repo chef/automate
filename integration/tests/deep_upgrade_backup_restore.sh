@@ -10,7 +10,6 @@ test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
 test_diagnostics_filters="~purge"
 
 CURRENT_OLDEST_VERSION=20190501153509
-HAB_FALLBACK_CHANNEL="current"
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
@@ -31,7 +30,7 @@ EOF
 do_deploy() {
     #shellcheck disable=SC2154
     cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
-    install_hab "0.54.0"
+    # install_hab "0.54.0"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
     $upgrade_scaffold_bin setup "$test_manifest_path"
     $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
