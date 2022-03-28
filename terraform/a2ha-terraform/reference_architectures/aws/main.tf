@@ -41,7 +41,7 @@ module "aws" {
   source                             = "./modules/aws"
   lb_access_logs                     = var.lb_access_logs
   tags                               = var.aws_tags
-  aws_instance_profile_name          = var.backup_config_s3 == "true" ? module.s3.instance_profile_name : false
+  aws_instance_profile_name          = var.backup_config_s3 == "true" ? module.s3[0].instance_profile_name : "false"
 }
 
 module "efs" {
@@ -65,6 +65,7 @@ module "efs" {
 
 module "s3" {
   source = "./modules/s3"
+  count = var.backup_config_s3 == "true" ? 1 : 0
   random_id = module.aws.random_id
   tags   = var.tag_name
 }
