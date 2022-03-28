@@ -396,7 +396,7 @@ func ServeVersions(versionPath string, manifests map[string]string) func(w http.
 	return func(w http.ResponseWriter, req *http.Request) {
 		logrus.Error("Print manifest values:")
 		versions := []string{}
-		b, err := ioutil.ReadFile(versionPath)
+		b, err := ioutil.ReadFile(versionPath) // nosemgrep
 		if err == nil {
 			err = json.Unmarshal(b, &versions)
 			if err != nil {
@@ -411,7 +411,7 @@ func ServeVersions(versionPath string, manifests map[string]string) func(w http.
 		}
 		w.Header().Set("Content-Type", "application/json")
 		versionByte, err := json.Marshal(versions)
-		_, err = io.WriteString(w, string(versionByte))
+		_, err = io.WriteString(w, string(versionByte)) // nosemgrep
 		if err != nil {
 			logrus.WithError(err).Error("error copying manifest to client")
 		}
