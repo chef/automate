@@ -32,9 +32,10 @@ pkg_exports=(
   [http-host]=network.host
   [http-port]=network.port
   [transport-port]=transport.port
-  [deprecated_external_es]=deprecated.external_es
+  [deprecated_external_os]=deprecated.external_os
   [deprecated_backup_location]=path.repo
   [disable]=disable
+  []
 )
 
 pkg_binds=(
