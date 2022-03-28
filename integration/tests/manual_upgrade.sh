@@ -28,6 +28,7 @@ EOF
 
 do_deploy() {
     set_test_manifest "current.json"
+    download_version "current" "$test_manifest_dir/current.json"
     set_test_versions "current.json-versions"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
     #shellcheck disable=SC2154
