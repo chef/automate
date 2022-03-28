@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "High Availability Components"
     parent = "automate/deploy_high_availability/introduction"
     identifier = "automate/deploy_high_availability/introduction/ha_components.md High Availability Components"
-    weight = 210
+    weight = 230
 +++
 
 This section lists the **Chef Automate High Availability (HA)** components and their purpose.
@@ -21,40 +21,27 @@ Provides commands such as `automate-cluster-ctl provision/deploy` which is insta
 
 ## Automate-ha-ctl
 
-Aids connect the backend (**postgres** and **elasticsearch**) databases using an automate configuration file and **Terraform** without any manual intervention.
+Aids connect the backend (**postgres** and **opensearch**) databases using an automate configuration file and **Terraform** without any manual intervention.
 
 ## Automate-ha-curator
 
-**Elasticsearch** curator aids in curating and managing the **Elasticsearch** indices and snapshots by obtaining the entire actionable list of indices (or snapshots) from the cluster. This component is the same as the default curator. It's written in a **hab** package to merge applications in a hab environment.
+**OpenSearch** curator aids in curating and managing the **OpenSearch** indices and snapshots by obtaining the entire actionable list of indices (or snapshots) from the cluster. This component is the same as the default curator. It's written in a **hab** package to merge applications in a hab environment.
 
 ## Automate-ha-deployment
 
 Aids in setting up a workspace for Chef Automate HA environment. For example, `/hab/a2_deploy_workspace`. It also includes **terraform** code, some necessary **scripts**, **inspecs**, **tests**, **Makefile** and so on.
 
-## Automate-ha-elasticsearch
+## Automate-ha-opensearch
 
-Includes the **elasticsearch** configuration and builds the **elasticsearch** package. It is installed in the backend nodes.
+Includes the **opensearch** configuration and builds the **opensearch** package. It is installed in the backend nodes.
 
 ## Automate-ha-elasticsidecar
 
-Provides a sidecar service for **automate-backend-elasticsearch** that reads user's credentials and passwords of the **elasticsearch** binding and applies it to **Elasticsearch** using the **odfe** tooling.
+Provides a sidecar service for **automate-backend-opensearch** that reads user's credentials and passwords of the **opensearch** binding and applies it to **OpenSearch** using the **odfe** tooling.
 
 ## Automate-ha-haproxy
 
 Aids in sending a request to the leader node and is placed on **postgres** cluster.
-
-## Automate-ha-kibana
-
-Aids in viewing logs at a central place. The **Kibana Dashboard** displays the **postgres** and **elasticsearch** nodes with system metrics such as RAM and CPU details, and services logs such as **pgleaderchk**, **curator**.
-
-## Automate-ha-journalbeat
-
-Aids in collecting **journalctl** logs like all the service logs. It is placed on all **postgres** and **elasticsearch** nodes. It collects and sends the log information to **elasticsearch**, and the **Kibana Dashboard** displays the respective log information.
-
-## Automate-ha-metricbeat
-
-This component is placed on all **postgres** and **elasticsearch** nodes. It collects all related metrics and sends them to
-**elasticsearch**. The **Kibana Dashboard** displays the respective log information.
 
 ## Automate-ha-pgleaderchk
 

@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 220
 +++
 
-The following Chef Automate HA Architecture diagram shows the Chef Automate HA components that work on the **Leader-Follower** strategy. This architecture includes the cluster of the _Chef Automate_, _Chef Server_, _Postgres_, and _Elasticsearch_.
+The following Chef Automate HA Architecture diagram shows the Chef Automate HA components that work on the **Leader-Follower** strategy. This architecture includes the cluster of the _Chef Automate_, _Chef Server_, _Postgres_, and _OpenSearch_.
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
 
@@ -26,7 +26,7 @@ The Chef Automate HA Architecture involves the following clusters part of the ma
 
 ### Backend Cluster and Nodes
 
-The backend components connect into the frontend Chef Habitat supervisor cluster. The **Postgres** and **Elasticsearch** instances run in the Chef Habitat supervisor. The **Postgres** and **Elasticsearch** databases require a minimum of three nodes, where one becomes a leader, and the other two are followers.
+The backend components connect into the frontend Chef Habitat supervisor cluster. The **Postgres** and **OpenSearch** instances run in the Chef Habitat supervisor. The **Postgres** and **OpenSearch** databases require a minimum of three nodes, where one becomes a leader, and the other two are followers.
 
 ### Frontend Cluster and Nodes
 
@@ -38,21 +38,17 @@ The backend and frontend clusters comprise **four** different servers with HA mo
 
 1. **Chef-automate**
 2. **Chef Infra Server**
-3. **Elasticsearch** is an open-source search and analytics engine based on Apache Lucene, built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and is used for indexing purposes.
+3. **OpenSearch** is an open-source search and analytics engine based on Apache Lucene, built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and is used for indexing purposes.
 4. **PostgreSQL** is an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
 
 <!-- ! -- These four components reside in a VPC under one network in AWS. Every node sits on a specific machine irrespective of a database. Single database for all three nodes of Chef Automate. -->
 
 **PostgreSQL** stores all application service, secret, recovery, and data. 
 
-**Elastic Search** stores compliance and client-run data and requires these data to be accessible in real-time. A Load balancer distributes to each of the Chef Automate components.
-
-**Journalbeat** and **Metricbeat** are common for all database instances. Journalbeat installed as an agent on the servers collects all the services logs and forwards them to Elasticsearch. Metricbeat installed on the servers periodically collects metrics from the operating system and services running on the server and sends them to the **Kibana**.
-
-**Kibana** is an open-source, web-based data visualization and analytical tool that allows you to explore, visualize, and build a dashboard over the log data massed in Elasticsearch clusters. Kibana is a part of the Elastic Stack and integrates with Elasticsearch. The **Kibana Dashboard** is a collection of charts, graphs, metrics, searches, and maps in a single pane and provides at-a-glance insights into data from different perspectives enabling you to drill down into the details.
+**Open Search** stores compliance and client-run data and requires these data to be accessible in real-time. A Load balancer distributes to each of the Chef Automate components.
 
 {{< note >}}
-Elastic Search internally manages the communication and backup and does not follow any leader-follower strategy.
+Open Search internally manages the communication and backup and does not follow any leader-follower strategy.
 {{< /note >}}
 
 ## Deployment Methods
@@ -73,7 +69,7 @@ It is a standard cloud service. Later, a series of configurations and installati
 - Installing Chef Automate into the Chef Automate instances.
 - Installing Chef Infra Server in all chef-server instances.
 - Installing and Configuring **PostgreSQL** into the **postres** instances.
-- Configuring and Installing **Elasticsearch** into **elasticsearch** instances.
+- Configuring and Installing **OpenSearch** into **opensearch** instances.
 - Installing a Chef Habitat and creating a supervisor network.
 
 ### On-premise Deployment (Existing Node/ Bare Infrastructure)
@@ -86,6 +82,6 @@ Bare Infrastructure deployments are installations of operating systems to target
 
 Some customers already have basic network infrastructure with VMs, networks, load balancers in their environment. This environment can be on-premises or in the cloud, and the respective organizations might not want to provide access to create items like VMs. In such cases, IPs of their instances are used to set up Chef Automate HA on their network premises.
 
-As an AWS setup, **Terraform** creates all components from scratch like EC2, Load Balancer. If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers wants to configure Chef Automate HA (**automate**, **chef-server**, **elasticsearch**, **postgresql**) in HA servers, then the customer should choose **Existing Node** reference architecture.
+As an AWS setup, **Terraform** creates all components from scratch like EC2, Load Balancer. If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers wants to configure Chef Automate HA (**automate**, **chef-server**, **opensearch**, **postgresql**) in HA servers, then the customer should choose **Existing Node** reference architecture.
 
 You can also execute the **Terraform** script for the bare infra deployment scenario. However, this script only handles installing and configuring components and does not create instances on the cloud providers.
