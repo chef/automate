@@ -306,6 +306,12 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 		return nil, err
 	}
 
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	logrus.Debugln("Is External PG enabled : ", enableExternalPg)
+
+	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+	logrus.Debugln("Is External ES enabled : ", enableExternalES)
+
 	for i, service := range expectedServices {
 		var convergeState converge.ServiceConvergeState
 		pkg := manifest.InstallableFromManifest(m, service.Name())
@@ -326,6 +332,25 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 				"hart":   hart.Path(),
 			}).Debug("Found hart override")
 		}
+
+		if service.Name() == constants.AutomatePGService {
+			if enableExternalPg {
+				service.DeploymentState = deployment.Removed
+			} else if service.DeploymentState == deployment.Removed {
+				service.DeploymentState = deployment.Running
+			}
+		}
+
+		if service.Name() == constants.AutomateSearchService {
+			if enableExternalES {
+				service.DeploymentState = deployment.Removed
+			} else if service.DeploymentState == deployment.Removed {
+				service.DeploymentState = deployment.Running
+			}
+		}
+
+		// logrus.Debugln("BUILD_DESIRED_STATE SERVICE_NAME ::: ", service.Name())
+		// logrus.Debugln("BUILD_DESIRED_STATE SERVICE_STATE ::: ", service.DeploymentState)
 
 		switch service.DeploymentState {
 		case deployment.Skip:
@@ -539,8 +564,10 @@ func (s *server) doDeploySome(serviceNames []string,
 	go func(serviceNames []string) {
 		defer sender.TaskComplete()
 		eDeploy.waitForConverge(task)
+
 		// NOTE(ssd) 2018-01-25: We don't use the timeout from
 		// the request because a deploy outlives the request
+
 		eDeploy.ensureStatus(context.Background(), serviceNames, s.ensureStatusTimeout)
 		if !usedBootstrapBundle {
 			eDeploy.maybeCreateInitialUser(serviceNames)
@@ -864,12 +891,17 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 	if s.err != nil {
 		return
 	}
+
 	e := s.sender
 
 	logctx := logrus.WithFields(logrus.Fields{
 		"mod":     "server.ensureStatus",
 		"timeout": timeout,
 	})
+
+	//To remove internal services from health check in case External ES or PG is enabled
+
+	serviceList = skipServicesForHealthCheck(serviceList, s, logctx)
 
 	var status *api.ServiceStatus
 	e.Phase(api.Running, events.CheckingServiceHealth)
@@ -907,6 +939,30 @@ func (s *errDeployer) ensureStatus(ctx context.Context, serviceList []string, ti
 	e.PhaseStep(api.CompleteOk, events.CheckingServiceHealth, "all services healthy", "")
 	e.Phase(api.CompleteOk, events.CheckingServiceHealth)
 	logctx.Debug("all services healthy")
+}
+
+func skipServicesForHealthCheck(serviceList []string, s *errDeployer, logctx *logrus.Entry) []string {
+	servicesToSkip := make(map[string]bool)
+
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	if enableExternalPg {
+		logctx.Debug("External PG is enabled.")
+		servicesToSkip[constants.AutomatePGService] = true
+	}
+	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+
+	if enableExternalEs {
+		logctx.Debug("External ES is enabled.")
+		servicesToSkip[constants.AutomateSearchService] = true
+	}
+
+	for i, v := range serviceList {
+		if _, ok := servicesToSkip[v]; ok {
+			logctx.Debug("Removed service " + v + " from Health Check")
+			serviceList = append(serviceList[:i], serviceList[i+1:]...)
+		}
+	}
+	return serviceList
 }
 
 func (s *server) Ping(context.Context, *api.PingRequest) (*api.PingResponse, error) {
@@ -1369,7 +1425,7 @@ func (s *server) doConverge(
 			if err != nil {
 				errHandler(err)
 			}
-			err = ci.CreatePostChecklistFile()
+			err = ci.CreatePostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 			if err != nil {
 				errHandler(err)
 			}
@@ -1940,12 +1996,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 			return nil, status.Errorf(codes.InvalidArgument, "Failed to get post checklist manager: %s", err)
 		}
 
-		ReadPendingPostChecklist, err = pcm.ReadPendingPostChecklistFile()
-		if err != nil {
-			logrus.Info("Failed to read pending post checklist:", err)
-			return nil, nil
-		}
-
+		ReadPendingPostChecklist, _ = pcm.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
 	}
 
 	if len(ReadPendingPostChecklist) == 0 {

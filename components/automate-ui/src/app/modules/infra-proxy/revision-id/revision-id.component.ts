@@ -20,6 +20,7 @@ import {
   getAllStatus as getAllRevisionsForOrgStatus
 } from 'app/entities/revisions/revision.selectors';
 import { Revision } from 'app/entities/revisions/revision.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-revision-id',
@@ -40,7 +41,8 @@ export class RevisionIdComponent implements OnDestroy {
   @HostBinding('class.active') isSlideOpen = false;
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnDestroy(): void {
@@ -60,6 +62,7 @@ export class RevisionIdComponent implements OnDestroy {
     this.policyfileName = policyfile;
     this.isSlideOpen = true;
     this.loadRevisions(this.policyfileName);
+    this.telemetryService.track('InfraServer_PolicyFiles_Revisions');
   }
 
   private loadRevisions(policyfileName): void {
