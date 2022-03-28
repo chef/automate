@@ -16,6 +16,8 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 
 ## Bare Infra Deployment
 
+![On-Premises Deployment Workflow](/images/automate/ha_bare_infra_deploy.png)
+
 1. Set the software and hardware requirements.
 1. Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the **Chef Automate** , **Chef Server** , **Postgres** , and **Elasticsearch** nodes.
 1. Obtain Bastion host server details from your system administrator.
@@ -52,6 +54,8 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 
 ## AWS Deployment
 
+![AWS Deployment Workflow](/images/automate/ha_aws_deploy.png)
+
 1. Set the software and hardware requirements.
 1. Access or obtain an AWS account.
 
@@ -70,9 +74,9 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
    1. Modify **VPC** and **subnet** values as required.
    1. Specify 100 GB of storage in the **Size** (GiB) field.
    1. Create a new security group or Select an existing security group option. Ensure Type is SSH, Protocol is TCP, and Port Range is 22 to create rules and connections.
-   1. Launch the EC2 instance.
+   1. Launch the **EC2 instance**.
 
-1. Ensure you have Chef Automate utility installed, else download and install the latest version.
+1. Ensure you have Chef Automate utility installed. Else download and install the latest version.
 1. Establish an AWS connection with the bastion host.
     1. SSH your instance using public DNS.
 
@@ -92,11 +96,11 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
       - aws\_secret\_access\_key=secret access key of the IAM user.
 
 1. Create the certificate for the Chef Automate and Chef Server load balancers.
-1. Login as a root in the Bastion host.
+1. Log in as a root in the Bastion host.
 1. Execute the command, _`./chef-automate init-config-ha aws_, which generates **config.toml** file with default settings and installs latest deployment package.
 1. Execute the command, _./chef-automate provision-infra config.toml_, which downloads Habitat, creates deployment workspace (_/hab/a2\_deploy\_workspace_), and provisions the infrastructure on AWS.
 
 1. Specify the following edits in the **config.toml** file:
    1. SSH pair name, key file path, chef automate nodes, number of PostgreSQL nodes, number of Chef Server, and ElasticSearch nodes.
-   1. Attach the DNS certificate ARN to Chef Server load balancer certificate ARN (_automate\_lb\_certificate\_arn_) and Chef Automate load balancer certificate ARN (_chef\_server\_lb\_certificate\_arn_).
-1. Deploy and provision the chef automate HA.
+   1. Attach the DNS certificate ARN to Chef Server load balancer certificate ARN (_automate\_lb\_certificate\_arn_)and Chef Automate load balancer certificate ARN (_chef\_server\_lb\_certificate\_arn_).
+1. Deploy and provision the Chef Automate HA.

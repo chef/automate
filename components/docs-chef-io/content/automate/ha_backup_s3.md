@@ -138,3 +138,5 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 1. SSH into the automate instance by typing the command, `sudo automate-cluster-ctl ssh automate`.
 
 1. Execute command, `./chef-automate backup create`, from the Chef Automate front-end node. The backup gets created.
+
+{{< figure src="/images/automate/ha_s3_backup.png" alt="S3 Backup">}}
