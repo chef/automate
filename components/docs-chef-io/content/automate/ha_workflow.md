@@ -42,7 +42,7 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 1. Ensure you have _Chef Automate_ utility installed, else download and install the latest version.
 1. Execute the command, _./chef-automate init-config-ha existing\_infra_, that generates **config.toml** file.
 1. In the **config.toml** file, specify the list of VM's public IP addresses for the cluster.
-1. Execute the command, **./chef-automate deploy config.toml** , that creates deployment workspace (\*/hab/a2\_deploy\_workspace\*), downloads Habitat, and establishes the cluster provisioning in your workspace.
+1. Execute the command, **./chef-automate deploy config.toml**, that creates deployment workspace (\*/hab/a2\_deploy\_workspace\*), downloads Habitat, and establishes the cluster provisioning in your workspace.
 1. Specify the following edits in the **config.toml** file:
 
    1. SSH pair name, key file path, chef automate nodes, number of PostgreSQL nodes, number of Chef Server, and ElasticSearch nodes.
@@ -98,5 +98,5 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 
 1. Specify the following edits in the **config.toml** file:
    1. SSH pair name, key file path, chef automate nodes, number of PostgreSQL nodes, number of Chef Server, and ElasticSearch nodes.
-   1. Attach the DNS certificate ARN to Chef Server load balancer certificate ARN (_automate\_lb\_certificate\_arn_)and Chef Automate load balancer certificate ARN (_chef\_server\_lb\_certificate\_arn_).
+   1. Attach the DNS certificate ARN to Chef Server load balancer certificate ARN (_automate\_lb\_certificate\_arn_) and Chef Automate load balancer certificate ARN (_chef\_server\_lb\_certificate\_arn_).
 1. Deploy and provision the chef automate HA.
