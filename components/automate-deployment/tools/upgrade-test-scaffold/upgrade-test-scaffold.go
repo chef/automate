@@ -93,10 +93,10 @@ for the 'serve' command to work as expected.
 	}
 
 	serveCmd := &cobra.Command{
-		Use:   "serve MANIFEST_FILE PID_FILE",
+		Use:   "serve MANIFEST_FILE PID_FILE [VERSION_FILE_PATH]",
 		Short: "Start small HTTPS server to serve the given manifest.",
 		Run:   serve,
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.RangeArgs(2, 3),
 	}
 
 	rootCmd.AddCommand(setupCmd)
@@ -411,6 +411,9 @@ func ServeVersions(versionPath string, manifests map[string]string) func(w http.
 		}
 		w.Header().Set("Content-Type", "application/json")
 		versionByte, err := json.Marshal(versions)
+		if err != nil {
+			logrus.WithError(err).Error("error marshaling versions")
+		}
 		_, err = io.WriteString(w, string(versionByte)) // nosemgrep
 		if err != nil {
 			logrus.WithError(err).Error("error copying manifest to client")
