@@ -5,3 +5,9 @@ variable "aws_s3_bucketName" {
 variable "name" {
   default = "chef-automate-ha"  
 }
+
+variable "random_id" {
+}
+
+variable "tags" {
+}

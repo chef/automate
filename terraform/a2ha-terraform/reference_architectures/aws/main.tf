@@ -45,7 +45,7 @@ module "aws" {
 
 module "efs" {
   source = "./modules/efs"
-#  count = var.bucket_config_efs == "true" ? 1 : 0
+  count = var.bucket_config_efs == "true" ? 1 : 0
   automate_private_ips      = module.aws.automate_private_ips
   chef_server_private_ips   = module.aws.chef_server_private_ips
   postgresql_private_ips    = module.aws.postgresql_private_ips
@@ -62,12 +62,12 @@ module "efs" {
   depends_on = [module.aws]
 }
 
-# module "s3" {
-#   source = "./modules/s3"
-#   count = var.bucket_config_s3 == "true" ? 1 : 0
-#   random_id = module.aws.random_id
-
-# }
+module "s3" {
+  source = "./modules/s3"
+  count = var.bucket_config_s3 == "true" ? 1 : 0
+  random_id = module.aws.random_id
+  tags   = var.tag_name
+}
 
 module "aws-output" {
   source                    = "./modules/aws_output"

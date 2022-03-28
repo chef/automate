@@ -6,7 +6,7 @@ resource "aws_iam_instance_profile" "backup_instance_profile" {
 resource "aws_iam_role" "backup_instance_role" {
   name               = var.name
   assume_role_policy = data.aws_iam_policy_document.backup_instance_role.json
-  tags               = local.default_tags
+  tags               = var.tags
 }
 
 data "aws_iam_policy_document" "backup_instance_role" {
