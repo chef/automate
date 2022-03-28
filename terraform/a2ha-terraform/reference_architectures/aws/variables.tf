@@ -167,3 +167,15 @@ variable "sudo_cmd" {
 variable "tag_name" {
   default = "A2"
 }
+
+variable "bucket_config_efs" {
+  default = "false" 
+}
+
+variable "bucket_config_s3" {
+  default = "false" 
+}
+
+variable "aws_instance_profile_name" {
+  default = ""
+}

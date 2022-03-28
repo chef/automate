@@ -180,3 +180,7 @@ variable "tags" {
 variable "tmp_path" {
   default = "/var/tmp"
 }
+
+variable "aws_instance_profile_name" {
+  default = ""
+}

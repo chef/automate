@@ -59,7 +59,7 @@ variable "nfs_mount_path" {
 }
 
 variable "tmp_path" {
-  default = "/var/automate-ha"
+  default = "/var/tmp"
 }
 
 variable "mount_id" {
