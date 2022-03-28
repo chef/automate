@@ -10,6 +10,7 @@ test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
 test_diagnostics_filters="~purge"
 
 CURRENT_OLDEST_VERSION=20190501153509
+HAB_FALLBACK_CHANNEL="current"
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
