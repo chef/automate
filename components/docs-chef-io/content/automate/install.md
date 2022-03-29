@@ -79,7 +79,7 @@ See ["Configure Data Collection"]({{< relref "data_collection.md" >}}) for more 
 
 ## Upgrades
 
-By default, Chef Automate will automatically upgrade to the latest version available. These updates can be taken safely, as we've committed to ensuring the stability of the upgrade process - automatic updates will never introduce breaking changes.
+By default, Chef Automate will automatically upgrade to the latest version available. You can also choose to implement manual upgrades covererd below.
 
 ### Release Channels
 
