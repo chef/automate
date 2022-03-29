@@ -95,7 +95,8 @@
       "type": "base",
       "services": [
         "chef/automate-opensearch",
-        "chef/automate-es-gateway"
+        "chef/automate-es-gateway",
+        "chef/es-sidecar-service"
       ]
     },
     {
