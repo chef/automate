@@ -262,7 +262,7 @@ func InstallChefAutomate(manifestPath string) error {
 
 	logrus.Infof("Downloading temporary habitat binary (%s)", habpkg.Ident(&habPkg))
 	dl := airgap.NewNetHabDownloader()
-	err = dl.DownloadHabBinary(habPkg.Version(), habPkg.Release(), tmpHabBin)
+	err = dl.DownloadHabBinary("1.6.181", "20201030172917", tmpHabBin)
 	if err != nil {
 		return errors.Wrap(err, "downloading temporary hab")
 	}
