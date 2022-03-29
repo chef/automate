@@ -46,7 +46,7 @@ module "aws" {
 
 module "efs" {
   source                    = "./modules/efs"
-  count                     = var.bucket_config_efs == "true" ? 1 : 0
+  count                     = var.backup_config_efs == "true" ? 1 : 0
   automate_private_ips      = module.aws.automate_private_ips
   chef_server_private_ips   = module.aws.chef_server_private_ips
   postgresql_private_ips    = module.aws.postgresql_private_ips

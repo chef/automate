@@ -1,36 +1,3 @@
-data "aws_elb_service_account" "main" {}
-
-# resource "aws_s3_bucket" "elb_logs" {
-#   bucket = "a2ha-elb-bucket"
-#   force_destroy = true
-# }
-
-# resource "aws_s3_bucket_acl" "elb_bucket_acl" {
-#   bucket = aws_s3_bucket.elb_logs.id
-#   acl    = "private"
-# }
-
-# resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
-#   bucket = aws_s3_bucket.elb_logs.id
-
-#   policy = <<EOF
-# {
-#   "Id": "Policy1446577137248",
-#   "Statement": [
-#     {
-#       "Action": "s3:PutObject",
-#       "Effect": "Allow",
-#       "Principal": {
-#         "AWS": "${data.aws_elb_service_account.main.arn}"
-#       },
-#       "Resource": "arn:aws:s3:::a2ha-elb-bucket/AWSLogs/*",
-#       "Sid": "Stmt1446575236270"
-#     }
-#   ],
-#   "Version": "2012-10-17"
-# }
-# EOF
-# }
 
 /////////////////////////
 // Automate Load Balancing
@@ -41,10 +8,6 @@ resource "aws_alb" "automate_lb" {
   security_groups    = [aws_security_group.load_balancer.id]
   subnets            = aws_subnet.public.*.id
   tags               = var.tags
-  # access_logs {
-  #   bucket           = aws_s3_bucket.elb_logs.bucket
-  #   enabled          = var.lb_access_logs
-  # }
 }
 
 resource "aws_alb_target_group" "automate_tg" {

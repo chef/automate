@@ -61,11 +61,11 @@ variable "aws_tags" {
 variable "aws_vpc_id" {
 }
 
-variable "bucket_config_efs" {
+variable "backup_config_efs" {
   default = "false"
 }
 
-variable "bucket_config_s3" {
+variable "backup_config_s3" {
   default = "false"
 }
 
