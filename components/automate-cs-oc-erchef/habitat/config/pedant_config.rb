@@ -196,5 +196,3 @@ ssl_client_cert OpenSSL::X509::Certificate.new(File.read(File.join("{{pkg.svc_co
 ssl_client_key OpenSSL::PKey::RSA.new(File.read(File.join("{{pkg.svc_config_path}}", "service.key")))
 ssl_ca_file File.join("{{pkg.svc_config_path}}", "root_ca.crt")
 
-include_version_in_status false
-
