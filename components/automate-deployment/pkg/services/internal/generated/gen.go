@@ -29,16 +29,6 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-elasticsearch",
-      "metadata": {
-        "name": "chef/automate-elasticsearch",
-        "data_service": true,
-        "binlinks": null,
-        "uses_platform_scaffolding": false,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "chef/automate-opensearch",
       "metadata": {
         "name": "chef/automate-opensearch",
@@ -545,25 +535,13 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
-      "name": "elasticsearch",
-      "aliases": null,
-      "type": "base",
-      "services": [
-        "chef/automate-elasticsearch",
-        "chef/automate-es-gateway",
-        "chef/es-sidecar-service"
-      ],
-      "packages": null,
-      "dependencies": null,
-      "hidden": false
-    },
-    {
       "name": "opensearch",
       "aliases": null,
       "type": "base",
       "services": [
         "chef/automate-opensearch",
-        "chef/automate-es-gateway"
+        "chef/automate-es-gateway",
+        "chef/es-sidecar-service"
       ],
       "packages": null,
       "dependencies": null,
@@ -641,7 +619,7 @@ var ProductMetadataJSON = `
       "dependencies": [
         "core",
         "postgresql",
-        "elasticsearch",
+        "opensearch",
         "cereal",
         "auth",
         "ui"
@@ -680,7 +658,7 @@ var ProductMetadataJSON = `
       "dependencies": [
         "core",
         "postgresql",
-        "elasticsearch"
+        "opensearch"
       ],
       "hidden": false
     },

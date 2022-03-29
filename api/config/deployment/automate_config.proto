@@ -18,7 +18,6 @@ import "config/shared/global.proto";
 import "config/cs_nginx/config_request.proto";
 import "config/deployment/config_request.proto";
 import "config/dex/config_request.proto";
-import "config/elasticsearch/config_request.proto";
 import "config/opensearch/config_request.proto";
 import "config/esgateway/config_request.proto";
 import "config/es_sidecar/config_request.proto";
@@ -62,7 +61,6 @@ message AutomateConfig {
 	chef.automate.domain.cfgmgmt.ConfigRequest config_mgmt = 6;
 	chef.automate.domain.deployment.ConfigRequest deployment = 3;
 	chef.automate.domain.dex.ConfigRequest dex = 4;
-	chef.automate.infra.elasticsearch.ConfigRequest elasticsearch = 7;
 	chef.automate.infra.esgateway.ConfigRequest esgateway = 31;
 	chef.automate.infra.es_sidecar.ConfigRequest es_sidecar = 11;
 	chef.automate.api.config.ConfigRequest gateway = 5;
