@@ -3,7 +3,6 @@
     "chef/backup-gateway",
     "chef/automate-postgresql",
     "chef/automate-pg-gateway",
-    "chef/automate-elasticsearch",
     "chef/automate-es-gateway",
     "chef/automate-minio",
     "chef/automate-ui",
@@ -88,15 +87,6 @@
       ]
     },
     {
-      "name": "elasticsearch",
-      "type": "base",
-      "services": [
-        "chef/automate-elasticsearch",
-        "chef/automate-es-gateway",
-        "chef/es-sidecar-service"
-      ]
-    },
-    {
       "name": "opensearch",
       "type": "base",
       "services": [
@@ -141,7 +131,7 @@
       "dependencies": [
         "core",
         "postgresql",
-        "elasticsearch",
+        "opensearch",
         "cereal",
         "auth",
         "ui"
@@ -177,7 +167,7 @@
       "name": "chef-server",
       "type": "product",
       "aliases": ["chef-infra-server", "infra-server"],
-      "dependencies": ["core", "postgresql", "elasticsearch"],
+      "dependencies": ["core", "postgresql", "opensearch"],
       "services": [
         "chef/automate-cs-bookshelf",
         "chef/automate-cs-oc-bifrost",
