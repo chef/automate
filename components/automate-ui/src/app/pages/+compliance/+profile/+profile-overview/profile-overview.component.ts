@@ -23,6 +23,7 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import { find } from 'lodash';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
 import { HttpStatus } from 'app/types/types';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 interface Profile {
     name: String;
@@ -89,7 +90,8 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     private uploadService: UploadService,
     private chefSessionService: ChefSessionService,
     private layoutFacade: LayoutFacadeService,
-    private productDeployedService: ProductDeployedService
+    private productDeployedService: ProductDeployedService,
+    private telemetryService: TelemetryService
   ) {
     this.isAvailableProfilesVisible = !this.productDeployedService.isProductDeployed('desktop');
   }
@@ -119,6 +121,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     };
     this.filteredProfiles = this.installedProfiles.filter(filter);
     this.filteredAvailableProfiles = this.availableProfiles.filter(filter);
+    this.telemetryService.track('Compliance_Profiles_Search', { searchText });
   }
 
   // load the user's profiles
