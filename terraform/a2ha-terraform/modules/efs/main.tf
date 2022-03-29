@@ -2,7 +2,6 @@ resource "aws_efs_file_system" "backups" {
   creation_token = "${var.tag_name}_${var.random_id}_efsfs"
   encrypted      = true
 
-#  tags = merge(var.tags, map("Name", "${var.tag_name}_${var.random_id}_efsfs"))
 }
 
 resource "aws_efs_mount_target" "backups" {

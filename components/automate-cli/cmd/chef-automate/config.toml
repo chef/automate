@@ -22,7 +22,7 @@ ssh_key_file = "~/.ssh/A2HA.pem"
 # existing_elk_password ""
 backup_mount = "/mnt/automate_backups"
 backup_config = ""
-s3_bucketName = ""
+# s3_bucketName = ""
 
 [automate.config]
 # admin_password = ""

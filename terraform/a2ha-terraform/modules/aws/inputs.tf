@@ -44,6 +44,10 @@ variable "aws_ami_id" {
 variable "aws_cidr_block_addr" {
 }
 
+variable "aws_instance_profile_name" {
+  default = ""
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -179,8 +183,4 @@ variable "tags" {
 
 variable "tmp_path" {
   default = "/var/tmp"
-}
-
-variable "aws_instance_profile_name" {
-  default = ""
 }

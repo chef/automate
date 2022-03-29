@@ -15,9 +15,10 @@ ssh_user = "centos"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
 # sudo_password = ""
-
+# Backup config type can be efs and s3
 backup_config = ""
-s3_bucketName = "chef-automate-ha"
+# If s3 is selected for backup_config ,then uncomment and give s3_bucketName or else default chef-automate-ha.<deployment-string> will go
+# s3_bucketName = "chef-automate-ha"
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"

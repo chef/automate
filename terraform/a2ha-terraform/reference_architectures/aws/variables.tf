@@ -38,6 +38,10 @@ variable "aws_ami_id" {
 variable "aws_cidr_block_addr" {
 }
 
+variable "aws_instance_profile_name" {
+  default = ""
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -55,6 +59,14 @@ variable "aws_tags" {
 }
 
 variable "aws_vpc_id" {
+}
+
+variable "bucket_config_efs" {
+  default = "false"
+}
+
+variable "bucket_config_s3" {
+  default = "false"
 }
 
 variable "chef_ebs_volume_iops" {
@@ -166,16 +178,4 @@ variable "sudo_cmd" {
 
 variable "tag_name" {
   default = "A2"
-}
-
-variable "bucket_config_efs" {
-  default = "false" 
-}
-
-variable "bucket_config_s3" {
-  default = "false" 
-}
-
-variable "aws_instance_profile_name" {
-  default = ""
 }

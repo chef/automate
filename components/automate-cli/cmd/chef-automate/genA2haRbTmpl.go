@@ -17,8 +17,6 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
-backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
-s3_bucketName "{{ .Aws.Config.S3BucketName }}"
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
@@ -76,6 +74,8 @@ workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
+backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
+{{ if  .Architecture.ConfigInitials.S3BucketName }} s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ else }} # s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ end }}
 {{ if .Architecture.ConfigInitials.SudoPassword }} sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ else }} # sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ end }}
 # logging_monitoring_management "true"
 # new_elk "false"
