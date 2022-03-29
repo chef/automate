@@ -28,14 +28,10 @@ EOF
 
 do_deploy() {
     set_test_manifest "current.json"
-    #shellcheck disable=SC2154
-    download_version "current" "$test_manifest_dir/current.json"
-    set_test_versions "current.json-versions"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
     #shellcheck disable=SC2154
     $upgrade_scaffold_bin setup "$test_manifest_path"
-    #shellcheck disable=SC2154
-    $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" "$test_versions_path" &
+    $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
     sleep 5
     export CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION=true
     export GODEBUG=x509ignoreCN=0
