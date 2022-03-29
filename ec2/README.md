@@ -6,12 +6,6 @@ Once the requirements are fulfilled, it takes around 5 minutes to have your a2 b
 
 # Requirements:
 
-## Install Vagrant
-If you are on a mac, you can use homebrew:
-```
-brew install vagrant
-```
-
 ## Install the most recent AWS vagrant plugin
 ```
 vagrant plugin install vagrant-aws
@@ -22,53 +16,9 @@ vagrant plugin install vagrant-aws
 vagrant box add aws https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
 ```
 
-~~## Install okta_aws in order to login to AWS via Okta~~
+## Install okta_aws in order to login to AWS via Okta
 
-~~https://github.com/chef/okta_aws~~
-
-Note: Access to Chef's AWS accounts via Okta is now deprecated. Instead use Progress Azure AD and SAML.
-
-## Install awscli and saml2aws to login to AWS
-If you are on a mac, you can use homebrew:
-```
-brew install awscli
-brew install saml2aws
-```
-
-## Configure saml2aws
-Run saml2aws configure with the following options:
-```
-saml2aws configure \
-     --idp-provider='AzureAD' \
-     --mfa='Auto' \
-     --url='https://account.activedirectory.windowsazure.com' \
-     --username='USERNAME@progress.com' \
-     --app-id='60978246-ce55-4e43-bdd1-f08b130d52bd' \
-     --skip-prompt
-```
-
-## Use saml2aws to obtain temporary credentials
-Login to AWS using saml2aws with chef-engineering as profile name:
-```
-$ saml2aws login --profile chef-engineering
-
-Using IdP Account default to access AzureAD https://account.activedirectory.windowsazure.com
-To use saved password just hit enter.
-? Username USERNAME@progress.com
-? Password ***************
-
-Authenticating as USERNAME@progress.com ...
-? Enter verification code 620226
-? Please choose the role Account: chef-engineering (112758395563) / ProgressAzureAD_Administrators
-Selected role: arn:aws:iam::112758395563:role/ProgressAzureAD_Administrators
-Requesting AWS credentials using SAML assertion.
-Logged in as: arn:aws:sts::112758395563:assumed-role/ProgressAzureAD_Administrators/USERNAME@progress.com
-
-Your new access key pair has been stored in the AWS configuration.
-Note that it will expire at 2022-03-21 13:23:00 +0530 IST
-To use this credential, call the AWS CLI with the --profile option (e.g. aws --profile chef-engineering ec2 describe-instances).
-```
-Note: Credential is valid for only 1 hour. To refresh the token, you have to relogin via `saml2aws`. You can check credential in `~/.aws/credentials` file.
+https://github.com/chef/okta_aws
 
 ## Variables
 
@@ -77,7 +27,6 @@ Note: Credential is valid for only 1 hour. To refresh the token, you have to rel
 1. `GITHUB_TOKEN` env variable with private repo read access to `chef` org repos
 
 2. `AWS_SSH_KEY_NAME` needs to be set to the name of your SSH key added to the [EC2 Key Pairs](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#KeyPairs:sort=keyName). This is not used outside of this Vagrantfile so is often passed as an env parameter (see below).
-3. `AWS_SSH_KEY_PATH` needs to be set to the path to your SSH key added to the `EC2 Key Pairs`.
 
 ### Optional ENV variables
 
@@ -105,11 +54,8 @@ Pick previous build timestamps from the three supported channels from here:
 
 Add to the ssh agent the private key that is allowed to clone the `a2` github repo:
 ```
-ssh-add -K PATH_TO_PRIVATE_KEY
+ssh-add
 ```
-
-## Add vaild Automate JWT license
-Provide a valid Automate JWT license as content in ENV variable `AUTOMATE_LICENSE` or save it in this file: `../dev/license.jwt`.
 
 # Launch the A2 instance
 
@@ -199,3 +145,4 @@ curl "http://127.0.0.1:9222/_cat/indices?v&pretty&s=index"
 In order to avoid waste, instances launched with this Vagrantfile will automatically stop after running for more than 2 days. If you want to increase or decrease this number based on your circumstance, you can set the STOP_HOURS variable same way AWS_SSH_KEY_NAME is set above. Default value for STOP_HOURS is 48.
 
 A stopped instance can be started back up or terminated from AWS EC2 instances page.
+...
