@@ -1,7 +1,7 @@
 # WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 #
 # If you are modifying this file, you almost surely also want to
-# modify pkg/es/config_request.go. The DefaultConfigRequest() function
+# modify pkg/os/config_request.go. The DefaultConfigRequest() function
 # sets all of the real defaults.
 #
 # The duplication is necessary currently since our tests and studio
@@ -229,30 +229,9 @@
 [runtime]
   max_open_files = ""
   max_locked_memory = "unlimited"
-  es_startup_sleep_time = ""
-  es_java_opts = ""
+  os_startup_sleep_time = ""
+  os_java_opts = ""
   heapsize = "1g"
 
 [deprecated]
-external_es = false
-
-# plugins.security.ssl.transport.pemcert_filepath: node.pem
-# plugins.security.ssl.transport.pemkey_filepath: node-key.pem
-# plugins.security.ssl.transport.pemtrustedcas_filepath: root-ca.pem
-# plugins.security.ssl.transport.enforce_hostname_verification: false
-# plugins.security.ssl.http.enabled: false
-# plugins.security.ssl.http.pemcert_filepath: node.pem
-# plugins.security.ssl.http.pemkey_filepath: node-key.pem
-# plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
-# plugins.security.allow_default_init_securityindex: true
-# plugins.security.authcz.admin_dn:
-#   - CN=A,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA
-# plugins.security.nodes_dn:
-#   - 'CN=N,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA'
-# plugins.security.audit.type: internal_opensearch
-# plugins.security.enable_snapshot_restore_privilege: true
-# plugins.security.check_snapshot_restore_write_privileges: true
-# plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
-# cluster.routing.allocation.disk.threshold_enabled: false
-# opendistro_security.audit.config.disabled_rest_categories: NONE
-# opendistro_security.audit.config.disabled_transport_categories: NONE
+external_os = false
