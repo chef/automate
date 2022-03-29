@@ -2,6 +2,11 @@
   <chef-loading-spinner class="spinner" *ngIf="usersListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="users" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
+  <app-reset-user-key
+        [openEvent]="openNotificationModal"
+        [serverId]="serverId"
+        [orgId]="orgId"
+        [name]="name"></app-reset-user-key>
   <ng-container *ngIf="!usersListLoading && !authFailure">
     <div class="wrapper">
       <div class="search-create-container">
@@ -27,7 +32,7 @@
             <chef-td>{{user.email_id}}</chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
-                <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey()">Reset User Key</mat-option>
+                <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey(user.infra_server_username)">Reset User Key</mat-option>
               </mat-select>
             </chef-td>
           </chef-tr>
