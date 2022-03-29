@@ -193,10 +193,3 @@ download_manifest() {
 
     curl "https://packages.chef.io/manifests/$channel/automate/latest.json" > "$dst"
 }
-
-download_version() {
-    local channel="$1"
-    local dst="$2"
-
-    curl "https://packages.chef.io/manifests/$channel/automate/versions.json" > "$dst-versions"
-}
