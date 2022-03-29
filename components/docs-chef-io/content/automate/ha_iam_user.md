@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "IAM Users"
-    parent = "automate/deploy_high_availability/aws_deployment"
-    identifier = "automate/deploy_high_availability/aws_deployment/ha_iam_user.md IAM Users"
-    weight = 250
+    parent = "automate/deploy_high_availability/reference"
+    identifier = "automate/deploy_high_availability/reference/ha_iam_user.md IAM Users"
+    weight = 230
 +++
 
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You can use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
