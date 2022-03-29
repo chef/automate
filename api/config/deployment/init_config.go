@@ -21,7 +21,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	es "github.com/chef/automate/api/config/elasticsearch"
 	license_control "github.com/chef/automate/api/config/license_control"
 	oss "github.com/chef/automate/api/config/opensearch"
 	global "github.com/chef/automate/api/config/shared"
@@ -222,10 +221,10 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 	})
 
 	cfg.OverrideConfigValues(&AutomateConfig{ // nolint: errcheck
-		Elasticsearch: &es.ConfigRequest{
-			V1: &es.ConfigRequest_V1{
-				Sys: &es.ConfigRequest_V1_System{
-					Runtime: &es.ConfigRequest_V1_Runtime{
+		Opensearch: &oss.ConfigRequest{
+			V1: &oss.ConfigRequest_V1{
+				Sys: &oss.ConfigRequest_V1_System{
+					Runtime: &oss.ConfigRequest_V1_Runtime{
 						Heapsize: w.String(c.ESHeapSize),
 					},
 				},
@@ -278,7 +277,7 @@ func esHeapSize() string {
 	if err != nil {
 		sysMem = 0
 	}
-	return fmt.Sprintf("%dg", es.RecommendedHeapSizeGB(sysMem))
+	return fmt.Sprintf("%dg", oss.RecommendedHeapSizeGB(sysMem))
 }
 
 func osHeapSize() string {
