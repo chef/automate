@@ -14,7 +14,7 @@ pkg_svc_group="root"
 pkg_svc_run="nginx -c $pkg_svc_config_path/nginx.conf"
 
 pkg_binds=(
-  [rails]="port http-port https-port force-ssl fqdn fqdn-sanitized"
+  [automate-supermarket]="port http-port https-port force-ssl fqdn fqdn-sanitized"
 )
 
 pkg_svc_user="root"

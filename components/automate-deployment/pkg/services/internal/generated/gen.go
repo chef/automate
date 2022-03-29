@@ -663,7 +663,8 @@ var ProductMetadataJSON = `
       ],
       "type": "product",
       "services": [
-        "chef/automate-supermarket-redis"
+        "chef/automate-supermarket-redis",
+        "chef/automate-supermarket"
       ],
       "packages": null,
       "dependencies": [

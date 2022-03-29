@@ -186,7 +186,8 @@
       "aliases": ["supermarket"],
       "dependencies": ["core","postgresql"],
       "services": [
-        "chef/automate-supermarket-redis"
+        "chef/automate-supermarket-redis",
+        "chef/automate-supermarket"
       ]
     },
     {

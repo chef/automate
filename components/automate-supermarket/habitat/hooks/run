@@ -1,6 +1,8 @@
-#!{{ pkgPathFor "core/bash" }}/bin/bash
 
-set -e
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+supermarket_path=$(hab pkg path chef/supermarket)
 
 HOME="{{ pkg.svc_data_path }}"
 export HOME
@@ -17,7 +19,7 @@ fi
 
 chown -R "{{ cfg.app.user }}":"{{ cfg.app.group }}" {{ pkg.svc_path }}
 
-cd {{ pkg.path }}/app
+cd $supermarket_path/app
 
 exec chpst \
     -U {{ cfg.app.user }}:{{ cfg.app.group }} \
