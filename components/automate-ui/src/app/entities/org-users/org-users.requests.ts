@@ -9,16 +9,17 @@ export class OrgUserRequests {
 
   constructor(private http: HttpClient) { }
 
+  //  get all org users
   public OrgUserRequests(server_id: string, org_id: string)
   : Observable<UsersSuccessPayload> {
     const url = `${env.infra_proxy_url}/servers/${server_id}/org/${org_id}/users`;
     return this.http.get<UsersSuccessPayload>(url);
   }
 
+  // Reset user key request
   public resetUserKeyRequests(server_id: string, org_id: string, name: string)
   : Observable<ResetKeySuccessPayload> {
     const url = `${env.infra_proxy_url}/servers/${server_id}/org/${org_id}/users/${name}`;
     return this.http.get<ResetKeySuccessPayload>(url);
   }
-  
 }
