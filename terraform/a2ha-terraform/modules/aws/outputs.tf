@@ -70,5 +70,5 @@ output "tag_name" {
 }
 
 output "tags" {
-   value = var.tags  
+  value = var.tags
 }
