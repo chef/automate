@@ -70,6 +70,7 @@ test_with_s3=false
 # and before the upgrade. You should not normally need to change this
 # variable.
 declare -r test_manifest_path="local_manifest.json"
+declare -r test_versions_path="local_versions.json"
 #
 # test_manifest_dir is the directory where we save all manifests
 # to. You should not normally need to change this variable.
@@ -90,6 +91,11 @@ declare -r test_tmp_hartifacts_path="tmp_results/"
 set_test_manifest() {
     local target_manifest_name=$1
     cp "$test_manifest_dir/$target_manifest_name" "$test_manifest_path"
+}
+
+set_test_versions() {
+    local target_versions_name=$1
+    cp "$test_manifest_dir/$target_versions_name" "$test_versions_path"
 }
 
 do_setup() {
