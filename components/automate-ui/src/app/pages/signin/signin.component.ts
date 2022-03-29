@@ -43,7 +43,6 @@ export class SigninComponent implements OnInit {
 
       this.error = false;
       this.setSession();
-      localStorage.setItem('manual-upgrade-banner', 'true');
       this.deleteIdTokenFromCookie(this.idToken);
       this.router.navigateByUrl(this.path);
     });
