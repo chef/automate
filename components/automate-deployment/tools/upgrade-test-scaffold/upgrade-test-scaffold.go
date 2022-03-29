@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -93,10 +92,10 @@ for the 'serve' command to work as expected.
 	}
 
 	serveCmd := &cobra.Command{
-		Use:   "serve MANIFEST_FILE PID_FILE [VERSION_FILE_PATH]",
+		Use:   "serve MANIFEST_FILE PID_FILE",
 		Short: "Start small HTTPS server to serve the given manifest.",
 		Run:   serve,
-		Args:  cobra.RangeArgs(2, 3),
+		Args:  cobra.ExactArgs(2),
 	}
 
 	rootCmd.AddCommand(setupCmd)
@@ -134,10 +133,6 @@ func writePidFile(pidFile string) error {
 func serve(cmd *cobra.Command, args []string) {
 	manifestPath := args[0]
 	pidFile := args[1]
-	var versionPath string
-	if len(args) >= 3 {
-		versionPath = args[2]
-	}
 	logrus.Info("======== DEEP UPGRADE SCAFFOLD =======")
 	logrus.Infof("Using manifest file %s", manifestPath)
 	logrus.Infof("Using pid file %s", pidFile)
@@ -191,8 +186,6 @@ func serve(cmd *cobra.Command, args []string) {
 
 	http.HandleFunc("/manifests/current/automate/latest.json", ServeLatestManifest(manifestPath, manifestMap))
 	http.HandleFunc("/manifests/dev/automate/latest.json", ServeLatestManifest(manifestPath, manifestMap))
-	http.HandleFunc("/manifests/current/automate/versions.json", ServeVersions(versionPath, manifestMap))
-	http.HandleFunc("/manifests/dev/automate/versions.json", ServeVersions(versionPath, manifestMap))
 	http.HandleFunc("/manifests/automate/", ServeManifest("/manifests/automate/", manifestMap))
 
 	http.HandleFunc("/set/", func(w http.ResponseWriter, req *http.Request) {
@@ -389,34 +382,5 @@ func ServeManifest(prefix string, manifests map[string]string) func(w http.Respo
 			return
 		}
 		http.NotFound(w, req)
-	}
-}
-
-func ServeVersions(versionPath string, manifests map[string]string) func(w http.ResponseWriter, req *http.Request) {
-	return func(w http.ResponseWriter, req *http.Request) {
-		logrus.Error("Print manifest values:")
-		versions := []string{}
-		b, err := ioutil.ReadFile(versionPath) // nosemgrep
-		if err == nil {
-			err = json.Unmarshal(b, &versions)
-			if err != nil {
-				logrus.WithError(err).Error("could not read versions file", versionPath)
-			}
-		}
-		if len(manifests) > 0 {
-			for k := range manifests {
-				versions = append(versions, k)
-				logrus.Error(fmt.Sprintf("#%v", k))
-			}
-		}
-		w.Header().Set("Content-Type", "application/json")
-		versionByte, err := json.Marshal(versions)
-		if err != nil {
-			logrus.WithError(err).Error("error marshaling versions")
-		}
-		_, err = io.WriteString(w, string(versionByte)) // nosemgrep
-		if err != nil {
-			logrus.WithError(err).Error("error copying manifest to client")
-		}
 	}
 }
