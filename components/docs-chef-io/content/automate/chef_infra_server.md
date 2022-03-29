@@ -83,22 +83,6 @@ Chef Automate warns you if you enter an invalid name, FQDN, IP address or WebUI:
 
 Once done, select **Add Chef Server** and see the server in the list of Chef Infra Servers.
 
-## Connect a Chef Organization to a Chef Infra Server
-
-To view a list of existing [organizations]({{< relref "server_orgs" >}}) on a Chef Infra Server,
-select a Chef Infra Server from the **Chef Servers** list, then select the **Organizations** tab, as shown below:
-
-{{< figure src="/images/automate/chef-server-organization.png" alt="Chef Infra Server Organization">}}
-
-To create a new organization, see the documentation on [setting up a Chef Infra Server]({{< relref "infra_server#set-up-the-chef-infra-server" >}}).
-
-To add an existing organization, select **Add Chef Organization**, which opens a dialog box as shown below:
-
-{{< figure src="/images/automate/add-chef-organization-popup-menu.png" width="500" alt="Add Chef Organization Form">}}
-
-Enter the _Name_, _Projects_, _Admin User_, and _Admin Key_ fields using the same values provided when the organization gets configured using _Knife_.
-Copy the contents of the `~/.chef/USER.pem` file and paste it into the **Admin Key** field. Then select **Add Chef Organization** to add the organization to the Chef Infra Server.
-
 ## Access Chef Infra Server Components
 
 Manage the following Chef Infra Server components for an organization using Chef Automate:
