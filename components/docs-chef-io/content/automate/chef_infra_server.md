@@ -36,15 +36,48 @@ The objects that you can manage from the Chef Infra Server are:
 - Policyfiles
 - PolicyGroup
 
+## Chef Automate WebUI Key
+
+Chef Automate uses the Web UI private key for signing requests sent to the Chef Infra Server. The key is subject to Chef server’s Secrets Management, and will be stored in `/etc/opscode/private-chef-secrets.json`. 
+
+The following example shows how the settings look when added to the configuration file:
+
+```
+chef_documentation_url ''
+disable_sign_up false
+events.port 11001
+logging.chef_log_level 'info'
+logging.log_level 'info'
+nginx_addon_prefix 30
+platform.user 'pivotal'
+public_port 443
+redis.host 'localhost'
+redis.port 11002
+# redis.url derived from redis.host and redis.port
+runit_timeout 30
+services['opscode-manage-events'].enable true
+services['opscode-manage-webapp'].enable true
+services['opscode-manage-worker'].enable true
+support_email_address 'support@chef.io'
+support_site_url 'http://chef.io/support'
+support_tickets_url 'https://chef.io/support/tickets'
+webapp.backlog 1024
+# webapp.listen derived from webapp.port
+webapp.port 9462
+webapp.tcp_nodelay true
+webapp.worker_processes 2
+webapp.worker_timeout 3600
+```
+
 ## Connect Chef Infra Servers to Chef Automate
 
 The _Chef Infra Server_ panel starts with an empty list of servers.
 
-To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server**, which will request the name, FQDN, and IP address of your Chef Infra Server:
+To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server**, which will request the name, FQDN or IP address, and WebUI of your Chef Infra Server:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu.png" width="500" alt="Add Chef Server Form">}}
 
-Chef Automate warns you if you enter an invalid FQDN or IP address:
+Chef Automate warns you if you enter an invalid name, FQDN, IP address or WebUI:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu-with-error.png" width="500" alt="Add Chef Server Form">}}
 
