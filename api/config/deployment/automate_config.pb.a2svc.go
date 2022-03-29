@@ -20,7 +20,6 @@ import (
 	csnginx "github.com/chef/automate/api/config/cs_nginx"
 	datafeed "github.com/chef/automate/api/config/data_feed"
 	dex "github.com/chef/automate/api/config/dex"
-	elasticsearch "github.com/chef/automate/api/config/elasticsearch"
 	erchef "github.com/chef/automate/api/config/erchef"
 	essidecar "github.com/chef/automate/api/config/es_sidecar"
 	esgateway "github.com/chef/automate/api/config/esgateway"
@@ -72,7 +71,6 @@ func NewAutomateConfig() *AutomateConfig {
 		DataFeedService:  datafeed.NewConfigRequest(),
 		Deployment:       NewConfigRequest(),
 		Dex:              dex.NewConfigRequest(),
-		Elasticsearch:    elasticsearch.NewConfigRequest(),
 		Erchef:           erchef.NewConfigRequest(),
 		EsSidecar:        essidecar.NewConfigRequest(),
 		Esgateway:        esgateway.NewConfigRequest(),
@@ -125,7 +123,6 @@ func DefaultAutomateConfig() *AutomateConfig {
 		DataFeedService:  datafeed.DefaultConfigRequest(),
 		Deployment:       DefaultConfigRequest(),
 		Dex:              dex.DefaultConfigRequest(),
-		Elasticsearch:    elasticsearch.DefaultConfigRequest(),
 		Erchef:           erchef.DefaultConfigRequest(),
 		EsSidecar:        essidecar.DefaultConfigRequest(),
 		Esgateway:        esgateway.DefaultConfigRequest(),
@@ -165,7 +162,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate(), c.Opensearch.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate(), c.Opensearch.Validate())
 	if err == nil {
 		return nil
 	}
@@ -186,7 +183,6 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.ConfigMgmt.SetGlobalConfig(c.Global)
 	c.Deployment.SetGlobalConfig(c.Global)
 	c.Dex.SetGlobalConfig(c.Global)
-	c.Elasticsearch.SetGlobalConfig(c.Global)
 	c.Esgateway.SetGlobalConfig(c.Global)
 	c.EsSidecar.SetGlobalConfig(c.Global)
 	c.Gateway.SetGlobalConfig(c.Global)
@@ -243,8 +239,6 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.Deployment, true
 	case "automate-dex":
 		return c.Dex, true
-	case "automate-elasticsearch":
-		return c.Elasticsearch, true
 	case "automate-es-gateway":
 		return c.Esgateway, true
 	case "es-sidecar-service":
