@@ -1411,7 +1411,14 @@ func (s *server) doConverge(
 		defer os.Setenv(isUpgradeMajorEnv, "false")
 
 		eDeploy.waitForConverge(task)
+		// TODO: We need some way to know that the hab supervisor has called
+		// the right hooks on each service before we check the status. Otherwise,
+		// we can run into cases where we check the status of the services
+		// before hab has applied all changes.
+		eDeploy.ensureStatus(context.Background(), s.deployment.NotSkippedServiceNames(), s.ensureStatusTimeout)
 
+		errHandler(eDeploy.err)
+		// json file
 		if os.Getenv(isUpgradeMajorEnv) == "true" {
 			var err error
 			ci, err := majorupgradechecklist.NewPostChecklistManager(s.deployment.CurrentReleaseManifest.Version())
@@ -1423,13 +1430,6 @@ func (s *server) doConverge(
 				errHandler(err)
 			}
 		}
-		// TODO: We need some way to know that the hab supervisor has called
-		// the right hooks on each service before we check the status. Otherwise,
-		// we can run into cases where we check the status of the services
-		// before hab has applied all changes.
-		eDeploy.ensureStatus(context.Background(), s.deployment.NotSkippedServiceNames(), s.ensureStatusTimeout)
-
-		errHandler(eDeploy.err)
 	}()
 
 	return task, nil
