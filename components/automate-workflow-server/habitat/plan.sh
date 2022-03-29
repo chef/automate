@@ -73,7 +73,6 @@ do_unpack() {
 }
 
 do_prepare() {
-  git config --global url."https://github.com/".insteadOf git://github.com/
   build_line "Setting ERL_FLAGS=-smp enable"
   export ERL_FLAGS="-smp enable"
 
@@ -100,7 +99,6 @@ do_prepare() {
 
 
 do_build() {
-  git config --global url."https://github.com/".insteadOf git://github.com/
   make --directory="$CACHE_PATH" distclean lean_rel with_patches
 }
 
@@ -111,7 +109,6 @@ do_install() {
   # exist in that path. Creating broken symlinks signals that these files
   # should exist at these locations. The working links are created in the init
   # hook.
-  git config --global url."https://github.com/".insteadOf git://github.com/
   rm "$pkg_prefix/delivery/releases/0.0.1/sys.config" \
     "$pkg_prefix/delivery/releases/0.0.1/vm.args"
   ln -sf "$pkg_svc_config_path/sys.config" "$pkg_prefix/delivery/releases/0.0.1/"
