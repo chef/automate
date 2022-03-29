@@ -1,2 +1,0 @@
-journalbeat_max_age = 7
-metricbeat_max_age = 7
