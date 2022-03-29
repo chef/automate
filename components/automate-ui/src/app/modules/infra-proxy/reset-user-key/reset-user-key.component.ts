@@ -50,7 +50,7 @@ export class ResetUserKeyComponent implements OnInit, OnDestroy {
         this.error = '';
         this.privateKey = '';
       });
-    
+
       combineLatest([
         this.store.select(resetStatus),
         this.store.select(resetUserKey),
