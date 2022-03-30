@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Deployment"
     parent = "automate/deploy_high_availability/minimal_node_ha_deployment"
     identifier = "automate/deploy_high_availability/minimal_node_ha_deployment/ha_deployment.md Deployment"
-    weight = 200
+    weight = 220
 +++
 
 TO BE ADDED
