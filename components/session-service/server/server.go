@@ -206,7 +206,7 @@ func (s *Server) initHandlers() {
 	r := mux.NewRouter()
 
 	//Middleware intercepter for HSTS
-	r.Use(httputils.AddHSTSHeader)
+	r.Use(httputils.HSTSMiddleware)
 
 	r.HandleFunc("/health", s.healthHandler).Methods("GET")
 	r.HandleFunc("/new", s.newHandler).Methods("GET")
