@@ -131,7 +131,7 @@ steps:
           pre-command:
             - .expeditor/export_semgrep_token.sh
       - docker#v3.7.0:
-          image: returntocorp/semgrep-agent:v1
+          image: returntocorp/semgrep-agent:sha-f3a1732
           propagate-environment: true
           workdir: /go/src/github.com/chef/automate
           environment:
