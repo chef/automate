@@ -77,7 +77,7 @@ aws s3 cp "$VERSION.json.asc" "s3://chef-automate-artifacts/manifests/automate/$
 aws s3 cp "$VERSION.json.sha256sum" "s3://chef-automate-artifacts/manifests/automate/$VERSION.json.sha256sum" --acl public-read --profile chef-cd
 
 # Upload the manifests to the appropriate place
-verson_array=(latest ${MAJOR_VERSION})
+version_array=(latest ${MAJOR_VERSION})
 for destination in "${version_array[@]}"
   do
     aws s3 cp "$VERSION.json" "s3://chef-automate-artifacts/dev/${destination}/automate/manifest_semver.json" --acl public-read --profile chef-cd
