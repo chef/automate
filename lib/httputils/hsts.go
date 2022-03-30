@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type HSTSHandler struct {
+type HSTS struct {
 	next http.Handler
 	// MaxAge sets the duration that the HSTS is valid for.
 	MaxAge time.Duration
@@ -52,8 +52,8 @@ func createHeaderValue(maxAge time.Duration, sendPreloadDirective bool) string {
 	return builder.String()
 }
 
-func Handler(next http.Handler) *HSTSHandler {
-	return &HSTSHandler{
+func HSTSHandler(next http.Handler) *HSTS {
+	return &HSTS{
 		next:                        next,
 		MaxAge:                      time.Hour * 24 * 730, //2 years; ie. 730 days; ie. 63072000 seconds
 		AcceptXForwardedProtoHeader: true,
@@ -62,7 +62,7 @@ func Handler(next http.Handler) *HSTSHandler {
 }
 
 //Add HSTS response header for https calls and redirect if call is over http
-func (h *HSTSHandler) AddHSTSHeaderAndRedirect(w http.ResponseWriter, r *http.Request) {
+func (h *HSTS) AddHSTSHeaderAndRedirect(w http.ResponseWriter, r *http.Request) {
 	if isHTTPS(r, h.AcceptXForwardedProtoHeader) {
 		w.Header().Add("Strict-Transport-Security", createHeaderValue(h.MaxAge, h.SendPreloadDirective))
 
@@ -81,17 +81,17 @@ func (h *HSTSHandler) AddHSTSHeaderAndRedirect(w http.ResponseWriter, r *http.Re
 }
 
 //Only add HSTS response header for https calls and doesn't redirect if call is over http
-func (h *HSTSHandler) AddHSTSHeader(w http.ResponseWriter, r *http.Request) {
+func (h *HSTS) AddHSTSHeader(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Strict-Transport-Security", createHeaderValue(h.MaxAge, h.SendPreloadDirective))
 	h.next.ServeHTTP(w, r)
 }
 
-func (h *HSTSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *HSTS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.AddHSTSHeader(w, r)
 }
 
 //HSTS middleware
 func HSTSMiddleware(next http.Handler) http.Handler {
-	h := Handler(next)
+	h := HSTSHandler(next)
 	return http.HandlerFunc(h.ServeHTTP)
 }
