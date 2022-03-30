@@ -55,7 +55,7 @@ func createHeaderValue(maxAge time.Duration, sendPreloadDirective bool) string {
 func Handler(next http.Handler) *HSTSHandler {
 	return &HSTSHandler{
 		next:                        next,
-		MaxAge:                      time.Hour * 24 * 365, //2 years; ie. 730 days; ie. 63072000 seconds
+		MaxAge:                      time.Hour * 24 * 730, //2 years; ie. 730 days; ie. 63072000 seconds
 		AcceptXForwardedProtoHeader: true,
 		SendPreloadDirective:        false,
 	}
