@@ -47,7 +47,7 @@ func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverI
 			log.Errorf("Unable to create project for serverid: %s", serverID)
 			return err, actionTaken
 		}
-		_, err = st.StoreOrg(ctx, org.Name, org.FullName, "", "", serverID, projects)
+		_, err = st.StoreOrg(ctx, org.Name, org.Name, "", "", serverID, projects)
 		if err != nil {
 			log.Errorf("Unable to insert org for server id: %s", serverID)
 		}
@@ -56,7 +56,7 @@ func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverI
 		_, err = st.DeleteOrg(ctx, org.Name, serverID)
 		actionTaken = pipeline.Delete
 	case pipeline.Update:
-		_, err = st.EditOrg(ctx, org.Name, org.FullName, "", serverID, nil)
+		_, err = st.EditOrg(ctx, org.Name, org.Name, "", serverID, nil)
 		actionTaken = pipeline.Update
 	default:
 	}
