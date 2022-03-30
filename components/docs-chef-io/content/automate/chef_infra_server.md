@@ -1,7 +1,6 @@
 +++
 title = "Chef Infra Server"
 
-weight = 20
 draft = false
 
 gh_repo = "automate"
@@ -42,7 +41,7 @@ Chef Automate uses the Web UI private key for signing requests sent to the Chef 
 
 The following example shows how the settings look when added to the configuration file:
 
-```
+```json
 chef_documentation_url ''
 disable_sign_up false
 events.port 11001
