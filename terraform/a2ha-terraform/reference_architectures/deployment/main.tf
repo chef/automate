@@ -293,6 +293,10 @@ module "bootstrap_automate" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
+  backup_config_s3                = var.backup_config_s3
+  backup_config_efs               = var.backup_config_efs
+  s3_endpoint                     = var.s3_endpoint
+  bucket_name                       = var.bucket_name
 }
 
 module "automate" {
@@ -328,6 +332,10 @@ module "automate" {
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
+  backup_config_s3       = var.backup_config_s3
+  backup_config_efs      = var.backup_config_efs
+  s3_endpoint            = var.s3_endpoint
+  bucket_name            = var.bucket_name
 }
 
 module "chef_server" {
@@ -359,4 +367,8 @@ module "chef_server" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
+  backup_config_s3                = var.backup_config_s3
+  backup_config_efs               = var.backup_config_efs
+  s3_endpoint                     = var.s3_endpoint
+  bucket_name                       = var.bucket_name
 }
