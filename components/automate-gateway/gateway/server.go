@@ -29,6 +29,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -479,7 +480,7 @@ func (s *Server) startHTTPServer() error {
 	uri := fmt.Sprintf("%s:%d", s.Config.Hostname, s.Config.Port)
 	s.httpServer = &http.Server{
 		Addr:    uri,
-		Handler: mux,
+		Handler: httputils.Handler(mux),
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{*s.serviceKeyPair},
 			NextProtos:   []string{"h2"},
