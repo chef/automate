@@ -480,7 +480,7 @@ func (s *Server) startHTTPServer() error {
 	uri := fmt.Sprintf("%s:%d", s.Config.Hostname, s.Config.Port)
 	s.httpServer = &http.Server{
 		Addr:    uri,
-		Handler: httputils.Handler(mux),
+		Handler: httputils.HSTSHandler(mux),
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{*s.serviceKeyPair},
 			NextProtos:   []string{"h2"},
