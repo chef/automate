@@ -173,6 +173,7 @@ resource "aws_instance" "chef_automate" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
+  iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
     delete_on_termination = true
@@ -203,6 +204,7 @@ resource "aws_instance" "chef_server" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
+  iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
     delete_on_termination = true
