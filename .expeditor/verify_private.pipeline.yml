@@ -32,21 +32,21 @@ steps:
 
   # license scout requires github account access because we currently
   # rely on at least 2 private repositories.
-  - label: license scout
-    command:
-      # here we reuse the license_scout.sh script used by expeditor to publish the manifest
-      - .expeditor/license_scout.sh
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        GITHUB_TOKEN:
-          account: github/chef
-          field: token
-      executor:
-        docker:
+  # - label: license scout
+  #   command:
+  #     # here we reuse the license_scout.sh script used by expeditor to publish the manifest
+  #     - .expeditor/license_scout.sh
+  #   timeout_in_minutes: 20
+  #   retry:
+  #     automatic:
+  #       limit: 1
+  #   expeditor:
+  #     secrets:
+  #       GITHUB_TOKEN:
+  #         account: github/chef
+  #         field: token
+  #     executor:
+  #       docker:
 
   # We need to build in order to run the
   # integration tests.
@@ -119,24 +119,24 @@ steps:
             "/go/src/github.com/chef/automate"
           ]
 
-  - label: ":semgrep: Security"
-    command:
-      - .expeditor/buildkite/semgrep.sh
-    timeout_in_minutes: 15
-    expeditor:
-      secrets: true
-    plugins:
-      # Temporary workaround per @tduffield; do not propagate this solution too much!
-      - chef/step-hook#v0.1.1:
-          pre-command:
-            - .expeditor/export_semgrep_token.sh
-      - docker#v3.7.0:
-          image: returntocorp/semgrep-agent:v1
-          propagate-environment: true
-          workdir: /go/src/github.com/chef/automate
-          environment:
-            - SEMGREP_TOKEN
-            - SEMGREP_ID
+  # - label: ":semgrep: Security"
+  #   command:
+  #     - .expeditor/buildkite/semgrep.sh
+  #   timeout_in_minutes: 15
+  #   expeditor:
+  #     secrets: true
+  #   plugins:
+  #     # Temporary workaround per @tduffield; do not propagate this solution too much!
+  #     - chef/step-hook#v0.1.1:
+  #         pre-command:
+  #           - .expeditor/export_semgrep_token.sh
+  #     - docker#v3.7.0:
+  #         image: returntocorp/semgrep-agent:v1
+  #         propagate-environment: true
+  #         workdir: /go/src/github.com/chef/automate
+  #         environment:
+  #           - SEMGREP_TOKEN
+  #           - SEMGREP_ID
 
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets
