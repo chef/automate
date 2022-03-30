@@ -15,6 +15,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/lib/platform/sys"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
@@ -27,8 +28,9 @@ var migrateDataCmdFlags = struct {
 }{}
 
 var ClearDataCmdFlags = struct {
-	data       string
-	autoAccept bool
+	data         string
+	autoAccept   bool
+	forceExecute bool
 }{}
 
 var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220120092917/bin"
@@ -72,6 +74,7 @@ func newClearDataCmd() *cobra.Command {
 	}
 	clearDataCmd.PersistentFlags().StringVar(&ClearDataCmdFlags.data, "data", "", "data")
 	clearDataCmd.PersistentFlags().BoolVarP(&ClearDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
+	clearDataCmd.Flags().BoolVarP(&ClearDataCmdFlags.forceExecute, "force", "f", false, "fore-execute")
 	return clearDataCmd
 }
 
@@ -103,8 +106,35 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 		if ClearDataCmdFlags.data == "" {
 			return errors.New("data flag is required")
 		} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
-			writer.Title("Deleting file created by pg_upgrade")
-			cleanUp()
+			ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+			if err != nil {
+				return err
+			}
+
+			isExecuted, err := ci.ReadPostChecklistById("clean_up", majorupgradechecklist.UPGRADE_METADATA)
+			if err != nil {
+				return err
+			}
+
+			if isExecuted {
+				if ClearDataCmdFlags.forceExecute {
+					isExecuted = false
+				} else {
+					err := promptCheckList(
+						"Cleanup is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
+					)
+					if err != nil {
+						return err
+					} else {
+						isExecuted = false
+					}
+				}
+			}
+
+			if !isExecuted {
+				writer.Title("Deleting file created by pg_upgrade")
+				cleanUp()
+			}
 		} else {
 			return errors.New("please provide valid input for data flag")
 		}
@@ -128,7 +158,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		isExecuted, err := ci.ReadPostChecklistById("migrate_pg")
+		isExecuted, err := ci.ReadPostChecklistById("migrate_pg", majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}
@@ -298,6 +328,11 @@ func cleanUp() error {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	} else {
+		ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+		if err != nil {
+			return err
+		}
+		ci.UpdatePostChecklistFile("clean_up", majorupgradechecklist.UPGRADE_METADATA)
 		writer.Title("successfully deleted files")
 	}
 	return nil
@@ -407,45 +442,53 @@ func executePgdata13ShellScript() error {
 }
 
 func checkUpdateMigration(check bool) error {
-	writer.Title(
-		"----------------------------------------------\n" +
-			"migration from: 9.6 to: 13 \n" +
-			"----------------------------------------------",
-	)
-
-	os.Unsetenv("PGHOST")
-
-	writer.Title("Checking for pg_upgrade")
-
-	args := []string{
-		"--old-datadir=" + OLD_PG_DATA_DIR,
-		"--new-datadir=" + NEW_PG_DATA_DIR,
-		"--old-bindir=" + OLD_BIN_DIR,
-		"--new-bindir=" + NEW_BIN_DIR,
-		"--check",
-		"-U",
-		PGUSER,
-	}
-
-	if !check {
-		strSlice := removeIndex(args, 4)
-		args = strSlice
-	}
-	err := executeAutomateCommandAsync(
-		NEW_BIN_DIR+"/pg_upgrade",
-		args,
-		"",
-		AUTOMATE_PG_MIGRATE_LOG_DIR+"/"+"pgmigrate.log")
+	isAvailableSpace, err := calDiskSizeAndDirSize()
 
 	if err != nil {
 		return err
 	}
-	if !check && err == nil {
-		ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+
+	if isAvailableSpace {
+		writer.Title(
+			"----------------------------------------------\n" +
+				"migration from: 9.6 to: 13 \n" +
+				"----------------------------------------------",
+		)
+
+		os.Unsetenv("PGHOST")
+
+		writer.Title("Checking for pg_upgrade")
+
+		args := []string{
+			"--old-datadir=" + OLD_PG_DATA_DIR,
+			"--new-datadir=" + NEW_PG_DATA_DIR,
+			"--old-bindir=" + OLD_BIN_DIR,
+			"--new-bindir=" + NEW_BIN_DIR,
+			"--check",
+			"-U",
+			PGUSER,
+		}
+
+		if !check {
+			strSlice := removeIndex(args, 4)
+			args = strSlice
+		}
+		err := executeAutomateCommandAsync(
+			NEW_BIN_DIR+"/pg_upgrade",
+			args,
+			"",
+			AUTOMATE_PG_MIGRATE_LOG_DIR+"/"+"pgmigrate.log")
+
 		if err != nil {
 			return err
 		}
-		ci.UpdatePostChecklistFile("migrate_pg")
+		if !check && err == nil {
+			ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+			if err != nil {
+				return err
+			}
+			ci.UpdatePostChecklistFile("migrate_pg", majorupgradechecklist.UPGRADE_METADATA)
+		}
 	}
 	return nil
 }
@@ -569,4 +612,28 @@ func pgVersion(path string) (string, error) {
 
 	getOldPgVersion := string(bytes.Trim(data, ""))
 	return getOldPgVersion, nil
+}
+
+func calDiskSizeAndDirSize() (bool, error) {
+	v, err := sys.SpaceAvailForPath("/hab/svc/automate-postgresql/data")
+	if err != nil {
+		return false, err
+	}
+	diskSpaceInMb := v / 1024
+	fmt.Println(diskSpaceInMb)
+
+	size, err := sys.DirSize("/hab/svc/automate-postgresql/data/pgdata")
+	if err != nil {
+		return false, err
+	}
+
+	dirSizeInMb := size / (1024 * 1024)
+
+	if diskSpaceInMb > uint64(dirSizeInMb) {
+		fmt.Println("disk space is greater than pgdata directory size")
+		return true, nil
+	} else {
+		fmt.Println("disk space is less than pgdata directory size")
+		return false, errors.New("Insufficient disk space")
+	}
 }
