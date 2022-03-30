@@ -100,17 +100,17 @@ func insertOrUpdateOrg(orgsInFiles []os.FileInfo, orgsInDB []storage.Org, orgPat
 			orgInfo, valuePresent := orgDatabaseMap[org.Name()]
 			orgJson = openOrgFolder(org, orgPath)
 			if valuePresent {
-				if orgJson.FullName != orgInfo {
+				if orgJson.Name != orgInfo {
 					//Update org in the result actions
-					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, pipeline.Update))
+					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.Name, pipeline.Update))
 				} else {
 					//Skip org action if full names are not equal
-					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, pipeline.Skip))
+					orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.Name, pipeline.Skip))
 
 				}
 			} else {
 				//Insert org action if not present in database
-				orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.FullName, pipeline.Insert))
+				orgList = append(orgList, createOrgStructForAction(orgJson.Name, orgJson.Name, pipeline.Insert))
 			}
 		}
 	}
