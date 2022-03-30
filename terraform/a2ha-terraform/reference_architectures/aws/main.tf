@@ -41,7 +41,7 @@ module "aws" {
   source                             = "./modules/aws"
   lb_access_logs                     = var.lb_access_logs
   tags                               = var.aws_tags
-  aws_instance_profile_name          = var.backup_config_s3 == "true" ? module.s3[0].instance_profile_name : "false"
+  aws_instance_profile_name          = var.backup_config_s3 == "true" ? module.s3[0].instance_profile_name : null
 }
 
 module "efs" {
