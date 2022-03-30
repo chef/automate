@@ -20,7 +20,6 @@ import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { UpdateNode } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { Utilities } from 'app/helpers/utilities/utilities';
 import { AvailableType } from '../infra-roles/infra-roles.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-edit-infra-node-modal',
@@ -58,8 +57,7 @@ export class EditInfraNodeModalComponent implements OnInit, OnDestroy, OnChanges
   private isDestroyed = new Subject<boolean>();
 
   constructor(
-    private store: Store<NgrxStateAtom>,
-    private telemetryService: TelemetryService
+    private store: Store<NgrxStateAtom>
   ) {
 
   }
@@ -164,7 +162,6 @@ export class EditInfraNodeModalComponent implements OnInit, OnDestroy, OnChanges
     }
 
     this.updatingData(node);
-    this.telemetryService.track('InfraServer_Nodes_EditRunList');
   }
 
   private resetEditModal(): void {

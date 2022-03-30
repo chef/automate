@@ -12,7 +12,6 @@ import {
   UpdateNodeTags
 } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { EntityStatus } from 'app/entities/entities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-update-node-tag-modal',
@@ -37,8 +36,7 @@ export class UpdateNodeTagModalComponent implements OnInit, OnDestroy {
   public updatingTags = false;
 
   constructor(
-    private store: Store<NgrxStateAtom>,
-    private telemetryService: TelemetryService
+    private store: Store<NgrxStateAtom>
   ) {  }
 
   ngOnInit(): void {
@@ -93,7 +91,6 @@ export class UpdateNodeTagModalComponent implements OnInit, OnDestroy {
       this.tags = this.tags.concat(this.inputTxt.replace(/^[,\s]+|[,\s]+$/g, '')
         .replace(/,[,\s]*,/g, ',').split(',').map(item => item.trim()));
       this.updateTags('add', this.tags);
-      this.telemetryService.track('InfraServer_Nodes_UpdateTags');
     }
   }
 

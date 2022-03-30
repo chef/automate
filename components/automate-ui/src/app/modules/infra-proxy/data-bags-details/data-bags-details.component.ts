@@ -17,7 +17,6 @@ import { getAllStatus, dataBagItemList, deleteStatus } from 'app/entities/data-b
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus  } from 'app/entities/data-bags/data-bag-item-details.selector';
 import { Regex } from 'app/helpers/auth/regex';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type DataBagsDetailsTab = 'details';
 
@@ -57,8 +56,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -150,7 +148,6 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
     this.dataBagItems[index].active = !this.dataBagItems[index].active;
     this.activeClassName = 'autoHeight';
-    this.telemetryService.track('InfraServer_Databags_Details_GetItems');
   }
 
   refreshData(data: string) {
@@ -183,7 +180,6 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.total = 0;
     } else {
       this.getDataBagItemsData();
-      this.telemetryService.track('InfraServer_Databags_Details_Search');
     }
   }
 
@@ -218,7 +214,6 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       databag_name: this.dataBagName,
       name: this.dataBagItemToDelete.name
     }));
-    this.telemetryService.track('InfraServer_Databags_Details_DeleteDatabagItem');
   }
 
   public closeDeleteModal(): void {

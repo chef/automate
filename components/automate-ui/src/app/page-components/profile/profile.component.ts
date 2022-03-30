@@ -90,8 +90,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.chefSessionService.logout('/', true);
-    localStorage.setItem('manual-upgrade-banner', 'true');
+    this.chefSessionService.logout('/', true, true /* don't skip signin method selection */);
   }
 
   showWelcomeModal() {

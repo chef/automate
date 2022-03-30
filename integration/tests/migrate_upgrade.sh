@@ -54,5 +54,4 @@ do_prepare_upgrade() {
     # manifest it creates.
     rm -f /opt/delivery/version-manifest.txt
     do_prepare_upgrade_default
-    set_version_file
 }

@@ -8,11 +8,6 @@ import { EditInfraNodeAttributeModalComponent } from './edit-infra-node-attribut
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { UpdateNodeAttributesSuccess } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { InfraNodeAttribute } from 'app/entities/infra-nodes/infra-nodes.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('EditInfraNodeAttributeModalComponent', () => {
   let component: EditInfraNodeAttributeModalComponent;
@@ -33,7 +28,6 @@ describe('EditInfraNodeAttributeModalComponent', () => {
         EditInfraNodeAttributeModalComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
         HttpClient, HttpHandler
       ],
       imports: [

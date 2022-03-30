@@ -18,7 +18,6 @@ import {
   getGroupsStatus,
   policyFile
 } from 'app/entities/policy-files/policy-group.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-policy-groups',
@@ -47,8 +46,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit(): void {
@@ -138,7 +136,6 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     if (this.groupList !== undefined) {
       this.searchArrayLength = this.groupList.length;
     }
-    this.telemetryService.track('InfraServer_PolicyGroups_Search');
   }
 
   onChangePage($event: { page: number; pageOfItems: Array<any> }) {

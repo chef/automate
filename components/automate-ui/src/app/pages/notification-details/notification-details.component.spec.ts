@@ -7,11 +7,6 @@ import { ngrxReducers, runtimeChecks } from '../../../app/ngrx.reducers';
 import { NotificationDetailsComponent } from './notification-details.component';
 import { MockComponent } from 'ng2-mock-component';
 import { FeatureFlagsService } from '../../../app/services/feature-flags/feature-flags.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('NotificationDetailsComponent', () => {
   let component: NotificationDetailsComponent;
@@ -37,8 +32,7 @@ describe('NotificationDetailsComponent', () => {
         NotificationDetailsComponent
       ],
       providers: [
-        FeatureFlagsService,
-        { provide: TelemetryService, useClass: MockTelemetryService }
+        FeatureFlagsService
       ],
       imports: [
         FormsModule,

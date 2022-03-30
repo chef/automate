@@ -10,7 +10,6 @@ import { Environment } from 'app/entities/environments/environment.model';
 import { getAllStatus, deleteStatus, environmentList } from 'app/entities/environments/environment.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import { Regex } from 'app/helpers/auth/regex';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-environments',
@@ -42,8 +41,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) {
   }
 
@@ -98,7 +96,6 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     } else {
       this.getEnvironmentData();
     }
-    this.telemetryService.track('InfraServer_Environments_Search');
   }
 
   onPageChange(event: number): void {
@@ -138,7 +135,6 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteEnvironment({
       server_id: this.serverId, org_id: this.orgId, name: this.environmentToDelete.name
     }));
-    this.telemetryService.track('InfraServer_Environments_Delete');
   }
 
   public closeDeleteModal(): void {

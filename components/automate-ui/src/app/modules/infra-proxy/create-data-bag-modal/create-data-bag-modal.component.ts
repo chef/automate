@@ -23,7 +23,6 @@ import {
   CreateDataBag
 } from 'app/entities/data-bags/data-bags.actions';
 import { Utilities } from 'app/helpers/utilities/utilities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-data-bag-modal',
@@ -46,8 +45,7 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder,
-    private telemetryService: TelemetryService
+    private fb: FormBuilder
   ) {
     this.createForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
@@ -118,7 +116,6 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new CreateDataBag({dataBag: dataBag}));
-    this.telemetryService.track('InfraServer_Databags_Create');
   }
 
   private resetCreateModal(): void {

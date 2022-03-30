@@ -12,7 +12,6 @@ import { EntityStatus, pending } from 'app/entities/entities';
 import { InfraNodeAttribute } from 'app/entities/infra-nodes/infra-nodes.model';
 import { UpdateNodeAttributes, GetNode } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { Utilities } from 'app/helpers/utilities/utilities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-edit-infra-node-attribute-modal',
@@ -50,8 +49,8 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
 
   constructor(
     private fb: FormBuilder,
-    private store: Store<NgrxStateAtom>,
-    private telemetryService: TelemetryService
+    private store: Store<NgrxStateAtom>
+
   ) {
     this.attributeForm = this.fb.group({
       default: ['', [Validators.required]]
@@ -131,7 +130,6 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
     };
 
     this.store.dispatch(new UpdateNodeAttributes(nodeAttr));
-    this.telemetryService.track('InfraServer_Nodes_EditAttributes');
   }
 
   private resetEditModal(): void {

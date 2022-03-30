@@ -31,7 +31,6 @@ import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { NodeList, NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
 import { Regex } from 'app/helpers/auth/regex';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-infra-nodes',
@@ -91,8 +90,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -142,14 +140,12 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     } else {
       this.getNodesData();
     }
-    this.telemetryService.track('InfraServer_Nodes_Search');
   }
 
   onPageChange(event: number): void {
     this.currentPage = event;
     this.loading = true;
     this.getNodesData();
-    this.telemetryService.track('InfraServer_Nodes_GetNodesData');
   }
 
   getNodesData() {
@@ -220,7 +216,6 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteNode({
       server_id: this.serverId, org_id: this.orgId, name: this.nodeToDelete.name
     }));
-    this.telemetryService.track('InfraServer_Nodes_Delete');
   }
 
   public closeDeleteModal(): void {
@@ -341,6 +336,5 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     this.currentPage = $event.pageIndex + 1;
     this.per_page = $event.pageSize;
     this.getNodesData();
-    this.telemetryService.track('InfraServer_Nodes_GetNodesData');
   }
 }

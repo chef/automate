@@ -14,7 +14,6 @@ import {
   getAllStatus as getAllPolicyFilesForOrgStatus,
   deleteStatus
 } from 'app/entities/policy-files/policy-file.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-policy-files',
@@ -47,8 +46,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -105,7 +103,6 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   }
 
   public searchPolicyFiles(searchText: string): void {
-    this.telemetryService.track('InfraServer_PolicyFiles_Search');
     this.searching = true;
     this.searchValue = searchText;
     if (!this.policyFiles || !searchText) {
@@ -133,7 +130,6 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeletePolicyFile({
       server_id: this.serverId, org_id: this.orgId, name: this.policyfileToDelete.name
     }));
-    this.telemetryService.track('InfraServer_PolicyFiles_Delete');
   }
 
   public closeDeleteModal(): void {

@@ -11,11 +11,6 @@ import { By } from '@angular/platform-browser';
 import { GetDataBagsSuccess } from 'app/entities/data-bags/data-bags.actions';
 import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import { DataBagsListComponent } from './data-bags-list.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('DataBagsListComponent', () => {
   let component: DataBagsListComponent;
@@ -50,8 +45,7 @@ describe('DataBagsListComponent', () => {
         DataBagsListComponent
       ],
       providers: [
-        FeatureFlagsService,
-        { provide: TelemetryService, useClass: MockTelemetryService }
+        FeatureFlagsService
       ],
       imports: [
         FormsModule,

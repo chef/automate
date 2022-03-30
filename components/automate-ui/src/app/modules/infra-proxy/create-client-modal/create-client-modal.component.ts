@@ -11,7 +11,6 @@ import { saveError, createClient } from 'app/entities/clients/client.selectors';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
 import { Utilities } from 'app/helpers/utilities/utilities';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-client-modal',
@@ -44,8 +43,7 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private store: Store<NgrxStateAtom>,
-    private telemetryService: TelemetryService
+    private store: Store<NgrxStateAtom>
   ) {
     this.createForm = this.fb.group({
       name: ['', [Validators.required,
@@ -146,7 +144,6 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
       create_key : true
     };
     this.store.dispatch(new CreateClient(client));
-    this.telemetryService.track('InfraServer_Clients_Create');
   }
 
   downloadKey() {
@@ -158,7 +155,6 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
 
     const blob = new Blob([template], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, this.createdClient + '.pem');
-    this.telemetryService.track('InfraServer_Clients_Download_PrivateKey');
   }
 
 }

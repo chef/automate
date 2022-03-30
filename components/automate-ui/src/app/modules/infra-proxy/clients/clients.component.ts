@@ -11,7 +11,6 @@ import { GetClients, DeleteClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
 import { getAllStatus, clientList, deleteStatus } from 'app/entities/clients/client.selectors';
 import { Regex } from 'app/helpers/auth/regex';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-clients',
@@ -42,8 +41,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) {}
 
   ngOnInit() {
@@ -93,14 +91,12 @@ export class ClientsComponent implements OnInit, OnDestroy {
     } else {
       this.getClientsData();
     }
-    this.telemetryService.track('InfraServer_Clients_Search');
   }
 
   onPageChange(event: number): void {
     this.current_page = event;
     this.loading = true;
     this.getClientsData();
-    this.telemetryService.track('InfraServer_Clients_GetClientsData');
   }
 
   getClientsData() {
@@ -139,7 +135,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteClient({
       server_id: this.serverId, org_id: this.orgId, name: this.clientToDelete.name
     }));
-    this.telemetryService.track('InfraServer_Clients_Delete');
   }
 
   public closeDeleteModal(): void {
@@ -152,6 +147,5 @@ export class ClientsComponent implements OnInit, OnDestroy {
     this.per_page = $event.pageSize;
     this.loading = true;
     this.getClientsData();
-    this.telemetryService.track('InfraServer_Clients_GetClientsData');
   }
 }

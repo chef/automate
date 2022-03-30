@@ -139,7 +139,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   public deleteNotification(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteNotificationRule(this.notificationToDelete));
-    this.telemetryService.track('Settings_Notifications_Delete');
   }
 
   public closeDeleteModal(): void {

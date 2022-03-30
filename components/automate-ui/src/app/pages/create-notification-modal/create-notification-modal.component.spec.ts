@@ -18,11 +18,7 @@ import {
   NotificationRule,
   ServiceActionType
 } from 'app/entities/notification_rules/notification_rule.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
-class MockTelemetryService {
-  track() { }
-}
 
 describe('CreateNotificationModalComponent', () => {
   let component: CreateNotificationModalComponent;
@@ -47,8 +43,7 @@ describe('CreateNotificationModalComponent', () => {
       providers: [
         NotificationRuleRequests,
         HttpClient,
-        HttpHandler,
-        { provide: TelemetryService, useClass: MockTelemetryService }
+        HttpHandler
       ]
     })
       .compileComponents();

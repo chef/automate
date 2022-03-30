@@ -19,11 +19,7 @@ import {
 } from 'app/entities/data-bags/data-bags.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { using } from 'app/testing/spec-helpers';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
-class MockTelemetryService {
-  track() { }
-}
 
 describe('CreateDataBagModalComponent', () => {
   let component: CreateDataBagModalComponent;
@@ -53,8 +49,7 @@ describe('CreateDataBagModalComponent', () => {
       ],
       providers: [
         HttpClient,
-        HttpHandler,
-        { provide: TelemetryService, useClass: MockTelemetryService }
+        HttpHandler
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

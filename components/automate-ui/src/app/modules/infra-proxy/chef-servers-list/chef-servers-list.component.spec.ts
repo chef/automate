@@ -14,11 +14,6 @@ import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { By } from '@angular/platform-browser';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('ChefServersListComponent', () => {
   let component: ChefServersListComponent;
@@ -66,7 +61,6 @@ describe('ChefServersListComponent', () => {
         ChefServersListComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [

@@ -46,7 +46,6 @@ import { Node, Options } from '../tree-table/models';
 import { AvailableType } from '../infra-roles/infra-roles.component';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type InfraNodeTabName = 'details' | 'runList' | 'attributes';
 
@@ -124,8 +123,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) {
     this.updateNodeForm = this.fb.group({
       environment: [null, [Validators.required]]
@@ -249,7 +247,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
         .replace(/,[,\s]*,/g, ',').split(',').map(item => item.trim()));
       this.inputTxt = '';
       this.updateTags('add', this.tags);
-      this.telemetryService.track('InfraServer_Nodes_AddTags');
     }
   }
 
@@ -262,7 +259,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
     this.removeTags.push(tag);
     this.updateTags('delete', this.removeTags);
-    this.telemetryService.track('InfraServer_Nodes_RemoveTags');
   }
 
   // load list of environments
@@ -311,7 +307,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       environment: this.updateNodeForm.controls.environment.value.trim()
     };
     this.store.dispatch(new UpdateNodeEnvironment({node: updatedNode}));
-    this.telemetryService.track('InfraServer_Nodes_ChangeNodeEnvironment');
   }
 
   updateRunlist() {

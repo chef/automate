@@ -13,7 +13,6 @@ import {
   RootFiles
 } from 'app/entities/cookbooks/cookbook-details.model';
 import { CookbookDetailsRequests } from 'app/entities/cookbooks/cookbook-details.requests';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-cookbook-dependencies-details',
@@ -44,8 +43,7 @@ export class CookbookDependenciesDetailsComponent {
 
   constructor(
     private http: HttpClient,
-    private cookbookDetailsRequests: CookbookDetailsRequests,
-    private telemetryService: TelemetryService
+    private cookbookDetailsRequests: CookbookDetailsRequests
   ) { }
 
   closeCookbookDependencies() {
@@ -61,7 +59,6 @@ export class CookbookDependenciesDetailsComponent {
     this.cookbookVersion = version;
     this.loadCookbookDetails();
     this.isSlideOpen = true;
-    this.telemetryService.track('InfraServer_PolicyFiles_CookbookDependency_Details');
   }
 
   handleDependenciesRules() {

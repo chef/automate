@@ -41,7 +41,7 @@ func (d *InMemory) GetManifest(_ context.Context, release string) (*manifest.A2,
 		return nil, err
 	}
 
-	if m.Version() != release {
+	if m.Build != release {
 		return nil, err
 	}
 

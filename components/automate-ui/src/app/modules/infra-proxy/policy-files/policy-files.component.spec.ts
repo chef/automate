@@ -12,11 +12,6 @@ import { By } from '@angular/platform-browser';
 import { GetPolicyFilesSuccess } from 'app/entities/policy-files/policy-file.action';
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import { using } from 'app/testing/spec-helpers';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('PolicyFilesComponent', () => {
   let component: PolicyFilesComponent;
@@ -59,8 +54,7 @@ describe('PolicyFilesComponent', () => {
         PolicyFilesComponent
       ],
       providers: [
-        FeatureFlagsService,
-        { provide: TelemetryService, useClass: MockTelemetryService }
+        FeatureFlagsService
       ],
       imports: [
         FormsModule,

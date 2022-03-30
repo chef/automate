@@ -10,7 +10,6 @@ import {
   CookbookDependencyList,
   CookbookList
 } from '../policy-file-details/policy-file-details.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-cookbook-dependencies',
@@ -33,7 +32,7 @@ export class CookbookDependenciesComponent {
   public cookbookRules: CookbookRuleList[] = [];
   public cookbookDependencies: CookbookDependencyList[] = [];
 
-  constructor(private telemetryService: TelemetryService) { }
+  constructor() { }
 
   closeCookbookDependencies() {
     this.toggleSlide();
@@ -48,7 +47,6 @@ export class CookbookDependenciesComponent {
     this.cookbookRules = cookbookRuleList;
     this.cookbookDependencies = cookbookDependencyList;
     this.isSlideOpen = true;
-    this.telemetryService.track('InfraServer_PolicyFiles_CookbookDependencies');
   }
 
   handleDependenciesRules() {

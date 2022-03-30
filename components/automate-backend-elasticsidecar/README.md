@@ -12,5 +12,3 @@ This is a service package.
 ## Notes
 
 This package relies on strict bindings and will not start unless all credentials and ssl are available from Elasticsearch.
-
-Just Rebuilding the package to use the chef/elasticsearch-odfe package pull it from the latest stable.

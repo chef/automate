@@ -145,10 +145,6 @@ type InstallBundleCreator struct {
 	// For development
 	hartifactsPath string
 	overrideOrigin string
-
-	//only for testing
-	optionalURL  string
-	versionsPath string
 }
 
 // InstallBundleCreatorOpt are functional options for the InstallBundleCreator
@@ -166,13 +162,6 @@ func WithInstallBundleHartifactsPath(hartifactsPath string, overrideOrigin strin
 	return func(c *InstallBundleCreator) {
 		c.overrideOrigin = overrideOrigin
 		c.hartifactsPath = hartifactsPath
-	}
-}
-
-// WithInstallBundleVersionsPath sets the path to search for override versions
-func WithInstallBundleVersionsPath(versionsPath string) InstallBundleCreatorOpt {
-	return func(c *InstallBundleCreator) {
-		c.versionsPath = versionsPath
 	}
 }
 
@@ -249,7 +238,7 @@ func (creator *InstallBundleCreator) Create(progress InstallBundleCreatorProgres
 	}
 
 	if creator.outputFile == "" {
-		creator.outputFile = fmt.Sprintf("automate-%s.aib", m.Version())
+		creator.outputFile = fmt.Sprintf("automate-%s.aib", m.Build)
 	}
 
 	if err := creator.createDirectories(); err != nil {
@@ -369,24 +358,10 @@ func (creator *InstallBundleCreator) loadManifest() (*manifest.A2, error) {
 		manifestProvider = manifest.NewLocalHartManifestProvider(manifestProvider, creator.hartifactsPath, creator.overrideOrigin)
 	}
 
-	var m *manifest.A2
-	var err error
-	ctx := context.Background()
 	if creator.version != "" {
-		m, err = manifestProvider.GetManifest(ctx, creator.version)
-	} else {
-		m, err = manifestProvider.GetCurrentManifest(ctx, creator.channel)
+		return manifestProvider.GetManifest(context.Background(), creator.version)
 	}
-	if err != nil {
-		return m, err
-	}
-
-	minCurrentVersion, err := manifest.GetMinimumCurrentManifestVersion(ctx, m.Version(), creator.channel, creator.versionsPath, creator.optionalURL)
-	if err != nil {
-		return nil, err
-	}
-	m.MinCompatibleVer = minCurrentVersion
-	return m, nil
+	return manifestProvider.GetCurrentManifest(context.Background(), creator.channel)
 }
 
 func (creator *InstallBundleCreator) downloadHab(m *manifest.A2, progress InstallBundleCreatorProgress) error {

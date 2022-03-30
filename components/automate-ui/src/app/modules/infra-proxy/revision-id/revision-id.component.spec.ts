@@ -11,11 +11,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { By } from '@angular/platform-browser';
 import { Revision } from 'app/entities/revisions/revision.model';
 import { GetRevisionsSuccess } from 'app/entities/revisions/revision.action';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('RevisionIdComponent', () => {
   let component: RevisionIdComponent;
@@ -48,8 +43,7 @@ describe('RevisionIdComponent', () => {
         RevisionIdComponent
       ],
       providers: [
-        FeatureFlagsService,
-        { provide: TelemetryService, useClass: MockTelemetryService }
+        FeatureFlagsService
       ],
       imports: [
         FormsModule,

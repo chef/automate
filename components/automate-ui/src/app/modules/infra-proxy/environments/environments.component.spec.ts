@@ -12,13 +12,8 @@ import { By } from '@angular/platform-browser';
 import { GetEnvironmentsSuccess } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
 import { using } from 'app/testing/spec-helpers';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
-class MockTelemetryService {
-  track() { }
-}
-
-describe('EnvironmentsComponent ', () => {
+describe('EnvironmentsComponent', () => {
   let component: EnvironmentsComponent;
   let fixture: ComponentFixture<EnvironmentsComponent>;
   let element;
@@ -54,7 +49,6 @@ describe('EnvironmentsComponent ', () => {
         EnvironmentsComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [

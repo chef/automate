@@ -160,7 +160,6 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       run_list: this.selectedRunList
     };
     this.store.dispatch(new CreateRole({role: role}));
-    this.telemetryService.track('InfraServer_Roles_Create');
   }
 
   dragDropHandler(count: ListItem[]) {

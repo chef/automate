@@ -15,13 +15,10 @@ type ReleaseManifest interface {
 
 // An A2 manifest specifies the expected contents of a build
 type A2 struct {
-	SchemaVersion    string          `json:"schema_version"`
-	Build            string          `json:"build"`
-	BuildSHA         string          `json:"build_sha"`
-	Packages         []habpkg.HabPkg `json:"packages"`
-	HartOverrides    []habpkg.Hart   `json:"hart_overrides"`
-	SemVersion       string          `json:"version"`
-	MinCompatibleVer string          `json:"min_compatible_ver"`
+	Build         string          `json:"build"`
+	BuildSHA      string          `json:"build_sha"`
+	Packages      []habpkg.HabPkg `json:"packages"`
+	HartOverrides []habpkg.Hart   `json:"hart_overrides"`
 }
 
 // PackageForServiceName returns a Package for the named service
@@ -55,10 +52,6 @@ func (m *A2) ListPackages() []habpkg.HabPkg {
 
 // Version returns the manifest version
 func (m *A2) Version() string {
-	//In case semantic version field available return that or else the build number
-	if m.SemVersion != "" {
-		return m.SemVersion
-	}
 	return m.Build
 }
 

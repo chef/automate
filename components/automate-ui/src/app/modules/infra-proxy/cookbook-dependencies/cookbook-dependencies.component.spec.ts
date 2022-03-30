@@ -11,11 +11,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { PolicyFileRequests } from 'app/entities/policy-files/policy-file.requests';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { CookbookRuleList, CookbookDependencyList, CookbookList } from '../policy-file-details/policy-file-details.component';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('CookbookDependenciesComponent', () => {
   let component: CookbookDependenciesComponent;
@@ -50,8 +45,7 @@ describe('CookbookDependenciesComponent', () => {
         FeatureFlagsService,
         PolicyFileRequests,
         HttpClient,
-        HttpHandler,
-        { provide: TelemetryService, useClass: MockTelemetryService }
+        HttpHandler
       ],
       imports: [
         FormsModule,

@@ -194,7 +194,6 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new CreateEnvironment({environment: environment})
     );
-    this.telemetryService.track('InfraServer_Environments_Create');
   }
 
   handleInput(event: KeyboardEvent): void {

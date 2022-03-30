@@ -4,8 +4,8 @@ provider "aws" {
 }
 
 provider "vault" {
-  address   = "https://vault.ps.chef.co"
-  namespace = "root"
+  address   = "https://vault.es.chef.co"
+  namespace = "releng"
   version   = "2.24.1"
 }
 

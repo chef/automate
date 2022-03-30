@@ -18,5 +18,4 @@ EOF
 do_prepare_upgrade() {
     do_prepare_upgrade_default
     set_test_manifest "build-habdev.json"
-    set_version_file
 }

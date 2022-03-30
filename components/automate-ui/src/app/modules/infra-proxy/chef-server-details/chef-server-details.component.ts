@@ -28,7 +28,6 @@ import {
   deleteStatus as deleteOrgStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type ChefServerTabName = 'orgs' | 'details';
 @Component({
@@ -65,8 +64,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
+
   ) {
 
     this.orgForm = fb.group({
@@ -222,7 +221,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       projects: this.orgForm.controls.projects.value
     };
     this.store.dispatch(new CreateOrg( serverOrg ));
-    this.telemetryService.track('InfraServer_Add_Chef_Organization');
   }
 
   private resetCreateModal(): void {

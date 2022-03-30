@@ -25,11 +25,6 @@ import { NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
 import { GetEnvironmentsSuccess } from 'app/entities/environments/environment.action';
 import { GetNodeRunlistsSuccess } from 'app/entities/nodeRunlists/nodeRunlists.action';
 import { By } from '@angular/platform-browser';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('InfraNodeDetailsComponent', () => {
   let component: InfraNodeDetailsComponent;
@@ -84,7 +79,6 @@ describe('InfraNodeDetailsComponent', () => {
         InfraNodeDetailsComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [

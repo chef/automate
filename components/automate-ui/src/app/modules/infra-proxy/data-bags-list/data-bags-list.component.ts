@@ -14,7 +14,6 @@ import {
   getAllStatus as getAllDatabagsForOrgStatus,
   deleteStatus
 } from 'app/entities/data-bags/data-bags.selectors';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-data-bags-list',
@@ -42,8 +41,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -98,7 +96,6 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteDataBag({
       server_id: this.serverId, org_id: this.orgId, name: this.dataBagToDelete.name
     }));
-    this.telemetryService.track('InfraServer_Databags_Delete');
   }
 
   public closeDeleteModal(): void {
@@ -124,6 +121,5 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
       });
     }
     this.searching = false;
-    this.telemetryService.track('InfraServer_Databags_Search');
   }
 }

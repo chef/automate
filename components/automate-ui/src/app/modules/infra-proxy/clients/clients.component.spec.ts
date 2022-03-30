@@ -12,11 +12,6 @@ import { By } from '@angular/platform-browser';
 import { GetClientsSuccess } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
 import { using } from 'app/testing/spec-helpers';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('ClientsComponent', () => {
   let component: ClientsComponent;
@@ -53,7 +48,6 @@ describe('ClientsComponent', () => {
         ClientsComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [

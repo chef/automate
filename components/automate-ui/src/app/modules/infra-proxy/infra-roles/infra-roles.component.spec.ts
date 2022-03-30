@@ -11,11 +11,6 @@ import { By } from '@angular/platform-browser';
 import { GetRolesSuccess } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import { using } from 'app/testing/spec-helpers';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('InfraRolesComponent', () => {
   let component: InfraRolesComponent;
@@ -49,7 +44,6 @@ describe('InfraRolesComponent', () => {
         InfraRolesComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [

@@ -11,11 +11,6 @@ import { InfraNode, InfraNodeAttribute } from 'app/entities/infra-nodes/infra-no
 import { GetNodesSuccess, GetNodeSuccess, UpdateNodeAttributesSuccess } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { GetNodeRunlistsSuccess } from 'app/entities/nodeRunlists/nodeRunlists.action';
 import { NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
-class MockTelemetryService {
-  track() { }
-}
 
 describe('InfraNodesComponent', () => {
   let component: InfraNodesComponent;
@@ -67,7 +62,6 @@ describe('InfraNodesComponent', () => {
         InfraNodesComponent
       ],
       providers: [
-        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [
