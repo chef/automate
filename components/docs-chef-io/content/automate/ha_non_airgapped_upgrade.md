@@ -1,15 +1,15 @@
 +++
-title = "Upgrade"
+title = "Non-Airgapped Upgrade"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Upgrade"
+    title = "Non-Airgapped Upgrade"
     parent = "automate/deploy_high_availability/ha_upgrade"
-    identifier = "automate/deploy_high_availability/ha_upgrade/ha_upgrade.md Automate Upgrade"
-    weight = 200
+    identifier = "automate/deploy_high_availability/ha_upgrade/ha_non_airgapped_upgrade.md Non-Airgapped Upgrade"
+    weight = 210
 +++
 
 This page lists the commands that aid in upgrading the Chef Automate High Availability (HA) frontend and backend clusters in your network infrastructure.
