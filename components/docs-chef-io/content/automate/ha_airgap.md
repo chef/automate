@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Airgapped HA Installation"
-    parent = "automate/deploy_high_availability/introduction"
-    identifier = "automate/deploy_high_availability/introduction/ha_airgap.md Airgapped HA Installation"
-    weight = 270
+    parent = "automate/deploy_high_availability/on_premises_deployment"
+    identifier = "automate/deploy_high_availability/on_premises_deployment/ha_airgap.md Airgapped HA Installation"
+    weight = 250
 +++
 
 An airgapped host means it has no direct inbound or outbound access to internet connectivity. You must create an Airgap Installation Bundle,`.aib` on an internet-connected host, to install or upgrade Chef Automate on an airgapped host. Then, transfer both the Airgap installation bundle and the chef-automate binary that you used to create it to the airgapped host for use.
