@@ -1,11 +1,11 @@
 +++
-title = "Upgrade Chef Automate to 3.x.x"
+title = "Upgrade Chef Automate to 3.X.X"
 date = 2022-03-03T12:02:46-08:00
 draft = false
 
 [menu]
   [menu.automate]
-    title = "Upgrade to 3.x.x"
+    title = "Upgrade to 3.X.X"
     identifier = "automate/major_upgrade.md Major Upgrade"
     parent = "automate"
 +++
