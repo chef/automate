@@ -39,14 +39,13 @@ locals {
 resource "null_resource" "automate_pre" {
 
   provisioner "remote-exec" {
-    inline = [
-      "echo 'Arvinth test'\n", 
-      "echo ${var.automate_role}\n/n", 
-      "echo ${var.tmp_path}\n/n", 
-      "echo ${var.backup_config_s3}\n/n",
-      "echo ${var.backup_config_efs}\n/n",
-      "echo ${var.s3_endpoint}\n/n",
-      "echo ${var.bucket_name}\n/n"
+    inline = [ 
+      "echo 'automate_role: ' ${var.automate_role}\n/n", 
+      "echo 'tmp_path: ' ${var.tmp_path}\n/n", 
+      "echo 'backup_config_s3: ' ${var.backup_config_s3}\n/n",
+      "echo 'backup_config_efs: ' ${var.backup_config_efs}\n/n",
+      "echo 's3_endpoint: ' ${var.s3_endpoint}\n/n",
+      "echo 'bucket_name: ' ${var.bucket_name}\n/n"
       ]
   }
 
