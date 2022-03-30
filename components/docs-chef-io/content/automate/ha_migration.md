@@ -1,14 +1,14 @@
 +++
-title = "Migration"
+title = "Introduction"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Migration"
+    title = "Introduction"
     parent = "automate/deploy_high_availability/migration"
-    identifier = "automate/deploy_high_availability/migration/ha_migration.md Migration"
+    identifier = "automate/deploy_high_availability/migration/ha_migration.md Introduction"
     weight = 200
 +++
 
