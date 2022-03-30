@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Destroying Infrastructure"
-    parent = "automate/deploy_high_availability/common_features"
-    identifier = "automate/deploy_high_availability/common_features/ha_destroy.md Destroying Infrastructure"
+    parent = "automate/deploy_high_availability/reference"
+    identifier = "automate/deploy_high_availability/reference/ha_destroy.md Destroying Infrastructure"
     weight = 220
 +++
 
