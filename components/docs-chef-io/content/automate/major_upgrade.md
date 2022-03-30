@@ -22,12 +22,11 @@ Please choose following upgrade journey based on your current version of chef au
 | -------------------- | ---------- |
 | Any version before 2022012400000| 2022012400000|
 | on 2022012400000| 3.0.1|
-| 3.0.1| 4.0.1|
 
-For example, if today you are on version 2021201164433. Then your Upgrade Journey should be:<br />
-1.Mannual upgrade to 2022012400000.<br />
-2.Then mannual upgrade to 3.0.1.<br />
-3.Then mannual upgrade to 4.0.1.
+For example, if today you are on version 2021201164433. Then your Upgrade Journey should be:
+
+1. Manual upgrade to 2022012400000.
+1. Then manual upgrade to 3.0.1.
 
 ## Prerequisites
 
@@ -43,7 +42,7 @@ In this version, Chef Automate upgrades the embedded Postgres database from **v9
 * [Automate in Air Gapped Environment with Embedded PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-embedded-pg" >}}).
 * [Automate in Air Gapped Environment with External PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-external-pg" >}})
 
-{{< note >}} To upgrade the version of Chef Automate, upgrade your current version to the previous latest version. Run the command `chef-automate upgrade run` to upgrade the Chef Automate version. {{< /note >}}
+{{< note >}} To upgrade the version of Chef Automate, upgrade your current version to the latest version in dead series. Run the command `chef-automate upgrade run` to upgrade the Chef Automate version. {{< /note >}}
 
 ### Automate with Embedded PostgreSQL
 
@@ -134,6 +133,18 @@ Once you have upgraded to the latest ongoing version, you can perform the signif
 
 ## FAQ
 
-How to check if automate is running external Postgres?
+**Q) How to check if automate is running external Postgres?**
 
-* Run `chef-automate config show` command. If `enable=true` is present in `global.v1.external.postgresql` it confirms that the automate is running external postgres.
+A) Run `chef-automate config show` command. If `enable=true` is present in `global.v1.external.postgresql` it confirms that the automate is running external postgres.
+
+**Q) When migrating data using the command `chef-automate post-major-upgrade migrate --data=PG`, why is it failing?**
+
+A) To fix the above mentioned issue you can restore the data using the command `chef-automate backup restore </path/to/backups/>BACKUP_ID`. Here use the *BACKUP ID* from the backup you have created before starting the upgrade.
+
+If the restore fails even after upgrading the Chef Automate version, follow the steps given below:
+  
+1. Uninstall **Chef Automate**.
+1. Install the last version (202232344344) using the air gapped installation process. Click [here](https://docs.chef.io/automate/airgapped_installation/) for more information on air gapped installation process.
+1. Restore the backup using `chef-automate backup restore <backup_id>`. Click [here](https://docs.chef.io/automate/restore/) for the reference.
+
+{{< note >}} If you have migrated data using alternative ways you will see a checklist of steps on running `chef-automate upgrade status` which won’t be marked as complete. To remove those checklists, run the command `sudo rm /hab/svc/deployment-service/var/upgrade_metadata.json`. {{< /note >}}
