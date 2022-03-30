@@ -67,6 +67,7 @@ main.password {
   width: 250px;
   border-radius: 3px;
   margin: 12px auto;
+  text-align: center;
 }
 
 .dex-error-text {
