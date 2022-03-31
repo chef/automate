@@ -27,3 +27,27 @@ Considerations to be taken:
 2. Frontends that is automate and chef-server should have same 2 IPs
 
 Deployment should be same go same as on prem config 
+
+
+
+
+
+
+
+
+Minimal node requirement
+
+Introduction:- Definition of minimal node
+
+Architecture:- Take the lucid chart image from Punit, modify the architecture for 5 node
+
+Configuration:
+
+General configuration for Automate HA can be found here <link>. Configuration notes for minimum node:
+
+Same IP for OS and PG
+Same IP for Automate and Server
+Screenshot of the configuration
+Deployment:
+
+Deployment commands and steps will be same as Automate HA general flow <deployment flow link>
