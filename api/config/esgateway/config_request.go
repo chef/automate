@@ -117,8 +117,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = ac.GlobalLogLevelToNginxLevel(logLevel)
 	}
 
-	if externalES := g.GetV1().GetExternal().GetElasticsearch(); externalES.GetEnable().GetValue() {
-		nodes := externalES.GetNodes()
+	if externalOS := g.GetV1().GetExternal().GetOpensearch(); externalOS.GetEnable().GetValue() {
+		nodes := externalOS.GetNodes()
 		c.V1.Sys.External = &ConfigRequest_V1_System_External{
 			Enable: w.Bool(true),
 		}
@@ -135,7 +135,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			c.V1.Sys.External.ParsedEndpoints = endpoints
 
 			if isSSL {
-				if serverName := externalES.GetSsl().GetServerName().GetValue(); serverName != "" {
+				if serverName := externalOS.GetSsl().GetServerName().GetValue(); serverName != "" {
 					c.V1.Sys.External.ServerName = w.String(serverName)
 				} else {
 					endpoint := endpoints[0].Address.GetValue()
@@ -144,7 +144,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			}
 		}
 
-		switch auth := g.GetV1().GetExternal().GetElasticsearch().GetAuth(); auth.GetScheme().GetValue() {
+		switch auth := g.GetV1().GetExternal().GetOpensearch().GetAuth(); auth.GetScheme().GetValue() {
 		case "basic_auth":
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
@@ -154,7 +154,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 				),
 			)))
 		case "aws_es":
-			// If we only have 1 AWS Elasticsearch Service endpoint specified, we can assume that
+			// If we only have 1 AWS Opensearch Service endpoint specified, we can assume that
 			// the host header should be the name of that endpoint.
 			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(endpoints) == 1 {
 				c.V1.Sys.Ngx.Http.ProxySetHeaderHost = endpoints[0].Address
@@ -162,15 +162,15 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
 					"%s:%s",
-					auth.GetAwsEs().GetUsername().GetValue(),
-					auth.GetAwsEs().GetPassword().GetValue(),
+					auth.GetAwsOs().GetUsername().GetValue(),
+					auth.GetAwsOs().GetPassword().GetValue(),
 				),
 			)))
 		default:
 		}
 
-		c.V1.Sys.External.RootCert = g.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCert()
-		c.V1.Sys.External.RootCertFile = g.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCertFile()
+		c.V1.Sys.External.RootCert = g.GetV1().GetExternal().GetOpensearch().GetSsl().GetRootCert()
+		c.V1.Sys.External.RootCertFile = g.GetV1().GetExternal().GetOpensearch().GetSsl().GetRootCertFile()
 	}
 }
 
