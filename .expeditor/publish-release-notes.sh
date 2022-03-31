@@ -56,7 +56,7 @@ This release uses:
 
 This release uses:
 - Postgres:
-- ElasticSearch:
+- OpenSearch:
 - Nginx:
 - Haproxy:
 
