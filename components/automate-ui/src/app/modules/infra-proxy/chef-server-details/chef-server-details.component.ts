@@ -31,8 +31,8 @@ import {
   GetServer,
   UpdateServer,
   UpdateWebUIKey,
-  ValidateWebUIKey
-  // , GetUsers
+  ValidateWebUIKey, 
+  GetUsers
 } from 'app/entities/servers/server.actions';
 import {
   GetOrgs,
@@ -218,7 +218,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.id = id;
         this.store.dispatch(new GetServer({ id }));
         this.store.dispatch(new GetOrgs({ server_id: id }));
-        // this.store.dispatch(new GetUsers({ server_id: id }));
+        this.store.dispatch(new GetUsers({ server_id: id }));
       });
 
     combineLatest([
