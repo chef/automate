@@ -8,7 +8,7 @@ slack:
 
 release_branches:
   - main:
-      version_constraint: "22.*"
+      version_constraint: "3.*"
 
 github:
   delete_branch_on_merge: true
