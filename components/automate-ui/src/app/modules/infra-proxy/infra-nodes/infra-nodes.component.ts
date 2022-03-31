@@ -173,9 +173,15 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
+  // ts = epoch timestamp
+  // returns date obj
+  epochToJsDate(ts) {
+    return new Date(ts * 1000);
+  }
+
   timeFromNow(epochFormat: string) {
     const epchoTime = Number(epochFormat);
-    const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
+    const fromNowValue = this.timeFromNowPipe.transform(this.epochToJsDate(epchoTime));
     return fromNowValue === '-' ? '--' : fromNowValue;
   }
 
