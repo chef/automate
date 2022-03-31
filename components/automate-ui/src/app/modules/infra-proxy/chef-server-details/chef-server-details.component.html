@@ -45,7 +45,7 @@
                 </span>
               </li>
               <li>
-                <span class="heading">last sync date</span>
+                <span class="heading">Last sync date</span>
                 <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
               </li>
               <li>
@@ -108,7 +108,7 @@
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
           <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
-            <!-- <chef-option value='users' data-cy="users-tab">Users</chef-option> -->
+            <chef-option value='users' data-cy="users-tab">Users</chef-option>
             <chef-option value='details' data-cy="details-tab">Details</chef-option>
           </app-authorized>
         </chef-tab-selector>
@@ -260,12 +260,6 @@
         </div>
       </section>
       <section class="page-body" *ngIf="tabValue === 'orgs'">
-        <chef-toolbar>
-          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', [server?.id]]">
-            <chef-button id="create-button" primary (click)="openCreateModal()" data-cy="add-org-button">Add Chef Organization
-            </chef-button>
-          </app-authorized>
-        </chef-toolbar>
         <div id="org-table-container" *ngIf="orgs.length != 0 && !orgsListLoading">
           <chef-table>
             <chef-thead>
