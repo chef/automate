@@ -6,8 +6,16 @@ project:
 slack:
   notify_channel: a2-notify
 
+release_branches:
+  - main:
+      version_constraint: "22.*"
+
 github:
   delete_branch_on_merge: true
+  minor_bump_labels:
+    - "Expeditor: Bump Version Minor"
+  major_bump_labels:
+    - "Expeditor: Bump Version Major"
 
 # At the given time, trigger the following scheduled workloads
 # https://expeditor.chef.io/docs/getting-started/subscriptions/#scheduling-workloads
@@ -69,7 +77,7 @@ artifact_channels:
 
 staging_areas:
   - post_merge:
-      workload: pull_request_merged:chef/automate:main:*
+      workload: pull_request_merged:chef/automate:{{release_branch}}:*
 
 subscriptions:
   # dev -> acceptance promotion
@@ -98,8 +106,12 @@ subscriptions:
         post_commit: true
 
   # These actions are taken, in order they are specified, anytime a Pull Request is merged.
-  - workload: staged_workload_released:chef/automate:main:post_merge:*
+  - workload: staged_workload_released:chef/automate:{{release_branch}}:post_merge:*
     actions:
+      - built_in:bump_version:
+          ignore_labels:
+            - "Expeditor: Skip Version Bump"
+            - "Expeditor: Skip All"
       - bash:.expeditor/generate-automate-cli-docs.sh:
           post_commit: false
           only_if_modified:
