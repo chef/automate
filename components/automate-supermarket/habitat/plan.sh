@@ -26,6 +26,7 @@ pkg_deps=(
   core/gcc-libs 
   core/libarchive 
   core/shared-mime-info
+  core/bundler
   # "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/supermarket/5.1.5/20220322060835"
@@ -40,7 +41,19 @@ pkg_exports=(
   [fqdn-sanitized]=app.fqdn_sanitized
   [fieri-url]=fieri.url
 )
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+
+chef_automate_hab_binding_mode="relaxed"
+automate_scaffolding_include_templates=(sqerl.config)
+
+db="postgresql://{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.cfg.username }}{{ else }}{{ cfg.db.user }}{{ /if }}"
+db="${db}:{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.cfg.password }}{{ else }}{{ cfg.db.password }}{{ /if }}"
+db="${db}@{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.sys.ip }}{{ else }}{{ cfg.db.host }}{{ /if }}"
+db="${db}:{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.cfg.port }}{{ else }}{{ cfg.db.port }}{{ /if }}"
+db="${db}/{{ cfg.db.name }}_{{ cfg.rails_env }}"
+
+redis="redis://{{ #if bind.redis }}{{ bind.redis.first.sys.ip }}{{ else }}{{ cfg.redis.host }}{{ /if }}"
+redis="${redis}:{{ #if bind.redis }}{{ bind.redis.first.cfg.port }}{{ else }}{{ cfg.redis.port }}{{ /if }}"
+redis="${redis}/{{ cfg.redis.database }}"
 
 supermarket_path=$(hab pkg path chef/supermarket)
 
@@ -176,6 +189,8 @@ EOF
   # shellcheck disable=SC2001
   gem_path=$(echo "$gem_path" | sed 's|^/root/\.gem/[^:]\{1,\}:||')
   # Compute gem directory where gems will be ultimately installed to
+  echo "### RUBY VERSUIN ###"
+  echo "$ruby_version and $ruby_engine"
   gem_dir="$scaffolding_app_prefix/vendor/bundle/$ruby_engine/$ruby_version"
   # Compute gem directory where gems are initially installed to via Bundler
   _cache_gem_dir="$CACHE_PATH/vendor/bundle/$ruby_engine/$ruby_version"
@@ -207,37 +222,69 @@ EOF
   # core/bundler @ version 2.2.14
   _bundler_version="2.2.14"
 
-  bundle config build.ruby-filemagic --with-magic-dir="$(pkg_path_for core/file)"
 }
 
 do_build() {
-  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
-
-  build_line "Generating app binstubs in $scaffolding_app_prefix/binstubs"
-  rm -rf "$scaffolding_app_prefix/.bundle"
-  pushd "$scaffolding_app_prefix" &> /dev/null || exit 1
-    bundle binstubs \
-      --all \
-      --path "$scaffolding_app_prefix/binstubs"
-  popd &> /dev/null || exit 1
-
-  cd $scaffolding_app_prefix
-  local start_sec elapsed
-
-  build_line "Installing dependencies using Bundler version ${_bundler_version}"
-  start_sec="$SECONDS"
-
+  echo "INTO BUILD ### "
   scaffolding_bundle_install
 }
 
+do_install() {
+  echo "INTO INSTAL ### "
+  scaffolding_generate_binstubs
+  scaffolding_vendor_bundler
+  scaffolding_fix_binstub_shebangs
+}
+
+scaffolding_vendor_bundler() {
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
+  build_line "Vendoring 'bundler' version ${_bundler_version}"
+  gem install \
+    --local "$(hab pkg path core/bundler)/cache/bundler-${_bundler_version}.gem" \
+    --install-dir "$GEM_HOME" \
+    --bindir "$scaffolding_app_prefix/binstubs" \
+    --no-document
+  _wrap_ruby_bin "$scaffolding_app_prefix/binstubs/bundle"
+  _wrap_ruby_bin "$scaffolding_app_prefix/binstubs/bundler"
+}
+
+scaffolding_generate_binstubs() {
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
+  build_line "Generating app binstubs in $scaffolding_app_prefix/binstubs"
+  rm -rf "$scaffolding_app_prefix/.bundle"
+  pushd "$scaffolding_app_prefix" > /dev/null
+  _bundle_install \
+    "$scaffolding_app_prefix/vendor/bundle" \
+    --local \
+    --quiet \
+    --binstubs="$scaffolding_app_prefix/binstubs"
+  popd > /dev/null
+}
+
+scaffolding_fix_binstub_shebangs() {
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
+  local shebang
+  shebang="#!$(hab pkg path core/ruby27)/bin/ruby"
+
+  build_line "Fixing Ruby shebang for binstubs"
+  find "$scaffolding_app_prefix/binstubs" -type f | while read -r binstub; do
+    if grep -q '^#!/usr/bin/env /.*/bin/ruby$' "$binstub"; then
+      sed -e "s|^#!/usr/bin/env /.\{0,\}/bin/ruby\$|${shebang}|" -i "$binstub"
+    fi
+  done
+}
+
 scaffolding_bundle_install() {
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
   local start_sec elapsed
 
   build_line "Installing dependencies using Bundler version ${_bundler_version}"
   start_sec="$SECONDS"
 
   {
-    _bundle install
+    _bundle_install \
+      "$scaffolding_app_prefix/vendor/bundle" \
+      --retry 5
   } || {
       _restore_bundle_config
       e="bundler returned an error"
@@ -256,10 +303,6 @@ scaffolding_bundle_install() {
   if [[ -z "${dot_bundle:-}" ]]; then
     rm -rf .bundle
   fi
-}
-
-do_install() {
-    return 0
 }
 
 do_strip() {
@@ -299,25 +342,76 @@ _detect_git() {
   fi
 }
 
-_restore_bundle_config() {
-  build_line "Restoring original bundler config"
-  if [[ -f .bundle/config.prehab ]]; then
-    rm -f .bundle/config
-    mv .bundle/config.prehab .bundle/config
-  fi
-}
-
 _bundle() {
-  local bundler_prefix
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
+  cd $scaffolding_app_prefix
   bundler_prefix="$(hab pkg path core/bundler)"
-
+  echo " *** SETTING ENV *** "
   env \
     -u RUBYOPT \
     -u GEMRC \
     GEM_HOME="$bundler_prefix" \
     GEM_PATH="$bundler_prefix" \
-    "$(hab pkg path core/ruby27)/bin/ruby" \
-    "$bundler_prefix/bin/bundle.real" ${*:-}
+    "$(hab pkg path core/ruby27)/bin/ruby" "$bundler_prefix/bin/bundle.real" ${*:-}
 }
 
-chef_automate_hab_binding_mode="relaxed"
+_bundle_install() {
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
+  cd $scaffolding_app_prefix
+  local path
+  path="$1"
+  shift
+
+echo "Going to install bundle *** "
+  _bundle install ${*:-} \
+    --jobs "$(nproc)" \
+    --without development:test \
+    --path "$path" \
+    --shebang="$(hab pkg path core/ruby27)/bin/ruby" \
+    --no-clean \
+    --deployment
+}
+
+_wrap_ruby_bin() {
+  echo "INTO WRAP RUBY BIN"
+  local bin="$1"
+  build_line "Adding wrapper $bin to ${bin}.real"
+  mv -v "$bin" "${bin}.real"
+  cat <<EOF > "$bin"
+#!$(hab pkg path core/busybox-static)/bin/sh
+set -e
+if test -n "\$DEBUG"; then set -x; fi
+export GEM_HOME="$GEM_HOME"
+export GEM_PATH="$GEM_PATH"
+unset RUBYOPT GEMRC
+exec $(hab pkg path core/ruby27)/bin/ruby ${bin}.real \$@
+EOF
+  chmod -v 755 "$bin"
+}
+
+_create_process_bin() {
+  local bin cmd env_sh
+  bin="$1"
+  cmd="$2"
+  env_sh="$pkg_svc_config_path/app_env.sh"
+
+  build_line "Creating ${bin} process bin"
+  cat <<EOF > "$bin"
+#!$(hab pkg path core/busybox-static)/bin/sh
+set -e
+if test -n "\$DEBUG"; then set -x; fi
+export HOME="$pkg_svc_data_path"
+if [ -f "$env_sh" ]; then
+  . "$env_sh"
+else
+  >&2 echo "No app env file found: '$env_sh'"
+  >&2 echo "Have you not started this service ($pkg_origin/$pkg_name) before?"
+  >&2 echo ""
+  >&2 echo "Aborting..."
+  exit 1
+fi
+cd $scaffolding_app_prefix
+exec $cmd \$@
+EOF
+  chmod -v 755 "$bin"
+}

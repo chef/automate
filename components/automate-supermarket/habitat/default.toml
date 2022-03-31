@@ -77,8 +77,8 @@ foodcritic_fail_tags = ''
 
 [db]
 host       = "localhost"
-name       = "supermarket"
-user       = "supermarket"
+name       = "automate-supermarket"
+user       = "automate-supermarket"
 password   = "supermarket"
 port       = 15432
 extensions = ['plpgsql', 'pg_trgm']

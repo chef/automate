@@ -21,7 +21,22 @@ chown -R "{{ cfg.app.user }}":"{{ cfg.app.group }}" {{ pkg.svc_path }}
 
 cd $supermarket_path/app
 
+
+_bundle() {
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
+  cd $scaffolding_app_prefix
+  bundler_prefix="$(hab pkg path core/bundler)"
+  echo " *** SETTING ENV *** "
+  env \
+    -u RUBYOPT \
+    -u GEMRC \
+    GEM_HOME="$bundler_prefix" \
+    GEM_PATH="$bundler_prefix" \
+    "$(hab pkg path core/ruby27)/bin/ruby" "$bundler_prefix/bin/bundle.real" ${*:-}
+}
+
+
 exec chpst \
     -U {{ cfg.app.user }}:{{ cfg.app.group }} \
     -u {{ cfg.app.user }}:{{ cfg.app.group }} \
-    bundle exec unicorn -E {{ cfg.rails_env }} -c {{ pkg.svc_config_path }}/unicorn.rb {{ pkg.path }}/app/config.ru 2>&1
+    _bundle exec unicorn -E {{ cfg.rails_env }} -c {{ pkg.svc_config_path }}/unicorn.rb $supermarket_path/app/config.ru 2>&1

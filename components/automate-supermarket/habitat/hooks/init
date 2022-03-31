@@ -62,20 +62,32 @@ PGPORT='{{ cfg.db.port }}'
 PGDATABASE='{{ cfg.db.name }}_{{ cfg.rails_env }}'
 export PGHOST PGDATABASE PGUSER PGPASSWORD PGPORT
 
+_bundle() {
+  scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
+  cd $scaffolding_app_prefix
+  bundler_prefix="$(hab pkg path core/bundler)"
+  env \
+    -u RUBYOPT \
+    -u GEMRC \
+    GEM_HOME="$bundler_prefix" \
+    GEM_PATH="$bundler_prefix" \
+    "$(hab pkg path core/ruby27)/bin/ruby" "$bundler_prefix/bin/bundle.real" ${*:-}
+}
+
 pushd $supermarket_path/app &>/dev/null || exit 1
   if psql --command '' &>/dev/null; then
     echo 'Database Exists'
-    cd $supermarket_path/app
+    cd $supermarket_path
     bundle exec rails db:migrate
   else
     cd "$supermarket_path/app"
-    echo "***path is ***"
     pwd
     echo 'Database does not exist'
-    bundle exec rails db:create
-    bundle exec rails db:schema:load
-    bundle exec rails db:migrate
-    bundle exec rails db:seed
+    bundler_path="$(hab pkg path core/ruby27)/bin/bundle"
+    _bundle exec rails db:create
+    _bundle exec rails db:schema:load
+    _bundle exec rails db:migrate
+    _bundle exec rails db:seed
   fi
 
   {{ #each cfg.db.extensions as |extension| ~}}
