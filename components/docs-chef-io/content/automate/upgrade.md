@@ -2,6 +2,7 @@
 title = "Upgrade Chef Automate"
 date = 2022-01-04T12:02:46-08:00
 draft = false
+gh_repo = "automate"
 
 [menu]
   [menu.automate]
@@ -9,8 +10,6 @@ draft = false
     identifier = "automate/upgrade.md Upgrade"
     parent = "automate"
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/upgrade.md)
 
 Chef Automate upgrades from one minor version to another automatically, but you cannot directly upgrade to any major version of Chef Automate. Use the `--major` flag to upgrade from the latest to a major version. This section will talk about the major version upgrade of Chef Automate with its possible scenarios.
 
