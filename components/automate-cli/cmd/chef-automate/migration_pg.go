@@ -21,10 +21,11 @@ import (
 )
 
 var migrateDataCmdFlags = struct {
-	check        bool
-	data         string
-	autoAccept   bool
-	forceExecute bool
+	check            bool
+	data             string
+	autoAccept       bool
+	forceExecute     bool
+	skipStorageCheck bool
 }{}
 
 var ClearDataCmdFlags = struct {
@@ -88,6 +89,7 @@ func newMigrateDataCmd() *cobra.Command {
 	migrateDataCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
 	migrateDataCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
 	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
+	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.skipStorageCheck, "skip-storage-check", "s", false, "skip storage check")
 	migrateDataCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "fore-execute")
 	return migrateDataCmd
 }
@@ -442,10 +444,16 @@ func executePgdata13ShellScript() error {
 }
 
 func checkUpdateMigration(check bool) error {
-	isAvailableSpace, err := calDiskSizeAndDirSize()
+	isAvailableSpace, err := false, error(nil)
 
-	if err != nil {
-		return err
+	if migrateDataCmdFlags.skipStorageCheck {
+		isAvailableSpace = true
+	} else {
+		isAvailableSpace, err = calDiskSizeAndDirSize()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	if isAvailableSpace {
