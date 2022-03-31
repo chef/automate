@@ -32,7 +32,7 @@
   "pooler": {:git, "https://github.com/seth/pooler.git", "521f568bf9a2ccbe7c7e0fc23f24cd06ec559b79", []},
   "protobuf": {:git, "https://github.com/tony612/protobuf-elixir.git", "a99ba02905148fa3cdcffb572f9af900990c10d7", [branch: "main"]},
   "ranch": {:hex, :ranch, "1.7.1", "6b1fab51b49196860b733a49c07604465a47bdb78aa10c1c16a3d199f7f8c881", [:rebar3], [], "hexpm", "451d8527787df716d99dc36162fca05934915db0b6141bbdac2ea8d3c7afc7d7"},
-  "sqerl": {:git, "https://github.com/chef/sqerl.git", "80800bf4304156783b0cf9e65f92e1a2367b79c3", []},
+  "sqerl": {:git, "https://github.com/chef/sqerl.git", "a27e3e58da53240dc9925ec03ecdb894b8231cf9", []},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], [], "hexpm", "4f8805eb5c8a939cf2359367cb651a3180b27dfb48444846be2613d79355d65e"},
   "temp": {:hex, :temp, "0.4.5", "c62ee92c778ddebb2738212fecea372f1a9beba10bacbd7e54e7efe29357a82e", [:mix], [], "hexpm", "850bc152a934c6b4eb47730bf3aaae7e7bc98bd0820073b9540e3e4c8c6fab86"},
   "timex": {:hex, :timex, "3.2.1", "639975eac45c4c08c2dbf7fc53033c313ff1f94fad9282af03619a3826493612", [:mix], [{:combine, "~> 0.10", [hex: :combine, repo: "hexpm", optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, repo: "hexpm", optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, repo: "hexpm", optional: false]}], "hexpm", "e80176f433f4b25c9723c966a5533d57e87b86154a96871115b835b6de146491"},
