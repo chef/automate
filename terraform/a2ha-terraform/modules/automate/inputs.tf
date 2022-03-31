@@ -154,5 +154,6 @@ variable "s3_endpoint" {
 }
 
 variable "bucket_name" {
+  default = "chef-automate-ha"
 }
 
