@@ -628,7 +628,6 @@ func calDiskSizeAndDirSize() (bool, error) {
 		return false, err
 	}
 	diskSpaceInMb := v / 1024
-	fmt.Println(diskSpaceInMb)
 
 	size, err := sys.DirSize("/hab/svc/automate-postgresql/data/pgdata")
 	if err != nil {
