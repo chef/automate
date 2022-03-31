@@ -2,6 +2,7 @@
 title = "Upgrade Chef Automate to 3.X.X"
 date = 2022-03-03T12:02:46-08:00
 draft = false
+gh_repo = "automate"
 
 [menu]
   [menu.automate]
@@ -10,141 +11,330 @@ draft = false
     parent = "automate"
 +++
 
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/major_upgrade.md)
-
-Chef Automate is a platform that provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically, but you cannot directly upgrade to any major version of Chef Automate. Use the `--major` flag to upgrade from the latest to a major version. This section will talk about the major version upgrade of Chef Automate with its possible scenarios.
+Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically; however, Chef Automatate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to 3.x.x.
 
 ## Upgrade Journey
 
-Please choose following upgrade journey based on your current version of chef automate.All these upgrades are mannual upgrades.
+Please choose following upgrade journey based on your current version of Chef Automate. All of these upgrades are manual upgrades.
 
 | Your Current Version | Upgrade To |
 | -------------------- | ---------- |
-| Any version before 2022012400000| 2022012400000|
-| on 2022012400000| 3.0.1|
+| Any version before 20220329091442| 20220329091442|
+| 20220329091442| 3.0.1|
 
-For example, if today you are on version 2021201164433. Then your Upgrade Journey should be:
+For example, if today you are on version 2021201164433, then your upgrade journey should be:
 
-1. Manual upgrade to 2022012400000.
-1. Then manual upgrade to 3.0.1.
+1. Manual upgrade to 20220329091442.
+1. Manual upgrade to 3.0.1.
 
 ## Prerequisites
 
-* **Plan your downtime**: This upgrade comes with downtime. So before upgrading, set the environment to handle the downtime.
-* **Automate Backup**: This Chef Automate version upgraded **PostgreSQL** version. So, take necessary backup of the data to help if there is a system failure.
+- **Plan your downtime**: This upgrade requires downtime. Before upgrading, set the environment to handle the downtime.
+- **Backup Chef Automate database**: This Chef Automate version upgrades PostgreSQL. [Backup](/automate/backup/) your data before upgrading.
 
 ## Upgrade Path
 
-In this version, Chef Automate upgrades the embedded Postgres database from **v9.6** to **v13**. Chef Automate gets upgraded with four possible scenarios:
+There are four possible upgrade scenarios:
 
-* [Automate with Embedded PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-with-embedded-pg" >}}).
-* [Automate with External PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-with-external-pg" >}}).
-* [Automate in Air Gapped Environment with Embedded PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-embedded-pg" >}}).
-* [Automate in Air Gapped Environment with External PostgreSQL]({{< relref "major_upgrade.md#customer-running-automate-in-air-gapped-environment-with-external-pg" >}})
+- [Chef Automate with Embedded PostgreSQL]({{< relref "#chef-automate-with-embedded-postgresql" >}})
+- [Chef Automate with External PostgreSQL]({{< relref "#chef-automate-with-external-postgresql" >}})
+- [Chef Automate in Air-Gapped Environment With Embedded PostgreSQL]({{< relref "#chef-automate-in-air-gapped-environment-with-embedded-postgresql" >}})
+- [Chef Automate in Air-Gapped Environment With External PostgreSQL]({{< relref "#chef-automate-in-air-gapped-environment-with-external-postgresql" >}})
 
-{{< note >}} To upgrade the version of Chef Automate, upgrade your current version to the latest version in dead series. Run the command `chef-automate upgrade run` to upgrade the Chef Automate version. {{< /note >}}
+{{< note >}}
 
-### Automate with Embedded PostgreSQL
+If you are unsure if your installation of Chef Automate is using an external PostgreSQL database, run `chef-automate config show`. You are using an external PostgreSQL database if `enable=true` is present in the `global.v1.external.postgresql` config setting.
 
-To upgrade Chef Automate with Embedded Postgres, follow the steps given below:
+{{< /note >}}
 
-* To avoid blockers while migrating the data it is recommended to have almost 60% of disk space available before version upgrade.
-* Check the availability of the latest version by using `chef-automate upgrade status` command.
-* Run the `chef-automate upgrade run --major` command to start the upgrade process. Once the Chef Automate gets upgraded, you will get:
-  * List of upgraded information.
-  * Checklist of requirements pre-upgrade.
-  * List of steps to perform post-upgrade.
+{{< warning >}}
 
-* Check the status of the version upgrade using `$ chef-automate upgrade status` command.
-* Migrate your data from PostgreSQL **v9.6** to **v13** by running `chef-automate post-major-upgrade migrate --data=PG` command.
-* Check whether all the services are running using `chef-automate status` command.
-* Rectify if all the data is present in your upgraded Chef Automate version. If yes, clear the old PostgreSQL data using `chef-automate post-major-upgrade clear-data --data=PG` command.
+Sixty percent of your drive should be free space before starting a major version upgrade.
 
-### Automate with External PostgreSQL
+{{< /warning >}}
 
-To upgrade Chef Automate with Embedded Postgres, follow the steps given below:
+### Chef Automate With Embedded PostgreSQL
 
-* Check the availability of the latest version by using `chef-automate upgrade status` command.
-* Run the `chef-automate upgrade run --major` command to start the upgrade process. Once the Chef Automate gets upgraded, you will get:
-  * List of upgraded information.
-  * Checklist of requirements pre-upgrade.
-  * List of steps to perform post-upgrade.
+To upgrade Chef Automate with embedded PostgreSQL, follow the steps given below:
 
-* Upgrade your **External PostgreSQL Database** manually using Database Administrator. Click [here]({{< relref "postgres_external_upgrade.md" >}}) to refer to the external postgres upgrade documentation. In case you have configured your *Host*, *Port* or *Password* of PostgreSQL, patch the new configuration to use Chef Automate.
-* Check whether all the services are running using `chef-automate status` command. Once done, you are ready with your Chef Automate version upgrade.
+**Upgrade Chef Automate**
 
-### Automate in Air Gapped Environment with Embedded PostgreSQL
+1. If you haven't already done so, upgrade to the last date-based version of Chef Automate:
 
-{{< note >}} To upgrade the version **(3.x.x)** of Chef Automate in Air Gapped Environment, firstly upgrade your version to the ongoing version **(20224354343234)**. Refer to the [Release Notes]({{< relref "release_notes_automate.md" >}}) to check the latest ongoing version. {{< /note >}}
+   ```sh
+   chef-automate upgrade run
+   ```
 
-#### Upgrade to Previously Released Version
+   This should upgrade to Chef Automate version 20220329091442.
+
+1. Check the availability of the latest version:
+
+   ```sh
+   chef-automate upgrade status
+   ```
+
+1. Initiate a major version upgrade:
+
+   ```sh
+   chef-automate upgrade run --major
+   ```
+
+   Once the upgrade is complete, you will get:
+
+   - Information about the upgrade.
+   - A checklist of requirements pre-upgrade.
+   - A list of steps to perform post-upgrade.
+
+**Upgrade PostgreSQL**
+
+1. Check the upgrade status of Chef Automate:
+
+   ```sh
+   chef-automate upgrade status
+   ```
+
+1. Migrate your data from PostgreSQL 9.6 to PostgreSQL 13:
+
+   ```sh
+   chef-automate post-major-upgrade migrate --data=PG
+   ```
+
+1. Verify that all services are running:
+
+   ```sh
+   chef-automate status
+   ```
+
+1. Verify that all the data is present in your upgraded Chef Automate version. If yes, clear the old PostgreSQL data:
+
+   ```sh
+   chef-automate post-major-upgrade clear-data --data=PG
+   ```
+
+### Chef Automate With External PostgreSQL
+
+To upgrade Chef Automate with external PostgreSQL, follow the steps given below:
+
+**Upgrade Chef Automate**
+
+1. If you haven't already done so, upgrade to the last date-based version of Chef Automate:
+
+   ```sh
+   chef-automate upgrade run
+   ```
+
+   This should upgrade to Chef Automate version 20220329091442.
+
+1. Check the availability of the latest version:
+
+   ```sh
+   chef-automate upgrade status
+   ```
+
+1. Initiate a major version upgrade:
+
+   ```sh
+   chef-automate upgrade run --major
+   ```
+
+   Once the upgrade is complete, you will get:
+
+   - Information about the upgrade.
+   - A checklist of requirements pre-upgrade.
+   - A list of steps to perform post-upgrade.
+
+**Upgrade External PostgreSQL**
+
+1. Upgrade your external PostgreSQL database manually. See the [external PostgreSQL upgrade]({{< relref "postgres_external_upgrade.md" >}}) documentation. If you have configured *Host*, *Port*, or *Password* of PostgreSQL, patch the new configuration to use Chef Automate.
+
+1. Verify that all services are running:
+
+   ```sh
+   chef-automate status
+   ```
+
+### Chef Automate in Air-Gapped Environment With Embedded PostgreSQL
+
+**Upgrade to Last Date-Based Version of Chef Automate**
 
 To upgrade your version to **20224354343234** version, follow the steps given below:
 
-* Download the latest CLI from Internet connected machine using `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip * > chef-automate && chmod +x chef-automate` command.
-* Create AIB bundle using Internet connected machine using `chef-automate airgap bundle create /<path>/automate_v2022012400000.aib --version 20224354343234` command.
-* Copy the CLI (chef-automate) and AIB (automate_v2022012400000.aib) to Air Gapped Machine where you are running the Chef Automate.
-* Run **Upgrade** in Air Gapped Machine using `sudo chef-automate upgrade run --airgap-bundle /<path>/ automate_v2022012400000.aib` command.
-* Once done, confirm the status upgrade using `$ chef-automate upgrade status` command.
+1. Download the latest Chef Automate CLI to an internet-connected machine:
 
-#### Upgrade to 3.x.x
+   ```sh
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+   ```
 
-Once you have upgraded to the latest ongoing version, you can perform the significant upgrade. To upgrade to 3.x.x, follow the steps given below:
+1. Create an Airgap Installation Bundle (AIB) using the internet-connected host:
 
-* Create AIB Bundle on Internet connected machine using `chef-automate airgap bundle create /<path>/automate_v22.0.1.aib --version 3.x.x` command.
-* Copy the CLI (chef-automate) and AIB (automate_v22.0.1.aib) to Air Gapped Machine where you are running the Chef Automate.
-* Run **Upgrade** in Air Gapped Machine using `sudo chef-automate upgrade run --airgap-bundle /<path>/automate_v3.x.x.aib --major` command. Once the Chef Automate gets upgraded you will get:
-  * List of upgraded information.
-  * Checklist of requirements pre-upgrade.
-  * List of steps to perform post-upgrade.
+   ```sh
+   chef-automate airgap bundle create /<PATH>/automate_v20220329091442.aib --version 20224354343234
+   ```
 
-* Check the status of the version upgrade using `$ chef-automate upgrade status` command.
-* Migrate your data from PostgreSQL **v9.6** to **v13** by running `chef-automate post-major-upgrade migrate --data=PG` command.
-* Check whether all the services are running using `chef-automate status` command.
-* Rectify if all the data is present in your upgraded Chef Automate version. If yes, clear the old PostgreSQL data using `chef-automate post-major-upgrade clear-data --data=PG` command.
+1. Copy the Chef Automate CLI (`chef-automate`) and the AIB (`automate_v20220329091442.aib`) to the air-gapped machine where you are running Chef Automate.
 
-### Automate in Air Gapped Environment with External PostgreSQL
+1. Run **Upgrade** in air-gapped machine:
 
-{{< note >}} To upgrade the version **(3.x.x)** of Chef Automate in Air Gapped Environment, firstly upgrade your version to the ongoing version **(20224354343234)**. Refer to the [Release Notes]({{< relref "release_notes_automate.md" >}}) to check the latest ongoing version. {{< /note >}}
+   ```sh
+   sudo chef-automate upgrade run --airgap-bundle /<PATH>/automate_v20220329091442.aib
+   ```
 
-#### Upgrade to Previously Released Version
+1. Once done, confirm the status of the upgrade:
 
-To upgrade your version to **20224354343234** version, follow the steps given below:
+   ```sh
+   chef-automate upgrade status
+   ```
 
-* Download the latest CLI from Internet connected machine using `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip * > chef-automate && chmod +x chef-automate` command.
-* Create AIB bundle using Internet connected machine using `chef-automate airgap bundle create /<path>/automate_v2022012400000.aib --version 20224354343234` command.
-* Copy the CLI (chef-automate) and AIB (automate_v2022012400000.aib) to Air Gapped Machine where you are running the Chef Automate.
-* Run **Upgrade** in Air Gapped Machine using `sudo chef-automate upgrade run --airgap-bundle /<path>/ automate_v2022012400000.aib` command.
-* Once done, confirm the status upgrade using `$ chef-automate upgrade status` command.
+**Upgrade to Chef Automate 3.x.x**
 
-#### Upgrade to 3.x.x
+Once you have upgraded to the last date-based version of Chef Automate, you can perform the major upgrade. To upgrade to 3.x.x, follow the steps below:
 
-Once you have upgraded to the latest ongoing version, you can perform the significant upgrade. To upgrade to 3.x.x, follow the steps given below:
+1. Create an Airgap Installation Bundle (AIB) on the internet-connected host:
 
-* Create AIB Bundle on Internet connected machine using `chef-automate airgap bundle create /<path>/automate_v22.0.1.aib --version 3.x.x` command.
-* Copy the CLI (chef-automate) and AIB (automate_v22.0.1.aib) to Air Gapped Machine where you are running the Chef Automate.
-* Run **Upgrade** in Air Gapped Machine using `sudo chef-automate upgrade run --airgap-bundle /<path>/automate_v3.x.x.aib --major` command. Once the Chef Automate gets upgraded you will get:
-  * List of upgraded information.
-  * Checklist of requirements pre-upgrade.
-  * List of steps to perform post-upgrade.
+   ```sh
+   chef-automate airgap bundle create /<PATH>/automate_v22.0.1.aib --version 3.x.x
+   ```
 
-* Upgrade your **External PostgreSQL Database** manually using Database Administrator. Click [here]({{< relref "postgres_external_upgrade.md" >}}) to refer to the external postgres upgrade documentation. In case you have configured your *Host*, *Port* or *Password* of PostgreSQL, patch the new configuration to use Chef Automate.
-* Check the status of the version upgrade using `$ chef-automate upgrade status` command. Once done, you are ready with your Chef Automate version upgrade.
+1. Copy the Chef Automate CLI (`chef-automate`) and AIB (`automate_v22.0.1.aib`) to the air-gapped machine running Chef Automate.
 
-## FAQ
+1. Uprade Chef Automate on the air-gapped machine:
 
-**Q) How to check if automate is running external Postgres?**
+   ```sh
+   sudo chef-automate upgrade run --airgap-bundle /<PATH>/automate_v3.x.x.aib --major
+   ```
 
-A) Run `chef-automate config show` command. If `enable=true` is present in `global.v1.external.postgresql` it confirms that the automate is running external postgres.
+   Once the Chef Automate has upgraded, you will get:
 
-**Q) When migrating data using the command `chef-automate post-major-upgrade migrate --data=PG`, why is it failing?**
+   - Information about the upgrade.
+   - A checklist of requirements pre-upgrade.
+   - A list of steps to perform post-upgrade.
 
-A) To fix the above mentioned issue you can restore the data using the command `chef-automate backup restore </path/to/backups/>BACKUP_ID`. Here use the *BACKUP ID* from the backup you have created before starting the upgrade.
+1. Check the status of the upgrade:
+
+   ```sh
+   chef-automate upgrade status
+   ```
+
+**Upgrade PostgreSQL**
+
+1. Migrate your data from PostgreSQL 9.6 to PostgreSQL 13:
+
+   ```sh
+   chef-automate post-major-upgrade migrate --data=PG
+   ```
+
+1. Check whether all the services are running:
+
+   ```sh
+   chef-automate status
+   ```
+
+1. Verify that all the data is present in your upgraded Chef Automate. If yes, clear the old PostgreSQL data:
+
+   ```sh
+   chef-automate post-major-upgrade clear-data --data=PG
+   ```
+
+### Chef Automate in Air-Gapped Environment With External PostgreSQL
+
+**Upgrade to Last Date-Based Version of Chef Automate**
+
+1. Download the latest Chef Automate CLI to an internet-connected machine:
+
+   ```sh
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+   ```
+
+1. Create an Airgap Installation Bundle (AIB) using the internet-connected host:
+
+   ```sh
+   chef-automate airgap bundle create /<PATH>/automate_v20220329091442.aib --version 20224354343234
+   ```
+
+1. Copy the Chef Automate CLI (`chef-automate`) and the AIB (`automate_v20220329091442.aib`) to the air-gapped machine where you are running Chef Automate.
+
+1. Upgrade the air-gapped machine:
+
+   ```sh
+   sudo chef-automate upgrade run --airgap-bundle /<PATH>/automate_v20220329091442.aib
+   ```
+
+1. Once done, confirm the status of the upgrade:
+
+   ```sh
+   chef-automate upgrade status
+   ```
+
+**Upgrade to Chef Automate 3.x.x**
+
+Once you have upgraded to the last date-based version of Chef Automate, you can perform the major upgrade. To upgrade to 3.x.x, follow the steps below:
+
+1. Create an Airgap Installation Bundle (AIB) on the internet-connected host:
+
+   ```sh
+   chef-automate airgap bundle create /<PATH>/automate_v22.0.1.aib --version 3.x.x
+   ```
+
+1. Copy the Chef Automate CLI (`chef-automate`) and AIB (`automate_v22.0.1.aib`) to the air-gapped machine running Chef Automate.
+
+1. Upgrade Chef Automate on the air-gapped machine:
+
+   ```sh
+   sudo chef-automate upgrade run --airgap-bundle /<PATH>/automate_v3.x.x.aib --major
+   ```
+
+   Once the Chef Automate has upgraded, you will get:
+
+   - Information about the upgrade.
+   - A checklist of requirements pre-upgrade.
+   - A list of steps to perform post-upgrade.
+
+1. Check the status of the upgrade:
+
+   ```sh
+   chef-automate upgrade status
+   ```
+
+**Upgrade External PostgreSQL**
+
+1. Upgrade your external PostgreSQL database manually. See the [external PostgreSQL upgrade]({{< relref "postgres_external_upgrade.md" >}}) documentation. If you have configured *Host*, *Port*, or *Password* of PostgreSQL, patch the new configuration to use Chef Automate.
+
+1. Verify that all services are running:
+
+   ```sh
+   chef-automate status
+   ```
+
+## Troubleshooting
+
+If Chef Automate fails to upgrade your database for PostgreSQL 13 when running `chef-automate post-major-upgrade migrate --data=PG`, restore the data:
+
+```sh
+chef-automate backup restore </path/to/backups/>BACKUP_ID
+```
+
+Use the backup ID from the backup you created before starting the upgrade.
 
 If the restore fails even after upgrading the Chef Automate version, follow the steps given below:
-  
-1. Uninstall **Chef Automate**.
-1. Install the last version (202232344344) using the air gapped installation process. Click [here](https://docs.chef.io/automate/airgapped_installation/) for more information on air gapped installation process.
-1. Restore the backup using `chef-automate backup restore <backup_id>`. Click [here](https://docs.chef.io/automate/restore/) for the reference.
 
-{{< note >}} If you have migrated data using alternative ways you will see a checklist of steps on running `chef-automate upgrade status` which won’t be marked as complete. To remove those checklists, run the command `sudo rm /hab/svc/deployment-service/var/upgrade_metadata.json`. {{< /note >}}
+1. Uninstall Chef Automate:
+
+   ```sh
+   chef-automate uninstall
+   ```
+
+1. Install the last date-based version (`202232344344`) using the air-gapped installation process. See the [air-gapped installation](/automate/airgapped_installation/) documentation for more information.
+
+1. Restore the backup:
+
+   ```sh
+   chef-automate backup restore <backup_id>
+   ```
+
+   See the [Chef Automate restore](/automate/restore/) documentation for more information.
+
+{{< note >}}
+
+If you have migrated database using alternative methods, you will see a checklist of steps after running `chef-automate upgrade status` which won’t be marked as complete. To remove those checklist items, run `sudo rm /hab/svc/deployment-service/var/upgrade_metadata.json`.
+
+{{< /note >}}
