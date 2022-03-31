@@ -56,3 +56,13 @@ do_deploy() {
     # this migrates v1 legacy policies
     "${cli_bin}" iam upgrade-to-v2 
 }
+
+run_upgrade() {
+    local cli_bin="/bin/chef-automate-${OLD_VERSION}"
+    "${cli_bin}" upgrade run
+    
+    sleep 45
+
+    #shellcheck disable=SC2154
+    wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+}
