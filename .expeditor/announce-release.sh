@@ -5,7 +5,7 @@ set -eou pipefail
 # Download the manifest
 curl -o manifest.json "https://packages.chef.io/manifests/${EXPEDITOR_TARGET_CHANNEL}/automate/latest_semver.json"
 # Extract the build version from the manifest
-build_version=$(jq -r -c ".build"  manifest.json)
+build_version=$(jq -r -c ".version"  manifest.json)
 # Download the release-notes for our specific build
 curl -o release-notes.md "https://packages.chef.io/release-notes/automate/${build_version}.md"
 
