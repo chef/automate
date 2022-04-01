@@ -30,6 +30,7 @@ import { Destination, regions } from 'app/entities/destinations/destination.mode
 import { Router } from '@angular/router';
 import { trigger, state, animate, transition, style, keyframes } from '@angular/animations';
 import { KVData } from 'app/entities/node-credentials/node-credential.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 const fadeEnable = trigger('fadeEnable', [
    state('inactive', style({})),
@@ -114,7 +115,8 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
-    private router: Router
+    private router: Router,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit(): void {
@@ -215,6 +217,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new UpdateDestination({ destination: destinationObj }));
     this.destination = destinationObj;
+    this.telemetryService.track('Settings_DataFeeds_Details_Save');
   }
 
   public sendTestForDataFeedUrl(): void {
@@ -241,6 +244,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
           this.testInProgress = false;
         }
       });
+    this.telemetryService.track('Settings_DataFeeds_Details_TestDataFeeds');
   }
 
   public get nameCtrl(): FormControl {
@@ -269,6 +273,11 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
           this.destination.enable = val;
         }
       });
+    if (val) {
+      this.telemetryService.track('Settings_DataFeeds_Details_Enable');
+    } else {
+      this.telemetryService.track('Settings_DataFeeds_Details_Disable');
+    }
   }
   public deleteDataFeed() {
     this.store.dispatch(new DeleteDestination(this.destination));
@@ -281,6 +290,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
           this.router.navigate(['/settings/data-feeds']);
         }
       });
+    this.telemetryService.track('Settings_DataFeeds_Details_Delete');
   }
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;

@@ -11,6 +11,7 @@ import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { regions } from 'app/entities/destinations/destination.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
@@ -99,6 +100,10 @@ export class DataFeedCreateComponent {
     useHeaders: false,
     customToken: false
   };
+
+  constructor(
+    private telemetryService: TelemetryService
+  ) { }
 
   set saveDone(done: boolean) {
     this.saveInProgress = done;
@@ -281,6 +286,7 @@ export class DataFeedCreateComponent {
       auth: this.authSelected,
       region: this.dropDownVal
     });
+    this.telemetryService.track('Settings_DataFeeds_TestConnection_' + this.integTitle);
   }
 
   public validateForm() {
@@ -360,6 +366,7 @@ export class DataFeedCreateComponent {
       auth: this.authSelected,
       region: this.dropDownVal
     });
+    this.telemetryService.track('Settings_DataFeeds_NewIntegration_' + this.integTitle);
   }
 
   public dismissNotification() {
