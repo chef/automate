@@ -407,8 +407,11 @@ EOF
   )" chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CreateBackup >/dev/null
     
     log_line "For org_id '${org_id}', the numbers of users are ${number_of_users}"
-  done   
+  done  
+   
   install_if_missing core/tar tar
   tar -cf backup.zip backup
+  rm -rf backup
+
   log_line "Sample back up zip created at current path ${PWD} with name 'backup.zip'"
 }
