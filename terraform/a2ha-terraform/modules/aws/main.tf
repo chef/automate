@@ -30,23 +30,23 @@ data "aws_vpc" "default" {
   id = var.aws_vpc_id
 }
 
-locals {                                                            
+locals {
   private_subnet_ids_string = join(",", var.private_custom_subnets)
-  private_subnet_ids_list = split(",", local.private_subnet_ids_string)             
+  private_subnet_ids_list = split(",", local.private_subnet_ids_string)
 }
 
-data "aws_subnet" "default" {                                  
-  count = length(var.private_custom_subnets) > 0 ? 3 : 0            
+data "aws_subnet" "default" {
+  count = length(var.private_custom_subnets) > 0 ? 3 : 0
   id    = local.private_subnet_ids_list[count.index]
 }
 
-locals {                                                            
+locals {
   public_subnet_ids_string = join(",", var.public_custom_subnets)
-  public_subnet_ids_list = split(",", local.public_subnet_ids_string)             
+  public_subnet_ids_list = split(",", local.public_subnet_ids_string)
 }
 
-data "aws_subnet" "public" {                                  
-  count = length(var.private_custom_subnets) > 0 ? 3 : 0            
+data "aws_subnet" "public" {
+  count = length(var.private_custom_subnets) > 0 ? 3 : 0
   id    = local.public_subnet_ids_list[count.index]
 }
 
@@ -77,6 +77,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_eip" "eip1" {
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   vpc              = true
   public_ipv4_pool = "amazon"
 
@@ -84,6 +85,7 @@ resource "aws_eip" "eip1" {
 }
 
 resource "aws_eip" "eip2" {
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   vpc              = true
   public_ipv4_pool = "amazon"
 
@@ -91,6 +93,7 @@ resource "aws_eip" "eip2" {
 }
 
 resource "aws_eip" "eip3" {
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   vpc              = true
   public_ipv4_pool = "amazon"
 
@@ -98,7 +101,8 @@ resource "aws_eip" "eip3" {
 }
 
 resource "aws_nat_gateway" "nat1" {
-  allocation_id = aws_eip.eip1.id
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  allocation_id = aws_eip.eip1[0].id
   subnet_id     = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public[0].id : aws_subnet.public[0].id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
@@ -107,7 +111,8 @@ resource "aws_nat_gateway" "nat1" {
 }
 
 resource "aws_nat_gateway" "nat2" {
-  allocation_id = aws_eip.eip2.id
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  allocation_id = aws_eip.eip2[0].id
   subnet_id     = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public[1].id : aws_subnet.public[1].id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
@@ -116,7 +121,8 @@ resource "aws_nat_gateway" "nat2" {
 }
 
 resource "aws_nat_gateway" "nat3" {
-  allocation_id = aws_eip.eip3.id
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
+  allocation_id = aws_eip.eip3[0].id
   subnet_id     = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public[2].id : aws_subnet.public[2].id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_nat_gw"))
@@ -125,10 +131,11 @@ resource "aws_nat_gateway" "nat3" {
 }
 
 resource "aws_route_table" "route1" {
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   vpc_id = data.aws_vpc.default.id
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat1.id
+    nat_gateway_id = aws_nat_gateway.nat1[0].id
   }
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
@@ -136,10 +143,11 @@ resource "aws_route_table" "route1" {
 }
 
 resource "aws_route_table" "route2" {
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   vpc_id = data.aws_vpc.default.id
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat2.id
+    nat_gateway_id = aws_nat_gateway.nat2[0].id
   }
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
@@ -147,10 +155,11 @@ resource "aws_route_table" "route2" {
 }
 
 resource "aws_route_table" "route3" {
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   vpc_id = data.aws_vpc.default.id
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat3.id
+    nat_gateway_id = aws_nat_gateway.nat3[0].id
   }
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_route_table"))
@@ -158,21 +167,21 @@ resource "aws_route_table" "route3" {
 }
 
 resource "aws_route_table_association" "nat1" {
-  count          = 1
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[0].id : aws_subnet.default[0].id
-  route_table_id = aws_route_table.route1.id
+  route_table_id = aws_route_table.route1[0].id
 }
 
 resource "aws_route_table_association" "nat2" {
-  count          = 1
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[1].id : aws_subnet.default[1].id
-  route_table_id = aws_route_table.route2.id
+  route_table_id = aws_route_table.route2[0].id
 }
 
 resource "aws_route_table_association" "nat3" {
-  count          = 1
+  count                   = length(var.public_custom_subnets) > 0 ? 0 : 1
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[2].id : aws_subnet.default[2].id
-  route_table_id = aws_route_table.route3.id
+  route_table_id = aws_route_table.route3[0].id
 }
 
 locals {
