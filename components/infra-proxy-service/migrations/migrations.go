@@ -385,7 +385,6 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 			return nil, err
 		}
 	}
-	//defer os.RemoveAll("./backup")
 
 	// Create data for org file org.json
 	orgJsonObj := pipeline.OrgJson{}
@@ -481,7 +480,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 		return nil, err
 	}
 
-	// Write key_dump.json file
+	// Write org users file members.json
 	membersJson, err := json.Marshal(members)
 	if err != nil {
 		log.Errorf("Failed to marshal %s", err.Error())
@@ -489,10 +488,11 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	}
 	err = writeFile(path.Join("./backup/organizations", req.OrgId, "members.json"), membersJson)
 	if err != nil {
-		log.Errorf("Failed to write server users file %s", err.Error())
+		log.Errorf("Failed to write org users file %s", err.Error())
 		return nil, err
 	}
 
+	// Write org admins file admins.json
 	adminsJson, err := json.Marshal(admins)
 	if err != nil {
 		log.Errorf("Failed to marshal %s", err.Error())
@@ -500,7 +500,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	}
 	err = writeFile(path.Join("./backup/organizations", req.OrgId, "groups", "admins.json"), adminsJson)
 	if err != nil {
-		log.Errorf("Failed to write server users file %s", err.Error())
+		log.Errorf("Failed to write org admins file %s", err.Error())
 		return nil, err
 	}
 
