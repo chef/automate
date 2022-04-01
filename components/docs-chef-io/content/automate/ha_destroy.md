@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Destroying Infrastructure"
     parent = "automate/deploy_high_availability/reference"
     identifier = "automate/deploy_high_availability/reference/ha_destroy.md Destroying Infrastructure"
-    weight = 220
+    weight = 240
 +++
 
 Follow any of the step to destroy terraform or infrastructure created while deploying Chef Automate High Availability (HA) using AWS or on-premises model.
