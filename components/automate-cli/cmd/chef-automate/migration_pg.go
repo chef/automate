@@ -151,6 +151,10 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 }
 
 func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
+	_, err := calDiskSizeAndDirSize()
+	if err != nil {
+		return err
+	}
 
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
@@ -636,11 +640,13 @@ func calDiskSizeAndDirSize() (bool, error) {
 
 	dirSizeInMb := size / (1024 * 1024)
 
+	msg := fmt.Sprintf("Insufficient disk space for migration.\n %18s: %7d MB\n %18s: %7d MB\n",
+		"Space Required", dirSizeInMb,
+		"Space Available", diskSpaceInMb)
+
 	if diskSpaceInMb > uint64(dirSizeInMb) {
-		fmt.Println("disk space is greater than pgdata directory size")
 		return true, nil
 	} else {
-		fmt.Println("disk space is less than pgdata directory size")
-		return false, errors.New("Insufficient disk space")
+		return false, errors.New(msg)
 	}
 }
