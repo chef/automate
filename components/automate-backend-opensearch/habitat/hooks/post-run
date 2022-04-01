@@ -1,0 +1,68 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+source {{pkg.svc_config_path}}/health_check
+
+{{#if svc.me.cfg.http-host ~}}
+HOST="{{svc.me.sys.ip}}"
+
+{{else}}
+HOST="127.0.0.1"
+
+{{/if ~}}
+
+{{! Handlebars doesn't allow else-if style statements so we have to handle
+    two exit early cases before rendering the post hook if either of those
+    conditions are not met
+~}}
+
+{{#if cfg.disable ~}}
+# ElasticSearch has been disabled via config, exit early.
+touch ${POST_RUN_SENTINEL}
+exit 0
+
+{{/if ~}}
+
+{{#if cfg.deprecated.external_es ~}}
+# We're using the deprecated external ElasticSearch proxy node, exit early.
+touch ${POST_RUN_SENTINEL}
+exit 0
+
+{{/if ~}}
+
+# ElasticSearch >= 6 doesn't allow configuring index settings in the elasticsearch.yml.
+# We're using this hook to configure the default index settings after the service
+# has initialized enough to service queries.
+
+# The hab post-run hook is fired immediately after the run hook, therefore it's
+# unlikely that elasticsearch is healthy the first time the post-run hook is
+# invoked. We call the health-check wait_until_healthy function which waits until
+# ElasticSearch returns green or yellow, and only after the service is healthy
+# do we attempt to configure it. If the service isn't healthy after our timeout
+# we'll exit 1 after which hab will fire off the hook again. We intentionally
+# fail and exit the hook frequently so that we don't end up with a hook
+# that that can run forever due to an existing bug where hab doesn't reap hooks
+# when services are unloaded:  https://github.com/habitat-sh/habitat/issues/7494
+
+if [[ $(wait_until_healthy 5) -ne 0 ]]; then
+  echo "Timed out waiting for ElasticSearch to become healthy"
+  exit 1 # always exit 0 in post-run or it'll retry the hook
+fi
+
+echo "Configuring index settings"
+curl \
+  -s \
+  -i \
+  -H 'Content-Type: application/json'\
+  -X PUT "http://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
+  -d '{
+    "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
+    "index.refresh_interval": "{{cfg.index.refresh_interval}}"
+  }'
+
+# The health-check hook will return an error unless we touch sentinel file to
+# signal to the health check that this hook has completed successfully.
+touch ${POST_RUN_SENTINEL}
+
+exit 0
