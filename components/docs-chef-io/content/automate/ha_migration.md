@@ -12,10 +12,7 @@ gh_repo = "automate"
     weight = 200
 +++
 
-This section explains the migration procedure for the following components of the Chef Automate High Availability (HA) feature:
-
-- Chef server (HA- backend) to Automate
-- Existing A2HA to Automate HA
+This page explains what is migration procedure and what are the most common examples of migrating data in Chef Automate High Availability (HA).
 
 ## What is Migration?
 
