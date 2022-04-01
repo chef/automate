@@ -79,6 +79,7 @@ message ConfigRequest {
 					google.protobuf.Int32Value proxy_read_timeout = 18;
 					google.protobuf.Int32Value proxy_send_timeout = 19;
 					google.protobuf.StringValue proxy_set_header_host = 20;
+					google.protobuf.StringValue proxy_ssl_verify = 21;
 
 				}
 

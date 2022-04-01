@@ -266,7 +266,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			}
 		}
 		if len(httpsNodes) > 0 && len(httpsNodes) < len(nodes) {
-			cfgErr.AddInvalidValue("global.v1.external.opensearch.nodes", "Cannot mix http and https nodes")
+			cfgErr.AddInvalidValue("   .nodes", "Cannot mix http and https nodes")
 		}
 
 		// Only one of root_cert or root_cert_file has been specified
