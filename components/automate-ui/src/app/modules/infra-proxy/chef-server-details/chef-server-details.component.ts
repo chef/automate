@@ -31,7 +31,7 @@ import {
   GetServer,
   UpdateServer,
   UpdateWebUIKey,
-  ValidateWebUIKey, 
+  ValidateWebUIKey,
   GetUsers
 } from 'app/entities/servers/server.actions';
 import {

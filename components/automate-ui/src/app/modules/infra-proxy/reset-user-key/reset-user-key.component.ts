@@ -6,7 +6,6 @@ import { combineLatest, Subject } from 'rxjs';
 import { ResetUserKey } from 'app/entities/org-users/org-users.action';
 import { Utilities } from 'app/helpers/utilities/utilities';
 import { saveAs } from 'file-saver';
-import { ResetKey } from 'app/entities/clients/client.model';
 import { isNil } from 'lodash';
 import { EntityStatus } from 'app/entities/entities';
 import { resetError, resetStatus, resetUserKey } from 'app/entities/org-users/org-users.selectors';
@@ -62,7 +61,7 @@ export class ResetUserKeyComponent implements OnInit, OnDestroy {
           !isNil(resetKeyState)) {
               this.resetting = false;
               this.isReset = true;
-              this.privateKey = resetKeyState?.user_key;
+              this.privateKey = resetKeyState?.private_key;
           } else if (resetStatusSt === EntityStatus.loadingFailure) {
               this.error = errorSt;
               this.closeCreateModal();
@@ -95,8 +94,7 @@ export class ResetUserKeyComponent implements OnInit, OnDestroy {
 
   resetKeyUser(): void {
     this.resetting = true;
-    const payload: ResetKey = {
-      'org_id': this.orgId,
+    const payload = {
       'server_id': this.serverId,
       'name': this.name
     };

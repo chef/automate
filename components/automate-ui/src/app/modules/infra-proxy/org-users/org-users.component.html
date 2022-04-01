@@ -15,6 +15,7 @@
       </div>
       <div class="empty-section" cy-data="empty-list" *ngIf="!loading && !users.length && current_page === 1">
         <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p>No users available.</p>
       </div>
       <chef-table data-cy=orgUsers-table-container *ngIf="users.length">
         <chef-thead>
