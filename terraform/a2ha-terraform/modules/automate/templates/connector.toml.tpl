@@ -11,12 +11,12 @@
   teams_port = ${teams_port}
 
 [services]
-  [services.elasticsearch]
-  ips = ${elasticsearch_ips}
+  [services.opensearch]
+  ips = ${opensearch_ips}
   sup_port = 9631
   svc_group = "default"
-  svc_name = "automate-ha-elasticsearch"
-  svc_port = ${elasticsearch_listen_port}
+  svc_name = "automate-ha-opensearch"
+  svc_port = ${opensearch_listen_port}
 
   [services.postgresql]
   ips = ${postgresql_ips}
