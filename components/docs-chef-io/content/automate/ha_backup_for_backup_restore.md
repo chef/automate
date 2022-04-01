@@ -13,4 +13,9 @@ gh_repo = "automate"
     weight = 111
 +++
 
-TO BE DONE
+
+Chef Automate let's you create a new backup. You can create it by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+
+```cmd
+./chef-automate backup create
+```
