@@ -241,6 +241,7 @@ do_prepare_upgrade() {
 
 append_version_file() {
     #prepare the versions.json file
+    #todo: vivek shankar build/version by schema_version
     newversion=$(jq -r -c ".build"  "$test_manifest_path")
     echo $newversion
     jq --arg val $newversion '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
