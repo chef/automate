@@ -408,5 +408,6 @@ EOF
     
     log_line "For org_id '${org_id}', the numbers of users are ${number_of_users}"
   done  
+  zip -r ${PWD}/backup.zip ${PWD}/backup
   log_line "Sample back up zip created at current path ${PWD} with name 'backup.zip'"
 }

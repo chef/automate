@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	"archive/zip"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -12,7 +11,6 @@ import (
 	"math/rand"
 	"os"
 	"path"
-	"path/filepath"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -506,12 +504,6 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 		return nil, err
 	}
 
-	// Create zip of backup
-	err = zipBackUp("./backup", "./backup.zip")
-	if err != nil {
-		log.Errorf("Failed to create zip of back up file %s", err.Error())
-		return nil, err
-	}
 	return &response.CreateBackupResponse{}, nil
 }
 
@@ -540,64 +532,4 @@ func writeFile(path string, data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func zipBackUp(source, target string) error {
-	// Create a writeMembersFileZIP file and zip.Writer
-	f, err := os.Create(target)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = f.Close()
-	}()
-
-	writer := zip.NewWriter(f)
-	defer func() {
-		_ = writer.Close()
-	}()
-	// Go through all the files of the source
-	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// Create a local file header
-		header, err := zip.FileInfoHeader(info)
-		if err != nil {
-			return err
-		}
-
-		// set compression
-		header.Method = zip.Deflate
-
-		// Set relative path of a file as the header name
-		header.Name, err = filepath.Rel(filepath.Dir(source), path)
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			header.Name += "/"
-		}
-
-		// Create writer for the file header and save content of the file
-		headerWriter, err := writer.CreateHeader(header)
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		f, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer func() {
-			_ = f.Close()
-		}()
-		_, err = io.Copy(headerWriter, f)
-		return err
-	})
 }
