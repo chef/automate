@@ -4211,11 +4211,6 @@ func init() {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
           "description": "Chef Infra Server."
-        },
-        "last_migration_time": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Last successfull migration or last sync status"
         }
       }
     },
@@ -4856,6 +4851,11 @@ func init() {
         "migration_status": {
           "type": "string",
           "title": "Migration Id for active Chef Infra server migration"
+        },
+        "last_migration_time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Last successfull migration or last sync status"
         }
       }
     },

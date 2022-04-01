@@ -28,8 +28,6 @@ message GetServers {
 message GetServer {
     // Chef Infra Server.
     Server server = 1;
-    // Last successfull migration or last sync status
-    google.protobuf.Timestamp last_migration_time = 2;
 }
 
 message Server {
@@ -49,6 +47,8 @@ message Server {
     string migration_type =8;
     //Migration Id for active Chef Infra server migration
     string migration_status =9;
+     // Last successfull migration or last sync status
+     google.protobuf.Timestamp last_migration_time = 10;
 }
 
 message GetServerStatus {

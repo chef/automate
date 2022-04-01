@@ -164,7 +164,7 @@ func (s *Server) GetServers(ctx context.Context, req *request.GetServers) (*resp
 func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*response.GetServer, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	var timeStamp *timestamppb.Timestamp
+
 	// Validate all request fields are required
 	err := validation.New(validation.Options{
 		Target:          "server",
@@ -185,16 +185,8 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 		log.Errorf("Unable to fetch migration status for server id:%s", req.Id)
 	}
 
-	// If timestamp is zero send nil value
-	if migration.Timestamp.IsZero() {
-		timeStamp = nil
-	} else {
-		timeStamp = timestamppb.New(migration.Timestamp)
-	}
-
 	resp := &response.GetServer{
-		Server:            fromStorageServerWithMigrationDetails(server, migration),
-		LastMigrationTime: timeStamp,
+		Server: fromStorageServerWithMigrationDetails(server, migration),
 	}
 	return resp, nil
 }
@@ -402,14 +394,24 @@ func fromStorageToListServers(sl []storage.Server) []*response.Server {
 
 // Create a response.Server from a storage.Server with migration
 func fromStorageServerWithMigrationDetails(s storage.Server, m storage.MigrationStatus) *response.Server {
+	var timeStamp *timestamppb.Timestamp
+
+	// If timestamp is zero send nil value
+	if m.Timestamp.IsZero() {
+		timeStamp = nil
+	} else {
+		timeStamp = timestamppb.New(m.Timestamp)
+	}
+
 	return &response.Server{
-		Id:              s.ID,
-		Name:            s.Name,
-		Fqdn:            s.Fqdn,
-		IpAddress:       s.IPAddress,
-		OrgsCount:       s.OrgsCount,
-		MigrationId:     m.MigrationID,
-		MigrationType:   m.MigrationType,
-		MigrationStatus: m.MigrationStatus,
+		Id:                s.ID,
+		Name:              s.Name,
+		Fqdn:              s.Fqdn,
+		IpAddress:         s.IPAddress,
+		OrgsCount:         s.OrgsCount,
+		MigrationId:       m.MigrationID,
+		MigrationType:     m.MigrationType,
+		MigrationStatus:   m.MigrationStatus,
+		LastMigrationTime: timeStamp,
 	}
 }

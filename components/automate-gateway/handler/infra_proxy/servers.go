@@ -35,8 +35,7 @@ func (a *InfraProxyServer) GetServer(ctx context.Context, r *gwreq.GetServer) (*
 	}
 
 	return &gwres.GetServer{
-		Server:            fromUpstreamServer(res.Server),
-		LastMigrationTime: res.LastMigrationTime,
+		Server: fromUpstreamServer(res.Server),
 	}, nil
 }
 
@@ -144,14 +143,15 @@ func (a *InfraProxyServer) UpdateWebuiKey(ctx context.Context, r *gwreq.UpdateWe
 
 func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 	return &gwres.Server{
-		Id:              t.GetId(),
-		Name:            t.GetName(),
-		Fqdn:            t.GetFqdn(),
-		IpAddress:       t.GetIpAddress(),
-		OrgsCount:       t.GetOrgsCount(),
-		MigrationId:     t.GetMigrationId(),
-		MigrationType:   t.GetMigrationType(),
-		MigrationStatus: t.GetMigrationStatus(),
+		Id:                t.GetId(),
+		Name:              t.GetName(),
+		Fqdn:              t.GetFqdn(),
+		IpAddress:         t.GetIpAddress(),
+		OrgsCount:         t.GetOrgsCount(),
+		MigrationId:       t.GetMigrationId(),
+		MigrationType:     t.GetMigrationType(),
+		MigrationStatus:   t.GetMigrationStatus(),
+		LastMigrationTime: t.GetLastMigrationTime(),
 	}
 }
 
