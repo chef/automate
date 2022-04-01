@@ -75,6 +75,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.ProxyReadTimeout = w.Int32(7200)
 	c.V1.Sys.Ngx.Http.ProxySendTimeout = w.Int32(600)
 	c.V1.Sys.Ngx.Http.ProxySetHeaderHost = w.String("$http_host")
+	c.V1.Sys.Ngx.Http.ProxySslVerify = w.String("on")
 
 	return c
 }
