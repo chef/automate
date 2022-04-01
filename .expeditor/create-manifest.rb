@@ -223,7 +223,7 @@ class ManifestGenerator
     manifest["schema_version"] = "2"
     manifest["hab_build"] = local_hab_version
     manifest["build"] = version
-    maniftest["version"] = version
+    manifest["version"] = version
     manifest["hab"] = []
 
     ["hab", "hab-sup", "hab-launcher"].each do |p|
