@@ -4,18 +4,18 @@
 [global.v1]
   fqdn = "<%= overrides[:automate_fqdn] %>"
 
-  [global.v1.external.elasticsearch]
-<% if svc_configs[:elasticsearch] -%>
+  [global.v1.external.opensearch]
+<% if svc_configs[:opensearch] -%>
     enable = true
-    nodes = <%= services[:elasticsearch][:ips].map { |ip| "https://#{ip}:#{services[:elasticsearch][:svc_port]}" } %>
-    [global.v1.external.elasticsearch.auth]
+    nodes = <%= services[:opensearch][:ips].map { |ip| "https://#{ip}:#{services[:opensearch][:svc_port]}" } %>
+    [global.v1.external.opensearch.auth]
       scheme = "basic_auth"
-      [global.v1.external.elasticsearch.auth.basic_auth]
-        username = "<%= svc_configs[:elasticsearch]['opendistro_auth']['admin_username'] -%>"
-        password = "<%= svc_configs[:elasticsearch]['opendistro_auth']['admin_password'] -%>"
-    [global.v1.external.elasticsearch.ssl]
-      server_name = "<%= cn(svc_configs[:elasticsearch]['opendistro_ssl']['ssl_cert']) -%>"
-      root_cert = """<%= svc_configs[:elasticsearch]['opendistro_ssl']['rootCA'] -%>"""
+      [global.v1.external.opensearch.auth.basic_auth]
+        username = "<%= svc_configs[:opensearch]['opendistro_auth']['admin_username'] -%>"
+        password = "<%= svc_configs[:opensearch]['opendistro_auth']['admin_password'] -%>"
+    [global.v1.external.opensearch.ssl]
+      server_name = "<%= cn(svc_configs[:opensearch]['tls']['ssl_cert']) -%>"
+      root_cert = """<%= svc_configs[:opensearch]['tls']['rootCA'] -%>"""
 <% else %>
     enable = false
 <% end %>
