@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -163,7 +164,7 @@ func (s *Server) GetServers(ctx context.Context, req *request.GetServers) (*resp
 func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*response.GetServer, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
+	var timeStamp *timestamppb.Timestamp
 	// Validate all request fields are required
 	err := validation.New(validation.Options{
 		Target:          "server",
@@ -179,12 +180,21 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
-	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
+	migration, err := s.service.Migration.GetLastSuccessfulMigration(ctx, req.Id)
 	if err != nil {
 		log.Errorf("Unable to fetch migration status for server id:%s", req.Id)
 	}
+
+	// If timestamp is zero send nil value
+	if migration.Timestamp.IsZero() {
+		timeStamp = nil
+	} else {
+		timeStamp = timestamppb.New(migration.Timestamp)
+	}
+
 	resp := &response.GetServer{
-		Server: fromStorageServerWithMigrationDetails(server, migration),
+		Server:            fromStorageServerWithMigrationDetails(server, migration),
+		LastMigrationTime: timeStamp,
 	}
 	return resp, nil
 }

@@ -3,6 +3,8 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
+import "google/protobuf/timestamp.proto";
+
 message CreateServer {
     // Chef Infra Server.
     Server server = 1;
@@ -26,6 +28,8 @@ message GetServers {
 message GetServer {
     // Chef Infra Server.
     Server server = 1;
+    // Last successfull migration or last sync status
+    google.protobuf.Timestamp last_migration_time = 2;
 }
 
 message Server {

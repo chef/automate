@@ -33,8 +33,10 @@ func (a *InfraProxyServer) GetServer(ctx context.Context, r *gwreq.GetServer) (*
 	if err != nil {
 		return nil, err
 	}
+
 	return &gwres.GetServer{
-		Server: fromUpstreamServer(res.Server),
+		Server:            fromUpstreamServer(res.Server),
+		LastMigrationTime: res.LastMigrationTime,
 	}, nil
 }
 
