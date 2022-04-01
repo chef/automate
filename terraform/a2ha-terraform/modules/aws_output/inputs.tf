@@ -25,3 +25,7 @@ variable "elasticsearch_public_ips" {
 variable "postgresql_private_ips" {
   default = []
 }
+
+variable "bucket_name" {
+  default = ""
+}

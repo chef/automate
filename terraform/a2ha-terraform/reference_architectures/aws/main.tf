@@ -80,4 +80,5 @@ module "aws-output" {
   elasticsearch_private_ips = module.aws.elasticsearch_private_ips
   automate_fqdn             = module.aws.automate_fqdn
   automate_frontend_urls    = module.aws.automate_frontend_urls
+  bucket_name               = var.backup_config_s3 == "true" ? module.s3.bucket_name : ""
 }
