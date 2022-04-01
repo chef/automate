@@ -51,8 +51,8 @@ export class OrgUserEffects {
   resetUserKey$ = createEffect(() =>
     this.actions$.pipe(
       ofType(OrgUsersActionTypes.RESETKEY),
-      mergeMap(( { payload: { server_id, org_id, name } }: ResetUserKey) =>
-        this.requests.resetUserKeyRequests(server_id, org_id, name).pipe(
+      mergeMap(( { payload: { server_id, name } }: ResetUserKey) =>
+        this.requests.resetUserKeyRequests(server_id, name).pipe(
           map((resp: ResetKeySuccessPayload) => new ResetUserKeySuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new ResetUserKeyFailure(error)))))));
@@ -60,10 +60,10 @@ export class OrgUserEffects {
   resetUserKeySuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(OrgUsersActionTypes.RESETKEY_SUCCESS),
-      map(({ payload: { name } }: ResetUserKeySuccess) => {
+      map(({ payload: { user_name } }: ResetUserKeySuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Successfully reset the key - ${name}.`
+          message: `Successfully reset the key - ${user_name}.`
         });
     })));
 

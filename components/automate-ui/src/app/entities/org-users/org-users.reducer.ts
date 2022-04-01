@@ -12,8 +12,10 @@ export interface OrgUserEntityState extends EntityState<OrgUser> {
   resetStatus: EntityStatus;
   resetError: EntityStatus;
   resetUserKey: {
-    user_key: string,
-    name: string
+    user_id: string,
+    user_name: string,
+    server_id: string,
+    private_key: string
   };
 }
 

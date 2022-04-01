@@ -37,17 +37,14 @@ export class GetUsersFailure implements Action {
 
 export class ResetUserKey implements Action {
   readonly type = OrgUsersActionTypes.RESETKEY;
-  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
+  constructor(public payload: { server_id: string, name: string }) { }
 }
 
 export interface ResetKeySuccessPayload {
-  name: string;
-  key: {
-    name: string,
-    public_key: string,
-    expiration_date: string,
-    private_key: string
-  };
+  user_id: string;
+  user_name: string;
+  server_id: string;
+  private_key: string;
 }
 
 export class ResetUserKeySuccess implements Action {
