@@ -220,9 +220,10 @@ class ManifestGenerator
     # of an implementation mistake in deployment-service, changing this
     # version is impossible without major feature work in
     # deployment-service to manage the upgrade.
-    manifest["schema_version"] = "1"
+    manifest["schema_version"] = "2"
     manifest["hab_build"] = local_hab_version
     manifest["build"] = version
+    maniftest["version"] = version
     manifest["hab"] = []
 
     ["hab", "hab-sup", "hab-launcher"].each do |p|

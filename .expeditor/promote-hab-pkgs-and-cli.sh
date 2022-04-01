@@ -35,7 +35,7 @@ aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/autom
 aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/releases.json" existing-releases.json --profile chef-cd || echo "[]" > existing-releases.json
 
 # Pull the version from the manifest
-version=$(jq -r -c ".build" manifest.json)
+version=$(jq -r -c ".version" manifest.json)
 
 # Promote the artifacts in Habitat Depot
 jq -r -c ".packages[]" manifest.json | while read -r service_ident; do
