@@ -357,6 +357,7 @@ EOF
 document "infra_service_load_knife_ec_backup_file" <<DOC
   Creates the sample knife ec backup file
   Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
+  and also make sure that there is no any backup directory and backup.zip in /src/
   
   -O No of Orgs default: 2
   -U No of Users default: 200
@@ -408,10 +409,10 @@ EOF
     
     log_line "For org_id '${org_id}', the numbers of users are ${number_of_users}"
   done  
-   
-  install_if_missing core/tar tar
-  tar -cf backup.zip backup
+
+  install_if_missing core/zip zip
+  zip -r backup.zip backup
   rm -rf backup
 
-  log_line "Sample back up zip created at current path ${PWD} with name 'backup.zip'"
+  log_line "Sample back up zip created at path '/src/backup.zip'"
 }
