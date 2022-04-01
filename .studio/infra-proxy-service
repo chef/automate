@@ -353,3 +353,60 @@ EOF
   done  
   log_line "Sample data loaded of $records users for server with server name '$server_prefix' and server id '$server_id'"
 }
+
+document "infra_service_load_knife_ec_backup_file" <<DOC
+  Creates the sample knife ec backup file
+  Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
+  
+  -O No of Orgs default: 2
+  -U No of Users default: 200
+
+  Example:
+  -----------------------------
+  infra_service_load_knife_ec_backup_file -O 2 -U 200
+DOC
+function infra_service_load_knife_ec_backup_file() {
+  install_if_missing core/jq-static jq
+  install_if_missing core/grpcurl grpcurl
+
+  local OPTIND opt
+  local orgs=2
+  local users=200
+
+
+  while getopts ":O:U:" opt; do
+    case $opt in
+      O) orgs="$OPTARG"
+      ;;
+      U) users="$OPTARG"
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+      : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+    esac
+  done
+  shift $((OPTIND -1))
+
+  log_line "Total number of orgs: $orgs"
+  log_line "Total number of users: $users"
+  
+  # Create knife ec backup file
+  local user_prefix="user"
+
+  for i in $(seq 1 ${orgs}); do
+    timestamp=$(date +%s%N)
+    local org_id="org-${timestamp}-id"
+    local number_of_users=$((users/orgs))
+
+    chef-automate dev grpcurl infra-proxy-service -- -d \
+    "$(cat << EOF
+      {"org_id": "${org_id}", "number_of_users": "${number_of_users}"}
+EOF
+  )" chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CreateBackup >/dev/null
+    
+    log_line "For org_id '${org_id}', the numbers of users are ${number_of_users}"
+  done  
+  log_line "Sample back up zip created at current path ${PWD} with name 'backup.zip'"
+}

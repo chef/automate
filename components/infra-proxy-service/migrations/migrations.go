@@ -1,25 +1,39 @@
 package migrations
 
 import (
+	"archive/zip"
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"math/rand"
 	"os"
 	"path"
+	"path/filepath"
+	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	pipeline_model "github.com/chef/automate/components/infra-proxy-service/pipeline"
 
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	"github.com/gofrs/uuid"
 	log "github.com/sirupsen/logrus"
 )
+
+type orgMembers struct {
+	Members []pipeline.MembersJson
+	Admins  []string
+}
 
 // UploadFile Takes the stream of data to upload a file
 func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadFileServer) error {
@@ -364,4 +378,223 @@ func SetStagedUserForConfirmPreview(users []*request.User) []pipeline_model.User
 		usersData = append(usersData, stagedUser)
 	}
 	return usersData
+}
+
+// CreateBackup Creates sample knife ec back up file
+func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateBackupRequest) (*response.CreateBackupResponse, error) {
+
+	// Create org directory
+	orgPath := path.Join("./backup/organizations/", req.OrgId, "groups")
+	if _, err := os.Stat(orgPath); os.IsNotExist(err) {
+		err := os.MkdirAll(orgPath, os.ModePerm)
+		if err != nil {
+			log.Errorf("Unable to create directory", err)
+			return nil, err
+		}
+	}
+	//defer os.RemoveAll("./backup")
+
+	// Create data for org file org.json
+	orgJsonObj := pipeline.OrgJson{}
+	orgJsonObj.Name = req.OrgId
+	orgJsonObj.FullName = req.OrgId + time.Now().String()
+	orgJson, err := json.Marshal(orgJsonObj)
+	if err != nil {
+		log.Errorf("Failed to marshal ", err)
+		return nil, err
+	}
+	err = writeFile(path.Join("./backup/organizations", req.OrgId, "org.json"), orgJson)
+	if err != nil {
+		log.Errorf("Failed to write org file ", err)
+		return nil, err
+	}
+
+	// Create an object for key_dump.json
+	serverUsers := []pipeline.KeyDump{}
+
+	if _, err := os.Stat(path.Join("./backup", "key_dump.json")); err == nil {
+		log.Info("File exist check please")
+		data, err := ioutil.ReadFile(path.Join("./backup", "key_dump.json"))
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(data, &serverUsers)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Create an object for members.json
+	members := []pipeline.MembersJson{}
+
+	// Create an object for admins.json
+	admins := pipeline.AdminsJson{}
+	admins.Name = "admins"
+	admins.Users = append(admins.Users, "pivotal")
+
+	// Random generator to set the values for ExternalAuthenticationUID and admins randomly
+	rand.Seed(time.Now().Unix())
+	users := []string{pipeline.Local, pipeline.LDAP}
+	isAdmins := []bool{true, false}
+
+	for i := 0; i < int(req.NumberOfUsers); i++ {
+
+		// Create an object for key_dump.json
+		keyDump := pipeline.KeyDump{}
+		nowTime := time.Now().Format("20060102150405")
+		keyDump.ID = "user_" + uuid.Must(uuid.NewV4()).String()
+
+		keyDump.Username = keyDump.ID
+		keyDump.Email = keyDump.ID + "@email.com"
+		keyDump.SerializedObject = "{\"first_name\":\"f_" + keyDump.ID + "\",\"last_name\":\"l_" + keyDump.ID + "\",\"display_name\":\"f_" + keyDump.ID + " l_" + keyDump.ID + "\"}"
+		keyDump.CreatedAt = nowTime
+		keyDump.UpdatedAt = nowTime
+		user := users[rand.Intn(len(users))]
+		if user == pipeline.LDAP {
+			keyDump.ExternalAuthenticationUID = keyDump.Username
+		}
+		keyDump.Admin = isAdmins[rand.Intn(len(isAdmins))]
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), 10)
+		if err != nil {
+			log.Errorf("Unable to create hashed password for user ", keyDump.Username)
+			break
+		}
+		keyDump.HashedPassword = string(hashedPassword)
+		serverUsers = append(serverUsers, keyDump)
+
+		// Create org members
+		member := pipeline.MembersJson{
+			User: pipeline.UsersJson{
+				Username: keyDump.Username,
+			},
+		}
+		members = append(members, member)
+
+		// Add to org admin
+		if keyDump.Admin {
+			admins.Users = append(admins.Users, keyDump.Username)
+		}
+	}
+
+	// Write server users file key_dump.json
+	keyDumpJson, err := json.Marshal(serverUsers)
+	if err != nil {
+		log.Errorf("Failed to marshal ", err)
+		return nil, err
+	}
+	err = writeFile(path.Join("./backup", "key_dump.json"), keyDumpJson)
+	if err != nil {
+		log.Errorf("Failed to write server users file ", err)
+		return nil, err
+	}
+
+	// Write key_dump.json file
+	membersJson, err := json.Marshal(members)
+	if err != nil {
+		log.Errorf("Failed to marshal ", err)
+		return nil, err
+	}
+	err = writeFile(path.Join("./backup/organizations", req.OrgId, "members.json"), membersJson)
+	if err != nil {
+		log.Errorf("Failed to write server users file ", err)
+		return nil, err
+	}
+
+	adminsJson, err := json.Marshal(admins)
+	if err != nil {
+		log.Errorf("Failed to marshal ", err)
+		return nil, err
+	}
+	err = writeFile(path.Join("./backup/organizations", req.OrgId, "groups", "admins.json"), adminsJson)
+	if err != nil {
+		log.Errorf("Failed to write server users file ", err)
+		return nil, err
+	}
+
+	// Create zip of backup
+	zipBackUp("./backup", "./backup.zip")
+	return &response.CreateBackupResponse{}, nil
+}
+
+func createFile(path string) error {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		_, err := os.Create(path)
+		if err != nil {
+			log.WithError(err).Error("Unable to create file ", err)
+			return err
+		}
+	}
+	return nil
+}
+
+func writeFile(path string, data []byte) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = createFile(path)
+		if err != nil {
+			log.Errorf("Unable to create file ", err)
+			return err
+		}
+	}
+	err := ioutil.WriteFile(path, data, 0644)
+	if err != nil {
+		log.Errorf("Unable to write file ", err)
+		return err
+	}
+	return nil
+}
+
+func zipBackUp(source, target string) error {
+	// Create a writeMembersFileZIP file and zip.Writer
+	f, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	writer := zip.NewWriter(f)
+	defer writer.Close()
+
+	// Go through all the files of the source
+	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Create a local file header
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		// set compression
+		header.Method = zip.Deflate
+
+		// Set relative path of a file as the header name
+		header.Name, err = filepath.Rel(filepath.Dir(source), path)
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			header.Name += "/"
+		}
+
+		// Create writer for the file header and save content of the file
+		headerWriter, err := writer.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		f, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		_, err = io.Copy(headerWriter, f)
+		return err
+	})
 }
