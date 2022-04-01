@@ -30,11 +30,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type orgMembers struct {
-	Members []pipeline.MembersJson
-	Admins  []string
-}
-
 // UploadFile Takes the stream of data to upload a file
 func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadFileServer) error {
 	log.Info("Starting the with the request to upload file")
@@ -388,7 +383,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	if _, err := os.Stat(orgPath); os.IsNotExist(err) {
 		err := os.MkdirAll(orgPath, os.ModePerm)
 		if err != nil {
-			log.Errorf("Unable to create directory", err)
+			log.Errorf("Unable to create directory %s", err.Error())
 			return nil, err
 		}
 	}
@@ -400,12 +395,12 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	orgJsonObj.FullName = req.OrgId + time.Now().String()
 	orgJson, err := json.Marshal(orgJsonObj)
 	if err != nil {
-		log.Errorf("Failed to marshal ", err)
+		log.Errorf("Failed to marshal %s ", err.Error())
 		return nil, err
 	}
 	err = writeFile(path.Join("./backup/organizations", req.OrgId, "org.json"), orgJson)
 	if err != nil {
-		log.Errorf("Failed to write org file ", err)
+		log.Errorf("Failed to write org file %s", err.Error())
 		return nil, err
 	}
 
@@ -456,7 +451,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 		keyDump.Admin = isAdmins[rand.Intn(len(isAdmins))]
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), 10)
 		if err != nil {
-			log.Errorf("Unable to create hashed password for user ", keyDump.Username)
+			log.Errorf("Unable to create hashed password for user %s %s", keyDump.Username, err)
 			break
 		}
 		keyDump.HashedPassword = string(hashedPassword)
@@ -479,40 +474,44 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	// Write server users file key_dump.json
 	keyDumpJson, err := json.Marshal(serverUsers)
 	if err != nil {
-		log.Errorf("Failed to marshal ", err)
+		log.Errorf("Failed to marshal %s", err.Error())
 		return nil, err
 	}
 	err = writeFile(path.Join("./backup", "key_dump.json"), keyDumpJson)
 	if err != nil {
-		log.Errorf("Failed to write server users file ", err)
+		log.Errorf("Failed to write server users file %s", err.Error())
 		return nil, err
 	}
 
 	// Write key_dump.json file
 	membersJson, err := json.Marshal(members)
 	if err != nil {
-		log.Errorf("Failed to marshal ", err)
+		log.Errorf("Failed to marshal %s", err.Error())
 		return nil, err
 	}
 	err = writeFile(path.Join("./backup/organizations", req.OrgId, "members.json"), membersJson)
 	if err != nil {
-		log.Errorf("Failed to write server users file ", err)
+		log.Errorf("Failed to write server users file %s", err.Error())
 		return nil, err
 	}
 
 	adminsJson, err := json.Marshal(admins)
 	if err != nil {
-		log.Errorf("Failed to marshal ", err)
+		log.Errorf("Failed to marshal %s", err.Error())
 		return nil, err
 	}
 	err = writeFile(path.Join("./backup/organizations", req.OrgId, "groups", "admins.json"), adminsJson)
 	if err != nil {
-		log.Errorf("Failed to write server users file ", err)
+		log.Errorf("Failed to write server users file %s", err.Error())
 		return nil, err
 	}
 
 	// Create zip of backup
-	zipBackUp("./backup", "./backup.zip")
+	err = zipBackUp("./backup", "./backup.zip")
+	if err != nil {
+		log.Errorf("Failed to create zip of back up file %s", err.Error())
+		return nil, err
+	}
 	return &response.CreateBackupResponse{}, nil
 }
 
@@ -531,13 +530,13 @@ func writeFile(path string, data []byte) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		err = createFile(path)
 		if err != nil {
-			log.Errorf("Unable to create file ", err)
+			log.Errorf("Unable to create file %s", err.Error())
 			return err
 		}
 	}
 	err := ioutil.WriteFile(path, data, 0644)
 	if err != nil {
-		log.Errorf("Unable to write file ", err)
+		log.Errorf("Unable to write file %s", err.Error())
 		return err
 	}
 	return nil
@@ -549,11 +548,14 @@ func zipBackUp(source, target string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 
 	writer := zip.NewWriter(f)
-	defer writer.Close()
-
+	defer func() {
+		_ = writer.Close()
+	}()
 	// Go through all the files of the source
 	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -592,8 +594,9 @@ func zipBackUp(source, target string) error {
 		if err != nil {
 			return err
 		}
-		defer f.Close()
-
+		defer func() {
+			_ = f.Close()
+		}()
 		_, err = io.Copy(headerWriter, f)
 		return err
 	})
