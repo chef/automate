@@ -45,7 +45,6 @@ export class ResetUserKeyComponent implements OnInit, OnDestroy {
         this.isReset = false;
         this.server = this.serverId;
         this.org = this.orgId;
-        this.name = this.name;
         this.error = '';
         this.privateKey = '';
       });
