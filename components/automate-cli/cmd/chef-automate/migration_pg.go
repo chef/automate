@@ -131,7 +131,9 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 						isExecuted = false
 					}
 				}
-			} else {
+			}
+
+			if !isExecuted {
 				writer.Title("Deleting file created by pg_upgrade")
 				cleanUp()
 			}
@@ -217,12 +219,13 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	if !migrateDataCmdFlags.skipStorageCheck {
+	if !migrateDataCmdFlags.skipStorageCheck  {
 		err := getLatestPgPath()
-		if err != nil || migrateDataCmdFlags.skipStorageCheck {
+		if err != nil ||  migrateDataCmdFlags.skipStorageCheck  {
 			return err
 		}
 	}
+
 
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
