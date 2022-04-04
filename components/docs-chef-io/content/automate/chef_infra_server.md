@@ -37,35 +37,19 @@ The objects that you can manage from the Chef Infra Server are:
 
 ## Chef Automate WebUI Key
 
-Chef Automate uses the Web UI private key for signing requests sent to the Chef Infra Server. The key is subject to Chef server’s Secrets Management, and will be stored in `/etc/opscode/private-chef-secrets.json`. 
+Chef Automate uses the Web UI private key for signing requests sent to the Chef Infra Server. The key is subject to Chef server’s Secrets Management, and will be stored in `/etc/opscode/private-chef-secrets.json`.
 
-The following example shows how the settings look when added to the configuration file:
+Any run of `chef-server-ctl` reconfigure will ensure the key exists and is stored without any additional steps.
 
-```json
-chef_documentation_url ''
-disable_sign_up false
-events.port 11001
-logging.chef_log_level 'info'
-logging.log_level 'info'
-nginx_addon_prefix 30
-platform.user 'pivotal'
-public_port 443
-redis.host 'localhost'
-redis.port 11002
-# redis.url derived from redis.host and redis.port
-runit_timeout 30
-services['opscode-manage-events'].enable true
-services['opscode-manage-webapp'].enable true
-services['opscode-manage-worker'].enable true
-support_email_address 'support@chef.io'
-support_site_url 'http://chef.io/support'
-support_tickets_url 'https://chef.io/support/tickets'
-webapp.backlog 1024
-# webapp.listen derived from webapp.port
-webapp.port 9462
-webapp.tcp_nodelay true
-webapp.worker_processes 2
-webapp.worker_timeout 3600
+To verify that the key is stored and ready to use by manage, run:
+
+```cmd
+chef-server-ctl show-secret chef-server webui_key
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpgIBAAKCAQEA3fJ+U+5prsJ8PtnbYzWAq+J2cE48u+iT7t/M9JS+3tlEgf3r
+1PTl70cW9jOI+kGGvayTKb8Dzqtm0tpQJo7Bv+XX42OylyVF2SN4WvMusT+jtJuF
+...
+-----END RSA PRIVATE KEY-----
 ```
 
 ## Connect Chef Infra Servers to Chef Automate
@@ -76,11 +60,17 @@ To add existing Chef Infra Servers to the Chef Automate infrastructure, select *
 
 {{< figure src="/images/automate/add-chef-server-popup-menu.png" width="500" alt="Add Chef Server Form">}}
 
+{{< note >}} The above feature is only available for Automate admin. {{< /note >}}
+
 Chef Automate warns you if you enter an invalid name, FQDN, IP address or WebUI:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu-with-error.png" width="500" alt="Add Chef Server Form">}}
 
 Once done, select **Add Chef Server** and see the server in the list of Chef Infra Servers.
+
+### Update WebUI Key
+
+
 
 ## Access Chef Infra Server Components
 
