@@ -82,6 +82,7 @@ type MigrationStorage interface {
 	DeleteMigrationStage(ctx context.Context, migrationId string) (MigrationStage, error)
 
 	GetActiveMigration(ctx context.Context, serverId string) (MigrationStatus, error)
+	GetLastSuccessfulMigration(ctx context.Context, serverId string) (MigrationStatus, error)
 	GetMigrationStatus(ctx context.Context, migrationId string) (MigrationStatus, error)
 }
 
@@ -177,6 +178,7 @@ type MigrationStatus struct {
 	MigrationStatus   string
 	MigrationStatusID int64
 	MigrationTypeID   int64
+	Timestamp         time.Time
 }
 
 // Errors returned from the backend
