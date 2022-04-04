@@ -90,7 +90,7 @@ func newMigrateDataCmd() *cobra.Command {
 	migrateDataCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
 	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.autoAccept, "", "y", false, "auto-accept")
 	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.skipStorageCheck, "skip-storage-check", "s", false, "skip storage check")
-	migrateDataCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "fore-execute")
+	migrateDataCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "force-execute")
 	return migrateDataCmd
 }
 
@@ -131,9 +131,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 						isExecuted = false
 					}
 				}
-			}
-
-			if !isExecuted {
+			} else {
 				writer.Title("Deleting file created by pg_upgrade")
 				cleanUp()
 			}
@@ -219,13 +217,12 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	if !migrateDataCmdFlags.skipStorageCheck  {
+	if !migrateDataCmdFlags.skipStorageCheck {
 		err := getLatestPgPath()
-		if err != nil ||  migrateDataCmdFlags.skipStorageCheck  {
+		if err != nil || migrateDataCmdFlags.skipStorageCheck {
 			return err
 		}
 	}
-
 
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
