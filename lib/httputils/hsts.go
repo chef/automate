@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+//Add HSTS header to response
+//See: https://github.com/chef/automate/issues/5698
 type HSTS struct {
 	next http.Handler
 	// MaxAge sets the duration that the HSTS is valid for.
