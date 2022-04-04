@@ -89,7 +89,7 @@ func TestFileGetCurrentManifestA2(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 2, len(manifest.Packages))
 	assert.Equal(t, 1, len(manifest.HartOverrides))
-	assert.Equal(t, "20180716213113", manifest.Build)
+	assert.Equal(t, "20180716213113", manifest.Version())
 	assert.Equal(t, "844b78fb80ca19c6a555de34d24e3e9b5a56ce06", manifest.BuildSHA)
 
 	found, pkg := manifest.PackageForServiceName("automate-cs-bookshelf")

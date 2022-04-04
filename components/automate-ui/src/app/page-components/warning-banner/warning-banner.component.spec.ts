@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WarningBannerComponent } from './warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { MockComponent } from 'ng2-mock-component';
 
 
 enum Configs {
@@ -40,7 +41,10 @@ describe('WarningBannerComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [WarningBannerComponent],
+      declarations: [
+        WarningBannerComponent,
+        MockComponent({ selector: 'chef-icon' })
+      ],
       imports: [HttpClientTestingModule],
       providers: [
         {provide: AppConfigService, useClass: MockAppConfigService}
@@ -51,6 +55,7 @@ describe('WarningBannerComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WarningBannerComponent);
     component = fixture.componentInstance;
+    component.showManualUpgradeContent = false;
     fixture.detectChanges();
   });
 
@@ -58,7 +63,7 @@ describe('WarningBannerComponent', () => {
     expect(component).toBeDefined();
   });
 
-  it('should load variables on initialization', () => {
+  it('should have variables on initialization', () => {
     expect(component.bannerMessage).toBe(Configs.Message);
     expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`);
     expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`);

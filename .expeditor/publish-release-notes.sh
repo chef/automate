@@ -5,9 +5,9 @@ set -eou pipefail
 source_channel=$EXPEDITOR_PROMOTABLE
 
 # Download the manifest
-aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest.json" manifest.json --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest_semver.json" manifest.json --profile chef-cd
 
-build_version=$(jq -r -c ".build"  manifest.json)
+build_version=$(jq -r -c ".version"  manifest.json)
 
 git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/chef/automate.wiki.git"
 

@@ -508,7 +508,7 @@ func (r *Runner) ShowBackup(ctx context.Context, t *api.BackupTask) (*api.Backup
 	desc := &api.BackupDescription{
 		Id:            t.TaskID(),
 		Sha256:        sha256,
-		ServerVersion: m.Build,
+		ServerVersion: m.Version(),
 		CliVersion:    cliRelease,
 	}
 	return desc, nil
@@ -573,7 +573,9 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 	var err error
 	deadline, ok := ctx.Deadline()
 	if !ok {
-		deadline = time.Now().Add(2 * time.Hour)
+		// With large node counts or large volumes of cloud targets, restores may take several hours
+		// TODO: Change this from hard coded duration to timeout supplied by chef-automate CLI
+		deadline = time.Now().Add(12 * time.Hour)
 	}
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 
@@ -997,7 +999,9 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 	var err error
 	deadline, ok := ctx.Deadline()
 	if !ok {
-		deadline = time.Now().Add(2 * time.Hour)
+		// With large node counts or large volumes of cloud targets, backups may take several hours
+		// TODO: Change this from hard coded duration to timeout supplied by chef-automate CLI
+		deadline = time.Now().Add(12 * time.Hour)
 	}
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()

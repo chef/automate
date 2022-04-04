@@ -473,6 +473,7 @@ steps:
   - label: "[unit] notifications-service"
     command:
       - cd components/notifications-service/server
+      - git config --global url."https://github.com/".insteadOf git://github.com/
       - make static unit
     timeout_in_minutes: 10
     retry:

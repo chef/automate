@@ -70,6 +70,7 @@ test_with_s3=false
 # and before the upgrade. You should not normally need to change this
 # variable.
 declare -r test_manifest_path="local_manifest.json"
+declare -r test_versions_path="local_versions.json"
 #
 # test_manifest_dir is the directory where we save all manifests
 # to. You should not normally need to change this variable.
@@ -90,6 +91,11 @@ declare -r test_tmp_hartifacts_path="tmp_results/"
 set_test_manifest() {
     local target_manifest_name=$1
     cp "$test_manifest_dir/$target_manifest_name" "$test_manifest_path"
+}
+
+set_test_versions() {
+    local target_versions_name=$1
+    cp "$test_manifest_dir/$target_versions_name" "$test_versions_path"
 }
 
 do_setup() {
@@ -228,7 +234,28 @@ do_test_deploy_default() {
 }
 
 do_prepare_upgrade() {
+    set_version_file
     do_prepare_upgrade_default
+    append_version_file
+}
+
+append_version_file() {
+    #prepare the versions.json file
+    #todo: vivek shankar build/version by schema_version
+    newversion=$(jq -r -c ".build"  "$test_manifest_path")
+    echo $newversion
+    jq --arg val $newversion '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
+}
+
+set_version_file() {
+    hab pkg install --binlink core/jq-static
+
+    #prepare the versions.json file
+    newversion=$(jq -r -c ".build"  "$test_manifest_path")
+    echo $newversion
+    versionsFile="/tmp/versions.json"
+    echo '[]' > $versionsFile
+    jq --arg val $newversion '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
 }
 
 do_prepare_upgrade_default() {

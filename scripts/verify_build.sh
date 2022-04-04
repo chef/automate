@@ -84,6 +84,8 @@ fi
 # being older or newer than we might expect.
 log_section_start "create manifest"
 .expeditor/create-manifest.rb
+echo "showing current dir files"
+ls
 mv manifest.json results/build.json
 
 log_section_start "create manifest (latest hab)"

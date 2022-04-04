@@ -25,6 +25,7 @@ import {
   ServiceActionType,
   RuleType
 } from 'app/entities/notification_rules/notification_rule.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 type NotificationTabName = 'details';
 
@@ -60,7 +61,8 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
 
     this.updateForm = this.fb.group({
@@ -128,6 +130,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     }));
     this.targetTypeValue = this.notification.targetType;
     this.ruleTypeValue = this.notification.ruleType;
+    this.telemetryService.track('Settings_Notifications_Details_Save');
   }
 
   public sendTestForTargetUrl(): void {
@@ -137,6 +140,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
     const targetSecretID: string = this.notification.targetSecretId;
     this.store.dispatch(new TestNotification({ name, targetUrl, targetSecretID}));
     this.testInProgress = false;
+    this.telemetryService.track('Settings_Notifications_Details_TestDataFeed');
   }
 
   public changeSelectionForWebhookType(event: { target: { value: ServiceActionType } }) {

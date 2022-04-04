@@ -46,6 +46,7 @@ service Deployment {
 	rpc BackupIntegrityShow(BackupIntegrityShowRequest) returns (BackupIntegrityShowResponse);
 	rpc ValidateBackupIntegrity(ValidateBackupIntegrityRequest) returns (ValidateBackupIntegrityResponse);
 	rpc Upgrade(UpgradeRequest) returns (UpgradeResponse);
+	rpc IsValidUpgrade(UpgradeRequest) returns (ValidatedUpgradeResponse);
 	rpc SetLogLevel(SetLogLevelRequest) returns (SetLogLevelResponse);
 	rpc GenerateAdminToken(GenerateAdminTokenRequest) returns (GenerateAdminTokenResponse);
 	rpc DeployID (DeployIDRequest) returns (DeployIDResponse);
@@ -185,7 +186,9 @@ message ServiceVersionsRequest {}
 
 message SystemLogsRequest {}
 
-message UpgradeStatusRequest {}
+message UpgradeStatusRequest {
+	string versions_path = 1;
+}
 
 message UpgradeStatusResponse {
 	UpgradeState state = 1;
@@ -206,6 +209,9 @@ message UpgradeStatusResponse {
 	// is_converge_disable is true if converging has been disabled.
 	// This will prevent things from upgrading
 	bool is_converge_disable = 8;
+	// is_converge_compatable is true in case the upgrade is minor/patch, and upgrading to major with --major flag
+	// and is false, if the next upgrade is major and does not provided --major flag.
+	bool is_converge_compatable = 9;
 
 	enum UpgradeState {
 		// UNKNOWN indicates that we were not able to
@@ -654,12 +660,20 @@ message CancelBackupResponse {
 
 message UpgradeRequest {
 	string version = 1;
+	bool is_major_upgrade = 2;
+	string versions_path = 3;
 }
 
 message UpgradeResponse {
 	string previous_version = 1;
 	string next_version = 2;
 	string task_id = 3;
+}
+
+message ValidatedUpgradeResponse {
+	string current_version = 1;
+	string target_version = 2;
+	string target_major = 3;
 }
 
 message CurrentReleaseManifestRequest {}
