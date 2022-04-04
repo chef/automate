@@ -1529,6 +1529,7 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type InfraProxyClient interface {
+	// GetServers returns all the servers added to Automate
 	GetServers(ctx context.Context, in *request.GetServers, opts ...grpc.CallOption) (*response.GetServers, error)
 	GetServerStatus(ctx context.Context, in *request.GetServerStatus, opts ...grpc.CallOption) (*response.GetServerStatus, error)
 	ValidateWebuiKey(ctx context.Context, in *request.ValidateWebuiKey, opts ...grpc.CallOption) (*response.ValidateWebuiKey, error)
@@ -2171,6 +2172,7 @@ func (c *infraProxyClient) ResetInfraServerUserKey(ctx context.Context, in *requ
 
 // InfraProxyServer is the server API for InfraProxy service.
 type InfraProxyServer interface {
+	// GetServers returns all the servers added to Automate
 	GetServers(context.Context, *request.GetServers) (*response.GetServers, error)
 	GetServerStatus(context.Context, *request.GetServerStatus) (*response.GetServerStatus, error)
 	ValidateWebuiKey(context.Context, *request.ValidateWebuiKey) (*response.ValidateWebuiKey, error)

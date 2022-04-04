@@ -33,30 +33,32 @@ import "external/annotations/iam/annotations.proto";
 
 
 service InfraProxy {
-  rpc GetServers (infra_proxy.request.GetServers) returns (infra_proxy.response.GetServers) {
-    option (google.api.http).get = "/api/v0/infra/servers";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:list";
-  };
-  rpc GetServerStatus (infra_proxy.request.GetServerStatus) returns (infra_proxy.response.GetServerStatus) {
-    option (google.api.http).get = "/api/v0/infra/servers/server_status";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
 
-  rpc ValidateWebuiKey (infra_proxy.request.ValidateWebuiKey) returns (infra_proxy.response.ValidateWebuiKey) {
-    option (google.api.http).post = "/api/v0/infra/servers/validate";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
+// GetServers returns all the servers added to Automate
+rpc GetServers (infra_proxy.request.GetServers) returns (infra_proxy.response.GetServers) {
+  option (google.api.http).get = "/api/v0/infra/servers";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers";
+  option (chef.automate.api.iam.policy).action = "infra:infraServers:list";
+};
+rpc GetServerStatus (infra_proxy.request.GetServerStatus) returns (infra_proxy.response.GetServerStatus) {
+  option (google.api.http).get = "/api/v0/infra/servers/server_status";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers";
+  option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+};
 
-  rpc UpdateWebuiKey (infra_proxy.request.UpdateWebuiKey) returns (infra_proxy.response.UpdateWebuiKey) {
-    option (google.api.http).post = "/api/v0/infra/servers/update";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
-  };
+rpc ValidateWebuiKey (infra_proxy.request.ValidateWebuiKey) returns (infra_proxy.response.ValidateWebuiKey) {
+  option (google.api.http).post = "/api/v0/infra/servers/validate";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers";
+  option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+};
+
+rpc UpdateWebuiKey (infra_proxy.request.UpdateWebuiKey) returns (infra_proxy.response.UpdateWebuiKey) {
+  option (google.api.http).post = "/api/v0/infra/servers/update";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers";
+  option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+};
 
   rpc GetServer (infra_proxy.request.GetServer) returns (infra_proxy.response.GetServer) {
     option (google.api.http).get = "/api/v0/infra/servers/{id}";

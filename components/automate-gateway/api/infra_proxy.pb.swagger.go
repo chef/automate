@@ -16,6 +16,7 @@ func init() {
   "paths": {
     "/api/v0/infra/servers": {
       "get": {
+        "summary": "GetServers returns all the servers added to Automate",
         "operationId": "InfraProxy_GetServers",
         "responses": {
           "200": {
