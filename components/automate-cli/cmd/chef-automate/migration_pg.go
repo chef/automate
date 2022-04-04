@@ -43,6 +43,7 @@ const (
 	NEW_PG_VERSION              = "13.5"
 	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
 	NEW_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata13"
+	PG_DATA_DIR                 = "/hab/svc/automate-postgresql/data"
 	PGPORT                      = "5432"
 	PGHOST                      = "0.0.0.0"
 	PGUSER                      = "automate"
@@ -52,6 +53,8 @@ const (
 	PGSSLKEY                    = "/hab/svc/automate-postgresql/config/server.key"
 	PGSSLROOTCERT               = "/hab/svc/automate-postgresql/config/root.crt"
 	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.24/20220218015755/bin"
+	CLEANUP_ID                  = "clean_up"
+	MIGRATE_PG_ID               = "migrate_pg"
 )
 
 func init() {
@@ -113,7 +116,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			isExecuted, err := ci.ReadPostChecklistById("clean_up", majorupgradechecklist.UPGRADE_METADATA)
+			isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
 			if err != nil {
 				return err
 			}
@@ -164,7 +167,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		isExecuted, err := ci.ReadPostChecklistById("migrate_pg", majorupgradechecklist.UPGRADE_METADATA)
+		isExecuted, err := ci.ReadPostChecklistById(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}
@@ -187,7 +190,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		if !isExecuted {
 			if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
 				err := promptCheckList(
-					"it will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
+					"It will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
 				)
 				if err != nil {
 					return err
@@ -219,13 +222,12 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	if !migrateDataCmdFlags.skipStorageCheck  {
+	if !migrateDataCmdFlags.skipStorageCheck {
 		err := getLatestPgPath()
-		if err != nil ||  migrateDataCmdFlags.skipStorageCheck  {
+		if err != nil || migrateDataCmdFlags.skipStorageCheck {
 			return err
 		}
 	}
-
 
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
@@ -330,7 +332,7 @@ func cleanUp() error {
 		AUTOMATE_PG_MIGRATE_LOG_DIR + "/analyze_new_cluster.sh",
 		AUTOMATE_PG_MIGRATE_LOG_DIR + "delete_old_cluster.sh",
 		AUTOMATE_PG_MIGRATE_LOG_DIR + "/pgmigrate.log",
-		"/hab/svc/automate-postgresql/data/pgdata",
+		OLD_PG_DATA_DIR,
 	}
 	err := executeCommand("rm", args, "")
 	if err != nil {
@@ -341,7 +343,7 @@ func cleanUp() error {
 		if err != nil {
 			return err
 		}
-		ci.UpdatePostChecklistFile("clean_up", majorupgradechecklist.UPGRADE_METADATA)
+		ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
 		writer.Title("successfully deleted files")
 	}
 	return nil
@@ -492,7 +494,7 @@ func checkUpdateMigration(check bool) error {
 			NEW_BIN_DIR+"/pg_upgrade",
 			args,
 			"",
-			AUTOMATE_PG_MIGRATE_LOG_DIR+"/"+"pgmigrate.log")
+			AUTOMATE_PG_MIGRATE_LOG_DIR+"/pgmigrate.log")
 
 		if err != nil {
 			return err
@@ -502,7 +504,7 @@ func checkUpdateMigration(check bool) error {
 			if err != nil {
 				return err
 			}
-			ci.UpdatePostChecklistFile("migrate_pg", majorupgradechecklist.UPGRADE_METADATA)
+			ci.UpdatePostChecklistFile(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
 		}
 	}
 	return nil
@@ -630,13 +632,13 @@ func pgVersion(path string) (string, error) {
 }
 
 func calDiskSizeAndDirSize() (bool, error) {
-	v, err := sys.SpaceAvailForPath("/hab/svc/automate-postgresql/data")
+	v, err := sys.SpaceAvailForPath(PG_DATA_DIR)
 	if err != nil {
 		return false, err
 	}
 	diskSpaceInMb := v / 1024
 
-	size, err := sys.DirSize("/hab/svc/automate-postgresql/data/pgdata")
+	size, err := sys.DirSize(OLD_PG_DATA_DIR)
 	if err != nil {
 		return false, err
 	}
