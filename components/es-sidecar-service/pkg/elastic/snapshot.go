@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"regexp"
-	"strconv"
 	"time"
 
 	elastic "github.com/olivere/elastic/v7"
@@ -784,7 +782,7 @@ func (fs *FsBackupsConfig) createRepoReq(repoName string) createRepoReq {
 // clusterVersion takes a slice of semantic version strings and returns the
 // highest major version. If any of the versions are not valid semantic versions,
 // or there are multiple different major version it will return an error.
-func clusterVersion(versions []string) (int, error) {
+/* func clusterVersion(versions []string) (int, error) {
 	verRegex := regexp.MustCompile(`(\d+)\.\d+\.\d+`)
 	var version int
 
@@ -809,4 +807,4 @@ func clusterVersion(versions []string) (int, error) {
 	}
 
 	return version, nil
-}
+} */
