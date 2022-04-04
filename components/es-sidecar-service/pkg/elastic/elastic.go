@@ -9,10 +9,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	elastic "github.com/olivere/elastic/v7"
 	elasticaws "github.com/olivere/elastic/v7/aws/v4"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
