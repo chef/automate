@@ -174,7 +174,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   }
 
   timeFromNow(epochFormat: string) {
-    const epchoTime = Number(epochFormat) * 1000; // seconds to milliseconds
+    const epchoTime = Number(epochFormat) * 1000; // from seconds to milliseconds
     const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
     return fromNowValue === '-' ? '--' : fromNowValue;
   }
