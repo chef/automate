@@ -70,7 +70,18 @@ Once done, select **Add Chef Server** and see the server in the list of Chef Inf
 
 ### Update WebUI Key
 
+In case you have mentioned an incorrect WebUI key, you can update the same by following the steps:
 
+* Select **Update** in front of the WebUI key as shown below:
+
+  {{< figure src="/images/automate/chef-infra-server-update-webui-key-main-page.png" alt="Select Update for WebUI Key">}}
+
+
+* Update the correct WebUI key in the text box shown below:
+
+  {{< figure src="/images/automate/chef-infra-server-update-webui-key.png" alt="Select Update for WebUI Key">}}
+
+Following the above two steps updated the WwbUI key of the Chef Automate.
 
 ## Access Chef Infra Server Components
 
