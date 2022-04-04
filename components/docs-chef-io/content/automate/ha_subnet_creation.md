@@ -47,5 +47,3 @@ Steps for how to create VPC, public and private subnets :-
 Or if you want to create from scratch then go to launch VPC wizard select the fields as shown below and click create VPC button.
 
 Note for CIDR input:-  Make sure that main route table (which gets created by default while creating VPC) is having route to internet gateway because the public subnets created by provision infra will be associated to the main route table only. 
-
-
