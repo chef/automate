@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -179,10 +180,11 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
-	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
+	migration, err := s.service.Migration.GetLastSuccessfulMigration(ctx, req.Id)
 	if err != nil {
 		log.Errorf("Unable to fetch migration status for server id:%s", req.Id)
 	}
+
 	resp := &response.GetServer{
 		Server: fromStorageServerWithMigrationDetails(server, migration),
 	}
@@ -392,14 +394,24 @@ func fromStorageToListServers(sl []storage.Server) []*response.Server {
 
 // Create a response.Server from a storage.Server with migration
 func fromStorageServerWithMigrationDetails(s storage.Server, m storage.MigrationStatus) *response.Server {
+	var timeStamp *timestamppb.Timestamp
+
+	// If timestamp is zero send nil value
+	if m.Timestamp.IsZero() {
+		timeStamp = nil
+	} else {
+		timeStamp = timestamppb.New(m.Timestamp)
+	}
+
 	return &response.Server{
-		Id:              s.ID,
-		Name:            s.Name,
-		Fqdn:            s.Fqdn,
-		IpAddress:       s.IPAddress,
-		OrgsCount:       s.OrgsCount,
-		MigrationId:     m.MigrationID,
-		MigrationType:   m.MigrationType,
-		MigrationStatus: m.MigrationStatus,
+		Id:                s.ID,
+		Name:              s.Name,
+		Fqdn:              s.Fqdn,
+		IpAddress:         s.IPAddress,
+		OrgsCount:         s.OrgsCount,
+		MigrationId:       m.MigrationID,
+		MigrationType:     m.MigrationType,
+		MigrationStatus:   m.MigrationStatus,
+		LastMigrationTime: timeStamp,
 	}
 }
