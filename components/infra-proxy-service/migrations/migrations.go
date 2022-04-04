@@ -397,14 +397,10 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	orgJsonObj := pipeline.OrgJson{}
 	orgJsonObj.Name = req.OrgId
 	orgJsonObj.FullName = "f_" + req.OrgId
-	orgJson, err := json.Marshal(orgJsonObj)
+
+	err := writeOrgFile(orgJsonObj, orgJsonPath)
 	if err != nil {
-		log.Errorf("Failed to marshal %s ", err.Error())
-		return nil, err
-	}
-	err = writeFile(orgJsonPath, orgJson)
-	if err != nil {
-		log.Errorf("Failed to write org file %s", err.Error())
+		log.Errorf("Failed to write org file org.json ", err)
 		return nil, err
 	}
 
@@ -475,38 +471,23 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	}
 
 	// Write server users file key_dump.json
-	keyDumpJson, err := json.Marshal(serverUsers)
+	err = writeServerUsersFile(serverUsers, keyDumpJsonPath)
 	if err != nil {
-		log.Errorf("Failed to marshal server users %s", err.Error())
-		return nil, err
-	}
-	err = writeFile(keyDumpJsonPath, keyDumpJson)
-	if err != nil {
-		log.Errorf("Failed to write server users file %s", err.Error())
+		log.Errorf("Failed to write server users file key_dump.json ", err)
 		return nil, err
 	}
 
 	// Write org users file members.json
-	membersJson, err := json.Marshal(members)
+	err = writeOrgUsersFile(members, membersJsonPath)
 	if err != nil {
-		log.Errorf("Failed to marshal org users%s", err.Error())
-		return nil, err
-	}
-	err = writeFile(membersJsonPath, membersJson)
-	if err != nil {
-		log.Errorf("Failed to write org users file %s", err.Error())
+		log.Errorf("Failed to write org users file members.json ", err)
 		return nil, err
 	}
 
 	// Write org admins file admins.json
-	adminsJson, err := json.Marshal(admins)
+	err = writeAdminsFile(admins, adminsJsonPath)
 	if err != nil {
-		log.Errorf("Failed to marshal org admins %s", err.Error())
-		return nil, err
-	}
-	err = writeFile(adminsJsonPath, adminsJson)
-	if err != nil {
-		log.Errorf("Failed to write org admins file %s", err.Error())
+		log.Errorf("Failed to write org users file members.json ", err)
 		return nil, err
 	}
 
@@ -535,6 +516,66 @@ func writeFile(path string, data []byte) error {
 	err := ioutil.WriteFile(path, data, 0644)
 	if err != nil {
 		log.Errorf("Unable to write file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//writeOrgFile: Write org file org.json
+func writeOrgFile(org pipeline.OrgJson, orgJsonPath string) error {
+	orgJson, err := json.Marshal(org)
+	if err != nil {
+		log.Errorf("Failed to marshal %s ", err.Error())
+		return err
+	}
+	err = writeFile(orgJsonPath, orgJson)
+	if err != nil {
+		log.Errorf("Failed to write org file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//	writeServerUsersFile: Write server users file key_dump.json
+func writeServerUsersFile(serverUsers []pipeline_model.KeyDump, keyDumpJsonPath string) error {
+	keyDumpJson, err := json.Marshal(serverUsers)
+	if err != nil {
+		log.Errorf("Failed to marshal server users %s", err.Error())
+		return err
+	}
+	err = writeFile(keyDumpJsonPath, keyDumpJson)
+	if err != nil {
+		log.Errorf("Failed to write server users file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//writeOrgUsersFile Write org users file members.json
+func writeOrgUsersFile(orgUsers []pipeline_model.MembersJson, membersJsonPath string) error {
+	membersJson, err := json.Marshal(orgUsers)
+	if err != nil {
+		log.Errorf("Failed to marshal org users%s", err.Error())
+		return err
+	}
+	err = writeFile(membersJsonPath, membersJson)
+	if err != nil {
+		log.Errorf("Failed to write org users file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//writeAdminsFile: Write org admins file admins.json
+func writeAdminsFile(admins pipeline_model.AdminsJson, adminsJsonPath string) error {
+	adminsJson, err := json.Marshal(admins)
+	if err != nil {
+		log.Errorf("Failed to marshal org admins %s", err.Error())
+		return err
+	}
+	err = writeFile(adminsJsonPath, adminsJson)
+	if err != nil {
+		log.Errorf("Failed to write org admins file %s", err.Error())
 		return err
 	}
 	return nil
