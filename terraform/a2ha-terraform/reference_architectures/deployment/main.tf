@@ -231,6 +231,7 @@ module "elasticsearch" {
   ssh_user                     = var.ssh_user
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
+  backup_config_efs            = var.backup_config_efs
 }
 
 module "postgresql" {
