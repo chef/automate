@@ -219,10 +219,13 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	err := getLatestPgPath()
-	if err != nil {
-		return err
+	if !migrateDataCmdFlags.skipStorageCheck  {
+		err := getLatestPgPath()
+		if err != nil ||  migrateDataCmdFlags.skipStorageCheck  {
+			return err
+		}
 	}
+
 
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
@@ -640,9 +643,10 @@ func calDiskSizeAndDirSize() (bool, error) {
 
 	dirSizeInMb := size / (1024 * 1024)
 
-	msg := fmt.Sprintf("Insufficient disk space for migration.\n %18s: %7d MB\n %18s: %7d MB\n",
+	msg := fmt.Sprintf("Insufficient disk space for migration.\n%s: %5d MB\n%s: %5d MB\n%s",
 		"Space Required", dirSizeInMb,
-		"Space Available", diskSpaceInMb)
+		"Space Available", diskSpaceInMb,
+		"To continue with less memory Please use --skip-storage-check")
 
 	if diskSpaceInMb > uint64(dirSizeInMb) {
 		return true, nil
