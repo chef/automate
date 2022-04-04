@@ -58,4 +58,4 @@ tail -n +3 bootstrap.aib | tar -tf -
 
 To see the data of service like secret service, search for it in `/hab/svc` directory. This can be required if you want to compare `.aib` data with multiple FE (In respective chef-automate and chef-server) nodes.
 
-For example: For secret service cat /hab/svc/secrets-service/data/secrets\_key
+**For example:** For secret service cat /hab/svc/secrets-service/data/secrets\_key
