@@ -1,5 +1,5 @@
 +++
-title = "Taking Backup with Amazon S3 Bucket"
+title = "AWS Backed Backup"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Taking Backup with Amazon S3 Bucket"
-    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_s3.md Taking Backup with Amazon S3 Bucket"
-    parent = "automate/deploy_high_availability/backup_and_restore"
+    title = "AWS Backed Backup"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_prerequisite/ha_backup_s3.md AWS Backed Backup"
+    parent = "automate/deploy_high_availability/backup_and_restore/ha_backup_prerequisite"
     weight = 210
 +++
 
