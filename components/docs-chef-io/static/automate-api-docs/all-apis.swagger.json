@@ -3738,6 +3738,68 @@
         }
       }
     },
+    "/api/v0/infra/servers/migrations/staged_data/{migration_id}": {
+      "get": {
+        "tags": [
+          "InfraProxyMigrationService"
+        ],
+        "operationId": "InfraProxyMigrationService_GetStagedData",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Migration ID",
+            "name": "migration_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.GetStagedDataResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/migrations/status/{migration_id}": {
+      "get": {
+        "tags": [
+          "InfraProxyMigrationService"
+        ],
+        "operationId": "InfraProxyMigrationService_GetMigrationStatus",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Migration ID.",
+            "name": "migration_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.GetMigrationStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/infra/servers/server_status": {
       "get": {
         "tags": [
@@ -3757,6 +3819,70 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServerStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/update": {
+      "post": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_UpdateWebuiKey",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateWebuiKey"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateWebuiKey"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/validate": {
+      "post": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_ValidateWebuiKey",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ValidateWebuiKey"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ValidateWebuiKey"
             }
           },
           "default": {
@@ -3854,6 +3980,190 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeleteServer"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/automateinfraserverusers": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetAutomateInfraServerUsersList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Automate Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerUsers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/infraserverorgs": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetInfraServerOrgs",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Automate Infra Server ID",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetInfraServerOrgs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/migrations/cancel_migration/{migration_id}": {
+      "get": {
+        "tags": [
+          "InfraProxyMigrationService"
+        ],
+        "operationId": "InfraProxyMigrationService_CancelMigration",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Server ID",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Migration ID",
+            "name": "migration_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/migrations/confirm_preview/{migration_id}": {
+      "post": {
+        "tags": [
+          "InfraProxyMigrationService"
+        ],
+        "operationId": "InfraProxyMigrationService_ConfirmPreview",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Server ID",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Migration ID.",
+            "name": "migration_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.ConfirmPreview"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.ConfirmPreview"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/org/{org_id}/users": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetAutomateInfraOrgUsersList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Automate Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Automate Infra Org ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers"
             }
           },
           "default": {
@@ -6217,6 +6527,52 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.OrgUsers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/user/{user_name}": {
+      "put": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_ResetInfraServerUserKey",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Server Id",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef Server Username",
+            "name": "user_name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ResetInfraServerUserKeyReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetInfraServerUserKeyRes"
             }
           },
           "default": {
@@ -15499,6 +15855,11 @@
           "description": "Unique ID. Cannot be changed. Used to sign in.",
           "type": "string"
         },
+        "is_hashed": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "boolean for if hash password there"
+        },
         "name": {
           "description": "Display name for local user.",
           "type": "string"
@@ -16946,6 +17307,255 @@
         "V2"
       ]
     },
+    "chef.automate.api.infra_proxy.migrations.request.ConfirmPreview": {
+      "type": "object",
+      "properties": {
+        "migration_id": {
+          "description": "Migration ID.",
+          "type": "string"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "Server ID"
+        },
+        "staged_data": {
+          "title": "Staged data",
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.StagedData"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.request.StagedData": {
+      "type": "object",
+      "properties": {
+        "orgs_to_delete": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to delete"
+        },
+        "orgs_to_migrate": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to migrate"
+        },
+        "orgs_to_skip": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to skip"
+        },
+        "orgs_to_update": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to update"
+        },
+        "users": {
+          "type": "array",
+          "title": "Users",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.User"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.request.User": {
+      "type": "object",
+      "properties": {
+        "action_ops": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Local User actionops"
+        },
+        "automate_username": {
+          "type": "string",
+          "title": "User's username in automate"
+        },
+        "connector": {
+          "type": "string",
+          "title": "Local or ldap user"
+        },
+        "display_name": {
+          "type": "string",
+          "title": "User's display name"
+        },
+        "email": {
+          "type": "string",
+          "title": "User's email ID"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User's first name"
+        },
+        "hash_password": {
+          "type": "string",
+          "title": "Local User hash password"
+        },
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "user is admin or not"
+        },
+        "is_conflicting": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "IsConflicting for user's existance in db"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User's last name"
+        },
+        "middle_name": {
+          "type": "string",
+          "title": "User's middle name"
+        },
+        "username": {
+          "type": "string",
+          "title": "User's username"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.CancelMigrationResponse": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "title": "Error message",
+          "items": {
+            "type": "string"
+          }
+        },
+        "success": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "migration ID"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.ConfirmPreview": {
+      "type": "object",
+      "properties": {
+        "migration_id": {
+          "type": "string",
+          "title": "Migration ID"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.GetMigrationStatusResponse": {
+      "type": "object",
+      "properties": {
+        "migration_id": {
+          "description": "Migration ID.",
+          "type": "string"
+        },
+        "migration_status": {
+          "type": "string",
+          "title": "Migration status"
+        },
+        "migration_type": {
+          "type": "string",
+          "title": "Migration type"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.GetStagedDataResponse": {
+      "type": "object",
+      "properties": {
+        "migration_id": {
+          "description": "Migration ID.",
+          "type": "string"
+        },
+        "staged_data": {
+          "title": "Staged data",
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.StagedData"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.StagedData": {
+      "type": "object",
+      "properties": {
+        "orgs_to_delete": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to delete"
+        },
+        "orgs_to_migrate": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to migrate"
+        },
+        "orgs_to_skip": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to skip"
+        },
+        "orgs_to_update": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of orgs to update"
+        },
+        "users": {
+          "type": "array",
+          "title": "Users",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.User"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.migrations.response.User": {
+      "type": "object",
+      "properties": {
+        "action_ops": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Local User actionops"
+        },
+        "automate_username": {
+          "type": "string",
+          "title": "User's username in automate"
+        },
+        "connector": {
+          "type": "string",
+          "title": "Local or ldap user"
+        },
+        "display_name": {
+          "type": "string",
+          "title": "User's display name"
+        },
+        "email": {
+          "type": "string",
+          "title": "User's email ID"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User's first name"
+        },
+        "hash_password": {
+          "type": "string",
+          "title": "Local user hashed password"
+        },
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "user is admin or not"
+        },
+        "is_conflicting": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "IsConflicting for user's existance in db"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User's last name"
+        },
+        "middle_name": {
+          "type": "string",
+          "title": "User's middle name"
+        },
+        "username": {
+          "type": "string",
+          "title": "User's username"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.ClientKey": {
       "type": "object",
       "properties": {
@@ -17075,14 +17685,6 @@
     "chef.automate.api.infra_proxy.request.CreateOrg": {
       "type": "object",
       "properties": {
-        "admin_key": {
-          "description": "Chef organization admin key.",
-          "type": "string"
-        },
-        "admin_user": {
-          "description": "Chef organization admin user.",
-          "type": "string"
-        },
         "id": {
           "description": "Chef organization ID.",
           "type": "string"
@@ -17165,6 +17767,10 @@
         "name": {
           "description": "Chef Infra Server name.",
           "type": "string"
+        },
+        "webui_key": {
+          "description": "Chef Infra Server Webui key.",
+          "type": "string"
         }
       }
     },
@@ -17233,6 +17839,23 @@
         "server_id": {
           "description": "Chef Infra Server ID.",
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.ResetInfraServerUserKeyReq": {
+      "type": "object",
+      "properties": {
+        "server_id": {
+          "type": "string",
+          "title": "Chef Server Id"
+        },
+        "user_id": {
+          "type": "string",
+          "title": "Chef Server User's Id"
+        },
+        "user_name": {
+          "type": "string",
+          "title": "Chef Server Username"
         }
       }
     },
@@ -17513,6 +18136,149 @@
         "name": {
           "description": "Chef Infra Server name.",
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.UpdateWebuiKey": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Chef Infra Server ID.",
+          "type": "string"
+        },
+        "webui_key": {
+          "type": "string",
+          "title": "Chef Server Webui Key"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.ValidateWebuiKey": {
+      "type": "object",
+      "properties": {
+        "fqdn": {
+          "type": "string",
+          "title": "Chef Server FQDN"
+        },
+        "id": {
+          "description": "Chef Infra Server ID.",
+          "type": "string"
+        },
+        "webui_key": {
+          "type": "string",
+          "title": "Optional Chef Server Webui Key"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "title": "Automate infra org users list",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraOrgUsersListItem"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraOrgUsersListItem": {
+      "type": "object",
+      "properties": {
+        "automate_user_id": {
+          "type": "string",
+          "title": "User automate user id"
+        },
+        "connector": {
+          "type": "string",
+          "title": "User connector"
+        },
+        "display_name": {
+          "type": "string",
+          "title": "User display name"
+        },
+        "email_id": {
+          "type": "string",
+          "title": "User email id"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User first name"
+        },
+        "infra_server_username": {
+          "type": "string",
+          "title": "User infra server username"
+        },
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "User is org admin or not"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User last name"
+        },
+        "middle_name": {
+          "type": "string",
+          "title": "User middle name"
+        },
+        "org_id": {
+          "description": "Automate Infra Org ID.",
+          "type": "string"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "User server id"
+        },
+        "user_id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "User id"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraServerUsers": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "title": "Automate infra server users list",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerUsersListItem"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraServerUsersListItem": {
+      "type": "object",
+      "properties": {
+        "automate_user_id": {
+          "type": "string",
+          "title": "User automate user id"
+        },
+        "connector": {
+          "type": "string",
+          "title": "User connector"
+        },
+        "credential_id": {
+          "type": "string",
+          "title": "User credential id"
+        },
+        "id": {
+          "type": "string",
+          "title": "User id"
+        },
+        "infra_server_username": {
+          "type": "string",
+          "title": "User infra server username"
+        },
+        "is_server_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "User is server admin or not"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "User server id"
         }
       }
     },
@@ -18140,6 +18906,15 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.GetInfraServerOrgs": {
+      "type": "object",
+      "properties": {
+        "migration_id": {
+          "type": "string",
+          "title": "id of organisation migration"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.GetOrg": {
       "type": "object",
       "properties": {
@@ -18580,6 +19355,27 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.ResetInfraServerUserKeyRes": {
+      "type": "object",
+      "properties": {
+        "private_key": {
+          "type": "string",
+          "title": "Chef Servers User's Private Key"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "Chef Server Id"
+        },
+        "user_id": {
+          "type": "string",
+          "title": "Chef Server User's Id"
+        },
+        "user_name": {
+          "type": "string",
+          "title": "Chef Server Username"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.ResetOrgAdminKey": {
       "type": "object",
       "properties": {
@@ -18766,6 +19562,18 @@
           "description": "Chef Infra Server IP address.",
           "type": "string"
         },
+        "migration_id": {
+          "type": "string",
+          "title": "Migration Id for active Chef Infra server migration"
+        },
+        "migration_status": {
+          "type": "string",
+          "title": "Migration Id for active Chef Infra server migration"
+        },
+        "migration_type": {
+          "type": "string",
+          "title": "Migration Phase for active Chef Infra server migration"
+        },
         "name": {
           "description": "Chef Infra Server name.",
           "type": "string"
@@ -18887,6 +19695,9 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.UpdateWebuiKey": {
+      "type": "object"
+    },
     "chef.automate.api.infra_proxy.response.UsersListItem": {
       "type": "object",
       "properties": {
@@ -18905,6 +19716,20 @@
         "username": {
           "type": "string",
           "title": "User username"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ValidateWebuiKey": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string",
+          "title": "webui key validation errors"
+        },
+        "valid": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Webui key is valid or not"
         }
       }
     },
