@@ -12,23 +12,29 @@ gh_repo = "automate"
     weight = 210
 +++
 
-In some scenario we are required to migrate A2HA data to Automate HA cluster (as we have new HA implementation in Automate). For that here are some steps that you'll have to follow.
+This page explains the procedure to migrate the existing A2HA data to the newly deployed Chef Automate HA. This migration involves following steps:
 
-Take backup of chef-automate from A2HA (Old) using below command, this command can be executed from any of front-end (chef-automate) node in case of multiple frontends. Usually if you don't specify any location for backup in config.toml then that backup will be store on /var/opt/chef-automate/backup location if you hit below command.
+* Backup the data from the existing A2HA using the following command:
 
-sudo chef-automate backup create
+  ```cmd
+  sudo chef-automate backup create
+  ```
 
-Make a tar file of backup that we have taken in step 1. Here make sure that you are also taking backup of .tar directory. Otherwise you'll face some issue related to metadata.json.
+  In case of multiple frontends, the above command can be executed from any of the front end (Chef Automate).  The above command saves the backup to the `/var/opt/chef-automate/backup location` unless specific location is specified in `config.toml`.
 
-E.g. tar -cvf backup.tar.gz path/to/backup/20201030172917/ /path/to/backup/automatebackup-elasticsearch/ /path/to/backup/.tmp/
+* Create a `.tar` file of the backup created above. It is necessary to have a back for the `.tar` directory or the `metadata.json` might throw some error.
 
-Create a aib file from any of chef-automate frontend node of A2HA. This will create a bundle of all necessary keys. Like pivotal.pem, secret key etc. Usually this will not be included in regular backup(step 1) so make sure you create a bundle for that.
+  For example: `tar -cvf backup.tar.gz path/to/backup/20201030172917/ /path/to/backup/automatebackup-elasticsearch/ /path/to/backup/.tmp/`
 
+* Create a `.aib` file from any of chef-automate frontend node of A2HA. This creates a bundle of all necessary keys, such as **pivotal.pem**, **secret key**, etc. Create a bundle for the file as this might not be included in regular backup process.
+
+```cmd
 sudo chef-automate bootstrap bundle create bootstrap.abb
+```
 
-Copy tar file and aib file that we created in step 2 and 3 respectively to any of the Automate HA chef-automate instance and extract it on specific location that you mentioned in config.toml file. Its is not necessary to extract that backup on below location. But make sure that restore command is able to read backup or not from your defined location on step1.
+* Copy the `.tar` and `.aib` file created above to any of the Automate HA Chef Automate instance. Extract the specific file to the specific location mentioned in `config.toml` file. For example: `/mnt/automate-backup`. It is not mandatory to extract the backup to the specified location but the restore command should always read the backup file from the above defined location.
 
-E.g /mnt/automate-backup
+* 
 
 Restore A2HA backup on Automate HA. Read this docs for chef-automate restore. In below command there is also a frontend-20210624095659.aib generated in new Automate HA file mention that's because while restoration we also keep in mind all the services habitat release version. Because during restoration time A2HA restoration will try to find A2HA habitat pkg version so there can be a scenario occure where all(A2HA and automate HA frontends (automate's)) packages version can't be the same. That's why we are passing current Automate HA packages. You can find frontend aib file in /var/tmp directory of your Automate HA chef-automate instance.
 
