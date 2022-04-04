@@ -51,7 +51,7 @@ const (
 	PGSSLCERT                   = "/hab/svc/automate-postgresql/config/server.crt"
 	PGSSLKEY                    = "/hab/svc/automate-postgresql/config/server.key"
 	PGSSLROOTCERT               = "/hab/svc/automate-postgresql/config/root.crt"
-	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.21/20211016180117/bin"
+	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.24/20220218015755/bin"
 )
 
 func init() {
