@@ -55,6 +55,17 @@ variable "aws_ssh_key_pair_name" {
 variable "aws_tags" {
 }
 
+variable "backup_config_efs" {
+  default = "false"
+}
+
+variable "backup_config_s3" {
+  default = "false"
+}
+
+variable "bucket_name" {
+}
+
 variable "chef_ebs_volume_iops" {
   default = 100
 }
@@ -163,6 +174,10 @@ variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
 
+variable "s3_endpoint" {
+  default = "https://s3.amazonaws.com"
+}
+
 variable "setup_managed_services" {
   default = false
 }
@@ -176,20 +191,4 @@ variable "ssh_user" {
 
 variable "sudo_cmd" {
   default = "sudo"
-}
-
-variable "backup_config_s3" {
-  default = "false"
-}
-
-variable "backup_config_efs" {
-  default = "false"
-}
-
-
-variable "s3_endpoint" {
-  default = "https://s3.amazonaws.com"
-}
-
-variable "bucket_name" {
 }

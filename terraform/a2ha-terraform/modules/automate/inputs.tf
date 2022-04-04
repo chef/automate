@@ -38,6 +38,18 @@ variable "backend_aib_dest_file" {
 variable "backend_aib_local_file" {
 }
 
+variable "backup_config_efs" {
+  default = "false"
+}
+
+variable "backup_config_s3" {
+  default = "false"
+}
+
+variable "bucket_name" {
+  default = "chef-automate-ha"
+}
+
 variable "cluster_id" {
   default = ""
 }
@@ -120,6 +132,10 @@ variable "public_ips" {
   default = []
 }
 
+variable "s3_endpoint" {
+  default = "https://s3.amazonaws.com"
+}
+
 variable "ssh_key_file" {
 }
 
@@ -140,20 +156,3 @@ variable "teams_port" {
 variable "tmp_path" {
   default = "/var/tmp"
 }
-variable "backup_config_s3" {
-  default = "false"
-}
-
-variable "backup_config_efs" {
-  default = "false"
-}
-
-
-variable "s3_endpoint" {
-  default = "https://s3.amazonaws.com"
-}
-
-variable "bucket_name" {
-  default = "chef-automate-ha"
-}
-
