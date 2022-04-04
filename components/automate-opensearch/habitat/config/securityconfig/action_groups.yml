@@ -135,4 +135,3 @@ MANAGE_SNAPSHOTS:
   permissions:
     - "cluster:admin/snapshot/*"
     - "cluster:admin/repository/*"
-    
