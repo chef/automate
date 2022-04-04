@@ -220,9 +220,10 @@ class ManifestGenerator
     # of an implementation mistake in deployment-service, changing this
     # version is impossible without major feature work in
     # deployment-service to manage the upgrade.
-    manifest["schema_version"] = "1"
+    manifest["schema_version"] = "2"
     manifest["hab_build"] = local_hab_version
     manifest["build"] = version
+    manifest["version"] = version
     manifest["hab"] = []
 
     ["hab", "hab-sup", "hab-launcher"].each do |p|
@@ -335,7 +336,7 @@ version = ENV["VERSION"] || DateTime.now.strftime("%Y%m%d%H%M%S")
 filename = if ENV["VERSION"]
              "#{ENV["VERSION"]}.json"
            else
-             "manifest_semver.json"
+             "manifest.json"
            end
 # Packages that are present in products.meta but we wish to exclude
 # from the manifest (probably because they are not yet published to
