@@ -1,5 +1,5 @@
 +++
-title = "Taking Backup with EFS System"
+title = "On-Premise Backed Backup"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Taking Backup with EFS System"
-    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_efs.md Taking Backup with EFS System"
-    parent = "automate/deploy_high_availability/backup_and_restore"
+    title = "On-Premise Backed Backup"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_prerequisite/ha_backup_efs.md On-Premise Backed Backup"
+    parent = "automate/deploy_high_availability/backup_and_restore/ha_backup_prerequisite"
     weight = 220
 +++
 
