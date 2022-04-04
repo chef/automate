@@ -206,7 +206,7 @@ download_manifest() {
     local channel="$1"
     local dst="$2"
 
-    curl "https://packages.chef.io/manifests/$channel/automate/latest.json" > "$dst"
+    curl "https://packages.chef.io/manifests/$channel/automate/latest_semver.json" > "$dst"
 }
 
 download_version() {
