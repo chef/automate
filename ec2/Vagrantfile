@@ -77,7 +77,7 @@ def latest_build_from_versions(channel)
   puts " * Getting latest build from #{versions_url}"
   versions_json = JSON.parse(open(versions_url).read)
   build = versions_json.last
-  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^\d+$/
+  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^(\d+\.)?(\d+\.)?(\*|\d+)$/
   return build
 end
 
