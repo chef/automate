@@ -34,25 +34,28 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
 
 * Copy the `.tar` and `.aib` file created above to any of the Automate HA Chef Automate instance. Extract the specific file to the specific location mentioned in `config.toml` file. For example: `/mnt/automate-backup`. It is not mandatory to extract the backup to the specified location but the restore command should always read the backup file from the above defined location.
 
-* 
+* To restore the A2HA backup on Automate HA, run the following command:
 
-Restore A2HA backup on Automate HA. Read this docs for chef-automate restore. In below command there is also a frontend-20210624095659.aib generated in new Automate HA file mention that's because while restoration we also keep in mind all the services habitat release version. Because during restoration time A2HA restoration will try to find A2HA habitat pkg version so there can be a scenario occure where all(A2HA and automate HA frontends (automate's)) packages version can't be the same. That's why we are passing current Automate HA packages. You can find frontend aib file in /var/tmp directory of your Automate HA chef-automate instance.
+  ```cmd
+  sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-20210624095659.aib --skip-preflight
+  ```
 
-E.g. sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-20210624095659.aib --skip-preflight
+  The above command also generates the `frontend-20210624095659.aib` file in new Automate HA file as during the restoration process, all the services habitat release version is also kept into consideration. At the time of restoration, the A2HA restoration will try to find the A2HA habitat pkg version so there can be a possibility of different package versions. To get the error free restoration, pass the current Automate HA packages (frontend `.aib` file) which is located in `/var/tmp` directory of your Automate HA chef-automate instance.
 
-After that if you not do this step then you will might face warning when you'll try to open chef-automate UI It looks like you do not have permission to access any data in automate So make sure you have unpacked the. aib file. Otherwise you'll not see login page. To unpack the bootstrap file that we copied from A2HA chef-automate using below command
+* Unpack the `.aib` bootstrap file. This will let you access the data in Chef Automate and will also let you view the login page.
 
-Sudo chef-automate bootstrap bundle unpack bootstrap.abb
+* Copy the `bootstrap.aib` file to another automate node and chef node. You can copy this file even if you have multiple automate and chef instances. The secrets restored by unpacking the bootstrap file is different for other automate instances. So, sync all the automate and chef instances.
 
-Copy the bootstrap.aib file to another automate node and chef node also if you are having multiple automate and chef instances. Because the secrets we have restored by unpacking the bootstrap file would be different for another automate instance. So we need to make that all the automate and chef instance would be in sync.
+## Important command and notes
 
-Important command and notes
+To view what bootstrap includes in `.aib` and `abb` file, run the following command:
 
-Using the below command you can see what bootstrap includes in aib file and abb file. Aib file will only include keys related data while abb file will include service packages also. You can use below command and can compare both the file's data
-
+```cmd
 tail -n +3 bootstrap.aib | tar -tf -
+```
 
-After using above command, if you want to see the data of service like secret service then you would see those services into /hab/svc directory. This'll be needed if you want to compare aib data between multiple FE(In respective chef-automate and chef-server) nodes.
+`.aib` file only includes keys related data whereas the `.abb` file  also includes service packages.
 
-E.g For secret service cat /hab/svc/secrets-service/data/secrets\_key
+To see the data of service like secret service, search for it in `/hab/svc` directory. This can be required if you want to compare `.aib` data with multiple FE (In respective chef-automate and chef-server) nodes.
 
+For example: For secret service cat /hab/svc/secrets-service/data/secrets\_key
