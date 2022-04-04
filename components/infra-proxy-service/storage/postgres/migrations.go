@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
@@ -216,6 +219,36 @@ func (p *postgres) insertMigration(ctx context.Context, migrationId, serverId, m
 	if err != nil {
 		return storage.Migration{}, err
 	}
+
+	return m, nil
+}
+
+//GetLastSuccessfulMigration gets the Migration ID and Migration Status for a server id
+func (p *postgres) GetLastSuccessfulMigration(ctx context.Context, serverId string) (storage.MigrationStatus, error) {
+	var m storage.MigrationStatus
+	var updateTime string
+	query := `select m.migration_id,t.type,s.status_message, m.updated_timestamp
+			  from migration m 
+			  join migration_type t on m.type_id=t.id 
+			  join migration_status s on m.status_id=s.id 
+			  and m.type_id=5000
+			  and m.server_id=$1 AND m.status_id=101 order by updated_timestamp desc FETCH FIRST ROW ONLY`
+	err := p.db.QueryRowContext(ctx,
+		query, serverId).
+		Scan(&m.MigrationID, &m.MigrationType, &m.MigrationStatus, &updateTime)
+
+	if err != nil {
+		return storage.MigrationStatus{}, err
+	}
+
+	// The string passed in Parse function is format
+	time, err := time.Parse("2006-01-02T15:04:05Z07:00", updateTime)
+	if err != nil {
+		log.Error("Unable to parse time", err)
+	}
+
+	m.Timestamp = time
+	log.Printf("Timestamp: %+v", m.Timestamp)
 
 	return m, nil
 }
