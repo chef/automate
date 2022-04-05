@@ -68,6 +68,8 @@ Chef Automate warns you if you enter an invalid name, FQDN, IP address or WebUI:
 
 Once done, select **Add Chef Server** and see the server in the list of Chef Infra Servers.
 
+
+
 ### Update WebUI Key
 
 In case you have mentioned an incorrect WebUI key, you can update the same by following the steps:
