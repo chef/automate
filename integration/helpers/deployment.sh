@@ -43,7 +43,8 @@ run_upgrade() {
     echo "print from run upgrade"
     if [ -z "$airgap_artifact_path" ]; then
         echo "print from run upgrade 1"
-        ERROR=$(chef-automate upgrade run 2>&1 >/dev/null)
+        ERROR=$(chef-automate upgrade run 2>&1 >/dev/null) || true
+        echo $ERROR
         if echo "${ERROR}" | grep 'This is a Major upgrade'; then
             echo "major normal upgrade"
             echo "y
