@@ -16,12 +16,12 @@ locals {
     })
   ]
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {
-    backend_aib_dest_file        = var.backend_aib_dest_file,
-    opensearch_pkg_ident      = var.opensearch_pkg_ident,
-    opensearch_svc_load_args  = var.opensearch_svc_load_args,
+    backend_aib_dest_file           = var.backend_aib_dest_file,
+    opensearch_pkg_ident            = var.opensearch_pkg_ident,
+    opensearch_svc_load_args        = var.opensearch_svc_load_args,
     opensearchsidecar_pkg_ident     = var.opensearchsidecar_pkg_ident,
     opensearchsidecar_svc_load_args = var.opensearchsidecar_svc_load_args,
-    tmp_path                     = var.tmp_path
+    tmp_path                        = var.tmp_path
   })
 }
 
@@ -30,7 +30,7 @@ resource "null_resource" "opensearch" {
 
   triggers = {
     es_user_toml_sha = sha1(local.opensearch_user_toml[count.index])
-    template = local.provision
+    template         = local.provision
   }
 
   connection {
