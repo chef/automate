@@ -21358,6 +21358,10 @@
       "x-displayName": "Nodes"
     },
     {
+      "name": "InfraProxy",
+      "x-displayName": "Infra Server"
+    },
+    {
       "name": "NodesService",
       "x-displayName": "Managed Nodes"
     },
@@ -21434,7 +21438,8 @@
     {
       "name": "Infra",
       "tags": [
-        "ConfigMgmt"
+        "ConfigMgmt",
+        "InfraProxy"
       ]
     },
     {
