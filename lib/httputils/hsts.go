@@ -64,7 +64,7 @@ func HSTSHandler(next http.Handler) *HSTS {
 }
 
 //Add HSTS response header for https calls and redirect if call is over http
-func (h *HSTS) AddHSTSHeaderAndRedirect(w http.ResponseWriter, r *http.Request) {
+func (h *HSTS) addHSTSHeaderAndRedirect(w http.ResponseWriter, r *http.Request) {
 	if isHTTPS(r, h.AcceptXForwardedProtoHeader) {
 		w.Header().Add("Strict-Transport-Security", createHeaderValue(h.MaxAge, h.SendPreloadDirective))
 
@@ -83,13 +83,13 @@ func (h *HSTS) AddHSTSHeaderAndRedirect(w http.ResponseWriter, r *http.Request) 
 }
 
 //Only add HSTS response header for https calls and doesn't redirect if call is over http
-func (h *HSTS) AddHSTSHeader(w http.ResponseWriter, r *http.Request) {
+func (h *HSTS) addHSTSHeader(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Strict-Transport-Security", createHeaderValue(h.MaxAge, h.SendPreloadDirective))
 	h.next.ServeHTTP(w, r)
 }
 
 func (h *HSTS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.AddHSTSHeader(w, r)
+	h.addHSTSHeader(w, r)
 }
 
 //HSTS middleware
