@@ -44,7 +44,11 @@ run_upgrade() {
         ERROR=$(chef-automate upgrade run 2>&1 >/dev/null)
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major'; then
             echo "major normal upgrade"
-            echo "y\ny\ny\n" | chef-automate upgrade run --major --versions-file "$versionsFile"
+            echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major --versions-file "$versionsFile"
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade"
@@ -53,7 +57,11 @@ run_upgrade() {
     else
         ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null)
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle'; then
-            echo "y\ny\ny\n" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
+            echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade airgap"
