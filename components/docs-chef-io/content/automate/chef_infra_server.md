@@ -70,7 +70,7 @@ Once done, select **Add Chef Server** and see the server in the list of Chef Inf
 
 ### Chef Server Information
 
-In Chef Infra Server, you can view the details of te infra servers created. Select the created infra server, and the UI shows the information of the infra server.
+In Chef Infra Server, you can view the details of the infra servers created. Select the created infra server, and the UI shows the information of the infra server.
 
 {{< figure src="/images/automate/chef-server-details-page.png" alt="Chef Infra Server Information Page">}}
 
