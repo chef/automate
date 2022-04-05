@@ -498,6 +498,19 @@ steps:
         linux:
           privileged: true
 
+  - label: "v2 to v22 upgrade"
+    command:
+      - integration/run_test integration/tests/v2_to_v3_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
   - label: "iam v1 to v2 force-upgrade"
     command:
       - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
