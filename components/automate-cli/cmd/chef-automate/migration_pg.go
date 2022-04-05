@@ -228,7 +228,6 @@ func pgMigrateExecutor() error {
 	// 		return err
 	// 	}
 	// }
-
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
 		return err
