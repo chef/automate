@@ -30,6 +30,9 @@ export TEMP_TAR_FILE=$TEMP_DIR/my.aib.$$.$RANDOM
 export MANIFEST_TFVARS="terraform/a2ha_manifest.auto.tfvars"
 export BACKENDAIB=
 export PACKAGES_INFO="/tmp/packages.info"
+export BUILD_VERSION=
+export frontend_aib=
+export backend_aib=
 
 # Helper Functions
 echo_env() {
@@ -85,27 +88,32 @@ airgap_bundle_create() {
   args+=("${original_aib_path}")
   # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
+    BUILD_VERSION=`"${CHEF_AUTOMATE_BIN_PATH}" airgap bundle info "${original_aib_path}" | grep Version | awk '{print $2}'`
     if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
-          cat "${original_aib_path}" > "${TARBALL_PATH}"
-          outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
+          frontend_aib="/hab/a2_deploy_workspace/terraform/transfer_files/frontend-${BUILD_VERSION}.aib"
+          cat "${original_aib_path}" > "${frontend_aib}"
+          outfile=${ORIGINAL_TARBALL:-${frontend_aib}}
           bname=$(basename "${outfile}")
           echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > "${FRONTENDAIB_TFVARS}"
           echo "frontend_aib_local_file = \"${bname}\"" >> "${FRONTENDAIB_TFVARS}"
+	        $(hab pkg path core/coreutils)/bin/md5sum $(frontend_aib) > $(frontend_aib).md5 
     fi
 
     if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
+          backend_aib="/hab/a2_deploy_workspace/terraform/transfer_files/backend-${BUILD_VERSION}.aib"
           # getting packges info from airgap bundle       
           ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${original_aib_path} > ${PACKAGES_INFO}
-          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > "${BACKENDAIB}"
+          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > "${backend_aib}"
           # this removes the magic header from the .aib
           # making it usable with the tar command
           rm -f ${TEMP_TAR_FILE}    
-          outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
+          outfile_backend=${ORIGINAL_TARBALL:-${backend_aib}}
           backend_name=$(basename "${outfile_backend}")
           echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > "${BACKENDAIB_TFVARS}" 
           echo "backend_aib_local_file = \"${backend_name}\"" >> "${BACKENDAIB_TFVARS}"
+	        $(hab pkg path core/coreutils)/bin/md5sum $(backend_aib) > $(backend_aib).md5
     fi
     rm -f "${original_aib_path}"
   else
