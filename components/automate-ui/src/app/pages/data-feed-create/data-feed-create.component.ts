@@ -301,15 +301,13 @@ export class DataFeedCreateComponent {
           case AuthTypes.ACCESSTOKEN: {
           if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
             this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-              if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
-                this.validHeadersValue && this.flagHeaders) {
-                return true;
-            } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
-              !this.headerChecked && this.flagHeaders) {
-              return true;
-            } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
-            return true;
-            }
+              if ((this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                this.validHeadersValue && this.flagHeaders)
+                || (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                !this.headerChecked && this.flagHeaders) ||
+                (this.integTitle !== WebhookIntegrationTypes.CUSTOM)) {
+                  return true;
+              }
             }
             break;
           }
