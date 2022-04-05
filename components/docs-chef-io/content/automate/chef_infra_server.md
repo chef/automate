@@ -68,7 +68,21 @@ Chef Automate warns you if you enter an invalid name, FQDN, IP address or WebUI:
 
 Once done, select **Add Chef Server** and see the server in the list of Chef Infra Servers.
 
+### Chef Server Information
 
+In Chef Infra Server, you can view the details of te infra servers created. Select the created infra server, and the UI shows the information of the infra server.
+
+{{< figure src="/images/automate/chef-server-details-page.png" alt="Chef Infra Server Information Page">}}
+
+In the above image you can view:
+
+1. The **FQDN** you inserted while creating.
+1. The **IP** address.
+1. The **WebUI** key.
+1. Last Sync Date.
+1. Last Migration Status.
+
+You can also update the **WebUI** key buy selecting the *Update* option of the WebUI key.
 
 ### Update WebUI Key
 
