@@ -96,6 +96,8 @@ module AutomateCluster
       default :region, 'us-east-1'
       default :vpc_id, " "
       default :cidr_block_addr, " "
+      default :private_custom_subnets, []
+      default :public_custom_subnets, []
       default :ssh_key_pair_name
       default :lb_access_logs, 'false'
       default :backup_config, ' '

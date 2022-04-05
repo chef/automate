@@ -70,6 +70,8 @@ type AwsConfigToml struct {
 			Region                          string `toml:"region"`
 			AwsVpcId                        string `toml:"aws_vpc_id"`
 			AwsCidrBlockAddr                string `toml:"aws_cidr_block_addr"`
+			PrivateCustomSubnets            []string `toml:"private_custom_subnets"`
+			PublicCustomSubnets             []string `toml:"public_custom_subnets"`
 			SSHKeyPairName                  string `toml:"ssh_key_pair_name"`
 			SetupManagedServices            bool   `toml:"setup_managed_services"`
 			ElasticsearchDomainUrl          string `toml:"managed_elasticsearch_domain_url"`

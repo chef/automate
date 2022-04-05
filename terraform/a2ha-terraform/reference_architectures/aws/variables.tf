@@ -165,6 +165,16 @@ variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
 
+variable "private_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
+variable "public_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
 variable "setup_managed_services" {
   default = false
 }

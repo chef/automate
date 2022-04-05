@@ -58,7 +58,7 @@ output "random_id" {
 }
 
 output "subnet_id" {
-  value = aws_subnet.default.*.id
+  value = length(var.private_custom_subnets) > 0 ? var.private_custom_subnets : aws_subnet.default.*.id
 }
 
 output "mount_id" {
@@ -71,4 +71,16 @@ output "tag_name" {
 
 output "tags" {
   value = var.tags
+}
+
+output "private_subnets" {
+  value = length(var.private_custom_subnets) > 0 ? var.private_custom_subnets : aws_subnet.default.*.id
+}
+
+output "base_linux_aws_security_group_id" {
+  value = aws_security_group.base_linux.id
+}
+
+output "aws_cluster_id" {
+  value = random_id.random.hex
 }

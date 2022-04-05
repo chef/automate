@@ -144,6 +144,16 @@ variable "postgresql_listen_port" {
   default = 5432
 }
 
+variable "private_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
+variable "public_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
 variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }

@@ -6,7 +6,7 @@ resource "aws_alb" "automate_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer.id]
-  subnets            = aws_subnet.public.*.id
+  subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : aws_subnet.public.*.id
   tags               = var.tags
 }
 
@@ -61,7 +61,7 @@ resource "aws_alb" "chef_server_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer.id]
-  subnets            = aws_subnet.public.*.id
+  subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : aws_subnet.public.*.id
   tags               = var.tags
 }
 
