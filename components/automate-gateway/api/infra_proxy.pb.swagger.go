@@ -16,7 +16,8 @@ func init() {
   "paths": {
     "/api/v0/infra/servers": {
       "get": {
-        "summary": "GetServers returns all the servers added to Automate",
+        "summary": "Get Infra Server",
+        "description": "Get Infra Servers returns all the servers added to Automate\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetServers",
         "responses": {
           "200": {
@@ -37,6 +38,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Add a Chef Infra Server to Automate",
+        "description": "Adds a Chef Infra Server to Automate and stores the WebUI key, server details.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateServer",
         "responses": {
           "200": {
@@ -94,12 +97,14 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
     "/api/v0/infra/servers/update": {
       "post": {
+        "summary": "Update Infra Server WebUI Key",
+        "description": "Updates the WebUI key stored for a Chef Server.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateWebuiKey",
         "responses": {
           "200": {
@@ -132,6 +137,8 @@ func init() {
     },
     "/api/v0/infra/servers/validate": {
       "post": {
+        "summary": "Validate Infra Server WebUI Key",
+        "description": "Returns if the WebUI key stored for a Chef Server is valid or not.\nIn case of invalid webUI key, it returns the error details.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_ValidateWebuiKey",
         "responses": {
           "200": {
@@ -164,6 +171,8 @@ func init() {
     },
     "/api/v0/infra/servers/{id}": {
       "get": {
+        "summary": "Get Infra Server Details",
+        "description": "Returns the details of the Infra Server added in Automate.\nThe details include the last sync status, date besides the Server details.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetServer",
         "responses": {
           "200": {
@@ -193,6 +202,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Chef Infra Server from Automate",
+        "description": "Deletes a Chef Infra Server details in Automate.\nThis API does not delete the Chef Infra Server.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteServer",
         "responses": {
           "200": {
@@ -222,6 +233,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a Chef Infra Server details in Automate",
+        "description": "Updates Chef Infra Server details in Automate.\nThis API does not update the Chef Infra Server.\nIn order to update the WebUI key, refer the Update WebUI Key api.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateServer",
         "responses": {
           "200": {
@@ -317,7 +330,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
@@ -361,6 +374,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
+        "summary": "Get all organisations of a Chef Infra Server",
+        "description": "Gets all the organisations of a Chef Infra Server added in Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgs:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetOrgs",
         "responses": {
           "200": {
@@ -423,12 +438,14 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{id}": {
       "get": {
+        "summary": "Get the details of an organisations of a Chef Infra Server",
+        "description": "Gets the details of an organisations of a Chef Infra Server added in Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgs:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetOrg",
         "responses": {
           "200": {
@@ -541,7 +558,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
@@ -587,7 +604,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
@@ -5012,13 +5029,16 @@ func init() {
       "type": "object",
       "properties": {
         "type_url": {
-          "type": "string"
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n` + "`" + `path/google.protobuf.Duration` + "`" + `). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + `, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, ` + "`" + `https` + "`" + ` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + ` (or the empty scheme) might be\nused with implementation specific semantics."
         },
         "value": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
         }
-      }
+      },
+      "description": "` + "`" + `Any` + "`" + ` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an ` + "`" + `Any` + "`" + ` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field ` + "`" + `@type` + "`" + ` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n` + "`" + `value` + "`" + ` which holds the custom JSON in addition to the ` + "`" + `@type` + "`" + `\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "google.protobuf.NullValue": {
       "type": "string",

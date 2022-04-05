@@ -3688,10 +3688,11 @@
     },
     "/api/v0/infra/servers": {
       "get": {
+        "description": "Get Infra Servers returns all the servers added to Automate\n\nAuthorization Action:\n```\ninfra:infraServers:list\n```",
         "tags": [
           "InfraProxy"
         ],
-        "summary": "GetServers returns all the servers added to Automate",
+        "summary": "Get Infra Server",
         "operationId": "InfraProxy_GetServers",
         "responses": {
           "200": {
@@ -3709,9 +3710,11 @@
         }
       },
       "post": {
+        "description": "Adds a Chef Infra Server to Automate and stores the WebUI key, server details.\n\nAuthorization Action:\n```\ninfra:infraServers:create\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Add a Chef Infra Server to Automate",
         "operationId": "InfraProxy_CreateServer",
         "parameters": [
           {
@@ -3801,41 +3804,13 @@
         }
       }
     },
-    "/api/v0/infra/servers/server_status": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetServerStatus",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Server FQDN.",
-            "name": "fqdn",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServerStatus"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
     "/api/v0/infra/servers/update": {
       "post": {
+        "description": "Updates the WebUI key stored for a Chef Server.\n\nAuthorization Action:\n```\ninfra:infraServers:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Infra Server WebUI Key",
         "operationId": "InfraProxy_UpdateWebuiKey",
         "parameters": [
           {
@@ -3865,9 +3840,11 @@
     },
     "/api/v0/infra/servers/validate": {
       "post": {
+        "description": "Returns if the WebUI key stored for a Chef Server is valid or not.\nIn case of invalid webUI key, it returns the error details.\n\nAuthorization Action:\n```\ninfra:infraServers:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Validate Infra Server WebUI Key",
         "operationId": "InfraProxy_ValidateWebuiKey",
         "parameters": [
           {
@@ -3897,9 +3874,11 @@
     },
     "/api/v0/infra/servers/{id}": {
       "get": {
+        "description": "Returns the details of the Infra Server added in Automate.\nThe details include the last sync status, date besides the Server details.\n\nAuthorization Action:\n```\ninfra:infraServers:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Infra Server Details",
         "operationId": "InfraProxy_GetServer",
         "parameters": [
           {
@@ -3926,9 +3905,11 @@
         }
       },
       "put": {
+        "description": "Updates Chef Infra Server details in Automate.\nThis API does not update the Chef Infra Server.\nIn order to update the WebUI key, refer the Update WebUI Key api.\n\nAuthorization Action:\n```\ninfra:infraServers:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update a Chef Infra Server details in Automate",
         "operationId": "InfraProxy_UpdateServer",
         "parameters": [
           {
@@ -3963,9 +3944,11 @@
         }
       },
       "delete": {
+        "description": "Deletes a Chef Infra Server details in Automate.\nThis API does not delete the Chef Infra Server.\n\nAuthorization Action:\n```\ninfra:infraServers:delete\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Delete a Chef Infra Server from Automate",
         "operationId": "InfraProxy_DeleteServer",
         "parameters": [
           {
@@ -4012,37 +3995,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerUsers"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
-    "/api/v0/infra/servers/{server_id}/infraserverorgs": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetInfraServerOrgs",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Automate Infra Server ID",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetInfraServerOrgs"
             }
           },
           "default": {
@@ -4165,238 +4117,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
-    "/api/v0/infra/servers/{server_id}/orgs": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetOrgs",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetOrgs"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_CreateOrg",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateOrg"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateOrg"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
-    "/api/v0/infra/servers/{server_id}/orgs/{id}": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetOrg",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Chef organization ID.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetOrg"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_UpdateOrg",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Chef organization ID.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateOrg"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateOrg"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_DeleteOrg",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Chef organization ID.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeleteOrg"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
-    "/api/v0/infra/servers/{server_id}/orgs/{id}/reset-key": {
-      "put": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_ResetOrgAdminKey",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Chef organization ID.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ResetOrgAdminKey"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetOrgAdminKey"
             }
           },
           "default": {
