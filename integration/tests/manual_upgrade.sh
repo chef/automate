@@ -87,6 +87,7 @@ y" | chef-automate upgrade run --major --version "$release"
     # chef-automate dev grpcurl deployment-service -- \
     #     chef.automate.domain.deployment.Deployment.Upgrade -d "{\"version\": \"$release\"}"
     wait_for_upgrade "false"
+    chef-automate post-major-upgrade migrate --data=PG -y
 }
 
 do_test_upgrade() {
