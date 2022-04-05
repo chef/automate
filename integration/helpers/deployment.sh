@@ -74,7 +74,7 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
     else
         echo "print from run upgrade3"
         ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null) || true
-        if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle'; then
+        if echo "${ERROR}" | grep 'This is a Major upgrade'; then
             echo "y
 y
 y
