@@ -1,8 +1,8 @@
 #!/bin/bash
 
 source /hab/sup/default/SystemdEnvironmentFile.sh
-echo  " 
+echo  '
 [es_yaml.path]      
-  repo = /mnt/automate_backups/elasticsearch " > es_config.toml
+  repo = "/mnt/automate_backups/elasticsearch" ' > es_config.toml
 
-hab config apply automate-ha-elasticsearch.default es_config.toml
+hab config apply automate-ha-elasticsearch.default $(date '+%s') es_config.toml
