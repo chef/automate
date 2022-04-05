@@ -41,7 +41,7 @@ ensure_key_ownership
 
 if [[ ! -f "/hab/svc/automate-postgresql/data/pgdata/PG_VERSION" ]]; then
   echo " Database does not exist, creating with 'initdb'"
-    /hab/pkgs/core/postgresql/9.6.21/20211016180117/bin/initdb -U automate \
+    /hab/pkgs/core/postgresql/9.6.24/20220218015755/bin/initdb -U automate \
     -E utf8 \
     -D /hab/svc/automate-postgresql/data/pgdata \
     --locale POSIX \
