@@ -52,10 +52,24 @@ y
 y
 y
 y" | chef-automate upgrade run --major --versions-file "$versionsFile"
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade"
             chef-automate upgrade run --versions-file "$versionsFile"
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
         fi
     else
         echo "print from run upgrade3"
@@ -66,20 +80,29 @@ y
 y
 y
 y" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
+
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade airgap"
             chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
         fi
     fi
 
-    # NOTE: This is a hack
-    # The hack above was no longer good enough because we have a thing that needs
-    # to be updated that isn't a service
-    sleep 45
 
-    #shellcheck disable=SC2154
-    wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
 }
 
 wait_for_upgrade() {
