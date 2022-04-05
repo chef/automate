@@ -318,13 +318,11 @@ export class DataFeedCreateComponent {
 
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('username').valid && this.createForm.get('password').valid) {
-              if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
-                this.validHeadersValue && this.flagHeaders) {
-                return true;
-              } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
-                !this.headerChecked && this.flagHeaders) {
-                return true;
-              } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
+              if ((this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                    this.validHeadersValue && this.flagHeaders)
+                    || (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                    !this.headerChecked && this.flagHeaders) ||
+                    (this.integTitle !== WebhookIntegrationTypes.CUSTOM)) {
                 return true;
               }
             }
