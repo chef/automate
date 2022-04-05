@@ -77,7 +77,7 @@ In this section, we will discuss about the the usage of data in EOL migration. A
     * Every folder is named for every organization and has information for the `org root@ec2-18-117-112-129:/home/ubuntu/backup# ls organizations/admin-org demoorg empty-org new_demoorg not-admin-org test-org test-org-new testo`
     * Read through `org.json` in each of the folder. It has details of the organization as shown below:
     
-    ```cmd
+    ```json
     {
         "name": "demoorg",
         "full_name": "Edit Demo Org",
@@ -99,7 +99,7 @@ In this section, we will discuss about the the usage of data in EOL migration. A
 
 Refer to the code given below
 
-```script
+```json
 {
     "id": "00000000000018192ac9b81d31e2130f",
     "authz_id": "d2ace138fbb7fba13ee42fc4f87259db",
