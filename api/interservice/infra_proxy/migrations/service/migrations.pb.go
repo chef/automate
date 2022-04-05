@@ -50,8 +50,8 @@ var file_interservice_infra_proxy_migrations_service_migrations_proto_rawDesc = 
 	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2f,
 	0x6d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e,
-	0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xf4,
-	0x06, 0x0a, 0x14, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61,
+	0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0x9d,
+	0x08, 0x0a, 0x14, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61,
 	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0xa2, 0x01, 0x0a, 0x0a, 0x55, 0x70, 0x6c, 0x6f,
 	0x61, 0x64, 0x46, 0x69, 0x6c, 0x65, 0x12, 0x46, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75,
 	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e,
@@ -106,12 +106,23 @@ var file_interservice_infra_proxy_migrations_service_migrations_proto_rawDesc = 
 	0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79,
 	0x2e, 0x6d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x72, 0x65, 0x73, 0x70,
 	0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x72, 0x6d, 0x50, 0x72, 0x65, 0x76,
-	0x69, 0x65, 0x77, 0x22, 0x00, 0x42, 0x4a, 0x5a, 0x48, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
-	0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x6d,
-	0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x65, 0x77, 0x22, 0x00, 0x12, 0xa6, 0x01, 0x0a, 0x0c, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x12, 0x48, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e,
+	0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x6d, 0x69, 0x67, 0x72, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x43, 0x72, 0x65,
+	0x61, 0x74, 0x65, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x4a, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65,
+	0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72,
+	0x6f, 0x78, 0x79, 0x2e, 0x6d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x72,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x61,
+	0x63, 0x6b, 0x75, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x4a,
+	0x5a, 0x48, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65,
+	0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69,
+	0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72,
+	0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x6d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var file_interservice_infra_proxy_migrations_service_migrations_proto_goTypes = []interface{}{
@@ -120,28 +131,32 @@ var file_interservice_infra_proxy_migrations_service_migrations_proto_goTypes = 
 	(*request.CancelMigrationRequest)(nil),      // 2: chef.automate.domain.infra_proxy.migrations.request.CancelMigrationRequest
 	(*request.GetStagedDataRequest)(nil),        // 3: chef.automate.domain.infra_proxy.migrations.request.GetStagedDataRequest
 	(*request.ConfirmPreview)(nil),              // 4: chef.automate.domain.infra_proxy.migrations.request.ConfirmPreview
-	(*response.UploadFileResponse)(nil),         // 5: chef.automate.domain.infra_proxy.migrations.response.UploadFileResponse
-	(*response.GetMigrationStatusResponse)(nil), // 6: chef.automate.domain.infra_proxy.migrations.response.GetMigrationStatusResponse
-	(*response.CancelMigrationResponse)(nil),    // 7: chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponse
-	(*response.GetStagedDataResponse)(nil),      // 8: chef.automate.domain.infra_proxy.migrations.response.GetStagedDataResponse
-	(*response.ConfirmPreview)(nil),             // 9: chef.automate.domain.infra_proxy.migrations.response.ConfirmPreview
+	(*request.CreateBackupRequest)(nil),         // 5: chef.automate.domain.infra_proxy.migrations.request.CreateBackupRequest
+	(*response.UploadFileResponse)(nil),         // 6: chef.automate.domain.infra_proxy.migrations.response.UploadFileResponse
+	(*response.GetMigrationStatusResponse)(nil), // 7: chef.automate.domain.infra_proxy.migrations.response.GetMigrationStatusResponse
+	(*response.CancelMigrationResponse)(nil),    // 8: chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponse
+	(*response.GetStagedDataResponse)(nil),      // 9: chef.automate.domain.infra_proxy.migrations.response.GetStagedDataResponse
+	(*response.ConfirmPreview)(nil),             // 10: chef.automate.domain.infra_proxy.migrations.response.ConfirmPreview
+	(*response.CreateBackupResponse)(nil),       // 11: chef.automate.domain.infra_proxy.migrations.response.CreateBackupResponse
 }
 var file_interservice_infra_proxy_migrations_service_migrations_proto_depIdxs = []int32{
-	0, // 0: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.UploadFile:input_type -> chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest
-	1, // 1: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetMigrationStatus:input_type -> chef.automate.domain.infra_proxy.migrations.request.GetMigrationStatusRequest
-	2, // 2: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CancelMigration:input_type -> chef.automate.domain.infra_proxy.migrations.request.CancelMigrationRequest
-	3, // 3: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetStagedData:input_type -> chef.automate.domain.infra_proxy.migrations.request.GetStagedDataRequest
-	4, // 4: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.ConfirmPreview:input_type -> chef.automate.domain.infra_proxy.migrations.request.ConfirmPreview
-	5, // 5: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.UploadFile:output_type -> chef.automate.domain.infra_proxy.migrations.response.UploadFileResponse
-	6, // 6: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetMigrationStatus:output_type -> chef.automate.domain.infra_proxy.migrations.response.GetMigrationStatusResponse
-	7, // 7: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CancelMigration:output_type -> chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponse
-	8, // 8: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetStagedData:output_type -> chef.automate.domain.infra_proxy.migrations.response.GetStagedDataResponse
-	9, // 9: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.ConfirmPreview:output_type -> chef.automate.domain.infra_proxy.migrations.response.ConfirmPreview
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.UploadFile:input_type -> chef.automate.domain.infra_proxy.migrations.request.UploadFileRequest
+	1,  // 1: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetMigrationStatus:input_type -> chef.automate.domain.infra_proxy.migrations.request.GetMigrationStatusRequest
+	2,  // 2: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CancelMigration:input_type -> chef.automate.domain.infra_proxy.migrations.request.CancelMigrationRequest
+	3,  // 3: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetStagedData:input_type -> chef.automate.domain.infra_proxy.migrations.request.GetStagedDataRequest
+	4,  // 4: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.ConfirmPreview:input_type -> chef.automate.domain.infra_proxy.migrations.request.ConfirmPreview
+	5,  // 5: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CreateBackup:input_type -> chef.automate.domain.infra_proxy.migrations.request.CreateBackupRequest
+	6,  // 6: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.UploadFile:output_type -> chef.automate.domain.infra_proxy.migrations.response.UploadFileResponse
+	7,  // 7: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetMigrationStatus:output_type -> chef.automate.domain.infra_proxy.migrations.response.GetMigrationStatusResponse
+	8,  // 8: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CancelMigration:output_type -> chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponse
+	9,  // 9: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.GetStagedData:output_type -> chef.automate.domain.infra_proxy.migrations.response.GetStagedDataResponse
+	10, // 10: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.ConfirmPreview:output_type -> chef.automate.domain.infra_proxy.migrations.response.ConfirmPreview
+	11, // 11: chef.automate.domain.infra_proxy.migrations.service.MigrationDataService.CreateBackup:output_type -> chef.automate.domain.infra_proxy.migrations.response.CreateBackupResponse
+	6,  // [6:12] is the sub-list for method output_type
+	0,  // [0:6] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_interservice_infra_proxy_migrations_service_migrations_proto_init() }
@@ -185,6 +200,7 @@ type MigrationDataServiceClient interface {
 	CancelMigration(ctx context.Context, in *request.CancelMigrationRequest, opts ...grpc.CallOption) (*response.CancelMigrationResponse, error)
 	GetStagedData(ctx context.Context, in *request.GetStagedDataRequest, opts ...grpc.CallOption) (*response.GetStagedDataResponse, error)
 	ConfirmPreview(ctx context.Context, in *request.ConfirmPreview, opts ...grpc.CallOption) (*response.ConfirmPreview, error)
+	CreateBackup(ctx context.Context, in *request.CreateBackupRequest, opts ...grpc.CallOption) (*response.CreateBackupResponse, error)
 }
 
 type migrationDataServiceClient struct {
@@ -265,6 +281,15 @@ func (c *migrationDataServiceClient) ConfirmPreview(ctx context.Context, in *req
 	return out, nil
 }
 
+func (c *migrationDataServiceClient) CreateBackup(ctx context.Context, in *request.CreateBackupRequest, opts ...grpc.CallOption) (*response.CreateBackupResponse, error) {
+	out := new(response.CreateBackupResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.infra_proxy.migrations.service.MigrationDataService/CreateBackup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MigrationDataServiceServer is the server API for MigrationDataService service.
 type MigrationDataServiceServer interface {
 	UploadFile(MigrationDataService_UploadFileServer) error
@@ -272,6 +297,7 @@ type MigrationDataServiceServer interface {
 	CancelMigration(context.Context, *request.CancelMigrationRequest) (*response.CancelMigrationResponse, error)
 	GetStagedData(context.Context, *request.GetStagedDataRequest) (*response.GetStagedDataResponse, error)
 	ConfirmPreview(context.Context, *request.ConfirmPreview) (*response.ConfirmPreview, error)
+	CreateBackup(context.Context, *request.CreateBackupRequest) (*response.CreateBackupResponse, error)
 }
 
 // UnimplementedMigrationDataServiceServer can be embedded to have forward compatible implementations.
@@ -292,6 +318,9 @@ func (*UnimplementedMigrationDataServiceServer) GetStagedData(context.Context, *
 }
 func (*UnimplementedMigrationDataServiceServer) ConfirmPreview(context.Context, *request.ConfirmPreview) (*response.ConfirmPreview, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfirmPreview not implemented")
+}
+func (*UnimplementedMigrationDataServiceServer) CreateBackup(context.Context, *request.CreateBackupRequest) (*response.CreateBackupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateBackup not implemented")
 }
 
 func RegisterMigrationDataServiceServer(s *grpc.Server, srv MigrationDataServiceServer) {
@@ -396,6 +425,24 @@ func _MigrationDataService_ConfirmPreview_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MigrationDataService_CreateBackup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.CreateBackupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MigrationDataServiceServer).CreateBackup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.infra_proxy.migrations.service.MigrationDataService/CreateBackup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MigrationDataServiceServer).CreateBackup(ctx, req.(*request.CreateBackupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _MigrationDataService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.infra_proxy.migrations.service.MigrationDataService",
 	HandlerType: (*MigrationDataServiceServer)(nil),
@@ -415,6 +462,10 @@ var _MigrationDataService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ConfirmPreview",
 			Handler:    _MigrationDataService_ConfirmPreview_Handler,
+		},
+		{
+			MethodName: "CreateBackup",
+			Handler:    _MigrationDataService_CreateBackup_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
