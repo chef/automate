@@ -32,7 +32,7 @@
             <chef-td>{{user.automate_user_id}}</chef-td>
             <chef-td>{{user.email_id}}</chef-td>
             <chef-td class="three-dot-column">
-              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]">
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/user/{user.infra_server_username}', 'put', [serverId, orgId]]">
                 <mat-select panelClass="chef-control-menu">
                   <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey(user.infra_server_username)">Reset User Key</mat-option>
                 </mat-select>
