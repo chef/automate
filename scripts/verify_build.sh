@@ -82,6 +82,12 @@ fi
 # dev.json manifest downloaded before the build as their starting
 # point. We are still open to clock-sync affecting package versions
 # being older or newer than we might expect.
+OLD_VERSION=$(cat VERSION)
+IFS=. read -r major minor patch <<<"$OLD_VERSION"
+((patch++))
+VERSION="$major"."$minor"."$patch"
+export VERSION
+
 log_section_start "create manifest"
 .expeditor/create-manifest.rb
 echo "showing current dir files"

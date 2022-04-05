@@ -52,7 +52,7 @@ aws s3 cp "s3://chef-automate-artifacts/dev/latest/automate/versions.json" exist
 aws s3 cp "s3://chef-automate-artifacts/dev/latest/automate/releases.json" existing-releases.json --profile chef-cd || echo "[]" > existing-releases.json
 
 # Use create-manifest to generate the manifest.json file
-VERSION=3.0.6 ruby .expeditor/create-manifest.rb
+ruby .expeditor/create-manifest.rb
 
 # Append the new version to the dev channel versions file
 jq ". |= .+ [\"$VERSION\"] | sort" existing-versions.json > updated-versions.json
