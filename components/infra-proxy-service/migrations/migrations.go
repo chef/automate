@@ -438,7 +438,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 		nowTime := time.Now().Format("20060102150405")
 		keyDump.ID = "user_" + uuid.Must(uuid.NewV4()).String()
 
-		keyDump.Username = keyDump.ID
+		keyDump.Username = fmt.Sprintf("user_%d", i)
 		keyDump.Email = keyDump.ID + "@email.com"
 		keyDump.SerializedObject = "{\"first_name\":\"f_" + keyDump.ID + "\",\"last_name\":\"l_" + keyDump.ID + "\",\"display_name\":\"f_" + keyDump.ID + " l_" + keyDump.ID + "\"}"
 		keyDump.CreatedAt = nowTime
