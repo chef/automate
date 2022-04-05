@@ -54,6 +54,13 @@ message ConfirmPreview {
   StagedData staged_data = 3; 
 }
 
+message CreateBackupRequest {
+  // Org ID
+  string org_id = 1;
+  // Number of users
+  int32 number_of_users = 2;
+}
+
 message StagedData {
   // Number of orgs to migrate
   int32 orgs_to_migrate =1;

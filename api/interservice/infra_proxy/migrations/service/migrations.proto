@@ -14,4 +14,5 @@ service MigrationDataService{
   rpc CancelMigration (chef.automate.domain.infra_proxy.migrations.request.CancelMigrationRequest) returns (chef.automate.domain.infra_proxy.migrations.response.CancelMigrationResponse) {};
   rpc GetStagedData (chef.automate.domain.infra_proxy.migrations.request.GetStagedDataRequest) returns (chef.automate.domain.infra_proxy.migrations.response.GetStagedDataResponse) {};
   rpc ConfirmPreview (chef.automate.domain.infra_proxy.migrations.request.ConfirmPreview) returns (chef.automate.domain.infra_proxy.migrations.response.ConfirmPreview) {};
+  rpc CreateBackup (chef.automate.domain.infra_proxy.migrations.request.CreateBackupRequest) returns (chef.automate.domain.infra_proxy.migrations.response.CreateBackupResponse) {};
 }
