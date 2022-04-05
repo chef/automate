@@ -319,7 +319,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   }
 
   public showUrl() {
-    return !(this.destination?.integration_types === IntegrationTypes.STORAGE)
+    return (this.destination?.integration_types !== IntegrationTypes.STORAGE)
     || this.destination?.services === StorageIntegrationTypes.MINIO;
   }
   public enableBtn() {
