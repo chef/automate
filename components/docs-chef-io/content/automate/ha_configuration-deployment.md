@@ -62,7 +62,7 @@ Some of the optional executions are as follows:
 
 * Execute the `./scripts/credentials set postgresql -auto` command and press **Enter**. This command rotates the credentials for Postgresql.
 
-* Execute the `./scripts/credentials set elasticsearch -auto` command and press **Enter**. This command rotates the credentials for ElasticSearch.
+* Execute the `./scripts/credentials set opensearch -auto` command and press **Enter**. This command rotates the credentials for OpenSearch.
 
 * Execute the `chef-automate test -full` command and press **Enter**. This command runs smoke tests on the setup.
 
@@ -71,7 +71,5 @@ Some of the optional executions are as follows:
 ## Clear the Bare Metal Infrastructure
 
 {{< note >}}
-
 You can clear the Bare-metal deployment workspace as per your requirements.
-
 {{< /note >}}
