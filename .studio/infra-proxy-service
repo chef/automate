@@ -395,7 +395,8 @@ function infra_service_load_knife_ec_backup_file() {
   
   # Create knife ec backup file
   local user_prefix="user"
-
+mkdir -p /src/backup
+chmod 777 /src/backup
   for i in $(seq 1 ${orgs}); do
     timestamp=$(date +%s%N)
     local org_id="org-${timestamp}-id"
