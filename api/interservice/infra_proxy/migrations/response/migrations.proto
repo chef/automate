@@ -79,3 +79,5 @@ message ConfirmPreview {
   // Migration ID
   string migration_id = 1; 
 }
+
+message CreateBackupResponse {}

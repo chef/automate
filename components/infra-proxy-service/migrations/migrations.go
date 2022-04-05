@@ -3,17 +3,24 @@ package migrations
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"math/rand"
 	"os"
 	"path"
+	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/response"
 	"github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"
+	"github.com/chef/automate/components/infra-proxy-service/pipeline"
 	pipeline_model "github.com/chef/automate/components/infra-proxy-service/pipeline"
 
 	"github.com/chef/automate/components/infra-proxy-service/validation"
@@ -364,4 +371,212 @@ func SetStagedUserForConfirmPreview(users []*request.User) []pipeline_model.User
 		usersData = append(usersData, stagedUser)
 	}
 	return usersData
+}
+
+// CreateBackup Creates sample knife ec back up file
+func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateBackupRequest) (*response.CreateBackupResponse, error) {
+
+	backupPath := "/src/backup/"
+
+	// Create org directory
+	orgPath := path.Join(backupPath, "organizations/", req.OrgId, "groups")
+	if _, err := os.Stat(orgPath); os.IsNotExist(err) {
+		err := os.MkdirAll(orgPath, os.ModePerm)
+		if err != nil {
+			log.Errorf("Unable to create directory %s", err.Error())
+			return nil, err
+		}
+	}
+
+	orgJsonPath := path.Join(backupPath, "organizations", req.OrgId, "org.json")
+	keyDumpJsonPath := path.Join(backupPath, "key_dump.json")
+	membersJsonPath := path.Join(backupPath, "organizations", req.OrgId, "members.json")
+	adminsJsonPath := path.Join(backupPath, "organizations", req.OrgId, "groups", "admins.json")
+
+	// Create data for org file org.json
+	orgJsonObj := pipeline.OrgJson{}
+	orgJsonObj.Name = req.OrgId
+	orgJsonObj.FullName = "f_" + req.OrgId
+
+	err := writeOrgFile(orgJsonObj, orgJsonPath)
+	if err != nil {
+		log.Errorf("Failed to write org file org.json ", err)
+		return nil, err
+	}
+
+	// Create an object for key_dump.json
+	serverUsers := []pipeline.KeyDump{}
+
+	if _, err := os.Stat(keyDumpJsonPath); err == nil {
+		data, err := ioutil.ReadFile(keyDumpJsonPath)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(data, &serverUsers)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Create an object for members.json
+	members := []pipeline.MembersJson{}
+
+	// Create an object for admins.json
+	admins := pipeline.AdminsJson{}
+	admins.Name = "admins"
+	admins.Users = append(admins.Users, "pivotal")
+
+	// Random generator to set the values for ExternalAuthenticationUID and admins randomly
+	rand.Seed(time.Now().Unix())
+	users := []string{pipeline.Local, pipeline.LDAP}
+	isAdmins := []bool{true, false}
+
+	for i := 0; i < int(req.NumberOfUsers); i++ {
+
+		// Create an object for key_dump.json
+		keyDump := pipeline.KeyDump{}
+		nowTime := time.Now().Format("20060102150405")
+		keyDump.ID = "user_" + uuid.Must(uuid.NewV4()).String()
+
+		keyDump.Username = fmt.Sprintf("user_%d", i)
+		keyDump.Email = keyDump.ID + "@email.com"
+		keyDump.SerializedObject = "{\"first_name\":\"f_" + keyDump.ID + "\",\"last_name\":\"l_" + keyDump.ID + "\",\"display_name\":\"f_" + keyDump.ID + " l_" + keyDump.ID + "\"}"
+		keyDump.CreatedAt = nowTime
+		keyDump.UpdatedAt = nowTime
+		user := users[rand.Intn(len(users))]
+		if user == pipeline.LDAP {
+			keyDump.ExternalAuthenticationUID = keyDump.Username
+		}
+		keyDump.Admin = isAdmins[rand.Intn(len(isAdmins))]
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), 10)
+		if err != nil {
+			log.Errorf("Unable to create hashed password for user %s %s", keyDump.Username, err)
+			break
+		}
+		keyDump.HashedPassword = string(hashedPassword)
+		serverUsers = append(serverUsers, keyDump)
+
+		// Create org members
+		member := pipeline.MembersJson{
+			User: pipeline.UsersJson{
+				Username: keyDump.Username,
+			},
+		}
+		members = append(members, member)
+
+		// Add to org admin
+		if keyDump.Admin {
+			admins.Users = append(admins.Users, keyDump.Username)
+		}
+	}
+
+	// Write server users file key_dump.json
+	err = writeServerUsersFile(serverUsers, keyDumpJsonPath)
+	if err != nil {
+		log.Errorf("Failed to write server users file key_dump.json ", err)
+		return nil, err
+	}
+
+	// Write org users file members.json
+	err = writeOrgUsersFile(members, membersJsonPath)
+	if err != nil {
+		log.Errorf("Failed to write org users file members.json ", err)
+		return nil, err
+	}
+
+	// Write org admins file admins.json
+	err = writeAdminsFile(admins, adminsJsonPath)
+	if err != nil {
+		log.Errorf("Failed to write org users file members.json ", err)
+		return nil, err
+	}
+
+	return &response.CreateBackupResponse{}, nil
+}
+
+func createFile(path string) error {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		_, err := os.Create(path)
+		if err != nil {
+			log.WithError(err).Error("Unable to create file ", err)
+			return err
+		}
+	}
+	return nil
+}
+
+func writeFile(path string, data []byte) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = createFile(path)
+		if err != nil {
+			log.Errorf("Unable to create file %s", err.Error())
+			return err
+		}
+	}
+	err := ioutil.WriteFile(path, data, 0644)
+	if err != nil {
+		log.Errorf("Unable to write file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//writeOrgFile: Write org file org.json
+func writeOrgFile(org pipeline.OrgJson, orgJsonPath string) error {
+	orgJson, err := json.Marshal(org)
+	if err != nil {
+		log.Errorf("Failed to marshal %s ", err.Error())
+		return err
+	}
+	err = writeFile(orgJsonPath, orgJson)
+	if err != nil {
+		log.Errorf("Failed to write org file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//	writeServerUsersFile: Write server users file key_dump.json
+func writeServerUsersFile(serverUsers []pipeline_model.KeyDump, keyDumpJsonPath string) error {
+	keyDumpJson, err := json.Marshal(serverUsers)
+	if err != nil {
+		log.Errorf("Failed to marshal server users %s", err.Error())
+		return err
+	}
+	err = writeFile(keyDumpJsonPath, keyDumpJson)
+	if err != nil {
+		log.Errorf("Failed to write server users file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//writeOrgUsersFile Write org users file members.json
+func writeOrgUsersFile(orgUsers []pipeline_model.MembersJson, membersJsonPath string) error {
+	membersJson, err := json.Marshal(orgUsers)
+	if err != nil {
+		log.Errorf("Failed to marshal org users%s", err.Error())
+		return err
+	}
+	err = writeFile(membersJsonPath, membersJson)
+	if err != nil {
+		log.Errorf("Failed to write org users file %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+//writeAdminsFile: Write org admins file admins.json
+func writeAdminsFile(admins pipeline_model.AdminsJson, adminsJsonPath string) error {
+	adminsJson, err := json.Marshal(admins)
+	if err != nil {
+		log.Errorf("Failed to marshal org admins %s", err.Error())
+		return err
+	}
+	err = writeFile(adminsJsonPath, adminsJson)
+	if err != nil {
+		log.Errorf("Failed to write org admins file %s", err.Error())
+		return err
+	}
+	return nil
 }
