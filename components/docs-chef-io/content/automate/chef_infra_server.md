@@ -82,7 +82,7 @@ In the above image you can view:
 1. Last Sync Date.
 1. Last Migration Status.
 
-You can also update the **WebUI** key buy selecting the *Update* option of the WebUI key.
+You can also update the **WebUI** key by selecting the *Update* option of the WebUI key.
 
 ### Update WebUI Key
 
