@@ -55,4 +55,6 @@ do_prepare_upgrade() {
     rm -f /opt/delivery/version-manifest.txt
     do_prepare_upgrade_default
     set_version_file
+    local cli_bin="chef-automate"
+    download_cli "latest" "${cli_bin}"
 }

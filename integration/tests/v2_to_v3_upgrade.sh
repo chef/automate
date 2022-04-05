@@ -51,5 +51,4 @@ do_deploy() {
 
 do_upgrade() {
     do_upgrade_default
-    sudo chef-automate post-major-upgrade migrate --data=PG -y
 }
