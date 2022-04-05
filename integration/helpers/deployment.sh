@@ -40,7 +40,9 @@ run_upgrade() {
     # Moving the hartifacts into the directory won't trigger a manifest rebuild
     # because that directory isn't watched for changes. Therefore, we'll trigger
     # a manifest rebuild with the run command.
+    echo "print from run upgrade"
     if [ -z "$airgap_artifact_path" ]; then
+        echo "print from run upgrade 1"
         ERROR=$(chef-automate upgrade run 2>&1 >/dev/null)
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major'; then
             echo "major normal upgrade"
@@ -55,6 +57,7 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
             chef-automate upgrade run --versions-file "$versionsFile"
         fi
     else
+        echo "print from run upgrade3"
         ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null)
         if echo "${ERROR}" | grep 'chef-automate upgrade run --major --airgap-bundle'; then
             echo "y
