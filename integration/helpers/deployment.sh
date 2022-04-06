@@ -43,7 +43,7 @@ run_upgrade() {
     echo "print from run upgrade"
     if [ -z "$airgap_artifact_path" ]; then
         echo "print from run upgrade 1"
-        ERROR=$(chef-automate upgrade run 2>&1 >/dev/null) || true
+        ERROR=$(chef-automate upgrade run --versions-file "$versionsFile" 2>&1 >/dev/null) || true
         echo $ERROR
         if echo "${ERROR}" | grep 'This is a Major upgrade'; then
             echo "major normal upgrade"
@@ -62,7 +62,7 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade"
-            chef-automate upgrade run --versions-file "$versionsFile"
+            # chef-automate upgrade run --versions-file "$versionsFile"
             # NOTE: This is a hack
             # The hack above was no longer good enough because we have a thing that needs
             # to be updated that isn't a service
@@ -73,7 +73,7 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
         fi
     else
         echo "print from run upgrade3"
-        ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" 2>&1 >/dev/null) || true
+        ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile" 2>&1 >/dev/null) || true
         if echo "${ERROR}" | grep 'This is a Major upgrade'; then
             echo "y
 y
@@ -91,7 +91,6 @@ y" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" -
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade airgap"
-            chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
             # NOTE: This is a hack
             # The hack above was no longer good enough because we have a thing that needs
             # to be updated that isn't a service
