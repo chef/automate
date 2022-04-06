@@ -138,7 +138,10 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 
 			if !isExecuted {
 				writer.Title("Deleting file created by pg_upgrade")
-				cleanUp()
+				err := cleanUp()
+				if err != nil {
+					//nothing
+				}
 			}
 		} else {
 			return errors.New("please provide valid input for data flag")
@@ -211,7 +214,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 
 			} else {
 				return errors.New(
-					"pg migration will only support 9.6 pg version for now, your pg version is: " + string(oldPgVersion),
+					"pg migration will only support 9.6 pg version for now, your pg version is: " + oldPgVersion,
 				)
 			}
 		}
@@ -272,22 +275,23 @@ func pgMigrateExecutor() error {
 
 	return nil
 }
-func getLatestPgPath() error {
-	latestPgPath := "find /hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq"
-	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
-	if err != nil {
-		fmt.Printf("error %s", err)
-	}
-	output := string(cmd)
-	fmt.Println("::::::", output)
-	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
-		output = output[:len(output)-10]
-		NEW_BIN_DIR = output
-	} else {
-		return fmt.Errorf("latest version %s not found", NEW_PG_VERSION)
-	}
-	return nil
-}
+
+// func getLatestPgPath() error {
+// 	latestPgPath := "find /hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq"
+// 	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
+// 	if err != nil {
+// 		fmt.Printf("error %s", err)
+// 	}
+// 	output := string(cmd)
+// 	fmt.Println("::::::", output)
+// 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
+// 		output = output[:len(output)-10]
+// 		NEW_BIN_DIR = output
+// 	} else {
+// 		return fmt.Errorf("latest version %s not found", NEW_PG_VERSION)
+// 	}
+// 	return nil
+// }
 
 func vacuumDb() error {
 	writer.Title(
@@ -343,7 +347,9 @@ func cleanUp() error {
 		if err != nil {
 			return err
 		}
-		ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		if err != nil {
+		}
 		writer.Title("successfully deleted files")
 	}
 	return nil
@@ -453,11 +459,12 @@ func executePgdata13ShellScript() error {
 }
 
 func checkUpdateMigration(check bool) error {
-	isAvailableSpace, err := false, error(nil)
+	isAvailableSpace := false
 
 	if migrateDataCmdFlags.skipStorageCheck {
 		isAvailableSpace = true
 	} else {
+		err := error(nil)
 		isAvailableSpace, err = calDiskSizeAndDirSize()
 
 		if err != nil {
@@ -504,7 +511,9 @@ func checkUpdateMigration(check bool) error {
 			if err != nil {
 				return err
 			}
-			ci.UpdatePostChecklistFile(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
+			err = ci.UpdatePostChecklistFile(MIGRATE_PG_ID, majorupgradechecklist.UPGRADE_METADATA)
+			if err != nil {
+			}
 		}
 	}
 	return nil
