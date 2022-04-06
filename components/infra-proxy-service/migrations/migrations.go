@@ -438,7 +438,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 		nowTime := time.Now().Format("20060102150405")
 		keyDump.ID = "user_" + uuid.Must(uuid.NewV4()).String()
 
-		keyDump.Username = fmt.Sprintf("user_%d", i)
+		keyDump.Username = fmt.Sprintf("user_%d_%s", i, req.OrgId)
 		keyDump.Email = keyDump.ID + "@email.com"
 		keyDump.SerializedObject = "{\"first_name\":\"f_" + keyDump.ID + "\",\"last_name\":\"l_" + keyDump.ID + "\",\"display_name\":\"f_" + keyDump.ID + " l_" + keyDump.ID + "\"}"
 		keyDump.CreatedAt = nowTime
@@ -487,7 +487,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	// Write org admins file admins.json
 	err = writeAdminsFile(admins, adminsJsonPath)
 	if err != nil {
-		log.Errorf("Failed to write org users file members.json ", err)
+		log.Errorf("Failed to write org admins file admins.json ", err)
 		return nil, err
 	}
 
