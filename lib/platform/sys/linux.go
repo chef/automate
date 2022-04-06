@@ -3,13 +3,13 @@
 package sys
 
 import (
-	"bytes"
+	bytes "bytes"
+	"github.com/chef/automate/lib/proc"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"syscall"
-	"github.com/chef/automate/lib/proc"
 )
 
 const (

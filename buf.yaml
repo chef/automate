@@ -444,4 +444,5 @@ breaking:
     - config/ui/config_request.proto
     - external/compliance/reporting/stats/stats.proto
     - config/compliance/config_request.proto
+    - config/postgresql/config_request.proto
 
