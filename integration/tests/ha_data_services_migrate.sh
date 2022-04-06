@@ -6,7 +6,7 @@ test_external_services=(ha_backend)
 test_diagnostics_filters="~purge"
 test_upgrades=true
 
-CURRENT_OLDEST_VERSION=20190501153509
+CURRENT_OLDEST_VERSION=20220329091442
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
