@@ -3,6 +3,7 @@
 package sys
 
 import (
+	bytes "bytes"
 	"github.com/chef/automate/lib/proc"
 	"github.com/pkg/errors"
 	"io/ioutil"
