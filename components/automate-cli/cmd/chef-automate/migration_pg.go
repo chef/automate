@@ -222,12 +222,12 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	if !migrateDataCmdFlags.skipStorageCheck {
-		err := getLatestPgPath()
-		if err != nil || migrateDataCmdFlags.skipStorageCheck {
-			return err
-		}
-	}
+	// if !migrateDataCmdFlags.skipStorageCheck {
+	// 	err := getLatestPgPath()
+	// 	if err != nil || migrateDataCmdFlags.skipStorageCheck {
+	// 		return err
+	// 	}
+	// }
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
 		return err
