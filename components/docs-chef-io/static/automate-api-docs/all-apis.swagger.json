@@ -3714,7 +3714,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "summary": "Add a Chef Infra Server to Automate",
+        "summary": "Add Chef Infra Server",
         "operationId": "InfraProxy_CreateServer",
         "parameters": [
           {
@@ -3909,7 +3909,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "summary": "Update a Chef Infra Server details in Automate",
+        "summary": "Update Chef Infra Server",
         "operationId": "InfraProxy_UpdateServer",
         "parameters": [
           {
@@ -3948,7 +3948,7 @@
         "tags": [
           "InfraProxy"
         ],
-        "summary": "Delete a Chef Infra Server from Automate",
+        "summary": "Delete Chef Infra Server",
         "operationId": "InfraProxy_DeleteServer",
         "parameters": [
           {
@@ -3964,37 +3964,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeleteServer"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
-    "/api/v0/infra/servers/{server_id}/automateinfraserverusers": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetAutomateInfraServerUsersList",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Automate Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerUsers"
             }
           },
           "default": {
@@ -4090,49 +4059,13 @@
         }
       }
     },
-    "/api/v0/infra/servers/{server_id}/org/{org_id}/users": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetAutomateInfraOrgUsersList",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Automate Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Automate Infra Org ID.",
-            "name": "org_id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraOrgUsers"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
+        "description": "Gets all Clients in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsClient:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Clients",
         "operationId": "InfraProxy_GetClients",
         "parameters": [
           {
@@ -4186,9 +4119,11 @@
         }
       },
       "post": {
+        "description": "Creates a Client in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsClient:create\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Create Client",
         "operationId": "InfraProxy_CreateClient",
         "parameters": [
           {
@@ -4232,9 +4167,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
       "get": {
+        "description": "Gets the details of a Client in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsClient:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Client",
         "operationId": "InfraProxy_GetClient",
         "parameters": [
           {
@@ -4275,9 +4212,11 @@
         }
       },
       "delete": {
+        "description": "Deletes a Client in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsClient:delete\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Delete Client",
         "operationId": "InfraProxy_DeleteClient",
         "parameters": [
           {
@@ -4320,9 +4259,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset": {
       "put": {
+        "description": "Resets a Client key  in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsClient:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Reset Client Key",
         "operationId": "InfraProxy_ResetClientKey",
         "parameters": [
           {
@@ -4373,9 +4314,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
+        "description": "Gets all the cookbooks of an organisation of a Chef Infra Server added in Automate.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsCookbooks:list\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Cookbooks",
         "operationId": "InfraProxy_GetCookbooks",
         "parameters": [
           {
@@ -4411,9 +4354,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
+        "description": "Gets all the versions of a cookbook in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsCookbooks:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Cookbook Versions",
         "operationId": "InfraProxy_GetCookbookVersions",
         "parameters": [
           {
@@ -4456,9 +4401,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
+        "description": "Gets the details of a cookbook in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsCookbooks:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Cookbook",
         "operationId": "InfraProxy_GetCookbook",
         "parameters": [
           {
@@ -4508,9 +4455,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
+        "description": "Gets the contents of a cookbook in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsCookbooks:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Cookbook File Content",
         "operationId": "InfraProxy_GetCookbookFileContent",
         "parameters": [
           {
@@ -4566,9 +4515,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags": {
       "get": {
+        "description": "Gets all Data Bags in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBags:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Data Bags",
         "operationId": "InfraProxy_GetDataBags",
         "parameters": [
           {
@@ -4602,9 +4553,11 @@
         }
       },
       "post": {
+        "description": "Creates a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBags:create\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Create Data Bag",
         "operationId": "InfraProxy_CreateDataBag",
         "parameters": [
           {
@@ -4648,9 +4601,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
       "get": {
+        "description": "Gets all the Items in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBagsItem:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Data Bag Items",
         "operationId": "InfraProxy_GetDataBagItems",
         "parameters": [
           {
@@ -4711,9 +4666,11 @@
         }
       },
       "post": {
+        "description": "Creates an Item in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBagsItem:create\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Create Data Bag Item",
         "operationId": "InfraProxy_CreateDataBagItem",
         "parameters": [
           {
@@ -4762,9 +4719,11 @@
         }
       },
       "delete": {
+        "description": "Deletes a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBags:delete\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Delete Data Bag",
         "operationId": "InfraProxy_DeleteDataBag",
         "parameters": [
           {
@@ -4807,9 +4766,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}": {
       "put": {
+        "description": "Updates an Item in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBagsItem:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Data Bag Item",
         "operationId": "InfraProxy_UpdateDataBagItem",
         "parameters": [
           {
@@ -4867,9 +4828,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
+        "description": "Gets details of an Items in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBagsItem:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Data Bag Item",
         "operationId": "InfraProxy_GetDataBagItem",
         "parameters": [
           {
@@ -4917,9 +4880,11 @@
         }
       },
       "delete": {
+        "description": "Deletes an Item in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsDataBagsItem:delete\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Delete Data Bag Item",
         "operationId": "InfraProxy_DeleteDataBagItem",
         "parameters": [
           {
@@ -4969,9 +4934,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments": {
       "get": {
+        "description": "Gets all Environments in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsEnvironments:list\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Environments",
         "operationId": "InfraProxy_GetEnvironments",
         "parameters": [
           {
@@ -5025,9 +4992,11 @@
         }
       },
       "post": {
+        "description": "Creates an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsEnvironments:create\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Create Environment",
         "operationId": "InfraProxy_CreateEnvironment",
         "parameters": [
           {
@@ -5071,9 +5040,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
+        "description": "Gets the details of an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsEnvironments:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Environment",
         "operationId": "InfraProxy_GetEnvironment",
         "parameters": [
           {
@@ -5114,9 +5085,11 @@
         }
       },
       "put": {
+        "description": "Updates an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsEnvironments:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Environment",
         "operationId": "InfraProxy_UpdateEnvironment",
         "parameters": [
           {
@@ -5165,9 +5138,11 @@
         }
       },
       "delete": {
+        "description": "Deletes an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsEnvironments:delete\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Delete Environment",
         "operationId": "InfraProxy_DeleteEnvironment",
         "parameters": [
           {
@@ -5210,9 +5185,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes": {
       "get": {
+        "description": "Gets all the Recipes for an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsEnvironments:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Environment Recipes",
         "operationId": "InfraProxy_GetEnvironmentRecipes",
         "parameters": [
           {
@@ -5255,9 +5232,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}": {
       "get": {
+        "description": "Gets the Expanded Run List of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Node Expanded Run List",
         "operationId": "InfraProxy_GetNodeExpandedRunList",
         "parameters": [
           {
@@ -5307,9 +5286,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
+        "description": "Gets all the Nodes in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Nodes",
         "operationId": "InfraProxy_GetNodes",
         "parameters": [
           {
@@ -5365,9 +5346,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
       "get": {
+        "description": "Gets the details of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Node",
         "operationId": "InfraProxy_GetNode",
         "parameters": [
           {
@@ -5408,9 +5391,11 @@
         }
       },
       "put": {
+        "description": "Updates a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Node",
         "operationId": "InfraProxy_UpdateNode",
         "parameters": [
           {
@@ -5459,9 +5444,11 @@
         }
       },
       "delete": {
+        "description": "Deletes a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:delete\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Delete Node",
         "operationId": "InfraProxy_DeleteNode",
         "parameters": [
           {
@@ -5504,9 +5491,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes": {
       "put": {
+        "description": "Updates the Attributes of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Node Attributes",
         "operationId": "InfraProxy_UpdateNodeAttributes",
         "parameters": [
           {
@@ -5557,9 +5546,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment": {
       "put": {
+        "description": "Updates the environment of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Node Environment",
         "operationId": "InfraProxy_UpdateNodeEnvironment",
         "parameters": [
           {
@@ -5610,9 +5601,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags": {
       "put": {
+        "description": "Updates the tags of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsNodes:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Node Tags",
         "operationId": "InfraProxy_UpdateNodeTags",
         "parameters": [
           {
@@ -5663,9 +5656,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
       "get": {
+        "description": "Gets all the Policy Files in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsPolicyFiles:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Policy Files",
         "operationId": "InfraProxy_GetPolicyfiles",
         "parameters": [
           {
@@ -5699,105 +5694,13 @@
         }
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetPolicyfile",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Chef Organization ID.",
-            "name": "org_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Policyfile name.",
-            "name": "name",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Policyfile revision ID.",
-            "name": "revision_id",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfile"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_DeletePolicyfile",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Chef Organization ID.",
-            "name": "org_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Policyfile name.",
-            "name": "name",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeletePolicyfile"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}/revisions": {
       "get": {
+        "description": "Gets the revisions of a Policy File in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsPolicyFiles:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Policy File Revisions",
         "operationId": "InfraProxy_GetPolicyfileRevisions",
         "parameters": [
           {
@@ -5840,9 +5743,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}": {
       "get": {
+        "description": "Gets the Policy Group of a Policy File in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsPolicyGroups:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Policy Group",
         "operationId": "InfraProxy_GetPolicygroup",
         "parameters": [
           {
@@ -5885,9 +5790,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
+        "description": "Gets all the Roles in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsRoles:list\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Roles",
         "operationId": "InfraProxy_GetRoles",
         "parameters": [
           {
@@ -5941,9 +5848,11 @@
         }
       },
       "post": {
+        "description": "Creates a Role in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsRoles:create\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Create Role",
         "operationId": "InfraProxy_CreateRole",
         "parameters": [
           {
@@ -5987,9 +5896,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
       "get": {
+        "description": "Gets the details of a Role in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsRoles:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Role",
         "operationId": "InfraProxy_GetRole",
         "parameters": [
           {
@@ -6030,9 +5941,11 @@
         }
       },
       "put": {
+        "description": "Updates a Role in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsRoles:update\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Update Role",
         "operationId": "InfraProxy_UpdateRole",
         "parameters": [
           {
@@ -6081,9 +5994,11 @@
         }
       },
       "delete": {
+        "description": "Deletes a Role in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsRoles:delete\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Delete Role",
         "operationId": "InfraProxy_DeleteRole",
         "parameters": [
           {
@@ -6126,9 +6041,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments": {
       "get": {
+        "description": "Gets the environments of a Role in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsRoles:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Role Environments",
         "operationId": "InfraProxy_GetRoleEnvironments",
         "parameters": [
           {
@@ -6171,9 +6088,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}": {
       "get": {
+        "description": "Gets the expanded run list of a Role in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServersOrgsRoles:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Role Expanded Run List",
         "operationId": "InfraProxy_GetRoleExpandedRunList",
         "parameters": [
           {
@@ -6223,9 +6142,11 @@
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users": {
       "get": {
+        "description": "Gets all the users of an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServers:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Org Users List",
         "operationId": "InfraProxy_GetOrgUsersList",
         "parameters": [
           {
@@ -6261,9 +6182,11 @@
     },
     "/api/v0/infra/servers/{server_id}/user/{user_name}": {
       "put": {
+        "description": "Resets the user key of an user in Chef Infra Server\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServers:list\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Reset Server Users Key",
         "operationId": "InfraProxy_ResetInfraServerUserKey",
         "parameters": [
           {
@@ -6307,9 +6230,11 @@
     },
     "/api/v0/infra/servers/{server_id}/users": {
       "post": {
+        "description": "Gets all the users of a Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n```\ninfra:infraServers:get\n```",
         "tags": [
           "InfraProxy"
         ],
+        "summary": "Get Server Users List",
         "operationId": "InfraProxy_GetServerUsersList",
         "parameters": [
           {

@@ -114,7 +114,7 @@ rpc GetServer (infra_proxy.request.GetServer) returns (infra_proxy.response.GetS
 };
 
   /*
-  Add a Chef Infra Server to Automate
+  Add Chef Infra Server
 
   Adds a Chef Infra Server to Automate and stores the WebUI key, server details.
 
@@ -131,7 +131,7 @@ rpc CreateServer (infra_proxy.request.CreateServer) returns (infra_proxy.respons
 };
 
   /*
-  Update a Chef Infra Server details in Automate
+  Update Chef Infra Server
 
   Updates Chef Infra Server details in Automate.
   This API does not update the Chef Infra Server.
@@ -150,7 +150,7 @@ rpc UpdateServer (infra_proxy.request.UpdateServer) returns (infra_proxy.respons
 };
 
   /*
-  Delete a Chef Infra Server from Automate
+  Delete Chef Infra Server
 
   Deletes a Chef Infra Server details in Automate.
   This API does not delete the Chef Infra Server.
@@ -167,7 +167,7 @@ rpc DeleteServer (infra_proxy.request.DeleteServer) returns (infra_proxy.respons
 };
 
   /*
-  Get all organisations of a Chef Infra Server
+  Get organisations
 
   Gets all the organisations of a Chef Infra Server added in Automate.
 
@@ -183,9 +183,9 @@ rpc GetOrgs (infra_proxy.request.GetOrgs) returns (infra_proxy.response.GetOrgs)
 };
 
   /*
-  Get the details of an organisations of a Chef Infra Server
+  Get organisation details
 
-  Gets the details of an organisations of a Chef Infra Server added in Automate.
+  Gets the details of an organisation of a Chef Infra Server added in Automate.
 
   Authorization Action:
   ```
@@ -238,270 +238,804 @@ rpc GetInfraServerOrgs (infra_proxy.request.GetInfraServerOrgs) returns (infra_p
   };
 };
 
-  rpc GetCookbooks (infra_proxy.request.Cookbooks) returns (infra_proxy.response.Cookbooks) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:list";
-  };
-  rpc GetCookbookVersions (infra_proxy.request.CookbookVersions) returns (infra_proxy.response.CookbookVersions) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
-  };
-  rpc GetCookbook (infra_proxy.request.Cookbook) returns (infra_proxy.response.Cookbook) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
-  };
-  rpc GetCookbookFileContent (infra_proxy.request.CookbookFileContent) returns (infra_proxy.response.CookbookFileContent) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
-  };
+/*
+  Get Cookbooks
 
-  rpc GetRoles (infra_proxy.request.Roles) returns (infra_proxy.response.Roles) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:list";
-  };
-  rpc GetRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:get";
-  };
-  rpc GetRoleExpandedRunList (infra_proxy.request.ExpandedRunList) returns (infra_proxy.response.ExpandedRunList) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:get";
-  };
-  rpc GetRoleEnvironments (infra_proxy.request.Role) returns (infra_proxy.response.RoleEnvironments) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:get";
-  };
-  rpc CreateRole (infra_proxy.request.CreateRole) returns (infra_proxy.response.Role) {
-    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:create";
-  };
-  rpc DeleteRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
-    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:delete";
-  };
-  rpc UpdateRole (infra_proxy.request.UpdateRole) returns (infra_proxy.response.Role) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:update";
-  };
+  Gets all the cookbooks of an organisation of a Chef Infra Server added in Automate.
+  This API makes call to Chef Infra Server and fetches data.
 
-  rpc GetClients (infra_proxy.request.Clients) returns (infra_proxy.response.Clients) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:get";
-  };
-  rpc GetClient (infra_proxy.request.Client) returns (infra_proxy.response.Client) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:get";
-  };
-  rpc CreateClient (infra_proxy.request.CreateClient) returns (infra_proxy.response.CreateClient) {
-    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:create";
-  };
-  rpc DeleteClient (infra_proxy.request.Client) returns (infra_proxy.response.Client) {
-    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:delete";
-  };
-  rpc ResetClientKey (infra_proxy.request.ClientKey) returns (infra_proxy.response.ResetClient) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:update";
-  };
+  Authorization Action:
+  ```
+  infra:infraServersOrgsCookbooks:list
+  ```
+*/
+rpc GetCookbooks (infra_proxy.request.Cookbooks) returns (infra_proxy.response.Cookbooks) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:list";
+};
 
-  rpc GetDataBags (infra_proxy.request.DataBags) returns (infra_proxy.response.DataBags) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:get";
-  };
-  rpc GetDataBagItems (infra_proxy.request.DataBagItems) returns (infra_proxy.response.DataBagItems) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:get";
-  };
-  rpc GetDataBagItem (infra_proxy.request.DataBagItem) returns (infra_proxy.response.DataBagItem) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:get";
-  };
-  rpc CreateDataBag (infra_proxy.request.CreateDataBag) returns (infra_proxy.response.CreateDataBag) {
-    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:create";
-  };
-  rpc CreateDataBagItem (infra_proxy.request.CreateDataBagItem) returns (infra_proxy.response.CreateDataBagItem) {
-    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:create";
-  };
-  rpc DeleteDataBag (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
-    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:delete";
-  };
-  rpc DeleteDataBagItem (infra_proxy.request.DataBagItem) returns (infra_proxy.response.DataBagItem) {
-    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:delete";
-  };
-  rpc UpdateDataBagItem (infra_proxy.request.UpdateDataBagItem) returns (infra_proxy.response.UpdateDataBagItem) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:update";
-  };
+  /*
+    Get Cookbook Versions
 
-  rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:list";
-  };
-  rpc GetEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:get";
-  };
-  rpc CreateEnvironment (infra_proxy.request.CreateEnvironment) returns (infra_proxy.response.Environment) {
-    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:create";
-  };
-  rpc DeleteEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
-    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:delete";
-  };
-  rpc UpdateEnvironment (infra_proxy.request.UpdateEnvironment) returns (infra_proxy.response.Environment) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:update";
-  };
-  rpc GetEnvironmentRecipes (infra_proxy.request.Environment) returns (infra_proxy.response.EnvironmentRecipesList) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:get";
-  };
+    Gets all the versions of a cookbook in an organisation
+    This API makes call to Chef Infra Server and fetches data.
 
-  rpc GetNodes (infra_proxy.request.Nodes) returns (infra_proxy.response.Nodes) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
-  };
-  rpc DeleteNode (infra_proxy.request.Node) returns (infra_proxy.response.DeleteNode) {
-    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:delete";
-  };
-  rpc UpdateNode (infra_proxy.request.NodeDetails) returns (infra_proxy.response.Node) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
-  };
-  rpc UpdateNodeAttributes (infra_proxy.request.UpdateNodeAttributes) returns (infra_proxy.response.UpdateNodeAttributes) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
-  };
+  Authorization Action:
+  ```
+  infra:infraServersOrgsCookbooks:get
+  ```
+  */
+rpc GetCookbookVersions (infra_proxy.request.CookbookVersions) returns (infra_proxy.response.CookbookVersions) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
+};
+
+  /*
+    Get Cookbook
+
+    Gets the details of a cookbook in an organisation
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsCookbooks:get
+  ```
+  */
+rpc GetCookbook (infra_proxy.request.Cookbook) returns (infra_proxy.response.Cookbook) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
+};
+
+  /*
+    Get Cookbook File Content
+
+    Gets the contents of a cookbook in an organisation
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsCookbooks:get
+  ```
+  */
+rpc GetCookbookFileContent (infra_proxy.request.CookbookFileContent) returns (infra_proxy.response.CookbookFileContent) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
+};
+
+  /*
+    Get Roles
+
+    Gets all the Roles in an organisation
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsRoles:list
+  ```
+  */
+rpc GetRoles (infra_proxy.request.Roles) returns (infra_proxy.response.Roles) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:list";
+};
+
+  /*
+    Get Role
+
+    Gets the details of a Role in an organisation
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsRoles:get
+  ```
+  */
+rpc GetRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:get";
+};
+
+  /*
+    Get Role Expanded Run List
+
+    Gets the expanded run list of a Role in an organisation
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsRoles:get
+  ```
+  */
+rpc GetRoleExpandedRunList (infra_proxy.request.ExpandedRunList) returns (infra_proxy.response.ExpandedRunList) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:get";
+};
+
+  /*
+    Get Role Environments
+
+    Gets the environments of a Role in an organisation
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsRoles:get
+  ```
+  */
+rpc GetRoleEnvironments (infra_proxy.request.Role) returns (infra_proxy.response.RoleEnvironments) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:get";
+};
+
+  /*
+    Create Role
+
+    Creates a Role in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsRoles:create
+  ```
+  */
+rpc CreateRole (infra_proxy.request.CreateRole) returns (infra_proxy.response.Role) {
+  option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:create";
+};
+
+  /*
+    Delete Role
+
+    Deletes a Role in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsRoles:delete
+  ```
+  */
+rpc DeleteRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
+  option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:delete";
+};
+
+  /*
+    Update Role
+
+    Updates a Role in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsRoles:update
+  ```
+  */
+rpc UpdateRole (infra_proxy.request.UpdateRole) returns (infra_proxy.response.Role) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsRoles:update";
+};
+
+  /*
+    Get Clients
+
+    Gets all Clients in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsClient:get
+  ```
+  */
+rpc GetClients (infra_proxy.request.Clients) returns (infra_proxy.response.Clients) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:clients";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:get";
+};
+
+  /*
+    Get Client
+
+    Gets the details of a Client in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsClient:get
+  ```
+  */
+rpc GetClient (infra_proxy.request.Client) returns (infra_proxy.response.Client) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:get";
+};
+
+  /*
+    Create Client
+
+    Creates a Client in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsClient:create
+  ```
+  */
+rpc CreateClient (infra_proxy.request.CreateClient) returns (infra_proxy.response.CreateClient) {
+  option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:create";
+};
+
+  /*
+    Delete Client
+
+    Deletes a Client in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsClient:delete
+  ```
+  */
+rpc DeleteClient (infra_proxy.request.Client) returns (infra_proxy.response.Client) {
+  option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:delete";
+};
+
+  /*
+    Reset Client Key
+
+    Resets a Client key  in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsClient:update
+  ```
+  */
+rpc ResetClientKey (infra_proxy.request.ClientKey) returns (infra_proxy.response.ResetClient) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClient:update";
+};
+
+  /*
+    Get Data Bags
+
+    Gets all Data Bags in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBags:get
+  ```
+  */
+rpc GetDataBags (infra_proxy.request.DataBags) returns (infra_proxy.response.DataBags) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:get";
+};
+
+  /*
+    Get Data Bag Items
+
+    Gets all the Items in a Data Bag in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBagsItem:get
+  ```
+  */
+rpc GetDataBagItems (infra_proxy.request.DataBagItems) returns (infra_proxy.response.DataBagItems) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:get";
+};
+
+  /*
+    Get Data Bag Item
+
+    Gets details of an Items in a Data Bag in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBagsItem:get
+  ```
+  */
+rpc GetDataBagItem (infra_proxy.request.DataBagItem) returns (infra_proxy.response.DataBagItem) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:get";
+};
+
+  /*
+    Create Data Bag
+
+    Creates a Data Bag in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBags:create
+  ```
+  */
+rpc CreateDataBag (infra_proxy.request.CreateDataBag) returns (infra_proxy.response.CreateDataBag) {
+  option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:create";
+};
+
+  /*
+    Create Data Bag Item
+
+    Creates an Item in a Data Bag in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBagsItem:create
+  ```
+  */
+rpc CreateDataBagItem (infra_proxy.request.CreateDataBagItem) returns (infra_proxy.response.CreateDataBagItem) {
+  option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:create";
+};
+
+  /*
+    Delete Data Bag
+
+    Deletes a Data Bag in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBags:delete
+  ```
+  */
+rpc DeleteDataBag (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
+  option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:delete";
+};
+
+  /*
+    Delete Data Bag Item
+
+    Deletes an Item in a Data Bag in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBagsItem:delete
+  ```
+  */
+rpc DeleteDataBagItem (infra_proxy.request.DataBagItem) returns (infra_proxy.response.DataBagItem) {
+  option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:delete";
+};
+
+  /*
+    Update Data Bag Item
+
+    Updates an Item in a Data Bag in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsDataBagsItem:update
+  ```
+  */
+rpc UpdateDataBagItem (infra_proxy.request.UpdateDataBagItem) returns (infra_proxy.response.UpdateDataBagItem) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:update";
+};
+
+  /*
+    Get Environments
+
+    Gets all Environments in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsEnvironments:list
+  ```
+  */
+rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:list";
+};
+
+  /*
+    Get Environment
+
+    Gets the details of an Environment in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsEnvironments:get
+  ```
+  */
+rpc GetEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:get";
+};
+
+  /*
+    Create Environment
+
+    Creates an Environment in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsEnvironments:create
+  ```
+  */
+rpc CreateEnvironment (infra_proxy.request.CreateEnvironment) returns (infra_proxy.response.Environment) {
+  option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:create";
+};
+
+  /*
+    Delete Environment
+
+    Deletes an Environment in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsEnvironments:delete
+  ```
+  */
+rpc DeleteEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
+  option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:delete";
+};
+
+  /*
+    Update Environment
+
+    Updates an Environment in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsEnvironments:update
+  ```
+  */
+rpc UpdateEnvironment (infra_proxy.request.UpdateEnvironment) returns (infra_proxy.response.Environment) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:update";
+};
+
+  /*
+    Get Environment Recipes
+
+    Gets all the Recipes for an Environment in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsEnvironments:get
+  ```
+  */
+rpc GetEnvironmentRecipes (infra_proxy.request.Environment) returns (infra_proxy.response.EnvironmentRecipesList) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:get";
+};
+
+  /*
+    Get Nodes
+
+    Gets all the Nodes in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:get
+  ```
+  */
+rpc GetNodes (infra_proxy.request.Nodes) returns (infra_proxy.response.Nodes) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
+};
+
+  /*
+    Get Node
+
+    Gets the details of a Node in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:get
+  ```
+  */
   rpc GetNode (infra_proxy.request.Node) returns (infra_proxy.response.Node) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
     option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
   };
-  rpc GetNodeExpandedRunList (infra_proxy.request.NodeExpandedRunList) returns (infra_proxy.response.NodeExpandedRunList) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
-  }
-  rpc UpdateNodeTags (infra_proxy.request.UpdateNodeTags) returns (infra_proxy.response.UpdateNodeTags) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
-  };
-  rpc UpdateNodeEnvironment (infra_proxy.request.UpdateNodeEnvironment) returns (infra_proxy.response.UpdateNodeEnvironment) {
-    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
-  };
 
-  rpc GetPolicyfiles (infra_proxy.request.Policyfiles) returns (infra_proxy.response.Policyfiles) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:get";
-  };
+  /*
+    Delete Node
 
-  rpc GetPolicyfile (infra_proxy.request.Policyfile) returns (infra_proxy.response.Policyfile) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:get";
-  };
+    Deletes a Node in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
 
-  rpc DeletePolicyfile (infra_proxy.request.DeletePolicyfile) returns (infra_proxy.response.DeletePolicyfile) {
-    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:delete";
-  };
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:delete
+  ```
+  */
+rpc DeleteNode (infra_proxy.request.Node) returns (infra_proxy.response.DeleteNode) {
+  option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:delete";
+};
 
-  rpc GetPolicyfileRevisions (infra_proxy.request.PolicyfileRevisions) returns (infra_proxy.response.PolicyfileRevisions) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}/revisions";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:get";
-  };
+  /*
+    Update Node
 
-  rpc GetPolicygroup (infra_proxy.request.Policygroup) returns (infra_proxy.response.Policygroup) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policygroups";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyGroups:get";
-  };
+    Updates a Node in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
 
-  rpc GetOrgUsersList (infra_proxy.request.OrgUsers) returns (infra_proxy.response.OrgUsers) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:users";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:update
+  ```
+  */
+rpc UpdateNode (infra_proxy.request.NodeDetails) returns (infra_proxy.response.Node) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
+};
 
-  rpc GetServerUsersList (infra_proxy.request.ServerUsers) returns (infra_proxy.response.ServerUsers) {
-    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/users";
-    option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:users";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
+  /*
+    Update Node Attributes
 
-  rpc GetAutomateInfraServerUsersList (infra_proxy.request.AutomateInfraServerUsers) returns (infra_proxy.response.AutomateInfraServerUsers) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/automateinfraserverusers";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:automateinfraserverusers";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
+    Updates the Attributes of a Node in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
 
-  rpc GetAutomateInfraOrgUsersList (infra_proxy.request.AutomateInfraOrgUsers) returns (infra_proxy.response.AutomateInfraOrgUsers) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/org/{org_id}/users";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:users";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgs:get";
-  };
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:update
+  ```
+  */
+rpc UpdateNodeAttributes (infra_proxy.request.UpdateNodeAttributes) returns (infra_proxy.response.UpdateNodeAttributes) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
+};
 
+  /*
+    Get Node Expanded Run List
+
+    Gets the Expanded Run List of a Node in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:get
+  ```
+  */
+rpc GetNodeExpandedRunList (infra_proxy.request.NodeExpandedRunList) returns (infra_proxy.response.NodeExpandedRunList) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
+}
+
+  /*
+    Update Node Tags
+
+    Updates the tags of a Node in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:update
+  ```
+  */
+rpc UpdateNodeTags (infra_proxy.request.UpdateNodeTags) returns (infra_proxy.response.UpdateNodeTags) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
+};
+
+  /*
+    Update Node Environment
+
+    Updates the environment of a Node in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsNodes:update
+  ```
+  */
+rpc UpdateNodeEnvironment (infra_proxy.request.UpdateNodeEnvironment) returns (infra_proxy.response.UpdateNodeEnvironment) {
+  option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
+};
+
+  /*
+    Get Policy Files
+
+    Gets all the Policy Files in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsPolicyFiles:get
+  ```
+  */
+rpc GetPolicyfiles (infra_proxy.request.Policyfiles) returns (infra_proxy.response.Policyfiles) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:get";
+};
+
+  /*
+    Get Policy File
+
+    Gets the details of a Policy File in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsPolicyFiles:get
+  ```
+  */
+rpc GetPolicyfile (infra_proxy.request.Policyfile) returns (infra_proxy.response.Policyfile) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:get";
+};
+
+rpc DeletePolicyfile (infra_proxy.request.DeletePolicyfile) returns (infra_proxy.response.DeletePolicyfile) {
+  option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:delete";
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    tags: "hidden";
+  };
+};
+
+  /*
+    Get Policy File Revisions
+
+    Gets the revisions of a Policy File in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsPolicyFiles:get
+  ```
+  */
+rpc GetPolicyfileRevisions (infra_proxy.request.PolicyfileRevisions) returns (infra_proxy.response.PolicyfileRevisions) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}/revisions";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyFiles:get";
+};
+
+  /*
+    Get Policy Group
+
+    Gets the Policy Group of a Policy File in an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServersOrgsPolicyGroups:get
+  ```
+  */
+rpc GetPolicygroup (infra_proxy.request.Policygroup) returns (infra_proxy.response.Policygroup) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policygroups";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyGroups:get";
+};
+
+  /*
+    Get Org Users List
+
+    Gets all the users of an organisation in Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServers:get
+  ```
+  */
+rpc GetOrgUsersList (infra_proxy.request.OrgUsers) returns (infra_proxy.response.OrgUsers) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:users";
+  option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+};
+
+  /*
+    Get Server Users List
+
+    Gets all the users of a Chef Infra Server.
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServers:get
+  ```
+  */
+rpc GetServerUsersList (infra_proxy.request.ServerUsers) returns (infra_proxy.response.ServerUsers) {
+  option (google.api.http).post = "/api/v0/infra/servers/{server_id}/users";
+  option (google.api.http).body = "*";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:users";
+  option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+};
+rpc GetAutomateInfraServerUsersList (infra_proxy.request.AutomateInfraServerUsers) returns (infra_proxy.response.AutomateInfraServerUsers) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/automateinfraserverusers";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:automateinfraserverusers";
+  option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    tags: "hidden";
+  };
+};
+rpc GetAutomateInfraOrgUsersList (infra_proxy.request.AutomateInfraOrgUsers) returns (infra_proxy.response.AutomateInfraOrgUsers) {
+  option (google.api.http).get = "/api/v0/infra/servers/{server_id}/org/{org_id}/users";
+  option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:users";
+  option (chef.automate.api.iam.policy).action = "infra:infraServersOrgs:get";
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    tags: "hidden";
+  };
+};
+
+  /*
+    Reset Server Users Key
+
+    Resets the user key of an user in Chef Infra Server
+    This API makes call to Chef Infra Server and fetches data.
+
+  Authorization Action:
+  ```
+  infra:infraServers:list
+  ```
+  */
   rpc ResetInfraServerUserKey(infra_proxy.request.ResetInfraServerUserKeyReq) returns (infra_proxy.response.ResetInfraServerUserKeyRes){
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/user/{user_name}";
     option (google.api.http).body = "*";
