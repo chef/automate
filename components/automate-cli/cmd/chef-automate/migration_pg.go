@@ -279,14 +279,9 @@ func getLatestPgPath() error {
 		fmt.Printf("error %s", err)
 	}
 	output := string(cmd)
+
 	if strings.TrimSpace(output) == "" {
-		cmd, err :=
-			exec.Command("find /hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq").Output()
-		if err != nil {
-			fmt.Printf("error %s", err)
-		}
-		output = string(cmd)
-		fmt.Println(output, "inside")
+		return nil
 	}
 
 	fmt.Println(output)
