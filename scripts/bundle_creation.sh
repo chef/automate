@@ -88,7 +88,7 @@ airgap_bundle_create() {
   args+=("${original_aib_path}")
   # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
-    BUILD_VERSION=`"${CHEF_AUTOMATE_BIN_PATH}" airgap bundle info "${original_aib_path}" | grep Version | awk '{print $2}'`
+    BUILD_VERSION=`"${CHEF_AUTOMATE_BIN_PATH}" airgap bundle info "${original_aib_path}" | grep -i version | awk '{print $2}'`
     if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
           frontend_aib="/hab/a2_deploy_workspace/terraform/transfer_files/frontend-${BUILD_VERSION}.aib"
