@@ -2,7 +2,7 @@
 # stable channel
 
 pkg_name="automate-ha-elasticsidecar"
-pkg_description="Password manager for elasticsearch-odfe"
+pkg_description="Sidecar for HA Opensearch"
 pkg_origin="chef"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
@@ -12,7 +12,6 @@ pkg_upstream_url="http://github.com/chef/a2-ha-backend/components/automate-backe
 pkg_deps=(
   core/bash
   core/ruby30
-  chef/elasticsearch-odfe
 )
 pkg_build_deps=(
   core/make
@@ -21,7 +20,7 @@ pkg_build_deps=(
 pkg_interpreters=(bin/ruby)
 
 pkg_binds=(
-  [elasticsearch]="http-port transport-port root-ca admin-pem admin-key admin_username admin_password dashboard_username dashboard_password"
+  [opensearch]="http-port transport-port root-ca admin-pem admin-key admin_username admin_password"
 )
 
 pkg_lib_dirs=(lib)
@@ -46,7 +45,6 @@ do_install() {
   mkdir "${pkg_prefix}/bin"
   install "$PLAN_CONTEXT/bin/elastic_sidecar.rb" "${pkg_prefix}/bin/elastic_sidecar.rb"
   mkdir "${pkg_prefix}/data"
-  install "$PLAN_CONTEXT/data/dashboards.tar.gz" "${pkg_prefix}/data/dashboards.tar.gz"
 }
 
 do_end() {
