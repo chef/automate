@@ -61,6 +61,19 @@ steps:
           single-use: true
           privileged: true
 
+  - label: "v2 to v3 upgrade (dev channel)"
+    command:
+      - integration/run_test integration/tests/v2_to_v3_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
   - wait
 
   - label: "[integration] chef server upgrade"

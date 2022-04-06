@@ -498,7 +498,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "v2 to v22 upgrade"
+  - label: "v2 to v3 upgrade"
     command:
       - integration/run_test integration/tests/v2_to_v3_upgrade.sh
     timeout_in_minutes: 25
