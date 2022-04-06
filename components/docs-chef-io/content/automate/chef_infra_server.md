@@ -96,7 +96,7 @@ In case you have mentioned an incorrect WebUI key, you can update the same by fo
 
   {{< figure src="/images/automate/chef-infra-server-update-webui-key.png" alt="Select Update for WebUI Key">}}
 
-Following the above two steps updated the WwbUI key of the Chef Automate.
+Follow the above two steps to update the WebUI key of the Chef Automate.
 
 ## Access Chef Infra Server Components
 
