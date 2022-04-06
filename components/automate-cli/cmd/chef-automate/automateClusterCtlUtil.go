@@ -208,6 +208,7 @@ we also need to have following files in /hab/a2_deploy_workspace/terraform dir
 */
 func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
+		writer.Printf("airgapBundle: %s", airgapBundle)
 		bundleName := getFrontendBundleName(airgapBundle)
 		err := generateFrontendBundles(bundleName, airgapBundle)
 		if err != nil {
@@ -255,7 +256,11 @@ func getFrontendBundleName(airgapPath string) string {
 	if strings.Contains(bundleName, "automate") {
 		bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
 	}
-	return bundleName
+	timestamp, err := executeShellCommandAndGrepValue("chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
+	if err != nil {
+		return bundleName
+	}
+	return bundleName + timestamp
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
 	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
@@ -488,6 +493,21 @@ func executeShellCommand(command string, args []string, workingDir string) error
 	err := c.Run()
 	writer.Printf("%s command execution done, exiting\n", command)
 	return err
+}
+
+func executeShellCommandAndGrepValue(command string, args []string, workingDir string) (string, error) {
+	writer.Printf("%s command execution started \n\n\n", command)
+	c := exec.Command(command, args...)
+	c.Stdin = os.Stdin
+	if len(workingDir) > 0 {
+		c.Dir = workingDir
+	}
+	c.Stdout = io.MultiWriter(os.Stdout)
+	c.Stderr = io.MultiWriter(os.Stderr)
+	out, err := c.Output()
+	writer.Printf("%s command execution done, exiting\n", command)
+	executeShellCommand("echo", []string{"timestamp: ", string(out)}, "")
+	return string(out), err
 }
 
 func extarctVersionAndRelease(filename string) (string, string) {
