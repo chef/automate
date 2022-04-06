@@ -54,6 +54,7 @@ do_prepare_upgrade() {
     # manifest it creates.
     rm -f /opt/delivery/version-manifest.txt
     # use latest current here
+    #shellcheck disable=SC2154
     download_manifest_version "current" "20220329091442" "$test_manifest_dir/20220329091442.json"
     set_test_manifest "20220329091442.json"
     set_version_file
