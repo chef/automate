@@ -279,7 +279,17 @@ func getLatestPgPath() error {
 		fmt.Printf("error %s", err)
 	}
 	output := string(cmd)
-	fmt.Println("::::::", strings.Contains(strings.ToUpper(output), NEW_PG_VERSION), NEW_PG_VERSION, output, cmd)
+	if strings.TrimSpace(output) == "" {
+		cmd, err :=
+			exec.Command("find", "/hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq").Output()
+		if err != nil {
+			fmt.Printf("error %s", err)
+		}
+		output = string(cmd)
+		fmt.Println(output, "inside")
+	}
+
+	fmt.Println(output)
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
 		output = output[:len(output)-10]
 		NEW_BIN_DIR = output
