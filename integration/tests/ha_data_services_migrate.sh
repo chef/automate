@@ -47,6 +47,7 @@ do_deploy() {
         --airgap-bundle bundle.aib \
         --admin-password chefautomate \
         --accept-terms-and-mlsa
+        --versions-file "$versionsFile"
 }
 
 do_prepare_upgrade() {
