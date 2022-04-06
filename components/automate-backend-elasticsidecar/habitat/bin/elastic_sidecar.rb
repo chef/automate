@@ -86,10 +86,6 @@ module AutomateCluster
         config['admin_username'] => {
           'hash' => hash_password(config['admin_password']),
           'roles' => [config['admin_username']]
-        },
-        config['dashboard_username'] => {
-          'hash' => hash_password(config['dashboard_password']),
-          'roles' => [config['dashboard_username']]
         }
       }
       f = File.new("#{config['securityconfig_path']}/internal_users.yml", 'w+')
@@ -101,9 +97,6 @@ module AutomateCluster
       roles_mapping = {
         'all_access' => {
           'backendroles' => [config['admin_username']]
-        },
-        'dashboard_user' => {
-          'backendroles' => [config['dashboard_username']]
         }
       }
       f = File.new("#{config['securityconfig_path']}/roles_mapping.yml", 'w+')
@@ -112,8 +105,8 @@ module AutomateCluster
     end
 
     def insert_credentials
-      insert_command = "#{config['tool_path']}/securityadmin.sh -h #{config['elasticsearch_ip']} \
-        -p #{config['elasticsearch_port']} -cacert #{config['elasticsearch_ca']} \
+      insert_command = "#{config['tool_path']}/securityadmin.sh -h #{config['opensearch_ip']} \
+        -p #{config['opensearch_port']} -cacert #{config['opensearch_ca']} \
         -cert #{config['admin_cert']} -key #{config['admin_key']} -nhnv -icl \
         -cd #{config['securityconfig_path']}"
       result = run_command(insert_command)
@@ -150,45 +143,6 @@ module AutomateCluster
       sleep config['wait_period']
     end
 
-    def insert_dashboards
-      if File.directory?(config['dashboard_directory'])
-        Dir.glob("#{config['dashboard_directory']}*.json") do |dashboard|
-          dashboard_uuid = File.basename(dashboard, ".json")
-          http = HTTP.accept(:json)
-                     .basic_auth(user: config['admin_username'], pass: config['admin_password'])
-          response = http.get("https://localhost:9200/.kibana/doc/dashboard:#{dashboard_uuid}", ssl_context: config['ctx_basic'])
-          unless JSON.parse(response.body)['found']
-            logger.warn "inserting dashboard: #{dashboard_uuid}"
-            http = HTTP.accept(:json)
-                       .headers("kbn-xsrf" => "true")
-                       .basic_auth(user: config['admin_username'], pass: config['admin_password'])
-            response = http.post("https://localhost:5601/api/kibana/dashboards/import", ssl_context: config['ctx_basic'], json: (File.read(dashboard)))
-          end
-          # Set a default index pattern, so the users don't need to dig around in settings to get a working dashboard
-          http = HTTP.accept(:json)
-                     .headers("kbn-xsrf" => "true")
-                     .basic_auth(user: config['admin_username'], pass: config['admin_password'])
-          kibana_config = http.get("https://localhost:5601/api/saved_objects/config/6.5.4", ssl_context: config['ctx_basic'])
-          # If we get a 404 then the fields we need to check later won't exist
-          if kibana_config.code == 404
-            override_default = true
-          end
-          if kibana_config.code == 200
-            if JSON.parse(kibana_config.body)['attributes']['defaultIndex'].nil?
-              override_default = true
-            end
-          end
-          if  override_default == true
-            logger.warn "Default index pattern is not configured, setting to metricbeat"
-            response = http.post("https://localhost:5601/api/saved_objects/config/6.5.4?overwrite=true", ssl_context: config['ctx_basic'], json: '{"attributes":{"defaultIndex":"b40cfb40-db5a-11e9-9a8d-7f87f55fd222"}}')
-          end
-        end
-      end
-    rescue HTTP::Error => e
-      logger.error e.message
-      'error'
-    end
-
     def run
       loop do
         response = test_authentication(config['admin_username'], config['admin_password'])
@@ -196,14 +150,12 @@ module AutomateCluster
           wait
           next
         elsif response.code == 200
-          logger.debug "auth successful for #{config['admin_username']} now testing #{config['dashboard_username']}"
-          response = test_authentication(config['dashboard_username'], config['dashboard_password'])
+          logger.debug "auth successful for #{config['admin_username']}"
         end
 
         case response.code
         when 200
           logger.debug 'Authentication successful, doing nothing'
-          insert_dashboards
         when 401, 403
           logger.warn 'Authentication failed, inserting credentials'
           rotate_credentials
