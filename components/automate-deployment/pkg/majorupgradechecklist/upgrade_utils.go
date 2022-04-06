@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 )
 
@@ -54,4 +55,13 @@ func GetMajorVersion(version string) (string, bool) {
 		return resp, is_major_version
 	}
 	return version, false
+}
+
+func IsExternalElasticSearch(writer cli.FormatWriter) bool {
+	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
+	if err != nil {
+		writer.Printf("failed to get elastic search configuration: %s\n", err.Error())
+		return false
+	}
+	return res.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
 }
