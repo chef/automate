@@ -54,8 +54,8 @@ do_prepare_upgrade() {
     # manifest it creates.
     rm -f /opt/delivery/version-manifest.txt
     # use latest current here
-    download_manifest_version "current" "20220121191356" "$test_manifest_dir/20220121191356.json"
-    set_test_manifest "20220121191356.json"
+    download_manifest_version "current" "20220329091442" "$test_manifest_dir/20220329091442.json"
+    set_test_manifest "20220329091442.json"
     set_version_file
     local cli_bin="chef-automate"
     download_cli "latest" "${cli_bin}"
