@@ -43,6 +43,7 @@ run_upgrade() {
     echo "print from run upgrade"
     if [ -z "$airgap_artifact_path" ]; then
         echo "print from run upgrade 1"
+        cat "$versionsFile"
         ERROR=$(chef-automate upgrade run --versions-file "$versionsFile" 2>&1 >/dev/null) || true
         echo $ERROR
         if echo "${ERROR}" | grep 'This is a Major upgrade'; then
