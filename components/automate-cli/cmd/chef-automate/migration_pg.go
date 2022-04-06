@@ -222,12 +222,12 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	// if !migrateDataCmdFlags.skipStorageCheck {
-	// 	err := getLatestPgPath()
-	// 	if err != nil || migrateDataCmdFlags.skipStorageCheck {
-	// 		return err
-	// 	}
-	// }
+	if !migrateDataCmdFlags.skipStorageCheck {
+		err := getLatestPgPath()
+		if err != nil || migrateDataCmdFlags.skipStorageCheck {
+			return err
+		}
+	}
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
 		return err
@@ -279,7 +279,13 @@ func getLatestPgPath() error {
 		fmt.Printf("error %s", err)
 	}
 	output := string(cmd)
-	fmt.Println("::::::", output)
+	arr := []string{"svc", "status"}
+	cmd1, err := exec.Command("hab", arr...).Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	output1 := string(cmd1)
+	fmt.Println("::::::", output1)
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
 		output = output[:len(output)-10]
 		NEW_BIN_DIR = output
