@@ -40,7 +40,6 @@ const (
 	AUTOMATE_VERSION            = "3"
 	AUTOMATE_PG_MIGRATE_LOG_DIR = "/tmp"
 	OLD_PG_VERSION              = "9.6"
-	NEW_PG_VERSION              = "13.5"
 	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
 	NEW_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata13"
 	PG_DATA_DIR                 = "/hab/svc/automate-postgresql/data"
@@ -55,6 +54,7 @@ const (
 	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.24/20220218015755/bin"
 	CLEANUP_ID                  = "clean_up"
 	MIGRATE_PG_ID               = "migrate_pg"
+	// NEW_PG_VERSION           = "13.5"
 )
 
 func init() {
@@ -459,12 +459,12 @@ func executePgdata13ShellScript() error {
 }
 
 func checkUpdateMigration(check bool) error {
-	isAvailableSpace := false
+	var isAvailableSpace bool
+	var err error
 
 	if migrateDataCmdFlags.skipStorageCheck {
 		isAvailableSpace = true
 	} else {
-		err := error(nil)
 		isAvailableSpace, err = calDiskSizeAndDirSize()
 
 		if err != nil {
