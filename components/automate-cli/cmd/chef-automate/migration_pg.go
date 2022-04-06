@@ -54,7 +54,7 @@ const (
 	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.24/20220218015755/bin"
 	CLEANUP_ID                  = "clean_up"
 	MIGRATE_PG_ID               = "migrate_pg"
-	// NEW_PG_VERSION           = "13.5"
+	NEW_PG_VERSION              = "13.5"
 )
 
 func init() {
@@ -225,12 +225,12 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	// if !migrateDataCmdFlags.skipStorageCheck {
-	// 	err := getLatestPgPath()
-	// 	if err != nil || migrateDataCmdFlags.skipStorageCheck {
-	// 		return err
-	// 	}
-	// }
+	if !migrateDataCmdFlags.skipStorageCheck {
+		err := getLatestPgPath()
+		if err != nil || migrateDataCmdFlags.skipStorageCheck {
+			return err
+		}
+	}
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
 		return err
@@ -276,22 +276,27 @@ func pgMigrateExecutor() error {
 	return nil
 }
 
-// func getLatestPgPath() error {
-// 	latestPgPath := "find /hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq"
-// 	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
-// 	if err != nil {
-// 		fmt.Printf("error %s", err)
-// 	}
-// 	output := string(cmd)
-// 	fmt.Println("::::::", output)
-// 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
-// 		output = output[:len(output)-10]
-// 		NEW_BIN_DIR = output
-// 	} else {
-// 		return fmt.Errorf("latest version %s not found", NEW_PG_VERSION)
-// 	}
-// 	return nil
-// }
+func getLatestPgPath() error {
+	latestPgPath := "find /hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq"
+	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	output := string(cmd)
+
+	if strings.TrimSpace(output) == "" {
+		return nil
+	}
+
+	fmt.Println(output)
+	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
+		output = output[:len(output)-10]
+		NEW_BIN_DIR = output
+	} else {
+		return fmt.Errorf("latest version %s not found", NEW_PG_VERSION)
+	}
+	return nil
+}
 
 func vacuumDb() error {
 	writer.Title(
