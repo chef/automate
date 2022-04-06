@@ -41,7 +41,7 @@ do_build() {
         --manifest "$test_manifest_dir/build.json" \
         --hartifacts "${test_hartifacts_path}" \
         --override-origin "$HAB_ORIGIN" \
-        --versions-file "$versionsFile"
+        --versions-file "$versionsFile" \
         update.aib
 
 
