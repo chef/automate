@@ -279,13 +279,7 @@ func getLatestPgPath() error {
 		fmt.Printf("error %s", err)
 	}
 	output := string(cmd)
-	arr := []string{"svc", "status"}
-	cmd1, err := exec.Command("hab", arr...).Output()
-	if err != nil {
-		fmt.Printf("error %s", err)
-	}
-	output1 := string(cmd1)
-	fmt.Println("::::::", output1)
+	fmt.Println("::::::", strings.Contains(strings.ToUpper(output), NEW_PG_VERSION), NEW_PG_VERSION, output, cmd)
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
 		output = output[:len(output)-10]
 		NEW_BIN_DIR = output
