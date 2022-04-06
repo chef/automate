@@ -41,6 +41,7 @@ do_build() {
 }
 
 do_deploy() {
+    set_version_file
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --airgap-bundle bundle.aib \
