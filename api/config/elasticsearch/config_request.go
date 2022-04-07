@@ -1,4 +1,4 @@
-package os
+package es
 
 import (
 	"fmt"
@@ -84,11 +84,11 @@ func DefaultConfigRequest() *ConfigRequest {
 	sys.Bootstrap.MemoryLock = w.Bool(false)
 
 	// network
-	sys.Network.Port = w.Int32(10168) // user.toml override
+	sys.Network.Port = w.Int32(10141) // user.toml override
 	sys.Network.Host = w.String("")
 
 	// transport
-	sys.Transport.Port = w.String("10169") // user.toml override
+	sys.Transport.Port = w.String("10142") // user.toml override
 
 	// discovery
 	sys.Discovery.ZenFdPingTimeout = w.String("30s")
@@ -109,7 +109,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	// runtime
 	sys.Runtime.MaxLockedMemory = w.String("unlimited")
-	sys.Runtime.OsJavaOpts = w.String("")
+	sys.Runtime.EsJavaOpts = w.String("")
 	sys.Runtime.Heapsize = w.String(defaultHeapSize())
 
 	// s3
@@ -140,8 +140,8 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 // SetGlobalConfig injects global configuration overrides
 func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	// Handle external configuration
-	if g.GetV1().GetExternal().GetOpensearch().GetEnable().GetValue() {
-		// Disable deploying automate-opensearch when we're using external es
+	if g.GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue() {
+		// Disable deploying automate-elasticsearch when we're using external es
 		c.V1.Sys.Disable = w.Bool(true)
 
 		return
@@ -150,13 +150,13 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	if b := g.GetV1().GetBackups(); b != nil {
 		if b.GetFilesystem() != nil {
 			// If backups are configured to use a filesystem location make sure
-			// that the path is specified in the repo, otherwise Opensearch
+			// that the path is specified in the repo, otherwise Elasticsearch
 			// will not be able to access the directory.
 			c.V1.Sys.Path.Repo = b.GetFilesystem().GetPath()
 
 			if !c.GetV1().GetSys().GetNode().GetData().GetValue() {
 				c.V1.Sys.Deprecated = &ConfigRequest_V1_Deprecated{
-					ExternalOs: w.Bool(true),
+					ExternalEs: w.Bool(true),
 				}
 			}
 		}
@@ -187,13 +187,13 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 const (
 	// ESHeapMinGB is the minimum amount of memory in GB we will
 	// recommend for ES Heap
-	OSHeapMinGB = 1
+	ESHeapMinGB = 1
 	// ESHeapMaxGB is the maximum amount of memory in GB we will
 	// recommend for ES Heap
-	OSHeapMaxGB = 16
+	ESHeapMaxGB = 16
 	// ESHeapPortion is the proportion of system memory we
 	// recommend for ES Heap
-	OSHeapPortion = 0.25
+	ESHeapPortion = 0.25
 	// KBPerGB is the number of KB in a GB, used for conversions
 	KBPerGB = 1048576
 )
@@ -207,13 +207,13 @@ func defaultHeapSize() string {
 }
 
 // RecommendedHeapSizeGB returns the recommended size of the
-// Opeensearch heap settings. The returned value is in Gigabytes.
+// Elasticsearch heap settings. The returned value is in Gigabytes.
 func RecommendedHeapSizeGB(sysMemKB int) int {
-	recommend := int(math.Round((float64(sysMemKB) * OSHeapPortion) / KBPerGB))
-	if recommend < OSHeapMinGB {
-		return OSHeapMinGB
-	} else if recommend > OSHeapMaxGB {
-		return OSHeapMaxGB
+	recommend := int(math.Round((float64(sysMemKB) * ESHeapPortion) / KBPerGB))
+	if recommend < ESHeapMinGB {
+		return ESHeapMinGB
+	} else if recommend > ESHeapMaxGB {
+		return ESHeapMaxGB
 	} else {
 		return recommend
 	}

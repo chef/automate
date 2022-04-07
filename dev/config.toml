@@ -63,11 +63,11 @@ BFcx3mHj8+EnWdU9BJ1TQZUYRL66axIa1fI7rTNAan/t9Xx1NHwZbbPCMBuolM9p
 OhLQB1XeN74ezxt5eHocIRrWow==
 -----END PRIVATE KEY-----"""
 
-[elasticsearch.v1.sys.runtime]
-  es_java_opts = "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=a2-dev.test"
+[opensearch.v1.sys.runtime]
+  #os_java_opts = "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=a2-dev.test"
   heapsize = "2g"
 
-[elasticsearch.v1.sys.network]
+[opensearch.v1.sys.network]
 host = "0.0.0.0"
 
 [postgresql.v1.sys.pg]
