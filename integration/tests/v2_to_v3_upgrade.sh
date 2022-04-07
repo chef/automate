@@ -1,27 +1,13 @@
 #!/bin/bash
 
-# this test script:
-# 1. deploys an older version of Automate and upgrades it to v2 using the beta CLI,
-#    including v1 policy migration.
-# 2. runs v1 inspec tests to verify the system is up and seed a v1 policy to migrate.
-# 3. upgrades Automate to the latest build. This force-upgrades the system to IAM v2.
-# 4. runs inspec tests to verify that the system was not disrupted by the force-upgrade
-#    and legacy v1 policies continue to be enforced.
-
 #shellcheck disable=SC2034
-test_name="iam_force_upgrade_from_v2_to_v22_with_legacy"
+test_name="v2_to_v3_upgrade"
 test_upgrades=true
 test_upgrade_strategy="none"
 
 # a2-iam-no-legacy-integration verifies permissions on an IAM v2 system
 # without v1 legacy policies
 test_deploy_inspec_profiles=(a2-deploy-smoke)
-
-# a2-deploy-integration verifies that the system is up and all APIs work correctly
-# (which now includes only IAM v2 APIs)
-# a2-iam-no-legacy-integration verifies permission enforcement on a fresh IAM v2
-# system with no v1 legacy policies enforced
-# The inspec tests don't pass if the diagnostics are run
 test_skip_diagnostics=true
 
 # here we use the latest milestone version
@@ -48,4 +34,3 @@ do_deploy() {
         --skip-preflight \
         --debug
 }
-

@@ -246,3 +246,4 @@ download_manifest_version() {
 
     curl -k "https://packages.chef.io/manifests/$channel/automate/$version.json" > "$dst"
 }
+
