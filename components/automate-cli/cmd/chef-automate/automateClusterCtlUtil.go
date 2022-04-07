@@ -268,7 +268,7 @@ func getFrontendBundleName(airgapPath string) string {
 	var bundleName string = filepath.Base(airgapPath)
 	parts := strings.Split(bundleName, "-")
 	if strings.Contains(parts[0], "automate") {
-		parts[0] = strings.ReplaceAll(bundleName, "automate", "frontend")
+		parts[0] = strings.ReplaceAll(parts[0], "automate", "frontend")
 	}
 	versionExt := strings.Split(parts[1], ".")
 	version, err := getVersion(airgapPath)
