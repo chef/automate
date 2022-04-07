@@ -289,7 +289,7 @@ func getLatestPgPath() error {
 	if strings.TrimSpace(output) == "" {
 		return nil
 	}
-	
+
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
 		NEW_BIN_DIR = "/hab/pkgs/core/" + strings.TrimSpace(output) + "/bin"
 	} else {
