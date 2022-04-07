@@ -209,7 +209,6 @@ we also need to have following files in /hab/a2_deploy_workspace/terraform dir
 */
 func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
-		writer.Printf("airgapBundle: %s", airgapBundle)
 		bundleName := getFrontendBundleName(airgapBundle)
 		err := generateFrontendBundles(bundleName, airgapBundle)
 		if err != nil {
@@ -273,11 +272,14 @@ func getFrontendBundleName(airgapPath string) string {
 	}
 	versionExt := strings.Split(parts[1], ".")
 	version, err := getVersion(airgapPath)
-	fmt.Print("\n Version and err : ",version,  ",", err)
 	versionExt[0] = version
 	newVersionExt := strings.Join(versionExt, ".")
 	parts[1] = newVersionExt
+	fmt.Print("\n  ", versionExt[0])
+	fmt.Print("\n part[0] : ",parts[0])
+	fmt.Print("\n part[1] : ",parts[1])
 	bundleName = strings.Join(parts, "-")
+	fmt.Print("\n part : ",parts)
 	
 	if err != nil {
 		return bundleName
