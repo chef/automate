@@ -61,6 +61,7 @@ message AutomateConfig {
 	chef.automate.domain.cfgmgmt.ConfigRequest config_mgmt = 6;
 	chef.automate.domain.deployment.ConfigRequest deployment = 3;
 	chef.automate.domain.dex.ConfigRequest dex = 4;
+	chef.automate.infra.opensearch.ConfigRequest opensearch = 7;
 	chef.automate.infra.esgateway.ConfigRequest esgateway = 31;
 	chef.automate.infra.es_sidecar.ConfigRequest es_sidecar = 11;
 	chef.automate.api.config.ConfigRequest gateway = 5;
@@ -103,5 +104,4 @@ message AutomateConfig {
 	chef.automate.domain.cds.ConfigRequest cds = 46;
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
-	chef.automate.infra.opensearch.ConfigRequest opensearch = 49;
 }
