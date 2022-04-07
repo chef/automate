@@ -49,6 +49,3 @@ do_deploy() {
         --debug
 }
 
-do_upgrade() {
-    do_upgrade_default
-}

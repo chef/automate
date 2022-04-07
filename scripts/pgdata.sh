@@ -1,4 +1,4 @@
-#!/hab/pkgs/core/bash/5.1/20210826055113/bin/bash
+#!/bin/bash
 #shellcheck disable=SC1128
 #
 shopt -s extglob
@@ -24,17 +24,7 @@ source /hab/svc/automate-postgresql/config/functions.sh
 mkdir -p /hab/svc/automate-postgresql/config/conf.d
 mkdir -p /hab/svc/automate-postgresql/var/pg_stat_tmp
 
-# Auto-detect pg data in the root of svc_data_path, where older versions of this plan had it
-if [[ -f "/hab/svc/automate-postgresql/data/PG_VERSION" ]]; then
-  echo "PGDATA detected in the root of the data path ( /hab/svc/automate-postgresql/data ), relocating it to /hab/svc/automate-postgresql/data/pgdata"
-  mkdir -p /hab/svc/automate-postgresql/data/pgdata
-  # bash extended globbing can cleanly move everything under a subfolder http://www.linuxjournal.com/content/bash-extended-globbing
-  mv /hab/svc/automate-postgresql/data/!(pgdata) /hab/svc/automate-postgresql/data/pgdata/
-  chmod 0700 /hab/svc/automate-postgresql/data/pgdata
-else
-  mkdir -p /hab/svc/automate-postgresql/data/pgdata
-fi
-
+mkdir -p /hab/svc/automate-postgresql/data/pgdata
 mkdir -p /hab/svc/automate-postgresql/data/archive
 
 ensure_dir_ownership
