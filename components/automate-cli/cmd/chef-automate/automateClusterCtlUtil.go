@@ -256,7 +256,7 @@ func getFrontendBundleName(airgapPath string) string {
 	if strings.Contains(bundleName, "automate") {
 		bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
 	}
-	timestamp, err := executeShellCommandAndGrepValue("chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
+	timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
 	if err != nil {
 		return bundleName
 	}
@@ -498,6 +498,7 @@ func executeShellCommand(command string, args []string, workingDir string) error
 func executeShellCommandAndGrepValue(command string, args []string, workingDir string) (string, error) {
 	writer.Printf("%s command execution started \n\n\n", command)
 	c := exec.Command(command, args...)
+	writer.Printf("%s :c output \n", c)
 	c.Stdin = os.Stdin
 	if len(workingDir) > 0 {
 		c.Dir = workingDir
@@ -505,6 +506,7 @@ func executeShellCommandAndGrepValue(command string, args []string, workingDir s
 	c.Stdout = io.MultiWriter(os.Stdout)
 	c.Stderr = io.MultiWriter(os.Stderr)
 	out, err := c.Output()
+	writer.Printf("%s, %s :out, err \n", out, err)
 	writer.Printf("%s command execution done, exiting\n", command)
 	executeShellCommand("echo", []string{"timestamp: ", string(out)}, "")
 	return string(out), err
