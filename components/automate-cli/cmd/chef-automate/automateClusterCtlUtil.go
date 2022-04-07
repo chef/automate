@@ -275,16 +275,12 @@ func getFrontendBundleName(airgapPath string) string {
 	versionExt[0] = version
 	newVersionExt := strings.Join(versionExt, ".")
 	parts[1] = newVersionExt
-	fmt.Print("\n  ", versionExt[0])
-	fmt.Print("\n part[0] : ",parts[0])
-	fmt.Print("\n part[1] : ",parts[1])
 	bundleName = strings.Join(parts, "-")
-	fmt.Print("\n part : ",parts)
 	
 	if err != nil {
 		return bundleName
 	}
-	executeShellCommand("echo", []string{bundleName}, "")
+	// executeShellCommand("echo", []string{bundleName}, "")
 	return bundleName
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
@@ -507,7 +503,7 @@ func executeSecretsInitCommand(secretsKeyFilePath string) error {
 }
 
 func executeShellCommand(command string, args []string, workingDir string) error {
-	writer.Printf("%s command execution started \n\n\n", command)
+	writer.Printf("\n%s command execution started \n\n\n", command)
 	c := exec.Command(command, args...)
 	c.Stdin = os.Stdin
 	if len(workingDir) > 0 {
