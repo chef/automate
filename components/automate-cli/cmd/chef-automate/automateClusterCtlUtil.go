@@ -281,7 +281,7 @@ func getFrontendBundleName(airgapPath string) string {
 		if err != nil {
 		return bundleName
 	}
-	executeShellCommand("echo", []string{version}, "")
+	executeShellCommand("echo", []string{bundleName + version}, "")
 	return bundleName + version
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
