@@ -15,7 +15,7 @@ ident="20220120092917"
 pkg_deps=(
   core/coreutils
   chef/mlsa
-  ${vendor_origin}/postgresql13/${pg_version}/ident
+  ${vendor_origin}/postgresql13/${pg_version}/${ident}
 )
 
 pkg_exports=(
