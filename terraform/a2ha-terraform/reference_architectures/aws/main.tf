@@ -1,3 +1,8 @@
+provider "aws" {
+  region  = var.aws_region
+  profile = var.aws_profile
+}
+
 module "aws" {
   ami_filter_name                    = var.ami_filter_name
   ami_filter_owner                   = var.ami_filter_owner
@@ -12,8 +17,6 @@ module "aws" {
   automate_lb_certificate_arn        = var.automate_lb_certificate_arn
   automate_server_instance_type      = var.automate_server_instance_type
   aws_ami_id                         = var.aws_ami_id
-  aws_profile                        = var.aws_profile
-  aws_region                         = var.aws_region
   aws_ssh_key_file                   = var.ssh_key_file
   aws_ssh_key_pair_name              = var.aws_ssh_key_pair_name
   aws_ssh_user                       = var.ssh_user

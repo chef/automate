@@ -1,7 +1,3 @@
-provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
-}
 
 resource "random_id" "random" {
   byte_length = 4

@@ -48,16 +48,6 @@ variable "aws_instance_profile_name" {
   default = ""
 }
 
-variable "aws_profile" {
-  default     = "default"
-  description = "The AWS profile to use from your ~/.aws/credentials file."
-}
-
-variable "aws_region" {
-  default     = "us-west-1"
-  description = "The name of the selected AWS region / datacenter."
-}
-
 variable "aws_ssh_key_file" {
 }
 
