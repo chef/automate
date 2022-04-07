@@ -117,3 +117,7 @@ bucket_name       = ""
 cdn_url           = ""
 private_objects   = true
 path              = ""
+
+
+[mlsa]
+accept = true

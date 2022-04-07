@@ -40,3 +40,4 @@ exec chpst \
     -U {{ cfg.app.user }}:{{ cfg.app.group }} \
     -u {{ cfg.app.user }}:{{ cfg.app.group }} \
     _bundle exec unicorn -E {{ cfg.rails_env }} -c {{ pkg.svc_config_path }}/unicorn.rb $supermarket_path/app/config.ru 2>&1
+

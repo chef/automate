@@ -4,22 +4,23 @@ pkg_maintainer="The Chef Maintainers <humans@chef.io>"
 pkg_license=("Apache-2.0")
 pkg_description="Supermarket is Chef's community repository for cookbooks, currently hosted at supermarket.chef.io.
 Supermarket can also run internally, behind-the-firewall."
-pkg_upstream_url="https://docs.chef.io/supermarket/#private-supermarket"
+pkg_upstream_url="https://www.chef.io/automate"
 pkg_build_deps=(core/phantomjs core/yarn)
 pkg_svc_user="root"
 pkg_svc_group="root"
 pkg_version="1.19.3.1"
 vendor_origin="chef"
 scaffolding_ruby_pkg="core/ruby27"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+automate_scaffolding_include_templates=(sqerl.config)
 
 pkg_binds_optional=(
-  [automate-postgresql]="port username"
+  [automate-pg-gateway]="port"
   [automate-supermarket-redis]="port"
 )
 
 pkg_deps=(
   core/coreutils
-  chef/mlsa
   core/bash 
   core/file 
   core/glibc 
@@ -27,6 +28,7 @@ pkg_deps=(
   core/libarchive 
   core/shared-mime-info
   core/bundler
+  "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/supermarket/5.1.5/20220322060835"
@@ -43,16 +45,16 @@ pkg_exports=(
 )
 
 chef_automate_hab_binding_mode="relaxed"
-automate_scaffolding_include_templates=(sqerl.config)
 
-db="postgresql://{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.cfg.username }}{{ else }}{{ cfg.db.user }}{{ /if }}"
-db="${db}:{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.cfg.password }}{{ else }}{{ cfg.db.password }}{{ /if }}"
-db="${db}@{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.sys.ip }}{{ else }}{{ cfg.db.host }}{{ /if }}"
-db="${db}:{{ #if bind.automate-postgresql }}{{ bind.automate-postgresql.first.cfg.port }}{{ else }}{{ cfg.db.port }}{{ /if }}"
+
+db="postgresql://{{ cfg.db.user }}"
+db="${db}:{{ cfg.db.password }}"
+db="${db}@{{ cfg.db.host }}"
+db="${db}:{{ #if bind.automate-pg-gateway }}{{ bind.automate-pg-gateway.first.port }}{{ else }}{{ cfg.db.port }}{{ /if }}"
 db="${db}/{{ cfg.db.name }}_{{ cfg.rails_env }}"
 
-redis="redis://{{ #if bind.redis }}{{ bind.redis.first.sys.ip }}{{ else }}{{ cfg.redis.host }}{{ /if }}"
-redis="${redis}:{{ #if bind.redis }}{{ bind.redis.first.cfg.port }}{{ else }}{{ cfg.redis.port }}{{ /if }}"
+redis="redis://{{ #if bind.automate-supermarket-redis }}{{ bind.automate-supermarket-redis.first.sys.ip }}{{ else }}{{ cfg.redis.host }}{{ /if }}"
+redis="${redis}:{{ #if bind.automate-supermarket-redis }}{{ bind.automate-supermarket-redis.first.cfg.port }}{{ else }}{{ cfg.redis.port }}{{ /if }}"
 redis="${redis}/{{ cfg.redis.database }}"
 
 supermarket_path=$(hab pkg path chef/supermarket)

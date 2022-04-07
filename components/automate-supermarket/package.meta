@@ -1,3 +1,4 @@
 {
-  "name": "chef/automate-supermarket"
+  "name": "chef/automate-supermarket",
+  "uses_platform_scaffolding": true
 }

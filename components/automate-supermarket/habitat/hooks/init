@@ -1,6 +1,18 @@
 #!{{ pkgPathFor "core/bash" }}/bin/bash
 set -e
 
+
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
+mkdir -p {{pkg.svc_var_path}}/logs
+
+export HOME={{pkg.svc_var_path}}
+export RUNNER_LOG_DIR="{{pkg.svc_var_path}}/logs"
+export RELX_CONFIG_PATH="{{pkg.svc_config_path}}/sys.config"
+export VMARGS_PATH="{{pkg.svc_config_path}}/vm.args"
+export DBNAME="{{cfg.db.name}}_{{ cfg.rails_env }}"
+
 supermarket_path=$(hab pkg path chef/supermarket)
 HOME="{{ pkg.svc_data_path }}"
 export HOME
@@ -45,22 +57,21 @@ if [ -z "${SECRET_KEY_BASE:-}" ]; then
   exit 5
 fi
 
-{{ #if bind.database ~}}
-{{ #with bind.database.first ~}}
-PGHOST='{{ sys.ip }}'
-PGUSER='{{ cfg.username }}'
-PGPASSWORD='{{ cfg.password }}'
-PGPORT='{{ cfg.port }}'
-{{~ /with }}
-{{~ else ~}}
-PGHOST='{{ cfg.db.host }}'
-PGDATABASE='{{ cfg.db.name }}_{{ cfg.rails_env }}'
+
 PGUSER='{{ cfg.db.user }}'
 PGPASSWORD='{{ cfg.db.password }}'
 PGPORT='{{ cfg.db.port }}'
-{{~ /if }}
-PGDATABASE='{{ cfg.db.name }}_{{ cfg.rails_env }}'
-export PGHOST PGDATABASE PGUSER PGPASSWORD PGPORT
+export PGUSER PGPASSWORD PGPORT
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
+
+echo " ### GOING TO set db ### "
+pg-helper rename-if-exists supermarket "$DBNAME"
+pg-helper ensure-service-database "$DBNAME"
+pg-helper create-extension "$DBNAME" "uuid-ossp"
+pg-helper alter-user $PGUSER with PASSWORD $PGPASSWORD
+pg-helper fix-permissions "$DBNAME"
 
 _bundle() {
   scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
@@ -83,7 +94,6 @@ pushd $supermarket_path/app &>/dev/null || exit 1
     cd "$supermarket_path/app"
     pwd
     echo 'Database does not exist'
-    bundler_path="$(hab pkg path core/ruby27)/bin/bundle"
     _bundle exec rails db:create
     _bundle exec rails db:schema:load
     _bundle exec rails db:migrate
