@@ -291,6 +291,7 @@ func runAirgapCreateInstallBundle(cmd *cobra.Command, args []string) error {
 }
 
 func runAirgapUnpackInstallBundle(cmd *cobra.Command, args []string) error {
+	airgap.AirgapInUse()
 	_, err := airgap.Unpack(args[0], airgap.WithUnpackHartsOnly(airgapCmdFlags.hartsOnly))
 	if err != nil {
 		return status.Annotate(err, status.AirgapUnpackInstallBundleError)

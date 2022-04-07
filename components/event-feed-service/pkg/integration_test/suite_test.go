@@ -60,7 +60,6 @@ func NewSuite(url string) (*Suite, error) {
 	}
 	s.esClient = esClient
 	s.indices = []string{persistence.IndexNameFeeds}
-	s.types = []string{persistence.DocType}
 
 	s.feedBackend = persistence.NewFeedStore(esClient)
 	err = s.feedBackend.InitializeStore(context.Background())

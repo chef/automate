@@ -184,7 +184,7 @@ func TestNodeRunInfoDateTime(t *testing.T) {
 			require.NoError(t, err)
 
 			if searchResult.TotalHits() > 0 {
-				for _, hit := range searchResult.Hits {
+				for _, hit := range searchResult.Hits.Hits {
 					var item iBackend.NodeRunDateInfo
 
 					if hit.Source != nil {
