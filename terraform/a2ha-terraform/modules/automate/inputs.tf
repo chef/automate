@@ -42,14 +42,6 @@ variable "cluster_id" {
   default = ""
 }
 
-variable "opensearch_listen_port" {
-  default = 9200
-}
-
-variable "opensearch_private_ips" {
-  default = []
-}
-
 variable "frontend_aib_dest_file" {
 }
 
@@ -100,6 +92,14 @@ variable "managed_rds_superuser_password" {
 
 variable "managed_rds_superuser_username" {
   default = ""
+}
+
+variable "opensearch_listen_port" {
+  default = 9200
+}
+
+variable "opensearch_private_ips" {
+  default = []
 }
 
 variable "postgresql_private_ips" {
