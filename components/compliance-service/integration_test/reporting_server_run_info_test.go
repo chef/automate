@@ -110,7 +110,7 @@ func TestReportingServerRunInfo(t *testing.T) {
 
 			require.NoError(t, err)
 
-			if searchResult.TotalHits() > 0 && searchResult.TotalHits() > 0 {
+			if searchResult.TotalHits() > 0 {
 				for _, hit := range searchResult.Hits.Hits {
 					var item relaxting.ESComplianceRunInfo
 					if hit.Source != nil {
