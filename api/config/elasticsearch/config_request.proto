@@ -1,14 +1,14 @@
 // -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
 syntax = "proto3";
 
-package chef.automate.infra.opensearch;
-option go_package = "github.com/chef/automate/api/config/opensearch;os";
+package chef.automate.infra.elasticsearch;
+option go_package = "github.com/chef/automate/api/config/elasticsearch;es";
 import "config/shared/tls.proto";
 import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
-	option (chef.automate.api.service_config) = {name: "automate-opensearch"};
+	option (chef.automate.api.service_config) = {name: "automate-elasticsearch"};
 
 	reserved 1 to 2;
 	V1 v1 = 3;
@@ -39,7 +39,7 @@ message ConfigRequest {
 			Deprecated deprecated = 18;
 			Index index = 20;
 
-			google.protobuf.BoolValue disable = 19; // If set to true, automate-opensearch will noop. Derived from the global config
+			google.protobuf.BoolValue disable = 19; // If set to true, automate-elasticsearch will noop. Derived from the global config
 		}
 
 		message Service {}
@@ -95,14 +95,14 @@ message ConfigRequest {
 
 		message Network {
 			google.protobuf.StringValue host = 1;
-			google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10168, protocol: "http" } ];
+			google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10141, protocol: "http" } ];
 		}
 
 		message Transport {
 			reserved 1;
 			// the transport port is actually a range of ports
 			// e.g. 9300-9400
-			google.protobuf.StringValue port = 2 [ (chef.automate.api.port) = { name: "transport", default: 10169, protocol: "es" } ];
+			google.protobuf.StringValue port = 2 [ (chef.automate.api.port) = { name: "transport", default: 10142, protocol: "es" } ];
 		}
 
 		message Discovery {
@@ -140,8 +140,8 @@ message ConfigRequest {
 
 			google.protobuf.StringValue max_open_files = 6;
 			google.protobuf.StringValue max_locked_memory = 7;
-			google.protobuf.Int32Value os_startup_sleep_time = 8;
-			google.protobuf.StringValue os_java_opts = 9;
+			google.protobuf.Int32Value es_startup_sleep_time = 8;
+			google.protobuf.StringValue es_java_opts = 9;
 			google.protobuf.StringValue heapsize = 10;
 		}
 
@@ -194,7 +194,7 @@ message ConfigRequest {
 		}
 
 		message Deprecated {
-				google.protobuf.BoolValue external_os = 1;
+				google.protobuf.BoolValue external_es = 1;
 		}
 	}
 }
