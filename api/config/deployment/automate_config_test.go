@@ -10,7 +10,7 @@ import (
 
 	"github.com/chef/automate/api/config/compliance"
 	dex "github.com/chef/automate/api/config/dex"
-	es "github.com/chef/automate/api/config/elasticsearch"
+	oss "github.com/chef/automate/api/config/opensearch"
 	config "github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	"github.com/chef/automate/lib/pcmp/passert"
@@ -271,10 +271,10 @@ func TestDeepCopy(t *testing.T) {
 
 func TestOverrideBooleans(t *testing.T) {
 	defaultConfig := &AutomateConfig{
-		Elasticsearch: &es.ConfigRequest{
-			V1: &es.ConfigRequest_V1{
-				Sys: &es.ConfigRequest_V1_System{
-					Node: &es.ConfigRequest_V1_Node{
+		Opensearch: &oss.ConfigRequest{
+			V1: &oss.ConfigRequest_V1{
+				Sys: &oss.ConfigRequest_V1_System{
+					Node: &oss.ConfigRequest_V1_Node{
 						Data:   w.Bool(true),
 						Master: w.Bool(false),
 					},
@@ -283,10 +283,10 @@ func TestOverrideBooleans(t *testing.T) {
 		},
 	}
 	overrideConfig := &AutomateConfig{
-		Elasticsearch: &es.ConfigRequest{
-			V1: &es.ConfigRequest_V1{
-				Sys: &es.ConfigRequest_V1_System{
-					Node: &es.ConfigRequest_V1_Node{
+		Opensearch: &oss.ConfigRequest{
+			V1: &oss.ConfigRequest_V1{
+				Sys: &oss.ConfigRequest_V1_System{
+					Node: &oss.ConfigRequest_V1_Node{
 						Data:   w.Bool(false),
 						Master: w.Bool(true),
 					},
@@ -299,8 +299,8 @@ func TestOverrideBooleans(t *testing.T) {
 	err := defaultConfig.OverrideConfigValues(overrideConfig)
 
 	assert.NoError(err)
-	passert.Equal(t, w.Bool(false), defaultConfig.Elasticsearch.V1.Sys.Node.Data)
-	passert.Equal(t, w.Bool(true), defaultConfig.Elasticsearch.V1.Sys.Node.Master)
+	passert.Equal(t, w.Bool(false), defaultConfig.Opensearch.V1.Sys.Node.Data)
+	passert.Equal(t, w.Bool(true), defaultConfig.Opensearch.V1.Sys.Node.Master)
 }
 
 func TestCorrectlyAnnotated(t *testing.T) {
