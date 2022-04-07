@@ -1,10 +1,10 @@
 variable "automate_archive_disk_fs_path" {
 }
 
-variable "opensearch_archive_disk_fs_path" {
+variable "instance_count" {
 }
 
-variable "instance_count" {
+variable "opensearch_archive_disk_fs_path" {
 }
 
 variable "postgresql_archive_disk_fs_path" {
