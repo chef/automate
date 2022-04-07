@@ -232,47 +232,48 @@ func pgMigrateExecutor() error {
 			return err
 		}
 	}
-	// existDir, err := dirExists(NEW_PG_DATA_DIR)
-	// if err != nil {
-	// 	return err
-	// }
 
-	// err = chefAutomateStop()
-	// if err != nil {
-	// 	return err
-	// }
+	existDir, err := dirExists(NEW_PG_DATA_DIR)
+	if err != nil {
+		return err
+	}
 
-	// if existDir {
-	// 	err = removeAndReplacePgdata13()
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
+	err = chefAutomateStop()
+	if err != nil {
+		return err
+	}
 
-	// err = executePgdata13ShellScript()
-	// if err != nil {
-	// 	return err
-	// }
+	if existDir {
+		err = removeAndReplacePgdata13()
+		if err != nil {
+			return err
+		}
+	}
 
-	// err = checkUpdateMigration(migrateDataCmdFlags.check)
-	// if err != nil {
-	// 	return err
-	// }
-	// err = chefAutomateStart()
-	// if err != nil {
-	// 	return err
-	// }
-	// err = chefAutomateStatus()
-	// if err != nil {
-	// 	return err
-	// }
+	err = executePgdata13ShellScript()
+	if err != nil {
+		return err
+	}
 
-	// if !migrateDataCmdFlags.check && err == nil {
-	// 	err = vacuumDb()
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
+	err = checkUpdateMigration(migrateDataCmdFlags.check)
+	if err != nil {
+		return err
+	}
+	err = chefAutomateStart()
+	if err != nil {
+		return err
+	}
+	err = chefAutomateStatus()
+	if err != nil {
+		return err
+	}
+
+	if !migrateDataCmdFlags.check && err == nil {
+		err = vacuumDb()
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -285,7 +286,10 @@ func getLatestPgPath() error {
 	}
 	output := string(cmd)
 
-	fmt.Printf("output %s", output)
+	if strings.TrimSpace(output) == "" {
+		return nil
+	}
+	
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
 		NEW_BIN_DIR = "/hab/pkgs/core/" + strings.TrimSpace(output) + "/bin"
 	} else {
