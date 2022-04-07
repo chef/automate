@@ -56,12 +56,7 @@ do_build() {
 do_install() {
   
   cd "$HAB_CACHE_SRC_PATH/opensearch-${pkg_version}"
-  #install -vDm644 README.textile "${pkg_prefix}/README.textile"
-  #install -vDm644 LICENSE.txt "${pkg_prefix}/LICENSE.txt"
-  #install -vDm644 NOTICE.txt "${pkg_prefix}/NOTICE.txt"
   chown -RL hab:hab ${pkg_prefix}
-  # Elasticsearch is greedy when grabbing config files from /bin/..
-  # so we need to put the untemplated config dir out of reach
   mkdir -p "${pkg_prefix}/os"
   ls -ltrh 
   cp -ra ./* "${pkg_prefix}/os"
@@ -82,20 +77,11 @@ do_install() {
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
   chown -RL hab:hab ${pkg_prefix}
   chown -RL hab:hab ${pkg_prefix}/*
-  #sh ${pkg_prefix}/os/plugins/opensearch-security/tools/securityadmin.sh
-  #chmod 777 -R ${pkg_prefix}/
-  #mkdir "${pkg_prefix}/os/config/certificates"
-  #$(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "${pkg_prefix}/os/config/"
+  chmod 777 "{{pkg_prefix}}/os/plugins/opensearch-security/tools/securityadmin.sh"
+  chmod 777 "{{pkg_prefix}}/os/plugins/opensearch-security/tools/install_demo_configuration.sh"
+  chmod 777 "{{pkg_prefix}}/os/plugins/opensearch-security/tools/audit_config_migrater.sh"
 }
 
 do_strip() {
   return 0
 }
-
-
-#what is HAB_CACHE_SRC_PATH : /hab/cache/src
-#what is pkg_prefix : /hab/pkgs/punitmundra/automate-opensearch/1.2.4/20220316071211
-#where i am : /hab/cache/src/opensearch-1.2.4
-
-# /hab/pkgs/punitmundra/automate-opensearch/1.2.4/20220316105159/os/bin/
-# /hab/svc/automate-opensearch/config/opensearch.keystore': No such file or directory
