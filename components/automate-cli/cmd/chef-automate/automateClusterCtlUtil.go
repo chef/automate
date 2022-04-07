@@ -271,13 +271,9 @@ func getFrontendBundleName(airgapPath string) string {
 	if strings.Contains(parts[0], "automate") {
 		parts[0] = strings.ReplaceAll(bundleName, "automate", "frontend")
 	}
-
 	versionExt := strings.Split(parts[1], ".")
-	//
-	// timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
-
-
 	version, err := getVersion(airgapPath)
+	fmt.Print("\n Version and err : ",version,  ",", err)
 	versionExt[0] = version
 	newVersionExt := strings.Join(versionExt, ".")
 	parts[1] = newVersionExt
@@ -520,23 +516,6 @@ func executeShellCommand(command string, args []string, workingDir string) error
 	err := c.Run()
 	writer.Printf("%s command execution done, exiting\n", command)
 	return err
-}
-
-func executeShellCommandAndGrepValue(command string, args []string, workingDir string) (string, error) {
-	writer.Printf("%s command execution started \n\n\n", command)
-	c := exec.Command(command, args...)
-	writer.Printf("%s :c output \n", c)
-	c.Stdin = os.Stdin
-	if len(workingDir) > 0 {
-		c.Dir = workingDir
-	}
-	c.Stdout = io.MultiWriter(os.Stdout)
-	c.Stderr = io.MultiWriter(os.Stderr)
-	out, err := c.Output()
-	writer.Printf("%s, %s :out, err \n", out, err)
-	writer.Printf("%s command execution done, exiting\n", command)
-	executeShellCommand("echo", []string{"timestamp: ", string(out)}, "")
-	return string(out), err
 }
 
 func extarctVersionAndRelease(filename string) (string, string) {
