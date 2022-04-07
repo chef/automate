@@ -256,7 +256,8 @@ func getFrontendBundleName(airgapPath string) string {
 	if strings.Contains(bundleName, "automate") {
 		bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
 	}
-	timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
+	// timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
+	timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath}, "")
 	if err != nil {
 		return bundleName
 	}
