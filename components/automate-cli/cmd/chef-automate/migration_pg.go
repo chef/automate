@@ -34,6 +34,7 @@ var ClearDataCmdFlags = struct {
 	forceExecute bool
 }{}
 
+//changes with postgresql13 version pinned in components/automate-postgresql/habitat/plan.sh
 var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220120092917/bin"
 
 const (
