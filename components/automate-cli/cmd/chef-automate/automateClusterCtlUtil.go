@@ -228,11 +228,6 @@ func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata
 	return nil
 }
 func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
-	version, err := getVersion(airgapBundle)
-	if err !=nil {
-		executeShellCommand("echo", []string{"Some error"}, "")
-	}
-	executeShellCommand("echo", []string{version}, "")
 	if len(airgapBundle) > 0 {
 		bundleName := getFrontendBundleName(airgapBundle)
 		err := generateFrontendBundles(bundleName, airgapBundle)
@@ -275,11 +270,19 @@ func getFrontendBundleName(airgapPath string) string {
 	if strings.Contains(bundleName, "automate") {
 		bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
 	}
-	timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
-	if err != nil {
+	//
+	// timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
+
+
+	version, err := getVersion(airgapPath)
+	if err !=nil {
+		executeShellCommand("echo", []string{"Some error"}, "")
+	}
+		if err != nil {
 		return bundleName
 	}
-	return bundleName + timestamp
+	executeShellCommand("echo", []string{version}, "")
+	return bundleName + version
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
 	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
