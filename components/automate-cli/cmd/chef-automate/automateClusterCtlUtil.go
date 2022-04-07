@@ -227,6 +227,7 @@ func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata
 	return nil
 }
 func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
+	executeShellCommand("echo", []string{airgapBundle}, "")
 	if len(airgapBundle) > 0 {
 		bundleName := getFrontendBundleName(airgapBundle)
 		err := generateFrontendBundles(bundleName, airgapBundle)
