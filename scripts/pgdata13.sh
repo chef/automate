@@ -48,4 +48,3 @@ if [[ ! -f "/hab/svc/automate-postgresql/data/pgdata13/PG_VERSION" ]]; then
     --locale POSIX \
     --data-checksums
 fi
-

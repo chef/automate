@@ -220,10 +220,6 @@ y" | chef-automate upgrade run --major --airgap-bundle ${frontend_aib_file}
             chef-automate post-major-upgrade migrate --data=PG -y
         else
             echo "regular normal upgrade airgap"
-            # chef-automate upgrade run --airgap-bundle ${frontend_aib_file}
-            # NOTE: This is a hack
-            # The hack above was no longer good enough because we have a thing that needs
-            # to be updated that isn't a service
             sleep 45
 
             #shellcheck disable=SC2154

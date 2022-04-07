@@ -203,10 +203,6 @@ else
                 chef-automate post-major-upgrade migrate --data=PG -y
             else
                 echo "regular normal upgrade airgap"
-                # chef-automate upgrade run --airgap-bundle /tmp/automate.aib
-                # NOTE: This is a hack
-                # The hack above was no longer good enough because we have a thing that needs
-                # to be updated that isn't a service
                 sleep 45
 
                 #shellcheck disable=SC2154
