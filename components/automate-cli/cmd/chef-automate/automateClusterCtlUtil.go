@@ -25,6 +25,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
 	"github.com/sirupsen/logrus"
@@ -227,7 +228,11 @@ func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata
 	return nil
 }
 func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
-	executeShellCommand("echo", []string{airgapBundle}, "")
+	version, err := getVersion(airgapBundle)
+	if err !=nil {
+		executeShellCommand("echo", []string{"Some error"}, "")
+	}
+	executeShellCommand("echo", []string{version}, "")
 	if len(airgapBundle) > 0 {
 		bundleName := getFrontendBundleName(airgapBundle)
 		err := generateFrontendBundles(bundleName, airgapBundle)
@@ -237,6 +242,19 @@ func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMeta
 	}
 	return nil
 }
+
+func getVersion(airgapBundle string) (string, error) {
+	_, manifestBytes, err := airgap.GetMetadata(airgapBundle)
+	if err != nil {
+		return "", status.Annotate(err, status.AirgapUnpackInstallBundleError)
+	}
+	manifest, err := parser.ManifestFromBytes(manifestBytes)
+	if err != nil {
+		return "", status.Annotate(err, status.AirgapUnpackInstallBundleError)
+	}
+	return manifest.Build, nil
+}
+
 func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
 		bundleName := getFrontendBundleName(airgapBundle)
@@ -257,8 +275,7 @@ func getFrontendBundleName(airgapPath string) string {
 	if strings.Contains(bundleName, "automate") {
 		bundleName = strings.ReplaceAll(bundleName, "automate", "frontend")
 	}
-	// timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
-	timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath}, "")
+	timestamp, err := executeShellCommandAndGrepValue("/usr/bin/chef-automate", []string{"airgap", "bundle", "info", airgapPath, "|", "grep", "-i", "version", "|", "awk", "'{print $2}'"}, "")
 	if err != nil {
 		return bundleName
 	}
