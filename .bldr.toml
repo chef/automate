@@ -1127,6 +1127,12 @@ paths = [
   "components/automate-backend-elasticsearch/*"
 ]
 
+[automate-ha-opensearch]
+plan_path = "components/automate-backend-opensearch"
+paths = [
+  "components/automate-backend-opensearch/*"
+]
+
 [automate-ha-metricbeat]
 plan_path = "components/automate-backend-metricbeat"
 paths = [
