@@ -15,6 +15,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/sys"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
@@ -238,6 +239,17 @@ func pgMigrateExecutor() error {
 		return err
 	}
 
+	defer func() {
+		err = chefAutomateStart()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		err = chefAutomateStatus()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
 	err = chefAutomateStop()
 	if err != nil {
 		return err
@@ -256,14 +268,6 @@ func pgMigrateExecutor() error {
 	}
 
 	err = checkUpdateMigration(migrateDataCmdFlags.check)
-	if err != nil {
-		return err
-	}
-	err = chefAutomateStart()
-	if err != nil {
-		return err
-	}
-	err = chefAutomateStatus()
 	if err != nil {
 		return err
 	}
@@ -445,8 +449,13 @@ func executePgdata13ShellScript() error {
 			"execute pgdata13 shell script \n" +
 			"----------------------------------------------",
 	)
+
+	err := fileutils.CopyFile("/hab/svc/automate-postgresql/hooks/init", "/tmp/pgdata13.sh")
+	if err != nil {
+		return errors.New("Cannot copy init file" + err.Error())
+	}
 	args := []string{
-		"./scripts/pgdata13.sh",
+		"/tmp/pgdata13.sh",
 	}
 	c := exec.Command("/bin/sh", args...)
 	c.SysProcAttr = &syscall.SysProcAttr{}
@@ -604,10 +613,10 @@ func removeIndex(s []string, index int) []string {
 
 func checkErrorForCommand(executable *exec.Cmd) error {
 	out, err := executable.Output()
+	fmt.Println(string(out))
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(out))
 	return nil
 }
 
