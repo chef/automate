@@ -201,9 +201,33 @@ if [ -e "/hab/user/deployment-service/config/user.toml" ]; then
   [ ! -L /usr/bin/hab ] && mv /usr/bin/hab /usr/bin/hab.$timestamp
 
   echo "Upgrading Automate"
-  chef-automate upgrade run --airgap-bundle ${frontend_aib_file}
 
-  wait_for_upgrade
+  ERROR=$(chef-automate upgrade run --airgap-bundle ${frontend_aib_file} 2>&1 >/dev/null) || true
+        if echo "${ERROR}" | grep 'This is a Major upgrade'; then
+            echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major --airgap-bundle ${frontend_aib_file}
+
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+            chef-automate post-major-upgrade migrate --data=PG -y
+        else
+            echo "regular normal upgrade airgap"
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+        fi
+  # chef-automate upgrade run --airgap-bundle ${frontend_aib_file}
+
+  # wait_for_upgrade
 
   echo "Applying /etc/chef-automate/config.toml"
   chef-automate config patch /etc/chef-automate/config.toml

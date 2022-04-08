@@ -258,6 +258,15 @@ set_version_file() {
     jq --arg val $newversion '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
 }
 
+prepare_upgrade_milestone(){
+  local channel="$1"
+  local version="$2"
+  # shellcheck disable=SC2154
+  download_manifest_version "$channel" "$version" "$test_manifest_dir/$version.json"
+  set_test_manifest "$version.json"
+  set_version_file
+}
+
 do_prepare_upgrade_default() {
     # Move the newly built packages into the hartifacts directory.
     mv -f $test_tmp_hartifacts_path/* "$test_hartifacts_path/" || true
