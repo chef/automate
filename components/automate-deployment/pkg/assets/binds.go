@@ -22,6 +22,7 @@ automate-ha-kibana BINDING_MODE strict
 automate-ha-metricbeat REQUIRED elasticsearch
 automate-ha-metricbeat OPTIONAL database
 automate-ha-metricbeat BINDING_MODE strict
+automate-ha-opensearch BINDING_MODE strict
 automate-ha-postgresql BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE strict

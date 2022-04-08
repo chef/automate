@@ -59,7 +59,8 @@ bootstrap.memory_lock: {{cfg.bootstrap.memory_lock}}
 #
 #network.host: 192.168.0.1
 {{#if cfg.network.host ~}}
-network.host: {{cfg.network.host}}
+network.bind_host: 0.0.0.0
+network.publish_host: {{cfg.network.host}}
 {{/if ~}}
 #
 # Set a custom port for HTTP:
