@@ -1,17 +1,18 @@
 +++
-title = "Upgrade Chef Automate to 3.X.X"
+title = "Upgrade to Chef Automate 3"
 date = 2022-03-03T12:02:46-08:00
 draft = false
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Upgrade to 3.X.X"
-    identifier = "automate/major_upgrade.md Major Upgrade"
-    parent = "automate"
+    title = "Upgrade to 3.x"
+    identifier = "automate/upgrade/major_upgrade.md Major Upgrade"
+    parent = "automate/upgrade"
+    weight = 20
 +++
 
-Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically; however, Chef Automatate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to 3.x.x.
+Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically. However, Chef Automatate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to Chef Automate 3.
 
 ## Upgrade Journey
 
@@ -73,7 +74,7 @@ To upgrade Chef Automate with embedded PostgreSQL, follow the steps given below:
    chef-automate upgrade status
    ```
 
-1. Initiate a major version upgrade:
+1. Start a major version upgrade:
 
    ```sh
    chef-automate upgrade run --major
