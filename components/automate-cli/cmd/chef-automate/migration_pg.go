@@ -232,6 +232,7 @@ func pgMigrateExecutor() error {
 			return err
 		}
 	}
+
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
 		return err
@@ -278,7 +279,7 @@ func pgMigrateExecutor() error {
 }
 
 func getLatestPgPath() error {
-	latestPgPath := "find /hab/pkgs/core -name postgresql -exec lsof {} \\; | grep postgresql | awk '{print $2}' | uniq"
+	latestPgPath := "lsof -F n| grep /hab/pkgs/core/postgresql | awk '{print $0}' | awk -F \"/\" '/1/ {print $5\"/\"$6\"/\"$7}' | uniq"
 	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
 	if err != nil {
 		fmt.Printf("error %s", err)
@@ -289,10 +290,8 @@ func getLatestPgPath() error {
 		return nil
 	}
 
-	fmt.Println(output)
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
-		output = output[:len(output)-10]
-		NEW_BIN_DIR = output
+		NEW_BIN_DIR = "/hab/pkgs/core/" + strings.TrimSpace(output) + "/bin"
 	} else {
 		return fmt.Errorf("latest version %s not found", NEW_PG_VERSION)
 	}
