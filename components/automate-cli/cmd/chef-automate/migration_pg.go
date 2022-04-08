@@ -15,7 +15,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/sys"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
@@ -450,10 +449,21 @@ func executePgdata13ShellScript() error {
 			"----------------------------------------------",
 	)
 
-	err := fileutils.CopyFile("/hab/svc/automate-postgresql/hooks/init", "/tmp/pgdata13.sh")
+	input, err := ioutil.ReadFile("/hab/svc/automate-postgresql/hooks/init")
 	if err != nil {
-		return errors.New("Cannot copy init file" + err.Error())
+		return err
 	}
+
+	output := bytes.Replace(input, []byte("initdb"), []byte("/hab/pkgs/core/postgresql13/13.5/20220120092917/bin/initdb"), -1)
+
+	if err = ioutil.WriteFile("/tmp/pgdata13.sh", output, 0100755); err != nil {
+		return err
+	}
+
+	// err = fileutils.CopyFile("/hab/svc/automate-postgresql/hooks/init", "/tmp/pgdata13.sh", fileutils.Overwrite())
+	// if err != nil {
+	// 	return errors.New("Cannot copy init file" + err.Error())
+	// }
 	args := []string{
 		"/tmp/pgdata13.sh",
 	}
