@@ -186,7 +186,7 @@ else
         if [[ "${airgapped}" == "true" ]]; then
             # chef-automate upgrade run --airgap-bundle /tmp/automate.aib
             ERROR=$(chef-automate upgrade run --airgap-bundle /tmp/automate.aib 2>&1 >/dev/null) || true
-            if echo "${ERROR}" | grep 'This is a Major upgrade'; then
+            if echo "$ERROR" | grep 'This is a Major upgrade'; then
             echo "y
     y
     y
