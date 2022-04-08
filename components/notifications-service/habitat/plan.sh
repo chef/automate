@@ -109,3 +109,4 @@ do_build() {
 do_install() {
   cp -av "${CACHE_PATH}/server/_habitat_build/habitat/rel/notifications/." "${pkg_prefix}"
 }
+

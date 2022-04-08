@@ -88,3 +88,4 @@ do_strip() {
     do_default_strip
   fi
 }
+
