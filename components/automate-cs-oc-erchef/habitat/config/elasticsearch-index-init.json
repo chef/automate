@@ -11,13 +11,6 @@
     "number_of_replicas": 2
   },
   "mappings": {
-    "object": {
-      "_source": {
-        "enabled": false
-      },
-      "_all": {
-        "enabled": false
-      },
       "properties": {
         "X_CHEF_database_CHEF_X": {
           "type": "keyword",
@@ -44,6 +37,5 @@
           "index": true
         }
       }
-    }
   }
 }
