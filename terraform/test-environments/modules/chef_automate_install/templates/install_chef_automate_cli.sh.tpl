@@ -188,10 +188,10 @@ else
             ERROR=$(chef-automate upgrade run --airgap-bundle /tmp/automate.aib 2>&1 >/dev/null) || true
             if echo "$ERROR" | grep 'This is a Major upgrade'; then
             echo "y
-    y
-    y
-    y
-    y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
+y
+y
+y
+y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
 
                 # NOTE: This is a hack
                 # The hack above was no longer good enough because we have a thing that needs
