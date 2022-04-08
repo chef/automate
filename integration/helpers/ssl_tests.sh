@@ -5,7 +5,8 @@ run_ssl_scan() {
     install_testssl_prereqs
     if [[ ! -d "/testssl.sh" ]]; then
        pushd "/"
-         hab pkg exec core/git git clone --depth 1 https://github.com/drwetter/testssl.sh.git
+         # pinned tag to resolve errors in security test
+         hab pkg exec core/git git clone --depth 1 --branch v3.0.7 https://github.com/drwetter/testssl.sh.git
        popd
     fi
     local testssl_last_commit
