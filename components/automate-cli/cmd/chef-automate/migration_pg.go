@@ -451,19 +451,17 @@ func executePgdata13ShellScript() error {
 
 	input, err := ioutil.ReadFile("/hab/svc/automate-postgresql/hooks/init")
 	if err != nil {
+		fmt.Printf("Failed to read init hook file")
 		return err
 	}
 
 	output := bytes.Replace(input, []byte("initdb"), []byte("/hab/pkgs/core/postgresql13/13.5/20220120092917/bin/initdb"), -1)
 
 	if err = ioutil.WriteFile("/tmp/pgdata13.sh", output, 0100755); err != nil {
+		fmt.Printf("Failed to write init hook file")
 		return err
 	}
 
-	// err = fileutils.CopyFile("/hab/svc/automate-postgresql/hooks/init", "/tmp/pgdata13.sh", fileutils.Overwrite())
-	// if err != nil {
-	// 	return errors.New("Cannot copy init file" + err.Error())
-	// }
 	args := []string{
 		"/tmp/pgdata13.sh",
 	}
