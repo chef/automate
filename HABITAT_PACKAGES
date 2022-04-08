@@ -79,6 +79,7 @@ automate-builder-api-proxy components/automate-builder-api-proxy
 sample-data-service components/sample-data-service
 user-settings-service components/user-settings-service
 automate-ha-elasticsearch components/automate-backend-elasticsearch
+automate-ha-opensearch components/automate-backend-opensearch
 automate-ha-metricbeat components/automate-backend-metricbeat
 automate-ha-journalbeat components/automate-backend-journalbeat
 automate-ha-haproxy components/automate-backend-haproxy
