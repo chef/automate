@@ -183,8 +183,6 @@ else
         redeploy
     fi
     if upgrade_automate; then
-        chef-automate start
-        sleep 45
         if [[ "${airgapped}" == "true" ]]; then
             # chef-automate upgrade run --airgap-bundle /tmp/automate.aib
             ERROR=$(chef-automate upgrade run --airgap-bundle /tmp/automate.aib 2>&1 >/dev/null) || true
@@ -209,7 +207,6 @@ y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
 
                 #shellcheck disable=SC2154
                 wait_for_upgrade
-                chef-automate post-major-upgrade migrate --data=PG -y || true
             fi
             rm -f /tmp/automate.aib
         fi
