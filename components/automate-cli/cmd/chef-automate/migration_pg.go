@@ -465,7 +465,7 @@ func executePgdata13ShellScript() error {
 	args := []string{
 		"/tmp/pgdata13.sh",
 	}
-	c := exec.Command("/bin/sh", args...)
+	c := exec.Command("/bin/bash", args...)
 	c.SysProcAttr = &syscall.SysProcAttr{}
 	uid, gid, err := lookupUser("hab")
 	if err != nil {
