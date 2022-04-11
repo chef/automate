@@ -188,12 +188,6 @@ while getopts ":b:t:w:o:h:v:q:c:" opt; do
     w)
       export WORKSPACE_PATH=${OPTARG}
       ;;
-    o)
-      export TARBALL_PATH=${OPTARG}
-      ;;
-    b)
-      export BACKENDAIB=${OPTARG}
-      ;;  
     t)
       export BUNDLE_TYPE=${OPTARG}
       ;;
