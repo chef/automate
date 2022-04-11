@@ -34,7 +34,7 @@ func TestReadPostChecklistById(t *testing.T) {
 	// if it is not executed then return false, if not true
 	res, err := pcm.ReadPostChecklistById("migrate_pg", FILE_NAME)
 	assert.NoError(t, err)
-	assert.Equal(t, true, res)
+	assert.Equal(t, false, res)
 	err = pcm.UpdatePostChecklistFile("migrate_pg", FILE_NAME)
 	assert.NoError(t, err)
 	res, err = pcm.ReadPostChecklistById("migrate_pg", FILE_NAME)
