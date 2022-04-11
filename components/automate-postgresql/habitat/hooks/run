@@ -26,7 +26,7 @@ ensure_dir_ownership
 ensure_key_ownership
 
 echo "Starting PostgreSQL"
-export PGDATA={{pkg.svc_data_path}}/pgdata
+export PGDATA={{pkg.svc_data_path}}/pgdata13
 
 pidfile="$PGDATA/postmaster.pid"
 if [ -f  "$pidfile" ]; then
