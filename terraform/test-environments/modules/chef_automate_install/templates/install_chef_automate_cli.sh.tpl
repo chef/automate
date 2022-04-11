@@ -172,43 +172,75 @@ fi
 
 if [[ "${airgapped}" == "false" ]]; then
     if (! automate_deployed) || upgrade_automate || automate_needs_redeploy; then
+        echo "installing automate cli"
         install_automate_cmd
     fi
 fi
 
 if ! automate_deployed; then
+    echo "deploying automate"
     deploy
 else
     if automate_needs_redeploy; then
+        echo "redeploying automate"
         redeploy
     fi
     if upgrade_automate; then
+        echo "inside upgrade_automate"
         if [[ "${airgapped}" == "true" ]]; then
+            echo "inside upgrade_automate airgapped true"
             # chef-automate upgrade run --airgap-bundle /tmp/automate.aib
             ERROR=$(chef-automate upgrade run --airgap-bundle /tmp/automate.aib 2>&1 >/dev/null) || true
             if echo "$ERROR" | grep 'This is a Major upgrade'; then
-            echo "y
+              echo "inside upgrade_automate airgapped true major upgrade"
+              echo "y
 y
 y
 y
 y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
 
-                # NOTE: This is a hack
-                # The hack above was no longer good enough because we have a thing that needs
-                # to be updated that isn't a service
-                sleep 45
+              # NOTE: This is a hack
+              # The hack above was no longer good enough because we have a thing that needs
+              # to be updated that isn't a service
+              sleep 45
 
-                #shellcheck disable=SC2154
-                wait_for_upgrade
-                chef-automate post-major-upgrade migrate --data=PG -y
+              #shellcheck disable=SC2154
+              wait_for_upgrade
+              chef-automate post-major-upgrade migrate --data=PG -y
             else
-                echo "regular normal upgrade airgap"
-                sleep 45
+              echo "regular normal upgrade airgap"
+              sleep 45
 
-                #shellcheck disable=SC2154
-                wait_for_upgrade
+              #shellcheck disable=SC2154
+              wait_for_upgrade
             fi
             rm -f /tmp/automate.aib
+        else
+          echo "inside upgrade_automate airgapped false"
+          ERROR=$(chef-automate upgrade run 2>&1 >/dev/null) || true
+          if echo "$ERROR" | grep 'This is a Major upgrade'; then
+            echo "inside upgrade_automate airgapped false major upgrade"
+            echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major
+
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+            chef-automate post-major-upgrade migrate --data=PG -y
+          else
+            echo "regular normal upgrade airgap false"
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+          fi
         fi
 
         cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
