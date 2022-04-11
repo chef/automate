@@ -56,19 +56,19 @@ help:
 
 $(BUNDLEAIB):
 	@echo "# Updating FE and BE component package versions" && \
-		$(AIRGAP_SH) -t all -o $(FRONTENDAIB) -b $(BACKENDAIB) -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)
+		$(AIRGAP_SH) -t all -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)
 
 $(BUNDLEAIBDEV):
 	@echo "# Updating FE and BE component package versions from dev channel " && \
-		$(AIRGAP_SH) -t all -c dev -o $(FRONTENDAIB) -b $(BACKENDAIB) -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)
+		$(AIRGAP_SH) -t all -c dev -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)
 
 $(FRONTENDAIB):
 	@echo "# Updating FE component package versions: $(FRONTENDAIB_TFVARS)" && \
-		$(AIRGAP_SH) -t upgradefrontends -o $(FRONTENDAIB) -v $(FRONTENDAIB_TFVARS)
+		$(AIRGAP_SH) -t upgradefrontends -v $(FRONTENDAIB_TFVARS)
 
 $(BACKENDAIB):
 	@echo "# Updating BE component package versions: $(BACKENDAIB_TFVARS)" && \
-		$(AIRGAP_SH) -t upgradebackends -b $(BACKENDAIB) -q $(BACKENDAIB_TFVARS)
+		$(AIRGAP_SH) -t upgradebackends -q $(BACKENDAIB_TFVARS)
 
 $(HABITAT_TFVARS):
 	@echo -e "# Generating habitat encryption keys in $(HABITAT_TFVARS)" && \
