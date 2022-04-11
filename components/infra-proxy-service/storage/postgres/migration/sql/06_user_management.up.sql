@@ -5,7 +5,7 @@ ALTER TABLE servers ADD COLUMN credential_id TEXT NOT NULL DEFAULT '';
 -- create table users
 CREATE TABLE IF NOT EXISTS users (
   id                        SERIAL PRIMARY KEY,
-  server_id                 TEXT NOT NULL references servers(id) ON DELETE RESTRICT,
+  server_id                 TEXT NOT NULL references servers(id) ON DELETE CASCADE,
   infra_server_username     TEXT NOT NULL DEFAULT '',
   connector                 TEXT NOT NULL DEFAULT 'local',
   automate_user_id          TEXT NOT NULL DEFAULT '',
