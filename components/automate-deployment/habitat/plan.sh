@@ -29,7 +29,7 @@ pkg_deps=(
   core/rsync
   core/tar
   chef/mlsa
-  # deployment-service uses the postgres11 client to backup/restore postgres.
+  # deployment-service uses the postgres11 client to backup/restore postgresql.
   # we need pg11 because the ha backend uses postgres 11
   core/postgresql13-client
 )

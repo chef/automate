@@ -226,13 +226,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
-	if !migrateDataCmdFlags.skipStorageCheck {
-		err := getLatestPgPath()
-		if err != nil || migrateDataCmdFlags.skipStorageCheck {
-			return err
-		}
-	}
-
+	getLatestPgPath()
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
 		return err
@@ -281,24 +275,25 @@ func pgMigrateExecutor() error {
 	return nil
 }
 
-func getLatestPgPath() error {
-	latestPgPath := "lsof -F n| grep /hab/pkgs/core/postgresql | awk '{print $0}' | awk -F \"/\" '/1/ {print $5\"/\"$6\"/\"$7}' | uniq"
+func getLatestPgPath() {
+	latestPgPath := "lsof -F n| grep /hab/pkgs/core/postgresql13 | awk '{print $0}' | awk -F \"/\" '/1/ {print $5\"/\"$6\"/\"$7}' | uniq"
 	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
 	output := string(cmd)
 
+	output = strings.Split(output, "\n")[0]
+
 	if strings.TrimSpace(output) == "" {
-		return nil
+		return
 	}
 
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
 		NEW_BIN_DIR = "/hab/pkgs/core/" + strings.TrimSpace(output) + "/bin"
 	} else {
-		return fmt.Errorf("latest version %s not found", NEW_PG_VERSION)
+		fmt.Println("latest version %s not found", NEW_PG_VERSION)
 	}
-	return nil
 }
 
 func vacuumDb() error {
@@ -455,7 +450,7 @@ func executePgdata13ShellScript() error {
 		return err
 	}
 
-	output := bytes.Replace(input, []byte("initdb"), []byte("/hab/pkgs/core/postgresql13/13.5/20220120092917/bin/initdb"), -1)
+	output := bytes.Replace(input, []byte("initdb"), []byte(NEW_BIN_DIR+"/initdb"), -1)
 
 	if err = ioutil.WriteFile("/tmp/pgdata13.sh", output, 0100755); err != nil { // nosemgrep
 		fmt.Printf("Failed to write init hook file")
