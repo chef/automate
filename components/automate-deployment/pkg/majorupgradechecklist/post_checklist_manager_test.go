@@ -41,9 +41,7 @@ func TestReadPostChecklistById(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, true, res)
 	_, err = pcm.ReadPostChecklistById("migrate_pg", UPGRADE_METADATA)
-	assert.Error(t, err)
-	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
-
+	assert.NoError(t, err)
 }
 
 func TestReadPendingPostChecklistFile(t *testing.T) {

@@ -1,6 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
-#stable channel
+# stable channel
 
 pkg_name=automate-platform-tools
 pkg_description="Small command-line utilities for Chef Automate"
