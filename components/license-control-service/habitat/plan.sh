@@ -36,3 +36,4 @@ do_install() {
   build_line "Copying migration files"
   cp -r migrations "${pkg_prefix}/migrations"
 }
+

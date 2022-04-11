@@ -9,3 +9,4 @@ test_upgrade_begin_manifest="current.json"
 do_prepare_upgrade() {
     set_test_manifest "acceptance.json"
 }
+

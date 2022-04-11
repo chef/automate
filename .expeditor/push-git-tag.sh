@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-manifest_url="https://packages.chef.io/manifests/${EXPEDITOR_TARGET_CHANNEL}/automate/latest.json"
+manifest_url="https://packages.chef.io/manifests/${EXPEDITOR_TARGET_CHANNEL}/automate/latest_semver.json"
 echo "Downloading latest manifest from $manifest_url"
 curl -o manifest.json "$manifest_url"
 
