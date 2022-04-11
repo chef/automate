@@ -265,23 +265,11 @@ func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetad
 	return nil
 }
 func getFrontendBundleName(airgapPath string) string {
-	var bundleName string = filepath.Base(airgapPath)
-	parts := strings.Split(bundleName, "-")
-	if strings.Contains(parts[0], "automate") {
-		parts[0] = strings.ReplaceAll(parts[0], "automate", "frontend")
-	}
-	versionExt := strings.Split(parts[1], ".")
 	version, err := getVersion(airgapPath)
-	versionExt[0] = version
-	newVersionExt := strings.Join(versionExt, ".")
-	parts[1] = newVersionExt
-	bundleName = strings.Join(parts, "-")
-	
 	if err != nil {
-		return bundleName
+		return "frontend"
 	}
-	// executeShellCommand("echo", []string{bundleName}, "")
-	return bundleName
+	return "frontend-"+ version
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
 	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
