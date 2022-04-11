@@ -455,7 +455,7 @@ func executePgdata13ShellScript() error {
 		return err
 	}
 
-	output := bytes.Replace(input, []byte("initdb"), []byte("/hab/pkgs/core/postgresql13/13.5/20220120092917/bin/initdb"), -1)
+	output := bytes.Replace(input, []byte("initdb"), []byte(NEW_BIN_DIR+"/initdb"), -1)
 
 	if err = ioutil.WriteFile("/tmp/pgdata13.sh", output, 0100755); err != nil { // nosemgrep
 		fmt.Printf("Failed to write init hook file")
