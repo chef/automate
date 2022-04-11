@@ -77,9 +77,15 @@ do_install() {
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
   chown -RL hab:hab ${pkg_prefix}
   chown -RL hab:hab ${pkg_prefix}/*
+<<<<<<< HEAD
   chmod 777 "{{pkg_prefix}}/os/plugins/opensearch-security/tools/securityadmin.sh"
   chmod 777 "{{pkg_prefix}}/os/plugins/opensearch-security/tools/install_demo_configuration.sh"
   chmod 777 "{{pkg_prefix}}/os/plugins/opensearch-security/tools/audit_config_migrater.sh"
+=======
+  chmod 777 "${pkg_prefix}/os/plugins/opensearch-security/tools/securityadmin.sh"
+  chmod 777 "${pkg_prefix}/os/plugins/opensearch-security/tools/install_demo_configuration.sh"
+  chmod 777 "${pkg_prefix}/os/plugins/opensearch-security/tools/audit_config_migrater.sh"
+>>>>>>> 70fae7cb172ad129443669001e394f12a52df735
 }
 
 do_strip() {

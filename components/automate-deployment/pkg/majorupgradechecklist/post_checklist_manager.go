@@ -55,20 +55,21 @@ func (pcm *PostChecklistManager) CreatePostChecklistFile(path string, isExecuted
 }
 
 func (pcm *PostChecklistManager) ReadPostChecklistById(id string, path string) (bool, error) {
-	checklistIDIsFound := false
+	checklistIDIsExecuted := true
 	res, err := ReadJsonFile(path)
 	if err != nil {
-		return checklistIDIsFound, err
+		// overriding error to nil, in the case of file not found
+		return checklistIDIsExecuted, nil
 	}
 
 	for i := 0; i < len(res.PostChecklist); i++ {
 		if res.PostChecklist[i].Id == id {
-			checklistIDIsFound = res.PostChecklist[i].IsExecuted
+			checklistIDIsExecuted = res.PostChecklist[i].IsExecuted
 			break
 		}
 	}
 
-	return checklistIDIsFound, nil
+	return checklistIDIsExecuted, nil
 }
 
 func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExternalPG bool) ([]string, error) {
