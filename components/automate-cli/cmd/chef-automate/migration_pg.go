@@ -226,6 +226,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 }
 
 func pgMigrateExecutor() error {
+	upgraded := false
 	getLatestPgPath()
 	existDir, err := dirExists(NEW_PG_DATA_DIR)
 	if err != nil {
@@ -240,6 +241,12 @@ func pgMigrateExecutor() error {
 		err = chefAutomateStatus()
 		if err != nil {
 			fmt.Println(err)
+		}
+		if !migrateDataCmdFlags.check && err == nil && upgraded {
+			err = vacuumDb()
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 	}()
 
@@ -264,14 +271,7 @@ func pgMigrateExecutor() error {
 	if err != nil {
 		return err
 	}
-
-	if !migrateDataCmdFlags.check && err == nil {
-		err = vacuumDb()
-		if err != nil {
-			return err
-		}
-	}
-
+	upgraded = true
 	return nil
 }
 
