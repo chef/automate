@@ -317,7 +317,7 @@ fi
 
 if [[ "${enable_workflow}" == "true" ]]; then
     if ! workflow-ctl list-enterprises | grep "${workflow_enterprise}"; then
-        ssh-keygen -t rsa -b 4096 -N '' -f /root/builder_key
+        echo "y" | ssh-keygen -t rsa -b 4096 -N '' -f /root/builder_key
         workflow-ctl create-enterprise "${workflow_enterprise}" --ssh-pub-key-file=/root/builder_key.pub
     fi
 fi
