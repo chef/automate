@@ -2,8 +2,9 @@ package majorupgradechecklist
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
+	"io/ioutil"
+	"net/http"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -193,6 +194,130 @@ func externalESUpgradeCheck() Checklist {
 	}
 }
 
+/*
+const disableShardCurlRequest = `curl --location --request PUT 'http://localhost:10141/_cluster/settings'
+-u 'admin:admin' --header 'Content-Type: application/json'
+--data-raw '{ "persistent": { "cluster.routing.allocation.enable": "primaries"}}'`
+
+const flushIndexRequest = `curl --location --request PUT 'http://localhost:10168/_cluster/settings' \
+-u 'admin:admin' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "persistent": {
+    "cluster.routing.allocation.enable": "all"
+  }}'`
+
+*/
+/*
+disableShardAllocation : Disable shard allocation: during upgrade
+we do not want any shard movement as the cluster will be
+taken down.
+*/
+func disableShardAllocation() error {
+	url := "http://localhost:10141/_cluster/settings"
+	method := "PUT"
+
+	payload := strings.NewReader(`{
+    "persistent": {
+        "cluster.routing.allocation.enable": "primaries"
+    }
+}`)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(body))
+	return nil
+}
+
+/*
+flushRequest : Stop indexing, and perform a flush:
+as the cluster will be taken down, indexing/searching
+should be stopped and _flush can be used to permanently
+store information into the index which will prevent any
+data loss during upgrade
+*/
+func flushRequest() error {
+
+	url := "http://localhost:10141/_flush"
+	method := "POST"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	fmt.Println(string(body))
+	return nil
+}
+
+/*
+reEnableShardAllocation: Re-enable shard allocation
+In case of Any error we can Undo the First request
+*/
+func reEnableShardAllocation() error {
+	url := "http://localhost:10141/_cluster/settings"
+	method := "PUT"
+
+	payload := strings.NewReader(`{
+		"persistent": {
+			"cluster.routing.allocation.enable": null
+		  }
+}`)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(body))
+	return nil
+}
 func disableShrding() Checklist {
 	return Checklist{
 		Name:        "disable sharding",
@@ -207,10 +332,17 @@ func disableShrding() Checklist {
 				h.Writer.Error(backupError)
 				return status.New(status.InvalidCommandArgsError, "sharing has to be disabled before upgrade")
 			}
-			// temporary code for action
-			cmd := exec.Command("chef-automate", "status")
-			cmd.Stdout = os.Stdout
-			cmd.Run()
+			err = disableShardAllocation()
+			if err != nil {
+				h.Writer.Error(err.Error())
+				return status.Errorf(status.DatabaseError, err.Error())
+			}
+
+			err = flushRequest()
+			if err != nil {
+				h.Writer.Error(err.Error())
+				return status.Errorf(status.DatabaseError, err.Error())
+			}
 			return nil
 		},
 	}
