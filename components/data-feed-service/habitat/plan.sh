@@ -51,3 +51,4 @@ do_install() {
   mkdir "${pkg_prefix}/migrations"
   cp -r dao/migration/sql/* "${pkg_prefix}/migrations"
 }
+
