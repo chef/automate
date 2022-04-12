@@ -8,15 +8,16 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_build_deps=(core/phantomjs core/yarn)
 pkg_svc_user="root"
 pkg_svc_group="root"
-pkg_version="1.19.3.1"
+pkg_version="5.1.5"
 vendor_origin="chef"
 scaffolding_ruby_pkg="core/ruby27"
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
-automate_scaffolding_include_templates=(sqerl.config)
+# pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+# automate_scaffolding_include_templates=(sqerl.config)
 
-pkg_binds_optional=(
+pkg_binds=(
   [automate-pg-gateway]="port"
   [automate-supermarket-redis]="port"
+  [pg-sidecar-service]="port"
 )
 
 pkg_deps=(
@@ -46,6 +47,8 @@ pkg_exports=(
 
 chef_automate_hab_binding_mode="relaxed"
 
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+automate_scaffolding_include_templates=(sqerl.config)
 
 db="postgresql://{{ cfg.db.user }}"
 db="${db}:{{ cfg.db.password }}"

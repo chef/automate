@@ -356,6 +356,7 @@ function build_all_changed_components() {
 
   install_if_missing core/git git
   install_if_missing core/ruby ruby
+  install_if_missing core/redis redis
   hab pkg binlink core/ruby gem
   gem install toml
   hab pkg install core/coreutils >/dev/null

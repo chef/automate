@@ -1,4 +1,14 @@
 {
   "name": "chef/automate-supermarket",
+  "bootstrap": [
+    {
+      "type": "secret",
+      "secret_spec": "supermarket.access_key_id"
+    },
+    {
+      "type": "secret",
+      "secret_spec": "supermarket.secret_access_key"
+    }
+  ],
   "uses_platform_scaffolding": true
 }

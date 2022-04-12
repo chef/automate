@@ -101,7 +101,7 @@ EOF
 {{~/eachAlive}}
 },
 "__placeholder": {}
-}
+}}
 EOF
 
 cat << EOF > "${pkg_prefix}/config/_a2_platform_external_pg_root_ca.crt"

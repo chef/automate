@@ -58,7 +58,6 @@
     "chef/automate-elasticsearch",
     "chef/automate-supermarket-redis",
     "chef/automate-supermarket",
-    "chef/automate-supermarket-nginx",
     "core/rsync"
   ],
 

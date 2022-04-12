@@ -7,6 +7,8 @@ robots_allow    = "/"
 secret_key_base = "9ee6f4446cc66e1398d4fe265f8714fcc46f7516aec5684fa2c3940e62c0329b597680e19a466ca5820eca9f0df99190331a"
 rack_env        = "production"
 lang            = "en_US.UTF-8"
+ip_mode = "ipv4"
+
 
 [app]
 chef_server_url             = "https://api.chef.io"
@@ -82,6 +84,16 @@ user       = "automate-supermarket"
 password   = "supermarket"
 port       = 15432
 extensions = ['plpgsql', 'pg_trgm']
+pool_queue_timeout=2000
+pool_max_size=20
+pool_init_size=20
+pool_queue_max=50
+
+[log]
+level="info"
+rotation_max_bytes = 104857600
+rotation_max_files = 10
+max_error_logs_per_second = 1000
 
 [datadog]
 tracer_enabled = false
@@ -121,3 +133,11 @@ path              = ""
 
 [mlsa]
 accept = true
+
+
+[supermarket]
+sql_retry_count=0
+sql_retry_delay=10
+abandoned_upload_cleanup_interval=1140000
+deleted_data_cleanup_interval=420000
+stream_download=true

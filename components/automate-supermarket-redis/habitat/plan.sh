@@ -1,20 +1,23 @@
-pkg_name="automate-supermarket-redis"
+pkg_name=automate-supermarket-redis
 pkg_origin="chef"
 pkg_version="4.0.14"
 pkg_description="Persistent key-value database, with built-in net interface"
 pkg_upstream_url="http://redis.io/"
-pkg_license=('Apache-2.0')
+pkg_license=('Chef-MLSA')
 pkg_maintainer="The Chef Maintainers <humans@chef.io>"
-pkg_svc_user="root"
-pkg_svc_group="root"
 vendor_origin="chef"
-pkg_bin_dirs=(bin)
 chef_automate_hab_binding_mode="relaxed"
+pkg_svc_run="$(hab pkg path core/redis)/bin/redis-server ${pkg_svc_config_path}/redis.config"
+
 pkg_deps=(
-  core/redis   
-  "${local_platform_tools_origin:-chef}/automate-platform-tools"
+  "chef/mlsa"
+  "${vendor_origin}/supermarket-redis/4.0.14/20220321050725"
 )
-pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+
+# pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+# scaffolding_go_base_path=github.com/chef
+# scaffolding_go_repo_name=supermarket
+# scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/${pkg_name}"
 
 
 pkg_exports=(
@@ -26,6 +29,7 @@ do_build() {
 }
 
 do_install() {
+  # do_default_install
   # hab pkg install core/redis
   # install {{ pkg_path }}
   return 0

@@ -9,8 +9,9 @@
 # than the init hook until the issue[0] has been resolved.
 #
 # [0] https://github.com/habitat-sh/habitat/issues/1973
-PROCESS_NUM=$(ps -ef | grep redis | grep -v "grep" | wc -l)
+# PROCESS_NUM=$(ps -ef | grep redis-server | grep -v "grep" | wc -l)
 
-if [ $PROCESS_NUM -eq 0 ]; then
-    redis-server ${pkg_svc_config_path}/redis.config
-fi
+# if [ $PROCESS_NUM -eq 0 ]; then
+echo "*** Starting REDIS ****"
+    $(hab pkg path core/redis)/bin/redis-server {{pkg.svc_config_path}}/redis.config
+
