@@ -66,7 +66,10 @@ func (backend *ES2Backend) getHttpClient() *http.Client {
 func (backend *ES2Backend) ES2Client() (*elastic.Client, error) {
 	//this is now a singleton as per best practice as outlined in the comment section of the elastic.NewClient
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
 	}
 	client := &http.Client{Transport: tr}
 	once.Do(func() {
