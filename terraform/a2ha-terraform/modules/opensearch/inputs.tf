@@ -10,21 +10,6 @@ variable "backend_aib_local_file" {
 variable "curator_pkg_ident" {
 }
 
-variable "habitat_info" {
-}
-
-variable "journalbeat_pkg_ident" {
-  default = "chef/automate-ha-journalbeat"
-}
-
-variable "kibana_pkg_ident" {
-  default = "chef/automate-ha-kibana"
-}
-
-variable "metricbeat_pkg_ident" {
-  default = "chef/automate-ha-metricbeat"
-}
-
 variable "opensearch_instance_count" {
   default = 1
 }
@@ -47,6 +32,24 @@ variable "opensearchsidecar_pkg_ident" {
 variable "opensearchsidecar_svc_load_args" {
 }
 
+<<<<<<< HEAD
+=======
+variable "habitat_info" {
+}
+
+variable "journalbeat_pkg_ident" {
+  default = "chef/automate-ha-journalbeat"
+}
+
+variable "kibana_pkg_ident" {
+  default = "chef/automate-ha-kibana"
+}
+
+variable "metricbeat_pkg_ident" {
+  default = "chef/automate-ha-metricbeat"
+}
+
+>>>>>>> 214c229cd410670edb0d8319a0303c0e101c2632
 variable "private_ips" {
   default = []
 }

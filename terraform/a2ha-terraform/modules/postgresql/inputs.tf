@@ -7,10 +7,12 @@ variable "backend_aib_dest_file" {
 variable "backend_aib_local_file" {
 }
 
-variable "habitat_info" {
+variable "opensearch_listen_port" {
+  default = 9200
 }
 
-variable "journalbeat_pkg_ident" {
+variable "opensearch_private_ips" {
+  default = []
 }
 
 variable "metricbeat_pkg_ident" {
