@@ -93,13 +93,7 @@ sudo chef-automate stop
     sudo sdiff -s /etc/postgresql/9.6/main/pg_hba.conf /etc/postgresql/13/main/pg_hba.conf
     ```
 
-### Stop PostgreSQL Services
-
-1. Stop Both PostgreSQL Servers:
-
-    ```bash
-    sudo systemctl stop postgresql.service
-    ```
+### Login as Postgres User
 
 1. Login as the `postgres` user
 
@@ -150,7 +144,13 @@ For more information on upgrading using `vacuumdb` see the PostgreSQL 13 documen
 
 For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` see the PostgreSQL 13 documentation for [pg_upgrade](https://www.postgresql.org/docs/13/pgupgrade.html).
 
-1. Run pg_upgrade check command.
+1. Stop Both PostgreSQL Servers:
+
+    ```bash
+    sudo systemctl stop postgresql.service
+    ```
+
+2. Run pg_upgrade check command.
 
     ```bash
     cd ~
@@ -164,7 +164,7 @@ For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` se
     --check
     ```
 
-1. Migrate the Data (run pg_upgrade command without --check):
+3. Migrate the Data (run pg_upgrade command without --check):
 
     ```bash
     cd ~
