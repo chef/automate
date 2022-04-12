@@ -43,9 +43,9 @@ Specify the action to restrict user access to the specific action.
 | Manage Projects | Settings | iam:projects:* | /iam/v2/projects | https://{{< example_fqdn "automate" >}}/settings/projects |
 {{% /responsive-table %}}
 
-##Infra Server View Actions
+## Infra Server View Actions
 
-These are the *IAM Actions* for the different views and action in the *Infra Server View* tab in Automate.
+These are *IAM Actions* for different views and action in the **Infra Server View** tab in Automate.
 
 | Task | Method     | IAM Action | API endpoint  | URL     |
 | ------| ---------- | --------- | ------------- | --------- |
@@ -90,11 +90,11 @@ These are the *IAM Actions* for the different views and action in the *Infra Ser
 | Update Node | POST | infra:infraServersOrgsNodes:update | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes |
 | Delete Node | DELETE | infra:infraServersOrgsNodes:delete | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name} |
 
-Three types of user policies automatically gets created with creation of every project
+Three types of user policies automatically gets created when a project is created.
 
-###Infra Viewer Policy Actions
+### Infra Viewer Policy Actions
 
-```   
+```
     secrets:*:get,
     secrets:*:list,
     infra:*:get,
@@ -111,7 +111,7 @@ Three types of user policies automatically gets created with creation of every p
     applications:*:list
 ```
 
-###Infra Editor Policy Actions
+### Infra Editor Policy Actions
 
 ```
     infra:*:list,
@@ -136,7 +136,7 @@ Three types of user policies automatically gets created with creation of every p
     applications:*
 ```
 
-###Infra Project Owner Policy Actions
+### Infra Project Owner Policy Actions
 
 ```
     infra:*:list,
