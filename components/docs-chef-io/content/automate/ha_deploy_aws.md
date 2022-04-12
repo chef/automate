@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 210
 +++
 
-<!-- !-- Chef gonna give storage calculator for customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page?? -->
+<!-- !-- Chef going to give storage calculator for a customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page?? -->
 
 This page explains how to deploy Chef Automate High Availability (HA) in your network premises/ infrastructure using Amazon Web Services (AWS).
 
@@ -30,7 +30,7 @@ Based on the number of nodes, the virtual machine requirements for AWS deploymen
 
 {{< note >}}
 
-ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. The above table includes instances’ RAM and volume size, set up for the testing purpose. Production depends on the number of nodes and the frequency of Chef Infra Client runs and compliance scans. However, for on-premises deployment, you can choose the above requirements for VM like RAM.
+ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. The above table includes instances’ RAM and volume size, set up for testing purposes. Production depends on the number of nodes and the frequency of Chef Infra Client runs and compliance scans. However, for on-premises deployment, you can choose the above requirements for VM like RAM.
 
 For **Elasticsearch** and **PostgresSQL**, a minimum of three node clusters is required.
 
@@ -52,18 +52,17 @@ To deploy Chef Automate HA, execute the following steps in the listed order:
 1. [Rotate the certificates]({{< relref "ha_cert_rotaion.md" >}}) if the certificates are expired or compromised. _optional_
 1. Enable **dnshostname** in VPC, which determines whether the VPC supports assigning public DNS hostnames to instances with public IP addresses.
 1. Execute [AWS Deployment commands]({{< relref "ha_aws_deploy_steps.md" >}}) to provision the Chef Automate HA on your cloud network infrastructure.
+1. Execute the [Chef Automate HA deployment commands]({{< relref "ha_aws_deploy_steps.md" >}}).
 
 {{< note >}}
 
-A DNS hostname uniquely names a computer and consists of a host name and a domain name. DNS servers resolve DNS hostnames to their corresponding IP addresses. To set up DNS in your VPC, ensure that DNS hostnames and DNS resolution are both enabled in your VPC.
+A DNS hostname uniquely names a computer and consists of a hostname and a domain name. DNS servers resolve DNS hostnames to their corresponding IP addresses. To set up DNS in your VPC, ensure that DNS hostnames and DNS resolution are enabled in your VPC.
 
-Refer [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/set-up-vpc-dns.html) page.
+Refer to [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/set-up-vpc-dns.html) page.
 
-If the DNS attributes, **enableDnsSupport** and **enableDnsHostnames** are true, instances in the VPC are set with public DNS hostnames. The default for these attributes is `false` when the VPC is a default VPC, or the VPC is created using the VPC console wizard.
+If the DNS attributes **enableDnsSupport** and **enableDnsHostnames** are true, instances in the VPC are set with public DNS hostnames. The default for these attributes is `false` when the VPC is a default VPC or the VPC is created using the VPC console wizard.
 
 {{< /note >}}
-
-1. Execute the [Chef Automate HA deployment commands](( {{< relref "ha_aws_deploy_steps.md" >}} )).
 
 ## AWS Infrastructure Resources
 
