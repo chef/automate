@@ -11,8 +11,8 @@
     [global.v1.external.opensearch.auth]
       scheme = "basic_auth"
       [global.v1.external.opensearch.auth.basic_auth]
-        username = "<%= svc_configs[:opensearch]['opendistro_auth']['admin_username'] -%>"
-        password = "<%= svc_configs[:opensearch]['opendistro_auth']['admin_password'] -%>"
+        username = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_username'] -%>"
+        password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
     [global.v1.external.opensearch.ssl]
       server_name = "<%= cn(svc_configs[:opensearch]['tls']['ssl_cert']) -%>"
       root_cert = """<%= svc_configs[:opensearch]['tls']['rootCA'] -%>"""
