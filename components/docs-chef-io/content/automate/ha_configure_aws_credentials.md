@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 220
 +++
 
-You need to setup the AWS credentials on the bastion host to trigger the Amazon Web Services (AWS) deployment.
+You need to set up the AWS credentials on the bastion host to trigger the Amazon Web Services (AWS) deployment.
 
 Follow these steps to do so:
 
