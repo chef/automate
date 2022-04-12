@@ -21,7 +21,7 @@ Chef Automate High Availability (HA) cluster requires multiple ports for the fro
 | --- | --- |
 | TCP 22 | Allows terraform to securely access (SSH) your network infrastructure and configure services. |
 | TCP 9631 | Allows the tools to query information from the backend to configure Chef Automate HA. |
-| Users, chef-servers, and chef- clients to frontend nodes | |
+| Users, chef-servers, and chef-clients to frontend nodes | |
 | TCP 443 | Allows you to establish a connection with the UI and chef-servers APIs for reporting. Access to this port is required if chef-clients have to report directly or download profiles. |
 | TCP 80, optional | Allows you to redirect to port 443. |
 
