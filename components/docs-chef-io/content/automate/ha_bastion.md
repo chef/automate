@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 A [Bastion Host](https://en.wikipedia.org/wiki/Bastion_host#:~:text=A%20bastion%20host%20is%20a,the%20threat%20to%20the%20computer.) is a special-purpose computer or server on a network specifically designed and configured to withstand attacks. This serve type generally hosts a single application or process, for example, a proxy server or load balancer. All other services are limited to reduce the threat to the computer.
 
-Its purpose is to provide access to a private network from an external network, such as the internet or outside of a firewall and involves access from untrusted networks or computers. These computers are also equipped with special networking interfaces to withstand high-bandwidth attacks through the internet.
+It provides access to a private network from an external network, such as the internet or outside of a firewall, and involves access from untrusted networks or computers. These computers are also equipped with unique networking interfaces to withstand high-bandwidth attacks through the internet.
 
 Bastion servers are instances that reside within your public subnet and are accessed using SSH. The purpose of a bastion host is to restrict access to a private network from an external network. Once remote connectivity establishes with the bastion host, it allows you to use SSH to log in to other instances (within private subnets) deeper within your network.
 
@@ -23,7 +23,7 @@ The bastion hosts provide secure access to Linux instances located in the privat
 
 ## Bastion Host for Chef Automate High Availability (HA)
 
-The Virtual machine is required for either of the Chef Automate HA deployment types to trigger the deployment, which is actually a bastion host. This section explains the bastion host requirements and configurations for the two deployment modes of the Chef Automate HA.
+The Virtual machine is required for either of the Chef Automate HA deployment types to trigger the deployment, actually a bastion host. This section explains the bastion host requirements and configurations for the two deployment modes of the Chef Automate HA.
 
 ### Bastion Host Prerequisites for On-Premise Deployment
 
@@ -34,7 +34,7 @@ The Virtual machine is required for either of the Chef Automate HA deployment ty
 - Hard Disk Space - 100 GB
 - Ports to be publicly accessible: 22 and 9631
 
-Refer [On-premises Deployment Model]({{< relref "ha_deploy_bareinfra.md" >}}) page for the deployment procedure.
+Refer to [On-premises Deployment Model]({{< relref "ha_deploy_bareinfra.md" >}}) page for the deployment procedure.
 
 ### Bastion Host Prerequisites for AWS (Amazon Web Services) Deployment
 
@@ -47,4 +47,4 @@ Refer [On-premises Deployment Model]({{< relref "ha_deploy_bareinfra.md" >}}) pa
 - SSH: VPC to Port 22, publicly accessible
 - [Setup Virtual Private Cloud (VPC) in AWS]({{< relref "ha_vpc_setup.md" >}})
 
-Refer [AWS Deployment Model]({{< relref "ha_deploy_aws.md" >}}) page for building an bastion host and Chef Automate HA deployment procedure using AWS.
+Refer to [AWS Deployment Model]({{< relref "ha_deploy_aws.md" >}}) page for building a bastion host and Chef Automate HA deployment procedure using AWS.
