@@ -9,6 +9,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
+	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -102,7 +103,18 @@ func (s *server) UpgradeStatus(ctx context.Context, req *api.UpgradeStatusReques
 		return response, errors.Wrap(err, "unable to get list of services for automate-full")
 	}
 
-	response.RemainingServices, err = detectUpgradingServices(desiredManifest, runningServices, serviceIDs)
+	//generate the map with omitted services
+	omittedServices := make(map[string]interface{})
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	if enableExternalPg {
+		omittedServices[constants.AutomatePGService] = ""
+	}
+	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+	if enableExternalES {
+		omittedServices[constants.AutomateSearchService] = ""
+	}
+
+	response.RemainingServices, err = detectUpgradingServices(desiredManifest, runningServices, serviceIDs, omittedServices)
 	if err != nil {
 		return response, err
 	}
@@ -120,7 +132,7 @@ func (s *server) UpgradeStatus(ctx context.Context, req *api.UpgradeStatusReques
 // upgrade per the current manifest.
 func detectUpgradingServices(a2Manifest *manifest.A2,
 	runningServices []habapi.ServiceInfo,
-	canonicalServices []habpkg.HabPkg) ([]*api.UpgradingService, error) {
+	canonicalServices []habpkg.HabPkg, omittedServices map[string]interface{}) ([]*api.UpgradingService, error) {
 
 	ret := make([]*api.UpgradingService, 0, len(runningServices))
 	// The manifest currently contains both service- and
@@ -155,6 +167,9 @@ func detectUpgradingServices(a2Manifest *manifest.A2,
 	}
 
 	for _, svc := range canonicalServices {
+		if _, ok := omittedServices[svc.Name()]; ok {
+			continue
+		}
 		manifestSvc := manifest.VersionedPackageFromManifest(a2Manifest, svc.Name())
 		if manifestSvc == nil {
 			return ret, errors.Errorf("required service %s not found in manifest", svc.Name())
