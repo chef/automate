@@ -19,7 +19,7 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 ![On-Premises Deployment Workflow](/images/automate/ha_bare_infra_deploy.png)
 
 1. Set the software and hardware requirements.
-1. Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the **Chef Automate** , **Chef Server** , **Postgres** , and **Elasticsearch** nodes.
+1. Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the **Chef Automate**, **Chef Server**, **Postgres**, and **Elasticsearch** nodes.
 1. Obtain Bastion host server details from your system administrator.
 
 1. Ensure the following network infrastructure is available:
@@ -40,8 +40,8 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
    | Elasticsearch (transport), 9300 | Kibana, 5601 |
    | Automate, ES-Node, 22,443 | |
 
-1. Login as a root in the Bastion host.
-1. Ensure you have _Chef Automate_ utility installed, else download and install the latest version.
+1. Log in as a root in the Bastion host.
+1. Ensure you have the _Chef Automate_ utility installed. Else download and install the latest version.
 1. Execute the command, _./chef-automate init-config-ha existing\_infra_, that generates **config.toml** file.
 1. In the **config.toml** file, specify the list of VM's public IP addresses for the cluster.
 1. Execute the command, **./chef-automate deploy config.toml**, that creates deployment workspace (\*/hab/a2\_deploy\_workspace\*), downloads Habitat, and establishes the cluster provisioning in your workspace.
@@ -97,8 +97,8 @@ This page includes the two types of Chef Automate High Availability (HA) Workflo
 
 1. Create the certificate for the Chef Automate and Chef Server load balancers.
 1. Log in as a root in the Bastion host.
-1. Execute the command, _`./chef-automate init-config-ha aws_, which generates **config.toml** file with default settings and installs latest deployment package.
-1. Execute the command, _./chef-automate provision-infra config.toml_, which downloads Habitat, creates deployment workspace (_/hab/a2\_deploy\_workspace_), and provisions the infrastructure on AWS.
+1. Execute the command, _`./chef-automate init-config-ha aws_, which generates **config.toml** file with default settings and installs the latest deployment package.
+1. Execute the command, _./chef-automate provision-infra config.toml_, which downloads Habitat, and creates deployment workspace (_/hab/a2\_deploy\_workspace_), and provisions the infrastructure on AWS.
 
 1. Specify the following edits in the **config.toml** file:
    1. SSH pair name, key file path, chef automate nodes, number of PostgreSQL nodes, number of Chef Server, and ElasticSearch nodes.
