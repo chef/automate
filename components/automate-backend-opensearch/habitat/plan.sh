@@ -35,6 +35,11 @@ pkg_exports=(
   [deprecated_external_es]=deprecated.external_es
   [deprecated_backup_location]=path.repo
   [disable]=disable
+  [root-ca]=tls.rootCA
+  [admin-pem]=tls.admin_cert
+  [admin-key]=tls.admin_key
+  [admin_username]=opensearch_auth.admin_username
+  [admin_password]=opensearch_auth.admin_password
 )
 
 pkg_exposes=(http-port transport-port)
