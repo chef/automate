@@ -33,11 +33,11 @@
           </chef-form-field>
           <chef-form-field class="timezone-field chef-form-field">
             <label for="timeformat">Time Format</label>
-            <mat-select 
-              #timeformat 
+            <mat-select
+              #timeformat
               panelClass="chef-dropdown"
-              [value]="userDetailsFormControl.timeformat" 
-              (selectionChange)="handleTimeFormatChange($event)" 
+              [value]="userDetailsFormControl.timeformat"
+              (selectionChange)="handleTimeFormatChange($event)"
               data-cy="timeformat-dropdown">
                 <mat-option *ngFor="let timeformatValue of userDetailsFormControl.timeformatValues" [value]="timeformatValue">
                   {{ timeformatValue }}
@@ -48,10 +48,10 @@
             <app-telemetry-checkbox></app-telemetry-checkbox>
           </chef-form-field>
         </form>
-        <chef-button 
-          [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !userDetailsFormControl.isTimeformatDirty && !userDetailsFormControl.isTelemetryCheckboxDirty" 
-          primary inline 
-          (click)="userDetails.saveUserPreference(timeformat, userDetailsFormControl)" 
+        <chef-button
+          [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !userDetailsFormControl.isTimeformatDirty && !userDetailsFormControl.isTelemetryCheckboxDirty"
+          primary inline
+          (click)="userDetails.saveUserPreference(timeformat, userDetailsFormControl)"
           data-cy="user-details-submit-button">
             <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
             <span *ngIf="userDetails.saveInProgress">Saving...</span>
@@ -105,7 +105,7 @@
           </chef-form-field>
         </form>
         <chef-button [disabled]="!userDetails.passwordForm.valid" class="update-password-button" primary (click)="userDetails.savePassword()">
-          <span>Reset Password</span>
+          <span>Reset Password123</span>
         </chef-button>
       </section>
     </main>

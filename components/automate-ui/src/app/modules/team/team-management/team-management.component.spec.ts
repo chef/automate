@@ -15,6 +15,11 @@ import {
 } from 'app/entities/teams/team.actions';
 import { TeamManagementComponent } from './team-management.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
@@ -56,7 +61,8 @@ describe('TeamManagementComponent', () => {
         TeamManagementComponent
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         FormsModule,
