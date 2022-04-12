@@ -53,11 +53,19 @@ func makeOutdatedServiceInfo(name string) habapi.ServiceInfo {
 }
 
 func TestDetectUpgradingServices(t *testing.T) {
-	manifest := newTestManifest("local-user-service", "ingest-service", "teams-service", "deployment-service")
+	manifest := newTestManifest("local-user-service", "ingest-service", "teams-service",
+		"deployment-service", "automate-postgresql", "automate-elasticsearch")
 	canonicalServices := []habpkg.HabPkg{
 		habpkg.New("chef", "local-user-service"),
 		habpkg.New("chef", "ingest-service"),
 		habpkg.New("chef", "teams-service"),
+		habpkg.New("chef", "automate-postgresql"),
+		habpkg.New("chef", "automate-elasticsearch"),
+	}
+
+	omittedServices := map[string]interface{}{
+		"automate-postgresql":    "",
+		"automate-elasticsearch": "",
 	}
 
 	t.Run("it returns the deployment-service as upgrading if it is older than the manifest",
@@ -65,7 +73,7 @@ func TestDetectUpgradingServices(t *testing.T) {
 			runningServices := []habapi.ServiceInfo{
 				makeOutdatedServiceInfo("deployment-service"),
 			}
-			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices)
+			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices, omittedServices)
 			require.Nil(t, err)
 			require.Equal(t, 1, len(ret))
 			assert.Equal(t, "deployment-service", ret[0].Target.Name)
@@ -79,7 +87,7 @@ func TestDetectUpgradingServices(t *testing.T) {
 				makeUpToDateServiceInfo("ingest-service"),
 				makeOutdatedServiceInfo("local-user-service"),
 			}
-			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices)
+			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices, omittedServices)
 			require.Nil(t, err)
 			require.Equal(t, 1, len(ret))
 			assert.Equal(t, "local-user-service", ret[0].Target.Name)
@@ -92,7 +100,7 @@ func TestDetectUpgradingServices(t *testing.T) {
 				makeUpToDateServiceInfo("teams-service"),
 				makeUpToDateServiceInfo("ingest-service"),
 			}
-			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices)
+			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices, omittedServices)
 			require.Nil(t, err)
 			require.Equal(t, 1, len(ret))
 			assert.Equal(t, "local-user-service", ret[0].Target.Name)
@@ -106,8 +114,10 @@ func TestDetectUpgradingServices(t *testing.T) {
 				makeUpToDateServiceInfo("ingest-service"),
 				makeUpToDateServiceInfo("local-user-service"),
 				makeUpToDateServiceInfo("old-service"),
+				makeUpToDateServiceInfo("automate-postgresql"),
+				makeOutdatedServiceInfo("automate-elasticsearch"),
 			}
-			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices)
+			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices, omittedServices)
 			require.Nil(t, err)
 			require.Equal(t, 1, len(ret))
 			assert.Nil(t, ret[0].Target)
