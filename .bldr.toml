@@ -911,6 +911,12 @@ paths = [
   "components/automate-workflow-web/*"
 ]
 
+[automate-supermarket]
+plan_path = "components/automate-supermarket"
+paths = [
+  "components/automate-supermarket/*"
+]
+
 [data-feed-service]
 plan_path = "components/data-feed-service"
 paths = [

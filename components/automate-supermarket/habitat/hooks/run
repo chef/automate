@@ -87,6 +87,7 @@ pg-helper create-extension "$DBNAME" "uuid-ossp"
 pg-helper alter-user $PGUSER with PASSWORD $PGPASSWORD
 pg-helper fix-permissions "$DBNAME"
 
+echo "### Done with setting up DB ###"
 secrets-helper generate supermarket.access_key_id 16 --if-not-exists
 secrets-helper generate supermarket.secret_access_key 16 --if-not-exists
 

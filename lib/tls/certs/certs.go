@@ -92,7 +92,10 @@ func (config *TLSConfig) ReadCerts() (*ServiceCerts, error) {
 }
 
 func ServiceCertsFromBytes(serviceCertData, serviceKeyData, rootCertData []byte) (*ServiceCerts, error) {
+	// fmt.Println("## CERT PEM BLOCK ## ", serviceCertData)
+
 	serviceKeyPair, err := tls.X509KeyPair(serviceCertData, serviceKeyData)
+	// fmt.Println("********* ERROR ***", err)
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not load key pair")
 	}

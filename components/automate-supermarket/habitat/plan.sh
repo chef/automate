@@ -17,7 +17,6 @@ scaffolding_ruby_pkg="core/ruby27"
 pkg_binds=(
   [automate-pg-gateway]="port"
   [automate-supermarket-redis]="port"
-  [pg-sidecar-service]="port"
 )
 
 pkg_deps=(
