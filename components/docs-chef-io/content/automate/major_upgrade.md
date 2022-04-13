@@ -183,7 +183,7 @@ To upgrade your version to **20220329091442** version, follow the steps given be
 1. Once done, confirm the status of the upgrade:
 
    ```sh
-   chef-automate upgrade status
+   sudo chef-automate upgrade status
    ```
 
 **Upgrade to Chef Automate 3.x.x**
@@ -215,7 +215,7 @@ Once you have upgraded to the last date-based version of Chef Automate, you can 
 1. Check the status of the upgrade:
 
    ```sh
-   chef-automate upgrade status
+   sudo chef-automate upgrade status
    ```
 
 **Upgrade PostgreSQL**
@@ -223,19 +223,19 @@ Once you have upgraded to the last date-based version of Chef Automate, you can 
 1. Migrate your data from PostgreSQL 9.6 to PostgreSQL 13:
 
    ```sh
-   chef-automate post-major-upgrade migrate --data=PG
+   sudo chef-automate post-major-upgrade migrate --data=PG
    ```
 
 1. Check whether all the services are running:
 
    ```sh
-   chef-automate status
+   sudo chef-automate status
    ```
 
 1. Verify that all the data is present in your upgraded Chef Automate. If yes, clear the old PostgreSQL data:
 
    ```sh
-   chef-automate post-major-upgrade clear-data --data=PG
+   sudo chef-automate post-major-upgrade clear-data --data=PG
    ```
 
 ### Chef Automate in Air-Gapped Environment With External PostgreSQL
