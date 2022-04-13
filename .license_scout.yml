@@ -252,6 +252,24 @@ fallbacks:
     - name: github.com/envoyproxy/protoc-gen-validate
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/master/LICENSE
+    - name: github.com/cncf/udpa/go
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/cncf/udpa/main/LICENSE
+    - name: github.com/envoyproxy/go-control-plane
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/envoyproxy/go-control-plane/main/LICENSE
+    - name: github.com/smartystreets/go-aws-auth
+      license_id: Unlicense
+      license_content: https://raw.githubusercontent.com/smarty-archives/go-aws-auth/master/LICENSE.md
+    - name: github.com/smartystreets/gunit
+      license_id: Unlicense
+      license_content: https://raw.githubusercontent.com/smartystreets/gunit/master/LICENSE.md
+    - name: google.golang.org/grpc
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/grpc/grpc-go/master/LICENSE
+    - name: google.golang.org/protobuf
+      license_id: Gocov-Authors
+      license_content: https://raw.githubusercontent.com/protocolbuffers/protobuf-go/master/LICENSE
     - name: github.com/google/go-cmp
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/google/go-cmp/master/LICENSE
