@@ -65,7 +65,11 @@ network.host: {{cfg.network.host}}
 # Set a custom port for HTTP:
 #
 http.port: {{cfg.network.port}}
+<<<<<<< HEAD
+transport.port: {{cfg.transport.port}}
+=======
 transport.tcp.port: {{cfg.transport.port}}
+>>>>>>> 3be40ad85240f334e23c3feb48ba12679b12226f
 #
 # For more information, consult the network module documentation.
 #
@@ -74,7 +78,17 @@ transport.tcp.port: {{cfg.transport.port}}
 # Pass an initial list of hosts to perform discovery when this node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
+<<<<<<< HEAD
+discovery.type: single-node
+#discovery.seed_hosts: ["{{cfg.network.host}}"]
+#{{#if bind.automate-opensearch ~}}
+#discovery.seed_hosts: [{{#each bind.automate-opensearch.members ~}} "{{sys.ip}}", {{/each ~}}]
+#{{else ~}}
+#discovery.seed_hosts: {{cfg.discovery.ping_unicast_hosts}}
+#{{/if ~}}
+=======
 #discovery.seed_hosts: ["host1", "host2"]
+>>>>>>> 3be40ad85240f334e23c3feb48ba12679b12226f
 #
 # Bootstrap the cluster using an initial set of master-eligible nodes:
 #
@@ -122,5 +136,12 @@ plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access
 plugins.security.system_indices.enabled: true
 plugins.security.system_indices.indices: [".opendistro-alerting-config", ".opendistro-alerting-alert*", ".opendistro-anomaly-results*", ".opendistro-anomaly-detector*", ".opendistro-anomaly-checkpoints", ".opendistro-anomaly-detection-state", ".opendistro-reports-*", ".opendistro-notifications-*", ".opendistro-notebooks", ".opensearch-observability", ".opendistro-asynchronous-search-response*", ".replication-metadata-store"]
 node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
+
+#plugins.security.ssl.transport.keystore_type: "JKS"
+#plugins.security.ssl.transport.keystore_filepath: opensearch.keystore
+#plugins.security.ssl.transport.keystore_password: "changeit"
+#plugins.security.ssl.transport.truststore_type: "JKS"
+#plugins.security.ssl.transport.truststore_filepath: ""
+#plugins.security.ssl.transport.truststore_password: "changeit"
 
 ######## End OpenSearch Security Configuration ########
