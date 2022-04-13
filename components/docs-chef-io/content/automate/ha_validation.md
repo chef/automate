@@ -24,23 +24,16 @@ Follow these steps to examine the firewall rules are stateful, and ports are ope
 1. Install hab package in your internet environment by executing the following commands that generate *netcate package*:
 
 ```bash
-
 sudo tar -xvzf /tmp/hab-x86_64-linux.tar.gz -C /usr/local/bin --strip-components 1
-
 export HAB_LICENSE=accept-no-persist
-
 hab pkg install core/netcat -bf
-
 ls -dtr1 /hab/cache/artifacts/core-netcat-*
-
 ```
 
 1. Provide the path of the `config.toml` file, `hab-utitlity` and `netcate` package in the command, `./chef-automate validate-ha-infrastructure */path/to/config.toml* */path/to/hab.tar.gz* */path/to/netcat.hart*`  as parameters.
 
 ```bash
-
 ./chef-automate validate-ha-infrastructure /root/config.toml /root/hab-x86_64-linux.tar.gz /hab/cache/artifact/core-netcat-<version>.hart
-
 ```
 
 This command shows the status of the set firewall rules and the ports configured.
