@@ -22,7 +22,8 @@ function health_check() {
   es_host="127.0.0.1"
   {{/if ~}}
 
-  color="$(curl -s --noproxy "$es_host" "http://$es_host:{{svc.me.cfg.http-port}}/_cat/health?h=st")"
+  color="$(curl -s -XGET https://$es_host:{{svc.me.cfg.http-port}}/_cat/health?h=st -k -u admin:admin -k -u admin:admin)"
+  #color="$(curl -s --noproxy "$es_host" "http://$es_host:{{svc.me.cfg.http-port}}/_cat/health?h=st")"
 
   case $color in
     "green")
