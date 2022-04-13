@@ -63,7 +63,7 @@ To upgrade Chef Automate with embedded PostgreSQL, follow the steps given below:
 1. If you haven't already done so, upgrade to the last date-based version of Chef Automate:
 
    ```sh
-   chef-automate upgrade run
+   sudo chef-automate upgrade run
    ```
 
    This should upgrade to Chef Automate version 20220329091442.
@@ -71,13 +71,13 @@ To upgrade Chef Automate with embedded PostgreSQL, follow the steps given below:
 1. Check the availability of the latest version:
 
    ```sh
-   chef-automate upgrade status
+   sudo chef-automate upgrade status
    ```
 
 1. Start a major version upgrade:
 
    ```sh
-   chef-automate upgrade run --major
+   sudo chef-automate upgrade run --major
    ```
 
    Once the upgrade is complete, you will get:
@@ -91,25 +91,25 @@ To upgrade Chef Automate with embedded PostgreSQL, follow the steps given below:
 1. Check the upgrade status of Chef Automate:
 
    ```sh
-   chef-automate upgrade status
+   sudo chef-automate upgrade status
    ```
 
 1. Migrate your data from PostgreSQL 9.6 to PostgreSQL 13:
 
    ```sh
-   chef-automate post-major-upgrade migrate --data=PG
+   sudo chef-automate post-major-upgrade migrate --data=PG
    ```
 
 1. Verify that all services are running:
 
    ```sh
-   chef-automate status
+   sudo chef-automate status
    ```
 
 1. Verify that all the data is present in your upgraded Chef Automate version. If yes, clear the old PostgreSQL data:
 
    ```sh
-   chef-automate post-major-upgrade clear-data --data=PG
+   sudo chef-automate post-major-upgrade clear-data --data=PG
    ```
 
 ### Chef Automate With External PostgreSQL
@@ -121,7 +121,7 @@ To upgrade Chef Automate with external PostgreSQL, follow the steps given below:
 1. If you haven't already done so, upgrade to the last date-based version of Chef Automate:
 
    ```sh
-   chef-automate upgrade run
+   sudo chef-automate upgrade run
    ```
 
    This should upgrade to Chef Automate version 20220329091442.
@@ -129,13 +129,13 @@ To upgrade Chef Automate with external PostgreSQL, follow the steps given below:
 1. Check the availability of the latest version:
 
    ```sh
-   chef-automate upgrade status
+   sudo chef-automate upgrade status
    ```
 
 1. Initiate a major version upgrade:
 
    ```sh
-   chef-automate upgrade run --major
+   sudo chef-automate upgrade run --major
    ```
 
    Once the upgrade is complete, you will get:
@@ -151,7 +151,7 @@ To upgrade Chef Automate with external PostgreSQL, follow the steps given below:
 1. Verify that all services are running:
 
    ```sh
-   chef-automate status
+   sudo chef-automate status
    ```
 
 ### Chef Automate in Air-Gapped Environment With Embedded PostgreSQL
@@ -256,8 +256,6 @@ Once you have upgraded to the last date-based version of Chef Automate, you can 
 
 1. Copy the Chef Automate CLI (`chef-automate`) and the AIB (`automate_v20220329091442.aib`) to the air-gapped machine where you are running Chef Automate.
 
-1. Make sure your upgrade-strategy is none
-
 1. Upgrade the air-gapped machine:
 
    ```sh
@@ -281,6 +279,8 @@ Once you have upgraded to the last date-based version of Chef Automate, you can 
    ```
 
 1. Copy the Chef Automate CLI (`chef-automate`) and AIB (`automate_v3.x.x.aib`) to the air-gapped machine running Chef Automate.
+
+1. Make sure your upgrade-strategy is none
 
 1. Upgrade Chef Automate on the air-gapped machine:
 

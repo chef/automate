@@ -99,7 +99,7 @@ Run `vacuumdb --all --full` on the PostgreSQL database if you don't have automat
 
 For more information on upgrading using `vacuumdb` see the PostgreSQL 13 documentation for [vacuumdb](https://www.postgresql.org/docs/13/app-vacuumdb.html).
 
-1. Login as the `postgres` user
+1. Login as `postgres` user
 
     ```bash
     sudo su - postgres
@@ -154,7 +154,7 @@ For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` se
     sudo systemctl stop postgresql.service
     ```
 
-2. Login as the `postgres` user
+2. Login as `postgres` user
 
     ```bash
     sudo su - postgres
