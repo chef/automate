@@ -39,6 +39,7 @@ var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220120092917/bin"
 
 const (
 	AUTOMATE_VERSION            = "3"
+	NEXT_AUTOMATE_VERSION       = "4"
 	AUTOMATE_PG_MIGRATE_LOG_DIR = "/tmp"
 	OLD_PG_VERSION              = "9.6"
 	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
@@ -55,7 +56,13 @@ const (
 	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.24/20220218015755/bin"
 	CLEANUP_ID                  = "clean_up"
 	MIGRATE_PG_ID               = "migrate_pg"
+	MIGRATE_ES_ID               = "migrate_es"
 	NEW_PG_VERSION              = "13.5"
+	ELASTICSEARCH_DATA_DIR      = "/hab/svc/automate-elasticsearch/data"
+	OPENSEARCH_DATA_DIR         = "/hab/svc/automate-opensearch/data"
+	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"
+	OPENSEARCH_VAR_DIR          = "/hab/svc/automate-opensearch/var"
+	OPENSEARCH_DIR              = "/hab/svc/automate-opensearch/"
 )
 
 func init() {
@@ -219,6 +226,46 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 				)
 			}
 		}
+	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
+		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+		if err != nil {
+			return err
+		}
+
+		isExecuted, err := ci.ReadPostChecklistById(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+		if err != nil {
+			return err
+		}
+
+		if isExecuted {
+			if migrateDataCmdFlags.forceExecute {
+				isExecuted = false
+			} else {
+				err := promptCheckList(
+					"migrate_es is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]")
+				if err != nil {
+					return err
+				} else {
+					isExecuted = false
+				}
+			}
+		}
+
+		if !isExecuted {
+			if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
+				err := promptCheckList(
+					"It will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
+				)
+				if err != nil {
+					return err
+				}
+				err = esMigrateExecutor()
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+		}
+		// end for the es migration
 	} else {
 		return errors.New("please provide valid input for data flag")
 	}
@@ -272,6 +319,67 @@ func pgMigrateExecutor() error {
 		return err
 	}
 	upgraded = true
+	return nil
+}
+
+// preRequisteForESDataMigration: this will return true when data and var dir is present
+
+func preRequisteForESDataMigration() (bool, error) {
+	existDir, err := dirExists(ELASTICSEARCH_DATA_DIR)
+	fmt.Println("existDir err:", err, existDir)
+	if err != nil {
+		return existDir, err
+	}
+	existDir, err = dirExists(ELASTICSEARCH_VAR_DIR)
+	fmt.Println("existDir err:", err, existDir)
+	if err != nil {
+		return existDir, err
+	}
+	return existDir, nil
+}
+
+const script = `
+mv /hab/svc/automate-opensearch/data /hab/svc/automate-opensearch/data.os;
+mv /hab/svc/automate-opensearch/var /hab/svc/automate-opensearch/var.os;
+cp -r /hab/svc/automate-elasticsearch/data /hab/svc/automate-opensearch/;
+cp -r /hab/svc/automate-elasticsearch/var /hab/svc/automate-opensearch/;
+chown -RL hab:hab /hab/svc/automate-opensearch/data;
+chown -RL hab:hab /hab/svc/automate-opensearch/var;
+`
+
+// esMigrateExecutor
+func esMigrateExecutor() error {
+	//upgraded := false
+	preRequiste, err := preRequisteForESDataMigration()
+	defer func() {
+		err = chefAutomateStart()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		err = chefAutomateStatus()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	if !preRequiste {
+		// NO DIR PRESENT
+		fmt.Println("preRequisteForESDataMigration failed")
+		return nil
+	}
+
+	err = chefAutomateStop()
+	if err != nil {
+		return err
+	}
+
+	command := exec.Command("/bin/sh", "-c", script)
+	err = command.Run()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	//upgraded = true
 	return nil
 }
 
