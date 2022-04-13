@@ -21,12 +21,12 @@ Please choose following upgrade journey based on your current version of Chef Au
 | Your Current Version | Upgrade To |
 | -------------------- | ---------- |
 | Any version before 20220329091442| 20220329091442|
-| 20220329091442| 3.0.1|
+| 20220329091442| 3.x.x|
 
 For example, if today you are on version 2021201164433, then your upgrade journey should be:
 
 1. Manual upgrade to 20220329091442.
-1. Manual upgrade to 3.0.1.
+1. Manual upgrade to 3.x.x.
 
 ## Prerequisites
 
@@ -60,7 +60,13 @@ To upgrade Chef Automate with embedded PostgreSQL, follow the steps given below:
 
 **Upgrade Chef Automate**
 
-1. If you haven't already done so, upgrade to the last date-based version of Chef Automate:
+1. Your current version should be 20220329091442. To check the version run:
+
+    ```sh
+    sudo chef-automate version
+    ```
+
+1. If you are on an earlier version, then upgrade to latest version of date series, by running:
 
    ```sh
    sudo chef-automate upgrade run
