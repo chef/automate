@@ -172,22 +172,65 @@ fi
 
 if [[ "${airgapped}" == "false" ]]; then
     if (! automate_deployed) || upgrade_automate || automate_needs_redeploy; then
+        echo "installing automate cli"
         install_automate_cmd
     fi
 fi
 
 if ! automate_deployed; then
+    echo "deploying automate"
     deploy
 else
     if automate_needs_redeploy; then
+        echo "redeploying automate"
         redeploy
     fi
     if upgrade_automate; then
+        echo "inside upgrade_automate"
         if [[ "${airgapped}" == "true" ]]; then
-            chef-automate upgrade run --airgap-bundle /tmp/automate.aib
+            echo "inside upgrade_automate airgapped true"
+            ERROR=$(chef-automate upgrade run --airgap-bundle /tmp/automate.aib 2>&1 >/dev/null) || true
+            if echo "$ERROR" | grep 'This is a Major upgrade'; then
+              echo "inside upgrade_automate airgapped true major upgrade"
+              echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
+              sleep 45
+              #shellcheck disable=SC2154
+              wait_for_upgrade
+              chef-automate post-major-upgrade migrate --data=PG -y
+            else
+              echo "regular normal upgrade airgap"
+              sleep 45
+              #shellcheck disable=SC2154
+              wait_for_upgrade
+            fi
             rm -f /tmp/automate.aib
+        else
+          echo "inside upgrade_automate airgapped false"
+          ERROR=$(chef-automate upgrade run 2>&1 >/dev/null) || true
+          if echo "$ERROR" | grep 'This is a Major upgrade'; then
+            echo "inside upgrade_automate airgapped false major upgrade"
+            echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major
+            sleep 45
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+            chef-automate post-major-upgrade migrate --data=PG -y
+          else
+            echo "regular normal upgrade airgap false"
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+          fi
         fi
-        wait_for_upgrade
+
         cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
         chef-automate config set /etc/chef-automate/config.toml
     fi
@@ -274,7 +317,7 @@ fi
 
 if [[ "${enable_workflow}" == "true" ]]; then
     if ! workflow-ctl list-enterprises | grep "${workflow_enterprise}"; then
-        ssh-keygen -t rsa -b 4096 -N '' -f /root/builder_key
+        echo "y" | ssh-keygen -t rsa -b 4096 -N '' -f /root/builder_key
         workflow-ctl create-enterprise "${workflow_enterprise}" --ssh-pub-key-file=/root/builder_key.pub
     fi
 fi

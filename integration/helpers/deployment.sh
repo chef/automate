@@ -41,18 +41,56 @@ run_upgrade() {
     # because that directory isn't watched for changes. Therefore, we'll trigger
     # a manifest rebuild with the run command.
     if [ -z "$airgap_artifact_path" ]; then
-        chef-automate upgrade run
+        # shellcheck disable=SC2154
+        cat "$versionsFile"
+        ERROR=$(chef-automate upgrade run --versions-file "$versionsFile" 2>&1 >/dev/null) || true
+        echo "$ERROR"
+        if echo "${ERROR}" | grep 'This is a Major upgrade'; then
+            echo "major normal upgrade"
+            echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major --versions-file "$versionsFile"
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+            chef-automate post-major-upgrade migrate --data=PG -y
+        else
+            echo "regular normal upgrade"
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+        fi
     else
-        chef-automate upgrade run --airgap-bundle "$airgap_artifact_path"
+        ERROR=$(chef-automate upgrade run --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile" 2>&1 >/dev/null) || true
+        if echo "${ERROR}" | grep 'This is a Major upgrade'; then
+            echo "y
+y
+y
+y
+y" | chef-automate upgrade run --major --airgap-bundle "$airgap_artifact_path" --versions-file "$versionsFile"
+
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+            chef-automate post-major-upgrade migrate --data=PG -y
+        else
+            echo "regular normal upgrade airgap"
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+        fi
     fi
 
-    # NOTE: This is a hack
-    # The hack above was no longer good enough because we have a thing that needs
-    # to be updated that isn't a service
-    sleep 45
 
-    #shellcheck disable=SC2154
-    wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
 }
 
 wait_for_upgrade() {
@@ -191,5 +229,21 @@ download_manifest() {
     local channel="$1"
     local dst="$2"
 
-    curl "https://packages.chef.io/manifests/$channel/automate/latest.json" > "$dst"
+    curl "https://packages.chef.io/manifests/$channel/automate/latest_semver.json" > "$dst"
 }
+
+download_version() {
+    local channel="$1"
+    local dst="$2"
+
+    curl "https://packages.chef.io/manifests/$channel/automate/versions.json" > "$dst-versions"
+}
+
+download_manifest_version() {
+    local channel="$1"
+    local version="$2"
+    local dst="$3"
+
+    curl -k "https://packages.chef.io/manifests/$channel/automate/$version.json" > "$dst"
+}
+

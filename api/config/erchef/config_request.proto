@@ -62,6 +62,8 @@ message ConfigRequest {
 				google.protobuf.StringValue base_resource_url = 4;
 				google.protobuf.BoolValue strict_search_result_acls = 5;
 				google.protobuf.StringValue actions_fqdn = 6;
+				google.protobuf.BoolValue cbv_cache_enabled = 7;
+				google.protobuf.Int32Value cbv_cache_item_ttl = 8;
 			}
 
 			message Indexing {

@@ -60,3 +60,4 @@ do_install() {
   cp -r "$PLAN_CONTEXT/../web/templates/"* "${pkg_prefix}/web/templates"
   cp -r "$PLAN_CONTEXT/../web/static"/* "${pkg_prefix}/web/static"
 }
+

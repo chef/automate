@@ -90,6 +90,16 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
 	}
 
+	if airgap.AirgapInUse() {
+		res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+		if err != nil {
+			return err
+		}
+		if res.Config.Deployment.GetV1().GetSvc().GetUpgradeStrategy().GetValue() != "none" {
+			return status.New(status.InvalidCommandArgsError, "Before running the upgrade, set upgrade_strategy = 'none' and patch the config.")
+		}
+	}
+
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
 	}
@@ -114,39 +124,42 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	})
 
 	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to start upgrade failed",
-		)
-	}
-
-	if validatedResp.CurrentVersion == validatedResp.TargetVersion {
-		writer.Println("Chef Automate up-to-date")
-		return nil
-	}
-
-	pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
-	if err != nil {
-		return err
-	}
-
-	if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
-		ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
-		if err != nil {
+		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") &&
+			!strings.Contains(err.Error(), "Unimplemented desc = unknown service chef.automate.domain.deployment.Deployment") {
 			return status.Wrap(
 				err,
 				status.DeploymentServiceCallError,
 				"Request to start upgrade failed",
 			)
 		}
-		err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+	} else {
+		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
+			writer.Println("Chef Automate up-to-date")
+			return nil
+		}
+
+		pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
 		if err != nil {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to start upgrade failed",
-			)
+			return err
+		}
+
+		if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
+			err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
 		}
 	}
 

@@ -82,13 +82,21 @@ fi
 # dev.json manifest downloaded before the build as their starting
 # point. We are still open to clock-sync affecting package versions
 # being older or newer than we might expect.
+OLD_VERSION=$(cat VERSION)
+IFS=. read -r major minor patch <<<"$OLD_VERSION"
+((patch++))
+VERSION="$major"."$minor"."$patch"
+export VERSION
+
 log_section_start "create manifest"
 .expeditor/create-manifest.rb
-mv manifest.json results/build.json
+echo "showing current dir files"
+ls
+mv "$VERSION".json results/build.json
 
 log_section_start "create manifest (latest hab)"
 HAB_PKG_CHANNEL=unstable NO_PIN_HAB=true .expeditor/create-manifest.rb
-mv manifest.json results/build-habdev.json
+mv "$VERSION".json results/build-habdev.json
 
 log_section_start "create buildkite artifact"
 # The integration test framework uses this file to decide whether or

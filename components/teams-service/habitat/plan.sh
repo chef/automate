@@ -46,3 +46,4 @@ do_install() {
   build_line "Copying migration files"
   cp -r storage/postgres/migration/sql "${pkg_prefix}/migrations"
 }
+
