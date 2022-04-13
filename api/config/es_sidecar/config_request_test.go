@@ -33,7 +33,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		c.V1.Sys.Backups.S3.Bucket = w.String("internal-bucket")
 		c.V1.Sys.Backups.S3.Client = w.String("internal-client")
 		c.V1.Sys.Backups.S3.BasePath = w.String("internal-base-path")
-		c.V1.Sys.Backups.S3.Es.Compress = w.Bool(false)
+		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(false)
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.External = &shared.External{
@@ -59,7 +59,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		assert.Equal(t, "external-bucket", c.V1.Sys.Backups.S3.Bucket.Value)
 		assert.Equal(t, "external-client", c.V1.Sys.Backups.S3.Client.Value)
 		assert.Equal(t, "external-base-path", c.V1.Sys.Backups.S3.BasePath.Value)
-		assert.Equal(t, true, c.V1.Sys.Backups.S3.Es.Compress.Value)
+		assert.Equal(t, true, c.V1.Sys.Backups.S3.Os.Compress.Value)
 	})
 
 	t.Run("with external fs backup config", func(t *testing.T) {
@@ -115,7 +115,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		c.V1.Sys.Backups.S3.Bucket = w.String("user-bucket")
 		c.V1.Sys.Backups.S3.Client = w.String("user-client")
 		c.V1.Sys.Backups.S3.BasePath = w.String("user-base-path")
-		c.V1.Sys.Backups.S3.Es.Compress = w.Bool(false)
+		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(false)
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.Backups = &shared.Backups{
@@ -136,7 +136,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		assert.Equal(t, "global-bucket", c.V1.Sys.Backups.S3.Bucket.Value)
 		assert.Equal(t, "user-client", c.V1.Sys.Backups.S3.Client.Value)
 		assert.Equal(t, "global-base-path", c.V1.Sys.Backups.S3.BasePath.Value)
-		assert.Equal(t, true, c.V1.Sys.Backups.S3.Es.Compress.Value)
+		assert.Equal(t, true, c.V1.Sys.Backups.S3.Os.Compress.Value)
 	})
 
 	t.Run("with internal global fs backup config with user config", func(t *testing.T) {
@@ -188,7 +188,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		assert.Equal(t, "s3", c.V1.Sys.Backups.Backend.Value)
 		assert.Equal(t, "global-bucket", c.V1.Sys.Backups.S3.Bucket.Value)
 		assert.Equal(t, "global-base-path", c.V1.Sys.Backups.S3.BasePath.Value)
-		assert.Equal(t, true, c.V1.Sys.Backups.S3.Es.Compress.Value)
+		assert.Equal(t, true, c.V1.Sys.Backups.S3.Os.Compress.Value)
 	})
 
 	t.Run("with internal global fs backup config without user config", func(t *testing.T) {
