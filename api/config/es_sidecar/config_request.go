@@ -16,10 +16,10 @@ func NewConfigRequest() *ConfigRequest {
 				Backups: &ConfigRequest_V1_System_Backups{
 					Fs: &ConfigRequest_V1_System_Backups_FsSettings{},
 					S3: &ConfigRequest_V1_System_Backups_S3Settings{
-						Es: &ac.Backups_S3_Elasticsearch{},
+						Os: &ac.Backups_S3_Opensearch{},
 					},
 					Gcs: &ConfigRequest_V1_System_Backups_GCSSettings{
-						Es: &ac.Backups_GCS_Elasticsearch{},
+						Os: &ac.Backups_GCS_Opensearch{},
 					},
 				},
 				Log: &ConfigRequest_V1_System_Log{},
@@ -40,7 +40,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Log.Format = w.String("text")
 
 	c.V1.Sys.Backups.Backend = w.String("s3")
-	c.V1.Sys.Backups.S3.Es.Compress = w.Bool(true)
+	c.V1.Sys.Backups.S3.Os.Compress = w.Bool(true)
 	return c
 }
 
@@ -73,16 +73,16 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	}
 
 	//
-	// Users can configure the ElasticSearch backup configuration the at es-sidecar
+	// Users can configure the OpenSearch backup configuration the at es-sidecar
 	// level, the global backups level, and in some cases the global external
 	// level. Precedence for configuration is as follows in order of priority
 	//
-	// * External configuration (if using external ElasticSearch)
+	// * External configuration (if using external OpenSearch)
 	// * Global configuration
 	// * User defined es-sidecar configuration
 	// * es-sidecar default configuration
 	//
-	externalCfg := g.GetV1().GetExternal().GetElasticsearch()
+	externalCfg := g.GetV1().GetExternal().GetOpensearch()
 
 	backupsCfg := c.GetV1().GetSys().GetBackups()
 	if backupsCfg == nil {
@@ -109,8 +109,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 func (c *ConfigRequest) applyExternalConfig(
 	cfg *ConfigRequest_V1_System_Backups,
 	global *ac.Backups,
-	override *ac.External_Elasticsearch_Backup,
-	auth *ac.External_Elasticsearch_Authentication,
+	override *ac.External_Opensearch_Backup,
+	auth *ac.External_Opensearch_Authentication,
 	nodes []*wrapperspb.StringValue) {
 
 	// If backups are disabled we don't need to worry about applying any other
@@ -150,12 +150,12 @@ func (c *ConfigRequest) applyExternalConfig(
 		}
 
 		if s := extS3cfg.GetSettings(); s != nil {
-			cfg.S3.Es = s
+			cfg.S3.Os = s
 		}
 
 		if auth.GetScheme().GetValue() == "aws_es" {
 			cfg.S3.EnableAwsAuth = w.Bool(true)
-			cfg.S3.AwsAuth = auth.GetAwsEs()
+			cfg.S3.AwsAuth = auth.GetAwsOs()
 			if len(nodes) > 0 {
 				cfg.S3.EsUrl = nodes[0]
 			}
@@ -187,7 +187,7 @@ func (c *ConfigRequest) applyExternalConfig(
 		}
 
 		if s := extGcscfg.GetSettings(); s != nil {
-			cfg.Gcs.Es = s
+			cfg.Gcs.Os = s
 		}
 	case "fs":
 		cfg.Backend = w.String(backend)
@@ -242,11 +242,11 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 			cfg.S3.BasePath = bp
 		}
 
-		if es := globalS3.GetEs(); es != nil {
-			newEs := &ac.Backups_S3_Elasticsearch{}
-			_ = ac.Merge(cfg.S3.GetEs(), es, newEs)
+		if os := globalS3.GetEs(); os != nil {
+			newOs := &ac.Backups_S3_Opensearch{}
+			_ = ac.Merge(cfg.S3.GetOs(), os, newOs)
 
-			cfg.S3.Es = newEs
+			cfg.S3.Os = newOs
 		}
 	}
 
@@ -266,11 +266,11 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 			cfg.S3.BasePath = bp
 		}
 
-		if es := globalGcs.GetEs(); es != nil {
-			newEs := &ac.Backups_S3_Elasticsearch{}
-			_ = ac.Merge(cfg.S3.GetEs(), es, newEs)
+		if os := globalGcs.GetEs(); os != nil {
+			newOs := &ac.Backups_S3_Opensearch{}
+			_ = ac.Merge(cfg.S3.GetOs(), os, newOs)
 
-			cfg.S3.Es = newEs
+			cfg.S3.Os = newOs
 		}
 	}
 
@@ -291,7 +291,7 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 	return
 }
 
-// Given a backup config that is not using external elasticsearch, migrate
+// Given a backup config that is not using external opensearch, migrate
 // old fs backend to the s3 compatible backup-gateway
 func (c *ConfigRequest) migrateToBackupGateway(cfg *ConfigRequest_V1_System_Backups) {
 	// If the backend is configured to use S3 then we need not worry about fallback
@@ -305,7 +305,7 @@ func (c *ConfigRequest) migrateToBackupGateway(cfg *ConfigRequest_V1_System_Back
 	cfg.Backend = w.String("s3")
 	cfg.S3 = &ConfigRequest_V1_System_Backups_S3Settings{
 		Bucket: w.String("backups"),
-		Es: &ac.Backups_S3_Elasticsearch{
+		Os: &ac.Backups_S3_Opensearch{
 			MaxSnapshotBytesPerSec: cfg.GetFs().GetMaxSnapshotBytesPerSec(),
 			MaxRestoreBytesPerSec:  cfg.GetFs().GetMaxRestoreBytesPerSec(),
 		},
