@@ -60,7 +60,9 @@ curl \
   -s \
   -i \
   -H 'Content-Type: application/json'\
-  -X PUT "http://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
+  -X PUT "https://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
+  -k \
+  -u admin:admin \
   -d '{
     "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
     "index.refresh_interval": "{{cfg.index.refresh_interval}}"
