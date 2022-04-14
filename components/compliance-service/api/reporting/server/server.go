@@ -174,7 +174,6 @@ func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlIt
 		in.PageNumber = 1
 	}
 
-	logrus.Debugf("Yashvi --- testing --------- page number ----- size", in.Size, in.PageNumber)
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {

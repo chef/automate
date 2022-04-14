@@ -688,7 +688,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	size int32, pageNumber int32) (*reportingapi.ControlItems, error) {
 	myName := "GetControlListItems"
 
-	logrus.Debugf("Yashvi1---- testing------ pagenumber and size got---- %s %s", size, pageNumber)
 	contListItems := make([]*reportingapi.ControlItem, 0)
 
 	controlSummaryTotals := &reportingapi.ControlSummary{
@@ -720,7 +719,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		FetchSource(false).
 		Size(1)
 
-	logrus.Debugf("Size of the bucket from  paginate %s", size*pageNumber)
 	controlTermsAgg := elastic.NewTermsAggregation().Field("profiles.controls.id").
 		Size(int(size*pageNumber)).
 		Order("_key", true)
@@ -892,7 +890,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 					}
 					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
 						start, end := paginate(int(pageNumber), int(size), len(controlBuckets.Buckets))
-						logrus.Debugf("Pagination for controls %s %s %s", start, end, len(controlBuckets.Buckets))
 						for _, controlBucket := range controlBuckets.Buckets[start:end] {
 							contListItem, err := backend.getControlItem(controlBucket)
 							if err != nil {
