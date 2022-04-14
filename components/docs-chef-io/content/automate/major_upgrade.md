@@ -64,10 +64,12 @@ Please upgrade to latest date pattern version number.
   ```
 ### Normal Upgrade to 20220329091442
 - Upgrade Chef Automate to latest minor version (20220329091442)
+
   ```sh
   sudo chef-automate upgrade run
   ```
 - Check all services are up and running
+
   ```sh
   sudo chef-automate status
   ```
@@ -251,6 +253,11 @@ If Chef Automate fails to migrate your data to PostgreSQL 13 when running `chef-
 ```sh
 sudo chef-automate backup restore </path/to/backups/>BACKUP_ID
 ```
+If you have Air-Gapped bundle which you want to restore to, then use this command:
+```sh
+sudo chef-automate backup restore  --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
+```
+Reference for [Restore methods](/automate/restore/).
 
 Use the backup ID from the backup you created before starting the upgrade.
 
