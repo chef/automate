@@ -213,7 +213,7 @@ We use a variety of testing tools. Here are the most common ones you
 are likely to encounter:
 
 - Go tests: Most of our Go projects write a portion of their tests
-  using stanard Go testing tooling. Most of the "unit tests" for go
+  using standard Go testing tooling. Most of the "unit tests" for go
   services are written in this style.  The output of these kind of
   tests typically looks something like:
 
