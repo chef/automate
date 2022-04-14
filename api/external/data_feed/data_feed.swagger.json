@@ -22,7 +22,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -44,7 +44,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -76,7 +76,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -114,7 +114,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -143,7 +143,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -172,7 +172,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -210,7 +210,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -242,7 +242,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
@@ -318,8 +318,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -352,8 +351,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -386,8 +384,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -420,8 +417,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -442,12 +438,10 @@
           "format": "int64"
         },
         "updated_nodes_only": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "disable_cidr_filter": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "cidr_filter": {
           "type": "array",
@@ -507,8 +501,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -522,8 +515,7 @@
       "type": "object",
       "properties": {
         "success": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -557,8 +549,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         }
       }
     },
@@ -584,8 +575,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -618,8 +608,7 @@
           "type": "string"
         },
         "enable": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "meta_data": {
           "type": "array",

@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -31,6 +32,7 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
+var _ = metadata.Join
 
 var (
 	filter_ApplicationsService_GetServiceGroups_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
@@ -615,11 +617,14 @@ func local_request_ApplicationsService_GetServicesUsageCount_0(ctx context.Conte
 // RegisterApplicationsServiceHandlerServer registers the http handlers for service ApplicationsService to "mux".
 // UnaryRPC     :call ApplicationsServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterApplicationsServiceHandlerFromEndpoint instead.
 func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ApplicationsServiceServer) error {
 
 	mux.Handle("GET", pattern_ApplicationsService_GetServiceGroups_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -627,6 +632,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetServiceGroups_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -640,6 +646,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetServiceGroupsHealthCounts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -647,6 +655,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetServiceGroupsHealthCounts_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -660,6 +669,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetServices_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -667,6 +678,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetServices_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -680,6 +692,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetServicesDistinctValues_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -687,6 +701,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetServicesDistinctValues_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -700,6 +715,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetServicesBySG_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -707,6 +724,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetServicesBySG_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -720,6 +738,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetServicesStats_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -727,6 +747,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetServicesStats_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -740,6 +761,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetDisconnectedServices_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -747,6 +770,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetDisconnectedServices_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -760,6 +784,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("POST", pattern_ApplicationsService_DeleteDisconnectedServices_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -767,6 +793,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_DeleteDisconnectedServices_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -780,6 +807,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("POST", pattern_ApplicationsService_DeleteServicesByID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -787,6 +816,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_DeleteServicesByID_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -800,6 +830,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -807,6 +839,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetVersion_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -820,6 +853,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetDisconnectedServicesConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -827,6 +862,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetDisconnectedServicesConfig_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -840,6 +876,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("POST", pattern_ApplicationsService_UpdateDisconnectedServicesConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -847,6 +885,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_UpdateDisconnectedServicesConfig_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -860,6 +899,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("POST", pattern_ApplicationsService_RunDisconnectedServicesJob_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -867,6 +908,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_RunDisconnectedServicesJob_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -880,6 +922,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetDeleteDisconnectedServicesConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -887,6 +931,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetDeleteDisconnectedServicesConfig_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -900,6 +945,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("POST", pattern_ApplicationsService_UpdateDeleteDisconnectedServicesConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -907,6 +954,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_UpdateDeleteDisconnectedServicesConfig_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -920,6 +968,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("POST", pattern_ApplicationsService_RunDeleteDisconnectedServicesJob_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -927,6 +977,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_RunDeleteDisconnectedServicesJob_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -940,6 +991,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("PUT", pattern_ApplicationsService_UpdateTelemetryReported_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -947,6 +1000,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_UpdateTelemetryReported_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -960,6 +1014,8 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 	mux.Handle("GET", pattern_ApplicationsService_GetServicesUsageCount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
 		if err != nil {
@@ -967,6 +1023,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		resp, md, err := local_request_ApplicationsService_GetServicesUsageCount_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
