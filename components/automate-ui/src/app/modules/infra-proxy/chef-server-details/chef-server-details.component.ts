@@ -216,7 +216,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     // Call to get server and orgs
     setTimeout( () => {
       this.getServerAndOrgs();
-    }, 5000 );
+    }, 4000 );
 
     // Get create server status
     combineLatest([
@@ -349,7 +349,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.orgsListLoading = true;
         setTimeout( () => {
           this.getServerAndOrgs();
-        }, 5000 );
+        }, 4000 );
       } else {
         this.confirmPreviewsubmit = false;
       }
@@ -423,7 +423,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.migration_id = this.server.migration_id;
       this.migration_type = this.server.migration_type;
       if (this.orgs.length > 0 ) {
-        this.migrationCompleted = true;
+        if (this.migrationInProgress) {
+          this.migrationCompleted = true;
+        }
         this.migrationNotRunning = false;
       }
 
@@ -440,7 +442,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }, 1000);
 
       // relaod the orgs in case of orgs are not loaded
-      if ( this.migrationCompleted && this.orgs.length < 0) {
+      if ( this.migrationCompleted && this.orgs.length <= 0) {
         this.getServerAndOrgs();
         this.migrationIsCompleted();
       }
