@@ -24,7 +24,7 @@ Based on the number of nodes, the virtual machine requirements for AWS deploymen
 | Instance          | Type         | RAM                                                   | Volume Size         | Volume Type | Volume iops |
 | :---------------  | :----------  | :---------------------------------------------------  | :-----------------  | :---------  | :---------  |
 | PostgreSQL        | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 150 |
-| Elasticsearch     | m5.large     | 8 GB RAM for test and 16 GB for production. vCPU - 2. | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 300 |
+| Opensearch     | m5.large     | 8 GB RAM for test and 16 GB for production. vCPU - 2. | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 300 |
 | Chef Automate     | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 100 |
 | Chef Infra Server | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 100 |
 
@@ -32,7 +32,7 @@ Based on the number of nodes, the virtual machine requirements for AWS deploymen
 
 ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. The above table includes instances’ RAM and volume size, set up for testing purposes. Production depends on the number of nodes and the frequency of Chef Infra Client runs and compliance scans. However, for on-premises deployment, you can choose the above requirements for VM like RAM.
 
-For **Elasticsearch** and **PostgresSQL**, a minimum of three node clusters is required.
+For **Opensearch** and **PostgresSQL**, a minimum of three node clusters is required.
 
 {{< /note >}}
 
@@ -68,7 +68,7 @@ If the DNS attributes **enableDnsSupport** and **enableDnsHostnames** are true, 
 
 The Chef Automate HA deployment using AWS creates the following network resources:
 
-- Three instances for ElasticSearch node.
+- Three instances for OpenSearch node.
 
 - Three instances for PostgreSQL node.
 
@@ -76,7 +76,7 @@ The Chef Automate HA deployment using AWS creates the following network resource
 
 - One instance for Chef Infra Server each. However, we can add more instances for the Chef Infra server based on your requirements.
 
-{{< figure src="/images/automate/ha_aws_resources1.png" alt="Chef Automate HA ElasticSearch and PostgreSQL Instances">}}
+{{< figure src="/images/automate/ha_aws_resources1.png" alt="Chef Automate HA OpenSearch and PostgreSQL Instances">}}
 
 - Two load balancers and two respective target groups. One each for the Chef Automate server and Chef Infra server.
 

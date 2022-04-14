@@ -13,4 +13,254 @@ gh_repo = "automate"
     weight = 230
 +++
 
-TO BE ADDED
+## Setup LB using Haproxy and nginx
+
+### Steps to install Haproxy
+
+Setup process to setup LB on server using Haproxy 
+
+1. Install haproxy on server 
+
+```bash
+sudo add-apt-repository ppa:vbernat/haproxy-1.8 
+sudo apt-get update 
+sudo apt-get install haproxy
+```
+
+2. First, create a self-signed SSL certificate to make communication encrypted 
+Steps to be followed-
+
+```bash
+apt-get -y install openssl 
+openssl req -nodes -x509 -newkey rsa:2048 -keyout /etc/ssl/private/test.key -out /etc/ssl/private/test.crt -days 30 
+cat /etc/ssl/private/test.key /etc/ssl/private/test.crt > /etc/ssl/private/test.pem 
+```
+
+3. Adding HAProxy Listener 
+We need to edit the configuration file to set it for our automate, you will find some default settings in the file you , which you need to keep as it is. 
+sudo vi /etc/haproxy/haproxy.cfg 
+Here we will need to add two listener , 1 on Port 80 and other on Port 443 in configuration file 
+
+```bash
+ frontend http_80 
+
+ bind 172.31.10.107:80 
+
+ mode http 
+
+ default_backend automate-servers 
+
+frontend https_443 
+
+bind 172.31.10.107:443 ssl crt /etc/ssl/private/test.pem 
+
+mode http 
+
+http-request set-header X-Forwarded-For %[src] 
+
+reqadd X-Forwarded-Proto:\ https 
+
+option http-server-close 
+
+default_backend automate-servers 
+
+ 
+
+#Add Backend Web Servers 
+#Here we will add backend server , where we want to forward our requests. 
+ 
+
+    backend automate-servers 
+
+    balance roundrobin 
+
+    server ec2-3-8-188-123.eu-west2.compute.amazonaws.com 3.8.188.123:443 check ssl verify none 
+
+    server ec2-3-9-146-238.eu-west-2.compute.amazonaws.com 3.9.146.238:443 check ssl verify none 
+
+    server ec2-18-132-204-33.eu-west-2.compute.amazonaws.com 18.132.204.33:443 check ssl verify none 
+
+ ```
+
+4. Configuration File will look like
+
+```bash
+       global 
+
+log /dev/log	local0 
+
+log /dev/log	local1 notice 
+
+chroot /var/lib/haproxy 
+
+stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners 
+
+stats timeout 30s 
+
+user haproxy 
+
+group haproxy 
+
+daemon 
+
+  
+
+# Default SSL material locations 
+
+ca-base /etc/ssl/certs 
+
+crt-base /etc/ssl/private 
+
+  
+
+# Default ciphers to use on SSL-enabled listening sockets. 
+
+# For more information, see ciphers(1SSL). This list is from: 
+
+#  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/ 
+
+# An alternative list with additional directives can be obtained from 
+
+#  https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=haproxy 
+
+ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS 
+
+ssl-default-bind-options no-sslv3 
+
+  
+
+defaults 
+
+log	global 
+
+mode	http 
+
+option	httplog 
+
+option	dontlognull 
+
+        timeout connect 5000 
+
+        timeout client  50000 
+
+        timeout server  50000 
+
+errorfile 400 /etc/haproxy/errors/400.http 
+
+errorfile 403 /etc/haproxy/errors/403.http 
+
+errorfile 408 /etc/haproxy/errors/408.http 
+
+errorfile 500 /etc/haproxy/errors/500.http 
+
+errorfile 502 /etc/haproxy/errors/502.http 
+
+errorfile 503 /etc/haproxy/errors/503.http 
+
+errorfile 504 /etc/haproxy/errors/504.http 
+
+  
+
+frontend http 
+
+    bind 172.31.10.107:80 
+
+    mode http 
+
+    default_backend automate-servers 
+
+  
+
+  
+
+frontend https_443 
+
+bind 172.31.10.107:443 ssl crt /etc/ssl/private/test.pem 
+
+mode http 
+
+http-request set-header X-Forwarded-For %[src] 
+
+reqadd X-Forwarded-Proto:\ https 
+
+option http-server-close 
+
+default_backend automate-servers 
+
+  
+
+backend automate-servers 
+
+    balance roundrobin 
+
+    server ec2-3-8-188-123.eu-west-2.compute.amazonaws.com 3.8.188.123:443 check ssl verify none 
+
+    server ec2-3-9-146-238.eu-west-2.compute.amazonaws.com 3.9.146.238:443 check ssl verify none 
+
+    server ec2-18-132-204-33.eu-west-2.compute.amazonaws.com 18.132.204.33:443 check ssl verify none 
+
+ ```
+ 
+5. Check configuration file 
+`haproxy -c -f /etc/haproxy/haproxy.cfg `
+ 
+6. Restart haproxy  
+`service haproxy restart `
+
+### Steps to install nginx and set it up like an LB 
+
+1. Install nginx on server 
+  Debian and Ubuntu 
+`sudo apt-get update  
+ sudo apt-get install nginx 
+#centos and redhat 
+sudo yum install epel-release 
+sudo yum update 
+sudo yum install nginx `
+
+2. Configuring nginx as a load balancer 
+we need to create conf file for our Load balancer 
+`vi /etc/nginx/conf.d/load-balancer.conf 
+
+           Add Below Content in load-balancer.conf  
+          #List of servers behind LB 
+
+          upstream backend { 
+
+            server 172.31.46.240:443;  
+
+           server 172.31.8.233:443; 
+
+           server 172.31.24.254:443; 
+
+          } 
+
+        server { 
+
+          Listen 443 ssl; 
+
+          ssl_certificate /etc/ssl/private/test.crt; 
+
+          ssl_certificate_key /etc/ssl/private/test.pem; 
+
+          ssl_protocols TLSv1 TLSv1.1 TLSv1.2; 
+
+         location / { 
+
+          proxy_pass https://backend; 
+
+         } 
+
+      }` 
+
+3. Check if configuration is correct by this command  
+`sudo nginx –t `
+
+4. Remove already existing default running site  
+   On Debian and Ubuntu systems you’ll need to remove the default symbolic link from the sites-enabled folder. 
+   `sudo rm /etc/nginx/sites-enabled/default` 
+  CentOS hosts don’t use the same linking. Instead, simply rename the default.conf in the  conf.d/ directory to something that doesn’t end with .conf, for example: 
+  `sudo mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.disabled `
+
+5. Restart the nginx 
+   `sudo systemctl restart nginx `

@@ -30,8 +30,6 @@ Following guidelines are adhered to achieve a robust degree of high availability
 
 - Several methods are followed in performance tuning, hardware planning, data retention policies, storage, network load-balancing, and firewall services.
 
-- As Chef Automate Cluster is offered as a Chef Professional Service, the customer receives expert architecture planning, system architecture recommendations, and performance tuning for their network infrastructure.
-
 ## Load Balancer
 
 **Load balancer** aids in identifying possible failure points and thereby helps in reducing downtime. More efficient workload distribution helps optimize network infrastructure components and increases application availability.
@@ -58,4 +56,4 @@ Both Chef Automate and Chef Infra Server have a load balancer with a UI. For exa
 
 ### Automate Backend
 
-The **ElasticSearch** and **PostgreSQL** database instances act as automated backend components. Chef habitat's hab supervisor concept makes a cluster for the database instance. Automate backend cluster rests in the habitat ring. For **Postgresql**, **pgleaderchk** service runs in all the **PostgreSQL** instances and ensures to choose a leader in case the leader database fails. For **ElasticSearch**, there is a **msae** concept of leader-follower, and for any database failure, a leader election occurs, and a new leader is chosen.
+The **OpenSearch** and **PostgreSQL** database instances act as automated backend components. Chef habitat's hab supervisor concept makes a cluster for the database instance. Automate backend cluster rests in the habitat ring. For **Postgresql**, **pgleaderchk** service runs in all the **PostgreSQL** instances and ensures to choose a leader in case the leader database fails. For **OpenSearch**, there is a **msae** concept of leader-follower, and for any database failure, a leader election occurs, and a new leader is chosen.
