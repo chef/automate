@@ -13,7 +13,7 @@ $(BIN_DIR)/gen_server_test_data:
 
 proto: bin/protoc-gen-go
 	protoc -I../../components/notifications-service/server/priv \
-		--go_out=plugins=grpc:./api \
+		--go_out=plugins=grpc:./ \
 		$(BASE_PROTO_FILES)
 
 bin/protoc-gen-go:
