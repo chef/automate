@@ -2,6 +2,11 @@
   <chef-loading-spinner class="spinner" *ngIf="usersListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="users" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
+  <app-reset-user-key
+        [openEvent]="openNotificationModal"
+        [serverId]="serverId"
+        [orgId]="orgId"
+        [name]="name"></app-reset-user-key>
   <ng-container *ngIf="!usersListLoading && !authFailure">
     <div class="wrapper">
       <div class="search-create-container">
@@ -10,6 +15,7 @@
       </div>
       <div class="empty-section" cy-data="empty-list" *ngIf="!loading && !users.length && current_page === 1">
         <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p>No users available.</p>
       </div>
       <chef-table data-cy=orgUsers-table-container *ngIf="users.length">
         <chef-thead>
@@ -26,9 +32,11 @@
             <chef-td>{{user.automate_user_id}}</chef-td>
             <chef-td>{{user.email_id}}</chef-td>
             <chef-td class="three-dot-column">
-              <mat-select panelClass="chef-control-menu">
-                <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey()">Reset User Key</mat-option>
-              </mat-select>
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/user/{user.infra_server_username}', 'put', [serverId, orgId]]">
+                <mat-select panelClass="chef-control-menu">
+                  <mat-option data-cy="resetPEMKey" (onSelectionChange)="resetPEMKey(user.infra_server_username)">Reset User Key</mat-option>
+                </mat-select>
+              </app-authorized>
             </chef-td>
           </chef-tr>
         </chef-tbody>

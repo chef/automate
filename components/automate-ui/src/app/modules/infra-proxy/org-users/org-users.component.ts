@@ -30,7 +30,9 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
   public current_page = 1;
   public per_page = 100;
   public total: number;
+  public name: string;
   private isDestroyed = new Subject<boolean>();
+  public openNotificationModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -82,8 +84,10 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
     this.loading = true;
   }
 
-  resetPEMKey() {
-    console.log('resetPEM');
+  resetPEMKey(name) {
+    console.log('resetPEM', name);
+    this.name = name;
+    this.openNotificationModal.emit();
   }
 
   onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
