@@ -1,0 +1,337 @@
+@import "~styles/variables";
+
+
+chef-modal {
+
+  [slot=title] {
+    font-style: normal;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    padding-bottom: 30px;
+  }
+
+  .flex-container {
+    display: flex;
+    justify-content: center;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+
+    .reset-div {
+      width: 100%;
+    }
+
+    .input-margin {
+      margin-bottom: 30px;
+    }
+
+    .id-margin {
+      width: 100%;
+    }
+
+    .left-box {
+      float: left;
+      height: auto;
+      width: 40%;
+    }
+
+    .right-box {
+      float: left;
+      height: auto;
+      width: 60%;
+    }
+
+    .title-text {
+      font-size: 36px;
+      font-weight: 900;
+      margin-top: 72px;
+      margin-bottom: 22px;
+      line-height: 1;
+    }
+
+    .action-text {
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 28px;
+    }
+
+    .left-align {
+      line-height: 30px;
+      margin-bottom: 63px;
+      margin-left: 43px;
+      text-align: left;
+    }
+
+    .big-icon {
+      z-index: 999999;
+      position: relative;
+    }
+
+    .key-tab-body {
+      display: flex;
+      background: $chef-white;
+      border: 0.5px solid $chef-key-tab;
+      height: 300px;
+
+      chef-snippet {
+        height: 298px;
+        width: 99.9%;
+      }
+
+    }
+
+    .detail {
+      background: $chef-success;
+      color: $white;
+      font-size: 12px;
+      line-height: 20px;
+      padding: 9px;
+      margin-bottom: 32px;
+
+      .icon-wrap {
+        display: inline-block;
+        position: relative;
+        width: 40px;
+
+        i {
+          display: block;
+          height: 16px;
+          width: 16px;
+          background-image: url('/assets/img/icon-check-circle.png');
+          position: absolute;
+          top: -51px;
+          left: 8px;
+        }
+
+      }
+
+      p {
+        display: inline-block;
+        font-size: 12px;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+        color: $white;
+        text-transform: capitalize;
+        margin-bottom: 0;
+      }
+
+    }
+
+    .button-bar {
+      text-align: right;
+      padding-top: 24px;
+
+      chef-button {
+        margin-bottom: 0;
+      }
+
+      #reset-button-object-modal, #download-button-object-modal {
+        margin-right: 0;
+      }
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+chef-modal.reset-client-modal {
+  ::ng-deep {
+    .modal {
+      box-shadow: 0px 0px 30px 0px #CCC;
+      outline: none;
+      width: 700px;
+
+      .options {
+        float: right;
+
+        chef-button[primary] {
+          background-color: $chef-critical;
+          border-color: $chef-critical;
+
+          &:hover, &:focus {
+            background-color: $chef-critical-dark;
+            border-color: $chef-critical-dark;
+          }
+
+          chef-loading-spinner {
+            color: $chef-critical-light;
+          }
+
+        }
+
+        chef-button[tertiary] {
+          color: $chef-critical;
+
+          &:hover, &:focus {
+            background-color: $chef-critical-light;
+            border-color: $chef-critical-light;
+          }
+
+          &[disabled] {
+            color: $chef-critical-light;
+          }
+        }
+
+      }
+
+      chef-button {
+
+        &:focus {
+          outline: 0.5px solid $chef-critical-dark;
+        }
+
+        &.close {
+          border: none;
+          color: $chef-black;
+          margin-right: 22px;
+          margin-top: 16px;
+
+          &:hover, &:focus {
+            background: none;
+            outline: none;
+            border: 0.5px solid $chef-primary-bright;
+            border-radius: 4px;
+          }
+
+          button:focus {
+            outline: none;
+            border: 0.5px solid $chef-primary-bright;
+            border-radius: 4px;
+          }
+        }
+
+        button {
+          line-height: 20px;
+          letter-spacing: 0.5px;
+
+          &:focus {
+            outline: 0.5px solid $chef-critical-dark;
+          }
+
+          span:focus {
+            outline: none;
+          }
+        }
+
+        .cancel-button.hydrated {
+          background: none;
+        }
+      }
+
+      .reset-div {
+        button:focus {
+          outline: none;
+          border: 0.5px solid $chef-critical-dark;
+          border-radius: 4px;
+        }
+      }
+
+      .id-margin {
+        button:focus {
+          outline: none;
+          border: 0.5px solid $chef-primary-bright;
+          border-radius: 4px;
+        }
+      }
+
+    }
+
+    .modal-overlay {
+      background-color: $chef-white;
+      opacity: 0.5;
+    }
+
+    chef-snippet pre {
+      font-size: 12px;
+      height: 297px;
+      width: 100%;
+      line-height: 20px;
+      letter-spacing: 0.25px;
+      padding: 1.5em;
+      color: $chef-black;
+    }
+
+  }
+
+}
+
+chef-modal.reset-modal {
+  ::ng-deep {
+    .modal {
+      box-shadow: 0px 0px 30px 0px $light-grey;
+      max-width: 528px;
+      min-width: 528px;
+      outline: none;
+
+      chef-button {
+        &.close {
+          border: none;
+          color: $chef-black;
+          margin-right: 22px;
+          margin-top: 16px;
+
+          &:hover, &:focus {
+            background: none;
+            outline: none;
+          }
+        }
+
+        button {
+          line-height: 20px;
+          letter-spacing: 0.5px;
+
+          &:focus {
+            outline: none;
+            border: 0.5px solid $chef-primary-bright;
+            border-radius: 4px;
+          }
+        }
+
+        .cancel-button.hydrated {
+          background: none;
+        }
+      }
+
+      chef-checkbox {
+        &[aria-checked=false] .check-wrap {
+          border-color: $chef-primary-bright;
+        }
+
+        &:focus {
+          outline: none;
+          border: 0.5px solid $chef-primary-bright;
+          border-radius: 4px;
+        }
+
+        .label-wrap {
+          margin-left: 8px;
+        }
+
+        .check-wrap {
+          width: 16px;
+          min-width: 16px;
+          height: 16px;
+        }
+      }
+    }
+
+    .modal-overlay {
+      background-color: $chef-white;
+      opacity: 0.5;
+    }
+
+    chef-snippet pre {
+      font-size: 12px;
+      height: 297px;
+      width: 100%;
+      line-height: 20px;
+      letter-spacing: 0.05px;
+      padding: 1.5em;
+    }
+  }
+}
