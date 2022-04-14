@@ -396,7 +396,6 @@ chown -RL hab:hab /hab/svc/automate-opensearch/var;
 
 // esMigrateExecutor
 func esMigrateExecutor() error {
-	//upgraded := false
 	preRequiste, err := preRequisteForESDataMigration()
 	defer func() {
 		err = chefAutomateStart()
@@ -910,7 +909,7 @@ func calDiskSizeAndDirSize(data, oldData string) (bool, error) {
 	dirSizeInMb := size / (1024 * 1024)
 
 	msg := fmt.Sprintf("Insufficient disk space for migration.\n%s: %5d MB\n%s: %5d MB\n%s",
-		"Space Required", dirSizeInMb,
+		"Space Required", (dirSizeInMb + int64(dirSizeInMb/10)),
 		"Space Available", diskSpaceInMb,
 		"To continue with less memory Please use --skip-storage-check")
 	// NewData > olddata + 10%of oldData
