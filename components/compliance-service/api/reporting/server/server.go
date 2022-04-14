@@ -170,14 +170,18 @@ func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlIt
 	if in.Size == 0 {
 		in.Size = 100
 	}
+	if in.PageNumber == 0 {
+		in.PageNumber = 1
+	}
 
+	logrus.Debugf("Yashvi --- testing --------- page number ----- size", in.Size, in.PageNumber)
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
-	controlListItems, err = srv.es.GetControlListItems(ctx, formattedFilters, in.Size)
+	controlListItems, err = srv.es.GetControlListItems(ctx, formattedFilters, in.Size, in.PageNumber)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}

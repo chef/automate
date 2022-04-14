@@ -301,8 +301,10 @@ message ControlItemRequest {
 	string text = 1;
 	// The maximum number of controls to return (Default 100).
 	int32 size = 2;
+	// For pagination start value
+	int32 page_number =3;
 	// The criteria used to filter the controls returned.
-	repeated ListFilter filters = 3;
+	repeated ListFilter filters = 4;
 }
 
 message WaiverData {

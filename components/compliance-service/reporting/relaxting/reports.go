@@ -685,9 +685,10 @@ func contains(a []string, x string) bool {
 }
 
 func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[string][]string,
-	size int32) (*reportingapi.ControlItems, error) {
+	size int32, pageNumber int32) (*reportingapi.ControlItems, error) {
 	myName := "GetControlListItems"
 
+	logrus.Debugf("Yashvi1---- testing------ pagenumber and size got---- %s %s", size, pageNumber)
 	contListItems := make([]*reportingapi.ControlItem, 0)
 
 	controlSummaryTotals := &reportingapi.ControlSummary{
@@ -719,8 +720,9 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		FetchSource(false).
 		Size(1)
 
+	logrus.Debugf("Size of the bucket from  paginate %s", size*pageNumber)
 	controlTermsAgg := elastic.NewTermsAggregation().Field("profiles.controls.id").
-		Size(int(size)).
+		Size(int(size*pageNumber)).
 		Order("_key", true)
 
 	controlTermsAgg.SubAggregation("impact",
@@ -889,7 +891,9 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 						controlSummaryTotals.Waived.Total = int32(totalWaivedControls.DocCount)
 					}
 					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
-						for _, controlBucket := range controlBuckets.Buckets {
+						start, end := paginate(int(pageNumber), int(size), len(controlBuckets.Buckets))
+						logrus.Debugf("Pagination for controls %s %s %s", start, end, len(controlBuckets.Buckets))
+						for _, controlBucket := range controlBuckets.Buckets[start:end] {
 							contListItem, err := backend.getControlItem(controlBucket)
 							if err != nil {
 								return nil, err
@@ -1447,4 +1451,19 @@ func getProfileAndControlQuery(filters map[string][]string, profileBaseFscInclud
 		nestedQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(profileLevelFsc))
 	}
 	return nestedQuery
+}
+
+func paginate(pageNum int, size int, length int) (int, int) {
+	start := (pageNum - 1) * size
+
+	if start > length {
+		start = length
+	}
+
+	end := start + size
+	if end > length {
+		end = length
+	}
+
+	return start, end
 }
