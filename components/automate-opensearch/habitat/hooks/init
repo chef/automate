@@ -20,3 +20,101 @@ source {{pkg.svc_config_path}}/health_check
 mkdir -p {{pkg.svc_var_path}}/logs
 mkdir -p {{pkg.svc_var_path}}/plugins
 mkdir -p {{pkg.svc_var_path}}/tmp
+
+
+openssl genrsa -out {{pkg.svc_config_path}}/root-ca-key.pem 2048
+openssl req -new -x509 -sha256 -key {{pkg.svc_config_path}}/root-ca-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca" -out {{pkg.svc_config_path}}/root-ca.pem -days 1095
+# Admin cert
+openssl genrsa -out {{pkg.svc_config_path}}/admin-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/admin-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/admin-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/admin-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin" -out {{pkg.svc_config_path}}/admin.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/admin.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/admin.pem -days 1095
+# Node cert 1
+openssl genrsa -out {{pkg.svc_config_path}}/node1-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/node1-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/node1-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/node1-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out {{pkg.svc_config_path}}/node1.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/node1.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/node1.pem -days 1095
+# Node cert 2
+openssl genrsa -out {{pkg.svc_config_path}}/node2-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/node2-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/node2-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/node2-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode" -out {{pkg.svc_config_path}}/node2.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/node2.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/node2.pem -days 1095
+# Client cert
+openssl genrsa -out {{pkg.svc_config_path}}/client-key-temp.pem 2048
+openssl pkcs8 -inform PEM -outform PEM -in {{pkg.svc_config_path}}/client-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{pkg.svc_config_path}}/client-key.pem
+openssl req -new -key {{pkg.svc_config_path}}/client-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefclient" -out {{pkg.svc_config_path}}/client.csr
+openssl x509 -req -in {{pkg.svc_config_path}}/client.csr -CA {{pkg.svc_config_path}}/root-ca.pem -CAkey {{pkg.svc_config_path}}/root-ca-key.pem -CAcreateserial -sha256 -out {{pkg.svc_config_path}}/client.pem -days 1095
+# Cleanup
+rm {{pkg.svc_config_path}}/admin-key-temp.pem
+rm {{pkg.svc_config_path}}/admin.csr
+rm {{pkg.svc_config_path}}/node1-key-temp.pem
+rm {{pkg.svc_config_path}}/node1.csr
+rm {{pkg.svc_config_path}}/node2-key-temp.pem
+rm {{pkg.svc_config_path}}/node2.csr
+rm {{pkg.svc_config_path}}/client-key-temp.pem
+rm {{pkg.svc_config_path}}/client.csr
+
+chown -RL hab:hab {{pkg.svc_config_path}}/root-ca.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/admin.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/admin.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/node1.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/node2.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/client.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/admin-key.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/node1-key.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/node2-key.pem
+chown -RL hab:hab {{pkg.svc_config_path}}/client-key.pem
+
+chmod 0600 {{pkg.svc_config_path}}/root-ca.pem
+chmod 0600 {{pkg.svc_config_path}}/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/node1.pem
+chmod 0600 {{pkg.svc_config_path}}/node2.pem
+chmod 0600 {{pkg.svc_config_path}}/client.pem
+chmod 0600 {{pkg.svc_config_path}}/admin-key.pem
+chmod 0600 {{pkg.svc_config_path}}/node1-key.pem
+chmod 0600 {{pkg.svc_config_path}}/node2-key.pem
+chmod 0600 {{pkg.svc_config_path}}/client-key.pem
+
+
+
+# setting security config, init and log settings permission to 600
+chown -RL hab:hab {{pkg.svc_config_path}}/init_ca
+chown -RL hab:hab {{pkg.svc_config_path}}/init_ca
+chown -RL hab:hab {{pkg.svc_config_path}}/log4j2.properties
+chown -RL hab:hab {{pkg.svc_config_path}}/init_keystore
+chown -RL hab:hab {{pkg.svc_config_path}}/opensearch.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/internal_users.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/config.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/roles_mapping.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/tenants.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/whitelist.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/audit.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/roles.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/action_groups.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/securityconfig/nodes_dn.yml
+chown -RL hab:hab {{pkg.svc_config_path}}/root_ca.crt
+chown -RL hab:hab {{pkg.svc_config_path}}/health_check
+chown -RL hab:hab {{pkg.svc_config_path}}/root-ca.srl
+chown -RL hab:hab {{pkg.svc_config_path}}/jvm.options
+chown -RL hab:hab {{pkg.svc_config_path}}/root-ca-key.pem
+
+chmod 0600 {{pkg.svc_config_path}}/init_ca
+chmod 0600 {{pkg.svc_config_path}}/init_ca
+chmod 0600 {{pkg.svc_config_path}}/log4j2.properties
+chmod 0600 {{pkg.svc_config_path}}/init_keystore
+chmod 0600 {{pkg.svc_config_path}}/opensearch.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/internal_users.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/config.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/roles_mapping.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/tenants.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/whitelist.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/audit.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/roles.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/action_groups.yml
+chmod 0600 {{pkg.svc_config_path}}/securityconfig/nodes_dn.yml
+chmod 0600 {{pkg.svc_config_path}}/root_ca.crt
+chmod 0600 {{pkg.svc_config_path}}/health_check
+chmod 0600 {{pkg.svc_config_path}}/root-ca.srl
+chmod 0600 {{pkg.svc_config_path}}/jvm.options
+chmod 0600 {{pkg.svc_config_path}}/root-ca-key.pem
