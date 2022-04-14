@@ -12,27 +12,13 @@ chef-page-header {
   padding: 1em 0 2em;
   background: $chef-white;
 
-  .summary-body {
-    display: inline-block;
-    font-size: 14px;
-    padding: 0 1em;
+  .summary-container {
+    display: grid;
+    grid-template-columns: 40% 46% 14%;
 
-    &.first {
-      width: 39%;
-
-      .heading {
-        display: inline-block;
-        font-weight: bold;
-        width: 30%;
-      }
-
-      .server-entity-value {
-        width: 70%;
-      }
-    }
-
-    &.middle {
-      width: 46%;
+    .summary-body {
+      font-size: 14px;
+      padding: 0 1em;
 
       .heading {
         display: inline-block;
@@ -43,10 +29,10 @@ chef-page-header {
       .server-entity-value {
         width: 70%;
       }
-    }
 
-    &.last {
-      width: 14%;
+      &.last {
+        position: relative;
+      }
     }
 
     .meta-head {
@@ -93,8 +79,8 @@ chef-page-header {
     }
 
     .sync-button {
-      float: right;
-      margin-bottom: 62px;
+      position: absolute;
+      right: 0;
 
       .img-inline {
         width: 17px;
@@ -141,7 +127,7 @@ th {
   padding: 0px;
 }
 
-tbody > .detail-row {
+tbody>.detail-row {
   padding-top: 0px;
   padding-bottom: 15px;
   height: 50px;
@@ -247,7 +233,7 @@ img {
 .circular-chart {
   display: inline-block;
   width: 30px;
-  justify-content: space-around ;
+  justify-content: space-around;
 }
 
 .circle-bg {
@@ -305,6 +291,7 @@ img {
 .chef-server-info-text {
   margin-left: 14px;
 }
+
 .migrationSlider-link {
   padding-left: 10px;
   text-decoration: underline;
