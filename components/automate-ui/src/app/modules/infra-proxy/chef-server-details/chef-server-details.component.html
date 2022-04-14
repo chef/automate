@@ -11,98 +11,98 @@
       <chef-page-header>
         <div class="meta-box">
           <p class="chef-server-info-text">CHEF SERVER INFORMATION</p>
-          <div class="summary-body first">
-            <ul>
-              <li>
-                <span class="heading">FQDN</span>
-                <span class="server-entity-value" data-cy="node-env">{{ server?.fqdn }}</span>
-              </li>
-              <li>
-                <span class="heading">IP Address</span>
-                <span class="server-entity-value">{{ server?.ip_address === '' ? '--' : server?.ip_address }}</span>
-              </li>
-              <li>
-                <span class="heading"></span>
-                <span class="server-entity-value"></span>
-              </li>
-            </ul>
-          </div>
-          <div class="summary-body middle">
-            <ul>
-              <li>
-                <span class="heading">Web UI Key</span>
-                <span class="server-entity-value">
-                  <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
-                  <span *ngIf="(isValid && !validating)" data-cy="valid-webui-key" class="webUIKeyStatus">Valid</span>
-                  <img *ngIf="(!isValid && !validating)" src="../../../../assets/img/warning.png" alt="warning" />
-                  <span *ngIf="(!isValid && !validating)" class="invalidStatus">Invalid</span>
-                  <span class="update-link" data-cy="open-WebKey-slider">
-                    <a
-                    data-cy="update-web-ui-key"
-                    (click)="webUIKeySlider.slidePanel()"
-                    >Update</a>
+          <div class="summary-container">
+            <div class="summary-body first">
+              <ul>
+                <li>
+                  <span class="heading">FQDN</span>
+                  <span class="server-entity-value" data-cy="node-env">{{ server?.fqdn }}</span>
+                </li>
+                <li>
+                  <span class="heading">IP Address</span>
+                  <span class="server-entity-value">{{ server?.ip_address === '' ? '--' : server?.ip_address }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="summary-body middle">
+              <ul>
+                <li>
+                  <span class="heading">Web UI Key</span>
+                  <span class="server-entity-value">
+                    <span *ngIf="validating" data-cy="valid-webui-key" class="webUIKeyStatus">Validating...</span>
+                    <span *ngIf="(isValid && !validating)" data-cy="valid-webui-key" class="webUIKeyStatus">Valid</span>
+                    <img *ngIf="(!isValid && !validating)" src="../../../../assets/img/warning.png" alt="warning" />
+                    <span *ngIf="(!isValid && !validating)" class="invalidStatus">Invalid</span>
+                    <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
+                      <span class="update-link" data-cy="open-WebKey-slider">
+                        <a data-cy="update-web-ui-key" (click)="webUIKeySlider.slidePanel()">Update</a>
+                      </span>
+                    </app-authorized>
                   </span>
-                </span>
-              </li>
-              <li>
-                <span class="heading">Last sync date</span>
-                <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
-              </li>
-              <li>
-                <span data-cy="lastStatus" *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted || !migrationInProgress" class="heading">Last Migration Status </span>
-                <!-- Completed status -->
-                <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted" class="server-entity-value">
-                  <img src='../../../../assets/img/completed.png' alt="info" />
-                  <span>Completed</span>
-                </span>
+                </li>
+                <li>
+                  <span class="heading">Last sync date</span>
+                  <span class="server-entity-value">Thu, Feb 04, 12:00:00 UTC</span>
+                </li>
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
+                  <li>
+                    <span data-cy="lastStatus"
+                      *ngIf="migrationCompleted || migrationfailed || migrationLoading || !migrationStarted || !migrationInProgress"
+                      class="heading">Last Migration Status </span>
+                    <!-- Completed status -->
+                    <span *ngIf="!migrationLoading && migrationStarted && migrationCompleted"
+                      class="server-entity-value">
+                      <img src='../../../../assets/img/completed.png' alt="info" />
+                      <span>Completed</span>
+                    </span>
 
-                <!-- Failed status -->
-                <span *ngIf="!migrationLoading && migrationStarted && migrationfailed && !migrationInProgress" class="server-entity-value" id="status-failed">
-                  <chef-tooltip position='bottom' class="tooltip" for='error-show-button'>
-                    <img src='../../../../assets/img/failed.png' alt="warning" />
-                    Migration failed, migration step not completed!
-                  </chef-tooltip>
-                  <img id='error-show-button' src='../../../../assets/img/failed.png' alt="info" />
-                  <span>Failed</span>
-                </span>
+                    <!-- Failed status -->
+                    <span *ngIf="!migrationLoading && migrationStarted && migrationfailed && !migrationInProgress"
+                      class="server-entity-value" id="status-failed">
+                      <chef-tooltip position='bottom' class="tooltip" for='error-show-button'>
+                        <img src='../../../../assets/img/failed.png' alt="warning" />
+                        Migration failed, migration step not completed!
+                      </chef-tooltip>
+                      <img id='error-show-button' src='../../../../assets/img/failed.png' alt="info" />
+                      <span>Failed</span>
+                    </span>
 
-                <!-- in progress status -->
-                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress && !migrationfailed && !migrationCompleted" class="heading" data-cy="sync-button">Sync In Progress </span>
-                <span *ngIf="!migrationLoading && migrationStarted && migrationInProgress && !migrationfailed && !migrationCompleted" class="server-entity-value svg-block">
-                  <svg viewBox="0 0 36 36" class="circular-chart single-chart blue">
-                    <path class="circle-bg"
-                      d="M18 2.0845
+                    <!-- in progress status -->
+                    <span
+                      *ngIf="!migrationLoading && migrationStarted && migrationInProgress && !migrationfailed && !migrationCompleted"
+                      class="heading" data-cy="sync-button">Sync In Progress </span>
+                    <span
+                      *ngIf="!migrationLoading && migrationStarted && migrationInProgress && !migrationfailed && !migrationCompleted"
+                      class="server-entity-value svg-block">
+                      <svg viewBox="0 0 36 36" class="circular-chart single-chart blue">
+                        <path class="circle-bg" d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path class="circle"
-                      [attr.stroke-dasharray]="currentMigrationProcess()"
-                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" [attr.stroke-dasharray]="currentMigrationProcess()" d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <span>{{stepsCompleted}} Steps Completed</span>
-                  <span *ngIf="migrationIsInPreview" class="migrationSlider-link">
-                    <a
-                    data-cy="show-preview"
-                    class="preview-link"
-                    (click)="migrationSlider.slidePanel(); getPreviewData()"
-                    >Click to Preview</a>
-                  </span>
-                </span>
-                <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
-                <span *ngIf="!migrationStarted" class="server-entity-value">--</span>
-              </li>
-            </ul>
-          </div>
-          <div class="summary-body last">
-            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
-              <chef-button id="sync-button" class="sync-button" secondary data-cy="sync-org-and-users" (click)="upload.slidePanel()">
-                <img alt="sync-button" src="/assets/img/sync_arrow.png" class="img-inline"/>
-                <span>Sync Org and Users</span>
-              </chef-button>
-            </app-authorized>
+                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      </svg>
+                      <span>{{stepsCompleted}} Steps Completed</span>
+                      <span *ngIf="migrationIsInPreview" class="migrationSlider-link">
+                        <a data-cy="show-preview" class="preview-link"
+                          (click)="migrationSlider.slidePanel(); getPreviewData()">Click to Preview</a>
+                      </span>
+                    </span>
+                    <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
+                    <span *ngIf="!migrationStarted" class="server-entity-value">--</span>
+                  </li>
+                </app-authorized>
+              </ul>
+            </div>
+            <div class="summary-body last">
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
+                <chef-button id="sync-button" class="sync-button" secondary data-cy="sync-org-and-users"
+                  (click)="upload.slidePanel()">
+                  <img alt="sync-button" src="/assets/img/sync_arrow.png" class="img-inline" />
+                  <span>Sync Org and Users</span>
+                </chef-button>
+              </app-authorized>
+            </div>
           </div>
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
@@ -113,40 +113,22 @@
           </app-authorized>
         </chef-tab-selector>
       </chef-page-header>
-      <app-create-org-modal
-        [visible]="createModalVisible"
-        [creating]="creatingServerOrg"
-        [createForm]="orgForm"
-        (close)="closeCreateModal()"
-        [conflictErrorEvent]="conflictErrorEvent"
-        (createClicked)="createServerOrg()">
+      <app-create-org-modal [visible]="createModalVisible" [creating]="creatingServerOrg" [createForm]="orgForm"
+        (close)="closeCreateModal()" [conflictErrorEvent]="conflictErrorEvent" (createClicked)="createServerOrg()">
       </app-create-org-modal>
-      <app-delete-infra-object-modal
-        [visible]="deleteModalVisible"
-        objectNoun="organization"
-        [objectName]="orgToDelete?.name"
-        (close)="closeDeleteModal()"
-        (deleteClicked)="deleteOrg()"
+      <app-delete-infra-object-modal [visible]="deleteModalVisible" objectNoun="organization"
+        [objectName]="orgToDelete?.name" (close)="closeDeleteModal()" (deleteClicked)="deleteOrg()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
-      <app-sync-org-users-slider
-        #upload
-        [uploadForm]="uploadZipForm"
-        [conflictErrorEvent]="conflictErrorEvent"
-        [isUploaded]="isUploaded"
-        (uploadClicked)="uploadZipFile($event)">
+      <app-sync-org-users-slider #upload [uploadForm]="uploadZipForm" [conflictErrorEvent]="conflictErrorEvent"
+        [isUploaded]="isUploaded" (uploadClicked)="uploadZipFile($event)">
       </app-sync-org-users-slider>
       <section class="page-body details-tab" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">
           <chef-form-field>
             <label>
               <span class="label">Name <span aria-hidden="true">*</span></span>
-              <input
-                chefInput
-                formControlName="name"
-                type="text"
-                [resetOrigin]="saveSuccessful"
-                autocomplete="off"
+              <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
                 data-cy="update-server-name">
             </label>
             <chef-error
@@ -173,21 +155,14 @@
             <chef-form-field>
               <label>
                 <span class="label">FQDN <span aria-hidden="true">*</span></span>
-                <input
-                  chefInput
-                  formControlName="fqdn"
-                  type="text"
-                  [resetOrigin]="saveSuccessful"
-                  autocomplete="off"
-                  data-cy="update-server-fqdn"
-                  placeholder="FQDN">
+                <input chefInput formControlName="fqdn" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
+                  data-cy="update-server-fqdn" placeholder="FQDN">
               </label>
               <chef-error
                 *ngIf="selected === 'fqdn' && fqdnForm.get('fqdn').hasError('required') && fqdnForm.get('fqdn').dirty">
                 FQDN is required.
               </chef-error>
-              <chef-error
-                *ngIf="fqdnForm.get('fqdn').hasError('pattern') ">
+              <chef-error *ngIf="fqdnForm.get('fqdn').hasError('pattern') ">
                 FQDN is invalid.
               </chef-error>
             </chef-form-field>
@@ -198,30 +173,19 @@
             <chef-form-field>
               <label>
                 <span class="label">IP Address <span aria-hidden="true">*</span></span>
-                <input
-                  chefInput
-                  formControlName="ip_address"
-                  type="text"
-                  [resetOrigin]="saveSuccessful"
-                  autocomplete="off"
-                  data-cy="update-server-ip-address"
-                  placeholder="IP Address">
+                <input chefInput formControlName="ip_address" type="text" [resetOrigin]="saveSuccessful"
+                  autocomplete="off" data-cy="update-server-ip-address" placeholder="IP Address">
               </label>
-              <chef-error
-                *ngIf="ipForm.get('ip_address').hasError('required') && ipForm.get('ip_address').dirty">
+              <chef-error *ngIf="ipForm.get('ip_address').hasError('required') && ipForm.get('ip_address').dirty">
                 IP Address is required.
               </chef-error>
-              <chef-error
-                *ngIf="ipForm.get('ip_address').hasError('pattern')">
+              <chef-error *ngIf="ipForm.get('ip_address').hasError('pattern')">
                 IP Address is invalid.
               </chef-error>
             </chef-form-field>
           </div>
           <div id="button-bar">
-            <chef-button
-              primary
-              inline
-              data-cy="save-button"
+            <chef-button primary inline data-cy="save-button"
               [disabled]="isLoading || !updateServerForm.valid || saveInProgress || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
               (click)="saveServer()">
               <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
@@ -241,20 +205,20 @@
                 <chef-th class="three-dot-column no-border"></chef-th>
               </chef-tr>
             </chef-thead>
-            <chef-tbody *ngFor = "let users of users.users">
+            <chef-tbody *ngFor="let users of users.users">
               <chef-tr>
                 <chef-td class="userName-column">{{users.infra_server_username}}</chef-td>
                 <chef-td class="automate-column">{{users.automate_user_id}}</chef-td>
                 <chef-td class="three-dot-column">
-                    <mat-select panelClass="chef-control-menu">
+                  <mat-select panelClass="chef-control-menu">
                     <mat-option data-cy="delete-org">Fetch PEM Key</mat-option>
-                    </mat-select>
+                  </mat-select>
                 </chef-td>
               </chef-tr>
             </chef-tbody>
           </chef-table>
         </div>
-        <div data-cy="empty-list" class="empty-section"  *ngIf="!isUserLoaded">
+        <div data-cy="empty-list" class="empty-section" *ngIf="!isUserLoaded">
           <img alt="No preview" src="/assets/img/no_preview.gif" />
           <p data-cy="no-records">No users available.</p>
         </div>
@@ -273,7 +237,8 @@
             <chef-tbody>
               <chef-tr *ngFor="let org of orgs">
                 <chef-td>
-                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'organizations', org.id]">{{ org.name }}</a>
+                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'organizations', org.id]">{{ org.name
+                    }}</a>
                 </chef-td>
                 <chef-td>{{ org.admin_user }}</chef-td>
                 <chef-td class="projects-column" [ngSwitch]="org.projects.length">
@@ -282,9 +247,11 @@
                   <ng-container *ngSwitchDefault>{{ org.projects.length }} projects</ng-container>
                 </chef-td>
                 <chef-td class="three-dot-column">
-                  <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]">
+                  <app-authorized
+                    [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]">
                     <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">
-                    <mat-option data-cy="delete-org" (onSelectionChange)="startOrgDelete($event, org)">Delete</mat-option>
+                      <mat-option data-cy="delete-org" (onSelectionChange)="startOrgDelete($event, org)">Delete
+                      </mat-option>
                     </mat-select>
                   </app-authorized>
                 </chef-td>
@@ -297,20 +264,12 @@
           <p data-cy="no-records">No Organization available.</p>
         </div>
       </section>
-      <app-update-web-uikey-slider 
-        #webUIKeySlider
-        [updating]="updatingWebuiKey"
-        [updateWebuiKeyForm]="updateWebuiKeyForm"
-        [conflictErrorEvent]="conflictErrorEvent"
-        [updatingWebuiKey]="updatingWebuiKey"
-        (updateWebuiKeyClicked)="updateWebuiKey()">
+      <app-update-web-uikey-slider #webUIKeySlider [updating]="updatingWebuiKey"
+        [updateWebuiKeyForm]="updateWebuiKeyForm" [conflictErrorEvent]="conflictErrorEvent"
+        [updatingWebuiKey]="updatingWebuiKey" (updateWebuiKeyClicked)="updateWebuiKey()">
       </app-update-web-uikey-slider>
-      <app-migration-slider
-        #migrationSlider
-        [migrationID]="migration_id"
-        [isPreview]="isPreview"
-        [previewData]="previewData"
-        (confirmPreview)="confirmPreview($event)"
+      <app-migration-slider #migrationSlider [migrationID]="migration_id" [isPreview]="isPreview"
+        [previewData]="previewData" (confirmPreview)="confirmPreview($event)"
         (cancelMigration)="cancelMigration($event)">
       </app-migration-slider>
     </main>
