@@ -15,8 +15,8 @@ const (
 	initMsgV4 = `This is a Major upgrade. 
 ========================
 
-  1) In this release Embedded Elastic Search is migrated to Open Search
-  2) This will need special care if you use Embedded Elastic Search. 
+  1) In this release Elastic Search is migrated to Open Search
+  2) This upgrade will require special care. 
 
 ===== Your installation is using %s Elastic Search =====
 
@@ -24,9 +24,11 @@ const (
   before continuing with the Upgrade to version %s:
 `
 
-	maintenanceModeError = "Please move Chef automate to maintenance mode before upgrading"
+	externalESUpgradeMsg = "You are ready with your external open search with migrated data from elastic search, this should be done with the help of your Administrator"
 
-	externalESUpgradeError = "setup external open search and apply the configuration"
+	externalESUpgradeError = "As you are using external elastic search, migrations of data to open search is required before the upgrade"
+
+	shardingError = "sharding has to be disabled before upgrade"
 
 	run_os_data_migrate = `Migrate Data from Elastic Search to Open Search using this command:
      $ ` + run_os_data_migrate_cmd
@@ -37,6 +39,11 @@ const (
      $ ` + run_os_data_cleanup_cmd
 
 	run_os_data_cleanup_cmd = `chef-automate post-major-upgrade clear-data --data=es`
+
+	disable_maintenance_mode = `Disable the maintenance mode if you enabled previously using:
+	$ ` + disable_maintenance_mode_cmd
+
+	disable_maintenance_mode_cmd = `chef-automate maintenance off`
 )
 
 var postChecklistV4Embedded = []PostCheckListItem{
@@ -44,6 +51,12 @@ var postChecklistV4Embedded = []PostCheckListItem{
 		Id:         "upgrade_status",
 		Msg:        run_chef_automate_upgrade_status,
 		Cmd:        run_chef_automate_upgrade_status_cmd,
+		Optional:   true,
+		IsExecuted: false,
+	}, {
+		Id:         "disable_maintenance_mode",
+		Msg:        disable_maintenance_mode,
+		Cmd:        disable_maintenance_mode_cmd,
 		Optional:   true,
 		IsExecuted: false,
 	}, {
@@ -80,6 +93,12 @@ var postChecklistV4External = []PostCheckListItem{
 		Optional:   true,
 		IsExecuted: false,
 	}, {
+		Id:         "disable_maintenance_mode",
+		Msg:        disable_maintenance_mode,
+		Cmd:        disable_maintenance_mode_cmd,
+		Optional:   true,
+		IsExecuted: false,
+	}, {
 		Id:         "check_ui",
 		Msg:        ui_check,
 		Cmd:        "",
@@ -102,17 +121,6 @@ func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4Checklist
 	}
 }
 
-func preChecklistV4(check checkFunc) []Checklist {
-	return []Checklist{
-		downTimeCheck(),
-		backupCheck(),
-		maintenanceModeCheck(),
-		check(),
-		disableShrding(),
-		postChecklistIntimationCheck(),
-	}
-}
-
 func (ci *V4ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckListItem {
 	var postChecklist []PostCheckListItem
 	if ci.isExternalES {
@@ -131,13 +139,15 @@ func (ci *V4ChecklistManager) RunChecklist(isExternalPG bool) error {
 	if ci.isExternalES {
 		dbType = "External"
 		postcheck = postChecklistV4External
-		checklists = append(checklists, preChecklistV4(externalESUpgradeCheck)...)
+		checklists = append(checklists, []Checklist{downTimeCheckV4(), backupCheck(), externalESUpgradeCheck(),
+			postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, preChecklistV4(diskSpaceCheck)...)
+		checklists = append(checklists, []Checklist{downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
+			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
+	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
@@ -156,19 +166,89 @@ func (ci *V4ChecklistManager) RunChecklist(isExternalPG bool) error {
 	return nil
 }
 
-func maintenanceModeCheck() Checklist {
+func postChecklistIntimationCheckV4(isEmbedded bool) Checklist {
 	return Checklist{
-		Name:        "maintenance_mode_acceptance",
-		Description: "put automate into maintenance mode",
+		Name:        "post_checklist_intimation_acceptance",
+		Description: "confirmation check for post checklist intimation",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Have you moved Chef automate to maintenance mode?:")
+			resp, err := h.Writer.Confirm("After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use")
+			if err != nil {
+				h.Writer.Error(err.Error())
+
+				shardError := enableSharding(h, isEmbedded)
+				if shardError != nil {
+					h.Writer.Error(shardError.Error())
+				}
+
+				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+			}
+			if !resp {
+				h.Writer.Error(postChecklistIntimationError)
+
+				shardError := enableSharding(h, isEmbedded)
+				if shardError != nil {
+					h.Writer.Error(shardError.Error())
+				}
+
+				return status.New(status.InvalidCommandArgsError, postChecklistIntimationError)
+			}
+			return nil
+		},
+	}
+}
+
+func promptUpgradeContinueV4(isEmbedded bool) Checklist {
+	return Checklist{
+		Name:        "post_checklist",
+		Description: "display post checklist and ask for final confirmation",
+		TestFunc: func(h ChecklistHelper) error {
+			resp, err := h.Writer.Confirm(v3_post_checklist_confirmation)
+			if err != nil {
+				h.Writer.Error(err.Error())
+
+				shardError := enableSharding(h, isEmbedded)
+				if shardError != nil {
+					h.Writer.Error(shardError.Error())
+				}
+
+				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+			}
+			if !resp {
+				h.Writer.Error("end user not ready to upgrade")
+
+				shardError := enableSharding(h, isEmbedded)
+				if shardError != nil {
+					h.Writer.Error(shardError.Error())
+				}
+
+				return status.New(status.InvalidCommandArgsError, "end user not ready to upgrade")
+			}
+			return nil
+		},
+	}
+}
+
+func enableSharding(h ChecklistHelper, isEmbedded bool) error {
+	if isEmbedded {
+		h.Writer.Println("enabling sharding")
+		return reEnableShardAllocation()
+	}
+	return nil
+}
+
+func downTimeCheckV4() Checklist {
+	return Checklist{
+		Name:        "down_time_acceptance",
+		Description: "confirmation for downtime",
+		TestFunc: func(h ChecklistHelper) error {
+			resp, err := h.Writer.Confirm("You had planned for a downtime, by running the command(chef-automate maintenance on)?:")
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
 				h.Writer.Error(downTimeError)
-				return status.New(status.InvalidCommandArgsError, maintenanceModeError)
+				return status.New(status.InvalidCommandArgsError, downTimeError)
 			}
 			return nil
 		},
@@ -180,13 +260,13 @@ func externalESUpgradeCheck() Checklist {
 		Name:        "external_es_upgrade_acceptance",
 		Description: "confirmation check for external es upgrade",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Upgrade your elastic search to Open Search with the help of your Administrator, and apply the configuration")
+			resp, err := h.Writer.Confirm(externalESUpgradeMsg)
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(backupError)
+				h.Writer.Error(externalESUpgradeError)
 				return status.New(status.InvalidCommandArgsError, externalESUpgradeError)
 			}
 			return nil
@@ -311,26 +391,27 @@ func reEnableShardAllocation() error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		return err
 	}
 	fmt.Println(string(body))
 	return nil
 }
-func disableShrding() Checklist {
+
+func disableSharding() Checklist {
 	return Checklist{
 		Name:        "disable sharding",
 		Description: "confirmation check to disable sharding",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Sharding will be disbled")
+			resp, err := h.Writer.Confirm("This will disable Sharding on your elastic search")
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, "sharing has to be disabled before upgrade")
+				h.Writer.Error(shardingError)
+				return status.New(status.InvalidCommandArgsError, shardingError)
 			}
 			err = disableShardAllocation()
 			if err != nil {
