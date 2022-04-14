@@ -29,6 +29,7 @@ import {
   GetUsers
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type FieldName = 'type' | 'identityProvider' | 'name';
 
@@ -95,7 +96,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    fb: FormBuilder) {
+    fb: FormBuilder,
+    private telemetryService: TelemetryService) {
 
     this.expressionForm = fb.group({
       // Must stay in sync with error checks in policy-add-members.component.html
@@ -189,6 +191,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       id: this.policy.id,
       members: this.membersToAddValues()
     }));
+    this.telemetryService.track('Settings_Policies_Members_AddMember');
   }
 
   ngOnDestroy() {

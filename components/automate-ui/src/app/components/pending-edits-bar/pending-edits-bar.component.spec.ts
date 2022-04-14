@@ -22,6 +22,11 @@ import {
   GetApplyRulesStatusSuccessPayload
 } from 'app/entities/projects/project.actions';
 import { PendingEditsBarComponent } from './pending-edits-bar.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('PendingEditsBarComponent', () => {
   let component: PendingEditsBarComponent;
@@ -311,7 +316,8 @@ function configureWith(perms: IndexedEntities<UserPermEntity>): void {
     ],
     providers: [
       FeatureFlagsService,
-      ProjectService
+      ProjectService,
+      { provide: TelemetryService, useClass: MockTelemetryService }
     ]
   }).compileComponents();
 }

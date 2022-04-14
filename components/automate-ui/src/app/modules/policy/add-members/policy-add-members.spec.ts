@@ -8,6 +8,11 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { PolicyAddMembersComponent, FieldName } from './policy-add-members.component';
 import { using } from 'app/testing/spec-helpers';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('PolicyAddMembersComponent', () => {
     let component: PolicyAddMembersComponent;
@@ -44,6 +49,9 @@ describe('PolicyAddMembersComponent', () => {
                         }
                     })
                 }, { runtimeChecks })
+            ],
+            providers: [
+              { provide: TelemetryService, useClass: MockTelemetryService }
             ]
         }).compileComponents();
     }));
