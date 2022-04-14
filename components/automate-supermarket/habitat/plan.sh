@@ -15,7 +15,7 @@ scaffolding_ruby_pkg="core/ruby27"
 # automate_scaffolding_include_templates=(sqerl.config)
 
 pkg_binds=(
-  [automate-pg-gateway]="port"
+  [automate-postgresql]="port"
   [automate-supermarket-redis]="port"
 )
 
@@ -54,6 +54,8 @@ db="${db}:{{ cfg.db.password }}"
 db="${db}@{{ cfg.db.host }}"
 db="${db}:{{ #if bind.automate-pg-gateway }}{{ bind.automate-pg-gateway.first.port }}{{ else }}{{ cfg.db.port }}{{ /if }}"
 db="${db}/{{ cfg.db.name }}_{{ cfg.rails_env }}"
+
+echo "## DB URL ##$db"
 
 redis="redis://{{ #if bind.automate-supermarket-redis }}{{ bind.automate-supermarket-redis.first.sys.ip }}{{ else }}{{ cfg.redis.host }}{{ /if }}"
 redis="${redis}:{{ #if bind.automate-supermarket-redis }}{{ bind.automate-supermarket-redis.first.cfg.port }}{{ else }}{{ cfg.redis.port }}{{ /if }}"

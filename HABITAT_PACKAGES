@@ -62,6 +62,7 @@ automate-cs-nginx components/automate-cs-nginx
 automate-workflow-nginx components/automate-workflow-nginx
 automate-workflow-web components/automate-workflow-web
 automate-supermarket components/automate-supermarket
+automate-supermarket-redis components/automate-supermarket-redis
 # Not managed by generator until we solve cross-dependency issue more
 # smoothly
 # automate-workflow-server components/automate-workflow-server

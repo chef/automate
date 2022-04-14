@@ -323,6 +323,7 @@ func newCmd() *cobra.Command {
 
 func pgsClient() (*client.Client, context.Context, func(), error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(opts.Client.ConTimeout)*time.Second)
+	fmt.Println(" Going to connect to Postgrew with opts", opts.Client)
 	cl, err := client.NewClient(
 		client.WithHost(opts.Client.Host),
 		client.WithPort(opts.Client.Port),

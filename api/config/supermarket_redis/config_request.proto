@@ -1,8 +1,8 @@
 // -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
 syntax = "proto3";
 
-package chef.automate.domain.supermarket;
-option go_package = "github.com/chef/automate/api/config/supermarket";
+package chef.automate.domain.supermarket_redis;
+option go_package = "github.com/chef/automate/api/config/redis";
 
 import "config/shared/global.proto";
 import "config/shared/tls.proto";
@@ -10,7 +10,7 @@ import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
-  option (chef.automate.api.service_config) = {name: "automate-supermarket"};
+  option (chef.automate.api.service_config) = {name: "automate-supermarket-redis"};
 
 	V1 v1 = 1;
 
@@ -23,7 +23,7 @@ message ConfigRequest {
 			Log log = 2;
 			Network network = 3;
 			Sql sql = 4;
-			Supermarket supermarket = 5;
+			Supermarket_redis supermarket_redis = 5;
 			chef.automate.infra.config.TLSCredentials tls = 6;
 
 			message Network {
@@ -46,7 +46,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_queue_timeout = 5;
 			}
 
-			message Supermarket {
+			message Supermarket_redis {
 				google.protobuf.Int32Value sql_retry_count = 1;
 				google.protobuf.Int32Value sql_retry_delay = 2;
 				google.protobuf.Int32Value abandoned_upload_cleanup_interval = 3;

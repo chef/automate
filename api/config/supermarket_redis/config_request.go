@@ -1,4 +1,4 @@
-package supermarket
+package supermarket_redis
 
 import (
 	ac "github.com/chef/automate/api/config/shared"

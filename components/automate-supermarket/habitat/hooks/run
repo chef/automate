@@ -81,9 +81,12 @@ render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 
 
 echo " ### GOING TO set db ### "
-pg-helper rename-if-exists supermarket "$DBNAME"
+# pg-helper rename-if-exists supermarket "$DBNAME"
+echo "## going to ensuer ###"
 pg-helper ensure-service-database "$DBNAME"
+echo "## Create extenssion ### "
 pg-helper create-extension "$DBNAME" "uuid-ossp"
+echo " ## PG USER ### "
 pg-helper alter-user $PGUSER with PASSWORD $PGPASSWORD
 pg-helper fix-permissions "$DBNAME"
 

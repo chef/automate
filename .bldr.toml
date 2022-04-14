@@ -194,6 +194,7 @@ paths = [
   "api/config/secrets/*",
   "api/config/session/*",
   "api/config/shared/*",
+  "api/config/supermarket/*",
   "api/config/teams/*",
   "api/config/ui/*",
   "api/config/user_settings/*",
@@ -399,6 +400,7 @@ paths = [
   "api/config/secrets/*",
   "api/config/session/*",
   "api/config/shared/*",
+  "api/config/supermarket/*",
   "api/config/teams/*",
   "api/config/ui/*",
   "api/config/user_settings/*",
@@ -489,6 +491,7 @@ paths = [
   "api/config/secrets/*",
   "api/config/session/*",
   "api/config/shared/*",
+  "api/config/supermarket/*",
   "api/config/teams/*",
   "api/config/ui/*",
   "api/config/user_settings/*",
@@ -915,6 +918,12 @@ paths = [
 plan_path = "components/automate-supermarket"
 paths = [
   "components/automate-supermarket/*"
+]
+
+[automate-supermarket]
+plan_path = "components/automate-supermarket-redis"
+paths = [
+  "components/automate-supermarket-redis/*"
 ]
 
 [data-feed-service]
