@@ -53,8 +53,8 @@ The backend and frontend clusters comprise **four** different servers with HA mo
 
 Chef Automate High Availability (HA) supports two types of deployment:
 
-- Amazon Web Services (AWS) Deployment
-- On-premise Deployment (Existing Node) Deployment
+- [Amazon Web Services (AWS) Deployment](/ha_auto_install)
+- [On-premise Deployment (Existing Node) Deployment](/ha_deploy_bareinfra)
 
 ### Cloud Deployment using Amazon Web Services (AWS)
 

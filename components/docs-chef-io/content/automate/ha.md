@@ -33,7 +33,3 @@ Thus, HA clusters strive to support the system or application, or services to ru
 ## Chef Automate High Availability (HA)
 
 The Chef Automate HA equates to reliability, intending to increase functionality, efficiency, and productivity. HA is built on the following three characteristics, **Redundancy**, **Monitoring**, and **Failover**. The Chef Automate HA architecture is an approach to defining the components, modules, or implementation of services of a system that ensures optimal operational performance, even at times of high loads. It aids in addressing three major issues, server failure, zone failure, and cloud failure. It also allows you to automate and test everything in your network.
-
-### Chef Automate Clusters
-
-The Chef Automate Clusters is a professional services solution offering installation, high availability, system uptime/scale-out performance, maintenance, and disaster recovery capabilities. It includes the Chef Infra Server API to simplify the Chef Infrastructure and is built for customers with more than 10,000 chef-client nodes. You can configure it in the private data center or preferred cloud.
