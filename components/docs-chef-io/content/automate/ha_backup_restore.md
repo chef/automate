@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Backup and Restore"
     identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore.md Backup and Restore"
     parent = "automate/deploy_high_availability/backup_and_restore"
-    weight = 101
+    weight = 200
 +++
 
 Computer security is safeguarding computer systems and data against theft, illegal access, or any disaster. It's the method of guarding against and detecting illegal access to your computer system. Data security refers to the process of securing data from illegal access or any disaster. This process includes the following terms:
