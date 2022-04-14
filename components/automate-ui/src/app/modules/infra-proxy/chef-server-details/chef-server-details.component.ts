@@ -299,11 +299,11 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.isUploaded = true;
         this.migration_id = uploadDetailsState?.migration_id;
         this.migrationLoading = false;
-        setTimeout(() => { this.getMigrationStatus(this.migration_id); }, 1000)
+        setTimeout(() => { this.getMigrationStatus(this.migration_id); }, 1000);
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
-        setTimeout(() => { this.migrationIsFailed(); }, 1000)
+        setTimeout(() => { this.migrationIsFailed(); }, 1000);
         this.upload.closeUploadSlider();
       }
     });
@@ -316,9 +316,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.cancelMigrationInProgress = true;
       this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.canceMigrationSuccessful) {
-        setTimeout(() => { this.migrationIsCancelled(); }, 1000)
+        setTimeout(() => { this.migrationIsCancelled(); }, 1000);
       } else {
-        setTimeout(() => { this.migrationIsInProcess(); }, 1000)
+        setTimeout(() => { this.migrationIsInProcess(); }, 1000);
       }
     });
 
@@ -345,7 +345,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (this.confirmPreviewSuccessful) {
         this.confirmPreviewsubmit = true;
         this.migrationLoading = false;
-        setTimeout(() => { this.migrationIsCompleted(); }, 1000)
+        setTimeout(() => { this.migrationIsCompleted(); }, 1000);
         this.orgsListLoading = true;
         setTimeout( () => {
           this.getServerAndOrgs();
@@ -430,7 +430,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
 
       if (this.migration_id !== '') {
-        setTimeout(() => { this.migrationProcessStarted(); }, 1000)
+        setTimeout(() => { this.migrationProcessStarted(); }, 1000);
         this.getMigrationStatus(this.migration_id);
       }
 
@@ -518,29 +518,28 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
             this.migrationStepValue = this.getKeyByValue(this.migrationSteps, this.migration_type);
             this.migrationStatusPercentage =
               Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
-            setTimeout(() => { this.migrationIsInProcess(); }, 1000)
+            setTimeout(() => { this.migrationIsInProcess(); }, 1000);
             this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
             if (this.migration_type === 'Creating Preview'
               && this.confirmPreviewsubmit === false
               && this.isCancelled === false) {
-              setTimeout(() => { this.migrationInPreview(); }, 1000)
+              setTimeout(() => { this.migrationInPreview(); }, 1000);
             }
 
             if (this.migration_type === 'Migration Completed') {
               setTimeout(() => {
                 this.migrationIsCompleted();
                 this.checkMigrationStatus.unsubscribe();
-              }, 1000)
+              }, 1000);
             }
 
             if (this.migration_type === 'Migration Cancelled' && this.canceMigrationSuccessful) {
               setTimeout(() => {
                 this.migrationIsCancelled();
                 this.checkMigrationStatus.unsubscribe();
-              }, 1000)
+              }, 1000);
             }
-          } 
-          else {
+          } else {
             this.migrationfailed = true;
             this.migrationCompleted = false;
             this.checkMigrationStatus.unsubscribe();
