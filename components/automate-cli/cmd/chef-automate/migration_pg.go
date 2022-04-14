@@ -62,7 +62,8 @@ const (
 	OPENSEARCH_DATA_DIR         = "/hab/svc/automate-opensearch/data"
 	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"
 	OPENSEARCH_VAR_DIR          = "/hab/svc/automate-opensearch/var"
-	OPENSEARCH_DIR              = "/hab/svc/automate-opensearch/"
+	OPENSEARCH_DIR              = "/hab/svc/automate-opensearch"
+	ELASTICSEARCH_DIR           = "/hab/svc/automate-elasticsearch"
 )
 
 func init() {
@@ -106,20 +107,60 @@ func newMigrateDataCmd() *cobra.Command {
 }
 
 func runCleanup(cmd *cobra.Command, args []string) error {
-	oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
-	if err != nil {
-		return err
-	}
-	if strings.TrimSpace(oldPgVersion) == OLD_PG_VERSION {
-		writer.Title(
-			"----------------------------------------------\n" +
-				"Cleanup \n" +
-				"----------------------------------------------",
-		)
-		if ClearDataCmdFlags.data == "" {
-			return errors.New("data flag is required")
-		} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
+	if strings.ToLower(ClearDataCmdFlags.data) == "es" {
+		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+		if err != nil {
+			fmt.Println(" major upgrade checklist failed")
+			return err
+		}
+
+		isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		if err != nil {
+			return err
+		}
+
+		if isExecuted {
+			if ClearDataCmdFlags.forceExecute {
+				isExecuted = false
+			} else {
+				err := promptCheckList(
+					"Cleanup is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
+				)
+				if err != nil {
+					return err
+				} else {
+					isExecuted = false
+				}
+			}
+		}
+
+		if !isExecuted {
+			writer.Title("Deleting file created by es_upgrade")
+			err := cleanUpes()
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+		}
+	} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
+		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
+		if err != nil {
+			return err
+		}
+
+		if strings.TrimSpace(oldPgVersion) == OLD_PG_VERSION {
+			writer.Title(
+				"----------------------------------------------\n" +
+					"Cleanup \n" +
+					"----------------------------------------------",
+			)
+
+			if ClearDataCmdFlags.data == "" {
+				return errors.New("data flag is required")
+			}
+
 			ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
+
 			if err != nil {
 				return err
 			}
@@ -151,28 +192,28 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 					//nothing
 				}
 			}
-		} else {
-			return errors.New("please provide valid input for data flag")
-		}
 
+		} else {
+			return errors.New(
+				"pg migration will only support 9.6 pg version for now, your es version is: " + oldPgVersion,
+			)
+		}
 	} else {
-		return errors.New(
-			"pg migration will only support 9.6 pg version for now, your pg version is: " + oldPgVersion,
-		)
+		return errors.New("please provide valid input for data flag")
 	}
 
 	return nil
 }
 
 func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
-	_, err := calDiskSizeAndDirSize()
-	if err != nil {
-		return err
-	}
 
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
+		_, err := calDiskSizeAndDirSize(PG_DATA_DIR, OLD_PG_DATA_DIR)
+		if err != nil {
+			return err
+		}
 		ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
 		if err != nil {
 			return err
@@ -227,8 +268,14 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
+		_, err := calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
+		if err != nil {
+			fmt.Println("Failed to calculate the space for data migation")
+			return err
+		}
 		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		if err != nil {
+			fmt.Println("error with major upgrade checklist")
 			return err
 		}
 
@@ -372,14 +419,56 @@ func esMigrateExecutor() error {
 	if err != nil {
 		return err
 	}
-
-	command := exec.Command("/bin/sh", "-c", script)
-	err = command.Run()
+	err = executeMigrate(migrateDataCmdFlags.check)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	//upgraded = true
+	return nil
+}
+
+func executeMigrate(check bool) error {
+	var isAvailableSpace bool
+	var err error
+
+	if migrateDataCmdFlags.skipStorageCheck {
+		isAvailableSpace = true
+	} else {
+		isAvailableSpace, err = calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if isAvailableSpace {
+		writer.Title(
+			"----------------------------------------------\n" +
+				"migration from es to os \n" +
+				"----------------------------------------------",
+		)
+
+		writer.Title("Checking for es_upgrade")
+
+		if !check && err == nil {
+			ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+			if err != nil {
+				return err
+			}
+			err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
+		command := exec.Command("/bin/sh", "-c", script)
+		err = command.Run()
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+	} // Endif isAvailableSpace
 	return nil
 }
 
@@ -466,6 +555,48 @@ func cleanUp() error {
 	return nil
 }
 
+const cleanUpScript = `
+rm -rf /hab/svc/automate-opensearch/data.os;
+rm -rf /hab/svc/automate-opensearch/var.os;
+rm -rf /hab/svc/automate-elasticsearch/data;
+rm -rf /hab/svc/automate-elasticsearch/var;
+`
+
+func cleanUpes() error {
+
+	if !migrateDataCmdFlags.autoAccept {
+		err := promptCheckList(
+			"Are you sure do you want to delete old elastic-search-data\n" +
+				"This will delete all the data (elasticsearch) and will not be able to recover it.\n" +
+				"Press y to agree, n to disagree? [y/n]")
+		if err != nil {
+			return err
+		}
+	}
+
+	command := exec.Command("/bin/sh", "-c", cleanUpScript)
+	err := command.Run()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	} else {
+		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+		if err != nil {
+			return err
+		}
+		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		if err != nil {
+			//TODO:
+		}
+		writer.Title("successfully deleted files")
+	}
+	return nil
+}
+
 func chefAutomateStop() error {
 	writer.Title(
 		"----------------------------------------------\n" +
@@ -489,7 +620,6 @@ func chefAutomateStop() error {
 
 	}
 	return nil
-
 }
 
 func chefAutomateStatus() error {
@@ -590,7 +720,7 @@ func checkUpdateMigration(check bool) error {
 	if migrateDataCmdFlags.skipStorageCheck {
 		isAvailableSpace = true
 	} else {
-		isAvailableSpace, err = calDiskSizeAndDirSize()
+		isAvailableSpace, err = calDiskSizeAndDirSize(PG_DATA_DIR, OLD_PG_DATA_DIR)
 
 		if err != nil {
 			return err
@@ -765,14 +895,14 @@ func pgVersion(path string) (string, error) {
 	return getOldPgVersion, nil
 }
 
-func calDiskSizeAndDirSize() (bool, error) {
-	v, err := sys.SpaceAvailForPath(PG_DATA_DIR)
+func calDiskSizeAndDirSize(data, oldData string) (bool, error) {
+	v, err := sys.SpaceAvailForPath(data)
 	if err != nil {
 		return false, err
 	}
 	diskSpaceInMb := v / 1024
 
-	size, err := sys.DirSize(OLD_PG_DATA_DIR)
+	size, err := sys.DirSize(oldData)
 	if err != nil {
 		return false, err
 	}
@@ -783,8 +913,8 @@ func calDiskSizeAndDirSize() (bool, error) {
 		"Space Required", dirSizeInMb,
 		"Space Available", diskSpaceInMb,
 		"To continue with less memory Please use --skip-storage-check")
-
-	if diskSpaceInMb > uint64(dirSizeInMb) {
+	// NewData > olddata + 10%of oldData
+	if diskSpaceInMb > (uint64(dirSizeInMb) + uint64(dirSizeInMb/10)) {
 		return true, nil
 	} else {
 		return false, errors.New(msg)
