@@ -37,7 +37,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.migrations.InfraProxyMigrationService/GetStagedData", "infra:infraServers:migrations:{migration_id}", "infra:infraServers:get", "GET", "/api/v0/infra/servers/migrations/staged_data/{migration_id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.migrations.InfraProxyMigrationService/GetStagedData", "infra:infraServers", "infra:infraServers:get", "GET", "/api/v0/infra/servers/migrations/staged_data/{migration_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetStagedDataRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

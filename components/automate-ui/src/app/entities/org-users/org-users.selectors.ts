@@ -16,3 +16,18 @@ export const orgUserList = createSelector(
   orgUserState,
   (state) => state.orgUserList
 );
+
+export const resetStatus = createSelector(
+  orgUserState,
+  (state) => state.resetStatus
+);
+
+export const resetError = createSelector(
+  orgUserState,
+  (state) => state.resetError
+);
+
+export const resetUserKey = createSelector(
+  orgUserState,
+  (state) => state.resetUserKey
+);
