@@ -19,15 +19,15 @@
               <ul>
                 <li>
                   <span>Migrated Orgs</span>
-                  <span>{{previewData?.staged_data?.orgs_to_migrate}}</span>
+                  <span>{{previewData?.orgs_to_migrate}}</span>
                 </li>
                 <li>
                   <span>Skipped Orgs</span>
-                  <span>{{previewData?.staged_data?.orgs_to_skip}}</span>
+                  <span>{{previewData?.orgs_to_skip}}</span>
                 </li>
                 <li>
                   <span>Updated Orgs</span>
-                  <span>{{previewData?.staged_data?.orgs_to_update}}</span>
+                  <span>{{previewData?.orgs_to_update}}</span>
                 </li>
               </ul>
             </div>
@@ -36,7 +36,7 @@
               <ul>
                 <li>
                   <span>Users</span>
-                  <span>{{previewData?.staged_data?.users.length || 0}}</span>
+                  <span>{{previewData?.users.length || 0}}</span>
                 </li>
                 <li>
                   <span>Conflicting Users</span>
@@ -47,7 +47,7 @@
           </div>
         </div>
       <form [formGroup]="migrationForm">
-        <div id="migration-table-container" *ngIf="previewData?.staged_data?.users.length > 0">
+        <div id="migration-table-container" *ngIf="previewData?.users.length > 0">
           <chef-table>
             <chef-thead>
               <chef-tr>

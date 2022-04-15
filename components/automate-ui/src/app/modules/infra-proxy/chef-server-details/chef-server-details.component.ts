@@ -684,7 +684,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public confirmPreview(usersData: User[]) {
     this.confirmPreviewsubmit = true;
-    this.previewData.staged_data.users = usersData;
+    this.previewData.users = usersData;
+    this.previewData.migration_id = this.migration_id;
     const payload = {
       server_id: this.server.id,
       previewData: this.previewData
