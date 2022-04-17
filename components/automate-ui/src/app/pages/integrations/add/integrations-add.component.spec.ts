@@ -7,6 +7,11 @@ import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IntegrationsAddComponent } from './integrations-add.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('IntegrationsAddComponent', () => {
   let component: IntegrationsAddComponent;
@@ -20,7 +25,8 @@ describe('IntegrationsAddComponent', () => {
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       declarations: [
         IntegrationsAddComponent
