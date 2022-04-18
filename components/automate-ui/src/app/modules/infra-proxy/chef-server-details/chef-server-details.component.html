@@ -63,7 +63,7 @@
                     </span>
     
                     <!-- Failed status -->
-                    <span *ngIf="migrationfailed" class="server-entity-value" id="status-failed">
+                    <span *ngIf="!migrationLoading && migrationfailed" class="server-entity-value" id="status-failed">
                       <chef-tooltip position='bottom' class="tooltip" for='error-show-button'>
                         <img src='../../../../assets/img/failed.png' alt="warning" />
                         Migration failed, migration step not completed!
@@ -73,7 +73,7 @@
                     </span>
     
                     <!-- Cancelled Status-->
-                    <span *ngIf="isCancelled" class="server-entity-value" id="status-failed">
+                    <span *ngIf="!migrationLoading && isCancelled" class="server-entity-value" id="status-failed">
                       <chef-tooltip position='bottom' class="tooltip" for='cancelled-show-button'>
                         <img src='../../../../assets/img/cancelled.png' alt="warning" />
                         Last migration cancelled!

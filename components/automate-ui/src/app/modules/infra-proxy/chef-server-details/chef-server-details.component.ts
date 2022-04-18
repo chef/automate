@@ -329,7 +329,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([previewStatusSt, previewState]) => {
       if (previewStatusSt === EntityStatus.loadingSuccess && !isNil(previewState)) {
-        this.previewData = previewState.staged_data;
+        this.previewData = previewState;
         this.isPreview = true;
       } else if (previewStatusSt === EntityStatus.loadingFailure) {
         this.previewDataLoaded = false;
@@ -423,8 +423,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.migration_id = this.server.migration_id;
       this.migration_type = this.server.migration_type;
       if (this.orgs.length > 0 ) {
-        if (this.migrationInProgress) {
-          this.migrationCompleted = true;
+        if (!this.migrationInProgress) {
+          this.migrationIsCompleted();
         }
         this.migrationNotRunning = false;
       }
@@ -581,12 +581,14 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   public migrationIsCompleted(): void {
-    this.migrationStarted = true;
-    this.migrationInProgress = false;
-    this.migrationIsInPreview = false;
-    this.migrationCompleted = true;
-    this.migrationfailed = false;
-    this.isCancelled = false;
+    if (!this.isCancelled) {
+      this.migrationStarted = true;
+      this.migrationInProgress = false;
+      this.migrationIsInPreview = false;
+      this.migrationCompleted = true;
+      this.migrationfailed = false;
+      this.isCancelled = false;
+    } 
   }
 
   public migrationIsFailed(): void {
@@ -684,7 +686,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public confirmPreview(usersData: User[]) {
     this.confirmPreviewsubmit = true;
-    this.previewData.users = usersData;
+    this.previewData.staged_data.users = usersData;
     this.previewData.migration_id = this.migration_id;
     const payload = {
       server_id: this.server.id,

@@ -36,13 +36,13 @@ export class MigrationSliderComponent implements OnChanges {
   ngOnChanges() {
     const group = {};
     if (this.previewData) {
-      this.previewData.users.forEach(
+      this.previewData.staged_data.users.forEach(
         (input_template: { automate_username: string | number, is_conflicting: boolean }) => {
         group[input_template.automate_username] = new FormControl(
           {value: '', disabled: !input_template.is_conflicting});
       });
 
-      this.usersData = this.previewData.users.map(
+      this.usersData = this.previewData.staged_data.users.map(
         (obj: User) => ({ ...obj, is_seleted: false })
       );
       this.conflictedUsers = this.usersData.filter((obj: User) => obj.is_conflicting);
