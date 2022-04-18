@@ -143,15 +143,18 @@ steps:
   # or take a long time.
   - wait
 
-  #  - label: “creating airgap bundle”
-  #    command:
-  #       - curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > 				 chef-automate && chmod +x chef-automate
-  #       - ./chef-automate airgap bundle create -c dev
-  #    timeout_in_minutes: 10
-  #    expeditor:
-  #      executor:
-  #        linux:
-  #          privileged: true
+   - label: "creating airgap bundle"
+     command:
+        - curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > 				 chef-automate && chmod +x chef-automate
+        - ./chef-automate airgap bundle create -c dev
+     timeout_in_minutes: 10
+     expeditor:
+       executor:
+         docker:
+           privileged: true
+           environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
 
   - label: "automate-load-balancer"
     command:
