@@ -13,16 +13,16 @@ gh_repo = "automate"
     weight = 230
 +++
 
-This guide details how to setup the loadbalancer configuration with:
+This guide details how to set up the load balancer configuration with:
 
 - Haproxy
 - nginx
 
 ## Haproxy
 
-The steps to setup the loadbalancer using Haproxy are:
+The steps to set up the load balancer using Haproxy are:
 
-1. Install Haproxy on server using the following commands:
+1. Install Haproxy on the server using the following commands:
 
 ```bash
 sudo add-apt-repository ppa:vbernat/haproxy-1.8 
@@ -38,13 +38,13 @@ openssl req -nodes -x509 -newkey rsa:2048 -keyout /etc/ssl/private/test.key -out
 cat /etc/ssl/private/test.key /etc/ssl/private/test.crt > /etc/ssl/private/test.pem 
 ```
 
-3. **Add HAProxy Listener:** Edit the configuration file to set it for the automate. Once done you will find some default settings in the file.
+3. **Add HAProxy Listener:** Edit the configuration file to set it for the automate. Once done, you will find some default settings in the file.
 
 ```bash
 sudo vi /etc/haproxy/haproxy.cfg 
 ```
 
-Add two listener , 1 on **Port 80** and other on **Port 443** in the configuration file.
+Add two listeners, one on **Port 80** and the other on **Port 443** in the configuration file.
 
 ```bash
 frontend http_80 
@@ -64,7 +64,7 @@ option http-server-close
 default_backend automate-servers 
 
 #Add Backend Web Servers 
-#Here we will add backend server , where we want to forward our requests. 
+#Here, we will add a backend server where we want to forward our requests. 
  
 backend automate-servers 
 
@@ -190,9 +190,9 @@ server {
 }
 ```
 
-3. Check if configuration is correct using `sudo nginx –t ` command.
+3. Check if the configuration is correct using the `sudo nginx –t ` command.
 
-4. Remove the already existing default running site on **Debian** and **Ubuntu** systems. Remove the default symbolic link from the sites-enabled folder.
+4. Remove the already existing default running the site on **Debian** and **Ubuntu** systems. Remove the default symbolic link from the sites-enabled folder.
 
 ```bash
 sudo rm /etc/nginx/sites-enabled/default
