@@ -53,7 +53,6 @@ func serve(cmd *cobra.Command, args []string) error {
 
 	ctx := context.Background()
 	configFile := args[0]
-	fmt.Println("##########configFile#######", configFile)
 	configData, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return errors.Wrapf(err, "failed to read config file %s", configFile)
@@ -87,7 +86,6 @@ func serve(cmd *cobra.Command, args []string) error {
 		return errors.New("missing config value authz_address")
 	}
 
-	fmt.Println("##############c.InfraProxyAddress###########", c.InfraProxyAddress)
 	if c.InfraProxyAddress == "" {
 		return errors.New("missing config value infra_proxy_address")
 	}
