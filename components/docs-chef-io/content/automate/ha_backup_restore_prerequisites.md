@@ -31,7 +31,7 @@ The two pre-backup configurations for AWS are:
 
 To run the terraform scripts, the IAM users should have proper permissions. Going forward, we will also discuss the required permissions. You should have your  `secret access key` and `key id`, or else you can regenerate a new access key.
 
-#### Permissions Required
+**Permissions Required**
 
 Check if the IAM user has all the required permissions. The permission policies are listed below:
 
