@@ -81,3 +81,5 @@ message ConfirmPreview {
 }
 
 message CreateBackupResponse {}
+
+message DeleteUserResponse{}

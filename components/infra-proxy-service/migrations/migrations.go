@@ -373,6 +373,18 @@ func SetStagedUserForConfirmPreview(users []*request.User) []pipeline_model.User
 	return usersData
 }
 
+//DeleteUser: Deletes user association from users and org_users table, called from local user service
+func (s *MigrationServer) DeleteUser(ctx context.Context, req *request.DeleteUserRequest) (*response.DeleteUserResponse, error) {
+	log.Info("Deleting users association with server and org")
+	_, err := s.service.Storage.DeleteUserAssciation(ctx, req.AutomateUsername)
+	if err != nil {
+		log.Errorf("Failed to delete the users association with server and org ", err)
+		return nil, err
+	}
+
+	return &response.DeleteUserResponse{}, nil
+}
+
 // CreateBackup Creates sample knife ec back up file
 func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateBackupRequest) (*response.CreateBackupResponse, error) {
 

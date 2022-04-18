@@ -90,7 +90,7 @@ ingest-service OPTIONAL es-sidecar-service
 ingest-service BINDING_MODE strict
 license-control-service REQUIRED automate-pg-gateway pg-sidecar-service
 license-control-service BINDING_MODE strict
-local-user-service REQUIRED authz-service automate-dex teams-service
+local-user-service REQUIRED authz-service automate-dex teams-service infra-proxy-service
 local-user-service BINDING_MODE strict
 nodemanager-service REQUIRED authz-service automate-pg-gateway cereal-service event-service pg-sidecar-service secrets-service
 nodemanager-service BINDING_MODE strict
