@@ -17,10 +17,10 @@ This section explains the Bare Metal (on-premises) Infrastructure Deployment (ex
 
 ## Pre-requisites
 
-- Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for Elasticsearch) to create the cluster of the Chef Automate, Chef Server, Postgres, and Elasticsearch nodes.
-- Obtain Bastion host server details from your system administrator. Ensure this server has the [needed requirements]({{< relref "ha_bastion.md#Bastion Host Requirements for On-Premise Deployment" >}}) included.
+- Obtain necessary virtual machine (VM) instance details (with private IP addresses and added public address for OpenSearch) to create the Chef Automate, Chef Server, Postgres, and OpenSearch cluster nodes.
+- Obtain Bastion host server details from your system administrator. Ensure this server has the [requirements]({{< relref "ha_bastion.md#Bastion Host Requirements for On-Premise Deployment" >}}) included.
 - Obtain the [Prerequisites for Chef Automate HA Deployment]({{< relref "ha_platform_support.md" >}}).
-- All VMs must expose port 22 for SSH. You may need to open specific ports across the VMs to establish the communication, which are:
+- All VMs must expose port 22 for SSH. Open specific ports across the VMs to establish the communication, which are:
 
    | Component                                | Port                    |
    | :--------------------------------------  | :---------------------  |
@@ -29,13 +29,13 @@ This section explains the Bare Metal (on-premises) Infrastructure Deployment (ex
    | PostgreSQL                               |     5432                |
    | Pgleaderchk                              |     6432                |
    | HaProxy                                  |     7432                |
-   | Elasticsearch (https)                    |     9200                |
-   | Elasticsearch (transport)                |     9300                |
+   | OpenSearch (https)                       |     9200                |
+   | OpenSearch (transport)                   |     9300                |
    | Kibana                                   |     5601                |
    | Automate,ES-Node                         |     22,443              |
 
 - Ensure you have [Chef Automate utility]({{< relref "ha_auto_install.md" >}}) installed, else download and install the latest version.
 - Servers are provisioned and accessible through SSH from each other.
-- Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch.
-- Create the certificates for security and authentication purposes. _optional_
-- Rotate the certificates if the certificates are expired or compromised. _optional_
+- Obtain load balancer IP addresses for all four instances - *Chef Automate, Chef Server, Postgress, OpenSearch*.
+- Create the certificates for security and authentication purposes. (*Optional*)
+- Rotate the certificates if the certificates are expired or compromised. (*Optional*)
