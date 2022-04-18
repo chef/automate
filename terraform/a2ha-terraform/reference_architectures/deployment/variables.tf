@@ -78,12 +78,12 @@ variable "chef_ebs_volume_type" {
   default = "gp3"
 }
 
-variable "chef_server_instance_type" {
-  default = "t3a.medium"
-}
-
 variable "chef_server_fqdn" {
   default = ""
+}
+
+variable "chef_server_instance_type" {
+  default = "t3a.medium"
 }
 
 variable "chef_server_lb_certificate_arn" {

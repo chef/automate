@@ -6,15 +6,15 @@ variable "existing_automate_private_ips" {
   default = []
 }
 
+variable "existing_chef_server_fqdn" {
+  default = []
+}
+
 variable "existing_chef_server_ips" {
   default = []
 }
 
 variable "existing_chef_server_private_ips" {
-  default = []
-}
-
-variable "existing_chef_server_fqdn" {
   default = []
 }
 
