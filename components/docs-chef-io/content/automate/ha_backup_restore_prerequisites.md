@@ -15,8 +15,10 @@ gh_repo = "automate"
 
 This page explains the prerequisites of the AWS and on-premise backed backup. You can also take back up for:
 
-- External Elastic Search (ES) and Postgres-SQL on Amazon S3 bucket.
-- External Elastic Search (ES) and Postgres-SQL on External File-system (EFS). You can take backup on EFS system through DNS or IP.
+- External Open Search and Postgres-SQL on Amazon S3 bucket.
+- External Open Search and Postgres-SQL on External File-system (EFS).
+
+{{< note >}} You can take backup on EFS system through DNS or IP. {{< /note >}}
 
 ## AWS Backed Backup
 
@@ -39,7 +41,7 @@ Check if the IAM user has all the required permissions. The permission policies 
 
 1. S3FullAccess (for aws AmazonS3FullAccess)
 
-Create an IAM role to give access of **s3** to **ElasticSearch** instances. The role should already be assigned as the ElasticSearch instance tries to communicate s3.
+Create an IAM role to give access of **s3** to **OpenSearch** instances. The role should already be assigned as the OpenSearch instance tries to communicate s3.
 
 The permissions can either be directly added to the user or can be added via **IAM Group**.
 
@@ -54,29 +56,29 @@ Once done with the above steps, `.toml` file and patch the `.config`. In the fil
 The content for the `automate.toml` file is given below:
 
 ```sh
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
     enable = true
     location = "s3"
 
-[global.v1.external.elasticsearch.backup.s3]
+[global.v1.external.opensearch.backup.s3]
 
     # bucket (required): The name of the bucket
     bucket = "bucket-name"
 
     # base_path (optional):  The path within the bucket where backups should be stored
     # If base_path is not set, backups will be stored at the root of the bucket.
-    base_path = "elasticsearch"
+    base_path = "opensearch"
 
-    # name of an s3 client configuration you create in your elasticsearch.yml
-    # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
+    # name of an s3 client configuration you create in your opensearch.yml
+    # see https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-client.html
     # for full documentation on how to configure client settings on your
-    # Elasticsearch nodes
+    # OpenSearch nodes
     client = "default"
 
-[global.v1.external.elasticsearch.backup.s3.settings]
+[global.v1.external.opensearch.backup.s3.settings]
     ## The meaning of these settings is documented in the S3 Repository Plugin
     ## documentation. See the following links:
-    ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
+    ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
 
     ## Backup repo settings
     # compress = false
@@ -122,107 +124,118 @@ Execute the command given below to trigger the deployment.
 
 Back-up the configurations once the cluster has been deployed.
 
-{{< note >}} **IAM Role:** Assign the IAM Role to the all the ElasticSearch instances in the cluster created above. {{< /note >}}
+{{< note >}} **IAM Role:** Assign the IAM Role to the all the OpenSearch instances in the cluster created above. {{< /note >}}
 
 ### File System(EFS) Configuration for backup
 
+To backup on share file system for AWS, follow the steps given below:
 
-Backup on share file system. (This section is specific for aws).
-
-Create the EFS over the AWS.
-
-Once EFS is ready there are 2 ways to mount (via DNS and via IP).
-
-Open the port(2049) Proto(NFS) for EFS security group.
-
-
-
-
-
-
-
-
-
-
-
-
+- Create the **EFS** over AWS.
+- Mount the creating EFS using **DNS** or **IP**.
+- Open the **Port(2049) Proto(NFS)** for EFS Security Group.
 
 ## On-Premise Backed Backup
 
-### Pre-backup configuration and setup for File system backup
+The two pre-backup configurations for On-Premise are:
 
-A shared file system is needed to create Elasticsearch snapshots. In order to register the snapshot repository with Elasticsearch it is necessary to mount the same shared filesystem to the same location on all master and data nodes. This location (or one of its parent directories) must be registered in the path.repo setting on all master and data nodes.
+- For File System Backup
+- For Object Storage (Non AWS)
 
-Assuming that the shared filesystem is mounted to /mnt/automate_backups, we can configure Automate to register the snapshot locations with Elasticsearch.
+### Pre Backup Configuration for File System Backup
 
-Ensure the shared file system is mounted on all Elasticsearch servers:
-      mount /mnt/automate_backups
-Create elasticsearch sub-directory and set permissions, this will only need to be done on a single Elasticsearch server if the network mount is correctly mounted.
+A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the same location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
 
-      sudo mkdir /mnt/automate_backups/elasticsearch
-      sudo chown hab:hab /mnt/automate_backups/elasticsearch/
-Configure Elasticsearch path.repo setting by SSHing to a single Elasticsearch server and using the following steps:
+Once the shared filesystem is mounted to `/mnt/automate_backups`, configure Automate to register the snapshot locations with OpenSearch.
 
-Export the current Elasticsearch config from the Habitat supervisor. You will need to have root access to run the following commmands
+- Mount the shared file system on all OpenSearch servers:
+
+```sh
+mount /mnt/automate_backups
+```
+
+- Create an OpenSearch sub-directory and set permissions to one of the OpenSearch server (only if the network mount is correctly mounted).
+
+```sh
+sudo mkdir /mnt/automate_backups/opensearch
+sudo chown hab:hab /mnt/automate_backups/opensearch/
+```
+
+Configure the OpenSearch `path.repo` setting by **SSHing** to a single OpenSearch server by following the steps given below:
+
+- Export the current OpenSearch config from the Habitat supervisor. Get the root access to run the following commands:
+
+```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
-automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml
-Edit es_config.toml and add the following settings to the end of the file.
-Note: If credentials have never been rotated this file may be empty.
-   [es_yaml.path]   
-   # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb   
-   repo = "/mnt/automate_backups/elasticsearch" 
-Apply updated es_config.toml config to Elasticsearch, this only needs to be done once. This will trigger a restart of the Elasticsearch services on each server.
-hab config apply automate-ha-elasticsearch.default $(date '+%s') es\_config.toml
+automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
+```
 
-hab svc status (check elasticsearch service is up or not)
+- Edit `es_config.toml` and add the following settings to the end of the file.
 
-curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check es. Check that all the indices is green or not)
+{{< note >}} If the credentials have never been rotated, the above file may be empty. {{< /note >}}
 
-# Watch for a message about Elasticsearch going from RED to GREEN
-`journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
-Configure Automate to handle external Elasticsearch backups
+```sh
+[es_yaml.path]   
+# Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb   
+repo = "/mnt/automate_backups/opensearch" 
+```
 
-Create a automate.toml file on the provisioning server
+To trigger the restart of the OpenSearch on each server, apply the updated  `es_config.toml` config to OpenSearch once. 
 
+```sh
+hab config apply automate-ha-opensearch.default $(date '+%s') es\_config.toml
+
+hab svc status (check whether OpenSearch service is up or not)
+
+curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices is green or not)
+
+# Watch for a message about OpenSearch going from RED to GREEN
+`journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
+```
+
+- Configure Automate to handle *External OpenSearch Backups*.
+
+- Create an `automate.toml` file on the provisioning server using following command:
+
+```bash
 touch automate.toml
+```
 
-Add the following configuration to automate.toml on the provisioning host.
+Add the following configuration to `automate.toml` on the provisioning host:
 
-   [global.v1.external.elasticsearch.backup]
-   enable = true
-   location = "fs"
+```sh
+[global.v1.external.opensearch.backup]
+enable = true
+location = "fs"
 
-   [global.v1.external.elasticsearch.backup.fs]
-   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
-   # a parent directory of the setting you configure here:
-   path = "/mnt/automate_backups/elasticsearch"
+[global.v1.external.opensearch.backup.fs]
+# The `path.repo` setting you've configured on your OpenSearch nodes must be a parent directory of the setting you configure here:
+path = "/mnt/automate_backups/opensearch"
 
-   [global.v1.backups.filesystem]
-   path = "/mnt/automate_backups/backups"
-After that patch the config. This will trigger the deployment also.
+[global.v1.backups.filesystem]
+path = "/mnt/automate_backups/backups"
+```
 
+- Patch the `.config` to trigger the deployment.
+
+```sh
 ./chef-automate config patch automate.toml
+```
 
-### Pre-backup configuration for Object storage (Non AWS)
+### Pre-Backup Configuration for Object Storage
 
-This section provide pre-backup configuration required in case we plan to backup our data on object storage system(Other than AWS S3) like Minio, non AWS S3.
+This section provides the pre-backup configuration required to backup the data on Object Storage System (Other than AWS S3) like *Minio*, *Non AWS S3*. The steps to set secret key using commands are given below:
 
-A) Steps to set key/secret using commands mentioned below :
+1. Login to all the opensearch nodes and the steps on all the opensearch nodes.
+  
+  - Export `ES_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
+  - Hab pkg `exec chef/opensearch-odfe opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
+  - Hab pkg `exec chef/opensearch-odfe opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
+  - Chown `hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
+  - Curl `-k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
 
-Login to all the elastic-search nodes and perform below steps on all the ES nodes.
+The final output after running the command 1.5 on third node is given below:
 
-1.1 export ES_PATH_CONF="/hab/svc/automate-ha-elasticsearch/config"
-
-1.2 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.access_key (It will ask to enter key, please enter your key)
-
-1.3 hab pkg exec chef/elasticsearch-odfe elasticsearch-keystore add s3.client.default.secret_key (It will ask to enter secret, please enter your key)
-
-1.4 chown hab:hab /hab/svc/automate-ha-elasticsearch/config/elasticsearch.keystore (Setting hab:hab permission)
-
-1.5 curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin (Command to load the above setting)
-
-After running command 1.5 on 3rd node, this will be the final output-
-
+```json
 {
   "_nodes" : {
     "total" : 3,
@@ -238,22 +251,38 @@ After running command 1.5 on 3rd node, this will be the final output-
       "name" : "Us5iBo4"
     },
     "qtz7KseqSlGm2lEm0BiUEg" : {
-     "name" : "qtz7Kse"
+      "name" : "qtz7Kse"
     }
   }
 }
-B) To override the existing default endpoint:
+```
 
-Login to one of the elastic search instance and run the below command on that (You will need root access to run the command):
+2. To override the existing default endpoint:
+
+- Login to one of the open search instance and run the following command (You need root access to run the command):
+
+```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
-automate-backend-ctl applied --svc=automate-ha-elasticsearch | tail -n +2 > es_config.toml
-Edit the created es_config.toml file and add the following settings to the end of the file. Note: If credentials have never been rotated this file may be empty.
+automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
+```
+
+- Edit the created `es_config.toml` file and add the following settings at the end of the file. (*The file will be empty if the credentials have not been rotated*)
+
+```sh
 [es_yaml.s3.client.default]
- endpoint = "<Bloomberg S3 endpoint, e.g. bloomberg.s3.com>"
-Use below command to apply the updated es_config.toml changes, this only needs to be done once: Note: This will trigger a restart of the Elasticsearch services on each server.
-hab config apply automate-ha-elasticsearch.default $(date '+%s') es_config.toml
-After that run command :
-journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
-And watch for a message about Elasticsearch going from RED /YELLOW to GREEN.
+endpoint = "<Bloomberg S3 endpoint, e.g. bloomberg.s3.com>"
+```
 
+- Run the following command to apply the updated `es_config.toml` changes. Run this command only once. (*This will trigger a restart of the OpenSearch services on each server*)
 
+```sh
+hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
+```
+
+- Once you are done will all the above steps, run the following command:
+
+```sh
+journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
+```
+
+The screen will display a message of OpenSearch going from **RED/YELLOW** to **GREEN**.
