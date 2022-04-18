@@ -97,7 +97,7 @@ airgap_bundle_create() {
           bname=$(basename "${outfile}")
           echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > "${FRONTENDAIB_TFVARS}"
           echo "frontend_aib_local_file = \"${bname}\"" >> "${FRONTENDAIB_TFVARS}"
-	        $(hab pkg path core/coreutils)/bin/md5sum "${frontend_aib}" > "${frontend_aib}".md5
+	        "$(hab pkg path core/coreutils)/bin/md5sum" "${frontend_aib}" > "${frontend_aib}".md5
     fi
 
     if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
@@ -113,7 +113,7 @@ airgap_bundle_create() {
           backend_name=$(basename "${outfile_backend}")
           echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > "${BACKENDAIB_TFVARS}" 
           echo "backend_aib_local_file = \"${backend_name}\"" >> "${BACKENDAIB_TFVARS}"
-	        $(hab pkg path core/coreutils)/bin/md5sum "${backend_aib}" > "${backend_aib}".md5
+	        "$(hab pkg path core/coreutils)/bin/md5sum" "${backend_aib}" > "${backend_aib}".md5
     fi
     rm -f "${original_aib_path}"
   else
