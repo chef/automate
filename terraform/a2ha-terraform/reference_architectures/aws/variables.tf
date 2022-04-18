@@ -163,3 +163,7 @@ variable "ssh_user" {
 variable "sudo_cmd" {
   default = "sudo"
 }
+
+variable "disable_api_termination" {
+  default = true
+}

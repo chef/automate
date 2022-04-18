@@ -41,6 +41,7 @@ module "aws" {
   source                             = "./modules/aws"
   lb_access_logs                     = var.lb_access_logs
   tags                               = var.aws_tags
+  disable_api_termination            = var.disable_api_termination
 }
 
 module "aws-output" {
