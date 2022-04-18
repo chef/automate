@@ -183,7 +183,7 @@ do_tasks() {
 if [ $# -eq 0 ]; then
   usage
 fi
-while getopts ":b:t:w:o:h:v:q:c:" opt; do
+while getopts ":t:w:h:v:q:c:" opt; do
   case "${opt}" in
     w)
       export WORKSPACE_PATH=${OPTARG}
