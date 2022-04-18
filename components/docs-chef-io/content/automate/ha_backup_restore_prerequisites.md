@@ -29,7 +29,7 @@ The two pre-backup configurations for AWS are:
 
 ### Pre Backup Configuration for s3 Backup
 
-In order to run the terraform scripts, the IAM users should have proper permissions. Going forward we will also discuss about the required permissions. You should have your  `secret access key` and `key id` or else you can regenerate a new access key.
+To run the terraform scripts, the IAM users should have proper permissions. Going forward, we will also discuss the required permissions. You should have your  `secret access key` and `key id`, or else you can regenerate a new access key.
 
 #### Permissions Required
 
@@ -43,7 +43,7 @@ Check if the IAM user has all the required permissions. The permission policies 
 
 Create an IAM role to give access of **s3** to **OpenSearch** instances. The role should already be assigned as the OpenSearch instance tries to communicate s3.
 
-The permissions can either be directly added to the user or can be added via **IAM Group**.
+The permissions can either be directly added to the user or added via **IAM Group**.
 
 Once done with the above steps, `.toml` file and patch the `.config`. In the file, modify the values listed below:
 
@@ -53,7 +53,7 @@ Once done with the above steps, `.toml` file and patch the `.config`. In the fil
 
 3. `vi configs/automate.toml`
 
-The content for the `automate.toml` file is given below:
+Refer to the content for the `automate.toml` file below:
 
 ```sh
 [global.v1.external.opensearch.backup]
@@ -122,13 +122,13 @@ Execute the command given below to trigger the deployment.
 ./chef-automate config patch configs/automate.toml
 ```
 
-Back-up the configurations once the cluster has been deployed.
+Take a back-up of the configurations once the cluster has been deployed.
 
 {{< note >}} **IAM Role:** Assign the IAM Role to the all the OpenSearch instances in the cluster created above. {{< /note >}}
 
 ### File System(EFS) Configuration for backup
 
-To backup on share file system for AWS, follow the steps given below:
+To backup on the share file system for AWS, follow the steps given below:
 
 - Create the **EFS** over AWS.
 - Mount the creating EFS using **DNS** or **IP**.
@@ -139,11 +139,11 @@ To backup on share file system for AWS, follow the steps given below:
 The two pre-backup configurations for On-Premise are:
 
 - For File System Backup
-- For Object Storage (Non AWS)
+- For Object Storage (Non-AWS)
 
 ### Pre Backup Configuration for File System Backup
 
-A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the same location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
+A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
 
 Once the shared filesystem is mounted to `/mnt/automate_backups`, configure Automate to register the snapshot locations with OpenSearch.
 
@@ -179,14 +179,14 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 repo = "/mnt/automate_backups/opensearch" 
 ```
 
-To trigger the restart of the OpenSearch on each server, apply the updated  `es_config.toml` config to OpenSearch once. 
+To trigger the restart of the OpenSearch on each server, apply the updated  `es_config.toml` config to OpenSearch once.
 
 ```sh
 hab config apply automate-ha-opensearch.default $(date '+%s') es\_config.toml
 
 hab svc status (check whether OpenSearch service is up or not)
 
-curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices is green or not)
+curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices are green or not)
 
 # Watch for a message about OpenSearch going from RED to GREEN
 `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
@@ -194,7 +194,7 @@ curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -
 
 - Configure Automate to handle *External OpenSearch Backups*.
 
-- Create an `automate.toml` file on the provisioning server using following command:
+- Create an `automate.toml` file on the provisioning server using the following command:
 
 ```bash
 touch automate.toml
@@ -223,9 +223,9 @@ path = "/mnt/automate_backups/backups"
 
 ### Pre-Backup Configuration for Object Storage
 
-This section provides the pre-backup configuration required to backup the data on Object Storage System (Other than AWS S3) like *Minio*, *Non AWS S3*. The steps to set secret key using commands are given below:
+This section provides the pre-backup configuration required to backup the data on Object Storage System (Other than AWS S3) like *Minio*, *Non-AWS S3*. The steps to set a secret key using commands are given below:
 
-1. Login to all the opensearch nodes and the steps on all the opensearch nodes.
+1. Log in to all the opensearch nodes and follow the steps on all the opensearch nodes.
   
   - Export `ES_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
   - Hab pkg `exec chef/opensearch-odfe opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
@@ -233,7 +233,7 @@ This section provides the pre-backup configuration required to backup the data o
   - Chown `hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
   - Curl `-k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
 
-The final output after running the command 1.5 on third node is given below:
+The final output after running the command 1.5 on the third node is given below:
 
 ```json
 {
@@ -259,7 +259,7 @@ The final output after running the command 1.5 on third node is given below:
 
 2. To override the existing default endpoint:
 
-- Login to one of the open search instance and run the following command (You need root access to run the command):
+- Login to one of the open search instances and run the following command (You need root access to run the command):
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh
@@ -279,7 +279,7 @@ endpoint = "<Bloomberg S3 endpoint, e.g. bloomberg.s3.com>"
 hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
 ```
 
-- Once you are done will all the above steps, run the following command:
+- Once done with the above steps, run the following command:
 
 ```sh
 journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
