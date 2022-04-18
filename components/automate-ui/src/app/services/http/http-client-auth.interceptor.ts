@@ -15,6 +15,8 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import * as selectors from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from '../projects-filter/projects-filter.reducer';
 
+import { Regex } from 'app/helpers/auth/regex';
+
 export const InterceptorSkipHeader = 'Skip-Interceptor';
 
 @Injectable()
@@ -51,8 +53,23 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
     const filtered = request.params.get('unfiltered') !== 'true';
     const params = request.params.delete('unfiltered');
 
-    if (this.projects && filtered) {
-      headers = headers.set('projects', this.projects);
+    if (request.url.includes('/orgs/')) {
+      console.log(request.url)
+      let checkInfraOrgsURL= false;
+      let url = request.url;
+      let serverID = url.split('/')[5];
+      let orgID = url.split('/')[7];
+      let newHeader = serverID +'_' + orgID;
+      if(url.includes('/infra/servers/') && Regex.patterns.VALID_URL.test(serverID)) {
+        checkInfraOrgsURL= true;
+        console.log("GEtting value 1")
+      }
+      if(checkInfraOrgsURL)
+        headers = headers.set('projects', newHeader);
+    } else {
+      if (this.projects && filtered) {
+        headers = headers.set('projects', this.projects);
+      }
     }
 
     return this.chefSession.token_provider.pipe(
