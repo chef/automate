@@ -1,7 +1,7 @@
 data "aws_elb_service_account" "main" {}
 
 resource "aws_s3_bucket" "elb_logs" {
-  bucket = "a2ha-elb-bucket"
+  bucket = "a2ha-elb-bucket-arvi"
   force_destroy = true
 }
 
@@ -23,7 +23,7 @@ resource "aws_s3_bucket_policy" "elb_logs_bucket_policy" {
       "Principal": {
         "AWS": "${data.aws_elb_service_account.main.arn}"
       },
-      "Resource": "arn:aws:s3:::a2ha-elb-bucket/AWSLogs/*",
+      "Resource": "arn:aws:s3:::a2ha-elb-bucket-arvi/AWSLogs/*",
       "Sid": "Stmt1446575236270"
     }
   ],
