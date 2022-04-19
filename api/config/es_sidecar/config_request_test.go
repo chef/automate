@@ -115,7 +115,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		c.V1.Sys.Backups.S3.Bucket = w.String("user-bucket")
 		c.V1.Sys.Backups.S3.Client = w.String("user-client")
 		c.V1.Sys.Backups.S3.BasePath = w.String("user-base-path")
-		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(false)
+		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(true)
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.Backups = &shared.Backups{
