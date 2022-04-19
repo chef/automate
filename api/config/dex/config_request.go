@@ -18,17 +18,18 @@ func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
-				Mlsa:       &shared.Mlsa{},
-				Log:        &ConfigRequest_V1_Log{},
-				Service:    &ConfigRequest_V1_System_Service{},
-				Grpc:       &ConfigRequest_V1_Grpc{},
-				Storage:    &ConfigRequest_V1_Storage{},
-				Expiry:     &ConfigRequest_V1_Expiry{},
-				Bootstrap:  &ConfigRequest_V1_Bootstrap{},
-				Connectors: &ConfigRequest_V1_Connectors{},
-				Tls:        &shared.TLSCredentials{},
-				Disclosure: &ConfigRequest_V1_Disclosure{},
-				Banner:     &ConfigRequest_V1_Banner{},
+				Mlsa:                 &shared.Mlsa{},
+				Log:                  &ConfigRequest_V1_Log{},
+				Service:              &ConfigRequest_V1_System_Service{},
+				Grpc:                 &ConfigRequest_V1_Grpc{},
+				Storage:              &ConfigRequest_V1_Storage{},
+				Expiry:               &ConfigRequest_V1_Expiry{},
+				Bootstrap:            &ConfigRequest_V1_Bootstrap{},
+				Connectors:           &ConfigRequest_V1_Connectors{},
+				Tls:                  &shared.TLSCredentials{},
+				Disclosure:           &ConfigRequest_V1_Disclosure{},
+				Banner:               &ConfigRequest_V1_Banner{},
+				InvalidLoginAttempts: &ConfigRequest_V1_InvalidLoginAttempts{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -56,6 +57,10 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Banner.Message = w.String("")
 	c.V1.Sys.Banner.BackgroundColor = w.String("3864f2") // Chef Success blue
 	c.V1.Sys.Banner.TextColor = w.String("FFFFFF")       // White
+
+	c.V1.Sys.InvalidLoginAttempts.EnableInvalidLoginAttempts = w.Bool(true)
+	c.V1.Sys.InvalidLoginAttempts.BlockedDuration = w.Int32(30)
+	c.V1.Sys.InvalidLoginAttempts.MaxInvalidLoginAttemptsAllowed = w.Int32(5)
 
 	return c
 }
@@ -205,6 +210,10 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 			c.V1.Sys.Expiry.IdTokens = w.String("3m")
 		}
 	}
+
+	c.V1.Sys.InvalidLoginAttempts.EnableInvalidLoginAttempts = c.V1.Sys.InvalidLoginAttempts.GetEnableInvalidLoginAttempts()
+	c.V1.Sys.InvalidLoginAttempts.BlockedDuration = c.V1.Sys.InvalidLoginAttempts.GetBlockedDuration()
+	c.V1.Sys.InvalidLoginAttempts.MaxInvalidLoginAttemptsAllowed = c.V1.Sys.InvalidLoginAttempts.GetMaxInvalidLoginAttemptsAllowed()
 
 	return c.V1.Sys, nil
 }
