@@ -37,16 +37,16 @@ func TestSetGlobalConfig(t *testing.T) {
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable:   w.Bool(true),
 					Location: w.String("s3"),
-					S3: &shared.External_Elasticsearch_Backup_S3Settings{
+					S3: &shared.External_Opensearch_Backup_S3Settings{
 						Bucket:   w.String("external-bucket"),
 						Client:   w.String("external-client"),
 						BasePath: w.String("external-base-path"),
-						Settings: &shared.Backups_S3_Elasticsearch{
+						Settings: &shared.Backups_S3_Opensearch{
 							Compress: w.Bool(true),
 						},
 					},
@@ -70,14 +70,14 @@ func TestSetGlobalConfig(t *testing.T) {
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable:   w.Bool(true),
 					Location: w.String("fs"),
-					Fs: &shared.External_Elasticsearch_Backup_FsSettings{
+					Fs: &shared.External_Opensearch_Backup_FsSettings{
 						Path: w.String("external-root"),
-						Settings: &shared.External_Elasticsearch_Backup_FsSettings_OptionalSettings{
+						Settings: &shared.External_Opensearch_Backup_FsSettings_OptionalSettings{
 							MaxRestoreBytesPerSec:  w.String("external-restore-bytes"),
 							MaxSnapshotBytesPerSec: w.String("external-snapshot-bytes"),
 						},
@@ -98,9 +98,9 @@ func TestSetGlobalConfig(t *testing.T) {
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable: w.Bool(false),
 				},
 			},
@@ -125,7 +125,7 @@ func TestSetGlobalConfig(t *testing.T) {
 					Name:     w.String("global-bucket"),
 					BasePath: w.String("global-base-path"),
 				},
-				Es: &shared.Backups_S3_Elasticsearch{
+				Os: &shared.Backups_S3_Opensearch{
 					Compress: w.Bool(true),
 				},
 			},
@@ -177,7 +177,7 @@ func TestSetGlobalConfig(t *testing.T) {
 					Name:     w.String("global-bucket"),
 					BasePath: w.String("global-base-path"),
 				},
-				Es: &shared.Backups_S3_Elasticsearch{
+				Os: &shared.Backups_S3_Opensearch{
 					Compress: w.Bool(true),
 				},
 			},
@@ -257,10 +257,10 @@ func TestSetGlobalConfig(t *testing.T) {
 			},
 		}
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
 				Nodes:  []*wrappers.StringValue{w.String("http://127.0.0.1:59200")},
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable:   w.Bool(true),
 					Location: w.String("s3"),
 				},
