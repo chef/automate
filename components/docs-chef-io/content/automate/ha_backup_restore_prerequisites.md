@@ -270,7 +270,7 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 
 ```sh
 [es_yaml.s3.client.default]
-endpoint = "<Bloomberg S3 endpoint, e.g. bloomberg.s3.com>"
+endpoint = "< S3 endpoint, e.g. xyz.s3.com>"
 ```
 
 - Run the following command to apply the updated `es_config.toml` changes. Run this command only once. (*This will trigger a restart of the OpenSearch services on each server*)

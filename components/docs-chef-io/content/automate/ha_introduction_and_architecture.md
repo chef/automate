@@ -13,12 +13,10 @@ gh_repo = "automate"
     weight = 200
 +++
 
-In this section, we will talk about the **Minimal Node HA Deployment** use-case and the way it can be achieved.
+This section will discuss the **Minimal Node HA Deployment** use case and how you can achieve it.
 
-When Chef Automate HA can be achieved with minimum of five nodes, this is called as Minimal Node HA Deployment. This deployment is not different from the usual HA deployment.
+When you achieve Chef Automate HA using a minimum of five nodes, you can call it a Minimal Node HA Deployment. This deployment is the same as the typical HA deployment. The best way to achieve the Minimal Node HA Deployment in the backend is to keep the **PostGreSQL** and **OpenSearch** clusters in the same node. This will let your three nodes of PostGreSQL and OpenSearch services run.
 
-The best way to achieve the Minimal Node HA Deployment in backend is to keep the **PostGreSQL** and **OpenSearch** clusters in same node. By this you will have three nodes of PostGreSQL and OpenSearch services running.
-
-Whereas, the best way to achieve the Minimal Node HA Deployment in frontend, is to set the automate on both frontend nodes. In this whole process, the Automate is already running Chef Server services so do not install it explicitely on any node.
+You can achieve the Minimal Node HA Deployment in the frontend by setting the automate on both frontend nodes. The Automate is already running Chef Server services in this process, so you can avoid installing it explicitly on any node.
 
 {{< figure src="/images/automate/minimal_node.png" alt="Minimal Node Deployment">}}
