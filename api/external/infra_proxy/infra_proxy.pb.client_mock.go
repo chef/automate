@@ -956,6 +956,26 @@ func (mr *MockInfraProxyClientMockRecorder) GetNodes(ctx, in interface{}, opts .
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodes", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNodes), varargs...)
 }
 
+// GetNode mocks base method
+func (m *MockInfraProxyClient) GetNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.Node, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetNode", varargs...)
+	ret0, _ := ret[0].(*response.Node)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNode indicates an expected call of GetNode
+func (mr *MockInfraProxyClientMockRecorder) GetNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNode), varargs...)
+}
+
 // DeleteNode mocks base method
 func (m *MockInfraProxyClient) DeleteNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.DeleteNode, error) {
 	m.ctrl.T.Helper()
@@ -1014,26 +1034,6 @@ func (mr *MockInfraProxyClientMockRecorder) UpdateNodeAttributes(ctx, in interfa
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeAttributes", reflect.TypeOf((*MockInfraProxyClient)(nil).UpdateNodeAttributes), varargs...)
-}
-
-// GetNode mocks base method
-func (m *MockInfraProxyClient) GetNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.Node, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetNode", varargs...)
-	ret0, _ := ret[0].(*response.Node)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNode indicates an expected call of GetNode
-func (mr *MockInfraProxyClientMockRecorder) GetNode(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyClient)(nil).GetNode), varargs...)
 }
 
 // GetNodeExpandedRunList mocks base method
@@ -2009,6 +2009,21 @@ func (mr *MockInfraProxyServerMockRecorder) GetNodes(arg0, arg1 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodes", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNodes), arg0, arg1)
 }
 
+// GetNode mocks base method
+func (m *MockInfraProxyServer) GetNode(arg0 context.Context, arg1 *request.Node) (*response.Node, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNode", arg0, arg1)
+	ret0, _ := ret[0].(*response.Node)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNode indicates an expected call of GetNode
+func (mr *MockInfraProxyServerMockRecorder) GetNode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNode), arg0, arg1)
+}
+
 // DeleteNode mocks base method
 func (m *MockInfraProxyServer) DeleteNode(arg0 context.Context, arg1 *request.Node) (*response.DeleteNode, error) {
 	m.ctrl.T.Helper()
@@ -2052,21 +2067,6 @@ func (m *MockInfraProxyServer) UpdateNodeAttributes(arg0 context.Context, arg1 *
 func (mr *MockInfraProxyServerMockRecorder) UpdateNodeAttributes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNodeAttributes", reflect.TypeOf((*MockInfraProxyServer)(nil).UpdateNodeAttributes), arg0, arg1)
-}
-
-// GetNode mocks base method
-func (m *MockInfraProxyServer) GetNode(arg0 context.Context, arg1 *request.Node) (*response.Node, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNode", arg0, arg1)
-	ret0, _ := ret[0].(*response.Node)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNode indicates an expected call of GetNode
-func (mr *MockInfraProxyServerMockRecorder) GetNode(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNode", reflect.TypeOf((*MockInfraProxyServer)(nil).GetNode), arg0, arg1)
 }
 
 // GetNodeExpandedRunList mocks base method
