@@ -8,6 +8,7 @@ export interface Server {
   migration_id?: string;
   migration_type?: string;
   migration_status?: string;
+  last_migration_time?: string;
 }
 
 export interface User {

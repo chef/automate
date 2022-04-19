@@ -77,11 +77,11 @@ export class ServerEffects {
   getServer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ServerActionTypes.GET),
-      mergeMap(({ payload: { id }}: GetServer) =>
-        this.requests.getServer(id).pipe(
+      mergeMap(({ payload: { server_id }}: GetServer) =>
+        this.requests.getServer(server_id).pipe(
           map((resp: ServerResponse) => new GetServerSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetServerFailure(error, id)))))));
+          observableOf(new GetServerFailure(error, server_id)))))));
 
   getServerFailure$ = createEffect(() =>
     this.actions$.pipe(

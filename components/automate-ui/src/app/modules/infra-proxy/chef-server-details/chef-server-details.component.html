@@ -42,7 +42,7 @@
                 </li>
                 <li>
                   <span class="heading">Last sync date</span>
-                  <span class="server-entity-value">--</span>
+                  <span class="server-entity-value">{{ server?.last_migration_time | date:'medium' }}</span>
                 </li>
                 <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
                   <li>
@@ -124,6 +124,7 @@
             </div>
           </div>
         </div>
+        <div>orgs: {{orgs.length}} | tab: {{tabValue}}</div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
           <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
@@ -132,14 +133,6 @@
           </app-authorized>
         </chef-tab-selector>
       </chef-page-header>
-      <app-create-org-modal
-        [visible]="createModalVisible"
-        [creating]="creatingServerOrg"
-        [createForm]="orgForm"
-        (close)="closeCreateModal()"
-        [conflictErrorEvent]="conflictErrorEvent"
-        (createClicked)="createServerOrg()">
-      </app-create-org-modal>
       <app-delete-infra-object-modal
         [visible]="deleteModalVisible"
         objectNoun="organization"
@@ -251,7 +244,7 @@
         </form>
       </section>
       <section class="page-body" *ngIf="tabValue === 'users'">
-        <div id="user-table-container" *ngIf="isUserLoaded">
+        <div id="user-table-container" *ngIf="isUserListLoaded">
           <chef-table>
             <chef-thead>
               <chef-tr>
@@ -273,7 +266,7 @@
             </chef-tbody>
           </chef-table>
         </div>
-        <div data-cy="empty-list" class="empty-section"  *ngIf="!isUserLoaded">
+        <div data-cy="empty-list" class="empty-section"  *ngIf="!isUserListLoaded">
           <img alt="No preview" src="/assets/img/no_preview.gif" />
           <p data-cy="no-records">No users available.</p>
         </div>
