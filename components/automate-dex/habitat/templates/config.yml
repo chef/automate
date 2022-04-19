@@ -235,6 +235,11 @@ expiry:
   signingKeys: {{cfg.expiry.signing_keys}}
   idTokens: {{cfg.expiry.id_tokens}}
 
+invalidLoginAttempts:
+  enableInvalidLoginAttempts: {{cfg.invalid_login_attempts.enable_invalid_login_attempts}}
+  blockedDuration: {{cfg.invalid_login_attempts.blocked_duration}}
+  maxInvalidLoginAttemptsAllowed: {{cfg.invalid_login_attempts.max_invalid_login_attempts_allowed}}
+
 frontend:
   dir: {{cfg.frontend_dir}}
   issuer: Chef Automate
