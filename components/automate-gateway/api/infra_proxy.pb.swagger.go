@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/api/v0/infra/servers": {
       "get": {
+        "summary": "Get Infra Server",
+        "description": "Get Infra Servers returns all the servers added to Automate\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetServers",
         "responses": {
           "200": {
@@ -36,6 +38,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Add Chef Infra Server",
+        "description": "Adds a Chef Infra Server to Automate and stores the WebUI key, server details.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateServer",
         "responses": {
           "200": {
@@ -93,12 +97,14 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
     "/api/v0/infra/servers/update": {
       "post": {
+        "summary": "Update Infra Server WebUI Key",
+        "description": "Updates the WebUI key stored for a Chef Server.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateWebuiKey",
         "responses": {
           "200": {
@@ -131,6 +137,8 @@ func init() {
     },
     "/api/v0/infra/servers/validate": {
       "post": {
+        "summary": "Validate Infra Server WebUI Key",
+        "description": "Returns if the WebUI key stored for a Chef Server is valid or not.\nIn case of invalid webUI key, it returns the error details.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_ValidateWebuiKey",
         "responses": {
           "200": {
@@ -163,6 +171,8 @@ func init() {
     },
     "/api/v0/infra/servers/{id}": {
       "get": {
+        "summary": "Get Infra Server Details",
+        "description": "Returns the details of the Infra Server added in Automate.\nThe details include the last sync status, date besides the Server details.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetServer",
         "responses": {
           "200": {
@@ -192,6 +202,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete Chef Infra Server",
+        "description": "Deletes a Chef Infra Server details in Automate.\nThis API does not delete the Chef Infra Server.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteServer",
         "responses": {
           "200": {
@@ -221,6 +233,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update Chef Infra Server",
+        "description": "Updates Chef Infra Server details in Automate.\nThis API does not update the Chef Infra Server.\nIn order to update the WebUI key, refer the Update WebUI Key api.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateServer",
         "responses": {
           "200": {
@@ -285,7 +299,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
@@ -316,7 +330,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
@@ -354,12 +368,14 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
+        "summary": "Get organisations",
+        "description": "Gets all the organisations of a Chef Infra Server added in Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgs:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetOrgs",
         "responses": {
           "200": {
@@ -422,12 +438,14 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{id}": {
       "get": {
+        "summary": "Get organisation details",
+        "description": "Gets the details of an organisation of a Chef Infra Server added in Automate.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgs:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetOrg",
         "responses": {
           "200": {
@@ -540,7 +558,7 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
@@ -586,12 +604,14 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
+        "summary": "Get Clients",
+        "description": "Gets all Clients in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsClient:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetClients",
         "responses": {
           "200": {
@@ -651,6 +671,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create Client",
+        "description": "Creates a Client in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsClient:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateClient",
         "responses": {
           "200": {
@@ -697,6 +719,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
       "get": {
+        "summary": "Get Client",
+        "description": "Gets the details of a Client in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsClient:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetClient",
         "responses": {
           "200": {
@@ -740,6 +764,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete Client",
+        "description": "Deletes a Client in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsClient:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteClient",
         "responses": {
           "200": {
@@ -785,6 +811,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset": {
       "put": {
+        "summary": "Reset Client Key",
+        "description": "Resets a Client key  in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsClient:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_ResetClientKey",
         "responses": {
           "200": {
@@ -838,6 +866,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
+        "summary": "Get Cookbooks",
+        "description": "Gets all the cookbooks of an organisation of a Chef Infra Server added in Automate.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsCookbooks:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbooks",
         "responses": {
           "200": {
@@ -876,6 +906,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
+        "summary": "Get Cookbook Versions",
+        "description": "Gets all the versions of a cookbook in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsCookbooks:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbookVersions",
         "responses": {
           "200": {
@@ -921,6 +953,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
+        "summary": "Get Cookbook",
+        "description": "Gets the details of a cookbook in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsCookbooks:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbook",
         "responses": {
           "200": {
@@ -973,6 +1007,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
+        "summary": "Get Cookbook File Content",
+        "description": "Gets the contents of a cookbook in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsCookbooks:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbookFileContent",
         "responses": {
           "200": {
@@ -1032,6 +1068,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags": {
       "get": {
+        "summary": "Get Data Bags",
+        "description": "Gets all Data Bags in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBags:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetDataBags",
         "responses": {
           "200": {
@@ -1068,6 +1106,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create Data Bag",
+        "description": "Creates a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBags:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateDataBag",
         "responses": {
           "200": {
@@ -1114,6 +1154,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
       "get": {
+        "summary": "Get Data Bag Items",
+        "description": "Gets all the Items in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBagsItem:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetDataBagItems",
         "responses": {
           "200": {
@@ -1180,6 +1222,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete Data Bag",
+        "description": "Deletes a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBags:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteDataBag",
         "responses": {
           "200": {
@@ -1223,6 +1267,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create Data Bag Item",
+        "description": "Creates an Item in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBagsItem:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateDataBagItem",
         "responses": {
           "200": {
@@ -1276,6 +1322,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}": {
       "put": {
+        "summary": "Update Data Bag Item",
+        "description": "Updates an Item in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBagsItem:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateDataBagItem",
         "responses": {
           "200": {
@@ -1336,6 +1384,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
+        "summary": "Get Data Bag Item",
+        "description": "Gets details of an Items in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBagsItem:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetDataBagItem",
         "responses": {
           "200": {
@@ -1386,6 +1436,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete Data Bag Item",
+        "description": "Deletes an Item in a Data Bag in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsDataBagsItem:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteDataBagItem",
         "responses": {
           "200": {
@@ -1438,6 +1490,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments": {
       "get": {
+        "summary": "Get Environments",
+        "description": "Gets all Environments in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsEnvironments:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetEnvironments",
         "responses": {
           "200": {
@@ -1497,6 +1551,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create Environment",
+        "description": "Creates an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsEnvironments:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateEnvironment",
         "responses": {
           "200": {
@@ -1543,6 +1599,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
+        "summary": "Get Environment",
+        "description": "Gets the details of an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsEnvironments:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetEnvironment",
         "responses": {
           "200": {
@@ -1586,6 +1644,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete Environment",
+        "description": "Deletes an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsEnvironments:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteEnvironment",
         "responses": {
           "200": {
@@ -1629,6 +1689,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update Environment",
+        "description": "Updates an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsEnvironments:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateEnvironment",
         "responses": {
           "200": {
@@ -1682,6 +1744,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes": {
       "get": {
+        "summary": "Get Environment Recipes",
+        "description": "Gets all the Recipes for an Environment in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsEnvironments:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetEnvironmentRecipes",
         "responses": {
           "200": {
@@ -1727,6 +1791,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}": {
       "get": {
+        "summary": "Get Node Expanded Run List",
+        "description": "Gets the Expanded Run List of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetNodeExpandedRunList",
         "responses": {
           "200": {
@@ -1779,6 +1845,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
+        "summary": "Get Nodes",
+        "description": "Gets all the Nodes in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetNodes",
         "responses": {
           "200": {
@@ -1840,6 +1908,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
       "get": {
+        "summary": "Get Node",
+        "description": "Gets the details of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetNode",
         "responses": {
           "200": {
@@ -1883,6 +1953,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete Node",
+        "description": "Deletes a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteNode",
         "responses": {
           "200": {
@@ -1926,6 +1998,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update Node",
+        "description": "Updates a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNode",
         "responses": {
           "200": {
@@ -1979,6 +2053,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes": {
       "put": {
+        "summary": "Update Node Attributes",
+        "description": "Updates the Attributes of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNodeAttributes",
         "responses": {
           "200": {
@@ -2032,6 +2108,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment": {
       "put": {
+        "summary": "Update Node Environment",
+        "description": "Updates the environment of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNodeEnvironment",
         "responses": {
           "200": {
@@ -2085,6 +2163,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags": {
       "put": {
+        "summary": "Update Node Tags",
+        "description": "Updates the tags of a Node in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsNodes:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNodeTags",
         "responses": {
           "200": {
@@ -2138,6 +2218,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
       "get": {
+        "summary": "Get Policy Files",
+        "description": "Gets all the Policy Files in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsPolicyFiles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetPolicyfiles",
         "responses": {
           "200": {
@@ -2176,6 +2258,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
       "get": {
+        "summary": "Get Policy File",
+        "description": "Gets the details of a Policy File in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsPolicyFiles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetPolicyfile",
         "responses": {
           "200": {
@@ -2265,12 +2349,14 @@ func init() {
           }
         ],
         "tags": [
-          "InfraProxy"
+          "hidden"
         ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}/revisions": {
       "get": {
+        "summary": "Get Policy File Revisions",
+        "description": "Gets the revisions of a Policy File in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsPolicyFiles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetPolicyfileRevisions",
         "responses": {
           "200": {
@@ -2316,6 +2402,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}": {
       "get": {
+        "summary": "Get Policy Group",
+        "description": "Gets the Policy Group of a Policy File in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsPolicyGroups:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetPolicygroup",
         "responses": {
           "200": {
@@ -2361,6 +2449,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
+        "summary": "Get Roles",
+        "description": "Gets all the Roles in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsRoles:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRoles",
         "responses": {
           "200": {
@@ -2420,6 +2510,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create Role",
+        "description": "Creates a Role in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsRoles:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateRole",
         "responses": {
           "200": {
@@ -2466,6 +2558,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
       "get": {
+        "summary": "Get Role",
+        "description": "Gets the details of a Role in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsRoles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRole",
         "responses": {
           "200": {
@@ -2509,6 +2603,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete Role",
+        "description": "Deletes a Role in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsRoles:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteRole",
         "responses": {
           "200": {
@@ -2552,6 +2648,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update Role",
+        "description": "Updates a Role in an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsRoles:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateRole",
         "responses": {
           "200": {
@@ -2605,6 +2703,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments": {
       "get": {
+        "summary": "Get Role Environments",
+        "description": "Gets the environments of a Role in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsRoles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRoleEnvironments",
         "responses": {
           "200": {
@@ -2650,6 +2750,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}": {
       "get": {
+        "summary": "Get Role Expanded Run List",
+        "description": "Gets the expanded run list of a Role in an organisation\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServersOrgsRoles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRoleExpandedRunList",
         "responses": {
           "200": {
@@ -2702,6 +2804,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users": {
       "get": {
+        "summary": "Get Org Users List",
+        "description": "Gets all the users of an organisation in Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetOrgUsersList",
         "responses": {
           "200": {
@@ -2740,6 +2844,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/user/{user_name}": {
       "put": {
+        "summary": "Reset Server Users Key",
+        "description": "Resets the user key of an user in Chef Infra Server\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_ResetInfraServerUserKey",
         "responses": {
           "200": {
@@ -2786,6 +2892,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/users": {
       "post": {
+        "summary": "Get Server Users List",
+        "description": "Gets all the users of a Chef Infra Server.\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetServerUsersList",
         "responses": {
           "200": {
@@ -5011,13 +5119,16 @@ func init() {
       "type": "object",
       "properties": {
         "type_url": {
-          "type": "string"
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n` + "`" + `path/google.protobuf.Duration` + "`" + `). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + `, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, ` + "`" + `https` + "`" + ` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + ` (or the empty scheme) might be\nused with implementation specific semantics."
         },
         "value": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
         }
-      }
+      },
+      "description": "` + "`" + `Any` + "`" + ` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an ` + "`" + `Any` + "`" + ` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field ` + "`" + `@type` + "`" + ` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n` + "`" + `value` + "`" + ` which holds the custom JSON in addition to the ` + "`" + `@type` + "`" + `\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "google.protobuf.NullValue": {
       "type": "string",
