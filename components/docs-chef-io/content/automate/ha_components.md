@@ -23,10 +23,6 @@ Provides commands such as `automate-cluster-ctl provision/deploy` installed via 
 
 Aids connect the backend (**postgres** and **opensearch**) databases using an automate configuration file and **Terraform** without manual intervention.
 
-## Automate-ha-curator
-
-**OpenSearch** curator aids in curating and managing the **OpenSearch** indices and snapshots by obtaining the entire actionable list of indices (or images) from the cluster. This component is the same as the default curator. It's written in a **hab** package to merge applications in a hab environment.
-
 ## Automate-ha-deployment
 
 Aids in setting up a workspace for Chef Automate HA environment. For example, `/hab/a2_deploy_workspace`. It also includes **terraform** code, some necessary **scripts**, **inspecs**, **tests**, **Makefile** and so on.

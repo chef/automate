@@ -18,7 +18,7 @@ gh_repo = "automate"
 
 Thus, HA is designed to avoid loss of service by reducing or managing failures and minimizing unscheduled downtime (when your system or network is not available for use or is unresponsive) that happens due to power outages or failure of a component.
 
-**Availability** includes two periods of time: how much time a service is accessible and how much time the system needs to respond to user requests. When it comes to measuring availability, several factors are salient. These include recovery time and both scheduled and unscheduled maintenance periods. Typically, availability is expressed as a percentage of uptime defined by service level agreements (SLAs). A score of 100 percent characterizes a system that never fails or experiences zero downtime by being 100% operational.
+**Availability** includes two periods of time: how much time a service is accessible and how much time the system needs to respond to user requests. When it comes to measuring availability, several factors are salient. These include recovery time and both scheduled and unscheduled maintenance periods.
 
 ## High Availability (HA) Clusters
 
@@ -32,4 +32,4 @@ Thus, HA clusters strive to support the system or application, or services to ru
 
 ## Chef Automate High Availability (HA)
 
-The Chef Automate HA equates to reliability, intending to increase functionality, efficiency, and productivity. HA is built on the following three characteristics, **Redundancy**, **Monitoring**, and **Failover**. The Chef Automate HA architecture is an approach to defining the components, modules, or implementation of services of a system that ensures optimal operational performance, even at times of high loads. It aids in addressing three major issues, server failure, zone failure, and cloud failure. It also allows you to automate and test everything in your network.
+The Chef Automate HA equates to reliability, intending to increase functionality, efficiency, and productivity. HA is built on the following characteristics, **Redundancy**, and **Failover**. The Chef Automate HA architecture is an approach to defining the components, modules, or implementation of services of a system that ensures optimal operational performance, even at times of high loads. It aids in addressing major issues, service failure, and zone failure.

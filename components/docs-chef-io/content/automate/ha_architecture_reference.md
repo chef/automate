@@ -13,41 +13,27 @@ gh_repo = "automate"
     weight = 220
 +++
 
-The following Chef Automate HA Architecture diagram shows the Chef Automate HA components that work on the **Leader-Follower** strategy. This architecture includes the cluster of the _Chef Automate_, _Chef Server_, _Postgres_, and _OpenSearch_.
+The following Chef Automate HA Architecture diagram shows the Chef Automate HA components. This architecture includes the cluster of the _Chef Automate_, _Chef Server_, _Postgres_, and _OpenSearch_.
 
 ![High Availability Architecture](/images/automate/ha_architecture.png)
 
-## Chef Automate Clusters
+## Chef Automate HA Topology
 
-The Chef Automate HA Architecture involves the following clusters part of the main cluster, which are:
+The Chef Automate HA Architecture involves the following clusters part of the main cluster:
 
-- Backend Cluster and Nodes
-- Frontend Cluster and Nodes
+- **Backend Cluster**
 
-### Backend Cluster and Nodes
+- **Postgres:** Database requires a minimum of three nodes. Postgres database uses *Leader-Follower* strategy, where one becomes a leader, and the other two are the followers.
 
-The backend components connect to the frontend Chef Habitat supervisor cluster. The **Postgres** and **OpenSearch** instances run in the Chef Habitat supervisor. The **Postgres** and **OpenSearch** databases require a minimum of three nodes, where one becomes a leader, and the other two are followers.
+- **OpenSearch:** Database requires a minimum of three nodes. OpenSearch database manages the [cluster internally](https://opensearch.org/docs/latest/opensearch/cluster/).
 
-### Frontend Cluster and Nodes
+- **Frontend Cluster**
 
-Chef Automate and Chef Server act as frontend nodes and serve as a web UI with load balancer configurations.
+Chef Automate and Chef Server act as frontend nodes and serve as a web UI with Load Balancer configurations.
 
-## Chef Automate Cluster Nodes
+- [Chef Automate](https://docs.chef.io/automate/)
 
-The backend and frontend clusters comprise **four** different servers with HA mode, which are as follows:
-
-- **Chef-automate**
-- **Chef Infra Server**
-- **OpenSearch** is an open-source search and analytics engine based on Apache Lucene, built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and can be used for indexing purposes.
-- **PostgreSQL** is an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
-
-<!-- ! -- These four components reside in a VPC under one network in AWS. Every node sits on a specific machine irrespective of a database. Single database for all three nodes of Chef Automate. -->
-
-**PostgreSQL** stores all application services, secret, recovery, and data.
-
-**Open Search** stores compliance and client-run data and requires these data to be accessible in real-time. A Load balancer distributes to each of the Chef Automate components.
-
-{{< note >}} Open Search internally manages the communication and backup and does not follow any leader-follower strategy. {{< /note >}}
+- [Chef Server](https://docs.chef.io/server/
 
 ## Deployment Methods
 
@@ -60,15 +46,13 @@ Chef Automate High Availability (HA) supports two types of deployment:
 
 AWS is a comprehensive, evolving cloud computing platform provided by Amazon that includes a mixture of infrastructure as a service (IaaS), platform as a service (PaaS), and packaged software as a service (SaaS) offerings. AWS services can offer an organization tools such as compute power, database storage, and content delivery services. Click [here](https://aws.amazon.com/what-is-cloud-computing/) to learn more.
 
-The entire Chef Automate HA infrastructure is built into the AWS cloud in AWS deployment. A standard **Terraform** script handles AWS deployment if you choose AWS as a reference architecture. This deployment terraform script first sets up all the prerequisites like creating an EC2, load balancer, security groups, and subnets. Ensure you have given the existing **VPCID** for security purposes, and you have created the **CIDR** block manually based on the respective **VPC**.
+The entire Chef Automate HA infrastructure is built into the AWS cloud in AWS deployment. A standard **Terraform** script handles AWS deployment if you choose AWS as a reference architecture. This deployment terraform script sets up all the prerequisites like creating an EC2, load balancer, security groups, and subnets.
 
-It is a standard cloud service. Later, a series of configurations and installations follows:
+The two step deployment process is as shown below:
 
-- Installing Chef Automate into the Chef Automate instances.
-- Installing Chef Infra Server in all chef-server instances.
-- Installing and Configuring **PostgreSQL** into the **postres** instances.
-- Configuring and Installing **OpenSearch** into **opensearch** instances.
-- Installing a Chef Habitat and creating a supervisor network.
+- Provisioning Infrastructure.
+- Deployment of services on provisioned infrastructure.
+  - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, *Chef Server* will be done in this step.
 
 ### On-premise Deployment (Existing Node/Bare Infrastructure)
 
