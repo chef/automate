@@ -124,7 +124,7 @@
             </div>
           </div>
         </div>
-        <div>orgs: {{orgs.length}} | tab: {{tabValue}}</div>
+
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
           <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
