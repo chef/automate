@@ -153,11 +153,11 @@ func (c *ConfigRequest) applyExternalConfig(
 			cfg.S3.Os = s
 		}
 
-		if auth.GetScheme().GetValue() == "aws_es" {
+		if auth.GetScheme().GetValue() == "aws_os" {
 			cfg.S3.EnableAwsAuth = w.Bool(true)
 			cfg.S3.AwsAuth = auth.GetAwsOs()
 			if len(nodes) > 0 {
-				cfg.S3.EsUrl = nodes[0]
+				cfg.S3.OsUrl = nodes[0]
 			}
 		}
 	case "gcs":
