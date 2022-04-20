@@ -35,7 +35,7 @@ wait_for_efs_dns() {
     host $NFS_SRC && mount ${mount_path} && break
     n=$((n+1))
     echo "Waiting EFS mount $NFS_SRC to appear in DNS"
-    sleep 2
+    sleep 11 # As AWS EFS DNS takes more time to come up
   done
   if [[ $n -ge $max ]]; then
     failure "Failed waiting for EFS mount $NFS_SRC to appear in DNS"

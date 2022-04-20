@@ -1,7 +1,3 @@
-provider "aws" {
-  region                   = var.aws_region
-  profile                  = var.aws_profile
-}
 
 resource "random_id" "random" {
   byte_length = 4
@@ -89,27 +85,7 @@ resource "aws_route_table_association" "publicsubnet" {
   route_table_id = aws_route_table.default.id
 }
 
-resource "aws_efs_file_system" "backups" {
-  creation_token = "${var.tag_name}_${random_id.random.hex}_efsfs"
-  encrypted = true
-
-  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efsfs"))
-}
-
-resource "aws_efs_mount_target" "backups" {
-  count           = 3
-  file_system_id  = aws_efs_file_system.backups.id
-  subnet_id       = element(aws_subnet.default.*.id, count.index)
-  security_groups = [aws_security_group.efs_mount.id]
-}
-
 locals {
-  mount_nfs = templatefile("${path.module}/mount_nfs.tpl", {
-    efs_mount_dns = aws_efs_file_system.backups.dns_name,
-    efs_region    = var.aws_region,
-    mount_path    = var.nfs_mount_path
-  })
-
   ami = length(var.aws_ami_id) > 0 ? var.aws_ami_id : data.aws_ami.image.id
 }
 
@@ -148,18 +124,8 @@ resource "aws_instance" "chef_automate_postgresql" {
     )
   )
 
-  provisioner "file" {
-    content     = local.mount_nfs
-    destination = "${var.tmp_path}/mount_nfs"
-  }
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S bash -ex ${var.tmp_path}/mount_nfs",
-    ]
-  }
-
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_route_table.default]
 }
 
 resource "aws_instance" "chef_automate_elasticsearch" {
@@ -172,14 +138,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = true
   ebs_optimized               = true
-
-  connection {
-    host        = coalesce(self.private_ip)
-    type        = "ssh"
-    user        = var.aws_ssh_user
-    private_key = file(var.aws_ssh_key_file)
-    script_path = "${var.tmp_path}/tf_inline_script_aws.sh"
-  }
+  iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
     delete_on_termination = true
@@ -195,30 +154,13 @@ resource "aws_instance" "chef_automate_elasticsearch" {
     )
   )
 
-  provisioner "file" {
-    content     = local.mount_nfs
-    destination = "${var.tmp_path}/mount_nfs"
-  }
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S bash -ex ${var.tmp_path}/mount_nfs",
-    ]
-  }
 
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_route_table.default]
 }
 
 resource "aws_instance" "chef_automate" {
   count = var.automate_instance_count
-
-  connection {
-    host        = coalesce(self.private_ip)
-    type        = "ssh"
-    user        = var.aws_ssh_user
-    private_key = file(var.aws_ssh_key_file)
-    script_path = "${var.tmp_path}/tf_inline_script_aws.sh"
-  }
 
   ami                         = local.ami
   instance_type               = var.automate_server_instance_type
@@ -227,6 +169,7 @@ resource "aws_instance" "chef_automate" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
+  iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
     delete_on_termination = true
@@ -242,30 +185,13 @@ resource "aws_instance" "chef_automate" {
     )
   )
 
-  provisioner "file" {
-    content     = local.mount_nfs
-    destination = "${var.tmp_path}/mount_nfs"
-  }
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S bash -ex ${var.tmp_path}/mount_nfs",
-    ]
-  }
-
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_route_table.default]
 }
 
 resource "aws_instance" "chef_server" {
   count = var.chef_server_instance_count
 
-  connection {
-    host        = coalesce(self.private_ip)
-    type        = "ssh"
-    user        = var.aws_ssh_user
-    private_key = file(var.aws_ssh_key_file)
-    script_path = "${var.tmp_path}/tf_inline_script_aws.sh"
-  }
 
   ami                         = local.ami
   instance_type               = var.chef_server_instance_type
@@ -274,6 +200,7 @@ resource "aws_instance" "chef_server" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
+  iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
     delete_on_termination = true
@@ -289,16 +216,5 @@ resource "aws_instance" "chef_server" {
     )
   )
 
-  provisioner "file" {
-    content     = local.mount_nfs
-    destination = "${var.tmp_path}/mount_nfs"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S bash -ex ${var.tmp_path}/mount_nfs",
-    ]
-  }
-
-  depends_on = [aws_efs_mount_target.backups,aws_route_table.default]
+  depends_on = [aws_route_table.default]
 }
