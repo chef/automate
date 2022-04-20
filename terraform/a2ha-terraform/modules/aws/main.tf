@@ -136,7 +136,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
   key_name                    = var.aws_ssh_key_pair_name
   subnet_id                   = element(aws_subnet.public.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
-  associate_public_ip_address = true
+  associate_public_ip_address = false //Changes to false as Dashboards are no longer enabled
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name
 

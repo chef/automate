@@ -350,23 +350,11 @@ func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
 		if strings.Contains(h, AUTOMATE_HA_PKG_HA_PROXY) {
 			deployablePackages = append(deployablePackages, "proxy_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, AUTOMATE_HA_PKG_JOURNALBEAT) {
-			deployablePackages = append(deployablePackages, "journalbeat_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
-		}
-		if strings.Contains(h, AUTOMATE_HA_PKG_METRICBEAT) {
-			deployablePackages = append(deployablePackages, "metricbeat_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
-		}
-		if strings.Contains(h, AUTOMATE_HA_PKG_KIBANA) {
-			deployablePackages = append(deployablePackages, "kibana_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
-		}
 		if strings.Contains(h, AUTOMATE_HA_ES) {
 			deployablePackages = append(deployablePackages, "elasticsearch_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
 		if strings.Contains(h, AUTOMATE_HA_ES_CAR) {
 			deployablePackages = append(deployablePackages, "elasticsidecar_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
-		}
-		if strings.Contains(h, AUTOMATE_HA_CURATOR) {
-			deployablePackages = append(deployablePackages, "curator_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
 	}
 	return ioutil.WriteFile(AUTOMATE_HA_TERRAFORM_DIR+"a2ha_manifest.auto.tfvars", []byte(strings.Join(deployablePackages[:], "\n")), AUTOMATE_HA_FILE_PERMISSION_0755) // nosemgrep
