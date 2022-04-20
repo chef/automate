@@ -1,6 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
-# stable channel
+#stable channel
 
 pkg_name=deployment-service
 pkg_description="Automate Deployment Service"
