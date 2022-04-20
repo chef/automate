@@ -38,6 +38,10 @@ variable "aws_ami_id" {
 variable "aws_cidr_block_addr" {
 }
 
+variable "aws_instance_profile_name" {
+  default = ""
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -48,6 +52,10 @@ variable "aws_region" {
   description = "The name of the selected AWS region / datacenter."
 }
 
+variable "aws_s3_bucketName" {
+  default = "chef-automate-ha"
+}
+
 variable "aws_ssh_key_pair_name" {
 }
 
@@ -55,6 +63,14 @@ variable "aws_tags" {
 }
 
 variable "aws_vpc_id" {
+}
+
+variable "backup_config_efs" {
+  default = "false"
+}
+
+variable "backup_config_s3" {
+  default = "false"
 }
 
 variable "chef_ebs_volume_iops" {
@@ -162,4 +178,8 @@ variable "ssh_user" {
 
 variable "sudo_cmd" {
   default = "sudo"
+}
+
+variable "tag_name" {
+  default = "A2"
 }

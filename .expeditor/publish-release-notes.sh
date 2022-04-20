@@ -18,49 +18,45 @@ pushd ./automate.wiki
 
   # Reset "Pending Release Notes" wiki page
   cat >./Pending-Release-Notes.md <<EOH
-## New Features
--
+## Upgrade Journey
 
-## Improvements
--
+Chef lets you choose your **upgrade journey** based on your current version of Chef Automate. You can do all the version upgrades manually.
 
-## Compliance Profile Updates
--
+| Your Current Version | Upgrade To |
+| -------------------- | ---------- |
+| Any version before 20220329091442| 20220329091442|
+| 20220329091442| 3.0.x|
 
-## Bug Fixes
--
+Click [here](/automate/major_upgrade/) to know more.
 
 ## Maintenance
--
+- 
 
-## Backward Incompatibilities
--
-
-## Security
-
-### Security Improvements
-(examples: new security configurations)
--
-### Security Updates
-(examples: dependency updates, CVE fixes)
--
-## Chef Product Versions
+## Chef Packaged Product Versions
 
 This release uses:
-- Chef Habitat version:
-- Chef Habitat Builder version:
-- Chef Infra Server version:
-- Chef InSpec version:
+- Chef Habitat version: 
+- Chef Habitat Builder version: 
+- Chef Infra Server version: 
+- Chef InSpec version: 
 
 ## Service Versions
 
 This release uses:
-- Postgres:
-- ElasticSearch:
-- Nginx:
-- Haproxy:
+- Postgres: 
+- ElasticSearch: 
+- Nginx: 
+- Haproxy: 
 
-View the [package manifest](https://packages.chef.io/manifests/current/automate/latest.json) for the latest release.
+## Supported External Chef Products
+
+This release supports the following external chef products:
+- Chef Infra Server version: 14.0.58+
+- Chef Inspec version: 4.3.2+
+- Chef Infra Client: 17.0.242+
+- Chef Habitat: 0.81+
+
+View the [package manifest](https://packages.chef.io/manifests/current/automate/latest_semver.json) for the latest release.
 
 EOH
 
