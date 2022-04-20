@@ -46,9 +46,7 @@ resource "aws_alb" "automate_lb" {
     enabled          = var.lb_access_logs
   }
   lifecycle {
-    ignore_changes = [
-      tags
-    ]
+    ignore_changes = [tags]
   }
 }
 
@@ -106,9 +104,7 @@ resource "aws_alb" "chef_server_lb" {
   subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : aws_subnet.public.*.id
   tags               = var.tags
   lifecycle {
-    ignore_changes = [
-      tags
-    ]
+    ignore_changes = [tags]
   }
 }
 
