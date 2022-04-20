@@ -14,6 +14,8 @@ If you have successfully done provision-infra and after that if you want to dest
 
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done`
 
+`for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform apply -var "disable_api_termination=false";cd $i;done`
+
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done`
 
 # SCENARIO 3
@@ -27,5 +29,7 @@ If you've completed `chef-automate deploy` and want to destroy deploy part then 
 If you have finished deployment and want destroy all the instances of whole infra then run below commnd.
 
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done`
+
+`for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform apply -var "disable_api_termination=false";cd $i;done`
 
 `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done`

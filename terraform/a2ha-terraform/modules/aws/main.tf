@@ -149,7 +149,7 @@ resource "aws_instance" "chef_automate_postgresql" {
     )
   )
     lifecycle {
-    ignore_changes = [tags, root_block_device]
+    ignore_changes = [tags, root_block_device, ami]
   }
 
   provisioner "file" {
@@ -200,7 +200,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
     )
   )
     lifecycle {
-    ignore_changes = [tags, root_block_device]
+    ignore_changes = [tags, root_block_device, ami]
   }
 
   provisioner "file" {
@@ -252,7 +252,7 @@ resource "aws_instance" "chef_automate" {
   )
 
   lifecycle {
-    ignore_changes = [tags, root_block_device]
+    ignore_changes = [tags, root_block_device, ami]
   }
 
   provisioner "file" {
@@ -304,7 +304,7 @@ resource "aws_instance" "chef_server" {
   )
 
   lifecycle {
-    ignore_changes = [tags, root_block_device]
+    ignore_changes = [tags, root_block_device, ami]
   }
 
   provisioner "file" {
