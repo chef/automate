@@ -148,7 +148,7 @@ resource "aws_instance" "chef_automate_postgresql" {
       )
     )
   )
-    lifecycle {
+  lifecycle {
     ignore_changes = [tags, root_block_device, ami]
   }
 
@@ -199,7 +199,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
       format("${var.tag_name}_${random_id.random.hex}_chef_automate_elasticsearch_%02d", count.index + 1)
     )
   )
-    lifecycle {
+  lifecycle {
     ignore_changes = [tags, root_block_device, ami]
   }
 
