@@ -269,3 +269,26 @@ func (p *postgres) deleteOrgUserAssociation(ctx context.Context, serverID, orgID
 	}
 	return orgUser, nil
 }
+
+//DeleteUserAssciation: Delete user based on the automate_user_id
+func (p *postgres) DeleteUserAssciation(ctx context.Context, username string) (string, error) {
+	var automateUsername string
+	row := p.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE automate_user_id = $1)`, username)
+	var userExist bool
+	if err := row.Scan(&userExist); err != nil {
+		// failed with an unexpected error
+		return "", p.processError(err)
+
+	}
+	if userExist {
+		err := p.db.QueryRowContext(ctx,
+			`DELETE FROM users WHERE automate_user_id = $1
+		RETURNING automate_user_id`, username).
+			Scan(&automateUsername)
+		if err != nil {
+			return "", p.processError(err)
+		}
+	}
+
+	return automateUsername, nil
+}

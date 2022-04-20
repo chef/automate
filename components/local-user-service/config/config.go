@@ -11,14 +11,15 @@ import (
 
 // Config is the config format for the main application.
 type Config struct {
-	GRPC            string `json:"grpc"` // GRPC endpoint hosting all GRPC services
-	A1UserData      string `json:"a1_user_data"`
-	A1UserRolesData string `json:"a1_user_roles_data"`
-	Logger          Logger `json:"logger"`
-	Users           Users  `json:"users"` //!\\ only one users adapter
-	TeamsAddress    string `json:"teams_address"`
-	AuthzAddress    string `json:"authz_address"`
-	certs.TLSConfig `json:"tls"`
+	GRPC              string `json:"grpc"` // GRPC endpoint hosting all GRPC services
+	A1UserData        string `json:"a1_user_data"`
+	A1UserRolesData   string `json:"a1_user_roles_data"`
+	Logger            Logger `json:"logger"`
+	Users             Users  `json:"users"` //!\\ only one users adapter
+	TeamsAddress      string `json:"teams_address"`
+	AuthzAddress      string `json:"authz_address"`
+	InfraProxyAddress string `json:"infra_proxy_address"`
+	certs.TLSConfig   `json:"tls"`
 }
 
 // Logger holds configuration required to customize logging
