@@ -39,6 +39,7 @@ module "aws" {
   proxy_listen_port                  = var.proxy_listen_port
   source                             = "../../modules/aws"
   tags                               = var.aws_tags
+  disable_api_termination            = var.disable_api_termination
 }
 
 module "aws-output" {
