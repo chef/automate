@@ -162,6 +162,7 @@ resource "aws_route_table" "route3" {
 
 }
 
+
 resource "aws_route_table_association" "nat1" {
   count          = length(var.public_custom_subnets) > 0 ? 0 : 1
   subnet_id      = length(var.private_custom_subnets) > 0 ? data.aws_subnet.default[0].id : aws_subnet.default[0].id
@@ -219,8 +220,8 @@ resource "aws_instance" "chef_automate_postgresql" {
     )
   )
 
-
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
+
 }
 
 resource "aws_instance" "chef_automate_elasticsearch" {
@@ -231,7 +232,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
   key_name                    = var.aws_ssh_key_pair_name
   subnet_id                   = length(var.public_custom_subnets) > 0 ? element(data.aws_subnet.public.*.id, count.index) : element(aws_subnet.public.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
-  associate_public_ip_address = true
+  associate_public_ip_address = false //Changes to false as Dashboards are no longer enabled
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name
 
@@ -249,9 +250,8 @@ resource "aws_instance" "chef_automate_elasticsearch" {
     )
   )
 
-
-
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
+
 }
 
 resource "aws_instance" "chef_automate" {
@@ -280,8 +280,8 @@ resource "aws_instance" "chef_automate" {
     )
   )
 
-
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
+  
 }
 
 resource "aws_instance" "chef_server" {
@@ -310,6 +310,7 @@ resource "aws_instance" "chef_server" {
       format("${var.tag_name}_${random_id.random.hex}_chef_server_%02d", count.index + 1)
     )
   )
-
+  
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
+
 }
