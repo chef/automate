@@ -54,6 +54,10 @@ variable "aws_region" {
   description = "The name of the selected AWS region / datacenter."
 }
 
+variable "aws_s3_bucketName_for_logs" {
+  default = "lblogs"
+}
+
 variable "aws_ssh_key_file" {
 }
 
@@ -120,6 +124,10 @@ variable "kibana_listen_port" {
 
 variable "lb_access_logs" {
   default = false
+}
+
+variable "log_bucket" {
+  default = ""
 }
 
 variable "nfs_mount_path" {

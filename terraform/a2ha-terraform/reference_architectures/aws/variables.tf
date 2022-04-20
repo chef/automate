@@ -48,6 +48,10 @@ variable "aws_region" {
   description = "The name of the selected AWS region / datacenter."
 }
 
+variable "aws_s3_bucketName_for_logs" {
+  default = "lblogs"
+}
+
 variable "aws_ssh_key_pair_name" {
 }
 
@@ -91,6 +95,10 @@ variable "elasticsearch_ebs_volume_type" {
 
 variable "elasticsearch_server_instance_type" {
   default = "m5a.large"
+}
+
+variable "lb_access_logs" {
+  default = "false"
 }
 
 variable "managed_elasticsearch_certificate" {
