@@ -154,5 +154,5 @@ variable "teams_port" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/var/automate-ha"
 }
