@@ -23,6 +23,8 @@ module "aws" {
   chef_server_instance_count         = var.chef_server_instance_count
   chef_server_instance_type          = var.chef_server_instance_type
   chef_server_lb_certificate_arn     = var.chef_server_lb_certificate_arn
+  public_custom_subnets              = var.public_custom_subnets
+  private_custom_subnets             = var.private_custom_subnets
   elasticsearch_ebs_volume_iops      = var.elasticsearch_ebs_volume_iops
   elasticsearch_ebs_volume_size      = var.elasticsearch_ebs_volume_size
   elasticsearch_ebs_volume_type      = var.elasticsearch_ebs_volume_type

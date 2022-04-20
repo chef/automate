@@ -148,8 +148,18 @@ variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
 
+variable "private_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
 variable "proxy_listen_port" {
   default = 7432
+}
+
+variable "public_custom_subnets" {
+  default = []
+  type    = list(string)
 }
 
 variable "setup_managed_services" {
