@@ -144,22 +144,22 @@ variable "postgresql_listen_port" {
   default = 5432
 }
 
+variable "postgresql_server_instance_type" {
+  default = "t3a.medium"
+}
+
 variable "private_custom_subnets" {
   default = []
   type    = list(string)
 }
 
+variable "proxy_listen_port" {
+  default = 7432
+}
+
 variable "public_custom_subnets" {
   default = []
   type    = list(string)
-}
-
-variable "postgresql_server_instance_type" {
-  default = "t3a.medium"
-}
-
-variable "proxy_listen_port" {
-  default = 7432
 }
 
 variable "setup_managed_services" {
@@ -184,5 +184,3 @@ variable "tags" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
-
-
