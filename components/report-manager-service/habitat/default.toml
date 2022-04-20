@@ -1,0 +1,23 @@
+[mlsa]
+accept = false
+
+[service]
+port = 10152
+
+[log]
+level = "info"
+format = "json"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+[storage]
+database = "chef_report_manager_service"
+user = "report_manager"
+max_open_conns = 10
+max_idle_conns = 5
+
+[objstore]
+bucket = "default"

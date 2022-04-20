@@ -160,5 +160,12 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
     secure = true
 {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.report-manager-service.members as |report-manager|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.report-manager-service]
+    target = "127.0.0.1:{{report-manager.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
 
 

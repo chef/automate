@@ -1,12 +1,18 @@
 package server
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+
+	"github.com/chef/automate/api/interservice/report_manager"
 
 	"github.com/blang/semver"
 	"github.com/gofrs/uuid"
 	gp "github.com/golang/protobuf/ptypes/empty"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -23,28 +29,30 @@ import (
 )
 
 type ComplianceIngestServer struct {
-	compliancePipeline pipeline.Compliance
-	client             *ingestic.ESClient
-	mgrClient          manager.NodeManagerServiceClient
-	automateURL        string
-	notifierClient     notifier.Notifier
+	compliancePipeline   pipeline.Compliance
+	client               *ingestic.ESClient
+	mgrClient            manager.NodeManagerServiceClient
+	automateURL          string
+	notifierClient       notifier.Notifier
+	enableLargeReporting bool
 }
 
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
-func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient,
+func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient, reportMgrClient report_manager.ReportManagerServiceClient,
 	automateURL string, notifierClient notifier.Notifier, authzProjectsClient authz.ProjectsServiceClient,
-	messageBufferSize int) *ComplianceIngestServer {
+	messageBufferSize int, enableLargeReporting bool) *ComplianceIngestServer {
 
-	compliancePipeline := pipeline.NewCompliancePipeline(esClient,
-		authzProjectsClient, mgrClient, messageBufferSize, notifierClient, automateURL)
+	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient, mgrClient,
+		reportMgrClient, messageBufferSize, notifierClient, automateURL, enableLargeReporting)
 
 	return &ComplianceIngestServer{
-		compliancePipeline: compliancePipeline,
-		client:             esClient,
-		mgrClient:          mgrClient,
-		automateURL:        automateURL,
-		notifierClient:     notifierClient,
+		compliancePipeline:   compliancePipeline,
+		client:               esClient,
+		mgrClient:            mgrClient,
+		automateURL:          automateURL,
+		notifierClient:       notifierClient,
+		enableLargeReporting: enableLargeReporting,
 	}
 }
 
@@ -59,19 +67,19 @@ func (srv *ComplianceIngestServer) ProjectUpdateStatus(ctx context.Context,
 	return nil, status.Error(codes.Unimplemented, "Endpoint no longer used")
 }
 
-func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in *compliance.Report) (*gp.Empty, error) {
+func SendComplianceReport(ctx context.Context, in *compliance.Report, s *ComplianceIngestServer) error {
 	logrus.Debugf("ProcessComplianceReport with id: %s", in.ReportUuid)
 	if s == nil {
-		return nil, fmt.Errorf("ProcessComplianceReport, ComplianceIngestServer == nil")
+		return fmt.Errorf("ProcessComplianceReport, ComplianceIngestServer == nil")
 	}
 
 	if len(in.NodeUuid) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "invalid report: missing node_uuid")
+		return status.Error(codes.InvalidArgument, "invalid report: missing node_uuid")
 	}
 
 	_, err := uuid.FromString(in.NodeUuid)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid report: invalid node_uuid: %s", err.Error())
+		return status.Errorf(codes.InvalidArgument, "invalid report: invalid node_uuid: %s", err.Error())
 	}
 
 	if len(in.Version) == 0 {
@@ -87,6 +95,66 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		}
 	}
 	logrus.Debugf("Calling compliancePipeline.Run for report id %s", in.ReportUuid)
-	err = s.compliancePipeline.Run(in)
-	return &gp.Empty{}, err
+	return s.compliancePipeline.Run(in)
+}
+
+// ProcessComplianceReport receives messages in chunks and creates report
+func (s *ComplianceIngestServer) ProcessComplianceReport(stream ingest_api.ComplianceIngesterService_ProcessComplianceReportServer) error {
+	var err error
+	reportData := bytes.Buffer{}
+
+	// loop until all data is read in chunks or any error occur.
+	for {
+		err = contextError(stream.Context())
+		if err != nil {
+			return err
+		}
+		logrus.Debug("waiting to receive more data")
+
+		req, err := stream.Recv()
+		if err == io.EOF {
+			logrus.Debug("no more data")
+			break
+		}
+		if err != nil {
+			logrus.Debugf("cannot receive chunk data: %v", err)
+			return err
+		}
+		chunk := req.GetContent()
+		logrus.Debugf("received a chunk with size: %d", len(chunk))
+		_, err = reportData.Write(chunk)
+		if err != nil {
+			logrus.Debugf("cannot write chunk data: %v", err)
+			return err
+		}
+	}
+	jsonBytes := reportData.Bytes()
+	reportSize := len(jsonBytes)
+	if !s.enableLargeReporting && reportSize > 4194304 {
+		err := fmt.Errorf("received message larger than max (%d vs %d), please enable large reporting to process big reports", reportSize, 4194304)
+		logrus.Error(err)
+		return err
+	}
+
+	in := &compliance.Report{}
+	err = json.Unmarshal(jsonBytes, &in)
+	if err != nil {
+		return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
+	}
+	err = SendComplianceReport(context.Background(), in, s)
+	if err != nil {
+		return err
+	}
+	return stream.SendAndClose(&gp.Empty{})
+}
+
+func contextError(ctx context.Context) error {
+	switch ctx.Err() {
+	case context.Canceled:
+		return errors.Wrap(ctx.Err(), "request is canceled")
+	case context.DeadlineExceeded:
+		return errors.Wrap(ctx.Err(), "deadline is exceeded")
+	default:
+		return nil
+	}
 }

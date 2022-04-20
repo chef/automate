@@ -53,7 +53,41 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlInfo", "compliance:reporting:reportcontrols:{id}", "compliance:reportcontrols:list", "POST", "/api/v0/compliance/reporting/reportcontrols/id/{id}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*Query); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "type":
+					return m.Type
+				case "sort":
+					return m.Sort
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ReadReport", "compliance:reporting:reports:{id}", "compliance:reports:get", "POST", "/api/v0/compliance/reporting/reports/id/{id}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*Query); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "type":
+					return m.Type
+				case "sort":
+					return m.Sort
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ReadNodeHeader", "compliance:reporting:nodeheader:{id}", "compliance:nodeheader:get", "POST", "/api/v0/compliance/reporting/nodeheader/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Query); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -88,6 +122,23 @@ func init() {
 		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListProfiles", "compliance:reporting:profiles", "compliance:reportProfiles:list", "POST", "/api/v0/compliance/reporting/profiles", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*Query); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "type":
+					return m.Type
+				case "sort":
+					return m.Sort
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ExportReportManager", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/reportmanager/export", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Query); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

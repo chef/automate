@@ -1,0 +1,15 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+MINIO_ACCESS_KEY="minioadmin"
+export MINIO_ACCESS_KEY
+MINIO_SECRET_KEY="minioadmin"
+export MINIO_SECRET_KEY
+export MINIO_BROWSER=off
+# export SSL_CERT_FILE={{pkgPathFor "core/cacerts"}}/ssl/cert.pem
+# export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
+
+exec minio server \
+  --address "127.0.0.1:{{cfg.service.port}}" \
+  "{{pkg.svc_data_path}}"

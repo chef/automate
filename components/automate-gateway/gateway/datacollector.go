@@ -6,9 +6,11 @@
 package gateway
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -24,6 +26,7 @@ import (
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
 	complianceEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	inspecEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	reportData "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/components/automate-gateway/pkg/limiter"
 )
 
@@ -38,6 +41,8 @@ const (
 	LivenessAgentMsg
 	ComplianceReportMsg
 )
+
+const maxSize = 1 << 20
 
 // Custom Unmarshaler
 var unmarshaler = jsonpb.Unmarshaler{AllowUnknownFields: true}
@@ -155,21 +160,54 @@ func (s *Server) processLivenessPing(ctx context.Context, w http.ResponseWriter,
 	}
 }
 
-// processComplianceReport process a ComplianceReport message
+// processComplianceReport process a ComplianceReport message in chunks
 func (s *Server) processComplianceReport(ctx context.Context, w http.ResponseWriter, body []byte) {
-	// Create report object from the request body
-	report := ParseBytesToComplianceReport(body)
+	// maximum allowed size of chunks
 
-	// Talk directly to the ingest-compliance-service
 	complianceIngester, err := s.clientsFactory.ComplianceIngesterClient()
 	if err != nil {
 		http.Error(w, "GRPC ComplianceIngester Unavailable", http.StatusServiceUnavailable)
 		return
 	}
 
-	_, err = complianceIngester.ProcessComplianceReport(ctx, report)
+	// get client stream for sending report bytes in chunks
+	stream, err := complianceIngester.ProcessComplianceReport(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), runtime.HTTPStatusFromCode(status.Code(err)))
+	}
+	reader := bufio.NewReader(bytes.NewBuffer(body))
+	buffer := make([]byte, maxSize)
+
+	// loop until all the data are send that is EOF reaches or if any error occur
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal("cannot read chunk to buffer: ", err)
+			http.Error(w, err.Error(), runtime.HTTPStatusFromCode(status.Code(err)))
+			return
+		}
+		request := &reportData.ReportData{Content: buffer[:n]}
+		err = stream.Send(request)
+		if err != nil {
+			http.Error(w, err.Error(), runtime.HTTPStatusFromCode(status.Code(err)))
+			return
+		}
+	}
+	_, err = stream.CloseAndRecv()
+	if err == io.EOF {
+		if _, err := w.Write([]byte("report written successfully")); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	if err != nil {
+		http.Error(w, err.Error(), runtime.HTTPStatusFromCode(status.Code(err)))
+		return
 	}
 }
 

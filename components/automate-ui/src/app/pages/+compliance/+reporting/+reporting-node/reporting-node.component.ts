@@ -1,13 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
+import { isNil } from 'lodash/fp';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService, ReportCollection, reportFormat } from '../../shared/reporting/stats.service';
-import { Subject, Observable } from 'rxjs';
+import { combineLatest, Subject, Observable } from 'rxjs';
 import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil, first, finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
+import { GetControlDetail } from 'app/entities/control-details/control-details.action';
+import { controlDetailStatus, controlDetailList, controlsList } from 'app/entities/control-details/control-details.selectors';
 
 @Component({
   selector: 'app-reporting-node',
@@ -36,6 +42,17 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   downloadInProgress = false;
   downloadFailed = false;
   openControls = {};
+  controlList: any = {};
+  pageIndex = 1;
+  perPage = 100;
+  controlsLoading = false;
+  controlDetails = {};
+  controlDetailsLoading = false;
+  isError = false;
+  reportId: string;
+  reportIdArray: Array<string | number> = [];
+  allControlList = [];
+  currentControl;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -43,7 +60,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private statsService: StatsService,
     private reportQueryService: ReportQueryService,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private store: Store<NgrxStateAtom>
   ) {
   }
 
@@ -72,6 +90,22 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       });
     });
 
+    combineLatest([
+      this.store.select(controlDetailStatus),
+      this.store.select(controlDetailList)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([detailsStatusSt, detailsListState]) => {
+      if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)) {
+        this.controlDetailsLoading = false;
+        this.isError = false;
+        this.controlDetails = detailsListState;
+        this.currentControl = this.controlDetails['profiles'][0].controls[0];
+      } else if (detailsStatusSt === EntityStatus.loadingFailure) {
+        this.isError = true;
+        this.reportIdArray = this.reportIdArray.slice(0, -1);
+      }
+    });
+
     this.onPageChanged(1);
   }
 
@@ -84,64 +118,66 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  onReportItemClick(_event, report) {
+  onReportItemClick(_event: any, report: any) {
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
 
     this.setActiveReport(report);
   }
 
-  onHistoryOpenClick(_event) {
+  onHistoryOpenClick(_event: any) {
     this.showScanHistory = true;
   }
 
-  onHistoryCloseClick(_event) {
+  onHistoryCloseClick(_event: any) {
     this.showScanHistory = false;
   }
 
-  onHistoryFilterClick(_event, status) {
+  onHistoryFilterClick(_event: any, status: string) {
     this.activeReportStatus = status;
   }
 
-  onFilterControlStatusClick(_event, status) {
+  onFilterControlStatusClick(_event: any, status: string) {
+    this.pageIndex = 1;
     this.activeStatusFilter = status;
+    this.getControlData(this.activeReport);
   }
 
-  onViewSourceClick(_event, control) {
+  onViewSourceClick(_event: any, control: { showMetaData: boolean; }) {
     control.showMetaData = !control.showMetaData;
   }
 
-  filteredReports(reports, status) {
+  filteredReports(reports: any[], status: string) {
     if (status === 'all') {
       return reports;
     }
 
-    return reports.filter(r => r.status === status);
+    return reports.filter((r: { status: any; }) => r.status === status);
   }
 
-  filteredProfiles(profiles, status) {
-    return profiles.filter(p => {
+  filteredProfiles(profiles: any[], status: string) {
+    return profiles.filter((p: { controls: any; }) => {
       return this.filteredControls(p.controls, status).length > 0;
     });
   }
 
-  filteredControls(controls, status) {
-    return controls.filter(c => status === 'all' || c.status === status);
+  filteredControls(controls: any[], status: string) {
+    return controls.filter((c: { status: any; }) => status === 'all' || c.status === status);
   }
 
-  profilesByStatus(profiles, status) {
-    return profiles.filter(p => p.status === status);
+  profilesByStatus(profiles: any[], status: string) {
+    return profiles.filter((p: { status: any; }) => p.status === status);
   }
 
-  isHistoryFilterSelected(status): boolean {
+  isHistoryFilterSelected(status: string): boolean {
     return this.activeReportStatus === status;
   }
 
-  isReportSelected(report): boolean {
+  isReportSelected(report: { id: any; }): boolean {
     return this.activeReport.id === report.id;
   }
 
-  isControlStatusSelected(status): boolean {
+  isControlStatusSelected(status: string): boolean {
     return this.activeStatusFilter === status;
   }
 
@@ -149,21 +185,51 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return this.openControls[id] && this.openControls[id].open;
   }
 
-  toggleControl(control) {
+  toggleControl(control: { id: string | number; profile_id: string; }) {
+    this.controlDetailsLoading = true;
     const state = this.openControls[control.id];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
+
+    if (toggled.open === true) {
+      if (!this.reportIdArray.includes(control.id)) {
+        this.reportIdArray.push(control.id);
+        const payload = {
+          report_id : this.activeReport.id,
+          filters : [
+            {'type': 'profile_id', 'values': [`${control.profile_id}`]},
+            {'type': 'control', 'values': [`${control.id}`]}]
+        };
+        this.store.dispatch(new GetControlDetail(payload));
+      } else {
+        this.store.select(controlsList).subscribe(data => {
+          this.allControlList = data;
+        });
+
+        this.allControlList.forEach((data) => {
+          data.profiles.forEach(p => {
+            p.controls.forEach(c => {
+              if (c.id === control.id) {
+                this.controlDetailsLoading = false;
+                this.controlDetails = data;
+                this.currentControl = this.controlDetails['profiles'][0].controls[0];
+              }
+            });
+          });
+        });
+      }
+    }
   }
 
-  openControlPane(control) {
+  openControlPane(control: { id: string | number; }) {
     return this.openControls[control.id].pane;
   }
 
-  showControlPane(control, pane) {
+  showControlPane(control: { id: string | number; }, pane: any) {
     this.openControls[control.id].pane = pane;
   }
 
-  statusIcon(status) {
+  statusIcon(status: any) {
     switch (status) {
       case ('failed'):
         return 'report_problem';
@@ -186,12 +252,12 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return 'minor';
   }
 
-  formatDuration(duration) {
+  formatDuration(duration: moment.DurationInputArg1) {
     const d = moment.duration(duration);
     return d.humanize();
   }
 
-  formatDaysAgo(timestamp) {
+  formatDaysAgo(timestamp: moment.MomentInput) {
     return moment(timestamp).fromNow();
   }
 
@@ -202,13 +268,56 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   private setActiveReport(report: any) {
     const reportQuery = this.reportQueryService.getReportQueryForReport(report);
-    this.statsService.getSingleReport(report.id, reportQuery)
+    this.statsService.getNodeHeader(report.id, reportQuery)
       .pipe(first())
       .subscribe(data => {
         this.reportLoading = false;
         this.layoutFacade.ShowPageLoading(false);
         this.activeReport = Object.assign(report, data);
       });
+
+    this.getControlData(report);
+  }
+
+  getFilterCount(report: any) {
+    if (!(report && (typeof report === 'object') && report.controls)) {
+      return 0;
+    }
+    switch (this.activeStatusFilter) {
+      case ('failed'):
+        return report.controls.failed.total;
+      case ('passed'):
+        return report.controls.passed.total;
+      case ('skipped'):
+        return report.controls.skipped.total;
+      case ('waived'):
+        return report.controls.waived.total;
+      default:
+        return report.controls.total;
+    }
+  }
+  getControlData(report: any) {
+    const filterCount = this.getFilterCount(report);
+    if (filterCount > 0) {
+      this.controlsLoading = true;
+      const reportQuery = this.reportQueryService.getReportQueryForReport(report);
+      this.statsService.getControlsList(report.id, reportQuery, this.pageIndex,
+        this.perPage, this.activeStatusFilter)
+      .pipe(first())
+      .subscribe(data => {
+        this.controlsLoading = false;
+        this.layoutFacade.ShowPageLoading(false);
+        if (this.pageIndex === 1) {
+          this.controlList = Object.assign(data);
+        } else {
+          this.controlList.control_elements.push(...data.control_elements);
+        }
+        this.pageIndex++;
+        this.controlsLoading = false;
+      });
+    } else {
+      this.controlList = {};
+    }
   }
 
   toggleDownloadDropdown() {
@@ -234,9 +343,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${fileFormat}`;
 
     const onComplete = () => this.downloadInProgress = false;
-    const onError = _e => this.downloadFailed = true;
+    const onError = (_e: any) => this.downloadFailed = true;
     const types = { 'json': 'application/json', 'csv': 'text/csv' };
-    const onNext = data => {
+    const onNext = (data: BlobPart) => {
       const type = types[fileFormat];
       const blob = new Blob([data], { type });
       saveAs(blob, filename);
@@ -248,5 +357,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.statsService.downloadNodeReport(fileFormat, reportQuery).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
+  }
+
+  onScrollDown() {
+    this.getControlData(this.activeReport);
   }
 }

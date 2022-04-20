@@ -14,10 +14,25 @@ service ReportingService {
 	rpc ListProfiles(Query) returns (ProfileMins) {};
 	rpc Export(Query) returns (stream ExportData) {};
 	rpc ExportNode(Query) returns (stream ExportData) {};
+	rpc ExportReportManager(Query) returns (CustomReportResponse) {};
 	rpc ReadNode(Id) returns (Node) {};
 	rpc ListNodes(Query) returns (Nodes) {};
 	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {};
+	rpc ReadNodeHeader(Query) returns (NodeHeaderInfo) {};
+	rpc ListControlInfo(Query) returns (ControlElements) {};
+	rpc GetReportContent(ReportContentRequest) returns (ReportContentResponse) {};
+	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
 }
+
+message ReportContentRequest {
+	string id =1;
+	repeated ListFilter filters = 2;
+}
+
+message ReportContentResponse {
+	bytes content = 1;
+}
+
 message ExportData {
 	bytes content = 1;
 }
@@ -41,6 +56,11 @@ message ListFilter {
 	repeated string values = 20;
 	string type = 21;
 }
+
+message ListFilters {
+	repeated ListFilter filters = 1;
+}
+
 message Total {
 	int32 total = 1;
 }
@@ -129,6 +149,19 @@ message Report {
 	string status_message = 21;
 }
 
+message NodeHeaderInfo {
+	string node_id = 1;
+	string node_name = 2;
+	google.protobuf.Timestamp end_time = 3;
+	string status = 4;
+	string environment = 5;
+	string version = 6;
+	Platform platform = 7;
+	repeated NodeHeaderProfileInfo profiles= 8;
+	repeated string roles = 9;
+	string status_message = 10;
+}
+
 message ReportIds {
 	repeated string ids = 1;
 	repeated ReportData report_data = 2;
@@ -161,6 +194,13 @@ message Profile {
 	string skip_message = 24;
 	string status_message = 25;
 }
+
+message NodeHeaderProfileInfo {
+	string name = 1;
+	string status = 2;
+	string status_message = 3;
+}
+
 message Ref {
 	string url = 1;
 	string ref = 2;
@@ -322,4 +362,34 @@ message ProfileMeta {
 	string id = 3;
 	string status = 4;
 	string full = 5;
+}
+message ControlElement {
+	string id = 1;
+	string title= 2;
+	string profile = 3;
+	float impact = 4;
+	int32 results = 5;
+	string status = 6;
+	string profile_id = 7;
+}
+message ControlElements {
+	repeated ControlElement control_elements = 1;
+}
+
+message CustomReportResponse {
+	string acknowledgement_id = 1;
+}
+
+message ReportListForReportManagerResponse {
+	repeated ReportResponse reports = 1;
+}
+
+message ReportResponse {
+	string report_id = 1;
+	repeated ProfileResponse profiles = 2;
+}
+
+message ProfileResponse {
+	string profile_id = 1;
+	repeated string controls = 2;
 }

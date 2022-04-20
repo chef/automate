@@ -45,3 +45,6 @@ level = "debug"
   [grpc_clients.endpoints.user-settings-service]
     target = "0.0.0.0:10107"
     secure = true
+  [grpc_clients.endpoints.report-manager-service]
+    target = "0.0.0.0:10152"
+    secure = true

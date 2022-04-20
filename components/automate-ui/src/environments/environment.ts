@@ -31,6 +31,7 @@ export const environment = {
   user_preference_url: '/api/v0/user-settings',
   compliance_stats_url: '/api/v0/compliance/reporting/stats',
   client_runs_stats_url: '/api/v0/cfgmgmt/telemetry',
+  download_report_list_url: '/api/v0/reportmanager',
   // TODO:eng-ex remove elasticsearch_url when all es requests go through config-mgmt
   // don't forget to remove it from the proxy
   elasticsearch_url: '/api/v0/elasticsearch',

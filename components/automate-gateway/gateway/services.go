@@ -39,6 +39,7 @@ import (
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
+	pb_report_manager "github.com/chef/automate/api/external/report_manager"
 	pb_secrets "github.com/chef/automate/api/external/secrets"
 	pb_user_settings "github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/api/interservice/authn"
@@ -47,6 +48,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	inter_eventfeed_Req "github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/api/interservice/report_manager"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
@@ -325,6 +327,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_user_settings.RegisterUserSettingsServiceServer(grpcServer, handler.NewUserSettingsHandler(userSettingsClient))
 
+	reportManagerClient, err := clients.ReportManagerClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for report-manager service")
+	}
+	pb_report_manager.RegisterReportManagerServiceServer(grpcServer, handler.NewReportManagerHandler(reportManagerClient))
+
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
@@ -373,6 +381,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
 		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
 		"user-settings":            pb_user_settings.RegisterUserSettingsServiceHandlerFromEndpoint,
+		"report-manager":           pb_report_manager.RegisterReportManagerServiceHandlerFromEndpoint,
 	})
 }
 
@@ -969,6 +978,74 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+func (s *Server) ReportManagerExportHandler(w http.ResponseWriter, r *http.Request) {
+
+	url := r.URL.Path
+	splitURL := strings.Split(url, "/")
+	if len(splitURL) <= 5 {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+
+	const (
+		resource = "reportmanager:reports:download:{id}"
+		action   = "reportmanager:requests:list"
+	)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	requestor := ctx.Value("requestorid")
+	if requestor == nil || requestor.(string) == "" {
+		http.Error(w, "invalid request, missing requestor info", http.StatusBadRequest)
+		return
+	}
+
+	reportMgrClient, err := s.clientsFactory.ReportManagerClient()
+	if err != nil {
+		http.Error(w, "grpc service for report manager unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	resp, err := reportMgrClient.GetPresignedURL(ctx, &report_manager.GetPresignedURLRequest{
+		Id:          splitURL[5],
+		RequestorId: requestor.(string),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	//incase of no records available, return error message
+	if resp.Url == "" {
+		http.Error(w, "either the record not exist or the requestor doesn't have access", http.StatusForbidden)
+		return
+	}
+
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, resp.GetUrl(), nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer res.Body.Close() // nolint: errcheck
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.%s", "export", resp.ReportType))
+	w.Header().Set("Content-Type", "application/octet-stream; charset=UTF-8")
+	w.Header().Set("Content-Length", strconv.FormatInt(resp.ReportSize, 10))
+	_, err = io.Copy(w, res.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func init() {
 	// Register streaming methods for introspection.
 	// - Almost all calls of this method are in *.pb.go files, auto-generated from proto files.
@@ -1017,6 +1094,8 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 		}
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
+
+		ctx = context.WithValue(ctx, "requestorid", authnResp.Requestor)
 
 		if err != nil {
 			log.Errorf("User not authenticated to perform the action: %s", err.Error())

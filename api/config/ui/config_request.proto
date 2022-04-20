@@ -31,6 +31,7 @@ message ConfigRequest {
 			message CustomSettings {
 				Banner banner = 1;
 				SessionSettings session_settings = 2;
+				LargeReporting large_reporting = 3;
 			}
 
 			message Service {
@@ -84,6 +85,10 @@ message ConfigRequest {
 		message SessionSettings {
 			google.protobuf.BoolValue enable_idle_timeout = 1;
 			google.protobuf.Int32Value idle_timeout_minutes = 2;
+		}
+
+		message LargeReporting {
+			google.protobuf.BoolValue enable_large_reporting = 1;
 		}
 	}
 }

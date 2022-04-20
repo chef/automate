@@ -25,9 +25,9 @@ import (
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
-	aEvent "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
+	reportmanager "github.com/chef/automate/api/interservice/report_manager"
 	jobsserver "github.com/chef/automate/components/compliance-service/api/jobs/server"
 	profilesserver "github.com/chef/automate/components/compliance-service/api/profiles/server"
 	reportingserver "github.com/chef/automate/components/compliance-service/api/reporting/server"
@@ -174,6 +174,11 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	ingesticESClient := ingestic.NewESClient(esClient)
 	ingesticESClient.InitializeStore(context.Background())
 	runner.ESClient = ingesticESClient
+	var reportmanagerClient reportmanager.ReportManagerServiceClient
+	reportmanagerClient = nil
+	if conf.Service.EnableLargeReporting {
+		reportmanagerClient = createReportManager(connFactory, conf.ReportConfig.Endpoint)
+	}
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
@@ -200,11 +205,12 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServiceServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
-			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, conf.Service.MessageBufferSize))
+			reportmanagerClient, conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient,
+			conf.Service.MessageBufferSize, conf.Service.EnableLargeReporting))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
-	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
+	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient))
 
 	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv)
 	profiles.RegisterProfilesServiceServer(s, ps)
@@ -227,6 +233,18 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	logrus.Info("Starting GRPC server on " + binding)
+
+	// check the index setting
+	maxInnerResults, err := relaxting.GetMaxInnerResultWindow(esr)
+	if err != nil {
+		logrus.Fatalf("serveGrpc aborting, unable to get max inner results window of indices: %v", err)
+	}
+	if maxInnerResults != int64(10000) {
+		err = relaxting.SetMaxInnerResultWindow(esr)
+		if err != nil {
+			logrus.Fatalf("serveGrpc aborting, unable to set max inner results window of indices: %v", err)
+		}
+	}
 
 	// running ElasticSearch migration
 	err = relaxting.RunMigrations(esr, statusSrv)
@@ -273,7 +291,7 @@ func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address s
 }
 
 func getEventConnection(connectionFactory *secureconn.Factory,
-	eventEndpoint string) aEvent.EventServiceClient {
+	eventEndpoint string) event.EventServiceClient {
 	if eventEndpoint == "" || eventEndpoint == ":0" {
 		if os.Getenv("RUN_MODE") == "test" {
 			logrus.Infof("using mock Event service Client")
@@ -294,7 +312,7 @@ func getEventConnection(connectionFactory *secureconn.Factory,
 		logrus.Fatalf("compliance setup, error grpc dialing to event-service aborting...")
 	}
 	// get event client
-	eventClient := aEvent.NewEventServiceClient(conn)
+	eventClient := event.NewEventServiceClient(conn)
 	if eventClient == nil {
 		logrus.Fatalf("compliance setup, could not obtain automate events service client: %s", err)
 	}
@@ -375,6 +393,24 @@ func getManagerConnection(connectionFactory *secureconn.Factory,
 	if mgrClient == nil {
 		logrus.Fatalf("getManagerConnection got nil for NewNodeManagerServiceClient")
 	}
+
+	return mgrClient
+}
+
+func createReportManager(connFactory *secureconn.Factory, address string) reportmanager.ReportManagerServiceClient {
+	if address == "" || address == ":0" {
+		logrus.Fatal("report-manager cannot be empty or Dial will get stuck")
+	}
+
+	logrus.Debugf("Connecting to report-manager %q", address)
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	conn, err := connFactory.DialContext(timeoutCtx, "report-manager-service",
+		address, grpc.WithBlock())
+	if err != nil {
+		logrus.Fatalf("report-manager, error grpc dialing to manager %s", err.Error())
+	}
+	mgrClient := reportmanager.NewReportManagerServiceClient(conn)
 
 	return mgrClient
 }

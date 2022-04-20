@@ -13,9 +13,14 @@ interface SessionSettings {
   idle_timeout_minutes?: number;
 }
 
+interface LargeReportingSettings {
+  enable_large_reporting?: boolean;
+}
+
 interface ConfigTypes {
   banner?: BannerConfigTypes;
   session_settings?: SessionSettings;
+  large_reporting?: LargeReportingSettings;
 }
 
 const initialConfig = {
@@ -28,6 +33,9 @@ const initialConfig = {
     session_settings: {
       enable_idle_timeout: null,
       idle_timeout_minutes: null
+    },
+    large_reporting: {
+      enable_large_reporting: null
     }
 };
 
@@ -71,6 +79,10 @@ export class AppConfigService {
 
   get bannerTextColor(): string {
     return this.convertToHex(this.appConfig.banner.text_color);
+  }
+
+  get isLargeReportingEnabled(): boolean {
+    return this.appConfig.large_reporting.enable_large_reporting;
   }
 
   private convertToHex(color: string): string {

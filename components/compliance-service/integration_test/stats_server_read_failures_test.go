@@ -23,7 +23,7 @@ func TestReadFailures(t *testing.T) {
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
 	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
-	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 
 	n := 5
 

@@ -18,7 +18,7 @@ import (
 )
 
 func TestReportingListSuggestionsFiltering(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	ctx := context.Background()
 
 	cases := []struct {
@@ -773,7 +773,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 // The terms (sorted alphabetically) after the first 500 are not included in the suggestions.
 func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	ctx := context.Background()
 
 	terms := make([]string, 500)
@@ -862,7 +862,7 @@ func TestReportingListSuggestionsUsersAccess(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 
 	n := 5
 
