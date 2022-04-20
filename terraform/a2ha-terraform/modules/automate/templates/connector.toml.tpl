@@ -10,6 +10,10 @@
   setup_managed_services = ${setup_managed_services}
   upgrade_strategy = "none"
   teams_port = ${teams_port}
+  backup_config_s3 = "${backup_config_s3}"
+  backup_config_efs = "${backup_config_efs}"
+  bucket_name = "${bucket_name}"
+  s3_endpoint = "${s3_endpoint}"
 
 [services]
   [services.elasticsearch]

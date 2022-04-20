@@ -13,6 +13,18 @@ aws_tags    = {
 aws_ssh_key_pair_name = "<%= config.aws.ssh_key_pair_name %>"
 <% end %>
 
+<% if config.backup_config == 'efs' %>
+ backup_config_efs = "true"
+<% end %>
+
+<% if config.backup_config == 's3' %>
+ backup_config_s3 = "true"
+<% end %>
+
+<% if config.s3_bucketName %>
+aws_s3_bucketName = "<%= config.s3_bucketName %>"
+<% end %>
+
 setup_managed_services = <%= config.aws.setup_managed_services %>
 managed_elasticsearch_domain_url = "<%= config.aws.managed_elasticsearch_domain_url %>"
 managed_elasticsearch_username = "<%= config.aws.managed_elasticsearch_username %>"

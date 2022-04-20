@@ -24,6 +24,7 @@ locals {
 }
 
 module "journalbeat" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
@@ -42,6 +43,7 @@ module "journalbeat" {
 }
 
 module "metricbeat" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
@@ -60,6 +62,7 @@ module "metricbeat" {
 }
 
 module "kibana" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
@@ -76,6 +79,7 @@ module "kibana" {
 }
 
 module "curator" {
+  count                     = 0
   airgap_info               = var.airgap_info
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
@@ -131,4 +135,31 @@ resource "null_resource" "elasticsearch" {
       "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/es_provision.sh",
     ]
   }
+}
+
+resource "null_resource" "backup_configuration" {
+  count = var.backup_config_efs == "true" ? 1 : 0
+
+  connection {
+    user        = var.ssh_user
+    private_key = file(var.ssh_key_file)
+    host        = var.private_ips[0]
+    script_path = "${var.tmp_path}/tf_inline_script_system_elasticsearch.sh"
+  }
+  
+  provisioner "file" {
+    destination = "${var.tmp_path}/efs_backup.sh"
+    source = "${path.module}/templates/efs_backup.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod 0700 ${var.tmp_path}/efs_backup.sh",
+      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/efs_backup.sh",
+    ]
+  }
+  
+  depends_on = [
+    null_resource.elasticsearch
+  ]
 }

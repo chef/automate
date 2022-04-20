@@ -27,7 +27,11 @@ locals {
     setup_managed_services              = var.setup_managed_services,
     teams_port                          = var.teams_port,
     tmp_path                            = var.tmp_path,
-  })
+    backup_config_s3                    = var.backup_config_s3,
+    backup_config_efs                   = var.backup_config_efs,
+    s3_endpoint                         = var.s3_endpoint,
+    bucket_name                         = var.bucket_name,
+  })          
 
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {
     admin_password                  = var.automate_admin_password,
@@ -44,6 +48,8 @@ locals {
 # special conditional resource if the server is a non-bootstrap
 # the file resource is nice and will wait until the file appears
 resource "null_resource" "automate_pre" {
+
+
   count = var.automate_role != "bootstrap_automate" ? var.automate_instance_count : 0
 
   connection {
