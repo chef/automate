@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz"
+	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
 	"github.com/chef/automate/api/interservice/local_user"
 	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/local-user-service/constants"
@@ -145,6 +146,16 @@ func (s *Server) CreateUser(ctx context.Context, req *local_user.CreateUserReq) 
 func (s *Server) DeleteUser(ctx context.Context, req *local_user.Email) (*local_user.DeleteUserResp, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	// Delete the server and org user association from infra proxy service
+	_, err := s.infraProxyClient.DeleteUser(ctx,
+		&infra_proxy.DeleteUserRequest{
+			AutomateUsername: req.Email,
+		})
+	if err != nil {
+		s.logger.Error("Failed to delete the user association with server and org " + err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	us, err := s.users.GetUser(ctx, req.Email)
 	if err != nil {
