@@ -40,3 +40,14 @@ The above hardware configuration can be used to test up to 5000 nodes.
 - For production ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 
 {{< /note >}}
+
+The hardware calculation formule for the production set up is given below:
+
+### Calculation for Volume Size for OpenSearch
+
+- **Data from Compliance Scan** = Number of Scans per Day X Approx Size of Data X Retention Days X Number of Nodes X 2(OpenSearch Replica)
+- **Data from Client Run** = Number of Runs per Day X Approx Size of Data X Retention Days X Number of Nodes * 2(OpenSearch Replica)
+- **Total data** = Data from Compliance Scan + Data from Client Run
+OpenSearch volume for each instance = **Total Data / 3**
+
+### Calculation for vCPU and RAM vs CCR
