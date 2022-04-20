@@ -90,19 +90,19 @@ variable "chef_server_instance_type" {
 variable "chef_server_lb_certificate_arn" {
 }
 
-variable "elasticsearch_ebs_volume_iops" {
+variable "opensearch_ebs_volume_iops" {
   default = 300
 }
 
-variable "elasticsearch_ebs_volume_size" {
+variable "opensearch_ebs_volume_size" {
   default = 50
 }
 
-variable "elasticsearch_ebs_volume_type" {
+variable "opensearch_ebs_volume_type" {
   default = "gp3"
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 
@@ -110,7 +110,7 @@ variable "elasticsearch_listen_port" {
   default = 9200
 }
 
-variable "elasticsearch_server_instance_type" {
+variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
 

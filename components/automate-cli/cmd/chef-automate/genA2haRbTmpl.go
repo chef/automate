@@ -155,7 +155,7 @@ aws do
   ### EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod
   chef_server_instance_type "{{ .Aws.Config.ChefServerInstanceType }}"
   ### EC2 instance type to use for Elasticsearch backends, minimum 8G of RAM for test, 16G for prod
-  elasticsearch_server_instance_type "{{ .Aws.Config.ElasticsearchServerInstanceType }}"
+  opensearch_server_instance_type "{{ .Aws.Config.OpensearchServerInstanceType }}"
   ### EC2 instance type to use for PostgreSQL backends, minimum 4G of RAM for test, 8G for prod
   postgresql_server_instance_type "{{ .Aws.Config.PostgresqlServerInstanceType }}"
   ### AWS Certificate is specific to the region and AWS account this is being deployed to.
@@ -168,9 +168,9 @@ aws do
   chef_ebs_volume_iops "{{ .Aws.Config.ChefEbsVolumeIops }}"
   chef_ebs_volume_size "{{ .Aws.Config.ChefEbsVolumeSize }}"
   chef_ebs_volume_type "{{ .Aws.Config.ChefEbsVolumeType }}"
-  elasticsearch_ebs_volume_iops "{{ .Aws.Config.ElasticsearchEbsVolumeIops }}"
-  elasticsearch_ebs_volume_size "{{ .Aws.Config.ElasticsearchEbsVolumeSize }}"
-  elasticsearch_ebs_volume_type "{{ .Aws.Config.ElasticsearchEbsVolumeType }}"
+  opensearch_ebs_volume_iops "{{ .Aws.Config.ElasticsearchEbsVolumeIops }}"
+  opensearch_ebs_volume_size "{{ .Aws.Config.ElasticsearchEbsVolumeSize }}"
+  opensearch_ebs_volume_type "{{ .Aws.Config.ElasticsearchEbsVolumeType }}"
   postgresql_ebs_volume_iops "{{ .Aws.Config.PostgresqlEbsVolumeIops }}"
   postgresql_ebs_volume_size "{{ .Aws.Config.PostgresqlEbsVolumeSize }}"
   postgresql_ebs_volume_type "{{ .Aws.Config.PostgresqlEbsVolumeType }}"

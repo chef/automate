@@ -1121,12 +1121,6 @@ paths = [
   "lib/version/*"
 ]
 
-[automate-ha-elasticsearch]
-plan_path = "components/automate-backend-elasticsearch"
-paths = [
-  "components/automate-backend-elasticsearch/*"
-]
-
 [automate-ha-opensearch]
 plan_path = "components/automate-backend-opensearch"
 paths = [

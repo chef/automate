@@ -77,19 +77,19 @@ variable "chef_server_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
 
-variable "elasticsearch_ebs_volume_iops" {
+variable "opensearch_ebs_volume_iops" {
   default = 300
 }
 
-variable "elasticsearch_ebs_volume_size" {
+variable "opensearch_ebs_volume_size" {
   default = 50
 }
 
-variable "elasticsearch_ebs_volume_type" {
+variable "opensearch_ebs_volume_type" {
   default = "gp3"
 }
 
-variable "elasticsearch_server_instance_type" {
+variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
 

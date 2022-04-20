@@ -79,27 +79,27 @@ variable "chef_server_private_ips" {
   default = []
 }
 
-variable "elasticsearch_ebs_volume_iops" {
+variable "opensearch_ebs_volume_iops" {
   default = 300
 }
 
-variable "elasticsearch_ebs_volume_size" {
+variable "opensearch_ebs_volume_size" {
   default = 50
 }
 
-variable "elasticsearch_ebs_volume_type" {
+variable "opensearch_ebs_volume_type" {
   default = "gp3"
 }
 
-variable "elasticsearch_private_ips" {
+variable "opensearch_private_ips" {
   default = []
 }
 
-variable "elasticsearch_public_ips" {
+variable "opensearch_public_ips" {
   default = []
 }
 
-variable "elasticsearch_server_instance_type" {
+variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
 

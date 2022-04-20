@@ -39,7 +39,7 @@ module "journalbeat" {
   journalbeat_pkg_ident     = var.journalbeat_pkg_ident
   journalbeat_svc_binds     = "--bind opensearch:automate-ha-opensearch.default"
   journalbeat_tags          = ["postgresql"]
-  elasticsearch_private_ips = var.opensearch_private_ips
+  opensearch_private_ips = var.opensearch_private_ips
   private_ips               = var.private_ips
   source                    = "../journalbeat"
   ssh_key_file              = var.ssh_key_file
@@ -57,7 +57,7 @@ module "metricbeat" {
   metricbeat_pkg_ident      = var.metricbeat_pkg_ident
   metricbeat_svc_binds      = "--bind database:automate-ha-postgresql.default --bind opensearch:automate-ha-opensearch.default"
   metricbeat_tags           = ["postgresql"]
-  elasticsearch_private_ips = var.opensearch_private_ips
+  opensearch_private_ips = var.opensearch_private_ips
   private_ips               = var.private_ips
   source                    = "../metricbeat"
   ssh_key_file              = var.ssh_key_file

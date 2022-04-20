@@ -8,7 +8,7 @@ variable "elasticsearch_listen_port" {
   default = 9200
 }
 
-variable "elasticsearch_private_ips" {
+variable "opensearch_private_ips" {
   default     = []
 }
 

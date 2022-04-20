@@ -32,9 +32,9 @@ module "system-tuning-opensearch" {
   source                          = "./modules/system"
   automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
   opensearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                  = var.elasticsearch_instance_count
+  instance_count                  = var.opensearch_instance_count
   postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
-  private_ips                     = var.elasticsearch_private_ips
+  private_ips                     = var.opensearch_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
@@ -57,8 +57,8 @@ module "system-tuning-postgresql" {
 module "airgap_bundle-opensearch" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-opensearch.archive_disk_info
-  instance_count    = var.elasticsearch_instance_count
-  private_ips       = var.elasticsearch_private_ips
+  instance_count    = var.opensearch_instance_count
+  private_ips       = var.opensearch_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -126,12 +126,12 @@ module "habitat-opensearch" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = ""
-  instance_count                  = var.elasticsearch_instance_count
+  instance_count                  = var.opensearch_instance_count
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
-  private_ips                     = var.elasticsearch_private_ips
+  private_ips                     = var.opensearch_private_ips
   peer_ips = concat(
-    var.elasticsearch_private_ips,
+    var.opensearch_private_ips,
     var.postgresql_private_ips
   )
   ssh_key_file           = var.ssh_key_file
@@ -156,7 +156,7 @@ module "habitat-postgresql" {
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.postgresql_private_ips
   peer_ips = concat(
-    var.elasticsearch_private_ips,
+    var.opensearch_private_ips,
     var.postgresql_private_ips
   )
   ssh_key_file           = var.ssh_key_file
@@ -217,7 +217,7 @@ module "opensearch" {
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   curator_pkg_ident               = var.curator_pkg_ident
-  opensearch_instance_count       = var.elasticsearch_instance_count
+  opensearch_instance_count       = var.opensearch_instance_count
   opensearch_listen_port          = var.elasticsearch_listen_port
   opensearch_pkg_ident            = var.opensearch_pkg_ident
   opensearch_svc_load_args        = var.elasticsearch_svc_load_args
@@ -227,7 +227,7 @@ module "opensearch" {
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   kibana_pkg_ident                = var.kibana_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
-  private_ips                     = var.elasticsearch_private_ips
+  private_ips                     = var.opensearch_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
@@ -240,7 +240,7 @@ module "postgresql" {
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   opensearch_listen_port          = var.elasticsearch_listen_port
-  opensearch_private_ips          = var.elasticsearch_private_ips
+  opensearch_private_ips          = var.opensearch_private_ips
   habitat_info                    = module.habitat-postgresql.habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
@@ -284,7 +284,7 @@ module "bootstrap_automate" {
   habitat_info                    = module.habitat-automate.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.elasticsearch_listen_port
-  opensearch_private_ips          = var.elasticsearch_private_ips
+  opensearch_private_ips          = var.opensearch_private_ips
   postgresql_private_ips          = var.postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = slice(var.automate_private_ips, 0, 1)
@@ -315,7 +315,7 @@ module "automate" {
   habitat_info                    = module.habitat-automate.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.elasticsearch_listen_port
-  opensearch_private_ips          = var.elasticsearch_private_ips
+  opensearch_private_ips          = var.opensearch_private_ips
   postgresql_private_ips          = var.postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips = slice(
@@ -350,7 +350,7 @@ module "chef_server" {
   habitat_info                    = module.habitat-chef_server.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.elasticsearch_listen_port
-  opensearch_private_ips          = var.elasticsearch_private_ips
+  opensearch_private_ips          = var.opensearch_private_ips
   postgresql_private_ips          = var.postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = var.chef_server_private_ips

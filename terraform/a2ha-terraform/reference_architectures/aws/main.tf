@@ -23,12 +23,12 @@ module "aws" {
   chef_server_instance_count         = var.chef_server_instance_count
   chef_server_instance_type          = var.chef_server_instance_type
   chef_server_lb_certificate_arn     = var.chef_server_lb_certificate_arn
-  elasticsearch_ebs_volume_iops      = var.elasticsearch_ebs_volume_iops
-  elasticsearch_ebs_volume_size      = var.elasticsearch_ebs_volume_size
-  elasticsearch_ebs_volume_type      = var.elasticsearch_ebs_volume_type
-  elasticsearch_instance_count       = var.elasticsearch_instance_count
+  opensearch_ebs_volume_iops      = var.opensearch_ebs_volume_iops
+  opensearch_ebs_volume_size      = var.opensearch_ebs_volume_size
+  opensearch_ebs_volume_type      = var.opensearch_ebs_volume_type
+  opensearch_instance_count       = var.opensearch_instance_count
   elasticsearch_listen_port          = var.elasticsearch_listen_port
-  elasticsearch_server_instance_type = var.elasticsearch_server_instance_type
+  opensearch_server_instance_type = var.opensearch_server_instance_type
   pgleaderchk_listen_port            = var.pgleaderchk_listen_port
   postgresql_ebs_volume_iops         = var.postgresql_ebs_volume_iops
   postgresql_ebs_volume_size         = var.postgresql_ebs_volume_size
@@ -48,8 +48,8 @@ module "aws-output" {
   automate_private_ips      = module.aws.automate_private_ips
   chef_server_private_ips   = module.aws.chef_server_private_ips
   postgresql_private_ips    = module.aws.postgresql_private_ips
-  elasticsearch_public_ips  = module.aws.elasticsearch_public_ips
-  elasticsearch_private_ips = module.aws.elasticsearch_private_ips
+  opensearch_public_ips  = module.aws.opensearch_public_ips
+  opensearch_private_ips = module.aws.opensearch_private_ips
   automate_fqdn             = module.aws.automate_fqdn
   automate_frontend_urls    = module.aws.automate_frontend_urls
 }

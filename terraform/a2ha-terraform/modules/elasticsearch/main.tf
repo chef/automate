@@ -1,15 +1,15 @@
 locals {
   elasticsearch_user_toml = [
-    for n in range(var.elasticsearch_instance_count) : templatefile("${path.module}/templates/elasticsearch_user.toml.tpl", {
+    for n in range(var.opensearch_instance_count) : templatefile("${path.module}/templates/elasticsearch_user.toml.tpl", {
       listen_port     = var.elasticsearch_listen_port,
-      minimum_masters = floor(var.elasticsearch_instance_count / 2 + 1),
+      minimum_masters = floor(var.opensearch_instance_count / 2 + 1),
       private_ip      = var.private_ips[n],
       private_ips     = join(", ", formatlist("\"%s\"", var.private_ips)),
       tmp_path        = var.tmp_path
     })
   ]
   elasticsidecar_user_toml = [
-    for n in range(var.elasticsearch_instance_count) : templatefile("${path.module}/templates/elasticsidecar_user.toml.tpl", {
+    for n in range(var.opensearch_instance_count) : templatefile("${path.module}/templates/elasticsidecar_user.toml.tpl", {
       private_ip = var.private_ips[n]
     })
   ]
@@ -28,11 +28,11 @@ module "journalbeat" {
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
   habitat_info              = var.habitat_info
-  instance_count            = var.elasticsearch_instance_count
+  instance_count            = var.opensearch_instance_count
   journalbeat_pkg_ident     = var.journalbeat_pkg_ident
   journalbeat_svc_binds     = "--bind elasticsearch:automate-ha-elasticsearch.default"
   journalbeat_tags          = ["elasticsearch"]
-  elasticsearch_private_ips = var.private_ips
+  opensearch_private_ips = var.private_ips
   private_ips               = var.private_ips
   source                    = "../journalbeat"
   ssh_key_file              = var.ssh_key_file
@@ -46,11 +46,11 @@ module "metricbeat" {
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
   habitat_info              = var.habitat_info
-  instance_count            = var.elasticsearch_instance_count
+  instance_count            = var.opensearch_instance_count
   metricbeat_pkg_ident      = var.metricbeat_pkg_ident
   metricbeat_svc_binds      = "--bind elasticsearch:automate-ha-elasticsearch.default"
   metricbeat_tags           = ["elasticsearch"]
-  elasticsearch_private_ips = var.private_ips
+  opensearch_private_ips = var.private_ips
   private_ips               = var.private_ips
   source                    = "../metricbeat"
   ssh_key_file              = var.ssh_key_file
@@ -64,7 +64,7 @@ module "kibana" {
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
   habitat_info              = var.habitat_info
-  instance_count            = var.elasticsearch_instance_count
+  instance_count            = var.opensearch_instance_count
   kibana_pkg_ident          = var.kibana_pkg_ident
   kibana_svc_binds          = "--bind elasticsearch:automate-ha-elasticsearch.default"
   private_ips               = var.private_ips
@@ -80,7 +80,7 @@ module "curator" {
   backend_aib_dest_file     = var.backend_aib_dest_file
   elasticsearch_listen_port = var.elasticsearch_listen_port
   habitat_info              = var.habitat_info
-  instance_count            = var.elasticsearch_instance_count
+  instance_count            = var.opensearch_instance_count
   curator_pkg_ident         = var.curator_pkg_ident
   curator_svc_binds         = "--bind elasticsearch:automate-ha-elasticsearch.default"
   private_ips               = var.private_ips
@@ -92,7 +92,7 @@ module "curator" {
 }
 
 resource "null_resource" "elasticsearch" {
-  count = var.elasticsearch_instance_count
+  count = var.opensearch_instance_count
 
   triggers = {
     es_user_toml_sha = sha1(local.elasticsearch_user_toml[count.index])

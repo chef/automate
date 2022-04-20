@@ -77,7 +77,7 @@ variable "elasticsearch_https_user" {
   default = "automate_elasticsearch"
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 

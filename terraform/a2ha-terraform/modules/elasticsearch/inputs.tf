@@ -10,7 +10,7 @@ variable "backend_aib_local_file" {
 variable "curator_pkg_ident" {
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 
