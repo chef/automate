@@ -158,6 +158,10 @@ variable "nfs_mount_path" {
   description = "The NFS mount base path for backups and archives."
 }
 
+variable "opensearch_pkg_ident" {
+  default = "chef/automate-ha-opensearch"
+}
+
 variable "pgleaderchk_listen_port" {
   default = 6432
 }

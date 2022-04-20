@@ -154,6 +154,10 @@ variable "managed_rds_superuser_username" {
   default = ""
 }
 
+variable "opensearch_pkg_ident" {
+  default = "chef/automate-ha-opensearch"
+}
+
 variable "postgresql_ebs_volume_iops" {
   default = 150
 }
