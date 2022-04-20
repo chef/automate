@@ -15,27 +15,28 @@ gh_repo = "automate"
 
 This section lists the recommended requirements for operating systems, virtual machine instances, and VPC for implementing the Chef Automate High Availability (HA) in your network infrastructure.
 
-| Operating Systems                        | Tested                    |
+| Operating Systems                        | Supported Version         |
 | :--------------------------------------  | :-----------------------  |
-| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8). Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 |packages) and v2 (using RHEL 7packages). |
+| Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
 | Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x          |
 | Centos (64 Bit OS)                       | 7                         |
 
-## Virtual Machine (VM) Instances Type
+## Hardware Configuration
 
-Based on the number of nodes, the virtual machine requirements are as follows:
+Based on the number of nodes, the virtual machine requirements for test instances are as follows:
 
-| Instance          | RAM               | Volume Size                                        |
-| :---------------  | :---------------- | :------------------------------------------------  |
-| PostgreSQL        | 4 GB RAM for test | 50 GB (dedicated hard disk space assigned to '/'). |
-| OpenSearch     | 8 GB RAM for test | 50 GB (dedicated hard disk space assigned to '/'). |
-| Chef Automate     | 4 GB RAM for test | 50 GB (dedicated hard disk space assigned to '/'). |
-| Chef Infra Server | 4 GB RAM for test | 50 GB (dedicated hard disk space assigned to '/'). |
+| Instance          | Count | vCPU | RAM   | Volume Size (dedicated hard disk space assigned to '/') |
+| :---------------  | :---- | :--- |:------| :-----------------------------------------------------  |
+| PostgreSQL        | 3     | 2    | 8 GB  | 50 GB                                                   |
+| OpenSearch        | 3     | 4    | 16 GB | 50 GB                                                   |
+| Chef Automate     | 2     | 2    | 8 GB  | 50 GB                                                   |
+| Chef Infra Server | 2     | 2    | 8 GB  | 50 GB                                                   |
+
+The above hardware configuration can be used to test up to 5000 nodes.
 
 {{< note >}}
 
-ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. The above table includes instances’ RAM and volume size, set up for testing. Production depends on the number of nodes and the frequency of Chef Infra Client runs and compliance scans. However, for on-premises deployment, you can choose the above requirements for VM like RAM.
-
-For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
+- For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
+- For production ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 
 {{< /note >}}
