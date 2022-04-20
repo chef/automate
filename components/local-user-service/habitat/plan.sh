@@ -23,6 +23,7 @@ pkg_binds=(
   [automate-dex]="grpc-host grpc-port port"
   [teams-service]="port"
   [authz-service]="port"
+  [infra-proxy-service]="port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"

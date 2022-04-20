@@ -61,6 +61,11 @@ message CreateBackupRequest {
   int32 number_of_users = 2;
 }
 
+message DeleteUserRequest {
+  // User's username in automate
+  string automate_username =1;
+}
+
 message StagedData {
   // Number of orgs to migrate
   int32 orgs_to_migrate =1;

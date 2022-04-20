@@ -373,6 +373,18 @@ func SetStagedUserForConfirmPreview(users []*request.User) []pipeline_model.User
 	return usersData
 }
 
+//DeleteUser: Deletes user association from users and org_users table, called from local user service
+func (s *MigrationServer) DeleteUser(ctx context.Context, req *request.DeleteUserRequest) (*response.DeleteUserResponse, error) {
+	log.Info("Deleting users association with server and org")
+	_, err := s.service.Storage.DeleteUserAssciation(ctx, req.AutomateUsername)
+	if err != nil {
+		log.Errorf("Failed to delete the users association with server and org %s", err.Error())
+		return nil, err
+	}
+
+	return &response.DeleteUserResponse{}, nil
+}
+
 // CreateBackup Creates sample knife ec back up file
 func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateBackupRequest) (*response.CreateBackupResponse, error) {
 
@@ -400,7 +412,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 
 	err := writeOrgFile(orgJsonObj, orgJsonPath)
 	if err != nil {
-		log.Errorf("Failed to write org file org.json ", err)
+		log.Errorf("Failed to write org file org.json %s", err.Error())
 		return nil, err
 	}
 
@@ -473,21 +485,21 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	// Write server users file key_dump.json
 	err = writeServerUsersFile(serverUsers, keyDumpJsonPath)
 	if err != nil {
-		log.Errorf("Failed to write server users file key_dump.json ", err)
+		log.Errorf("Failed to write server users file key_dump.json %s", err.Error())
 		return nil, err
 	}
 
 	// Write org users file members.json
 	err = writeOrgUsersFile(members, membersJsonPath)
 	if err != nil {
-		log.Errorf("Failed to write org users file members.json ", err)
+		log.Errorf("Failed to write org users file members.json %s", err.Error())
 		return nil, err
 	}
 
 	// Write org admins file admins.json
 	err = writeAdminsFile(admins, adminsJsonPath)
 	if err != nil {
-		log.Errorf("Failed to write org admins file admins.json ", err)
+		log.Errorf("Failed to write org admins file admins.json %s", err.Error())
 		return nil, err
 	}
 
