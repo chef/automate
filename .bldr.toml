@@ -1122,10 +1122,10 @@ paths = [
   "lib/version/*"
 ]
 
-[automate-ha-elasticsearch]
-plan_path = "components/automate-backend-elasticsearch"
+[automate-ha-opensearch]
+plan_path = "components/automate-backend-opensearch"
 paths = [
-  "components/automate-backend-elasticsearch/*"
+  "components/automate-backend-opensearch/*"
 ]
 
 [automate-ha-haproxy]

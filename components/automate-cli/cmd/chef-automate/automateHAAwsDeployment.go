@@ -142,8 +142,8 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	if len(a.config.Aws.Config.ChefServerInstanceType) < 1 {
 		errorList.PushBack("Invalid or empty aws chef_server_instance_type")
 	}
-	if len(a.config.Aws.Config.ElasticsearchServerInstanceType) < 1 {
-		errorList.PushBack("Invalid or empty aws elasticsearch_server_instance_type")
+	if len(a.config.Aws.Config.OpensearchServerInstanceType) < 1 {
+		errorList.PushBack("Invalid or empty aws opensearch_server_instance_type")
 	}
 	if len(a.config.Aws.Config.PostgresqlServerInstanceType) < 1 {
 		errorList.PushBack("Invalid or empty aws postgresql_server_instance_type")
@@ -173,13 +173,13 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 		errorList.PushBack("Invalid or empty aws chef_ebs_volume_type")
 	}
 	if len(a.config.Aws.Config.ElasticsearchEbsVolumeIops) < 1 {
-		errorList.PushBack("Invalid or empty aws elasticsearch_ebs_volume_iops")
+		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_iops")
 	}
 	if len(a.config.Aws.Config.ElasticsearchEbsVolumeSize) < 1 {
-		errorList.PushBack("Invalid or empty aws elasticsearch_ebs_volume_size")
+		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_size")
 	}
 	if len(a.config.Aws.Config.ElasticsearchEbsVolumeType) < 1 {
-		errorList.PushBack("Invalid or empty aws elasticsearch_ebs_volume_type")
+		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_type")
 	}
 	if len(a.config.Aws.Config.PostgresqlEbsVolumeIops) < 1 {
 		errorList.PushBack("Invalid or empty aws postgresql_ebs_volume_iops")

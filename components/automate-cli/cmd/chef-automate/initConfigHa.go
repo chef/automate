@@ -91,7 +91,7 @@ type AwsConfigToml struct {
 			LBAccessLogs                    string   `toml:"lb_access_logs"`
 			AutomateServerInstanceType      string   `toml:"automate_server_instance_type"`
 			ChefServerInstanceType          string   `toml:"chef_server_instance_type"`
-			ElasticsearchServerInstanceType string   `toml:"elasticsearch_server_instance_type"`
+			ElasticsearchServerInstanceType string   `toml:"opensearch_server_instance_type"`
 			PostgresqlServerInstanceType    string   `toml:"postgresql_server_instance_type"`
 			AutomateLbCertificateArn        string   `toml:"automate_lb_certificate_arn"`
 			ChefServerLbCertificateArn      string   `toml:"chef_server_lb_certificate_arn"`
@@ -101,9 +101,9 @@ type AwsConfigToml struct {
 			ChefEbsVolumeIops               string   `toml:"chef_ebs_volume_iops"`
 			ChefEbsVolumeSize               string   `toml:"chef_ebs_volume_size"`
 			ChefEbsVolumeType               string   `toml:"chef_ebs_volume_type"`
-			ElasticsearchEbsVolumeIops      string   `toml:"elasticsearch_ebs_volume_iops"`
-			ElasticsearchEbsVolumeSize      string   `toml:"elasticsearch_ebs_volume_size"`
-			ElasticsearchEbsVolumeType      string   `toml:"elasticsearch_ebs_volume_type"`
+			ElasticsearchEbsVolumeIops      string   `toml:"opensearch_ebs_volume_iops"`
+			ElasticsearchEbsVolumeSize      string   `toml:"opensearch_ebs_volume_size"`
+			ElasticsearchEbsVolumeType      string   `toml:"opensearch_ebs_volume_type"`
 			PostgresqlEbsVolumeIops         string   `toml:"postgresql_ebs_volume_iops"`
 			PostgresqlEbsVolumeSize         string   `toml:"postgresql_ebs_volume_size"`
 			PostgresqlEbsVolumeType         string   `toml:"postgresql_ebs_volume_type"`
@@ -164,7 +164,7 @@ type ExistingInfraConfigToml struct {
 			AutomatePrivateIps      []string `toml:"automate_private_ips"`
 			ChefServerPrivateIps    []string `toml:"chef_server_private_ips"`
 			ElasticsearchIps        []string `toml:"elasticsearch_ips"`
-			ElasticsearchPrivateIps []string `toml:"elasticsearch_private_ips"`
+			ElasticsearchPrivateIps []string `toml:"opensearch_private_ips"`
 			PostgresqlPrivateIps    []string `toml:"postgresql_private_ips"`
 		} `toml:"config"`
 	} `toml:"existing_infra"`

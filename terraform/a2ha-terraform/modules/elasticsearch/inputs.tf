@@ -14,7 +14,7 @@ variable "backup_config_efs" {
 variable "curator_pkg_ident" {
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 
