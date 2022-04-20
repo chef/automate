@@ -28,6 +28,7 @@ type Storage interface {
 	GetUser(ctx context.Context, id string) (User, error)
 	EditUser(ctx context.Context, user User) (User, error)
 	DeleteUser(ctx context.Context, user User) (User, error)
+	DeleteUserAssciation(ctx context.Context, username string) (string, error)
 
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
 	GetAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) ([]OrgUser, error)

@@ -86,14 +86,19 @@ func serve(cmd *cobra.Command, args []string) error {
 		return errors.New("missing config value authz_address")
 	}
 
+	if c.InfraProxyAddress == "" {
+		return errors.New("missing config value infra_proxy_address")
+	}
+
 	serverConfig := server.Config{
-		Logger:          logger,
-		Users:           c.Users.Config,
-		A1UserData:      c.A1UserData,
-		A1UserRolesData: c.A1UserRolesData,
-		ServiceCerts:    serviceCerts,
-		TeamsAddress:    c.TeamsAddress,
-		AuthzAddress:    c.AuthzAddress,
+		Logger:            logger,
+		Users:             c.Users.Config,
+		A1UserData:        c.A1UserData,
+		A1UserRolesData:   c.A1UserRolesData,
+		ServiceCerts:      serviceCerts,
+		TeamsAddress:      c.TeamsAddress,
+		AuthzAddress:      c.AuthzAddress,
+		InfraProxyAddress: c.InfraProxyAddress,
 	}
 
 	serv, err := server.NewServer(ctx, serverConfig)
