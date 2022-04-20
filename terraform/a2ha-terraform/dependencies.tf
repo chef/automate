@@ -1,17 +1,16 @@
 terraform {
   required_providers {
-   aws = {
-      source  = "hashicorp/aws"
+    aws = {
+      source = "hashicorp/aws"
     }
-   null = {
-      source  = "hashicorp/null"
+    null = {
+      source = "hashicorp/null"
     }
-   random = {
+    random = {
       source = "hashicorp/random"
-   }
-   local = {
+    }
+    local = {
       source = "hashicorp/local"
-   }
-
+    }
   }
 }
