@@ -209,8 +209,11 @@ we also need to have following files in /hab/a2_deploy_workspace/terraform dir
 */
 func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
-		bundleName := getFrontendBundleName(airgapBundle)
-		err := generateFrontendBundles(bundleName, airgapBundle)
+		bundleName, err := getFrontendBundleName(airgapBundle)
+		if err != nil {
+			return err
+		}
+		err = generateFrontendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
@@ -228,8 +231,11 @@ func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata
 }
 func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
-		bundleName := getFrontendBundleName(airgapBundle)
-		err := generateFrontendBundles(bundleName, airgapBundle)
+		bundleName, err := getFrontendBundleName(airgapBundle)
+		if err != nil {
+			return err
+		}
+		err = generateFrontendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
@@ -251,8 +257,11 @@ func getVersion(airgapBundle string) (string, error) {
 
 func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
-		bundleName := getFrontendBundleName(airgapBundle)
-		err := generateBackendBundles(bundleName, airgapBundle)
+		bundleName, err := getFrontendBundleName(airgapBundle)
+		if err != nil {
+			return err
+		}
+		err = generateBackendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
 		}
@@ -264,12 +273,12 @@ func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetad
 	}
 	return nil
 }
-func getFrontendBundleName(airgapPath string) string {
+func getFrontendBundleName(airgapPath string) (string, error) {
 	version, err := getVersion(airgapPath)
 	if err != nil {
-		return "frontend"
+		return "", err
 	}
-	return "frontend-" + version
+	return "frontend-" + version, nil
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
 	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
