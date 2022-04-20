@@ -42,8 +42,20 @@ variable "backup_config_efs" {
   default = "false"
 }
 
+variable "backup_config_efs" {
+  default = "false"
+}
+
 variable "backup_config_s3" {
   default = "false"
+}
+
+variable "backup_config_s3" {
+  default = "false"
+}
+
+variable "bucket_name" {
+  default = "chef-automate-ha"
 }
 
 variable "bucket_name" {
@@ -136,6 +148,10 @@ variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
 }
 
+variable "s3_endpoint" {
+  default = "https://s3.amazonaws.com"
+}
+
 variable "ssh_key_file" {
 }
 
@@ -156,20 +172,3 @@ variable "teams_port" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
-variable "backup_config_s3" {
-  default = "false"
-}
-
-variable "backup_config_efs" {
-  default = "false"
-}
-
-
-variable "s3_endpoint" {
-  default = "https://s3.amazonaws.com"
-}
-
-variable "bucket_name" {
-  default = "chef-automate-ha"
-}
-
