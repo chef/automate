@@ -18,6 +18,7 @@ ssh_key_file = "~/.ssh/A2HA.pem"
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
+efs_creation = "false"
 
 [automate.config]
 # admin_password = ""
@@ -44,6 +45,8 @@ region = "us-east-1"
 # E.g. aws_cidr_block_addr = "172.31.64.0"
 aws_vpc_id  = ""
 aws_cidr_block_addr  = ""
+private_custom_subnets = []
+public_custom_subnets = []
 # ssh key pair name in AWS to access instances
 ssh_key_pair_name = "A2HA"
 setup_managed_services = false

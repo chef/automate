@@ -77,6 +77,10 @@ variable "chef_server_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
 
+variable "efs_creation" {
+  default = "false"
+}
+
 variable "elasticsearch_ebs_volume_iops" {
   default = 300
 }
@@ -147,6 +151,16 @@ variable "postgresql_ebs_volume_type" {
 
 variable "postgresql_server_instance_type" {
   default = "t3a.medium"
+}
+
+variable "private_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
+variable "public_custom_subnets" {
+  default = []
+  type    = list(string)
 }
 
 variable "setup_managed_services" {

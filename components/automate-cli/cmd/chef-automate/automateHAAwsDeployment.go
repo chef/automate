@@ -96,6 +96,9 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 	if len(a.config.Architecture.ConfigInitials.BackupMount) < 1 {
 		errorList.PushBack("Invalid or empty backup_mount")
 	}
+	if len(a.config.Architecture.ConfigInitials.EFSCreation) < 1 {
+		errorList.PushBack("Invalid or empty efs_creation")
+	}
 	if len(a.config.Automate.Config.AdminPassword) > 0 {
 		val, err := password.NewValidator()
 		if err != nil {

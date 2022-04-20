@@ -35,6 +35,7 @@ type AwsConfigToml struct {
 			ExistingElkUsername         string `toml:"existing_elk_username"`
 			ExistingElkPassword         string `toml:"existing_elk_password"`
 			BackupMount                 string `toml:"backup_mount"`
+			EFSCreation                 string `toml:"efs_creation"`
 			HabitatUIDGid               string `toml:"habitat_uid_gid"`
 		} `toml:"aws"`
 	} `toml:"architecture"`
@@ -64,48 +65,50 @@ type AwsConfigToml struct {
 	} `toml:"postgresql"`
 	Aws struct {
 		Config struct {
-			Profile                         string `toml:"profile"`
-			Region                          string `toml:"region"`
-			AwsVpcId                        string `toml:"aws_vpc_id"`
-			AwsCidrBlockAddr                string `toml:"aws_cidr_block_addr"`
-			SSHKeyPairName                  string `toml:"ssh_key_pair_name"`
-			SetupManagedServices            bool   `toml:"setup_managed_services"`
-			ElasticsearchDomainUrl          string `toml:"managed_elasticsearch_domain_url"`
-			ElasticsearchUsername           string `toml:"managed_elasticsearch_username"`
-			ElasticsearchUserPassword       string `toml:"managed_elasticsearch_user_password"`
-			ElasticsearchCertificate        string `toml:"managed_elasticsearch_certificate"`
-			RDSInstanceUrl                  string `toml:"managed_rds_instance_url"`
-			RDSSuperUserName                string `toml:"managed_rds_superuser_username"`
-			RDSSuperUserPassword            string `toml:"managed_rds_superuser_password"`
-			RDSDBUserName                   string `toml:"managed_rds_dbuser_username"`
-			RDSDBUserPassword               string `toml:"managed_rds_dbuser_password"`
-			RDSCertificate                  string `toml:"managed_rds_certificate"`
-			AmiFilterName                   string `toml:"ami_filter_name"`
-			AmiFilterVirtType               string `toml:"ami_filter_virt_type"`
-			AmiFilterOwner                  string `toml:"ami_filter_owner"`
-			AmiID                           string `toml:"ami_id"`
-			LBAccessLogs                    string `toml:"lb_access_logs"`
-			AutomateServerInstanceType      string `toml:"automate_server_instance_type"`
-			ChefServerInstanceType          string `toml:"chef_server_instance_type"`
-			ElasticsearchServerInstanceType string `toml:"elasticsearch_server_instance_type"`
-			PostgresqlServerInstanceType    string `toml:"postgresql_server_instance_type"`
-			AutomateLbCertificateArn        string `toml:"automate_lb_certificate_arn"`
-			ChefServerLbCertificateArn      string `toml:"chef_server_lb_certificate_arn"`
-			AutomateEbsVolumeIops           string `toml:"automate_ebs_volume_iops"`
-			AutomateEbsVolumeSize           string `toml:"automate_ebs_volume_size"`
-			AutomateEbsVolumeType           string `toml:"automate_ebs_volume_type"`
-			ChefEbsVolumeIops               string `toml:"chef_ebs_volume_iops"`
-			ChefEbsVolumeSize               string `toml:"chef_ebs_volume_size"`
-			ChefEbsVolumeType               string `toml:"chef_ebs_volume_type"`
-			ElasticsearchEbsVolumeIops      string `toml:"elasticsearch_ebs_volume_iops"`
-			ElasticsearchEbsVolumeSize      string `toml:"elasticsearch_ebs_volume_size"`
-			ElasticsearchEbsVolumeType      string `toml:"elasticsearch_ebs_volume_type"`
-			PostgresqlEbsVolumeIops         string `toml:"postgresql_ebs_volume_iops"`
-			PostgresqlEbsVolumeSize         string `toml:"postgresql_ebs_volume_size"`
-			PostgresqlEbsVolumeType         string `toml:"postgresql_ebs_volume_type"`
-			XContact                        string `toml:"X-Contact"`
-			XDept                           string `toml:"X-Dept"`
-			XProject                        string `toml:"X-Project"`
+			Profile                         string   `toml:"profile"`
+			Region                          string   `toml:"region"`
+			AwsVpcId                        string   `toml:"aws_vpc_id"`
+			AwsCidrBlockAddr                string   `toml:"aws_cidr_block_addr"`
+			PrivateCustomSubnets            []string `toml:"private_custom_subnets"`
+			PublicCustomSubnets             []string `toml:"public_custom_subnets"`
+			SSHKeyPairName                  string   `toml:"ssh_key_pair_name"`
+			SetupManagedServices            bool     `toml:"setup_managed_services"`
+			ElasticsearchDomainUrl          string   `toml:"managed_elasticsearch_domain_url"`
+			ElasticsearchUsername           string   `toml:"managed_elasticsearch_username"`
+			ElasticsearchUserPassword       string   `toml:"managed_elasticsearch_user_password"`
+			ElasticsearchCertificate        string   `toml:"managed_elasticsearch_certificate"`
+			RDSInstanceUrl                  string   `toml:"managed_rds_instance_url"`
+			RDSSuperUserName                string   `toml:"managed_rds_superuser_username"`
+			RDSSuperUserPassword            string   `toml:"managed_rds_superuser_password"`
+			RDSDBUserName                   string   `toml:"managed_rds_dbuser_username"`
+			RDSDBUserPassword               string   `toml:"managed_rds_dbuser_password"`
+			RDSCertificate                  string   `toml:"managed_rds_certificate"`
+			AmiFilterName                   string   `toml:"ami_filter_name"`
+			AmiFilterVirtType               string   `toml:"ami_filter_virt_type"`
+			AmiFilterOwner                  string   `toml:"ami_filter_owner"`
+			AmiID                           string   `toml:"ami_id"`
+			LBAccessLogs                    string   `toml:"lb_access_logs"`
+			AutomateServerInstanceType      string   `toml:"automate_server_instance_type"`
+			ChefServerInstanceType          string   `toml:"chef_server_instance_type"`
+			ElasticsearchServerInstanceType string   `toml:"elasticsearch_server_instance_type"`
+			PostgresqlServerInstanceType    string   `toml:"postgresql_server_instance_type"`
+			AutomateLbCertificateArn        string   `toml:"automate_lb_certificate_arn"`
+			ChefServerLbCertificateArn      string   `toml:"chef_server_lb_certificate_arn"`
+			AutomateEbsVolumeIops           string   `toml:"automate_ebs_volume_iops"`
+			AutomateEbsVolumeSize           string   `toml:"automate_ebs_volume_size"`
+			AutomateEbsVolumeType           string   `toml:"automate_ebs_volume_type"`
+			ChefEbsVolumeIops               string   `toml:"chef_ebs_volume_iops"`
+			ChefEbsVolumeSize               string   `toml:"chef_ebs_volume_size"`
+			ChefEbsVolumeType               string   `toml:"chef_ebs_volume_type"`
+			ElasticsearchEbsVolumeIops      string   `toml:"elasticsearch_ebs_volume_iops"`
+			ElasticsearchEbsVolumeSize      string   `toml:"elasticsearch_ebs_volume_size"`
+			ElasticsearchEbsVolumeType      string   `toml:"elasticsearch_ebs_volume_type"`
+			PostgresqlEbsVolumeIops         string   `toml:"postgresql_ebs_volume_iops"`
+			PostgresqlEbsVolumeSize         string   `toml:"postgresql_ebs_volume_size"`
+			PostgresqlEbsVolumeType         string   `toml:"postgresql_ebs_volume_type"`
+			XContact                        string   `toml:"X-Contact"`
+			XDept                           string   `toml:"X-Dept"`
+			XProject                        string   `toml:"X-Project"`
 		} `toml:"config"`
 	} `toml:"aws"`
 }

@@ -23,6 +23,8 @@ module "aws" {
   chef_server_instance_count         = var.chef_server_instance_count
   chef_server_instance_type          = var.chef_server_instance_type
   chef_server_lb_certificate_arn     = var.chef_server_lb_certificate_arn
+  public_custom_subnets              = var.public_custom_subnets
+  private_custom_subnets             = var.private_custom_subnets
   elasticsearch_ebs_volume_iops      = var.elasticsearch_ebs_volume_iops
   elasticsearch_ebs_volume_size      = var.elasticsearch_ebs_volume_size
   elasticsearch_ebs_volume_type      = var.elasticsearch_ebs_volume_type
@@ -41,6 +43,23 @@ module "aws" {
   tags                               = var.aws_tags
 }
 
+module "efs" {
+  source                           = "../../modules/efs"
+  efs_creation                     = var.efs_creation
+  private_subnets                  = module.aws.private_subnets
+  private_custom_subnets           = var.private_custom_subnets
+  ssh_key_file                     = var.ssh_key_file
+  automate_private_ips             = module.aws.automate_private_ips
+  chef_server_private_ips          = module.aws.chef_server_private_ips
+  postgresql_private_ips           = module.aws.postgresql_private_ips
+  elasticsearch_private_ips        = module.aws.elasticsearch_private_ips 
+  tags                             = var.aws_tags
+  aws_region                       = var.aws_region
+  aws_vpc_id                       = var.aws_vpc_id
+  base_linux_aws_security_group_id = module.aws.base_linux_aws_security_group_id
+  aws_cluster_id                   = module.aws.aws_cluster_id
+}
+
 module "aws-output" {
   source                    = "../../modules/aws_output"
   automate_private_ips      = module.aws.automate_private_ips
@@ -50,4 +69,5 @@ module "aws-output" {
   elasticsearch_private_ips = module.aws.elasticsearch_private_ips
   automate_fqdn             = module.aws.automate_fqdn
   automate_frontend_urls    = module.aws.automate_frontend_urls
+  depends_on                = [module.efs]
 }

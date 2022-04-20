@@ -52,6 +52,7 @@ module AutomateCluster
     default(:secrets_key_file, '/etc/chef-automate/secrets.key').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
     default(:secrets_store_file, 'secrets.json').writes_value { |path| AutomateCluster::Config.expand_relative_paths(path) }
     default :backup_mount, '/mnt/automate_backups'
+    default :efs_creation, 'false'
     default :habitat_uid_gid, ''
 
     config_context :automate do
@@ -96,6 +97,8 @@ module AutomateCluster
       default :region, 'us-east-1'
       default :vpc_id, " "
       default :cidr_block_addr, " "
+      default :private_custom_subnets, []
+      default :public_custom_subnets, []
       default :ssh_key_pair_name
       default :lb_access_logs, 'false'
       default :setup_managed_services, false
