@@ -336,8 +336,8 @@ func generateA2HAManifestTfvars(airgapMetadata airgap.UnpackMetadata) error {
 		if strings.Contains(h, AUTOMATE_HA_PKG_KIBANA) {
 			deployablePackages = append(deployablePackages, "kibana_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
-		if strings.Contains(h, AUTOMATE_HA_ES) {
-			deployablePackages = append(deployablePackages, "elasticsearch_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
+		if strings.Contains(h, AUTOMATE_HA_OS) {
+			deployablePackages = append(deployablePackages, "opensearch_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")
 		}
 		if strings.Contains(h, AUTOMATE_HA_ES_CAR) {
 			deployablePackages = append(deployablePackages, "elasticsidecar_pkg_ident = \""+getBldrSupportedPkgName(h)+"\"")

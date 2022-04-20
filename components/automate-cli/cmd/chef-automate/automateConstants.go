@@ -32,7 +32,7 @@ const AUTOMATE_HA_PKG_HA_PROXY = "automate-ha-haproxy"
 const AUTOMATE_HA_PKG_JOURNALBEAT = "automate-ha-journalbeat"
 const AUTOMATE_HA_PKG_METRICBEAT = "automate-ha-metricbeat"
 const AUTOMATE_HA_PKG_KIBANA = "automate-ha-kibana"
-const AUTOMATE_HA_ES = "automate-ha-elasticsearch"
+const AUTOMATE_HA_OS = "automate-ha-opensearch"
 const AUTOMATE_HA_ES_CAR = "automate-ha-elasticsidecar"
 const AUTOMATE_HA_CURATOR = "automate-ha-curator"
 

@@ -135,7 +135,7 @@ create_manifest_auto_tfvars(){
   journalbeat_pkg_ident = " $(grep "automate-ha-journalbeat" ${PACKAGES_INFO})"
   metricbeat_pkg_ident = " $(grep "automate-ha-metricbeat" ${PACKAGES_INFO})"
   kibana_pkg_ident = " $(grep "automate-ha-kibana" ${PACKAGES_INFO})"
-  elasticsearch_pkg_ident = " $(grep "automate-ha-elasticsearch" ${PACKAGES_INFO})"
+  opensearch_pkg_ident = " $(grep "automate-ha-opensearch" ${PACKAGES_INFO})"
   elasticsidecar_pkg_ident = " $(grep "automate-ha-elasticsidecar" ${PACKAGES_INFO})"
   curator_pkg_ident = " $(grep "automate-ha-curator" ${PACKAGES_INFO})"
 EOL
