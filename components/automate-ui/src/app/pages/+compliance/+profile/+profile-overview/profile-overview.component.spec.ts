@@ -16,6 +16,7 @@ import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { ProductDeployedService } from 'app/services/product-deployed/product-deployed.service';
 import { MockComponent } from 'ng2-mock-component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 class MockProductDeployedService {
   constructor(private products: string[]) { }
@@ -36,6 +37,10 @@ class MockUploadService {
   sendFile(_file: File): Observable<Object> {
     return observableOf('{}');
   }
+}
+
+class MockTelemetryService {
+  track() { }
 }
 
 describe('ProfilesOverviewComponent', () => {
@@ -68,7 +73,8 @@ describe('ProfilesOverviewComponent', () => {
           {provide: ChefSessionService, useValue: mockSession},
           {provide: UploadService, useClass: MockUploadService},
           FeatureFlagsService,
-          { provide: ProductDeployedService, useValue: new MockProductDeployedService([]) }
+          { provide: ProductDeployedService, useValue: new MockProductDeployedService([]) },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ],
         schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
       });
@@ -428,7 +434,8 @@ describe('ProfilesOverviewComponent', () => {
           {provide: ChefSessionService, useValue: mockSession},
           {provide: UploadService, useClass: MockUploadService},
           FeatureFlagsService,
-          { provide: ProductDeployedService, useValue: new MockProductDeployedService([]) }
+          { provide: ProductDeployedService, useValue: new MockProductDeployedService([]) },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ],
         schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
       });
@@ -515,7 +522,9 @@ describe('ProfilesOverviewComponent', () => {
           {provide: UploadService, useClass: MockUploadService},
           FeatureFlagsService,
           // This installs the Desktop offering
-          { provide: ProductDeployedService, useValue: new MockProductDeployedService(['desktop']) }
+          { provide: ProductDeployedService,
+            useValue: new MockProductDeployedService(['desktop']) },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ],
         schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
       });
@@ -601,7 +610,9 @@ describe('ProfilesOverviewComponent', () => {
           {provide: UploadService, useClass: MockUploadService},
           FeatureFlagsService,
           // This installs the Desktop offering
-          { provide: ProductDeployedService, useValue: new MockProductDeployedService(['desktop']) }
+          { provide: ProductDeployedService,
+            useValue: new MockProductDeployedService(['desktop']) },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ],
         schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
       });
