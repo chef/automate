@@ -41,7 +41,7 @@ function manifest_for_channel() {
     fi
 
     install_if_missing core/curl curl
-    curl -sS "https://packages.chef.io/manifests/$channel/automate/latest.json"
+    curl -sS "https://packages.chef.io/manifests/$channel/automate/latest_semver.json"
 }
 
 document "versions_for_channel"<<DOC

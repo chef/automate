@@ -3,7 +3,7 @@
 ## Desired State
 
 #### Backups
-This document outlines how we plan to implement backup and restore operations for Automate 2. It's describes a three phase plan that we'll use to incrementally deliver value until we realize our eventual goal of distributed backups orchestrated by the `deployment-service`.
+This document outlines how we plan to implement backup and restore operations for Automate. It's describes a three phase plan that we'll use to incrementally deliver value until we realize our eventual goal of distributed backups orchestrated by the `deployment-service`.
 
 Each service in A2 will be responsible and require a gRPC endpoint for:
   * creating a backup of its data

@@ -160,7 +160,7 @@ function pkg_from_manifest {
   install_if_missing core/curl curl
   manifest=$(find_local_manifest)
   if [[ "$manifest" = "" ]]; then
-      manifest_content=$(curl -sS "https://packages.chef.io/manifests/dev/automate/latest.json")
+      manifest_content=$(curl -sS "https://packages.chef.io/manifests/dev/automate/latest_semver.json")
   else
       manifest_content=$(cat "$manifest")
   fi

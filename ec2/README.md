@@ -160,9 +160,9 @@ tail -f /hab/studios/home--*/hab/sup/default/sup.log
 Let's say you specified `acceptance` channel for the automate VERSION and you want to upgrade to a new version to test data migration. Run this command in the hab studio to overwrite the original manifest and trigger an upgrade to the latest build from the dev channel:
 
 ```
-wget -O /src/results/build.json "https://packages.chef.io/manifests/dev/automate/latest.json"
+wget -O /src/results/build.json "https://packages.chef.io/manifests/dev/automate/latest_semver.json"
 ```
-If you want a specific build, replace `latest` in the URL above with the build timestamp(Ex: 20190329033403). Find all `dev` build timestamps in `versions.json`
+If you want a specific build, replace `latest_semver` in the URL above with the build version(Ex: 3.0.23). Find all `dev` build versions in `versions.json`
 
 Wait 30 seconds or so for the auto-upgrade to kick in. You can verify the progress of the upgrade with:
 ```

@@ -12,9 +12,9 @@ gh_repo = "automate"
     weight = 20
 +++
 
-# Audit Cookbook + InSpec + Automate 2 Versions Support Matrix
+# Audit Cookbook + InSpec + Automate Versions Support Matrix
 
-Refer to the [following Supported Versions list](https://github.com/chef-cookbooks/audit#chef-automate) to confirm a full set of working versions for your chef-client, Audit cookbook, InSpec, and Automate 2. When these do not match up, ingestion problems can occur because the messages will not show up in the expected format.
+Refer to the [following Supported Versions list](https://github.com/chef-cookbooks/audit#chef-automate) to confirm a full set of working versions for your chef-client, Audit cookbook, InSpec, and Automate. When these do not match up, ingestion problems can occur because the messages will not show up in the expected format.
 
 # Node Run and Audit Data Collection
 
