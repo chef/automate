@@ -304,7 +304,7 @@ func disableShardAllocation() error {
 }`)
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, payload)
+	req, err := http.NewRequest(method, url, payload) // nosemgrep
 
 	if err != nil {
 		return err
@@ -318,7 +318,7 @@ func disableShardAllocation() error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		return err
 	}
@@ -339,7 +339,7 @@ func flushRequest() error {
 	method := "POST"
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequest(method, url, nil) // nosemgrep
 
 	if err != nil {
 		fmt.Println(err)
@@ -353,7 +353,7 @@ func flushRequest() error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -377,7 +377,7 @@ func reEnableShardAllocation() error {
 }`)
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, payload)
+	req, err := http.NewRequest(method, url, payload) // nosemgrep
 
 	if err != nil {
 		return err
