@@ -255,6 +255,54 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		}
 	}
 
+	if externalOS := c.GetV1().GetExternal().GetOpensearch(); externalOS.GetEnable().GetValue() {
+		// External ES nodes all either have https urls or https urls
+		nodes := externalOS.GetNodes()
+		httpsNodes := make([]string, 0)
+		for _, n := range nodes {
+			ns := n.GetValue()
+			if strings.HasPrefix(ns, "https") {
+				httpsNodes = append(httpsNodes, ns)
+			}
+		}
+		if len(httpsNodes) > 0 && len(httpsNodes) < len(nodes) {
+			cfgErr.AddInvalidValue("global.v1.external.opensearch.nodes", "Cannot mix http and https nodes")
+		}
+
+		// Only one of root_cert or root_cert_file has been specified
+		rc := c.GetV1().GetExternal().GetOpensearch().GetSsl().GetRootCert().GetValue()
+		rcf := c.GetV1().GetExternal().GetOpensearch().GetSsl().GetRootCertFile().GetValue()
+		if rc != "" && rcf != "" {
+			cfgErr.AddInvalidValue("global.v1.external.opensearch.ssl", "Specify either global.v1.external.opensearch.ssl.root_cert or global.v1.external.opensearch.ssl.root_cert_file, but not both.")
+		}
+
+		auth := c.GetV1().GetExternal().GetOpensearch().GetAuth()
+		scheme := auth.GetScheme().GetValue()
+		switch scheme {
+		case "basic_auth":
+			u := auth.GetBasicAuth().GetUsername().GetValue()
+			p := auth.GetBasicAuth().GetPassword().GetValue()
+			if u == "" {
+				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.basic_auth.username")
+			}
+			if p == "" {
+				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.basic_auth.password")
+			}
+		case "aws_os":
+			u := auth.GetAwsOs().GetUsername().GetValue()
+			p := auth.GetAwsOs().GetPassword().GetValue()
+			if u == "" {
+				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.username")
+			}
+			if p == "" {
+				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.aws_os.password")
+			}
+		case "":
+		default:
+			cfgErr.AddInvalidValue("global.v1.external.opensearch.auth.scheme",
+				"Scheme should be one of 'basic_auth', 'aws_os'.")
+		}
+	}
 	if externalPG := c.GetV1().GetExternal().GetPostgresql(); externalPG.GetEnable().GetValue() {
 		if auth := c.GetV1().GetExternal().GetPostgresql().GetAuth(); auth.GetScheme().GetValue() != "password" {
 			// use supported auth scheme (currently only password auth is

@@ -55,6 +55,7 @@
     "chef/automate-ha-postgresql",
     "chef/automate-ha-cluster-ctl",
     "chef/automate-netcat",
+    "chef/automate-opensearch",
     "core/rsync"
   ],
 
@@ -93,6 +94,14 @@
         "chef/automate-elasticsearch",
         "chef/automate-es-gateway",
         "chef/es-sidecar-service"
+      ]
+    },
+    {
+      "name": "opensearch",
+      "type": "base",
+      "services": [
+        "chef/automate-opensearch",
+        "chef/automate-es-gateway"
       ]
     },
     {
@@ -160,6 +169,7 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
+        "chef/automate-opensearch",
         "chef/user-settings-service"
       ]
     },

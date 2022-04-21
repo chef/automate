@@ -19,6 +19,7 @@ import "config/cs_nginx/config_request.proto";
 import "config/deployment/config_request.proto";
 import "config/dex/config_request.proto";
 import "config/elasticsearch/config_request.proto";
+import "config/opensearch/config_request.proto";
 import "config/esgateway/config_request.proto";
 import "config/es_sidecar/config_request.proto";
 import "config/gateway/config_request.proto";
@@ -104,4 +105,5 @@ message AutomateConfig {
 	chef.automate.domain.cds.ConfigRequest cds = 46;
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
+	chef.automate.infra.opensearch.ConfigRequest opensearch = 49;
 }

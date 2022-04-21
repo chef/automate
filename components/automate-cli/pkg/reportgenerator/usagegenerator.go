@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gocarina/gocsv"
-	elastic "gopkg.in/olivere/elastic.v6"
+	elastic "github.com/olivere/elastic/v7"
 )
 
 type ConvergeInfo struct {
@@ -221,11 +221,11 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 			os.Exit(1)
 		}
 
-		if searchResult.Hits.TotalHits > 0 {
+		if searchResult.TotalHits() > 0 {
 
 			for ind, hit := range searchResult.Hits.Hits {
 				var s ConvergeInfo
-				err = json.Unmarshal(*hit.Source, &s)
+				err = json.Unmarshal(hit.Source, &s)
 				if err != nil {
 					fmt.Println("Json marshal err :", err)
 					os.Exit(1)
@@ -393,7 +393,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 		searchResult, err := searchService.Do(context.Background())
 		errorMessage(errorQuery, err)
 
-		if searchResult.Hits.TotalHits > 0 {
+		if searchResult.TotalHits() > 0 {
 			if header == true {
 				headers := []string{"Resource_ID", "Version", "Resource_Name", "Environment", "End_Time", "Platform__Name", "Controls_Sums__Total", "Controls_Sums__Passed", "Controls_Sums__Skipped", "Controls_Sums__Failed", "Profiles__Count"}
 				err := w.Write(headers)
@@ -407,7 +407,7 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 
 			for _, hit := range searchResult.Hits.Hits {
 
-				err = json.Unmarshal(*hit.Source, &s)
+				err = json.Unmarshal(hit.Source, &s)
 				errorMessage("Json marshal err :", err)
 
 				record := []string{

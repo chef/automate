@@ -39,6 +39,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-opensearch",
+      "metadata": {
+        "name": "chef/automate-opensearch",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/automate-es-gateway",
       "metadata": null
     },
@@ -532,6 +542,18 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
+      "name": "opensearch",
+      "aliases": null,
+      "type": "base",
+      "services": [
+        "chef/automate-opensearch",
+        "chef/automate-es-gateway"
+      ],
+      "packages": null,
+      "dependencies": null,
+      "hidden": false
+    },
+    {
       "name": "cereal",
       "aliases": null,
       "type": "base",
@@ -616,6 +638,7 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-cds",
+        "chef/automate-opensearch",
         "chef/user-settings-service"
       ],
       "packages": null,
