@@ -77,7 +77,7 @@ def latest_build_from_versions(channel)
   puts " * Getting latest build from #{versions_url}"
   versions_json = JSON.parse(open(versions_url).read)
   build = versions_json.last
-  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^\d+$/
+  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^(\d+\.)?(\d+\.)?(\*|\d+)$/
   return build
 end
 
@@ -254,6 +254,7 @@ EC2HOSTNAME=`curl -Ss http://169.254.169.254/latest/meta-data/public-hostname`
 sed -i "s/fqdn = .*/fqdn = '$EC2HOSTNAME'/" dev/config.toml
 sed -i "s/heapsize = .*/heapsize = '#{ENV['ES_HEAP_SIZE']}g'/" dev/config.toml
 echo "#{automate_license}" > dev/license.jwt
+chown -R ubuntu:ubuntu /home/ubuntu/automate
 SCRIPT
 
 $enter_hab_studio = <<SCRIPT
