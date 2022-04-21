@@ -184,3 +184,7 @@ variable "tags" {
 variable "tmp_path" {
   default = "/var/automate-ha"
 }
+
+variable "disable_api_termination" {
+  default = true
+}
