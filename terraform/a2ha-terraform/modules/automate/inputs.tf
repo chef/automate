@@ -98,7 +98,7 @@ variable "managed_elasticsearch_user_password" {
   default = ""
 }
 
-variable "managed_elasticsearch_username" { 
+variable "managed_elasticsearch_username" {
   default = ""
 }
 
@@ -144,6 +144,9 @@ variable "public_ips" {
   default = []
 }
 
+variable "setup_managed_services" {
+  default = false
+}
 variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
 }

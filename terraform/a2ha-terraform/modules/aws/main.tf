@@ -186,7 +186,7 @@ locals {
 }
 
 resource "aws_instance" "chef_automate_postgresql" {
-  count = var.postgresql_instance_count
+  count = var.setup_managed_services ? 0 : var.postgresql_instance_count
 
   ami                         = local.ami
   instance_type               = var.postgresql_server_instance_type
@@ -225,7 +225,7 @@ resource "aws_instance" "chef_automate_postgresql" {
 }
 
 resource "aws_instance" "chef_automate_elasticsearch" {
-  count = var.elasticsearch_instance_count
+  count = var.setup_managed_services ? 0 : var.elasticsearch_instance_count
 
   ami                         = local.ami
   instance_type               = var.elasticsearch_server_instance_type
