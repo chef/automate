@@ -1,5 +1,5 @@
 variable "ami_filter_name" {
-  default = "chef-highperf-centos7-*"
+  default = "automate-ha-centos7"
 }
 
 variable "ami_filter_owner" {
@@ -15,7 +15,7 @@ variable "automate_ebs_volume_iops" {
 }
 
 variable "automate_ebs_volume_size" {
-  default = 50
+  default = 60
 }
 
 variable "automate_ebs_volume_type" {
@@ -66,7 +66,7 @@ variable "chef_ebs_volume_iops" {
 }
 
 variable "chef_ebs_volume_size" {
-  default = 50
+  default = 60
 }
 
 variable "chef_ebs_volume_type" {
@@ -89,7 +89,7 @@ variable "elasticsearch_ebs_volume_iops" {
 }
 
 variable "elasticsearch_ebs_volume_size" {
-  default = 50
+  default = 60
 }
 
 variable "elasticsearch_ebs_volume_type" {
@@ -129,7 +129,7 @@ variable "postgresql_ebs_volume_iops" {
 }
 
 variable "postgresql_ebs_volume_size" {
-  default = 50
+  default = 60
 }
 
 variable "postgresql_ebs_volume_type" {
