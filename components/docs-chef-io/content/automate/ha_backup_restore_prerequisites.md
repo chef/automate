@@ -128,7 +128,7 @@ Take a back-up of the configurations once the cluster has been deployed.
 
 ### File System(EFS) Configuration for backup
 
-To backup on the share file system for AWS, follow the steps given below:
+To backup on the shared file system for AWS, follow the steps given below:
 
 - Create the **EFS** over AWS.
 - Mount the creating EFS using **DNS** or **IP**.
