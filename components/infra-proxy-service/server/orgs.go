@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	"github.com/gofrs/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 // CreateOrg creates a new org
@@ -105,6 +106,13 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 	}).Validate()
 
 	if err != nil {
+		return nil, err
+	}
+
+	// Delete users asscoiation with org
+	err = s.service.Storage.DeleteAutomateInfraOrgUsers(ctx, req.ServerId, req.Id)
+	if err != nil {
+		log.Errorf("Failed to delete the org users ", err)
 		return nil, err
 	}
 
