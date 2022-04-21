@@ -7,6 +7,7 @@ locals {
       postgresql_private_ips    = join(", ", formatlist("\"%s\"", var.postgresql_private_ips)),
       automate_fqdn             = var.automate_fqdn
       automate_frontend_urls    = var.automate_frontend_urls
+      bucket_name               = var.bucket_name
     })
 
     copy_terraform_files_for_destroy = [

@@ -7,6 +7,11 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { CreateUserModalComponent } from './create-user-modal.component';
 import { EventEmitter } from '@angular/core';
 import { using } from 'app/testing/spec-helpers';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('CreateUserModalComponent', () => {
   let component: CreateUserModalComponent;
@@ -26,6 +31,9 @@ describe('CreateUserModalComponent', () => {
       imports: [
         ReactiveFormsModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+      ],
+      providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ]
     })
       .compileComponents();

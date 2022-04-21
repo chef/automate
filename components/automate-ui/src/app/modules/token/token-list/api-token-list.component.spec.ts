@@ -12,6 +12,11 @@ import { CreateTokenSuccess, CreateTokenFailure } from 'app/entities/api-tokens/
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { ApiTokenListComponent } from './api-token-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ApiTokenListComponent', () => {
   let component: ApiTokenListComponent;
@@ -29,7 +34,8 @@ describe('ApiTokenListComponent', () => {
         BrowserAnimationsModule
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       declarations: [
         ApiTokenListComponent,

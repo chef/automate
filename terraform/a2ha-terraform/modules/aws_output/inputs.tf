@@ -10,6 +10,10 @@ variable "automate_private_ips" {
   default = []
 }
 
+variable "bucket_name" {
+  default = ""
+}
+
 variable "chef_server_private_ips" {
   default = []
 }

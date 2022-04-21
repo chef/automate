@@ -35,33 +35,48 @@
 }
 
 .heading-actions {
+  display: flex;
+  flex-direction: row;
   position: relative;
 
-  .download {
-    position: absolute;
-    right: 0;
-    width: 114px;
+  .checkin-select, .download-select {
+    margin-left: 5px;
+    position: relative;
 
-    chef-button {
-      margin: 0;
-      font-size: 14px;
-      text-align: center;
-      padding: 5px 0;
-      border-bottom: 1px solid $chef-grey;
+    &-dropdown {
+      position: absolute;
+      right: 0;
       width: 100%;
-      color: inherit;
+      z-index: 1;
 
-      button {
+      chef-button {
         margin: 0;
-        padding: 0;
-      }
+        font-size: 14px;
+        text-align: center;
+        padding: 5px 0;
+        border-bottom: 1px solid $chef-grey;
+        width: 100%;
+        color: inherit;
+        background-color: $chef-white;
 
-      &:hover {
-        cursor: pointer;
-      }
+        &.selected {
+          background-color: #3864F2;
+          color: #FFFFFF;
+        }
 
-      &:last-child {
-        border-bottom: none;
+        button {
+          margin: 0;
+          padding: 0;
+        }
+
+        &:not(.selected):hover {
+          cursor: pointer;
+          background-color: #DEE5FD;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
       }
     }
   }

@@ -61,6 +61,7 @@ var deployCmdFlags = struct {
 	enableWorkflow                  bool
 	products                        []string
 	bootstrapBundlePath             string
+	userAuth                        bool
 }{}
 
 // deployCmd represents the new command
@@ -168,6 +169,12 @@ func newDeployCmd() *cobra.Command {
 		"bootstrap-bundle",
 		"",
 		"Path to bootstrap bundle")
+	cmd.PersistentFlags().BoolVarP(
+		&deployCmdFlags.userAuth,
+		"yes",
+		"y",
+		false,
+		"Do not prompt for confirmation; accept defaults and continue")
 
 	if !isDevMode() {
 		for _, flagName := range []string{
@@ -210,6 +217,9 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 				status.ConfigError,
 				"Merging command flag overrides into Chef Automate config failed",
 			)
+		}
+		if deployCmdFlags.userAuth {
+			deployCmdFlags.acceptMLSA = deployCmdFlags.userAuth
 		}
 		if len(deployCmdFlags.channel) > 0 && (deployCmdFlags.channel == "dev" || deployCmdFlags.channel == "current") {
 			writer.Printf("deploying with channel : %s \n", deployCmdFlags.channel)

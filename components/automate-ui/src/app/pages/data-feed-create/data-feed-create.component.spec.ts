@@ -10,6 +10,11 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Regex } from 'app/helpers/auth/regex';
 import { Destination } from 'app/entities/destinations/destination.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('DataFeedCreateComponent', () => {
   let component: DataFeedCreateComponent;
@@ -43,7 +48,8 @@ describe('DataFeedCreateComponent', () => {
         DataFeedCreateComponent
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         FormsModule,
