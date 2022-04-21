@@ -154,7 +154,7 @@ module BackendUtils
       tf_output_value("opensearch_private_ips")
     end
 
-    def opensearch_private_ips
+    def opensearch_public_ips
       tf_output_value("opensearch_public_ips")
     end
 

@@ -57,7 +57,7 @@ output "opensearch_private_ips" {
   value = [vsphere_virtual_machine.chef_automate_opensearch.*.default_ip_address]
 }
 
-output "opensearch_private_ips" {
+output "opensearch_public_ips" {
   value = [vsphere_virtual_machine.chef_automate_opensearch.*.default_ip_address]
 }
 
