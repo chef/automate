@@ -195,6 +195,7 @@ resource "aws_instance" "chef_automate_postgresql" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
+  disable_api_termination     = var.disable_api_termination
 
   connection {
     host        = coalesce(self.private_ip)
@@ -219,6 +220,9 @@ resource "aws_instance" "chef_automate_postgresql" {
       )
     )
   )
+  lifecycle {
+    ignore_changes = [tags, root_block_device, ami]
+  }
 
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
@@ -235,6 +239,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
   associate_public_ip_address = false //Changes to false as Dashboards are no longer enabled
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name
+  disable_api_termination     = var.disable_api_termination
 
   root_block_device {
     delete_on_termination = true
@@ -249,6 +254,9 @@ resource "aws_instance" "chef_automate_elasticsearch" {
       format("${var.tag_name}_${random_id.random.hex}_chef_automate_elasticsearch_%02d", count.index + 1)
     )
   )
+  lifecycle {
+    ignore_changes = [tags, root_block_device, ami]
+  }
 
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
@@ -265,6 +273,7 @@ resource "aws_instance" "chef_automate" {
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name
+  disable_api_termination     = var.disable_api_termination
 
   root_block_device {
     delete_on_termination = true
@@ -282,6 +291,9 @@ resource "aws_instance" "chef_automate" {
 
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
   
+    lifecycle {
+    ignore_changes = [tags, root_block_device, ami]
+  }
 }
 
 resource "aws_instance" "chef_server" {
@@ -296,6 +308,7 @@ resource "aws_instance" "chef_server" {
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name
+  disable_api_termination     = var.disable_api_termination
 
   root_block_device {
     delete_on_termination = true
@@ -313,4 +326,7 @@ resource "aws_instance" "chef_server" {
   
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
+  lifecycle {
+    ignore_changes = [tags, root_block_device, ami]
+  }
 }

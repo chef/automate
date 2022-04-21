@@ -140,6 +140,10 @@ variable "setup_managed_services" {
   default = false
 }
 
+variable "setup_managed_services" {
+  default = false
+}
+
 variable "ssh_key_file" {
 }
 
