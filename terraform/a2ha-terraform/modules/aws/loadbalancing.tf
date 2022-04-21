@@ -8,6 +8,12 @@ resource "aws_alb" "automate_lb" {
   security_groups    = [aws_security_group.load_balancer.id]
   subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : aws_subnet.public.*.id
   tags               = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "aws_alb_target_group" "automate_tg" {
@@ -63,6 +69,11 @@ resource "aws_alb" "chef_server_lb" {
   security_groups    = [aws_security_group.load_balancer.id]
   subnets            = length(var.public_custom_subnets) > 0 ? data.aws_subnet.public.*.id : aws_subnet.public.*.id
   tags               = var.tags
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "aws_alb_target_group" "chef_server_tg" {

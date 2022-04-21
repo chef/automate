@@ -193,3 +193,6 @@ variable "sudo_cmd" {
 variable "tag_name" {
   default = "A2"
 }
+variable "disable_api_termination" {
+  default = true
+}
