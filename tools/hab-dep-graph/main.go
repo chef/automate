@@ -68,7 +68,7 @@ You can generate the graph for a particular package by passing it as an argument
 
 Or combine this with other tools to create the dep graph for a particular release:
 
-    pkg_list="$(curl https://packages.chef.io/manifests/dev/automate/latest.json 2>/dev/null | jq -r '.packages | .[]')"
+    pkg_list="$(curl https://packages.chef.io/manifests/dev/automate/latest_semver.json 2>/dev/null | jq -r '.packages | .[]')"
     go run ./tools/hab-dep-graph $pkg_list
 `,
 

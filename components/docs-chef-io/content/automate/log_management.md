@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 40
 +++
 
-Chef Automate 2.0 uses `systemd`. Log management is performed according to the configuration defined for the system service `journald`.
+Chef Automate uses `systemd`. Log management is performed according to the configuration defined for the system service `journald`.
 
 ### Viewing Logs
 

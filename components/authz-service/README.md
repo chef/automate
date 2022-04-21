@@ -90,13 +90,13 @@ Figure 11 is analogous to Figure 1, but now includes projects.
 The major thing to note here is that now downstream services need to be an active participant
 by typically filtering results by the allowable projects (extreme right in the figure) .
 
-![Automate 2 Authorization With Projects](../../dev-docs/diagrams/authz-projects-sequence.png)
+![Automate Authorization With Projects](../../dev-docs/diagrams/authz-projects-sequence.png)
 
 FIGURE 11 -- AUTHZ SEQUENCE DIAGRAM *WITH* PROJECTS
 
 The next figure sheds light on how a request for "all projects" is handled.
 
-![Automate 2 Authorization With Projects](../../dev-docs/diagrams/authz-all-or-no-projects.png)
+![Automate Authorization With Projects](../../dev-docs/diagrams/authz-all-or-no-projects.png)
 
 FIGURE 12 -- HANDLING OF "ALL PROJECTS" REQUESTED
 
@@ -107,7 +107,7 @@ There is a lot more to say about projects, but this at least serves as a place h
 There are a lot of moving parts in Authz service.
 To aid in visualizing the various pieces here is an entity-relationship diagram detailing the data layer.
 
-![Automate 2 AuthZ Entity Relationship Diagram](../../dev-docs/diagrams/authz-entity-relationships.png)
+![Automate AuthZ Entity Relationship Diagram](../../dev-docs/diagrams/authz-entity-relationships.png)
 
 FIGURE 13 -- ENTITY RELATIONSHIP DIAGRAM
 

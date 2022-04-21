@@ -75,7 +75,7 @@ location / {
 
 ### Why proxying?
 
-While looking for ways to reconcile our initial plan (see [Request flow issue](docs/Request_flow_issue.md)) with the planned deployment model of Automate 2.0, which puts an emphasis on a fairly limited, little-complexity frontend service, [Træfik](https://traefik.io/), the issue came up that we might **just do the proxying ourselves**.
+While looking for ways to reconcile our initial plan (see [Request flow issue](docs/Request_flow_issue.md)) with the planned deployment model of Automate, which puts an emphasis on a fairly limited, little-complexity frontend service, [Træfik](https://traefik.io/), the issue came up that we might **just do the proxying ourselves**.
 
 Since it was both fairly easy to get up and running in the service, and results in a deployment with low complexity (no nginx, no upstreams, location lines with regexp matches, lua handlers...), it was decided that it's at least worth trying.
 From the perspective of authn-service's code, it doesn't matter much, so keep both interfaces alive for now -- with the intention to kill the one we don't end up using later on.
