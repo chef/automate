@@ -14,7 +14,7 @@ directories:
   - ./components/automate-debug
   - ./components/automate-deployment
   - ./components/automate-dex
-  - ./components/automate-elasticsearch
+  - ./components/automate-opensearch
   - ./components/automate-es-gateway
   - ./components/automate-gateway
   - ./components/automate-grpc
