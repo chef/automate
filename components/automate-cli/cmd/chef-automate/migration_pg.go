@@ -268,11 +268,21 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
-		_, err := calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
-		if err != nil {
-			fmt.Println("Failed to calculate the space for data migation")
-			return err
+
+		var isAvailableSpace bool
+		var err error
+
+		if migrateDataCmdFlags.skipStorageCheck {
+			isAvailableSpace = true
+		} else {
+			isAvailableSpace, err = calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
+
+			if err != nil {
+				fmt.Println("Error while calDiskSizeAndDirSize:", err.Error())
+				return err
+			}
 		}
+		fmt.Println("isAvailableSpace:", isAvailableSpace)
 		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		if err != nil {
 			fmt.Println("error with major upgrade checklist")
@@ -309,6 +319,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 				err = esMigrateExecutor()
 				if err != nil {
 					fmt.Println(err)
+					return err
 				}
 			}
 		}
@@ -397,20 +408,9 @@ chown -RL hab:hab /hab/svc/automate-opensearch/var;
 // esMigrateExecutor
 func esMigrateExecutor() error {
 	preRequiste, err := preRequisteForESDataMigration()
-	defer func() {
-		err = chefAutomateStart()
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		err = chefAutomateStatus()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
-
 	if !preRequiste {
 		// NO DIR PRESENT
-		fmt.Println("preRequisteForESDataMigration failed")
+		fmt.Println("preRequisteForESDataMigration failed", err)
 		return nil
 	}
 
@@ -427,47 +427,40 @@ func esMigrateExecutor() error {
 }
 
 func executeMigrate(check bool) error {
-	var isAvailableSpace bool
-	var err error
+	writer.Title(
+		"----------------------------------------------\n" +
+			"migration from es to os \n" +
+			"----------------------------------------------",
+	)
+	writer.Title("Checking for es_upgrade")
+	defer func() {
+		err := chefAutomateStart()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		err = chefAutomateStatus()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
 
-	if migrateDataCmdFlags.skipStorageCheck {
-		isAvailableSpace = true
-	} else {
-		isAvailableSpace, err = calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
-
+	if !check {
+		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		if err != nil {
 			return err
+		}
+		err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
 
-	if isAvailableSpace {
-		writer.Title(
-			"----------------------------------------------\n" +
-				"migration from es to os \n" +
-				"----------------------------------------------",
-		)
-
-		writer.Title("Checking for es_upgrade")
-
-		if !check && err == nil {
-			ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-			if err != nil {
-				return err
-			}
-			err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
-			if err != nil {
-				fmt.Println(err)
-			}
-		}
-
-		command := exec.Command("/bin/sh", "-c", script)
-		err = command.Run()
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-
-	} // Endif isAvailableSpace
+	command := exec.Command("/bin/sh", "-c", script)
+	err := command.Run()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 	return nil
 }
 
@@ -589,7 +582,8 @@ func cleanUpes() error {
 		}
 		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
-			//TODO:
+			fmt.Println(err)
+			return err
 		}
 		writer.Title("successfully deleted files")
 	}
