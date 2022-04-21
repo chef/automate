@@ -144,15 +144,16 @@ variable "public_ips" {
   default = []
 }
 
-variable "setup_managed_services" {
-  default = false
-}
 variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
 }
 
 variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
+}
+
+variable "setup_managed_services" {
+  default = false
 }
 
 variable "ssh_key_file" {

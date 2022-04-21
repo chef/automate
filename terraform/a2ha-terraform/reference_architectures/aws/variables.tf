@@ -93,6 +93,10 @@ variable "chef_server_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
 
+variable "disable_api_termination" {
+  default = true
+}
+
 variable "elasticsearch_ebs_volume_iops" {
   default = 300
 }
@@ -192,7 +196,4 @@ variable "sudo_cmd" {
 
 variable "tag_name" {
   default = "A2"
-}
-variable "disable_api_termination" {
-  default = true
 }

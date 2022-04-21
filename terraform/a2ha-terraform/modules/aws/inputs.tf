@@ -84,6 +84,10 @@ variable "chef_server_instance_type" {
 variable "chef_server_lb_certificate_arn" {
 }
 
+variable "disable_api_termination" {
+  default = true
+}
+
 variable "elasticsearch_ebs_volume_iops" {
   default = 300
 }
@@ -183,8 +187,4 @@ variable "tags" {
 
 variable "tmp_path" {
   default = "/var/automate-ha"
-}
-
-variable "disable_api_termination" {
-  default = true
 }
