@@ -116,6 +116,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 
 		isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
+			fmt.Println("ReadPostChecklistById: failed")
 			return err
 		}
 
@@ -127,6 +128,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 					"Cleanup is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
 				)
 				if err != nil {
+					fmt.Println("promptCheckList : failed")
 					return err
 				} else {
 					isExecuted = false
@@ -578,11 +580,12 @@ func cleanUpes() error {
 	} else {
 		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		if err != nil {
+			fmt.Println(err.Error())
 			return err
 		}
 		err = ci.UpdatePostChecklistFile(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(err.Error())
 			return err
 		}
 		writer.Title("successfully deleted files")
