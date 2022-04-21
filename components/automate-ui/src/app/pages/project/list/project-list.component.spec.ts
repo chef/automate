@@ -17,6 +17,11 @@ import {
 } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectListComponent } from './project-list.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
@@ -94,7 +99,8 @@ describe('ProjectListComponent', () => {
       ],
       providers: [
         FeatureFlagsService,
-        ProjectService
+        ProjectService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ]
     }).compileComponents();
   }));
