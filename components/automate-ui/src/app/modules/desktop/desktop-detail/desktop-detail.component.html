@@ -18,20 +18,30 @@
     <div class="checkin-history-header">
       <h3>Check-in History</h3>
       <div class="heading-actions">
-        <chef-button secondary (click)="updateCheckInDays()">
-          <span>Last {{ (checkInNumDays === twoWeekNumDays ? 2 : 4) }} Weeks</span>
-          <chef-icon>expand_more</chef-icon>
-        </chef-button>
-        <chef-button secondary (click)="toggleDownloadDropdown()" class='download-dropdown-toggle'>
-          <span>Download</span>
-          <chef-icon>expand_more</chef-icon>
-        </chef-button>
-          <chef-dropdown class='download' [visible]="downloadDropdownVisible">
+        <div class="checkin-select">
+          <chef-button secondary (click)="toggleCheckInPeriodDropdown()" class='download-dropdown-toggle'>
+            <span>Last {{ (checkInNumDays === twoWeekNumDays ? 2 : 4) }} Weeks</span>
+            <chef-icon>expand_more</chef-icon>
+          </chef-button>
+            <chef-dropdown class='checkin-select-dropdown' [visible]="checkInPeriodDropdownVisible">
+              <chef-click-outside omit="download-dropdown-toggle" (clickOutside)="closeCheckInPeriodDropdown()">
+                <chef-button tertiary [ngClass]="{'selected': this.checkInNumDays === this.twoWeekNumDays}" (click)="updateCheckInDays(this.twoWeekNumDays)">Last 2 Weeks</chef-button>
+                <chef-button tertiary [ngClass]="{'selected': this.checkInNumDays === this.fourWeekNumDays}" (click)="updateCheckInDays(this.fourWeekNumDays)">Last 4 Weeks</chef-button>
+              </chef-click-outside>
+            </chef-dropdown>
+        </div>
+        <div class="download-select">
+          <chef-button secondary (click)="toggleDownloadDropdown()" class='download-dropdown-toggle'>
+            <span>Download</span>
+            <chef-icon>expand_more</chef-icon>
+          </chef-button>
+          <chef-dropdown class='download-select-dropdown' [visible]="downloadDropdownVisible">
             <chef-click-outside omit="download-dropdown-toggle" (clickOutside)="closeDownloadDropdown()">
               <chef-button tertiary (click)="onDownloadCheckInHistory('json')">JSON</chef-button>
               <chef-button tertiary (click)="onDownloadCheckInHistory('csv')">CSV</chef-button>
             </chef-click-outside>
           </chef-dropdown>
+        </div>
       </div>
     </div>
     <chef-table class="checkin-history-table grid">
