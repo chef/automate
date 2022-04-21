@@ -24,6 +24,11 @@ import {
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 const declarations: any[] = [
   MockComponent({ selector: 'app-user-table',
@@ -90,7 +95,8 @@ describe('TeamDetailsComponent', () => {
     TestBed.configureTestingModule({
       declarations,
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         ReactiveFormsModule,
