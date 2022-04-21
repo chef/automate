@@ -195,6 +195,7 @@ resource "aws_instance" "chef_automate_postgresql" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
+  disable_api_termination     = true
 
   connection {
     host        = coalesce(self.private_ip)
@@ -235,6 +236,14 @@ resource "aws_instance" "chef_automate_elasticsearch" {
   associate_public_ip_address = false //Changes to false as Dashboards are no longer enabled
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name
+
+  connection {
+    host        = coalesce(self.private_ip)
+    type        = "ssh"
+    user        = var.aws_ssh_user
+    private_key = file(var.aws_ssh_key_file)
+    script_path = "${var.tmp_path}/tf_inline_script_aws.sh"
+  }
 
   root_block_device {
     delete_on_termination = true
