@@ -21,6 +21,11 @@ import {
   WebhookIntegrationTypes
 } from '../data-feed-create/data-feed-create.component';
 import { of, throwError } from 'rxjs';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('DataFeedComponent', () => {
   let component: DataFeedComponent;
@@ -63,7 +68,8 @@ describe('DataFeedComponent', () => {
         FeatureFlagsService,
         DestinationRequests,
         HttpClient,
-        HttpHandler
+        HttpHandler,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         FormsModule,
