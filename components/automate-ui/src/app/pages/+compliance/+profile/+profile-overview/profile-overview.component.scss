@@ -6,8 +6,8 @@
 
 .profiles-search {
   display: flex;
-  flex-direction: row;
   margin: 18px 0 14px;
+  flex-direction: row;
   width: 100%;
 
   &.active {
@@ -33,28 +33,12 @@
     border-radius: 0px 4px 4px 0px;
     cursor: pointer;
     font-size: 16px;
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-
->>>>>>> add search button in profile page
-=======
-
->>>>>>> fix lint errors in css
     &:focus {
       outline: none;
       border: 1px solid $chef-primary-bright;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-
->>>>>>> add search button in profile page
-=======
-
->>>>>>> fix lint errors in css
     &[disabled] {
       cursor: auto;
     }
