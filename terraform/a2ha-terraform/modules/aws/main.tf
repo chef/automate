@@ -195,6 +195,7 @@ resource "aws_instance" "chef_automate_postgresql" {
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false
   ebs_optimized               = true
+  disable_api_termination     = true
 
   connection {
     host        = coalesce(self.private_ip)
