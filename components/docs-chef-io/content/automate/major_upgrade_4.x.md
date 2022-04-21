@@ -1,5 +1,5 @@
 +++
-title = "Upgrade to Chef Automate 4"
+title = "Upgrade to Chef Automate 4.x"
 date = 2022-03-03T12:02:46-08:00
 draft = false
 gh_repo = "automate"
@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 20
 +++
 
-Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically. However, Chef Automatate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to Chef Automate 4.
+Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically. However, Chef Automatate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to Chef Automate 4.x.
 
 ## Upgrade Journey
 
@@ -30,15 +30,10 @@ For example, if today you are on version 2021201164433, then your upgrade journe
 1. Manual upgrade to 3.0.x.
 1. Manual upgrade to 4.0.x
 
-If today you are on version 3.0.x, then your jouney should be:
-
-1. Manual upgrade to 3.0.x.
-1. Manual upgrade to 4.0.x
-
 ## Prerequisites
 
-- **Plan your downtime**: This upgrade requires downtime. Before upgrading, set the environment to handle the downtime.
-- **Backup Chef Automate database**: This Chef Automate version upgrades PostgreSQL. [Backup](/automate/backup/) your data before upgrading.
+- **Plan your downtime**: This upgrade requires downtime. Before upgrading, set the environment to handle the downtime. Run `sudo chef-automate maintenance on` to turn on maintenance mode.
+- **Backup Chef Automate database**: This Chef Automate version upgrades ElasticSearch. [Backup](/automate/backup/) your data before upgrading.
 - **Current Version should be 3.0.x** If you are not on this version, please do normal upgrade as per your topology.
 
 ## Upgrade to version 3.0.x
@@ -105,6 +100,12 @@ Sixty percent of your drive should be free space before starting a major version
 
 {{< /warning >}}
 
+{{< warning >}}
+
+Sharding needs to be disabled for automate running embedded elasticsearch. Please accept the checklist item asking permission to disable sharding.
+
+{{< /warning >}}
+
 ### Chef Automate With Embedded Elasticsearch
 
 To upgrade Chef Automate with embedded Elasticsearch, follow the steps given below:
@@ -129,37 +130,48 @@ Once the upgrade is complete, you will get a list of steps to perform post-upgra
     ```
     When the status is up-to-date, move ahead.
 
-2. Migrate your data from elasticsearch 6.8 to Opensearch 1.2.3:
+2. Turn off maintenance mode:
+
+    ```sh
+    sudo chef-automate maintenance off
+    ```
+
+3. Migrate your data from elasticsearch 6.8 to Opensearch 1.2.4:
 
     ```sh
     sudo chef-automate post-major-upgrade migrate --data=es
     ```
 
-3. Verify that all services are running:
+4. Verify that all services are running:
 
     ```sh
     sudo chef-automate status
     ```
 
-4. Verify that all the data is present in your upgraded Chef Automate. If yes, clear the old elasticsearch 6.8 data:
+5. Verify that all the data is present in your upgraded Chef Automate. If yes, clear the old elasticsearch 6.8 data:
 
     ```sh
     sudo chef-automate post-major-upgrade clear-data --data=es
     ```
 
-### Chef Automate With External PostgreSQL
+### Chef Automate With External Elasticsearch
 
-To upgrade Chef Automate with external PostgreSQL, follow the steps given below:
+To upgrade Chef Automate with external elasticsearch, follow the steps given below:
 
 **Upgrade Chef Automate from version 3.0.x to 4.0.x**
-1. Upgrade your external elasticsearch 6.8 to opensearch 1.2.3 manually. If you have configured *Host*, *Port*, *Username* or *Password* of Elasticsearch, patch the new configuration to use Chef Automate.
-3. Start major version upgrade:
+1. Upgrade your external elasticsearch 6.8 to opensearch 1.2.4 manually. If you have configured *Host*, *Port*, *Username* or *Password* of Elasticsearch, patch the new configuration to use Chef Automate.
+2. Start major version upgrade:
     ```sh
     sudo chef-automate upgrade run --major
     ```
-4. Check upgrade status is up-to-date
+3. Check upgrade status is up-to-date
     ```sh
     sudo chef-automate status
+    ```
+4. Turn off maintenance mode:
+
+    ```sh
+    sudo chef-automate maintenance off
     ```
 
 ### Chef Automate in Air-Gapped Environment With Embedded Elasticsearch
@@ -201,19 +213,25 @@ To upgrade to 4.0.x, follow the steps below:
     ```
     When the status is up-to-date, move ahead.
 
-2. Migrate your data from Elasticsearch 6.8 to Opensearch 1.2.3:
+2. Turn off maintenance mode:
+
+    ```sh
+    sudo chef-automate maintenance off
+    ```
+
+3. Migrate your data from Elasticsearch 6.8 to Opensearch 1.2.4:
 
     ```sh
     sudo chef-automate post-major-upgrade migrate --data=es
     ```
 
-3. Verify that all services are running:
+4. Verify that all services are running:
 
     ```sh
     sudo chef-automate status
     ```
 
-4. Verify that all the data is present in your upgraded Chef Automate. If yes, clear the old elasticsearch 6.8 data:
+5. Verify that all the data is present in your upgraded Chef Automate. If yes, clear the old elasticsearch 6.8 data:
 
     ```sh
     sudo chef-automate post-major-upgrade clear-data --data=es
@@ -243,7 +261,7 @@ To upgrade to 4.0.x, follow the steps below:
     ```sh
     sudo ./chef-automate config show
     ```
-2. Upgrade your external Elasticsearch 6.8 to Opensearch 1.2.3 manually. If you have configured *Host*, *Port*, *Username* or *Password* of Elasticsearch, patch the new configuration to use Chef Automate.
+2. Upgrade your external Elasticsearch 6.8 to Opensearch 1.2.4 manually. If you have configured *Host*, *Port*, *Username* or *Password* of Elasticsearch, patch the new configuration to use Chef Automate.
 3. Upgrade using new AIB and Chef Automate CLI:
 
     ```sh
@@ -254,9 +272,15 @@ To upgrade to 4.0.x, follow the steps below:
     sudo chef-automate status
     ```
 
+5. Turn off maintenance mode:
+
+    ```sh
+    sudo chef-automate maintenance off
+    ```
+
 ## Troubleshooting
 
-If Chef Automate fails to migrate your data to Opensearch 1.2.3 when running `chef-automate post-major-upgrade migrate --data=es`, restore the data:
+If Chef Automate fails to migrate your data to Opensearch 1.2.4 when running `chef-automate post-major-upgrade migrate --data=es`, restore the data:
 ```sh
 sudo chef-automate backup restore </path/to/backups/>BACKUP_ID
 ```
