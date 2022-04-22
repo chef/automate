@@ -21,7 +21,7 @@ This section lists the steps to connect the existing Chef Infra Server organizat
 
 ## Knife EC Backup
 
-*knife-ec-backup* is the command to take backup of Chef Infra Server/Backend during Chef Infra Server Migration. *knife-ec-backup* can backup and restore the data in a Chef Infra Server installation and preserves the data in an intermediate and editable text mode. It is similar to the `knife download` and `knife upload` commands and uses the same underlying libraries, but also includes workarounds for objects not yet supported by those tools and various Infra Server API deficiencies.
+*knife-ec-backup* is the command to take backup of Chef Infra Server/Backend during Chef Infra Server Migration. *knife-ec-backup* can backup and restore the data in a Chef Infra Server installation and preserves the data in an intermediate and editable text mode. It is similar to the `knife download` and `knife upload` commands. It uses the same underlying libraries and includes workarounds for objects not yet supported by those tools and various Infra Server API deficiencies.
 
 ### Prerequisites
 
@@ -31,7 +31,7 @@ This section lists the steps to connect the existing Chef Infra Server organizat
 
 #### Chef Infra Server (Recommended)
 
-This gem is installed with Chef Infra Server 12 and later and the sub-commands are available with embedded copy of `knife`. Refer to the command shown below:
+Install this gem with Chef Infra Server 12 and later, and the sub-commands are available with an embedded copy of `knife`. Refer to the command shown below:
 
 ```cmd
 sudo /opt/opscode/bin/knife ec backup ~/chef-server-backup-directory
@@ -45,7 +45,7 @@ If you need a newer version of `knife-ec-backup` you can install it using the em
 
 #### Chef WorkStation Install (Unsupported)
 
-On systems other than the Chef Infra Server, installation of the `gem` is not tested or supported. However, if you attempt to do so you will need the PostgreSQL libraries installed.
+On systems other than the Chef Infra Server, installing the `gem` is not tested or supported. However, if you attempt to do so, you will need the PostgreSQL libraries installed.
 
 For example, on macOS:
 
@@ -54,11 +54,11 @@ brew install libpq
 gem install knife-ec-backup -- --with-pg-config=/usr/local/Cellar/libpq/9.2/bin/pg_config
 ```
 
-The current location of `pg_config` can be determined with brew info `libpq`.
+You can determine the current location of `pg_config` with brew info `libpq`.
 
 ### Run the `knife-ec-backup` Command
 
-Run the `knife-ec-backup` command when you are logged in to your Chef Server machine.
+Run the `knife-ec-backup` command when logged in to your Chef Server machine.
 
 For example: `/opt/opscode/bin/knife ec backup --server-url https://ec2-18-xxx-112-xxx.us-east-2.compute.amazonaws.com ./backup/ --with-user-sql --with-key-sql -c /etc/opscode/pivotal.rb`.
 
@@ -93,13 +93,13 @@ You can zip and download the *knife-ec-backup* command to local by running the f
 zip -r directory.zip directory
 ```
 
-{{< note >}} The above command is one of the option to zip the *knife-ec-backup* command. You can also run the command using any other option. {{< /note >}}
+{{< note >}} The above command is one of the options to zip the *knife-ec-backup* command. You can also run the command using any other option. {{< /note >}}
 
 ## Chef Server Organization and User Sync
 
-When you add a server to Automate, the **organization** and **user** are not associated to the Automate as Automate never lists any **user** or **organization** to the server.
+When you add a server to Automate, the **organization** and **user** are not associated with the Automate as Automate never lists any **user** or **organization** to the server.
 
-The image below refer to the details page of a Chef Server:
+The image below refers to the details page of a Chef Server:
 
 {{< figure src="/images/automate/chef_server_details_page.png" alt="Chef Server Details Page">}}
 
@@ -109,7 +109,7 @@ The image below refer to the details page of a Chef Server:
 
 To migrate the existing organizations and users to the Chef Automate Infrastructure:
 
-- Select **Sync Org and Users** button inside Chef Server detail box.
+- Select the **Sync Org and Users** button inside the Chef Server detail box.
 
 - A slider opens with an option to upload a file.
 
@@ -121,11 +121,11 @@ To migrate the existing organizations and users to the Chef Automate Infrastruct
 
 ## Start Sync
 
-Once you have uploaded the file, the sync process starts. You can view the progress of the sync on the Server details section in the **Server Section** details page.
+Once you have uploaded the file, the sync process starts. You can view the sync progress the Server details section on the **Server Section** details page.
 
 {{< figure src="/images/automate/migration_is_in_progress_page.png" alt="Chef Server Details Page">}}
 
-Once the parsing of the `.zip` file content is completed, a preview link is shown beside the progress label terming **Sync in Progress**.  
+Once the parsing of the `.zip` file content is done, a preview link is shown beside the progress label terming **Sync in Progress**.  
 
 {{< figure src="/images/automate/sync_in_progress.png" alt="Sync In Progress">}}
 
@@ -135,7 +135,7 @@ Select the **Click to Preview** link to view the screen.
 
 ## Cancel Sync
 
-To cancel the sync, select **Cancel** button. The cancellation will not modify anything in the system.
+To cancel the sync, select the **Cancel** button. The cancellation will not modify anything in the system.
 
 {{< figure src="/images/automate/cancel_migration_button.png" alt="Cancel Migration Button">}}
 
@@ -143,26 +143,26 @@ To cancel the sync, select **Cancel** button. The cancellation will not modify a
 
 The preview screen gives the information related to organizations where you can view:
 
-- The number of total organizations to be updated.
-- The number of organizations already available with Automate and need no modification or is skipped.
+- The number of entire organizations to be updated.
+- The number of organizations already available with Automate needs no modification or is skipped.
 - The number of organizations to be deleted.
 
-You can also view the list of users to be added to Automate on preview screen. Refer to the **Link to User Permission** to learn about User Permission Sync.
+You can also view the list of users to be added to Automate on the preview screen. Refer to the **Link to User Permission** to learn about User Permission Sync.
 
 {{< figure src="/images/automate/preview_screen.png" alt="Preview Screen">}}
 
 The preview screen helps in letting you know which are available in Automate system associated with different Chef Server. Automate does not take any decisive action but gives a provision to the admin to provide a new **username**.
-These users are highlighted and a text box is enabled to add the corresponding new **username**.
+These users are highlighted, and a text box is enabled to add the corresponding new **username**.
 
 ## Confirming Sync
 
-The sync will continue if you select the **Confirm** button. The Automate will show the **Compete** status when are sync is completed.
+The sync will continue if you select the **Confirm** button. The Automate will show the **Compete** status when sync is completed.
 
 {{< figure src="/images/automate/cancel_migration_button.png" alt="Confirm Sync Button">}}
 
 ## Failed Sync
 
-The sync might fail and show the **Failed** status under metadata. You can get to know about the reason of failure bu hovering the **Error** icon.
+The sync might fail and show the **Failed** status under metadata. You can learn about the reason for failure by hovering over the **Error** icon.
 
 {{< figure src="/images/automate/chef-infra-server-migration-failed-metadata.png" alt="Failed Metadata">}}
 
@@ -171,7 +171,7 @@ The sync might fail and show the **Failed** status under metadata. You can get t
 - All the organizations are synced to Automate and linked to Chef Infra Server.
 - Every organization has an **IAM** project associated.
 - All the users from the Chef Server are synced.
-- The users are added to the Chef Server and associated with the organixation and the corresponding **IAM** projects.
+- The users are added to the Chef Server and associated with the organization and the corresponding **IAM** projects.
 - The users are added to the **IAM** policies of the IAM projects based on the permission user holds in Chef Server. Refer to the **Link to User Permission** to learn more about User Permission Sync.
 
 ## User Permission Sync
