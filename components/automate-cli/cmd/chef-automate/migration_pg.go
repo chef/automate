@@ -59,9 +59,7 @@ const (
 	MIGRATE_ES_ID               = "migrate_es"
 	NEW_PG_VERSION              = "13.5"
 	ELASTICSEARCH_DATA_DIR      = "/hab/svc/automate-elasticsearch/data"
-	OPENSEARCH_DATA_DIR         = "/hab/svc/automate-opensearch/data"
 	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"
-	OPENSEARCH_VAR_DIR          = "/hab/svc/automate-opensearch/var"
 	OPENSEARCH_DIR              = "/hab/svc/automate-opensearch"
 	ELASTICSEARCH_DIR           = "/hab/svc/automate-elasticsearch"
 )
@@ -318,7 +316,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 					}
 				}
 			} else {
-				writer.Title("Insufficent Space for ES data Migration ")
+				writer.Title("Insufficient Space for ES data Migration ")
 			} // isAvailableSpace
 		}
 		// end for the es migration
