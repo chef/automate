@@ -7,8 +7,7 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
 	github.com/lib/pq v1.8.0
-	github.com/olivere/elastic v6.2.35+incompatible // indirect
-	github.com/olivere/elastic/v7 v7.0.32
+	github.com/olivere/elastic/v7 v7.0.28
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.7.0
