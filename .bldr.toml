@@ -821,7 +821,6 @@ paths = [
   "lib/httputils/*",
   "lib/io/*",
   "lib/logger/*",
-  "api/interservice/infra_proxy/*",
   "lib/oidc/*",
   "lib/platform/config/*",
   "lib/proxy/*",
@@ -830,7 +829,8 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*"
+  "lib/version/*",
+  "api/interservice/infra_proxy/*"
 ]
 
 [teams-service]
