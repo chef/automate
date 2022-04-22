@@ -193,7 +193,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 
 		} else {
 			return errors.New(
-				"pg migration will only support 9.6 pg version for now, your es version is: " + oldPgVersion,
+				"pg migration will only support 9.6 pg version for now, your pg version is: " + oldPgVersion,
 			)
 		}
 	} else {
@@ -272,20 +272,20 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		if err != nil {
-			writer.Error("Error while calDiskSizeAndDirSize:" + err.Error())
+			writer.Error("Error while calDiskSizeAndDirSize : " + err.Error())
 			return err
 		}
 
 		if isAvailableSpace {
 			ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 			if err != nil {
-				writer.Error("NewPostChecklistManager Failed")
+				writer.Error("NewPostChecklistManager Failed : " + err.Error())
 				return err
 			}
 
 			isExecuted, err := ci.ReadPostChecklistById(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
 			if err != nil {
-				writer.Error("ReadPostChecklistById Failed")
+				writer.Error("ReadPostChecklistById Failed : " + err.Error())
 				return err
 			}
 
@@ -313,7 +313,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 					}
 					err = esMigrateExecutor()
 					if err != nil {
-						writer.Error(err.Error())
+						writer.Error("esMigrateExecutor : " + err.Error())
 						return err
 					}
 				}
@@ -406,7 +406,7 @@ func esMigrateExecutor() error {
 	preRequiste, err := preRequisteForESDataMigration()
 	if !preRequiste {
 		// NO DIR PRESENT
-		writer.Warn("Pre Requiste For ES DataMigration failed" + err.Error())
+		writer.Warn("Pre Requiste For ES DataMigration failed : " + err.Error())
 		return nil
 	}
 
@@ -450,12 +450,12 @@ func executeMigrate(check bool) error {
 	if !check {
 		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		if err != nil {
-			writer.Fail(err.Error())
+			writer.Fail("NewPostChecklistManager : " + err.Error())
 			return err
 		}
 		err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
-			writer.Fail(err.Error())
+			writer.Fail("UpdatePostChecklistFile : " + err.Error())
 		}
 	}
 	return nil
