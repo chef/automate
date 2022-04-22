@@ -271,14 +271,13 @@ describe('chef server details', () => {
     it('sync in progress visible', () => {
       const element = '[data-cy=lastStatus]';
       cy.get('body').then((body) => {
-        
         if (body.find(element).length > 0) {
           isStarted = false;
             console.log('into', isStarted);
 
         }
       });
-    })
+    });
 
     it('preview button is not available if migration is not in create preview mode', () => {
       if (isStarted === true) {
@@ -302,7 +301,7 @@ describe('chef server details', () => {
             cy.get('app-notification.info').contains('Confirm preview successful.');
             cy.get('app-notification.info chef-icon').click({ multiple: true });
         });
-      } 
+      }
     });
   });
 });
