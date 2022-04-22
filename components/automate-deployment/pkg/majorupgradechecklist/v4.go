@@ -60,7 +60,7 @@ var postChecklistV4Embedded = []PostCheckListItem{
 		Optional:   true,
 		IsExecuted: false,
 	}, {
-		Id:         "migrate_os",
+		Id:         "migrate_es",
 		Msg:        run_os_data_migrate,
 		Cmd:        run_os_data_migrate_cmd,
 		IsExecuted: false,
