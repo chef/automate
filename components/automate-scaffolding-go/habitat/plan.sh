@@ -10,7 +10,7 @@ pkg_version="0.1.0"
 pkg_license=('Chef-MLSA')
 pkg_source=nosuchfile.tar.gz
 pkg_deps=(
-  core/go/1.17 # This is only pinned to force a scaffolding rebuild to this version
+  core/go/1.15 # This is only pinned to force a scaffolding rebuild to this version
   core/git/2.26.2
 )
 
