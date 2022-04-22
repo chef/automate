@@ -2,7 +2,7 @@ include ../../Makefile.common_go
 .PHONY: docs run proto unit vendor_swagger
 
 BIN=automate-gateway
-LINTERARGS:=--skip-files .*\.pb\.swagger\.go
+LINTERARGS:=--skip-files '.*\.pb\.go'
 SWAGGER_UI_VERSION := 3.35.2
 SWAGGER_UI_URL := https://github.com/swagger-api/swagger-ui/archive/v$(SWAGGER_UI_VERSION).tar.gz
 
