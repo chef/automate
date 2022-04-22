@@ -110,13 +110,13 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 	if strings.ToLower(ClearDataCmdFlags.data) == "es" {
 		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		if err != nil {
-			writer.Title(" major upgrade checklist failed")
+			writer.Error("NewPostChecklistManager Failed")
 			return err
 		}
 
 		isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
-			fmt.Println("ReadPostChecklistById: failed")
+			writer.Error("ReadPostChecklistById Failed")
 			return err
 		}
 
@@ -128,7 +128,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 					"Cleanup is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
 				)
 				if err != nil {
-					fmt.Println("promptCheckList : failed")
+					writer.Error("promptCheckList Failed")
 					return err
 				} else {
 					isExecuted = false
@@ -140,7 +140,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 			writer.Title("Deleting file created by es_upgrade")
 			err := cleanUpes()
 			if err != nil {
-				fmt.Println(err)
+				writer.Error(err.Error())
 				return err
 			}
 		}
@@ -156,10 +156,6 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 					"Cleanup \n" +
 					"----------------------------------------------",
 			)
-
-			if ClearDataCmdFlags.data == "" {
-				return errors.New("data flag is required")
-			}
 
 			ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
 
@@ -272,19 +268,20 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
 		isAvailableSpace, err := calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
 		if err != nil {
-			writer.Title("Error while calDiskSizeAndDirSize:" + err.Error())
+			writer.Error("Error while calDiskSizeAndDirSize:" + err.Error())
 			return err
 		}
 
 		if isAvailableSpace {
 			ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 			if err != nil {
-				writer.Title("error with major upgrade checklist")
+				writer.Error("NewPostChecklistManager Failed")
 				return err
 			}
 
 			isExecuted, err := ci.ReadPostChecklistById(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
 			if err != nil {
+				writer.Error("ReadPostChecklistById Failed")
 				return err
 			}
 
@@ -312,7 +309,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 					}
 					err = esMigrateExecutor()
 					if err != nil {
-						writer.Title(err.Error())
+						writer.Error(err.Error())
 						return err
 					}
 				}
@@ -405,7 +402,7 @@ func esMigrateExecutor() error {
 	preRequiste, err := preRequisteForESDataMigration()
 	if !preRequiste {
 		// NO DIR PRESENT
-		writer.Title("Pre Requiste For ES DataMigration failed" + err.Error())
+		writer.Warn("Pre Requiste For ES DataMigration failed" + err.Error())
 		return nil
 	}
 
@@ -439,22 +436,23 @@ func executeMigrate(check bool) error {
 		}
 	}()
 
+	command := exec.Command("/bin/sh", "-c", script)
+	err := command.Run()
+	if err != nil {
+		writer.Fail(err.Error())
+		return err
+	}
+
 	if !check {
 		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		if err != nil {
+			writer.Fail(err.Error())
 			return err
 		}
 		err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
 		if err != nil {
 			writer.Fail(err.Error())
 		}
-	}
-
-	command := exec.Command("/bin/sh", "-c", script)
-	err := command.Run()
-	if err != nil {
-		fmt.Println(err)
-		return err
 	}
 	return nil
 }
