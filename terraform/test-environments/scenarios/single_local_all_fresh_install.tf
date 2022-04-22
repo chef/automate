@@ -36,7 +36,7 @@ module "single_local_all_fresh_install" {
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
     X-LongRunning      = "true"
-    X-Sleep = "off=(M-F,23);on=(M-F,7);tz=Asia/Kolkata"
+    X-Sleep = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
   }
 }
 

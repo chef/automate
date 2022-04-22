@@ -28,7 +28,7 @@ module "inspec_target_rhel7" {
 
   additional_tags = {
     X-LongRunning      = "true"
-    X-Sleep = "off=(M-F,23);on=(M-F,7);tz=Asia/Kolkata"
+    X-Sleep = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
   }
 }
 

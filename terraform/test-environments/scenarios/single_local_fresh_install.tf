@@ -36,7 +36,7 @@ module "single_local_fresh_install" {
     X-Channel          = "${var.channel}"
     X-CI-Test          = "e2e"
     X-LongRunning      = "true"
-    X-Sleep = "off=(M-F,23);on=(M-F,7);tz=Asia/Kolkata"
+    X-Sleep = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
   }
 }
 
