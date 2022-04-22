@@ -110,7 +110,6 @@ sudo_password = ""
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
-chef_lb_fqdn = ""
 
 [automate.config]
 # admin_password = ""
@@ -122,6 +121,7 @@ config_file = "configs/automate.toml"
 
 [chef_server.config]
 instance_count = "1"
+chef_lb_fqdn = ""
 
 [elasticsearch.config]
 instance_count = "3"

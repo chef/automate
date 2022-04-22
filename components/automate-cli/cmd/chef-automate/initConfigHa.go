@@ -132,7 +132,6 @@ type ExistingInfraConfigToml struct {
 			ExistingElkUsername         string `toml:"existing_elk_username"`
 			ExistingElkPassword         string `toml:"existing_elk_password"`
 			BackupMount                 string `toml:"backup_mount"`
-			ChefLbfqdn                  string `toml:"chef_lb_fqdn"`
 			HabitatUIDGid               string `toml:"habitat_uid_gid"`
 		} `toml:"existing_infra"`
 	} `toml:"architecture"`
@@ -148,6 +147,7 @@ type ExistingInfraConfigToml struct {
 	ChefServer struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
+			ChefLbfqdn    string `toml:"chef_lb_fqdn"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
 	Elasticsearch struct {
