@@ -59,7 +59,7 @@ module "system-tuning-postgresql" {
 module "airgap_bundle-elasticsearch" {
   source            = "./modules/airgap_bundle"
   count             = var.setup_managed_services ? 0 : 1
-  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-elasticsearch.archive_disk_info
+  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-elasticsearch[0].archive_disk_info
   instance_count    = var.elasticsearch_instance_count
   private_ips       = var.elasticsearch_private_ips
   bundle_files = [{
@@ -74,7 +74,7 @@ module "airgap_bundle-elasticsearch" {
 module "airgap_bundle-postgresql" {
   count             = var.setup_managed_services ? 0 : 1
   source            = "./modules/airgap_bundle"
-  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-postgresql.archive_disk_info
+  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-postgresql[0].archive_disk_info
   instance_count    = var.postgresql_instance_count
   private_ips       = var.postgresql_private_ips
   bundle_files = [{
@@ -123,7 +123,7 @@ module "airgap_bundle-chef_server" {
 module "habitat-elasticsearch" {
   source                          = "./modules/habitat"
   count                           = var.setup_managed_services ? 0 : 1
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-elasticsearch.airgap_info
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-elasticsearch[0].airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key
@@ -149,7 +149,7 @@ module "habitat-elasticsearch" {
 module "habitat-postgresql" {
   count                           = var.setup_managed_services ? 0 : 1
   source                          = "./modules/habitat"
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql.airgap_info
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql[0].airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key
@@ -219,7 +219,7 @@ module "habitat-chef_server" {
 module "elasticsearch" {
   source                       = "./modules/elasticsearch"
   count                        = var.setup_managed_services ? 0 : 1
-  airgap_info                  = var.setup_managed_services ? "" : module.airgap_bundle-elasticsearch.airgap_info
+  airgap_info                  = var.setup_managed_services ? "" : module.airgap_bundle-elasticsearch[0].airgap_info
   backend_aib_dest_file        = var.backend_aib_dest_file
   backend_aib_local_file       = var.backend_aib_local_file
   curator_pkg_ident            = var.curator_pkg_ident
@@ -229,7 +229,7 @@ module "elasticsearch" {
   elasticsearch_svc_load_args  = var.elasticsearch_svc_load_args
   elasticsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
   elasticsidecar_svc_load_args = var.elasticsidecar_svc_load_args
-  habitat_info                 = var.setup_managed_services ? "" : module.habitat-elasticsearch.habitat_info
+  habitat_info                 = var.setup_managed_services ? "" : module.habitat-elasticsearch[0].habitat_info
   journalbeat_pkg_ident        = var.journalbeat_pkg_ident
   kibana_pkg_ident             = var.kibana_pkg_ident
   metricbeat_pkg_ident         = var.metricbeat_pkg_ident
@@ -244,12 +244,12 @@ module "elasticsearch" {
 module "postgresql" {
   count                           = var.setup_managed_services ? 0 : 1
   source                          = "./modules/postgresql"
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql.airgap_info
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql[0].airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   elasticsearch_listen_port       = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.elasticsearch_private_ips
-  habitat_info                    = var.setup_managed_services ? "" : module.habitat-postgresql.habitat_info
+  habitat_info                    = var.setup_managed_services ? "" : module.habitat-postgresql[0].habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
