@@ -26,6 +26,10 @@ const (
 
 	backupError = "Please take a backup and restart the upgrade process."
 
+	diskSpaceError = `Please ensure to have 60% free disk space`
+
+	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
+
 	run_chef_automate_upgrade_status_cmd = `chef-automate upgrade status`
 	run_chef_automate_upgrade_status     = `Check the status of your upgrade using:  
      $ ` + run_chef_automate_upgrade_status_cmd + `
@@ -240,7 +244,7 @@ func backupCheck() Checklist {
 			}
 			if !resp {
 				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+				return status.New(status.InvalidCommandArgsError, backupError)
 			}
 			return nil
 		},
@@ -258,8 +262,8 @@ func diskSpaceCheck() Checklist {
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+				h.Writer.Error(diskSpaceError)
+				return status.New(status.InvalidCommandArgsError, diskSpaceError)
 			}
 			return nil
 		},
@@ -277,8 +281,8 @@ func postChecklistIntimationCheck() Checklist {
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+				h.Writer.Error(postChecklistIntimationError)
+				return status.New(status.InvalidCommandArgsError, postChecklistIntimationError)
 			}
 			return nil
 		},
