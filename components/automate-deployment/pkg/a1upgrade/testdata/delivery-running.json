@@ -94,7 +94,7 @@
           "127.0.0.1"
         ]
       },
-      "telemetry_api": "https://telemetry.chef.io",
+      "telemetry_api": "https://telemetry.chef.co",
       "telemetry": {
         "open_timeout": 5,
         "read_timeout": 5,
