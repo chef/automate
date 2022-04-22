@@ -11,10 +11,6 @@ module "cd_infrastructure" {
 provider "aws" {
   region  = "${module.cd_infrastructure.aws_region}"
   profile = "${module.cd_infrastructure.aws_profile}"
-
-  ignore_tags {
-    keys = ["CreatedBy", "X-CreatedBy", "CreatorPrincipalId"]
-  }
 }
 
 #

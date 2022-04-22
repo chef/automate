@@ -35,6 +35,8 @@ module "performance_test_single_local_inplace_upgrade" {
     X-Channel          = "${var.channel}"
     X-SAML             = "saml"
     X-CI-Test          = "e2e"
+    X-LongRunning      = "true"
+    X-Sleep = "off=(M-F,23);on=(M-F,7);tz=Asia/Kolkata"
   }
 }
 
