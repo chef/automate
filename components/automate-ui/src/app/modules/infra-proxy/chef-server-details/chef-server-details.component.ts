@@ -456,6 +456,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.authFailure = true;
         this.isUserListLoaded = false;
       }
+      this.orgsListLoading = false;
     });
   }
 
