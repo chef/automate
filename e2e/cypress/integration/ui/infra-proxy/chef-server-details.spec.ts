@@ -253,7 +253,7 @@ describe('chef server details', () => {
 
   function checkResponse(response: any) {
     if (response.body.staged_data) {
-      console.log("-----------checkResponse----------",response.body);
+      console.log('-----------checkResponse----------', response.body);
 
     }
   }
@@ -266,7 +266,7 @@ describe('chef server details', () => {
         data.migration_type = data.migrationStatus.migration_type;
         const migration_status = data.migrationStatus.migration_status;
       });
-    })
+    });
 
     it('sync in progress visible', () => {
       const element = '[data-cy=lastStatus]';
@@ -274,23 +274,24 @@ describe('chef server details', () => {
         
         if (body.find(element).length > 0) {
           isStarted = false;
-            console.log('into', isStarted)
+            console.log('into', isStarted);
+
         }
       });
     })
 
     it('preview button is not available if migration is not in create preview mode', () => {
-      if(isStarted === true) {
+      if (isStarted === true) {
         cy.get('[data-cy=sync-button]').contains('Sync In Progress');
         cy.get('[data-cy=show-preview]').contains('Click to Preview').should('not.exist');
       }
     });
 
     it('check preview is available', () => {
-      if(isStarted === true) {
+      if (isStarted === true) {
         cy.get('[data-cy=lastStatus]').then(() => {
             cy.get('[data-cy=show-preview]').contains('Click to Preview').click();
-            getPreviewData('',).then((response) => {
+            getPreviewData('').then((response) => {
               checkResponse(response);
             });
             cy.get('app-chef-server-details .sidenav-header').should('exist');
@@ -302,6 +303,6 @@ describe('chef server details', () => {
             cy.get('app-notification.info chef-icon').click({ multiple: true });
         });
       } 
-    })
+    });
   });
 });
