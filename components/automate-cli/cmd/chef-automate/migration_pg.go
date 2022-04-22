@@ -208,10 +208,6 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 	if migrateDataCmdFlags.data == "" {
 		return errors.New("data flag is required")
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "pg" {
-		_, err := calDiskSizeAndDirSize(PG_DATA_DIR, OLD_PG_DATA_DIR)
-		if err != nil {
-			return err
-		}
 		ci, err := majorupgradechecklist.NewPostChecklistManager(AUTOMATE_VERSION)
 		if err != nil {
 			return err
@@ -266,7 +262,15 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
-		isAvailableSpace, err := calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
+		var isAvailableSpace bool
+		var err error
+		if migrateDataCmdFlags.skipStorageCheck {
+			isAvailableSpace = true
+			err = nil
+		} else {
+			isAvailableSpace, err = calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
+		}
+
 		if err != nil {
 			writer.Error("Error while calDiskSizeAndDirSize:" + err.Error())
 			return err
