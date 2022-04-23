@@ -25,6 +25,11 @@ module "inspec_target_rhel7" {
   tag_dept        = "CoreEng"
   tag_contact     = "${var.aws_tag_contact}"
   tag_application = "a2"
+
+  additional_tags = {
+    X-LongRunning = "true"
+    X-Sleep       = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
+  }
 }
 
 module "inspec_target_rhel7_cd_base" {
