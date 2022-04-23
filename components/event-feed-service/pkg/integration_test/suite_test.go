@@ -53,6 +53,23 @@ func NewSuite(url string) (*Suite, error) {
 
 	s.elasticsearchUrl = url
 
+	/* cert, err := tls.LoadX509KeyPair("/hab/svc/automate-opensearch/config/root-ca.pem", "/hab/svc/automate-opensearch/config/root-ca-key.pem")
+	if err != nil {
+		return nil, err
+	}
+	caCert, err := ioutil.ReadFile("/hab/svc/automate-opensearch/config/root-ca.pem")
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+	tlsConfig := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		RootCAs:            caCertPool,
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
+	}
+	tlsConfig.BuildNameToCertificate() */
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			MinVersion:         tls.VersionTLS12,
@@ -65,6 +82,7 @@ func NewSuite(url string) (*Suite, error) {
 		olivere.SetURL(s.elasticsearchUrl),
 		olivere.SetSniff(false),
 		olivere.SetHttpClient(client),
+		olivere.SetBasicAuth("admin", "admin"),
 	)
 	if err != nil {
 		return nil, errors.Wrapf(err, "connecting to opensearch (%s)", url)
