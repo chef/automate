@@ -2,7 +2,9 @@ package integration_test
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 
 	olivere "github.com/olivere/elastic/v7"
@@ -51,9 +53,18 @@ func NewSuite(url string) (*Suite, error) {
 
 	s.elasticsearchUrl = url
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
+
 	esClient, err := olivere.NewClient(
 		olivere.SetURL(s.elasticsearchUrl),
 		olivere.SetSniff(false),
+		olivere.SetHttpClient(client),
 	)
 	if err != nil {
 		return nil, errors.Wrapf(err, "connecting to opensearch (%s)", url)
