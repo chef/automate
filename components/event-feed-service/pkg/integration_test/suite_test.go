@@ -56,7 +56,7 @@ func NewSuite(url string) (*Suite, error) {
 		olivere.SetSniff(false),
 	)
 	if err != nil {
-		return nil, errors.Wrapf(err, "connecting to elasticsearch (%s)", url)
+		return nil, errors.Wrapf(err, "connecting to opensearch (%s)", url)
 	}
 	s.esClient = esClient
 	s.indices = []string{persistence.IndexNameFeeds}

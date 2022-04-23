@@ -77,7 +77,7 @@ func NewSuite() *Suite {
 func (s *Suite) GlobalSetup() error {
 	// set global elasticsearchUrl
 	var haveURL bool
-	elasticsearchUrl, haveURL = os.LookupEnv("ELASTICSEARCH_URL")
+	elasticsearchUrl, haveURL = os.LookupEnv("OPENSEARCH_URL")
 	if !haveURL {
 		return errors.New("The environment variable ELASTICSEARCH_URL must be set for integration tests to run")
 	}

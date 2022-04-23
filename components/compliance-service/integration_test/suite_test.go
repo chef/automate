@@ -52,11 +52,11 @@ func NewGlobalSuite() *Suite {
 
 	// Create a new elastic Client
 	esclient, err := elastic.NewClient(
-		elastic.SetURL(elasticsearchUrl),
+		elastic.SetURL(opensearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", opensearchUrl, err)
 		os.Exit(1)
 	}
 
@@ -85,11 +85,11 @@ func NewLocalSuite(t *testing.T) *Suite {
 
 	// Create a new elastic Client
 	esclient, err := elastic.NewClient(
-		elastic.SetURL(elasticsearchUrl),
+		elastic.SetURL(opensearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", opensearchUrl, err)
 		os.Exit(1)
 	}
 

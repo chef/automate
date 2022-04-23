@@ -297,18 +297,18 @@ func (s *Suite) Indices() []string {
 func createServices(s *Suite) error {
 	// Create a new elastic Client
 	esClient, err := elastic.NewClient(
-		elastic.SetURL(elasticsearchUrl),
+		elastic.SetURL(opensearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		return errors.Wrapf(err, "Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		return errors.Wrapf(err, "Could not create elasticsearch client from %q: %s\n", opensearchUrl, err)
 	}
 
 	s.client = esClient
-	s.cfgmgmt = cfgElastic.New(elasticsearchUrl)
-	iClient, err := iElastic.New(elasticsearchUrl)
+	s.cfgmgmt = cfgElastic.New(opensearchUrl)
+	iClient, err := iElastic.New(opensearchUrl)
 	if err != nil {
-		return errors.Wrapf(err, "Could not create ingest backend client from %q: %s\n", elasticsearchUrl, err)
+		return errors.Wrapf(err, "Could not create ingest backend client from %q: %s\n", opensearchUrl, err)
 	}
 
 	s.ingest = iClient

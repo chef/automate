@@ -24,7 +24,6 @@ var (
 	// for integration testing with feed service
 	esClient *olivere.Client
 	indices  = []string{persistence.IndexNameFeeds}
-	types    = []string{persistence.DocType}
 
 	suite = NewSuite()
 )
