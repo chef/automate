@@ -1,5 +1,5 @@
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/polyfills.ts
+SF:/github/workspace/components/automate-ui/src/polyfills.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -18,7 +18,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/test.ts
+SF:/github/workspace/components/automate-ui/src/test.ts
 FN:27,(anonymous_0)
 FNF:1
 FNH:1
@@ -49,7 +49,7 @@ BRF:4
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/ngrx.reducers.ts
+SF:/github/workspace/components/automate-ui/src/app/ngrx.reducers.ts
 FN:73,(anonymous_0)
 FN:103,routerReducer
 FN:254,(anonymous_2)
@@ -173,7 +173,7 @@ BRF:17
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/route.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/route.selectors.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -198,7 +198,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/staticConfig.ts
+SF:/github/workspace/components/automate-ui/src/app/staticConfig.ts
 FN:5,isProductDeployed
 FNF:1
 FNH:1
@@ -218,7 +218,7 @@ BRF:4
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/chef-components.module.ts
+SF:/github/workspace/components/automate-ui/src/app/components/chef-components.module.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -280,7 +280,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/authorized/authorized.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/authorized/authorized.component.ts
 FN:13,(anonymous_0)
 FN:24,(anonymous_1)
 FN:27,(anonymous_2)
@@ -370,7 +370,7 @@ BRF:12
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/breadcrumb/breadcrumb.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/breadcrumb/breadcrumb.component.ts
 FN:7,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -392,7 +392,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/breadcrumbs/breadcrumbs.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/breadcrumbs/breadcrumbs.component.ts
 FN:7,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -413,7 +413,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/calendar/calendar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/calendar/calendar.component.ts
 FN:9,(anonymous_0)
 FN:18,(anonymous_1)
 FN:24,(anonymous_2)
@@ -547,7 +547,7 @@ BRF:15
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/chart-progress-bar/chart-progress-bar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/chart-progress-bar/chart-progress-bar.component.ts
 FN:8,(anonymous_0)
 FN:18,(anonymous_1)
 FN:21,(anonymous_2)
@@ -613,7 +613,7 @@ BRF:12
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/confirm-apply-start-modal/confirm-apply-start-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/confirm-apply-start-modal/confirm-apply-start-modal.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -635,7 +635,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/confirm-apply-stop-modal/confirm-apply-stop-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/confirm-apply-stop-modal/confirm-apply-stop-modal.component.ts
 FN:8,(anonymous_0)
 FN:13,(anonymous_1)
 FN:16,(anonymous_2)
@@ -693,7 +693,7 @@ BRF:8
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/create-object-modal/create-object-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/create-object-modal/create-object-modal.component.ts
 FN:18,(anonymous_0)
 FN:36,(anonymous_1)
 FN:38,(anonymous_2)
@@ -831,7 +831,7 @@ BRF:16
 BRH:12
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/delete-object-modal/delete-object-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/delete-object-modal/delete-object-modal.component.ts
 FN:8,(anonymous_0)
 FN:15,(anonymous_1)
 FN:18,(anonymous_2)
@@ -862,7 +862,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/error/error.directive.ts
+SF:/github/workspace/components/automate-ui/src/app/components/error/error.directive.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -882,7 +882,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/form-control/form-control.directive.ts
+SF:/github/workspace/components/automate-ui/src/app/components/form-control/form-control.directive.ts
 FN:62,(anonymous_0)
 FN:72,(anonymous_1)
 FN:76,(anonymous_2)
@@ -942,7 +942,7 @@ BRF:8
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/form-field/form-field.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/form-field/form-field.component.ts
 FN:8,(anonymous_0)
 FN:11,(anonymous_1)
 FN:12,(anonymous_2)
@@ -972,7 +972,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/guitar-string-collection/guitar-string-collection.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/guitar-string-collection/guitar-string-collection.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -989,7 +989,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/guitar-string-collection/guitar-string/guitar-string.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/guitar-string-collection/guitar-string/guitar-string.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -1006,7 +1006,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/guitar-string-collection/guitar-string-item/guitar-string-item.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/guitar-string-collection/guitar-string-item/guitar-string-item.component.ts
 FN:7,(anonymous_0)
 FN:13,(anonymous_1)
 FN:16,(anonymous_2)
@@ -1083,7 +1083,7 @@ BRF:20
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/guitar-string-collection/guitar-string-section/guitar-string-section.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/guitar-string-collection/guitar-string-section/guitar-string-section.component.ts
 FN:7,(anonymous_0)
 FN:10,(anonymous_1)
 FN:19,(anonymous_2)
@@ -1117,7 +1117,7 @@ BRF:4
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/input/input.directive.ts
+SF:/github/workspace/components/automate-ui/src/app/components/input/input.directive.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -1137,7 +1137,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/landing/landing.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/landing/landing.component.ts
 FN:23,(anonymous_0)
 FN:43,(anonymous_1)
 FN:47,(anonymous_2)
@@ -1217,7 +1217,7 @@ BRF:6
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/message-modal/message-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/message-modal/message-modal.component.ts
 FN:7,(anonymous_0)
 FN:12,(anonymous_1)
 FNF:2
@@ -1242,7 +1242,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/notification/notification.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/notification/notification.component.ts
 FN:25,(anonymous_0)
 FN:29,(anonymous_1)
 FN:34,(anonymous_2)
@@ -1283,7 +1283,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/notifications/notifications.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/notifications/notifications.component.ts
 FN:12,(anonymous_0)
 FN:15,(anonymous_1)
 FN:18,(anonymous_2)
@@ -1325,7 +1325,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/page-picker/page-picker.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/page-picker/page-picker.component.ts
 FN:7,(anonymous_0)
 FN:21,(anonymous_1)
 FN:24,(anonymous_2)
@@ -1421,7 +1421,7 @@ BRF:18
 BRH:14
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/pending-edits-bar/pending-edits-bar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/pending-edits-bar/pending-edits-bar.component.ts
 FN:16,(anonymous_0)
 FN:30,(anonymous_1)
 FN:31,(anonymous_2)
@@ -1514,7 +1514,7 @@ BRF:6
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/process-progress-bar/process-progress-bar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/process-progress-bar/process-progress-bar.component.ts
 FN:12,(anonymous_0)
 FN:23,(anonymous_1)
 FN:26,(anonymous_2)
@@ -1600,7 +1600,7 @@ BRF:12
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/projects-dropdown/projects-dropdown.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/projects-dropdown/projects-dropdown.component.ts
 FN:12,(anonymous_0)
 FN:21,(anonymous_1)
 FN:24,(anonymous_2)
@@ -1662,7 +1662,7 @@ BRF:6
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/resource-dropdown/resource-dropdown.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/resource-dropdown/resource-dropdown.component.ts
 FN:8,(anonymous_0)
 FN:29,(anonymous_1)
 FN:32,(anonymous_2)
@@ -1826,7 +1826,7 @@ BRF:30
 BRH:21
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/sidebar/sidebar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/sidebar/sidebar.component.ts
 FN:8,(anonymous_0)
 FN:13,(anonymous_1)
 FN:17,(anonymous_2)
@@ -1883,7 +1883,7 @@ BRF:6
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/sidebar-entry/sidebar-entry.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/sidebar-entry/sidebar-entry.component.ts
 FN:7,(anonymous_0)
 FN:12,(anonymous_1)
 FNF:2
@@ -1909,7 +1909,7 @@ BRF:3
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/tab/tab.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/tab/tab.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -1929,7 +1929,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/table/table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/table/table.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -1949,7 +1949,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/table/table-body/table-body.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/table/table-body/table-body.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -1969,7 +1969,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/table/table-cell/table-cell.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/table/table-cell/table-cell.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -1989,7 +1989,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/table/table-header/table-header.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/table/table-header/table-header.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -2009,7 +2009,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/table/table-header-cell/table-header-cell.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/table/table-header-cell/table-header-cell.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -2029,7 +2029,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/table/table-row/table-row.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/table/table-row/table-row.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -2049,7 +2049,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/tabs/tabs.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/tabs/tabs.component.ts
 FN:8,(anonymous_0)
 FN:12,(anonymous_1)
 FN:15,(anonymous_2)
@@ -2079,7 +2079,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/components/time/time.component.ts
+SF:/github/workspace/components/automate-ui/src/app/components/time/time.component.ts
 FN:8,(anonymous_0)
 FN:12,(anonymous_1)
 FNF:2
@@ -2103,7 +2103,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/entities.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/entities.ts
 FN:6,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -2161,7 +2161,7 @@ BRF:9
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/api-tokens/api-token.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/api-tokens/api-token.actions.ts
 FN:5,(anonymous_0)
 FN:26,(anonymous_1)
 FN:32,(anonymous_2)
@@ -2284,7 +2284,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/api-tokens/api-token.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/api-tokens/api-token.reducer.ts
 FN:26,apiTokenEntityReducer
 FNF:1
 FNH:1
@@ -2345,7 +2345,7 @@ BRF:17
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/api-tokens/api-token.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/api-tokens/api-token.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -2383,7 +2383,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/automate-settings/automate-settings.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/automate-settings/automate-settings.actions.ts
 FN:5,(anonymous_0)
 FN:14,(anonymous_1)
 FN:21,(anonymous_2)
@@ -2435,7 +2435,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/automate-settings/automate-settings.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/automate-settings/automate-settings.model.ts
 FN:5,(anonymous_0)
 FN:13,(anonymous_1)
 FN:29,(anonymous_2)
@@ -2515,7 +2515,7 @@ BRF:10
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/automate-settings/automate-settings.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/automate-settings/automate-settings.reducer.ts
 FN:16,automateSettingsEntityReducer
 FNF:1
 FNH:1
@@ -2549,7 +2549,7 @@ BRF:8
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/automate-settings/automate-settings.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/automate-settings/automate-settings.selectors.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -2571,7 +2571,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cds/cds.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cds/cds.actions.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:29,(anonymous_2)
@@ -2673,7 +2673,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cds/cds.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cds/cds.reducer.ts
 FN:16,desktopEntityReducer
 FNF:1
 FNH:1
@@ -2725,7 +2725,7 @@ BRF:17
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/client-runs/client-runs.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/client-runs/client-runs.actions.ts
 FN:5,(anonymous_0)
 FN:26,(anonymous_1)
 FN:32,(anonymous_2)
@@ -2845,7 +2845,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/client-runs/client-runs.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/client-runs/client-runs.reducer.ts
 FN:34,clientRunsEntityReducer
 FNF:1
 FNH:1
@@ -2904,7 +2904,7 @@ BRF:20
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/client-runs/client-runs.requests.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/client-runs/client-runs.requests.ts
 FN:15,(anonymous_0)
 FN:18,(anonymous_1)
 FN:38,(anonymous_2)
@@ -3084,7 +3084,7 @@ BRF:39
 BRH:19
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/client-runs/client-runs.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/client-runs/client-runs.selectors.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -3111,7 +3111,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/clients/client-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/clients/client-details.reducer.ts
 FN:11,(anonymous_0)
 FN:16,clientDetailsEntityReducer
 FNF:2
@@ -3154,7 +3154,7 @@ BRF:10
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/clients/client-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/clients/client-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -3186,7 +3186,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/clients/client.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/clients/client.action.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:30,(anonymous_2)
@@ -3292,7 +3292,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/clients/client.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/clients/client.reducer.ts
 FN:13,(anonymous_0)
 FN:19,clientEntityReducer
 FN:39,(anonymous_2)
@@ -3362,7 +3362,7 @@ BRF:23
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/clients/client.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/clients/client.selectors.ts
 FN:9,(anonymous_0)
 FN:10,(anonymous_1)
 FN:11,(anonymous_2)
@@ -3398,7 +3398,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook-details.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook-details.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -3432,7 +3432,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook-details.reducer.ts
 FN:10,(anonymous_0)
 FN:15,cookbookDetailsEntityReducer
 FN:28,(anonymous_2)
@@ -3471,7 +3471,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook-details.requests.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook-details.requests.ts
 FN:11,(anonymous_0)
 FN:14,(anonymous_1)
 FN:17,(anonymous_2)
@@ -3507,7 +3507,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FNF:2
@@ -3530,7 +3530,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook-versions.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook-versions.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -3564,7 +3564,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook-versions.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook-versions.reducer.ts
 FN:10,(anonymous_0)
 FN:15,cookbookVersionsEntityReducer
 FN:29,(anonymous_2)
@@ -3603,7 +3603,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook-versions.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook-versions.selectors.ts
 FN:10,(anonymous_0)
 FN:11,(anonymous_1)
 FNF:2
@@ -3625,7 +3625,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -3659,7 +3659,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook.reducer.ts
 FN:10,(anonymous_0)
 FN:15,cookbookEntityReducer
 FN:28,(anonymous_2)
@@ -3698,7 +3698,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/cookbooks/cookbook.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/cookbooks/cookbook.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FNF:2
@@ -3721,7 +3721,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/credentials/credential.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/credentials/credential.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -3755,7 +3755,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/credentials/credential.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/credentials/credential.reducer.ts
 FN:13,credentialReducer
 FNF:1
 FNH:1
@@ -3786,7 +3786,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/credentials/credential.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/credentials/credential.selectors.ts
 FN:10,(anonymous_0)
 FN:10,(anonymous_1)
 FN:11,(anonymous_2)
@@ -3813,7 +3813,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bag-details.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bag-details.actions.ts
 FN:5,(anonymous_0)
 FN:20,(anonymous_1)
 FN:27,(anonymous_2)
@@ -3901,7 +3901,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bag-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bag-details.reducer.ts
 FN:14,(anonymous_0)
 FN:21,dataBagItemsEntityReducer
 FN:43,(anonymous_2)
@@ -3974,7 +3974,7 @@ BRF:22
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bag-details.selector.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bag-details.selector.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -4012,7 +4012,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bag-item-details.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bag-item-details.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -4046,7 +4046,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bag-item-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bag-item-details.reducer.ts
 FN:10,(anonymous_0)
 FN:15,dataBagItemDetailsEntityReducer
 FN:30,(anonymous_2)
@@ -4085,7 +4085,7 @@ BRF:5
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bag-item-details.selector.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bag-item-details.selector.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FNF:2
@@ -4108,7 +4108,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bags.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bags.actions.ts
 FN:5,(anonymous_0)
 FN:17,(anonymous_1)
 FN:24,(anonymous_2)
@@ -4178,7 +4178,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bags.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bags.reducer.ts
 FN:13,(anonymous_0)
 FN:19,dataBagEntityReducer
 FN:50,(anonymous_2)
@@ -4232,7 +4232,7 @@ BRF:11
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/data-bags/data-bags.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/data-bags/data-bags.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -4264,7 +4264,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/desktop/desktop.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/desktop/desktop.actions.ts
 FN:5,(anonymous_0)
 FN:44,(anonymous_1)
 FN:51,(anonymous_2)
@@ -4490,7 +4490,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/desktop/desktop.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/desktop/desktop.model.ts
 FN:5,(anonymous_0)
 FN:15,(anonymous_1)
 FN:20,(anonymous_2)
@@ -4579,7 +4579,7 @@ BRF:10
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/desktop/desktop.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/desktop/desktop.reducer.ts
 FN:146,desktopEntityReducer
 FN:213,(anonymous_1)
 FN:233,nodeMetadataCounts
@@ -4716,7 +4716,7 @@ BRF:49
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/destinations/destination.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/destinations/destination.actions.ts
 FN:5,(anonymous_0)
 FN:29,(anonymous_1)
 FN:35,(anonymous_2)
@@ -4860,7 +4860,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/destinations/destination.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/destinations/destination.model.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -4872,7 +4872,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/destinations/destination.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/destinations/destination.reducer.ts
 FN:27,destinationEntityReducer
 FNF:1
 FNH:1
@@ -4946,7 +4946,7 @@ BRF:23
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/destinations/destination.requests.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/destinations/destination.requests.ts
 FN:14,(anonymous_0)
 FN:17,(anonymous_1)
 FN:20,(anonymous_2)
@@ -5084,7 +5084,7 @@ BRF:16
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/destinations/destination.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/destinations/destination.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -5128,7 +5128,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/environments/environment-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/environments/environment-details.reducer.ts
 FN:11,(anonymous_0)
 FN:17,environmentDetailsEntityReducer
 FN:39,(anonymous_2)
@@ -5174,7 +5174,7 @@ BRF:8
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/environments/environment-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/environments/environment-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -5203,7 +5203,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/environments/environment.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/environments/environment.action.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:30,(anonymous_2)
@@ -5309,7 +5309,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/environments/environment.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/environments/environment.model.ts
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -5332,7 +5332,7 @@ BRF:6
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/environments/environment.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/environments/environment.reducer.ts
 FN:13,(anonymous_0)
 FN:19,environmentEntityReducer
 FN:40,(anonymous_2)
@@ -5398,7 +5398,7 @@ BRF:19
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/environments/environment.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/environments/environment.selectors.ts
 FN:9,(anonymous_0)
 FN:10,(anonymous_1)
 FN:11,(anonymous_2)
@@ -5431,7 +5431,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/global-config/destination-config.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/global-config/destination-config.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -5465,7 +5465,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/global-config/destination-config.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/global-config/destination-config.reducer.ts
 FN:18,globalConfigEntityReducer
 FNF:1
 FNH:1
@@ -5498,7 +5498,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/global-config/destination-config.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/global-config/destination-config.selectors.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FNF:2
@@ -5518,7 +5518,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-nodes/infra-node-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-nodes/infra-node-details.reducer.ts
 FN:10,(anonymous_0)
 FN:15,infraNodeDetailsEntityReducer
 FNF:2
@@ -5552,7 +5552,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-nodes/infra-node-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-nodes/infra-node-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -5578,7 +5578,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-nodes/infra-nodes.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-nodes/infra-nodes.actions.ts
 FN:5,(anonymous_0)
 FN:32,(anonymous_1)
 FN:39,(anonymous_2)
@@ -5738,7 +5738,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-nodes/infra-nodes.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-nodes/infra-nodes.reducer.ts
 FN:17,(anonymous_0)
 FN:23,infraNodeEntityReducer
 FN:34,(anonymous_2)
@@ -5850,7 +5850,7 @@ BRF:46
 BRH:20
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-nodes/infra-nodes.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-nodes/infra-nodes.selectors.ts
 FN:9,(anonymous_0)
 FN:10,(anonymous_1)
 FN:11,(anonymous_2)
@@ -5907,7 +5907,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-roles/infra-role-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-roles/infra-role-details.reducer.ts
 FN:11,(anonymous_0)
 FN:17,infraRoleDetailsEntityReducer
 FNF:2
@@ -5948,7 +5948,7 @@ BRF:8
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-roles/infra-role-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-roles/infra-role-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -5977,7 +5977,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-roles/infra-role.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-roles/infra-role.action.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:30,(anonymous_2)
@@ -6083,7 +6083,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-roles/infra-role.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-roles/infra-role.model.ts
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -6106,7 +6106,7 @@ BRF:6
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-roles/infra-role.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-roles/infra-role.reducer.ts
 FN:13,(anonymous_0)
 FN:19,infraRoleEntityReducer
 FN:39,(anonymous_2)
@@ -6172,7 +6172,7 @@ BRF:19
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/infra-roles/infra-role.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/infra-roles/infra-role.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -6210,7 +6210,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/jobs/job.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/jobs/job.actions.ts
 FN:5,(anonymous_0)
 FN:20,(anonymous_1)
 FN:27,(anonymous_2)
@@ -6298,7 +6298,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/jobs/job.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/jobs/job.reducer.ts
 FN:12,jobEntityReducer
 FNF:1
 FNH:1
@@ -6334,7 +6334,7 @@ BRF:8
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/jobs/job.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/jobs/job.selectors.ts
 FN:9,(anonymous_0)
 FNF:1
 FNH:0
@@ -6352,7 +6352,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/layout/layout-sidebar.service.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/layout/layout-sidebar.service.ts
 FN:12,(anonymous_0)
 FN:18,(anonymous_1)
 FN:226,(anonymous_2)
@@ -6425,7 +6425,7 @@ BRF:10
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/layout/layout.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/layout/layout.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -6458,7 +6458,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/layout/layout.facade.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/layout/layout.facade.ts
 FN:16,(anonymous_0)
 FN:24,(anonymous_1)
 FN:33,(anonymous_2)
@@ -6585,7 +6585,7 @@ BRF:16
 BRH:11
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/layout/layout.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/layout/layout.reducer.ts
 FN:10,layoutEntityReducer
 FNF:1
 FNH:1
@@ -6610,7 +6610,7 @@ BRF:4
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/layout/layout.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/layout/layout.selectors.ts
 FN:6,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -6630,7 +6630,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/license/license.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/license/license.actions.ts
 FN:5,(anonymous_0)
 FN:19,(anonymous_1)
 FN:25,(anonymous_2)
@@ -6710,7 +6710,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/license/license.facade.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/license/license.facade.ts
 FN:13,(anonymous_0)
 FN:19,(anonymous_1)
 FN:28,(anonymous_2)
@@ -6775,7 +6775,7 @@ BRF:4
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/license/license.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/license/license.model.ts
 FN:6,parsedExpirationDate
 FNF:1
 FNH:1
@@ -6792,7 +6792,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/license/license.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/license/license.reducer.ts
 FN:26,licenseStatusEntityReducer
 FNF:1
 FNH:1
@@ -6835,7 +6835,7 @@ BRF:12
 BRH:12
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/license/license.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/license/license.selectors.ts
 FN:7,(anonymous_0)
 FN:8,(anonymous_1)
 FN:9,(anonymous_2)
@@ -6861,7 +6861,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/managers/manager.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/managers/manager.actions.ts
 FN:5,(anonymous_0)
 FN:42,(anonymous_1)
 FN:49,(anonymous_2)
@@ -7077,7 +7077,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/managers/manager.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/managers/manager.reducer.ts
 FN:18,managerEntityReducer
 FNF:1
 FNH:1
@@ -7173,7 +7173,7 @@ BRF:30
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/managers/manager.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/managers/manager.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -7225,7 +7225,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/node-credentials/node-credential-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/node-credentials/node-credential-details.reducer.ts
 FN:10,(anonymous_0)
 FN:15,nodeCredentialDetailsEntityReducer
 FNF:2
@@ -7259,7 +7259,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/node-credentials/node-credential-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/node-credentials/node-credential-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -7285,7 +7285,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/node-credentials/node-credential.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/node-credentials/node-credential.actions.ts
 FN:5,(anonymous_0)
 FN:27,(anonymous_1)
 FN:34,(anonymous_2)
@@ -7414,7 +7414,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/node-credentials/node-credential.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/node-credentials/node-credential.model.ts
 FN:7,(anonymous_0)
 FN:14,(anonymous_1)
 FNF:2
@@ -7463,7 +7463,7 @@ BRF:10
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/node-credentials/node-credential.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/node-credentials/node-credential.reducer.ts
 FN:15,(anonymous_0)
 FN:27,nodeCredentialEntityReducer
 FNF:2
@@ -7535,7 +7535,7 @@ BRF:21
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/node-credentials/node-credential.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/node-credentials/node-credential.selectors.ts
 FN:12,(anonymous_0)
 FN:13,(anonymous_1)
 FN:14,(anonymous_2)
@@ -7579,7 +7579,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/nodeRunlists/nodeRunlists.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/nodeRunlists/nodeRunlists.action.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -7613,7 +7613,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/nodeRunlists/nodeRunlists.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/nodeRunlists/nodeRunlists.reducer.ts
 FN:10,(anonymous_0)
 FN:15,nodeRunlistEntityReducer
 FN:28,(anonymous_2)
@@ -7652,7 +7652,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/nodeRunlists/nodeRunlists.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/nodeRunlists/nodeRunlists.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -7678,7 +7678,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/nodes/nodes.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/nodes/nodes.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:13,(anonymous_2)
@@ -7725,7 +7725,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/nodes/nodes.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/nodes/nodes.reducer.ts
 FN:30,nodesEntityReducer
 FNF:1
 FNH:1
@@ -7762,7 +7762,7 @@ BRF:8
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notification_rules/notification_rule.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notification_rules/notification_rule.action.ts
 FN:5,(anonymous_0)
 FN:26,(anonymous_1)
 FN:32,(anonymous_2)
@@ -7888,7 +7888,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notification_rules/notification_rule.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notification_rules/notification_rule.model.ts
 FN:6,(anonymous_0)
 FN:12,(anonymous_1)
 FN:30,(anonymous_2)
@@ -7968,7 +7968,7 @@ BRF:17
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notification_rules/notification_rule.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notification_rules/notification_rule.reducer.ts
 FN:15,(anonymous_0)
 FN:23,notificationRuleEntityReducer
 FNF:2
@@ -8031,7 +8031,7 @@ BRF:17
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notification_rules/notification_rule.requests.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notification_rules/notification_rule.requests.ts
 FN:16,(anonymous_0)
 FN:19,(anonymous_1)
 FN:20,(anonymous_2)
@@ -8140,7 +8140,7 @@ BRF:10
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notification_rules/notification_rule.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notification_rules/notification_rule.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -8181,7 +8181,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notifications/notification.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notifications/notification.actions.ts
 FN:5,(anonymous_0)
 FN:10,(anonymous_1)
 FN:17,(anonymous_2)
@@ -8209,7 +8209,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notifications/notification.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notifications/notification.model.ts
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -8228,7 +8228,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notifications/notification.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notifications/notification.reducer.ts
 FN:9,notificationEntityReducer
 FNF:1
 FNH:1
@@ -8259,7 +8259,7 @@ BRF:6
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/notifications/notification.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/notifications/notification.selectors.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -8272,7 +8272,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/orgs/org.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/orgs/org.actions.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:30,(anonymous_2)
@@ -8378,7 +8378,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/orgs/org.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/orgs/org.reducer.ts
 FN:23,orgEntityReducer
 FNF:1
 FNH:1
@@ -8438,7 +8438,7 @@ BRF:17
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/orgs/org.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/orgs/org.selectors.ts
 FN:10,(anonymous_0)
 FN:11,(anonymous_1)
 FN:12,(anonymous_2)
@@ -8475,7 +8475,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policies/policy.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policies/policy.actions.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:29,(anonymous_2)
@@ -8580,7 +8580,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policies/policy.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policies/policy.model.ts
 FN:4,memberListToStringList
 FN:5,(anonymous_1)
 FN:11,policyFromPayload
@@ -8827,7 +8827,7 @@ BRF:66
 BRH:64
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policies/policy.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policies/policy.reducer.ts
 FN:18,policyEntityReducer
 FNF:1
 FNH:1
@@ -8883,7 +8883,7 @@ BRF:17
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policies/policy.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policies/policy.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -8924,7 +8924,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-file-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-file-details.reducer.ts
 FN:10,(anonymous_0)
 FN:15,policyFileDetailsEntityReducer
 FNF:2
@@ -8958,7 +8958,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-file-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-file-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -8984,7 +8984,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-file.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-file.action.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:30,(anonymous_2)
@@ -9090,7 +9090,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-file.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-file.reducer.ts
 FN:11,(anonymous_0)
 FN:17,policyFileEntityReducer
 FN:36,(anonymous_2)
@@ -9136,7 +9136,7 @@ BRF:8
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-file.requests.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-file.requests.ts
 FN:11,(anonymous_0)
 FN:14,(anonymous_1)
 FN:17,(anonymous_2)
@@ -9174,7 +9174,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-file.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-file.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -9200,7 +9200,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-group-details.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-group-details.reducer.ts
 FN:10,(anonymous_0)
 FN:15,policyGroupDetailsEntityReducer
 FNF:2
@@ -9234,7 +9234,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-group-details.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-group-details.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -9260,7 +9260,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-group.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-group.reducer.ts
 FN:10,(anonymous_0)
 FN:15,policyGroupsEntityReducer
 FNF:2
@@ -9296,7 +9296,7 @@ BRF:7
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/policy-files/policy-group.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/policy-files/policy-group.selectors.ts
 FN:9,(anonymous_0)
 FN:10,(anonymous_1)
 FN:11,(anonymous_2)
@@ -9320,7 +9320,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/profiles/profile.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/profiles/profile.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -9354,7 +9354,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/profiles/profile.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/profiles/profile.reducer.ts
 FN:12,profileEntityReducer
 FNF:1
 FNH:1
@@ -9384,7 +9384,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/profiles/profile.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/profiles/profile.selectors.ts
 FN:9,(anonymous_0)
 FNF:1
 FNH:0
@@ -9402,7 +9402,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/projects/project.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/projects/project.actions.ts
 FN:5,(anonymous_0)
 FN:32,(anonymous_1)
 FN:38,(anonymous_2)
@@ -9556,7 +9556,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/projects/project.effects.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/projects/project.effects.ts
 FN:23,(anonymous_0)
 FN:27,(anonymous_1)
 FN:27,(anonymous_2)
@@ -9752,7 +9752,7 @@ BRF:14
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/projects/project.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/projects/project.model.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -9768,7 +9768,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/projects/project.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/projects/project.reducer.ts
 FN:9,(anonymous_0)
 FN:38,projectEntityReducer
 FN:78,(anonymous_2)
@@ -9842,7 +9842,7 @@ BRF:20
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/projects/project.requests.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/projects/project.requests.ts
 FN:9,(anonymous_0)
 FN:12,(anonymous_1)
 FN:15,(anonymous_2)
@@ -9890,7 +9890,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/projects/project.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/projects/project.selectors.ts
 FN:10,(anonymous_0)
 FN:11,(anonymous_1)
 FN:12,(anonymous_2)
@@ -9927,7 +9927,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/projects/project.service.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/projects/project.service.ts
 FN:10,(anonymous_0)
 FN:14,(anonymous_1)
 FN:17,(anonymous_2)
@@ -9962,7 +9962,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/recipes/recipe.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/recipes/recipe.action.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -9996,7 +9996,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/recipes/recipe.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/recipes/recipe.reducer.ts
 FN:10,(anonymous_0)
 FN:15,recipeEntityReducer
 FN:28,(anonymous_2)
@@ -10035,7 +10035,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/recipes/recipe.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/recipes/recipe.selectors.ts
 FN:9,(anonymous_0)
 FN:10,(anonymous_1)
 FNF:2
@@ -10056,7 +10056,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/reset-admin-key/reset-admin-key.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/reset-admin-key/reset-admin-key.actions.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -10090,7 +10090,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/reset-admin-key/reset-admin-key.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/reset-admin-key/reset-admin-key.reducer.ts
 FN:13,adminKeyEntityReducer
 FNF:1
 FNH:1
@@ -10121,7 +10121,7 @@ BRF:5
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/reset-admin-key/reset-admin-key.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/reset-admin-key/reset-admin-key.selectors.ts
 FN:9,(anonymous_0)
 FNF:1
 FNH:1
@@ -10139,7 +10139,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/revisions/revision.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/revisions/revision.action.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -10173,7 +10173,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/revisions/revision.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/revisions/revision.reducer.ts
 FN:10,(anonymous_0)
 FN:15,revisionEntityReducer
 FN:28,(anonymous_2)
@@ -10212,7 +10212,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/revisions/revision.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/revisions/revision.selectors.ts
 FN:9,(anonymous_0)
 FN:10,(anonymous_1)
 FNF:2
@@ -10233,7 +10233,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/role-environments/role-environments.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/role-environments/role-environments.action.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -10267,7 +10267,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/role-environments/role-environments.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/role-environments/role-environments.reducer.ts
 FN:10,(anonymous_0)
 FN:15,roleEnvironmentEntityReducer
 FN:28,(anonymous_2)
@@ -10306,7 +10306,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/role-environments/role-environments.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/role-environments/role-environments.selectors.ts
 FN:9,(anonymous_0)
 FN:10,(anonymous_1)
 FNF:2
@@ -10327,7 +10327,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/roles/role.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/roles/role.actions.ts
 FN:5,(anonymous_0)
 FN:17,(anonymous_1)
 FN:23,(anonymous_2)
@@ -10397,7 +10397,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/roles/role.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/roles/role.reducer.ts
 FN:14,roleEntityReducer
 FNF:1
 FNH:1
@@ -10439,7 +10439,7 @@ BRF:11
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/roles/role.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/roles/role.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -10468,7 +10468,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/rules/rule.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/rules/rule.actions.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:30,(anonymous_2)
@@ -10574,7 +10574,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/rules/rule.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/rules/rule.model.ts
 FN:4,isConditionOperator
 FNF:1
 FNH:1
@@ -10591,7 +10591,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/rules/rule.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/rules/rule.reducer.ts
 FN:69,ruleEntityReducer
 FNF:1
 FNH:1
@@ -10653,7 +10653,7 @@ BRF:17
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/rules/rule.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/rules/rule.selectors.ts
 FN:10,(anonymous_0)
 FN:11,(anonymous_1)
 FN:12,(anonymous_2)
@@ -10693,7 +10693,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/runlists/runlists.action.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/runlists/runlists.action.ts
 FN:5,(anonymous_0)
 FN:11,(anonymous_1)
 FN:18,(anonymous_2)
@@ -10727,7 +10727,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/runlists/runlists.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/runlists/runlists.reducer.ts
 FN:10,(anonymous_0)
 FN:15,runlistEntityReducer
 FNF:2
@@ -10761,7 +10761,7 @@ BRF:5
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/runlists/runlists.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/runlists/runlists.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -10787,7 +10787,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/servers/server.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/servers/server.actions.ts
 FN:5,(anonymous_0)
 FN:23,(anonymous_1)
 FN:29,(anonymous_2)
@@ -10893,7 +10893,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/servers/server.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/servers/server.reducer.ts
 FN:23,serverEntityReducer
 FNF:1
 FNH:1
@@ -10952,7 +10952,7 @@ BRF:16
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/servers/server.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/servers/server.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -10990,7 +10990,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/service-groups/service-groups.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/service-groups/service-groups.actions.ts
 FN:5,(anonymous_0)
 FN:26,(anonymous_1)
 FN:32,(anonymous_2)
@@ -11106,7 +11106,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/service-groups/service-groups.facade.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/service-groups/service-groups.facade.ts
 FN:11,(anonymous_0)
 FN:26,(anonymous_1)
 FN:38,(anonymous_2)
@@ -11188,7 +11188,7 @@ BRF:15
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/service-groups/service-groups.model.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/service-groups/service-groups.model.ts
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -11211,7 +11211,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/service-groups/service-groups.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/service-groups/service-groups.reducer.ts
 FN:48,serviceGroupsEntityReducer
 FNF:1
 FNH:1
@@ -11268,7 +11268,7 @@ BRF:19
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/service-groups/service-groups.requests.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/service-groups/service-groups.requests.ts
 FN:12,(anonymous_0)
 FN:15,(anonymous_1)
 FN:22,(anonymous_2)
@@ -11411,7 +11411,7 @@ BRF:32
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/service-groups/service-groups.selector.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/service-groups/service-groups.selector.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -11469,7 +11469,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/teams/team.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/teams/team.actions.ts
 FN:5,(anonymous_0)
 FN:32,(anonymous_1)
 FN:38,(anonymous_2)
@@ -11628,7 +11628,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/teams/team.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/teams/team.reducer.ts
 FN:22,teamEntityReducer
 FNF:1
 FNH:1
@@ -11699,7 +11699,7 @@ BRF:25
 BRH:24
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/teams/team.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/teams/team.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -11752,7 +11752,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/userperms/userperms.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/userperms/userperms.actions.ts
 FN:5,(anonymous_0)
 FN:17,(anonymous_1)
 FN:23,(anonymous_2)
@@ -11821,7 +11821,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/userperms/userperms.entity.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/userperms/userperms.entity.ts
 FN:5,(anonymous_0)
 FN:13,(anonymous_1)
 FNF:2
@@ -11844,7 +11844,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/userperms/userperms.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/userperms/userperms.reducer.ts
 FN:10,(anonymous_0)
 FN:22,permEntityReducer
 FNF:2
@@ -11893,7 +11893,7 @@ BRF:11
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/userperms/userperms.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/userperms/userperms.selectors.ts
 FN:8,(anonymous_0)
 FN:8,(anonymous_1)
 FN:11,(anonymous_2)
@@ -11918,7 +11918,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/users/user.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/users/user.actions.ts
 FN:5,(anonymous_0)
 FN:25,(anonymous_1)
 FN:31,(anonymous_2)
@@ -12035,7 +12035,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/users/user.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/users/user.reducer.ts
 FN:16,userEntityReducer
 FNF:1
 FNH:1
@@ -12093,7 +12093,7 @@ BRF:19
 BRH:17
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/users/user.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/users/user.selectors.ts
 FN:11,(anonymous_0)
 FN:12,(anonymous_1)
 FN:13,(anonymous_2)
@@ -12133,7 +12133,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/users/userself.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/users/userself.actions.ts
 FN:5,(anonymous_0)
 FN:18,(anonymous_1)
 FN:25,(anonymous_2)
@@ -12208,7 +12208,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/users/userself.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/users/userself.reducer.ts
 FN:13,userSelfEntityReducer
 FNF:1
 FNH:1
@@ -12250,7 +12250,7 @@ BRF:12
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/entities/users/userself.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/entities/users/userself.selectors.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -12275,7 +12275,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/auth/authorized.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/auth/authorized.ts
 FN:17,(anonymous_0)
 FN:22,(anonymous_1)
 FN:22,(anonymous_2)
@@ -12390,7 +12390,7 @@ BRF:14
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/auth/id-mapper.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/auth/id-mapper.ts
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -12405,7 +12405,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/auth/regex.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/auth/regex.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -12418,7 +12418,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/auth/sorter.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/auth/sorter.ts
 FN:15,(anonymous_0)
 FN:22,(anonymous_1)
 FN:23,(anonymous_2)
@@ -12454,7 +12454,7 @@ BRF:7
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/auth/username-mapper.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/auth/username-mapper.ts
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -12469,7 +12469,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/auth/validator.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/auth/validator.ts
 FN:7,(anonymous_0)
 FN:8,(anonymous_1)
 FN:19,(anonymous_2)
@@ -12514,7 +12514,7 @@ BRF:12
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/datetime/datetime.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/datetime/datetime.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -12536,7 +12536,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/history-selection/history-selection.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/history-selection/history-selection.ts
 FN:10,(anonymous_0)
 FN:13,(anonymous_1)
 FN:16,(anonymous_2)
@@ -12578,7 +12578,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/infra-proxy/collapsible-list-mapper.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/infra-proxy/collapsible-list-mapper.ts
 FN:5,(anonymous_0)
 FN:6,(anonymous_1)
 FN:9,(anonymous_2)
@@ -12599,7 +12599,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/jwt/jwt.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/jwt/jwt.ts
 FN:6,(anonymous_0)
 FN:16,(anonymous_1)
 FNF:2
@@ -12624,7 +12624,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/helpers/utilities/utilities.ts
+SF:/github/workspace/components/automate-ui/src/app/helpers/utilities/utilities.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -12646,7 +12646,7 @@ BRF:3
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/desktop/check-in-time-series/check-in-time-series.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/desktop/check-in-time-series/check-in-time-series.component.ts
 FN:10,(anonymous_0)
 FN:18,(anonymous_1)
 FN:21,(anonymous_2)
@@ -12703,7 +12703,7 @@ BRF:4
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/desktop/daily-check-in/daily-check-in.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/desktop/daily-check-in/daily-check-in.component.ts
 FN:10,(anonymous_0)
 FN:17,(anonymous_1)
 FN:18,(anonymous_2)
@@ -12752,7 +12752,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/desktop/empty-data/empty-data.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/desktop/empty-data/empty-data.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -12768,7 +12768,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/desktop/top-errors/top-errors.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/desktop/top-errors/top-errors.component.ts
 FN:11,(anonymous_0)
 FN:18,(anonymous_1)
 FN:19,(anonymous_2)
@@ -12826,7 +12826,7 @@ BRF:4
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/desktop/unknown-desktop-duration-counts/unknown-desktop-duration-counts.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/desktop/unknown-desktop-duration-counts/unknown-desktop-duration-counts.component.ts
 FN:11,(anonymous_0)
 FN:18,(anonymous_1)
 FN:19,(anonymous_2)
@@ -12899,7 +12899,7 @@ BRF:9
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/chef-server-details/chef-server-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/chef-server-details/chef-server-details.component.ts
 FN:24,(anonymous_0)
 FN:53,(anonymous_1)
 FN:57,(anonymous_2)
@@ -13098,7 +13098,7 @@ BRF:30
 BRH:17
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/chef-servers-list/chef-servers-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/chef-servers-list/chef-servers-list.component.ts
 FN:19,(anonymous_0)
 FN:54,(anonymous_1)
 FN:60,(anonymous_2)
@@ -13248,7 +13248,7 @@ BRF:26
 BRH:20
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/client-details/client-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/client-details/client-details.component.ts
 FN:16,(anonymous_0)
 FN:27,(anonymous_1)
 FN:33,(anonymous_2)
@@ -13314,7 +13314,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/clients/clients.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/clients/clients.component.ts
 FN:17,(anonymous_0)
 FN:34,(anonymous_1)
 FN:41,(anonymous_2)
@@ -13461,7 +13461,7 @@ BRF:22
 BRH:15
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/cookbook-dependencies/cookbook-dependencies.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/cookbook-dependencies/cookbook-dependencies.component.ts
 FN:8,(anonymous_0)
 FN:18,(anonymous_1)
 FN:21,(anonymous_2)
@@ -13523,7 +13523,7 @@ BRF:4
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/cookbook-dependencies-details/cookbook-dependencies-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/cookbook-dependencies-details/cookbook-dependencies-details.component.ts
 FN:12,(anonymous_0)
 FN:23,(anonymous_1)
 FN:26,(anonymous_2)
@@ -13622,7 +13622,7 @@ BRF:14
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/cookbook-details/cookbook-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/cookbook-details/cookbook-details.component.ts
 FN:21,(anonymous_0)
 FN:45,(anonymous_1)
 FN:48,(anonymous_2)
@@ -13787,7 +13787,7 @@ BRF:20
 BRH:11
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/cookbooks/cookbooks.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/cookbooks/cookbooks.component.ts
 FN:15,(anonymous_0)
 FN:24,(anonymous_1)
 FN:33,(anonymous_2)
@@ -13850,7 +13850,7 @@ BRF:6
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/create-chef-server-modal/create-chef-server-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/create-chef-server-modal/create-chef-server-modal.component.ts
 FN:10,(anonymous_0)
 FN:19,(anonymous_1)
 FN:20,(anonymous_2)
@@ -13912,7 +13912,7 @@ BRF:6
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/create-client-modal/create-client-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/create-client-modal/create-client-modal.component.ts
 FN:19,(anonymous_0)
 FN:39,(anonymous_1)
 FN:41,(anonymous_2)
@@ -14055,7 +14055,7 @@ BRF:24
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/create-data-bag-modal/create-data-bag-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/create-data-bag-modal/create-data-bag-modal.component.ts
 FN:19,(anonymous_0)
 FN:35,(anonymous_1)
 FN:37,(anonymous_2)
@@ -14159,7 +14159,7 @@ BRF:10
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/create-databag-item-modal/create-databag-item-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/create-databag-item-modal/create-databag-item-modal.component.ts
 FN:19,(anonymous_0)
 FN:38,(anonymous_1)
 FN:40,(anonymous_2)
@@ -14282,7 +14282,7 @@ BRF:12
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/create-environment-modal/create-environment-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/create-environment-modal/create-environment-modal.component.ts
 FN:25,(anonymous_0)
 FN:69,(anonymous_1)
 FN:71,(anonymous_2)
@@ -14529,7 +14529,7 @@ BRF:24
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/create-infra-role-modal/create-infra-role-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/create-infra-role-modal/create-infra-role-modal.component.ts
 FN:20,(anonymous_0)
 FN:55,(anonymous_1)
 FN:57,(anonymous_2)
@@ -14721,7 +14721,7 @@ BRF:12
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/create-org-modal/create-org-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/create-org-modal/create-org-modal.component.ts
 FN:11,(anonymous_0)
 FN:22,(anonymous_1)
 FN:23,(anonymous_2)
@@ -14797,7 +14797,7 @@ BRF:10
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/data-bags-details/data-bags-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/data-bags-details/data-bags-details.component.ts
 FN:20,(anonymous_0)
 FN:39,(anonymous_1)
 FN:45,(anonymous_2)
@@ -14998,7 +14998,7 @@ BRF:19
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/data-bags-list/data-bags-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/data-bags-list/data-bags-list.component.ts
 FN:16,(anonymous_0)
 FN:31,(anonymous_1)
 FN:40,(anonymous_2)
@@ -15111,7 +15111,7 @@ BRF:12
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/delete-infra-object-modal/delete-infra-object-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/delete-infra-object-modal/delete-infra-object-modal.component.ts
 FN:8,(anonymous_0)
 FN:16,(anonymous_1)
 FN:19,(anonymous_2)
@@ -15143,7 +15143,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/edit-data-bag-item-modal/edit-data-bag-item-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/edit-data-bag-item-modal/edit-data-bag-item-modal.component.ts
 FN:16,(anonymous_0)
 FN:31,(anonymous_1)
 FN:34,(anonymous_2)
@@ -15237,7 +15237,7 @@ BRF:4
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/edit-environment-attribute-modal/edit-environment-attribute-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/edit-environment-attribute-modal/edit-environment-attribute-modal.component.ts
 FN:21,(anonymous_0)
 FN:55,(anonymous_1)
 FN:57,(anonymous_2)
@@ -15454,7 +15454,7 @@ BRF:29
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/edit-infra-node-attribute-modal/edit-infra-node-attribute-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/edit-infra-node-attribute-modal/edit-infra-node-attribute-modal.component.ts
 FN:17,(anonymous_0)
 FN:35,(anonymous_1)
 FN:37,(anonymous_2)
@@ -15572,7 +15572,7 @@ BRF:8
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/edit-infra-node-modal/edit-infra-node-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/edit-infra-node-modal/edit-infra-node-modal.component.ts
 FN:15,(anonymous_0)
 FN:38,(anonymous_1)
 FN:40,(anonymous_2)
@@ -15722,7 +15722,7 @@ BRF:10
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/edit-infra-role-modal/edit-infra-role-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/edit-infra-role-modal/edit-infra-role-modal.component.ts
 FN:17,(anonymous_0)
 FN:48,(anonymous_1)
 FN:50,(anonymous_2)
@@ -15907,7 +15907,7 @@ BRF:17
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/environment-details/environment-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/environment-details/environment-details.component.ts
 FN:23,(anonymous_0)
 FN:57,(anonymous_1)
 FN:60,(anonymous_2)
@@ -16077,7 +16077,7 @@ BRF:16
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/environments/environments.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/environments/environments.component.ts
 FN:17,(anonymous_0)
 FN:34,(anonymous_1)
 FN:41,(anonymous_2)
@@ -16222,7 +16222,7 @@ BRF:23
 BRH:15
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/included-policies-details/included-policies-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/included-policies-details/included-policies-details.component.ts
 FN:8,(anonymous_0)
 FN:15,(anonymous_1)
 FN:18,(anonymous_2)
@@ -16277,7 +16277,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/infra-node-details/infra-node-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/infra-node-details/infra-node-details.component.ts
 FN:28,(anonymous_0)
 FN:75,(anonymous_1)
 FN:78,(anonymous_2)
@@ -16668,7 +16668,7 @@ BRF:83
 BRH:28
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/infra-nodes/infra-nodes.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/infra-nodes/infra-nodes.component.ts
 FN:22,(anonymous_0)
 FN:54,(anonymous_1)
 FN:62,(anonymous_2)
@@ -16964,7 +16964,7 @@ BRF:59
 BRH:35
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/infra-role-details/infra-role-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/infra-role-details/infra-role-details.component.ts
 FN:25,(anonymous_0)
 FN:65,(anonymous_1)
 FN:71,(anonymous_2)
@@ -17228,7 +17228,7 @@ BRF:54
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/infra-roles/infra-roles.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/infra-roles/infra-roles.component.ts
 FN:19,(anonymous_0)
 FN:37,(anonymous_1)
 FN:45,(anonymous_2)
@@ -17397,7 +17397,7 @@ BRF:29
 BRH:17
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/infra-search-bar/infra-search-bar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/infra-search-bar/infra-search-bar.component.ts
 FN:8,(anonymous_0)
 FN:14,(anonymous_1)
 FN:17,(anonymous_2)
@@ -17426,7 +17426,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/infra-tab-change/infra-tab-change.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/infra-tab-change/infra-tab-change.component.ts
 FN:8,(anonymous_0)
 FN:11,(anonymous_1)
 FN:14,(anonymous_2)
@@ -17455,7 +17455,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/infra-tab-change/infra-tab/infra-tab.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/infra-tab-change/infra-tab/infra-tab.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -17476,7 +17476,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/json-tree-table/json-tree-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/json-tree-table/json-tree-table.component.ts
 FN:8,(anonymous_0)
 FN:11,(anonymous_1)
 FN:14,(anonymous_2)
@@ -17575,7 +17575,7 @@ BRF:16
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/org-details/org-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/org-details/org-details.component.ts
 FN:20,(anonymous_0)
 FN:41,(anonymous_1)
 FN:81,(anonymous_2)
@@ -17764,7 +17764,7 @@ BRF:32
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/org-edit/org-edit.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/org-edit/org-edit.component.ts
 FN:16,(anonymous_0)
 FN:31,(anonymous_1)
 FN:37,(anonymous_2)
@@ -17859,7 +17859,7 @@ BRF:10
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/paginator/paginator.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/paginator/paginator.component.ts
 FN:8,(anonymous_0)
 FN:13,(anonymous_1)
 FN:18,(anonymous_2)
@@ -17920,7 +17920,7 @@ BRF:16
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/policy-file-details/policy-file-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/policy-file-details/policy-file-details.component.ts
 FN:26,(anonymous_0)
 FN:46,(anonymous_1)
 FN:49,(anonymous_2)
@@ -18089,7 +18089,7 @@ BRF:25
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/policy-files/policy-files.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/policy-files/policy-files.component.ts
 FN:16,(anonymous_0)
 FN:33,(anonymous_1)
 FN:40,(anonymous_2)
@@ -18217,7 +18217,7 @@ BRF:12
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/policy-group-details/policy-group-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/policy-group-details/policy-group-details.component.ts
 FN:20,(anonymous_0)
 FN:34,(anonymous_1)
 FN:37,(anonymous_2)
@@ -18333,7 +18333,7 @@ BRF:14
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/policy-groups/policy-groups.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/policy-groups/policy-groups.component.ts
 FN:16,(anonymous_0)
 FN:31,(anonymous_1)
 FN:38,(anonymous_2)
@@ -18471,7 +18471,7 @@ BRF:20
 BRH:11
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/reset-admin-key/reset-admin-key.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/reset-admin-key/reset-admin-key.component.ts
 FN:15,(anonymous_0)
 FN:28,(anonymous_1)
 FN:31,(anonymous_2)
@@ -18542,7 +18542,7 @@ BRF:4
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/reset-client-key/reset-client-key.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/reset-client-key/reset-client-key.component.ts
 FN:17,(anonymous_0)
 FN:26,(anonymous_1)
 FN:28,(anonymous_2)
@@ -18646,7 +18646,7 @@ BRF:12
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/reset-node-key/reset-node-key.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/reset-node-key/reset-node-key.component.ts
 FN:17,(anonymous_0)
 FN:26,(anonymous_1)
 FN:28,(anonymous_2)
@@ -18758,7 +18758,7 @@ BRF:12
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/revision-id/revision-id.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/revision-id/revision-id.component.ts
 FN:15,(anonymous_0)
 FN:24,(anonymous_1)
 FN:28,(anonymous_2)
@@ -18828,7 +18828,7 @@ BRF:6
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/select-box/src/lib/list-item.domain.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/select-box/src/lib/list-item.domain.ts
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -18845,7 +18845,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/select-box/src/lib/select-box.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/select-box/src/lib/select-box.component.ts
 FN:20,(anonymous_0)
 FN:24,(anonymous_1)
 FN:50,(anonymous_2)
@@ -19300,7 +19300,7 @@ BRF:113
 BRH:16
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/select-box/src/lib/select-box.service.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/select-box/src/lib/select-box.service.ts
 FN:7,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -19321,7 +19321,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/default.options.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/default.options.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -19333,7 +19333,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/component/tree-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/component/tree-table.component.ts
 FN:16,(anonymous_0)
 FN:23,(anonymous_1)
 FN:29,(anonymous_2)
@@ -19481,7 +19481,7 @@ BRF:22
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/mocks/mockSearchableTree.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/mocks/mockSearchableTree.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -19493,7 +19493,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/mocks/mockTree.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/mocks/mockTree.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -19505,7 +19505,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/mocks/mockTreeTableTree.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/mocks/mockTreeTableTree.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -19517,7 +19517,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/services/converter/converter.service.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/services/converter/converter.service.ts
 FN:10,(anonymous_0)
 FN:17,(anonymous_1)
 FN:19,(anonymous_2)
@@ -19562,7 +19562,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/services/tree/tree.service.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/services/tree/tree.service.ts
 FN:18,(anonymous_0)
 FN:19,(anonymous_1)
 FN:29,(anonymous_2)
@@ -19645,7 +19645,7 @@ BRF:10
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/tree-table/services/validator/validator.service.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/tree-table/services/validator/validator.service.ts
 FN:8,(anonymous_0)
 FNF:1
 FNH:1
@@ -19666,7 +19666,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/infra-proxy/update-node-tag-modal/update-node-tag-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/infra-proxy/update-node-tag-modal/update-node-tag-modal.component.ts
 FN:15,(anonymous_0)
 FN:27,(anonymous_1)
 FN:29,(anonymous_2)
@@ -19756,7 +19756,7 @@ BRF:8
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/license/license-apply/license-apply.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/license/license-apply/license-apply.component.ts
 FN:15,(anonymous_0)
 FN:31,(anonymous_1)
 FN:37,(anonymous_2)
@@ -19892,7 +19892,7 @@ BRF:16
 BRH:12
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/license/license-lockout/license-lockout.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/license/license-lockout/license-lockout.component.ts
 FN:16,(anonymous_0)
 FN:48,(anonymous_1)
 FN:60,(anonymous_2)
@@ -20078,7 +20078,7 @@ BRF:27
 BRH:22
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/license/license-notifications/license-notifications.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/license/license-notifications/license-notifications.component.ts
 FN:11,(anonymous_0)
 FN:17,(anonymous_1)
 FN:18,(anonymous_2)
@@ -20127,7 +20127,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/policy/add-members/policy-add-members.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/policy/add-members/policy-add-members.component.ts
 FN:26,(anonymous_0)
 FN:52,(anonymous_1)
 FN:53,(anonymous_2)
@@ -20422,7 +20422,7 @@ BRF:46
 BRH:12
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/policy/list/policy-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/policy/list/policy-list.component.ts
 FN:16,(anonymous_0)
 FN:22,(anonymous_1)
 FN:23,(anonymous_2)
@@ -20498,7 +20498,7 @@ BRF:8
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/roles/list/roles-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/roles/list/roles-list.component.ts
 FN:16,(anonymous_0)
 FN:22,(anonymous_1)
 FN:23,(anonymous_2)
@@ -20562,7 +20562,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/team/team-details/team-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/team/team-details/team-details.component.ts
 FN:27,(anonymous_0)
 FN:54,(anonymous_1)
 FN:57,(anonymous_2)
@@ -20735,7 +20735,7 @@ BRF:21
 BRH:15
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/team/team-management/team-management.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/team/team-management/team-management.component.ts
 FN:21,(anonymous_0)
 FN:31,(anonymous_1)
 FN:32,(anonymous_2)
@@ -20858,7 +20858,7 @@ BRF:10
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/token/token-details/api-token-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/token/token-details/api-token-details.component.ts
 FN:21,(anonymous_0)
 FN:37,(anonymous_1)
 FN:40,(anonymous_2)
@@ -20961,7 +20961,7 @@ BRF:10
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/token/token-list/api-token-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/token/token-list/api-token-list.component.ts
 FN:27,(anonymous_0)
 FN:37,(anonymous_1)
 FN:39,(anonymous_2)
@@ -21117,7 +21117,7 @@ BRF:20
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/user/user-details/user-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/user/user-details/user-details.component.ts
 FN:27,(anonymous_0)
 FN:50,(anonymous_1)
 FN:51,(anonymous_2)
@@ -21462,7 +21462,7 @@ BRF:53
 BRH:24
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/user/user-management/user-management.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/user/user-management/user-management.component.ts
 FN:16,(anonymous_0)
 FN:30,(anonymous_1)
 FN:37,(anonymous_2)
@@ -21546,7 +21546,7 @@ BRF:4
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/modules/user/user-table/user-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/modules/user/user-table/user-table.component.ts
 FN:7,(anonymous_0)
 FN:12,(anonymous_1)
 FN:20,(anonymous_2)
@@ -21584,7 +21584,7 @@ BRF:6
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/accordion/accordion.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/accordion/accordion.component.ts
 FN:8,(anonymous_0)
 FN:13,(anonymous_1)
 FN:25,(anonymous_2)
@@ -21622,7 +21622,7 @@ BRF:4
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/accordion/accordion-item/accordion-item.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/accordion/accordion-item/accordion-item.component.ts
 FN:8,(anonymous_0)
 FN:11,(anonymous_1)
 FN:15,(anonymous_2)
@@ -21649,7 +21649,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/attributes/attributes.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/attributes/attributes.component.ts
 FN:9,(anonymous_0)
 FN:21,(anonymous_1)
 FN:22,(anonymous_2)
@@ -21730,7 +21730,7 @@ BRF:10
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/client-runs-table/client-runs-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/client-runs-table/client-runs-table.component.ts
 FN:7,(anonymous_0)
 FN:18,(anonymous_1)
 FN:22,(anonymous_2)
@@ -21807,7 +21807,7 @@ BRF:8
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/converge-radial-graph/converge-radial-graph.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/converge-radial-graph/converge-radial-graph.component.ts
 FN:8,(anonymous_0)
 FN:15,(anonymous_1)
 FN:26,(anonymous_2)
@@ -21850,7 +21850,7 @@ BRF:6
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/create-user-modal/create-user-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/create-user-modal/create-user-modal.component.ts
 FN:23,(anonymous_0)
 FN:46,(anonymous_1)
 FN:48,(anonymous_2)
@@ -21983,7 +21983,7 @@ BRF:19
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/data-feed-table/data-feed-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/data-feed-table/data-feed-table.component.ts
 FN:10,(anonymous_0)
 FN:25,(anonymous_1)
 FN:28,(anonymous_2)
@@ -22090,7 +22090,7 @@ BRF:21
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/date-selector/date-selector.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/date-selector/date-selector.component.ts
 FN:9,(anonymous_0)
 FN:16,(anonymous_1)
 FN:19,(anonymous_2)
@@ -22143,7 +22143,7 @@ BRF:4
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/deletable-node-control/deletable-node-control.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/deletable-node-control/deletable-node-control.component.ts
 FN:8,(anonymous_0)
 FN:21,(anonymous_1)
 FN:27,(anonymous_2)
@@ -22248,7 +22248,7 @@ BRF:15
 BRH:11
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/delta-viewer/delta-viewer.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/delta-viewer/delta-viewer.component.ts
 FN:9,(anonymous_0)
 FN:12,(anonymous_1)
 FN:18,(anonymous_2)
@@ -22278,7 +22278,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/event-feed-guitar-strings/event-feed-guitar-strings.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/event-feed-guitar-strings/event-feed-guitar-strings.component.ts
 FN:13,(anonymous_0)
 FN:22,(anonymous_1)
 FN:34,(anonymous_2)
@@ -22731,7 +22731,7 @@ BRF:97
 BRH:38
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/event-feed-table/event-feed-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/event-feed-table/event-feed-table.component.ts
 FN:14,(anonymous_0)
 FN:20,(anonymous_1)
 FN:24,(anonymous_2)
@@ -22881,7 +22881,7 @@ BRF:27
 BRH:19
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/feature-flags/feature-flags.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/feature-flags/feature-flags.component.ts
 FN:11,(anonymous_0)
 FN:17,(anonymous_1)
 FN:43,(anonymous_2)
@@ -22980,7 +22980,7 @@ BRF:17
 BRH:15
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/insight-attributes-dropdown/insight-attributes-dropdown.component.ts
 FN:8,(anonymous_0)
 FN:17,(anonymous_1)
 FN:23,(anonymous_2)
@@ -23053,7 +23053,7 @@ BRF:6
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/job-nodes-form/job-nodes-form.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/job-nodes-form/job-nodes-form.component.ts
 FN:13,(anonymous_0)
 FN:30,(anonymous_1)
 FN:37,(anonymous_2)
@@ -23254,7 +23254,7 @@ BRF:36
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/json-tree/json-tree.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/json-tree/json-tree.component.ts
 FN:10,(anonymous_0)
 FN:13,(anonymous_1)
 FN:16,(anonymous_2)
@@ -23354,7 +23354,7 @@ BRF:16
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/json-tree/vendor/json-tree.js
+SF:/github/workspace/components/automate-ui/src/app/page-components/json-tree/vendor/json-tree.js
 FN:8,(anonymous_0)
 FN:17,(anonymous_1)
 FN:27,(anonymous_2)
@@ -23649,7 +23649,7 @@ BRF:64
 BRH:30
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/logs-modal/logs-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/logs-modal/logs-modal.component.ts
 FN:11,(anonymous_0)
 FN:17,(anonymous_1)
 FN:25,(anonymous_2)
@@ -23766,7 +23766,7 @@ BRF:32
 BRH:14
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/mini-table/mini-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/mini-table/mini-table.component.ts
 FN:9,(anonymous_0)
 FN:13,(anonymous_1)
 FNF:2
@@ -23789,7 +23789,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/navbar/navbar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/navbar/navbar.component.ts
 FN:8,(anonymous_0)
 FN:14,(anonymous_1)
 FNF:2
@@ -23814,7 +23814,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/node-rollup/node-rollup.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/node-rollup/node-rollup.component.ts
 FN:7,(anonymous_0)
 FN:14,(anonymous_1)
 FN:17,(anonymous_2)
@@ -23877,7 +23877,7 @@ BRF:9
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/profile/profile.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/profile/profile.component.ts
 FN:18,(anonymous_0)
 FN:29,(anonymous_1)
 FN:35,(anonymous_2)
@@ -24006,7 +24006,7 @@ BRF:12
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/projects-filter/projects-filter.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/projects-filter/projects-filter.component.ts
 FN:8,(anonymous_0)
 FN:13,(anonymous_1)
 FNF:2
@@ -24030,7 +24030,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/projects-filter-dropdown/projects-filter-dropdown.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/projects-filter-dropdown/projects-filter-dropdown.component.ts
 FN:10,(anonymous_0)
 FN:29,(anonymous_1)
 FN:34,(anonymous_2)
@@ -24149,7 +24149,7 @@ BRF:10
 BRH:8
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/resource-item/resource-item.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/resource-item/resource-item.component.ts
 FN:8,(anonymous_0)
 FN:12,(anonymous_1)
 FN:15,(anonymous_2)
@@ -24180,7 +24180,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/resources/resources.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/resources/resources.component.ts
 FN:10,(anonymous_0)
 FN:25,(anonymous_1)
 FN:30,(anonymous_2)
@@ -24264,7 +24264,7 @@ BRF:6
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/run-history/run-history.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/run-history/run-history.component.ts
 FN:15,(anonymous_0)
 FN:29,(anonymous_1)
 FN:53,(anonymous_2)
@@ -24425,7 +24425,7 @@ BRF:19
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/run-list/run-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/run-list/run-list.component.ts
 FN:9,(anonymous_0)
 FN:16,(anonymous_1)
 FN:19,(anonymous_2)
@@ -24604,7 +24604,7 @@ BRF:30
 BRH:25
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/run-list-role-header/run-list-role-header.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/run-list-role-header/run-list-role-header.component.ts
 FN:8,(anonymous_0)
 FN:11,(anonymous_1)
 FNF:2
@@ -24628,7 +24628,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/run-list-table/run-list-table.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/run-list-table/run-list-table.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -24646,7 +24646,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/run-summary/run-summary.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/run-summary/run-summary.component.ts
 FN:11,(anonymous_0)
 FN:16,(anonymous_1)
 FN:19,(anonymous_2)
@@ -24755,7 +24755,7 @@ BRF:23
 BRH:19
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/search-bar/search-bar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/search-bar/search-bar.component.ts
 FN:11,(anonymous_0)
 FN:31,(anonymous_1)
 FN:33,(anonymous_2)
@@ -25072,7 +25072,7 @@ BRF:67
 BRH:44
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/select-list-item/select-list-item.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/select-list-item/select-list-item.component.ts
 FN:7,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -25094,7 +25094,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/selectbox/selectbox.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/selectbox/selectbox.component.ts
 FN:7,(anonymous_0)
 FN:17,(anonymous_1)
 FN:22,(anonymous_2)
@@ -25233,7 +25233,7 @@ BRF:33
 BRH:14
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/services-sidebar/services-sidebar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/services-sidebar/services-sidebar.component.ts
 FN:18,(anonymous_0)
 FN:52,(anonymous_1)
 FN:54,(anonymous_2)
@@ -25427,7 +25427,7 @@ BRF:24
 BRH:16
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/simple-line-graph/simple-line-graph.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/simple-line-graph/simple-line-graph.component.ts
 FN:8,(anonymous_0)
 FN:16,(anonymous_1)
 FN:21,(anonymous_2)
@@ -25739,7 +25739,7 @@ BRF:18
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/telemetry-checkbox/telemetry-checkbox.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/telemetry-checkbox/telemetry-checkbox.component.ts
 FN:10,(anonymous_0)
 FN:17,(anonymous_1)
 FN:20,(anonymous_2)
@@ -25797,7 +25797,7 @@ BRF:6
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/warning-banner/warning-banner.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/warning-banner/warning-banner.component.ts
 FN:8,(anonymous_0)
 FN:13,(anonymous_1)
 FN:20,(anonymous_2)
@@ -25834,7 +25834,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/page-components/welcome-modal/welcome-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/page-components/welcome-modal/welcome-modal.component.ts
 FN:17,(anonymous_0)
 FN:35,(anonymous_1)
 FN:42,(anonymous_2)
@@ -25934,7 +25934,7 @@ BRF:19
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/compliance.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/compliance.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -25950,7 +25950,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+node-credentials/create-node-credential-modal/create-node-credential-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+node-credentials/create-node-credential-modal/create-node-credential-modal.component.ts
 FN:19,(anonymous_0)
 FN:54,(anonymous_1)
 FN:56,(anonymous_2)
@@ -26073,7 +26073,7 @@ BRF:12
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credential-details/node-credential-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credential-details/node-credential-details.component.ts
 FN:21,(anonymous_0)
 FN:68,(anonymous_1)
 FN:77,(anonymous_2)
@@ -26235,7 +26235,7 @@ BRF:31
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.actions.ts
 FN:5,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -26257,7 +26257,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.component.ts
 FN:23,(anonymous_0)
 FN:38,(anonymous_1)
 FN:41,(anonymous_2)
@@ -26409,7 +26409,7 @@ BRF:16
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer.ts
 FN:7,(anonymous_0)
 FN:21,nodeCredentialListReducer
 FNF:2
@@ -26440,7 +26440,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.selectors.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -26453,7 +26453,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+profile/+profile-details/profile-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+profile/+profile-details/profile-details.component.ts
 FN:15,(anonymous_0)
 FN:34,(anonymous_1)
 FN:38,(anonymous_2)
@@ -26645,7 +26645,7 @@ BRF:20
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+profile/+profile-overview/profile-overview.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+profile/+profile-overview/profile-overview.component.ts
 FN:18,(anonymous_0)
 FN:57,(anonymous_1)
 FN:65,(anonymous_2)
@@ -26915,7 +26915,7 @@ BRF:24
 BRH:12
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+profile/+profile-overview/util.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+profile/+profile-overview/util.ts
 FN:8,formatProgressResponse
 FN:36,formatInspecReport
 FNF:2
@@ -26984,7 +26984,7 @@ BRF:22
 BRH:19
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/reporting.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/reporting.component.ts
 FN:17,(anonymous_0)
 FN:156,(anonymous_1)
 FN:157,(anonymous_2)
@@ -27349,7 +27349,7 @@ BRF:49
 BRH:16
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/shared.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/shared.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -27361,7 +27361,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-controls/reporting-controls.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-controls/reporting-controls.component.ts
 FN:12,(anonymous_0)
 FN:20,(anonymous_1)
 FN:24,(anonymous_2)
@@ -27457,7 +27457,7 @@ BRF:9
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-node/reporting-node.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-node/reporting-node.component.ts
 FN:16,(anonymous_0)
 FN:42,(anonymous_1)
 FN:51,(anonymous_2)
@@ -27694,7 +27694,7 @@ BRF:18
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-nodes/reporting-nodes.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-nodes/reporting-nodes.component.ts
 FN:16,(anonymous_0)
 FN:33,(anonymous_1)
 FN:38,(anonymous_2)
@@ -27979,7 +27979,7 @@ BRF:47
 BRH:7
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-overview/reporting-overview.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-overview/reporting-overview.component.ts
 FN:13,(anonymous_0)
 FN:60,(anonymous_1)
 FN:63,(anonymous_2)
@@ -28205,7 +28205,7 @@ BRF:26
 BRH:24
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-overview/overview-trend/overview-trend.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-overview/overview-trend/overview-trend.component.ts
 FN:12,(anonymous_0)
 FN:23,(anonymous_1)
 FN:26,(anonymous_2)
@@ -28543,7 +28543,7 @@ BRF:42
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-profile/reporting-profile.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-profile/reporting-profile.component.ts
 FN:16,(anonymous_0)
 FN:31,(anonymous_1)
 FN:43,(anonymous_2)
@@ -28776,7 +28776,7 @@ BRF:31
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-profiles/reporting-profiles.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/+reporting-profiles/reporting-profiles.component.ts
 FN:17,(anonymous_0)
 FN:35,(anonymous_1)
 FN:40,(anonymous_2)
@@ -29001,7 +29001,7 @@ BRF:23
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+reporting/reporting-searchbar/reporting-searchbar.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+reporting/reporting-searchbar/reporting-searchbar.component.ts
 FN:13,(anonymous_0)
 FN:47,(anonymous_1)
 FN:49,(anonymous_2)
@@ -29450,7 +29450,7 @@ BRF:64
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+scanner/containers/jobs-list/jobs-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+scanner/containers/jobs-list/jobs-list.component.ts
 FN:15,(anonymous_0)
 FN:23,(anonymous_1)
 FN:25,(anonymous_2)
@@ -29587,7 +29587,7 @@ BRF:16
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+scanner/containers/nodes-add/nodes-add.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+scanner/containers/nodes-add/nodes-add.component.ts
 FN:18,(anonymous_0)
 FN:40,(anonymous_1)
 FN:46,(anonymous_2)
@@ -29830,7 +29830,7 @@ BRF:29
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+scanner/state/scanner.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+scanner/state/scanner.actions.ts
 FN:5,(anonymous_0)
 FN:7,(anonymous_1)
 FN:9,(anonymous_2)
@@ -29944,7 +29944,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+scanner/state/scanner.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+scanner/state/scanner.selectors.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -29996,7 +29996,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/+scanner/state/scanner.state.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/+scanner/state/scanner.state.ts
 FN:59,scannerReducer
 FNF:1
 FNH:1
@@ -30069,7 +30069,7 @@ BRF:29
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/shared/reporting/index.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/shared/reporting/index.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -30085,7 +30085,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/shared/reporting/report-data.service.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/shared/reporting/report-data.service.ts
 FN:10,(anonymous_0)
 FN:55,(anonymous_1)
 FN:57,(anonymous_2)
@@ -30201,7 +30201,7 @@ BRF:14
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/shared/reporting/report-query.service.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/shared/reporting/report-query.service.ts
 FN:12,(anonymous_0)
 FN:14,(anonymous_1)
 FN:15,(anonymous_2)
@@ -30285,7 +30285,7 @@ BRF:6
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/shared/reporting/scan-results.service.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/shared/reporting/scan-results.service.ts
 FN:8,(anonymous_0)
 FN:29,(anonymous_1)
 FN:32,(anonymous_2)
@@ -30332,7 +30332,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/shared/reporting/stats.service.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/shared/reporting/stats.service.ts
 FN:14,(anonymous_0)
 FN:21,(anonymous_1)
 FN:25,(anonymous_2)
@@ -30688,7 +30688,7 @@ BRF:75
 BRH:40
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/+compliance/shared/reporting/suggestions.service.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/+compliance/shared/reporting/suggestions.service.ts
 FN:12,(anonymous_0)
 FN:16,(anonymous_1)
 FN:25,(anonymous_2)
@@ -30726,7 +30726,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/automate-settings/automate-settings.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/automate-settings/automate-settings.component.ts
 FN:18,(anonymous_0)
 FN:66,(anonymous_1)
 FN:70,(anonymous_2)
@@ -31008,7 +31008,7 @@ BRF:47
 BRH:30
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/client-runs/client-runs.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/client-runs/client-runs.component.ts
 FN:22,(anonymous_0)
 FN:142,(anonymous_1)
 FN:147,(anonymous_2)
@@ -31418,7 +31418,7 @@ BRF:50
 BRH:34
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/compliance-landing/compliance-landing.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/compliance-landing/compliance-landing.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -31437,7 +31437,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/component-library/demos/cl-api/cl-api.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/component-library/demos/cl-api/cl-api.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -31454,7 +31454,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/component-library/demos/cl-api-prop/cl-api-prop.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/component-library/demos/cl-api-prop/cl-api-prop.component.ts
 FN:8,(anonymous_0)
 FN:17,(anonymous_1)
 FN:20,(anonymous_2)
@@ -31500,7 +31500,7 @@ BRF:6
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/component-library/demos/cl-code-section/cl-code-section.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/component-library/demos/cl-code-section/cl-code-section.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -31516,7 +31516,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/component-library/demos/cl-section/cl-section.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/component-library/demos/cl-section/cl-section.component.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -31532,7 +31532,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/create-data-feed-modal/create-data-feed-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/create-data-feed-modal/create-data-feed-modal.component.ts
 FN:9,(anonymous_0)
 FN:16,(anonymous_1)
 FN:27,(anonymous_2)
@@ -31598,7 +31598,7 @@ BRF:6
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/create-notification-modal/create-notification-modal.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/create-notification-modal/create-notification-modal.component.ts
 FN:21,(anonymous_0)
 FN:28,(anonymous_1)
 FN:56,(anonymous_2)
@@ -31799,7 +31799,7 @@ BRF:33
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/data-feed/data-feed.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/data-feed/data-feed.component.ts
 FN:20,(anonymous_0)
 FN:27,(anonymous_1)
 FN:57,(anonymous_2)
@@ -32079,7 +32079,7 @@ BRF:67
 BRH:56
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/data-feed-config-details/data-feed-config-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/data-feed-config-details/data-feed-config-details.component.ts
 FN:12,(anonymous_0)
 FN:19,(anonymous_1)
 FN:27,(anonymous_2)
@@ -32231,7 +32231,7 @@ BRF:48
 BRH:12
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/data-feed-create/data-feed-create.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/data-feed-create/data-feed-create.component.ts
 FN:11,(anonymous_0)
 FN:18,(anonymous_1)
 FN:23,(anonymous_2)
@@ -32564,7 +32564,7 @@ BRF:87
 BRH:63
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/data-feed-details/data-feed-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/data-feed-details/data-feed-details.component.ts
 FN:44,(anonymous_0)
 FN:51,(anonymous_1)
 FN:58,(anonymous_2)
@@ -32853,7 +32853,7 @@ BRF:82
 BRH:39
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/integrations/add/integration-add.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/integrations/add/integration-add.reducer.ts
 FN:8,(anonymous_0)
 FN:17,integrationsAddReducer
 FNF:2
@@ -32892,7 +32892,7 @@ BRF:8
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/integrations/add/integrations-add.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/integrations/add/integrations-add.component.ts
 FN:16,(anonymous_0)
 FN:22,(anonymous_1)
 FN:60,(anonymous_2)
@@ -32962,7 +32962,7 @@ BRF:4
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/integrations/add/integrations-add.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/integrations/add/integrations-add.selectors.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -32975,7 +32975,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/integrations/detail/integrations-detail.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/integrations/detail/integrations-detail.reducer.ts
 FN:7,(anonymous_0)
 FN:22,integrationsDetailReducer
 FNF:2
@@ -33018,7 +33018,7 @@ BRF:9
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/integrations/edit/integrations-edit.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/integrations/edit/integrations-edit.reducer.ts
 FN:7,(anonymous_0)
 FN:16,integrationsEditReducer
 FNF:2
@@ -33054,7 +33054,7 @@ BRF:7
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/integrations/list/integrations-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/integrations/list/integrations-list.component.ts
 FN:15,(anonymous_0)
 FN:27,(anonymous_1)
 FN:32,(anonymous_2)
@@ -33138,7 +33138,7 @@ BRF:6
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-add/job-add.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-add/job-add.component.ts
 FN:25,(anonymous_0)
 FN:33,(anonymous_1)
 FN:55,(anonymous_2)
@@ -33510,7 +33510,7 @@ BRF:77
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-add/job-add.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-add/job-add.reducer.ts
 FN:8,(anonymous_0)
 FN:17,jobAddReducer
 FNF:2
@@ -33547,7 +33547,7 @@ BRF:7
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-add/job-add.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-add/job-add.selectors.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -33565,7 +33565,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-add/job-add.validators.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-add/job-add.validators.ts
 FN:4,(anonymous_0)
 FN:6,(anonymous_1)
 FN:9,(anonymous_2)
@@ -33596,7 +33596,7 @@ BRF:4
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-edit/job-edit.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-edit/job-edit.component.ts
 FN:26,(anonymous_0)
 FN:34,(anonymous_1)
 FN:47,(anonymous_2)
@@ -33904,7 +33904,7 @@ BRF:43
 BRH:9
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-edit/job-edit.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-edit/job-edit.reducer.ts
 FN:8,(anonymous_0)
 FN:17,jobEditReducer
 FNF:2
@@ -33941,7 +33941,7 @@ BRF:7
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-edit/job-edit.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-edit/job-edit.selectors.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -33959,7 +33959,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-list/job-list.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-list/job-list.actions.ts
 FN:5,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -33981,7 +33981,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/job-list/job-list.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/job-list/job-list.reducer.ts
 FN:7,(anonymous_0)
 FN:22,jobListReducer
 FNF:2
@@ -34012,7 +34012,7 @@ BRF:5
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/node-details/node-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/node-details/node-details.component.ts
 FN:14,(anonymous_0)
 FN:27,(anonymous_1)
 FN:32,(anonymous_2)
@@ -34104,7 +34104,7 @@ BRF:5
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/notification-details/notification-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/notification-details/notification-details.component.ts
 FN:20,(anonymous_0)
 FN:27,(anonymous_1)
 FN:50,(anonymous_2)
@@ -34256,7 +34256,7 @@ BRF:18
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/notifications/notifications.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/notifications/notifications.component.ts
 FN:15,(anonymous_0)
 FN:22,(anonymous_1)
 FN:40,(anonymous_2)
@@ -34444,7 +34444,7 @@ BRF:34
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/project/details/project-details.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/project/details/project-details.component.ts
 FN:22,(anonymous_0)
 FN:39,(anonymous_1)
 FN:43,(anonymous_2)
@@ -34608,7 +34608,7 @@ BRF:22
 BRH:13
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/project/list/project-list.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/project/list/project-list.component.ts
 FN:22,(anonymous_0)
 FN:47,(anonymous_1)
 FN:51,(anonymous_2)
@@ -34739,7 +34739,7 @@ BRF:10
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/project/rules/project-rules.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/project/rules/project-rules.component.ts
 FN:26,(anonymous_0)
 FN:62,(anonymous_1)
 FN:67,(anonymous_2)
@@ -34972,7 +34972,7 @@ BRF:37
 BRH:16
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/service-groups/service-groups.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/service-groups/service-groups.component.ts
 FN:17,(anonymous_0)
 FN:100,(anonymous_1)
 FN:103,(anonymous_2)
@@ -35352,7 +35352,7 @@ BRF:63
 BRH:32
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/settings-landing/settings-landing.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/settings-landing/settings-landing.component.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -35371,7 +35371,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/signin/signin.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/signin/signin.component.ts
 FN:10,(anonymous_0)
 FN:16,(anonymous_1)
 FN:19,(anonymous_2)
@@ -35454,7 +35454,7 @@ BRF:12
 BRH:11
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pages/top-nav-landing/top-nav-landing.component.ts
+SF:/github/workspace/components/automate-ui/src/app/pages/top-nav-landing/top-nav-landing.component.ts
 FN:9,(anonymous_0)
 FN:59,(anonymous_1)
 FN:70,(anonymous_2)
@@ -35486,7 +35486,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/capitalize.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/capitalize.pipe.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -35509,7 +35509,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/cast-formgroup.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/cast-formgroup.pipe.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -35528,7 +35528,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/chef-pipes.module.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/chef-pipes.module.ts
 FNF:0
 FNH:0
 DA:2,1
@@ -35559,7 +35559,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/chef-status-icon.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/chef-status-icon.pipe.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -35601,7 +35601,7 @@ BRF:15
 BRH:10
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/continuous.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/continuous.pipe.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:0
@@ -35629,7 +35629,7 @@ BRF:4
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/datetime.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/datetime.pipe.ts
 FN:13,(anonymous_0)
 FNF:1
 FNH:1
@@ -35652,7 +35652,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/defined-or-default.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/defined-or-default.pipe.ts
 FN:15,(anonymous_0)
 FNF:1
 FNH:1
@@ -35682,7 +35682,7 @@ BRF:6
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/iam-type.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/iam-type.pipe.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -35705,7 +35705,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/pagination-true-end.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/pagination-true-end.pipe.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -35728,7 +35728,7 @@ BRF:4
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/pluralize.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/pluralize.pipe.ts
 FN:27,(anonymous_0)
 FNF:1
 FNH:1
@@ -35757,7 +35757,7 @@ BRF:6
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/select-list-input.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/select-list-input.pipe.ts
 FN:7,(anonymous_0)
 FN:9,(anonymous_1)
 FNF:2
@@ -35781,7 +35781,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/selected-status.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/selected-status.pipe.ts
 FN:7,(anonymous_0)
 FN:11,(anonymous_1)
 FN:13,(anonymous_2)
@@ -35825,7 +35825,7 @@ BRF:7
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/service-status-icon.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/service-status-icon.pipe.ts
 FN:7,(anonymous_0)
 FNF:1
 FNH:1
@@ -35855,7 +35855,7 @@ BRF:6
 BRH:5
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/status-selector.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/status-selector.pipe.ts
 FN:8,(anonymous_0)
 FN:9,(anonymous_1)
 FN:33,(anonymous_2)
@@ -35906,7 +35906,7 @@ BRF:10
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/time-duration.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/time-duration.pipe.ts
 FN:8,(anonymous_0)
 FNF:1
 FNH:1
@@ -35926,7 +35926,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/pipes/time-from-now.pipe.ts
+SF:/github/workspace/components/automate-ui/src/app/pipes/time-from-now.pipe.ts
 FN:8,(anonymous_0)
 FNF:1
 FNH:1
@@ -35951,7 +35951,7 @@ BRF:4
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/app-config/app-config.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/app-config/app-config.service.ts
 FN:20,(anonymous_0)
 FN:24,(anonymous_1)
 FN:27,(anonymous_2)
@@ -36006,7 +36006,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/attributes/attributes.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/attributes/attributes.service.ts
 FN:11,(anonymous_0)
 FN:29,(anonymous_1)
 FN:33,(anonymous_2)
@@ -36044,7 +36044,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/chef-session/chef-session.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/chef-session/chef-session.service.ts
 FN:27,(anonymous_0)
 FN:40,(anonymous_1)
 FN:60,(anonymous_2)
@@ -36353,7 +36353,7 @@ BRF:54
 BRH:19
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/config/config.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/config/config.service.ts
 FN:12,(anonymous_0)
 FN:30,(anonymous_1)
 FN:31,(anonymous_2)
@@ -36398,7 +36398,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/event-feed/event-feed.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/services/event-feed/event-feed.actions.ts
 FN:5,(anonymous_0)
 FN:7,(anonymous_1)
 FN:10,(anonymous_2)
@@ -36482,7 +36482,7 @@ BRF:6
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/event-feed/event-feed.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/services/event-feed/event-feed.reducer.ts
 FN:9,(anonymous_0)
 FN:38,eventFeedReducer
 FNF:2
@@ -36560,7 +36560,7 @@ BRF:25
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/event-feed/event-feed.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/event-feed/event-feed.service.ts
 FN:24,(anonymous_0)
 FN:27,(anonymous_1)
 FN:33,(anonymous_2)
@@ -36832,7 +36832,7 @@ BRF:61
 BRH:52
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/feature-flags/feature-flags.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/feature-flags/feature-flags.service.ts
 FN:8,(anonymous_0)
 FN:12,(anonymous_1)
 FN:14,(anonymous_2)
@@ -36880,7 +36880,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/http/http-client-auth.interceptor.ts
+SF:/github/workspace/components/automate-ui/src/app/services/http/http-client-auth.interceptor.ts
 FN:13,(anonymous_0)
 FN:17,(anonymous_1)
 FN:18,(anonymous_2)
@@ -36946,7 +36946,7 @@ BRF:8
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/metadata/metadata.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/metadata/metadata.service.ts
 FN:10,(anonymous_0)
 FN:13,(anonymous_1)
 FN:15,(anonymous_2)
@@ -36979,7 +36979,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/node-details/node-details-resolver.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/node-details/node-details-resolver.service.ts
 FN:9,(anonymous_0)
 FN:13,(anonymous_1)
 FN:18,(anonymous_2)
@@ -37026,7 +37026,7 @@ BRF:4
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/node-details/node-details.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/node-details/node-details.service.ts
 FN:8,(anonymous_0)
 FN:11,(anonymous_1)
 FNF:2
@@ -37049,7 +37049,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/node-details/node-norunid-resolver.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/node-details/node-norunid-resolver.service.ts
 FN:9,(anonymous_0)
 FN:13,(anonymous_1)
 FN:16,(anonymous_2)
@@ -37097,7 +37097,7 @@ BRF:6
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/node-details/node-noruns-details-resolver.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/node-details/node-noruns-details-resolver.service.ts
 FN:8,(anonymous_0)
 FN:11,(anonymous_1)
 FN:17,(anonymous_2)
@@ -37140,7 +37140,7 @@ BRF:4
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/node-details/node-runs.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/node-details/node-runs.service.ts
 FN:12,(anonymous_0)
 FN:15,(anonymous_1)
 FN:22,(anonymous_2)
@@ -37264,7 +37264,7 @@ BRF:14
 BRH:1
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/product-deployed/product-deployed.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/product-deployed/product-deployed.service.ts
 FN:8,(anonymous_0)
 FN:9,(anonymous_1)
 FN:13,(anonymous_2)
@@ -37289,7 +37289,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/profiles/available-profiles.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/profiles/available-profiles.service.ts
 FN:12,(anonymous_0)
 FN:17,(anonymous_1)
 FN:18,(anonymous_2)
@@ -37339,7 +37339,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/profiles/profiles.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/profiles/profiles.service.ts
 FN:11,(anonymous_0)
 FN:14,(anonymous_1)
 FN:19,(anonymous_2)
@@ -37391,7 +37391,7 @@ BRF:2
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/profiles/upload.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/profiles/upload.service.ts
 FN:15,(anonymous_0)
 FN:18,(anonymous_1)
 FN:23,(anonymous_2)
@@ -37493,7 +37493,7 @@ BRF:23
 BRH:6
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/projects-filter/projects-filter.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/services/projects-filter/projects-filter.actions.ts
 FN:5,(anonymous_0)
 FN:15,(anonymous_1)
 FN:21,(anonymous_2)
@@ -37549,7 +37549,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/projects-filter/projects-filter.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/services/projects-filter/projects-filter.reducer.ts
 FN:20,projectsFilterReducer
 FN:53,setDropdownProperties
 FN:56,selectionLabel
@@ -37727,7 +37727,7 @@ BRF:48
 BRH:44
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/projects-filter/projects-filter.selectors.ts
+SF:/github/workspace/components/automate-ui/src/app/services/projects-filter/projects-filter.selectors.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -37781,7 +37781,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/projects-filter/projects-filter.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/projects-filter/projects-filter.service.ts
 FN:12,(anonymous_0)
 FN:23,(anonymous_1)
 FN:29,(anonymous_2)
@@ -37841,7 +37841,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/run-history-store/run-history.store.ts
+SF:/github/workspace/components/automate-ui/src/app/services/run-history-store/run-history.store.ts
 FN:8,(anonymous_0)
 FN:15,(anonymous_1)
 FN:18,(anonymous_2)
@@ -37918,7 +37918,7 @@ BRF:12
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/storage/localstorage.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/storage/localstorage.service.ts
 FN:9,(anonymous_0)
 FN:13,(anonymous_1)
 FN:17,(anonymous_2)
@@ -37950,7 +37950,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/storage/sessionstorage.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/storage/sessionstorage.service.ts
 FN:9,(anonymous_0)
 FN:13,(anonymous_1)
 FN:17,(anonymous_2)
@@ -37982,7 +37982,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/storage/storage.ts
+SF:/github/workspace/components/automate-ui/src/app/services/storage/storage.ts
 FN:5,(anonymous_0)
 FN:8,(anonymous_1)
 FN:15,(anonymous_2)
@@ -38013,7 +38013,7 @@ BRF:4
 BRH:4
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/telemetry/telemetry.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/telemetry/telemetry.service.ts
 FN:43,(anonymous_0)
 FN:67,(anonymous_1)
 FN:76,(anonymous_2)
@@ -38359,7 +38359,7 @@ BRF:54
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/telemetry/application-stats/application-stats.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/telemetry/application-stats/application-stats.service.ts
 FN:12,(anonymous_0)
 FN:15,(anonymous_1)
 FN:17,(anonymous_2)
@@ -38438,7 +38438,7 @@ BRF:9
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/telemetry/client-runs-stats/client-runs-stats.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/telemetry/client-runs-stats/client-runs-stats.service.ts
 FN:12,(anonymous_0)
 FN:15,(anonymous_1)
 FN:17,(anonymous_2)
@@ -38517,7 +38517,7 @@ BRF:9
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/telemetry/compliance-stats/compliance-stats.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/telemetry/compliance-stats/compliance-stats.service.ts
 FN:12,(anonymous_0)
 FN:15,(anonymous_1)
 FN:17,(anonymous_2)
@@ -38596,7 +38596,7 @@ BRF:9
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/user-preferences/signin-ui-settings.ts
+SF:/github/workspace/components/automate-ui/src/app/services/user-preferences/signin-ui-settings.ts
 FN:5,(anonymous_0)
 FN:14,(anonymous_1)
 FN:23,(anonymous_2)
@@ -38634,7 +38634,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/user-preferences/user-preferences.actions.ts
+SF:/github/workspace/components/automate-ui/src/app/services/user-preferences/user-preferences.actions.ts
 FN:5,(anonymous_0)
 FN:15,(anonymous_1)
 FN:21,(anonymous_2)
@@ -38691,7 +38691,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/user-preferences/user-preferences.reducer.ts
+SF:/github/workspace/components/automate-ui/src/app/services/user-preferences/user-preferences.reducer.ts
 FN:17,userPreferencesEntityReducer
 FNF:1
 FNH:1
@@ -38727,7 +38727,7 @@ BRF:9
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/user-preferences/user-preferences.selector.ts
+SF:/github/workspace/components/automate-ui/src/app/services/user-preferences/user-preferences.selector.ts
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FN:8,(anonymous_2)
@@ -38752,7 +38752,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/services/user-preferences/user-preferences.service.ts
+SF:/github/workspace/components/automate-ui/src/app/services/user-preferences/user-preferences.service.ts
 FN:10,(anonymous_0)
 FN:15,(anonymous_1)
 FN:18,(anonymous_2)
@@ -38787,7 +38787,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/testing/custom-matchers.ts
+SF:/github/workspace/components/automate-ui/src/app/testing/custom-matchers.ts
 FN:6,(anonymous_0)
 FN:8,(anonymous_1)
 FNF:2
@@ -38818,7 +38818,7 @@ BRF:6
 BRH:3
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/testing/mock-chef-session.service.ts
+SF:/github/workspace/components/automate-ui/src/app/testing/mock-chef-session.service.ts
 FN:5,(anonymous_0)
 FN:14,(anonymous_1)
 FN:15,(anonymous_2)
@@ -38872,7 +38872,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/testing/spec-helpers.ts
+SF:/github/workspace/components/automate-ui/src/app/testing/spec-helpers.ts
 FN:45,using
 FN:54,checkFirstPerm
 FNF:2
@@ -38912,7 +38912,7 @@ BRF:8
 BRH:2
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/app/types/types.ts
+SF:/github/workspace/components/automate-ui/src/app/types/types.ts
 FN:6,(anonymous_0)
 FN:13,(anonymous_1)
 FN:49,(anonymous_2)
@@ -39308,7 +39308,7 @@ BRF:59
 BRH:37
 end_of_record
 TN:
-SF:/github/workspace/components/automate-ui/./components/automate-ui/src/environments/environment.no_auth.ts
+SF:/github/workspace/components/automate-ui/src/environments/environment.no_auth.ts
 FNF:0
 FNH:0
 DA:2,1
