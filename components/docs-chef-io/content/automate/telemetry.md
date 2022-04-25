@@ -9,6 +9,7 @@ gh_repo = "automate"
     title = "Telemetry"
     parent = "automate/configure"
     identifier = "automate/configure/telemetry.md Telemetry"
+    weight = 50
 +++
 
 ### About Telemetry
