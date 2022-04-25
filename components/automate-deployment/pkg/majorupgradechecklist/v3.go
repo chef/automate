@@ -117,15 +117,15 @@ var postChecklistExternal = []PostCheckListItem{
 }
 
 type V3ChecklistManager struct {
-	writer  cli.FormatWriter
-	version string
+	writer       cli.FormatWriter
+	version      string
 	isExternalPG bool
 }
 
 func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3ChecklistManager {
 	return &V3ChecklistManager{
-		writer:  writer,
-		version: version,
+		writer:       writer,
+		version:      version,
 		isExternalPG: IsExternalPG(),
 	}
 }
