@@ -1,7 +1,6 @@
 +++
 title = "Disclosure Panel and Banner"
 
-weight = 60
 draft = false
 
 gh_repo = "automate"

@@ -1,7 +1,6 @@
 +++
 title = "Invalid Login Attempts"
 
-weight = 70
 draft = false
 
 gh_repo = "automate"
@@ -10,11 +9,14 @@ gh_repo = "automate"
     title = "Invalid Login Attempts"
     parent = "automate/configure"
     identifier = "automate/configure/invalid_login_attempts.md Invalid Login Attempts"
+    weight = 60
 +++
 
-Chef Automate has an option to configure Invalid Login Attempts which is enabled by default to avoid multiple failed login attempts in short period of time. Chef Automate blocks user for specified duration in minutes, after allowed number of invalid login attempts is met.
+Chef Automate lets you configure **Invalid Login Attempts**, which is enabled (by default) to avoid multiple failed login attempts in a shorter time. Chef Automate also blocks the user for a specified duration (in minutes) once the maximum allowed number of invalid login attempts reached
 
-Default configuration of invalid_login_attempts in Chef Automate:
+Once the maximum allowed number of invalid login attempts is reached, Chef Automate blocks the user for a specific time being.
+
+The default configuration of `invalid_login_attempts` in Chef Automate is as follows:
 
 ```toml
 [dex.v1.sys]
@@ -24,12 +26,10 @@ Default configuration of invalid_login_attempts in Chef Automate:
       max_invalid_login_attempts_allowed = 5
 ```
 
-Above default values can be changed:
+To change the above default values, follow the steps given below:
 
-- Set the value of `enable_invalid_login_attempts` property to **false** in *config.toml* file to disable this feature.
-- Set the value of `blocked_duration` property to your desired time in minutes(for example **30**). (Setting the value of this property to **30** will block the user from trying to log in with invalid credentials for 30 minutes after `max_invalid_login_attempts_allowed` is consumed).
-- Set the value of `max_invalid_login_attempts_allowed` to your desired number (for example **5**). (Setting the value of ths property to **5** will let user try for 5 times with failed login attempts beyond which user will be blocked for set `blocked_duration`. Only when user has made all 5 failed attempts within specified `blocked_duration`)
+- Set the value of `enable_invalid_login_attempts` property to **false** in *config.toml* file to disable the feature.
+- Set the value of `blocked_duration` property to your desired time in minutes(for example, **30** mins). (Setting the value of this property to **30** will block the user from trying to log in with invalid credentials for 30 minutes after `max_invalid_login_attempts_allowed` is consumed).
+- Set the value of `max_invalid_login_attempts_allowed` to your desired number (for example, **5**). (Setting the value of this property to **5** will let the user try five times with failed login attempts beyond which the user will be blocked for set `blocked_duration`. Only when the user has made all five failed attempts within specified `blocked_duration`)
 
-{{< note >}}
-The failed login attempts will reset and same blocked user or user with some failed login attempts can start fresh again after specified `blocked_duration` 
-{{< /note >}}
+{{< note >}} When the failed login attempt resets, it will start only when the same blocked user or the user with failed login attempts will start and after specifing the `blocked_duration`. {{< /note >}}
