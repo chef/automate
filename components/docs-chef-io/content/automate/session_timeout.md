@@ -1,7 +1,6 @@
 +++
 title = "Session Timeout"
 
-weight = 70
 draft = false
 
 gh_repo = "automate"
@@ -10,6 +9,7 @@ gh_repo = "automate"
     title = "Session Timeout"
     parent = "automate/configure"
     identifier = "automate/configure/session_timeout.md Session Timeout"
+    weight = 40
 +++
 
 Chef Automate has an optional session timeout configuration for signing out idle workstations. Chef Automate measure session activity as any interaction from a workstation, from a mouse, keyboard, or touchpad. With session timeout enabled, Chef Automate signs out idle workstations after a set number of minutes.
