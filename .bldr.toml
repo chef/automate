@@ -920,7 +920,7 @@ paths = [
   "components/automate-supermarket/*"
 ]
 
-[automate-supermarket]
+[automate-supermarket-redis]
 plan_path = "components/automate-supermarket-redis"
 paths = [
   "components/automate-supermarket-redis/*"
