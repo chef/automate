@@ -119,12 +119,14 @@ var postChecklistExternal = []PostCheckListItem{
 type V3ChecklistManager struct {
 	writer  cli.FormatWriter
 	version string
+	isExternalPG bool
 }
 
 func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3ChecklistManager {
 	return &V3ChecklistManager{
 		writer:  writer,
 		version: version,
+		isExternalPG: IsExternalPG(),
 	}
 }
 
@@ -148,9 +150,9 @@ func IsExternalPG() bool {
 	return config.IsExternalPG()
 }
 
-func (ci *V3ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckListItem {
+func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	var postChecklist []PostCheckListItem
-	if isExternalPG {
+	if ci.isExternalPG {
 		postChecklist = postChecklistExternal
 	} else {
 		postChecklist = postChecklistEmbedded
@@ -158,13 +160,13 @@ func (ci *V3ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckLis
 	return postChecklist
 }
 
-func (ci *V3ChecklistManager) RunChecklist(isExternalPG bool) error {
+func (ci *V3ChecklistManager) RunChecklist() error {
 
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
 
-	if isExternalPG {
+	if ci.isExternalPG {
 		dbType = "External"
 		postcheck = postChecklistExternal
 		checklists = append(checklists, preChecklist(externalPGUpgradeCheck)...)
@@ -325,4 +327,8 @@ func promptUpgradeContinue() Checklist {
 			return nil
 		},
 	}
+}
+
+func (ci *V3ChecklistManager) GetExternalDB() bool {
+	return IsExternalPG()
 }

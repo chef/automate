@@ -121,7 +121,7 @@ func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4Checklist
 	}
 }
 
-func (ci *V4ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckListItem {
+func (ci *V4ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	var postChecklist []PostCheckListItem
 	if ci.isExternalES {
 		postChecklist = postChecklistV4External
@@ -131,7 +131,7 @@ func (ci *V4ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckLis
 	return postChecklist
 }
 
-func (ci *V4ChecklistManager) RunChecklist(isExternalPG bool) error {
+func (ci *V4ChecklistManager) RunChecklist() error {
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
@@ -427,4 +427,8 @@ func disableSharding() Checklist {
 			return nil
 		},
 	}
+}
+
+func (ci *V4ChecklistManager) GetExternalDB() bool {
+	return ci.isExternalES
 }

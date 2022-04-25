@@ -42,9 +42,9 @@ func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	}, nil
 }
 
-func (pcm *PostChecklistManager) CreatePostChecklistFile(path string, isExecuted bool) error {
+func (pcm *PostChecklistManager) CreatePostChecklistFile(path string,) error {
 	params := PostChecklist{}
-	params.PostChecklist = append(params.PostChecklist, pcm.ci.GetPostChecklist(isExecuted)...)
+	params.PostChecklist = append(params.PostChecklist, pcm.ci.GetPostChecklist()...)
 	params.Version = pcm.version
 	err := CreateJsonFile(&params, path)
 	if err != nil {
@@ -72,7 +72,8 @@ func (pcm *PostChecklistManager) ReadPostChecklistById(id string, path string) (
 	return checklistIDIsExecuted, nil
 }
 
-func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExternalPG bool) ([]string, error) {
+func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]string, error) {
+	isExternalDB := pcm.ci.GetExternalDB()
 	var postCmdList []string
 	var showPostChecklist = false
 	res, err := ReadJsonFile(path)
@@ -82,7 +83,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExt
 
 	if res.Version == pcm.version {
 		for i := 0; i < len(res.PostChecklist); i++ {
-			if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || (isExternalPG && !res.Seen) {
+			if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || (isExternalDB && !res.Seen) {
 				showPostChecklist = true
 				break
 			}
@@ -96,7 +97,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string, isExt
 			}
 		}
 
-		if isExternalPG {
+		if isExternalDB {
 			res.Seen = true
 			err = CreateJsonFile(res, path)
 			if err != nil {
