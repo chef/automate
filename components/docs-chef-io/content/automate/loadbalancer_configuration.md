@@ -15,14 +15,14 @@ gh_repo = "automate"
 
 This guide details how to set up the load balancer configuration with:
 
-- Haproxy
-- nginx
+- HAProxy
+- Nginx
 
-## Haproxy
+## HAProxy
 
-The steps to set up the load balancer using Haproxy are:
+The steps to set up the load balancer using HAProxy are:
 
-1. Install Haproxy on the server using the following commands:
+1. Install HAProxy on the server using the following commands:
 
 ```bash
 sudo add-apt-repository ppa:vbernat/haproxy-1.8 
@@ -151,9 +151,9 @@ backend automate-servers
 
 6. Restart haproxy using `service haproxy restart `.
 
-## nginx
+## Nginx
 
-1. Install **nginx** on server Debian and Ubuntu using the following commands:
+1. Install **Nginx** on server Debian and Ubuntu using the following commands:
 
 ```bash
 sudo apt-get update  
@@ -165,7 +165,7 @@ sudo yum update
 sudo yum install nginx 
 ```
 
-2. To Configure nginx as a loadbalancer, create `.conf` file for the Load balancer `vi /etc/nginx/conf.d/load-balancer.conf`. In the `load-balancer.conf` file, add the following content:
+2. To Configure Nginx as a loadbalancer, create `.conf` file for the Load balancer `vi /etc/nginx/conf.d/load-balancer.conf`. In the `load-balancer.conf` file, add the following content:
 
 ```sh
 #List of servers behind LB 
