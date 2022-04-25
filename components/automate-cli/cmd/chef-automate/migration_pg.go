@@ -262,6 +262,10 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
 		var isAvailableSpace bool
 		var err error
+		if migrateDataCmdFlags.check {
+			writer.Title("--check flag is not required for es-migation. \nPlease run the command without --check flag")
+			return nil
+		}
 		if migrateDataCmdFlags.skipStorageCheck {
 			isAvailableSpace = true
 			err = nil
@@ -302,14 +306,14 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 
 			if !isExecuted {
-				if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
+				if !migrateDataCmdFlags.autoAccept {
 					err := promptCheckList(
 						"It will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
 					)
 					if err != nil {
 						return err
 					}
-					err = esMigrateExecutor()
+					err = esMigrateExecutor(ci)
 					if err != nil {
 						writer.Error("esMigrateExecutor : " + err.Error())
 						return err
@@ -400,7 +404,7 @@ chown -RL hab:hab /hab/svc/automate-opensearch/var;
 `
 
 // esMigrateExecutor
-func esMigrateExecutor() error {
+func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
 	preRequiste, err := preRequisteForESDataMigration()
 	if !preRequiste {
 		// NO DIR PRESENT
@@ -412,7 +416,7 @@ func esMigrateExecutor() error {
 	if err != nil {
 		return err
 	}
-	err = executeMigrate(migrateDataCmdFlags.check)
+	err = executeMigrate(ci)
 	if err != nil {
 		return err
 	}
@@ -420,7 +424,7 @@ func esMigrateExecutor() error {
 	return nil
 }
 
-func executeMigrate(check bool) error {
+func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"migration from es to os \n" +
@@ -444,18 +448,11 @@ func executeMigrate(check bool) error {
 		writer.Fail(err.Error())
 		return err
 	}
-
-	if !check {
-		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-		if err != nil {
-			writer.Fail("NewPostChecklistManager : " + err.Error())
-			return err
-		}
-		err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
-		if err != nil {
-			writer.Fail("UpdatePostChecklistFile : " + err.Error())
-		}
+	err = ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+	if err != nil {
+		writer.Fail("UpdatePostChecklistFile : " + err.Error())
 	}
+	writer.Title("Done with Migration \n Please wait for some time to reindex the data")
 	return nil
 }
 
