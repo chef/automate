@@ -6,8 +6,8 @@ import (
 )
 
 type ChecklistManager interface {
-	RunChecklist(isExternalPG bool) error
-	GetPostChecklist(isExternalPG bool) []PostCheckListItem
+	RunChecklist() error
+	GetPostChecklist() []PostCheckListItem
 }
 
 func NewChecklistManager(writer cli.FormatWriter, version string) (ChecklistManager, error) {
