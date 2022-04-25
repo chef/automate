@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 This section lists the steps to connect the existing Chef Infra Server organization and users to Chef Automate and migrate all the organization and users into Chef Automate.
 
-## Prerequisite
+## Prerequisites
 
 - Chef Server backup using `knife ec backup` command.
 - Chef Server is added to the Infra Server View.
@@ -42,19 +42,6 @@ If you need a newer version of `knife-ec-backup` you can install it using the em
 ```cmd
 /opt/opscode/embedded/bin/gem install knife-ec-backup --no-doc
 ```
-
-#### Chef WorkStation Install (Unsupported)
-
-On systems other than the Chef Infra Server, installing the `gem` is not tested or supported. However, if you attempt to do so, you will need the PostgreSQL libraries installed.
-
-For example, on macOS:
-
-```cmd
-brew install libpq
-gem install knife-ec-backup -- --with-pg-config=/usr/local/Cellar/libpq/9.2/bin/pg_config
-```
-
-You can determine the current location of `pg_config` with brew info `libpq`.
 
 ### Run the `knife-ec-backup` Command
 
