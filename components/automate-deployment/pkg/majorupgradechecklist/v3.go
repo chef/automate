@@ -328,7 +328,3 @@ func promptUpgradeContinue() Checklist {
 		},
 	}
 }
-
-func (ci *V3ChecklistManager) GetExternalDB() bool {
-	return IsExternalPG()
-}

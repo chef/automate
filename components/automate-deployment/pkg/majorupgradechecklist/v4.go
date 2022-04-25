@@ -428,7 +428,3 @@ func disableSharding() Checklist {
 		},
 	}
 }
-
-func (ci *V4ChecklistManager) GetExternalDB() bool {
-	return ci.isExternalES
-}
