@@ -181,6 +181,32 @@ func (p *postgres) GetAutomateInfraOrgUsers(ctx context.Context, serverId, orgId
 	return orgUsers, nil
 }
 
+// DeleteAutomateInfraOrgUsers: Deletes users of an org
+func (p *postgres) DeleteAutomateInfraOrgUsers(ctx context.Context, serverID, orgID string) error {
+	return p.deleteAutomateInfraOrgUsers(ctx, serverID, orgID)
+}
+
+func (p *postgres) deleteAutomateInfraOrgUsers(ctx context.Context, serverID, orgID string) error {
+	var usersExist bool
+
+	row := p.db.QueryRowContext(ctx, `SELECT EXISTS(
+		SELECT 1 FROM org_users WHERE org_id=$1 and user_id IN (SELECT id from users WHERE server_id=$2))`, orgID, serverID)
+	if err := row.Scan(&usersExist); err != nil {
+		// failed with an unexpected error
+		return p.processError(err)
+	}
+	if usersExist {
+		err := p.db.QueryRowContext(ctx,
+			`DELETE FROM org_users WHERE org_id=$1 and user_id IN (SELECT id from users WHERE server_id=$2)
+			RETURNING org_id`, orgID, serverID).
+			Scan(&orgID)
+		if err != nil {
+			return p.processError(err)
+		}
+	}
+	return nil
+}
+
 func (p *postgres) GetUsers(ctx context.Context, serverID string) ([]storage.User, error) {
 	return p.getUsers(ctx, p.db, serverID)
 }
