@@ -33,7 +33,7 @@ Chef Automate and Chef Server act as frontend nodes and serve as a web UI with L
 
 - [Chef Automate](https://docs.chef.io/automate/)
 
-- [Chef Server](https://docs.chef.io/server/
+- [Chef Server](https://docs.chef.io/server/)
 
 ## Deployment Methods
 
