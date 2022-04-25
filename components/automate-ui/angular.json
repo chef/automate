@@ -105,6 +105,7 @@
             "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
+            "codeCoverage":true,
             "scripts": [
               "src/modernizr-custom.js"
             ],

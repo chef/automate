@@ -4,7 +4,7 @@
   pushd ./components/automate-ui >/dev/null || return 1
     npm test
   popd >/dev/null || return 1
-  cp ./components/automate-ui/lconv.info Coverage_report
+  cp ./components/automate-ui/coverage/lconv.info Coverage_report
   echo "Got NPM Coverage"
 
   echo "Getting Go Coverage"
