@@ -32,6 +32,7 @@ type Storage interface {
 
 	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
 	GetAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) ([]OrgUser, error)
+	DeleteAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) error
 
 	StoreOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (OrgUser, error)
 	EditOrgUserAssociation(ctx context.Context, serverID, orgID, username string, isAdmin bool) (OrgUser, error)
