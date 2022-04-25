@@ -21,31 +21,27 @@ Chef Automate High Availability (HA) cluster requires multiple ports for the fro
 | --- | --- |
 | TCP 22 | Allows terraform to securely access (SSH) your network infrastructure and configure services. |
 | TCP 9631 | Allows the tools to query information from the backend to configure Chef Automate HA. |
-| Users, chef-servers, and chef-clients to frontend nodes | |
-| --- | --- |
+| **Users, Chef-Servers, and Chef-Clients to Frontend Nodes** | |
 | TCP 443 | Allows you to establish a connection with the UI and chef-servers APIs for reporting. Access to this port is required if chef-clients have to report directly or download profiles. |
 | TCP 80, optional | Allows you to redirect to port 443. |
 
-## Network Traffic for Incoming Elastic-search Backend Nodes
+## Network Traffic for Incoming OpenSearch Backend Nodes
 
-| Provisioning server to Elasticsearch backend nodes | |
+| Provisioning server to OpenSearch backend nodes | |
 | --- | --- |
 | TCP 22 | Allows Terraform to securely access (SSH) your network infrastructure and configure services. |
 | TCP 9631 | Allows the tools to query information from the backend to configure Chef Automate HA. |
-| Admin users to Elasticsearch backend nodes | |
-| --- | --- |
-| TCP 5601, optional | Allows you to establish a connection with Kibana on the Elasticsearch servers. The successful connection hosts an operations dashboard displaying metrics for the Elasticsearch and Postgres servers. |
-| Frontend nodes to the Elasticsearch backend nodes | |
-| TCP 9200 | Allows Chef Automate HA to communicate to the Elasticsearch API. |
+| **Admin users to OpenSearch Backend Nodes** | |
+| TCP 5601, optional | Allows you to establish a connection with Kibana on the OpenSearch servers. The successful connection hosts an operations dashboard displaying metrics for the OpenSearch and Postgres servers. |
+| Frontend nodes to the OpenSearch backend nodes | |
+| TCP 9200 | Allows Chef Automate HA to communicate to the OpenSearch API. |
 | TCP 9631 | Allows the tools to query information from the backend to configure Chef Automate HA. |
-| Elasticsearch backend nodes to Elasticsearch backend nodes | |
-| --- | --- |
-| TCP 9300 | Allows Elasticsearch node to distribute data in its cluster. |
-| TCP/UDP 9638 | Allows Habitat to communicate configuration changes between Elasticsearch nodes. |
-| TCP 9631 | Allows Habitat API to be reachable from services on the Elasticsearch nodes |
-| Postgres backends nodes to Elasticsearch backends nodes and vice versa | |
-| --- | --- |
-| TCP 9200 | Allows Metricbeats to send data to the Elasticsearch for use in Kibana. |
+| **OpenSearch Backend Nodes to OpenSearch Backend Nodes** | |
+| TCP 9300 | Allows OpenSearch node to distribute data in its cluster. |
+| TCP/UDP 9638 | Allows Habitat to communicate configuration changes between OpenSearch nodes. |
+| TCP 9631 | Allows Habitat API to be reachable from services on the OpenSearch nodes |
+| **Postgres Backend Nodes to OpenSearch Backend Nodes and Vice-Versa** | |
+| TCP 9200 | Allows Metricbeats to send data to the OpenSearch for use in Kibana. |
 | TCP/UDP 9638 | Allows Habitat to communicate configuration changes between backend nodes. |
 | TCP 9631 | Allows the Habitat API to be reachable from services on all backend nodes. |
 
@@ -55,16 +51,13 @@ Chef Automate High Availability (HA) cluster requires multiple ports for the fro
 | --- | --- |
 | TCP 22 | Allows Terraform to securely access (SSH) and configure services. |
 | TCP 9631 | Allows the tools for configuration to reach the habitat API.  |
-| Frontend nodes to Postgres backend nodes | |
-| --- | --- |
+| **Frontend Nodes to Postgres Backend Nodes** | |
 | TCP 7432 | Allows Automate to connect to haproxy that forwards to the psql leader. |
 | TCP 9631 | Allows the tools to query information from the backend to configure Chef Automate HA. |
-| Postgres backend nodes to Postgres backend nodes | |
-| --- | --- |
+| **Postgres Backend Nodes to Postgres Backend Nodes** | |
 | TCP 5432 | Allows haproxy on Postgres backends to forward connections to the leader. |
 | TCP/UDP 9638 | Allows Habitat to communicate configuration changes between Postgres nodes. |
 | TCP 9631 | Allows the Habitat API to be reachable from services on the Postgres nodes. |
-| Elasticsearch backend nodes to Postgres backend nodes and vice versa | |
-| --- | --- |
+| **OpenSearch Backend Nodes to Postgres Backend Nodes and Vice-Versa** | |
 | TCP/UDP 9638 | Allows Habitat to communicate configuration changes between backend nodes. |
 | TCP 9631 | Allows the Habitat API to be reachable from services on all backend nodes. |
