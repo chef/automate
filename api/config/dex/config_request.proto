@@ -144,7 +144,7 @@ message ConfigRequest {
 
 		message InvalidLoginAttempts {
 			google.protobuf.BoolValue enable_invalid_login_attempts = 1;
-			google.protobuf.Int32Value blocked_duration = 2;
+			google.protobuf.Int32Value blocked_duration_in_minutes = 2;
 			google.protobuf.Int32Value max_invalid_login_attempts_allowed = 3;
 		}
 	}
