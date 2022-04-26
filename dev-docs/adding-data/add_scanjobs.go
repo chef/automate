@@ -95,7 +95,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("\n\n!!!!!!!!!!!!!!!!!!!!!!\nNOTE: YOU MUST BE ON VPN TO GET WORKING SCAN JOBS\n!!!!!!!!!!!!!!!!!!!!!!\n\n")
+	fmt.Println("\n\n!!!!!!!!!!!!!!!!!!!!!!\nNOTE: YOU MUST BE ON VPN TO GET WORKING SCAN JOBS\n!!!!!!!!!!!!!!!!!!!!!!")
 
 	// get the gateway nodes client
 	gatewayNodesClient := gwnodes.NewNodesServiceClient(suite.gwConn)
