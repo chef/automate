@@ -43,7 +43,7 @@ def get_latest_manifest(channel)
   http = Net::HTTP.new(PACKAGES_HOST, 443)
   http.use_ssl = true
   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-  req = Net::HTTP::Get.new("/manifests/#{channel}/automate/latest.json",
+  req = Net::HTTP::Get.new("/manifests/#{channel}/automate/latest_semver.json",
                            {'User-Agent' => HTTP_USER_AGENT})
   resp = http.request(req)
   JSON.parse(resp.body)

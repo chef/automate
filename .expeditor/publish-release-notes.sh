@@ -29,24 +29,48 @@ Chef lets you choose your **upgrade journey** based on your current version of C
 
 Click [here](/automate/major_upgrade/) to know more.
 
+## New Features
+-
+
+## Improvements
+-
+
+## Compliance Profile Updates
+-
+
+## Bug Fixes
+-
+
 ## Maintenance
-- 
+-
+
+## Backward Incompatibilities
+-
+
+## Security
+
+### Security Improvements
+(examples: new security configurations)
+-
+### Security Updates
+(examples: dependency updates, CVE fixes)
+-
 
 ## Chef Packaged Product Versions
 
 This release uses:
-- Chef Habitat version: 
-- Chef Habitat Builder version: 
-- Chef Infra Server version: 
-- Chef InSpec version: 
+- Chef Habitat version:
+- Chef Habitat Builder version:
+- Chef Infra Server version:
+- Chef InSpec version:
 
 ## Service Versions
 
 This release uses:
-- Postgres: 
-- ElasticSearch: 
-- Nginx: 
-- Haproxy: 
+- Postgres:
+- ElasticSearch:
+- Nginx:
+- Haproxy:
 
 ## Supported External Chef Products
 

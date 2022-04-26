@@ -42,20 +42,8 @@ variable "backup_config_efs" {
   default = "false"
 }
 
-variable "backup_config_efs" {
-  default = "false"
-}
-
 variable "backup_config_s3" {
   default = "false"
-}
-
-variable "backup_config_s3" {
-  default = "false"
-}
-
-variable "bucket_name" {
-  default = "chef-automate-ha"
 }
 
 variable "bucket_name" {
@@ -144,15 +132,12 @@ variable "public_ips" {
   default = []
 }
 
-variable "setup_managed_services" {
-  default = false
-}
 variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
 }
 
-variable "s3_endpoint" {
-  default = "https://s3.amazonaws.com"
+variable "setup_managed_services" {
+  default = false
 }
 
 variable "ssh_key_file" {

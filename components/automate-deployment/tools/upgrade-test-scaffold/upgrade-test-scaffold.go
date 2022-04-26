@@ -191,6 +191,8 @@ func serve(cmd *cobra.Command, args []string) {
 
 	http.HandleFunc("/manifests/current/automate/latest.json", ServeLatestManifest(manifestPath, manifestMap))
 	http.HandleFunc("/manifests/dev/automate/latest.json", ServeLatestManifest(manifestPath, manifestMap))
+	http.HandleFunc("/manifests/current/automate/latest_semver.json", ServeLatestManifest(manifestPath, manifestMap))
+	http.HandleFunc("/manifests/dev/automate/latest_semver.json", ServeLatestManifest(manifestPath, manifestMap))
 	http.HandleFunc("/manifests/current/automate/versions.json", ServeVersions(versionPath, manifestMap))
 	http.HandleFunc("/manifests/dev/automate/versions.json", ServeVersions(versionPath, manifestMap))
 	http.HandleFunc("/manifests/automate/", ServeManifest("/manifests/automate/", manifestMap))
