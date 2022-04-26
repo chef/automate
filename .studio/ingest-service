@@ -24,7 +24,7 @@ function ingest_integration() {
   # Mocka a NodeJS framework for integration tests (TODO: Replace it for the above method)
   install_ingest_test_framework
   # Make sure our service and dependencies are running
-  wait_for_ok_response $ELASTICSEARCH_URL
+  wait_for_ok_response $OPENSEARCH_URL
   wait_or_fail_for_port_to_listen $INGEST_PORT
   pushd /src/components/ingest-service >/dev/null;
     mocha
@@ -366,7 +366,7 @@ function load_desktop_reports() {
 
   # set the date that the all the node were initially created in automate to a year ago. 
   year_ago=$(date --rfc-3339=seconds  -d "1 year ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
-  curl -X POST "$ELASTICSEARCH_URL/node-state/_update_by_query?pretty" -H 'Content-Type: application/json' -d'
+  curl -X POST "$OPENSEARCH_URL/node-state/_update_by_query?pretty" -H 'Content-Type: application/json' -d'
   {
     "script": {
       "source": "ctx._source[\u0027created\u0027] = \u0027'$year_ago'\u0027",
