@@ -13,10 +13,7 @@ gh_repo = "automate"
     weight = 210
 +++
 
-This page explains the prerequisites of the AWS and on-premise backed backup. You can also take back up for:
-
-- External Open Search and Postgres-SQL on Amazon S3 bucket.
-- External Open Search and Postgres-SQL on External File-system (EFS).
+This page explains the prerequisites of the AWS and on-premise backup.
 
 {{< note >}} You can take backup on EFS system through DNS or IP. {{< /note >}}
 
@@ -24,10 +21,10 @@ This page explains the prerequisites of the AWS and on-premise backed backup. Yo
 
 The two pre-backup configurations for AWS are:
 
-- For s3 Backup
+- For S3 Backup
 - For EFS Backup
 
-### Pre Backup Configuration for s3 Backup
+### Pre Backup Configuration for S3 Backup
 
 To run the terraform scripts, the IAM users should have proper permissions. Going forward, we will also discuss the required permissions. You should have your  `secret access key` and `key id`, or else you can regenerate a new access key.
 
@@ -41,7 +38,7 @@ Check if the IAM user has all the required permissions. The permission policies 
 
 1. S3FullAccess (for aws AmazonS3FullAccess)
 
-Create an IAM role to give access of **s3** to **OpenSearch** instances. The role should already be assigned as the OpenSearch instance tries to communicate s3.
+Create an IAM role to give access of **S3** to **OpenSearch** instances. The role should already be assigned as the OpenSearch instance tries to communicate S3.
 
 The permissions can either be directly added to the user or added via **IAM Group**.
 
@@ -122,11 +119,11 @@ Execute the command given below to trigger the deployment.
 ./chef-automate config patch configs/automate.toml
 ```
 
-Take a back-up of the configurations once the cluster has been deployed.
+Take a [back-up](/automate/ha_backup_for_backup_restore) of the configurations once the cluster has been deployed.
 
-{{< note >}} **IAM Role:** Assign the IAM Role to the all the OpenSearch instances in the cluster created above. {{< /note >}}
+{{< note >}} **IAM Role:** Assign the IAM Role to all the OpenSearch instances in the cluster created above. {{< /note >}}
 
-### File System(EFS) Configuration for backup
+### Elastic File System(EFS) Configuration for backup
 
 To backup on the shared file system for AWS, follow the steps given below:
 
@@ -139,7 +136,7 @@ To backup on the shared file system for AWS, follow the steps given below:
 The two pre-backup configurations for On-Premise are:
 
 - For File System Backup
-- For Object Storage (Non-AWS)
+- For Object Storage
 
 ### Pre Backup Configuration for File System Backup
 
@@ -160,7 +157,7 @@ sudo mkdir /mnt/automate_backups/opensearch
 sudo chown hab:hab /mnt/automate_backups/opensearch/
 ```
 
-Configure the OpenSearch `path.repo` setting by **SSHing** to a single OpenSearch server by following the steps given below:
+Configure the OpenSearch `path.repo` setting by SSH to a single OpenSearch server by following the steps given below:
 
 - Export the current OpenSearch config from the Habitat supervisor. Get the root access to run the following commands:
 

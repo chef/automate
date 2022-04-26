@@ -12,11 +12,11 @@ gh_repo = "automate"
     weight = 200
 +++
 
-This page explains what is migration procedure and what are the most common examples of migrating data in Chef Automate High Availability (HA).
+This page explains the migration procedure and the most common examples of migrating data in Chef Automate High Availability (HA).
 
 ## What is Migration?
 
-A migration is the transfer of data, information, or technology from one place, or system, to another. It's common for teams to migrate their infrastructure components to improve scalability and performance, improve the caching layer, or transition from an in-house solution to a cloud-based one.
+Migration is the transfer of data, information, or technology from one place or system to another. It's common for teams to migrate their infrastructure components to improve scalability and performance, improve the caching layer, or transition from an in-house solution to a cloud-based one.
 
 A few common examples of IT migration include:
 

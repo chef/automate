@@ -39,8 +39,8 @@ Chef Automate and Chef Server act as frontend nodes and serve as a web UI with L
 
 Chef Automate High Availability (HA) supports two types of deployment:
 
-- [Amazon Web Services (AWS) Deployment](/ha_auto_install)
-- [On-premise Deployment (Existing Node) Deployment](/ha_deploy_bareinfra)
+- [Amazon Web Services (AWS) Deployment](/automate/ha_auto_install)
+- [On-premise Deployment (Existing Node) Deployment](/automate/ha_deploy_bareinfra)
 
 ### Cloud Deployment using Amazon Web Services (AWS)
 
