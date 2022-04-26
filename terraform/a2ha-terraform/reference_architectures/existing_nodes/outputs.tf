@@ -18,7 +18,7 @@ output "chef_server_private_ips" {
   value = formatlist("%s", var.existing_chef_server_private_ips)
 }
 
-output "elasticsearch_private_ips" {
+output "opensearch_private_ips" {
   value = formatlist("%s", var.existing_elasticsearch_private_ips)
 }
 

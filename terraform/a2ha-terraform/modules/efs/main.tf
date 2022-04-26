@@ -18,7 +18,7 @@ locals {
     mount_path    = var.nfs_mount_path
   })
   
-  ip_list = concat(var.automate_private_ips, var.chef_server_private_ips, var.postgresql_private_ips, var.elasticsearch_private_ips)
+  ip_list = concat(var.automate_private_ips, var.chef_server_private_ips, var.postgresql_private_ips, var.opensearch_private_ips)
 
 }
 

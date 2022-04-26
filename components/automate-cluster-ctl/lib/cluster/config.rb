@@ -86,7 +86,7 @@ module AutomateCluster
       default :automate_private_ips, []
       default :chef_server_private_ips, []
       default :elasticsearch_ips, []
-      default :elasticsearch_private_ips, []
+      default :opensearch_private_ips, []
       default :postgresql_private_ips, []
     end
 

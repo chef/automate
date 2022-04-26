@@ -55,7 +55,7 @@ module "efs" {
   automate_private_ips      = module.aws.automate_private_ips
   chef_server_private_ips   = module.aws.chef_server_private_ips
   postgresql_private_ips    = module.aws.postgresql_private_ips
-  elasticsearch_private_ips = module.aws.elasticsearch_private_ips
+  opensearch_private_ips = module.aws.opensearch_private_ips
   random_id                 = module.aws.random_id
   aws_region                = var.aws_region
   aws_ssh_key_file          = var.ssh_key_file

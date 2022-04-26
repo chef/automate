@@ -21,7 +21,7 @@ variable "chef_server_private_ips" {
   default = []
 }
 
-variable "elasticsearch_private_ips" {
+variable "opensearch_private_ips" {
   default = []
 }
 
