@@ -7,12 +7,12 @@ __bucket_base_path() {
     return 0
 }
 
-s3_bucket_name="a2-backup-restore-test"
+s3_bucket_name="a2ha-bloomberg"
 
 s3_bucket_base_path="$(__bucket_base_path)"
 
 # deployment-service currently requires the regional endpoint
-s3_endpoint="https://s3.us-west-2.amazonaws.com"
+s3_endpoint="https://s3.ap-southeast-2.amazonaws.com"
 
 do_create_config_s3_default() {
   #shellcheck disable=SC2154
@@ -24,8 +24,8 @@ do_create_config_s3_default() {
   base_path = "${s3_bucket_base_path}"
   endpoint = "${s3_endpoint}"
 [global.v1.backups.s3.credentials]
-  access_key = "$AWS_ACCESS_KEY_ID"
-  secret_key = "$AWS_SECRET_ACCESS_KEY"
+  access_key = "AKIARUQHMSKVZI6NK45U"
+  secret_key = "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"
   session_token = "$AWS_SESSION_TOKEN"
 EOF
 }
@@ -81,8 +81,8 @@ do_restore_s3_default() {
       --debug \
       --override-origin "$HAB_ORIGIN" \
       "s3://${s3_bucket_name}/${s3_bucket_base_path}/${test_backup_id}" \
-      --s3-access-key "$AWS_ACCESS_KEY_ID" \
-      --s3-secret-key "$AWS_SECRET_ACCESS_KEY" \
+      --s3-access-key "AKIARUQHMSKVZI6NK45U" \
+      --s3-secret-key "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" \
       --s3-session-token "$AWS_SESSION_TOKEN"
 }
 

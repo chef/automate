@@ -118,6 +118,7 @@ func (s *Suite) GlobalSetup() error {
 
 // GlobalTeardown is the place where you tear everything down after we have finished
 // executing all our test suite, at the moment we are just deleting ES Indices
+
 func (s *Suite) GlobalTeardown() {
 	// Make sure we clean them all!
 	indices, _ := s.client.IndexNames()
@@ -135,7 +136,14 @@ func (s *Suite) GlobalTeardown() {
 		}
 	}
 	time.Sleep(2 * time.Second)
-	_, err := s.client.DeleteIndex(indicesToDelete...).Do(context.Background())
+	var index []string
+	for i, v := range indicesToDelete {
+		if v == ".opendistro_security" {
+			index = append(indicesToDelete[:i], indicesToDelete[i+1:]...)
+			break
+		}
+	}
+	_, err := s.client.DeleteIndex(index...).Do(context.Background())
 	if err != nil {
 		fmt.Printf("Could not 'delete' ES indicesToDelete: '%s'\nError: %s", indicesToDelete, err)
 		os.Exit(3)
