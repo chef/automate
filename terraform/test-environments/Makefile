@@ -54,10 +54,15 @@ remote-state: init
 	rm -rf .terraform && \
 	terraform init -backend-config="key=a2/$(TF_STATE)"
 
+dev-remote-state: init
+	cd dev_scenarios && \
+	rm -rf .terraform && \
+	terraform init -backend-config="key=a2/$(TF_STATE)"
+
 plan: remote-state
 	cd scenarios && terraform plan -var-file=vars/$(TF_VARS).tfvars
 
-dev_apply: remote-state
+dev_apply: dev-remote-state
 	cd dev_scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars
 
 apply: remote-state
