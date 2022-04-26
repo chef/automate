@@ -1,0 +1,60 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+# Elasticsearch Health Check for Habitat
+
+# For details on the elasticsearch health colors, see:
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
+
+export POST_RUN_SENTINEL="{{pkg.svc_var_path}}/post-run-completed"
+
+function health_check() {
+
+  # When the post-run hook completes it'll write out this file. If the file does
+  # not exist we'll assume it has not completed and therefore we should fail.
+  if [[ ! -f ${POST_RUN_SENTINEL} ]]; then
+    return 2
+  fi
+
+  local es_host
+  {{#if svc.me.cfg.http-host ~}}
+  es_host="{{svc.me.sys.ip}}"
+  {{else}}
+  es_host="127.0.0.1"
+  {{/if ~}}
+
+  color="$(curl -s --noproxy "$es_host" "http://$es_host:{{svc.me.cfg.http-port}}/_cat/health?h=st")"
+
+  case $color in
+    "green")
+      rc=0 ;;                     # OK (200)
+    "yellow")
+      rc=1 ;;                     # WARNING (200)
+    "red")
+      rc=2 ;;                     # CRITICAL (503)
+    *)
+      rc=3 ;;                     # UNKNOWN (500)
+  esac
+
+  return $rc
+}
+
+function wait_until_healthy() {
+  local retries
+  retries=60
+  [[ -v $1 ]] && retries=$1
+  local res
+
+  for (( i=1; i<=${retries}; i++ )) do
+    health_check
+
+    res=$?
+    if [[ $res -le 1 ]]; then
+      res=0
+      break
+    fi
+
+    sleep 1
+  done
+
+  return $res
+}

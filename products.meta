@@ -59,6 +59,7 @@
     "chef/automate-ha-cluster-ctl",
     "chef/automate-netcat",
     "chef/automate-opensearch",
+    "chef/automate-ha-opensearch",
     "core/rsync"
   ],
 

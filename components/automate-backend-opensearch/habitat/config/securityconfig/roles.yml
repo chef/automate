@@ -1,0 +1,27 @@
+all_access:
+  cluster:
+    - UNLIMITED
+  indices:
+    '*':
+      '*':
+        - UNLIMITED
+  tenants:
+    admin_tenant: RW
+dashboard_user:
+  cluster:
+    - CLUSTER_COMPOSITE_OPS
+    - CLUSTER_MONITOR
+  indices:
+    '*':
+      '*':
+        - READ
+        - SEARCH
+        - GET
+        - indices:admin/mappings/fields/get*
+        - indices:admin/validate/query*
+        - indices:admin/get*
+    '?kibana':
+      '*':
+        - INDEX
+        - CRUD
+        - SEARCH

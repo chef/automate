@@ -3,9 +3,9 @@ locals {
     tmp_path = var.tmp_path
   })
   archive_disk_info = templatefile("${path.module}/templates/archive_disk.info.tpl", {
-    automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path,
-    elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path,
-    postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
+    automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path,
+    opensearch_archive_disk_fs_path = var.opensearch_archive_disk_fs_path,
+    postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
   })
 }
 
