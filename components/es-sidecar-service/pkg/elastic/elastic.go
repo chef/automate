@@ -2,7 +2,9 @@ package elastic
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -22,10 +24,8 @@ const (
 			"number_of_replicas":0
 		},
 		"mappings:": {
-			"test-data" : {
-				"properties" : {
-					"end_time": { "type" : "date" }
-				}
+			"properties" : {
+				"end_time": { "type" : "date" }
 			}
 		}
 	}`
@@ -81,11 +81,21 @@ func New(esURL string, opts ...NewElasticOpts) (*Elastic, error) {
 	for _, opt := range opts {
 		opt(&o)
 	}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+	httpClient := &http.Client{Transport: tr}
+
 	client, err := elastic.NewClient(
 		// NOTE - take a look at docs here to see what's relevant:
 		// https://github.com/olivere/elastic/wiki/Configuration
 		elastic.SetURL(esURL),
 		elastic.SetSniff(false),
+		elastic.SetHttpClient(httpClient),
+		elastic.SetBasicAuth("admin", "admin"),
 	)
 
 	if err != nil {

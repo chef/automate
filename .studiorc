@@ -16,7 +16,7 @@ unset SSL_CERT_FILE
 # the HTTP calls in the mocha tests that talk to ES in ingest-service
 # will need to be updated to pass certs along.
 export ES_VERSION=5.6.4
-export OPENSEARCH_URL="http://localhost:10144"
+export OPENSEARCH_URL="https://localhost:10168"
 export POSTGRESQL_URL="localhost:5432"
 # Ingest
 export INGEST_URL="https://localhost:10122"

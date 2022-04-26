@@ -2,7 +2,9 @@ package integration_test
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 
 	es_sidecar "github.com/chef/automate/components/es-sidecar-service/pkg/elastic"
@@ -31,8 +33,19 @@ func NewSuite(url string) *Suite {
 	log.SetLevel(log.DebugLevel)
 	log.SetOutput(os.Stderr)
 
-	esClient, err := elastic.NewClient(
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
+
+	esClient, err := elastic.NewSimpleClient(
 		elastic.SetURL(url),
+		elastic.SetSniff(false),
+		elastic.SetHttpClient(client),
+		elastic.SetBasicAuth("admin", "admin"),
 	)
 
 	if err != nil {
