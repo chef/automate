@@ -261,10 +261,14 @@ func (s *Suite) indexExists(i string) bool {
 func (s *Suite) DeleteAllDocuments() {
 	// ES Query to match all documents
 	q := elastic.RawStringQuery("{\"match_all\":{}}")
-
 	// Make sure we clean them all!
 	indices, _ := s.client.IndexNames()
-
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	_, err := s.client.DeleteByQuery().
 		Index(indices...).
 		Query(q).

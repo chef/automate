@@ -160,7 +160,12 @@ func (s *Suite) DeleteAllDocuments() {
 
 	// Make sure we clean them all!
 	indices := s.indices
-
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	_, err := s.esClient.DeleteByQuery().
 		Index(indices...).
 		Type(s.types...).
