@@ -84,18 +84,18 @@ chef_ebs_volume_size = "<%= config.aws.chef_ebs_volume_size %>"
 chef_ebs_volume_type = "<%= config.aws.chef_ebs_volume_type %>"
 <% end %>
 
-elasticsearch_server_instance_type = "<%= config.aws.elasticsearch_server_instance_type %>"
+opensearch_server_instance_type = "<%= config.aws.opensearch_server_instance_type %>"
 
-<% if config.aws.elasticsearch_ebs_volume_iops %>
-elasticsearch_ebs_volume_iops = "<%= config.aws.elasticsearch_ebs_volume_iops %>"
+<% if config.aws.opensearch_ebs_volume_iops %>
+opensearch_ebs_volume_iops = "<%= config.aws.opensearch_ebs_volume_iops %>"
 <% end %>
 
-<% if config.aws.elasticsearch_ebs_volume_size %>
-elasticsearch_ebs_volume_size = "<%= config.aws.elasticsearch_ebs_volume_size %>"
+<% if config.aws.opensearch_ebs_volume_size %>
+opensearch_ebs_volume_size = "<%= config.aws.opensearch_ebs_volume_size %>"
 <% end %>
 
-<% if config.aws.elasticsearch_ebs_volume_type %>
-elasticsearch_ebs_volume_type = "<%= config.aws.elasticsearch_ebs_volume_type %>"
+<% if config.aws.opensearch_ebs_volume_type %>
+opensearch_ebs_volume_type = "<%= config.aws.opensearch_ebs_volume_type %>"
 <% end %>
 
 postgresql_server_instance_type = "<%= config.aws.postgresql_server_instance_type %>"
@@ -148,7 +148,7 @@ automate_fqdn = "<%= config.automate.fqdn %>" # leave commented out for AWS, oth
 <% end %>
 automate_instance_count = <%= config.automate.instance_count %>
 chef_server_instance_count = <%= config.chef_server.instance_count %>
-elasticsearch_instance_count = <%= config.elasticsearch.instance_count %>
+opensearch_instance_count = <%= config.elasticsearch.instance_count %>
 nfs_mount_path = "<%= config.backup_mount %>"
 postgresql_instance_count = <%= config.postgresql.instance_count %>
 postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"

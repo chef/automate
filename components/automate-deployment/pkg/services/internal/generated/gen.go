@@ -449,10 +449,6 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-ha-elasticsearch",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-ha-elasticsidecar",
       "metadata": null
     },
