@@ -12,11 +12,6 @@ module "dashboard" {
   meta_description = "This is just a link to the channel-specific release dashboard site you are viewing right now...recursion FTW!"
 
   tag_contact = "${var.aws_tag_contact}"
-
-  additional_tags = {
-    X-LongRunning = "true"
-    X-Sleep       = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
-  }
 }
 
 resource "null_resource" "dashboard_deploy" {
@@ -47,10 +42,6 @@ module "ui_library_website" {
   tag_contact = "${var.aws_tag_contact}"
   create      = "${var.environment == "union" ? "true" : "false"}"
 
-  additional_tags = {
-    X-LongRunning = "true"
-    X-Sleep       = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
-  }
 }
 
 #########################################################################
@@ -69,8 +60,4 @@ module "a2_code_coverage_website" {
   tag_contact = "${var.aws_tag_contact}"
   create      = "${var.environment == "union" ? "true" : "false"}"
 
-  additional_tags = {
-    X-LongRunning = "true"
-    X-Sleep       = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
-  }
 }
