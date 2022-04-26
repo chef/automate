@@ -224,7 +224,7 @@ module "opensearch" {
   backend_aib_local_file          = var.backend_aib_local_file
   curator_pkg_ident               = var.curator_pkg_ident
   opensearch_instance_count       = var.opensearch_instance_count
-  opensearch_listen_port          = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.opensearch_listen_port
   opensearch_pkg_ident            = var.opensearch_pkg_ident
   opensearch_svc_load_args        = var.elasticsearch_svc_load_args
   opensearchsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
@@ -247,7 +247,7 @@ module "postgresql" {
   airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql[0].airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
-  opensearch_listen_port          = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.opensearch_listen_port
   opensearch_private_ips          = var.opensearch_private_ips
   habitat_info                    = var.setup_managed_services ? "" : module.habitat-postgresql[0].habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
@@ -291,7 +291,7 @@ module "bootstrap_automate" {
   frontend_aib_local_file             = var.frontend_aib_local_file
   habitat_info                        = module.habitat-automate.habitat_info
   hab_sup_http_gateway_auth_token     = var.hab_sup_http_gateway_auth_token
-  opensearch_listen_port              = var.elasticsearch_listen_port
+  opensearch_listen_port              = var.opensearch_listen_port
   opensearch_private_ips              = var.opensearch_private_ips
   managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
@@ -337,7 +337,7 @@ module "automate" {
   frontend_aib_local_file             = var.frontend_aib_local_file
   habitat_info                        = module.habitat-automate.habitat_info
   hab_sup_http_gateway_auth_token     = var.hab_sup_http_gateway_auth_token
-  opensearch_listen_port              = var.elasticsearch_listen_port
+  opensearch_listen_port              = var.opensearch_listen_port
   opensearch_private_ips              = var.opensearch_private_ips
   managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
@@ -387,7 +387,7 @@ module "chef_server" {
   frontend_aib_local_file             = var.frontend_aib_local_file
   habitat_info                        = module.habitat-chef_server.habitat_info
   hab_sup_http_gateway_auth_token     = var.hab_sup_http_gateway_auth_token
-  opensearch_listen_port              = var.elasticsearch_listen_port
+  opensearch_listen_port              = var.opensearch_listen_port
   opensearch_private_ips              = var.opensearch_private_ips
   managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
