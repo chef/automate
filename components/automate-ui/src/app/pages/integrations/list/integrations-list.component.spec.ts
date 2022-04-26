@@ -9,6 +9,11 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { IntegrationsListComponent } from './integrations-list.component';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { DeleteManager } from 'app/entities/managers/manager.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('IntegrationsListComponent', () => {
   let component: IntegrationsListComponent;
@@ -40,7 +45,8 @@ describe('IntegrationsListComponent', () => {
         IntegrationsListComponent
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       schemas: [
         CUSTOM_ELEMENTS_SCHEMA

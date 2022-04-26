@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
 
     this
       .http
-      .get <RespManifest> (`https://packages.chef.io/manifests/${this.channel}/automate/latest.json`)
+      .get <RespManifest> (`https://packages.chef.io/manifests/${this.channel}/automate/latest_semver.json`)
       .subscribe(data => {
         this.build_version = data.build;
         this.packages = data.packages;

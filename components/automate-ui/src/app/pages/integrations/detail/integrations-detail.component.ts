@@ -9,6 +9,7 @@ import { IntegrationsDetailState } from './integrations-detail.reducer';
 import { integrationsDetail } from './integrations-detail.selectors';
 import { includes, without } from 'lodash';
 import { ManagerDeleteNodes } from 'app/entities/managers/manager.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations-detail',
@@ -23,7 +24,8 @@ export class IntegrationsDetailComponent {
   constructor(
     private router: Router,
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.managerDetail$ = this.store.select(integrationsDetail);
@@ -36,6 +38,7 @@ export class IntegrationsDetailComponent {
   deleteNodes() {
     this.store.dispatch(new ManagerDeleteNodes({ ids: this.selectedNodes }));
     this.selectedNodes = [];
+    this.telemetryService.track('Settings_NodeIntegrations_Details_RemoveNodes');
   }
 
   selectNode(id: string) {

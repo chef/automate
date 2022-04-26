@@ -10,6 +10,7 @@ import { EntityStatus } from 'app/entities/entities';
 import { allUsers, getStatus } from 'app/entities/users/user.selectors';
 import { DeleteUser, GetUsers } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-user-management',
@@ -32,7 +33,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
  }
 
@@ -75,6 +77,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public deleteUser(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteUser(this.userToDelete));
+    this.telemetryService.track('Settings_Users_Delete');
   }
 
   public showEmptyStateMessage(): boolean {

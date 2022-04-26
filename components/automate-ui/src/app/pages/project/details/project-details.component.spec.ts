@@ -14,6 +14,11 @@ import { Project } from 'app/entities/projects/project.model';
 import { Rule } from 'app/entities/rules/rule.model';
 import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { ProjectDetailsComponent } from './project-details.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
@@ -116,7 +121,8 @@ describe('ProjectDetailsComponent', () => {
          }, { runtimeChecks })
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ]
     }).compileComponents();
   }));

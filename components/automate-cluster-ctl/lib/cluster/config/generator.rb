@@ -22,6 +22,7 @@ module AutomateCluster
         ami_filter_virt_type: "Filter settings default to CentOS if left blank",
         ami_id: "Overrides ami filter search features",
         lb_access_logs: "If lb_access logs is true then elb logs will be enabled and new s3 bucket will be created as name of a2ha-elb-bucket. Please find it after provision in your aws console",
+        s3_bucketName: "The name of s3 bucket to be created for taking backup , by default name will be chef-automate-ha",
         dept: "DEPRECATED: AWS Tag: Department name to apply to AWS insfrastructure tags",
         project: "DEPRECATED: AWS Tag: Project name to apply to AWS insfrastructure tags",
         automate_lb_certificate_arn: "AWS Certificate is specific to the region and AWS account this is being deployed to.",

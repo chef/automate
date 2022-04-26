@@ -32,6 +32,7 @@ var upgradeRunCmdFlags = struct {
 	skipDeploy           bool
 	isMajorUpgrade       bool
 	versionsPath         string
+	acceptMLSA           bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -152,7 +153,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 					"Request to start upgrade failed",
 				)
 			}
-			err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+			err = ci.RunChecklist()
 			if err != nil {
 				return status.Wrap(
 					err,
@@ -194,12 +195,14 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 	}
-	response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
-	if err != nil {
-		return err
-	}
-	if !strings.Contains(response, "y") {
-		return errors.New("canceled upgrade")
+	if !upgradeRunCmdFlags.acceptMLSA {
+		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		if err != nil {
+			return err
+		}
+		if !strings.Contains(response, "y") {
+			return errors.New("canceled upgrade")
+		}
 	}
 
 	if offlineMode {
@@ -399,6 +402,12 @@ func init() {
 		"skip-deploy",
 		false,
 		"will only upgrade and not deploy the bundle")
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.acceptMLSA,
+		"yes",
+		"y",
+		false,
+		"Do not prompt for confirmation; accept defaults and continue")
 
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.isMajorUpgrade,
@@ -443,7 +452,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA)
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil

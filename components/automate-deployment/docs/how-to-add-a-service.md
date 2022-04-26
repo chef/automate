@@ -1,6 +1,6 @@
-# How To Add a New Service to Automate 2
+# How To Add a New Service to Automate
 
-Adding a new service to Automate 2 is not currently as easy as we would like. This document will guide you through it. There are two general chunks of work required when adding a new service:
+Adding a new service to Automate is not currently as easy as we would like. This document will guide you through it. There are two general chunks of work required when adding a new service:
 * You need to setup your service to fulfil the platform contract
 * You need to teach deployment service how to deploy your service
 
@@ -155,4 +155,4 @@ to wire up your new service to other services this will be needed.
 
 ### The product.meta File
 
-The list of services and other mandatory packages that comprise Automate 2 and other Chef products is maintained in `product.meta`. This file is also used to generate the manifest file that represents a Chef Automate 2 release as described above. Edit this file and add your service. Services may also define extra metadata for their service in a `package.meta` for their component. See https://godoc.org/github.com/chef/automate/lib/product for more information.
+The list of services and other mandatory packages that comprise Automate and other Chef products is maintained in `product.meta`. This file is also used to generate the manifest file that represents a Chef Automate release as described above. Edit this file and add your service. Services may also define extra metadata for their service in a `package.meta` for their component. See https://godoc.org/github.com/chef/automate/lib/product for more information.
