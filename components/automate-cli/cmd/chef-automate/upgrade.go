@@ -153,7 +153,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 					"Request to start upgrade failed",
 				)
 			}
-			err = ci.RunChecklist(majorupgradechecklist.IsExternalPG())
+			err = ci.RunChecklist()
 			if err != nil {
 				return status.Wrap(
 					err,
@@ -452,7 +452,7 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 			return []string{}, err
 		}
 
-		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA, majorupgradechecklist.IsExternalPG())
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA)
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil
