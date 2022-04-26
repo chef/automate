@@ -27,8 +27,8 @@ import (
 
 // Global variables
 var (
-	// The elasticsearch URL is coming from the environment variable ELASTICSEARCH_URL
-	//elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
+	// The elasticsearch URL is coming from the environment variable OPENSEARCH_URL
+	//elasticsearchUrl = os.Getenv("OPENSEARCH_URL")
 	elasticsearchUrl string
 
 	esBackend *cElastic.Backend
@@ -79,7 +79,7 @@ func (s *Suite) GlobalSetup() error {
 	var haveURL bool
 	elasticsearchUrl, haveURL = os.LookupEnv("OPENSEARCH_URL")
 	if !haveURL {
-		return errors.New("The environment variable ELASTICSEARCH_URL must be set for integration tests to run")
+		return errors.New("The environment variable OPENSEARCH_URL must be set for integration tests to run")
 	}
 
 	// set global esBackend
