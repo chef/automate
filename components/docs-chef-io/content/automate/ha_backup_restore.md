@@ -1,5 +1,5 @@
 +++
-title = "Backup and Restore"
+title = "Overview"
 
 draft = false
 
@@ -7,8 +7,8 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Backup and Restore"
-    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore.md Backup and Restore"
+    title = "Overview"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore.md Overview"
     parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 200
 +++
@@ -27,12 +27,6 @@ In information technology, a data backup is a copy of computer data taken and st
 ## Data Restore
 
 Data restore is the process of copying backup data from secondary storage and restoring it to its original location or a new location. A restoring process is carried out to return lost, stolen, or damaged data to its original condition or move it to a new location.
-
-## Difference between Backup and Restore
-
-Backup and recovery are duplicating data, storing it in a secure place in case of loss or damage, and then restoring that data to a location, the original one or a safe alternative that can be used again in operations to avoid downtime. Backup and recovery is also a category of onsite and cloud-based technology solutions that automate and support this process, enabling organizations to protect and retain the data for business and compliance reasons.
-
-The key difference between backup and recovery is that the backup process is how you save and protect your production data and safely store it. Reliable backups and fast recovery together ensure business continuity and business resilience.
 
 ## Chef Automate High Availability (HA) Backups
 

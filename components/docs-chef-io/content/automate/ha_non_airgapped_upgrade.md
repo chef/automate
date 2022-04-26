@@ -16,7 +16,7 @@ This page lists the commands that aid in upgrading the Chef Automate High Availa
 
 {{< note >}}
 
-- The upgrade of the backend nodes restarts **OpenSearch** and **PostgreSQL** services.
+- The backend nodes' upgrade restarts **OpenSearch** and **PostgreSQL** services.
 
 - You cannot downgrade the Automate version. If you intend to install the lower version of the Chef Automate High Availability (HA) system, uninstall the existing version of the same, and destroy the terraform.
 
@@ -24,7 +24,7 @@ This page lists the commands that aid in upgrading the Chef Automate High Availa
 
 ## Upgrade Procedure
 
-- Execute the `chef-automate upgrade run --upgrade-airgap-bundles` command to upgrade the bundles and deploy it on the respective nodes.
+- Execute the `chef-automate upgrade run --upgrade-airgap-bundles` command to upgrade the bundles and deploy them on the respective nodes.
 
 - Execute the `chef-automate upgrade run --upgrade-airgap-bundles --skip-deploy` command to update the bundles. The *--skip-deploy* flag skips the deployment of these bundles.
 
