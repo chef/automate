@@ -11,6 +11,10 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for provision-infra
+- name: "yes"
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
 inherited_options:
 - name: debug
   shorthand: d

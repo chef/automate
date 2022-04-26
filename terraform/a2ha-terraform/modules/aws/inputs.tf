@@ -44,14 +44,8 @@ variable "aws_ami_id" {
 variable "aws_cidr_block_addr" {
 }
 
-variable "aws_profile" {
-  default     = "default"
-  description = "The AWS profile to use from your ~/.aws/credentials file."
-}
-
-variable "aws_region" {
-  default     = "us-west-1"
-  description = "The name of the selected AWS region / datacenter."
+variable "aws_instance_profile_name" {
+  default = ""
 }
 
 variable "aws_ssh_key_file" {
@@ -90,19 +84,19 @@ variable "chef_server_instance_type" {
 variable "chef_server_lb_certificate_arn" {
 }
 
-variable "elasticsearch_ebs_volume_iops" {
+variable "opensearch_ebs_volume_iops" {
   default = 300
 }
 
-variable "elasticsearch_ebs_volume_size" {
+variable "opensearch_ebs_volume_size" {
   default = 50
 }
 
-variable "elasticsearch_ebs_volume_type" {
+variable "opensearch_ebs_volume_type" {
   default = "gp3"
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 
@@ -110,7 +104,7 @@ variable "elasticsearch_listen_port" {
   default = 9200
 }
 
-variable "elasticsearch_server_instance_type" {
+variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
 
@@ -154,8 +148,18 @@ variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
 
+variable "private_custom_subnets" {
+  default = []
+  type    = list(string)
+}
+
 variable "proxy_listen_port" {
   default = 7432
+}
+
+variable "public_custom_subnets" {
+  default = []
+  type    = list(string)
 }
 
 variable "setup_managed_services" {
@@ -178,5 +182,5 @@ variable "tags" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/var/automate-ha"
 }

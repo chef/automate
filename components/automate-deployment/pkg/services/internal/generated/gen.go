@@ -449,31 +449,11 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-ha-elasticsearch",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-ha-elasticsidecar",
       "metadata": null
     },
     {
-      "name": "chef/automate-ha-kibana",
-      "metadata": null
-    },
-    {
-      "name": "chef/automate-ha-metricbeat",
-      "metadata": null
-    },
-    {
-      "name": "chef/automate-ha-journalbeat",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-ha-ctl",
-      "metadata": null
-    },
-    {
-      "name": "chef/automate-ha-curator",
       "metadata": null
     },
     {

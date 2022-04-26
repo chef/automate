@@ -77,7 +77,7 @@ variable "elasticsearch_https_user" {
   default = "automate_elasticsearch"
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 
@@ -158,6 +158,10 @@ variable "nfs_mount_path" {
   description = "The NFS mount base path for backups and archives."
 }
 
+variable "opensearch_pkg_ident" {
+  default = "chef/automate-ha-opensearch"
+}
+
 variable "pgleaderchk_listen_port" {
   default = 6432
 }
@@ -228,7 +232,7 @@ variable "teams_port" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/var/automate-ha"
 }
 
 variable "sudo_password" {

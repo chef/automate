@@ -52,13 +52,9 @@ directories:
   - ./components/session-service
   - ./components/teams-service
   - ./components/trial-license-service
-  - ./components/automate-backend-curator
-  - ./components/automate-backend-elasticsearch
+  - ./components/automate-backend-opensearch
   - ./components/automate-backend-elasticsidecar
   - ./components/automate-backend-haproxy
-  - ./components/automate-backend-journalbeat
-  - ./components/automate-backend-kibana
-  - ./components/automate-backend-metricbeat
   - ./components/automate-backend-postgresql
   - ./components/automate-backend-deployment
   - ./components/automate-ha-pgleaderchk

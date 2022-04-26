@@ -15,9 +15,14 @@ ssh_user = "centos"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
 # sudo_password = ""
+# Backup config type can be efs and s3
+backup_config = ""
+# If s3 is selected for backup_config ,then uncomment and give s3_bucketName or else default chef-automate-ha.<deployment-string> will go
+# s3_bucketName = "chef-automate-ha"
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
+
 
 [automate.config]
 # admin_password = ""
@@ -44,6 +49,8 @@ region = "us-east-1"
 # E.g. aws_cidr_block_addr = "172.31.64.0"
 aws_vpc_id  = ""
 aws_cidr_block_addr  = ""
+private_custom_subnets = []
+public_custom_subnets = []
 # ssh key pair name in AWS to access instances
 ssh_key_pair_name = "A2HA"
 setup_managed_services = false
@@ -65,7 +72,7 @@ ami_id = ""
 lb_access_logs = "false"
 automate_server_instance_type = "t3.medium"
 chef_server_instance_type = "t3.medium"
-elasticsearch_server_instance_type = "m5.large"
+opensearch_server_instance_type = "m5.large"
 postgresql_server_instance_type = "t3.medium"
 automate_lb_certificate_arn = "arn:aws:acm...."
 chef_server_lb_certificate_arn = "arn:aws:acm...."
@@ -75,9 +82,9 @@ automate_ebs_volume_type = "gp3"
 chef_ebs_volume_iops = "100"
 chef_ebs_volume_size = "50"
 chef_ebs_volume_type = "gp3"
-elasticsearch_ebs_volume_iops = "100"
-elasticsearch_ebs_volume_size = "50"
-elasticsearch_ebs_volume_type = "gp3"
+opensearch_ebs_volume_iops = "100"
+opensearch_ebs_volume_size = "50"
+opensearch_ebs_volume_type = "gp3"
 postgresql_ebs_volume_iops = "100"
 postgresql_ebs_volume_size = "50"
 postgresql_ebs_volume_type = "gp3"
@@ -125,7 +132,7 @@ instance_count = "3"
 automate_private_ips = []
 chef_server_private_ips = []
 elasticsearch_ips = []
-elasticsearch_private_ips = []
+opensearch_private_ips = []
 postgresql_private_ips = []
 `
 

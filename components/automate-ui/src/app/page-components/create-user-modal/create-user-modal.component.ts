@@ -14,6 +14,7 @@ import { EntityStatus } from 'app/entities/entities';
 import { Utilities } from 'app/helpers/utilities/utilities';
 import { CreateUserPayload, CreateUser } from 'app/entities/users/user.actions';
 import { createStatus, createError } from 'app/entities/users/user.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -37,7 +38,8 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    fb: FormBuilder
+    fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in create-user-modal.component.html
@@ -110,6 +112,7 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new CreateUser(userCreateReq));
+    this.telemetryService.track('Settings_Users_Create');
   }
 
   handleUsernameInput(event: KeyboardEvent): void {

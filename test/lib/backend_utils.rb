@@ -150,12 +150,12 @@ module BackendUtils
       tf_output_value("postgresql_private_ips")
     end
 
-    def elasticsearch_private_ips
-      tf_output_value("elasticsearch_private_ips")
+    def opensearch_private_ips
+      tf_output_value("opensearch_private_ips")
     end
 
-    def elasticsearch_public_ips
-      tf_output_value("elasticsearch_public_ips")
+    def opensearch_public_ips
+      tf_output_value("opensearch_public_ips")
     end
 
     def hab_config_path
@@ -283,7 +283,7 @@ module BackendUtils
     end
 
     def pg_bin_path
-      pg_bin_path = "\$(#{accept_license_no_persist} hab pkg path core/postgresql11)/bin"
+      pg_bin_path = "\$(#{accept_license_no_persist} hab pkg path core/postgresql13)/bin"
       pg_pw = "PGPASSWORD=$(echo ENV['SUDO_PASSWORD'] | #{sudo_cmd} -S cat /hab/svc/automate-ha-postgresql/config/pwfile)"
       @pg_bin_path ||= "#{pg_pw} #{pg_bin_path}"
     end

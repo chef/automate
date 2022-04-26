@@ -79,9 +79,9 @@ document](./dev-docs/DEV_ENVIRONMENT.md).
 
 ## Architecture
 
-The following picture illustrates the Automate 2.0 architecture
+The following picture illustrates the Automate architecture
 
-![Automate 2 Architecture](dev-docs/diagrams/a2-architecture.png)
+![Automate Architecture](dev-docs/diagrams/a2-architecture.png)
 
 ## API Compatibility
 

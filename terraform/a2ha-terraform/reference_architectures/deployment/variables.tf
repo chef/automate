@@ -55,6 +55,17 @@ variable "aws_ssh_key_pair_name" {
 variable "aws_tags" {
 }
 
+variable "backup_config_efs" {
+  default = "false"
+}
+
+variable "backup_config_s3" {
+  default = "false"
+}
+
+variable "bucket_name" {
+}
+
 variable "chef_ebs_volume_iops" {
   default = 100
 }
@@ -79,27 +90,27 @@ variable "chef_server_private_ips" {
   default = []
 }
 
-variable "elasticsearch_ebs_volume_iops" {
+variable "opensearch_ebs_volume_iops" {
   default = 300
 }
 
-variable "elasticsearch_ebs_volume_size" {
+variable "opensearch_ebs_volume_size" {
   default = 50
 }
 
-variable "elasticsearch_ebs_volume_type" {
+variable "opensearch_ebs_volume_type" {
   default = "gp3"
 }
 
-variable "elasticsearch_private_ips" {
+variable "opensearch_private_ips" {
   default = []
 }
 
-variable "elasticsearch_public_ips" {
+variable "opensearch_public_ips" {
   default = []
 }
 
-variable "elasticsearch_server_instance_type" {
+variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
 
@@ -143,6 +154,10 @@ variable "managed_rds_superuser_username" {
   default = ""
 }
 
+variable "opensearch_pkg_ident" {
+  default = "chef/automate-ha-opensearch"
+}
+
 variable "postgresql_ebs_volume_iops" {
   default = 150
 }
@@ -161,6 +176,10 @@ variable "postgresql_private_ips" {
 
 variable "postgresql_server_instance_type" {
   default = "t3a.medium"
+}
+
+variable "s3_endpoint" {
+  default = "https://s3.amazonaws.com"
 }
 
 variable "setup_managed_services" {

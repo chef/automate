@@ -10,6 +10,11 @@ import { MockComponent } from 'ng2-mock-component';
 import { GetNodeCredential, UpdateNodeCredential } from 'app/entities/node-credentials/node-credential.actions';
 import { NodeCredential, NodeCredentialTypes, SaveNodeCredential, NodeObject } from 'app/entities/node-credentials/node-credential.model';
 import { Router } from '@angular/router';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('NodeCredentialDetailsScreenComponent', () => {
   let router: Router;
@@ -73,7 +78,8 @@ describe('NodeCredentialDetailsScreenComponent', () => {
       ],
       providers: [
         FeatureFlagsService,
-        SaveNodeCredential
+        SaveNodeCredential,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         FormsModule,

@@ -74,6 +74,8 @@ workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
+backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
+{{ if  .Architecture.ConfigInitials.S3BucketName }} s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ else }} # s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ end }}
 {{ if .Architecture.ConfigInitials.SudoPassword }} sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ else }} # sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ end }}
 # logging_monitoring_management "true"
 # new_elk "false"
@@ -128,6 +130,8 @@ aws do
   region "{{ .Aws.Config.Region }}"
   vpc_id "{{ .Aws.Config.AwsVpcId }}"
   cidr_block_addr "{{ .Aws.Config.AwsCidrBlockAddr }}"
+  private_custom_subnets [{{ range $index, $element := .Aws.Config.PrivateCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  public_custom_subnets [{{ range $index, $element := .Aws.Config.PublicCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
   ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
   lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
@@ -155,7 +159,7 @@ aws do
   ### EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod
   chef_server_instance_type "{{ .Aws.Config.ChefServerInstanceType }}"
   ### EC2 instance type to use for Elasticsearch backends, minimum 8G of RAM for test, 16G for prod
-  elasticsearch_server_instance_type "{{ .Aws.Config.ElasticsearchServerInstanceType }}"
+  opensearch_server_instance_type "{{ .Aws.Config.OpensearchServerInstanceType }}"
   ### EC2 instance type to use for PostgreSQL backends, minimum 4G of RAM for test, 8G for prod
   postgresql_server_instance_type "{{ .Aws.Config.PostgresqlServerInstanceType }}"
   ### AWS Certificate is specific to the region and AWS account this is being deployed to.
@@ -168,9 +172,9 @@ aws do
   chef_ebs_volume_iops "{{ .Aws.Config.ChefEbsVolumeIops }}"
   chef_ebs_volume_size "{{ .Aws.Config.ChefEbsVolumeSize }}"
   chef_ebs_volume_type "{{ .Aws.Config.ChefEbsVolumeType }}"
-  elasticsearch_ebs_volume_iops "{{ .Aws.Config.ElasticsearchEbsVolumeIops }}"
-  elasticsearch_ebs_volume_size "{{ .Aws.Config.ElasticsearchEbsVolumeSize }}"
-  elasticsearch_ebs_volume_type "{{ .Aws.Config.ElasticsearchEbsVolumeType }}"
+  opensearch_ebs_volume_iops "{{ .Aws.Config.ElasticsearchEbsVolumeIops }}"
+  opensearch_ebs_volume_size "{{ .Aws.Config.ElasticsearchEbsVolumeSize }}"
+  opensearch_ebs_volume_type "{{ .Aws.Config.ElasticsearchEbsVolumeType }}"
   postgresql_ebs_volume_iops "{{ .Aws.Config.PostgresqlEbsVolumeIops }}"
   postgresql_ebs_volume_size "{{ .Aws.Config.PostgresqlEbsVolumeSize }}"
   postgresql_ebs_volume_type "{{ .Aws.Config.PostgresqlEbsVolumeType }}"

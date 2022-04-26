@@ -243,6 +243,7 @@ paths = [
   "lib/cereal/*",
   "lib/config/*",
   "lib/grpc/*",
+  "lib/httputils/*",
   "lib/io/*",
   "lib/license/*",
   "lib/platform/command/*",
@@ -1115,28 +1116,10 @@ paths = [
   "lib/version/*"
 ]
 
-[automate-ha-elasticsearch]
-plan_path = "components/automate-backend-elasticsearch"
-paths = [
-  "components/automate-backend-elasticsearch/*"
-]
-
 [automate-ha-opensearch]
 plan_path = "components/automate-backend-opensearch"
 paths = [
   "components/automate-backend-opensearch/*"
-]
-
-[automate-ha-metricbeat]
-plan_path = "components/automate-backend-metricbeat"
-paths = [
-  "components/automate-backend-metricbeat/*"
-]
-
-[automate-ha-journalbeat]
-plan_path = "components/automate-backend-journalbeat"
-paths = [
-  "components/automate-backend-journalbeat/*"
 ]
 
 [automate-ha-haproxy]
@@ -1145,22 +1128,10 @@ paths = [
   "components/automate-backend-haproxy/*"
 ]
 
-[automate-ha-kibana]
-plan_path = "components/automate-backend-kibana"
-paths = [
-  "components/automate-backend-kibana/*"
-]
-
 [automate-ha-elasticsidecar]
 plan_path = "components/automate-backend-elasticsidecar"
 paths = [
   "components/automate-backend-elasticsidecar/*"
-]
-
-[automate-ha-curator]
-plan_path = "components/automate-backend-curator"
-paths = [
-  "components/automate-backend-curator/*"
 ]
 
 [automate-ha-postgresql]

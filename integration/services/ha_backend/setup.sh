@@ -80,13 +80,13 @@ postgresql_pkg_ident="chef/$PG_PKG_NAME"
 PGLEADERCHK_PKG_NAME="automate-ha-pgleaderchk"
 pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME"
 proxy_pkg_ident="chef/automate-ha-haproxy"
-ELASTICSEARCH_PKG_NAME="automate-ha-elasticsearch"
-elasticsearch_pkg_ident="chef/automate-ha-elasticsearch"
+OPENSEARCH_PKG_NAME="automate-ha-eopensearch"
+opensearch_pkg_ident="chef/automate-ha-eopensearch"
 ELASTICSIDECAR_PKG_NAME="automate-ha-elasticsidecar"
 elasticsidecar_pkg_ident="chef/$ELASTICSIDECAR_PKG_NAME"
 
 echo "Installing HA Backend Habitat packages from $channel"
-HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsearch_pkg_ident}${version}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${opensearch_pkg_ident}${version}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${proxy_pkg_ident}${version}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${pgleaderchk_pkg_ident}${version}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${postgresql_pkg_ident}${version}"
@@ -99,8 +99,8 @@ hostname=$(hostname)
 mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
 echo "Configuring HA Backend Services"
-mkdir -p "/hab/user/${ELASTICSEARCH_PKG_NAME}/config/"
-cat > "/hab/user/${ELASTICSEARCH_PKG_NAME}/config/user.toml" <<EOF
+mkdir -p "/hab/user/${OPENSEARCH_PKG_NAME}/config/"
+cat > "/hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml" <<EOF
 [runtime]
 es_java_opts = "-Xms1024m -Xmx1024m"
 
@@ -159,5 +159,5 @@ echo "Starting HA Backend Habitat services"
 HAB_LICENSE="accept-no-persist" hab svc load ${postgresql_pkg_ident} --topology leader --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${pgleaderchk_pkg_ident} --bind database:"$PG_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${proxy_pkg_ident} --bind database:"$PG_PKG_NAME".default --bind pgleaderchk:"$PGLEADERCHK_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
-HAB_LICENSE="accept-no-persist" hab svc load ${elasticsearch_pkg_ident} --channel ${channel}
-HAB_LICENSE="accept-no-persist" hab svc load ${elasticsidecar_pkg_ident} --bind elasticsearch:"$ELASTICSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${opensearch_pkg_ident} --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${elasticsidecar_pkg_ident} --bind opensearch:"$OPENSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}

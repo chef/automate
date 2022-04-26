@@ -10,15 +10,19 @@ variable "automate_private_ips" {
   default = []
 }
 
+variable "bucket_name" {
+  default = ""
+}
+
 variable "chef_server_private_ips" {
   default = []
 }
 
-variable "elasticsearch_private_ips" {
+variable "opensearch_private_ips" {
   default = []
 }
 
-variable "elasticsearch_public_ips" {
+variable "opensearch_public_ips" {
   default = []
 }
 

@@ -7,10 +7,14 @@ variable "backend_aib_dest_file" {
 variable "backend_aib_local_file" {
 }
 
+variable "backup_config_efs" {
+  default = "false"
+}
+
 variable "curator_pkg_ident" {
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 
@@ -65,5 +69,5 @@ variable "sudo_cmd" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/var/automate-ha"
 }

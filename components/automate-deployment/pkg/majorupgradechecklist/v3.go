@@ -26,6 +26,10 @@ const (
 
 	backupError = "Please take a backup and restart the upgrade process."
 
+	diskSpaceError = `Please ensure to have 60% free disk space`
+
+	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
+
 	run_chef_automate_upgrade_status_cmd = `chef-automate upgrade status`
 	run_chef_automate_upgrade_status     = `Check the status of your upgrade using:  
      $ ` + run_chef_automate_upgrade_status_cmd + `
@@ -113,14 +117,16 @@ var postChecklistExternal = []PostCheckListItem{
 }
 
 type V3ChecklistManager struct {
-	writer  cli.FormatWriter
-	version string
+	writer       cli.FormatWriter
+	version      string
+	isExternalPG bool
 }
 
 func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3ChecklistManager {
 	return &V3ChecklistManager{
-		writer:  writer,
-		version: version,
+		writer:       writer,
+		version:      version,
+		isExternalPG: IsExternalPG(),
 	}
 }
 
@@ -144,9 +150,9 @@ func IsExternalPG() bool {
 	return config.IsExternalPG()
 }
 
-func (ci *V3ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckListItem {
+func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	var postChecklist []PostCheckListItem
-	if isExternalPG {
+	if ci.isExternalPG {
 		postChecklist = postChecklistExternal
 	} else {
 		postChecklist = postChecklistEmbedded
@@ -154,13 +160,13 @@ func (ci *V3ChecklistManager) GetPostChecklist(isExternalPG bool) []PostCheckLis
 	return postChecklist
 }
 
-func (ci *V3ChecklistManager) RunChecklist(isExternalPG bool) error {
+func (ci *V3ChecklistManager) RunChecklist() error {
 
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
 
-	if isExternalPG {
+	if ci.isExternalPG {
 		dbType = "External"
 		postcheck = postChecklistExternal
 		checklists = append(checklists, preChecklist(externalPGUpgradeCheck)...)
@@ -240,7 +246,7 @@ func backupCheck() Checklist {
 			}
 			if !resp {
 				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+				return status.New(status.InvalidCommandArgsError, backupError)
 			}
 			return nil
 		},
@@ -258,8 +264,8 @@ func diskSpaceCheck() Checklist {
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+				h.Writer.Error(diskSpaceError)
+				return status.New(status.InvalidCommandArgsError, diskSpaceError)
 			}
 			return nil
 		},
@@ -277,8 +283,8 @@ func postChecklistIntimationCheck() Checklist {
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+				h.Writer.Error(postChecklistIntimationError)
+				return status.New(status.InvalidCommandArgsError, postChecklistIntimationError)
 			}
 			return nil
 		},

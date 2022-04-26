@@ -32,7 +32,7 @@ variable "chef_server_instance_ram_mb" {
   description = "RAM value in MB"
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 

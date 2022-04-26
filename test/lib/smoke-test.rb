@@ -57,8 +57,8 @@ module AutomateCluster
           end
         end
 
-        utils.backend_logger.info ">>>> Running Automate Elasticsearch inspec smoke tests against: #{utils.elasticsearch_public_ips}"
-        utils.elasticsearch_public_ips.each do |ip|
+        utils.backend_logger.info ">>>> Running Automate Elasticsearch inspec smoke tests against: #{utils.opensearch_public_ips}"
+        utils.opensearch_public_ips.each do |ip|
           begin
             cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-backend-elasticsearch-smoke/"
             utils.backend_logger.debug cmd

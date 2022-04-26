@@ -30,42 +30,6 @@ locals {
   })
 }
 
-module "journalbeat" {
-  airgap_info               = var.airgap_info
-  backend_aib_dest_file     = var.backend_aib_dest_file
-  elasticsearch_listen_port = var.opensearch_listen_port
-  habitat_info              = var.habitat_info
-  instance_count            = var.postgresql_instance_count
-  journalbeat_pkg_ident     = var.journalbeat_pkg_ident
-  journalbeat_svc_binds     = "--bind opensearch:automate-ha-opensearch.default"
-  journalbeat_tags          = ["postgresql"]
-  elasticsearch_private_ips = var.opensearch_private_ips
-  private_ips               = var.private_ips
-  source                    = "../journalbeat"
-  ssh_key_file              = var.ssh_key_file
-  ssh_user                  = var.ssh_user
-  ssh_user_sudo_password    = var.ssh_user_sudo_password
-  sudo_cmd                  = var.sudo_cmd
-}
-
-module "metricbeat" {
-  airgap_info               = var.airgap_info
-  backend_aib_dest_file     = var.backend_aib_dest_file
-  elasticsearch_listen_port = var.opensearch_listen_port
-  habitat_info              = var.habitat_info
-  instance_count            = var.postgresql_instance_count
-  metricbeat_pkg_ident      = var.metricbeat_pkg_ident
-  metricbeat_svc_binds      = "--bind database:automate-ha-postgresql.default --bind opensearch:automate-ha-opensearch.default"
-  metricbeat_tags           = ["postgresql"]
-  elasticsearch_private_ips = var.opensearch_private_ips
-  private_ips               = var.private_ips
-  source                    = "../metricbeat"
-  ssh_key_file              = var.ssh_key_file
-  ssh_user                  = var.ssh_user
-  ssh_user_sudo_password    = var.ssh_user_sudo_password
-  sudo_cmd                  = var.sudo_cmd
-}
-
 resource "null_resource" "postgresql" {
   count = var.postgresql_instance_count
 
