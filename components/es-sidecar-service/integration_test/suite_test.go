@@ -79,6 +79,12 @@ func (suite *Suite) DeleteAllIndices() {
 	if err != nil {
 		fmt.Printf("Could not retrieve index list: %s\n", err)
 	}
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	suite.esClient.DeleteIndex(indices...).Do(context.Background())
 }
 

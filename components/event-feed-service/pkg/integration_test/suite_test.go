@@ -132,7 +132,12 @@ func (s *Suite) GlobalTeardown() {
 	if len(toDelete) == 0 {
 		return
 	}
-
+	for i, v := range toDelete {
+		if v == ".opendistro_security" {
+			toDelete = append(toDelete[:i], toDelete[i+1:]...)
+			break
+		}
+	}
 	_, err := s.esClient.DeleteIndex(toDelete...).Do(context.Background())
 	if err != nil {
 		fmt.Printf("Could not 'delete' ES indices: '%s'\nError: %s", s.indices, err)

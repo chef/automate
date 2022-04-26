@@ -134,6 +134,12 @@ func (s *Suite) GlobalTeardown() {
 			indicesToDelete = append(indicesToDelete, index)
 		}
 	}
+	for i, v := range indicesToDelete {
+		if v == ".opendistro_security" {
+			indicesToDelete = append(indicesToDelete[:i], indicesToDelete[i+1:]...)
+			break
+		}
+	}
 	time.Sleep(2 * time.Second)
 	_, err := s.client.DeleteIndex(indicesToDelete...).Do(context.Background())
 	if err != nil {
