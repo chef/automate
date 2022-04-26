@@ -410,12 +410,19 @@ func (s *Suite) DeleteAllDocuments() {
 	var err error
 	// ES Query to match all documents
 	q := elastic.RawStringQuery("{\"match_all\":{}}")
-
+	indices, _ := s.elasticClient.IndexNames()
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	maxNumberOfTries := 3
 	tries := 0
 	for ; tries < maxNumberOfTries; tries++ {
-		_, err = s.elasticClient.DeleteByQuery("_all").
+		_, err = s.elasticClient.DeleteByQuery().
 			Query(q).
+			Index(indices...).
 			IgnoreUnavailable(true).
 			Refresh("true").
 			WaitForCompletion(true).
