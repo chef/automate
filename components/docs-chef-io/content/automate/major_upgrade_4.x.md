@@ -22,13 +22,13 @@ Please choose the following upgrade journey based on your current version of Che
 | -------------------- | ---------- |
 | Any version before 20220329091442| 20220329091442|
 | 20220329091442| 3.x.x|
-| 3.x.x| 4.x.x
+| 3.x.x| 4.0.x
 
 For example, if today you are on version *2021201164433*, your upgrade journey should be:
 
 1. Manual upgrade to *20220329091442*
 1. Manual upgrade to *3.x.x*
-1. Manual upgrade to *4.x.x*
+1. Manual upgrade to *4.0.x*
 
 ## Prerequisites
 
@@ -52,9 +52,9 @@ sudo chef-automate version
 
 To upgrade to automate 3.x.x follow the link: [upgrading to 3.x.x]({{< relref "major_upgrade.md" >}})
 
-## Upgrade Path from 3.x.x to 4.x.x
+## Upgrade Path from 3.x.x to 4.0.x
 
-There are four possible scenarios to upgrade from 3.x.x to 4.x.x version.
+There are four possible scenarios to upgrade from 3.x.x to 4.0.x version.
 
 - [Chef Automate with Embedded Elasticsearch]({{< relref "#chef-automate-with-embedded-elasticsearch" >}})
 
@@ -76,7 +76,7 @@ Also, accept the checklist item asking permission to disable sharding. {{< /warn
 
 To upgrade Chef Automate with embedded Elasticsearch, follow the steps given below:
 
-**Upgrade Chef Automate from version 3.x.x to 4.x.x**
+**Upgrade Chef Automate from version 3.x.x to 4.0.x**
 
 1. Start a major version upgrade:\
 
@@ -122,7 +122,7 @@ sudo chef-automate post-major-upgrade clear-data --data=es
 
 To upgrade Chef Automate with external elasticsearch, follow the steps given below:
 
-**Upgrade Chef Automate from version 3.x.x to 4.x.x**
+**Upgrade Chef Automate from version 3.x.x to 4.0.x**
 
 1. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
@@ -146,9 +146,9 @@ sudo chef-automate maintenance off
 
 ### Chef Automate in Air-Gapped Environment With Embedded ElasticSearch
 
-**Upgrade Chef Automate from version 3.x.x to 4.x.x**
+**Upgrade Chef Automate from version 3.x.x to 4.0.x**
 
-To upgrade to 4.x.x, follow the steps below:
+To upgrade to 4.0.x, follow the steps below:
 
 #### On Internet connected machine
 
@@ -164,7 +164,7 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 sudo ./chef-automate airgap bundle create
 ```
 
-3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_4.x.x.aib`) to the air-gapped machine running Chef Automate.
+3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_4.0.x.aib`) to the air-gapped machine running Chef Automate.
 
 #### On Air-Gapped machine running Chef Automate
 
@@ -177,7 +177,7 @@ sudo ./chef-automate config show
 2. Upgrade using new AIB and Chef Automate CLI:
 
 ```sh
-sudo ./chef-automate upgrade run --airgap-bundle automate_4.x.x.aib --major
+sudo ./chef-automate upgrade run --airgap-bundle automate_4.0.x.aib --major
 ```
 
 **Post Upgrade**
@@ -214,9 +214,9 @@ sudo chef-automate post-major-upgrade clear-data --data=es
 
 ### Chef Automate in Air-Gapped Environment With External ElasticSearch
 
-**Upgrade Chef Automate from version 3.x.x to 4.x.x**
+**Upgrade Chef Automate from version 3.x.x to 4.0.x**
 
-To upgrade to 4.x.x, follow the steps below:
+To upgrade to 4.0.x, follow the steps below:
 
 #### On Internet connected machine
 
@@ -232,7 +232,7 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 sudo ./chef-automate airgap bundle create
 ```
 
-3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_4.x.x.aib`) to the air-gapped machine running Chef Automate.
+3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_4.0.x.aib`) to the air-gapped machine running Chef Automate.
 
 #### On Air-Gapped machine running Chef Automate
 
@@ -247,7 +247,7 @@ sudo ./chef-automate config show
 3. Upgrade using new AIB and Chef Automate CLI:
 
 ```sh
-sudo ./chef-automate upgrade run --airgap-bundle automate_4.x.x.aib --major
+sudo ./chef-automate upgrade run --airgap-bundle automate_4.0.x.aib --major
 ```
 
 4. Check whether upgrade status is up-to-date
