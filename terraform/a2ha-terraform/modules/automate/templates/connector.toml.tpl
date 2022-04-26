@@ -16,12 +16,12 @@
   s3_endpoint = "${s3_endpoint}"
 
 [services]
-  [services.elasticsearch]
-  ips = ${elasticsearch_ips}
+  [services.opensearch]
+  ips = ${opensearch_ips}
   sup_port = 9631
   svc_group = "default"
-  svc_name = "automate-ha-elasticsearch"
-  svc_port = ${elasticsearch_listen_port}
+  svc_name = "automate-ha-opensearch"
+  svc _port = ${opensearch_listen_port}
   managed_elasticsearch_certificate = "${managed_elasticsearch_certificate}"
   managed_elasticsearch_domain_url = "${managed_elasticsearch_domain_url}"
   managed_elasticsearch_user_password = "${managed_elasticsearch_user_password}"

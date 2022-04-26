@@ -3,29 +3,29 @@ resource "random_id" "cluster_id" {
 }
 
 module "system-tuning-automate" {
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
-  elasticsearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
-  instance_count                     = var.automate_instance_count
-  postgresql_archive_disk_fs_path    = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
-  private_ips                        = var.automate_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_user_sudo_password             = local.fe_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  source                          = "./modules/system"
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
+  instance_count                  = var.automate_instance_count
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
+  private_ips                     = var.automate_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.fe_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
 module "system-tuning-chef_server" {
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
-  elasticsearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
-  instance_count                     = var.chef_server_instance_count
-  postgresql_archive_disk_fs_path    = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
-  private_ips                        = var.chef_server_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_user_sudo_password             = local.fe_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  source                          = "./modules/system"
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
+  instance_count                  = var.chef_server_instance_count
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
+  private_ips                     = var.chef_server_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.fe_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
 module "system-tuning-opensearch" {
@@ -43,20 +43,20 @@ module "system-tuning-opensearch" {
 }
 
 module "system-tuning-postgresql" {
-  count                              = var.setup_managed_services ? 0 : 1
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
-  elasticsearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
-  instance_count                     = var.postgresql_instance_count
-  postgresql_archive_disk_fs_path    = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
-  private_ips                        = var.postgresql_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_user_sudo_password             = local.be_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  source                          = "./modules/system"
+  count                           = var.setup_managed_services ? 0 : 1
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
+  instance_count                  = var.postgresql_instance_count
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
+  private_ips                     = var.postgresql_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.be_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
-module "airgap_bundle-elasticsearch" {
+module "airgap_bundle-opensearch" {
   source            = "./modules/airgap_bundle"
   count             = var.setup_managed_services ? 0 : 1
   archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-opensearch[0].archive_disk_info
@@ -120,10 +120,10 @@ module "airgap_bundle-chef_server" {
   tmp_path     = var.tmp_path
 }
 
-module "habitat-elasticsearch" {
+module "habitat-opensearch" {
   source                          = "./modules/habitat"
   count                           = var.setup_managed_services ? 0 : 1
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-elasticsearch[0].airgap_info
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-opensearch[0].airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key

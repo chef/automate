@@ -9,7 +9,7 @@ authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
 automate-ha-elasticsearch BINDING_MODE strict
-automate-ha-elasticsidecar REQUIRED elasticsearch
+automate-ha-elasticsidecar REQUIRED opensearch
 automate-ha-elasticsidecar BINDING_MODE strict
 automate-ha-haproxy OPTIONAL database pgleaderchk
 automate-ha-haproxy BINDING_MODE strict
