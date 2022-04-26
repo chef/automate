@@ -126,7 +126,7 @@ module "elasticsearch" {
   backend_aib_local_file       = var.backend_aib_local_file
   curator_pkg_ident            = var.curator_pkg_ident
   elasticsearch_instance_count = var.elasticsearch_instance_count
-  elasticsearch_listen_port    = var.elasticsearch_listen_port
+  opensearch_listen_port       = var.elasticsearch_listen_port
   elasticsearch_pkg_ident      = var.elasticsearch_pkg_ident
   elasticsearch_svc_load_args  = var.elasticsearch_svc_load_args
   elasticsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
@@ -147,7 +147,7 @@ module "postgresql" {
   airgap_info                     = module.airgap_bundle-backend.airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
-  elasticsearch_listen_port       = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.existing_elasticsearch_private_ips
   habitat_info                    = module.habitat-backend.habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
@@ -191,7 +191,7 @@ module "bootstrap_automate" {
   frontend_aib_local_file         = var.frontend_aib_local_file
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
-  elasticsearch_listen_port       = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.existing_elasticsearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
   postgresql_private_ips          = var.existing_postgresql_private_ips
@@ -222,7 +222,7 @@ module "automate" {
   frontend_aib_local_file         = var.frontend_aib_local_file
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
-  elasticsearch_listen_port       = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.existing_elasticsearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
   postgresql_private_ips          = var.existing_postgresql_private_ips
@@ -257,7 +257,7 @@ module "chef_server" {
   frontend_aib_local_file         = var.frontend_aib_local_file
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
-  elasticsearch_listen_port       = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.elasticsearch_listen_port
   elasticsearch_private_ips       = var.existing_elasticsearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
   postgresql_private_ips          = var.existing_postgresql_private_ips

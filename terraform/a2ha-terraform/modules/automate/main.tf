@@ -10,7 +10,7 @@ locals {
     automate_dc_token                   = var.automate_dc_token,
     automate_role                       = var.automate_role,
     elasticsearch_ips                   = jsonencode(formatlist("%s", var.elasticsearch_private_ips)),
-    elasticsearch_listen_port           = var.elasticsearch_listen_port,
+    opensearch_listen_port              = var.elasticsearch_listen_port,
     managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate,
     managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url,
     managed_elasticsearch_user_password = var.managed_elasticsearch_user_password,
