@@ -69,6 +69,9 @@ module "airgap_bundle-opensearch" {
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
   tmp_path     = var.tmp_path
+  depends_on   = [
+    module.system-tuning-opensearch
+  ]
 }
 
 module "airgap_bundle-postgresql" {
@@ -84,6 +87,9 @@ module "airgap_bundle-postgresql" {
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
   tmp_path     = var.tmp_path
+  depends_on   = [
+    module.system-tuning-postgresql
+  ]
 }
 
 module "airgap_bundle-automate" {
@@ -101,6 +107,9 @@ module "airgap_bundle-automate" {
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
   tmp_path     = var.tmp_path
+  depends_on   = [
+    module.system-tuning-automate
+  ]
 }
 
 module "airgap_bundle-chef_server" {
@@ -118,6 +127,9 @@ module "airgap_bundle-chef_server" {
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
   tmp_path     = var.tmp_path
+  depends_on   = [
+    module.system-tuning-chef_server
+  ]
 }
 
 module "habitat-opensearch" {

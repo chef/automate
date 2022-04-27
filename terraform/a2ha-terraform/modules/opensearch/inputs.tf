@@ -10,6 +10,10 @@ variable "backend_aib_local_file" {
 variable "curator_pkg_ident" {
 }
 
+variable "backup_config_efs" {
+  default = "false"
+}
+
 variable "habitat_info" {
 }
 
@@ -70,5 +74,5 @@ variable "sudo_cmd" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/var/automate-ha"
 }

@@ -66,3 +66,30 @@ resource "null_resource" "opensearch" {
     ]
   }
 }
+
+resource "null_resource" "backup_configuration" {
+  count = var.backup_config_efs == "true" ? 1 : 0
+
+  connection {
+    user        = var.ssh_user
+    private_key = file(var.ssh_key_file)
+    host        = var.private_ips[0]
+    script_path = "${var.tmp_path}/tf_inline_script_system_opensearch.sh"
+  }
+  
+  provisioner "file" {
+    destination = "${var.tmp_path}/efs_backup.sh"
+    source = "${path.module}/templates/efs_backup.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod 0700 ${var.tmp_path}/efs_backup.sh",
+      "echo '${var.ssh_user_sudo_password}' | ${var.sudo_cmd} -S ${var.tmp_path}/efs_backup.sh",
+    ]
+  }
+  
+  depends_on = [
+    null_resource.opensearch
+  ]
+}
