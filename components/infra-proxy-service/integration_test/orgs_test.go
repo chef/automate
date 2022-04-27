@@ -1,13 +1,13 @@
-package server_test
+package integration_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -16,7 +16,6 @@ import (
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authz"
 	request "github.com/chef/automate/api/interservice/infra_proxy/request"
-	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -24,13 +23,13 @@ import (
 
 func TestOrgs(t *testing.T) {
 	ctx := context.Background()
-	_, serviceRef, conn, close, authzMock, secretsMock := test.SetupInfraProxyService(ctx, t)
-	cl := infra_proxy.NewInfraProxyServiceClient(conn)
+	_, serviceRef, _, close, authzMock, secretsMock := test.SetupInfraProxyService(ctx, t)
+	//cl := infra_proxy.NewInfraProxyServiceClient(conn)
+
 	defer close()
+	webuiKeyPath := "/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
 
-	webUiKeyPath := "/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
-
-	key, err := ioutil.ReadFile(webUiKeyPath)
+	key, err := ioutil.ReadFile(webuiKeyPath)
 	require.NoError(t, err)
 
 	webuiKey := string(key)
@@ -50,15 +49,12 @@ func TestOrgs(t *testing.T) {
 
 	t.Run("CreateOrg", func(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
-		secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil).AnyTimes()
-		secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil).AnyTimes()
-		secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any()).AnyTimes()
 
-		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		serverRes, err := infraProxy.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      fqdn,
-			IpAddress: "",
+			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,
 		})
 		require.NoError(t, err)
@@ -73,7 +69,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp, err := cl.CreateOrg(ctx, req)
+			resp, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 
@@ -82,7 +78,7 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, req.ServerId, org.ServerId)
 			assert.Equal(t, 2, len(org.Projects))
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
 
 		t.Run("when no projects are passed, creates the new org successfully with empty projects", func(t *testing.T) {
@@ -95,20 +91,20 @@ func TestOrgs(t *testing.T) {
 				Projects: []string{},
 			}
 
-			resp, err := cl.CreateOrg(ctx, req)
+			resp, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			org := resp.Org
 			assert.Equal(t, req.Name, org.Name)
 			assert.Equal(t, 0, len(org.Projects))
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
 
 		t.Run("when the org exists, raise the error org already exists", func(t *testing.T) {
 			ctx := context.Background()
 
-			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+			resp, err := infraProxy.CreateOrg(ctx, &request.CreateOrg{
 				Id:       "infra-org-id",
 				Name:     "infra-org",
 				ServerId: serverRes.Server.Id,
@@ -116,7 +112,7 @@ func TestOrgs(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
+			resp2, err := infraProxy.CreateOrg(ctx, &request.CreateOrg{
 				Id:       "infra-org-id",
 				Name:     "infra-org",
 				ServerId: serverRes.Server.Id,
@@ -125,12 +121,12 @@ func TestOrgs(t *testing.T) {
 			assert.Nil(t, resp2)
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
 
 		t.Run("when the org required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+			resp, err := infraProxy.CreateOrg(ctx, &request.CreateOrg{
 				Id:       "infra-org-id",
 				ServerId: serverRes.Server.Id,
 				Projects: []string{},
@@ -139,7 +135,7 @@ func TestOrgs(t *testing.T) {
 			assert.Error(t, err, "must supply org name")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 
-			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
+			resp2, err := infraProxy.CreateOrg(ctx, &request.CreateOrg{
 				Id:       "infra-org-id",
 				Name:     "",
 				ServerId: serverRes.Server.Id,
@@ -152,7 +148,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when the org required field server ID is missing or empty, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+			resp, err := infraProxy.CreateOrg(ctx, &request.CreateOrg{
 				Id:       "infra-org-id",
 				Name:     "infra-org",
 				Projects: []string{},
@@ -161,7 +157,7 @@ func TestOrgs(t *testing.T) {
 			assert.Error(t, err, "must supply server ID")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 
-			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
+			resp2, err := infraProxy.CreateOrg(ctx, &request.CreateOrg{
 				Id:       "infra-org-id",
 				Name:     "infra-org",
 				ServerId: "",
@@ -175,7 +171,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the server does not exist, raise server not found error", func(t *testing.T) {
 			ctx := context.Background()
 			serverID := "97e01ea1-976e-4626-88c8-43345c5d934f"
-			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+			resp, err := infraProxy.CreateOrg(ctx, &request.CreateOrg{
 				Id:       "infra-org-id",
 				Name:     "infra-org",
 				ServerId: serverID,
@@ -186,17 +182,16 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.NotFound, err)
 
 		})
-		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		cleanupServer(ctx, t, serverRes.Server.Id)
 	})
 
 	t.Run("GetOrgs", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
-
-		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		serverRes, err := infraProxy.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      fqdn,
-			IpAddress: "",
+			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,
 		})
 		require.NoError(t, err)
@@ -204,7 +199,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when no orgs exist returns empty list", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			resp, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.Nil(t, err)
@@ -222,18 +217,18 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{},
 			}
-			resp, err := cl.CreateOrg(ctx, req)
+			resp, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 
-			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgs, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, orgs)
 			assert.Equal(t, 1, len(orgs.GetOrgs()))
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
 
 		t.Run("when the project filter is filtered by * returns all orgs", func(t *testing.T) {
@@ -245,7 +240,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -255,20 +250,20 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
 			ctx = test.InsertProjectsIntoNewContext([]string{"*"})
-			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgs, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, orgs)
 			assert.Equal(t, 2, len(orgs.Orgs))
 
-			cleanupOrg(ctx, t, cl, resp1.Org.Id, resp1.Org.ServerId)
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp1.Org.Id, resp1.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when the project filter is filtered by (unassigned) returns all (unassigned) orgs", func(t *testing.T) {
@@ -279,13 +274,9 @@ func TestOrgs(t *testing.T) {
 				Name:     "infra-org",
 				ServerId: serverRes.Server.Id,
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
-
-			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
-			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req = &request.CreateOrg{
 				Id:       "infra-org-id-2",
@@ -293,20 +284,20 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"other_project"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
 			ctx = test.InsertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
-			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgs, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, orgs)
 			assert.Equal(t, 1, len(orgs.Orgs))
 
-			cleanupOrg(ctx, t, cl, resp1.Org.Id, resp1.Org.ServerId)
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp1.Org.Id, resp1.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when the project filter has one project returns only the orgs with the same project as the filter", func(t *testing.T) {
@@ -318,7 +309,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -328,20 +319,20 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
 			ctx = test.InsertProjectsIntoNewContext([]string{"project1"})
-			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgs, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, orgs)
 			assert.Equal(t, 1, len(orgs.Orgs))
 
-			cleanupOrg(ctx, t, cl, resp1.Org.Id, resp1.Org.ServerId)
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp1.Org.Id, resp1.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when the project filter has multiple projects returns only the orgs with at least one of the projects from the filter", func(t *testing.T) {
@@ -353,7 +344,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -363,7 +354,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project3"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
@@ -373,21 +364,21 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"other_project"},
 			}
-			resp3, err := cl.CreateOrg(ctx, req)
+			resp3, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp3)
 
 			ctx = test.InsertProjectsIntoNewContext([]string{"project1", "project3"})
-			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgs, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, orgs)
 			assert.Equal(t, 2, len(orgs.Orgs))
 
-			cleanupOrg(ctx, t, cl, resp1.Org.Id, resp1.Org.ServerId)
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
-			cleanupOrg(ctx, t, cl, resp3.Org.Id, resp3.Org.ServerId)
+			cleanupOrg(ctx, t, resp1.Org.Id, resp1.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp3.Org.Id, resp3.Org.ServerId)
 		})
 
 		t.Run("when the project filter has one project and none of the orgs in the db have that project, returns empty orgs", func(t *testing.T) {
@@ -399,7 +390,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -409,33 +400,33 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
 			ctx = test.InsertProjectsIntoNewContext([]string{"other_project"})
-			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgs, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			require.NotNil(t, orgs)
 			assert.Equal(t, 0, len(orgs.Orgs))
 
-			cleanupOrg(ctx, t, cl, resp1.Org.Id, resp1.Org.ServerId)
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp1.Org.Id, resp1.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
-		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		cleanupServer(ctx, t, serverRes.Server.Id)
 
 	})
 
 	t.Run("GetOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
-		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		serverRes, err := infraProxy.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      fqdn,
-			IpAddress: "",
+			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,
 		})
 		require.NoError(t, err)
@@ -443,7 +434,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when there is no ID in the request, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.GetOrg(ctx, &request.GetOrg{
+			resp, err := infraProxy.GetOrg(ctx, &request.GetOrg{
 				Id: "",
 			})
 
@@ -453,7 +444,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when there is no Server ID in the request, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.GetOrg(ctx, &request.GetOrg{
+			resp, err := infraProxy.GetOrg(ctx, &request.GetOrg{
 				Id: "infra-org-id",
 			})
 
@@ -464,7 +455,7 @@ func TestOrgs(t *testing.T) {
 		t.Run("when the org does not exists, return org not found", func(t *testing.T) {
 			ctx := context.Background()
 			orgID := "97e01ea1-976e-4626-88c8-43345c5d934f"
-			resp, err := cl.GetOrg(ctx, &request.GetOrg{
+			resp, err := infraProxy.GetOrg(ctx, &request.GetOrg{
 				Id:       orgID,
 				ServerId: serverRes.Server.Id,
 			})
@@ -483,11 +474,11 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp, err := cl.CreateOrg(ctx, req)
+			resp, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 
-			org, err := cl.GetOrg(ctx, &request.GetOrg{
+			org, err := infraProxy.GetOrg(ctx, &request.GetOrg{
 				Id:       resp.Org.Id,
 				ServerId: "INVALID-ID",
 			})
@@ -496,7 +487,7 @@ func TestOrgs(t *testing.T) {
 			require.Contains(t, err.Error(), fmt.Sprintf("no org found with ID \"%s\"", resp.Org.Id))
 			grpctest.AssertCode(t, codes.NotFound, err)
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
 
 		t.Run("when the org exists, returns the org successfully", func(t *testing.T) {
@@ -508,11 +499,11 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp, err := cl.CreateOrg(ctx, req)
+			resp, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 
-			org, err := cl.GetOrg(ctx, &request.GetOrg{
+			org, err := infraProxy.GetOrg(ctx, &request.GetOrg{
 				Id:       resp.Org.Id,
 				ServerId: resp.Org.ServerId,
 			})
@@ -523,18 +514,18 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, resp.Org.AdminUser, org.Org.AdminUser)
 			assert.Equal(t, resp.Org.Projects, org.Org.Projects)
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
-		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		cleanupServer(ctx, t, serverRes.Server.Id)
 	})
 
 	t.Run("DeleteOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
-		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		serverRes, err := infraProxy.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      fqdn,
-			IpAddress: "",
+			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,
 		})
 		require.NoError(t, err)
@@ -557,7 +548,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -567,17 +558,17 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			orgsBefore, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsBefore, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			assert.Equal(t, 2, len(orgsBefore.Orgs))
 
-			resp, err2 := cl.DeleteOrg(ctx, &request.DeleteOrg{
+			resp, err2 := infraProxy.DeleteOrg(ctx, &request.DeleteOrg{
 				Id:       resp1.Org.Id,
 				ServerId: resp1.Org.ServerId,
 			})
@@ -586,14 +577,14 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, resp1.Org.Id, resp.Org.Id)
 			assert.Equal(t, resp1.Org.Name, resp.Org.Name)
 
-			orgsAfter, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsAfter, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			assert.Equal(t, len(orgsAfter.Orgs), len(orgsBefore.Orgs)-1)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = test.DefaultMockPurgeFunc
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when an existing org is deleted and is in the project filter, deletes the org successfully", func(t *testing.T) {
@@ -612,7 +603,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -622,11 +613,11 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			orgsBefore, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsBefore, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
@@ -634,7 +625,7 @@ func TestOrgs(t *testing.T) {
 
 			ctx = test.InsertProjectsIntoNewContext([]string{"project2"})
 
-			resp, err2 := cl.DeleteOrg(ctx, &request.DeleteOrg{
+			resp, err2 := infraProxy.DeleteOrg(ctx, &request.DeleteOrg{
 				Id:       resp1.Org.Id,
 				ServerId: serverRes.Server.Id,
 			})
@@ -643,14 +634,14 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, resp1.Org.Id, resp.Org.Id)
 			assert.Equal(t, resp1.Org.Name, resp.Org.Name)
 
-			orgsAfter, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsAfter, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			assert.Equal(t, len(orgsAfter.Orgs), len(orgsBefore.Orgs)-1)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = test.DefaultMockPurgeFunc
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when an existing org is deleted and the project filter is *, deletes the org successfully", func(t *testing.T) {
@@ -663,17 +654,13 @@ func TestOrgs(t *testing.T) {
 				return nil, errors.New("unexpected org name passed to PurgeSubjectFromPolicies")
 			}
 
-			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
-			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
-
 			req := &request.CreateOrg{
 				Id:       "infra-org-id-1",
 				Name:     "infra-org",
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -683,11 +670,11 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			orgsBefore, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsBefore, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
@@ -695,7 +682,7 @@ func TestOrgs(t *testing.T) {
 
 			ctx = test.InsertProjectsIntoNewContext([]string{"*"})
 
-			resp, err2 := cl.DeleteOrg(ctx, &request.DeleteOrg{
+			resp, err2 := infraProxy.DeleteOrg(ctx, &request.DeleteOrg{
 				Id:       resp1.Org.Id,
 				ServerId: serverRes.Server.Id,
 			})
@@ -704,14 +691,14 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, resp1.Org.Id, resp.Org.Id)
 			assert.Equal(t, resp1.Org.Name, resp.Org.Name)
 
-			orgsAfter, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsAfter, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			assert.Equal(t, len(orgsAfter.Orgs), len(orgsBefore.Orgs)-1)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = test.DefaultMockPurgeFunc
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when an existing org is deleted and the project filter is (unassigned), deletes the org successfully", func(t *testing.T) {
@@ -730,7 +717,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -740,11 +727,11 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			orgsBefore, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsBefore, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
@@ -752,7 +739,7 @@ func TestOrgs(t *testing.T) {
 
 			ctx = test.InsertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 
-			resp, err2 := cl.DeleteOrg(ctx, &request.DeleteOrg{
+			resp, err2 := infraProxy.DeleteOrg(ctx, &request.DeleteOrg{
 				Id:       resp1.Org.Id,
 				ServerId: serverRes.Server.Id,
 			})
@@ -761,14 +748,14 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, resp1.Org.Id, resp.Org.Id)
 			assert.Equal(t, resp1.Org.Name, resp.Org.Name)
 
-			orgsAfter, err := cl.GetOrgs(context.Background(), &request.GetOrgs{
+			orgsAfter, err := infraProxy.GetOrgs(context.Background(), &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
 			assert.Equal(t, len(orgsAfter.Orgs), len(orgsBefore.Orgs)-1)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = test.DefaultMockPurgeFunc
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when an existing org is filtered by projects return NotFound", func(t *testing.T) {
@@ -786,7 +773,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp1, err := cl.CreateOrg(ctx, req)
+			resp1, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
 
@@ -796,11 +783,11 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project2"},
 			}
-			resp2, err := cl.CreateOrg(ctx, req)
+			resp2, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			orgsBefore, err := cl.GetOrgs(ctx, &request.GetOrgs{
+			orgsBefore, err := infraProxy.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
 			require.NoError(t, err)
@@ -808,20 +795,20 @@ func TestOrgs(t *testing.T) {
 
 			ctx = test.InsertProjectsIntoNewContext([]string{"other_project"})
 
-			resp, err2 := cl.DeleteOrg(ctx, &request.DeleteOrg{
+			resp, err2 := infraProxy.DeleteOrg(ctx, &request.DeleteOrg{
 				Id:       resp1.Org.Id,
 				ServerId: serverRes.Server.Id,
 			})
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err2)
 
-			cleanupOrg(ctx, t, cl, resp1.Org.Id, resp1.Org.ServerId)
-			cleanupOrg(ctx, t, cl, resp2.Org.Id, resp2.Org.ServerId)
+			cleanupOrg(ctx, t, resp1.Org.Id, resp1.Org.ServerId)
+			cleanupOrg(ctx, t, resp2.Org.Id, resp2.Org.ServerId)
 		})
 
 		t.Run("when the org to delete is does not exist, returns org not found", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err2 := cl.DeleteOrg(ctx, &request.DeleteOrg{
+			resp, err2 := infraProxy.DeleteOrg(ctx, &request.DeleteOrg{
 				Id:       "97e01ea1-976e-4626-88c8-43345c5d934f",
 				ServerId: serverRes.Server.Id,
 			})
@@ -829,16 +816,16 @@ func TestOrgs(t *testing.T) {
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err2)
 		})
-		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		cleanupServer(ctx, t, serverRes.Server.Id)
 	})
 
 	t.Run("UpdateOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
-		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		serverRes, err := infraProxy.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      fqdn,
-			IpAddress: "",
+			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,
 		})
 		require.NoError(t, err)
@@ -852,7 +839,7 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp, err := cl.CreateOrg(ctx, req)
+			resp, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 
@@ -864,13 +851,13 @@ func TestOrgs(t *testing.T) {
 				ServerId:  serverRes.Server.Id,
 				Projects:  []string{"project1", "project2"},
 			}
-			updatedOrgResp, err := cl.UpdateOrg(ctx, updateReq)
+			updatedOrgResp, err := infraProxy.UpdateOrg(ctx, updateReq)
 			require.NoError(t, err, "update org")
 			require.NotNil(t, updatedOrgResp)
 			assert.Equal(t, updateReq.Name, updatedOrgResp.Org.Name)
 			assert.Equal(t, updateReq.Projects, updatedOrgResp.Org.Projects)
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
 
 		t.Run("when org to update does not exist, raise org not found", func(t *testing.T) {
@@ -882,7 +869,7 @@ func TestOrgs(t *testing.T) {
 				ServerId:  serverRes.Server.Id,
 				Projects:  []string{"project1", "project2"},
 			}
-			updateOrg, err := cl.UpdateOrg(ctx, updateReq)
+			updateOrg, err := infraProxy.UpdateOrg(ctx, updateReq)
 
 			require.Nil(t, updateOrg)
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -890,7 +877,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when the org ID is missing or empty, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+			resp, err := infraProxy.UpdateOrg(ctx, &request.UpdateOrg{
 				Name:      "update-infra-org",
 				AdminUser: "admin",
 				ServerId:  serverRes.Server.Id,
@@ -900,7 +887,7 @@ func TestOrgs(t *testing.T) {
 			assert.Error(t, err, "must supply org ID")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 
-			resp2, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+			resp2, err := infraProxy.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "",
 				Name:      "update-infra-org",
 				AdminUser: "admin",
@@ -914,7 +901,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when the org required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+			resp, err := infraProxy.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				AdminUser: "admin",
 				ServerId:  serverRes.Server.Id,
@@ -924,7 +911,7 @@ func TestOrgs(t *testing.T) {
 			assert.Error(t, err, "must supply org name")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 
-			resp2, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+			resp2, err := infraProxy.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "",
 				AdminUser: "admin",
@@ -938,7 +925,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when the org required field server ID is missing or empty, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+			resp, err := infraProxy.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "infra-org",
 				AdminUser: "admin",
@@ -948,7 +935,7 @@ func TestOrgs(t *testing.T) {
 			assert.Error(t, err, "must supply server ID")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 
-			resp2, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+			resp2, err := infraProxy.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "infra-org",
 				AdminUser: "admin",
@@ -962,10 +949,7 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when the server does not exist, raise server not found error", func(t *testing.T) {
 			ctx := context.Background()
-			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
-			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
-			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+			resp, err := infraProxy.UpdateOrg(ctx, &request.UpdateOrg{
 				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
 				Name:      "infra-org",
 				AdminUser: "admin",
@@ -975,16 +959,16 @@ func TestOrgs(t *testing.T) {
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
-		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		cleanupServer(ctx, t, serverRes.Server.Id)
 	})
 
 	t.Run("ResetOrgAdminKey", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
-		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		serverRes, err := infraProxy.CreateServer(ctx, &request.CreateServer{
 			Id:        "chef-infra-server",
 			Name:      "Chef Infra Server",
 			Fqdn:      fqdn,
-			IpAddress: "",
+			IpAddress: "0.0.0.0",
 			WebuiKey:  webuiKey,
 		})
 		require.NoError(t, err)
@@ -999,15 +983,15 @@ func TestOrgs(t *testing.T) {
 				ServerId: serverRes.Server.Id,
 				Projects: []string{"project1", "project2"},
 			}
-			resp, err := cl.CreateOrg(ctx, req)
+			resp, err := infraProxy.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 
 			newSecretWithID := secrets.Secret{
-				Name: "infra-proxy-service-webui-key",
+				Name: "infra-proxy-service-admin-key",
 				Type: "chef-server",
 				Data: []*query.Kv{
-					{Key: "key", Value: webuiKey},
+					{Key: "key", Value: "--NEW_KEY--"},
 				},
 			}
 			newSecretWithID.Id = "fake id"
@@ -1016,7 +1000,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&newSecretWithID, nil)
 
 			newKey := "--NEW_KEY--"
-			updateOrg, err := cl.ResetOrgAdminKey(ctx, &request.ResetOrgAdminKey{
+			updateOrg, err := infraProxy.ResetOrgAdminKey(ctx, &request.ResetOrgAdminKey{
 				Id:       resp.Org.Id,
 				ServerId: serverRes.Server.Id,
 				AdminKey: newKey,
@@ -1024,7 +1008,7 @@ func TestOrgs(t *testing.T) {
 			require.NoError(t, err, "reset org admin key")
 			require.NotNil(t, updateOrg)
 
-			cleanupOrg(ctx, t, cl, resp.Org.Id, resp.Org.ServerId)
+			cleanupOrg(ctx, t, resp.Org.Id, resp.Org.ServerId)
 		})
 
 		t.Run("when org to reset admin key does not exist, raise org not found", func(t *testing.T) {
@@ -1034,20 +1018,20 @@ func TestOrgs(t *testing.T) {
 				AdminKey: "--NEW_KEY--",
 				ServerId: serverRes.Server.Id,
 			}
-			resp, err := cl.ResetOrgAdminKey(ctx, resetReq)
+			resp, err := infraProxy.ResetOrgAdminKey(ctx, resetReq)
 
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 
-		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		cleanupServer(ctx, t, serverRes.Server.Id)
 	})
 
 }
 
-func cleanupOrg(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyServiceClient, orgID string, serverID string) {
+func cleanupOrg(ctx context.Context, t *testing.T, orgID string, serverID string) {
 	t.Helper()
 	deleteReq := &request.DeleteOrg{Id: orgID, ServerId: serverID}
-	_, err := cl.DeleteOrg(context.Background(), deleteReq)
+	_, err := infraProxy.DeleteOrg(context.Background(), deleteReq)
 	require.NoError(t, err)
 }
