@@ -216,7 +216,11 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for users mgmt service")
 	}
-	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
+	infraProxyMigrationClient, err := clients.InfraProxyMigrationClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for infra proxy migration service")
+	}
+	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient, infraProxyMigrationClient))
 
 	teamsClient, err := clients.TeamsClient()
 	if err != nil {
@@ -323,10 +327,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		return errors.Wrap(err, "create client for infra proxy service")
 	}
 
-	infraProxyMigrationClient, err := clients.InfraProxyMigrationClient()
-	if err != nil {
-		return errors.Wrap(err, "create client for infra proxy migration service")
-	}
 	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
 
 	pb_infra_proxy_migrations.RegisterInfraProxyMigrationServiceServer(grpcServer, handler_infra_proxy_migration.NewInfraProxyMigrationHandler(infraProxyMigrationClient))

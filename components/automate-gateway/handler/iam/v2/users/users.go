@@ -6,17 +6,24 @@ import (
 	pb_common "github.com/chef/automate/api/external/iam/v2/common"
 	pb_req "github.com/chef/automate/api/external/iam/v2/request"
 	pb_resp "github.com/chef/automate/api/external/iam/v2/response"
+	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/migrations/request"
+	migrations "github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
+
 	"github.com/chef/automate/api/interservice/local_user"
 )
 
 // Server is the server interface
 type Server struct {
-	users local_user.UsersMgmtServiceClient
+	users                     local_user.UsersMgmtServiceClient
+	infraProxyMigrationClient migrations.MigrationDataServiceClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(users local_user.UsersMgmtServiceClient) *Server {
-	return &Server{users: users}
+func NewServer(users local_user.UsersMgmtServiceClient, migrationClient migrations.MigrationDataServiceClient) *Server {
+	return &Server{
+		users:                     users,
+		infraProxyMigrationClient: migrationClient,
+	}
 }
 
 // CreateUser creates a new user.
@@ -60,7 +67,17 @@ func (p *Server) ListUsers(
 
 func (p *Server) DeleteUser(
 	ctx context.Context, req *pb_req.DeleteUserReq) (*pb_resp.DeleteUserResp, error) {
-	_, err := p.users.DeleteUser(ctx, &local_user.Email{Email: req.Id})
+
+	// Delete the server and org user association from infra proxy service
+	_, err := p.infraProxyMigrationClient.DeleteUser(ctx,
+		&infra_proxy.DeleteUserRequest{
+			AutomateUsername: req.Id,
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.users.DeleteUser(ctx, &local_user.Email{Email: req.Id})
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz"
-	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/migrations/service"
 	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/local-user-service/password"
 	"github.com/chef/automate/components/local-user-service/users"
@@ -27,28 +26,26 @@ import (
 
 // Config holds the server's configuration options.
 type Config struct {
-	A1UserData        string
-	A1UserRolesData   string
-	Logger            *zap.Logger
-	Users             UsersConfig
-	ServiceCerts      *certs.ServiceCerts
-	TeamsAddress      string
-	AuthzAddress      string
-	InfraProxyAddress string
+	A1UserData      string
+	A1UserRolesData string
+	Logger          *zap.Logger
+	Users           UsersConfig
+	ServiceCerts    *certs.ServiceCerts
+	TeamsAddress    string
+	AuthzAddress    string
 }
 
 // Server is the top level object.
 type Server struct {
-	users            users.Adapter
-	logger           *zap.Logger
-	validator        *password.Validator
-	connFactory      *secureconn.Factory
-	health           *health.Service
-	teamsClient      teams.TeamsServiceClient
-	a1UserData       string
-	a1UserRolesData  string
-	authzClient      authz.PoliciesServiceClient
-	infraProxyClient infra_proxy.MigrationDataServiceClient
+	users           users.Adapter
+	logger          *zap.Logger
+	validator       *password.Validator
+	connFactory     *secureconn.Factory
+	health          *health.Service
+	teamsClient     teams.TeamsServiceClient
+	a1UserData      string
+	a1UserRolesData string
+	authzClient     authz.PoliciesServiceClient
 }
 
 // NewServer constructs a server from the provided config.
@@ -92,22 +89,16 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		return nil, errors.Wrapf(err, "failed to dial authz-service at (%s)", c.AuthzAddress)
 	}
 
-	infraProxyConn, err := factory.DialContext(ctx, "infra-proxy-service", c.InfraProxyAddress)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to dial infra-proxy-service at (%s)", c.InfraProxyAddress)
-	}
-
 	s := &Server{
-		logger:           c.Logger,
-		users:            usrs,
-		validator:        val,
-		connFactory:      secureconn.NewFactory(*c.ServiceCerts),
-		teamsClient:      teams.NewTeamsServiceClient(conn),
-		a1UserData:       c.A1UserData,
-		a1UserRolesData:  c.A1UserRolesData,
-		authzClient:      authz.NewPoliciesServiceClient(authzConn),
-		health:           health.NewService(),
-		infraProxyClient: infra_proxy.NewMigrationDataServiceClient(infraProxyConn),
+		logger:          c.Logger,
+		users:           usrs,
+		validator:       val,
+		connFactory:     secureconn.NewFactory(*c.ServiceCerts),
+		teamsClient:     teams.NewTeamsServiceClient(conn),
+		a1UserData:      c.A1UserData,
+		a1UserRolesData: c.A1UserRolesData,
+		authzClient:     authz.NewPoliciesServiceClient(authzConn),
+		health:          health.NewService(),
 	}
 
 	// make grpc-go log through zap
