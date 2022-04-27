@@ -9,10 +9,10 @@ log() {
     echo "[$(date -u)] $*"
 }
 
-if [[ -z "${EXPEDITOR_ID:-}" ]]; then
-    log "No EXEDITOR_ID variable found. Doing nothing. This pipeline should not be manually triggered."
-    # exit 1
-fi
+# if [[ -z "${EXPEDITOR_ID:-}" ]]; then
+#     log "No EXEDITOR_ID variable found. Doing nothing. This pipeline should not be manually triggered."
+#     # exit 1
+# fi
 
 VERSION=$(cat VERSION)
 MAJOR_VERSION=${VERSION%%\.*}
@@ -121,6 +121,10 @@ pushd "${tmpdir}"
   aws --profile chef-cd s3 cp "chef-automate_linux_amd64.zip.sha256sum" "s3://chef-automate-artifacts/files/automate/$VERSION/chef-automate_linux_amd64.zip.sha256sum" --acl public-read
 popd
 
+
+# aws s3 cp s3://chef-cd-citadel/packages_at_chef.io.pgp packages_at_chef.io.pgp --profile=chef-cd
+# gpg --import packages_at_chef.io.pgp
+"${automate_cli_path}/static/linux/chef-automate" airgap bundle create -c dev
 airgapbundle=`ls | grep automate-[0-9.]*aib`
 gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "$airgapbundle.asc" --detach-sign $airgapbundle
 sha256sum $airgapbundle > "$airgapbundle.sha256sum"
