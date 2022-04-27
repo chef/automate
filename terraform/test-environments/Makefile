@@ -63,7 +63,7 @@ plan: remote-state
 	cd scenarios && terraform plan -var-file=vars/$(TF_VARS).tfvars
 
 dev_apply: remote-state
-	cd scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars -target=s3_websites.tf
+	cd scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars -target=s3_websites.tf -target=single_local_fresh_install.tf
 
 apply: remote-state
 	cd scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars
