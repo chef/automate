@@ -61,7 +61,8 @@
               </chef-tr>
             </chef-thead>
             <chef-tbody>
-              <chef-tr *ngFor="let user of usersData; let i = index;">
+              <chef-tr *ngFor="let user of usersData; let i = index;"
+                [ngClass]="[ (user.connector === 'local') && user.is_conflicting ? 'conflictRow' : '']">
                 <chef-td class="first">
                   <chef-checkbox (change)="selectedUser($event)" [checked]="user.is_selected" [value]="user.username"></chef-checkbox>
                 </chef-td>
