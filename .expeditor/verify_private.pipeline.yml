@@ -164,11 +164,10 @@ steps:
   - label: "automate-load-balancer"
     command:
       - . scripts/verify_setup.sh
-      - |
-        hab studio run "source scripts/verify_studio_init.sh &&
-          start_deployment_service &&
-          chef-automate dev deploy-some chef/automate-load-balancer --with-deps &&
-          automate_load_balancer_integration"
+      - hab studio run "source scripts/verify_studio_init.sh &&
+        start_deployment_service &&
+        chef-automate dev deploy-some chef/automate-load-balancer --with-deps &&
+        automate_load_balancer_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
