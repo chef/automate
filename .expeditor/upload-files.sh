@@ -121,15 +121,20 @@ pushd "${tmpdir}"
   aws --profile chef-cd s3 cp "chef-automate_linux_amd64.zip.sha256sum" "s3://chef-automate-artifacts/files/automate/$VERSION/chef-automate_linux_amd64.zip.sha256sum" --acl public-read
 popd
 
-
-# aws s3 cp s3://chef-cd-citadel/packages_at_chef.io.pgp packages_at_chef.io.pgp --profile=chef-cd
-# gpg --import packages_at_chef.io.pgp
+# Creating the Automate Airgap Bundle
 "${automate_cli_path}/static/linux/chef-automate" airgap bundle create -c dev
 airgapbundle=`ls | grep automate-[0-9.]*aib`
+
+# Create gpg signature and sha256sum
 gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "$airgapbundle.asc" --detach-sign $airgapbundle
 sha256sum $airgapbundle > "$airgapbundle.sha256sum"
 ls
-aws s3 cp $airgapbundle "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.aib" --acl public-read --profile chef-cd
+
+# Upload the bundle to S3 Bucket
+aws s3 cp $airgapbundle "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle" --acl public-read --profile chef-cd
+aws s3 cp $airgapbundle.asc "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.asc" --acl public-read --profile chef-cd
+aws s3 cp $airgapbundle.sha256sum "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.sha256sum" --acl public-read --profile chef-cd
+
 
 #
 # Cleanup
