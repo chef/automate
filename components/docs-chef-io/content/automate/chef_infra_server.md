@@ -37,7 +37,7 @@ The objects that you can manage from the Chef Infra Server are:
 
 ## Chef Automate WebUI Key
 
-Chef Automate uses the Web UI private key for signing requests sent to the Chef Infra Server. The key is subject to Chef server’s Secrets Management, and will be stored in `/etc/opscode/private-chef-secrets.json`.
+Chef Automate uses the Web UI private key for signing requests sent to the Chef Infra Server. The key is subject to Chef server's Secrets Management, and will be stored in `/etc/opscode/private-chef-secrets.json`.
 
 Any run of `chef-server-ctl` reconfigure will ensure the key exists and is stored without any additional steps.
 
