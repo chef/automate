@@ -26,7 +26,7 @@ openssl genrsa -out $configPath/client-key-temp.pem 2048
 openssl pkcs8 -inform PEM -outform PEM -in $configPath/client-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out $configPath/client-key.pem
 openssl req -new -key $configPath/client-key.pem -subj "/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefclient" -out $configPath/client.csr
 openssl x509 -req -in $configPath/client.csr -CA $configPath/root-ca.pem -CAkey $configPath/root-ca-key.pem -CAcreateserial -sha256 -out $configPath/client.pem -days 1095
-# Cleanup
+# Cleanup   
 rm $configPath/admin-key-temp.pem
 rm $configPath/admin.csr
 rm $configPath/node1-key-temp.pem
