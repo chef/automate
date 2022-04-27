@@ -238,9 +238,9 @@ func (t *TestDB) DeleteUserAssociation(ctx context.Context, username string) (st
 	panic("implement me")
 }
 
-func (t *TestDB) DeleteAutomateInfraOrgUsers(ctx context.Context, username string) (string, error) {
+func (t *TestDB) DeleteAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) error {
 	if t.NeedError {
-		return "", errors.New("failed to delete org users")
+		return errors.New("failed to delete org users")
 	}
-	return "user_1", nil
+	return nil
 }
