@@ -134,8 +134,9 @@ ls
 aws s3 cp $airgapbundle "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle" --acl public-read --profile chef-cd
 aws s3 cp $airgapbundle.asc "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.asc" --acl public-read --profile chef-cd
 aws s3 cp $airgapbundle.sha256sum "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.sha256sum" --acl public-read --profile chef-cd
-
-
+aws s3 sp $airgapbundle "s3://chef-automate-artifacts/acceptance/latest/airgap_bundle/automate.aib" --acl public-read --profile chef-cd
+aws s3 cp $airgapbundle.asc "s3://chef-automate-artifacts/acceptance/latest/airgap_bundle/automate.asc" --acl public-read --profile chef-cd
+aws s3 cp $airgapbundle.sha256sum "s3://chef-automate-artifacts/acceptance/latest/airgap_bundle/automate.sha256sum" --acl public-read --profile chef-cd
 #
 # Cleanup
 #
