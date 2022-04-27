@@ -247,7 +247,6 @@ paths = [
   "lib/httputils/*",
   "lib/io/*",
   "lib/license/*",
-  "lib/logger/*",
   "lib/platform/command/*",
   "lib/platform/sys/*",
   "lib/proc/*",
@@ -829,8 +828,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*",
-  "api/interservice/infra_proxy/*"
+  "lib/version/*"
 ]
 
 [teams-service]
@@ -1012,7 +1010,6 @@ paths = [
   "api/external/secrets/*",
   "api/interservice/authz/*",
   "api/interservice/infra_proxy/*",
-  "api/interservice/local_user/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/io/*",
