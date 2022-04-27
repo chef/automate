@@ -171,14 +171,14 @@ EOH
   rm ${config_toml}
   sleep 5
   chef-automate status --wait-for-healthy
-  chef-automate dev remove-some chef/automate-elasticsearch
+  chef-automate dev remove-some chef/automate-opensearch
   sleep 10
   [[ -d ${es_dir} ]] && rm -r "${es_dir:?}/*"
   mkdir -p ${es_dir}
   log_line "Loading A1 nodes into Elasticsearch data directory"
   cp -r /src/nodes ${es_dir}/.
   chown -R hab:hab ${es_dir}
-  chef-automate dev deploy-some chef/automate-elasticsearch
+  chef-automate dev deploy-some chef/automate-opensearch
 }
 
 document "ingest_test_A1_migration" <<DOC
