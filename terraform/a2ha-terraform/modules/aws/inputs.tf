@@ -84,6 +84,18 @@ variable "chef_server_instance_type" {
 variable "chef_server_lb_certificate_arn" {
 }
 
+variable "kibana_listen_port" {
+  default = 5601
+}
+
+variable "lb_access_logs" {
+  default = false
+}
+
+variable "nfs_mount_path" {
+  default = "/mnt/automate_backups"
+}
+
 variable "opensearch_ebs_volume_iops" {
   default = 300
 }
@@ -106,18 +118,6 @@ variable "opensearch_listen_port" {
 
 variable "opensearch_server_instance_type" {
   default = "m5a.large"
-}
-
-variable "kibana_listen_port" {
-  default = 5601
-}
-
-variable "lb_access_logs" {
-  default = false
-}
-
-variable "nfs_mount_path" {
-  default = "/mnt/automate_backups"
 }
 
 variable "pgleaderchk_listen_port" {

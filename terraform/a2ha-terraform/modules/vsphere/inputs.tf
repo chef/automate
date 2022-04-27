@@ -32,10 +32,6 @@ variable "chef_server_instance_ram_mb" {
   description = "RAM value in MB"
 }
 
-variable "opensearch_instance_count" {
-  default = 3
-}
-
 variable "elasticsearch_instance_cpus" {
   default = 2
 }
@@ -50,6 +46,10 @@ variable "elasticsearch_instance_ram_mb" {
 }
 
 variable "nfs_mount_path" {
+}
+
+variable "opensearch_instance_count" {
+  default = 3
 }
 
 variable "postgresql_instance_count" {

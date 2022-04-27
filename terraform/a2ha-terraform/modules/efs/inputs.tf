@@ -21,10 +21,6 @@ variable "chef_server_private_ips" {
   default = []
 }
 
-variable "opensearch_private_ips" {
-  default = []
-}
-
 variable "elasticsearch_public_ips" {
   default = []
 }
@@ -38,6 +34,10 @@ variable "mount_id" {
 
 variable "nfs_mount_path" {
   default = "/mnt/automate_backups"
+}
+
+variable "opensearch_private_ips" {
+  default = []
 }
 
 variable "postgresql_private_ips" {
