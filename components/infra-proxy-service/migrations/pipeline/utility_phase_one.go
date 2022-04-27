@@ -203,7 +203,7 @@ func Unzip(result pipeline.Result) (pipeline.Result, error) {
 			return result, err
 		}
 
-		_, err = io.Copy(outFile, readClose)
+		_, err = io.CopyN(outFile, readClose, 32*1024)
 		if err != nil {
 			log.Errorf("cannot copy file for migration id: %s, %s", result.Meta.MigrationID, err.Error())
 			return result, err
@@ -273,7 +273,7 @@ func getActionForOrgUsers(ctx context.Context, st storage.Storage, result pipeli
 		log.Info("Getting actions for org id", org.Name)
 		var chefServerOrgUsers []pipeline.UserAssociation
 		// check whether org directory exist or not
-		if _, err := os.Stat(path.Join(orgPath, org.Name)); !os.IsNotExist(err) {
+		if _, err := os.Stat(path.Join(orgPath, org.Name)); !errors.Is(err, os.ErrNotExist) {
 			chefServerOrgUsers, err = getChefServerOrgUsers(org.Name, orgPath)
 			if err != nil {
 				log.Errorf("Unable to get the chef server organization users %s ", err)

@@ -393,7 +393,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 
 	// Create org directory
 	orgPath := path.Join(backupPath, "organizations/", req.OrgId, "groups")
-	if _, err := os.Stat(orgPath); os.IsNotExist(err) {
+	if _, err := os.Stat(orgPath); errors.Is(err, os.ErrNotExist) {
 		err := os.MkdirAll(orgPath, os.ModePerm)
 		if err != nil {
 			log.Errorf("Unable to create directory %s", err.Error())
@@ -509,24 +509,36 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	return &response.CreateBackupResponse{}, nil
 }
 
-func createFile(path string) error {
+func createFile(path string) (*os.File, error) {
+	var file *os.File
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		_, err := os.Create(path)
+		file, err := os.Create(path)
 		if err != nil {
 			log.WithError(err).Error("Unable to create file ", err)
-			return err
+			return file, err
 		}
 	}
-	return nil
+	return file, nil
 }
 
 func writeFile(path string, data []byte) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err = createFile(path)
+	var file *os.File
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		file, err = createFile(path)
 		if err != nil {
 			log.Errorf("Unable to create file %s", err.Error())
 			return err
 		}
+	} else {
+		file, err = os.Open(path)
+		if err != nil {
+			log.Errorf("failed to open file %s : %s", path, err.Error())
+			return err
+		}
+	}
+	if err := json.NewEncoder(file).Encode(data); err != nil {
+		log.Errorf("Unable to write file %s", err.Error())
+		return err
 	}
 	err := ioutil.WriteFile(path, data, 0644)
 	if err != nil {
