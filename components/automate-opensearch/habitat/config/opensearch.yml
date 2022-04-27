@@ -41,6 +41,9 @@ path.data:
 #
 path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
 #
+{{#if cfg.path.repo ~}}
+path.repo: {{cfg.path.repo}}
+{{/if ~}}
 # ----------------------------------- Memory -----------------------------------
 #
 # Lock the memory on startup:
