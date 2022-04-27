@@ -15,6 +15,7 @@ export A1_BUILDER_PASSWORD="migrated-builder-password"
 
 
 do_build() {
+    prepare_upgrade_milestone "current" "20220329091442"
     do_build_default
     set_test_manifest "build.json"
     log_info "Installing harts"

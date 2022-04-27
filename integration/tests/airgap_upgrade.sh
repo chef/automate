@@ -5,6 +5,7 @@ test_name="airgap_upgrade"
 test_upgrades=true
 
 do_build() {
+    prepare_upgrade_milestone "current" "3.0.49"
     do_build_default
     set_test_manifest "build.json"
     log_info "Installing harts"

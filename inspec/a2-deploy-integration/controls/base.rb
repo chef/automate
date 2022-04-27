@@ -75,7 +75,7 @@ describe command("chef-automate status") do
     backup-gateway
     automate-postgresql
     automate-pg-gateway
-    automate-elasticsearch
+    automate-opensearch
     automate-es-gateway
     automate-ui
     pg-sidecar-service

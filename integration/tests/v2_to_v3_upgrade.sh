@@ -15,6 +15,10 @@ OLD_VERSION=20220329091442
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${OLD_VERSION}.json"
 
+do_build() {
+    prepare_upgrade_milestone "current" "3.0.49"
+}
+
 do_deploy() {
     #shellcheck disable=SC2154
     cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
