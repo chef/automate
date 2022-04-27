@@ -20,15 +20,17 @@ import (
 const (
 	testMapping = `{
 		"settings": {
-			"number_of_shards":1,
-			"number_of_replicas":0
+		  "number_of_shards": 1,
+		  "number_of_replicas": 0
 		},
-		"mappings:": {
-			"properties" : {
-				"end_time": { "type" : "date" }
+		"mappings": {
+		  "properties": {
+			"end_time": {
+			  "type": "date"
 			}
+		  }
 		}
-	}`
+	  }`
 	docDeleteQueryFmt = `{
 		"range" : {
 			"%s" : {
