@@ -147,7 +147,7 @@ steps:
     command:
       - curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > 				 chef-automate && chmod +x chef-automate
       - ./chef-automate airgap bundle create -c dev
-      - . upload-files.sh
+      - .expeditor/upload-files.sh
     timeout_in_minutes: 10
     expeditor:
       executor:
