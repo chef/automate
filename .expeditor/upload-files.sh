@@ -9,10 +9,10 @@ log() {
     echo "[$(date -u)] $*"
 }
 
-if [[ -z "${EXPEDITOR_ID:-}" ]]; then
-    log "No EXEDITOR_ID variable found. Doing nothing. This pipeline should not be manually triggered."
-    exit 1
-fi
+# if [[ -z "${EXPEDITOR_ID:-}" ]]; then
+#     log "No EXEDITOR_ID variable found. Doing nothing. This pipeline should not be manually triggered."
+#     exit 1
+# fi
 
 VERSION=$(cat VERSION)
 MAJOR_VERSION=${VERSION%%\.*}
