@@ -81,7 +81,7 @@ variable "opensearch_instance_count" {
   default = 3
 }
 
-variable "elasticsearch_listen_port" {
+variable "opensearch_listen_port" {
   default = 9200
 }
 

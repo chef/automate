@@ -3,29 +3,29 @@ resource "random_id" "cluster_id" {
 }
 
 module "system-tuning-automate" {
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
-  elasticsearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
-  instance_count                     = var.automate_instance_count
-  postgresql_archive_disk_fs_path    = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
-  private_ips                        = var.automate_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_user_sudo_password             = local.fe_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  source                          = "./modules/system"
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
+  instance_count                  = var.automate_instance_count
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
+  private_ips                     = var.automate_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.fe_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
 module "system-tuning-chef_server" {
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
-  elasticsearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
-  instance_count                     = var.chef_server_instance_count
-  postgresql_archive_disk_fs_path    = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
-  private_ips                        = var.chef_server_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_user_sudo_password             = local.fe_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  source                          = "./modules/system"
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
+  instance_count                  = var.chef_server_instance_count
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
+  private_ips                     = var.chef_server_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.fe_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
 module "system-tuning-opensearch" {
@@ -43,17 +43,17 @@ module "system-tuning-opensearch" {
 }
 
 module "system-tuning-postgresql" {
-  count                              = var.setup_managed_services ? 0 : 1
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
-  elasticsearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
-  instance_count                     = var.postgresql_instance_count
-  postgresql_archive_disk_fs_path    = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
-  private_ips                        = var.postgresql_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_user_sudo_password             = local.be_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  source                          = "./modules/system"
+  count                           = var.setup_managed_services ? 0 : 1
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
+  opensearch_archive_disk_fs_path = var.setup_managed_services ? "" : var.elasticsearch_archive_disk_fs_path
+  instance_count                  = var.postgresql_instance_count
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
+  private_ips                     = var.postgresql_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_user_sudo_password          = local.be_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
 module "airgap_bundle-opensearch" {
@@ -123,7 +123,7 @@ module "airgap_bundle-chef_server" {
 module "habitat-opensearch" {
   source                          = "./modules/habitat"
   count                           = var.setup_managed_services ? 0 : 1
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-elasticsearch[0].airgap_info
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-opensearch[0].airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key
@@ -224,7 +224,7 @@ module "opensearch" {
   backend_aib_local_file          = var.backend_aib_local_file
   curator_pkg_ident               = var.curator_pkg_ident
   opensearch_instance_count       = var.opensearch_instance_count
-  opensearch_listen_port          = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.opensearch_listen_port
   opensearch_pkg_ident            = var.opensearch_pkg_ident
   opensearch_svc_load_args        = var.elasticsearch_svc_load_args
   opensearchsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
@@ -247,7 +247,7 @@ module "postgresql" {
   airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-postgresql[0].airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
-  opensearch_listen_port          = var.elasticsearch_listen_port
+  opensearch_listen_port          = var.opensearch_listen_port
   opensearch_private_ips          = var.opensearch_private_ips
   habitat_info                    = var.setup_managed_services ? "" : module.habitat-postgresql[0].habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
@@ -291,7 +291,7 @@ module "bootstrap_automate" {
   frontend_aib_local_file             = var.frontend_aib_local_file
   habitat_info                        = module.habitat-automate.habitat_info
   hab_sup_http_gateway_auth_token     = var.hab_sup_http_gateway_auth_token
-  opensearch_listen_port              = var.elasticsearch_listen_port
+  opensearch_listen_port              = var.opensearch_listen_port
   opensearch_private_ips              = var.opensearch_private_ips
   managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
@@ -337,7 +337,7 @@ module "automate" {
   frontend_aib_local_file             = var.frontend_aib_local_file
   habitat_info                        = module.habitat-automate.habitat_info
   hab_sup_http_gateway_auth_token     = var.hab_sup_http_gateway_auth_token
-  opensearch_listen_port              = var.elasticsearch_listen_port
+  opensearch_listen_port              = var.opensearch_listen_port
   opensearch_private_ips              = var.opensearch_private_ips
   managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url
@@ -387,7 +387,7 @@ module "chef_server" {
   frontend_aib_local_file             = var.frontend_aib_local_file
   habitat_info                        = module.habitat-chef_server.habitat_info
   hab_sup_http_gateway_auth_token     = var.hab_sup_http_gateway_auth_token
-  opensearch_listen_port              = var.elasticsearch_listen_port
+  opensearch_listen_port              = var.opensearch_listen_port
   opensearch_private_ips              = var.opensearch_private_ips
   managed_elasticsearch_certificate   = var.managed_elasticsearch_certificate
   managed_elasticsearch_domain_url    = var.managed_elasticsearch_domain_url

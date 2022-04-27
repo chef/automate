@@ -1,7 +1,7 @@
 locals {
   elasticsearch_user_toml = [
     for n in range(var.opensearch_instance_count) : templatefile("${path.module}/templates/elasticsearch_user.toml.tpl", {
-      listen_port     = var.elasticsearch_listen_port,
+      listen_port     = var.opensearch_listen_port,
       minimum_masters = floor(var.opensearch_instance_count / 2 + 1),
       private_ip      = var.private_ips[n],
       private_ips     = join(", ", formatlist("\"%s\"", var.private_ips)),
