@@ -6,4 +6,4 @@ studio_secrets:
     account: github/chef
     field: token
   HAB_FALLBACK_CHANNEL:
-    value: "stable"
+    value: "refresh2022q2"
