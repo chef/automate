@@ -769,7 +769,6 @@ paths = [
   "api/external/common/*",
   "api/external/iam/*",
   "api/interservice/authz/*",
-  "api/interservice/infra_proxy/*",
   "api/interservice/local_user/*",
   "api/interservice/teams/*",
   "lib/grpc/*",
