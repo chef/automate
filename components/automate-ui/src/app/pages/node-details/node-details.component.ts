@@ -90,6 +90,7 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
   openRunHistory() {
     this.runHistoryVisible = true;
     document.getElementById('run-history-panel').focus();
+    this.telemetryService.track('InfraServer_ClientRuns_Details_RunHistory');
   }
 
   closeRunHistory() {
