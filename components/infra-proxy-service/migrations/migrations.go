@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
@@ -537,11 +536,6 @@ func writeFile(path string, data []byte) error {
 		}
 	}
 	if err := json.NewEncoder(file).Encode(data); err != nil {
-		log.Errorf("Unable to write file %s", err.Error())
-		return err
-	}
-	err := ioutil.WriteFile(path, data, 0644)
-	if err != nil {
 		log.Errorf("Unable to write file %s", err.Error())
 		return err
 	}
