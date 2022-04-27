@@ -147,7 +147,7 @@ steps:
     command:
       - curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > 				 chef-automate && chmod +x chef-automate
       - ./chef-automate airgap bundle create -c dev
-      - ls
+      - ls | grep automate-[0-9.]*aib
     timeout_in_minutes: 10
     expeditor:
       executor:
