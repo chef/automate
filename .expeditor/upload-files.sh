@@ -121,6 +121,12 @@ pushd "${tmpdir}"
   aws --profile chef-cd s3 cp "chef-automate_linux_amd64.zip.sha256sum" "s3://chef-automate-artifacts/files/automate/$VERSION/chef-automate_linux_amd64.zip.sha256sum" --acl public-read
 popd
 
+airgapbundle=`ls | grep automate-[0-9.]*aib`
+gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "$airgapbundle.asc" --detach-sign $airgapbundle
+sha256sum $airgapbundle > "$airgapbundle.sha256sum"
+ls
+aws s3 cp $airgapbundle "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.aib" --acl public-read --profile chef-cd
+
 #
 # Cleanup
 #

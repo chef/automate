@@ -147,11 +147,7 @@ steps:
     command:
       - curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > 				 chef-automate && chmod +x chef-automate
       - ./chef-automate airgap bundle create -c dev
-      - airgapbundle=`ls | grep automate-[0-9.]*aib`
-      - gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "$airgapbundle.asc" --detach-sign $airgapbundle
-      - sha256sum $airgapbundle > "$airgapbundle.sha256sum"
-      - ls
-      - aws s3 cp $airgapbundle "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.aib" --acl public-read --profile chef-cd
+      - ./upload-files.sh
     timeout_in_minutes: 10
     expeditor:
       executor:
