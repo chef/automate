@@ -37,7 +37,9 @@ UPDATE iam_roles
             iam:teamUsers:*,
             iam:users:get,
             iam:users:list,
-            applications:*
+            applications:*,
+	    infra:node:*,
+	    infra:nodeManagers:*
         }'
     WHERE
         id = 'project-owner';
