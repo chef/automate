@@ -59,66 +59,133 @@ end
 #
 # chef-automate status: returns status of services
 #
-describe command("chef-automate status") do
-  # TODO(ssd) 2018-07-23: This output is here to help us debug a
-  # flakey test. Inspec's default output mode truncates the status
-  # output and thus we can't see what is actually failing.
-  it "complete output" do
-    STDERR.puts "-------------- chef-automate status --------------"
-    STDERR.puts subject.stdout
-    STDERR.puts "--------------------------------------------------"
+describe.one do
+
+  describe command("chef-automate status") do
+    # TODO(ssd) 2018-07-23: This output is here to help us debug a
+    # flakey test. Inspec's default output mode truncates the status
+    # output and thus we can't see what is actually failing.
+    it "complete output" do
+      STDERR.puts "-------------- chef-automate status --------------"
+        STDERR.puts subject.stdout
+      STDERR.puts "--------------------------------------------------"
+    end
+
+    # NOTE: This list was up-to-date as of 2019-08-14
+    %w{
+      deployment-service
+      backup-gateway
+      automate-postgresql
+      automate-pg-gateway
+      automate-opensearch
+      automate-es-gateway
+      automate-ui
+      pg-sidecar-service
+      cereal-service
+      event-service
+      es-sidecar-service
+      event-feed-service
+      authz-service
+      automate-dex
+      teams-service
+      authn-service
+      secrets-service
+      applications-service
+      notifications-service
+      nodemanager-service
+      compliance-service
+      license-control-service
+      local-user-service
+      session-service
+      ingest-service
+      config-mgmt-service
+      data-feed-service
+      event-gateway
+      automate-gateway
+      automate-load-balancer
+    }.each do |service_name|
+      its('stdout') { should match /#{service_name}.* ok/ }
+    end
+
+   # status messages are defined in https://github.com/chef/automate/blob/master/components/automate-deployment/pkg/api/service_status.go
+   # we check for "bad" statuses so the test output will show the full stdout if
+   # we get a failure
+   %w{
+     warning
+     CRITICAL
+     unknown
+     failed
+   }.each do |unwanted_status|
+     its('stdout') { should_not include(unwanted_status) }
+   end
+
+   its('stderr') { should eq '' }
+   its('exit_status') { should eq 0 }
   end
 
-  # NOTE: This list was up-to-date as of 2019-08-14
-  %w{
-    deployment-service
-    backup-gateway
-    automate-postgresql
-    automate-pg-gateway
-    automate-opensearch
-    automate-es-gateway
-    automate-ui
-    pg-sidecar-service
-    cereal-service
-    event-service
-    es-sidecar-service
-    event-feed-service
-    authz-service
-    automate-dex
-    teams-service
-    authn-service
-    secrets-service
-    applications-service
-    notifications-service
-    nodemanager-service
-    compliance-service
-    license-control-service
-    local-user-service
-    session-service
-    ingest-service
-    config-mgmt-service
-    data-feed-service
-    event-gateway
-    automate-gateway
-    automate-load-balancer
-  }.each do |service_name|
-    its('stdout') { should match /#{service_name}.* ok/ }
-  end
+## OR 
+   
+  describe command("chef-automate status") do
+    # TODO(ssd) 2018-07-23: This output is here to help us debug a
+    # flakey test. Inspec's default output mode truncates the status
+    # output and thus we can't see what is actually failing.
+    it "complete output" do
+      STDERR.puts "-------------- chef-automate status --------------"
+      STDERR.puts subject.stdout
+      STDERR.puts "--------------------------------------------------"
+    end
 
-  # status messages are defined in https://github.com/chef/automate/blob/master/components/automate-deployment/pkg/api/service_status.go
-  # we check for "bad" statuses so the test output will show the full stdout if
-  # we get a failure
-  %w{
-    warning
-    CRITICAL
-    unknown
-    failed
-  }.each do |unwanted_status|
-    its('stdout') { should_not include(unwanted_status) }
-  end
+    # NOTE: This list was up-to-date as of 2019-08-14
+    %w{
+      deployment-service
+      backup-gateway
+      automate-postgresql
+      automate-pg-gateway
+      automate-elasticseach
+      automate-es-gateway
+      automate-ui
+      pg-sidecar-service
+      cereal-service
+      event-service
+      es-sidecar-service
+      event-feed-service
+      authz-service
+      automate-dex
+      teams-service
+      authn-service
+      secrets-service
+      applications-service
+      notifications-service
+      nodemanager-service
+      compliance-service
+      license-control-service
+      local-user-service
+      session-service
+      ingest-service
+      config-mgmt-service
+      data-feed-service
+      event-gateway
+      automate-gateway
+      automate-load-balancer
+    }.each do |service_name|
+      its('stdout') { should match /#{service_name}.* ok/ }
+     end
 
-  its('stderr') { should eq '' }
-  its('exit_status') { should eq 0 }
+   # status messages are defined in https://github.com/chef/automate/blob/master/components/automate-deployment/pkg/api/service_status.go
+   # we check for "bad" statuses so the test output will show the full stdout if
+   # we get a failure
+   %w{
+     warning
+     CRITICAL
+     unknown
+     failed
+   }.each do |unwanted_status|
+     its('stdout') { should_not include(unwanted_status) }
+   end
+
+   its('stderr') { should eq '' }
+   its('exit_status') { should eq 0 }
+  end
 end
 
 describe "when deployment-service is restarted" do
