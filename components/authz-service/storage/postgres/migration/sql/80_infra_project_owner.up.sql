@@ -3,6 +3,8 @@ BEGIN;
 UPDATE iam_roles
     SET
         actions = '{
+	    infra:node:*,
+	    infra:nodeManagers:*,
             infra:*:list,
             infra:*:get,
             infra:infraServersOrgsRoles:create,
@@ -37,9 +39,7 @@ UPDATE iam_roles
             iam:teamUsers:*,
             iam:users:get,
             iam:users:list,
-            applications:*,
-	    infra:node:*,
-	    infra:nodeManagers:*
+            applications:*
         }'
     WHERE
         id = 'project-owner';
