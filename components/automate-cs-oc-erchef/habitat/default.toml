@@ -40,6 +40,10 @@ reindex_batch_size=10
 reindex_sleep_min_ms=50
 reindex_sleep_max_ms=2000
 reindex_item_retries=3
+search_provider="elasticsearch"
+search_queue_mode="batch"
+search_auth_username="admin"
+search_auth_password="admin"
 
 [authz]
 fanout = 20
