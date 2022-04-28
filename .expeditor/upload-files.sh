@@ -128,6 +128,7 @@ airgapbundle=`ls | grep automate-[0-9.]*aib`
 # Create gpg signature and sha256sum
 gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "$airgapbundle.asc" --detach-sign $airgapbundle
 sha256sum $airgapbundle > "$airgapbundle.sha256sum"
+ls
 
 # Upload the bundle to S3 Bucket
 aws s3 cp $airgapbundle "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle" --acl public-read --profile chef-cd
