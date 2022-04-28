@@ -245,7 +245,7 @@ start-es6: create-es-data-dir
 
 start-os124: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
-	docker rm -f cc_os124 2> /dev/null; sleep 1; docker-compose -f $(PWD)/opensearch/docker-compose.yml up
+	docker rm -f cc_os124 2> /dev/null; sleep 1; docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "DISABLE_SECURITY_PLUGIN=true" opensearchproject/opensearch:1.2.4
 	@$(MAKE) wait-for-es
 
 create-es-data-dir:
