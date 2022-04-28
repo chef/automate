@@ -1033,7 +1033,7 @@ rpc GetAutomateInfraOrgUsersList (infra_proxy.request.AutomateInfraOrgUsers) ret
 
   Authorization Action:
   ```
-  infra:infraServers:list
+  "iam:usersSelf:update";
   ```
   */
   rpc ResetInfraServerUserKey(infra_proxy.request.ResetInfraServerUserKeyReq) returns (infra_proxy.response.ResetInfraServerUserKeyRes){
