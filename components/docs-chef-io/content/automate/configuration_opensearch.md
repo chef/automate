@@ -239,33 +239,12 @@ To configure Opensearch for your Chef Automate installation, create a TOML file 
 Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
-[opensearch.v1.sys.proxy]
-# NOTE: The opensearch proxy settings are derived from the global proxy settings.
-# host = "<proxy host>"
-# port = <proxy port>
-# user = "<proxy username>"
-# password = "<proxy password>"
-# no_proxy = <["0.0.0.0", "127.0.0.1"]>
 [opensearch.v1.sys.cluster]
 # name = "chef-insights"
-[opensearch.v1.sys.cluster.routing.allocation]
-# node_concurrent_recoveries = 2
-# node_initial_primaries_recoveries = 4
-# same_shard_host = false
 [opensearch.v1.sys.node]
 # max_local_storage_nodes = 1
-# master = true
-# data = true
 [opensearch.v1.sys.path]
 # logs = "logs"
-[opensearch.v1.sys.indices.recovery]
-# max_bytes_per_sec = "20mb"
-[opensearch.v1.sys.indices.breaker]
-# total_limit = "70%"
-# fielddata_limit = "60%"
-# fielddata_overhead = "1.03"
-# request_limit = "40%"
-# request_overhead = "1"
 [opensearch.v1.sys.bootstrap]
 # memory_lock = false
 [opensearch.v1.sys.network]
@@ -273,24 +252,8 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # port = 10141
 [opensearch.v1.sys.transport]
 # port = "10142"
-[opensearch.v1.sys.discovery]
-# ping_unicast_hosts = "[]"
-# minimum_master_nodes = 1
-# zen_fd_ping_timeout = "30s"
-[opensearch.v1.sys.gateway]
-# expected_nodes = 0
-# expected_master_nodes = 0
-# expected_data_nodes = 0
 [opensearch.v1.sys.action]
 # destructive_requires_name = true
-[opensearch.v1.sys.logger]
-# level = "info"
-[opensearch.v1.sys.runtime]
-# max_locked_memory = "unlimited"
-# es_java_opts = ""
-# NOTE: see https://opensearch.org/docs/latest/opensearch/install/important-settings/
-# for important guidance regarding the configuration of the heap size setting
-# heapsize = "4g"
 ```
 
 #### Setting Opensearch Heap

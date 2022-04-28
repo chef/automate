@@ -6,15 +6,15 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Architecture_os"
+    title = "Architecture_Opensearch"
     parent = "automate/reference"
-    identifier = "automate/reference/architecture_os.md Architecture_os"
+    identifier = "automate/reference/architecture_overview_os.md Architecture_os"
     weight = 10
 +++
 
 ## Automate 2 Architecture
 
-![Automate 2 Architecture](/images/automate/a2-architecture.png)
+![Automate 2 Architecture](/images/automate/a2-architecture-os.JPEG)
 
 ## Component overview
 
