@@ -92,15 +92,15 @@ If you wish to reset to the default configuration or to modify the configuration
 To configure local filesystem backups of Chef Automate data stored in an externally-deployed Opensearch cluster:
 
 1. Ensure that the filesystems you intend to use for backups are mounted to the same path on all Opensearch master and data nodes.
-1. Configure the Opensearch `path.repo` setting on each node as described in the [Opensearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/modules-snapshots.html#_shared_file_system_repository).
+1. Configure the Opensearch `path.repo` setting on each node as described in the [Opensearch documentation](https://opensearch.org/docs/latest/monitoring-plugins/pa/reference/).
 1. Add the following to your `config.toml`:
 
 ```toml
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
 enable = true
 location = "fs"
 
-[global.v1.external.elasticsearch.backup.fs]
+[global.v1.external.opensearch.backup.fs]
 # The `path.repo` setting you've configured on your Opensearch nodes must be
 # a parent directory of the setting you configure here:
 path = "/var/opt/chef-automate/backups"
@@ -110,9 +110,9 @@ path = "/var/opt/chef-automate/backups"
 
 To configure AWS S3 backups of Chef Automate data stored in an externally-deployed Opensearch cluster:
 
-1. Install the [`repository-s3` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3.html) on all nodes in your Opensearch cluster.
+1. Install the `repository-s3` on all nodes in your Opensearch cluster.
 1. If you wish to use IAM authentication to provide your Opensearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
-1. Configure each Opensearch node with a S3 client configuration containing the proper S3 endpoint, credentials, and other settings as [described in the Opensearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html).
+1. Configure each Opensearch node with a S3 client configuration containing the proper S3 endpoint, credentials, and other settings as described in the Opensearch documentation.
 1. Enable S3 backups by adding the following settings to your `config.toml`:
 
     ```toml
@@ -130,15 +130,13 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
       base_path = "<base path>"
 
       # name of an s3 client configuration you create in your opensearch.yml
-      # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
       # for full documentation on how to configure client settings on your
       # Opensearch nodes
       client = "<client name>"
 
     [global.v1.external.opensearch.backup.s3.settings]
     ## The meaning of these settings is documented in the S3 Repository Plugin
-    ## documentation. See the following links:
-    ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
+    ## documentation.
 
     ## Backup repo settings
     # compress = false
@@ -161,9 +159,9 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
 
 To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data stored in an externally-deployed Opensearch cluster:
 
-1. Install the [`repository-gcs` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs.html) on all nodes in your Opensearch cluster.
-1. Create a storage bucket and configure a service account to access it per the steps [described in the Opensearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-usage.html).
-1. Configure each Opensearch node with a GCS client configuration that contains the proper GCS settings as [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-gcs-client.html).
+1. Install the `repository-gcs` plugin on all nodes in your Opensearch cluster.
+1. Create a storage bucket and configure a service account to access it per the steps described in the Opensearch documentation.
+1. Configure each Opensearch node with a GCS client configuration that contains the proper GCS settings as described in the Opensearch documentation.
 1. Enable GCS backups by adding the following settings to your `config.toml`:
 
     ```toml
