@@ -52,7 +52,7 @@ pipelines:
         - CHANNEL: dev
   - deploy/dev:
       description: Deploy changes to a2-dev.cd.chef.co instances
-      definition: .expeditor/deploy.pipeline.yml
+      definition: .expeditor/deploy-dev.pipeline.yml
       env:
         - CHANNEL: dev
   - deploy/acceptance:

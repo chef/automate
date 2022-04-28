@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ "$CHANNEL" == "dev" ]; then
+  exit 0
+fi
+
 echo -e "$CHEF_CI_SSH_PRIVATE_KEY" > chef-ci-ad-ssh
 
 export HAB_LICENSE=accept-no-persist

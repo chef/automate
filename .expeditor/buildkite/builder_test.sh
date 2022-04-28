@@ -2,6 +2,10 @@
 
 set -eo pipefail
 
+if [ "$CHANNEL" == "dev" ]; then
+  exit 0
+fi
+
 cd /workdir/
 
 data=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json")

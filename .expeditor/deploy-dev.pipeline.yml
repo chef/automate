@@ -1,0 +1,12 @@
+steps:
+  - label: ":terraform:"
+    command: .expeditor/buildkite/terraform.sh
+    concurrency: 1
+    concurrency_group: chef-automate-master/deploy/$CHANNEL
+    timeout_in_minutes: 60
+    expeditor:
+      accounts:
+        - aws/chef-cd
+        - github
+      executor:
+        docker:
