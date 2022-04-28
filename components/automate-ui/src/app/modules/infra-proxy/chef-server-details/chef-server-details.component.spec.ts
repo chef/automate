@@ -13,6 +13,11 @@ import { By } from '@angular/platform-browser';
 import { ChefServerDetailsComponent } from './chef-server-details.component';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ChefServerDetailsComponent', () => {
   let component: ChefServerDetailsComponent;
@@ -54,7 +59,8 @@ describe('ChefServerDetailsComponent', () => {
         ChefServerDetailsComponent
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         FormsModule,

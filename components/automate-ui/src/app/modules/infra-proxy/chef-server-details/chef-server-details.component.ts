@@ -59,6 +59,7 @@ import {
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { SyncOrgUsersSliderComponent } from '../sync-org-users-slider/sync-org-users-slider.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type ChefServerTabName = 'orgs' | 'users' | 'details';
 @Component({
@@ -151,8 +152,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService
-
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
 
     this.orgForm = fb.group({
@@ -564,6 +565,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     };
     this.updatingWebuiKeyData(this.webuiKey);
     this.updateWebuiKeyForm.reset();
+    this.telemetryService.track('InfraServer_ChefInfraServer_Update_UpdateWebUIKey');
   }
 
   private updatingWebuiKeyData(webuikey: WebUIKey) {
@@ -591,6 +593,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       migration_id : migration_id
     };
     this.store.dispatch(new CancelMigration(payload));
+    this.telemetryService.track('InfraServer_ChefInfraServer_ClickToPreview_CancelMigration');
   }
 
   // get migraion preview function
@@ -608,5 +611,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       migration_id: migrationID
     };
     this.store.dispatch(new ConfirmPreview(payload));
+    this.telemetryService.track('InfraServer_ChefInfraServer_ClickToPreview_ConfirmMigration');
   }
 }
