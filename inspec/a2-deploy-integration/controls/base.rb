@@ -77,7 +77,7 @@ describe.one do
       backup-gateway
       automate-postgresql
       automate-pg-gateway
-      automate-opensearch
+      automate-elasticsearch
       automate-es-gateway
       automate-ui
       pg-sidecar-service
@@ -141,7 +141,7 @@ describe.one do
       backup-gateway
       automate-postgresql
       automate-pg-gateway
-      automate-elasticseach
+      automate-opensearch
       automate-es-gateway
       automate-ui
       pg-sidecar-service
