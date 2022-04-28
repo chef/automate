@@ -42,6 +42,10 @@
                   <span>Conflicting Users</span>
                   <span>{{conflictedUsers?.length || 0}}</span>
                 </li>
+                <li>
+                  <span>Selected Users For Migration</span>
+                  <span>{{selectedUsersData?.length || 0}}</span>
+                </li>
               </ul>
             </div>
           </div>
@@ -63,7 +67,7 @@
             <chef-tbody>
               <chef-tr *ngFor="let user of usersData; let i = index;">
                 <chef-td class="first">
-                  <chef-checkbox (change)="selectedUser($event)" [checked]="user.is_selected" [value]="user.username"></chef-checkbox>
+                  <chef-checkbox id="{{user.email}}-chef-checkbox" (change)="selectedUser($event, user)" [checked]="user.is_selected" [value]="user.username"></chef-checkbox>
                 </chef-td>
                 <chef-td class="middle">
                   {{user.username}}
@@ -72,19 +76,22 @@
                     {{user.automate_username}}
                 </chef-td>
                 <chef-td class="middle">
-                  <input 
+                  <input
+                    id="{{user.email}}-input"
                     *ngIf="(user.connector === 'local')"
                     chefInput
                     formControlName="{{user.automate_username}}"
                     type="text"
                     attr.data-username="{{user.username}}"
                     (change)="onChangeEvent($event)"
-                    (blur)="handleName($event)"
+                    (blur)="handleName($event, user)"
                     autocomplete="off" />
                 </chef-td>
                 <chef-td class="last">
-                  <p class="warning-msg"
-                   *ngIf="(user.connector === 'local') && user.is_conflicting">
+                  <p
+                    id="{{user.email}}-warning" 
+                    class="warning-msg" 
+                    *ngIf="(user.connector === 'local') && user.is_conflicting">
                     Warning. User already exists in Automate. This will overwrite this users IAM settings.
                   </p>
                 </chef-td>
@@ -96,7 +103,7 @@
           <chef-button id="cancel-migration-slider" tertiary [disabled]="!isPreview" (click)="cancelMigrationclicked()">
             Cancel Migration
           </chef-button>
-          <chef-button primary [disabled]="!isPreview" data-cy="confirm-migration-button" id="migration-button" (click)="confirmPreviewData()">
+          <chef-button primary [disabled]="!isPreview || notReadyToConfirm" data-cy="confirm-migration-button" id="migration-button" (click)="confirmPreviewData()">
             <span *ngIf="isPreview">confirm Migration</span>
           </chef-button>
         </div>

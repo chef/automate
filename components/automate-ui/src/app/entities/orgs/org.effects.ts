@@ -290,11 +290,4 @@ export class OrgEffects {
           catchError((error: HttpErrorResponse) =>
             observableOf(new CheckUserFailure(error)))))));
 
-  CheckUserSuccess = createEffect(() =>
-    this.actions$.pipe(
-      ofType(OrgActionTypes.CHECK_USER_SUCCESS),
-      map(({ payload:  { user } }) => new CreateNotification({
-        type: Type.error,
-        message: `Could not use ${user} user name.`
-    }))));
 }
