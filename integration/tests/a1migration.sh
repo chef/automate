@@ -14,8 +14,8 @@ export AUTOMATE_API_DEFAULT_PASSWORD="migrated-admin-password"
 export A1_BUILDER_PASSWORD="migrated-builder-password"
 
 do_build() {
-    prepare_upgrade_milestone "current" "20220329091442"
     do_build_default
+    prepare_upgrade_milestone "current" "20220329091442"
     sync_a1_migration_data
 }
 
