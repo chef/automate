@@ -5,6 +5,11 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 
 import { SyncOrgUsersSliderComponent } from './sync-org-users-slider.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('SyncOrgUsersSliderComponent', () => {
   let component: SyncOrgUsersSliderComponent;
@@ -19,6 +24,9 @@ describe('SyncOrgUsersSliderComponent', () => {
         MockComponent({ selector: 'input'}),
         MockComponent({ selector: 'chef-loading-spinner' }),
         SyncOrgUsersSliderComponent
+      ],
+      providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         ReactiveFormsModule

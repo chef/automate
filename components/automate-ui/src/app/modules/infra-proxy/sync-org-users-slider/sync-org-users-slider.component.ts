@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit, HostBinding, ViewChild,
 import { FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Utilities } from 'app/helpers/utilities/utilities';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-sync-org-users-slider',
@@ -24,7 +25,7 @@ export class SyncOrgUsersSliderComponent implements OnInit {
   public file: File = null;
   public isFile = false;
 
-  constructor() { }
+  constructor(private telemetryService: TelemetryService) { }
 
   ngOnInit(): void {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
@@ -48,6 +49,7 @@ export class SyncOrgUsersSliderComponent implements OnInit {
     formData.append('file', this.file);
     this.uploadClicked.emit(this.file);
     this.migrationSlider = true;
+    this.telemetryService.track('InfraServer_ChefInfraServer_SyncOrgAndUser_UploadFile');
     this.closeUploadSlider();
   }
 
