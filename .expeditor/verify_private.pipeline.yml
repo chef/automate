@@ -48,8 +48,8 @@ steps:
       executor:
         docker:
 
-  We need to build in order to run the
-  integration tests.
+  # We need to build in order to run the
+  # integration tests.
  - label: build
    command:
      - scripts/verify_build.sh
