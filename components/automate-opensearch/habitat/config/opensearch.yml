@@ -140,3 +140,17 @@ node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
 #plugins.security.ssl.transport.truststore_password: "changeit"
 
 ######## End OpenSearch Security Configuration ########
+
+{{#if cfg.plugins.cloud_aws_signer ~}}
+cloud.aws.signer: {{cfg.plugins.cloud_aws_signer}}
+{{/if ~}}
+
+s3.client.{{ cfg.s3.client.name }}.protocol: https
+s3.client.{{ cfg.s3.client.name }}.read_timeout: {{cfg.s3.client.read_timeout}}
+s3.client.{{ cfg.s3.client.name }}.max_retries: {{cfg.s3.client.max_retries}}
+s3.client.{{ cfg.s3.client.name }}.use_throttle_retries: {{cfg.s3.client.use_throttle_retries}}
+{{~#eachAlive bind.backup-gateway.members as |bgw|}}
+{{~#if @last}}
+s3.client.{{ cfg.s3.client.name }}.endpoint: 127.0.0.1:{{bgw.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}
