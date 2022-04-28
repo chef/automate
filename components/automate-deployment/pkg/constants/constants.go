@@ -13,5 +13,5 @@ const (
 
 const (
 	AutomatePGService     = "automate-postgresql"
-	AutomateSearchService = "automate-elasticsearch"
+	AutomateSearchService = "automate-opensearch"
 )
