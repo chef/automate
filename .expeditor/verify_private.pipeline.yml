@@ -48,24 +48,24 @@ steps:
       executor:
         docker:
 
-  # We need to build in order to run the
-  # integration tests.
-#  - label: build
-#    command:
-#      - scripts/verify_build.sh
-#    timeout_in_minutes: 60
-#    env:
-#      ALLOW_LOCAL_PACKAGES: true
-#      HAB_STUDIO_SUP: false
-#      HAB_NONINTERACTIVE: true
-#    expeditor:
-#      secrets:
-#        HAB_STUDIO_SECRET_GITHUB_TOKEN:
-#          account: github/chef
-#          field: token
-#      executor:
-#        linux:
-#          privileged: true
+  We need to build in order to run the
+  integration tests.
+ - label: build
+   command:
+     - scripts/verify_build.sh
+   timeout_in_minutes: 60
+   env:
+     ALLOW_LOCAL_PACKAGES: true
+     HAB_STUDIO_SUP: false
+     HAB_NONINTERACTIVE: true
+   expeditor:
+     secrets:
+       HAB_STUDIO_SECRET_GITHUB_TOKEN:
+         account: github/chef
+         field: token
+     executor:
+       linux:
+         privileged: true
 
 
 #  - label: "[unit] license-control-service"
@@ -141,7 +141,7 @@ steps:
 #  # Wait for the build to complete before starting anything below this
 #  # directive. All tests below this wait either require build assets
 #  # or take a long time.
-#  - wait
+ - wait
 #
 #  - label: "automate-load-balancer"
 #    command:
