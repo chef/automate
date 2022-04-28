@@ -36,5 +36,6 @@ do_deploy() {
 }
 
 do_prepare_upgrade() {
-    prepare_upgrade_milestone "current" "3.0.49"
+    set_version_file
+    prepare_upgrade_milestone_append_version "current" "3.0.49"
 }
