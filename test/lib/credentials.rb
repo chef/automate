@@ -251,6 +251,19 @@ module AutomateCluster
               exit 1
             end
           end
+          if args.key?(:os_pass) && args[:os_pass]
+            if args[:admin_pass]
+              pass_conf += <<~ENDHEREDOC
+                [global.v1.external.opensearch.auth]
+                  scheme = 'basic_auth'
+                [global.v1.external.opensearch.auth.basic_auth]
+                  password = '#{args[:admin_pass]}'
+              ENDHEREDOC
+            else
+              utils.backend_logger.error 'os PASS values were not set properly - aborting!'
+              exit 1
+            end
+          end
           if args.key?(:es_pass) && args[:es_pass]
             if args[:admin_pass]
               pass_conf += <<~ENDHEREDOC
@@ -288,6 +301,20 @@ module AutomateCluster
               exit 1
             end
           end
+          if args.key?(:os_certs) && args[:os_certs]
+            if certificates[:ca_root][:public][:value]
+              cert_conf += <<~ENDHEREDOC
+                [global.v1.external.opensearch.ssl]
+                  root_cert = """#{certificates[:ca_root][:public][:value]}"""
+                  server_name = "#{certificates[:opensearch][:public][:short_cn]}"
+              ENDHEREDOC
+            else
+              utils.backend_logger.error 'CA Root values were not set properly - aborting!'
+              exit 1
+            end
+          end
+          
+
           if args.key?(:fe_certs) && args[:fe_certs]
             if certificates[:frontend][:public][:value] && certificates[:frontend][:private][:value]
               cert_conf += <<~ENDHEREDOC
@@ -409,6 +436,32 @@ module AutomateCluster
                 value: nil
               }
             },
+            opensearch: {
+              public: {
+                filename: "#{utils.top_level_dir}/certs/os_ssl_public.pem",
+                value: nil,
+                full_cn_reversed: nil,
+                short_cn: nil,
+                extendedKeyUsage_client_server: true
+              },
+              private: {
+                filename: "#{utils.top_level_dir}/certs/os_ssl_private.key",
+                value: nil
+              }
+            },
+            opensearch_admin: {
+              public: {
+                filename: "#{utils.top_level_dir}/certs/os_admin_ssl_public.pem",
+                value: nil,
+                full_cn_reversed: nil,
+                short_cn: nil,
+                extendedKeyUsage_client_server: true
+              },
+              private: {
+                filename: "#{utils.top_level_dir}/certs/os_admin_ssl_private.key",
+                value: nil
+              }
+            },
             kibana: {
               public: {
                 filename: "#{utils.top_level_dir}/certs/kibana_ssl_public.pem",
@@ -494,6 +547,11 @@ module AutomateCluster
             load_es_cert!(certificates[:elasticsearch], certstore)
             load_es_cert!(certificates[:elasticsearch_admin], certstore)
           end
+          if options[:os_ssl] == true || options[:rotate_all] == true
+            utils.backend_logger.info 'Reading opensearch Node and Admin keys'
+            load_es_cert!(certificates[:opensearch], certstore)
+            load_es_cert!(certificates[:opensearch_admin], certstore)
+          end
           if options[:kibana_ssl] == true || options[:rotate_all] == true
             utils.backend_logger.info 'Reading Kibana HTTPS keys'
             load_cert!(certificates[:kibana], certstore)
@@ -561,6 +619,7 @@ module AutomateCluster
       option :rotate_all, type: :boolean, default: false, desc: 'Rotate all SSL certificates from certs/*'
       option :pg_ssl, type: :boolean, default: false, desc: 'Apply postgres sql SSL from certs/*'
       option :es_ssl, type: :boolean, default: false, desc: 'Apply elasticsearch https SSL from certs/*'
+      option :os_ssl, type: :boolean, default: false, desc: 'Apply opensearch https SSL from certs/*'
       option :kibana_ssl, type: :boolean, default: false, desc: 'Apply kibana https SSL from certs/*'
       option :fe_ssl, type: :boolean, default: false, desc: 'Apply frontend https SSL from certs/*'
       def ssl
@@ -582,6 +641,13 @@ module AutomateCluster
           patch_frontends(es_certs: true) unless options[:frontend] == false
           hab_config_apply(es_certs: true, service_name: 'elasticsearch') unless options[:gossip] == false
         end
+        
+        if options[:os_ssl] == true || options[:rotate_all] == true
+          no_op = false
+          patch_frontends(os_certs: true) unless options[:frontend] == false
+          hab_config_apply(os_certs: true, service_name: 'opensearch') unless options[:gossip] == false
+        end
+
 
         if options[:kibana_ssl] == true || options[:rotate_all] == true
           no_op = false
@@ -628,9 +694,19 @@ module AutomateCluster
         utils.backend_logger.info '★  Elasticsearch and Kibana Credentials Rotated ★'
       end
 
+    desc 'opensearch', 'set the opensearch credentials'
+      option :auto, type: :boolean, default: true, desc: 'Auto generate new account passwords. Otherwise prompt for values.'
+      def opensearch
+        utils.backend_logger.info '☘  opensearch Credentials ☘'
+        admin_pass = get_pass('admin')
+        patch_frontends(os_pass: true, admin_pass: admin_pass) unless options[:frontend] == false
+        hab_config_apply(os_pass: true, admin_pass: admin_pass, service_name: 'opensearch') unless options[:gossip] == false
+        utils.backend_logger.info '★  Opensearch Credentials Rotated ★'
+      end
+
       desc 'all', 'set ALL credentials and ssl certificates'
       def all
-        elasticsearch
+        opensearch
         postgresql
         ssl
       end
