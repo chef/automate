@@ -216,11 +216,11 @@ To configure local filesystem backups of Chef Automate data stored in an externa
 1. Add the following to your `config.toml`:
 
 ```toml
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
 enable = true
 location = "fs"
 
-[global.v1.external.elasticsearch.backup.fs]
+[global.v1.external.opensearch.backup.fs]
 # The `path.repo` setting you've configured on your Opensearch nodes must be
 # a parent directory of the setting you configure here:
 path = "/var/opt/chef-automate/backups"
@@ -236,11 +236,11 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
 1. Enable S3 backups by adding the following settings to your `config.toml`:
 
     ```toml
-    [global.v1.external.elasticsearch.backup]
+    [global.v1.external.opensearch.backup]
     enable = true
     location = "s3"
 
-    [global.v1.external.elasticsearch.backup.s3]
+    [global.v1.external.opensearch.backup.s3]
 
       # bucket (required): The name of the bucket
       bucket = "<bucket name>"
@@ -251,10 +251,10 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
 
       # name of an s3 client configuration you create in your opensearch.yml
       # for full documentation on how to configure client settings on your
-      # Elasticsearch nodes
+      # Opensearch nodes
       client = "<client name>"
 
-    [global.v1.external.elasticsearch.backup.s3.settings]
+    [global.v1.external.opensearch.backup.s3.settings]
     ## The meaning of these settings is documented in the S3 Repository Plugin
     ## documentation.
 

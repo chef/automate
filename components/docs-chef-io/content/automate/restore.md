@@ -57,7 +57,7 @@ Ensure access for the backup type used:
 1. To restore a backup to a machine with less memory than the original system, adjust for the appropriate lower memory settings by creating a `patch.toml` file that specifies the heapsize, and providing the file at restore time:
 
      ```toml
-       [elasticsearch.v1.sys.runtime]
+       [opensearch.v1.sys.runtime]
          heapsize = "4096m"
          # Use "m" for megabytes and "g" for gigabytes
      ```
