@@ -8,7 +8,7 @@ describe AutomateCluster::SSH do
   let(:connection) { instance_double("AutomateCluster::SSHConnection") }
 
   before  do
-    expect(tfoutput).to receive(:ssh_node_types).and_return(["automate", "postgresql", "elasticsearch"])
+    expect(tfoutput).to receive(:ssh_node_types).and_return(["automate", "postgresql", "opensearch"])
     expect(AutomateCluster::Terraform).to receive(:output).and_return(tfoutput)
   end
 

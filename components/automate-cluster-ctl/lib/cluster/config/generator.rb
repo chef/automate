@@ -8,7 +8,7 @@ module AutomateCluster
       existing_nodes: "Only applies when using an existing node architecture",
       automate: "Automate frontend node related settings",
       postgresql: "PostgreSQL related settings",
-      elasticsearch: "Elasticsearch related settings",
+      opensearch: "Opensearch related settings",
       chef_server: "Chef Server frontend node related settings",
     }.freeze
 

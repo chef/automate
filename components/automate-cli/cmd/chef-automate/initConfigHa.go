@@ -54,11 +54,11 @@ type AwsConfigToml struct {
 			InstanceCount string `toml:"instance_count"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
-	Elasticsearch struct {
+	Opensearch struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
 		} `toml:"config"`
-	} `toml:"elasticsearch"`
+	} `toml:"opensearch"`
 	Postgresql struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
@@ -149,11 +149,11 @@ type ExistingInfraConfigToml struct {
 			InstanceCount string `toml:"instance_count"`
 		} `toml:"config"`
 	} `toml:"chef_server"`
-	Elasticsearch struct {
+	Opensearch struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`
 		} `toml:"config"`
-	} `toml:"elasticsearch"`
+	} `toml:"opensearch"`
 	Postgresql struct {
 		Config struct {
 			InstanceCount string `toml:"instance_count"`

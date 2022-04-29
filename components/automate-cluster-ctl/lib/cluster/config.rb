@@ -73,7 +73,7 @@ module AutomateCluster
       default :instance_count, 1
     end
 
-    config_context :elasticsearch do
+    config_context :opensearch do
       default :instance_count, 3
     end
 

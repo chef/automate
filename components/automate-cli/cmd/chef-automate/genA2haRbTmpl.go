@@ -41,10 +41,10 @@ chef_server do
 end
 
 ###############################################################
-### Elasticsearch related settings                          ###
+### Opensearch related settings                          ###
 ###############################################################
-elasticsearch do
-  instance_count {{ .Elasticsearch.Config.InstanceCount }}
+opensearch do
+  instance_count {{ .Opensearch.Config.InstanceCount }}
 end
 
 ###############################################################
@@ -108,10 +108,10 @@ chef_server do
 end
 
 ###############################################################
-### Elasticsearch related settings                          ###
+### Opensearch related settings                          ###
 ###############################################################
-elasticsearch do
-  instance_count {{ .Elasticsearch.Config.InstanceCount }}
+opensearch do
+  instance_count {{ .Opensearch.Config.InstanceCount }}
 end
 
 ###############################################################

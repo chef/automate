@@ -35,7 +35,7 @@ config_file = "configs/automate.toml"
 [chef_server.config]
 instance_count = "1"
 
-[elasticsearch.config]
+[opensearch.config]
 instance_count = "3"
 
 [postgresql.config]
@@ -122,7 +122,7 @@ config_file = "configs/automate.toml"
 [chef_server.config]
 instance_count = "1"
 
-[elasticsearch.config]
+[opensearch.config]
 instance_count = "3"
 
 [postgresql.config]
