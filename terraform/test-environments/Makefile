@@ -57,9 +57,6 @@ remote-state: init
 plan: remote-state
 	cd scenarios && terraform plan -var-file=vars/$(TF_VARS).tfvars
 
-dev_apply: remote-state
-	cd scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars -target=s3_websites.tf -target=single_local_fresh_install.tf
-
 apply: remote-state
 	cd scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars
 
@@ -89,8 +86,6 @@ unmark-deploy:
 	aws --profile chef-cd s3 rm s3://$(DASHBOARD_URL)/assets/deploy_logs
 
 deploy: mark-deploy apply dashboard unmark-deploy
-
-dev_deploy: mark-deploy dev_apply dashboard unmark-deploy
 
 lint:
 	terraform fmt -check=true -list=true -diff=true

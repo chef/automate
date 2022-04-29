@@ -19,9 +19,4 @@ fi
 export LOGS_URL="$BUILDKITE_BUILD_URL"
 
 cd terraform/test-environments
-
-if [ "$CHANNEL" == "dev" ]; then
-  make dev_deploy
-else
-  make deploy
-fi
+make deploy
