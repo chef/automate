@@ -2,7 +2,7 @@
 
 {{#if cfg.disable ~}}
 exit 0
-#{{~else}}
+{{~else}}
 source {{pkg.svc_config_path}}/health_check
 
 health_check

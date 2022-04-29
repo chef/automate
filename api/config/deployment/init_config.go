@@ -232,18 +232,6 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 		},
 	})
 
-	cfg.OverrideConfigValues(&AutomateConfig{ // nolint: errcheck
-		Opensearch: &oss.ConfigRequest{
-			V1: &oss.ConfigRequest_V1{
-				Sys: &oss.ConfigRequest_V1_System{
-					Runtime: &oss.ConfigRequest_V1_Runtime{
-						Heapsize: w.String(c.OSHeapSize),
-					},
-				},
-			},
-		},
-	})
-
 	return &cfg
 }
 

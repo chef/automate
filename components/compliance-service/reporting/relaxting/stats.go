@@ -42,17 +42,17 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
 	b, _ := json.Marshal(source)
-	fmt.Println(string(b))
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
-		fmt.Println(err)
+		logrus.Error(err)
 		return nil, err
 	}
-	fmt.Println(searchResult)
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -85,9 +85,9 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-	fmt.Println(source)
+	logrus.Info(source)
 	b, _ := json.Marshal(source)
-	fmt.Println(string(b))
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
@@ -95,12 +95,12 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 		Do(context.Background())
 	if err != nil {
 		if searchResult != nil {
-			fmt.Println(searchResult.Error)
+			logrus.Error(searchResult.Error)
 		}
-		fmt.Println(err)
+		logrus.Info(err)
 		return nil, err
 	}
-	fmt.Println(searchResult)
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -135,17 +135,17 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
 	b, _ := json.Marshal(source)
-	fmt.Println(string(b))
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
-		fmt.Println(err)
+		logrus.Error(err)
 		return nil, err
 	}
-	fmt.Println(searchResult)
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -194,17 +194,17 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
 	b, _ := json.Marshal(source)
-	fmt.Println(string(b))
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
-		fmt.Println(err)
+		logrus.Error(err)
 		return failures, err
 	}
-	fmt.Println(searchResult)
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
