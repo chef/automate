@@ -20,7 +20,7 @@ POSTGRES_PORT ?= 15432
 POSTGRES_USER ?= postgres
 POSTGRES_PASS ?= admin
 POSTGRES_URI  ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASS)@$(POSTGRES_HOST):$(POSTGRES_PORT)/chef_automate?sslmode=disable
-ES_VER ?= 7
+ES_VER ?= 6
 PACKAGE = "github.com/chef/automate/components/compliance-service"
 
 GIT_SHA ?= $(shell git rev-parse HEAD)
@@ -245,7 +245,7 @@ start-es6: create-es-data-dir
 
 start-os124: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
-	docker rm -f cc_os124 2> /dev/null; sleep 1; docker-compose -f $(PWD)/opensearch/docker-compose.yml up
+	docker rm -f cc_os124 2> /dev/null; sleep 1; docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "DISABLE_SECURITY_PLUGIN=true" opensearchproject/opensearch:1.2.4
 	@$(MAKE) wait-for-es
 
 create-es-data-dir:
