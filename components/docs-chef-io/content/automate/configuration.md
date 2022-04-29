@@ -233,78 +233,41 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 ### Additional Configuration
 
-#### General Elasticsearch Configuration
+#### General Opensearch Configuration
 
-To configure Elasticsearch for your Chef Automate installation, create a TOML file that contains the partial configuration below.
+To configure Opensearch for your Chef Automate installation, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
-[elasticsearch.v1.sys.proxy]
-# NOTE: The elasticsearch proxy settings are derived from the global proxy settings.
-# host = "<proxy host>"
-# port = <proxy port>
-# user = "<proxy username>"
-# password = "<proxy password>"
-# no_proxy = <["0.0.0.0", "127.0.0.1"]>
-[elasticsearch.v1.sys.cluster]
+[opensearch.v1.sys.cluster]
 # name = "chef-insights"
-[elasticsearch.v1.sys.cluster.routing.allocation]
-# node_concurrent_recoveries = 2
-# node_initial_primaries_recoveries = 4
-# same_shard_host = false
-[elasticsearch.v1.sys.node]
+[opensearch.v1.sys.node]
 # max_local_storage_nodes = 1
-# master = true
-# data = true
-[elasticsearch.v1.sys.path]
+[opensearch.v1.sys.path]
 # logs = "logs"
-[elasticsearch.v1.sys.indices.recovery]
-# max_bytes_per_sec = "20mb"
-[elasticsearch.v1.sys.indices.breaker]
-# total_limit = "70%"
-# fielddata_limit = "60%"
-# fielddata_overhead = "1.03"
-# request_limit = "40%"
-# request_overhead = "1"
-[elasticsearch.v1.sys.bootstrap]
+[opensearch.v1.sys.bootstrap]
 # memory_lock = false
-[elasticsearch.v1.sys.network]
+[opensearch.v1.sys.network]
 # host = "0.0.0.0"
 # port = 10141
-[elasticsearch.v1.sys.transport]
+[opensearch.v1.sys.transport]
 # port = "10142"
-[elasticsearch.v1.sys.discovery]
-# ping_unicast_hosts = "[]"
-# minimum_master_nodes = 1
-# zen_fd_ping_timeout = "30s"
-[elasticsearch.v1.sys.gateway]
-# expected_nodes = 0
-# expected_master_nodes = 0
-# expected_data_nodes = 0
-[elasticsearch.v1.sys.action]
+[opensearch.v1.sys.action]
 # destructive_requires_name = true
-[elasticsearch.v1.sys.logger]
-# level = "info"
-[elasticsearch.v1.sys.runtime]
-# max_locked_memory = "unlimited"
-# es_java_opts = ""
-# NOTE: see https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
-# for important guidance regarding the configuration of the heap size setting
-# heapsize = "4g"
 ```
 
-#### Setting Elasticsearch Heap
+#### Setting Opensearch Heap
 
-The Elasticsearch heap size can, and in most cases should, be set to 50% of the available system
-memory. However, you should review and consider the important caveats covered in the [Elasticsearch heap size documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html).
+The Opensearch heap size can, and in most cases should, be set to 50% of the available system
+memory. However, you should review and consider the important caveats covered in the [Opensearch heap size documentation](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
 
-For example, a system with 32GB of memory can have its Elasticsearch heap
+For example, a system with 32GB of memory can have its Opensearch heap
 size set to `16g`; to do so, one would first create a TOML file that contains the partial
 configuration below, and then run `chef-automate config patch </path/to/your-file.toml>` to
 deploy the change.
 
 ```toml
-[elasticsearch.v1.sys.runtime]
+[opensearch.v1.sys.runtime]
 heapsize = "16g"
 ```
 
