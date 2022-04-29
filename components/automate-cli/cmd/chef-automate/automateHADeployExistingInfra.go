@@ -87,7 +87,7 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.ChefServer.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty chef-server instance_count")
 	}
-	if len(e.config.Elasticsearch.Config.InstanceCount) < 1 {
+	if len(e.config.Opensearch.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty elastic-search instance_count")
 	}
 	if len(e.config.Postgresql.Config.InstanceCount) < 1 {

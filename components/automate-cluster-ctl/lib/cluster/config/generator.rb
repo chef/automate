@@ -29,7 +29,7 @@ module AutomateCluster
         chef_server_lb_certificate_arn: "AWS Certificate is specific to the region and AWS account this is being deployed to.",
         automate_server_instance_type: "EC2 instance type to use for Automate frontends, minimum >2G of RAM for test, 8G for prod",
         chef_server_instance_type: "EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod",
-        opensearch_server_instance_type: "EC2 instance type to use for Elasticsearch backends, minimum 8G of RAM for test, 16G for prod",
+        opensearch_server_instance_type: "EC2 instance type to use for Opensearch backends, minimum 8G of RAM for test, 16G for prod",
         postgresql_server_instance_type: "EC2 instance type to use for PostgreSQL backends, minimum 4G of RAM for test, 8G for prod",
       },
       automate: {

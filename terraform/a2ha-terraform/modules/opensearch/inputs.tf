@@ -7,11 +7,11 @@ variable "backend_aib_dest_file" {
 variable "backend_aib_local_file" {
 }
 
-variable "curator_pkg_ident" {
-}
-
 variable "backup_config_efs" {
   default = "false"
+}
+
+variable "curator_pkg_ident" {
 }
 
 variable "habitat_info" {

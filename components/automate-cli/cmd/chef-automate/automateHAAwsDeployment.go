@@ -112,7 +112,7 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 	if len(a.config.ChefServer.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty chef-server instance_count")
 	}
-	if len(a.config.Elasticsearch.Config.InstanceCount) < 1 {
+	if len(a.config.Opensearch.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty elastic-search instance_count")
 	}
 	if len(a.config.Postgresql.Config.InstanceCount) < 1 {
