@@ -704,7 +704,8 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	}
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	// To search over a range start time is required.
+	//filters["start_time"] = []string{}
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
