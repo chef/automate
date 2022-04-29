@@ -47,7 +47,7 @@ The default is to remove compliance reports after 60 days, and to remove complia
 
 ## Data Lifecycle API
 
-Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in Elasticsearch or PostgreSQL.
+Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in Opensearch or PostgreSQL.
 
 The `data-lifecycle` API allows configuring and running lifecycle jobs by data type:
 
@@ -250,7 +250,7 @@ Infra node lifecycle jobs have the following options:
 Purge jobs have the following options:
 
 * `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage before purging occurs.
-  * `elasticsearch` (array) - An array of Elasticsearch purge policies
+  * `elasticsearch` (array) - An array of Opensearch purge policies
     * `disabled` (bool) - True or false if this job is enabled.
     * `policy_name` (string) - The name of the purge policy you wish to update.
     * `older_than_days` (int) - The threshold for what qualifies for deletion.
@@ -261,7 +261,7 @@ Services jobs have the following options:
 
 ##### Infra Job Settings
 
-The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two Elasticsearch purge policies.
+The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two Opensearch purge policies.
 
 ```json
 { "job_settings": [

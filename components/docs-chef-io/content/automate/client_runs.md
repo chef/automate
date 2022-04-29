@@ -219,7 +219,7 @@ You will need an [API token]({{< relref "api_tokens.md#creating-api-tokens" >}})
 
 ### Configuring Data Cleanup
 
-By default, Chef Automate prevents irreversible destructive operations by keeping deleted node history in Elasticsearch, unless users configure this functionality.
+By default, Chef Automate prevents irreversible destructive operations by keeping deleted node history in Opensearch, unless users configure this functionality.
 Chef Software recommends setting the `threshold` for destroying deleted node history to 1 day and running data cleanup every 15 minutes.
 
 Available data cleanup configuration parameters:
