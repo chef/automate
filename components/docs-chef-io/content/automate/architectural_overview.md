@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 ## Automate 2 Architecture
 
-![Automate 2 Architecture](/images/automate/a2-architecture.png)
+![Automate 2 Architecture](/images/automate/a2-architecture-os.JPEG)
 
 ## Component overview
 
@@ -72,7 +72,7 @@ Service securely stores credentials for other services.
 
 ### Elasticsearch Sidecar Service
 
-This service runs alongside Elasticsearch. It provides common Elasticsearch functionality such as monitoring disk usage and handling index purges.
+This service runs alongside Opensearch. It provides common Opensearch functionality such as monitoring disk usage and handling index purges.
 
 ### Dex
 
