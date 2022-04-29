@@ -163,16 +163,16 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 
 		if s3 := b.GetS3(); s3 != nil {
 			client := c.GetV1().GetSys().GetS3().GetClient()
-			if es := s3.GetEs(); es != nil {
-				if rt := es.GetReadTimeout(); rt != nil {
+			if oss := s3.GetEs(); oss != nil {
+				if rt := oss.GetReadTimeout(); rt != nil {
 					client.ReadTimeout = rt
 				}
 
-				if mr := es.GetMaxRetries(); mr != nil {
+				if mr := oss.GetMaxRetries(); mr != nil {
 					client.MaxRetries = mr
 				}
 
-				if tr := es.GetUseThrottleRetries(); tr != nil {
+				if tr := oss.GetUseThrottleRetries(); tr != nil {
 					client.UseThrottleRetries = tr
 				}
 			}
