@@ -5,6 +5,8 @@ exec 2>&1
 # Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
 export GODEBUG=x509ignoreCN=0
 
+export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
+
 {{#if cfg.disable ~}}
 while true
 do
@@ -26,6 +28,5 @@ export ES_PATH_CONF="{{pkg.svc_config_path}}"
 source {{pkg.svc_config_path}}/init_keystore
 source {{pkg.svc_config_path}}/init_ca
 
-export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
 exec opensearch
 {{~/if}}
