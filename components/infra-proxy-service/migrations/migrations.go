@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
@@ -508,34 +509,27 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	return &response.CreateBackupResponse{}, nil
 }
 
-func createFile(path string) (*os.File, error) {
-	var file *os.File
+func createFile(path string) error {
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		file, err := os.Create(path)
+		_, err := os.Create(path)
 		if err != nil {
 			log.WithError(err).Error("Unable to create file ", err)
-			return file, err
+			return err
 		}
 	}
-	return file, nil
+	return nil
 }
 
 func writeFile(path string, data []byte) error {
-	var file *os.File
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		file, err = createFile(path)
+		err = createFile(path)
 		if err != nil {
 			log.Errorf("Unable to create file %s", err.Error())
 			return err
 		}
-	} else {
-		file, err = os.Open(path)
-		if err != nil {
-			log.Errorf("failed to open file %s : %s", path, err.Error())
-			return err
-		}
 	}
-	if err := json.NewEncoder(file).Encode(data); err != nil {
+	err := ioutil.WriteFile(path, data, 0644)
+	if err != nil {
 		log.Errorf("Unable to write file %s", err.Error())
 		return err
 	}
