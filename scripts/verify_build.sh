@@ -86,18 +86,10 @@ fi
 # being older or newer than we might expect.
 
 OLD_VERSION=$(cat VERSION)
-echo "OLD_VERSION:$OLD_VERSION"
 IFS=. read -r major minor patch <<<"$OLD_VERSION"
-echo "major:$major"
-echo "minor:$minor"
-echo "patch:$patch"
-#echo "IFS:$IFS"
 patch=$((patch + 1))
-#((patch++))
-echo "patch:$patch"
 VERSION="$major"."$minor"."$patch"
 export VERSION
-echo "VERSION:$VERSION"
 log_section_start "create manifest"
 .expeditor/create-manifest.rb
 echo "showing current dir files"

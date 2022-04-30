@@ -19,7 +19,6 @@ pkg_deps=(
   core/coreutils
   core/glibc
   core/zlib
-
   chef/mlsa
   core/curl # health_check
   chef/automate-openjdk
@@ -45,7 +44,6 @@ pkg_exposes=(http-port transport-port)
 
 do_download() {
   do_default_download
-  #wget $pkg_source
 }
 
 do_build() {
@@ -59,10 +57,6 @@ do_install() {
   mkdir -p "${pkg_prefix}/os"
   ls -ltrh 
   cp -ra ./* "${pkg_prefix}/os"
-  echo "what is HAB_CACHE_SRC_PATH : "$HAB_CACHE_SRC_PATH
-  echo "what is pkg_prefix : "${pkg_prefix}
-  echo "where i am : " 
-  pwd
   # jvm.options needs to live relative to the binary.
   # mkdir -p "$pkg_prefix/es/config"
   # install -vDm644 config/jvm.options "$pkg_prefix/es/config/jvm.options"
