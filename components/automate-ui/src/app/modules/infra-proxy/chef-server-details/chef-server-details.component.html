@@ -26,7 +26,9 @@
         </table>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
-          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
+            <chef-option value='details' data-cy="details-tab">Details</chef-option>
+          </app-authorized>
         </chef-tab-selector>
       </chef-page-header>
       <app-create-org-modal
@@ -142,7 +144,7 @@
       </section>
       <section class="page-body" *ngIf="tabValue === 'orgs'">
         <chef-toolbar>
-          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', server?.id]">
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', [server?.id]]">
             <chef-button id="create-button" primary (click)="openCreateModal()" data-cy="add-org-button">Add Chef Organization
             </chef-button>
           </app-authorized>
@@ -169,11 +171,11 @@
                   <ng-container *ngSwitchDefault>{{ org.projects.length }} projects</ng-container>
                 </chef-td>
                 <chef-td class="three-dot-column">
-                  <!-- <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]"> -->
+                  <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]">
                     <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">
                     <mat-option data-cy="delete-org" (onSelectionChange)="startOrgDelete($event, org)">Delete</mat-option>
                     </mat-select>
-                  <!-- </app-authorized> -->
+                  </app-authorized>
                 </chef-td>
               </chef-tr>
             </chef-tbody>
