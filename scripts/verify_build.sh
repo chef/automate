@@ -91,7 +91,7 @@ IFS=. read -r major minor patch <<<"$OLD_VERSION"
 echo "major:$major"
 echo "minor:$minor"
 echo "patch:$patch"
-echo "IFS:$IFS"
+#echo "IFS:$IFS"
 patch=$((patch + 1))
 #((patch++))
 echo "patch:$patch"
