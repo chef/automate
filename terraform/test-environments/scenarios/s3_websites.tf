@@ -12,7 +12,6 @@ module "dashboard" {
   meta_description = "This is just a link to the channel-specific release dashboard site you are viewing right now...recursion FTW!"
 
   tag_contact = "${var.aws_tag_contact}"
-
 }
 
 resource "null_resource" "dashboard_deploy" {
@@ -42,7 +41,6 @@ module "ui_library_website" {
 
   tag_contact = "${var.aws_tag_contact}"
   create      = "${var.environment == "union" ? "true" : "false"}"
-
 }
 
 #########################################################################
@@ -60,5 +58,4 @@ module "a2_code_coverage_website" {
 
   tag_contact = "${var.aws_tag_contact}"
   create      = "${var.environment == "union" ? "true" : "false"}"
-
 }
