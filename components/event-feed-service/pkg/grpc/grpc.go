@@ -44,7 +44,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		return errors.Wrapf(err, "connecting to elasticsearch (%s)", c.ElasticSearchURL)
+		return errors.Wrapf(err, "connecting to opensearch (%s)", c.ElasticSearchURL)
 	}
 
 	feedStore := persistence.NewFeedStore(esClient)

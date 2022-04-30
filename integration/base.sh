@@ -267,6 +267,15 @@ prepare_upgrade_milestone(){
   set_version_file
 }
 
+prepare_upgrade_milestone_append_version(){
+  local channel="$1"
+  local version="$2"
+  # shellcheck disable=SC2154
+  download_manifest_version "$channel" "$version" "$test_manifest_dir/$version.json"
+  set_test_manifest "$version.json"
+  append_version_file
+}
+
 do_prepare_upgrade_default() {
     # Move the newly built packages into the hartifacts directory.
     mv -f $test_tmp_hartifacts_path/* "$test_hartifacts_path/" || true

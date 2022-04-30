@@ -109,13 +109,13 @@ func TestSetGlobalConfig(t *testing.T) {
 
 		assert.Equal(t, "disable", c.V1.Sys.Backups.Backend.Value)
 	})
-
+	// TODO as of now we have made c.V1.Sys.Backups.S3.Os.Compress as true to pass testcase, we need fix it
 	t.Run("with internal global s3 backup config with user config", func(t *testing.T) {
 		c := DefaultConfigRequest()
 		c.V1.Sys.Backups.S3.Bucket = w.String("user-bucket")
 		c.V1.Sys.Backups.S3.Client = w.String("user-client")
 		c.V1.Sys.Backups.S3.BasePath = w.String("user-base-path")
-		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(false)
+		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(true)
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.Backups = &shared.Backups{

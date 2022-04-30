@@ -23,7 +23,7 @@ import (
 )
 
 func TestReportingServerRunInfo(t *testing.T) {
-	backend := &relaxting.ES2Backend{ESUrl: elasticsearchUrl}
+	backend := &relaxting.ES2Backend{ESUrl: opensearchUrl}
 	server := reportingServer.New(backend)
 
 	lis := bufconn.Listen(1024 * 1024)
@@ -130,7 +130,7 @@ func TestReportingServerRunInfoLoadSixteenDaysOfData(t *testing.T) {
 	//clear out the docs
 	defer suite.DeleteAllDocuments()
 
-	backend := &relaxting.ES2Backend{ESUrl: elasticsearchUrl}
+	backend := &relaxting.ES2Backend{ESUrl: opensearchUrl}
 	server := reportingServer.New(backend)
 
 	lis := bufconn.Listen(1024 * 1024)

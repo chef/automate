@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
-	suite            = NewSuite(elasticsearchUrl)
+	opensearchUrl = os.Getenv("OPENSEARCH_URL")
+	suite         = NewSuite(opensearchUrl)
 )
 
 const (

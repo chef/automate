@@ -16,9 +16,9 @@ import (
 
 // Global variables
 var (
-	// The elasticsearch URL is coming from the environment variable ELASTICSEARCH_URL
-	elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
-	postgresUrl      = os.Getenv("PG_URL")
+	// The opensearch URL is coming from the environment variable OPENSEARCH_URL
+	opensearchUrl = os.Getenv("OPENSEARCH_URL")
+	postgresUrl   = os.Getenv("PG_URL")
 
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.

@@ -18,7 +18,7 @@ require (
 	github.com/apache/thrift v0.0.0-20161221203622-b2a4d4ae21c7 // indirect
 	github.com/apoydence/onpar v0.0.0-20190519213022-ee068f8ea4d1 // indirect
 	github.com/armon/go-metrics v0.3.2 // indirect
-	github.com/aws/aws-sdk-go v1.43.21
+	github.com/aws/aws-sdk-go v1.40.32
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/boltdb/bolt v1.3.2-0.20171120010307-9da317453632
@@ -81,7 +81,7 @@ require (
 	github.com/nats-io/nats.go v1.9.1
 	github.com/nats-io/stan.go v0.6.0
 	github.com/olivere/elastic v6.2.35+incompatible
-	github.com/olivere/elastic/v7 v7.0.32
+	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.19.1
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0

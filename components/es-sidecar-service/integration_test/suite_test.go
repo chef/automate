@@ -2,7 +2,9 @@ package integration_test
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 
 	es_sidecar "github.com/chef/automate/components/es-sidecar-service/pkg/elastic"
@@ -31,8 +33,19 @@ func NewSuite(url string) *Suite {
 	log.SetLevel(log.DebugLevel)
 	log.SetOutput(os.Stderr)
 
-	esClient, err := elastic.NewClient(
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
+
+	esClient, err := elastic.NewSimpleClient(
 		elastic.SetURL(url),
+		elastic.SetSniff(false),
+		elastic.SetHttpClient(client),
+		elastic.SetBasicAuth("admin", "admin"),
 	)
 
 	if err != nil {
@@ -65,6 +78,12 @@ func (suite *Suite) DeleteAllIndices() {
 	indices, err := suite.esClient.IndexNames()
 	if err != nil {
 		fmt.Printf("Could not retrieve index list: %s\n", err)
+	}
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
 	}
 	suite.esClient.DeleteIndex(indices...).Do(context.Background())
 }

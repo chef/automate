@@ -199,7 +199,7 @@ func waitForRestoreSuccess(t *testing.T, serviceName, snapshotName string) {
 const (
 	includedIndex = "included-index"
 	excludedIndex = "excluded-index"
-	snapShotName  = "chef-automate-es7-example-service"
+	snapShotName  = "chef-automate-es6-example-service"
 )
 
 func TestCreateSnapshot(t *testing.T) {

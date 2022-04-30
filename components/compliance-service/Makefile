@@ -20,7 +20,7 @@ POSTGRES_PORT ?= 15432
 POSTGRES_USER ?= postgres
 POSTGRES_PASS ?= admin
 POSTGRES_URI  ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASS)@$(POSTGRES_HOST):$(POSTGRES_PORT)/chef_automate?sslmode=disable
-ES_VER ?= 7
+ES_VER ?= 6
 PACKAGE = "github.com/chef/automate/components/compliance-service"
 
 GIT_SHA ?= $(shell git rev-parse HEAD)
@@ -231,7 +231,7 @@ start-es-pg: start-pg create-es-data-dir
 	ls -la "$$data_dir";
 	@$(MAKE) start-es
 
-start-es: start-es$(ES_VER)
+start-es: start-os124
 
 start-es5: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 5 container...${reset}\n"
@@ -241,6 +241,11 @@ start-es5: create-es-data-dir
 start-es6: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
 	docker rm -f cc_es6 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+	@$(MAKE) wait-for-es
+
+start-os124: create-es-data-dir
+	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
+	docker rm -f cc_os124 2> /dev/null; sleep 1; docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "DISABLE_SECURITY_PLUGIN=true" opensearchproject/opensearch:1.2.4
 	@$(MAKE) wait-for-es
 
 create-es-data-dir:

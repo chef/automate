@@ -24,13 +24,12 @@ var (
 	// for integration testing with feed service
 	esClient *olivere.Client
 	indices  = []string{persistence.IndexNameFeeds}
-	types    = []string{persistence.DocType}
 
 	suite = NewSuite()
 )
 
 func doInit() {
-	esURL := os.Getenv("ELASTICSEARCH_URL")
+	esURL := os.Getenv("OPENSEARCH_URL")
 	client, err := olivere.NewClient(
 		olivere.SetURL(esURL),
 		olivere.SetSniff(false),
