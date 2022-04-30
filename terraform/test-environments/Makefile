@@ -54,8 +54,16 @@ remote-state: init
 	rm -rf .terraform && \
 	terraform init -backend-config="key=a2/$(TF_STATE)"
 
+dev-remote-state: init
+	cd dev_scenarios && \
+	rm -rf .terraform && \
+	terraform init -backend-config="key=a2/$(TF_STATE)"
+
 plan: remote-state
 	cd scenarios && terraform plan -var-file=vars/$(TF_VARS).tfvars
+
+dev_apply: dev-remote-state
+	cd dev_scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars
 
 apply: remote-state
 	cd scenarios && terraform apply -auto-approve -var-file=vars/$(TF_VARS).tfvars
@@ -86,6 +94,8 @@ unmark-deploy:
 	aws --profile chef-cd s3 rm s3://$(DASHBOARD_URL)/assets/deploy_logs
 
 deploy: mark-deploy apply dashboard unmark-deploy
+
+dev_deploy: mark-deploy dev_apply dashboard unmark-deploy
 
 lint:
 	terraform fmt -check=true -list=true -diff=true
