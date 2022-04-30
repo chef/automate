@@ -121,6 +121,7 @@ config_file = "configs/automate.toml"
 
 [chef_server.config]
 instance_count = "1"
+chef_lb_fqdn = ""
 
 [elasticsearch.config]
 instance_count = "3"

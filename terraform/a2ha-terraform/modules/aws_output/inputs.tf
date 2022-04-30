@@ -14,6 +14,14 @@ variable "bucket_name" {
   default = ""
 }
 
+variable "chef_server_fqdn" {
+  default = ""
+}
+
+variable "chef_server_frontend_urls" {
+  default = ""
+}
+
 variable "chef_server_private_ips" {
   default = []
 }
