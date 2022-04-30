@@ -445,10 +445,6 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-ha-deployment",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-ha-elasticsearch",
       "metadata": null
     },

@@ -45,7 +45,6 @@
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
-    "chef/automate-ha-deployment",
     "chef/automate-ha-elasticsearch",
     "chef/automate-ha-elasticsidecar",
     "chef/automate-ha-ctl",

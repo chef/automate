@@ -1149,12 +1149,6 @@ paths = [
   "components/automate-backend-ctl/*"
 ]
 
-[automate-ha-deployment]
-plan_path = "components/automate-backend-deployment"
-paths = [
-  "components/automate-backend-deployment/*"
-]
-
 [automate-ha-pgleaderchk]
 plan_path = "components/automate-ha-pgleaderchk"
 paths = [

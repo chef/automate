@@ -82,7 +82,6 @@ automate-ha-haproxy components/automate-backend-haproxy
 automate-ha-elasticsidecar components/automate-backend-elasticsidecar
 automate-ha-postgresql components/automate-backend-postgresql
 automate-ha-ctl components/automate-backend-ctl
-automate-ha-deployment components/automate-backend-deployment
 automate-ha-pgleaderchk components/automate-ha-pgleaderchk
 automate-ha-cluster-ctl components/automate-cluster-ctl
 automate-netcat components/automate-netcat
