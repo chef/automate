@@ -92,7 +92,9 @@ echo "major:$major"
 echo "minor:$minor"
 echo "patch:$patch"
 echo "IFS:$IFS"
-((patch++))
+patch=$((patch + 1))
+#((patch++))
+echo "patch:$patch"
 VERSION="$major"."$minor"."$patch"
 export VERSION
 echo "VERSION:$VERSION"
