@@ -35,7 +35,6 @@ pkg_exports=(
   [deprecated_external_os]=deprecated.external_os
   [deprecated_backup_location]=path.repo
   [disable]=disable
-  []
 )
 
 pkg_binds=(

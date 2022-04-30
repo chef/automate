@@ -103,25 +103,25 @@ ha_backend_setup() {
     fi
 
     cat <<DOC > "$ha_backend_config"
-[global.v1.external.elasticsearch]
+[global.v1.external.opensearch]
 enable = true
 nodes = ["https://${ha_backend_container1_ip}:9200", "https://${ha_backend_container2_ip}:9200"]
 
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
 enable = true
 location = "fs"
 
-[global.v1.external.elasticsearch.backup.fs]
+[global.v1.external.opensearch.backup.fs]
 path = "/services/ha_backend_backups"
 
-[global.v1.external.elasticsearch.auth]
+[global.v1.external.opensearch.auth]
 scheme = "basic_auth"
 
-[global.v1.external.elasticsearch.auth.basic_auth]
+[global.v1.external.opensearch.auth.basic_auth]
 username = "${HA_BACKEND_USER}"
 password = "${HA_BACKEND_PASSWORD}"
 
-[global.v1.external.elasticsearch.ssl]
+[global.v1.external.opensearch.ssl]
 # defaults from automate-ha-backend
 server_name = "chefnode"
 root_cert = """$(cat "${certdir}/MyRootCA.pem")"""

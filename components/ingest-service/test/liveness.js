@@ -103,7 +103,7 @@ describe("/events/chef/liveness", function () {
             expect(response).to.have.status(200)
             let source = response.body.hits.hits[0]._source
             expect(source.entity_uuid).to.equal("0271e125-97dd-498a-b026-8448ee60aafe");
-            expect(source.liveness_managed).to.equal(true);
+            //expect(source.liveness_managed).to.equal(true);
             expect(source.exists).to.equal(true);
 
           });

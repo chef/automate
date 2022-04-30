@@ -21,15 +21,15 @@ do_create_config() {
 
     #shellcheck disable=SC2154
     cat <<EOF >> "$test_config_path"
-[global.v1.external.elasticsearch]
+[global.v1.external.opensearch]
 enable = true
 nodes = ["http://127.0.0.1:59200"]
 
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
 enable = true
 location = "fs"
 
-[global.v1.external.elasticsearch.backup.fs]
+[global.v1.external.opensearch.backup.fs]
 path = "/var/opt/chef-automate/backups"
 EOF
 }
