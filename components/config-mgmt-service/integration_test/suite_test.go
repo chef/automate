@@ -11,8 +11,8 @@ import (
 	"os"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	cElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
 	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"
@@ -27,8 +27,8 @@ import (
 
 // Global variables
 var (
-	// The elasticsearch URL is coming from the environment variable ELASTICSEARCH_URL
-	//elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
+	// The elasticsearch URL is coming from the environment variable OPENSEARCH_URL
+	//elasticsearchUrl = os.Getenv("OPENSEARCH_URL")
 	elasticsearchUrl string
 
 	esBackend *cElastic.Backend
@@ -77,9 +77,9 @@ func NewSuite() *Suite {
 func (s *Suite) GlobalSetup() error {
 	// set global elasticsearchUrl
 	var haveURL bool
-	elasticsearchUrl, haveURL = os.LookupEnv("ELASTICSEARCH_URL")
+	elasticsearchUrl, haveURL = os.LookupEnv("OPENSEARCH_URL")
 	if !haveURL {
-		return errors.New("The environment variable ELASTICSEARCH_URL must be set for integration tests to run")
+		return errors.New("The environment variable OPENSEARCH_URL must be set for integration tests to run")
 	}
 
 	// set global esBackend
@@ -132,6 +132,12 @@ func (s *Suite) GlobalTeardown() {
 		//don't ever delete node run info.. we'll do that after each test when needed
 		if index != mappings.IndexNameNodeRunInfo {
 			indicesToDelete = append(indicesToDelete, index)
+		}
+	}
+	for i, v := range indicesToDelete {
+		if v == ".opendistro_security" {
+			indicesToDelete = append(indicesToDelete[:i], indicesToDelete[i+1:]...)
+			break
 		}
 	}
 	time.Sleep(2 * time.Second)
@@ -196,17 +202,6 @@ func (s *Suite) verifyIndices(indices ...string) []string {
 	return validIndices
 }
 
-// types returns the list of ES types registered in the Ingest service code base
-func (s *Suite) types() []string {
-	types := make([]string, len(mappings.AllMappings))
-
-	for i, esMap := range mappings.AllMappings {
-		types[i] = esMap.Type
-	}
-
-	return types
-}
-
 // Indices returns the list of ES indices registered in the Ingest service code base
 func (s *Suite) Indices() []string {
 	indices := make([]string, len(mappings.AllMappings))
@@ -242,10 +237,14 @@ func (s *Suite) DeleteAllDocuments() {
 
 	// Make sure we clean them all!
 	indices, _ := s.client.IndexNames()
-
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	_, err := s.client.DeleteByQuery().
 		Index(indices...).
-		Type(s.types()...).
 		Query(q).
 		IgnoreUnavailable(true).
 		Refresh("true").

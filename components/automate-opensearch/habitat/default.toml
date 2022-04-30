@@ -1,7 +1,7 @@
 # WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 #
 # If you are modifying this file, you almost surely also want to
-# modify pkg/es/config_request.go. The DefaultConfigRequest() function
+# modify pkg/os/config_request.go. The DefaultConfigRequest() function
 # sets all of the real defaults.
 #
 # The duplication is necessary currently since our tests and studio
@@ -13,7 +13,7 @@
   #
   # Use a descriptive name for your cluster:
   #
-  name = "elasticsearch"
+  name = "opensearch"
 
   [cluster.routing.allocation]
     #
@@ -224,14 +224,14 @@
 # ======================== Elasticsearch Plugins Configuration =========================
 [plugins]
   cloud_aws_signer = ""
-
+  #security.ssl.http.enabled = false
 # ======================== Runtime Configuration =========================
 [runtime]
   max_open_files = ""
   max_locked_memory = "unlimited"
-  es_startup_sleep_time = ""
-  es_java_opts = ""
+  os_startup_sleep_time = ""
+  os_java_opts = ""
   heapsize = "1g"
 
 [deprecated]
-external_es = false
+external_os = false

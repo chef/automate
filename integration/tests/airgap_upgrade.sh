@@ -6,6 +6,7 @@ test_upgrades=true
 
 do_build() {
     do_build_default
+    prepare_upgrade_milestone "current" "3.0.49"
     set_test_manifest "build.json"
     log_info "Installing harts"
     # We need to make sure the harts are installed so that the bundle creation works

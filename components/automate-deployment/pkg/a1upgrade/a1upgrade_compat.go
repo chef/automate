@@ -224,7 +224,7 @@ func (s *CompatCheckerSkips) SkipWorkflowCheck() {
 func (c *CompatChecker) RunAutomateChecks(a1Config *A1Config, skip CompatCheckerSkips) error {
 	fips := a1Config.DeliveryRunning.Delivery.FIPS.Enabled
 	workflow := a1Config.DeliveryRunning.Delivery.Delivery.GitRepos
-	esClusterUrls := a1Config.DeliveryRunning.Delivery.Elasticsearch.ClusterURLS
+	esClusterUrls := a1Config.DeliveryRunning.Delivery.Opensearch.ClusterURLS
 	proxyHost := a1Config.DeliveryRunning.Delivery.Delivery.Proxy.Host
 	backupRetention := a1Config.DeliveryRunning.Delivery.Backup.Retention.Enabled
 	backupType := a1Config.DeliveryRunning.Delivery.Backup.Type
@@ -311,7 +311,7 @@ func (c *CompatChecker) RunAutomateChecks(a1Config *A1Config, skip CompatChecker
 
 func (c *CompatChecker) RunChefServerChecks(a1Config *A1Config) error {
 	deliveryRunning := a1Config.DeliveryRunning.Delivery
-	a1EsConfig := &deliveryRunning.Elasticsearch
+	a1EsConfig := &deliveryRunning.Opensearch
 	a1PgConfig := &deliveryRunning.PostgreSQL
 
 	chefServerConfig := a1Config.ChefServerRunning.PrivateChef
@@ -541,7 +541,7 @@ func (c *CompatChecker) RunningMarketplaceImage(omnibusRoot string) error {
 }
 
 func (c *CompatChecker) ChefServerElasticsearchConfigValid(csEsConfig *OpscodeSolr4,
-	a1EsConfig *DeliveryRunningElasticsearch,
+	a1EsConfig *DeliveryRunningOpensearch,
 	csErchefConfig *OpscodeErchef) error {
 
 	esEnabled := csEsConfig.Enable

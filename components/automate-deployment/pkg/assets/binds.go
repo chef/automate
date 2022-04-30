@@ -34,9 +34,7 @@ automate-cs-oc-erchef BINDING_MODE relaxed
 deployment-service BINDING_MODE strict
 automate-dex REQUIRED automate-pg-gateway pg-sidecar-service
 automate-dex BINDING_MODE strict
-automate-elasticsearch REQUIRED backup-gateway
-automate-elasticsearch BINDING_MODE strict
-automate-es-gateway REQUIRED automate-elasticsearch
+automate-es-gateway REQUIRED automate-opensearch
 automate-es-gateway BINDING_MODE relaxed
 automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service user-settings-service
 automate-gateway BINDING_MODE relaxed
@@ -45,6 +43,8 @@ automate-ha-pgleaderchk BINDING_MODE strict
 automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
 automate-minio BINDING_MODE strict
+automate-opensearch REQUIRED backup-gateway
+automate-opensearch BINDING_MODE strict
 automate-pg-gateway REQUIRED automate-postgresql
 automate-pg-gateway BINDING_MODE relaxed
 automate-postgresql BINDING_MODE strict
@@ -66,7 +66,7 @@ config-mgmt-service BINDING_MODE strict
 data-feed-service REQUIRED automate-pg-gateway cereal-service compliance-service config-mgmt-service pg-sidecar-service secrets-service
 data-feed-service BINDING_MODE strict
 es-sidecar-service REQUIRED automate-es-gateway
-es-sidecar-service OPTIONAL automate-elasticsearch
+es-sidecar-service OPTIONAL automate-opensearch
 es-sidecar-service BINDING_MODE relaxed
 event-feed-service REQUIRED authz-service automate-es-gateway cereal-service
 event-feed-service OPTIONAL es-sidecar-service

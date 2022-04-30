@@ -17,7 +17,7 @@ import (
 func TestListProfiles(t *testing.T) {
 	suite.DeleteAllDocuments()
 
-	es2Backend := relaxting.ES2Backend{ESUrl: elasticsearchUrl}
+	es2Backend := relaxting.ES2Backend{ESUrl: opensearchUrl}
 	server := reportingServer.New(&es2Backend)
 
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"

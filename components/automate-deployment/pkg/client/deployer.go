@@ -966,7 +966,7 @@ When you can backup your Chef Automate v1 installation successfully, run the upg
 		return
 	}
 
-	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Elasticsearch.NginxProxyURL
+	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Opensearch.NginxProxyURL
 	repoType := d.upgrade.A1Config.DeliveryRunning.Delivery.Backup.Type
 
 	if err := a1upgrade.WaitForEsSnapshot(d.writer, esURL, repoType, d.a1BackupName()); err != nil {
@@ -1003,7 +1003,7 @@ func (d *deployer) migrateEs2Indices() {
 
 	d.writer.Title("Ensuring Elasticsearch data is compatible with Chef Automate v2")
 
-	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Elasticsearch.NginxProxyURL
+	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Opensearch.NginxProxyURL
 	w := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 
 	r, err := a1upgrade.NewReindexer(w, esURL)

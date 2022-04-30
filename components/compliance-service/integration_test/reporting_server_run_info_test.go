@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/olivere/elastic.v6"
+	"github.com/olivere/elastic/v7"
 
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 
@@ -23,7 +23,7 @@ import (
 )
 
 func TestReportingServerRunInfo(t *testing.T) {
-	backend := &relaxting.ES2Backend{ESUrl: elasticsearchUrl}
+	backend := &relaxting.ES2Backend{ESUrl: opensearchUrl}
 	server := reportingServer.New(backend)
 
 	lis := bufconn.Listen(1024 * 1024)
@@ -110,11 +110,11 @@ func TestReportingServerRunInfo(t *testing.T) {
 
 			require.NoError(t, err)
 
-			if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+			if searchResult.TotalHits() > 0 {
 				for _, hit := range searchResult.Hits.Hits {
 					var item relaxting.ESComplianceRunInfo
 					if hit.Source != nil {
-						err := json.Unmarshal(*hit.Source, &item)
+						err := json.Unmarshal(hit.Source, &item)
 						require.NoError(t, err)
 						assert.Equal(t, test.expectedNodeId, item.NodeID)
 						assert.Equal(t, test.expectedFirstRun, item.FirstRun)
@@ -130,7 +130,7 @@ func TestReportingServerRunInfoLoadSixteenDaysOfData(t *testing.T) {
 	//clear out the docs
 	defer suite.DeleteAllDocuments()
 
-	backend := &relaxting.ES2Backend{ESUrl: elasticsearchUrl}
+	backend := &relaxting.ES2Backend{ESUrl: opensearchUrl}
 	server := reportingServer.New(backend)
 
 	lis := bufconn.Listen(1024 * 1024)
