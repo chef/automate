@@ -25,9 +25,9 @@ curl https://packages.chef.io/files/"${EXPEDITOR_TARGET_CHANNEL}"/latest/chef-au
 gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "${version}".aib.asc --detach-sign ./"${version}".aib
 sha256sum "${version}".aib > "${version}".aib.sha256sum
 
-aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/latest.aib" --acl public-read --profile chef-cd
-aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/latest.aib.asc" --acl public-read --profile chef-cd
-aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/latest.aib.sha255sum" --acl public-read --profile chef-cd
-aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/${version}/${version}.aib" --acl public-read --profile chef-cd
-aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/${version}/${version}.aib.asc" --acl public-read --profile chef-cd
-aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/${version}/${version}.aib.sha255sum" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/automate.aib" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest//automate/automate.aib.asc" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/automate.aib.sha255sum" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/${version}/${version}.aib" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/${version}/${version}.aib.asc" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/${version}/${version}.aib.sha255sum" --acl public-read --profile chef-cd
