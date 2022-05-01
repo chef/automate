@@ -2,45 +2,31 @@
 
 set -eou pipefail
 
-VERSION=$(cat VERSION)
-MAJOR_VERSION=${VERSION%%\.*}
-export MAJOR_VERSION
-export VERSION
+if [ "${EXPEDITOR_TARGET_CHANNEL}" = "unstable" ];
+then
+  echo "This file does not support actions for artifacts promoted to unstable"
+  exit 1
+fi
 
-log "Using VERSION=$VERSION"
+aws s3 cp s3://chef-cd-citadel/packages_at_chef.io.pgp packages_at_chef.io.pgp --profile=chef-cd
+gpg --import packages_at_chef.io.pgp
 
-# Export the HAB_AUTH_TOKEN for use of promoting habitat packages to {{TARGET_CHANNE}}
-HAB_AUTH_TOKEN=$(vault kv get -field auth_token account/static/habitat/chef-ci)
-export HAB_AUTH_TOKEN
-
-source_channel=$EXPEDITOR_PROMOTABLE
-
-# Download the manifest
-aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest_semver.json" manifest.json --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest_semver.json" manifest.json --profile chef-cd
 
 # Pull the version from the manifest
 version=$(jq -r -c ".version" manifest.json)
 
-# Import packages@chef.io GPG signing key
-aws s3 cp s3://chef-cd-citadel/packages_at_chef.io.pgp packages_at_chef.io.pgp --profile=chef-cd
-gpg --import packages_at_chef.io.pgp
+# Get the current cli from the channel
+curl https://packages.chef.io/files/"${EXPEDITOR_TARGET_CHANNEL}"/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 
-# Creating the Automate Airgap Bundle
-"${automate_cli_path}/static/linux/chef-automate" airgap bundle create -c dev
-airgapbundle=`ls | grep automate-[0-9.]*aib`
+./chef-automate airgap bundle create -c "${EXPEDITOR_TARGET_CHANNEL}" ./"${version}".aib
 
-# Create gpg signature and sha256sum
-gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "$airgapbundle.asc" --detach-sign $airgapbundle
-sha256sum $airgapbundle > "$airgapbundle.sha256sum"
-ls
+gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "${version}".aib.asc --detach-sign ./"${version}".aib
+sha256sum "${version}".aib > "${version}".aib.sha256sum
 
-# Upload the bundle to S3 Bucket
-aws s3 cp $airgapbundle "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle" --acl public-read --profile chef-cd
-aws s3 cp $airgapbundle.asc "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.asc" --acl public-read --profile chef-cd
-aws s3 cp $airgapbundle.sha256sum "s3://chef-automate-artifacts/airgap_bundle/$VERSION/$airgapbundle.sha256sum" --acl public-read --profile chef-cd
-aws s3 cp $airgapbundle "s3://chef-automate-artifacts/acceptance/latest/automate/airgap_bundle/automate.aib" --acl public-read --profile chef-cd
-aws s3 cp $airgapbundle.asc "s3://chef-automate-artifacts/acceptance/latest/automate/airgap_bundle/automate.asc" --acl public-read --profile chef-cd
-aws s3 cp $airgapbundle.sha256sum "s3://chef-automate-artifacts/acceptance/latest/automate/airgap_bundle/automate.sha256sum" --acl public-read --profile chef-cd
-
-# Cleanup
-rm manifest.json
+aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest//automate/airgap_bundle/automate.aib.asc" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib.sha256sum" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib.asc" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib.sha256sum" --acl public-read --profile chef-cd
