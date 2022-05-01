@@ -27,7 +27,7 @@ sha256sum "${version}".aib > "${version}".aib.sha256sum
 
 aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib" --acl public-read --profile chef-cd
 aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest//automate/airgap_bundle/automate.aib.asc" --acl public-read --profile chef-cd
-aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib.sha255sum" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib.sha256sum" --acl public-read --profile chef-cd
 aws s3 cp "${version}".aib "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib" --acl public-read --profile chef-cd
 aws s3 cp "${version}".aib.asc "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib.asc" --acl public-read --profile chef-cd
-aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib.sha255sum" --acl public-read --profile chef-cd
+aws s3 cp "${version}".aib.sha256sum "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib.sha256sum" --acl public-read --profile chef-cd
