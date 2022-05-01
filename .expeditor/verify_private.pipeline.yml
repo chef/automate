@@ -18,7 +18,6 @@ steps:
     command:
       - .expeditor/create-airgap-bundle.sh
     timeout_in_minutes: 10
-    concurrency: 1
     expeditor:
       secrets:
         GITHUB_TOKEN:
