@@ -9,6 +9,9 @@ then
   exit 1
 fi
 
+aws s3 cp s3://chef-cd-citadel/packages_at_chef.io.pgp packages_at_chef.io.pgp --profile=chef-cd
+gpg --import packages_at_chef.io.pgp
+
 aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/manifest_semver.json" manifest.json --profile chef-cd
 
 # Pull the version from the manifest
