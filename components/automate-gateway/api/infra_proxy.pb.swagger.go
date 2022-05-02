@@ -2845,7 +2845,7 @@ func init() {
     "/api/v0/infra/servers/{server_id}/user/{user_name}": {
       "put": {
         "summary": "Reset Server Users Key",
-        "description": "Resets the user key of an user in Chef Infra Server\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Resets the user key of an user in Chef Infra Server\nThis API makes call to Chef Infra Server and fetches data.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:usersSelf:update\"\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_ResetInfraServerUserKey",
         "responses": {
           "200": {
