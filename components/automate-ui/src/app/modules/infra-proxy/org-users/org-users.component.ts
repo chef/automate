@@ -31,6 +31,7 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
   public per_page = 100;
   public total: number;
   public name: string;
+  public userName: string;
   private isDestroyed = new Subject<boolean>();
   public openNotificationModal = new EventEmitter<void>();
 
@@ -43,6 +44,9 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
     this.getOrgUsersData();
+
+    const abc = JSON.parse(localStorage.getItem('chef-automate-user'));
+    this.userName = abc["username"];
 
     combineLatest([
       this.store.select(getAllStatus),
