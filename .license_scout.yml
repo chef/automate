@@ -52,7 +52,7 @@ directories:
   - ./components/session-service
   - ./components/teams-service
   - ./components/trial-license-service
-  - ./components/automate-backend-elasticsearch
+  - ./components/automate-backend-opensearch
   - ./components/automate-backend-elasticsidecar
   - ./components/automate-backend-haproxy
   - ./components/automate-backend-postgresql

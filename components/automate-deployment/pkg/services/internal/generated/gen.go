@@ -449,10 +449,6 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-ha-elasticsearch",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-ha-elasticsidecar",
       "metadata": null
     },
@@ -479,6 +475,16 @@ var ProductMetadataJSON = `
     {
       "name": "chef/automate-netcat",
       "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-opensearch",
+      "metadata": {
+        "name": "chef/automate-ha-opensearch",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
     },
     {
       "name": "core/rsync",

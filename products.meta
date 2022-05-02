@@ -46,7 +46,6 @@
     "chef/automate-cli",
     "chef/user-settings-service",
     "chef/automate-ha-deployment",
-    "chef/automate-ha-elasticsearch",
     "chef/automate-ha-elasticsidecar",
     "chef/automate-ha-ctl",
     "chef/automate-ha-haproxy",
@@ -54,6 +53,7 @@
     "chef/automate-ha-postgresql",
     "chef/automate-ha-cluster-ctl",
     "chef/automate-netcat",
+    "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
     "core/rsync"
   ],

@@ -1,10 +1,10 @@
 resource "aws_iam_instance_profile" "backup_instance_profile" {
-  name = var.name
+  name = "${var.name}-${var.random_id}"
   role = aws_iam_role.backup_instance_role.name
 }
 
 resource "aws_iam_role" "backup_instance_role" {
-  name               = var.name
+  name               = "${var.name}-${var.random_id}"
   assume_role_policy = data.aws_iam_policy_document.backup_instance_role.json
 }
 

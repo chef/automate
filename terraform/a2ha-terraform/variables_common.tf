@@ -77,11 +77,11 @@ variable "elasticsearch_https_user" {
   default = "automate_elasticsearch"
 }
 
-variable "elasticsearch_instance_count" {
+variable "opensearch_instance_count" {
   default = 3
 }
 
-variable "elasticsearch_listen_port" {
+variable "opensearch_listen_port" {
   default = 9200
 }
 
@@ -156,6 +156,10 @@ variable "metricbeat_pkg_ident" {
 variable "nfs_mount_path" {
   default     = "/mnt/automate_backups"
   description = "The NFS mount base path for backups and archives."
+}
+
+variable "opensearch_pkg_ident" {
+  default = "chef/automate-ha-opensearch"
 }
 
 variable "pgleaderchk_listen_port" {

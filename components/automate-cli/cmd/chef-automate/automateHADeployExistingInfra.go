@@ -87,7 +87,7 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.ChefServer.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty chef-server instance_count")
 	}
-	if len(e.config.Elasticsearch.Config.InstanceCount) < 1 {
+	if len(e.config.Opensearch.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty elastic-search instance_count")
 	}
 	if len(e.config.Postgresql.Config.InstanceCount) < 1 {
@@ -105,8 +105,8 @@ func (e *existingInfra) validateConfigFields() *list.List {
 		errorList.PushBack("Invalid or empty elasticsearch_ips")
 	}
 
-	if len(e.config.ExistingInfra.Config.ElasticsearchPrivateIps) < 1 {
-		errorList.PushBack("Invalid or empty elasticsearch_private_ips")
+	if len(e.config.ExistingInfra.Config.OpensearchPrivateIps) < 1 {
+		errorList.PushBack("Invalid or empty opensearch_private_ips")
 	}
 
 	if len(e.config.ExistingInfra.Config.PostgresqlPrivateIps) < 1 {
@@ -138,7 +138,7 @@ func (e *existingInfra) validateIPs() *list.List {
 		}
 	}
 
-	for _, element := range e.config.ExistingInfra.Config.ElasticsearchPrivateIps {
+	for _, element := range e.config.ExistingInfra.Config.OpensearchPrivateIps {
 		if checkIPAddress(element) != nil {
 			errorList.PushBack("elastic search private Ip " + element + notValidErrorString)
 		}

@@ -116,8 +116,8 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_443_tcp" {
 # Allow elasticsearch clients
 resource "aws_security_group_rule" "ingress_chef_automate_allow_elasticsearch_tcp" {
   type                     = "ingress"
-  from_port                = var.elasticsearch_listen_port
-  to_port                  = var.elasticsearch_listen_port + 200
+  from_port                = var.opensearch_listen_port
+  to_port                  = var.opensearch_listen_port + 200
   protocol                 = "tcp"
   security_group_id        = aws_security_group.chef_automate.id
   source_security_group_id = aws_security_group.chef_automate.id
