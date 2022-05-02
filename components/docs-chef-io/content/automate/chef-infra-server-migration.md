@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 40
 +++
 
-This section lists the steps to connect the existing Chef Infra Server organization and users to Chef Automate and migrate all the organization and users into Chef Automate.
+Chef Infra Server has two global entities, **Users** and **Organizations**. Chef Infra Server Migration ensures that both Users and Organizations migrate to Chef Automate. This section lists the steps to connect the existing Chef Infra Server Users and Organizations to Chef Automate and migrate all the Users and Organizations into Chef Automate.
 
 ## Prerequisites
 
