@@ -165,9 +165,9 @@ The sync might fail and show the **Failed** status under metadata. You can learn
 
 Automate on sync creates a unique project for every newly added organization. The different policies and their associated permissions are listed below:
 
-|               | Cookbooks | Roles                      | Environments               | Attributes                 | Databags                   | Clients | Nodes | PolicyFiles | Policy Group | Users under an Org | Add Infra Server |
-| ------------- |-----------|----------------------------|----------------------------|----------------------------|----------------------------|---------|-------|-------------|--------------|--- ----------------|------------------|
-| Viewer        | Read      | Read                       | Read                       | Read                       | Read                       | Read    | Read  | Read        | Read         | No access          | No access        |
+| | Cook books | Roles | Environments | Attributes | Data bags | Clients | Nodes | Policy Files | Policy Group | Users under an Org | Add Infra Server |
+|-|-----------|-------|--------------|------------|----------|---------|------|-------------|--------------|-------------------|------------------|
+| Viewer | Read | Read | Read | Read | Read | Read | Read | Read | Read | No access | No access |
 | Editor        | Read      | Read, Edit, Create         | Read, Edit, Create         | Read, Edit, Create         | Read, Edit, Create         | Read, Edit, Create         | Read, Edit, Create         | Read, Edit, Create         | Read, Edit, Create         | No access          | No access        |
 | Project Owner | Read      | Read, Edit, Create, Delete | Read, Edit, Create, Delete | Read, Edit, Create, Delete | Read, Edit, Create, Delete | Read, Edit, Create, Delete         | Read, Edit, Create, Delete | Read, Edit, Create, Delete | Read, Edit, Create, Delete | Read               | No access        |
 
