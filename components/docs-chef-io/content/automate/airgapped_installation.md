@@ -23,6 +23,16 @@ To install or upgrade Chef Automate on an airgapped host, you will need to creat
 
 To get a trial license for an airgapped host [contact Chef](https://www.chef.io/contact-us/).
 
+
+## Download the Airgapped Package
+
+If you don't want to create the airgap bundle manually, then you can directly download the airgapped package. Below is the command for downloading the package.
+
+```shell
+curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o <output-filename>.aib
+```
+This command gives you airgap bundle. Now you can simply follow the steps for deploying the airgap installation bundle which are mentioned below.
+
 ## Create an Airgap Installation Bundle
 
 On an internet-connected host, download the Chef Automate command-line tool and use it to
