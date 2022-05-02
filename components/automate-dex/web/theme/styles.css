@@ -63,17 +63,18 @@ main.password {
 }
 
 .dex-error-box {
-  background-color: #dc267f;
+  background-color: #F9DBEA;
   width: 250px;
   border-radius: 3px;
-  margin: 12px auto;
-  text-align: center;
+  margin: 60px auto;
+  padding: 12px;
 }
 
 .dex-error-text {
   font-size: 12px;
   top: -1px;
   position: relative;
+  color: #DC267F;
 }
 
 .dex-btn-text {
@@ -228,4 +229,12 @@ main.password {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, .5);
   -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+i.eye-position {
+  margin-top: -26px;
+  cursor: pointer;
+  left: -10px;
+  position: relative;
+  float: right;
 }
