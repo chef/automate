@@ -1,5 +1,5 @@
 [dex.v1.sys]
     [dex.v1.sys.invalid_login_attempts]
         enable_invalid_login_attempts = true
-        blocked_duration = 10
+        blocked_duration_in_minutes = 10
         max_invalid_login_attempts_allowed = 2

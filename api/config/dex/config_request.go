@@ -59,7 +59,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Banner.TextColor = w.String("FFFFFF")       // White
 
 	c.V1.Sys.InvalidLoginAttempts.EnableInvalidLoginAttempts = w.Bool(true)
-	c.V1.Sys.InvalidLoginAttempts.BlockedDuration = w.Int32(30)
+	c.V1.Sys.InvalidLoginAttempts.BlockedDurationInMinutes = w.Int32(30)
 	c.V1.Sys.InvalidLoginAttempts.MaxInvalidLoginAttemptsAllowed = w.Int32(5)
 
 	return c
@@ -212,7 +212,7 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 	}
 
 	c.V1.Sys.InvalidLoginAttempts.EnableInvalidLoginAttempts = c.V1.Sys.InvalidLoginAttempts.GetEnableInvalidLoginAttempts()
-	c.V1.Sys.InvalidLoginAttempts.BlockedDuration = c.V1.Sys.InvalidLoginAttempts.GetBlockedDuration()
+	c.V1.Sys.InvalidLoginAttempts.BlockedDurationInMinutes = c.V1.Sys.InvalidLoginAttempts.GetBlockedDurationInMinutes()
 	c.V1.Sys.InvalidLoginAttempts.MaxInvalidLoginAttemptsAllowed = c.V1.Sys.InvalidLoginAttempts.GetMaxInvalidLoginAttemptsAllowed()
 
 	return c.V1.Sys, nil

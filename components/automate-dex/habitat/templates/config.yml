@@ -237,7 +237,7 @@ expiry:
 
 invalidLoginAttempts:
   enableInvalidLoginAttempts: {{cfg.invalid_login_attempts.enable_invalid_login_attempts}}
-  blockedDuration: {{cfg.invalid_login_attempts.blocked_duration}}
+  blockedDurationInMinutes: {{cfg.invalid_login_attempts.blocked_duration_in_minutes}}
   maxInvalidLoginAttemptsAllowed: {{cfg.invalid_login_attempts.max_invalid_login_attempts_allowed}}
 
 frontend:
