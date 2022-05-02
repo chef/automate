@@ -33,25 +33,23 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 
 ## Download the Airgap Installation Bundle
 
-Airgap installation bundles can be downloaded to an internet connected machine.
-In order to download the airgap bundle of the latest automate version, download the bundle:
+Download the airgap installation bundles of the latest automate version to an internet-connected machine using:
+
 ```shell
 curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o </path/to/airgap-install-bundle>
 ```
 
-To download the bundle of a specific version:
+Download the bundle of a specific version using:
+
 ```shell
 curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o </path/to/airgap-install-bundle>
 ```
 
-{{< note >}}
-Chef Automate bundles are available for 30 days from the release of a version. 
-{{< /note >}}
+{{< note >}} Chef Automate bundles are available for 30 days from the release of a version. {{< /note >}}
 
 ## Create an Airgap Installation Bundle
 
-On an internet-connected host, download the Chef Automate command-line tool and use it to
-prepare an Airgap Installation Bundle.
+Download the Chef Automate command-line tool on an internet-connected host, and use it to prepare an Airgap Installation Bundle.
 
 ### Prepare Airgap Installation Bundle
 
