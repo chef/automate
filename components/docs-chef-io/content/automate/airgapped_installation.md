@@ -23,34 +23,35 @@ To install or upgrade Chef Automate on an airgapped host, you will need to creat
 
 To get a trial license for an airgapped host [contact Chef](https://www.chef.io/contact-us/).
 
-
-## Download the Airgapped Package
-
-If you don't want to create the Airgapped bundle manually, then you can directly download the Airgapped bundle using https://package.chef.io.   Below is the command for downloading the latest version of Automate bundle.
-
-```shell
-curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o <output-filename>.aib
-```
-This command gives you airgap bundle. You can download any version of Automate bundle using:
-
-```shell
-https://packages.chef.io/airgap_bundle/current/automate/<version>.aib
-```
-
-Now you can simply follow the steps for deploying the airgap installation bundle which are mentioned below.
-
-## Create an Airgap Installation Bundle
-
-On an internet-connected host, download the Chef Automate command-line tool and use it to
-prepare an Airgap Installation Bundle.
-
-### Get Chef Automate Installer and Admin Tool
+## Get Chef Automate Installer and Admin Tool
 
 Download the Chef Automate command-line tool from the `current` [release channel]({{< relref "install.md#release-channels" >}}).
 
 ```shell
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
+
+## Download the Airgap Installation Bundle
+
+Airgap installation bundles can be downloaded to an internet connected machine.
+In order to download the airgap bundle of the latest automate version, download the bundle:
+```shell
+curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o </path/to/airgap-install-bundle>
+```
+
+To download the bundle of a specific version:
+```shell
+curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o </path/to/airgap-install-bundle>
+```
+
+{{< note >}}
+Chef Automate bundles are available for 30 days from the release of a version. 
+{{< /note >}}
+
+## Create an Airgap Installation Bundle
+
+On an internet-connected host, download the Chef Automate command-line tool and use it to
+prepare an Airgap Installation Bundle.
 
 ### Prepare Airgap Installation Bundle
 
