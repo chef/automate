@@ -51,6 +51,7 @@ run_upgrade() {
 y
 y
 y
+y
 y" | chef-automate upgrade run --major --versions-file "$versionsFile"
             # NOTE: This is a hack
             # The hack above was no longer good enough because we have a thing that needs

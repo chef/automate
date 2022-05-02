@@ -88,6 +88,7 @@ do_upgrade() {
 y
 y
 y
+y
 y" | chef-automate upgrade run --major  --version "$release"
         sleep 45
         #shellcheck disable=SC2154
