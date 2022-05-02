@@ -34,3 +34,8 @@ do_deploy() {
         --skip-preflight \
         --debug
 }
+
+do_prepare_upgrade() {
+    set_version_file
+    prepare_upgrade_milestone_append_version "current" "3.0.49"
+}

@@ -9,6 +9,7 @@ import {
 import { NodeAttributes } from '../../types/types';
 import { AttributesService } from '../../services/attributes/attributes.service';
 import { JsonTreeComponent } from '../json-tree/json-tree.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-attributes',
@@ -38,7 +39,8 @@ export class AttributesComponent implements OnInit {
 
   constructor(
     private attributesService: AttributesService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private telemetryService: TelemetryService
   ) {}
 
   ngOnInit() {
@@ -99,5 +101,6 @@ export class AttributesComponent implements OnInit {
   resetSearch() {
     this.searchTerm = this.resultCount = this.resultSummary = null;
     this.tree.reset();
+    this.telemetryService.track('InfraServer_ClientRuns_Details_Attributes_Search');
   }
 }

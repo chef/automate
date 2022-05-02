@@ -50,12 +50,6 @@ paths = [
   "components/automate-openjdk/*"
 ]
 
-[automate-elasticsearch]
-plan_path = "components/automate-elasticsearch"
-paths = [
-  "components/automate-elasticsearch/*"
-]
-
 [automate-postgresql]
 plan_path = "components/automate-postgresql"
 paths = [
@@ -191,6 +185,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
   "api/config/postgresql/*",
@@ -394,6 +389,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
   "api/config/platform/*",
@@ -483,6 +479,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
   "api/config/platform/*",
@@ -1174,6 +1171,12 @@ paths = [
 plan_path = "components/automate-netcat"
 paths = [
   "components/automate-netcat/*"
+]
+
+[automate-opensearch]
+plan_path = "components/automate-opensearch"
+paths = [
+  "components/automate-opensearch/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

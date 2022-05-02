@@ -7,9 +7,9 @@ import (
 
 	b "github.com/chef/automate/components/config-mgmt-service/backend"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 const (
@@ -45,7 +45,7 @@ func (es Backend) GetLatestRunRolloutBreakdownCounts() (*b.NodeSegmentRolloutPro
 		}
 
 		var nodesInSegment int32
-		json.Unmarshal(*s.Aggregations["doc_count"], &nodesInSegment)
+		json.Unmarshal(s.Aggregations["doc_count"], &nodesInSegment)
 
 		segmentWithStatus := &b.NodeSegmentRevisionsStatus{
 			NodeSegment:      segment,
@@ -63,7 +63,7 @@ func (es Backend) GetLatestRunRolloutBreakdownCounts() (*b.NodeSegmentRolloutPro
 		for _, policyRev := range nodesPolicyRevCounts.Buckets {
 
 			var total int
-			json.Unmarshal(*policyRev.Aggregations["doc_count"], &total)
+			json.Unmarshal(policyRev.Aggregations["doc_count"], &total)
 
 			revId := policyRev.Key.(string)
 
@@ -80,7 +80,7 @@ func (es Backend) GetLatestRunRolloutBreakdownCounts() (*b.NodeSegmentRolloutPro
 			}
 			for _, statusInfo := range statusCounts.Buckets {
 				var countWithStatus int
-				json.Unmarshal(*statusInfo.Aggregations["doc_count"], &countWithStatus)
+				json.Unmarshal(statusInfo.Aggregations["doc_count"], &countWithStatus)
 				status := statusInfo.Key.(string)
 				switch status {
 				case "success":

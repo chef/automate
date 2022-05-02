@@ -17,6 +17,7 @@ import { saveAs } from 'file-saver';
 import {
   finalize
 } from 'rxjs/operators';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-run-history',
@@ -52,7 +53,8 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private nodeHistoryStore: RunHistoryStore,
-    private nodeRunsService: NodeRunsService
+    private nodeRunsService: NodeRunsService,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit() {
@@ -121,6 +123,7 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
     const onError = _e => console.error('error downloading report');
     const types = {'json': 'application/json', 'csv': 'text/csv'};
     const onNext = data => {
+      this.telemetryService.track('InfraServer_ClientRuns_Details_RunHistory_DownloadCSV');
       const type = types[format];
       const blob = new Blob([data], {type});
       saveAs(blob, filename);
@@ -151,12 +154,15 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
     switch (status) {
       case SelectedStatus.Failure:
         this.nodeHistoryStore.addFilter('status', 'failure');
+        this.telemetryService.track('InfraServer_ClientRuns_Details_RunHistory_FilterFailureList');
         return;
       case SelectedStatus.Success:
         this.nodeHistoryStore.addFilter('status', 'success');
+        this.telemetryService.track('InfraServer_ClientRuns_Details_RunHistory_FilterSuccessList');
         return;
       default:
         this.nodeHistoryStore.removeFilter('status');
+        this.telemetryService.track('InfraServer_ClientRuns_Details_RunHistory_ListAll');
         return;
     }
   }

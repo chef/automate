@@ -3,18 +3,17 @@ package mappings
 // ComplianceRunInfo mapping used to create the `compliance-run-info index
 var ComplianceRunInfo = Mapping{
 	Index:      IndexNameComplianceRunInfo,
-	Type:       DocType,
 	Timeseries: false,
 	Mapping: `
-{
-  "template": "` + IndexNameComplianceRunInfo + `",
-  "settings": {
-    "index": {
-      "refresh_interval": "1s"
-    }
-  },
-  "mappings": {
-    "` + DocType + `": {
+  {
+    "index_patterns": ["` + IndexNameComplianceRunInfo + `"],
+    "settings": {
+      "index": {
+        "refresh_interval": "1s",
+        "number_of_shards": "5"
+      }
+    },
+    "mappings": {
       "properties": {
         "node_uuid": {
           "type": "keyword"
@@ -28,6 +27,5 @@ var ComplianceRunInfo = Mapping{
       }
     }
   }
-}
 	`,
 }

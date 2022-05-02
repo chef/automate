@@ -13,8 +13,6 @@ import (
 const (
 	// The format of the date string on the end of the index name
 	TimeseriesDateFmt = "2006.01.02"
-
-	DocType = "_doc"
 	//run info for telematics
 	NodeCurrentRunInfoVersion = "1"
 	nodeAndVersionRunInfo     = "node-" + NodeCurrentRunInfoVersion
@@ -38,7 +36,6 @@ var AllMappings = []Mapping{
 type Mapping struct {
 	Index      string
 	Alias      string
-	Type       string
 	Timeseries bool
 	Mapping    string
 	Properties string

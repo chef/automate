@@ -11,6 +11,11 @@ import { NodeRunsService } from '../../services/node-details/node-runs.service';
 import { NodeHistoryFilter } from '../../types/types';
 import { MockComponent } from 'ng2-mock-component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('RunHistoryComponent', () => {
   let fixture: ComponentFixture<RunHistoryComponent>;
@@ -37,7 +42,8 @@ describe('RunHistoryComponent', () => {
       ],
       providers: [
         RunHistoryStore,
-        { provide: NodeRunsService, useClass: MockNodeRunsService }
+        { provide: NodeRunsService, useClass: MockNodeRunsService },
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

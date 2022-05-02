@@ -11,13 +11,13 @@ import (
 	w "github.com/chef/automate/api/config/shared/wrappers"
 )
 
-func TestExternalElasticsearch(t *testing.T) {
+func TestExternalOpensearch(t *testing.T) {
 	t.Run("single http endpoint", func(t *testing.T) {
 		c := DefaultConfigRequest()
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://server1:9200"),
@@ -46,7 +46,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://server1:9200"),
@@ -78,7 +78,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://server1:9200"),
@@ -106,7 +106,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://server1"),
@@ -134,7 +134,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://server1"),
@@ -161,7 +161,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://10.0.0.1:1120"),
@@ -189,7 +189,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://10.0.0.1"),
@@ -217,7 +217,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://10.0.0.1:1120"),
@@ -245,7 +245,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://10.0.0.1"),
@@ -281,14 +281,14 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://server1"),
 						},
-						Auth: &ac.External_Elasticsearch_Authentication{
+						Auth: &ac.External_Opensearch_Authentication{
 							Scheme: w.String("aws_es"),
-							AwsEs: &ac.External_Elasticsearch_Authentication_AwsElasticsearchAuth{
+							AwsOs: &ac.External_Opensearch_Authentication_AwsOpensearchAuth{
 								Username: w.String("testuser"),
 								Password: w.String("testpassword"),
 							},

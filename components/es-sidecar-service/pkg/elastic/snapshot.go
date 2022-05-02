@@ -7,13 +7,11 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"regexp"
-	"strconv"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 /*
@@ -744,15 +742,16 @@ func (es *Elastic) snapshotExist(ctx context.Context, repoName, snapshotName str
 // This follows elastic's recommendations:
 // https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
 func (es *Elastic) repoNamesFor(ctx context.Context, serviceName string) ([]string, error) {
-	stats, err := es.client.ClusterStats().Do(ctx)
+	/* stats, err := es.client.ClusterStats().Do(ctx)
 	if err != nil {
 		return nil, err
-	}
+	} */
 
-	major, err := clusterVersion(stats.Nodes.Versions)
-	if err != nil {
+	//major, err := clusterVersion(stats.Nodes.Versions)
+	major := 6
+	/* if err != nil {
 		return nil, err
-	}
+	} */
 
 	return []string{
 		fmt.Sprintf("chef-automate-es%d-%s", major, serviceName),
@@ -783,7 +782,7 @@ func (fs *FsBackupsConfig) createRepoReq(repoName string) createRepoReq {
 // clusterVersion takes a slice of semantic version strings and returns the
 // highest major version. If any of the versions are not valid semantic versions,
 // or there are multiple different major version it will return an error.
-func clusterVersion(versions []string) (int, error) {
+/* func clusterVersion(versions []string) (int, error) {
 	verRegex := regexp.MustCompile(`(\d+)\.\d+\.\d+`)
 	var version int
 
@@ -808,4 +807,4 @@ func clusterVersion(versions []string) (int, error) {
 	}
 
 	return version, nil
-}
+} */

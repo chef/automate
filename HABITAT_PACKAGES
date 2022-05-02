@@ -20,7 +20,6 @@
 automate-platform-tools components/automate-platform-tools
 backup-gateway components/backup-gateway
 automate-openjdk components/automate-openjdk
-automate-elasticsearch components/automate-elasticsearch
 automate-postgresql components/automate-postgresql
 automate-debug components/automate-debug
 #
@@ -87,3 +86,4 @@ automate-ha-deployment components/automate-backend-deployment
 automate-ha-pgleaderchk components/automate-ha-pgleaderchk
 automate-ha-cluster-ctl components/automate-cluster-ctl
 automate-netcat components/automate-netcat
+automate-opensearch components/automate-opensearch

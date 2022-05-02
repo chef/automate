@@ -61,6 +61,7 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
+    echo "component: $component"
     component_build="echo \"--- [\$(date -u)] build $component\"; build $component"
     build_commands="${build_commands} $component_build;"
 done
@@ -68,6 +69,7 @@ done
 if [[ "$build_commands" != "" ]]; then
     # We override HAB_CACHE_KEY_PATH to ensure we only see the key we
     # generated in this build
+    echo "Inside If"
     export HAB_DOCKER_OPTS="--label buildkitejob=$BUILDKITE_JOB_ID"
     HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio run -D "source .studiorc; set -e; $build_commands"
 fi
@@ -82,12 +84,12 @@ fi
 # dev.json manifest downloaded before the build as their starting
 # point. We are still open to clock-sync affecting package versions
 # being older or newer than we might expect.
+
 OLD_VERSION=$(cat VERSION)
 IFS=. read -r major minor patch <<<"$OLD_VERSION"
-((patch++))
+patch=$((patch + 1))
 VERSION="$major"."$minor"."$patch"
 export VERSION
-
 log_section_start "create manifest"
 .expeditor/create-manifest.rb
 echo "showing current dir files"

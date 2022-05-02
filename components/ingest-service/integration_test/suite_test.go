@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/authz"
 	cfgmgmt_response "github.com/chef/automate/api/interservice/cfgmgmt/response"
@@ -170,10 +170,10 @@ func (s *Suite) GetNonExistingNodes(x int) ([]cfgBackend.Node, error) {
 
 	var nodes []cfgBackend.Node
 	var n cfgBackend.Node
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
 		for _, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(*hit.Source, &n)
+			err := json.Unmarshal(hit.Source, &n)
 			if err != nil {
 				fmt.Printf("Error unmarshalling the node object: %s", err)
 			} else {
@@ -261,13 +261,16 @@ func (s *Suite) indexExists(i string) bool {
 func (s *Suite) DeleteAllDocuments() {
 	// ES Query to match all documents
 	q := elastic.RawStringQuery("{\"match_all\":{}}")
-
 	// Make sure we clean them all!
 	indices, _ := s.client.IndexNames()
-
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	_, err := s.client.DeleteByQuery().
 		Index(indices...).
-		Type(s.types()...).
 		Query(q).
 		IgnoreUnavailable(true).
 		Refresh("true").
@@ -278,17 +281,6 @@ func (s *Suite) DeleteAllDocuments() {
 		fmt.Printf("Could not 'clean' ES documents from indices: '%v'\nError: %s", indices, err)
 		os.Exit(3)
 	}
-}
-
-// types returns the list of ES types registered in the Ingest service code base
-func (s *Suite) types() []string {
-	types := make([]string, len(mappings.AllMappings))
-
-	for i, esMap := range mappings.AllMappings {
-		types[i] = esMap.Type
-	}
-
-	return types
 }
 
 // Indices returns the list of ES indices registered in the Ingest service code base
@@ -309,18 +301,18 @@ func (s *Suite) Indices() []string {
 func createServices(s *Suite) error {
 	// Create a new elastic Client
 	esClient, err := elastic.NewClient(
-		elastic.SetURL(elasticsearchUrl),
+		elastic.SetURL(opensearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		return errors.Wrapf(err, "Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		return errors.Wrapf(err, "Could not create elasticsearch client from %q: %s\n", opensearchUrl, err)
 	}
 
 	s.client = esClient
-	s.cfgmgmt = cfgElastic.New(elasticsearchUrl)
-	iClient, err := iElastic.New(elasticsearchUrl)
+	s.cfgmgmt = cfgElastic.New(opensearchUrl)
+	iClient, err := iElastic.New(opensearchUrl)
 	if err != nil {
-		return errors.Wrapf(err, "Could not create ingest backend client from %q: %s\n", elasticsearchUrl, err)
+		return errors.Wrapf(err, "Could not create ingest backend client from %q: %s\n", opensearchUrl, err)
 	}
 
 	s.ingest = iClient

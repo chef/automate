@@ -80,13 +80,25 @@ do_upgrade() {
     curl -vv --insecure "https://packages.chef.io/set/$release" -X POST -d @"$target_manifest"
     log_info "Upgrading to $release"
     # Uncomment once the --version flag is on dev
-    echo "y
+    ERROR=$(chef-automate upgrade run  --version "$release" 2>&1 >/dev/null) || true
+    echo "$ERROR"
+    if echo "${ERROR}" | grep 'This is a Major upgrade'; then
+        echo "major normal upgrade"
+        echo "y
 y
 y
 y
-y" | chef-automate upgrade run --major --version "$release"
-    wait_for_upgrade "false"
-    chef-automate post-major-upgrade migrate --data=PG -y
+y" | chef-automate upgrade run --major  --version "$release"
+        sleep 45
+        #shellcheck disable=SC2154
+        wait_for_upgrade "false"
+        chef-automate post-major-upgrade migrate --data=PG -y
+    else
+        echo "regular normal upgrade"
+        sleep 45
+        #shellcheck disable=SC2154
+        wait_for_upgrade "false"
+    fi
 }
 
 do_test_upgrade() {
