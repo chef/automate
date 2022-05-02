@@ -1033,14 +1033,14 @@ rpc GetAutomateInfraOrgUsersList (infra_proxy.request.AutomateInfraOrgUsers) ret
 
   Authorization Action:
   ```
-  infra:infraServers:list
+  iam:usersSelf:update"
   ```
   */
   rpc ResetInfraServerUserKey(infra_proxy.request.ResetInfraServerUserKeyReq) returns (infra_proxy.response.ResetInfraServerUserKeyRes){
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/user/{user_name}";
     option (google.api.http).body = "*";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers";
-    option (chef.automate.api.iam.policy).action = "infra:infraServersResetInfraServerUserKey:put";
+    option (chef.automate.api.iam.policy).resource = "iam:usersSelf:{user_name}";
+    option (chef.automate.api.iam.policy).action = "iam:usersSelf:update";
   };
 }
 
