@@ -1,13 +1,3 @@
-locals {
-  tunables_sh = templatefile("${path.module}/templates/tunables.sh.tpl", {
-    tmp_path = var.tmp_path
-  })
-  archive_disk_info = templatefile("${path.module}/templates/archive_disk.info.tpl", {
-    automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path,
-    opensearch_archive_disk_fs_path = var.opensearch_archive_disk_fs_path,
-    postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
-  })
-}
 resource "null_resource" "create_temp_path" {
 
   count = var.instance_count
@@ -21,6 +11,16 @@ resource "null_resource" "create_temp_path" {
   provisioner "remote-exec" {
     inline = [ "sudo mkdir -p ${var.tmp_path}", "sudo chown -R ${var.ssh_user}:${var.ssh_user} ${var.tmp_path}" ]
    }
+}
+gilocals {
+  tunables_sh = templatefile("${path.module}/templates/tunables.sh.tpl", {
+    tmp_path = var.tmp_path
+  })
+  archive_disk_info = templatefile("${path.module}/templates/archive_disk.info.tpl", {
+    automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path,
+    opensearch_archive_disk_fs_path = var.opensearch_archive_disk_fs_path,
+    postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
+  })
 }
 
 resource "null_resource" "system_base_provisioning" {
