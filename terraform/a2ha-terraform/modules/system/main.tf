@@ -12,7 +12,8 @@ resource "null_resource" "create_temp_path" {
     inline = [ "sudo mkdir -p ${var.tmp_path}", "sudo chown -R ${var.ssh_user}:${var.ssh_user} ${var.tmp_path}" ]
    }
 }
-gilocals {
+
+locals {
   tunables_sh = templatefile("${path.module}/templates/tunables.sh.tpl", {
     tmp_path = var.tmp_path
   })
