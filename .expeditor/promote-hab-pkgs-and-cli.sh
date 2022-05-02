@@ -80,6 +80,15 @@ aws s3 cp updated-versions.json "s3://chef-automate-artifacts/${EXPEDITOR_TARGET
 # Upload the updated releases file
 aws s3 cp updated-releases.json "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/releases.json" --acl public-read --profile chef-cd
 
+# Promote the airgap bundle
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/airgap_bundle/automate.aib" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib" --acl public-read  --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/airgap_bundle/automate.aib.asc" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib.asc" --acl public-read  --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/airgap_bundle/automate.aib.sha256sum" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/automate.aib.sha256sum" --acl public-read  --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/airgap_bundle/${version}/${version}.aib" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib" --acl public-read  --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/airgap_bundle/${version}/${version}.aib.asc" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib.asc" --acl public-read  --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/airgap_bundle/${version}/${version}.aib.sha256sum" "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/automate/airgap_bundle/${version}/${version}.aib.sha256sum" --acl public-read  --profile chef-cd
+
+
 # Cleanup
 rm manifest.json
 rm existing-versions.json
