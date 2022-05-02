@@ -53,7 +53,7 @@
                         Last Migration Status
                     </span>
                     <!-- Completed status -->
-                    <span *ngIf="migrationCompleted" class="server-entity-value">
+                    <span *ngIf="!migrationLoading && migrationCompleted" class="server-entity-value">
                       <img src='../../../../assets/img/completed.png' alt="info" />
                       <span>Completed</span>
                     </span>
@@ -105,12 +105,7 @@
                       </span>
                     </span>
                     <span *ngIf="migrationLoading" class="server-entity-value">Loading....</span>
-                    <span *ngIf="
-                      !migrationLoading &&
-                      migrationNotRunning &&
-                      !migrationCancelled &&
-                      !migrationFailed &&
-                      !migrationCompleted"class="server-entity-value">--</span>
+                    <span *ngIf="migration_id === ''"class="server-entity-value">--</span>
                   </li>
                 </app-authorized>
               </ul>
