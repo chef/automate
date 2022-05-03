@@ -63,6 +63,7 @@ main.password {
 }
 
 .dex-error-box {
+  display: flex;
   background-color: #F9DBEA;
   width: 250px;
   border-radius: 3px;
@@ -106,7 +107,7 @@ main.password {
   width: 150px;
   font-weight: 400;
   font-size: 14px;
-  margin-top: 10px;
+  margin-top: 22px;
 }
 
 .theme-body {
