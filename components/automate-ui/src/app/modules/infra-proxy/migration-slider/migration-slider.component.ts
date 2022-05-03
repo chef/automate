@@ -53,6 +53,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
       this.conflictedUsers = this.usersData.filter((obj: User) => obj.is_conflicting);
       this.usersData.forEach((item: User) => item.is_selected = true);
       this.usersData.forEach((item: User) => this.selectedUsersData.push(item));
+      this.checkNotreadyToConfirm();
     }
     this.migrationForm = new FormGroup(group);
   }
@@ -69,20 +70,24 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   cancelMigrationclicked() {
     this.toggleSlide();
     this.cancelMigration.emit(this.migrationID);
+    this.selectedUsersData = [];
   }
 
   toggleSlide() {
     this.isSlideOpen1 = !this.isSlideOpen1;
     this.usersData.forEach((item: User) => item.is_selected = false);
+    this.selectedUsersData = [];
   }
 
   confirmPreviewData() {
     this.toggleSlide();
     this.confirmPreview.emit(this.selectedUsersData);
+    this.selectedUsersData = [];
   }
 
   slidePanel() {
     this.isSlideOpen1 = true;
+    this.selectedUsersData = [];
   }
 
   selectedAllUsers(event: any) {

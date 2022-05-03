@@ -54,16 +54,18 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
     const params = request.params.delete('unfiltered');
 
     if (request.url.includes('/orgs/')) {
-      let checkInfraOrgsURL= false;
-      let url = request.url;
-      let serverID = url.split('/')[5];
-      let orgID = url.split('/')[7];
-      let newHeader = serverID + '_' + orgID;
-      if(url.includes('/infra/servers/') && Regex.patterns.VALID_URL.test(serverID)) {
-        checkInfraOrgsURL= true;
+      let checkInfraOrgsURL = false;
+      const url = request.url;
+      const serverID = url.split('/')[5];
+      const orgID = url.split('/')[7];
+      const newHeader = serverID + '_' + orgID;
+      if (url.includes('/infra/servers/') && Regex.patterns.VALID_URL.test(serverID)) {
+        checkInfraOrgsURL = true;
       }
-      if(checkInfraOrgsURL)
+
+      if (checkInfraOrgsURL) {
         headers = headers.set('projects', newHeader);
+      }
     } else {
       if (this.projects && filtered) {
         headers = headers.set('projects', this.projects);

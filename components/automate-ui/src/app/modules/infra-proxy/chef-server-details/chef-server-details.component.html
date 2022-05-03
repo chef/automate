@@ -80,8 +80,8 @@
     
     
                     <!-- in progress status -->
-                    <span *ngIf="migrationInProgress && migrationIsInPreview" class="heading" data-cy="sync-button">Sync In Progress </span>
-                    <span *ngIf="migrationInProgress && migrationIsInPreview" class="server-entity-value svg-block">
+                    <span *ngIf="!migrationLoading && migrationInProgress && migrationIsInPreview" class="heading" data-cy="sync-button">Sync In Progress </span>
+                    <span *ngIf="!migrationLoading && migrationInProgress && migrationIsInPreview" class="server-entity-value svg-block">
                       <svg viewBox="0 0 36 36" class="circular-chart single-chart blue">
                         <path class="circle-bg"
                           d="M18 2.0845
