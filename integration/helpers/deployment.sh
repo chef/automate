@@ -60,7 +60,7 @@ y" | chef-automate upgrade run --major --versions-file "$versionsFile"
 
             #shellcheck disable=SC2154
             wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
-            chef-automate post-major-upgrade migrate --data=PG -y
+            chef-automate post-major-upgrade migrate --data=es -y
         else
             echo "regular normal upgrade"
             sleep 45
