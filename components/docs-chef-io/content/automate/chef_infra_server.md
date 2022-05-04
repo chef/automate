@@ -313,10 +313,6 @@ Select a specific data bag item to view the details. The details contain an _id_
 
 {{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
 
-To delete a data bag item, select **Delete**. In the dialog box displayed, select **Delete** to delete the data bag item.
-
-{{< figure src="/images/automate/delete-data-bag-item.png" alt="Delete a Data Bag Item">}}
-
 #### Delete a Data Bag
 
 Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
