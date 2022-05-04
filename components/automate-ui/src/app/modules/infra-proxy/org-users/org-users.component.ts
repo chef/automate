@@ -46,7 +46,7 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
     this.getOrgUsersData();
 
     const abc = JSON.parse(localStorage.getItem('chef-automate-user'));
-    this.userName = abc["username"];
+    this.userName = abc['username'];
 
     combineLatest([
       this.store.select(getAllStatus),

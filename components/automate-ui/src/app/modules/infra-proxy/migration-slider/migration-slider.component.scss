@@ -135,4 +135,12 @@
       text-align: right;
     }
   }
+
+  .user-exist-warning {
+    border: 1px solid rgba(220, 38, 127, 0.9);
+  }
+
+  .warning-msg-hide {
+    display: none;
+  }
 }
