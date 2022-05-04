@@ -487,6 +487,10 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-elasticsearch",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }

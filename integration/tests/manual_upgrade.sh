@@ -93,7 +93,7 @@ y" | chef-automate upgrade run --major  --version "$release"
         sleep 45
         #shellcheck disable=SC2154
         wait_for_upgrade "false"
-        chef-automate post-major-upgrade migrate --data=PG -y
+        echo "y" | chef-automate post-major-upgrade migrate --data=ES
     else
         echo "regular normal upgrade"
         sleep 45
