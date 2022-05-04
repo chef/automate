@@ -1,7 +1,6 @@
 +++
 title = "Chef Infra Server"
 
-weight = 20
 draft = false
 
 gh_repo = "automate"
@@ -36,35 +35,68 @@ The objects that you can manage from the Chef Infra Server are:
 - Policyfiles
 - PolicyGroup
 
+## Chef Automate WebUI Key
+
+Chef Automate uses the Web UI private key for signing requests sent to the Chef Infra Server. The key is subject to Chef server’s Secrets Management, and will be stored in `/etc/opscode/private-chef-secrets.json`.
+
+Any run of `chef-server-ctl` reconfigure will ensure the key exists and is stored without any additional steps.
+
+To verify that the key is stored and ready to use by manage, run:
+
+```cmd
+chef-server-ctl show-secret chef-server webui_key
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpgIBAAKCAQEA3fJ+U+5prsJ8PtnbYzWAq+J2cE48u+iT7t/M9JS+3tlEgf3r
+1PTl70cW9jOI+kGGvayTKb8Dzqtm0tpQJo7Bv+XX42OylyVF2SN4WvMusT+jtJuF
+...
+-----END RSA PRIVATE KEY-----
+```
+
 ## Connect Chef Infra Servers to Chef Automate
 
 The _Chef Infra Server_ panel starts with an empty list of servers.
 
-To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server**, which will request the name, FQDN, and IP address of your Chef Infra Server:
+To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server**, which will request the name, FQDN or IP address, and WebUI key of your Chef Infra Server:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu.png" width="500" alt="Add Chef Server Form">}}
 
-Chef Automate warns you if you enter an invalid FQDN or IP address:
+{{< note >}} The above feature is only available for Automate admin. {{< /note >}}
+
+Chef Automate warns you if you enter an invalid name, FQDN, IP address or WebUI key:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu-with-error.png" width="500" alt="Add Chef Server Form">}}
 
 Once done, select **Add Chef Server** and see the server in the list of Chef Infra Servers.
 
-## Connect a Chef Organization to a Chef Infra Server
+### Chef Server Information
 
-To view a list of existing [organizations]({{< relref "server_orgs" >}}) on a Chef Infra Server,
-select a Chef Infra Server from the **Chef Servers** list, then select the **Organizations** tab, as shown below:
+In Chef Infra Server, you can view the details of the infra servers created. Select the created infra server, and the UI shows the information of the infra server.
 
-{{< figure src="/images/automate/chef-server-organization.png" alt="Chef Infra Server Organization">}}
+{{< figure src="/images/automate/chef-server-details-page.png" alt="Chef Infra Server Information Page">}}
 
-To create a new organization, see the documentation on [setting up a Chef Infra Server]({{< relref "infra_server#set-up-the-chef-infra-server" >}}).
+In the above image you can view:
 
-To add an existing organization, select **Add Chef Organization**, which opens a dialog box as shown below:
+1. The **FQDN** you inserted while creating.
+1. The **IP** address.
+1. The **WebUI** key.
+1. Last Sync Date.
+1. Last Migration Status.
 
-{{< figure src="/images/automate/add-chef-organization-popup-menu.png" width="500" alt="Add Chef Organization Form">}}
+You can also update the **WebUI** key by selecting the *Update* option of the WebUI key.
 
-Enter the _Name_, _Projects_, _Admin User_, and _Admin Key_ fields using the same values provided when the organization gets configured using _Knife_.
-Copy the contents of the `~/.chef/USER.pem` file and paste it into the **Admin Key** field. Then select **Add Chef Organization** to add the organization to the Chef Infra Server.
+### Update WebUI Key
+
+In case you have mentioned an incorrect WebUI key, you can update the same by following the steps:
+
+- Select **Update** in front of the WebUI key as shown below:
+
+  {{< figure src="/images/automate/chef-infra-server-update-webui-key-main-page.png" alt="Select Update for WebUI Key">}}
+
+- Update the correct WebUI key in the text box shown below:
+
+  {{< figure src="/images/automate/chef-infra-server-update-webui-key.png" alt="Select Update for WebUI Key">}}
+
+Follow the above two steps to update the WebUI key of the Chef Automate.
 
 ## Access Chef Infra Server Components
 
