@@ -183,11 +183,11 @@
 <% end %>
 
 <% if overrides[:backup_config_efs] == "true" -%>
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
   enable = true
   location = "fs"
 
-[global.v1.external.elasticsearch.backup.fs]
+[global.v1.external.opensearch.backup.fs]
   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
   # a parent directory of the setting you configure here:
   path = "/mnt/automate_backups/elasticsearch"
