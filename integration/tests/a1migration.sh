@@ -25,6 +25,8 @@ do_deploy() {
     # when bin and usr/bin are the same directory and thus migrations will fail.
     mkdir -p /opt/opscode/bin/
     cp "$A2_ROOT_DIR/components/automate-deployment/bin/linux/chef-server-ctl" /opt/opscode/bin/
+    echo "==============================================================="
+    cat $test_manifest_path
 
     #shellcheck disable=SC2154
     chef-automate migrate-from-v1 "$test_config_path" \

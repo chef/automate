@@ -263,6 +263,8 @@ prepare_upgrade_milestone(){
   local version="$2"
   # shellcheck disable=SC2154
   download_manifest_version "$channel" "$version" "$test_manifest_dir/$version.json"
+  
+  cat "$test_manifest_dir/$version.json"
   set_test_manifest "$version.json"
   set_version_file
 }
