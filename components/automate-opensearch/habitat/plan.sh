@@ -51,7 +51,6 @@ do_build() {
 }
 
 do_install() {
-  
   cd "$HAB_CACHE_SRC_PATH/opensearch-${pkg_version}"
   chown -RL hab:hab ${pkg_prefix}
   mkdir -p "${pkg_prefix}/os"
@@ -67,6 +66,8 @@ do_install() {
   #LD_RUN_PATH=$LD_RUN_PATH:${pkg_prefix}/os/modules/x-pack-ml/platform/linux-x86_64/lib
   #export LD_RUN_PATH
   #sudo ./bin/opensearch-plugin install repository-s3
+  rm -rf "${pkg_prefix}/os/jdk"
+
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
   chown -RL hab:hab ${pkg_prefix}
   chown -RL hab:hab ${pkg_prefix}/*

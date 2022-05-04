@@ -156,6 +156,9 @@ module "habitat-opensearch" {
   ssh_user_sudo_password = local.be_sudo_password
   sudo_cmd               = var.sudo_cmd
   habitat_uid_gid        = var.habitat_uid_gid
+  depends_on   = [
+    module.system-tuning-opensearch
+  ]
 }
 
 module "habitat-postgresql" {
@@ -182,6 +185,9 @@ module "habitat-postgresql" {
   ssh_user_sudo_password = local.be_sudo_password
   sudo_cmd               = var.sudo_cmd
   habitat_uid_gid        = var.habitat_uid_gid
+  depends_on   = [
+    module.system-tuning-postgresql
+  ]
 }
 
 module "habitat-automate" {
@@ -204,6 +210,9 @@ module "habitat-automate" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
+  depends_on   = [
+    module.system-tuning-automate
+  ]
 }
 
 module "habitat-chef_server" {
@@ -226,6 +235,9 @@ module "habitat-chef_server" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
+  depends_on   = [
+    module.system-tuning-chef_server
+  ]
 }
 
 module "opensearch" {
@@ -251,6 +263,9 @@ module "opensearch" {
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   backup_config_efs               = var.backup_config_efs
+  depends_on   = [
+    module.system-tuning-opensearch
+  ]
 }
 
 module "postgresql" {
@@ -283,6 +298,9 @@ module "postgresql" {
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
+  depends_on   = [
+    module.system-tuning-postgresql
+  ]
 }
 
 module "bootstrap_automate" {
@@ -329,6 +347,9 @@ module "bootstrap_automate" {
   backup_config_efs                   = var.backup_config_efs
   s3_endpoint                         = var.s3_endpoint
   bucket_name                         = var.bucket_name
+  depends_on   = [
+    module.system-tuning-automate
+  ]
 }
 
 module "automate" {
@@ -379,6 +400,9 @@ module "automate" {
   backup_config_efs      = var.backup_config_efs
   s3_endpoint            = var.s3_endpoint
   bucket_name            = var.bucket_name
+  depends_on   = [
+    module.system-tuning-automate
+  ]
 }
 
 module "chef_server" {
@@ -425,4 +449,7 @@ module "chef_server" {
   backup_config_efs                   = var.backup_config_efs
   s3_endpoint                         = var.s3_endpoint
   bucket_name                         = var.bucket_name
+  depends_on   = [
+    module.system-tuning-chef_server
+  ]
 }
