@@ -19,7 +19,7 @@ resource "null_resource" "create_temp_path" {
   }
 
   provisioner "remote-exec" {
-    inline = [ "sudo mkdir -p ${var.tmp_path}", "sudo chown -R ${var.ssh_user}:${var.ssh_user} ${var.tmp_path}" ]
+    inline = [ "echo tmp_path: ${var.tmp_path}", "sudo mkdir -p ${var.tmp_path}", "sudo chown -R ${var.ssh_user}:${var.ssh_user} ${var.tmp_path}" ]
    }
 }
 
@@ -54,5 +54,6 @@ resource "null_resource" "system_base_provisioning" {
     ]
   }
 
+  depends_on = [null_resource.create_temp_path]
 }
 

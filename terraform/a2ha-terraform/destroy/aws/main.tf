@@ -32,7 +32,7 @@ module "aws" {
   opensearch_ebs_volume_size      = var.opensearch_ebs_volume_size
   opensearch_ebs_volume_type      = var.opensearch_ebs_volume_type
   opensearch_instance_count       = var.opensearch_instance_count
-  openearch_listen_port           = var.opensearch_listen_port
+  opensearch_listen_port           = var.opensearch_listen_port
   opensearch_server_instance_type = var.opensearch_server_instance_type
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   postgresql_ebs_volume_iops      = var.postgresql_ebs_volume_iops
