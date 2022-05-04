@@ -1,17 +1,18 @@
 import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment as env } from 'environments/environment';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest, interval, Subscription } from 'rxjs';
-import { filter, pluck, take, takeUntil } from 'rxjs/operators';
+import { Subject, combineLatest } from 'rxjs';
+import { filter, first, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-import { HttpStatus } from 'app/types/types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
+import { pending, EntityStatus } from 'app/entities/entities';
 import {
   getStatus,
   serverFromRoute,
@@ -20,14 +21,11 @@ import {
   getUsersStatus,
   updateWebUIKey,
   validateWebUIKeyStatus,
-  getValidateWebUIKeyStatus,
-  migrationStatus,
-  getMigrationStatus
+  getValidateWebUIKeyStatus
 } from 'app/entities/servers/server.selectors';
 
 import { MigrationStatus, Server, WebUIKey } from 'app/entities/servers/server.model';
 import {
-  GetMigrationStatus,
   GetServer,
   UpdateServer,
   UpdateWebUIKey,
@@ -36,7 +34,6 @@ import {
 } from 'app/entities/servers/server.actions';
 import {
   GetOrgs,
-  CreateOrg,
   DeleteOrg,
   UploadZip,
   CancelMigration,
@@ -45,10 +42,8 @@ import {
 } from 'app/entities/orgs/org.actions';
 import { Org, User } from 'app/entities/orgs/org.model';
 import {
-  createStatus,
-  createError,
   allOrgs,
-  getAllStatus as getAllOrgsForServerStatus,
+  getAllStatus as getOrgsStatus,
   deleteStatus as deleteOrgStatus,
   uploadStatus,
   uploadDetails,
@@ -58,8 +53,9 @@ import {
   confirmPreviewStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { SyncOrgUsersSliderComponent } from '../sync-org-users-slider/sync-org-users-slider.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
 
 export type ChefServerTabName = 'orgs' | 'users' | 'details';
 @Component({
@@ -78,32 +74,35 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public ipForm: FormGroup;
   public orgForm: FormGroup;
   public createModalVisible = false;
-  public creatingServerOrg = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public orgToDelete: Org;
   public deleteModalVisible = false;
-  private id: string;
   public saveSuccessful = false;
   public saveInProgress = false;
   public orgsListLoading = true;
+
+  private server_id: string;
+  private isDestroyed = new Subject<boolean>();
+
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
-  private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public selected = 'fqdn';
-  public isUserLoaded = false;
+  public isUserListLoaded = false;
   public users;
-  public usersListLoading;
+  public usersListLoading: boolean;
   public authFailure = false;
   public isValid = false;
   public isServerLoaded = false;
   public validating = true;
 
+  // used for webuikey
   public updateWebuiKeyForm: FormGroup;
   public updatingWebuiKey = false;
   public webuiKey: WebUIKey;
   public updateWebUIKeySuccessful = false;
 
+  // used for the preview migration step
   public uploadZipForm: FormGroup;
   public isUploaded = false;
   public migrationStatus: MigrationStatus;
@@ -111,13 +110,30 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public stepsCompleted: string;
   public totalMigrationSteps = 13;
   public migrationStepValue: number;
-  public migrationfailed = false;
-  public migrationCompleted = false;
-  public migrationInProgress = false;
+
+  // migration steps
   public migrationLoading = true;
-  public migrationStarted = false;
+  public migrationInProgress = false;
   public migrationIsInPreview = false;
-  public migration_type: string;
+  public migrationCompleted = false;
+  public migrationFailed = false;
+  public migrationCancelled = false;
+  public migrationNotRunning = true;
+
+  // migration values
+  public migration_id = '';
+  public migration_type = '';
+  public migration_status = '';
+
+  // migration preview data
+  public previewData;
+  public isPreview = false;
+  public confirmPreviewSuccessful = false;
+  public cancelMigrationSuccessful = false;
+  public confirmPreviewsubmit = false;
+  public myInterval: ReturnType<typeof setInterval>;
+  public orgDataLoaded = false;
+  public orgData: Org[] = [];
   public migrationSteps: Record<string, string> = {
     1: 'Migration started',
     2: 'Upload of zip file',
@@ -134,26 +150,15 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     13: 'Migration Completed'
   };
 
-  public migration_id: string;
-  public cancelMigrationInProgress = false;
-  public canceMigrationSuccessful = false;
-  public isCancelled = false;
-
-  public previewDataLoaded =  false;
-  public previewData;
-  public isPreview = false;
-  public confirmPreviewSuccessful = false;
-  public confirmPreviewsubmit = false;
-
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
-  mySubscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
+    private http: HttpClient
   ) {
 
     this.orgForm = fb.group({
@@ -173,6 +178,16 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     // Populate our tabValue from the fragment.
+
+    this.store.select(routeParams).pipe(
+      pluck('id'),
+      filter(identity),
+      takeUntil(this.isDestroyed))
+      .subscribe((server_id: string) => {
+        this.server_id = server_id;
+      });
+
+
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
     .subscribe((url: string) => {
       this.url = url;
@@ -183,13 +198,16 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
           break;
         case 'users':
           this.tabValue = 'users';
+          // call to get the list of users
+          this.getListOfUsers(this.server_id);
           break;
-        case 'attributes':
+        case 'orgs':
           this.tabValue = 'orgs';
           break;
       }
     });
 
+    // validations
     this.updateServerForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
@@ -200,95 +218,35 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         Validators.pattern(Regex.patterns.VALID_FQDN)
       ]]
     });
+
     this.ipForm = this.fb.group({
       ip_address: ['', [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
       ]]
     });
+
     this.uploadZipForm = this.fb.group({
       file: ['', [Validators.required]]
     });
 
-    this.store.select(routeParams).pipe(
-      pluck('id'),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.id = id;
-        this.store.dispatch(new GetServer({ id }));
-        this.store.dispatch(new GetOrgs({ server_id: id }));
-        this.store.dispatch(new GetUsers({ server_id: id }));
-      });
+    // Call to get server and orgs
+    if (this.tabValue !== 'users') {
+      setTimeout( () => {
+        this.getServerAndOrgs();
+      }, 2000 );
+    }
 
-    combineLatest([
-      this.store.select(getStatus),
-      this.store.select(getAllOrgsForServerStatus)
-    ]).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe(([getServerSt, getOrgsSt]) => {
-      this.isLoading =
-        !allLoaded([getServerSt, getOrgsSt]);
-    });
-
-    combineLatest([
-      this.store.select(getStatus),
-      this.store.select(getAllOrgsForServerStatus),
-      this.store.select(serverFromRoute),
-      this.store.select(allOrgs)
-    ]).pipe(
-      filter(([getServerStatus, getOrgsStatus, serverState, allOrgsState]) =>
-        getServerStatus === EntityStatus.loadingSuccess &&
-        getOrgsStatus === EntityStatus.loadingSuccess &&
-        !isNil(serverState) &&
-        !isNil(allOrgsState)),
-      takeUntil(this.isDestroyed)
-    ).pipe(take(1))
-    .subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
-      this.server = { ...ServerState };
-      this.orgs = allOrgsState;
-      this.updateServerForm.controls['name'].setValue(this.server.name);
-      this.fqdnForm.controls['fqdn'].setValue(this.server.fqdn);
-      this.ipForm.controls['ip_address'].setValue(this.server.ip_address);
-      this.creatingServerOrg = false;
-      this.orgsListLoading = false;
-      this.closeCreateModal();
-      this.isServerLoaded = true;
-      this.migrationLoading = false;
-      this.migration_id = '';
-      this.migration_id = this.server.migration_id;
-      this.migration_type = this.server.migration_type;
-      if (this.migration_id !== '') {
-        this.migrationStarted = true;
-        this.getMigrationStatus(this.migration_id);
-      }
-    });
-
-    combineLatest([
-      this.store.select(createStatus),
-      this.store.select(createError)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(() => this.createModalVisible),
-      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
-      .subscribe(([_, error]) => {
-        if (error.status === HttpStatus.CONFLICT) {
-          this.conflictErrorEvent.emit(true);
-          this.creatingServerOrg = false;
-        } else {
-          // Close the modal on any error other than conflict and display in banner.
-          this.closeCreateModal();
-        }
-      });
-
+    // Get deleted org status
     this.store.select(deleteOrgStatus).pipe(
-      filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
+      filter(status => this.server_id !== undefined && status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.store.dispatch(new GetServer({ id: this.id })
+        this.store.dispatch(new GetOrgs({ server_id: this.server_id })
       );
     });
 
+    // Get updated server status
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.saveInProgress && !pending(state)))
@@ -302,22 +260,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-    combineLatest([
-      this.store.select(getUsersStatus),
-      this.store.select(getUsers)
-    ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([getUsersSt, UsersState]) => {
-      if (getUsersSt === EntityStatus.loadingSuccess && !isNil(UsersState)) {
-        this.users = UsersState;
-        this.usersListLoading = false;
-        this.users.users.length > 0 ? this.isUserLoaded = true : this.isUserLoaded = false;
-      } else if (getUsersSt === EntityStatus.loadingFailure) {
-        this.usersListLoading = false;
-        this.authFailure = true;
-        this.isUserLoaded = false;
-      }
-    });
-
+    // Get update webuikey status
     this.store.select(updateWebUIKey).pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.updatingWebuiKey && !pending(state)))
@@ -329,6 +272,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Get upload migration status
     combineLatest([
       this.store.select(uploadStatus),
       this.store.select(uploadDetails)
@@ -337,44 +281,31 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (uploadStatusSt === EntityStatus.loadingSuccess && !isNil(uploadDetailsState)) {
         // show migration slider
         this.isUploaded = true;
+        this.migrationLoading = true;
         this.migration_id = uploadDetailsState?.migration_id;
-        this.migrationStarted = true;
-        this.migrationLoading = false;
-        this.migrationIsInPreview = false;
-        this.migrationCompleted = false;
-        this.migrationInProgress = true;
-        this.migrationfailed = false;
-        this.isCancelled = false;
-        this.getMigrationStatus(this.migration_id);
+        this.callToGetMigrationStatus();
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
         // close upload slider with error notification
         this.isUploaded = false;
-        this.migrationfailed = true;
+        setTimeout(() => { this.migrationIsFailed(); }, 1000);
         this.upload.closeUploadSlider();
       }
     });
 
+    // Get cancel migration status
     this.store.select(cancelStatus).pipe(
       takeUntil(this.isDestroyed),
       filter(state => !pending(state)))
     .subscribe((state) => {
-      this.cancelMigrationInProgress = true;
-      this.canceMigrationSuccessful = (state === EntityStatus.loadingSuccess);
-      if (this.canceMigrationSuccessful) {
-        this.isCancelled = true;
-        this.migrationIsInPreview = false;
-        this.migrationCompleted = false;
-        this.migrationInProgress = false;
-        this.migrationfailed = true;
+      this.cancelMigrationSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.cancelMigrationSuccessful) {
+        setTimeout(() => { this.migrationIsCancelled(); }, 1000);
       } else {
-        this.isCancelled = false;
-        this.migrationIsInPreview = true;
-        this.migrationCompleted = false;
-        this.migrationInProgress = true;
-        this.migrationfailed = false;
+        setTimeout(() => { this.migrationIsInProcess(); }, 1000);
       }
     });
 
+    //  Get preview migration status
     combineLatest([
       this.store.select(previewStatus),
       this.store.select(previewData)
@@ -383,40 +314,37 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (previewStatusSt === EntityStatus.loadingSuccess && !isNil(previewState)) {
         this.previewData = previewState;
         this.isPreview = true;
-      } else if (previewStatusSt === EntityStatus.loadingFailure) {
-        this.previewDataLoaded = false;
       }
     });
 
+    // Get confirm preview status
     this.store.select(confirmPreviewStatus).pipe(
-      takeUntil(this.isDestroyed),
+    takeUntil(this.isDestroyed),
     filter(state => this.migrationIsInPreview && !pending(state)))
     .subscribe((state) => {
       this.confirmPreviewSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.confirmPreviewSuccessful) {
-        this.migrationIsInPreview = false;
         this.confirmPreviewsubmit = true;
+        this.migrationLoading = true;
+        this.orgsListLoading = true;
+        setTimeout( () => {
+          // call to show complete status
+          this.migrationIsCompleted();
+          // call to get the list of orgs
+          this.getListofOrgs(this.server_id);
+        }, 2000 );
+        // Get the running migration status
+        this.callToGetMigrationStatus();
       } else {
         this.confirmPreviewsubmit = false;
-      }
-    });
-
-    setTimeout(() => {
-      if (this.isServerLoaded) {
-        this.validateWebUIKey(this.server);
-      }
-    }, 1000);
-
-    this.mySubscription = interval(50000).subscribe(() => {
-      if (this.migrationStarted && this.migration_type !== 'Migration Completed') {
-        this.getMigrationStatus(this.migration_id);
       }
     });
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed.next(true);
+    this.isDestroyed.next();
     this.isDestroyed.complete();
+    // clearInterval(this.myInterval);
   }
 
   onSelectedTab(event: { target: { value: ChefServerTabName } }) {
@@ -428,33 +356,19 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.selected = id;
   }
 
-  public openCreateModal(): void {
-    this.createModalVisible = true;
-  }
+  // get server and orgs
+  public getServerAndOrgs(): void {
+    // call to get the server details
+    this.getServerDetails(this.server_id);
+    // call to get the list of orgs
+    this.getListofOrgs(this.server_id);
 
-  public closeCreateModal(): void {
-    this.createModalVisible = false;
-    this.resetCreateModal();
-  }
-
-  public createServerOrg(): void {
-    this.creatingServerOrg = true;
-    const serverOrg = {
-      id: this.orgForm.controls['id'].value,
-      server_id: this.id,
-      name: this.orgForm.controls['name'].value.trim(),
-      admin_user: this.orgForm.controls['admin_user'].value.trim(),
-      admin_key: this.orgForm.controls['admin_key'].value.trim(),
-      projects: this.orgForm.controls.projects.value
-    };
-    this.store.dispatch(new CreateOrg( serverOrg ));
-    this.telemetryService.track('InfraServer_Add_Chef_Organization');
-  }
-
-  private resetCreateModal(): void {
-    this.creatingServerOrg = false;
-    this.orgForm.reset();
-    this.conflictErrorEvent.emit(false);
+    // Call to check the webuikey valid or not
+    setTimeout(() => {
+      if (this.isServerLoaded) {
+        this.validateWebUIKey(this.server);
+      }
+    }, 1000);
   }
 
   public startOrgDelete($event: MatOptionSelectionChange, org: Org): void {
@@ -471,6 +385,73 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  // get server details
+  private getServerDetails(server_id: string): void {
+    this.store.dispatch(new GetServer({ server_id }));
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(serverFromRoute)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([getServerStatus, serverState]) => {
+        if (getServerStatus === EntityStatus.loadingSuccess && !isNil(serverState)) {
+          this.server = { ...serverState };
+          this.updateServerForm.controls['name'].setValue(this.server.name);
+          this.fqdnForm.controls['fqdn'].setValue(this.server.fqdn);
+          this.ipForm.controls['ip_address'].setValue(this.server.ip_address);
+          this.isServerLoaded = true;
+          this.migration_id = this.server?.migration_id;
+          console.log(this.migration_id);
+          this.migration_status = this.server?.migration_status;
+          this.migration_type = this.server?.migration_type;
+
+          // call migration status single time to load the last status
+          if (this.migration_id !== '') {
+            this.migrationLoading = true;
+            setTimeout(() => { this.getMigrationStatus(this.migration_id); }, 2000);
+          }
+        }
+    });
+  }
+
+  // get list of orgs
+  private getListofOrgs(server_id: string): void {
+    this.store.dispatch(new GetOrgs({ server_id: server_id }));
+    combineLatest([
+      this.store.select(getOrgsStatus),
+      this.store.select(allOrgs)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([_getOrgsStatus, allOrgsState]) => {
+        if (_getOrgsStatus === EntityStatus.loadingSuccess && !isNil(allOrgsState)) {
+          this.orgs = allOrgsState;
+          this.orgsListLoading = false;
+        } else {
+          this.orgs = [];
+        }
+    });
+  }
+
+  // get list of users
+  private getListOfUsers(server_id: string): void {
+    this.store.dispatch(new GetUsers({ server_id: server_id }));
+    // Get users status
+    combineLatest([
+      this.store.select(getUsersStatus),
+      this.store.select(getUsers)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([getUsersSt, UsersState]) => {
+      if (getUsersSt === EntityStatus.loadingSuccess && !isNil(UsersState)) {
+        this.users = UsersState;
+        this.usersListLoading = false;
+        this.users.users.length > 0 ? this.isUserListLoaded = true : this.isUserListLoaded = false;
+      } else if (getUsersSt === EntityStatus.loadingFailure) {
+        this.usersListLoading = false;
+        this.authFailure = true;
+        this.isUserListLoaded = false;
+      }
+      this.orgsListLoading = false;
+    });
   }
 
   // validate the webui ui key
@@ -490,43 +471,78 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   // get migration status
-  private getMigrationStatus(migration_id: string): void {
-    this.store.dispatch(new GetMigrationStatus(migration_id));
-    combineLatest([
-      this.store.select(migrationStatus),
-      this.store.select(getMigrationStatus)
-    ]).pipe(takeUntil(this.isDestroyed))
-      .subscribe(([migrationSt, getMigrationState]) => {
-        if (migrationSt === EntityStatus.loadingSuccess && !isNil(getMigrationState)) {
-          this.migrationStatus = getMigrationState;
-          this.migration_type = this.migrationStatus.migration_type;
-          const migration_status = this.migrationStatus.migration_status;
-          if (migration_status === 'Completed' ) {
-            this.migrationStepValue = this.getKeyByValue(this.migrationSteps, this.migration_type);
-            this.migrationStatusPercentage =
-              Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
-            this.migrationInProgress = true;
-            this.migrationLoading = false;
-            this.migrationfailed = false;
-            this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
-            if (this.migration_type === 'Creating Preview'
-              && this.confirmPreviewsubmit === false
-              && this.isCancelled === false) {
-              this.migrationIsInPreview = true;
-            }
-            if (this.migration_type === 'Migration Completed') {
-              this.mySubscription.unsubscribe();
-              this.migrationCompleted = true;
-              this.migrationInProgress = false;
-              this.migrationfailed = false;
-            }
-          } else {
-            this.migrationfailed = true;
-            this.migrationCompleted = false;
-            this.mySubscription.unsubscribe();
-          }
-        }
-      });
+  public getMigrationStatus(migration_id: string): void {
+    setTimeout(() => { this.getTheMigrationStatus(migration_id); }, 2000);
+  }
+
+  public migrationProcessStarted() {
+    this.migrationInProgress = true;
+    this.migrationIsInPreview = false;
+    this.migrationCompleted = false;
+    this.migrationFailed = false;
+    this.migrationCancelled = false;
+    this.migrationNotRunning = false;
+  }
+
+  public migrationIsInProcess(): void {
+    this.migrationInProgress = true;
+    this.migrationIsInPreview = false;
+    this.migrationCompleted = false;
+    this.migrationFailed = false;
+    this.migrationCancelled = false;
+    this.migrationNotRunning = false;
+  }
+
+  public migrationInPreview(): void {
+    this.migrationInProgress = true;
+    this.migrationIsInPreview = true;
+    this.migrationCompleted = false;
+    this.migrationFailed = false;
+    this.migrationCancelled = false;
+    this.migrationNotRunning = false;
+  }
+
+  public migrationIsCompleted(): void {
+    if (!this.migrationCancelled) {
+      this.migrationInProgress = false;
+      this.migrationIsInPreview = false;
+      this.migrationCompleted = true;
+      this.migrationFailed = false;
+      this.migrationCancelled = false;
+      this.migrationNotRunning = true;
+      this.migrationLoading = false;
+      // clearInterval(this.myInterval);
+    }
+  }
+
+  public migrationIsFailed(): void {
+    this.migrationInProgress = false;
+    this.migrationIsInPreview = false;
+    this.migrationCompleted = false;
+    this.migrationFailed = true;
+    this.migrationCancelled = false;
+    this.migrationNotRunning = true;
+    this.migrationLoading = false;
+    // clearInterval(this.myInterval);
+  }
+
+  public migrationIsCancelled(): void {
+    this.migrationInProgress = false;
+    this.migrationIsInPreview = false;
+    this.migrationCompleted = false;
+    this.migrationFailed = false;
+    this.migrationCancelled = true;
+    this.migrationNotRunning = true;
+    this.migrationLoading = false;
+    // clearInterval(this.myInterval);
+  }
+
+  public callToGetMigrationStatus() {
+    this.myInterval =  setInterval(() => {
+      if (this.migration_id !== '') {
+        this.getMigrationStatus(this.migration_id);
+      }
+    }, 5000);
   }
 
   public getKeyByValue(object: Record<string, string>, value: string) {
@@ -553,7 +569,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public updateWebuiKey(): void {
     this.updatingWebuiKey = true;
     this.webuiKey = {
-      id: this.id,
+      id: this.server_id,
       webui_key: this.updateWebuiKeyForm.controls['webUiKey'].value
     };
     this.updatingWebuiKeyData(this.webuiKey);
@@ -576,7 +592,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       formData: formData
     };
     this.store.dispatch(new UploadZip( uploadZipPayload ));
-    this.migrationStarted = true;
   }
 
   // cancel migration function
@@ -600,11 +615,62 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public confirmPreview(usersData: User[]) {
     this.confirmPreviewsubmit = true;
     this.previewData.staged_data.users = usersData;
+    this.previewData.migration_id = this.migration_id;
     const payload = {
       server_id: this.server.id,
       previewData: this.previewData
     };
     this.store.dispatch(new ConfirmPreview(payload));
     this.telemetryService.track('InfraServer_ChefInfraServer_ClickToPreview_ConfirmMigration');
+  }
+
+  public getTheMigrationStatus(migration_id: string) {
+    this.http.get<MigrationStatus>(
+      `${env.infra_proxy_url}/servers/migrations/status/${migration_id}`)
+      .pipe(first())
+      .subscribe
+      (status => {
+        this.migrationStatus = status;
+        this.migration_type = this.migrationStatus?.migration_type;
+        this.migration_status = this.migrationStatus?.migration_status;
+
+        // case for the migration is in progress/creating_peview
+        if (this.migration_status === 'Completed' || this.migration_status === 'In Progress') {
+          this.migrationStepValue = this.getKeyByValue(this.migrationSteps, this.migration_type);
+          this.migrationStatusPercentage =
+            Number((this.migrationStepValue / this.totalMigrationSteps) * 100);
+          this.migrationIsInProcess();
+          this.stepsCompleted =  this.migrationStepValue.toFixed(0) + '/' + '13';
+          if (this.migration_type === 'Creating Preview'
+            && this.migrationCancelled === false
+            && this.migrationFailed === false) {
+            console.log('migration in progress');
+            this.migrationInPreview();
+          }
+        }
+
+        // case for the migration completed
+        if (this.migration_type === 'Migration Completed'
+              && this.migration_status ===  'Completed') {
+          console.log('migration completed');
+          this.migrationIsCompleted();
+        }
+
+        // case for the migration cancelled
+        if (this.migration_type === 'Migration Cancelled'
+              && this.migration_status ===  'Completed') {
+          console.log('migration cancelled');
+          this.migrationIsCancelled();
+        }
+
+        // case for the migration failed
+        if (this.migration_type === 'Migration Completed'
+            && this.migration_status ===  'Failed') {
+          console.log('migration failed');
+          this.migrationIsFailed();
+        }
+
+        this.migrationLoading = false;
+      });
   }
 }
