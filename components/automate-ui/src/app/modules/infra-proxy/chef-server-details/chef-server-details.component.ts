@@ -281,6 +281,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (uploadStatusSt === EntityStatus.loadingSuccess && !isNil(uploadDetailsState)) {
         // show migration slider
         this.isUploaded = true;
+        this.migrationLoading = true;
         this.migration_id = uploadDetailsState?.migration_id;
         this.callToGetMigrationStatus();
       } else if (uploadStatusSt === EntityStatus.loadingFailure) {
@@ -324,7 +325,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.confirmPreviewSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.confirmPreviewSuccessful) {
         this.confirmPreviewsubmit = true;
-        this.migrationLoading = false;
+        this.migrationLoading = true;
         this.orgsListLoading = true;
         setTimeout( () => {
           // call to show complete status
@@ -509,6 +510,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.migrationFailed = false;
       this.migrationCancelled = false;
       this.migrationNotRunning = true;
+      this.migrationLoading = false;
       // clearInterval(this.myInterval);
     }
   }
@@ -520,6 +522,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.migrationFailed = true;
     this.migrationCancelled = false;
     this.migrationNotRunning = true;
+    this.migrationLoading = false;
     // clearInterval(this.myInterval);
   }
 
@@ -530,6 +533,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.migrationFailed = false;
     this.migrationCancelled = true;
     this.migrationNotRunning = true;
+    this.migrationLoading = false;
     // clearInterval(this.myInterval);
   }
 
@@ -538,7 +542,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (this.migration_id !== '') {
         this.getMigrationStatus(this.migration_id);
       }
-    }, 3000);
+    }, 5000);
   }
 
   public getKeyByValue(object: Record<string, string>, value: string) {

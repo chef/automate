@@ -65,6 +65,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
 
   closeMigrationSlider() {
     this.toggleSlide();
+    this.selectedUsersData = [];
   }
 
   cancelMigrationclicked() {
@@ -76,7 +77,6 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   toggleSlide() {
     this.isSlideOpen1 = !this.isSlideOpen1;
     this.usersData.forEach((item: User) => item.is_selected = false);
-    this.selectedUsersData = [];
   }
 
   confirmPreviewData() {
@@ -87,7 +87,6 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
 
   slidePanel() {
     this.isSlideOpen1 = true;
-    this.selectedUsersData = [];
   }
 
   selectedAllUsers(event: any) {
@@ -114,12 +113,12 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
         }
       });
       if (user.is_conflicting) {
-        input.classList.remove('user-exist-warning');
-        warning.classList.add('warning-msg-hide');
+        input?.classList?.remove('user-exist-warning');
+        warning?.classList?.add('warning-msg-hide');
       }
     } else {
       this.selectedUsersData.push(this.usersData[index]);
-      warning.classList.remove('warning-msg-hide');
+      warning?.classList?.remove('warning-msg-hide');
       this.callAndSetUserData(user);
     }
   }
