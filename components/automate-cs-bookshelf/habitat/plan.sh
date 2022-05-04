@@ -7,7 +7,7 @@ pkg_name="automate-cs-bookshelf"
 pkg_description="Wrapper package for chef/bookshelf"
 pkg_origin="chef"
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.15.8"
+pkg_version="14.14.1"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -16,7 +16,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/bookshelf/14.15.8/20220502135653"
+  "${vendor_origin}/bookshelf/14.14.1/20220405043525"
 )
 
 pkg_binds=(
