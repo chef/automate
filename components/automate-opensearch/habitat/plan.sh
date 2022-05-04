@@ -51,9 +51,6 @@ do_build() {
 }
 
 do_install() {
-  JAVA_HOME="$(pkg_path_for chef/automate-openjdk)"
-  export JAVA_HOME
-  echo "JAVA_HOME:$JAVA_HOME"
   cd "$HAB_CACHE_SRC_PATH/opensearch-${pkg_version}"
   chown -RL hab:hab ${pkg_prefix}
   mkdir -p "${pkg_prefix}/os"
