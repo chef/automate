@@ -42,7 +42,7 @@ export class Regex {
     // Allow valid header input for Custom webhook
     VALID_HEADER: /([a-zA-Z]):([a-zA-Z])[^\r\n]/,
 
-    //Allow A to Z and a to z and 0 to 9
+    // Allow A to Z and a to z and 0 to 9
     VALID_URL: /^[0-9a-zA-Z]+$/
   };
 

@@ -185,6 +185,7 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 	if err != nil {
 		log.Errorf("Unable to fetch lastMigration status for server id:%s, err: %+v", req.Id, err)
 	}
+
 	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
 	if err != nil {
 		log.Errorf("Unable to fetch migration status for server id:%s, err: %+v", req.Id, err)

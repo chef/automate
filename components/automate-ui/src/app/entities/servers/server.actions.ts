@@ -63,7 +63,7 @@ export class GetServersFailure implements Action {
 export class GetServer implements Action {
   readonly type = ServerActionTypes.GET;
 
-  constructor(public payload: { id: string }) { }
+  constructor(public payload: { server_id: string }) { }
 }
 
 export class GetServerSuccess implements Action {
