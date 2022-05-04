@@ -39,3 +39,46 @@ do_prepare_upgrade() {
     set_version_file
     prepare_upgrade_milestone_append_version "current" "3.0.49"
 }
+
+run_upgrade() {
+    local airgap_artifact_path="$1"
+
+    # NOTE: This is a bit of a hack.
+    #
+    # The deployment-service determines the upgrade status by comparing the package
+    # versions in it's manifest with the package versions that are currently
+    # installed and running. The manifest is cached and only upgrade periodically.
+    # To trigger an upgrade we need the manifest to include our new hartifacts.
+    # Moving the hartifacts into the directory won't trigger a manifest rebuild
+    # because that directory isn't watched for changes. Therefore, we'll trigger
+    # a manifest rebuild with the run command.
+    if [ -z "$airgap_artifact_path" ]; then
+        # shellcheck disable=SC2154
+        cat "$versionsFile"
+        ERROR=$(chef-automate upgrade run --versions-file "$versionsFile" 2>&1 >/dev/null) || true
+        echo "$ERROR"
+        if echo "${ERROR}" | grep 'This is a Major upgrade'; then
+            echo "major normal upgrade"
+            echo "y
+y
+y
+y
+y
+y" | chef-automate upgrade run --major --versions-file "$versionsFile"
+            # NOTE: This is a hack
+            # The hack above was no longer good enough because we have a thing that needs
+            # to be updated that isn't a service
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+            chef-automate post-major-upgrade migrate --data=PG -y
+        else
+            echo "regular normal upgrade"
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
+        fi
+    fi
+}
