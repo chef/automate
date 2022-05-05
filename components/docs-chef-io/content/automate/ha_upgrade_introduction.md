@@ -16,7 +16,7 @@ gh_repo = "automate"
 
 Upgradation is a process of replacing older version with improved newer version with some new features or/and fixes for bugs that has been noticed in older versions. Use the --major flag to upgrade from the latest to a major version. This section will talk about the version upgrade of Chef Automate with its possible scenarios.
 
-{{< note >}} Unlike some of the other chef services, Automate HA won't upgrade from one minor version to another {{< /note >}}
+{{< note >}} Unlike some of the other chef services, Automate HA won't upgrade from one minor version to another. This needs to be done manually by running command. {{< /note >}}
 
 ## Release Channels
 
