@@ -73,13 +73,6 @@ do_deploy() {
         ]
       }
     }'
-
-    curl -XPUT  -H 'Content-Type: application/json' http://localhost:10144/_cluster/settings -d '{
- "persistent" : {
-      "cluster.max_shards_per_node": "5000"
-  }
-}' -u admin:admin
-
 }
 
 do_restore() {
@@ -94,6 +87,14 @@ do_test_restore() {
     test_delete_broken_backups
     test_can_regenerate_cert_after_restore
 
+    echo "======================================================================"
+        curl -XPUT  -H 'Content-Type: application/json' http://localhost:10144/_cluster/settings -d '{
+          "persistent" : {
+            "cluster.max_shards_per_node": "5000"
+          }
+        }' -u admin:admin
+
+    echo " run the curl request to change the shard...now we can run the inspec test."
     # verifies IAM force-upgrade was applied
     # and the restored system demonstrates expected behavior around IAM permissions
     run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-no-legacy-integration"
