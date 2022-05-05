@@ -40,7 +40,6 @@ path.data:
 # Path to log files:
 #
 path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
-path.repo: /var/opt/chef-automate/backups
 #
 # ----------------------------------- Memory -----------------------------------
 #
