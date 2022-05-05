@@ -163,7 +163,6 @@ type ExistingInfraConfigToml struct {
 		Config struct {
 			AutomatePrivateIps   []string `toml:"automate_private_ips"`
 			ChefServerPrivateIps []string `toml:"chef_server_private_ips"`
-			ElasticsearchIps     []string `toml:"elasticsearch_ips"`
 			OpensearchPrivateIps []string `toml:"opensearch_private_ips"`
 			PostgresqlPrivateIps []string `toml:"postgresql_private_ips"`
 		} `toml:"config"`

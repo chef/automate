@@ -131,7 +131,6 @@ instance_count = "3"
 [existing_infra.config]
 automate_private_ips = []
 chef_server_private_ips = []
-elasticsearch_ips = []
 opensearch_private_ips = []
 postgresql_private_ips = []
 `

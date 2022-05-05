@@ -19,15 +19,15 @@ output "chef_server_private_ips" {
 }
 
 output "opensearch_private_ips" {
-  value = formatlist("%s", var.existing_elasticsearch_private_ips)
+  value = formatlist("%s", var.existing_opensearch_private_ips)
 }
 
 output "postgresql_private_ips" {
   value = formatlist("%s", var.existing_postgresql_private_ips)
 }
 
-output "elasticsearch_public_ips" {
-  value = formatlist("%s", var.existing_elasticsearch_ips)
+output "opensearch_public_ips" {
+  value = formatlist("%s", var.existing_opensearch_ips)
 }
 
 output "automate_ssh" {
@@ -57,15 +57,12 @@ output "postgresql_ssh" {
   )
 }
 
-output "elasticsearch_ssh" {
+output "opensearch_ssh" {
   value = formatlist(
     "ssh -i %s %s@%s",
     var.ssh_key_file,
     var.ssh_user,
-    var.existing_elasticsearch_ips,
+    var.existing_opensearch_ips,
   )
 }
 
-output "ops_dashboard_addresses" {
-  value = formatlist("https://%s:5601/app/kibana#/dashboards?_g=()", var.existing_elasticsearch_ips)
-}

@@ -14,11 +14,11 @@ variable "existing_chef_server_private_ips" {
   default = []
 }
 
-variable "existing_elasticsearch_ips" {
+variable "existing_opensearch_ips" {
   default = []
 }
 
-variable "existing_elasticsearch_private_ips" {
+variable "existing_opensearch_private_ips" {
   default = []
 }
 
