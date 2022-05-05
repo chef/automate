@@ -32,8 +32,8 @@ import (
 const (
 	knifeConfigFile     = "/hab/svc/automate-cs-nginx/config/knife_superuser.rb"
 	erchefReindexScript = "hab pkg exec chef/oc_erchef reindex-opc-organization"
-	erchefDBURI         = "postgresql://automate@127.0.0.1:5432/automate-cs-oc-erchef?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"  // nolint: lll
-	bifrostDBURI        = "postgresql://automate@127.0.0.1:5432/automate-cs-oc-bifrost?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll
+	erchefDBURI         = "postgresql://automate@127.0.0.1:10145/automate-cs-oc-erchef?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"  // nolint: lll
+	bifrostDBURI        = "postgresql://automate@127.0.0.1:10145/automate-cs-oc-bifrost?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" // nolint: lll
 	bifrostURL          = "https://127.0.0.1:10202"
 	lbURL               = "https://127.0.0.1:10200"
 	tlsCrt              = "/hab/svc/automate-cs-nginx/config/service.crt"
