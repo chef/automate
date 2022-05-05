@@ -14,12 +14,6 @@ do_create_config() {
   max_shards_per_node = 5000
 EOF
 
-curl -XPUT  -H 'Content-Type: application/json' http://localhost:10144/_cluster/settings -d '{
- "persistent" : {
-      "cluster.max_shards_per_node": "5000"
-  }
-}' -u admin:admin
-
 }
 
 do_deploy() {
@@ -79,6 +73,13 @@ do_deploy() {
         ]
       }
     }'
+
+    curl -XPUT  -H 'Content-Type: application/json' http://localhost:10144/_cluster/settings -d '{
+ "persistent" : {
+      "cluster.max_shards_per_node": "5000"
+  }
+}' -u admin:admin
+
 }
 
 do_restore() {
