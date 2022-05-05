@@ -17,7 +17,7 @@ func init() {
     "/api/v0/compliance/reporting/controls": {
       "post": {
         "summary": "List Controls",
-        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering, but not pagination or sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_ListControlItems",
         "responses": {
           "200": {
@@ -469,7 +469,7 @@ func init() {
         "page_number": {
           "type": "integer",
           "format": "int32",
-          "title": "For pagination start value"
+          "title": "The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results. (Default 1)"
         },
         "filters": {
           "type": "array",

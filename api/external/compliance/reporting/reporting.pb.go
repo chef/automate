@@ -87,7 +87,7 @@ type ControlItemRequest struct {
 	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	// The maximum number of controls to return (Default 100).
 	Size int32 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	// For pagination start value
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results. (Default 1)
 	PageNumber int32 `protobuf:"varint,3,opt,name=page_number,json=pageNumber,proto3" json:"page_number,omitempty"`
 	// The criteria used to filter the controls returned.
 	Filters []*ListFilter `protobuf:"bytes,4,rep,name=filters,proto3" json:"filters,omitempty"`
@@ -4943,7 +4943,7 @@ type ReportingServiceClient interface {
 	//List Controls
 	//
 	//Lists controls from the last run, with optional filtering.
-	//Supports filtering, but not pagination or sorting.
+	//Supports filtering,pagination but not sorting.
 	//Limited to 100 results by default.
 	//
 	//Authorization Action:
@@ -5280,7 +5280,7 @@ type ReportingServiceServer interface {
 	//List Controls
 	//
 	//Lists controls from the last run, with optional filtering.
-	//Supports filtering, but not pagination or sorting.
+	//Supports filtering,pagination but not sorting.
 	//Limited to 100 results by default.
 	//
 	//Authorization Action:

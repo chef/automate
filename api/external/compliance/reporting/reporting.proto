@@ -80,7 +80,7 @@ service ReportingService {
 	List Controls
 
 	Lists controls from the last run, with optional filtering.
-	Supports filtering, but not pagination or sorting.
+	Supports filtering,pagination but not sorting.
 	Limited to 100 results by default.
 
 	Authorization Action:
@@ -301,7 +301,7 @@ message ControlItemRequest {
 	string text = 1;
 	// The maximum number of controls to return (Default 100).
 	int32 size = 2;
-	// For pagination start value
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results. (Default 1)
 	int32 page_number =3;
 	// The criteria used to filter the controls returned.
 	repeated ListFilter filters = 4;
