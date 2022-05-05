@@ -32,12 +32,6 @@ do_deploy() {
     echo "==============================================================="
     cat $test_manifest_path
 
-    download_manifest_version "current" "20220329091442" "$test_manifest_dir/20220329091442.json"
-    set_test_manifest "20220329091442.json"
-
-    echo "==============================================================="
-    cat $test_manifest_path
-
     local cli_bin="chef-automate"
     download_cli "20220329091442" "${cli_bin}"
 
