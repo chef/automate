@@ -32,6 +32,9 @@ do_deploy() {
     echo "==============================================================="
     cat $test_manifest_path
 
+    local cli_bin="chef-automate"
+    download_cli "20220329091442" "${cli_bin}"
+
     #shellcheck disable=SC2154
     chef-automate migrate-from-v1 "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
