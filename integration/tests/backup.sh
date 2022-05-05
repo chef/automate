@@ -8,7 +8,18 @@ test_diagnostics_opts="--opt compliance-report.days:120 --opt cfgmgmt-actions.da
 do_create_config() {
     do_create_config_default
     #shellcheck disable=SC2154
-    echo -e "[opensearch.v1.sys.cluster] \n max_shards_per_node = 5000" >> "$test_config_path"
+    #echo -e "[opensearch.v1.sys.cluster] \n max_shards_per_node = 5000" >> "$test_config_path"
+    cat >> "$test_config_path" <<EOF
+[opensearch.v1.sys.cluster]
+  max_shards_per_node = 5000
+EOF
+
+curl -XPUT  -H 'Content-Type: application/json' http://localhost:10144/_cluster/settings -d '{
+ "persistent" : {
+      "cluster.max_shards_per_node": "5000"
+  }
+}' -u admin:admin
+
 }
 
 do_deploy() {
