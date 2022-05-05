@@ -6,7 +6,7 @@ run_ssl_scan() {
     if [[ ! -d "/testssl.sh" ]]; then
        pushd "/"
          # pinned tag to resolve errors in security test
-         hab pkg exec core/git git clone --depth 7 https://github.com/drwetter/testssl.sh.git
+         hab pkg exec core/git git clone https://github.com/drwetter/testssl.sh.git
          OLD_DIR=$(pwd)
          cd testssl.sh
          hab pkg exec core/git git reset --hard b6c18f5e4e2b34fb1f997384367e47d0a54b09df
