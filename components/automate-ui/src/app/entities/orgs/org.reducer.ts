@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { OrgActionTypes, OrgActions, UploadSuccessPayload, PreviewSuccessPayload } from './org.actions';
+import { OrgActionTypes, OrgActions, UploadSuccessPayload, PreviewSuccessPayload, CheckUserPayload } from './org.actions';
 import { Org } from './org.model';
 
 export interface OrgEntityState extends EntityState<Org> {
@@ -20,6 +20,7 @@ export interface OrgEntityState extends EntityState<Org> {
   previewData: PreviewSuccessPayload;
   confirmPreviewStatus: EntityStatus;
   checkUserStatus: EntityStatus;
+  getCheckedUserStatus: CheckUserPayload;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -49,7 +50,8 @@ export const OrgEntityInitialState: OrgEntityState =
     cancelStatus: EntityStatus.notLoaded,
     previewData: null,
     confirmPreviewStatus: EntityStatus.notLoaded,
-    checkUserStatus: EntityStatus.notLoaded
+    checkUserStatus: EntityStatus.notLoaded,
+    getCheckedUserStatus: null
   });
 
 export function orgEntityReducer(
@@ -162,7 +164,10 @@ export function orgEntityReducer(
       return set(CHECK_USER_STATUS, EntityStatus.loading, state);
 
     case OrgActionTypes.CHECK_USER_SUCCESS:
-        return set(CHECK_USER_STATUS, EntityStatus.loadingSuccess, state);
+        return pipe(
+          set('getCheckedUserStatus', action.payload),
+          set(CHECK_USER_STATUS, EntityStatus.loadingSuccess)
+        )(state) as OrgEntityState;
 
     case OrgActionTypes.CHECK_USER_FAILURE:
       return set(CHECK_USER_STATUS, EntityStatus.loadingFailure, state);

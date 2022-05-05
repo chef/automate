@@ -247,7 +247,7 @@ export class CheckUser implements Action {
 export class CheckUserSuccess implements Action {
   readonly type = OrgActionTypes.CHECK_USER_SUCCESS;
 
-  constructor(public paylode: CheckUserPayload) { }
+  constructor(public payload: CheckUserPayload) { }
 }
 
 export class CheckUserFailure implements Action {

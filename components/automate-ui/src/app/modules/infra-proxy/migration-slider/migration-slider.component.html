@@ -32,11 +32,11 @@
               </ul>
             </div>
             <div class="summary-body">
-              <p>We have found <span class="heading">Users</span> to be migrated.</p>
+              <p>We have found <span class="heading">Users</span> to be migrated, skipped and Updated.</p>
               <ul>
                 <li>
                   <span>Users</span>
-                  <span>{{previewData?.staged_data?.users.length || 0}}</span>
+                  <span>{{totalUsers?.length || 0}}</span>
                 </li>
                 <li>
                   <span>Conflicting Users</span>
@@ -45,6 +45,18 @@
                 <li>
                   <span>Selected Users For Migration</span>
                   <span>{{selectedUsersData?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Skipped Users</span>
+                  <span>{{skippedUsers?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Deleted Users</span>
+                  <span>{{deletedUsers?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Updated Users</span>
+                  <span>{{updatedUsers?.length || 0}}</span>
                 </li>
               </ul>
             </div>
@@ -83,7 +95,6 @@
                     formControlName="{{user.automate_username}}"
                     type="text"
                     attr.data-username="{{user.username}}"
-                    (change)="onChangeEvent($event)"
                     (blur)="handleName($event, user)"
                     autocomplete="off" />
                 </chef-td>
@@ -91,9 +102,10 @@
                   <p
                     id="{{user.email}}-warning" 
                     class="warning-msg" 
-                    *ngIf="(user.connector === 'local') && user.is_conflicting">
+                    *ngIf="!user.checking_conflcit && (user.connector === 'local') && user.is_conflicting">
                     Warning. User already exists in Automate. This will overwrite this users IAM settings.
                   </p>
+                  <p *ngIf="user.checking_conflcit">Checking...</p>
                 </chef-td>
               </chef-tr>
             </chef-tbody>

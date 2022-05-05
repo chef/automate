@@ -34,4 +34,5 @@ export interface User {
   is_conflicting: boolean;
   is_admin: boolean;
   is_selected?: boolean;
+  checking_conflcit?: boolean;
 }
