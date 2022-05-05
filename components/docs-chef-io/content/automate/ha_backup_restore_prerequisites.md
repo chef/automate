@@ -13,7 +13,10 @@ gh_repo = "automate"
     weight = 210
 +++
 
-This page explains the prerequisites of the AWS and on-premise backup.
+
+{{< note >}} For AWS infra, if you added `backup_config` during provisioning, prerequistes will already configured as part of deployment itself. So this can be skipped if you are using AWS infra. {{< /note >}}
+
+This page explains the prerequisites of the on-premise backup.
 
 {{< note >}} You can take backup on EFS system through DNS or IP. {{< /note >}}
 

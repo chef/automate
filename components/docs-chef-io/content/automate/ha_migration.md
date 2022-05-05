@@ -24,3 +24,12 @@ A few common examples of IT migration include:
 - Moving data from one kind of database to another.
 - Replacing one data storage system with another.
 - Moving from on-premise infrastructure to cloud infrastructure.
+
+## Migration in-terms of Automate HA
+
+User can migrate to Automate HA from existing A2HA, Automate or Chef-Backend. While these usecases and steps to migrate are discussed in detail in following section, there are some best practices to follow
+
+## Best Practices
+
+- While migration from existing infra to Automate HA, there could be data loss. To avoid that, it is suggested to take a data backup before migration.
+- Migration will usually have some downtime. So, planing migration accordingly with respect to downtime is necessary.
