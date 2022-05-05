@@ -28,10 +28,10 @@ aws_s3_bucketName = "<%= config.s3_bucketName %>"
 <% end %>
 
 setup_managed_services = <%= config.aws.setup_managed_services %>
-managed_elasticsearch_domain_url = "<%= config.aws.managed_elasticsearch_domain_url %>"
-managed_elasticsearch_username = "<%= config.aws.managed_elasticsearch_username %>"
-managed_elasticsearch_user_password = "<%= config.aws.managed_elasticsearch_user_password %>"
-managed_elasticsearch_certificate = "<%= config.aws.managed_elasticsearch_certificate %>"
+managed_opensearch_domain_url = "<%= config.aws.managed_opensearch_domain_url %>"
+managed_opensearch_username = "<%= config.aws.managed_opensearch_username %>"
+managed_opensearch_user_password = "<%= config.aws.managed_opensearch_user_password %>"
+managed_opensearch_certificate = "<%= config.aws.managed_opensearch_certificate %>"
 managed_rds_instance_url = "<%= config.aws.managed_rds_instance_url %>"
 managed_rds_superuser_username = "<%= config.aws.managed_rds_superuser_username %>"
 managed_rds_superuser_password = "<%= config.aws.managed_rds_superuser_password %>"
@@ -130,10 +130,9 @@ vsphere_linux_template = "<%= config.vsphere.linux_template %>"
 <% if config.architecture == 'existing_nodes' %>
 # Existing nodes
 ################################################################################
-existing_elasticsearch_ips = <%= config.existing_nodes.elasticsearch_ips %>
 existing_automate_private_ips = <%= config.existing_nodes.automate_private_ips %>
 existing_chef_server_private_ips = <%= config.existing_nodes.chef_server_private_ips %>
-existing_elasticsearch_private_ips = <%= config.existing_nodes.opensearch_private_ips %>
+existing_opensearch_private_ips = <%= config.existing_nodes.opensearch_private_ips %>
 existing_postgresql_private_ips = <%= config.existing_nodes.postgresql_private_ips %>
 <% end %>
 
