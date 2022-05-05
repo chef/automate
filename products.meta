@@ -55,6 +55,7 @@
     "chef/automate-netcat",
     "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
+    "chef/automate-elasticsearch",
     "core/rsync"
   ],
 

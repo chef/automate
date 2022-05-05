@@ -90,7 +90,7 @@ export class UpdateNodeTagModalComponent implements OnInit, OnDestroy {
 
   addTags() {
     if (this.inputTxt !== '') {
-      this.tags = this.tags.concat(this.inputTxt.replace(/^[,\s]+|[,\s]+$/g, '')
+      this.tags = this.tags.concat(this.inputTxt.replace(/^[,\s]+$|^[,\s]+$/g, '')
         .replace(/,[,\s]*,/g, ',').split(',').map(item => item.trim()));
       this.updateTags('add', this.tags);
       this.telemetryService.track('InfraServer_Nodes_UpdateTags');
