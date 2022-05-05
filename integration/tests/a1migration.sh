@@ -15,7 +15,7 @@ export A1_BUILDER_PASSWORD="migrated-builder-password"
 
 do_build() {
     do_build_default
-    prepare_upgrade_milestone "current" "20220329091442"
+    # prepare_upgrade_milestone "current" "20220329091442"
     sync_a1_migration_data
 }
 
@@ -25,6 +25,10 @@ do_deploy() {
     # when bin and usr/bin are the same directory and thus migrations will fail.
     mkdir -p /opt/opscode/bin/
     cp "$A2_ROOT_DIR/components/automate-deployment/bin/linux/chef-server-ctl" /opt/opscode/bin/
+
+    download_manifest_version "current" "20220329091442" "$test_manifest_dir/20220329091442.json"
+    set_test_manifest "20220329091442.json"
+
     echo "==============================================================="
     cat $test_manifest_path
 
