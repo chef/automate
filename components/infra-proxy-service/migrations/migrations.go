@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
@@ -528,7 +527,7 @@ func writeFile(path string, data []byte) error {
 			return err
 		}
 	}
-	err := ioutil.WriteFile(path, data, 0644)
+	err := os.WriteFile(path, data, 0644)
 	if err != nil {
 		log.Errorf("Unable to write file %s", err.Error())
 		return err
