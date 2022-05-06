@@ -35,7 +35,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Read", "infra:nodes:{id}", "infra:nodes:get", "GET", "/api/v0/nodes/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Read", "infra:nodes", "infra:nodes:get", "GET", "/api/v0/nodes/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -48,7 +48,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Update", "infra:nodes:{id}", "infra:nodes:update", "PUT", "/api/v0/nodes/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Update", "infra:nodes", "infra:nodes:update", "PUT", "/api/v0/nodes/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Node); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -77,7 +77,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Delete", "infra:nodes:{id}", "infra:nodes:delete", "DELETE", "/api/v0/nodes/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Delete", "infra:nodes", "infra:nodes:delete", "DELETE", "/api/v0/nodes/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -106,7 +106,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Rerun", "infra:nodes:{id}", "infra:nodes:rerun", "GET", "/api/v0/nodes/rerun/id/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Rerun", "infra:nodes", "infra:nodes:rerun", "GET", "/api/v0/nodes/rerun/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Id); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

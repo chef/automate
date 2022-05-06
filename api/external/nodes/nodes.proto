@@ -67,7 +67,7 @@ service NodesService {
 			get: "/api/v0/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
+			resource: "infra:nodes"
 			action: "infra:nodes:get"
 		};
 	};
@@ -90,7 +90,7 @@ service NodesService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
+			resource: "infra:nodes"
 			action: "infra:nodes:update"
 		};
 	};
@@ -110,7 +110,7 @@ service NodesService {
 			delete: "/api/v0/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
+			resource: "infra:nodes"
 			action: "infra:nodes:delete"
 		};
 	};
@@ -193,7 +193,7 @@ service NodesService {
 			get: "/api/v0/nodes/rerun/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
+			resource: "infra:nodes"
 			action: "infra:nodes:rerun"
 		};
 	};

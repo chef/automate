@@ -508,16 +508,16 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	return &response.CreateBackupResponse{}, nil
 }
 
-func createFile(path string) error {
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		_, err := os.Create(path)
-		if err != nil {
-			log.WithError(err).Error("Unable to create file ", err)
-			return err
-		}
-	}
-	return nil
-}
+// func createFile(path string) error {
+// 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+// 		_, err := os.Create(path)
+// 		if err != nil {
+// 			log.WithError(err).Error("Unable to create file ", err)
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
 
 func writeFile(path string, data []byte) error {
 	file, err := os.Create(path)
@@ -525,8 +525,9 @@ func writeFile(path string, data []byte) error {
 		log.WithError(err).Error("Unable to create file ", err)
 		return err
 	}
-	defer file.Close()
-
+	defer func() {
+		_ = file.Close()
+	}()
 	noOfBytes, err := file.Write(data)
 	if err != nil {
 		log.Errorf("Unable to write file %s", err.Error())
