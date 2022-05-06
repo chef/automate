@@ -336,9 +336,9 @@ function do_test_chef_server_ctl() {
     run_chef_server_ctl_cmd "${c}" || return 1
   done
 
-  # local cmd="PATH=/hab/bin:/bin chef-server-ctl password ${user} > /dev/null 2>&1"
-  # log_line "Running '${cmd}'..."
-  # eval "printf 'newpass\nnewpass\n' | $cmd"
+  local cmd="PATH=/hab/bin:/bin chef-server-ctl password ${user} > /dev/null 2>&1"
+  log_line "Running '${cmd}'..."
+  eval "printf 'newpass\nnewpass\n' | $cmd"
   local res=$?
   if [ $res -ne 0 ]; then
     log_line "Command 'chef-server-ctl password' failed with exit code ${res}"
