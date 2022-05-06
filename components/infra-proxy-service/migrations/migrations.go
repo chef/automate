@@ -520,20 +520,37 @@ func createFile(path string) error {
 }
 
 func writeFile(path string, data []byte) error {
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		err = createFile(path)
-		if err != nil {
-			log.Errorf("Unable to create file %s", err.Error())
-			return err
-		}
+	file, err := os.Create(path)
+	if err != nil {
+		log.WithError(err).Error("Unable to create file ", err)
+		return err
 	}
-	err := os.WriteFile(path, data, 0644)
+	defer file.Close()
+
+	noOfBytes, err := file.Write(data)
 	if err != nil {
 		log.Errorf("Unable to write file %s", err.Error())
 		return err
 	}
+	log.Info(noOfBytes, ": bytes are written to the file")
 	return nil
 }
+
+// func writeFile(path string, data []byte) error {
+// 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+// 		err = createFile(path)
+// 		if err != nil {
+// 			log.Errorf("Unable to create file %s", err.Error())
+// 			return err
+// 		}
+// 	}
+// 	err := os.WriteFile(path, data, 0644)
+// 	if err != nil {
+// 		log.Errorf("Unable to write file %s", err.Error())
+// 		return err
+// 	}
+// 	return nil
+// }
 
 //writeOrgFile: Write org file org.json
 func writeOrgFile(org pipeline.OrgJson, orgJsonPath string) error {
