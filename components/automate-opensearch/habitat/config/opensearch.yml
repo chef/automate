@@ -15,6 +15,34 @@
 # Use a descriptive name for your cluster:
 #
 cluster.name: {{cfg.cluster.name}}
+cluster.max_shards_per_node: {{cfg.cluster.max_shards_per_node}}
+cluster.routing.allocation.node_concurrent_recoveries: {{cfg.cluster.routing.allocation.node_concurrent_recoveries}}
+cluster.routing.allocation.node_initial_primaries_recoveries: {{cfg.cluster.routing.allocation.node_initial_primaries_recoveries}}
+cluster.routing.allocation.same_shard.host: {{cfg.cluster.routing.allocation.same_shard_host}}
+
+cluster.routing.allocation.disk.watermark.low: 1GB
+cluster.routing.allocation.disk.watermark.high: 500MB
+cluster.routing.allocation.disk.watermark.flood_stage: 250MB
+cluster.info.update.interval: 1m
+
+
+{{#if cfg.cluster.routing.allocation.awareness_attributes ~}}
+cluster.routing.allocation.awareness.attributes: {{cfg.cluster.routing.allocation.awareness_attributes}}
+{{/if ~}}
+
+
+indices.recovery.max_bytes_per_sec: {{cfg.indices.recovery.max_bytes_per_sec}}
+
+{{#if cfg.indices.fielddata.cache_size ~}}
+indices.fielddata.cache.size: {{cfg.indices.fielddata.cache_size}}
+{{/if ~}}
+
+indices.breaker.total.limit: {{cfg.indices.breaker.total_limit}}
+indices.breaker.fielddata.limit: {{cfg.indices.breaker.fielddata_limit}}
+indices.breaker.fielddata.overhead: {{cfg.indices.breaker.fielddata_overhead}}
+indices.breaker.request.limit: {{cfg.indices.breaker.request_limit}}
+indices.breaker.request.overhead: {{cfg.indices.breaker.request_overhead}}
+
 #
 # ------------------------------------ Node ------------------------------------
 #
