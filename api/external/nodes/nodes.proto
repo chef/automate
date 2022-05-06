@@ -47,8 +47,8 @@ service NodesService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:create"
+			resource: "infra:nodeManagers"
+			action: "infra:nodeManagers:create"
 		};
 	};
 
@@ -67,8 +67,8 @@ service NodesService {
 			get: "/api/v0/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:get"
+			resource: "infra:nodeManagers:{id}"
+			action: "infra:nodeManagers:get"
 		};
 	};
 
@@ -90,8 +90,8 @@ service NodesService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:update"
+			resource: "infra:nodeManagers:{id}"
+			action: "infra:nodeManagers:update"
 		};
 	};
 
@@ -110,8 +110,8 @@ service NodesService {
 			delete: "/api/v0/nodes/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:delete"
+			resource: "infra:nodeManagers:{id}"
+			action: "infra:nodeManagers:delete"
 		};
 	};
 
@@ -132,8 +132,8 @@ service NodesService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:delete"
+			resource: "infra:nodeManagers"
+			action: "infra:nodeManagers:delete"
 		};
 	};
 
@@ -173,8 +173,8 @@ service NodesService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:list"
+			resource: "infra:nodeManagers"
+			action: "infra:nodeManagers:list"
 		};
 	};
 
@@ -193,8 +193,8 @@ service NodesService {
 			get: "/api/v0/nodes/rerun/id/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes:{id}"
-			action: "infra:nodes:rerun"
+			resource: "infra:nodeManagers:{id}"
+			action: "infra:nodeManagers:rerun"
 		};
 	};
 
@@ -223,8 +223,8 @@ service NodesService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:delete"
+			resource: "infra:nodeManagers"
+			action: "infra:nodeManagers:delete"
 		};
 	};
 
@@ -262,8 +262,8 @@ service NodesService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "infra:nodes"
-			action: "infra:nodes:create"
+			resource: "infra:nodeManagers"
+			action: "infra:nodeManagers:create"
 		};
 	};
 
