@@ -14,7 +14,22 @@
 #
 # Use a descriptive name for your cluster:
 #
+# https://opensearch.org/docs/latest/opensearch/rest-api/cluster-allocation/
 cluster.name: {{cfg.cluster.name}}
+cluster.routing.allocation.node_concurrent_recoveries: {{cfg.cluster.routing.allocation.node_concurrent_recoveries}}
+cluster.routing.allocation.node_initial_primaries_recoveries: {{cfg.cluster.routing.allocation.node_initial_primaries_recoveries}}
+cluster.routing.allocation.same_shard.host: {{cfg.cluster.routing.allocation.same_shard_host}}
+# https://opensearch.org/docs/latest/opensearch/popular-api/
+cluster.routing.allocation.disk.watermark.low: 1GB
+cluster.routing.allocation.disk.watermark.high: 500MB
+cluster.routing.allocation.disk.watermark.flood_stage: 250MB
+cluster.info.update.interval: 1m
+
+cluster.max_shards_per_node: {{cfg.cluster.max_shards_per_node}}
+
+{{#if cfg.cluster.routing.allocation.awareness_attributes ~}}
+cluster.routing.allocation.awareness.attributes: {{cfg.cluster.routing.allocation.awareness_attributes}}
+{{/if ~}}
 #
 # ------------------------------------ Node ------------------------------------
 #
@@ -24,6 +39,8 @@ cluster.name: {{cfg.cluster.name}}
 {{#if cfg.node.name ~}}
 node.name: {{cfg.node.name}}
 {{/if ~}}
+node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
+
 #
 # Add custom attributes to the node:
 #
@@ -44,6 +61,19 @@ path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
 {{#if cfg.path.repo ~}}
 path.repo: {{cfg.path.repo}}
 {{/if ~}}
+
+indices.recovery.max_bytes_per_sec: {{cfg.indices.recovery.max_bytes_per_sec}}
+
+{{#if cfg.indices.fielddata.cache_size ~}}
+indices.fielddata.cache.size: {{cfg.indices.fielddata.cache_size}}
+{{/if ~}}
+
+indices.breaker.total.limit: {{cfg.indices.breaker.total_limit}}
+indices.breaker.fielddata.limit: {{cfg.indices.breaker.fielddata_limit}}
+indices.breaker.fielddata.overhead: {{cfg.indices.breaker.fielddata_overhead}}
+indices.breaker.request.limit: {{cfg.indices.breaker.request_limit}}
+indices.breaker.request.overhead: {{cfg.indices.breaker.request_overhead}}
+
 # ----------------------------------- Memory -----------------------------------
 #
 # Lock the memory on startup:
@@ -95,10 +125,15 @@ discovery.type: single-node
 #
 # Block initial recovery after a full cluster restart until N nodes are started:
 #
-#gateway.recover_after_nodes: 3
+#https://github.com/opensearch-project/OpenSearch/issues/3117
 {{#if cfg.gateway.recover_after_nodes ~}}
 gateway.recover_after_nodes: {{cfg.gateway.recover_after_nodes}}
 {{/if ~}}
+gateway.expected_data_nodes: {{cfg.gateway.expected_data_nodes}}
+{{#if cfg.gateway.recover_after_time ~}}
+gateway.recover_after_time: {{cfg.gateway.recover_after_time}}
+{{/if ~}}
+
 #
 # For more information, consult the gateway module documentation.
 #
@@ -130,7 +165,6 @@ plugins.security.check_snapshot_restore_write_privileges: true
 plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
 plugins.security.system_indices.enabled: true
 plugins.security.system_indices.indices: [".opendistro-alerting-config", ".opendistro-alerting-alert*", ".opendistro-anomaly-results*", ".opendistro-anomaly-detector*", ".opendistro-anomaly-checkpoints", ".opendistro-anomaly-detection-state", ".opendistro-reports-*", ".opendistro-notifications-*", ".opendistro-notebooks", ".opensearch-observability", ".opendistro-asynchronous-search-response*", ".replication-metadata-store"]
-node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
 
 #plugins.security.ssl.transport.keystore_type: "JKS"
 #plugins.security.ssl.transport.keystore_filepath: opensearch.keystore
