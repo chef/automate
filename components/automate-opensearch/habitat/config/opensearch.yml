@@ -14,11 +14,12 @@
 #
 # Use a descriptive name for your cluster:
 #
+# https://opensearch.org/docs/latest/opensearch/rest-api/cluster-allocation/
 cluster.name: {{cfg.cluster.name}}
 cluster.routing.allocation.node_concurrent_recoveries: {{cfg.cluster.routing.allocation.node_concurrent_recoveries}}
 cluster.routing.allocation.node_initial_primaries_recoveries: {{cfg.cluster.routing.allocation.node_initial_primaries_recoveries}}
 cluster.routing.allocation.same_shard.host: {{cfg.cluster.routing.allocation.same_shard_host}}
-
+# https://opensearch.org/docs/latest/opensearch/popular-api/
 cluster.routing.allocation.disk.watermark.low: 1GB
 cluster.routing.allocation.disk.watermark.high: 500MB
 cluster.routing.allocation.disk.watermark.flood_stage: 250MB
@@ -124,12 +125,10 @@ discovery.type: single-node
 #
 # Block initial recovery after a full cluster restart until N nodes are started:
 #
-#gateway.recover_after_nodes: 3
+#https://github.com/opensearch-project/OpenSearch/issues/3117
 {{#if cfg.gateway.recover_after_nodes ~}}
 gateway.recover_after_nodes: {{cfg.gateway.recover_after_nodes}}
 {{/if ~}}
-gateway.expected_nodes: {{cfg.gateway.expected_nodes}}
-gateway.expected_master_nodes: {{cfg.gateway.expected_master_nodes}}
 gateway.expected_data_nodes: {{cfg.gateway.expected_data_nodes}}
 {{#if cfg.gateway.recover_after_time ~}}
 gateway.recover_after_time: {{cfg.gateway.recover_after_time}}
