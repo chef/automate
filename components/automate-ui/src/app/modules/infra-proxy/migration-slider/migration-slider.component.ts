@@ -32,7 +32,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   public skippedUsers: User[] = [];
   public deletedUsers: User[] = [];
   public updatedUsers: User[] = [];
-  public userData: User
+  public userData: User;
   public notReadyToConfirm = true;
   public userExist: boolean;
   public checking_user = false;
@@ -48,12 +48,20 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   ngOnChanges() {
     const group = {};
     if (this.previewData) {
-      this.totalUsers = this.previewData.staged_data.users
-      this.skippedUsers = this.previewData.staged_data.users.filter((obj: User) => obj.action_ops == 2);
-      this.deletedUsers = this.previewData.staged_data.users.filter((obj: User) => obj.action_ops == 3);
-      this.updatedUsers = this.previewData.staged_data.users.filter((obj: User) => obj.action_ops == 4);
-
-      this.previewData.staged_data.users = this.previewData.staged_data.users.filter((obj: User) => obj.action_ops == 1);
+      this.selectedUsersData = [];
+      this.totalUsers = this.previewData.staged_data.users;
+      // skipped users
+      this.skippedUsers =
+        this.previewData.staged_data.users.filter((obj: User) => obj.action_ops === 2);
+      // deleted users
+      this.deletedUsers =
+        this.previewData.staged_data.users.filter((obj: User) => obj.action_ops === 3);
+      // updated users
+      this.updatedUsers =
+        this.previewData.staged_data.users.filter((obj: User) => obj.action_ops === 4);
+      // users for migration
+      this.previewData.staged_data.users =
+        this.previewData.staged_data.users.filter((obj: User) => obj.action_ops === 1);
       this.previewData.staged_data.users.forEach(
         (input_template: { automate_username: string | number, is_conflicting: boolean }) => {
         group[input_template.automate_username] = new FormControl(
@@ -61,12 +69,11 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
       });
 
       this.usersData = this.previewData.staged_data.users.map(
-        (obj: User) => ({ ...obj, is_seleted: false, checking_conflcit: false })
+        (obj: User) => ({ ...obj, is_selected: false, checking_conflcit: false })
       );
       this.conflictedUsers = this.usersData.filter((obj: User) => obj.is_conflicting);
       this.usersData.forEach((item: User) => item.is_selected = true);
       this.usersData.forEach((item: User) => this.selectedUsersData.push(item));
-      this.checkNotreadyToConfirm();
     }
     this.migrationForm = new FormGroup(group);
   }
@@ -90,12 +97,32 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   toggleSlide() {
     this.isSlideOpen1 = !this.isSlideOpen1;
     this.usersData.forEach((item: User) => item.is_selected = false);
+    this.selectedUsersData = [];
   }
 
   confirmPreviewData() {
-    this.toggleSlide();
-    this.confirmPreview.emit(this.selectedUsersData);
-    this.selectedUsersData = [];
+    const selectedUsersForMigation =
+      this.selectedUsersData.filter(e => e.is_conflicting === true).length;
+    if ( selectedUsersForMigation === 0 ) {
+      this.confirmPreview.emit(this.selectedUsersData);
+      this.toggleSlide();
+    } else {
+      this.selectedUsersData.forEach((item: User) => {
+        if (item.is_conflicting) {
+          const input = document.getElementById(item.email + '-input');
+          const warning = document.getElementById(item.email + '-warning');
+          input?.classList?.add('user-exist-warning');
+          warning?.classList?.remove('warning-msg-hide');
+        }
+      });
+      this.conflictedUsers.forEach((item: User) => {
+        if (!item.is_selected) {
+          const input = document.getElementById(item.email + '-input');
+          input?.classList?.remove('user-exist-warning');
+        }
+      });
+    }
+
   }
 
   slidePanel() {
@@ -107,10 +134,15 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
     this.usersData.forEach((item: User) => item.is_selected = checked);
     if (checked) {
       this.usersData.forEach((item: User) => this.selectedUsersData.push(item));
+      this.conflictedUsers = [];
+      this.usersData.forEach((item: User) => {
+        if (item.is_conflicting) {
+          this.conflictedUsers.push(item);
+        }
+      });
     } else {
       this.selectedUsersData = [];
     }
-    this.checkNotreadyToConfirm();
   }
 
   selectedUser(event: Event, user: User) {
@@ -136,6 +168,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
       }
     } else {
       this.selectedUsersData.push(this.usersData[index]);
+      this.selectedUsersData.forEach((item: User) => item.is_selected = true);
       warning?.classList?.remove('warning-msg-hide');
       this.callAndSetUserData(user);
     }
@@ -158,7 +191,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   }
 
   callAndSetUserData(user: User) {
-    this.userData = user
+    this.userData = user;
     const input = document.getElementById(this.userData.email + '-input');
     const username = this.userData.username;
     const index = this.usersData.findIndex(x => x.username === username);
@@ -179,37 +212,37 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
           if (checkUserSt === EntityStatus.loadingSuccess && !isNil(getCheckedUserState)) {
             if ((input as HTMLInputElement).value === getCheckedUserState.user.id) {
               input.classList.add('user-exist-warning');
-  
-              const index = this.usersData.findIndex(x => x.username === user.username);
+              const index1 = this.usersData.findIndex(x => x.username === user.username);
               this.conflictedUsers.forEach((item: User) => {
                 if (item.username !== user.username) {
-                  this.conflictedUsers.push(this.usersData[index]);
+                  this.conflictedUsers.push(this.usersData[index1]);
                 }
               });
-  
+
               // uniq data for the conflcted users
               this.conflictedUsers = [...new Set(this.conflictedUsers)];
-  
+
               this.selectedUsersData.forEach((item: User) => {
                 if (item.username === user.username) {
                   item.is_conflicting = true;
                 }
               });
-  
+
               // uniq data for the selected users
               this.selectedUsersData = [...new Set(this.selectedUsersData)];
-  
+
               this.usersData.forEach((item: User) => {
                 if (item.username === user.username) {
                   item.is_conflicting = true;
                 }
               });
-  
+
               // uniq data for the users data
               this.usersData = [...new Set(this.usersData)];
-  
+
               // reassign the old username
-              this.usersData[index].automate_username = (input as HTMLInputElement).dataset.username;
+              this.usersData[index].automate_username =
+                (input as HTMLInputElement).dataset.username;
             }
           } else {
             if (this.userData.automate_username === username) {
@@ -246,14 +279,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
             }
           }
         });
-      this.checkNotreadyToConfirm();
     }
     user.checking_conflcit = false;
-  }
-
-  checkNotreadyToConfirm() {
-    const selectedConflictUsersCount =
-        this.selectedUsersData.filter(e => e.is_conflicting === true).length;
-      this.notReadyToConfirm = selectedConflictUsersCount === 0 ? false : true;
   }
 }

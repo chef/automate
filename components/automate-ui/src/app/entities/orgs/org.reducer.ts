@@ -3,7 +3,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { OrgActionTypes, OrgActions, UploadSuccessPayload, PreviewSuccessPayload, CheckUserPayload } from './org.actions';
+import { OrgActionTypes,
+  OrgActions,
+  UploadSuccessPayload,
+  PreviewSuccessPayload,
+  CheckUserPayload
+} from './org.actions';
 import { Org } from './org.model';
 
 export interface OrgEntityState extends EntityState<Org> {
