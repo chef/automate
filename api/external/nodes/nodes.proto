@@ -46,10 +46,9 @@ service NodesService {
 			post: "/api/v0/nodes"
 			body: "*"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node"
-			action: "infra:node:create"
-		};
+		
+		option (chef.automate.api.iam.policy).resource = "infra:nodes";
+		option (chef.automate.api.iam.policy).action = "infra:nodes:create";
 	};
 
 	/*
@@ -66,10 +65,9 @@ service NodesService {
 		option (google.api.http) = {
 			get: "/api/v0/nodes/id/{id}"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node:{id}"
-			action: "infra:node:get"
-		};
+
+		option (chef.automate.api.iam.policy).resource = "infra:nodes:{id}";
+		option (chef.automate.api.iam.policy).action = "infra:nodes:get";
 	};
 
 	/*
@@ -89,10 +87,9 @@ service NodesService {
 			put: "/api/v0/nodes/id/{id}"
 			body: "*"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node:{id}"
-			action: "infra:node:update"
-		};
+
+		option (chef.automate.api.iam.policy).resource = "infra:nodes:{id}";
+		option (chef.automate.api.iam.policy).action = "infra:nodes:update";
 	};
 
 	/*
@@ -109,10 +106,9 @@ service NodesService {
 		option (google.api.http) = {
 			delete: "/api/v0/nodes/id/{id}"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node:{id}"
-			action: "infra:node:delete"
-		};
+
+		option (chef.automate.api.iam.policy).resource = "infra:nodes:{id}";
+		option (chef.automate.api.iam.policy).action = "infra:nodes:delete";
 	};
 
 	/*
@@ -131,10 +127,9 @@ service NodesService {
 			post: "/api/v0/nodes/delete/ids"
 			body: "*"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node"
-			action: "infra:node:delete"
-		};
+		
+		option (chef.automate.api.iam.policy).resource = "infra:nodes";
+		option (chef.automate.api.iam.policy).action = "infra:nodes:delete";
 	};
 
 	/*
@@ -172,10 +167,9 @@ service NodesService {
 			post: "/api/v0/nodes/search"
 			body: "*"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node"
-			action: "infra:node:list"
-		};
+
+		option (chef.automate.api.iam.policy).resource = "infra:nodes";
+		option (chef.automate.api.iam.policy).action ="infra:nodes:list";
 	};
 
 	/*
@@ -192,10 +186,9 @@ service NodesService {
 		option (google.api.http) = {
 			get: "/api/v0/nodes/rerun/id/{id}"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node:{id}"
-			action: "infra:node:rerun"
-		};
+
+		option (chef.automate.api.iam.policy).resource = "infra:nodes:{id}";
+		option (chef.automate.api.iam.policy).action ="infra:nodes:rerun";
 	};
 
 	/*
@@ -222,10 +215,9 @@ service NodesService {
 			post: "/api/v0/nodes/delete"
 			body: "*"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node"
-			action: "infra:node:delete"
-		};
+
+		option (chef.automate.api.iam.policy).resource = "infra:nodes";
+		option (chef.automate.api.iam.policy).action = "infra:nodes:delete";
 	};
 
 	/*
@@ -261,10 +253,9 @@ service NodesService {
 			post: "/api/v0/nodes/bulk-create"
 			body: "*"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "infra:node"
-			action: "infra:node:create"
-		};
+
+		option (chef.automate.api.iam.policy).resource = "infra:nodes";
+		option (chef.automate.api.iam.policy).action = "infra:nodes:create";
 	};
 
 }
