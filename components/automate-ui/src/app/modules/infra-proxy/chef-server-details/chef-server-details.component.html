@@ -240,6 +240,11 @@
         </form>
       </section>
       <section class="page-body" *ngIf="tabValue === 'users'">
+        <app-reset-user-key
+          [openEvent]="openNotificationModal"
+          [serverId]="server?.id"
+          [name]="username">
+        </app-reset-user-key>
         <div id="user-table-container" *ngIf="isUserListLoaded">
           <chef-table>
             <chef-thead>
@@ -249,13 +254,13 @@
                 <chef-th class="three-dot-column no-border"></chef-th>
               </chef-tr>
             </chef-thead>
-            <chef-tbody *ngFor = "let users of users.users">
+            <chef-tbody *ngFor = "let user of users.users">
               <chef-tr>
-                <chef-td class="userName-column">{{users.infra_server_username}}</chef-td>
-                <chef-td class="automate-column">{{users.automate_user_id}}</chef-td>
+                <chef-td class="userName-column">{{user.infra_server_username}}</chef-td>
+                <chef-td class="automate-column">{{user.automate_user_id}}</chef-td>
                 <chef-td class="three-dot-column">
                     <mat-select panelClass="chef-control-menu">
-                    <mat-option data-cy="delete-org">Fetch PEM Key</mat-option>
+                      <mat-option data-cy="resetPUserEMKey" (onSelectionChange)="resetUserPEMKey(user.infra_server_username)">Reset User Key</mat-option>
                     </mat-select>
                 </chef-td>
               </chef-tr>

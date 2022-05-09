@@ -152,6 +152,11 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   @ViewChild('upload', { static: false }) upload: SyncOrgUsersSliderComponent;
 
+  // reset user pem key
+  public openNotificationModal = new EventEmitter<void>();
+  public username: string;
+
+
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
@@ -672,5 +677,11 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
         this.migrationLoading = false;
       });
+  }
+
+  resetUserPEMKey(username: string) {
+    console.log('resetPEM', username);
+    this.username = username;
+    this.openNotificationModal.emit();
   }
 }
