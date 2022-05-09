@@ -439,6 +439,7 @@ func getAllVersions(ctx context.Context, url string) ([]string, error) {
 		return []string{}, errors.Wrap(err, "error in preparing the request to get the list of available versions")
 	}
 	req = req.WithContext(ctx)
+
 	config := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			MinVersion:         tls.VersionTLS12,
