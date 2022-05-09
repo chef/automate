@@ -394,6 +394,7 @@ func preRequisteForESDataMigration() (bool, error) {
 	return existDir, nil
 }
 
+/*
 const script = `
 mv /hab/svc/automate-opensearch/data /hab/svc/automate-opensearch/data.os;
 mv /hab/svc/automate-opensearch/var /hab/svc/automate-opensearch/var.os;
@@ -402,6 +403,16 @@ cp -r /hab/svc/automate-elasticsearch/var /hab/svc/automate-opensearch/;
 chown -RL hab:hab /hab/svc/automate-opensearch/data;
 chown -RL hab:hab /hab/svc/automate-opensearch/var;
 `
+*/
+const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+
+const fscript = `
+mv %[1]vsvc/automate-opensearch/data %[1]vsvc/automate-opensearch/data.os; 
+mv %[1]vsvc/automate-opensearch/var %[1]vsvc/automate-opensearch/var.os; 
+cp -r %[1]vsvc/automate-elasticsearch/data %[1]vsvc/automate-opensearch/; 
+cp -r %[1]vsvc/automate-elasticsearch/var %[1]vsvc/automate-opensearch/; 
+chown -RL hab:hab %[1]vsvc/automate-opensearch/data; 
+chown -RL hab:hab %[1]vsvc/automate-opensearch/var;`
 
 // esMigrateExecutor
 func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
@@ -441,8 +452,10 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
 			writer.Fail(err.Error())
 		}
 	}()
-
+	habRoot := getHabRootPath(habrootcmd)
+	script := fmt.Sprintf(fscript, habRoot)
 	command := exec.Command("/bin/sh", "-c", script)
+
 	err := command.Run()
 	if err != nil {
 		writer.Fail(err.Error())
@@ -454,6 +467,19 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
 	}
 	writer.Title("Done with Migration \n Please wait for some time to reindex the data")
 	return nil
+}
+
+func getHabRootPath(habrootcmd string) string {
+	out, err := exec.Command(habrootcmd).Output()
+	if err != nil {
+		writer.Fail(err.Error())
+		return ""
+	}
+	pkgPath := string(out)
+	writer.Title("HAB Root Path " + pkgPath)
+	habIndex := strings.Index(string(pkgPath), "hab")
+	rootHab := pkgPath[0 : habIndex+4] // this will give <>/<>/hab/
+	return rootHab
 }
 
 func getLatestPgPath() {
@@ -540,11 +566,20 @@ func cleanUp() error {
 	return nil
 }
 
+/*
 const cleanUpScript = `
 rm -rf /hab/svc/automate-opensearch/data.os;
 rm -rf /hab/svc/automate-opensearch/var.os;
 rm -rf /hab/svc/automate-elasticsearch/data;
 rm -rf /hab/svc/automate-elasticsearch/var;
+`
+*/
+
+const fcleanUpScript = `
+rm -rf %[1]vsvc/automate-opensearch/data.os;
+rm -rf %[1]vsvc/automate-opensearch/var.os;
+rm -rf %[1]vsvc/automate-elasticsearch/data;
+rm -rf %[1]vsvc/automate-elasticsearch/var;
 `
 
 func cleanUpes() error {
@@ -558,6 +593,8 @@ func cleanUpes() error {
 			return err
 		}
 	}
+	habRoot := getHabRootPath(habrootcmd)
+	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
 
 	command := exec.Command("/bin/sh", "-c", cleanUpScript)
 	err := command.Run()
