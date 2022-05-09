@@ -440,7 +440,10 @@ func getAllVersions(ctx context.Context, url string) ([]string, error) {
 	}
 	req = req.WithContext(ctx)
 	config := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
 	}
 	httpClient := &http.Client{Transport: config}
 	response, err := httpClient.Do(req)
