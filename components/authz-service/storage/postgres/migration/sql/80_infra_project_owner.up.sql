@@ -3,7 +3,7 @@ BEGIN;
 UPDATE iam_roles
     SET
         actions = '{
-	    infra:node:*,
+	    infra:nodes:*,
 	    infra:nodeManagers:*,
             infra:*:list,
             infra:*:get,
