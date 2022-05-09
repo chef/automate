@@ -174,7 +174,7 @@ func CreatePreviewSrc(service *service.Service) PhaseOnePipelineProcessor {
 }
 
 func createPreviewSrc(result <-chan PipelineData, service *service.Service) <-chan PipelineData {
-	log.Info("Starting to craete preview pipeline")
+	log.Info("Starting to create preview pipeline")
 
 	out := make(chan PipelineData, 100)
 
@@ -201,6 +201,10 @@ func createPreviewSrc(result <-chan PipelineData, service *service.Service) <-ch
 				continue
 			}
 			res.Result = result
+			// Clear backup files
+			if err = ClearBackUpFiles(result.Meta.ZipFile); err != nil {
+				log.Errorf("cannot delete the zipfile: %+v", err)
+			}
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
@@ -392,6 +396,10 @@ func (p *PhaseOnePipeline) Run(result pipeline.Result, service *service.Service)
 	if err != nil {
 		MigrationError(err, service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
+		// Clear backup files
+		if err = ClearBackUpFiles(result.Meta.ZipFile); err != nil {
+			log.Errorf("cannot delete the zipfile: %+v", err)
+		}
 	}
 	log.Info("received done")
 }

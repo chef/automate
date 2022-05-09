@@ -2,7 +2,6 @@ package manifest
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -439,14 +438,7 @@ func getAllVersions(ctx context.Context, url string) ([]string, error) {
 		return []string{}, errors.Wrap(err, "error in preparing the request to get the list of available versions")
 	}
 	req = req.WithContext(ctx)
-
-	config := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: true,
-		},
-	}
-	httpClient := &http.Client{Transport: config}
+	httpClient := &http.Client{}
 	response, err := httpClient.Do(req)
 	if err != nil {
 		return []string{}, errors.Wrap(err, fmt.Sprintf("error in invoking the endpoint %s", url))
