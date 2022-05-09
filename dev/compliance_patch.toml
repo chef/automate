@@ -1,0 +1,2 @@
+[compliance.v1.sys.service]
+message_buffer_size = 2000
