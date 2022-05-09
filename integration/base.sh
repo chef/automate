@@ -178,7 +178,8 @@ do_create_config_default() {
         --channel $test_channel \
         --file "$test_config_path" \
         --upgrade-strategy "$test_upgrade_strategy" \
-        --es-mem "1g"
+        --es-mem "2g" \
+        --os-mem "2g"
     cat >> "$test_config_path" <<EOF
 [deployment.v1.sys.log]
   level = "debug"
