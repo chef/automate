@@ -6,7 +6,7 @@ draft = false
 [menu]
   [menu.automate]
     title = "Upgrade to Opensearch"
-    identifier = "automate/configuring_automate/opensearch/upgrade_to_opensearch.md opensearch_external_upgrade.md"
+    identifier = "automate/configuring_automate/elasticsearch/opensearch_external_upgrade.md opensearch_external_upgrade.md"
     parent = "automate/configuring_automate/opensearch"
 +++
 
