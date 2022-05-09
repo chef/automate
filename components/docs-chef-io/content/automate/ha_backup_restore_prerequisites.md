@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 
-{{< note >}} For AWS infra, if you added `backup_config` during provisioning, prerequistes will already configured as part of deployment itself. So this can be skipped if you are using AWS infra. {{< /note >}}
+{{< note >}} For AWS infra, if you added `backup_config` during provisioning, prerequisites will already be configured as part of deployment itself. Skip this step if you are using AWS infra. {{< /note >}}
 
 This page explains the prerequisites of the on-premise backup.
 
