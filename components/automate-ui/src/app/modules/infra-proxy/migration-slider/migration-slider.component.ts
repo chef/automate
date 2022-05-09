@@ -83,7 +83,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed.next();
+    this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
 
