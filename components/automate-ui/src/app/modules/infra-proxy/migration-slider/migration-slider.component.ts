@@ -142,6 +142,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
       });
     } else {
       this.selectedUsersData = [];
+      this.conflictedUsers = [];
     }
   }
 

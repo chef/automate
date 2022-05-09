@@ -42,7 +42,8 @@
                 </li>
                 <li>
                   <span class="heading">Last sync date</span>
-                  <span class="server-entity-value">{{ server?.last_migration_time | date:'medium' }}</span>
+                  <span *ngIf="migration_id !== ''" class="server-entity-value">{{ server?.last_migration_time | date:'medium' }}</span>
+                  <span *ngIf="migration_id === ''" class="server-entity-value">--</span>
                 </li>
                 <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
                   <li>

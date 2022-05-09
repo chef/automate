@@ -416,6 +416,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
           if (this.migration_id !== '') {
             this.migrationLoading = true;
             setTimeout(() => { this.getMigrationStatus(this.migration_id); }, 2000);
+          } else {
+            this.migrationLoading = false;
           }
         }
     });
