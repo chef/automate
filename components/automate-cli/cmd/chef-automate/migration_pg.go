@@ -491,7 +491,7 @@ func getLatestPgPath() {
 	}
 	output := string(cmd)
 
-	output = strings.Split(output, "\n")[0]
+	///output = strings.Split(output, "\n")[0]
 
 	if strings.TrimSpace(output) == "" {
 		return
