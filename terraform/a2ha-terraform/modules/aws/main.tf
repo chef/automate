@@ -229,7 +229,7 @@ resource "aws_instance" "chef_automate_opensearch" {
   ami                         = local.ami
   instance_type               = var.opensearch_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
-  subnet_id                   = length(var.public_custom_subnets) > 0 ? element(data.aws_subnet.public.*.id, count.index) : element(aws_subnet.public.*.id, count.index)
+  subnet_id                   = length(var.private_custom_subnets) > 0 ? element(data.aws_subnet.default.*.id, count.index) : element(aws_subnet.default.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = false //Changes to false as Dashboards are no longer enabled
   ebs_optimized               = true

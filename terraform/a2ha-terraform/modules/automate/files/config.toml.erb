@@ -128,11 +128,11 @@
 <% end %>
 
 <% if overrides[:backup_config_s3] == "true" -%>
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
   enable = true
   location = "s3"
 
-[global.v1.external.elasticsearch.backup.s3]
+[global.v1.external.opensearch.backup.s3]
 
   # bucket (required): The name of the bucket
   bucket = "<%= overrides[:bucket_name] %>"
@@ -147,7 +147,7 @@
   # Elasticsearch nodes
   client = "default"
 
-[global.v1.external.elasticsearch.backup.s3.settings]
+[global.v1.external.opensearch.backup.s3.settings]
   ## The meaning of these settings is documented in the S3 Repository Plugin
   ## documentation. See the following links:
   ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html

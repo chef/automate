@@ -21,6 +21,8 @@ export ES_STARTUP_SLEEP_TIME={{cfg.runtime.es_startup_sleep_time}}
 export TMPDIR="{{pkg.svc_var_path}}/tmp"
 export ES_TMPDIR="{{pkg.svc_var_path}}/tmp"
 export ES_PATH_CONF="{{pkg.svc_config_path}}"
+JDK_PKG_PATH=`HAB_LICENSE=accept-no-persist hab pkg path chef/automate-openjdk`
+export JDK_PKG_PATH
 
 # Initialize the secrets keystore and trusted certs ca keystore
 source {{pkg.svc_config_path}}/init_keystore
@@ -38,6 +40,9 @@ chmod 0600 {{pkg.svc_config_path}}/admin-key.pem
 chmod 0600 {{pkg.svc_config_path}}/node1-key.pem
 chmod 0600 {{pkg.svc_config_path}}/node2-key.pem
 chmod 0600 {{pkg.svc_config_path}}/client-key.pem
+
+echo "JDK PATH"
+echo $JDK_PKG_PATH
 
 echo "Executing opensearch securityadmin"
 echo "......................................................................."
@@ -60,6 +65,13 @@ export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
 hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/root-ca.pem -nhnv
 
 echo "Done !!!! Executing opensearch securityadmin"
+
+hab pkg exec chef/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
+
+hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore {{pkg.svc_var_path}}/ca.jks -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
+
+hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore $JDK_PKG_PATH/lib/security/cacerts -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
+
 #exec opensearch
 #hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9201 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
 #hab pkg exec core/bash {{pkg.path}}/os/opensearch-tar-install.sh
