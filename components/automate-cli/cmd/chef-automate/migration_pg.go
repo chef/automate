@@ -475,16 +475,17 @@ func getHabRootPath(habrootcmd string) string {
 		writer.Fail(err.Error())
 		return ""
 	}
-	pkgPath := string(out)
+	pkgPath := string(out) // /a/b/c/hab    /hab/svc
 	writer.Title("HAB Root Path " + pkgPath)
 	habIndex := strings.Index(string(pkgPath), "hab")
 	rootHab := pkgPath[0 : habIndex+4] // this will give <>/<>/hab/
 	return rootHab
 }
 
+const habRootPathForPg = "HAB_LICENSE=accept-no-persist hab pkg path core/postgresql13"
+
 func getLatestPgPath() {
-	latestPgPath := "lsof -F n| grep /hab/pkgs/core/postgresql13 | awk '{print $0}' | awk -F \"/\" '/1/ {print $5\"/\"$6\"/\"$7}' | uniq"
-	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
+	cmd, err := exec.Command("/bin/sh", "-c", habRootPathForPg).Output()
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
@@ -497,7 +498,7 @@ func getLatestPgPath() {
 	}
 
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
-		NEW_BIN_DIR = "/hab/pkgs/core/" + strings.TrimSpace(output) + "/bin"
+		NEW_BIN_DIR = strings.TrimSpace(output) + "/bin"
 	} else {
 		fmt.Printf("latest version %s not found", NEW_PG_VERSION)
 	}
