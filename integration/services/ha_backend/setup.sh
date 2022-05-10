@@ -100,15 +100,6 @@ mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
 echo "Configuring HA Backend Services"
 
-echo "listing config folder files"
-sudo ls -l /hab/svc/automate-ha-opensearch/config
-
-echo "Checking cert file contents"
-
-sudo cat /hab/svc/automate-ha-opensearch/config/root-ca.pem
-sudo cat /hab/svc/automate-ha-opensearch/config/node1.pem
-sudo cat /hab/svc/automate-ha-opensearch/config/node1-key.pem
-
 mkdir -p "/hab/user/${OPENSEARCH_PKG_NAME}/config/"
 cat > "/hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml" <<EOF
 [runtime]
