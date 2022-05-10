@@ -12,6 +12,10 @@ _frontend2_container_name="$(service_container_name "cs2")"
 do_setup() {
     do_setup_default
 
+    echo "-------------------------------------"
+    echo "INSIDE do_setup() OF ha_chef_server.sh"
+    echo "-------------------------------------"
+
     echo "Setting up Habitat"
     groupadd hab
     useradd -g hab hab

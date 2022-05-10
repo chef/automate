@@ -98,6 +98,20 @@ hostname=$(hostname)
 # copy the certs to the correct names
 mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
+echo "INSIDE integration/services/ha_backend/setup.sh"
+
+echo "list of files in certificates folder"
+ls -lrt /certificates
+
+echo "cat /certificates/MyRootCA.pem"
+cat /certificates/MyRootCA.pem
+
+echo "cat /certificates/odfe-node.pem"
+cat /certificates/odfe-node.pem
+
+echo "cat /certificates/odfe-node.key"
+cat /certificates/odfe-node.key
+
 echo "Configuring HA Backend Services"
 
 mkdir -p "/hab/user/${OPENSEARCH_PKG_NAME}/config/"
@@ -137,6 +151,9 @@ admin_key    = """$(cat /certificates/odfe-admin.key)"""
 ssl_cert    = """$(cat /certificates/odfe-node.pem)"""
 ssl_key     = """$(cat /certificates/odfe-node.key)"""
 EOF
+
+echo "Checking user.toml of OPENSEARCH CONFIG"
+cat /hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml
 
 mkdir -p "/hab/user/${ELASTICSIDECAR_PKG_NAME}/config/"
 cat > "/hab/user/${ELASTICSIDECAR_PKG_NAME}/config/user.toml" <<EOF

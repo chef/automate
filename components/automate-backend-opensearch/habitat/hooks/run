@@ -53,6 +53,23 @@ ls -ltrh {{pkg.svc_config_path}}
 echo "......................................................................."
 # /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh 
 
+echo "****** INSIDE OPENSEARCH PACKAGE RUN HOOK *******"
+
+echo "{{pkg.svc_config_path}}/root-ca.pem -------------"
+cat {{pkg.svc_config_path}}/root-ca.pem
+
+echo "{{pkg.svc_config_path}}/admin.pem -------------"
+cat {{pkg.svc_config_path}}/admin.pem
+
+echo "{{pkg.svc_config_path}}/admin-key.pem -------------"
+cat {{pkg.svc_config_path}}/admin-key.pem
+
+echo "{{pkg.svc_config_path}}/node1.pem -----------------"
+cat {{pkg.svc_config_path}}/node1.pem
+
+echo "{{pkg.svc_config_path}}/node1-key.pem ------------"
+cat {{pkg.svc_config_path}}/node1-key.pem
+
 echo "Inserted default securityconfig opensearch"
 
 #hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.path}}/os/plugins/opensearch-security/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/admin-key.pem -nhnv
