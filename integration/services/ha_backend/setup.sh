@@ -101,13 +101,13 @@ mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 echo "Configuring HA Backend Services"
 
 echo "listing config folder files"
-ls -l /hab/svc/automate-ha-opensearch/config
+sudo ls -l /hab/svc/automate-ha-opensearch/config
 
 echo "Checking cert file contents"
 
-cat /hab/svc/automate-ha-opensearch/config/root-ca.pem
-cat /hab/svc/automate-ha-opensearch/config/node1.pem
-cat /hab/svc/automate-ha-opensearch/config/node1-key.pem
+sudo cat /hab/svc/automate-ha-opensearch/config/root-ca.pem
+sudo cat /hab/svc/automate-ha-opensearch/config/node1.pem
+sudo cat /hab/svc/automate-ha-opensearch/config/node1-key.pem
 
 mkdir -p "/hab/user/${OPENSEARCH_PKG_NAME}/config/"
 cat > "/hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml" <<EOF
@@ -128,16 +128,13 @@ repo = "/services/ha_backend_backups"
 
 [discovery]
 ping_unicast_hosts = ["$(head -n 1 /services/ha_backend_peers)"]
-[es_yaml.cluster.routing.allocation.disk.watermark]
+
+[cluster.routing.allocation.disk.watermark]
 low = "95%"
 high = "98%"
 flood_stage = "99%"
 
-[es_yaml.opendistro_security]
-enable_snapshot_restore_privilege = true
-
-[opendistro_ssl]
-
+[tls]
 # root pem cert that signed the two cert/key pairs below
 rootCA = """$(cat /certificates/MyRootCA.pem)"""
 
