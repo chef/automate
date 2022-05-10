@@ -285,9 +285,9 @@ EOF
 
 ${var.saml == "true" ? local.saml_config : ""}
 
-[elasticsearch.v1.sys.runtime]
+[opensearch.v1.sys.runtime]
   heapsize = "${var.enable_cloudwatch_metrics == "true" ? "16g" : "2g"}"
-[elasticsearch.v1.sys.cluster]
+[opensearch.v1.sys.cluster]
   max_shards_per_node = ${var.enable_cloudwatch_metrics == "true" ? "1500" : "1000"}
 TOML
   }

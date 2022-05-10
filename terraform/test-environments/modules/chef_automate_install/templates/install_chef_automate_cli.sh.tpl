@@ -196,11 +196,12 @@ else
 y
 y
 y
+y
 y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
               sleep 45
               #shellcheck disable=SC2154
               wait_for_upgrade
-              chef-automate post-major-upgrade migrate --data=PG -y
+              echo "y" | chef-automate post-major-upgrade migrate --data=ES
             else
               echo "regular normal upgrade airgap"
               sleep 45
@@ -217,11 +218,12 @@ y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
 y
 y
 y
+y
 y" | chef-automate upgrade run --major
             sleep 45
             #shellcheck disable=SC2154
             wait_for_upgrade
-            chef-automate post-major-upgrade migrate --data=PG -y
+            echo "y" |chef-automate post-major-upgrade migrate --data=ES
           else
             echo "regular normal upgrade airgap false"
             sleep 45
