@@ -392,11 +392,13 @@ func (p *PhaseOnePipeline) Run(result pipeline.Result, service *service.Service)
 	if err != nil {
 		MigrationError(err, service.Migration, ctx, result.Meta.MigrationID, result.Meta.ServerID)
 		log.Errorf("Phase one pipeline received error for migration %s: %s", result.Meta.MigrationID, err)
-		// Clear backup files
-		if err = ClearBackUpFiles(result.Meta.ZipFile); err != nil {
-			log.Errorf("cannot delete the zipfile: %+v", err)
-		}
 	}
+
+	// Clear backup files
+	if err = ClearBackUpFiles(result.Meta.ZipFile); err != nil {
+		log.Errorf("cannot delete the zipfile: %+v", err)
+	}
+
 	log.Info("received done")
 }
 

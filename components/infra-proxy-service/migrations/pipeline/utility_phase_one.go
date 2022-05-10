@@ -66,11 +66,6 @@ func CreatePreview(ctx context.Context, st storage.Storage, mst storage.Migratio
 	}
 	log.Info("Successfully completed the create preview phase for migration id: ", result.Meta.MigrationID)
 
-	// Clear backup files
-	if err = ClearBackUpFiles(result.Meta.ZipFile); err != nil {
-		log.Errorf("cannot delete the zipfile: %+v", err)
-	}
-
 	return result, nil
 }
 
