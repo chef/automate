@@ -201,10 +201,6 @@ func createPreviewSrc(result <-chan PipelineData, service *service.Service) <-ch
 				continue
 			}
 			res.Result = result
-			// Clear backup files
-			if err = ClearBackUpFiles(result.Meta.ZipFile); err != nil {
-				log.Errorf("cannot delete the zipfile: %+v", err)
-			}
 			select {
 			case out <- res:
 			case <-res.Ctx.Done():
