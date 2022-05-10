@@ -610,3 +610,11 @@ func createLocalUser(ctx context.Context, localUserClient local_user.UsersMgmtSe
 	}
 	return nil
 }
+
+func ClearBackUpFiles(path string) error {
+	if err := os.RemoveAll(filepath.Dir(path)); err != nil {
+		log.Errorf("Unable to delete files and folders: %s", err.Error())
+		return err
+	}
+	return nil
+}
