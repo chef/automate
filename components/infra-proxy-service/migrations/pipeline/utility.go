@@ -65,6 +65,7 @@ func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverI
 
 //function to create a new iam project for each client
 func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, orgId string, authzProjectClient authz.ProjectsServiceClient) ([]string, error) {
+	var projectID *authz.CreateProjectResp
 
 	newProject := &authz.CreateProjectReq{
 		Name:         serverId + "_" + orgId,
@@ -72,9 +73,19 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 		SkipPolicies: false,
 	}
 
-	projectID, err := authzProjectClient.CreateProject(ctx, newProject)
+	existingProject := &authz.GetProjectReq{
+		Id: serverId + "_" + orgId,
+	}
+
+	projResp, err := authzProjectClient.GetProject(ctx, existingProject)
 	if err != nil {
-		return nil, err
+		log.Error("cannot get the project with the id: ", existingProject.Id)
+	}
+	if projResp == nil {
+		projectID, err = authzProjectClient.CreateProject(ctx, newProject)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return []string{projectID.Project.Name}, nil
