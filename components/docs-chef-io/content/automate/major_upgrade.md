@@ -12,6 +12,8 @@ gh_repo = "automate"
     weight = 20
 +++
 
+{{< warning >}} Existing A2 HA customers should NOT upgrade to 3.x now. Please wait for Automate HA release. {{< /warning >}}
+
 Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically. However, Chef Automate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to Chef Automate 3.x.
 
 ## Upgrade Journey
