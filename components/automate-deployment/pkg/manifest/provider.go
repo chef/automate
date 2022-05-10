@@ -440,13 +440,18 @@ func getAllVersions(ctx context.Context, url string) ([]string, error) {
 	}
 	req = req.WithContext(ctx)
 
+	// config := &http.Transport{
+	// 	TLSClientConfig: &tls.Config{
+	// 		MinVersion:         tls.VersionTLS12,
+	// 		InsecureSkipVerify: true,
+	// 	},
+	// }
 	config := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: true,
-		},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	httpClient := &http.Client{Transport: config}
+
+	// httpClient := &http.Client{Transport: config}
 	response, err := httpClient.Do(req)
 	if err != nil {
 		return []string{}, errors.Wrap(err, fmt.Sprintf("error in invoking the endpoint %s", url))

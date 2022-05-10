@@ -491,6 +491,16 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-supermarket-nginx",
+      "metadata": {
+        "name": "chef/automate-supermarket-nginx",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -664,7 +674,8 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-supermarket-redis",
-        "chef/automate-supermarket"
+        "chef/automate-supermarket",
+        "chef/automate-supermarket-nginx"
       ],
       "packages": null,
       "dependencies": [

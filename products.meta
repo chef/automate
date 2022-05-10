@@ -58,6 +58,7 @@
     "chef/automate-elasticsearch",
     "chef/automate-supermarket-redis",
     "chef/automate-supermarket",
+    "chef/automate-supermarket-nginx",
     "core/rsync"
   ],
 
@@ -186,7 +187,8 @@
       "dependencies": ["core","postgresql"],
       "services": [
         "chef/automate-supermarket-redis",
-        "chef/automate-supermarket"
+        "chef/automate-supermarket",
+        "chef/automate-supermarket-nginx"
       ]
     },
     {
