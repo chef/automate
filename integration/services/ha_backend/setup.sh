@@ -81,7 +81,7 @@ PGLEADERCHK_PKG_NAME="automate-ha-pgleaderchk"
 pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME"
 proxy_pkg_ident="chef/automate-ha-haproxy"
 OPENSEARCH_PKG_NAME="automate-ha-opensearch"
-opensearch_pkg_ident="chef/automate-ha-opensearch"
+opensearch_pkg_ident="sandhi18/automate-ha-opensearch/1.2.4/20220510131126"
 ELASTICSIDECAR_PKG_NAME="automate-ha-elasticsidecar"
 elasticsidecar_pkg_ident="chef/$ELASTICSIDECAR_PKG_NAME"
 
