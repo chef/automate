@@ -166,12 +166,20 @@ func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, i
 
 	logQueryPartMin(IndexNameFeeds, source, "GetFeed")
 	///// TODO remove this code before merge ////
+	catAlloc, err := efs.client.CatAllocation().FilterPath("explain").Do(context.Background())
+	if err != nil {
+		fmt.Println("failed to cat allocation")
+	}
+	catAllocJson, _ := json.Marshal(catAlloc)
+	fmt.Println(string(catAllocJson))
+	fmt.Println("------------------------------------------------------")
+	fmt.Println("------------------------------------------------------")
 	allShards, err := efs.client.CatShards().Pretty(true).Do(context.Background())
 	if err != nil {
 		fmt.Println("error in printing shards")
 	}
 	allShardsJson, _ := json.Marshal(allShards)
-	fmt.Println(allShardsJson)
+	fmt.Println(string(allShardsJson))
 	///// ----------------------------------------------------//////
 	searchService := efs.client.Search().
 		SearchSource(searchSource).
