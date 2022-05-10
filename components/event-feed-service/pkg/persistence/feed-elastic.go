@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -164,7 +165,13 @@ func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, i
 	}
 
 	logQueryPartMin(IndexNameFeeds, source, "GetFeed")
-
+	///// TODO remove this code before merge ////
+	allShards, err := efs.client.CatShards().Pretty(true).Do(context.Background())
+	if err != nil {
+		fmt.Println("error in printing shards")
+	}
+	fmt.Println(allShards)
+	///// ----------------------------------------------------//////
 	searchService := efs.client.Search().
 		SearchSource(searchSource).
 		Index(IndexNameFeeds)
