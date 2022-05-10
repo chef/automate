@@ -134,8 +134,8 @@ These flags enable you to migrate by skipping preflight checks for unsupported f
 ### External Elasticsearch cluster
 
 The Chef Automate 2 migration process requires manual intervention to migrate a Chef Automate 1 installation that uses external Elasticsearch.
-
-To migrate an external Elasticsearch cluster, please reach out to a Customer Success or Customer Support representative for assistance.
+In general, external systems are the responsiblity of the customer organization.
+If this is not something the customer organization can handle, we will be happy to offer a Professional Services engagement for this function.
 
 ### New Data Paths
 
