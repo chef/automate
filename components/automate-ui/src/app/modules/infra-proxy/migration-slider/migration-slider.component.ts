@@ -138,6 +138,8 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
       this.usersData.forEach((item: User) => {
         if (item.is_conflicting) {
           this.conflictedUsers.push(item);
+          const warning = document.getElementById(item.email + '-warning');
+          warning?.classList?.remove('warning-msg-hide');
         }
       });
     } else {
@@ -169,6 +171,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
       }
     } else {
       this.selectedUsersData.push(this.usersData[index]);
+      this.conflictedUsers.push(this.usersData[index]);
       this.selectedUsersData.forEach((item: User) => item.is_selected = true);
       warning?.classList?.remove('warning-msg-hide');
       this.callAndSetUserData(user);
