@@ -45,8 +45,8 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
 
     this.getOrgUsersData();
 
-    const abc = JSON.parse(localStorage.getItem('chef-automate-user'));
-    this.userName = abc['username'];
+    const getUsername = JSON.parse(localStorage.getItem('chef-automate-user'));
+    this.userName = getUsername['username'];
 
     combineLatest([
       this.store.select(getAllStatus),
@@ -88,7 +88,7 @@ export class OrgUsersComponent implements OnInit, OnDestroy {
     this.loading = true;
   }
 
-  resetPEMKey(name) {
+  resetPEMKey(name: string) {
     console.log('resetPEM', name);
     this.name = name;
     this.openNotificationModal.emit();
