@@ -46,17 +46,6 @@ func (p *pg) CreateProject(ctx context.Context, project *storage.Project, skipPo
 		return nil, storage.ErrProjectInGraveyard
 	}
 
-	// Don't insert if the project is already in the DB.
-	var ifExists bool
-	row = tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM iam_projects WHERE id=$1 OR name=$2)", project.ID, project.Name)
-	if err := row.Scan(&ifExists); err != nil {
-		err = p.processError(err)
-		// failed with an unexpected error
-		if err != storage.ErrNotFound {
-			return nil, err
-		}
-	}
-
 	if err := p.insertProjectWithQuerier(ctx, project, tx); err != nil {
 		return nil, p.processError(err)
 	}

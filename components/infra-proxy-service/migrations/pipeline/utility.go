@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -70,6 +71,18 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 		Name:         serverId + "_" + orgId,
 		Id:           serverId + "_" + orgId,
 		SkipPolicies: false,
+	}
+
+	existingProject := &authz.GetProjectReq{
+		Id: serverId + "_" + orgId,
+	}
+
+	projResp, err := authzProjectClient.GetProject(ctx, existingProject)
+	if err != nil {
+		log.Error("cannot get the project with the id: ", existingProject.Id)
+	}
+	if projResp != nil {
+		return nil, errors.New("the project with this id is already created!")
 	}
 
 	projectID, err := authzProjectClient.CreateProject(ctx, newProject)
