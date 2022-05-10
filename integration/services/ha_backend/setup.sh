@@ -99,25 +99,35 @@ hostname=$(hostname)
 mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
 echo "Configuring HA Backend Services"
+
+echo "listing config folder files"
+ls -l /hab/svc/automate-ha-opensearch/config
+
+echo "Checking cert file contents"
+
+cat /hab/svc/automate-ha-opensearch/config/root-ca.pem
+cat /hab/svc/automate-ha-opensearch/config/node1.pem
+cat /hab/svc/automate-ha-opensearch/config/node1-key.pem
+
 mkdir -p "/hab/user/${OPENSEARCH_PKG_NAME}/config/"
 cat > "/hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml" <<EOF
 [runtime]
 es_java_opts = "-Xms1024m -Xmx1024m"
 
-[es_yaml.network]
+[network]
 host = "0.0.0.0"
 
-[es_yaml.transport]
+[transport]
 host = "0.0.0.0"
 
-[es_yaml.bootstrap]
+[bootstrap]
 memory_lock = false
 
-[es_yaml.path]
+[path]
 repo = "/services/ha_backend_backups"
 
-[es_yaml.discovery.zen.ping.unicast]
-hosts = ["$(head -n 1 /services/ha_backend_peers)"]
+[discovery]
+ping_unicast_hosts = ["$(head -n 1 /services/ha_backend_peers)"]
 [es_yaml.cluster.routing.allocation.disk.watermark]
 low = "95%"
 high = "98%"
