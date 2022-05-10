@@ -170,7 +170,8 @@ func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, i
 	if err != nil {
 		fmt.Println("error in printing shards")
 	}
-	fmt.Println(allShards)
+	allShardsJson, _ := json.Marshal(allShards)
+	fmt.Println(allShardsJson)
 	///// ----------------------------------------------------//////
 	searchService := efs.client.Search().
 		SearchSource(searchSource).
