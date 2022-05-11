@@ -28,7 +28,7 @@ export JDK_PKG_PATH
 source {{pkg.svc_config_path}}/init_keystore
 source {{pkg.svc_config_path}}/init_ca
 
-cp {{pkg.path}}/os/config/certificates/* {{pkg.svc_config_path}}/
+# cp {{pkg.path}}/os/config/certificates/* {{pkg.svc_config_path}}/
 
 chmod 0600 {{pkg.svc_config_path}}/root-ca.pem
 chmod 0600 {{pkg.svc_config_path}}/admin.pem
@@ -57,6 +57,23 @@ echo "......................................................................."
 ls -ltrh {{pkg.svc_config_path}}
 echo "......................................................................."
 # /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh 
+
+echo "****** INSIDE OPENSEARCH PACKAGE RUN HOOK *******"
+
+echo "{{pkg.svc_config_path}}/root-ca.pem -------------"
+cat {{pkg.svc_config_path}}/root-ca.pem
+
+echo "{{pkg.svc_config_path}}/admin.pem -------------"
+cat {{pkg.svc_config_path}}/admin.pem
+
+echo "{{pkg.svc_config_path}}/admin-key.pem -------------"
+cat {{pkg.svc_config_path}}/admin-key.pem
+
+echo "{{pkg.svc_config_path}}/node1.pem -----------------"
+cat {{pkg.svc_config_path}}/node1.pem
+
+echo "{{pkg.svc_config_path}}/node1-key.pem ------------"
+cat {{pkg.svc_config_path}}/node1-key.pem
 
 echo "Inserted default securityconfig opensearch"
 

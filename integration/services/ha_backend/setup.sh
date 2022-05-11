@@ -98,36 +98,39 @@ hostname=$(hostname)
 # copy the certs to the correct names
 mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
+echo "INSIDE integration/services/ha_backend/setup.sh"
+
+echo "list of files in certificates folder"
+ls -lrt /certificates
+
 echo "Configuring HA Backend Services"
+
 mkdir -p "/hab/user/${OPENSEARCH_PKG_NAME}/config/"
 cat > "/hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml" <<EOF
 [runtime]
 es_java_opts = "-Xms1024m -Xmx1024m"
 
-[es_yaml.network]
+[network]
 host = "0.0.0.0"
 
-[es_yaml.transport]
+[transport]
 host = "0.0.0.0"
 
-[es_yaml.bootstrap]
+[bootstrap]
 memory_lock = false
 
-[es_yaml.path]
+[path]
 repo = "/services/ha_backend_backups"
 
-[es_yaml.discovery.zen.ping.unicast]
-hosts = ["$(head -n 1 /services/ha_backend_peers)"]
-[es_yaml.cluster.routing.allocation.disk.watermark]
+[discovery]
+ping_unicast_hosts = ["$(head -n 1 /services/ha_backend_peers)"]
+
+[cluster.routing.allocation.disk.watermark]
 low = "95%"
 high = "98%"
 flood_stage = "99%"
 
-[es_yaml.opendistro_security]
-enable_snapshot_restore_privilege = true
-
-[opendistro_ssl]
-
+[tls]
 # root pem cert that signed the two cert/key pairs below
 rootCA = """$(cat /certificates/MyRootCA.pem)"""
 
@@ -139,6 +142,9 @@ admin_key    = """$(cat /certificates/odfe-admin.key)"""
 ssl_cert    = """$(cat /certificates/odfe-node.pem)"""
 ssl_key     = """$(cat /certificates/odfe-node.key)"""
 EOF
+
+echo "Checking user.toml of OPENSEARCH CONFIG"
+cat /hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml
 
 mkdir -p "/hab/user/${ELASTICSIDECAR_PKG_NAME}/config/"
 cat > "/hab/user/${ELASTICSIDECAR_PKG_NAME}/config/user.toml" <<EOF
