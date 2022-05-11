@@ -453,7 +453,13 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
 		}
 	}()
 	habRoot := getHabRootPath(habrootcmd)
+	fmt.Println("---------------------habRoot-------------------")
+	fmt.Println(habRoot)
+
 	script := fmt.Sprintf(fscript, habRoot)
+	fmt.Println("---------------------scritp-------------------")
+	fmt.Println(script)
+
 	command := exec.Command("/bin/sh", "-c", script)
 
 	err := command.Run()
@@ -595,8 +601,12 @@ func cleanUpes() error {
 		}
 	}
 	habRoot := getHabRootPath(habrootcmd)
-	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
+	fmt.Println("---------------------habRoot-------------------")
+	fmt.Println(habRoot)
 
+	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
+	fmt.Println("----------------------------------------")
+	fmt.Println(cleanUpScript)
 	command := exec.Command("/bin/sh", "-c", cleanUpScript)
 	err := command.Run()
 	if err != nil {
