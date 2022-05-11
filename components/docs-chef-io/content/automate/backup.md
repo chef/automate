@@ -62,7 +62,11 @@ The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}
 
 A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
 
+<<<<<<< HEAD
+To provide externally-deployed Opensearch nodes access to Chef Automate's built-in backup storage services, you must [configure Opensearch backup]({{< relref "install_os.md#configuring-external-opensearch" >}}) settings separately from Chef Automate's primary backup settings.
+=======
 To provide externally-deployed Opensearch nodes access to Chef Automate's built-in backup storage services, you must [configure Opensearch backup]({{< relref "install.md#configuring-external-opensearch" >}}) settings separately from Chef Automate's primary backup settings.
+>>>>>>> 7a608c2859437526e91abfd34e3f9ab2678817ee
 
 ## Backup to AWS S3
 
