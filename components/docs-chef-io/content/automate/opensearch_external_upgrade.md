@@ -106,7 +106,7 @@ We recommend migrating your data over reindexing and reconfiguring.
 
 ## Migrate Data
 
-Copy or move your Elasticsearch OSS data and logs directories to the newly installed OpenSearch paths. See [OpenSearch’s documentation on upgrading to OpenSearch](https://opensearch.org/docs/latest/upgrade-to/upgrade-to/#upgrade-to-opensearch).
+Copy or move your Elasticsearch OSS data and logs directories to the newly installed OpenSearch paths. See [OpenSearch's documentation on upgrading to OpenSearch](https://opensearch.org/docs/latest/upgrade-to/upgrade-to/#upgrade-to-opensearch).
 
 You can now configure Chef Automate to use Opensearch clusters.
 
