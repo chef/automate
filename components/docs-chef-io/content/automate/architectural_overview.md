@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 ## Automate 2 Architecture
 
-![Automate 2 Architecture](/images/automate/a2-architecture-os.JPEG)
+![Automate 2 Architecture](/images/automate/a2-architecture-os.png)
 
 ## Component overview
 
