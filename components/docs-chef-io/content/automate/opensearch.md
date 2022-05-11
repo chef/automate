@@ -1,13 +1,16 @@
 +++
 title = "Opensearch"
+
 date = 2022-01-04T12:09:09-08:00
 draft = false
 
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Configure Opensearch"
-    identifier = "automate/configuring_automate/Opensearch/Opensearch.md Opensearch"
-    parent = "automate/configuring_automate/Opensearch"
+    identifier = "automate/configuring_automate/opensearch/opensearch.md Opensearch"
+    parent = "automate/configuring_automate/opensearch"
+    weight = 10
 +++
 
 You can configure Chef Automate to use Opensearch clusters that are not deployed via Chef Automate itself.

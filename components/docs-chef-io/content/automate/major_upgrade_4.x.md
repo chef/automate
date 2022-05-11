@@ -21,22 +21,22 @@ Please choose the following upgrade journey based on your current version of Che
 | Your Current Version | Upgrade To |
 | -------------------- | ---------- |
 | Any version before 20220329091442| 20220329091442|
-| 20220329091442| 3.x.x|
-| 3.x.x| 4.0.x
+| 20220329091442| 3.0.49|
+| 3.0.49| 4.0.x
 
 For example, if today you are on version *2021201164433*, your upgrade journey should be:
 
 1. Manual upgrade to *20220329091442*
-1. Manual upgrade to *3.x.x*
+1. Manual upgrade to *3.0.49*
 1. Manual upgrade to *4.0.x*
 
 ## Prerequisites
 
 - **Plan your downtime:** This upgrade requires downtime. Before upgrading, set the environment to handle the downtime. Run `sudo chef-automate maintenance on` to turn on maintenance mode.
 - **Backup Chef Automate database:** This Chef Automate version upgrades ElasticSearch. [Backup](/automate/backup/) your data before upgrading.
-- **Current version should be 3.x.x:** If you are not on *3.x.x* version, do regular upgrades according to your topology.
+- **Current version should be 3.0.49:** If you are not on *3.0.49* version, do regular upgrades according to your topology.
 
-## Upgrade to Version 3.x.x
+## Upgrade to Version 3.0.49
 
 Check your current version:
 
@@ -44,17 +44,17 @@ Check your current version:
 sudo chef-automate version
 ```
 
-{{< note >}} If your server Version is less than *20220329091442*, refer to [Upgrade to 3.x.x]({{< relref "major_upgrade.md" >}}) page. {{< /note >}}
+{{< note >}} If your server Version is less than *20220329091442*, refer to [Upgrade to 3.0.49]({{< relref "major_upgrade.md" >}}) page. {{< /note >}}
 
-{{< note >}} If your server sersion is less than *3.x.x*, upgrade to latest minor version in 3 series. {{< /note >}}
+{{< note >}} If your server sersion is less than *3.0.49*, upgrade to latest minor version in 3 series. {{< /note >}}
 
-### Normal and airgapped upgrade to 3.x.x
+### Normal and airgapped upgrade to 3.0.49
 
-To upgrade to automate 3.x.x follow the link: [upgrading to 3.x.x]({{< relref "major_upgrade.md" >}})
+To upgrade to automate 3.0.49 follow the link: [upgrading to 3.0.49]({{< relref "major_upgrade.md" >}})
 
-## Upgrade Path from 3.x.x to 4.0.x
+## Upgrade Path from 3.0.49 to 4.0.x
 
-There are four possible scenarios to upgrade from 3.x.x to 4.0.x version.
+There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
 
 - [Chef Automate with Embedded Elasticsearch]({{< relref "#chef-automate-with-embedded-elasticsearch" >}})
 
@@ -76,7 +76,7 @@ Also, accept the checklist item asking permission to disable sharding. {{< /warn
 
 To upgrade Chef Automate with embedded Elasticsearch, follow the steps given below:
 
-**Upgrade Chef Automate from version 3.x.x to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 1. Start a major version upgrade:\
 
@@ -122,7 +122,7 @@ sudo chef-automate post-major-upgrade clear-data --data=es
 
 To upgrade Chef Automate with external elasticsearch, follow the steps given below:
 
-**Upgrade Chef Automate from version 3.x.x to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 1. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
@@ -146,7 +146,7 @@ sudo chef-automate maintenance off
 
 ### Chef Automate in Air-Gapped Environment With Embedded ElasticSearch
 
-**Upgrade Chef Automate from version 3.x.x to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 To upgrade to 4.0.x, follow the steps below:
 
@@ -214,7 +214,7 @@ sudo chef-automate post-major-upgrade clear-data --data=es
 
 ### Chef Automate in Air-Gapped Environment With External ElasticSearch
 
-**Upgrade Chef Automate from version 3.x.x to 4.0.x**
+**Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 To upgrade to 4.0.x, follow the steps below:
 
@@ -286,7 +286,7 @@ To start the upgrade, use the **backup ID** from the backup created. In case the
 sudo chef-automate uninstall
 ```
 
-2. Install the last major version (`3.0.x`) using the [air-gapped installation](/automate/airgapped_installation/) process.
+2. Install the last major version (`3.0.49`) using the [air-gapped installation](/automate/airgapped_installation/) process.
 
 3. Restore the backup:
 
