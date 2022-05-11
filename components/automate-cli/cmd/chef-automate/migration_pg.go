@@ -577,12 +577,7 @@ func cleanUpes() error {
 		}
 	}
 	habRoot := getHabRootPath(habrootcmd)
-	fmt.Println("---------------------habRoot-------------------")
-	fmt.Println(habRoot)
-
 	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
-	fmt.Println("----------------------------------------")
-	fmt.Println(cleanUpScript)
 	command := exec.Command("/bin/sh", "-c", cleanUpScript)
 	err := command.Run()
 	if err != nil {
