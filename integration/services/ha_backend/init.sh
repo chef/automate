@@ -151,9 +151,6 @@ enable = true
 host = "0.0.0.0"
 DOC
 
-echo "INSIDE ha_backend init.sh..... cat ha_backend_config"
-cat $ha_backend_config
-
     for try in {1..8}; do
         echo "Testing odfe connectivity (attempt ${try})"
 

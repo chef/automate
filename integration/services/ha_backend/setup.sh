@@ -81,7 +81,7 @@ PGLEADERCHK_PKG_NAME="automate-ha-pgleaderchk"
 pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME"
 proxy_pkg_ident="chef/automate-ha-haproxy"
 OPENSEARCH_PKG_NAME="automate-ha-opensearch"
-opensearch_pkg_ident="sandhi18/automate-ha-opensearch/1.2.4/20220510131126"
+opensearch_pkg_ident="chef/automate-ha-opensearch"
 ELASTICSIDECAR_PKG_NAME="automate-ha-elasticsidecar"
 elasticsidecar_pkg_ident="chef/$ELASTICSIDECAR_PKG_NAME"
 
@@ -102,15 +102,6 @@ echo "INSIDE integration/services/ha_backend/setup.sh"
 
 echo "list of files in certificates folder"
 ls -lrt /certificates
-
-echo "cat /certificates/MyRootCA.pem"
-cat /certificates/MyRootCA.pem
-
-echo "cat /certificates/odfe-node.pem"
-cat /certificates/odfe-node.pem
-
-echo "cat /certificates/odfe-node.key"
-cat /certificates/odfe-node.key
 
 echo "Configuring HA Backend Services"
 
