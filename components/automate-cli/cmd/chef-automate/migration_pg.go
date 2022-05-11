@@ -476,10 +476,10 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot stri
 }
 
 func getHabRootPath(habrootcmd string) string {
-	out, err := exec.Command(habrootcmd).Output()
+	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
 	if err != nil {
 		writer.Fail(err.Error())
-		return ""
+		return "/hab/"
 	}
 	pkgPath := string(out) // /a/b/c/hab    /hab/svc
 	writer.Title("HAB Root Path " + pkgPath)
