@@ -223,12 +223,11 @@ resource "aws_instance" "chef_automate_postgresql" {
   depends_on = [aws_route_table.route1,aws_route_table.route2,aws_route_table.route3]
 
 }
-
-resource "aws_instance" "chef_automate_elasticsearch" {
-  count = var.setup_managed_services ? 0 : var.elasticsearch_instance_count
+resource "aws_instance" "chef_automate_opensearch" {
+  count = var.setup_managed_services ? 0 : var.opensearch_instance_count
 
   ami                         = local.ami
-  instance_type               = var.elasticsearch_server_instance_type
+  instance_type               = var.opensearch_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
   subnet_id                   = length(var.public_custom_subnets) > 0 ? element(data.aws_subnet.public.*.id, count.index) : element(aws_subnet.public.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
@@ -238,15 +237,15 @@ resource "aws_instance" "chef_automate_elasticsearch" {
 
   root_block_device {
     delete_on_termination = true
-    iops                  = var.elasticsearch_ebs_volume_type == "io1" ? var.elasticsearch_ebs_volume_iops : 0
-    volume_size           = var.elasticsearch_ebs_volume_size
-    volume_type           = var.elasticsearch_ebs_volume_type
+    iops                  = var.opensearch_ebs_volume_type == "io1" ? var.opensearch_ebs_volume_iops : 0
+    volume_size           = var.opensearch_ebs_volume_size
+    volume_type           = var.opensearch_ebs_volume_type
   }
 
   tags = merge(
     var.tags,
     map("Name",
-      format("${var.tag_name}_${random_id.random.hex}_chef_automate_elasticsearch_%02d", count.index + 1)
+      format("${var.tag_name}_${random_id.random.hex}_chef_automate_opensearch_%02d", count.index + 1)
     )
   )
 

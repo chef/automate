@@ -6,6 +6,11 @@ import { AttributesComponent } from './attributes.component';
 import { AttributesService } from '../../services/attributes/attributes.service';
 import { JsonTreeComponent } from '../json-tree/json-tree.component';
 import { NodeAttributes } from '../../types/types';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 class MockAttributesService {
   nullNodeAttributes = new NodeAttributes({
@@ -77,7 +82,8 @@ describe('AttributesComponent', () => {
         JsonTreeComponent
       ],
       providers: [
-        { provide: AttributesService, useClass: MockAttributesService }
+        { provide: AttributesService, useClass: MockAttributesService },
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

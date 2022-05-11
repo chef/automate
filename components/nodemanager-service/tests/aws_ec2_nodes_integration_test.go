@@ -186,7 +186,7 @@ func TestAWSEC2SearchNodes(t *testing.T) {
 		NodeManagerId: AwsEC2ManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{
-				{Key: "Name", Values: []string{"vj*"}},
+				{Key: "Name", Values: []string{"a2*"}},
 			},
 		},
 	}

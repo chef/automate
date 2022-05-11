@@ -53,8 +53,8 @@ developed independently.
 * [Backup Gateway](components/backup-gateway)
 * [Data Lifecycle Service](components/data-lifecycle-service)
 * [Deployment Service](components/automate-deployment)
-* [Elasticsearch Gateway](components/automate-es-gateway)
-* [Elasticsearch Sidecar](components/es-sidecar-service)
+* [Opensearch Gateway](components/automate-es-gateway)
+* [Opensearch Sidecar](components/es-sidecar-service)
 * [License Control Service](components/license-control-service)
 * [PostgreSQL Gateway](components/automate-pg-gateway)
 * [PostgreSQL Sidecar](components/pg-sidecar-service)
@@ -79,9 +79,9 @@ document](./dev-docs/DEV_ENVIRONMENT.md).
 
 ## Architecture
 
-The following picture illustrates the Automate 2.0 architecture
+The following picture illustrates the Automate architecture
 
-![Automate 2 Architecture](dev-docs/diagrams/a2-architecture.png)
+![Automate Architecture](dev-docs/diagrams/a2-architecture.png)
 
 ## API Compatibility
 
@@ -89,4 +89,5 @@ At this stage in development, the Go libraries and other APIs found in
 this repository are not intended for use outside of Chef Automate. If
 you think part of this repository would help and would like to depend
 on it, please open a GitHub issue so we can discuss it.
+
 

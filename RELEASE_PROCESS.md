@@ -1,4 +1,4 @@
-# Automate 2.0 Release Philosophy and Process
+# Automate Release Philosophy and Process
 
 Automate's pipeline and release process adhere to the [patterns of continuous delivery](https://continuousdelivery.com/implementing/patterns/). Each time a PR/change is merged to master we produce a build which is a candidate for release to our end-users. Although it feels counterintuitive, we are actually lowering our risk by incrementally releasing small batches of change. It also creates a separation between the _technical_ decision to ship our software (by way of channel promotions) from the _business_ decision to fully release a new feature to our end-users. [Feature flags/toggles](https://martinfowler.com/bliki/FeatureToggle.html) allow us to continue merging partially implemented features to master, yet control when our end-users begin using these features.
 
@@ -28,7 +28,7 @@ The Release Engineering team executes this promotion Mondays at **7:30 PST/10:30
 
 We don't revert, we roll forward! We also transform and roll out.
 
-To be more specific we don't support/encourage customers rolling back to a previously promoted version of Automate 2.0. Instead, we should get a fix merged, promoted and into our end-users hands ASAP. This might be as simple as `git revert`-ing the bug while we we consider the proper long-term fix.
+To be more specific we don't support/encourage customers rolling back to a previously promoted version of Automate. Instead, we should get a fix merged, promoted and into our end-users hands ASAP. This might be as simple as `git revert`-ing the bug while we we consider the proper long-term fix.
 
 ## Release Notes
 
@@ -49,8 +49,8 @@ https://packages.chef.io/release-notes/automate/<BUILD_VERSION>.md
 
 These published release notes are used to communicate update availability across a number of distribution channels including:
 
-- The Automate 2.0 download/landing page.
-- Update notification prompts we'll be adding to the Automate 2.0 user interface.
+- The Automate download/landing page.
+- Update notification prompts we'll be adding to the Automate user interface.
 - Discourse, blog and Slack posts
 
 ## Change Flow

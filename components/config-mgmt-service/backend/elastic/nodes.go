@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
@@ -42,7 +42,7 @@ func (es Backend) NodeExists(nodeID string, filters map[string][]string) (bool, 
 		return false, err
 	}
 
-	return searchResult.Hits.TotalHits > 0, nil
+	return searchResult.TotalHits() > 0, nil
 }
 
 // GetInventoryNodes - Collect inventory nodes from elasticsearch. This function allows
@@ -87,11 +87,11 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	}
 
 	var nodes []backend.InventoryNode
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
 		for _, hit := range searchResult.Hits.Hits {
 			var n backend.InventoryNode
-			err := json.Unmarshal(*hit.Source, &n)
+			err := json.Unmarshal(hit.Source, &n)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -150,11 +150,11 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 	}
 
 	var nodes []backend.Node
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
 		for _, hit := range searchResult.Hits.Hits {
 			var n backend.Node
-			err := json.Unmarshal(*hit.Source, &n)
+			err := json.Unmarshal(hit.Source, &n)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -221,11 +221,11 @@ func (es Backend) GetNodes(page int, perPage int, sortField string,
 	}
 
 	var nodes []backend.Node
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
 		for _, hit := range searchResult.Hits.Hits {
 			var n backend.Node
-			err := json.Unmarshal(*hit.Source, &n)
+			err := json.Unmarshal(hit.Source, &n)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -359,12 +359,12 @@ func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 		return nodeAttribute, err
 	}
 
-	if getResult.Hits.TotalHits == 0 {
+	if getResult.TotalHits() == 0 {
 		return nodeAttribute, errors.New(errors.NodeAttributeNotFound, "No attributes found")
 	}
 
 	source := getResult.Hits.Hits[0].Source // We only want one attribute
-	err = json.Unmarshal(*source, &nodeAttribute)
+	err = json.Unmarshal(source, &nodeAttribute)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"object": source,

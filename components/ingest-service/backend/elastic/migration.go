@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
@@ -331,12 +331,12 @@ func (es *Backend) GetLatestA1NodeRun(ctx context.Context,
 		return run, false, err
 	}
 
-	if searchResult.Hits.TotalHits == 0 {
+	if searchResult.TotalHits() == 0 {
 		return run, false, nil
 	}
 
 	source := searchResult.Hits.Hits[0].Source
-	err = json.Unmarshal(*source, &run)
+	err = json.Unmarshal(source, &run)
 	if err != nil {
 		return run, false, err
 	}
@@ -415,12 +415,12 @@ func (es *Backend) GetNodeBasics(ctx context.Context, cursorID string) ([]backen
 		return nil, err
 	}
 
-	nodeBasicsCollection := make([]backend.NodeBasics, 0, searchResult.Hits.TotalHits)
+	nodeBasicsCollection := make([]backend.NodeBasics, 0, searchResult.TotalHits())
 	var n backend.NodeBasics
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
 		for _, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(*hit.Source, &n)
+			err := json.Unmarshal(hit.Source, &n)
 			if err != nil {
 				log.WithFields(log.Fields{"error": err}).
 					Error("Error unmarshalling the node object")
@@ -455,10 +455,10 @@ func (es *Backend) GetInsightsRunData(ctx context.Context, insightsIndex string,
 
 	var insightsRunNodePayLoadDataCollection []backend.InsightsRunNodePayLoadData
 	var run backend.InsightsRunNodePayLoadData
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
 		for _, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(*hit.Source, &run)
+			err := json.Unmarshal(hit.Source, &run)
 			if err != nil {
 				log.WithFields(log.Fields{"error": err}).
 					Error("Error unmarshalling the node object")

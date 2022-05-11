@@ -13,16 +13,14 @@ import (
 )
 
 var (
-	elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
-	suite            = NewSuite(elasticsearchUrl)
+	opensearchUrl = os.Getenv("OPENSEARCH_URL")
+	suite         = NewSuite(opensearchUrl)
 )
 
 const (
 	GRPC_PORT = 10390
 	GRPC_HOST = "localhost"
 )
-
-const testTypeName = "test-data"
 
 // TestMain provides setup and teardown to surround test execution.
 // teardown everything after we have finished testing.
@@ -54,7 +52,6 @@ type testDocument struct {
 func addDocToIndex(t *testing.T, indexName string, doc testDocument, id string) {
 	res, err := suite.esClient.Index().
 		Index(indexName).
-		Type(testTypeName).
 		Id(id).
 		BodyJson(doc).
 		Refresh("true").

@@ -5,10 +5,10 @@ log_level = "{{cfg.log.level}}"
 # Listen to what our gossip protocol whispers
 #
 # We have modified our plan to have a hard dependency to
-# elasticsearch, that will ensure that we will always start
+# opensearch, that will ensure that we will always start
 # our service with the required bindings
 #
-# Elasticsearch
+# Opensearch
 {{~#eachAlive bind.automate-es-gateway.members as |gwmember|}}
   {{~#if @last}}
 elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
@@ -16,9 +16,9 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
 {{~/eachAlive}}
 
 [backups]
-{{~#eachAlive bind.automate-elasticsearch.members as |member|}}
+{{~#eachAlive bind.automate-opensearch.members as |member|}}
   {{~#if @last}}
-    {{~#if member.cfg.deprecated_external_es}}
+    {{~#if member.cfg.deprecated_external_os}}
   backend = "fs"
     {{else}}
       {{~#if cfg.backups.backend}}

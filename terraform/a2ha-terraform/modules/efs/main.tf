@@ -18,14 +18,14 @@ locals {
     mount_path    = var.nfs_mount_path
   })
   
-  ip_list = concat(var.automate_private_ips, var.chef_server_private_ips, var.postgresql_private_ips, var.elasticsearch_private_ips)
+  ip_list = concat(var.automate_private_ips, var.chef_server_private_ips, var.postgresql_private_ips, var.opensearch_private_ips)
 
 }
 
 resource "null_resource" "mount_efs" {
   count = length(local.ip_list)
   connection {
-    host        = "${ local.ip_list[count.index] }"
+    host        =  local.ip_list[count.index]
     type        = "ssh"
     user        = var.aws_ssh_user
     private_key = file(var.aws_ssh_key_file)

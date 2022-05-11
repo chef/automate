@@ -11,7 +11,7 @@ import (
 
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 
-	"gopkg.in/olivere/elastic.v6"
+	"github.com/olivere/elastic/v7"
 
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 
@@ -183,12 +183,12 @@ func TestNodeRunInfoDateTime(t *testing.T) {
 
 			require.NoError(t, err)
 
-			if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+			if searchResult.TotalHits() > 0 {
 				for _, hit := range searchResult.Hits.Hits {
 					var item iBackend.NodeRunDateInfo
 
 					if hit.Source != nil {
-						err := json.Unmarshal(*hit.Source, &item)
+						err := json.Unmarshal(hit.Source, &item)
 						require.NoError(t, err)
 						assert.Equal(t, test.expectedNodeId, item.NodeID)
 						assert.Equal(t, test.expectedFirstRun, item.FirstRun)

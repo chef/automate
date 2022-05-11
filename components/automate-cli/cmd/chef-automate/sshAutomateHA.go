@@ -68,18 +68,18 @@ type AutomteHAInfraDetails struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`
 		} `json:"chef_server_ssh"`
-		ElasticsearchPrivateIps struct {
+		OpensearchPrivateIps struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`
-		} `json:"elasticsearch_private_ips"`
-		ElasticsearchPublicIps struct {
+		} `json:"opensearch_private_ips"`
+		OpensearchPublicIps struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`
-		} `json:"elasticsearch_public_ips"`
-		ElasticsearchSSH struct {
+		} `json:"opensearch_public_ips"`
+		OpensearchSSH struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`
-		} `json:"elasticsearch_ssh"`
+		} `json:"opensearch_ssh"`
 		OpsDashboardAddresses struct {
 			Value []string `json:"value"`
 			Type  []string `json:"type"`
@@ -254,9 +254,9 @@ func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]str
 		return d.Outputs.ChefServerSSH.Value, nil
 	case "postgresql":
 		return d.Outputs.PostgresqlSSH.Value, nil
-	case "elasticsearch":
-		return d.Outputs.ElasticsearchSSH.Value, nil
+	case "opensearch":
+		return d.Outputs.OpensearchSSH.Value, nil
 	default:
-		return nil, errors.New("invalid hostname possible values should be any one of automate, chef_server, postgresql or elasticsearch")
+		return nil, errors.New("invalid hostname possible values should be any one of automate, chef_server, postgresql or opensearch")
 	}
 }

@@ -9,22 +9,15 @@ build_version=$(jq -r -c ".version"  manifest.json)
 # Download the release-notes for our specific build
 curl -o release-notes.md "https://packages.chef.io/release-notes/automate/${build_version}.md"
 
-topic_title="Automate 2 version $build_version Released!"
+topic_title="Automate version $build_version Released!"
 topic_body=$(cat <<EOH
-We are delighted to announce the availability of version $build_version of Chef Automate 2.
+We are delighted to announce the availability of version $build_version of Chef Automate.
 
 $(cat release-notes.md)
 
 ---
-## How to Upgrade
 
-By default Chef Automate 2 will [automatically upgrade](https://automate.chef.io/docs/install/#upgrades) to this new version. If you have disabled automatic upgrades you can manually initiate an upgrade by running:
-
-\`\`\`
-chef-automate upgrade run
-\`\`\`
-
-As always, we welcome your feedback and invite you to contact us directly or share your [feedback online](https://www.chef.io/feedback/). Thanks for using Chef Automate 2!
+As always, we welcome your feedback and invite you to contact us directly or share your [feedback online](https://www.chef.io/feedback/). Thanks for using Chef Automate!
 EOH
 )
 

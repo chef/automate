@@ -147,7 +147,11 @@ Add the following to your config.toml:
 ```toml
 [global.v1.external.opensearch]
   enable = true
+<<<<<<< HEAD
   nodes = ["http://opensearch1.example:9200", "http://opensearch.example:9200", "..." ]
+=======
+  nodes = ["http://opensearch1.example:10168", "http://opensearch.example:10168", "..." ]
+>>>>>>> 7a608c2859437526e91abfd34e3f9ab2678817ee
 
 # Uncomment and fill out if using external opensearch with SSL and/or basic auth
 # [global.v1.external.opensearch.auth]
