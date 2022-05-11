@@ -16,17 +16,25 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
 {{~/eachAlive}}
 
 [backups]
-{{~#eachAlive bind.automate-opensearch.members as |member|}}
-  {{~#if @last}}
-    {{~#if member.cfg.deprecated_external_os}}
-  backend = "fs"
-    {{else}}
-      {{~#if cfg.backups.backend}}
-  backend = "{{cfg.backups.backend}}"
+{{~#if bind.automate-opensearch}}
+  {{~#eachAlive bind.automate-opensearch.members as |member|}}
+    {{~#if @last}}
+      {{~#if member.cfg.deprecated_external_os}}
+    backend = "fs"
+      {{else}}
+        {{~#if cfg.backups.backend}}
+    backend = "{{cfg.backups.backend}}"
+        {{~/if}}
       {{~/if}}
     {{~/if}}
+  {{~/eachAlive}}
+{{~else}}
+  {{~#if cfg.backups.s3.bucket}}  
+  backend = "s3"
+  {{~else}}
+  backend = "fs"
   {{~/if}}
-{{~/eachAlive}}
+{{~/if}}
 {{~#if cfg.backups.verify_repo}}
   verify_repo = true
 {{~else}}

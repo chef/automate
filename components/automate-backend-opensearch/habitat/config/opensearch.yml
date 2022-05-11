@@ -41,6 +41,9 @@ path.data:
 #
 path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
 #
+{{#if cfg.path.repo ~}}
+path.repo: {{cfg.path.repo}}
+{{/if ~}}
 # ----------------------------------- Memory -----------------------------------
 #
 # Lock the memory on startup:
@@ -66,7 +69,9 @@ network.publish_host: {{cfg.network.host}}
 # Set a custom port for HTTP:
 #
 http.port: {{cfg.network.port}}
-#
+
+transport.port: {{cfg.transport.port}}
+
 # For more information, consult the network module documentation.
 #
 # --------------------------------- Discovery ----------------------------------
@@ -105,14 +110,14 @@ action.destructive_requires_name: {{cfg.action.destructive_requires_name}}
 
 ######## Start OpenSearch Security  Configuration ########
 #plugins.security.disabled: true
-plugins.security.ssl.transport.pemcert_filepath: node1.pem
-plugins.security.ssl.transport.pemkey_filepath: node1-key.pem
-plugins.security.ssl.transport.pemtrustedcas_filepath: root-ca.pem
+plugins.security.ssl.transport.pemcert_filepath: certificates/node1.pem
+plugins.security.ssl.transport.pemkey_filepath: certificates/node1-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: certificates/root-ca.pem
 plugins.security.ssl.transport.enforce_hostname_verification: false
 plugins.security.ssl.http.enabled: true
-plugins.security.ssl.http.pemcert_filepath: node1.pem
-plugins.security.ssl.http.pemkey_filepath: node1-key.pem
-plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
+plugins.security.ssl.http.pemcert_filepath: certificates/node1.pem
+plugins.security.ssl.http.pemkey_filepath: certificates/node1-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: certificates/root-ca.pem
 plugins.security.ssl.transport.resolve_hostname: false
 plugins.security.allow_unsafe_democertificates: true
 plugins.security.allow_default_init_securityindex: true
@@ -129,3 +134,13 @@ plugins.security.system_indices.indices: [".opendistro-alerting-config", ".opend
 node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
 
 ######## End OpenSearch Security Configuration ########
+
+{{#if cfg.plugins.cloud_aws_signer ~}}
+cloud.aws.signer: {{cfg.plugins.cloud_aws_signer}}
+{{/if ~}}
+
+s3.client.default.protocol: https
+s3.client.default.read_timeout: 60s
+s3.client.default.max_retries: 3
+s3.client.default.use_throttle_retries: true
+s3.client.default.endpoint: s3.amazonaws.com

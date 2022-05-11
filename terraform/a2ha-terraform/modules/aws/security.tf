@@ -193,6 +193,15 @@ resource "aws_security_group_rule" "load_balancer_egress_allow_0-65535_all" {
 }
 
 # Egress : base_linux security group
+resource "aws_security_group_rule" "linux_egress_allow_0-65535_all" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
 resource "aws_security_group_rule" "egress_allow_80_tcp_all" {
   type              = "egress"
   from_port         = 80

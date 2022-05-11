@@ -13,3 +13,4 @@ Non-service package.
 ## Usage
 
 `automate-cluster-ctl help`
+
