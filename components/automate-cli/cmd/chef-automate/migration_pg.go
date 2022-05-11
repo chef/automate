@@ -394,16 +394,6 @@ func preRequisteForESDataMigration() (bool, error) {
 	return existDir, nil
 }
 
-/*
-const script = `
-mv /hab/svc/automate-opensearch/data /hab/svc/automate-opensearch/data.os;
-mv /hab/svc/automate-opensearch/var /hab/svc/automate-opensearch/var.os;
-cp -r /hab/svc/automate-elasticsearch/data /hab/svc/automate-opensearch/;
-cp -r /hab/svc/automate-elasticsearch/var /hab/svc/automate-opensearch/;
-chown -RL hab:hab /hab/svc/automate-opensearch/data;
-chown -RL hab:hab /hab/svc/automate-opensearch/var;
-`
-*/
 const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
 
 const fscript = `
@@ -423,9 +413,6 @@ func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
 		return nil
 	}
 	habRoot := getHabRootPath(habrootcmd)
-	fmt.Println("---------------------habRoot-------------------")
-	fmt.Println(habRoot)
-
 	err = chefAutomateStop()
 	if err != nil {
 		return err
@@ -457,9 +444,6 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot stri
 	}()
 
 	script := fmt.Sprintf(fscript, habRoot)
-	fmt.Println("---------------------scritp-------------------")
-	fmt.Println(script)
-
 	command := exec.Command("/bin/sh", "-c", script)
 
 	err := command.Run()
@@ -499,8 +483,6 @@ func getLatestPgPath() {
 		fmt.Printf("error %s", err)
 	}
 	output := string(cmd)
-
-	///output = strings.Split(output, "\n")[0]
 
 	if strings.TrimSpace(output) == "" {
 		return
@@ -575,15 +557,6 @@ func cleanUp() error {
 	}
 	return nil
 }
-
-/*
-const cleanUpScript = `
-rm -rf /hab/svc/automate-opensearch/data.os;
-rm -rf /hab/svc/automate-opensearch/var.os;
-rm -rf /hab/svc/automate-elasticsearch/data;
-rm -rf /hab/svc/automate-elasticsearch/var;
-`
-*/
 
 const fcleanUpScript = `
 rm -rf %[1]vsvc/automate-opensearch/data.os;
