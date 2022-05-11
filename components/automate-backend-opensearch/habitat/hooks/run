@@ -30,16 +30,16 @@ source {{pkg.svc_config_path}}/init_ca
 
 # cp {{pkg.path}}/os/config/certificates/* {{pkg.svc_config_path}}/
 
-chmod 0600 {{pkg.svc_config_path}}/root-ca.pem
-chmod 0600 {{pkg.svc_config_path}}/admin.pem
-chmod 0600 {{pkg.svc_config_path}}/admin.pem
-chmod 0600 {{pkg.svc_config_path}}/node1.pem
-chmod 0600 {{pkg.svc_config_path}}/node2.pem
-chmod 0600 {{pkg.svc_config_path}}/client.pem
-chmod 0600 {{pkg.svc_config_path}}/admin-key.pem
-chmod 0600 {{pkg.svc_config_path}}/node1-key.pem
-chmod 0600 {{pkg.svc_config_path}}/node2-key.pem
-chmod 0600 {{pkg.svc_config_path}}/client-key.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/root-ca.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node1.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node2.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/client.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/admin-key.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node1-key.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node2-key.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/client-key.pem
 
 echo "JDK PATH"
 echo $JDK_PKG_PATH
@@ -60,26 +60,29 @@ echo "......................................................................."
 
 echo "****** INSIDE OPENSEARCH PACKAGE RUN HOOK *******"
 
-echo "{{pkg.svc_config_path}}/root-ca.pem -------------"
-cat {{pkg.svc_config_path}}/root-ca.pem
+echo " List of files in config/certificates folder"
+ls -lrt {{pkg.svc_config_path}}/certificates
 
-echo "{{pkg.svc_config_path}}/admin.pem -------------"
-cat {{pkg.svc_config_path}}/admin.pem
+echo "{{pkg.svc_config_path}}/certificates/root-ca.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/root-ca.pem
 
-echo "{{pkg.svc_config_path}}/admin-key.pem -------------"
-cat {{pkg.svc_config_path}}/admin-key.pem
+echo "{{pkg.svc_config_path}}/certificates/admin.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/admin.pem
 
-echo "{{pkg.svc_config_path}}/node1.pem -----------------"
-cat {{pkg.svc_config_path}}/node1.pem
+echo "{{pkg.svc_config_path}}/certificates/admin-key.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/admin-key.pem
 
-echo "{{pkg.svc_config_path}}/node1-key.pem ------------"
-cat {{pkg.svc_config_path}}/node1-key.pem
+echo "{{pkg.svc_config_path}}/certificates/node1.pem -----------------"
+cat {{pkg.svc_config_path}}/certificates/node1.pem
+
+echo "{{pkg.svc_config_path}}/certificates/node1-key.pem ------------"
+cat {{pkg.svc_config_path}}/certificates/node1-key.pem
 
 echo "Inserted default securityconfig opensearch"
 
 #hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.path}}/os/plugins/opensearch-security/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/admin-key.pem -nhnv
 export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
-hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/root-ca.pem -nhnv
+hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/certificates/admin-key.pem -cert {{pkg.svc_config_path}}/certificates/admin.pem -cacert {{pkg.svc_config_path}}/certificates/root-ca.pem -nhnv
 
 echo "Done !!!! Executing opensearch securityadmin"
 
