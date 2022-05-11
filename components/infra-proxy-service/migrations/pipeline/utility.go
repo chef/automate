@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/local_user"
@@ -67,14 +68,22 @@ func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverI
 func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, orgId string, authzProjectClient authz.ProjectsServiceClient) ([]string, error) {
 	var projectID *authz.CreateProjectResp
 
+	// NOTE: Project name shouldn't be bigger then 48 chars, so remove all the special chars from
+	// from the server id and take first 20 chars and concatenate with '_' followed by orgID
+	re, err := regexp.Compile(`[^\w]`)
+	if err != nil {
+		log.Error("cannot compile regex: ", err)
+	}
+	serverId = re.ReplaceAllString(serverId, "")
+
 	newProject := &authz.CreateProjectReq{
-		Name:         serverId + "_" + orgId,
-		Id:           serverId + "_" + orgId,
+		Name:         serverId[:20] + "_" + orgId,
+		Id:           serverId[:20] + "_" + orgId,
 		SkipPolicies: false,
 	}
 
 	existingProject := &authz.GetProjectReq{
-		Id: serverId + "_" + orgId,
+		Id: newProject.Id,
 	}
 
 	projResp, err := authzProjectClient.GetProject(ctx, existingProject)
