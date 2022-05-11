@@ -422,12 +422,15 @@ func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
 		writer.Warn("Pre Requiste For ES DataMigration failed : " + err.Error())
 		return nil
 	}
+	habRoot := getHabRootPath(habrootcmd)
+	fmt.Println("---------------------habRoot-------------------")
+	fmt.Println(habRoot)
 
 	err = chefAutomateStop()
 	if err != nil {
 		return err
 	}
-	err = executeMigrate(ci)
+	err = executeMigrate(ci, habRoot)
 	if err != nil {
 		return err
 	}
@@ -435,7 +438,7 @@ func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
 	return nil
 }
 
-func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
+func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot string) error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"migration from es to os \n" +
@@ -452,9 +455,6 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
 			writer.Fail(err.Error())
 		}
 	}()
-	habRoot := getHabRootPath(habrootcmd)
-	fmt.Println("---------------------habRoot-------------------")
-	fmt.Println(habRoot)
 
 	script := fmt.Sprintf(fscript, habRoot)
 	fmt.Println("---------------------scritp-------------------")
@@ -485,6 +485,9 @@ func getHabRootPath(habrootcmd string) string {
 	writer.Title("HAB Root Path " + pkgPath)
 	habIndex := strings.Index(string(pkgPath), "hab")
 	rootHab := pkgPath[0 : habIndex+4] // this will give <>/<>/hab/
+	if rootHab == "" {
+		rootHab = "/hab/"
+	}
 	return rootHab
 }
 
