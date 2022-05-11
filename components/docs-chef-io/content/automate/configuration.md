@@ -17,7 +17,7 @@ The `chef-automate` CLI provides commands to help you work with your existing Ch
 
 * `chef-automate config show` shows your current configuration, not including default settings
 * `chef-automate config patch </path/to/partial-config.toml>` updates an existing Chef Automate configuration by merging the contents of`</path/to/partial-config.toml>` with your current Chef Automate configuration, and applying any changes. This command is enough in most situations
-* `chef-automate config set </path/to/full-config.toml>` replaces the current Chef Automate configuration with the provided configuration, and applies any changes. Use this command to replace your Chef Automate configuration
+* `chef-automate config set </path/to/full-config.toml>` replaces the current Chef Automate configuration with the provided configuration, and applies any changes. Use this command to replace your Chef Automate configuration. If you want to delete an entry that you have added previously rather than change one, use this. In your toml file, leave out the setting you no longer want.
 
 Update your Chef Automate configuration by generating a section of a configuration, and applying it with `chef-automate config patch`.
 The rest of this document describes how to make common configuration changes.
