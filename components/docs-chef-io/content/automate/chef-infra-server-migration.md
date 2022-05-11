@@ -72,7 +72,7 @@ The command takes the backup of the Chef Infra Server in the allotted folder. Th
 └── users
 ```
 
-### Step 3: Compress the folder 
+### Step 3: Compress the folder
 
 You can zip the *knife-ec-backup* output by running the following command:
 
@@ -169,7 +169,7 @@ The sync might fail and show the **Failed** status under metadata. You can learn
 - All the users from the Chef Infra Server are synced.
 - The users are added to the Chef Infra Server and associated with the organization and the corresponding **IAM** projects.
 - The users are added to the **IAM** policies of the IAM projects based on the permission user holds in Chef Infra Server. Refer to the **Link to User Permission** to learn more about User Permission Sync.
-- The LDAP users will be added to the **IAM** policies of the IAM projects based on the permission user holds in Chef Infra Server. 
+- The LDAP users will be added to the **IAM** policies of the IAM projects based on the permission user holds in Chef Infra Server.
 - Automate does not enforce the LDAP settings to be available before migrating LDAP users. The LDAP configuration can be done after the migration of the users.
 
 ## User Permission Sync
