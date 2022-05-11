@@ -140,7 +140,7 @@ If you wish to enable all of Chef Automate at a later time, you can update the p
     Updating deployment configuration
 
     Applying deployment configuration
-      Installed automate-elasticsearch
+      Installed automate-opensearch
       Installed automate-es-gateway
       Installed event-service
       Installed es-sidecar-service
@@ -154,7 +154,7 @@ If you wish to enable all of Chef Automate at a later time, you can update the p
       Installed config-mgmt-service
       Installed data-feed-service
       Installed event-gateway
-      Started automate-elasticsearch
+      Started automate-opensearch
       Started automate-es-gateway
       Started event-service
       Started es-sidecar-service
