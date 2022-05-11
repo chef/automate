@@ -44,7 +44,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 	emptyTotals := TotalNodeCounts{Total: 0, Passed: 0, Skipped: 0, Failed: 0, Waived: 0}
 	myName := "GetNodes"
 
-	// Only end_time matters for this call
+	// Start_time and End_Time matters for this call
 	filters["start_time"] = []string{}
 	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
@@ -70,6 +70,8 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		"report_uuid",
 		"end_time")
 
+	col := elastic.NewCollapseBuilder("node_uuid")
+
 	if queryInfo.level == ReportLevel {
 		fsc.Include(
 			"status",
@@ -81,7 +83,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		Query(queryInfo.filtQuery).
 		Sort(sortField, sortAsc).
 		From(int(from)).
-		Size(int(size))
+		Size(int(size)).Collapse(col)
 
 	// Adding a second sort field when we don't sort by node name
 	if sortField != "node_name.lower" {
