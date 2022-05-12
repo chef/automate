@@ -86,8 +86,8 @@ message External {
     Authentication auth = 4;
     SSL ssl = 5;
   }
-
-message Opensearch {
+  
+  message Opensearch {
     message Backup {
       message FsSettings {
         message OptionalSettings {
