@@ -69,9 +69,9 @@ func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverI
 func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, orgId string, authzProjectClient authz.ProjectsServiceClient) ([]string, error) {
 	var projectID *authz.CreateProjectResp
 
-	// NOTE: Project name shouldn't be bigger then 48 chars, so remove all the special chars from
+	// NOTE: Project name shouldn't be bigger then 48 chars, so remove all the special chars
 	// from the server id and take first 20 chars and concatenate with '_' followed by orgID
-	serverId = validation(serverId)
+	serverId = removeSpecialChars(serverId)
 
 	newProject := &authz.CreateProjectReq{
 		Name:         serverId + "_" + orgId,
@@ -292,7 +292,7 @@ func removePolicyFromUser(ctx context.Context, org pipeline.Org, user pipeline.U
 func getPolicyId(isAdmin bool, org pipeline.Org, serverId string) string {
 	var policyId string
 
-	serverId = validation(serverId)
+	serverId = removeSpecialChars(serverId)
 
 	if isAdmin {
 		policyId = fmt.Sprintf("%s_%s-%s", serverId, org.Name, "project-owners")
@@ -302,7 +302,7 @@ func getPolicyId(isAdmin bool, org pipeline.Org, serverId string) string {
 	return policyId
 }
 
-func validation(str string) string {
+func removeSpecialChars(str string) string {
 	re, err := regexp.Compile(`[^\w]`)
 	if err != nil {
 		log.Error("cannot compile regex: ", err)
