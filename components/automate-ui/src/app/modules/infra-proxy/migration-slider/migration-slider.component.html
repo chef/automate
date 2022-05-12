@@ -103,7 +103,7 @@
                     id="{{user.email}}-warning" 
                     class="warning-msg" 
                     *ngIf="!user.checking_conflcit && (user.connector === 'local') && user.is_conflicting">
-                    Warning. User already exists in Automate. This will overwrite this users IAM settings.
+                    Warning. User already exists in current user list or Automate. This will overwrite this users IAM settings.
                   </p>
                   <p *ngIf="user.checking_conflcit">Checking...</p>
                 </chef-td>

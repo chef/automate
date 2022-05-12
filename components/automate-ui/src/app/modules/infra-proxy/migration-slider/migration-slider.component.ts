@@ -48,7 +48,11 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   ngOnChanges() {
     const group = {};
     if (this.previewData) {
+      this.usersData = [];
       this.selectedUsersData = [];
+      this.conflictedUsers = [];
+
+
       this.totalUsers = this.previewData.staged_data.users;
       // skipped users
       this.skippedUsers =
@@ -151,30 +155,22 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   selectedUser(event: Event, user: User) {
     const checkBox = document.getElementById(user.email + '-chef-checkbox');
     const input = document.getElementById(user.email + '-input');
-    const warning = document.getElementById(user.email + '-warning');
-    console.log(event.stopPropagation);
+    console.log(event.target);
     const index = this.usersData.findIndex(x => x.username === user.username);
     if (checkBox.textContent === 'check') {
-      this.selectedUsersData.forEach((value, i) => {
-        if (value.username === user.username) {
-          this.selectedUsersData.splice(i, 1);
-        }
-      });
-      this.conflictedUsers.forEach((value, i) => {
-        if (value.username === user.username) {
-          this.conflictedUsers.splice(i, 1);
-        }
-      });
+      this.removeUserFromUsersData(this.selectedUsersData, user);
+      this.removeUserFromUsersData(this.conflictedUsers, user);
+      
       if (user.is_conflicting) {
         input?.classList?.remove('user-exist-warning');
-        warning?.classList?.add('warning-msg-hide');
       }
     } else {
       this.selectedUsersData.push(this.usersData[index]);
-      this.conflictedUsers.push(this.usersData[index]);
       this.selectedUsersData.forEach((item: User) => item.is_selected = true);
-      warning?.classList?.remove('warning-msg-hide');
-      this.callAndSetUserData(user);
+      if (user.is_conflicting) {
+        this.conflictedUsers.push(this.usersData[index]);
+        this.callAndSetUserData(user);
+      }
     }
   }
 
@@ -187,10 +183,13 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
 
   callToCheckUsernameExist(event: Event, user: User) {
     const checkBox = document.getElementById(user.email + '-chef-checkbox');
-    console.log(event.stopPropagation);
+    console.log(event.target);
 
     if (checkBox.textContent === 'check') {
       setTimeout(() => { this.callAndSetUserData(user); }, 2000);
+    } else {
+      this.checking_user = false;
+      user.checking_conflcit = false;
     }
   }
 
@@ -199,15 +198,22 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
     const input = document.getElementById(this.userData.email + '-input');
     const username = this.userData.username;
     const index = this.usersData.findIndex(x => x.username === username);
-
     // console.log(automate_username);
     if ((input as HTMLInputElement).value !== '') {
+      // check user exists on dataset
+      const usersDataSet = this.usersData.map((user: User)=> user.automate_username)
+      if (usersDataSet.includes((input as HTMLInputElement).value)) {
+        this.userExistInDatasetOrAutomate(input, user, index);
+        user.checking_conflcit = false;
+        return
+      }
+
       const payload = {
         user: (input as HTMLInputElement).value
       };
       this.store.dispatch(new CheckUser(payload));
-      // check user status
 
+      // check user status
       combineLatest([
         this.store.select(checkUserStatus),
         this.store.select(getCheckedUserStatus)
@@ -215,75 +221,91 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
         .subscribe(([checkUserSt, getCheckedUserState]) => {
           if (checkUserSt === EntityStatus.loadingSuccess && !isNil(getCheckedUserState)) {
             if ((input as HTMLInputElement).value === getCheckedUserState.user.id) {
-              input.classList.add('user-exist-warning');
-              const index1 = this.usersData.findIndex(x => x.username === user.username);
-              this.conflictedUsers.forEach((item: User) => {
-                if (item.username !== user.username) {
-                  this.conflictedUsers.push(this.usersData[index1]);
-                }
-              });
-
-              // uniq data for the conflcted users
-              this.conflictedUsers = [...new Set(this.conflictedUsers)];
-
-              this.selectedUsersData.forEach((item: User) => {
-                if (item.username === user.username) {
-                  item.is_conflicting = true;
-                }
-              });
-
-              // uniq data for the selected users
-              this.selectedUsersData = [...new Set(this.selectedUsersData)];
-
-              this.usersData.forEach((item: User) => {
-                if (item.username === user.username) {
-                  item.is_conflicting = true;
-                }
-              });
-
-              // uniq data for the users data
-              this.usersData = [...new Set(this.usersData)];
-
-              // reassign the old username
-              this.usersData[index].automate_username =
-                (input as HTMLInputElement).dataset.username;
+              this.userExistInDatasetOrAutomate(input, user, index)
             }
           } else {
-            if (this.userData.automate_username === username) {
+            if (this.userData.username === username) {
+              console.log("not exist")
               input.classList.remove('user-exist-warning');
-              this.conflictedUsers.forEach((value, i) => {
-                if (value.username === user.username) {
-                  this.conflictedUsers.splice(i, 1);
-                }
-              });
 
-              // uniq data for the conflcted users
+              // remove the user from the conflictedUsers
+              this.removeUserFromUsersData(this.conflictedUsers, user);
+
+              // uniq data for the conflcted users and set the is_conflicting value
               this.conflictedUsers = [...new Set(this.conflictedUsers)];
+              this.setConflictUsersAttrValue(this.selectedUsersData, user, false);
 
-              this.selectedUsersData.forEach((item: User) => {
-                if (item.username === user.username) {
-                  item.is_conflicting = false;
-                }
-              });
-
-              // uniq data for the selected users
+              // uniq data for the selected users and set the is_conflicting value
               this.selectedUsersData = [...new Set(this.selectedUsersData)];
-
-              this.usersData.forEach((item: User) => {
-                if (item.username === user.username) {
-                  item.is_conflicting = false;
-                }
-              });
-
+              this.setConflictUsersAttrValue(this.usersData, user, false);
+              
               // uniq data for the users data
               this.usersData = [...new Set(this.usersData)];
 
               // set the changed username
               this.usersData[index].automate_username = (input as HTMLInputElement).value;
+
+              // disabled the input after changing the name
+              (input as HTMLInputElement).disabled = true;
+
+              // set the username to usersData array
+              this.usersData.forEach((item: User) => {
+                if (item.automate_username === username) {
+                  item.automate_username = (input as HTMLInputElement).value;
+                }
+              });
             }
           }
         });
+    } else {
+      user.is_conflicting = true;
     }
     user.checking_conflcit = false;
+  }
+
+  public setConflictUsersAttrValue(userDataSet: User[], user: User, value: boolean) {
+    userDataSet.forEach((item: User) => {
+      if (item.username === user.username) {
+        item.is_conflicting = value;
+      }
+    });
+  }
+
+  public removeUserFromUsersData(userDataSet: User[], user: User) {
+    userDataSet.forEach((value, i) => {
+      if (value.username === user.username) {
+        userDataSet.splice(i, 1);
+      }
+    });
+  }
+
+  public addUserToUsersData(userDataSet: User[], user: User) {
+    const index = this.usersData.findIndex(x => x.username === user.username);
+    userDataSet.forEach((item: User) => {
+      if (item.username !== user.username) {
+        userDataSet.push(this.usersData[index]);
+      }
+    });
+  }
+
+  public userExistInDatasetOrAutomate(input: HTMLElement, user: User, index: number) {
+    console.log("exist")
+    input.classList.add('user-exist-warning');
+    this.addUserToUsersData(this.conflictedUsers, user);
+
+    // uniq data for the conflcted users and set the is_conflicting value
+    this.conflictedUsers = [...new Set(this.conflictedUsers)];
+    this.setConflictUsersAttrValue(this.selectedUsersData, user, true);
+
+    // uniq data for the selected users and set the is_conflicting value
+    this.selectedUsersData = [...new Set(this.selectedUsersData)];
+    this.setConflictUsersAttrValue(this.usersData, user, true);
+
+    // uniq data for the users data
+    this.usersData = [...new Set(this.usersData)];
+
+    // reassign the old username
+    this.usersData[index].automate_username =
+      (input as HTMLInputElement).dataset.username;
   }
 }
