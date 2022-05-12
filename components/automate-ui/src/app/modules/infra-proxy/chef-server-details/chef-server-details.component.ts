@@ -205,6 +205,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
           this.tabValue = 'users';
           // call to get the list of users
           this.getListOfUsers(this.server_id);
+          this.getServerDetails(this.server_id);
           break;
         case 'orgs':
           this.tabValue = 'orgs';
@@ -415,6 +416,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
           if (this.migration_id !== '') {
             this.migrationLoading = true;
             setTimeout(() => { this.getMigrationStatus(this.migration_id); }, 2000);
+          } else {
+            this.migrationLoading = false;
           }
         }
     });
