@@ -103,3 +103,21 @@ To see what exactly will happen in your system, pass `--dry-run`:
 ```bash
 chef-automate iam admin-access restore NEW_PASSWORD --dry-run
 ```
+
+## Issue: Increase in Data collector API failure
+
+### Details:
+
+Possible reason of failures in data collector API could be due to change in the use case we are running.
+
+This can be due to the following reasons:
+
+- Increase in frequency of scan
+- Number of controls have changed
+- Increase in number of nodes
+
+
+### Possible fixes:
+
+- Changing heap size. Heap size should not be more than 70% of the RAM
+- Upgrading machine to improve performance
