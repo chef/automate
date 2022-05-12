@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 func GetMaxInnerResultWindow(backend ES2Backend) (int64, error) {
