@@ -99,14 +99,15 @@ For example:
 #  ssl_verify_depth = "2"
 ```
 
-## Steps To Migrate from Elasticsearch to External OpenSearch
-There are two ways to migrate from Elasticsearch to external OpenSearch: migrating your data, or reindexing and reconfiguring your database.
+## Steps To Migrate from External Elasticsearch to External OpenSearch
+Please refer the documententation for the elastic search migration to opensearch.
 
-We recommend migrating your data over reindexing and reconfiguring.
+[OpenSearch's documentation on upgrading to OpenSearch](https://opensearch.org/docs/latest/upgrade-to/upgrade-to/#upgrade-to-opensearch).
 
-## Migrate Data
+Once the migration of the data is complete, you can now configure Chef Automate to use Opensearch clusters,
+using `chef-automate config patch` command.
 
-Copy or move your Elasticsearch OSS data and logs directories to the newly installed OpenSearch paths. See [OpenSearch's documentation on upgrading to OpenSearch](https://opensearch.org/docs/latest/upgrade-to/upgrade-to/#upgrade-to-opensearch).
-
-You can now configure Chef Automate to use Opensearch clusters.
+{{< note >}}
+After upgrading to version 4.x, Automate will continue to have both the configuration for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
+{{< /note >}}
 
