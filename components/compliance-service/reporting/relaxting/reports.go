@@ -1601,12 +1601,9 @@ func getFiltersQueryForDeepReport(reportId string,
 func (backend ES2Backend) getFilterQueryWithPagination(reportId string,
 	filters map[string][]string) (*elastic.BoolQuery, error) {
 	utils.DeDupFilters(filters)
-	typeQuery := elastic.NewTypeQuery(mappings.DocType)
-
 	boolQuery := elastic.NewBoolQuery()
-	boolQuery = boolQuery.Must(typeQuery)
 
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(reportId)
 	boolQuery = boolQuery.Must(idsQuery)
 
@@ -1849,11 +1846,11 @@ func (backend *ES2Backend) GetReportManagerRequest(reportId string, filters map[
 		return mgrRequest, err
 	}
 	// we should only receive one searchResult value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits.Value > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecReport := ESInSpecReport{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esInSpecReport)
+				err := json.Unmarshal(hit.Source, &esInSpecReport)
 				if err != nil {
 					logrus.Errorf("error unmarshalling the search response: %+v", err)
 					return mgrRequest, err
