@@ -80,3 +80,8 @@ export const checkUserStatus = createSelector(
   orgState,
   (state) => state.checkUserStatus
 );
+
+export const getCheckedUserStatus = createSelector(
+  orgState,
+  (state) => state.getCheckedUserStatus
+);
