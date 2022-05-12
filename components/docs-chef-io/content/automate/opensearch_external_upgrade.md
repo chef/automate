@@ -110,3 +110,7 @@ Copy or move your Elasticsearch OSS data and logs directories to the newly insta
 
 You can now configure Chef Automate to use Opensearch clusters.
 
+{{< note >}}
+After upgrading to version 4.x, Automate will continue to have both the configuration for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
+{{< /note >}}
+

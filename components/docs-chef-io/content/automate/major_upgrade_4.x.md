@@ -262,6 +262,10 @@ sudo chef-automate status
 sudo chef-automate maintenance off
 ```
 
+{{< note >}}
+After upgrading to version 4.x, Automate will continue to have both the configuration for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
+{{< /note >}}
+
 ## Troubleshooting
 
 If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
