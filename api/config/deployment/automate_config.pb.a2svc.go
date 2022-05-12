@@ -231,6 +231,8 @@ func (c *AutomateConfig) SetGlobalConfig() {
 // PlatformServiceConfigForService gets the config for the service by name
 func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (shared.PlatformServiceConfigurable, bool) {
 	switch serviceName {
+	case "global":
+		return c.Global, true
 	case "authn-service":
 		return c.AuthN, true
 	case "authz-service":

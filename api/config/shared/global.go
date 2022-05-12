@@ -388,3 +388,12 @@ func (c *GlobalConfig) NoProxyString() *gw.StringValue {
 
 	return w.String(strings.Join(noProxy, ","))
 }
+
+func (c *GlobalConfig) SetGlobalConfig(g *GlobalConfig) {
+}
+
+func (c *GlobalConfig) PrepareSystemConfig(certificate *TLSCredentials) (PreparedSystemConfig, error) {
+	sys := c.V1.Sys
+	sys.Tls = certificate
+	return c.V1.Sys, nil
+}
