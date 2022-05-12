@@ -91,6 +91,7 @@ func NewAutomateConfig() *AutomateConfig {
 		Minio:              minio.NewConfigRequest(),
 		Nodemanager:        nodemanager.NewConfigRequest(),
 		Notifications:      notifications.NewConfigRequest(),
+		Opensearch:         opensearch.NewConfigRequest(),
 		PgGateway:          pggateway.NewConfigRequest(),
 		PgSidecar:          pgsidecar.NewConfigRequest(),
 		Postgresql:         postgresql.NewConfigRequest(),
@@ -145,6 +146,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		Minio:              minio.DefaultConfigRequest(),
 		Nodemanager:        nodemanager.DefaultConfigRequest(),
 		Notifications:      notifications.DefaultConfigRequest(),
+		Opensearch:         opensearch.DefaultConfigRequest(),
 		PgGateway:          pggateway.DefaultConfigRequest(),
 		PgSidecar:          pgsidecar.DefaultConfigRequest(),
 		Postgresql:         postgresql.DefaultConfigRequest(),
@@ -169,7 +171,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate(), c.ReportManager.Validate(), c.ReportManagerMinio.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate(), c.Opensearch.Validate(), c.ReportManager.Validate(), c.ReportManagerMinio.Validate())
 	if err == nil {
 		return nil
 	}
@@ -229,6 +231,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.Cds.SetGlobalConfig(c.Global)
 	c.SampleData.SetGlobalConfig(c.Global)
 	c.UserSettings.SetGlobalConfig(c.Global)
+	c.Opensearch.SetGlobalConfig(c.Global)
 	c.ReportManager.SetGlobalConfig(c.Global)
 	c.ReportManagerMinio.SetGlobalConfig(c.Global)
 }
