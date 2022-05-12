@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
