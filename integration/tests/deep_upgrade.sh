@@ -45,9 +45,12 @@ do_upgrade() {
 }
 
 do_deploy() {
+    log_info "Starting do deploy"
     #shellcheck disable=SC2154
     cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
+    log_info "Starting install hab"
     install_hab "0.54.0"
+    log_info "Starting scaffold"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
     $upgrade_scaffold_bin setup "$test_manifest_path"
     $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
