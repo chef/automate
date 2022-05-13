@@ -347,7 +347,7 @@ sudo chef-automate maintenance off
 ```
 
 {{< note >}}
-After upgrading to version 4.x, Automate will continue to have both the configuration for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
+After upgrading to version 4.x, Automate will have the configurations both for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
 {{< /note >}}
 
 ## Troubleshooting
