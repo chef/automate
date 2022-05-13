@@ -53,6 +53,9 @@ do_deploy() {
     $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
     sleep 5
 
+    log_info "Test Channel"
+    log_info "$test_channel"
+
     log_info "Generating Automate configuration"
     #shellcheck disable=SC2154
     /bin/chef-automate init-config \
