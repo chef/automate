@@ -25,9 +25,7 @@ This inspec will check below services are installed and runnig or not.
     - chef/local-user-service
     - chef/authn-service
     - chef/license-control-service
-    - chef/automate-elasticsearch
     - chef/automate-pg-gateway
-    - chef/automate-postgresql
     - chef/deployment-service
     - chef/ingest-service
     - chef/automate-cs-oc-bifrost
@@ -36,6 +34,6 @@ This inspec will check below services are installed and runnig or not.
 
 It will also test below check
     - Automate diagnotsics
-    - Automate elasticsearch diskspace
+    - Automate opensearch diskspace
     - Automate_admin_token lifecycle
     - Loadbalancer cert validity

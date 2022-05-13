@@ -1,10 +1,10 @@
-name: automate-backend-elasticsearch-smoke
+name: automate-ha-opensearch-smoke
 title: InSpec Profile
 maintainer: Chef Software, Inc.
 copyright: Chef Software, Inc.
 copyright_email: success@chef.io
 license: All Rights Reserved
-summary: An InSpec Compliance Profile for testing Elasticsearch backends
+summary: An InSpec Compliance Profile for testing Opensearch backends
 version: 0.1.0
 depends:
   - name: automate-backend-resources
