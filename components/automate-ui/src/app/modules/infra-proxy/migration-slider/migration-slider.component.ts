@@ -160,7 +160,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
     if (checkBox.textContent === 'check') {
       this.removeUserFromUsersData(this.selectedUsersData, user);
       this.removeUserFromUsersData(this.conflictedUsers, user);
-      
+
       if (user.is_conflicting) {
         input?.classList?.remove('user-exist-warning');
       }
@@ -201,11 +201,11 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
     // console.log(automate_username);
     if ((input as HTMLInputElement).value !== '') {
       // check user exists on dataset
-      const usersDataSet = this.usersData.map((user: User)=> user.automate_username)
+      const usersDataSet = this.usersData.map((user1: User) => user1.automate_username);
       if (usersDataSet.includes((input as HTMLInputElement).value)) {
         this.userExistInDatasetOrAutomate(input, user, index);
         user.checking_conflcit = false;
-        return
+        return;
       }
 
       const payload = {
@@ -221,11 +221,11 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
         .subscribe(([checkUserSt, getCheckedUserState]) => {
           if (checkUserSt === EntityStatus.loadingSuccess && !isNil(getCheckedUserState)) {
             if ((input as HTMLInputElement).value === getCheckedUserState.user.id) {
-              this.userExistInDatasetOrAutomate(input, user, index)
+              this.userExistInDatasetOrAutomate(input, user, index);
             }
           } else {
             if (this.userData.username === username) {
-              console.log("not exist")
+              console.log('not exist');
               input.classList.remove('user-exist-warning');
 
               // remove the user from the conflictedUsers
@@ -238,7 +238,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
               // uniq data for the selected users and set the is_conflicting value
               this.selectedUsersData = [...new Set(this.selectedUsersData)];
               this.setConflictUsersAttrValue(this.usersData, user, false);
-              
+
               // uniq data for the users data
               this.usersData = [...new Set(this.usersData)];
 
@@ -289,7 +289,7 @@ export class MigrationSliderComponent implements OnChanges, OnDestroy {
   }
 
   public userExistInDatasetOrAutomate(input: HTMLElement, user: User, index: number) {
-    console.log("exist")
+    console.log('exist');
     input.classList.add('user-exist-warning');
     this.addUserToUsersData(this.conflictedUsers, user);
 
