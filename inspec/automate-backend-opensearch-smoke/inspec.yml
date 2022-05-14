@@ -1,4 +1,4 @@
-name: automate-ha-opensearch-smoke
+name: automate-backend-opensearch-smoke
 title: InSpec Profile
 maintainer: Chef Software, Inc.
 copyright: Chef Software, Inc.
