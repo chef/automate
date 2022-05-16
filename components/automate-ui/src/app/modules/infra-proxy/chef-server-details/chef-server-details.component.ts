@@ -348,7 +348,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed.next();
+    this.isDestroyed.next(true);
     this.isDestroyed.complete();
     // clearInterval(this.myInterval);
   }

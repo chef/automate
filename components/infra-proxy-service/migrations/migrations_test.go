@@ -50,18 +50,18 @@ func TestConfirmPreview(t *testing.T) {
 	type args struct {
 		ctx       context.Context
 		server    MigrationServer
-		req       *request.ConfirmPreview
+		req       *request.ConfirmPreviewRequest
 		NeedError bool
 	}
 	tests := []struct {
 		name      string
 		args      args
 		wantError error
-		want1     *response.ConfirmPreview
+		want1     *response.ConfirmPreviewResponse
 	}{
-		{name: "Test confrim preview, should return migration id", args: args{ctx: context.Background(), server: MigrationServer{service: &service.Service{Migration: &testDB.MigrationDB{}}}, req: &request.ConfirmPreview{ServerId: "server1", MigrationId: "mig1", StagedData: &request.StagedData{}}}, wantError: nil, want1: &response.ConfirmPreview{MigrationId: "mig1"}},
+		{name: "Test confrim preview, should return migration id", args: args{ctx: context.Background(), server: MigrationServer{service: &service.Service{Migration: &testDB.MigrationDB{}}}, req: &request.ConfirmPreviewRequest{ServerId: "server1", MigrationId: "mig1", StagedData: &request.StagedData{}}}, wantError: nil, want1: &response.ConfirmPreviewResponse{MigrationId: "mig1"}},
 
-		{name: "Test Error from confirm preview, if migration is failed", args: args{ctx: context.Background(), server: MigrationServer{service: &service.Service{Migration: &testDB.MigrationDB{NeedError: true}}}, req: &request.ConfirmPreview{ServerId: "server1", MigrationId: "mig1"}}, wantError: errors.New("Failed to migrate."), want1: nil},
+		{name: "Test Error from confirm preview, if migration is failed", args: args{ctx: context.Background(), server: MigrationServer{service: &service.Service{Migration: &testDB.MigrationDB{NeedError: true}}}, req: &request.ConfirmPreviewRequest{ServerId: "server1", MigrationId: "mig1"}}, wantError: errors.New("Failed to migrate."), want1: nil},
 	}
 
 	for _, tt := range tests {

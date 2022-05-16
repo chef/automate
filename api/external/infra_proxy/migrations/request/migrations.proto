@@ -44,7 +44,7 @@ message GetStagedDataRequest {
 }
 
 
-message ConfirmPreview {
+message ConfirmPreviewRequest {
   // Server ID
   string server_id = 1;
   // Migration ID.

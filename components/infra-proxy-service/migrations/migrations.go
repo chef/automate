@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
@@ -33,7 +32,8 @@ func (s *MigrationServer) UploadFile(stream service.MigrationDataService_UploadF
 	log.Info("Starting the with the request to upload file")
 	req, err := stream.Recv()
 	serverId := req.ServerId
-	fileName := req.GetMeta().GetName()
+	fileName := req.GetMeta().
+		GetName()
 	ctx := context.Background()
 	migrationId, err := createMigrationId()
 	if err != nil {
@@ -318,7 +318,7 @@ func (s *MigrationServer) StoreStagedData(ctx context.Context, migrationId strin
 }
 
 // ConfirmPreview trigger the preview pipline
-func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreview) (*response.ConfirmPreview, error) {
+func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.ConfirmPreviewRequest) (*response.ConfirmPreviewResponse, error) {
 	// Validate all request fields are required
 	err := validation.New(validation.Options{
 		Target:          "server",
@@ -342,7 +342,7 @@ func (s *MigrationServer) ConfirmPreview(ctx context.Context, req *request.Confi
 	// call pipeline function to trigger the phase 2 pipeline
 	go s.phaseTwoPipeline.Run(md, migrationStage.StagedData, s.service)
 
-	return &response.ConfirmPreview{
+	return &response.ConfirmPreviewResponse{
 		MigrationId: req.MigrationId,
 	}, nil
 }
@@ -392,7 +392,7 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 
 	// Create org directory
 	orgPath := path.Join(backupPath, "organizations/", req.OrgId, "groups")
-	if _, err := os.Stat(orgPath); os.IsNotExist(err) {
+	if _, err := os.Stat(orgPath); errors.Is(err, os.ErrNotExist) {
 		err := os.MkdirAll(orgPath, os.ModePerm)
 		if err != nil {
 			log.Errorf("Unable to create directory %s", err.Error())
@@ -420,12 +420,14 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	serverUsers := []pipeline.KeyDump{}
 
 	if _, err := os.Stat(keyDumpJsonPath); err == nil {
-		data, err := ioutil.ReadFile(keyDumpJsonPath)
+
+		keyDumpFile, err := os.Open(keyDumpJsonPath)
 		if err != nil {
+			log.Errorf("failed to open keydump file: %s ", err.Error())
 			return nil, err
 		}
-		err = json.Unmarshal(data, &serverUsers)
-		if err != nil {
+		if err = json.NewDecoder(keyDumpFile).Decode(&serverUsers); err != nil {
+			log.Errorf("failed to decode keydump json file %s", err.Error())
 			return nil, err
 		}
 	}
@@ -506,32 +508,50 @@ func (s *MigrationServer) CreateBackup(ctx context.Context, req *request.CreateB
 	return &response.CreateBackupResponse{}, nil
 }
 
-func createFile(path string) error {
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		_, err := os.Create(path)
-		if err != nil {
-			log.WithError(err).Error("Unable to create file ", err)
-			return err
-		}
-	}
-	return nil
-}
+// func createFile(path string) error {
+// 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+// 		_, err := os.Create(path)
+// 		if err != nil {
+// 			log.WithError(err).Error("Unable to create file ", err)
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
 
 func writeFile(path string, data []byte) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err = createFile(path)
-		if err != nil {
-			log.Errorf("Unable to create file %s", err.Error())
-			return err
-		}
+	file, err := os.Create(path)
+	if err != nil {
+		log.WithError(err).Error("Unable to create file ", err)
+		return err
 	}
-	err := ioutil.WriteFile(path, data, 0644)
+	defer func() {
+		_ = file.Close()
+	}()
+	noOfBytes, err := file.Write(data)
 	if err != nil {
 		log.Errorf("Unable to write file %s", err.Error())
 		return err
 	}
+	log.Info(noOfBytes, ": bytes are written to the file")
 	return nil
 }
+
+// func writeFile(path string, data []byte) error {
+// 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+// 		err = createFile(path)
+// 		if err != nil {
+// 			log.Errorf("Unable to create file %s", err.Error())
+// 			return err
+// 		}
+// 	}
+// 	err := os.WriteFile(path, data, 0644)
+// 	if err != nil {
+// 		log.Errorf("Unable to write file %s", err.Error())
+// 		return err
+// 	}
+// 	return nil
+// }
 
 //writeOrgFile: Write org file org.json
 func writeOrgFile(org pipeline.OrgJson, orgJsonPath string) error {

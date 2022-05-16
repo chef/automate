@@ -9,9 +9,9 @@ message CreateOrg {
     // Chef organization name.
     string name = 2;
     // Chef Infra Server ID.
-    string server_id = 5;
+    string server_id = 3;
     // List of projects this chef organization belongs to. May be empty.
-    repeated string projects = 6;
+    repeated string projects = 4;
 }
 
 message UpdateOrg {

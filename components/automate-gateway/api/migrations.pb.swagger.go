@@ -121,7 +121,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.ConfirmPreview"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.response.ConfirmPreviewResponse"
             }
           },
           "default": {
@@ -151,7 +151,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.ConfirmPreview"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.migrations.request.ConfirmPreviewRequest"
             }
           }
         ],
@@ -162,7 +162,7 @@ func init() {
     }
   },
   "definitions": {
-    "chef.automate.api.infra_proxy.migrations.request.ConfirmPreview": {
+    "chef.automate.api.infra_proxy.migrations.request.ConfirmPreviewRequest": {
       "type": "object",
       "properties": {
         "server_id": {
@@ -284,7 +284,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.migrations.response.ConfirmPreview": {
+    "chef.automate.api.infra_proxy.migrations.response.ConfirmPreviewResponse": {
       "type": "object",
       "properties": {
         "migration_id": {

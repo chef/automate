@@ -22,7 +22,10 @@ UPDATE iam_roles
             iam:projects:list,
             iam:projects:get,
             iam:projects:assign,
-            applications:*
+            applications:*,
+	    infra:nodes:*,
+	    infra:nodeManagers:*
+
         }'
     WHERE
         id = 'editor';

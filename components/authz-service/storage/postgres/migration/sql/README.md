@@ -80,4 +80,3 @@
 - [`78_update_viewer_role_pols.up.sql`](78_update_viewer_role_pols.up.sql)
 - [`79_infra_editor_update.up.sql`](79_infra_editor_update.up.sql)
 - [`80_infra_project_owner.up.sql`](80_infra_project_owner.up.sql)
-
