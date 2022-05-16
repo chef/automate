@@ -1,4 +1,4 @@
-# A2ha Automate InSpec Profile
+# Automate-ha Automate InSpec Profile
 
 This inspec will check below services are installed and runnig or not.
     - chef/config-mgmt-service

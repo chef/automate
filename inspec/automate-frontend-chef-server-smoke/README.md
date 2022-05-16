@@ -1,4 +1,4 @@
-# A2ha Chef-server InSpec Profile
+# Automate-ha Chef-server InSpec Profile
 
 
 This inspec will check below services are installed and running or not.  
