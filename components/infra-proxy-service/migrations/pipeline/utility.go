@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/local_user"
@@ -14,8 +15,8 @@ import (
 // StoreOrgs reads the Result struct and populate the orgs table
 func StoreOrgs(ctx context.Context, st storage.Storage, authzProjectClient authz.ProjectsServiceClient, res pipeline.Result) (pipeline.Result, error) {
 	var err error
-
 	log.Info("Starting the organization migration phase for migration id: ", res.Meta.MigrationID)
+
 	for _, org := range res.ParsedResult.Orgs {
 		if org.ActionOps == pipeline.Skip {
 			res.ParsedResult.OrgsCount.Skipped++
@@ -32,6 +33,7 @@ func StoreOrgs(ctx context.Context, st storage.Storage, authzProjectClient authz
 		log.Errorf("Failed to migrate orgs for migration id %s : %s", res.Meta.MigrationID, err.Error())
 		return res, err
 	}
+
 	log.Info("Successfully completed the organization migration phase for migration id: ", res.Meta.MigrationID)
 	return res, err
 }
@@ -67,6 +69,10 @@ func StoreOrg(ctx context.Context, st storage.Storage, org pipeline.Org, serverI
 func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, orgId string, authzProjectClient authz.ProjectsServiceClient) ([]string, error) {
 	var projectID *authz.CreateProjectResp
 
+	// NOTE: Project name shouldn't be bigger then 48 chars, so remove all the special chars
+	// from the server id and take first 20 chars and concatenate with '_' followed by orgID
+	serverId = removeSpecialChars(serverId)
+
 	newProject := &authz.CreateProjectReq{
 		Name:         serverId + "_" + orgId,
 		Id:           serverId + "_" + orgId,
@@ -74,7 +80,7 @@ func createProjectFromOrgIdAndServerID(ctx context.Context, serverId string, org
 	}
 
 	existingProject := &authz.GetProjectReq{
-		Id: serverId + "_" + orgId,
+		Id: newProject.Id,
 	}
 
 	projResp, err := authzProjectClient.GetProject(ctx, existingProject)
@@ -285,10 +291,25 @@ func removePolicyFromUser(ctx context.Context, org pipeline.Org, user pipeline.U
 
 func getPolicyId(isAdmin bool, org pipeline.Org, serverId string) string {
 	var policyId string
+
+	serverId = removeSpecialChars(serverId)
+
 	if isAdmin {
 		policyId = fmt.Sprintf("%s_%s-%s", serverId, org.Name, "project-owners")
 	} else {
 		policyId = fmt.Sprintf("%s_%s-%s", serverId, org.Name, "project-editors")
 	}
 	return policyId
+}
+
+func removeSpecialChars(str string) string {
+	re, err := regexp.Compile(`[^\w]`)
+	if err != nil {
+		log.Error("cannot compile regex: ", err)
+	}
+	str = re.ReplaceAllString(str, "")
+	if len(str) < 20 {
+		return str
+	}
+	return str[:20]
 }

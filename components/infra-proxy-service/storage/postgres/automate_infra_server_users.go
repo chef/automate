@@ -296,8 +296,8 @@ func (p *postgres) deleteOrgUserAssociation(ctx context.Context, serverID, orgID
 	return orgUser, nil
 }
 
-//DeleteUserAssciation: Delete user based on the automate_user_id
-func (p *postgres) DeleteUserAssciation(ctx context.Context, username string) (string, error) {
+//DeleteUserAssociation: Delete user based on the automate_user_id
+func (p *postgres) DeleteUserAssociation(ctx context.Context, username string) (string, error) {
 	var automateUsername string
 	row := p.db.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE automate_user_id = $1)`, username)
 	var userExist bool
