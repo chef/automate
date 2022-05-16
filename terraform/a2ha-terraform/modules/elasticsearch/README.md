@@ -1,4 +1,4 @@
-# automate-backend-elasticsearch-module
+# automate-backend-opensearch-module
 
 Terraform Module
 
@@ -7,4 +7,4 @@ Terraform Module
 * habitat
 
 ## Description
-Installs Elasticsearch on target from Habitat pkg and in a leader topology.
+Installs Opensearch on target from Habitat pkg and in a leader topology.

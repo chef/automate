@@ -60,7 +60,7 @@ module AutomateCluster
         utils.backend_logger.info ">>>> Running Automate Elasticsearch inspec smoke tests against: #{utils.opensearch_public_ips}"
         utils.opensearch_public_ips.each do |ip|
           begin
-            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-backend-elasticsearch-smoke/"
+            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-backend-opensearch-smoke/"
             utils.backend_logger.debug cmd
             result = utils.run_command cmd
             utils.backend_logger.info "STDOUT: #{result.stdout}" unless options[:live_stream]
