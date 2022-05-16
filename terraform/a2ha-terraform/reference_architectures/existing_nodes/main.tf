@@ -119,18 +119,18 @@ module "habitat-frontend" {
   habitat_uid_gid                 = var.habitat_uid_gid
 }
 
-module "elasticsearch" {
-  source                       = "./modules/elasticsearch"
+module "opensearch" {
+  source                       = "./modules/opensearch"
   airgap_info                  = module.airgap_bundle-backend.airgap_info
   backend_aib_dest_file        = var.backend_aib_dest_file
   backend_aib_local_file       = var.backend_aib_local_file
   curator_pkg_ident            = var.curator_pkg_ident
   opensearch_instance_count = var.opensearch_instance_count
   opensearch_listen_port       = var.opensearch_listen_port
-  elasticsearch_pkg_ident      = var.elasticsearch_pkg_ident
-  elasticsearch_svc_load_args  = var.elasticsearch_svc_load_args
-  elasticsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
-  elasticsidecar_svc_load_args = var.elasticsidecar_svc_load_args
+  opensearch_pkg_ident            = var.opensearch_pkg_ident
+  opensearch_svc_load_args        = var.elasticsearch_svc_load_args
+  opensearchsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
+  opensearchsidecar_svc_load_args = var.elasticsidecar_svc_load_args
   habitat_info                 = module.habitat-backend.habitat_info
   journalbeat_pkg_ident        = var.journalbeat_pkg_ident
   kibana_pkg_ident             = var.kibana_pkg_ident
