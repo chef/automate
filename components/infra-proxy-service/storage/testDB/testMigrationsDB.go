@@ -273,3 +273,7 @@ func (m MigrationDB) GetMigrationStatus(ctx context.Context, migrationId string)
 		MigrationStatus: "Completed",
 	}, nil
 }
+
+func (m MigrationDB) GetLastSuccessfulMigration(ctx context.Context, serverId string) (storage.MigrationStatus, error) {
+	panic("implement me")
+}
