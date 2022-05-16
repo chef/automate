@@ -39,14 +39,8 @@ func (m *GlobalConfig) GetPort(name string) (uint16, error) {
 // ListSecrets lists all the secrets exposed by the config
 func (m *GlobalConfig) ListSecrets() []a2conf.SecretInfo {
 	return []a2conf.SecretInfo{a2conf.SecretInfo{
-		EnvironmentVariable: "AUTOMATE_SECRET_ES_USERNAME",
-		Name:                "es_username",
-	}, a2conf.SecretInfo{
 		EnvironmentVariable: "AUTOMATE_SECRET_ES_PASSWORD",
 		Name:                "es_password",
-	}, a2conf.SecretInfo{
-		EnvironmentVariable: "AUTOMATE_SECRET_OS_USERNAME",
-		Name:                "os_username",
 	}, a2conf.SecretInfo{
 		EnvironmentVariable: "AUTOMATE_SECRET_OS_PASSWORD",
 		Name:                "os_password",
@@ -59,29 +53,6 @@ func (m *GlobalConfig) GetSecret(name string) *wrappers.StringValue {
 		return nil
 	}
 	switch name {
-	case "es_username":
-		v0 := m.V1
-		if v0 == nil {
-			return nil
-		}
-		v1 := v0.External
-		if v1 == nil {
-			return nil
-		}
-		v2 := v1.Elasticsearch
-		if v2 == nil {
-			return nil
-		}
-		v3 := v2.Auth
-		if v3 == nil {
-			return nil
-		}
-		v4 := v3.BasicAuth
-		if v4 == nil {
-			return nil
-		}
-		v5 := v4.Username
-		return v5
 	case "es_password":
 		v0 := m.V1
 		if v0 == nil {
@@ -104,29 +75,6 @@ func (m *GlobalConfig) GetSecret(name string) *wrappers.StringValue {
 			return nil
 		}
 		v5 := v4.Password
-		return v5
-	case "os_username":
-		v0 := m.V1
-		if v0 == nil {
-			return nil
-		}
-		v1 := v0.External
-		if v1 == nil {
-			return nil
-		}
-		v2 := v1.Opensearch
-		if v2 == nil {
-			return nil
-		}
-		v3 := v2.Auth
-		if v3 == nil {
-			return nil
-		}
-		v4 := v3.BasicAuth
-		if v4 == nil {
-			return nil
-		}
-		v5 := v4.Username
 		return v5
 	case "os_password":
 		v0 := m.V1
@@ -159,32 +107,6 @@ func (m *GlobalConfig) GetSecret(name string) *wrappers.StringValue {
 // SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist
 func (m *GlobalConfig) SetSecret(name string, value *wrappers.StringValue) error {
 	switch name {
-	case "es_username":
-		v0 := &m.V1
-		if *v0 == nil {
-			*v0 = &V1{}
-		}
-		v1 := &(*v0).External
-		if *v1 == nil {
-			*v1 = &External{}
-		}
-		v2 := &(*v1).Elasticsearch
-		if *v2 == nil {
-			*v2 = &External_Elasticsearch{}
-		}
-		v3 := &(*v2).Auth
-		if *v3 == nil {
-			*v3 = &External_Elasticsearch_Authentication{}
-		}
-		v4 := &(*v3).BasicAuth
-		if *v4 == nil {
-			*v4 = &External_Elasticsearch_Authentication_BasicAuth{}
-		}
-		v5 := &(*v4).Username
-		if *v5 == nil {
-			*v5 = &wrapperspb.StringValue{}
-		}
-		*v5 = value
 	case "es_password":
 		v0 := &m.V1
 		if *v0 == nil {
@@ -207,32 +129,6 @@ func (m *GlobalConfig) SetSecret(name string, value *wrappers.StringValue) error
 			*v4 = &External_Elasticsearch_Authentication_BasicAuth{}
 		}
 		v5 := &(*v4).Password
-		if *v5 == nil {
-			*v5 = &wrapperspb.StringValue{}
-		}
-		*v5 = value
-	case "os_username":
-		v0 := &m.V1
-		if *v0 == nil {
-			*v0 = &V1{}
-		}
-		v1 := &(*v0).External
-		if *v1 == nil {
-			*v1 = &External{}
-		}
-		v2 := &(*v1).Opensearch
-		if *v2 == nil {
-			*v2 = &External_Opensearch{}
-		}
-		v3 := &(*v2).Auth
-		if *v3 == nil {
-			*v3 = &External_Opensearch_Authentication{}
-		}
-		v4 := &(*v3).BasicAuth
-		if *v4 == nil {
-			*v4 = &External_Opensearch_Authentication_BasicAuth{}
-		}
-		v5 := &(*v4).Username
 		if *v5 == nil {
 			*v5 = &wrapperspb.StringValue{}
 		}
