@@ -70,8 +70,8 @@ message External {
 
     message Authentication {
       message BasicAuth {
-        google.protobuf.StringValue username = 1 [(chef.automate.api.secret) = { name: "es_username" }];
-        google.protobuf.StringValue password = 2[(chef.automate.api.secret) = { name: "es_password" }];
+        google.protobuf.StringValue username = 1;
+        google.protobuf.StringValue password = 2 [(chef.automate.api.secret) = { name: "es_password" }];
       }
       message AwsElasticsearchAuth {
         // Authentication for Aws ES must provide a user and password for basic
@@ -135,7 +135,7 @@ message External {
 
     message Authentication {
       message BasicAuth {
-        google.protobuf.StringValue username = 1 [(chef.automate.api.secret) = { name: "os_username" }];
+        google.protobuf.StringValue username = 1;
         google.protobuf.StringValue password = 2 [(chef.automate.api.secret) = { name: "os_password" }];
       }
       message AwsOpensearchAuth {
