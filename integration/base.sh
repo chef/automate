@@ -5,7 +5,7 @@
 #shellcheck disable=SC1091
 
 set -eo pipefail
-OLD_VERSION="3.0.49"
+OLD_VERSION="latest"
 test_name=""
 test_upgrades=false
 test_backup_restore=false
