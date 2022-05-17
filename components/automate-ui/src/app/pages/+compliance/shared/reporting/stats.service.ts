@@ -217,6 +217,7 @@ export class StatsService {
       map(({ reports, total }) => new ReportCollection(reports, total)));
   }
 
+
   downloadReport(format: string, reportQuery: ReportQuery): Observable<Blob> {
     let url = '';
     if (this.appConfigService.isLargeReportingEnabled) {
