@@ -5,7 +5,7 @@
 #shellcheck disable=SC1091
 
 set -eo pipefail
-
+OLD_VERSION="3.0.49"
 test_name=""
 test_upgrades=false
 test_backup_restore=false
@@ -172,7 +172,7 @@ do_create_config_default() {
     if [ $test_upgrades = true ]; then
       # Install the automate CLI from current
       cli_bin="/bin/chef-automate-latest"
-      download_cli "latest" "${cli_bin}"
+      download_cli "${OLD_VERSION}" "${cli_bin}"
     fi
     ${cli_bin} init-config \
         --channel $test_channel \
