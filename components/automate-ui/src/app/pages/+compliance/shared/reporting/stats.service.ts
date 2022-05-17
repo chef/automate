@@ -228,7 +228,6 @@ export class StatsService {
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
     reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
-
     const body = { type: format, filters: this.formatFilters(reportQuery) };
     return this.httpClient.post(url, body, { responseType: 'blob' });
   }
