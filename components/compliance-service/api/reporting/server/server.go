@@ -170,6 +170,9 @@ func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlIt
 	if in.Size == 0 {
 		in.Size = 100
 	}
+	if in.PageNumber == 0 {
+		in.PageNumber = 1
+	}
 
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
@@ -177,7 +180,7 @@ func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlIt
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
-	controlListItems, err = srv.es.GetControlListItems(ctx, formattedFilters, in.Size)
+	controlListItems, err = srv.es.GetControlListItems(ctx, formattedFilters, in.Size, in.PageNumber)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
