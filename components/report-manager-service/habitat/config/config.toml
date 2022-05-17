@@ -41,3 +41,5 @@ target = "127.0.0.1:{{cereal-service.cfg.port}}"
 endpoint = "{{cfg.minio.endpoint}}"
 root_user = "{{cfg.minio.root_user}}"
 root_password = "{{cfg.minio.root_password}}"
+cert = """{{cfg.minio.cert}}"""
+enable_ssl = {{cfg.minio.enable_ssl}}

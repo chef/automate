@@ -21,3 +21,6 @@ max_idle_conns = 5
 
 [objstore]
 bucket = "default"
+
+[minio]
+enable_ssl = false

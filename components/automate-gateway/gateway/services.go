@@ -3,6 +3,8 @@ package gateway
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -1024,6 +1026,20 @@ func (s *Server) ReportManagerExportHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	client := http.Client{}
+
+	if resp.EnabledSsl {
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM([]byte(resp.ClientCert))
+
+		client = http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: caCertPool,
+				},
+			},
+		}
+	}
+
 	req, err := http.NewRequest(http.MethodGet, resp.GetUrl(), nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
