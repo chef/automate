@@ -30,7 +30,7 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
-inspec_release="chef/inspec/4.51.1/20220425142913"
+inspec_release="chef/inspec/4.56.22/20220517052126"
 pkg_deps=(
   core/coreutils
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
