@@ -62,7 +62,6 @@ output "opensearch_ssh" {
     "ssh -i %s %s@%s",
     var.ssh_key_file,
     var.ssh_user,
-    var.existing_opensearch_ips,
+    var.existing_opensearch_private_ips,
   )
 }
-
