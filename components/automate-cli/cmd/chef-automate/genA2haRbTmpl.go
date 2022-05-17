@@ -60,7 +60,6 @@ end
 existing_nodes do
   automate_private_ips [{{ range $index, $element := .ExistingInfra.Config.AutomatePrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   chef_server_private_ips [{{ range $index, $element := .ExistingInfra.Config.ChefServerPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
-  elasticsearch_ips [{{ range $index, $element := .ExistingInfra.Config.ElasticsearchIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   opensearch_private_ips [{{ range $index, $element := .ExistingInfra.Config.OpensearchPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   postgresql_private_ips [{{ range $index, $element := .ExistingInfra.Config.PostgresqlPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
 end

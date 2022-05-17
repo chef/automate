@@ -7,8 +7,6 @@ title 'Chef Automate Backend Deploy Smoke Tests'
 %w(
   chef/automate-ha-postgresql
   chef/automate-ha-haproxy
-  chef/automate-ha-journalbeat
-  chef/automate-ha-metricbeat
   chef/automate-ha-pgleaderchk
 ).each do |svc|
   describe hab_svc(svc) do

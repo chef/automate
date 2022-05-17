@@ -12,14 +12,12 @@ end
 %w(
   chef/automate-load-balancer
   chef/license-control-service
-  chef/automate-elasticsearch
   chef/automate-cs-oc-erchef
   chef/pg-sidecar-service
   chef/es-sidecar-service
   chef/automate-es-gateway
   chef/backup-gateway
   chef/automate-cs-nginx
-  chef/automate-postgresql
   chef/automate-cs-bookshelf
   chef/deployment-service
   chef/automate-cs-oc-bifrost
@@ -33,7 +31,6 @@ end
 
 %w(
   license-control-service
-  automate-elasticsearch
   automate-cs-oc-erchef
   pg-sidecar-service
   automate-es-gateway

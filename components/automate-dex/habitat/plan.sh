@@ -39,7 +39,7 @@ do_before() {
 do_unpack() {
   git clone "https://github.com/chef/dex-1" "$GOPATH/src/github.com/chef/dex-1"
   ( cd "$GOPATH/src/github.com/chef/dex-1" || exit
-    git checkout add_request_validators
+    git checkout add_invalid_attempts
   )
 }
 

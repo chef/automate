@@ -76,7 +76,7 @@ do_install() {
     mkdir -p $pkg_prefix/inspec
     cp -r lib $pkg_prefix/
     cp -r libexec $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-opensearch-smoke $pkg_prefix/inspec/
     cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/inspec/
     cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/inspec/
     cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/inspec/
