@@ -97,30 +97,18 @@
     * automate-backend-haproxy
       * Version: core/haproxy/2.2.2/20200923113708
 
-3. elasticsearch
-    * automate-backend-elasticsearch
-      * Version: chef/elasticsearch-odfe/0.10.1.2/20210812193038
+3. Opensearch
+    * automate-backend-opensearch
+      * Version: chef/automate-openjdk/11.0.13+8/20220516080416
 
-4. journalbeat
-    * automate-backend-journalbeat
-      * Version: chef/journalbeat/6.8.6/20210812193038
-
-5. metricbeat
-    * automate-backend-metricbeat
-      * Version: chef/metricbeat/6.8.6/20210812193038
-
-6. kibana
-    * automate-backend-kibana
-      * Version: chef/kibana-odfe/0.10.0.4/20210812193038
-
-7. terraform
+4. terraform
     * automate-backend-deployment
       * Version: core/terraform/0.12.26/20200922233119      
 
-8. aws-cli
+5. aws-cli
     * automate-backend-deployment
       * Version: core/aws-cli/1.18.145/20200924113212
 
-9. ruby
+6. ruby
     * automate-cluster-ctl
       * Version: core/ruby26

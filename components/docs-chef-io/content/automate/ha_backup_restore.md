@@ -248,19 +248,19 @@ sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 
 {{< note >}}
 
-If the network is mounted correctly, you need to perform this step on a single Elasticsearch server.
+If the network is mounted correctly, you need to perform this step on a single Opensearch server.
 
 {{< /note >}}
 
-1. Export the current Elasticsearch configuration from the Habitat supervisor.
+1. Export the current Opensearch configuration from the Habitat supervisor.
 
 1. Log in as a root user.
 
-1. SSH to a single Elasticsearch server and configure Elasticsearch `path.repo` setting by executing the following commands:
+1. SSH to a single Opensearch server and configure Opensearch `path.repo` setting by executing the following commands:
 
 ```bash
 source /hab/sup/default/SystemdEnvironmentFile.sh
-automate-backend-ctl applied --svc=automate-backend-elasticsearch | tail -n +2 > es_config.toml
+automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
 ```
 
 1. Edit `es_config.toml` to add the following settings at the end of the file:
@@ -280,11 +280,11 @@ This file may be empty if credentials are never rotated.
 1. Apply updated `es_config.toml` configuration to Elasticsearch by executing the following commands:
 
 ```bash
-hab config apply automate-backend-elasticsearch.default $(date '+%s') es_config.toml
-hab svc status (check elasticsearch service is up or not)
+hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
+hab svc status (check opensearch service is up or not)
 curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u admin:admin
    # Watch for a message about Elasticsearch going from RED to GREEN
-`journalctl -u hab-sup -f | grep 'automate-ha-elasticsearch'
+`journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
 ```
 
 You can perform this application only once, which triggers a restart of the Elasticsearch services on each server.
