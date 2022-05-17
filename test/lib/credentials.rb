@@ -189,19 +189,6 @@ module AutomateCluster
               utils.backend_logger.error 'Opensearch Certificate values were not set properly - aborting!'
               exit 1
             end
-          elsif args.key?(:kibana_certs) && args[:kibana_certs]
-            if certificates[:kibana][:private][:value] &&
-               certificates[:kibana][:public][:value] &&
-               certificates[:ca_root][:public][:value]
-              cert_conf = <<~ENDHEREDOC
-                [opendistro_ssl]
-                  ssl_key = """#{certificates[:kibana][:private][:value]}"""
-                  ssl_cert = """#{certificates[:kibana][:public][:value]}"""
-              ENDHEREDOC
-            else
-              utils.backend_logger.error 'Kibana Certificate values were not set properly - aborting!'
-              exit 1
-            end
           end
 
           conf = pass_conf + "\n" + cert_conf
@@ -409,16 +396,6 @@ module AutomateCluster
                 value: nil
               }
             },
-            kibana: {
-              public: {
-                filename: "#{utils.top_level_dir}/certs/kibana_ssl_public.pem",
-                value: nil
-              },
-              private: {
-                filename: "#{utils.top_level_dir}/certs/kibana_ssl_private.key",
-                value: nil
-              }
-            },
             frontend: {
               public: {
                 filename: "#{utils.top_level_dir}/certs/frontend_ssl_public.pem",
@@ -494,10 +471,6 @@ module AutomateCluster
             load_es_cert!(certificates[:opensearch], certstore)
             load_es_cert!(certificates[:opensearch_admin], certstore)
           end
-          if options[:kibana_ssl] == true || options[:rotate_all] == true
-            utils.backend_logger.info 'Reading Kibana HTTPS keys'
-            load_cert!(certificates[:kibana], certstore)
-          end
           if options[:fe_ssl] == true || options[:rotate_all] == true
             utils.backend_logger.info 'Reading Frontend API HTTPS keys'
             load_cert!(certificates[:frontend], certstore)
@@ -561,7 +534,6 @@ module AutomateCluster
       option :rotate_all, type: :boolean, default: false, desc: 'Rotate all SSL certificates from certs/*'
       option :pg_ssl, type: :boolean, default: false, desc: 'Apply postgres sql SSL from certs/*'
       option :oser_ssl, type: :boolean, default: false, desc: 'Apply opensearch https SSL from certs/*'
-      option :kibana_ssl, type: :boolean, default: false, desc: 'Apply kibana https SSL from certs/*'
       option :fe_ssl, type: :boolean, default: false, desc: 'Apply frontend https SSL from certs/*'
       def ssl
         utils.backend_logger.info '☘  SSL Certificates ☘'
@@ -581,11 +553,6 @@ module AutomateCluster
           no_op = false
           patch_frontends(es_certs: true) unless options[:frontend] == false
           hab_config_apply(es_certs: true, service_name: 'opensearch') unless options[:gossip] == false
-        end
-
-        if options[:kibana_ssl] == true || options[:rotate_all] == true
-          no_op = false
-          hab_config_apply(kibana_certs: true, service_name: 'kibana')
         end
 
         if options[:fe_ssl] == true || options[:rotate_all] == true
