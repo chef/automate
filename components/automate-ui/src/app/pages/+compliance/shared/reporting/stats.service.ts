@@ -8,6 +8,7 @@ import { omitBy, isNil } from 'lodash';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 const CC_API_URL = environment.compliance_url;
 
@@ -34,7 +35,8 @@ export class StatsService {
   constructor(
     private httpClient: HttpClient,
     private route: ActivatedRoute,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
+    private telemetryService: TelemetryService,
   ) {}
 
   getFailures(types: Array<string>, reportQuery: ReportQuery): Observable<any> {
@@ -221,6 +223,7 @@ export class StatsService {
     let url = '';
     if (this.appConfigService.isLargeReportingEnabled) {
       url = `${CC_API_URL}/reporting/reportmanager/export`; // download Ack API
+      this.telemetryService.track("large_compliance_reports_enabled")
     } else {
       url = `${CC_API_URL}/reporting/export`; // direct download
     }
