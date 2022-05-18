@@ -1449,3 +1449,18 @@ func getProfileAndControlQuery(filters map[string][]string, profileBaseFscInclud
 	}
 	return nestedQuery
 }
+
+func paginate(pageNum int, size int, length int) (int, int) {
+	start := (pageNum - 1) * size
+
+	if start > length {
+		start = length
+	}
+
+	end := start + size
+	if end > length {
+		end = length
+	}
+
+	return start, end
+}
