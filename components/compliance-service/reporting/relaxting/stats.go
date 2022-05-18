@@ -19,7 +19,7 @@ import (
 func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.ReportSummary, error) {
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
 	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -63,7 +63,7 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
 	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -88,11 +88,21 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	logrus.Info(source)
 	b, _ := json.Marshal(source)
 	logrus.Info(string(b))
-	searchResult, err := queryInfo.client.Search().
-		SearchSource(searchSource).
-		Index(queryInfo.esIndex).
-		Size(0).
-		Do(context.Background())
+	var searchResult *elastic.SearchResult
+	if GetFilterDepth(filters) == ReportLevel {
+		searchResult, err = queryInfo.client.Search().FilterPath("aggregations.failed", "aggregations.passed", "aggregations.waived", "aggregations.skipped").
+			SearchSource(searchSource).
+			Index(queryInfo.esIndex).
+			Size(0).
+			Do(context.Background())
+	} else {
+		searchResult, err = queryInfo.client.Search().
+			SearchSource(searchSource).
+			Index(queryInfo.esIndex).
+			Size(0).
+			Do(context.Background())
+	}
+
 	if err != nil {
 		if searchResult != nil {
 			logrus.Error(searchResult.Error)
@@ -100,6 +110,7 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 		logrus.Info(err)
 		return nil, err
 	}
+
 	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
