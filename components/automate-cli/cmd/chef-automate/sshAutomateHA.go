@@ -247,14 +247,14 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 }
 
 func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]string, error) {
-	switch servername {
-	case "automate":
+	switch strings.ToLower(servername) {
+	case "automate", "a2":
 		return d.Outputs.AutomateSSH.Value, nil
-	case "chef_server":
+	case "chef_server", "cs":
 		return d.Outputs.ChefServerSSH.Value, nil
-	case "postgresql":
+	case "postgresql", "pg":
 		return d.Outputs.PostgresqlSSH.Value, nil
-	case "opensearch":
+	case "opensearch", "os":
 		return d.Outputs.OpensearchSSH.Value, nil
 	default:
 		return nil, errors.New("invalid hostname possible values should be any one of automate, chef_server, postgresql or opensearch")
