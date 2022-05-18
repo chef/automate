@@ -140,10 +140,10 @@ export class DownloadReportsService implements OnDestroy {
     });
   }
 
-  downloadReport(ack_id: string): Observable<string> {
+  downloadReport(ack_id: string): Observable<Blob> {
     let url = `${REPORT_LIST_API_URL}/export`;
     url = url + '/' + ack_id;
-    return this.httpClient.get(url, { responseType: 'text' });
+    return this.httpClient.get(url, { responseType: 'blob' });
   }
 
   getFilename(createdDate: string) {
