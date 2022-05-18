@@ -709,19 +709,19 @@ describe('StatsService', () => {
         filters: filters,
         last24h: false
       };
-      const arraybuffer = new ArrayBuffer(16);
+      const blob = new Blob();
 
-      service.downloadReport(type, reportQuery).subscribe((data: ArrayBuffer)  => {
-        expect(data).toEqual(arraybuffer);
+      service.downloadReport(type, reportQuery).subscribe((data: Blob)  => {
+        expect(data).toEqual(blob);
         done();
       });
 
       const req = httpTestingController.expectOne(url);
       expect(req.request.method).toEqual('POST');
-      expect(req.request.responseType).toEqual('arraybuffer');
+      expect(req.request.responseType).toEqual('blob');
       expect(req.request.body).toEqual({type, filters: service.formatFilters(reportQuery)});
 
-      req.flush(arraybuffer);
+      req.flush(blob);
     });
   });
 });
