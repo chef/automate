@@ -104,7 +104,7 @@ sudo chef-automate upgrade status
 sudo chef-automate maintenance off
 ```
 
-4. All configuration fields of the Elasticsearch should be copied into the OpenSearch configuration.
+4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
 For Example:
 
@@ -162,7 +162,7 @@ sudo chef-automate status
 
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-4. All configuration fields of the Elasticsearch should be copied into the OpenSearch configuration.
+4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
 For Example:
 
@@ -238,7 +238,7 @@ sudo chef-automate upgrade status
 sudo chef-automate maintenance off
 ```
 
-3. All configuration fields of the Elasticsearch should be copied into the OpenSearch configuration.
+3. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
 For Example:
 
@@ -320,7 +320,7 @@ sudo chef-automate status
 
 4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-5. All configuration fields of the Elasticsearch should be copied into the OpenSearch configuration.
+5. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
 For Example:
 
