@@ -709,19 +709,19 @@ describe('StatsService', () => {
         filters: filters,
         last24h: false
       };
-      const text = 'report';
 
-      service.downloadReport(type, reportQuery).subscribe(data => {
-        expect(data).toEqual(text);
+      const blob = new Blob();
+      service.downloadReport(type, reportQuery).subscribe((data: Blob)  => {
+        expect(data).toEqual(blob);
         done();
       });
 
       const req = httpTestingController.expectOne(url);
       expect(req.request.method).toEqual('POST');
-      expect(req.request.responseType).toEqual('text');
+      expect(req.request.responseType).toEqual('blob');
       expect(req.request.body).toEqual({type, filters: service.formatFilters(reportQuery)});
 
-      req.flush(text);
+      req.flush(blob);
     });
   });
 });
