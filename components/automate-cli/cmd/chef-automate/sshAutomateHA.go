@@ -257,6 +257,6 @@ func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]str
 	case "opensearch", "os":
 		return d.Outputs.OpensearchSSH.Value, nil
 	default:
-		return nil, errors.New("invalid hostname possible values should be any one of automate, chef_server, postgresql or opensearch")
+		return nil, errors.New("invalid hostname possible values should be any one of automate/a2, chef_server/cs, postgresql/pg or opensearch/os")
 	}
 }
