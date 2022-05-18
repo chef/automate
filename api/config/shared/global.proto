@@ -155,6 +155,8 @@ message External {
     google.protobuf.StringValue endpoint = 1;
     google.protobuf.StringValue root_user = 2;
     google.protobuf.StringValue root_password = 3;
+    google.protobuf.BoolValue enable_ssl = 4;
+    google.protobuf.StringValue cert = 5;
   }
 
   message Postgresql {

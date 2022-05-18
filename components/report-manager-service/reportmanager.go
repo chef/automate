@@ -2,6 +2,7 @@ package reportmanager
 
 import (
 	"context"
+	"crypto/x509"
 	"fmt"
 	"net"
 
@@ -74,12 +75,28 @@ func getObjectStoreConnection(ctx context.Context, conf config.ReportManager) (*
 	endpoint := conf.Minio.EndPoint
 	accessKeyID := conf.Minio.RootUser
 	secretAccessKey := conf.Minio.RootPassword
-	useSSL := false
 
-	objStoreClient, err := minio.New(endpoint, &minio.Options{
+	minioOptions := &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
-	})
+		Secure: conf.Minio.EnableSsl,
+	}
+
+	if conf.Minio.EnableSsl {
+		tr, err := minio.DefaultTransport(true)
+		if err != nil {
+			return nil, fmt.Errorf("error in getting default transport to establish the secure connection to minio: %w", err)
+		}
+
+		certPool := x509.NewCertPool()
+		if ok := certPool.AppendCertsFromPEM([]byte(conf.Minio.Cert)); !ok {
+			return nil, fmt.Errorf("error in creating a certPool with the provided certificate to establish the secure connection to minio: %w", err)
+		}
+
+		tr.TLSClientConfig.RootCAs = certPool
+		minioOptions.Transport = tr
+	}
+
+	objStoreClient, err := minio.New(endpoint, minioOptions)
 	if err != nil {
 		return nil, fmt.Errorf("error in creating a connection to object store server with end point %s: %w", endpoint, err)
 	}
@@ -114,7 +131,7 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 	//register health server for health status
 	health.RegisterHealthServer(s, health.NewService())
 	report_manager.RegisterReportManagerServiceServer(s,
-		server.New(objStoreClient, cerealManager, conf.ObjStore.BucketName, db, conf.Service.EnableLargeReporting, complianceReportingClient))
+		server.New(objStoreClient, cerealManager, conf, db, complianceReportingClient))
 
 	//Initiate the cereal manager with 2 workers
 	err = worker.InitCerealManager(cerealManager, 2, db, objStoreClient, conf.ObjStore.BucketName, complianceReportingClient)
