@@ -34,6 +34,8 @@ For example, if today you are on version *2021201164433*, your upgrade journey s
 
 ## Prerequisites
 
+{{< note >}} If your Elasticsearch contains older indexes of version 5, please [re-index](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html) them to version 6 with the same name, before proceeding with the upgrade. {{< /note >}}
+
 - **Plan your downtime:** This upgrade requires downtime. Before upgrading, set the environment to handle the downtime. Run `sudo chef-automate maintenance on` to turn on maintenance mode.
 - **Backup Chef Automate database:** This Chef Automate version upgrades ElasticSearch. [Backup](/automate/backup/) your data before upgrading.
 - **Current version should be 3.0.49:** If you are not on *3.0.49* version, do regular upgrades according to your topology.
@@ -80,7 +82,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
 **Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
-1. Start a major version upgrade:\
+1. Start a major version upgrade:
 
 Here, you will be prompted to accept multiple Pre Upgrade checklist. Accept the actions before upgrade.
 
@@ -90,31 +92,51 @@ sudo chef-automate upgrade run --major
 
 Once you are done with the upgrade, follow the steps post upgrade which are:
 
-1. Check the upgrade status of Chef Automate:
+2. Check the upgrade status of Chef Automate:
 
 ```sh
 sudo chef-automate upgrade status
 ```
 
-2. Turn off maintenance mode:
+3. Turn off maintenance mode:
 
 ```sh
 sudo chef-automate maintenance off
 ```
 
-3. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
+
+For Example:
+
+If Elasticsearch configuration was:
+
+```bash
+[elasticsearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Then add in OpenSearch configuration as:
+
+```bash
+[opensearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Apply this using the `config patch` command.
+
+5. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
 
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
 
-4. Verify whether all services are running:
+6. Verify whether all services are running:
 
 ```sh
 sudo chef-automate status
 ```
 
-5. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+7. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
 
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
@@ -140,7 +162,27 @@ sudo chef-automate status
 
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-4. Turn off maintenance mode:
+4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
+
+For Example:
+
+If Elasticsearch configuration was:
+
+```bash
+[elasticsearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Then add in OpenSearch configuration as:
+
+```bash
+[opensearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Apply this using `config patch` command.
+
+5. Turn off maintenance mode:
 
 ```sh
 sudo chef-automate maintenance off
@@ -196,19 +238,39 @@ sudo chef-automate upgrade status
 sudo chef-automate maintenance off
 ```
 
-3. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+3. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
+
+For Example:
+
+If Elasticsearch configuration was:
+
+```bash
+[elasticsearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Then add in OpenSearch configuration as:
+
+```bash
+[opensearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Apply this using `config patch` command.
+
+4. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
 
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
 
-4. Verify whether all services are running:
+5. Verify whether all services are running:
 
 ```sh
 sudo chef-automate status
 ```
 
-5. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+6. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
 
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
@@ -258,7 +320,27 @@ sudo chef-automate status
 
 4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-5. Turn off maintenance mode using following command:
+5. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
+
+For Example:
+
+If Elasticsearch configuration was:
+
+```bash
+[elasticsearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Then add in OpenSearch configuration as:
+
+```bash
+[opensearch.v1.sys.runtime]
+    heapsize = "8g"
+```
+
+Apply this using `config patch` command.
+
+6. Turn off maintenance mode using following command:
 
 ```sh
 sudo chef-automate maintenance off
