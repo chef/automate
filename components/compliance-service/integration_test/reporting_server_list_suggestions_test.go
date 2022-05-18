@@ -773,11 +773,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 // The terms (sorted alphabetically) after the first 500 are not included in the suggestions.
 func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
-<<<<<<< HEAD
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl})
-=======
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
->>>>>>> Export request API(#5968) (#5976)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
 	ctx := context.Background()
 
 	terms := make([]string, 500)
@@ -866,11 +862,7 @@ func TestReportingListSuggestionsUsersAccess(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
-<<<<<<< HEAD
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl})
-=======
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
->>>>>>> Export request API(#5968) (#5976)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
 
 	n := 5
 
