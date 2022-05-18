@@ -18,6 +18,8 @@ type Minio struct {
 	EndPoint     string `mapstructure:"endpoint"`
 	RootUser     string `mapstructure:"root_user"`
 	RootPassword string `mapstructure:"root_password"`
+	EnableSsl    bool   `mapstructure:"enable_ssl"`
+	Cert         string `mapstructure:"cert"`
 }
 
 type ObjStore struct {

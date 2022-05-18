@@ -28,6 +28,10 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.Format = w.String("text")
+
+	c.V1.Sys.Minio = &ConfigRequest_V1_System_Minio{
+		EnableSsl: w.Bool(false),
+	}
 	return c
 }
 
@@ -47,6 +51,9 @@ func (c *ConfigRequest) Validate() error {
 		}
 		if c.GetV1().GetSys().GetMinio().GetRootPassword().GetValue() == "" {
 			err.AddInvalidValue("global.v1.external.minio.root_password", "value should not be empty")
+		}
+		if c.GetV1().GetSys().GetMinio().GetEnableSsl().GetValue() && c.GetV1().GetSys().GetMinio().GetCert().GetValue() == "" {
+			err.AddInvalidValue("global.v1.external.minio.cert", "value should not be empty")
 		}
 	}
 
@@ -85,6 +92,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 			Endpoint:     minio.GetEndpoint(),
 			RootUser:     minio.GetRootUser(),
 			RootPassword: minio.GetRootPassword(),
+			EnableSsl:    minio.GetEnableSsl(),
+			Cert:         minio.GetCert(),
 		}
 	}
 }
