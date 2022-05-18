@@ -60,4 +60,6 @@ message GetPresignedURLResponse {
 	string url = 1;
 	string report_type = 2;
 	int64 report_size = 3;
+	bool enabled_ssl = 4;
+	string client_cert = 5;
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	cc_reporting "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/report_manager"
+	"github.com/chef/automate/components/report-manager-service/config"
 	"github.com/chef/automate/components/report-manager-service/objstore"
 	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/chef/automate/components/report-manager-service/utils"
@@ -33,11 +34,17 @@ type Server struct {
 	ObjBucket                 string
 	DataStore                 *storage.DB
 	EnableLargeReporting      bool
+	TSL                       TSL
+}
+
+type TSL struct {
+	TSLEnabled bool
+	ClientCert string
 }
 
 // New creates a new server
-func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket string, db *storage.DB,
-	enableLargeReporting bool, complianceReportingClient cc_reporting.ReportingServiceClient) *Server {
+func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, conf config.ReportManager, db *storage.DB,
+	complianceReportingClient cc_reporting.ReportingServiceClient) *Server {
 	return &Server{
 		ObjStoreClient: objstore.ReportManagerObjStore{
 			ObjStoreClient: objStoreClient,
@@ -45,9 +52,13 @@ func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket 
 		ComplianceReportingClient: complianceReportingClient,
 		CerealManager:             cerealManager,
 		ctx:                       context.Background(),
-		ObjBucket:                 objBucket,
+		ObjBucket:                 conf.ObjStore.BucketName,
 		DataStore:                 db,
-		EnableLargeReporting:      enableLargeReporting,
+		EnableLargeReporting:      conf.Service.EnableLargeReporting,
+		TSL: TSL{
+			TSLEnabled: conf.Minio.EnableSsl,
+			ClientCert: conf.Minio.Cert,
+		},
 	}
 }
 
@@ -164,5 +175,12 @@ func (s *Server) GetPresignedURL(ctx context.Context, req *report_manager.GetPre
 	if req.Id == "" || req.RequestorId == "" {
 		return &report_manager.GetPresignedURLResponse{}, fmt.Errorf("id and requestor should not be empty")
 	}
-	return s.DataStore.GetPreSignedURL(req.Id, req.RequestorId)
+
+	resp, err := s.DataStore.GetPreSignedURL(req.Id, req.RequestorId)
+	if err == nil {
+		resp.EnabledSsl = s.TSL.TSLEnabled
+		resp.ClientCert = s.TSL.ClientCert
+	}
+
+	return resp, err
 }
