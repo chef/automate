@@ -35,8 +35,19 @@ func NewConfigRequest() *ConfigRequest {
 				Gateway:   &ConfigRequest_V1_Gateway{},
 				Action:    &ConfigRequest_V1_Action{},
 				Logger:    &ConfigRequest_V1_Logger{},
-				Plugins:   &ConfigRequest_V1_Plugins{},
-				Runtime:   &ConfigRequest_V1_Runtime{},
+				Plugins: &ConfigRequest_V1_Plugins{
+					Security: &ConfigRequest_V1_Security{
+						Ssl: &ConfigRequest_V1_Ssl{
+							Transport: &ConfigRequest_V1_PluginTransport{},
+							Http:      &ConfigRequest_V1_Http{},
+						},
+						Authcz:        &ConfigRequest_V1_Authcz{},
+						Audit:         &ConfigRequest_V1_Audit{},
+						Restapi:       &ConfigRequest_V1_RestApi{},
+						SystemIndices: &ConfigRequest_V1_SystemIndices{},
+					},
+				},
+				Runtime: &ConfigRequest_V1_Runtime{},
 				S3: &ConfigRequest_V1_S3{
 					Client: &ConfigRequest_V1_S3_Client{},
 				},
@@ -117,6 +128,27 @@ func DefaultConfigRequest() *ConfigRequest {
 	sys.S3.Client.ReadTimeout = w.String("50s")
 	sys.S3.Client.MaxRetries = w.Int32(3)
 	sys.S3.Client.UseThrottleRetries = w.Bool(true)
+
+	// plugins
+	sys.Plugins.Security.AllowUnsafeDemocertificates = w.Bool(true)
+	sys.Plugins.Security.AllowDefaultInitSecurityindex = w.Bool(true)
+	sys.Plugins.Security.NodesDn = w.String("- CN=chefnode,O=Chef Software Inc,L=Seattle,ST=Washington,C=US")
+	sys.Plugins.Security.EnableSnapshotRestorePrivilege = w.Bool(true)
+	sys.Plugins.Security.CheckSnapshotRestoreWritePrivileges = w.Bool(true)
+	sys.Plugins.Security.Ssl.Transport.PemcertFilepath = w.String("node1.pem")
+	sys.Plugins.Security.Ssl.Transport.PemkeyFilepath = w.String("node1-key.pem")
+	sys.Plugins.Security.Ssl.Transport.PemtrustedcasFilepath = w.String("root-ca.pem")
+	sys.Plugins.Security.Ssl.Transport.EnforceHostnameVerification = w.Bool(false)
+	sys.Plugins.Security.Ssl.Transport.ResolveHostname = w.Bool(false)
+	sys.Plugins.Security.Ssl.Http.Enabled = w.Bool(true)
+	sys.Plugins.Security.Ssl.Http.PemcertFilepath = w.String("node1.pem")
+	sys.Plugins.Security.Ssl.Http.PemkeyFilepath = w.String("node1-key.pem")
+	sys.Plugins.Security.Ssl.Http.PemtrustedcasFilepath = w.String("root-ca.pem")
+	sys.Plugins.Security.Authcz.AdminDn = w.String("- CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US")
+	sys.Plugins.Security.Audit.Type = w.String("internal_opensearch")
+	sys.Plugins.Security.Restapi.RolesEnabled = w.String("[\"all_access\", \"security_rest_api_access\"]")
+	sys.Plugins.Security.SystemIndices.Enabled = w.Bool(true)
+	sys.Plugins.Security.SystemIndices.Indices = w.String("[\".opendistro-alerting-config\", \".opendistro-alerting-alert*\", \".opendistro-anomaly-results*\", \".opendistro-anomaly-detector*\", \".opendistro-anomaly-checkpoints\", \".opendistro-anomaly-detection-state\", \".opendistro-reports-*\", \".opendistro-notifications-*\", \".opendistro-notebooks\", \".opensearch-observability\", \".opendistro-asynchronous-search-response*\", \".replication-metadata-store\"]")
 
 	return c
 }

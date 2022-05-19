@@ -223,6 +223,33 @@
 
 # ======================== Elasticsearch Plugins Configuration =========================
 [plugins]
+  [plugins.security]
+    allow_unsafe_democertificates = true
+    allow_default_init_securityindex = true
+    nodes_dn = "- CN=chefnode,O=Chef Software Inc,L=Seattle,ST=Washington,C=US"
+    enable_snapshot_restore_privilege = true
+    check_snapshot_restore_write_privileges = true
+
+  [plugins.security.ssl.transport]
+    pemcert_filepath = "certificates/node1.pem"
+    pemkey_filepath = "certificates/node1-key.pem"
+    pemtrustedcas_filepath = "certificates/root-ca.pem"
+    enforce_hostname_verification = false
+    resolve_hostname = false
+  [plugins.security.ssl.http]
+    enabled = true
+    pemcert_filepath = "certificates/node1.pem"
+    pemkey_filepath = "certificates/node1-key.pem"
+    pemtrustedcas_filepath = "certificates/root-ca.pem"
+  [plugins.security.authcz]
+    admin_dn = "- CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US"
+  [plugins.security.audit]
+    type = "internal_opensearch"
+  [plugins.security.restapi]
+    roles_enabled = "[\"all_access\", \"security_rest_api_access\"]"
+  [plugins.security.system_indices]
+    enabled = true
+    indices = "[\".opendistro-alerting-config\", \".opendistro-alerting-alert*\", \".opendistro-anomaly-results*\", \".opendistro-anomaly-detector*\", \".opendistro-anomaly-checkpoints\", \".opendistro-anomaly-detection-state\", \".opendistro-reports-*\", \".opendistro-notifications-*\", \".opendistro-notebooks\", \".opensearch-observability\", \".opendistro-asynchronous-search-response*\", \".replication-metadata-store\"]"
   cloud_aws_signer = ""
   #security.ssl.http.enabled = false
 # ======================== Runtime Configuration =========================
@@ -241,3 +268,5 @@ external_os = false
   admin_password = "admin"
 
 [tls]
+
+  
