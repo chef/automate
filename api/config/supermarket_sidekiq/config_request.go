@@ -10,10 +10,10 @@ func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
-				Log:                &ConfigRequest_V1_System_Log{},
-				Network:            &ConfigRequest_V1_System_Network{},
-				Sql:                &ConfigRequest_V1_System_Sql{},
-				SupermarketSidekiq: &ConfigRequest_V1_System_SupermarketSidekiq{},
+				Log:         &ConfigRequest_V1_System_Log{},
+				Network:     &ConfigRequest_V1_System_Network{},
+				Sql:         &ConfigRequest_V1_System_Sql{},
+				Supermarket: &ConfigRequest_V1_System_Supermarket{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},

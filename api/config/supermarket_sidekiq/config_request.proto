@@ -23,7 +23,7 @@ message ConfigRequest {
 			Log log = 2;
 			Network network = 3;
 			Sql sql = 4;
-			SupermarketSidekiq supermarket = 5;
+			Supermarket_sidekiq sidekiq = 5;
 			chef.automate.infra.config.TLSCredentials tls = 6;
 
 			message Network {
@@ -46,7 +46,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_queue_timeout = 5;
 			}
 
-			message SupermarketNginx {
+			message Supermarket_sidekiq {
 				google.protobuf.Int32Value sql_retry_count = 1;
 				google.protobuf.Int32Value sql_retry_delay = 2;
 				google.protobuf.Int32Value abandoned_upload_cleanup_interval = 3;

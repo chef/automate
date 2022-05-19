@@ -395,6 +395,8 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{Name: "automate-cds", WriteMetadata: false},
 		{Name: "automate-supermarket-redis", WriteMetadata: false},
 		{Name: "automate-supermarket-nginx", WriteMetadata: false},
+		{Name: "automate-supermarket-sidekiq", WriteMetadata: false},
+
 		// Supermarket
 		{
 			Name:          "automate-supermarket",
