@@ -14,7 +14,7 @@ cd /workdir/e2e
 data=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json")
 instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.tags | any(. == "e2e")) | .fqdn')
 
-for instance in "${instances_to_test[*]}"
+for instance in ${instances_to_test[*]}
 do
   if ! jq -enr --arg fqdn "$instance" --argjson data "$data" '$data[] | select(.fqdn == $fqdn) | .tags | any(. == "saml")'; then
     export CYPRESS_SKIP_SSO=true
