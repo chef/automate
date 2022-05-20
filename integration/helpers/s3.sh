@@ -7,7 +7,7 @@ __bucket_base_path() {
     return 0
 }
 
-s3_bucket_name="a2-backup-restore-test"
+s3_bucket_name="a2-backup-restore-test1"
 
 s3_bucket_base_path="$(__bucket_base_path)"
 

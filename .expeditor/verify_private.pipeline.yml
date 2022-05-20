@@ -705,7 +705,7 @@ steps:
     timeout_in_minutes: 35
     expeditor:
       accounts:
-        - aws/chef-cd
+        - aws/chef-engineering
       executor:
         linux:
           single-use: true
@@ -715,13 +715,13 @@ steps:
           path: secret/a2/license
           field: license
         AWS_ACCESS_KEY_ID:
-          account: aws/chef-cd
+          account: aws/chef-engineering
           field: access_key_id
         AWS_SECRET_ACCESS_KEY:
-          account: aws/chef-cd
+          account: aws/chef-engineering
           field: secret_access_key
         AWS_SESSION_TOKEN:
-          account: aws/chef-cd
+          account: aws/chef-engineering
           field: session_token
 
   - label: "backup to gcs"
