@@ -7,6 +7,7 @@ cd /workdir/
 data=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json")
 instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.id | startswith("single_local_all_")) | .fqdn')
 
+# shellcheck disable=SC2048
 for instance in ${instances_to_test[*]}
 do
   echo "--- Executing Builder Tests Against $instance"
