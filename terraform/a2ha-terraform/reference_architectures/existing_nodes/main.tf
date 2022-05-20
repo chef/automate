@@ -47,9 +47,7 @@ module "airgap_bundle-backend" {
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
   tmp_path     = var.tmp_path
-  depends_on = [
-    module.system-tuning-backend
-  ]
+  depends_on = [module.system-tuning-backend]
 }
 
 module "airgap_bundle-frontend" {
