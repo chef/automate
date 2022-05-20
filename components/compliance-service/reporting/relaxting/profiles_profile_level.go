@@ -23,8 +23,9 @@ func (depth *ProfileDepth) getProfileMinsFromNodesAggs(filters map[string][]stri
 		Field("profiles.controls_sums.skipped.total"))
 	termsQuery.SubAggregation("waived", elastic.NewSumAggregation().
 		Field("profiles.controls_sums.waived.total"))
-	termsQuery.SubAggregation("status", elastic.NewTermsAggregation().
-		Field("profiles.status"))
+	/*termsQuery.SubAggregation("status", elastic.NewTermsAggregation().
+	Field("profiles.status"))*/
+	termsQuery.SubAggregation("status", getStatusLevelAggregation())
 
 	aggs["totals"] = termsQuery
 
@@ -54,13 +55,39 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 				}
 
 				// Using the status of the profile, introduced with inspec 3.0 to overwrite the status calculations from totals
+
 				profileStatusHash := make(map[string]int64, 0)
-				statuses, _ := bucket.Aggregations.Terms("status")
+				/*statuses, _ := bucket.Aggregations.Terms("status")
 				if statuses.Buckets != nil {
 					for _, statusBucket := range statuses.Buckets {
 						status := statusBucket.Key.(string)
 						profileStatusHash[status] = statusBucket.DocCount
 					}
+				}
+				*/
+				statuses, _ := bucket.Aggregations.Terms("status")
+				if statuses.Buckets != nil {
+					var latestStatus string
+					var latestDocCount int64
+					endTimeLatest := 0.0
+					if len(statuses.Buckets) > 1 {
+						for _, statusBucket := range statuses.Buckets {
+							mostRecentBucket, _ := statusBucket.Aggregations.ReverseNested("most_recent")
+							endTimeBuckets, _ := mostRecentBucket.Aggregations.Terms("end_time")
+							endTime := endTimeBuckets.Buckets[0].Key.(float64)
+							if endTime > endTimeLatest {
+								latestStatus = statusBucket.Key.(string)
+								latestDocCount = statusBucket.DocCount
+								endTimeLatest = endTime
+							}
+						}
+					} else {
+						statusBucket := statuses.Buckets[0]
+						latestStatus = statusBucket.Key.(string)
+						latestDocCount = statusBucket.DocCount
+					}
+					status := latestStatus
+					profileStatusHash[status] = latestDocCount
 				}
 
 				var profileStatus string

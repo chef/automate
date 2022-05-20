@@ -658,7 +658,7 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 	filters["status"] = make([]string, 0)
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
 	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
