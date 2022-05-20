@@ -17,6 +17,7 @@ pkg_dirname="jdk-${pkg_version}"
 pkg_license=("GPL-2.0-with-classpath-exception")
 pkg_description=('AdoptOpenJDK binaries are created from the unmodified source code at OpenJDK.')
 pkg_upstream_url=https://adoptopenjdk.net/
+
 pkg_deps=(
   core/gcc-libs
   core/glibc
