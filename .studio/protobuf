@@ -77,6 +77,7 @@ document "compile_go_protobuf_component" <<DOC
   A wrapper around the compile_go_protobuf to compile the protobuf definitions of a specific component.
 DOC
 function compile_go_protobuf_component() {
+  # sheelcheck disable=SC2268
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
 
   # NOTE: To (re)build the world from scratch, automate-grpc must first be

@@ -16,6 +16,7 @@ DOC
 function grpcurl() {
   local TOOL_BIN
   TOOL_BIN=$(type -P grpcurl);
+  # speelcheck disable=SC2268
   if [[ "x${TOOL_BIN}" == "x" ]]; then
     install_if_missing core/grpcurl grpcurl;
     TOOL_BIN=$(type -P grpcurl);

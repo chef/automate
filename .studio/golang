@@ -124,6 +124,7 @@ document "reload_component_binary" <<DOC
   habitat package. If no package have been installed, it will try to install one.
 DOC
 function reload_component_binary() {
+  # shellcheck disable=SC2268
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
   verify_component $1 || return $?
   local component=$1
@@ -165,6 +166,7 @@ document "go_update_component" <<DOC
   Go update will generate a new binary (go_build) and force load it (reload_binary).
 DOC
 function go_update_component() {
+  # shellcheck disable=SC2268
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
   verify_component $1 || return $?
   local component=$1
@@ -210,6 +212,7 @@ document "auto_go_update_component" <<DOC
   Watch for file changes in a component and on change build and update the service.
 DOC
 function auto_go_update_component() {
+  # shellcheck disable=SC2268
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
   verify_component $1 || return $?
   local component=$1
@@ -234,6 +237,7 @@ document "go_component_static_tests" <<DOC
   Runs the static tests for a component
 DOC
 function go_component_static_tests() {
+  # shellcheck disable=SC2268
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
   verify_component $1 || return $?
   local component=$1
@@ -263,6 +267,7 @@ document "go_component_lint" <<DOC
   Runs the golangci linter for a component
 DOC
 function go_component_lint() {
+  # shellcheck disable=SC2268
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
   verify_component $1 || return $?
   local component=$1
