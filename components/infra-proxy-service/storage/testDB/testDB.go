@@ -230,10 +230,6 @@ func (t *TestDB) DeleteOrgUserAssociation(ctx context.Context, serverID, orgID, 
 	return storage.OrgUser{ID: 2, OrgID: orgID, UserID: 2, IsAdmin: isAdmin, InfraServerUsername: username}, nil
 }
 
-func (t *TestDB) DeleteAutomateInfraOrgUsers(ctx context.Context, serverId, orgId string) error {
-	panic("implement me")
-}
-
 func (t *TestDB) DeleteUserAssociation(ctx context.Context, username string) (string, error) {
 	panic("implement me")
 }
