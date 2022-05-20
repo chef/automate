@@ -95,6 +95,7 @@ module "habitat-backend" {
     var.existing_opensearch_private_ips,
     var.existing_postgresql_private_ips
   )
+  depends_on = [module.system-tuning-backend]
 }
 
 module "habitat-frontend" {
@@ -117,6 +118,7 @@ module "habitat-frontend" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
+  depends_on = [module.system-tuning-frontend]
 }
 
 module "opensearch" {
@@ -140,6 +142,7 @@ module "opensearch" {
   ssh_user                     = var.ssh_user
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
+  depends_on = [module.system-tuning-backend]
 }
 
 module "postgresql" {
@@ -171,6 +174,7 @@ module "postgresql" {
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
+  depends_on = [module.system-tuning-backend]
 }
 
 module "bootstrap_automate" {
@@ -202,6 +206,7 @@ module "bootstrap_automate" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
+  depends_on = [module.system-tuning-frontend]
 }
 
 module "automate" {
@@ -237,6 +242,7 @@ module "automate" {
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
+  depends_on = [module.system-tuning-frontend]
 }
 
 module "chef_server" {
@@ -268,4 +274,5 @@ module "chef_server" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
+  depends_on = [module.system-tuning-frontend]
 }
