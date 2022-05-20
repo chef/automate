@@ -10,11 +10,6 @@ test_name="backup-s3"
 test_backup_restore=true
 
 do_create_config() {
-  echo "printing debug::::::"
-  echo $AWS_ACCESS_KEY_ID
-  echo $AWS_SECRET_ACCESS_KEY
-  echo $AWS_SESSION_TOKEN
-  echo "end printing debug::::::"
   do_create_config_default
   do_create_config_s3_default
 }
