@@ -269,8 +269,8 @@ func (depth *ReportDepth) getStatsSummaryAggs() map[string]elastic.Aggregation {
 	//We have nodeUUIDTermsQSize set to 1 because we don't need to return the actual values.
 	// This works for node_uuid because it's unique to the report_id.
 	// We will use when we compute reportSummary.Stats.Nodes (below)
-	nodeUUIDTermsQSize := 1
-	nodeUUIDTerms := elastic.NewTermsAggregation().Field("node_uuid").Size(nodeUUIDTermsQSize)
+	//nodeUUIDTermsQSize := 1
+	nodeUUIDTerms := elastic.NewCardinalityAggregation().Field("node_uuid")
 	platformTerms := elastic.NewTermsAggregation().Field("platform.name").Size(reporting.ESize)
 	environmentTerms := elastic.NewTermsAggregation().Field("environment").Size(reporting.ESize)
 
@@ -344,12 +344,10 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 	if environments, found := aggRoot.Aggregations.Terms("environment"); found {
 		summary.Stats.Environments = int32(len(environments.Buckets))
 	}
-	if nodes, found := aggRoot.Aggregations.Terms("nodes"); found {
-		//we need to do this because the number of nodes can get huge and we only need the node count
-		//by setting the terms query for node_id to 1, we won't return any values but then we can just
-		//use nodes.SumOfOtherDocCount which works well because node_uuid is unique per node and therefore
-		summary.Stats.NodesCnt = int32(len(nodes.Buckets)) + int32(nodes.SumOfOtherDocCount)
-		summary.Stats.Nodes = int64(len(nodes.Buckets)) + nodes.SumOfOtherDocCount
+	if nodes, found := aggRoot.Aggregations.Cardinality("nodes"); found {
+		//Using Cardnality which gives us the unique counts of the nodes
+		summary.Stats.NodesCnt = int32(*nodes.Value)
+		summary.Stats.Nodes = int64(*nodes.Value)
 	}
 	if platforms, found := aggRoot.Aggregations.Terms("platforms"); found {
 		summary.Stats.Platforms = int32(len(platforms.Buckets))
@@ -402,40 +400,46 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 }
 
 func (depth *ReportDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregation {
-	aggCompliant := elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("status", "passed"))
 
-	aggSkipped := elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("status", "skipped"))
+	//Keeping the older code commented for reference
+	//aggCompliant := elastic.NewFilterAggregation().
+	//	Filter(elastic.NewTermQuery("status", "passed"))
 
-	aggNoncompliant := elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("status", "failed"))
+	//aggSkipped := elastic.NewFilterAggregation().
+	//	Filter(elastic.NewTermQuery("status", "skipped"))
 
-	aggWaived := elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("status", "waived"))
+	//aggNoncompliant := elastic.NewFilterAggregation().
+	//	Filter(elastic.NewTermQuery("status", "failed"))
 
-	aggHighRisk := elastic.NewFilterAggregation().
-		Filter(elastic.NewRangeQuery("controls_sums.failed.critical").Gt(0))
+	//aggWaived := elastic.NewFilterAggregation().
+	//Filter(elastic.NewTermQuery("status", "waived"))
 
-	aggMediumRisk := elastic.NewFilterAggregation().
-		Filter(elastic.NewBoolQuery().
-			Must(elastic.NewTermQuery("controls_sums.failed.critical", 0)).
-			Must(elastic.NewRangeQuery("controls_sums.failed.major").Gt(0)))
+	//aggNoncompliant := elastic.NewFilterAggregation().
+	//	Filter(elastic.NewTermQuery("status", "failed"))
 
-	aggLowRisk := elastic.NewFilterAggregation().
-		Filter(elastic.NewBoolQuery().
-			Must(elastic.NewTermQuery("controls_sums.failed.critical", 0)).
-			Must(elastic.NewTermQuery("controls_sums.failed.major", 0)).
-			Must(elastic.NewRangeQuery("controls_sums.failed.minor").Gt(0)))
+	//aggWaived := elastic.NewFilterAggregation().
+	//	Filter(elastic.NewTermQuery("status", "waived")) aggs
+
+	//	aggs["compliant"] = aggCompliant
+	//	aggs["skipped"] = aggSkipped
+	//aggs["noncompliant"] = aggNoncompliant
+	//	aggs["waived"] = aggWaived
+	//	aggs["high_risk"] = aggHighRisk
+	//	aggs["medium_risk"] = aggMediumRisk
+	//	aggs["low_risk"] = aggLowRisk
+
+	aggPassedAndFailed := getFailedPassedNodesCountsScript(10000)
+
+	aggWaivedAndSkipped := getWaivedSkippedNodesCountsScript(10000)
 
 	aggs := make(map[string]elastic.Aggregation)
-	aggs["compliant"] = aggCompliant
-	aggs["skipped"] = aggSkipped
-	aggs["noncompliant"] = aggNoncompliant
-	aggs["waived"] = aggWaived
-	aggs["high_risk"] = aggHighRisk
-	aggs["medium_risk"] = aggMediumRisk
-	aggs["low_risk"] = aggLowRisk
+	for aggName, agg := range aggPassedAndFailed {
+		aggs[aggName] = agg
+	}
+
+	for aggName, agg := range aggWaivedAndSkipped {
+		aggs[aggName] = agg
+	}
 
 	return aggs
 }
@@ -443,22 +447,22 @@ func (depth *ReportDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregat
 func (depth *ReportDepth) getStatsSummaryNodesResult(aggRoot *elastic.SearchResult) *stats.NodeSummary {
 	summary := &stats.NodeSummary{}
 
-	singleBucket, found := aggRoot.Aggregations.Filter("compliant")
+	sumBucket, found := aggRoot.Aggregations.Sum("passed")
 	if found {
-		summary.Compliant = int32(singleBucket.DocCount)
+		summary.Compliant = int32(*sumBucket.Value)
 	}
 
-	singleBucket, found = aggRoot.Aggregations.Filter("skipped")
+	sumBucket, found = aggRoot.Aggregations.Sum("skipped")
 	if found {
-		summary.Skipped = int32(singleBucket.DocCount)
+		summary.Skipped = int32(*sumBucket.Value)
 	}
 
-	singleBucket, found = aggRoot.Aggregations.Filter("noncompliant")
+	sumBucket, found = aggRoot.Aggregations.Sum("failed")
 	if found {
-		summary.Noncompliant = int32(singleBucket.DocCount)
+		summary.Noncompliant = int32(*sumBucket.Value)
 	}
 
-	singleBucket, found = aggRoot.Aggregations.Filter("high_risk")
+	singleBucket, found := aggRoot.Aggregations.Filter("high_risk")
 	if found {
 		summary.HighRisk = int32(singleBucket.DocCount)
 	}
@@ -473,9 +477,9 @@ func (depth *ReportDepth) getStatsSummaryNodesResult(aggRoot *elastic.SearchResu
 		summary.LowRisk = int32(singleBucket.DocCount)
 	}
 
-	singleBucket, found = aggRoot.Aggregations.Filter("waived")
+	sumBucket, found = aggRoot.Aggregations.Sum("waived")
 	if found {
-		summary.Waived = int32(singleBucket.DocCount)
+		summary.Waived = int32(*sumBucket.Value)
 	}
 	return summary
 }
@@ -524,4 +528,79 @@ func (depth *ReportDepth) getStatsSummaryControlsResult(aggRoot *elastic.SearchR
 
 func (depth *ReportDepth) getQueryInfo() *QueryInfo {
 	return depth.QueryInfo
+}
+
+func getFailedPassedNodesCountsScript(size int) map[string]elastic.Aggregation {
+	nodesUuids := elastic.NewTermsAggregation().
+		Field("node_uuid").
+		Size(int(size))
+
+	aggFailed := elastic.NewScriptedMetricAggregation().
+		InitScript(getInitScriptForNodeCounts()).
+		MapScript(getMapScriptForNodeCounts("failed")).
+		CombineScript(getCombineScriptForNodeCounts()).
+		ReduceScript(getReduceScriptForNodeCounts())
+
+	aggPassed := elastic.NewScriptedMetricAggregation().
+		InitScript(getInitScriptForNodeCounts()).
+		MapScript(getMapScriptForNodeCounts("passed")).
+		CombineScript(getCombineScriptForNodeCounts()).
+		ReduceScript(getReduceScriptForNodeCounts())
+
+	nodesUuids.SubAggregation("node_latest_status_failed", aggFailed)
+	nodesUuids.SubAggregation("node_latest_status_passed", aggPassed)
+
+	aggs := make(map[string]elastic.Aggregation)
+
+	aggs["failed"] = elastic.NewSumBucketAggregation().BucketsPath("nodes>node_latest_status_failed.value")
+	aggs["passed"] = elastic.NewSumBucketAggregation().BucketsPath("nodes>node_latest_status_passed.value")
+	aggs["nodes"] = nodesUuids
+	return aggs
+}
+
+func getWaivedSkippedNodesCountsScript(size int) map[string]elastic.Aggregation {
+	nodesUuids := elastic.NewTermsAggregation().
+		Field("node_uuid").
+		Size(int(size))
+
+	aggWaived := elastic.NewScriptedMetricAggregation().
+		InitScript(getInitScriptForNodeCounts()).
+		MapScript(getMapScriptForNodeCounts("waived")).
+		CombineScript(getCombineScriptForNodeCounts()).
+		ReduceScript(getReduceScriptForNodeCounts())
+
+	aggSkipped := elastic.NewScriptedMetricAggregation().
+		InitScript(getInitScriptForNodeCounts()).
+		MapScript(getMapScriptForNodeCounts("skipped")).
+		CombineScript(getCombineScriptForNodeCounts()).
+		ReduceScript(getReduceScriptForNodeCounts())
+
+	nodesUuids.SubAggregation("node_latest_status_waived", aggWaived)
+	nodesUuids.SubAggregation("node_latest_status_skipped", aggSkipped)
+
+	aggs := make(map[string]elastic.Aggregation)
+
+	aggs["waived"] = elastic.NewSumBucketAggregation().BucketsPath("node>node_latest_status_waived.value")
+	aggs["skipped"] = elastic.NewSumBucketAggregation().BucketsPath("node>node_latest_status_skipped.value")
+	aggs["node"] = nodesUuids
+	return aggs
+}
+
+func getInitScriptForNodeCounts() *elastic.Script {
+	return elastic.NewScript("state.timestamp_latest=0;state.last_value=0;state.count=0L")
+}
+
+func getReduceScriptForNodeCounts() *elastic.Script {
+	return elastic.NewScript("def count = 0; def timestamp_latest = 0L; for (s in states) {if (s.timestamp_latest > (timestamp_latest)) {timestamp_latest = s.timestamp_latest; count = s.count;}} return count;")
+}
+
+func getMapScriptForNodeCounts(status string) *elastic.Script {
+	script2 := fmt.Sprintf("def date_as_millis = doc['end_time'].getValue().toInstant().toEpochMilli();if (date_as_millis > state.timestamp_latest) { state.timestamp_latest = date_as_millis; state.last_value = doc.status.value;if(state.last_value=='%s'){state.count=1;}}", status)
+
+	return elastic.NewScript(script2)
+}
+
+func getCombineScriptForNodeCounts() *elastic.Script {
+	return elastic.NewScript("return state")
+
 }
