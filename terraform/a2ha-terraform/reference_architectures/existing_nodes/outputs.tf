@@ -26,10 +26,6 @@ output "postgresql_private_ips" {
   value = formatlist("%s", var.existing_postgresql_private_ips)
 }
 
-output "opensearch_public_ips" {
-  value = formatlist("%s", var.existing_opensearch_ips)
-}
-
 output "automate_ssh" {
   value = formatlist(
     "ssh -i %s %s@%s",
@@ -62,7 +58,6 @@ output "opensearch_ssh" {
     "ssh -i %s %s@%s",
     var.ssh_key_file,
     var.ssh_user,
-    var.existing_opensearch_ips,
+    var.existing_opensearch_private_ips,
   )
 }
-
