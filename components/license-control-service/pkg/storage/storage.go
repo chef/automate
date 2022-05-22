@@ -20,6 +20,8 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
+const HATEMPPATH = "/var/automate-ha"
+
 // NoLicenseError is the error returned by a backend when it does not
 // have a configured License.
 type NoLicenseError struct{ backend string }
@@ -288,8 +290,21 @@ func (m *MemBackend) StoreDeployment(context.Context, string) error {
 	return nil
 }
 
+func isHA() bool {
+	_, err := os.Stat(HATEMPPATH)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 //StoreDeployment stores the deployment info in the DB
 func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
+	deploymentType := 0
+	if isHA() {
+		deploymentType = 1
+	}
+
 	err := Transact(p, func(tx *DBTrans) error {
 		var count int
 		rows := tx.QueryRow("select count(*) from deployment")
@@ -301,16 +316,16 @@ func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
 		if count > 0 {
 			_, err := tx.Exec(
 				`UPDATE deployment
-				SET id = $1, updated_at = $2`,
-				id, nowTime)
+				SET id = $1, updated_at = $2, type_id = $3`,
+				id, nowTime, deploymentType)
 			if err != nil {
 				return errors.Wrapf(err, "Failed to update deployment")
 			}
 		} else {
 			_, err := tx.Exec(
-				`INSERT INTO deployment (id, created_at, updated_at)
-				VALUES ($1, $2, $2)`,
-				id, nowTime)
+				`INSERT INTO deployment (id, created_at, updated_at, type_id)
+				VALUES ($1, $2, $2, $3)`,
+				id, nowTime, deploymentType)
 			if err != nil {
 				return errors.Wrapf(err, "Failed to insert deployment")
 			}
@@ -331,14 +346,15 @@ type Deployment struct {
 	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Type      string
 }
 
 //GetDeployment: fetches the deployment data
 func (p *PGBackend) GetDeployment(ctx context.Context) (Deployment, error) {
 	var d Deployment
 	err := p.db.QueryRowContext(ctx,
-		`SELECT * FROM deployment`).
-		Scan(&d.ID, &d.CreatedAt, &d.UpdatedAt)
+		`SELECT a.ID, CREATED_AT, UPDATED_AT, TYPE FROM DEPLOYMENT a INNER JOIN DEPLOYMENT_TYPE b ON a.TYPE_ID = b.ID`).
+		Scan(&d.ID, &d.CreatedAt, &d.UpdatedAt, &d.Type)
 	if err != nil {
 		return Deployment{}, errors.Wrapf(err, "Failed to get deployment")
 	}
