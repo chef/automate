@@ -10,3 +10,4 @@
   echo "Getting Go Coverage"
   go test --count 1 ./... --coverprofile Coverage_report/cover.out
   echo "Got Go Coverage"
+
