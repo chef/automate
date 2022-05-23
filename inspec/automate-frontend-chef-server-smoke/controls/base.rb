@@ -35,7 +35,6 @@ end
   pg-sidecar-service
   automate-es-gateway
   automate-cs-nginx
-  automate-postgresql
   deployment-service
   automate-cs-oc-bifrost
   automate-pg-gateway

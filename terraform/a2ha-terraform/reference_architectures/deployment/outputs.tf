@@ -61,10 +61,3 @@ output "opensearch_ssh" {
     var.opensearch_private_ips,
   )
 }
-
-output "ops_dashboard_addresses" {
-  value = formatlist(
-    "https://%s:5601/app/kibana#/dashboards?_g=()",
-    var.opensearch_public_ips,
-  )
-}
