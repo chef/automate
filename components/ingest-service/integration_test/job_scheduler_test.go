@@ -55,7 +55,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    true,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Es: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,
@@ -83,7 +83,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    false,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Es: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,
@@ -110,7 +110,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    true,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Es: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,

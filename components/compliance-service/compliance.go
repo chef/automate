@@ -388,7 +388,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		compRIndex           = fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
 		compRName            = "compliance-reports"
 		defaultPurgePolicies = &purge.Policies{
-			Es: map[string]purge.EsPolicy{
+			Es: map[string]purge.OsPolicy{
 				compSName: {
 					Name:          compSName,
 					IndexName:     compSIndex,

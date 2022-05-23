@@ -25,7 +25,7 @@ const (
 )
 
 var DefaultPurgePolicies = &purge.Policies{
-	Es: map[string]purge.EsPolicy{
+	Es: map[string]purge.OsPolicy{
 		PurgeConvergeHistoryName: {
 			Name:          PurgeConvergeHistoryName,
 			IndexName:     PurgeConvergeHistoryIndex,

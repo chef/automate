@@ -22,7 +22,7 @@ const (
 )
 
 var DefaultPurgePolicies = &purge.Policies{
-	Es: map[string]purge.EsPolicy{
+	Es: map[string]purge.OsPolicy{
 		PurgeFeedPolicyName: {
 			Name:             PurgeFeedPolicyName,
 			IndexName:        PurgeFeedIndexName,

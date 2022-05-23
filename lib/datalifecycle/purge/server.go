@@ -129,7 +129,7 @@ func (server *Server) Show(ctx context.Context,
 		err          error
 		sched        *cereal.Schedule
 		policies     Policies
-		dsEsPolicies = []*dlcAPI.EsPolicy{}
+		dsOsPolicies = []*dlcAPI.OsPolicy{}
 		dsPgPolicies = []*dlcAPI.PgPolicy{}
 	)
 
@@ -145,7 +145,7 @@ func (server *Server) Show(ctx context.Context,
 	}
 
 	for _, policy := range policies.Es {
-		dsEsPolicies = append(dsEsPolicies, &dlcAPI.EsPolicy{
+		dsOsPolicies = append(dsOsPolicies, &dlcAPI.OsPolicy{
 			Name:             policy.Name,
 			Index:            policy.IndexName,
 			OlderThanDays:    policy.OlderThanDays,
@@ -164,7 +164,7 @@ func (server *Server) Show(ctx context.Context,
 	res.InstanceName = server.scheduleName
 	res.WorkflowName = server.workflowName.String()
 	res.Enabled = sched.Enabled
-	res.EsPolicies = dsEsPolicies
+	res.OsPolicies = dsOsPolicies
 	res.PgPolicies = dsPgPolicies
 	res.Recurrence = sched.Recurrence
 	nextDue, err := ptypes.TimestampProto(sched.NextDueAt)
@@ -211,7 +211,7 @@ func (server *Server) Configure(ctx context.Context,
 		updated    = false
 		err        error
 		policies   = Policies{
-			Es: map[string]EsPolicy{},
+			Es: map[string]OsPolicy{},
 			Pg: map[string]PgPolicy{},
 		}
 	)
@@ -310,11 +310,11 @@ func (server *Server) Configure(ctx context.Context,
 // updateEsPolicies takes in desired policy update and the current policies set
 // and return updated policy set, a boolean that indicates that the set was updated, and
 // an error if the policy update refers to an unknown policy.
-func (server *Server) updateEsPolicies(esUpdates []*dlcAPI.EsPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
+func (server *Server) updateEsPolicies(esUpdates []*dlcAPI.OsPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
 	var (
 		updated     = false
 		newPolicies = Policies{
-			Es: map[string]EsPolicy{},
+			Es: map[string]OsPolicy{},
 		}
 	)
 

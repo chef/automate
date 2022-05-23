@@ -47,7 +47,7 @@ func TestPurge(t *testing.T) {
 				enabled:    true,
 				recurrence: rec1.String(),
 				update: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{
+					Es: []*dlcAPI.OsPolicyUpdate{
 						{
 							PolicyName:    "converge-history",
 							OlderThanDays: 7,
@@ -63,7 +63,7 @@ func TestPurge(t *testing.T) {
 				enabled:    false,
 				recurrence: rec2.String(),
 				update: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.EsPolicyUpdate{
+					Es: []*dlcAPI.OsPolicyUpdate{
 						{
 							PolicyName:    "converge-history",
 							OlderThanDays: 14,
@@ -121,7 +121,7 @@ func TestPurge(t *testing.T) {
 			Enabled:    true,
 			Recurrence: recurrence.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*dlcAPI.EsPolicyUpdate{
+				Es: []*dlcAPI.OsPolicyUpdate{
 					{
 						PolicyName: "not-a-valid-policy",
 					},

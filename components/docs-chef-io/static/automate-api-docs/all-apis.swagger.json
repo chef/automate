@@ -14020,7 +14020,7 @@
         }
       }
     },
-    "chef.automate.api.data_lifecycle.EsPolicy": {
+    "chef.automate.api.data_lifecycle.OsPolicy": {
       "type": "object",
       "properties": {
         "custom_purge_field": {
@@ -14042,7 +14042,7 @@
         }
       }
     },
-    "chef.automate.api.data_lifecycle.EsPolicyUpdate": {
+    "chef.automate.api.data_lifecycle.OsPolicyUpdate": {
       "type": "object",
       "properties": {
         "disabled": {
@@ -14213,7 +14213,7 @@
         "elasticsearch": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.data_lifecycle.EsPolicy"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.OsPolicy"
           }
         },
         "postgres": {
@@ -14231,7 +14231,7 @@
         "elasticsearch": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.data_lifecycle.EsPolicyUpdate"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.OsPolicyUpdate"
           }
         },
         "postgres": {
