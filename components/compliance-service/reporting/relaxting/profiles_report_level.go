@@ -87,6 +87,12 @@ func (depth *ReportDepth) getProfileMinsFromNodesResults(
 				} else if profileStatusHash["failed"] > 0 && profileStatusHash["loaded"] == 0 && profileStatusHash[""] == 0 {
 					profileStatus = "failed"
 					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%q, root status=failed", profileName)
+				} else if profileStatusHash["passed"] > 0 && profileStatusHash["loaded"] == 0 && profileStatusHash[""] == 0 {
+					profileStatus = "passed"
+					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%q, root status=passed", profileName)
+				} else if profileStatusHash["waived"] > 0 && profileStatusHash["loaded"] == 0 && profileStatusHash[""] == 0 {
+					profileStatus = "waived"
+					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%q, root status=waived", profileName)
 				} else {
 					sumFailures, _ := bucket.Aggregations.Sum("failures")
 					sumPassed, _ := bucket.Aggregations.Sum("passed")
