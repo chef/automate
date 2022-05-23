@@ -177,12 +177,12 @@ module AutomateCluster
                   ssl_key = """#{certificates[:opensearch][:private][:value]}"""
                   admin_cert = """#{certificates[:opensearch_admin][:public][:value]}"""
                   admin_key = """#{certificates[:opensearch_admin][:private][:value]}"""
-                [es_yaml.opendistro_security.authcz]
+                [plugins.security.authcz]
                   admin_dn = [ "#{certificates[:opensearch_admin][:public][:full_cn_reversed]}" ]
-                [es_yaml.opendistro_security.ssl.transport]
+                [plugins.security.ssl.transport]
                   enforce_hostname_verification = false
                   resolve_hostname = false
-                [es_yaml.opendistro_security]
+                [plugins.security]
                   nodes_dn = [ "#{certificates[:opensearch][:public][:full_cn_reversed]}" ]
               ENDHEREDOC
             else
