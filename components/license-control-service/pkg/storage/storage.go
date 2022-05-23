@@ -316,8 +316,8 @@ func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
 		if count > 0 {
 			_, err := tx.Exec(
 				`UPDATE deployment
-				SET id = $1, updated_at = $2, type_id = $3`,
-				id, nowTime, deploymentType)
+				SET id = $1, updated_at = $2`,
+				id, nowTime)
 			if err != nil {
 				return errors.Wrapf(err, "Failed to update deployment")
 			}
