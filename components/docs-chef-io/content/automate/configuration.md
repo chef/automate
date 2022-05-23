@@ -17,10 +17,9 @@ The `chef-automate` CLI provides commands to help you work with your existing Ch
 
 * `chef-automate config show` shows your current configuration, not including default settings
 * `chef-automate config patch </path/to/partial-config.toml>` updates an existing Chef Automate configuration by merging the contents of`</path/to/partial-config.toml>` with your current Chef Automate configuration, and applying any changes. This command is enough in most situations
-* `chef-automate config set </path/to/full-config.toml>` replaces the current Chef Automate configuration with the provided configuration, and applies any changes. Use this command to replace your Chef Automate configuration
+* `chef-automate config set </path/to/full-config.toml>` replaces the current Chef Automate configuration with the provided configuration and applies any changes. Use this command to replace your Chef Automate configuration.
 
-Update your Chef Automate configuration by generating a section of a configuration, and applying it with `chef-automate config patch`.
-The rest of this document describes how to make common configuration changes.
+Update your Chef Automate configuration by generating a configuration section and applying it with the `chef-automate config patch`. The rest of this document describes how to make common configuration changes.
 
 ## Use Cases
 
@@ -31,7 +30,7 @@ This section describes those settings and how to change them on an existing Chef
 
 #### Chef Automate FQDN
 
-Your Chef Automate fully qualified domain name (FQDN) is customizable. There isn't a maximum length for a FQDN, but the top-level domain length has a limit of 25 characters.
+Your Chef Automate fully qualified domain name (FQDN) is customizable. There isn't a maximum length for an FQDN, but the top-level domain length has a limit of 25 characters.
 
 For reference, these are the parts of a URL:
 
@@ -88,14 +87,10 @@ The only supported `deployment_type` is `local`.
 
 #### Settings
 
-You cannot change the admin username, name, and password set during initial deployment.
+During initial deployment, you cannot change the admin username, name, and password set.
 
-To change the admin password after deployment, use the Chef Automate UI.
-Sign in as the admin user, navigate to the _Users_ page under the **Settings** tab.
-Select "Local Administrator" to show the admin's _User Details_ page.
-Navigate to the _Reset Password_ tab.
-Enter your previous password, and enter and confirm your new password in the interface.
-Select the **Reset Password** button to save your changes.
+To change the admin password after deployment, use the Chef Automate UI. Sign in as the admin user, and navigate to the _Users_ page under the **Settings** tab.
+Select "Local Administrator" to show the admin's _User Details_ page. Navigate to the _Reset Password_ tab. Enter your previous password, and enter and confirm your new password in the interface. Select the **Reset Password** button to save your changes.
 
 To change the admin password from the command-line, first [fetch the admin user record](/automate/api/), copy the User ID, and then use:
 
@@ -128,16 +123,16 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### License Key
 
-You can apply your Chef Automate license with the `chef-automate license apply` command in one of two ways:
+You can apply for your Chef Automate license with the `chef-automate license apply` command in one of two ways:
 
 * `chef-automate license apply </path/to/license-file.jwt>`
 * `chef-automate license apply <content-of-license>`
 
-You cannot apply a license after your initial deployment by patching the configuration file.
+After your initial deployment, you cannot apply for a license by patching the configuration file.
 
 #### Proxy Settings
 
-You can configure Chef Automate to use a proxy either by setting environment variables, or by setting configuration options.
+You can configure Chef Automate to use a proxy by setting environment variables or setting configuration options.
 
 The command `chef-automate deploy` without a configuration file will respect the proxy environment variables:
 
@@ -179,8 +174,7 @@ Chef Automate must be able to access the following:
 
 #### Global Log Level
 
-Configure the log level for all Chef Automate services by creating a TOML file.
-By default each service will initialize at the `info` level, but the following settings are available: `debug`, `info`, `warning`, `panic`, or `fatal`.
+Configure the log level for all Chef Automate services by creating a TOML file. By default, each service will initialize at the `info` level, but the following settings are available: `debug`, `info`, `warning`, `panic`, or `fatal`.
 
 ```toml
 [global.v1.log]
@@ -193,7 +187,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 ```toml
 # This is a default Chef Automate configuration file. You can run
-# 'chef-automate deploy' with this config file and it should
+# 'chef-automate deploy' with this config file, and it should
 # successfully create a new Chef Automate instance with default settings.
 
 [global.v1]
@@ -233,78 +227,38 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 ### Additional Configuration
 
-#### General Elasticsearch Configuration
+#### General Opensearch Configuration
 
-To configure Elasticsearch for your Chef Automate installation, create a TOML file that contains the partial configuration below.
+To configure OpenSearch for your Chef Automate installation, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
-[elasticsearch.v1.sys.proxy]
-# NOTE: The elasticsearch proxy settings are derived from the global proxy settings.
-# host = "<proxy host>"
-# port = <proxy port>
-# user = "<proxy username>"
-# password = "<proxy password>"
-# no_proxy = <["0.0.0.0", "127.0.0.1"]>
-[elasticsearch.v1.sys.cluster]
+[opensearch.v1.sys.cluster]
 # name = "chef-insights"
-[elasticsearch.v1.sys.cluster.routing.allocation]
-# node_concurrent_recoveries = 2
-# node_initial_primaries_recoveries = 4
-# same_shard_host = false
-[elasticsearch.v1.sys.node]
+[opensearch.v1.sys.node]
 # max_local_storage_nodes = 1
-# master = true
-# data = true
-[elasticsearch.v1.sys.path]
+[opensearch.v1.sys.path]
 # logs = "logs"
-[elasticsearch.v1.sys.indices.recovery]
-# max_bytes_per_sec = "20mb"
-[elasticsearch.v1.sys.indices.breaker]
-# total_limit = "70%"
-# fielddata_limit = "60%"
-# fielddata_overhead = "1.03"
-# request_limit = "40%"
-# request_overhead = "1"
-[elasticsearch.v1.sys.bootstrap]
+[opensearch.v1.sys.bootstrap]
 # memory_lock = false
-[elasticsearch.v1.sys.network]
+[opensearch.v1.sys.network]
 # host = "0.0.0.0"
 # port = 10141
-[elasticsearch.v1.sys.transport]
+[opensearch.v1.sys.transport]
 # port = "10142"
-[elasticsearch.v1.sys.discovery]
-# ping_unicast_hosts = "[]"
-# minimum_master_nodes = 1
-# zen_fd_ping_timeout = "30s"
-[elasticsearch.v1.sys.gateway]
-# expected_nodes = 0
-# expected_master_nodes = 0
-# expected_data_nodes = 0
-[elasticsearch.v1.sys.action]
+[opensearch.v1.sys.action]
 # destructive_requires_name = true
-[elasticsearch.v1.sys.logger]
-# level = "info"
-[elasticsearch.v1.sys.runtime]
-# max_locked_memory = "unlimited"
-# es_java_opts = ""
-# NOTE: see https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html
-# for important guidance regarding the configuration of the heap size setting
-# heapsize = "4g"
 ```
 
-#### Setting Elasticsearch Heap
+#### Setting Opensearch Heap
 
-The Elasticsearch heap size can, and in most cases should, be set to 50% of the available system
-memory. However, you should review and consider the important caveats covered in the [Elasticsearch heap size documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html).
+The OpenSearch heap size can, and in most cases, should be set to 50% of the available system memory. However, you should consider the essential caveats covered in the [Opensearch heap size documentation](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
 
-For example, a system with 32GB of memory can have its Elasticsearch heap
-size set to `16g`; to do so, one would first create a TOML file that contains the partial
-configuration below, and then run `chef-automate config patch </path/to/your-file.toml>` to
-deploy the change.
+For example, a system with 32GB of memory can have its Opensearch heap size set to `16g`; to do so, one would first create a TOML file that contains the partial
+configuration below, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
 
 ```toml
-[elasticsearch.v1.sys.runtime]
+[opensearch.v1.sys.runtime]
 heapsize = "16g"
 ```
 
@@ -444,7 +398,7 @@ max_inflight_requests = 100
 
 #### Sign-out on Browser Close
 
-Configuration to sign out users from Chef Automate when they close the browser.
+When you close the browser, the configuration to sign out from Chef Automate is:
 
 ```toml
 [session.v1.sys.service]
@@ -455,7 +409,7 @@ Configuration to sign out users from Chef Automate when they close the browser.
 
 #### Disclosure Banner
 
-Configuration to display a custom banner on every Chef Automate page, including the sign-in page. Default: `false`.
+Configuration displays a custom banner on every Chef Automate page, including the sign-in page. Default: `false`.
 
 ```toml
 [global.v1]
@@ -484,22 +438,20 @@ Configuration to display a disclosure on the sign-in page. Requires a `.txt` or 
 ```
 
 ### Content Security Policy Header
-Content-Security-Policy is the name of a HTTP response header that modern browsers use to enhance the security of the document (or web page).
-The Content-Security-Policy header allows you to restrict how resources such as JavaScript, CSS, or pretty much anything that the browser loads.
+
+Content-Security-Policy is the name of a HTTP response header that modern browsers use to enhance the document's security(or web page). The Content-Security-Policy header allows you to restrict how resources such as JavaScript, CSS, or anything that the browser loads.
 
 Refer: https://owasp.org/www-community/controls/Content_Security_Policy
 
-Content Security Policy header can be enabled in Automate by patching the following configuration
+In Automate, enable the Content Security Policy header by patching the following configuration.
 
 ```toml
 [load_balancer.v1.sys.ngx.http]
   enable_csp_header = true
 ```
 
-
 {{< warning >}}
-Enabling CSP header may break the SAML login.
-This may happen if the IDP Login page has inline javascripts which CSP header prevents from getting evaluated by default.
+Enabling the CSP header may break the SAML login. This may happen if the IDP Login page has inline javascript, which the CSP header prevents from getting evaluated by default.
 {{< /warning >}}
 
 ### Troubleshooting
@@ -508,7 +460,7 @@ Common syntax errors may cause issues in configuration files:
 
 * Keys: Names use underscores, not dashes.
 * Ports: Use the correct type. Single numbers are integers and don't need quotation marks. Ranges are strings and require quotation marks.
-* Whitespace: Both tabs and spaces are whitespace.
+* Whitespace: Both tabs and spaces are whitespaces.
 * Arrays: Use square brackets with comma-separated entries of the same type.
 
 See the [TOML README](https://github.com/BurntSushi/toml-1) for more details.

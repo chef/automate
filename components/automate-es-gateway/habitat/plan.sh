@@ -70,7 +70,7 @@ pkg_exports=(
 )
 
 pkg_binds=(
-  [automate-elasticsearch]="http-port"
+  [automate-opensearch]="http-port"
 )
 
 pkg_exposes=(http-port)

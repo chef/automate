@@ -14,13 +14,13 @@ gh_repo = "automate"
 
 ## Automate 2 Architecture
 
-![Automate 2 Architecture](/images/automate/a2-architecture.png)
+![Automate 2 Architecture](/images/automate/a2-architecture-os.png)
 
 ## Component overview
 
 ### Automate Gateway
 
-The Automate Gateway serves as the application layer of Chef Automate's architecture. All public facing requests go through the gateway and authentication/authorization takes place here.
+The Automate Gateway serves as the application layer of Chef Automate's architecture. All public-facing requests go through the gateway, and authentication/authorization occurs here.
 
 ### Deployment Service
 
@@ -32,11 +32,11 @@ This service serves all configuration management related information to the API 
 
 ### Ingest Service
 
-This service is the primary ingress event handler for configuration management related events such as Chef Infra Client runs and Chef Infra Server actions. It also manages the data related to these domains, such as cleanup, migration and index initialization.
+This service is the primary ingress event handler for configuration management related events such as Chef Infra Client runs and Chef Infra Server actions. It also manages the data related to these domains, such as cleanup, migration, and index initialization.
 
 ### Compliance Service
 
-This service handles InSpec and scan job-related data, including event ingestion and reporting.
+This service handles InSpec and scans job-related data, including event ingestion and reporting.
 
 ### Notification Service
 
@@ -44,7 +44,7 @@ This service is responsible for sending notifications based on configured rules 
 
 ### License Control Service
 
-This service provides policy information to the rest of the system derived from the license file. It also provides telemetry configuration.
+This service provides policy information to the rest of the system derived from the license file. It also includes telemetry configuration.
 
 ### AuthZ Service
 
@@ -56,11 +56,11 @@ This service provides the API to verify a requestor is allowed to interact with 
 
 ### Teams Service
 
-This service is an API for defining local teams that are used as part of the authorization model for Chef Automate.
+This service is an API for defining local teams used as part of the authorization model for Chef Automate.
 
 ### Users Service
 
-This service is used to manage users local to Chef Automate (as opposed to users defined in an external identity provider).
+This service manages users local to Chef Automate (as opposed to users defined in an external identity provider).
 
 ### Session Service
 
@@ -70,10 +70,10 @@ This service stands between the browser and Dex. It acts as an [OpenID Connect](
 
 Service securely stores credentials for other services.
 
-### Elasticsearch Sidecar Service
+### OpenSearch Sidecar Service
 
-This service runs alongside Elasticsearch. It provides common Elasticsearch functionality such as monitoring disk usage and handling index purges.
+This service runs alongside OpenSearch. It provides standard OpenSearch functionality to monitor disk usage and handle index purges.
 
 ### Dex
 
-[Dex](https://github.com/dexidp/dex) is a federated OpenID Connect (OIDC) provider that allows Automate to integrate with external identity providers via LDAP, SAML or OpenID Connect.
+[Dex](https://github.com/dexidp/dex) is a federated OpenID Connect (OIDC) provider that allows Automate to integrate with external identity providers via LDAP, SAML, or OpenID Connect.

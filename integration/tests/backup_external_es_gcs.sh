@@ -26,10 +26,10 @@ do_create_config() {
   do_create_config_default
   do_create_config_gcs_default
   cat <<EOF >> "$test_config_path"
-[global.v1.external.elasticsearch]
+[global.v1.external.opensearch]
   enable = true
   nodes = ["http://127.0.0.1:59200"]
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
   enable = true
   location = "gcs"
 EOF

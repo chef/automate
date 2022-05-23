@@ -5,7 +5,7 @@
 #shellcheck disable=SC1091
 
 set -eo pipefail
-
+OLD_VERSION="latest"
 test_name=""
 test_upgrades=false
 test_backup_restore=false
@@ -172,13 +172,13 @@ do_create_config_default() {
     if [ $test_upgrades = true ]; then
       # Install the automate CLI from current
       cli_bin="/bin/chef-automate-latest"
-      download_cli "latest" "${cli_bin}"
+      download_cli "${OLD_VERSION}" "${cli_bin}"
     fi
     ${cli_bin} init-config \
         --channel $test_channel \
         --file "$test_config_path" \
         --upgrade-strategy "$test_upgrade_strategy" \
-        --es-mem "1g"
+        --es-mem "2g"
     cat >> "$test_config_path" <<EOF
 [deployment.v1.sys.log]
   level = "debug"
@@ -265,6 +265,15 @@ prepare_upgrade_milestone(){
   download_manifest_version "$channel" "$version" "$test_manifest_dir/$version.json"
   set_test_manifest "$version.json"
   set_version_file
+}
+
+prepare_upgrade_milestone_append_version(){
+  local channel="$1"
+  local version="$2"
+  # shellcheck disable=SC2154
+  download_manifest_version "$channel" "$version" "$test_manifest_dir/$version.json"
+  set_test_manifest "$version.json"
+  append_version_file
 }
 
 do_prepare_upgrade_default() {

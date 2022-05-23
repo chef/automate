@@ -105,6 +105,7 @@ var a2Config = config{
 
 		// A2HA Component sample keys and certificates
 		{regex: `components/automate-backend-elasticsearch/habitat/config/certificates/*`},
+		{regex: `components/automate-backend-opensearch/habitat/config/certificates/*`},
 		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/*`},
 		{regex: `components/automate-backend-kibana/habitat/config/certificates/*`},
 		{regex: `components/automate-backend-postgresql/habitat/config/*`},

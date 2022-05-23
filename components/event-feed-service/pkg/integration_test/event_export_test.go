@@ -18,11 +18,11 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	olivere "github.com/olivere/elastic/v7"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
-	olivere "gopkg.in/olivere/elastic.v6"
 )
 
 func TestEventExportMatchAllFields(t *testing.T) {

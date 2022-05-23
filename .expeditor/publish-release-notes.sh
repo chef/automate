@@ -68,17 +68,9 @@ This release uses:
 
 This release uses:
 - Postgres:
-- ElasticSearch:
+- OpenSearch:
 - Nginx:
 - Haproxy:
-
-## Supported External Chef Products
-
-This release supports the following external chef products:
-- Chef Infra Server version: 14.0.58+
-- Chef Inspec version: 4.3.2+
-- Chef Infra Client: 17.0.242+
-- Chef Habitat: 0.81+
 
 View the [package manifest](https://packages.chef.io/manifests/current/automate/latest_semver.json) for the latest release.
 

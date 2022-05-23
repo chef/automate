@@ -26,7 +26,7 @@ bindings() {
       (
         declare -A pkg_binds
         declare -A pkg_binds_optional
-        #shellcheck disable=SC1090
+        #shellcheck disable=SC1091
         source "${component_path}/habitat/plan.sh"
         safe_comp=${component//-/_}
         if [[ -n "${!pkg_binds[*]}" ]]

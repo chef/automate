@@ -53,7 +53,7 @@ func (db *DB) GetUserSettings(name string, connector string) (*user_settings.Get
 	err := db.SelectOne(&userSettingsData, selectUserSettings, name, connector)
 	if err != nil {
 		return settingsResponse, errorutils.ProcessSQLNotFound(err,
-			fmt.Sprintf("connector: $s, user_name: %s", connector, name), "GetJob error")
+			fmt.Sprintf("connector: %s, user_name: %s", connector, name), "GetJob error")
 	}
 	logrus.Infof("userSettingsData.Settings %v", userSettingsData.Settings)
 

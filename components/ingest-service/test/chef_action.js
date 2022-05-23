@@ -58,7 +58,7 @@ describe("/events/chef/action", function () {
           return helpers.ActionRefresh().then(function(response) {
             return chakram.get(actionsUrl()).then(function(response) {
               expect(response).to.have.status(200);
-              expect(response.body.hits.total).to.equal(0);
+              expect(response.body.hits.total.value).to.equal(0);
             });
           });
         });
@@ -86,7 +86,7 @@ describe("/events/chef/action", function () {
             // Get all the node state index docs from elasticsearch
             return chakram.get(nodeStateUrl()).then(function(response) {
               expect(response).to.have.status(200)
-              expect(response.body.hits.total).to.equal(1);
+              expect(response.body.hits.total.value).to.equal(1);
               let source = response.body.hits.hits[0]._source
               expect(source.entity_uuid).to.equal(entityUuid);
               let originalTimestamp = source.timestamp;
@@ -96,7 +96,7 @@ describe("/events/chef/action", function () {
                 return helpers.NodeStateRefresh().then(function(response) {
                   return chakram.get(nodeStateUrl()).then(function(response) {
                     expect(response).to.have.status(200)
-                    expect(response.body.hits.total).to.equal(1);
+                    expect(response.body.hits.total.value).to.equal(1);
                     let source = response.body.hits.hits[0]._source
                     expect(source.entity_uuid).to.equal(entityUuid);
                     expect(source.exists).to.equal(false);
@@ -145,7 +145,7 @@ describe("/events/chef/action", function () {
             // Wait for the get all docs request
             return chakram.get(nodeStateUrl()).then(function(response) {
               expect(response).to.have.status(200)
-              expect(response.body.hits.total).to.equal(1);
+              expect(response.body.hits.total.value).to.equal(1);
               let source = response.body.hits.hits[0]._source
               expect(source.entity_uuid).to.equal(entityUuid);
               expect(source.exists).to.equal(true);
@@ -154,7 +154,7 @@ describe("/events/chef/action", function () {
                 return helpers.NodeStateRefresh().then(function(response) {
                   return chakram.get(nodeStateUrl()).then(function(response) {
                     expect(response).to.have.status(200)
-                    expect(response.body.hits.total).to.equal(1);
+                    expect(response.body.hits.total.value).to.equal(1);
                     let source = response.body.hits.hits[0]._source
                     expect(source.entity_uuid).to.equal(entityUuid);
                     expect(source.exists).to.equal(false);

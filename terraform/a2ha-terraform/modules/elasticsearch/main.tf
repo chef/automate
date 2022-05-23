@@ -1,15 +1,15 @@
 locals {
   elasticsearch_user_toml = [
-    for n in range(var.elasticsearch_instance_count) : templatefile("${path.module}/templates/elasticsearch_user.toml.tpl", {
-      listen_port     = var.elasticsearch_listen_port,
-      minimum_masters = floor(var.elasticsearch_instance_count / 2 + 1),
+    for n in range(var.opensearch_instance_count) : templatefile("${path.module}/templates/elasticsearch_user.toml.tpl", {
+      listen_port     = var.opensearch_listen_port,
+      minimum_masters = floor(var.opensearch_instance_count / 2 + 1),
       private_ip      = var.private_ips[n],
       private_ips     = join(", ", formatlist("\"%s\"", var.private_ips)),
       tmp_path        = var.tmp_path
     })
   ]
   elasticsidecar_user_toml = [
-    for n in range(var.elasticsearch_instance_count) : templatefile("${path.module}/templates/elasticsidecar_user.toml.tpl", {
+    for n in range(var.opensearch_instance_count) : templatefile("${path.module}/templates/elasticsidecar_user.toml.tpl", {
       private_ip = var.private_ips[n]
     })
   ]
@@ -24,7 +24,7 @@ locals {
 }
 
 resource "null_resource" "elasticsearch" {
-  count = var.elasticsearch_instance_count
+  count = var.opensearch_instance_count
 
   triggers = {
     es_user_toml_sha = sha1(local.elasticsearch_user_toml[count.index])

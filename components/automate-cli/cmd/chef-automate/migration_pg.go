@@ -394,14 +394,15 @@ func preRequisteForESDataMigration() (bool, error) {
 	return existDir, nil
 }
 
-const script = `
-mv /hab/svc/automate-opensearch/data /hab/svc/automate-opensearch/data.os;
-mv /hab/svc/automate-opensearch/var /hab/svc/automate-opensearch/var.os;
-cp -r /hab/svc/automate-elasticsearch/data /hab/svc/automate-opensearch/;
-cp -r /hab/svc/automate-elasticsearch/var /hab/svc/automate-opensearch/;
-chown -RL hab:hab /hab/svc/automate-opensearch/data;
-chown -RL hab:hab /hab/svc/automate-opensearch/var;
-`
+const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+
+const fscript = `
+mv %[1]vsvc/automate-opensearch/data %[1]vsvc/automate-opensearch/data.os; 
+mv %[1]vsvc/automate-opensearch/var %[1]vsvc/automate-opensearch/var.os; 
+cp -r %[1]vsvc/automate-elasticsearch/data %[1]vsvc/automate-opensearch/; 
+cp -r %[1]vsvc/automate-elasticsearch/var %[1]vsvc/automate-opensearch/; 
+chown -RL hab:hab %[1]vsvc/automate-opensearch/data; 
+chown -RL hab:hab %[1]vsvc/automate-opensearch/var;`
 
 // esMigrateExecutor
 func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
@@ -411,12 +412,12 @@ func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
 		writer.Warn("Pre Requiste For ES DataMigration failed : " + err.Error())
 		return nil
 	}
-
+	habRoot := getHabRootPath(habrootcmd)
 	err = chefAutomateStop()
 	if err != nil {
 		return err
 	}
-	err = executeMigrate(ci)
+	err = executeMigrate(ci, habRoot)
 	if err != nil {
 		return err
 	}
@@ -424,7 +425,7 @@ func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
 	return nil
 }
 
-func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
+func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot string) error {
 	writer.Title(
 		"----------------------------------------------\n" +
 			"migration from es to os \n" +
@@ -442,7 +443,9 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
 		}
 	}()
 
+	script := fmt.Sprintf(fscript, habRoot)
 	command := exec.Command("/bin/sh", "-c", script)
+
 	err := command.Run()
 	if err != nil {
 		writer.Fail(err.Error())
@@ -456,22 +459,37 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager) error {
 	return nil
 }
 
+func getHabRootPath(habrootcmd string) string {
+	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
+	if err != nil {
+		writer.Fail(err.Error())
+		return "/hab/"
+	}
+	pkgPath := string(out) // /a/b/c/hab    /hab/svc
+	writer.Title("HAB Root Path " + pkgPath)
+	habIndex := strings.Index(string(pkgPath), "hab")
+	rootHab := pkgPath[0 : habIndex+4] // this will give <>/<>/hab/
+	if rootHab == "" {
+		rootHab = "/hab/"
+	}
+	return rootHab
+}
+
+const habRootPathForPg = "HAB_LICENSE=accept-no-persist hab pkg path core/postgresql13"
+
 func getLatestPgPath() {
-	latestPgPath := "lsof -F n| grep /hab/pkgs/core/postgresql13 | awk '{print $0}' | awk -F \"/\" '/1/ {print $5\"/\"$6\"/\"$7}' | uniq"
-	cmd, err := exec.Command("/bin/sh", "-c", latestPgPath).Output()
+	cmd, err := exec.Command("/bin/sh", "-c", habRootPathForPg).Output()
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
 	output := string(cmd)
-
-	output = strings.Split(output, "\n")[0]
 
 	if strings.TrimSpace(output) == "" {
 		return
 	}
 
 	if strings.Contains(strings.ToUpper(output), NEW_PG_VERSION) {
-		NEW_BIN_DIR = "/hab/pkgs/core/" + strings.TrimSpace(output) + "/bin"
+		NEW_BIN_DIR = strings.TrimSpace(output) + "/bin"
 	} else {
 		fmt.Printf("latest version %s not found", NEW_PG_VERSION)
 	}
@@ -540,11 +558,11 @@ func cleanUp() error {
 	return nil
 }
 
-const cleanUpScript = `
-rm -rf /hab/svc/automate-opensearch/data.os;
-rm -rf /hab/svc/automate-opensearch/var.os;
-rm -rf /hab/svc/automate-elasticsearch/data;
-rm -rf /hab/svc/automate-elasticsearch/var;
+const fcleanUpScript = `
+rm -rf %[1]vsvc/automate-opensearch/data.os;
+rm -rf %[1]vsvc/automate-opensearch/var.os;
+rm -rf %[1]vsvc/automate-elasticsearch/data;
+rm -rf %[1]vsvc/automate-elasticsearch/var;
 `
 
 func cleanUpes() error {
@@ -558,7 +576,8 @@ func cleanUpes() error {
 			return err
 		}
 	}
-
+	habRoot := getHabRootPath(habrootcmd)
+	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
 	command := exec.Command("/bin/sh", "-c", cleanUpScript)
 	err := command.Run()
 	if err != nil {

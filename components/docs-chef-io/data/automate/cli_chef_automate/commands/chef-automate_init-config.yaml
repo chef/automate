@@ -22,6 +22,9 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for init-config
+- name: os-mem
+  usage: |
+    The amount of system memory to allocate to Opensearch's heap.  (default: 25% of system memory)
 - name: private-key
   usage: |
     The path to a private key corresponding to the TLS certificate.

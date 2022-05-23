@@ -14,14 +14,6 @@ variable "backup_config_efs" {
 variable "curator_pkg_ident" {
 }
 
-variable "elasticsearch_instance_count" {
-  default = 3
-}
-
-variable "elasticsearch_listen_port" {
-  default = 9200
-}
-
 variable "elasticsearch_pkg_ident" {
 }
 
@@ -44,6 +36,14 @@ variable "kibana_pkg_ident" {
 }
 
 variable "metricbeat_pkg_ident" {
+}
+
+variable "opensearch_instance_count" {
+  default = 3
+}
+
+variable "opensearch_listen_port" {
+  default = 9200
 }
 
 variable "private_ips" {

@@ -12,9 +12,7 @@ gh_repo = "automate"
     weight = 30
 +++
 
-Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports and scans in Chef Automate.
-Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in Elasticsearch or PostgreSQL.
-Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
+Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports, and scans in Chef Automate. Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in OpenSearch or PostgreSQL. Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
 ## Data Lifecycle
 
@@ -47,7 +45,7 @@ The default is to remove compliance reports after 60 days, and to remove complia
 
 ## Data Lifecycle API
 
-Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in Elasticsearch or PostgreSQL.
+Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in OpenSearch or PostgreSQL.
 
 The `data-lifecycle` API allows configuring and running lifecycle jobs by data type:
 
@@ -113,7 +111,7 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
         "disabled": false,
         "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
         "purge_policies": {
-          "elasticsearch": [
+          "opensearch": [
             {
               "policy_name": "actions",
               "older_than_days": 30,
@@ -136,7 +134,7 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
         "disabled": false,
         "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
         "purge_policies": {
-          "elasticsearch": [
+          "opensearch": [
             {
               "policy_name": "compliance-reports",
               "older_than_days": 100,
@@ -159,7 +157,7 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
         "disabled": false,
         "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
         "purge_policies": {
-          "elasticsearch": [
+          "opensearch": [
             {
               "policy_name": "feed",
               "older_than_days": 90,
@@ -212,7 +210,7 @@ For example, if you want to configure compliance settings, create a smaller JSON
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
           {
             "policy_name": "compliance-reports",
             "older_than_days": 100,
@@ -250,7 +248,7 @@ Infra node lifecycle jobs have the following options:
 Purge jobs have the following options:
 
 * `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage before purging occurs.
-  * `elasticsearch` (array) - An array of Elasticsearch purge policies
+  * `opensearch` (array) - An array of OpenSearch purge policies
     * `disabled` (bool) - True or false if this job is enabled.
     * `policy_name` (string) - The name of the purge policy you wish to update.
     * `older_than_days` (int) - The threshold for what qualifies for deletion.
@@ -261,7 +259,7 @@ Services jobs have the following options:
 
 ##### Infra Job Settings
 
-The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two Elasticsearch purge policies.
+The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two OpenSearch purge policies.
 
 ```json
 { "job_settings": [
@@ -284,7 +282,7 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
         {
           "policy_name": "actions",
           "older_than_days": 30,
@@ -311,7 +309,7 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
 
 ##### Compliance Job Settings
 
-The `compliance` data type has one compliance purge job with two Elasticsearch purge policies.
+The `compliance` data type has one compliance purge job with two OpenSearch purge policies.
 
 ```json
 { "job_settings": [
@@ -320,7 +318,7 @@ The `compliance` data type has one compliance purge job with two Elasticsearch p
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
           {
             "policy_name": "compliance-reports",
             "older_than_days": 100,
@@ -344,7 +342,7 @@ The `compliance` data type has one compliance purge job with two Elasticsearch p
 
 ##### Event Feed Job Settings
 
-The `event_feed` data type has one event feed purge job with one Elasticsearch purge policy.
+The `event_feed` data type has one event feed purge job with one OpenSearch purge policy.
 
 ```json
 { "job_settings": [
@@ -352,7 +350,7 @@ The `event_feed` data type has one event feed purge job with one Elasticsearch p
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
         {
           "policy_name": "feed",
           "older_than_days": 90,

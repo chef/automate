@@ -63,7 +63,7 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../test $pkg_prefix/workspace/
 
   build_line "Copying inspec"
-  cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/workspace/inspec/
+  cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-opensearch-smoke $pkg_prefix/workspace/inspec/
   cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/workspace/inspec/
   cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/workspace/inspec/
   cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/workspace/inspec/

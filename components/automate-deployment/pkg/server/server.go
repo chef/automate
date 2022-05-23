@@ -309,7 +309,7 @@ func (s *server) buildDesiredState() (*converge.DesiredState, error) {
 	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
 	logrus.Debugln("Is External PG enabled : ", enableExternalPg)
 
-	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
 	logrus.Debugln("Is External ES enabled : ", enableExternalES)
 
 	for i, service := range expectedServices {
@@ -949,7 +949,7 @@ func skipServicesForHealthCheck(serviceList []string, s *errDeployer, logctx *lo
 		logctx.Debug("External PG is enabled.")
 		servicesToSkip[constants.AutomatePGService] = true
 	}
-	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+	enableExternalEs := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
 
 	if enableExternalEs {
 		logctx.Debug("External ES is enabled.")

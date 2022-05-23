@@ -24,12 +24,12 @@ output "postgresql_ssh" {
   )
 }
 
-output "elasticsearch_ssh" {
+output "opensearch_ssh" {
   value = formatlist(
     "ssh -i %s %s@%s",
     var.aws_ssh_key_file,
     var.aws_ssh_user,
-    aws_instance.chef_automate_elasticsearch.*.private_ip,
+    aws_instance.chef_automate_opensearch.*.private_ip,
   )
 }
 
@@ -45,12 +45,12 @@ output "postgresql_private_ips" {
   value = aws_instance.chef_automate_postgresql.*.private_ip
 }
 
-output "elasticsearch_public_ips" {
-  value = aws_instance.chef_automate_elasticsearch.*.public_ip
+output "opensearch_public_ips" {
+  value = aws_instance.chef_automate_opensearch.*.public_ip
 }
 
-output "elasticsearch_private_ips" {
-  value = aws_instance.chef_automate_elasticsearch.*.private_ip
+output "opensearch_private_ips" {
+  value = aws_instance.chef_automate_opensearch.*.private_ip
 }
 
 output "random_id" {

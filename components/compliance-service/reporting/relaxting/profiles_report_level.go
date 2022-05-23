@@ -1,8 +1,8 @@
 package relaxting
 
 import (
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting"

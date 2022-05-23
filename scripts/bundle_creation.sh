@@ -140,7 +140,7 @@ create_manifest_auto_tfvars(){
   pgleaderchk_pkg_ident = " $(grep "automate-ha-pgleaderchk" ${PACKAGES_INFO})"
   postgresql_pkg_ident = " $(grep "automate-ha-postgresql" ${PACKAGES_INFO})" 
   proxy_pkg_ident = " $(grep "automate-ha-haproxy" ${PACKAGES_INFO})"
-  elasticsearch_pkg_ident = " $(grep "automate-ha-elasticsearch" ${PACKAGES_INFO})"
+  opensearch_pkg_ident = " $(grep "automate-ha-opensearch" ${PACKAGES_INFO})"
   elasticsidecar_pkg_ident = " $(grep "automate-ha-elasticsidecar" ${PACKAGES_INFO})"
 EOL
 }

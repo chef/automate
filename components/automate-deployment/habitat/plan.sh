@@ -14,7 +14,7 @@ pkg_deps=(
   # list without careful thought. The ordering of dependencies in this
   # list determines the order in which our PATH is constructed at
   # runtime by Habitat.
-  #
+  # 
   # IF YOU UPDATE THIS PIN YOU MUST ALSO UPDATE .expeditor/create-manifest.rb
   core/hab/1.6.181/20201030172917
   core/net-tools

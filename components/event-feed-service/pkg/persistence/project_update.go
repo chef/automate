@@ -6,9 +6,9 @@ import (
 	"github.com/chef/automate/api/interservice/authz"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/elasticutil"
+	olivere "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	olivere "gopkg.in/olivere/elastic.v6"
 )
 
 func (efs ElasticFeedStore) UpdateProjectTags(
@@ -164,7 +164,6 @@ func (efs ElasticFeedStore) updateEventProjectTags(
 
 	startTaskResult, err := olivere.NewUpdateByQueryService(efs.client).
 		Index(IndexNameFeeds).
-		Type(Feeds.Type).
 		Script(olivere.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().

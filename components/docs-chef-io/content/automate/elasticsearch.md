@@ -16,6 +16,10 @@ You can configure Chef Automate to use Elasticsearch clusters that are not deplo
 
 These configuration directions are intended for in the initial deployment of Chef Automate.
 
+{{% warning %}}
+Since automate releases after version 3.0.49 do not support elasticsearch and only supports opensearch, please make sure to use the configuration shown on this page with automate 3.0.49 or below.
+{{% /warning %}}
+
 {{< note >}}
 Chef Automate supports the official Elasticsearch Service by Elastic. Chef Automate does not test or support alternative services, such as Amazon Elasticsearch Service (Amazon ES).
 {{< /note >}}

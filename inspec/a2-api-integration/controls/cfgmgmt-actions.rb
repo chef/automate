@@ -9,7 +9,7 @@ control 'config-mgmt-action-1' do
 
   describe "prepare" do
     let(:elasticsearch_url) do
-      ENV["ELASTICSEARCH_URL"] || "http://localhost:10144"
+      ENV["OPENSEARCH_URL"] || "http://localhost:10144"
     end
 
     # Our tests rely on absolute counts for actions. The actions fixtures that are

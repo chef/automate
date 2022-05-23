@@ -77,6 +77,10 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_queue_max = 8;
 				google.protobuf.Int32Value batch_size = 9;
 				google.protobuf.Int32Value batch_max_wait = 10;
+				google.protobuf.StringValue search_provider = 11;
+				google.protobuf.StringValue search_queue_mode = 12;
+				google.protobuf.StringValue search_auth_username = 13;
+				google.protobuf.StringValue search_auth_password = 14;
 			}
 
 			message Authz {

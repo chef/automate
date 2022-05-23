@@ -14,8 +14,8 @@ output "chef_server_private_ips" {
   value = formatlist("%s", module.aws.chef_server_private_ips)
 }
 
-output "elasticsearch_private_ips" {
-  value = formatlist("%s", module.aws.elasticsearch_private_ips)
+output "opensearch_private_ips" {
+  value = formatlist("%s", module.aws.opensearch_private_ips)
 }
 
 output "postgresql_private_ips" {

@@ -2,7 +2,7 @@ REPOROOT=../
 include ../Makefile.common_go
 
 unit:
-	go test -v ./...
+	go test -cover -v ./...
 
 
 PG_URL ?= "postgresql://postgres@127.0.0.1:5432/cereal_test?sslmode=disable&timezone=UTC"

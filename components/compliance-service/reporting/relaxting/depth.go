@@ -3,9 +3,9 @@ package relaxting
 import (
 	"encoding/json"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
@@ -112,7 +112,7 @@ func getDeepControlsSums(hit *elastic.SearchHit,
 				for _, profileHit := range innerHit.Hits.Hits {
 					var profile ProfileSource
 					if profileHit.Source != nil {
-						err = json.Unmarshal(*profileHit.Source, &profile)
+						err = json.Unmarshal(profileHit.Source, &profile)
 						if err == nil {
 							if queryInfo.level == ControlLevel {
 								nodeControlSummary, status, err = getControlLevelControlSums(profileHit)
@@ -137,7 +137,7 @@ func getControlLevelControlSums(hit *elastic.SearchHit) (nodeControlSummary repo
 				for _, controlHit := range innerHit.Hits.Hits {
 					var control ControlSource
 					if controlHit.Source != nil {
-						err = json.Unmarshal(*controlHit.Source, &control)
+						err = json.Unmarshal(controlHit.Source, &control)
 						if err == nil {
 							// this is for one node and since this control should only be in this profile once, it's
 							// reasonable to list it with a cardinality of 1
@@ -177,7 +177,7 @@ func getDeepInspecProfiles(hit *elastic.SearchHit,
 				for _, profileHit := range innerHit.Hits.Hits {
 					var profile ESInSpecReportProfile
 					if profileHit.Source != nil {
-						err = json.Unmarshal(*profileHit.Source, &profile)
+						err = json.Unmarshal(profileHit.Source, &profile)
 						if err == nil {
 							if queryInfo.level == ControlLevel {
 								profile.Controls, status, err = getControlLevelControls(profileHit)
@@ -204,7 +204,7 @@ func getControlLevelControls(hit *elastic.SearchHit) (controls []ESInSpecReportC
 				for _, controlHit := range innerHit.Hits.Hits {
 					var control ESInSpecReportControl
 					if controlHit.Source != nil {
-						err = json.Unmarshal(*controlHit.Source, &control)
+						err = json.Unmarshal(controlHit.Source, &control)
 						if err == nil {
 							status = control.Status
 							controls = append(controls, control)

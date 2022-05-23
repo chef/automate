@@ -32,7 +32,7 @@ module "vsphere" {
   postgresql_instance_cpus            = "2"
   postgresql_instance_ram_mb          = "4096"
   postgresql_instance_datadisk_gb     = "20"
-  elasticsearch_instance_count        = "3"
+  opensearch_instance_count        = "3"
   elasticsearch_instance_cpus         = "2"
   elasticsearch_instance_ram_mb       = "8192"
   elasticsearch_instance_datadisk_gb  = "100"

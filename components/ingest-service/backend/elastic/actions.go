@@ -39,7 +39,7 @@ func (es *Backend) GetActions(index string, pageSize int, cursorDate time.Time,
 
 	for _, hit := range searchResult.Hits.Hits {
 		var action backend.InternalChefAction
-		err := json.Unmarshal(*hit.Source, &action)
+		err := json.Unmarshal(hit.Source, &action)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"object": hit.Source,
@@ -54,7 +54,7 @@ func (es *Backend) GetActions(index string, pageSize int, cursorDate time.Time,
 		es.reverseActions(actions)
 	}
 
-	return actions, searchResult.Hits.TotalHits, nil
+	return actions, searchResult.TotalHits(), nil
 }
 
 func (es *Backend) reverseActions(actions []backend.InternalChefAction) {
