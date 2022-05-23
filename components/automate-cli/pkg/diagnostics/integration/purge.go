@@ -38,7 +38,7 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.OsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "feed",
@@ -127,7 +127,7 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.OsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "compliance-reports",
@@ -181,12 +181,12 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.OsPolicyUpdate{},
+					Os: []*dlcAPI.OsPolicyUpdate{},
 				},
 			}
 
 			for _, p := range show.OsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.OsPolicyUpdate{
+				req.PolicyUpdate.Os = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,
@@ -221,7 +221,7 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.OsPolicyUpdate{
+					Os: []*dlcAPI.OsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "actions",
@@ -275,12 +275,12 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.OsPolicyUpdate{},
+					Os: []*dlcAPI.OsPolicyUpdate{},
 				},
 			}
 
 			for _, p := range show.OsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.OsPolicyUpdate{
+				req.PolicyUpdate.Os = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,

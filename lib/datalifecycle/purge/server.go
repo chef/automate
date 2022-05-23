@@ -144,7 +144,7 @@ func (server *Server) Show(ctx context.Context,
 		return res, status.Error(codes.Internal, err.Error())
 	}
 
-	for _, policy := range policies.Es {
+	for _, policy := range policies.Os {
 		dsOsPolicies = append(dsOsPolicies, &dlcAPI.OsPolicy{
 			Name:             policy.Name,
 			Index:            policy.IndexName,
@@ -245,7 +245,7 @@ func (server *Server) Configure(ctx context.Context,
 	// Generate desired policies based on current or default policies and the
 	// desired policy update.
 	var up bool
-	policies, up, err = server.updateEsPolicies(req.GetPolicyUpdate().GetEs(), policies)
+	policies, up, err = server.updateEsPolicies(req.GetPolicyUpdate().GetOs(), policies)
 	if up == true {
 		updated = true
 	}
