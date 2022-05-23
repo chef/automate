@@ -528,7 +528,7 @@ func configWriteRequiresReload(pkg habpkg.Installable) bool {
 	//even if we remove the dependency in the future. Adding the GW to the list will ensure that the
 	//mitigation is executed for the GW as well, therefore restarting all the required services.
 
-	return pkg.Name() == postgresqlServiceName || pkg.Name() == elasticsearchServiceName || pkg.Name() == esGatewayServiceName || pkg.Name() == pgGatewayServiceName
+	return pkg.Name() == postgresqlServiceName || pkg.Name() == opensearchServiceName || pkg.Name() == esGatewayServiceName || pkg.Name() == pgGatewayServiceName
 }
 
 func configOutOfDate(step runningPhaseStep) (bool, error) {

@@ -109,7 +109,7 @@ func (s *server) UpgradeStatus(ctx context.Context, req *api.UpgradeStatusReques
 	if enableExternalPg {
 		omittedServices[constants.AutomatePGService] = ""
 	}
-	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
 	if enableExternalES {
 		omittedServices[constants.AutomateSearchService] = ""
 	}

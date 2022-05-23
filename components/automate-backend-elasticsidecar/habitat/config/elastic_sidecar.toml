@@ -9,5 +9,5 @@ securityconfig_path = "/hab/svc/automate-ha-elasticsidecar/data/securityconfig"
 opensearch_ip = "{{cfg.opensearch_ip}}"
 opensearch_port = {{cfg.opensearch_port}}
 wait_period = {{cfg.wait_period}}
-java_home = "{{pkgPathFor "core/openjdk11"}}"
+java_home = "{{pkgPathFor "chef/automate-openjdk"}}"
 tool_path = "{{pkgPathFor "chef/automate-ha-opensearch"}}/os/plugins/opensearch-security/tools/"

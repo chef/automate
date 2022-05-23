@@ -54,18 +54,18 @@ func makeOutdatedServiceInfo(name string) habapi.ServiceInfo {
 
 func TestDetectUpgradingServices(t *testing.T) {
 	manifest := newTestManifest("local-user-service", "ingest-service", "teams-service",
-		"deployment-service", "automate-postgresql", "automate-elasticsearch")
+		"deployment-service", "automate-postgresql", "automate-opensearch")
 	canonicalServices := []habpkg.HabPkg{
 		habpkg.New("chef", "local-user-service"),
 		habpkg.New("chef", "ingest-service"),
 		habpkg.New("chef", "teams-service"),
 		habpkg.New("chef", "automate-postgresql"),
-		habpkg.New("chef", "automate-elasticsearch"),
+		habpkg.New("chef", "automate-opensearch"),
 	}
 
 	omittedServices := map[string]interface{}{
-		"automate-postgresql":    "",
-		"automate-elasticsearch": "",
+		"automate-postgresql": "",
+		"automate-opensearch": "",
 	}
 
 	t.Run("it returns the deployment-service as upgrading if it is older than the manifest",
@@ -115,7 +115,7 @@ func TestDetectUpgradingServices(t *testing.T) {
 				makeUpToDateServiceInfo("local-user-service"),
 				makeUpToDateServiceInfo("old-service"),
 				makeUpToDateServiceInfo("automate-postgresql"),
-				makeOutdatedServiceInfo("automate-elasticsearch"),
+				makeOutdatedServiceInfo("automate-opensearch"),
 			}
 			ret, err := detectUpgradingServices(manifest, runningServices, canonicalServices, omittedServices)
 			require.Nil(t, err)
