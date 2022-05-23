@@ -173,7 +173,7 @@ func mitigationRequiredForPkg(t target.Target, pkg habpkg.VersionedPackage) (boo
 	// comes up. By having it in this list, we can rebuild pg gateway when we update postgres and things
 	// will happen in a sane order.
 	pkgIsImportant := pkg.Name() == postgresqlServiceName ||
-		pkg.Name() == elasticsearchServiceName ||
+		pkg.Name() == opensearchServiceName ||
 		pkg.Name() == pgGatewayServiceName ||
 		pkg.Name() == esGatewayServiceName
 	if !pkgIsImportant {

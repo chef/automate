@@ -378,7 +378,7 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		// up yet. Some of them may in the future once we have
 		// runtime configuration. Although maybe that will all
 		// be handled via postgresql which would be nice.
-		{Name: "automate-elasticsearch", WriteMetadata: false},
+		{Name: "automate-opensearch", WriteMetadata: false},
 		{Name: "automate-es-gateway", WriteMetadata: false},
 		{Name: "automate-gateway", WriteMetadata: false},
 		{Name: "event-gateway", WriteMetadata: false},
