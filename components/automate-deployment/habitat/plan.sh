@@ -33,6 +33,7 @@ pkg_deps=(
   # we need pg11 because the ha backend uses postgres 11
   core/postgresql13-client
 )
+
 pkg_bin_dirs=(bin)
 pkg_exports=(
   [port]=service.port
