@@ -92,7 +92,7 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			}
 
 			for _, p := range show.OsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
+				req.PolicyUpdate.Os = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,
