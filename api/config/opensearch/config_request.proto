@@ -133,6 +133,7 @@ message ConfigRequest {
 		message Plugins {
 			reserved 1;
 			google.protobuf.StringValue cloud_aws_signer = 2;
+			Security security = 3;
 		}
 
 		message Runtime {
@@ -195,6 +196,54 @@ message ConfigRequest {
 
 		message Deprecated {
 				google.protobuf.BoolValue external_os = 1;
+		}
+
+		message Security {
+			google.protobuf.BoolValue allow_unsafe_democertificates = 1;
+			google.protobuf.BoolValue allow_default_init_securityindex = 2;
+			google.protobuf.StringValue nodes_dn = 3;
+			google.protobuf.BoolValue enable_snapshot_restore_privilege = 4;
+			google.protobuf.BoolValue check_snapshot_restore_write_privileges = 5;
+			Ssl ssl = 6;
+			Authcz authcz = 7;
+			Audit audit = 8;
+			RestApi restapi = 9;
+			SystemIndices system_indices = 10;
+		}
+
+		message Ssl {
+			PluginTransport transport = 1;
+			Http http = 2;
+		}
+
+		message PluginTransport {
+			google.protobuf.StringValue pemcert_filepath = 1;
+			google.protobuf.StringValue pemkey_filepath = 2;
+			google.protobuf.StringValue pemtrustedcas_filepath = 3;
+			google.protobuf.BoolValue enforce_hostname_verification = 4;
+			google.protobuf.BoolValue resolve_hostname = 5;
+		}
+
+		message Http {
+			google.protobuf.BoolValue enabled = 1;
+			google.protobuf.StringValue pemcert_filepath = 2;
+			google.protobuf.StringValue pemkey_filepath = 3;
+			google.protobuf.StringValue pemtrustedcas_filepath = 4;
+		}
+
+		message Authcz {
+			google.protobuf.StringValue admin_dn = 1;
+		}
+		message Audit {
+			google.protobuf.StringValue type = 1;
+		}
+		
+		message RestApi {
+			google.protobuf.StringValue roles_enabled = 1;
+		}
+		message SystemIndices {
+			google.protobuf.BoolValue enabled = 1;
+			google.protobuf.StringValue indices = 2;
 		}
 	}
 }

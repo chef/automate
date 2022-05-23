@@ -146,25 +146,27 @@ action.destructive_requires_name: {{cfg.action.destructive_requires_name}}
 
 ######## Start OpenSearch Security  Configuration ########
 #plugins.security.disabled: true
-plugins.security.ssl.transport.pemcert_filepath: node1.pem
-plugins.security.ssl.transport.pemkey_filepath: node1-key.pem
-plugins.security.ssl.transport.pemtrustedcas_filepath: root-ca.pem
-plugins.security.ssl.transport.enforce_hostname_verification: false
-plugins.security.ssl.http.enabled: true
-plugins.security.ssl.http.pemcert_filepath: node1.pem
-plugins.security.ssl.http.pemkey_filepath: node1-key.pem
-plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
-plugins.security.allow_unsafe_democertificates: true
-plugins.security.allow_default_init_securityindex: true
+plugins.security.ssl.transport.pemcert_filepath: {{cfg.plugins.security.ssl.transport.pemcert_filepath}}
+plugins.security.ssl.transport.pemkey_filepath: {{cfg.plugins.security.ssl.transport.pemkey_filepath}}
+plugins.security.ssl.transport.pemtrustedcas_filepath: {{cfg.plugins.security.ssl.transport.pemtrustedcas_filepath}}
+plugins.security.ssl.transport.enforce_hostname_verification: {{cfg.plugins.security.ssl.transport.enforce_hostname_verification}}
+plugins.security.ssl.transport.resolve_hostname: {{cfg.plugins.security.ssl.transport.resolve_hostname}}
+plugins.security.ssl.http.enabled: {{cfg.plugins.security.ssl.http.enabled}}
+plugins.security.ssl.http.pemcert_filepath: {{cfg.plugins.security.ssl.http.pemcert_filepath}}
+plugins.security.ssl.http.pemkey_filepath: {{cfg.plugins.security.ssl.http.pemkey_filepath}}
+plugins.security.ssl.http.pemtrustedcas_filepath: {{cfg.plugins.security.ssl.http.pemtrustedcas_filepath}}
+plugins.security.allow_unsafe_democertificates: {{cfg.plugins.security.allow_unsafe_democertificates}}
+plugins.security.allow_default_init_securityindex: {{ cfg.plugins.security.allow_default_init_securityindex }}
 plugins.security.authcz.admin_dn:
-  - CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US
-
-plugins.security.audit.type: internal_opensearch
-plugins.security.enable_snapshot_restore_privilege: true
-plugins.security.check_snapshot_restore_write_privileges: true
-plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
-plugins.security.system_indices.enabled: true
-plugins.security.system_indices.indices: [".opendistro-alerting-config", ".opendistro-alerting-alert*", ".opendistro-anomaly-results*", ".opendistro-anomaly-detector*", ".opendistro-anomaly-checkpoints", ".opendistro-anomaly-detection-state", ".opendistro-reports-*", ".opendistro-notifications-*", ".opendistro-notebooks", ".opensearch-observability", ".opendistro-asynchronous-search-response*", ".replication-metadata-store"]
+  {{ cfg.plugins.security.authcz.admin_dn }}
+plugins.security.nodes_dn:
+  {{ cfg.plugins.security.nodes_dn }}
+plugins.security.audit.type: {{ cfg.plugins.security.audit.type }}
+plugins.security.enable_snapshot_restore_privilege: {{ cfg.plugins.security.enable_snapshot_restore_privilege }}
+plugins.security.check_snapshot_restore_write_privileges: {{ cfg.plugins.security.check_snapshot_restore_write_privileges }}
+plugins.security.restapi.roles_enabled: {{  cfg.plugins.security.restapi.roles_enabled }}
+plugins.security.system_indices.enabled: {{ cfg.plugins.security.system_indices.enabled }}
+plugins.security.system_indices.indices: {{ cfg.plugins.security.system_indices.indices }}
 
 #plugins.security.ssl.transport.keystore_type: "JKS"
 #plugins.security.ssl.transport.keystore_filepath: opensearch.keystore
