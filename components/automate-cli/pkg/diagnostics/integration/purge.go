@@ -87,12 +87,12 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*dlcAPI.OsPolicyUpdate{},
+					Os: []*dlcAPI.OsPolicyUpdate{},
 				},
 			}
 
 			for _, p := range show.OsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.OsPolicyUpdate{
+				req.PolicyUpdate.Es = append(req.PolicyUpdate.Os, &dlcAPI.OsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,

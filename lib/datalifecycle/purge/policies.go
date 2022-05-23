@@ -13,13 +13,13 @@ import (
 // Policies represent the purge policies that are persisted in the workflow
 // parameters.
 type Policies struct {
-	Es map[string]OsPolicy `json:"es"`
+	Os map[string]OsPolicy `json:"os"`
 	Pg map[string]PgPolicy `json:"pg"`
 }
 
 func NewPolicies() *Policies {
 	return &Policies{
-		Es: map[string]OsPolicy{},
+		Os: map[string]OsPolicy{},
 		Pg: map[string]PgPolicy{},
 	}
 }
@@ -43,7 +43,7 @@ func (p OsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarService
 		res    *es.PurgeResponse
 		req    = &es.PurgeRequest{}
 		logctx = log.WithFields(log.Fields{
-			"policy_type":     "elasticsearch",
+			"policy_type":     "opensearch",
 			"id":              id,
 			"older_than_days": p.OlderThanDays,
 			"index_name":      p.IndexName,
