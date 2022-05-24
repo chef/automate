@@ -26,4 +26,5 @@ message TelemetryResponse {
   string telemetry_url = 8;
   int64 max_nodes = 9;
   string deployment_id = 10;
+  string deployment_type = 11;
 }
