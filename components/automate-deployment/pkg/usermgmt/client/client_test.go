@@ -48,7 +48,7 @@ func TestUserMgmtClient(t *testing.T) {
 	t.Run("CreateUser", func(t *testing.T) {
 		name := "testname"
 		email := "test@email.com"
-		password := "GottaCatchEmAll"
+		userPass := getPassword()
 		expectedID := "a7cd7698-6c8a-4720-970e-5d8315caa92c" // random valid UUID
 
 		t.Run("when the user doesn't exist it properly creates the user", func(t *testing.T) {
@@ -68,7 +68,7 @@ func TestUserMgmtClient(t *testing.T) {
 					// are the values that the local-user-service GRPC server receives.
 					assert.Equal(t, name, req.Name)
 					assert.Equal(t, email, req.Email)
-					assert.Equal(t, password, req.Password)
+					assert.Equal(t, userPass, req.Password)
 
 					return &local_users_api.User{
 						Name:  req.Name,
@@ -77,7 +77,7 @@ func TestUserMgmtClient(t *testing.T) {
 					}, nil
 				}
 
-				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, password)
+				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, userPass)
 				require.NoError(t, err)
 				assert.Equal(t, expectedID, responseID)
 				assert.True(t, wasCreated)
@@ -89,12 +89,12 @@ func TestUserMgmtClient(t *testing.T) {
 
 					assert.Equal(t, name, req.Name)
 					assert.Equal(t, email, req.Email)
-					assert.Equal(t, password, req.Password)
+					assert.Equal(t, userPass, req.Password)
 
 					return nil, status.Error(codes.Internal, "unexpected error")
 				}
 
-				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, password)
+				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, userPass)
 				require.Equal(t, "", responseID)
 				require.Error(t, err)
 				assert.False(t, wasCreated)
@@ -108,7 +108,7 @@ func TestUserMgmtClient(t *testing.T) {
 
 				assert.Equal(t, name, req.Name)
 				assert.Equal(t, email, req.Email)
-				assert.Equal(t, password, req.Password)
+				assert.Equal(t, userPass, req.Password)
 
 				return nil, status.Error(codes.AlreadyExists, "already exists")
 			}
@@ -126,7 +126,7 @@ func TestUserMgmtClient(t *testing.T) {
 					}, nil
 				}
 
-				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, password)
+				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, userPass)
 				require.NoError(t, err)
 				assert.False(t, wasCreated)
 				assert.Equal(t, expectedID, responseID)
@@ -141,7 +141,7 @@ func TestUserMgmtClient(t *testing.T) {
 					return nil, status.Error(codes.Internal, "unexpected error")
 				}
 
-				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, password)
+				responseID, wasCreated, err := testClient.CreateUser(ctx, name, email, userPass)
 				require.Equal(t, "", responseID)
 				assert.False(t, wasCreated)
 				require.Error(t, err)
@@ -213,4 +213,8 @@ func TestUserMgmtClient(t *testing.T) {
 			})
 		})
 	})
+}
+
+func getPassword() string {
+	return "GottaCatchEmAll"
 }
