@@ -23,7 +23,6 @@ pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
   [cereal-service]="port"
-  [report-manager-minio-gateway]="port"
   [compliance-service]="port"
 )
 pkg_bin_dirs=(bin)
