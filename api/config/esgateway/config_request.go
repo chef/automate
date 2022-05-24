@@ -154,7 +154,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 					auth.GetBasicAuth().GetPassword().GetValue(),
 				),
 			)))
-		case "aws_es":
+		case "aws_os":
 			// If we only have 1 AWS Opensearch Service endpoint specified, we can assume that
 			// the host header should be the name of that endpoint.
 			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(endpoints) == 1 {
