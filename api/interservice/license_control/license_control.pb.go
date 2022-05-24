@@ -280,11 +280,11 @@ type Capability struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name    string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`             // ComplianceReporting
+	Name    string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`       // ComplianceReporting
 	Measure string                 `protobuf:"bytes,2,opt,name=measure,proto3" json:"measure,omitempty" toml:"measure,omitempty" mapstructure:"measure,omitempty"` // nodes
-	Limit   int64                  `protobuf:"zigzag64,3,opt,name=limit,proto3" json:"limit,omitempty" toml:"limit,omitempty" mapstructure:"limit,omitempty"`      // 50
-	Start   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start,proto3" json:"start,omitempty" toml:"start,omitempty" mapstructure:"start,omitempty"`         // date capability becomes active
-	End     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end,proto3" json:"end,omitempty" toml:"end,omitempty" mapstructure:"end,omitempty"`                 // date capability is no longer active
+	Limit   int64                  `protobuf:"zigzag64,3,opt,name=limit,proto3" json:"limit,omitempty" toml:"limit,omitempty" mapstructure:"limit,omitempty"`  // 50
+	Start   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start,proto3" json:"start,omitempty" toml:"start,omitempty" mapstructure:"start,omitempty"`     // date capability becomes active
+	End     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end,proto3" json:"end,omitempty" toml:"end,omitempty" mapstructure:"end,omitempty"`         // date capability is no longer active
 }
 
 func (x *Capability) Reset() {
