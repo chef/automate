@@ -14,7 +14,7 @@
     "/api/v0/compliance/reporting/controls": {
       "post": {
         "summary": "List Controls",
-        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering, but not pagination or sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n```\ncompliance:controlItems:list\n```",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n```\ncompliance:controlItems:list\n```",
         "operationId": "ReportingService_ListControlItems",
         "responses": {
           "200": {
@@ -462,6 +462,11 @@
           "type": "integer",
           "format": "int32",
           "description": "The maximum number of controls to return (Default 100)."
+        },
+        "page_number": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results. (Default 1)"
         },
         "filters": {
           "type": "array",
