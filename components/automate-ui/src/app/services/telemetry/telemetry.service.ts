@@ -52,6 +52,8 @@ export class TelemetryService {
   private licenseType;
   private maxNodes;
   private instanceId;
+  private isESExternallyDeployed;
+  private isPGExternallyDeployed;
   private buildVersion;
   private previousUrl: string;
   private currentUrl: string;
@@ -91,6 +93,8 @@ export class TelemetryService {
         this.maxNodes = config.maxNodes;
         this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
         this.instanceId = config.deploymentId || configService.defaultDeployId;
+        this.isESExternallyDeployed = config.isESExternallyDeployed;
+        this.isPGExternallyDeployed = config.isPGExternallyDeployed;
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
@@ -427,7 +431,10 @@ export class TelemetryService {
     const nodeUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: eventName,
-      properties: { node_cnt: nodeUsageStats.node_cnt }
+      properties: { node_cnt: nodeUsageStats.node_cnt,
+        isESExternallyDeployed: this.isESExternallyDeployed,
+        isPGExternallyDeployed: this.isPGExternallyDeployed
+      }
     }, true).subscribe(() => {
       if (nodeUsageStatsSubscription) {
         nodeUsageStatsSubscription.unsubscribe();
@@ -450,7 +457,11 @@ export class TelemetryService {
     const applicationUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: 'servicesCountsGlobal',
-      properties: { total_services: applicationUsageStats.total_services }
+      properties: {
+        total_services: applicationUsageStats.total_services,
+        isESExternallyDeployed: this.isESExternallyDeployed,
+        isPGExternallyDeployed: this.isPGExternallyDeployed
+      }
     }, true).subscribe(() => {
       if (applicationUsageStatsSubscription) {
         applicationUsageStatsSubscription.unsubscribe();
