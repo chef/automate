@@ -41,7 +41,7 @@ In this section, we'll discuss about the steps to deploy Chef Automate HA on-pre
    - Ensure `ssh_key_pair_name` and `ssh key file path` have the same value.
    - Assign permission to the **ssh key file** by running the `chmod 400 /root/.ssh/id_rsa` command.
    - Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes the value `1`.
-   - Ensure not to modify the cluster number value as `3` for PostgreSQL and OpenSearch.
+   - Ensure not to modify the cluster number value less than `3` for PostgreSQL and OpenSearch. Also, make sure odd number of clusters are added. Eg., 3, 5, 7,...
    - Ensure the instance type supports the respective AWS region.
    - Add *Load Balancer Certificate* details for Chef Automate and Chef Server as shown below:
 
@@ -68,7 +68,7 @@ chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificat
 
 14. Run the `./scripts/credentials set opensearch -auto` command and select **Enter**. This command rotates the credentials for OpenSearch.
 
-15. Run the `chef-automate test -full` command and select **Enter**. This command runs smoke tests on the setup.
+15. Run the `chef-automate test --full` command and select **Enter**. This command runs smoke tests on the setup.
 
 <!-- The default location for the secrets key and secret storage is set in the config file. The default location for the key is /etc/chef-automate/secrets.key and the secret store file is in /hab/a2_deploy_workspace/secrets.json -->
 
