@@ -1,4 +1,4 @@
-pkg_name=automate-supermarket-redis
+pkg_name=automate-supermarket-sidekiq
 pkg_origin="chef"
 pkg_version="4.0.14"
 pkg_description="Supermarket is Chef's community repository for cookbooks, currently hosted at supermarket.chef.io.
@@ -11,31 +11,41 @@ chef_automate_hab_binding_mode="relaxed"
 pkg_svc_user="root"
 pkg_svc_group="root"
 pkg_deps=(
-  chef/mlsa
+  core/ruby27/2.7.4/20211019113603
+  core/node/14.16.1/20211016165647
+  core/libxml2/2.9.10/20210826132717
+  core/libxslt/1.1.34/20210826231334
+  core/postgresql-client/9.6.24/20220217081107
+  core/busybox-static/1.33.0/20210826062032
+  core/coreutils/8.32/20210826054709
+  core/bash/5.1/20210826055113
+  core/file/5.39/20210826050928
+  core/glibc/2.33/20210826050111
+  core/gcc-libs/9.3.0/20210826054136
+  core/libarchive/3.5.1/20211016174003
+  core/shared-mime-info/1.10/20211019161119
+  "${local_platform_tools_origin:-chef}/automate-platform-tools"
   "${vendor_origin}/supermarket-sidekiq/5.1.18/20220414064110"
 )
 
+chef_automate_hab_binding_mode="relaxed"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
+automate_scaffolding_include_templates=(sqerl.config)
+
 pkg_binds_optional=(
-  [database]="port username password"
-  [redis]="port"
+  [automate-pg-gateway]="port username password"
+  [automate-supermarket-redis]="port"
 )
 
 pkg_binds=(
-  [rails]="fieri-url port fqdn force-ssl"
+  [automate-supermarket]="fieri-url port fqdn force-ssl"
 )
-# pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
-# scaffolding_go_base_path=github.com/chef
-# scaffolding_go_repo_name=supermarket
-# scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/${pkg_name}"
 
 do_build() {
   return 0
 }
 
 do_install() {
-  # do_default_install
-  # hab pkg install core/redis
-  # install {{ pkg_path }}
   return 0
 }
 

@@ -7,17 +7,11 @@ pkg_description="NGINX web server."
 pkg_license=('Apache-2.0')
 pkg_upstream_url=https://nginx.org/
 vendor_origin="chef"
+pkg_build_deps=(core/coreutils core/curl core/ruby27)
+
 pkg_deps=( 
-  core/coreutils
+  core/openresty/1.19.3.1/20211019115752
   chef/mlsa
-  # TODO 2020-05-12: PIN PIN PIN
-  #
-  # All dependencies that are shared between this package and the
-  # chef-server-* packages are pinned to the versions required by the
-  # chef-server-* packages.
-  #
-  core/curl
-  core/ruby27 
   "${vendor_origin}/supermarket-nginx/1.19.3.1/20220321050811"
 )
 pkg_svc_user="root"

@@ -19,20 +19,26 @@ pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
 )
+pkg_build_deps=(core/coreutils core/bash core/file core/glibc core/gcc-libs core/libarchive core/shared-mime-info core/bundler)
 
 pkg_deps=(
-  core/coreutils
-  core/bash 
-  core/file 
-  core/glibc 
-  core/gcc-libs 
-  core/libarchive 
-  core/shared-mime-info
-  core/bundler
+  core/ruby27/2.7.5/20220312100031
+  core/node/14.18.1/20220311123947
+  core/libxml2/2.9.12/20220311133931
+  core/libxslt/1.1.34/20220312081836
+  core/postgresql-client/9.6.24/20220311205413
+  core/busybox-static/1.34.1/20220311112317
+  core/coreutils/8.32/20220311101609
+  core/bash/5.1/20220311102415
+  core/file/5.41/20220311083211
+  core/glibc/2.34/20220311081742
+  core/gcc-libs/9.4.0/20220311083308
+  core/libarchive/3.5.2/20220311132828
+  core/shared-mime-info/1.10/20220313111259 
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/supermarket/5.1.5/20220322060835"
+  "${vendor_origin}/supermarket/5.1.32/20220524075351"
 )
 
 pkg_exports=(
@@ -225,7 +231,7 @@ EOF
 
   # core/ruby includes its own bundler which is used (2.2.22 at this time) however the scaffolding tries to vendor
   # core/bundler @ version 2.2.14
-  _bundler_version="2.2.14"
+  _bundler_version="2.2.33"
 
 }
 
@@ -239,6 +245,7 @@ do_install() {
   scaffolding_generate_binstubs
   scaffolding_vendor_bundler
   scaffolding_fix_binstub_shebangs
+  fix_interpreter "$pkg_prefix/delivery/bin/runner_ctl" core/coreutils bin/env
 }
 
 scaffolding_vendor_bundler() {
@@ -351,7 +358,7 @@ _bundle() {
   scaffolding_app_prefix="$(hab pkg path chef/supermarket)/app"
   cd $scaffolding_app_prefix
   bundler_prefix="$(hab pkg path core/bundler)"
-  echo " *** SETTING ENV *** "
+  echo " *** SETTING BUNDLER *** "
   env \
     -u RUBYOPT \
     -u GEMRC \
