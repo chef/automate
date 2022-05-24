@@ -127,7 +127,7 @@ func TestVerification(t *testing.T) {
   "schema_version": "1",
   "build": "20181207131525",
   "hab": [
-    "core/hab/0.54.0/20180221022026",
+    "core/hab/0.69.0/20181127182011",
     "core/hab-sup/0.69.0/20181127183841",
     "core/hab-launcher/9106/20181126205526"
   ],
