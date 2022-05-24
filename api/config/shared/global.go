@@ -3,15 +3,19 @@ package shared
 import (
 	"fmt"
 	"net/url"
+	"os/exec"
 	"strings"
-
-	gw "github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/sirupsen/logrus"
 
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/proxy"
 	"github.com/chef/automate/lib/stringutils"
+	gw "github.com/golang/protobuf/ptypes/wrappers"
+	"github.com/sirupsen/logrus"
+)
+
+const (
+	habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
 )
 
 // NewGlobalConfig returns a new GlobalConfig instance with zero values.
@@ -237,7 +241,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.basic_auth.username")
 			}
 			if p == "" {
-				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.basic_auth.password")
+				args := []string{
+					"show",
+					"userconfig.es_password",
+				}
+				execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || string(getPass) == "" {
+					cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.basic_auth.password")
+				}
 			}
 		case "aws_es":
 			u := auth.GetAwsEs().GetUsername().GetValue()
@@ -286,7 +298,15 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.basic_auth.username")
 			}
 			if p == "" {
-				cfgErr.AddMissingKey("global.v1.external.opensearch.auth.basic_auth.password")
+				args := []string{
+					"show",
+					"userconfig.es_password",
+				}
+				execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil || string(getPass) == "" {
+					cfgErr.AddMissingKey("global.v1.external.opensearch.auth.basic_auth.password")
+				}
 			}
 		case "aws_os":
 			u := auth.GetAwsOs().GetUsername().GetValue()
@@ -396,4 +416,14 @@ func (c *GlobalConfig) PrepareSystemConfig(certificate *TLSCredentials) (Prepare
 	sys := c.V1.Sys
 	sys.Tls = certificate
 	return c.V1.Sys, nil
+}
+
+func getLatestPlatformToolsPath() string {
+	cmd, err := exec.Command("/bin/sh", "-c", habPkgPlatformToolsPath).Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	output := string(cmd)
+
+	return strings.TrimSpace(output)
 }
