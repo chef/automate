@@ -177,13 +177,13 @@ module AutomateCluster
                   ssl_key = """#{certificates[:opensearch][:private][:value]}"""
                   admin_cert = """#{certificates[:opensearch_admin][:public][:value]}"""
                   admin_key = """#{certificates[:opensearch_admin][:private][:value]}"""
-                #[plugins.security.authcz]
-                #  admin_dn = [ "#{certificates[:opensearch_admin][:public][:full_cn_reversed]}" ]
-                #[plugins.security.ssl.transport]
-                #  enforce_hostname_verification = false
-                #  resolve_hostname = false
-                #[plugins.security]
-                #  nodes_dn = [ "#{certificates[:opensearch][:public][:full_cn_reversed]}" ]
+                [plugins.security.authcz]
+                  admin_dn = '- #{certificates[:opensearch_admin][:public][:full_cn_reversed]}'
+                [plugins.security.ssl.transport]
+                  enforce_hostname_verification = false
+                  resolve_hostname = false
+                [plugins.security]
+                  nodes_dn = '- #{certificates[:opensearch][:public][:full_cn_reversed]}'
               ENDHEREDOC
             else
               utils.backend_logger.error 'Opensearch Certificate values were not set properly - aborting!'
