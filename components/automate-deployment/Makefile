@@ -279,7 +279,7 @@ basic-a1-migrate: guard-HAB_ORIGIN
 	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate migrate-from-v1 --channel dev --upgrade-strategy none --yes --skip-backup-check --override-origin ${HAB_ORIGIN} --hartifacts /a2/results
 
 basic-a1-diagnostics:
-	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate diagnostics run
+	cd basic-a1 && echo ":::::::8th way log" && docker-compose exec basic-a1 "curl localhost:10144/comp-7-s-2022.05.19/_settings?human" && docker-compose exec basic-a1 /basic-a1/chef-automate diagnostics run
 
 basic-a1-do-all: guard-HAB_ORIGIN basic-a1-build basic-a1-start-chef-server basic-a1-up basic-a1-reconfigure-chef-server basic-a1-migrate basic-a1-diagnostics basic-a1-test
 
