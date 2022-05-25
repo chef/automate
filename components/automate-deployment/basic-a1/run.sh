@@ -14,6 +14,9 @@ sysctl -w vm.dirty_expire_centisecs=20000
 # Run setup to make sure our package versions and configuration are up to date.
 chef-apply /basic-a1/setup.rb
 
+echo "::::here i am rock:::::"
+curl localhost:9200/compliance-latest-1/_settings?human
+
 # TODO: this is disabled because it tries to import your secret origin key, but
 # that doesn't work because we disabled mounting ~/.hab in the container
 # because that was breaking other stuff
