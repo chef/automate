@@ -20,8 +20,8 @@ test_detect_broken_cli=true
 # and fix it, but we try to identify common cases and fix them in the
 # tests.
 test_detect_broken_packages=true
-
-CURRENT_OLDEST_VERSION=20200115001116
+# core / hab / 1.6.288 / 20210402192338
+CURRENT_OLDEST_VERSION=20211020062000
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
@@ -47,7 +47,7 @@ do_upgrade() {
 do_deploy() {
     #shellcheck disable=SC2154
     cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
-    install_hab "0.90.6"
+    install_hab "1.6.288"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
     $upgrade_scaffold_bin setup "$test_manifest_path"
     $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
