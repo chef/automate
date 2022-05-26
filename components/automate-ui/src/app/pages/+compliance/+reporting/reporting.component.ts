@@ -305,7 +305,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
           type: Type.info,
           message: 'Download request is submitted. You will get notification once it is ready for download.'
         }));
-        this.store.dispatch(new AckDownloadReports(JSON.parse(data).acknowledgement_id));
+        this.store.dispatch(new AckDownloadReports(data.acknowledgement_id));
         this.downloadReportsService.initiateLongPolling();
       } else {
         const types = { 'json': 'application/json', 'csv': 'text/csv' };

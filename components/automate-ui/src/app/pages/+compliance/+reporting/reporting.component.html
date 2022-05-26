@@ -3,21 +3,17 @@
     <main>
       <chef-page-header>
         <chef-heading>Reports</chef-heading>
-        <chef-subheading>Compliance reports describe the status of scanned infrastructure. Filtering by a profile, or a profile and one associated control, will enable deep filtering, which will also reflect on the status of the node.</chef-subheading>
+        <chef-subheading>Compliance reports describe the status of scanned infrastructure. Filtering by a profile, or a
+          profile and one associated control, will enable deep filtering, which will also reflect on the status of the
+          node.</chef-subheading>
       </chef-page-header>
 
       <div class="reporting-header">
-        <app-reporting-searchbar
-          [date]="endDate$ | async"
-          [filters]="filters$ | async"
-          [last24h]="(reportQuery.state | async).last24h"
-          [filterTypes]="availableFilterTypes"
-          [filterValues]="availableFilterValues"
-          (suggestValues)="onSuggestValues($event)"
-          (filtersCleared)="onFiltersClear($event)"
-          (filterRemoved)="onFilterRemoved($event)"
-          (filterAdded)="onFilterAdded($event)"
-          (dateChanged)="onEndDateChanged($event)"
+        <app-reporting-searchbar [date]="endDate$ | async" [filters]="filters$ | async"
+          [last24h]="(reportQuery.state | async).last24h" [filterTypes]="availableFilterTypes"
+          [filterValues]="availableFilterValues" (suggestValues)="onSuggestValues($event)"
+          (filtersCleared)="onFiltersClear($event)" (filterRemoved)="onFilterRemoved($event)"
+          (filterAdded)="onFilterAdded($event)" (dateChanged)="onEndDateChanged($event)"
           (last24Selected)="onLast24Selected()">
         </app-reporting-searchbar>
         <div class="download-report" data-cy="download-dropdown">
@@ -29,7 +25,9 @@
               <ul class="menu-list">
                 <li (click)="onDownloadOptPressed('json')"><span>Download JSON</span></li>
                 <li (click)="onDownloadOptPressed('csv')" data-cy="download-csv"><span>Download CSV</span></li>
-                <li *ngIf="appConfigService.isLargeReportingEnabled" (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()" data-cy="open-report"><span>Open Report</span></li>
+                <li *ngIf="appConfigService.isLargeReportingEnabled"
+                  (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()" data-cy="open-report">
+                  <span>Open Report</span></li>
               </ul>
             </chef-click-outside>
           </chef-dropdown>
@@ -52,16 +50,13 @@
 
       <!--Reporting Summary-->
       <div class="reporting-summary">
-        <div
-          *ngIf="reportData.reportingSummaryEmpty"
-          class="empty-summary">
+        <div *ngIf="reportData.reportingSummaryEmpty" class="empty-summary">
           <p>
-            There are no compliance scans to display report metadata. Learn how to start your first <a href="https://docs.chef.io/automate/data_collection" target="_blank">compliance scan</a>.
+            There are no compliance scans to display report metadata. Learn how to start your first <a
+              href="https://docs.chef.io/automate/data_collection" target="_blank">compliance scan</a>.
           </p>
         </div>
-        <div
-          *ngIf="!reportData.reportingSummaryEmpty && !!reportData.reportingSummary"
-          class="summary"
+        <div *ngIf="!reportData.reportingSummaryEmpty && !!reportData.reportingSummary" class="summary"
           [ngClass]="reportData.reportingSummary.status">
           <div class="summary-toggle" (click)="toggleSummary()">
             <p>
@@ -85,7 +80,8 @@
               <tr>
                 <th id="report-date-label">
                   Report Date
-                  <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
+                  <chef-tooltip for="report-date-label">Latest information available for everything at this date.
+                  </chef-tooltip>
                 </th>
                 <td>
                   <app-time [time]="(endDate$ | async)"></app-time>
@@ -105,7 +101,8 @@
                 </th>
                 <td>
                   {{ reportData.reportingSummary.stats.platforms | number }}
-                  {{ reportData.reportingSummary.stats.platforms | i18nPlural: {'=1': 'Platform', 'other': 'Platforms'} }}
+                  {{ reportData.reportingSummary.stats.platforms | i18nPlural: {'=1': 'Platform', 'other': 'Platforms'}
+                  }}
                 </td>
               </tr>
               <tr>
@@ -114,7 +111,8 @@
                 </th>
                 <td>
                   {{ reportData.reportingSummary.stats.environments | number }}
-                  {{ reportData.reportingSummary.stats.environments | i18nPlural: {'=1': 'Environment', 'other': 'Environments'} }}
+                  {{ reportData.reportingSummary.stats.environments | i18nPlural: {'=1': 'Environment', 'other':
+                  'Environments'} }}
                 </td>
               </tr>
               <tr>
@@ -134,20 +132,24 @@
       <!--Tabs (Overview, Nodes, Profiles)-->
       <ul class="nav-tabs-list">
         <li class="nav-tabs-item">
-          <a class="nav-tab" routerLink="/compliance/reports/overview" routerLinkActive="active" queryParamsHandling="preserve">Overview</a>
+          <a class="nav-tab" routerLink="/compliance/reports/overview" routerLinkActive="active"
+            queryParamsHandling="preserve">Overview</a>
         </li>
         <li class="nav-tabs-item">
-          <a class="nav-tab" routerLink="/compliance/reports/nodes" routerLinkActive="active" queryParamsHandling="preserve" data-cy="nodes-tab">
+          <a class="nav-tab" routerLink="/compliance/reports/nodes" routerLinkActive="active"
+            queryParamsHandling="preserve" data-cy="nodes-tab">
             {{reportData.reportingSummary?.stats.nodes | number }} Nodes
           </a>
         </li>
         <li class="nav-tabs-item">
-          <a class="nav-tab" routerLink="/compliance/reports/profiles" routerLinkActive="active" queryParamsHandling="preserve">
+          <a class="nav-tab" routerLink="/compliance/reports/profiles" routerLinkActive="active"
+            queryParamsHandling="preserve">
             {{reportData.reportingSummary?.stats.profiles | number }} Profiles
           </a>
         </li>
         <li class="nav-tabs-item">
-          <a class="nav-tab" routerLink="/compliance/reports/controls" routerLinkActive="active" queryParamsHandling="preserve">
+          <a class="nav-tab" routerLink="/compliance/reports/controls" routerLinkActive="active"
+            queryParamsHandling="preserve">
             {{reportData.reportingSummary?.stats.controls | number }} Controls
           </a>
         </li>
@@ -155,11 +157,8 @@
 
       <router-outlet></router-outlet>
 
-      <chef-modal
-        id="download-modal"
-        title="download-title"
-        [visible]="downloadStatusVisible"
-        (closeModal)="hideDownloadStatus()">
+      <chef-modal *ngIf="!this.appConfigService.isLargeReportingEnabled" id="download-modal" title="download-title"
+        [visible]="downloadStatusVisible" (closeModal)="hideDownloadStatus()">
         <ng-container *ngIf="downloadInProgress">
           <h2 id="download-report" class="display4" slot="title">Downloading report...</h2>
         </ng-container>
@@ -185,10 +184,12 @@
               <th scope="col">Duration</th>
             </tr>
             <ng-container *ngIf="downloadReportsService.reportList.length > 0">
-              <tr *ngFor="let report of downloadReportsService.reportList; index as i" [ngClass]="{'json': report.report_type === 'json', 'csv': report.report_type === 'csv'}">
+              <tr *ngFor="let report of downloadReportsService.reportList; index as i"
+                [ngClass]="{'json': report.report_type === 'json', 'csv': report.report_type === 'csv'}">
                 <ng-container>
                   <td *ngIf="report.status === 'success'" class="success-status">
-                    <a (click)="showDownloadStatus();downloadReportsService.onLinkToDownload(report)" class="download-link">
+                    <a (click)="showDownloadStatus();downloadReportsService.onLinkToDownload(report)"
+                      class="download-link">
                       <app-time [time]='report.created_at'></app-time>
                     </a>
                   </td>
@@ -199,17 +200,17 @@
                     <app-time [time]='report.created_at'></app-time>
                   </td>
                 </ng-container>
-                <td *ngIf="report.status === 'success'">{{ downloadReportsService.byteConverter(report.report_size) }}</td>
+                <td *ngIf="report.status === 'success'">{{ downloadReportsService.byteConverter(report.report_size) }}
+                </td>
                 <ng-container *ngIf="report.status === 'failed'">
                   <td [id]="'error-message-' + i" class="failed-status error-message">{{ report.err_message }}</td>
-                </ng-container>  
+                </ng-container>
                 <td *ngIf="report.status === 'running'" class="running-status">In progress...</td>
                 <td *ngIf="report.status === 'success' || report.status === 'failed'">{{report.duration}}</td>
-                <ng-container *ngIf="report.status === 'failed'"> <!-- keep this tooltip at last to avoid extra empty space between columns  -->
-                  <chef-tooltip
-                  [attr.for]="'error-message-' + i"
-                  position="top"
-                  delay="0">{{ report.err_message }}</chef-tooltip>
+                <ng-container *ngIf="report.status === 'failed'">
+                  <!-- keep this tooltip at last to avoid extra empty space between columns  -->
+                  <chef-tooltip [attr.for]="'error-message-' + i" position="top" delay="0">{{ report.err_message }}
+                  </chef-tooltip>
                 </ng-container>
               </tr>
             </ng-container>
