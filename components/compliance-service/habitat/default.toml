@@ -10,6 +10,7 @@ host = "localhost"
 port = 10121
 external_fqdn = "localhost"
 enable_large_reporting = false
+lcr_open_search_requests = 50
 
 [storage]
 database = "chef_compliance_service"

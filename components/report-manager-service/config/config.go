@@ -15,11 +15,13 @@ type ReportManager struct {
 }
 
 type Minio struct {
-	EndPoint     string `mapstructure:"endpoint"`
-	RootUser     string `mapstructure:"root_user"`
-	RootPassword string `mapstructure:"root_password"`
-	EnableSsl    bool   `mapstructure:"enable_ssl"`
-	Cert         string `mapstructure:"cert"`
+	EndPoint                     string `mapstructure:"endpoint"`
+	RootUser                     string `mapstructure:"root_user"`
+	RootPassword                 string `mapstructure:"root_password"`
+	EnableSsl                    bool   `mapstructure:"enable_ssl"`
+	Cert                         string `mapstructure:"cert"`
+	ConcurrentOpenSearchRequests int    `mapstructure:"concurrent_open_search_requests"`
+	ConcurrentMinioRequests      int    `mapstructure:"concurrent_minio_requests"`
 }
 
 type ObjStore struct {

@@ -3,6 +3,8 @@
     endpoint = "127.0.0.1:9000"
     root_user = "minioadmin"
     root_password = "minioadmin"
+    concurrent_open_search_requests = 10
+    concurrent_minio_requests = 5
     enable_ssl = false
     cert = """-----BEGIN CERTIFICATE-----
 MIIFsDCCA5igAwIBAgIBBzANBgkqhkiG9w0BAQwFADBQMQswCQYDVQQGEwJFWDEQ

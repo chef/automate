@@ -13,9 +13,10 @@ type Service struct {
 	LogLevel   string
 	ServerBind string
 	certs.TLSConfig
-	ConfigFilePath       string
-	MessageBufferSize    int
-	EnableLargeReporting bool
+	ConfigFilePath        string
+	MessageBufferSize     int
+	EnableLargeReporting  bool
+	LcrOpenSearchRequests int
 }
 
 // Compliance service specific config options
