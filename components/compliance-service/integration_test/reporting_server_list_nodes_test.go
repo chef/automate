@@ -15,7 +15,7 @@ import (
 )
 
 func TestListNodesFiltering(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5)
 	ctx := context.Background()
 
 	cases := []struct {
@@ -518,7 +518,7 @@ func TestListNodesFiltering(t *testing.T) {
 }
 
 func TestListNodesWildcardFiltering(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5)
 	ctx := context.Background()
 
 	cases := []struct {
@@ -2447,7 +2447,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 }
 
 func TestListNodesProjectFiltering(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5)
 	nodeIds := []string{newUUID(), newUUID(), newUUID(), newUUID(), newUUID(), newUUID()}
 	reports := []*relaxting.ESInSpecReport{
 		{

@@ -43,7 +43,7 @@ const (
 )
 
 func InitCerealManager(cerealManager *cereal.Manager, workerCount int, db *storage.DB, objStoreClient *minio.Client,
-	objBucket string, complianceReportingClient reporting.ReportingServiceClient) error {
+	objBucket string, concurrentRequests int, complianceReportingClient reporting.ReportingServiceClient) error {
 	err := cerealManager.RegisterWorkflowExecutor(ReportWorkflowName, &ReportWorkflow{
 		DB: db,
 	})
@@ -57,6 +57,7 @@ func InitCerealManager(cerealManager *cereal.Manager, workerCount int, db *stora
 		},
 		ObjBucketName:             objBucket,
 		ComplianceReportingClient: complianceReportingClient,
+		ConcurrentRequests:        concurrentRequests,
 	}, cereal.TaskExecutorOpts{Workers: workerCount})
 }
 
@@ -205,6 +206,7 @@ type GenerateReportTask struct {
 	ObjStoreClient            objstore.ObjectStore
 	ObjBucketName             string
 	ComplianceReportingClient reporting.ReportingServiceClient
+	ConcurrentRequests        int
 }
 
 type GenerateReportParameters struct {
@@ -340,218 +342,303 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, jobID 
 			Values: filter.GetValues(),
 		})
 	}
+	startTime := time.Now()
 	reportList, err := t.getReportsList(ctx, listFilters)
 	if err != nil {
 		return nil, err
 	}
-
+	logrus.Infof("got the Reports list in(seconds): %g", time.Now().Sub(startTime).Seconds())
 	logrus.Infof("fetched %d reports to process from compliance service %s", len(reportList.Reports), jobID)
 
-	for _, report := range reportList.GetReports() {
-		controlsMap := make(map[string]map[string]*inspec.Control)
-		profilesMap := make(map[string]*inspec.Profile)
-		objectName := utils.GetObjName(report.GetReportId())
+	startTime = time.Now()
+	total := len(reportList.GetReports())
+	respMap := make(map[int]CustomReportChan)
+	errsMap := make(map[int]CustomReportErrorChan)
+	cCustomReport := make(chan CustomReportChan)
+	cErr := make(chan CustomReportErrorChan)
 
-		//check the existence of object
-		_, err = t.ObjStoreClient.StatObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
-		if err != nil {
-			fmt.Println("Stat Object Error:", err.Error())
-			errResp := minio.ToErrorResponse(err)
-			// if the error code is `NoSuchKey`, we need to fetch the object from elastic search and store into object store
-			if errResp.Code == "NoSuchKey" {
-				err := t.fetchAndStoreObj(ctx, report.GetReportId(), listFilters)
-				if err != nil {
-					err = errors.Wrap(err, "not able to fetch and store the object")
-					logrus.WithError(err).Error()
-					return nil, err
-				}
-			} else {
-				err = errors.Wrap(err, "could not check the object existence in object store")
+	fetchInterval := t.ConcurrentRequests
+	for i := 0; i < total; i = i + fetchInterval {
+		count := 0
+		if i+fetchInterval < total {
+			count = fetchInterval
+		} else {
+			count = total - i
+		}
+
+		logrus.Infof("fetching %d - %d reports of total %d", i+0, i+count-1, total)
+		for idx := 0; idx < count; idx++ {
+			go t.fetchCustomReportData(ctx, i+idx, reportList.Reports[i+idx], listFilters, cCustomReport, cErr)
+		}
+
+		for idx := 0; idx < count; idx++ {
+			select {
+			case cResponse := <-cCustomReport:
+				respMap[cResponse.index] = cResponse
+			case errorResponse := <-cErr:
+				errsMap[errorResponse.index] = errorResponse
+			}
+		}
+	}
+
+	if len(errsMap) > 0 {
+		var errString string
+		for key, value := range errsMap {
+			errString = fmt.Sprintf("%s.\n failed to retrieve custom report %d/%d with ID %s . Error: %s", errString, key, total, value.reportID, value.err.Error())
+		}
+		//return responseID, fmt.Errorf(errString)
+		return nil, errors.Wrap(err, "error in unmarshalling the report content")
+	}
+
+	for idx := 0; idx < total; idx++ {
+		if result, ok := respMap[idx]; ok {
+			finalData = append(finalData, result.customReport)
+		}
+	}
+
+	logrus.Infof("processed the Reports list in(seconds): %g", time.Now().Sub(startTime).Seconds())
+	return finalData, nil
+}
+
+type CustomReportChan struct {
+	index        int
+	reportID     string
+	customReport *reporting.Report
+}
+
+type CustomReportErrorChan struct {
+	index    int
+	reportID string
+	err      error
+}
+
+func (t *GenerateReportTask) fetchCustomReportData(ctx context.Context, index int, report *reporting.ReportResponse,
+	listFilters []*reporting.ListFilter, respChan chan CustomReportChan, cErr chan CustomReportErrorChan) {
+
+	cur, err := t.getCustomReportData(ctx, report, listFilters)
+	if err != nil {
+		errResp := CustomReportErrorChan{
+			index:    index,
+			reportID: report.GetReportId(),
+			err:      err,
+		}
+		cErr <- errResp
+		return
+	}
+	resp := CustomReportChan{
+		index:        index,
+		reportID:     report.GetReportId(),
+		customReport: cur,
+	}
+	respChan <- resp
+}
+
+func (t *GenerateReportTask) getCustomReportData(ctx context.Context, report *reporting.ReportResponse,
+	listFilters []*reporting.ListFilter) (*reporting.Report, error) {
+
+	controlsMap := make(map[string]map[string]*inspec.Control)
+	profilesMap := make(map[string]*inspec.Profile)
+	objectName := utils.GetObjName(report.GetReportId())
+
+	//check the existence of object
+	_, err := t.ObjStoreClient.StatObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
+	if err != nil {
+		logrus.Infof("Stat Object Error: %s", err.Error())
+		errResp := minio.ToErrorResponse(err)
+		// if the error code is `NoSuchKey`, we need to fetch the object from elastic search and store into object store
+		if errResp.Code == "NoSuchKey" {
+			err := t.fetchAndStoreObj(ctx, report.GetReportId(), listFilters)
+			if err != nil {
+				err = errors.Wrap(err, "not able to fetch and store the object")
 				logrus.WithError(err).Error()
 				return nil, err
 			}
-		}
-
-		objReader, err := t.ObjStoreClient.GetObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
-		if err != nil {
-			err = errors.Wrap(err, "could not get the file from object store")
+		} else {
+			err = errors.Wrap(err, "could not check the object existence in object store")
 			logrus.WithError(err).Error()
 			return nil, err
 		}
-		cmpReport := compliance.Report{}
-		d := json.NewDecoder(objReader)
-		err = d.Decode(&cmpReport)
+	}
+
+	objReader, err := t.ObjStoreClient.GetObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
+	if err != nil {
+		err = errors.Wrap(err, "could not get the file from object store")
+		logrus.WithError(err).Error()
+		return nil, err
+	}
+	cmpReport := compliance.Report{}
+	d := json.NewDecoder(objReader)
+	err = d.Decode(&cmpReport)
+	if err != nil {
+		err = errors.Wrap(err, "error in unmarshalling the report content")
+		logrus.WithError(err).Error()
+		return nil, err
+	}
+
+	//populate controlsMap and ProfileMap
+	for _, profile := range cmpReport.Profiles {
+		profilesMap[profile.Sha256] = profile
+		controlMap := make(map[string]*inspec.Control)
+		for _, control := range profile.Controls {
+			controlMap[control.Id] = control
+		}
+		controlsMap[profile.Sha256] = controlMap
+	}
+	reportData := &reporting.Report{
+		Id:               cmpReport.ReportUuid,
+		NodeId:           cmpReport.NodeUuid,
+		NodeName:         cmpReport.NodeName,
+		Status:           cmpReport.Status,
+		Environment:      cmpReport.Environment,
+		Version:          cmpReport.Version,
+		JobId:            cmpReport.JobUuid,
+		Ipaddress:        cmpReport.Ipaddress,
+		Fqdn:             cmpReport.Fqdn,
+		Roles:            cmpReport.Roles,
+		ChefTags:         cmpReport.ChefTags,
+		StatusMessage:    cmpReport.StatusMessage,
+		ChefServer:       cmpReport.SourceFqdn,
+		ChefOrganization: cmpReport.OrganizationName,
+	}
+	if cmpReport.Platform != nil && (cmpReport.Platform.Name != "" || cmpReport.Platform.Release != "") {
+		reportData.Platform = &reporting.Platform{
+			Name:    cmpReport.Platform.Name,
+			Release: cmpReport.Platform.Release,
+			Full:    stringutils.GetFullPlatformName(cmpReport.Platform.Name, cmpReport.Platform.Release),
+		}
+	}
+	if cmpReport.Statistics != nil {
+		reportData.Statistics = &reporting.Statistics{
+			Duration: cmpReport.Statistics.Duration,
+		}
+	}
+	if cmpReport.EndTime != "" {
+		endTime, err := time.Parse(time.RFC3339, cmpReport.EndTime)
 		if err != nil {
-			err = errors.Wrap(err, "error in unmarshalling the report content")
+			err = errors.Wrap(err, "error in converting the end time content")
 			logrus.WithError(err).Error()
 			return nil, err
 		}
-
-		//populate controlsMap and ProfileMap
-		for _, profile := range cmpReport.Profiles {
-			profilesMap[profile.Sha256] = profile
-			controlMap := make(map[string]*inspec.Control)
-			for _, control := range profile.Controls {
-				controlMap[control.Id] = control
-			}
-			controlsMap[profile.Sha256] = controlMap
+		endTimeProto, err := ptypes.TimestampProto(endTime)
+		if err != nil {
+			err = errors.Wrap(err, "error in converting the end time content to proto format")
+			logrus.WithError(err).Error()
+			return nil, err
 		}
-		reportData := &reporting.Report{
-			Id:               cmpReport.ReportUuid,
-			NodeId:           cmpReport.NodeUuid,
-			NodeName:         cmpReport.NodeName,
-			Status:           cmpReport.Status,
-			Environment:      cmpReport.Environment,
-			Version:          cmpReport.Version,
-			JobId:            cmpReport.JobUuid,
-			Ipaddress:        cmpReport.Ipaddress,
-			Fqdn:             cmpReport.Fqdn,
-			Roles:            cmpReport.Roles,
-			ChefTags:         cmpReport.ChefTags,
-			StatusMessage:    cmpReport.StatusMessage,
-			ChefServer:       cmpReport.SourceFqdn,
-			ChefOrganization: cmpReport.OrganizationName,
+		reportData.EndTime = endTimeProto
+	}
+	for _, profile := range report.Profiles {
+		compProfile, ok := profilesMap[profile.ProfileId]
+		if !ok {
+			continue
 		}
-		if cmpReport.Platform != nil && (cmpReport.Platform.Name != "" || cmpReport.Platform.Release != "") {
-			reportData.Platform = &reporting.Platform{
-				Name:    cmpReport.Platform.Name,
-				Release: cmpReport.Platform.Release,
-				Full:    stringutils.GetFullPlatformName(cmpReport.Platform.Name, cmpReport.Platform.Release),
-			}
+		profileData := &reporting.Profile{
+			Name:           compProfile.Name,
+			Title:          compProfile.Title,
+			Copyright:      compProfile.Copyright,
+			CopyrightEmail: compProfile.CopyrightEmail,
+			Summary:        compProfile.Summary,
+			Version:        compProfile.Version,
+			Full:           stringutils.GetFullProfileName(compProfile.Title, compProfile.Version),
+			Sha256:         compProfile.Sha256,
+			Status:         compProfile.Status,
+			SkipMessage:    compProfile.SkipMessage,
+			StatusMessage:  compProfile.StatusMessage,
 		}
-		if cmpReport.Statistics != nil {
-			reportData.Statistics = &reporting.Statistics{
-				Duration: cmpReport.Statistics.Duration,
-			}
+		for _, depend := range compProfile.Depends {
+			profileData.Depends = append(profileData.Depends, &reporting.Dependency{
+				Name:        depend.Name,
+				Url:         depend.Url,
+				Path:        depend.Path,
+				Git:         depend.Git,
+				Branch:      depend.Branch,
+				Tag:         depend.Tag,
+				Commit:      depend.Commit,
+				Version:     depend.Version,
+				Supermarket: depend.Supermarket,
+				Compliance:  depend.Compliance,
+				Status:      depend.Status,
+				SkipMessage: depend.SkipMessage,
+			})
 		}
-		if cmpReport.EndTime != "" {
-			endTime, err := time.Parse(time.RFC3339, cmpReport.EndTime)
-			if err != nil {
-				err = errors.Wrap(err, "error in converting the end time content")
-				logrus.WithError(err).Error()
-				return nil, err
-			}
-			endTimeProto, err := ptypes.TimestampProto(endTime)
-			if err != nil {
-				err = errors.Wrap(err, "error in converting the end time content to proto format")
-				logrus.WithError(err).Error()
-				return nil, err
-			}
-			reportData.EndTime = endTimeProto
-		}
-		for _, profile := range report.Profiles {
-			compProfile, ok := profilesMap[profile.ProfileId]
+		controlMap := controlsMap[profile.ProfileId]
+		for _, control := range profile.Controls {
+			compControl, ok := controlMap[control]
 			if !ok {
 				continue
 			}
-			profileData := &reporting.Profile{
-				Name:           compProfile.Name,
-				Title:          compProfile.Title,
-				Copyright:      compProfile.Copyright,
-				CopyrightEmail: compProfile.CopyrightEmail,
-				Summary:        compProfile.Summary,
-				Version:        compProfile.Version,
-				Full:           stringutils.GetFullProfileName(compProfile.Title, compProfile.Version),
-				Sha256:         compProfile.Sha256,
-				Status:         compProfile.Status,
-				SkipMessage:    compProfile.SkipMessage,
-				StatusMessage:  compProfile.StatusMessage,
+
+			controlData := &reporting.Control{
+				Id:        compControl.Id,
+				Code:      compControl.Code,
+				Desc:      compControl.Desc,
+				Impact:    compControl.Impact,
+				Title:     compControl.Title,
+				WaivedStr: WaivedStr(compControl.WaiverData),
 			}
-			for _, depend := range compProfile.Depends {
-				profileData.Depends = append(profileData.Depends, &reporting.Dependency{
-					Name:        depend.Name,
-					Url:         depend.Url,
-					Path:        depend.Path,
-					Git:         depend.Git,
-					Branch:      depend.Branch,
-					Tag:         depend.Tag,
-					Commit:      depend.Commit,
-					Version:     depend.Version,
-					Supermarket: depend.Supermarket,
-					Compliance:  depend.Compliance,
-					Status:      depend.Status,
-					SkipMessage: depend.SkipMessage,
+
+			//process the tags
+			tags, err := getTags(compControl.GetTags().GetFields())
+			if err != nil {
+				err = errors.Wrap(err, "error in getting the tags")
+				logrus.WithError(err).Error()
+				return nil, err
+			}
+			controlData.Tags = tags
+
+			stringTags, err := getStringTags(compControl.GetTags().GetFields())
+			if err != nil {
+				err = errors.Wrap(err, "error in getting the stringTags")
+				logrus.WithError(err).Error()
+				return nil, err
+			}
+			controlData.StringTags = stringTags
+
+			if compControl.SourceLocation != nil && (compControl.SourceLocation.Ref != "" ||
+				compControl.SourceLocation.Line != 0) {
+				controlData.SourceLocation = &reporting.SourceLocation{
+					Ref:  compControl.SourceLocation.Ref,
+					Line: compControl.SourceLocation.Line,
+				}
+			}
+			if compControl.WaiverData != nil && (compControl.WaiverData.ExpirationDate != "" ||
+				compControl.WaiverData.Justification != "" || compControl.WaiverData.Run ||
+				compControl.WaiverData.SkippedDueToWaiver || compControl.WaiverData.Message != "") {
+				controlData.WaiverData = &reporting.OrigWaiverData{
+					ExpirationDate:     compControl.WaiverData.ExpirationDate,
+					Justification:      compControl.WaiverData.Justification,
+					Run:                compControl.WaiverData.Run,
+					SkippedDueToWaiver: compControl.WaiverData.SkippedDueToWaiver,
+					Message:            compControl.WaiverData.Message,
+				}
+			}
+			if compControl.RemovedResultsCounts != nil && (compControl.RemovedResultsCounts.Failed != 0 ||
+				compControl.RemovedResultsCounts.Skipped != 0 || compControl.RemovedResultsCounts.Passed != 0) {
+				controlData.RemovedResultsCounts = &reporting.RemovedResultsCounts{
+					Failed:  compControl.RemovedResultsCounts.Failed,
+					Skipped: compControl.RemovedResultsCounts.Skipped,
+					Passed:  compControl.RemovedResultsCounts.Passed,
+				}
+			}
+			for _, result := range compControl.Results {
+				controlData.Results = append(controlData.Results, &reporting.Result{
+					Status:      result.Status,
+					CodeDesc:    result.CodeDesc,
+					RunTime:     result.RunTime,
+					Message:     result.Message,
+					SkipMessage: result.SkipMessage,
 				})
 			}
-			controlMap := controlsMap[profile.ProfileId]
-			for _, control := range profile.Controls {
-				compControl, ok := controlMap[control]
-				if !ok {
-					continue
-				}
-
-				controlData := &reporting.Control{
-					Id:        compControl.Id,
-					Code:      compControl.Code,
-					Desc:      compControl.Desc,
-					Impact:    compControl.Impact,
-					Title:     compControl.Title,
-					WaivedStr: WaivedStr(compControl.WaiverData),
-				}
-
-				//process the tags
-				tags, err := getTags(compControl.GetTags().GetFields())
-				if err != nil {
-					err = errors.Wrap(err, "error in getting the tags")
-					logrus.WithError(err).Error()
-					return nil, err
-				}
-				controlData.Tags = tags
-
-				stringTags, err := getStringTags(compControl.GetTags().GetFields())
-				if err != nil {
-					err = errors.Wrap(err, "error in getting the stringTags")
-					logrus.WithError(err).Error()
-					return nil, err
-				}
-				controlData.StringTags = stringTags
-
-				if compControl.SourceLocation != nil && (compControl.SourceLocation.Ref != "" ||
-					compControl.SourceLocation.Line != 0) {
-					controlData.SourceLocation = &reporting.SourceLocation{
-						Ref:  compControl.SourceLocation.Ref,
-						Line: compControl.SourceLocation.Line,
-					}
-				}
-				if compControl.WaiverData != nil && (compControl.WaiverData.ExpirationDate != "" ||
-					compControl.WaiverData.Justification != "" || compControl.WaiverData.Run ||
-					compControl.WaiverData.SkippedDueToWaiver || compControl.WaiverData.Message != "") {
-					controlData.WaiverData = &reporting.OrigWaiverData{
-						ExpirationDate:     compControl.WaiverData.ExpirationDate,
-						Justification:      compControl.WaiverData.Justification,
-						Run:                compControl.WaiverData.Run,
-						SkippedDueToWaiver: compControl.WaiverData.SkippedDueToWaiver,
-						Message:            compControl.WaiverData.Message,
-					}
-				}
-				if compControl.RemovedResultsCounts != nil && (compControl.RemovedResultsCounts.Failed != 0 ||
-					compControl.RemovedResultsCounts.Skipped != 0 || compControl.RemovedResultsCounts.Passed != 0) {
-					controlData.RemovedResultsCounts = &reporting.RemovedResultsCounts{
-						Failed:  compControl.RemovedResultsCounts.Failed,
-						Skipped: compControl.RemovedResultsCounts.Skipped,
-						Passed:  compControl.RemovedResultsCounts.Passed,
-					}
-				}
-				for _, result := range compControl.Results {
-					controlData.Results = append(controlData.Results, &reporting.Result{
-						Status:      result.Status,
-						CodeDesc:    result.CodeDesc,
-						RunTime:     result.RunTime,
-						Message:     result.Message,
-						SkipMessage: result.SkipMessage,
-					})
-				}
-				profileData.Controls = append(profileData.Controls, controlData)
-			}
-			reportData.Profiles = append(reportData.Profiles, profileData)
+			profileData.Controls = append(profileData.Controls, controlData)
 		}
-		finalData = append(finalData, reportData)
+		reportData.Profiles = append(reportData.Profiles, profileData)
 	}
-	return finalData, nil
+	return reportData, nil
 }
 
 func (t *GenerateReportTask) jsonExporter(ctx context.Context, finalData []*reporting.Report, jobID,
 	requestorID string) (int64, string, error) {
+	startTime := time.Now()
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(finalData)
 	if err != nil {
@@ -567,12 +654,14 @@ func (t *GenerateReportTask) jsonExporter(ctx context.Context, finalData []*repo
 		logrus.WithError(err).Error()
 		return 0, "", err
 	}
+	logrus.Infof("json report generated in(seconds): %g", time.Now().Sub(startTime).Seconds())
 	return info.Size, objectName, nil
 }
 
 func (t *GenerateReportTask) csvExporter(ctx context.Context, finalData []*reporting.Report, jobID,
 	requestorID string) (int64, string, error) {
 
+	startTime := time.Now()
 	tempFile := fmt.Sprintf("/tmp/%s.csv", jobID)
 	csvFile, err := os.Create(tempFile)
 	if err != nil {
@@ -621,6 +710,7 @@ func (t *GenerateReportTask) csvExporter(ctx context.Context, finalData []*repor
 		logrus.WithError(err).Error()
 		return 0, "", err
 	}
+	logrus.Infof("csv report generated in(seconds): %g", time.Now().Sub(startTime).Seconds())
 	return info.Size, objectName, nil
 }
 

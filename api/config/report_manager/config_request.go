@@ -30,7 +30,9 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Log.Format = w.String("text")
 
 	c.V1.Sys.Minio = &ConfigRequest_V1_System_Minio{
-		EnableSsl: w.Bool(false),
+		EnableSsl:                    w.Bool(false),
+		ConcurrentOpenSearchRequests: w.Int32(50),
+		ConcurrentMinioRequests:      w.Int32(10),
 	}
 	return c
 }
@@ -89,11 +91,13 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 
 	if minio := g.GetV1().GetExternal().GetMinio(); minio != nil {
 		c.V1.Sys.Minio = &ConfigRequest_V1_System_Minio{
-			Endpoint:     minio.GetEndpoint(),
-			RootUser:     minio.GetRootUser(),
-			RootPassword: minio.GetRootPassword(),
-			EnableSsl:    minio.GetEnableSsl(),
-			Cert:         minio.GetCert(),
+			Endpoint:                     minio.GetEndpoint(),
+			RootUser:                     minio.GetRootUser(),
+			RootPassword:                 minio.GetRootPassword(),
+			EnableSsl:                    minio.GetEnableSsl(),
+			Cert:                         minio.GetCert(),
+			ConcurrentOpenSearchRequests: minio.ConcurrentOpenSearchRequests,
+			ConcurrentMinioRequests:      minio.ConcurrentMinioRequests,
 		}
 	}
 }

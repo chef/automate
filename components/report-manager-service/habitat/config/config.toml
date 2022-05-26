@@ -43,3 +43,5 @@ root_user = "{{cfg.minio.root_user}}"
 root_password = "{{cfg.minio.root_password}}"
 cert = """{{cfg.minio.cert}}"""
 enable_ssl = {{cfg.minio.enable_ssl}}
+concurrent_open_search_requests = {{cfg.minio.concurrent_open_search_requests}}
+concurrent_minio_requests = {{cfg.minio.concurrent_minio_requests}}

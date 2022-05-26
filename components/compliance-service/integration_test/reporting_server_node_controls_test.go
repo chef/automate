@@ -13,7 +13,7 @@ import (
 )
 
 func TestNodeControl(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5)
 	ctx := context.Background()
 	endTime := time.Now()
 	IDs := []string{newUUID(), newUUID(), newUUID(), newUUID(), newUUID()}
@@ -240,7 +240,7 @@ func TestNodeControl(t *testing.T) {
 			expectedResultCount: 3,
 		},
 		{
-			description: "ListControlInfo: check for paginated response with fitler",
+			description: "ListControlInfo: check for paginated response with filter",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -294,7 +294,7 @@ func TestNodeControl(t *testing.T) {
 			expectedResultCount: 1,
 		},
 		{
-			description: "ListControlInfo: check for paginated response with control fitler",
+			description: "ListControlInfo: check for paginated response with control filter",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -383,7 +383,7 @@ func TestNodeControl(t *testing.T) {
 			expectedResultCount: 1,
 		},
 		{
-			description: "ListControlInfo: check for paginated response with multiple control fitler",
+			description: "ListControlInfo: check for paginated response with multiple control filter",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -472,7 +472,7 @@ func TestNodeControl(t *testing.T) {
 			expectedResultCount: 2,
 		},
 		{
-			description: "ListControlInfo: check for paginated response with project and control fitler",
+			description: "ListControlInfo: check for paginated response with project and control filter",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -585,7 +585,7 @@ func TestNodeControl(t *testing.T) {
 }
 
 func TestNodeControlWithError(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5)
 	ctx := context.Background()
 	endTime := time.Now()
 	IDs := []string{newUUID(), newUUID(), newUUID(), newUUID(), newUUID()}
