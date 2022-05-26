@@ -29,18 +29,20 @@ import (
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
 // See: https://github.com/chef/automate/pull/1143#discussion_r170428374
-const streamBufferSize = 262144
+const streamBufferSize = 2097152
 
 // Server implementation for reporting
 type Server struct {
-	es        *relaxting.ES2Backend
-	reportMgr reportmanager.ReportManagerServiceClient
+	es                       *relaxting.ES2Backend
+	reportMgr                reportmanager.ReportManagerServiceClient
+	lcr_open_search_requests int
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient) *Server {
+func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, lcr_open_search_requests int) *Server {
 	server := Server{
-		es: es,
+		es:                       es,
+		lcr_open_search_requests: lcr_open_search_requests,
 	}
 	if rm != nil {
 		server.reportMgr = rm
@@ -372,14 +374,47 @@ func (srv *Server) GetReportListForReportManager(filters *reporting.ListFilters,
 	total := len(reportIDs.Ids)
 	resp := reporting.ReportListForReportManagerResponse{}
 
-	for idx := total - 1; idx >= 0; idx-- {
-		//for idx, reportID := range reportIDs.Ids {
-		//cur, err := srv.es.GetReportManagerRequest(reportID, formattedFilters)
-		cur, err := srv.es.GetReportManagerRequest(reportIDs.Ids[idx], formattedFilters)
-		if err != nil {
-			return fmt.Errorf("failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs.Ids[idx], err)
+	cReportRequest := make(chan ReportManagerChan)
+	cErr := make(chan ReportManagerErrorChan)
+	respMap := make(map[int]ReportManagerChan)
+	errsMap := make(map[int]ReportManagerErrorChan)
+
+	fetchInterval := srv.lcr_open_search_requests
+	for i := 0; i < total; i = i + fetchInterval {
+		count := 0
+		if i+fetchInterval < total {
+			count = fetchInterval
+		} else {
+			count = total - i
 		}
-		resp.Reports = append(resp.Reports, cur)
+		logrus.Infof("fetching %d - %d reports of total %d", i+0, i+count-1, total)
+		for idx := 0; idx < count; idx++ {
+			go srv.getReportManagerReqForNode(i+idx, reportIDs.Ids[i+idx], formattedFilters, cReportRequest, cErr)
+		}
+
+		for idx := 0; idx < count; idx++ {
+			select {
+			case cResponse := <-cReportRequest:
+				respMap[cResponse.index] = cResponse
+			case errorResponse := <-cErr:
+				errsMap[errorResponse.index] = errorResponse
+			}
+		}
+	}
+
+	if len(errsMap) > 0 {
+		var errString string
+		for key, value := range errsMap {
+			errString = fmt.Sprintf("%s.\n failed to retrieve report %d/%d with ID %s . Error: %s", errString, key, total, value.reportID, value.err.Error())
+		}
+		//return responseID, fmt.Errorf(errString)
+		return status.Errorf(codes.Internal, errString)
+	}
+
+	for idx := 0; idx < total; idx++ {
+		if result, ok := respMap[idx]; ok {
+			resp.Reports = append(resp.Reports, result.reportResp)
+		}
 	}
 
 	//return &resp, nil
@@ -407,6 +442,40 @@ func (srv *Server) GetReportListForReportManager(filters *reporting.ListFilters,
 		}
 	}
 	return nil
+}
+
+type ReportManagerChan struct {
+	index      int
+	reportID   string
+	reportResp *reporting.ReportResponse
+}
+
+type ReportManagerErrorChan struct {
+	index    int
+	reportID string
+	err      error
+}
+
+func (srv *Server) getReportManagerReqForNode(index int, reportID string,
+	formattedFilters map[string][]string, respChan chan ReportManagerChan,
+	cErr chan ReportManagerErrorChan) {
+
+	cur, err := srv.es.GetReportManagerRequest(reportID, formattedFilters)
+	if err != nil {
+		errResp := ReportManagerErrorChan{
+			index:    index,
+			reportID: reportID,
+			err:      err,
+		}
+		cErr <- errResp
+		return
+	}
+	resp := ReportManagerChan{
+		index:      index,
+		reportID:   reportID,
+		reportResp: cur,
+	}
+	respChan <- resp
 }
 
 func validateReportQueryParams(formattedFilters map[string][]string) error {
@@ -678,7 +747,6 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 	}
 
 	//convert es report to ingest report format
-
 	resp := ingest.Report{
 		Version: report.Version,
 		Platform: &inspec.Platform{

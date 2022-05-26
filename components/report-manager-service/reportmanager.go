@@ -134,7 +134,8 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 		server.New(objStoreClient, cerealManager, conf, db, complianceReportingClient))
 
 	//Initiate the cereal manager with 2 workers
-	err = worker.InitCerealManager(cerealManager, 2, db, objStoreClient, conf.ObjStore.BucketName, complianceReportingClient)
+	err = worker.InitCerealManager(cerealManager, 2, db, objStoreClient, conf.ObjStore.BucketName,
+		conf.Minio.ConcurrentMinioRequests, complianceReportingClient)
 	if err != nil {
 		logrus.Fatalf("failed to initiate cereal manager: %v", err)
 	}

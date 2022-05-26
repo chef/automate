@@ -210,7 +210,8 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
-	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient))
+	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient,
+		conf.Service.LcrOpenSearchRequests))
 
 	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv)
 	profiles.RegisterProfilesServiceServer(s, ps)

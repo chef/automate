@@ -42,6 +42,8 @@ message ConfigRequest {
 				google.protobuf.StringValue root_password = 3;
 				google.protobuf.BoolValue enable_ssl = 4;
 				google.protobuf.StringValue cert = 5;
+				google.protobuf.Int32Value concurrent_open_search_requests = 6;
+				google.protobuf.Int32Value concurrent_minio_requests = 7;
 			}
 		}
 

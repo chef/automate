@@ -24,3 +24,5 @@ bucket = "default"
 
 [minio]
 enable_ssl = false
+concurrent_open_search_requests = 50
+concurrent_minio_requests = 10
