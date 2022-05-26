@@ -156,6 +156,7 @@ export class InfraNodeEffects {
   updateNodeEnvironmentSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(NodeActionTypes.UPDATE_ENVIRONMENT_SUCCESS),
+      // eslint-disable-next-line no-empty-pattern
       map(({ }: UpdateNodeEnvironmentSuccess) => new CreateNotification({
         type: Type.info,
         message: 'Successfully updated node environment.'
