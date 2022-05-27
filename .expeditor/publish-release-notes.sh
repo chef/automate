@@ -5,9 +5,9 @@ set -eou pipefail
 source_channel=$EXPEDITOR_PROMOTABLE
 
 # Download the manifest
-aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest.json" manifest.json --profile chef-cd
+aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manifest_semver.json" manifest.json --profile chef-cd
 
-build_version=$(jq -r -c ".build"  manifest.json)
+build_version=$(jq -r -c ".version"  manifest.json)
 
 git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/chef/automate.wiki.git"
 
@@ -18,6 +18,17 @@ pushd ./automate.wiki
 
   # Reset "Pending Release Notes" wiki page
   cat >./Pending-Release-Notes.md <<EOH
+## Upgrade Journey
+
+Chef lets you choose your **upgrade journey** based on your current version of Chef Automate. You can do all the version upgrades manually.
+
+| Your Current Version | Upgrade To |
+| -------------------- | ---------- |
+| Any version before 20220329091442| 20220329091442|
+| 20220329091442| 3.0.x|
+
+Click [here](/automate/major_upgrade/) to know more.
+
 ## New Features
 -
 
@@ -44,7 +55,8 @@ pushd ./automate.wiki
 ### Security Updates
 (examples: dependency updates, CVE fixes)
 -
-## Chef Product Versions
+
+## Chef Packaged Product Versions
 
 This release uses:
 - Chef Habitat version:
@@ -56,11 +68,11 @@ This release uses:
 
 This release uses:
 - Postgres:
-- ElasticSearch:
+- OpenSearch:
 - Nginx:
 - Haproxy:
 
-View the [package manifest](https://packages.chef.io/manifests/current/automate/latest.json) for the latest release.
+View the [package manifest](https://packages.chef.io/manifests/current/automate/latest_semver.json) for the latest release.
 
 EOH
 

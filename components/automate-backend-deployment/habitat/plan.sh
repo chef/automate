@@ -63,7 +63,7 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../test $pkg_prefix/workspace/
 
   build_line "Copying inspec"
-  cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/workspace/inspec/
+  cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-opensearch-smoke $pkg_prefix/workspace/inspec/
   cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/workspace/inspec/
   cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/workspace/inspec/
   cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/workspace/inspec/
@@ -87,8 +87,14 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../certs $pkg_prefix/workspace/ 
   cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/deployment-makefile/Makefile $pkg_prefix/workspace/
   cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/How-to-destroy-infra.md $pkg_prefix/workspace/terraform/
-  cp -r $PLAN_CONTEXT/.terraform $pkg_prefix/workspace/terraform/.terraform
-  cp -r $PLAN_CONTEXT/.terraform.lock.hcl $pkg_prefix/workspace/terraform/
+
+  # terraform dependecies
+  build_line "building dependencies"
+  cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/dependencies.tf $pkg_prefix/workspace/terraform/
+  pushd $pkg_prefix/workspace/terraform/
+  terraform init
+  rm -f dependencies.tf
+  popd
 
   # make sure no state is copied over
   rm -f $pkg_prefix/workspace/terraform/*.tfstate

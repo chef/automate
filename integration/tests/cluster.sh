@@ -87,6 +87,7 @@ do_test_deploy() {
     frontend2_ip=$(container_ip "$_frontend2_container_name")
 
     export ELASTICSEARCH_URL="http://$frontend1_ip:10144"
+    export OPENSEARCH_URL="http://$frontend1_ip:10144"
     test_notifications_endpoint="http://$test_container_ip:15555"
 
     # The backend will timeout pg connections after 5 minutes, which will

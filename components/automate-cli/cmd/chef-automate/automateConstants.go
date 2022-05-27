@@ -29,12 +29,8 @@ backend_aib_local_file = "{{ .backendBundleFile }}"
 const AUTOMATE_HA_PKG_PG_LDR_CHK = "automate-ha-pgleaderchk"
 const AUTOMATE_HA_PKG_PG = "automate-ha-postgresql"
 const AUTOMATE_HA_PKG_HA_PROXY = "automate-ha-haproxy"
-const AUTOMATE_HA_PKG_JOURNALBEAT = "automate-ha-journalbeat"
-const AUTOMATE_HA_PKG_METRICBEAT = "automate-ha-metricbeat"
-const AUTOMATE_HA_PKG_KIBANA = "automate-ha-kibana"
-const AUTOMATE_HA_ES = "automate-ha-elasticsearch"
+const AUTOMATE_HA_OS = "automate-ha-opensearch"
 const AUTOMATE_HA_ES_CAR = "automate-ha-elasticsidecar"
-const AUTOMATE_HA_CURATOR = "automate-ha-curator"
 
 const ORIGIN_PATTERN = `[a-zA-z0-9]*`
 const PACKAGE_NAME_PATTERN = `-[a-zA-Z0-9]*-.*-\d+\.`

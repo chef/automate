@@ -15,7 +15,9 @@ import (
 	"github.com/chef/automate/lib/tls/certs"
 )
 
-type HelloServer struct{}
+type HelloServer struct {
+	pb.UnimplementedGreeterServer
+}
 
 // SayHello implements helloworld.GreeterServer
 func (s *HelloServer) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {

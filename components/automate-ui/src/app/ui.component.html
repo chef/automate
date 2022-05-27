@@ -19,7 +19,6 @@
   
   <!-- App Header -->
   <div id="app-header-wrapper" [hidden]="!layoutFacade.layout.header.display">
-    <app-warning-banner *ngIf="showBanner"></app-warning-banner>
     <app-license-notifications (triggerApplyLicense)="licenseApplyModal.openModal();"></app-license-notifications>
     <app-navbar></app-navbar>
   </div>
@@ -34,6 +33,7 @@
         <app-chef-notifications></app-chef-notifications>
       </div>
       <chef-loading-spinner [hidden]="!(layoutFacade.showPageLoading$ | async)" size='50' fixed></chef-loading-spinner>
+      <app-warning-banner *ngIf="showBanner" (close)="closeBanner()"></app-warning-banner>
       <router-outlet></router-outlet>
     </div>
     <!-- App Sidebar -->

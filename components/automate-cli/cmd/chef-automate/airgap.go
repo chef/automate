@@ -28,19 +28,13 @@ type airgapFlags struct {
 	hartsOnly      bool
 	retries        int
 	retryDelay     int
+	versionsPath   string
 }
 
 func (f airgapFlags) validateArgs() error {
-	if f.manifestPath != "" && f.channel != "" {
-		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a manifest.json and a release channel")
-	}
 
 	if f.manifestPath != "" && f.version != "" {
 		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a manifest.json and a version")
-	}
-
-	if f.channel != "" && f.version != "" {
-		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a channel and a version")
 	}
 
 	if f.hartifactsPath != "" && f.overrideOrigin == "" {
@@ -120,10 +114,16 @@ func newAirgapCmd() *cobra.Command {
 		"Chef Automate version to create an airgap bundle for",
 	)
 
+	bundleCreateCmd.PersistentFlags().StringVar(
+		&airgapCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
 	if !isDevMode() {
 		for _, flagName := range []string{
 			"override-origin",
 			"hartifacts",
+			"versions-file",
 		} {
 			err := bundleCreateCmd.PersistentFlags().MarkHidden(flagName)
 			if err != nil {
@@ -239,6 +239,10 @@ func runAirgapCreateInstallBundle(cmd *cobra.Command, args []string) error {
 				airgapCmdFlags.overrideOrigin,
 			),
 		)
+	}
+
+	if airgapCmdFlags.versionsPath != "" {
+		opts = append(opts, airgap.WithInstallBundleVersionsPath(airgapCmdFlags.versionsPath))
 	}
 
 	if len(args) > 0 && args[0] != "" {

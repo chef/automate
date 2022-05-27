@@ -498,6 +498,32 @@ steps:
         linux:
           privileged: true
 
+  - label: "v2 to v3 upgrade"
+    command:
+      - integration/run_test integration/tests/v2_to_v3_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+  
+  - label: "v3 to v4 upgrade"
+    command:
+      - integration/run_test integration/tests/v3_to_v4_upgrade.sh
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
   - label: "iam v1 to v2 force-upgrade"
     command:
       - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
@@ -563,25 +589,25 @@ steps:
         linux:
           privileged: true
 
-  - label: "a1migration"
-    command:
-      - integration/run_test integration/tests/a1migration.sh
-    timeout_in_minutes: 30
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
+#  - label: "a1migration"
+#    command:
+#      - integration/run_test integration/tests/a1migration.sh
+#    timeout_in_minutes: 30
+#    expeditor:
+#      executor:
+#        linux:
+#          single-use: true
+#          privileged: true
 
-  - label: "airgap a1migration"
-    command:
-      - integration/run_test integration/tests/airgap_a1migration.sh
-    timeout_in_minutes: 25
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
+#  - label: "airgap a1migration"
+#    command:
+#      - integration/run_test integration/tests/airgap_a1migration.sh
+#    timeout_in_minutes: 25
+#    expeditor:
+#      executor:
+#        linux:
+#          single-use: true
+#          privileged: true
 
   - label: "product"
     command:
@@ -622,7 +648,7 @@ steps:
   - label: "airgap ow upgrade"
     command:
       - integration/run_test integration/tests/airgap_ow_upgrade.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       executor:
         linux:
@@ -630,7 +656,7 @@ steps:
   - label: "airgap backup"
     command:
       - integration/run_test integration/tests/airgap_backup.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       executor:
         linux:
@@ -802,7 +828,7 @@ steps:
   - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       secrets:
         A2_LICENSE:
@@ -853,7 +879,7 @@ steps:
   - label: "builder smoke"
     command:
       - integration/run_test integration/tests/bldr_smoke.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       secrets:
         A2_LICENSE:

@@ -47,3 +47,4 @@ do_install() {
   build_line "Copying migration files"
   cp -r migration/sql "${pkg_prefix}/migrations"
 }
+

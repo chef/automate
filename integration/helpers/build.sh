@@ -38,8 +38,13 @@ build_tools() {
 
 create_manifest() {
     local dst="$1"
+    OLD_VERSION=$(cat VERSION)
+    IFS=. read -r major minor patch <<<"$OLD_VERSION"
+    ((patch++))
+    VERSION="$major"."$minor"."$patch"
+    export VERSION
     ALLOW_LOCAL_PACKAGES=true "$(a2_root_dir)/.expeditor/create-manifest.rb"
-    mv manifest.json "$dst"
+    mv "$VERSION".json "$dst"
 }
 
 copy_hartifacts() {

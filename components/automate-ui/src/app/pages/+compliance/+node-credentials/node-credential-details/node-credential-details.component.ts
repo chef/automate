@@ -14,6 +14,7 @@ import { credentialFromRoute, getStatus } from 'app/entities/node-credentials/no
 import { updateStatus } from 'app/entities/node-credentials/node-credential.selectors';
 import { NodeCredential, SaveNodeCredential, NodeObject } from 'app/entities/node-credentials/node-credential.model';
 import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type NodeCredentialTabName = 'details' | 'reset';
 
@@ -48,7 +49,8 @@ export class NodeCredentialDetailsScreenComponent implements OnInit, OnDestroy {
     public saveCred: SaveNodeCredential,
     private fb: FormBuilder,
     private router: Router,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.sshForms = this.fb.group({
       username: ['', Validators.required],
@@ -165,10 +167,12 @@ export class NodeCredentialDetailsScreenComponent implements OnInit, OnDestroy {
       this.saveSuccessful = false;
       this.saveInProgress = true;
       this.nodeCredential.name = data.name;
+      this.telemetryService.track('Settings_NodeCredentials_Details_Save');
     } else {
       this.resetSuccessful = false;
       this.resetInProgress = true;
       this.nodeCredential = this.saveCred.getNodeCredentialCreate(data);
+      this.telemetryService.track('Settings_NodeCredentials_ResetCredentials_Save');
     }
     if (!this.checkError(
         'password',

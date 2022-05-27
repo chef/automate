@@ -1,10 +1,10 @@
 variable "automate_archive_disk_fs_path" {
 }
 
-variable "elasticsearch_archive_disk_fs_path" {
+variable "instance_count" {
 }
 
-variable "instance_count" {
+variable "opensearch_archive_disk_fs_path" {
 }
 
 variable "postgresql_archive_disk_fs_path" {
@@ -33,5 +33,5 @@ variable "sudo_cmd" {
 }
 
 variable "tmp_path" {
-  default = "/var/tmp"
+  default = "/var/automate-ha"
 }

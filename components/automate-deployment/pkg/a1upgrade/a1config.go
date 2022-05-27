@@ -22,7 +22,7 @@ type DeliveryRunning struct {
 			S3SSECustomerKey       string `json:"sse_customer_key"`
 			S3SSECustomerKeyMD5    string `json:"sse_customer_key_md5"`
 			S3SSEKMSKeyID          string `json:"ssekms_key_id"`
-			Elasticsearch          struct {
+			Opensearch             struct {
 				S3AccessKeyID          string `json:"access_key_id"`
 				S3Bucket               string `json:"bucket"`
 				S3Region               string `json:"region"`
@@ -30,7 +30,7 @@ type DeliveryRunning struct {
 				S3ServerSideEncryption string `json:"server_side_encryption"`
 				Location               string `json:"location"`
 				Type                   string `json:"type"`
-			} `json:"elasticsearch"`
+			} `json:"opensearch"`
 			Location  string `json:"location"`
 			Type      string `json:"type"`
 			Retention struct {
@@ -80,8 +80,8 @@ type DeliveryRunning struct {
 			SecretsKey        string                       `json:"secrets_key"`
 			ErlCookie         string                       `json:"erl_cookie"`
 		} `json:"delivery"`
-		Elasticsearch DeliveryRunningElasticsearch `json:"elasticsearch"`
-		FIPS          struct {
+		Opensearch DeliveryRunningOpensearch `json:"opensearch"`
+		FIPS       struct {
 			Enabled bool `json:"enable"`
 		} `json:"fips"`
 		Nginx struct {
@@ -140,7 +140,7 @@ type DeliveryRunning struct {
 	} `json:"delivery"`
 }
 
-type DeliveryRunningElasticsearch struct {
+type DeliveryRunningOpensearch struct {
 	ClusterURLS     []string    `json:"urls"`
 	MaxOpenFiles    json.Number `json:"max_open_files"`
 	MaxMapCount     json.Number `json:"max_map_count"`

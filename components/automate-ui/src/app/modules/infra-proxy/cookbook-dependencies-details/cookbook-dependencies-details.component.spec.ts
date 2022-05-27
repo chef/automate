@@ -10,6 +10,11 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { CookbookDetailsRequests } from 'app/entities/cookbooks/cookbook-details.requests';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('CookbookDependenciesDetailsComponent', () => {
   let component: CookbookDependenciesDetailsComponent;
@@ -44,7 +49,8 @@ describe('CookbookDependenciesDetailsComponent', () => {
         FeatureFlagsService,
         CookbookDetailsRequests,
         HttpClient,
-        HttpHandler
+        HttpHandler,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         FormsModule,

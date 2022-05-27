@@ -50,3 +50,5 @@ do_install() {
   build_line "Copying migration files"
   cp -r tokens/pg/sql "${pkg_prefix}/migrations"
 }
+
+

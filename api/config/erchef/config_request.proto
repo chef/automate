@@ -62,6 +62,8 @@ message ConfigRequest {
 				google.protobuf.StringValue base_resource_url = 4;
 				google.protobuf.BoolValue strict_search_result_acls = 5;
 				google.protobuf.StringValue actions_fqdn = 6;
+				google.protobuf.BoolValue cbv_cache_enabled = 7;
+				google.protobuf.Int32Value cbv_cache_item_ttl = 8;
 			}
 
 			message Indexing {
@@ -75,6 +77,10 @@ message ConfigRequest {
 				google.protobuf.Int32Value pool_queue_max = 8;
 				google.protobuf.Int32Value batch_size = 9;
 				google.protobuf.Int32Value batch_max_wait = 10;
+				google.protobuf.StringValue search_provider = 11;
+				google.protobuf.StringValue search_queue_mode = 12;
+				google.protobuf.StringValue search_auth_username = 13;
+				google.protobuf.StringValue search_auth_password = 14;
 			}
 
 			message Authz {

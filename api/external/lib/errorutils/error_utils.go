@@ -6,11 +6,11 @@ import (
 	"net"
 
 	"github.com/lib/pq"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 // ProcessSQLNotFound checks for err of type sql.ErrNoRows and returns NotFoundError if true,

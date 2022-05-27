@@ -15,6 +15,14 @@ exit 0
 #
 # We return CRITICAL if we can't connect as well as if the server is
 # rejecting connections (not yet ready).
+export PGPORT="5432"
+export PGHOST="0.0.0.0"
+export PGUSER="automate"
+export PGDATABASE="postgres"
+export PGSSLMODE="verify-ca"
+export PGSSLCERT="/hab/svc/automate-postgresql/config/server.crt"
+export PGSSLKEY="/hab/svc/automate-postgresql/config/server.key"
+export PGSSLROOTCERT="/hab/svc/automate-postgresql/config/root.crt"
 
 { pg_isready --port {{cfg.service.port}} --dbname postgres --username {{cfg.superuser.name}} --quiet; err="$?"; } || true
 case "$err" in

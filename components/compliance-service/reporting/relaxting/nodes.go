@@ -7,13 +7,12 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
-
 	"github.com/chef/automate/api/external/lib/errorutils"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting"
+	elastic "github.com/olivere/elastic/v7"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type ProfileSource struct {
@@ -111,11 +110,11 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 	}
 	nodes := make([]*reportingapi.Node, 0)
 	// extract node information from ESInSpecSummary into Node
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			var item ESInSpecSummary
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &item)
+				err := json.Unmarshal(hit.Source, &item)
 				if err == nil {
 					// read all profiles
 					profiles := make([]*reportingapi.ProfileMeta, 0)
@@ -282,11 +281,11 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 	LogQueryPartMin(esIndex, searchResult.Hits, "GetNode - search results hits")
 
 	// we should only receive one value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			var item ESInSpecReport
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &item)
+				err := json.Unmarshal(hit.Source, &item)
 				if err == nil {
 					// read all profiles
 					profiles := make([]*reportingapi.ProfileMeta, 0)

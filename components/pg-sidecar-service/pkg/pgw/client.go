@@ -594,7 +594,6 @@ func (client *Client) DeploySqitch(db, dir, user string) error {
 	sqitchArgs := command.Args(
 		"--quiet",
 		"--top-dir", dir,
-		"--engine", "pg",
 		"deploy",
 		sqitchPGURI,
 	)

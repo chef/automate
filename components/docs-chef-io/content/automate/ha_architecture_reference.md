@@ -166,4 +166,4 @@ This component is used in a proxy health check to determine where to route SQL r
 
 ### Automate-ha-postgresql
 
-This component is a wrapper package of *core/postgresql11* for Chef Automate that provides a backend **HA PostgreSQL**.
+This component is a wrapper package of *core/postgresql13* for Chef Automate that provides a backend **HA PostgreSQL**.

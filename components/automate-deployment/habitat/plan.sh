@@ -14,7 +14,7 @@ pkg_deps=(
   # list without careful thought. The ordering of dependencies in this
   # list determines the order in which our PATH is constructed at
   # runtime by Habitat.
-  #
+  # 
   # IF YOU UPDATE THIS PIN YOU MUST ALSO UPDATE .expeditor/create-manifest.rb
   core/hab/1.6.181/20201030172917
   core/net-tools
@@ -29,10 +29,11 @@ pkg_deps=(
   core/rsync
   core/tar
   chef/mlsa
-  # deployment-service uses the postgres11 client to backup/restore postgres.
+  # deployment-service uses the postgres11 client to backup/restore postgresql.
   # we need pg11 because the ha backend uses postgres 11
   core/postgresql13-client
 )
+
 pkg_bin_dirs=(bin)
 pkg_exports=(
   [port]=service.port
@@ -50,3 +51,4 @@ scaffolding_go_binary_list=(
 do_strip() {
   return 0
 }
+

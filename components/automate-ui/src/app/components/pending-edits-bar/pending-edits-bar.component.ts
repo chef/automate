@@ -11,6 +11,7 @@ import { Project } from 'app/entities/projects/project.model';
 import { allProjects } from 'app/entities/projects/project.selectors';
 import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
 import { allPerms } from 'app/entities/userperms/userperms.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-pending-edits-bar',
@@ -29,7 +30,8 @@ export class PendingEditsBarComponent implements OnDestroy {
   constructor(
     public layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
-    public projects: ProjectService
+    public projects: ProjectService,
+    private telemetryService: TelemetryService
   ) {
     this.projects.getApplyRulesStatus();
 
@@ -90,6 +92,7 @@ export class PendingEditsBarComponent implements OnDestroy {
       .subscribe(() => {
         this.projects.getApplyRulesStatus();
       });
+    this.telemetryService.track('Settings_Projects_UpdateProjects');
   }
 
   public cancelApplyStart(): void {

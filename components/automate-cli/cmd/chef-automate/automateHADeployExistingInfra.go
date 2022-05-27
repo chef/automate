@@ -20,7 +20,7 @@ func newExistingInfa(configPath string) *existingInfra {
 }
 
 func (e *existingInfra) doDeployWork(args []string) error {
-	var err = bootstrapEnv(e)
+	var err = bootstrapEnv(e, deployCmdFlags.airgap)
 	if err != nil {
 		return err
 	}
@@ -87,8 +87,8 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.ChefServer.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty chef-server instance_count")
 	}
-	if len(e.config.Elasticsearch.Config.InstanceCount) < 1 {
-		errorList.PushBack("Invalid or empty elastic-search instance_count")
+	if len(e.config.Opensearch.Config.InstanceCount) < 1 {
+		errorList.PushBack("Invalid or empty open-search instance_count")
 	}
 	if len(e.config.Postgresql.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty postgres-sql instance_count")
@@ -101,12 +101,9 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.ExistingInfra.Config.ChefServerPrivateIps) < 1 {
 		errorList.PushBack("Invalid or empty chef_server_private_ips")
 	}
-	if len(e.config.ExistingInfra.Config.ElasticsearchIps) < 1 {
-		errorList.PushBack("Invalid or empty elasticsearch_ips")
-	}
 
-	if len(e.config.ExistingInfra.Config.ElasticsearchPrivateIps) < 1 {
-		errorList.PushBack("Invalid or empty elasticsearch_private_ips")
+	if len(e.config.ExistingInfra.Config.OpensearchPrivateIps) < 1 {
+		errorList.PushBack("Invalid or empty opensearch_private_ips")
 	}
 
 	if len(e.config.ExistingInfra.Config.PostgresqlPrivateIps) < 1 {
@@ -132,15 +129,9 @@ func (e *existingInfra) validateIPs() *list.List {
 		}
 	}
 
-	for _, element := range e.config.ExistingInfra.Config.ElasticsearchIps {
+	for _, element := range e.config.ExistingInfra.Config.OpensearchPrivateIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("elastic search Ip " + element + notValidErrorString)
-		}
-	}
-
-	for _, element := range e.config.ExistingInfra.Config.ElasticsearchPrivateIps {
-		if checkIPAddress(element) != nil {
-			errorList.PushBack("elastic search private Ip " + element + notValidErrorString)
+			errorList.PushBack("open search private Ip " + element + notValidErrorString)
 		}
 	}
 

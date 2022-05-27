@@ -17,6 +17,7 @@ import {
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
@@ -40,7 +41,8 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.updateForm = fb.group({
       // Must stay in sync with error checks in api-token-details.component.html
@@ -101,6 +103,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
     const projects: string[] = this.updateForm.controls.projects.value;
     this.store.dispatch(new UpdateToken({...this.token, name, active, projects }));
+    this.telemetryService.track('Settings_APItokens_Details_Save');
   }
 
   public get nameCtrl(): FormControl {

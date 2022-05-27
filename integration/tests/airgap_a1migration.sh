@@ -16,6 +16,7 @@ export A1_BUILDER_PASSWORD="migrated-builder-password"
 
 do_build() {
     do_build_default
+    prepare_upgrade_milestone "current" "20220329091442"
     set_test_manifest "build.json"
     log_info "Installing harts"
     # We need to make sure the harts are installed so that the bundle creation works
@@ -25,12 +26,15 @@ do_build() {
         hab pkg install "${test_hartifacts_path}"/*.hart
     fi
 
+    set_version_file
+
     log_info "Creating airgap bundle"
     #shellcheck disable=SC2154
     chef-automate airgap bundle create \
         --manifest "${test_manifest_path}" \
         --hartifacts "${test_hartifacts_path}" \
         --override-origin "$HAB_ORIGIN" \
+        --versions-file "$versionsFile" \
         bundle.aib
 
     sync_a1_migration_data

@@ -8,9 +8,9 @@ error() {
 # typical usage (inside hab studio) -- supply your username to the script:
 #     [19][default:/src:0]#  CHEF_USERNAME=msorens ./scripts/get_secrets.sh
 
-export VAULT_ADDR=${VAULT_ADDR:-https://vault.es.chef.co}
+export VAULT_ADDR=${VAULT_ADDR:-https://vault.ps.chef.co}
 export VAULT_CACERT=""
-export VAULT_NAMESPACE=releng
+export VAULT_NAMESPACE=root
 CHEF_USERNAME=${CHEF_USERNAME:-unknown}
 STUDIO_TYPE=${STUDIO_TYPE:-none}
 

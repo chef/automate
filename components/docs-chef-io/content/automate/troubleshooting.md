@@ -56,7 +56,7 @@ Chef Automate disables disk writes if available disk space drops below 250 MB an
 ingest-service.default(O): time="2018-05-16T00:10:09Z" level=error msg="Message failure" error="rpc error: code = Internal desc = elastic: Error 403 (Forbidden): blocked by: [FORBIDDEN/12/index read-only / allow delete (api)]; [type=cluster_block_exception] elastic: Error 403 (Forbidden): blocked by: [FORBIDDEN/12/index read-only / allow delete (api)]; [type=cluster_block_exception]"
 ```
 
-After freeing up disk space, you will need to remove the write block on the Elasticsearch indices by running:
+After freeing up disk space, you will need to remove the write block on the Opensearch indices by running:
 
 ```bash
 curl -X PUT "localhost:10141/_all/_settings" -H 'Content-Type: application/json' -d'
@@ -103,3 +103,21 @@ To see what exactly will happen in your system, pass `--dry-run`:
 ```bash
 chef-automate iam admin-access restore NEW_PASSWORD --dry-run
 ```
+
+## Issue: Increase in Data collector API failure
+
+### Details:
+
+Possible reason of failures in data collector API could be due to change in the use case we are running.
+
+This can be due to the following reasons:
+
+- Increase in frequency of scan
+- Number of controls have changed
+- Increase in number of nodes
+
+
+### Possible fixes:
+
+- Changing heap size. Heap size should not be more than 70% of the RAM
+- Upgrading machine to improve performance

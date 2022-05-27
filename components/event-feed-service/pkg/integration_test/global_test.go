@@ -10,8 +10,8 @@ import (
 
 // Global variables
 var (
-	// The elasticsearch URL comes from the environment variable ELASTICSEARCH_URL
-	elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
+	// The opensearch URL comes from the environment variable OPENSEARCH_URL
+	opensearchUrl = os.Getenv("OPENSEARCH_URL")
 
 	// Suite variable is available to all tests that
 	// belong to the 'integration_test' package
@@ -32,9 +32,9 @@ func GetTestSuite() *Suite {
 //
 // => Docs: https://golang.org/pkg/testing/#hdr-Main
 func TestMain(m *testing.M) {
-	log.Infof("ELASTIC URL is: %s", elasticsearchUrl)
+	log.Infof("OpenSearch URL is: %s", opensearchUrl)
 	var err error
-	testSuite, err = NewSuite(elasticsearchUrl)
+	testSuite, err = NewSuite(opensearchUrl)
 	if err != nil {
 		log.WithError(err).Error("initializing test suite")
 		os.Exit(3)

@@ -11,12 +11,12 @@ GOLANGCILINTVERSION=1.26.0
 unset SSL_CERT_FILE
 
 # TODO (tc) Let's get rid of this hard-coded config long-term.
-# Elasticsearch
+# Opensearch
 # TODO (tc) This should be https once certs are added, at which point
 # the HTTP calls in the mocha tests that talk to ES in ingest-service
 # will need to be updated to pass certs along.
 export ES_VERSION=5.6.4
-export ELASTICSEARCH_URL="http://localhost:10141"
+export OPENSEARCH_URL="http://localhost:10144"
 export POSTGRESQL_URL="localhost:5432"
 # Ingest
 export INGEST_URL="https://localhost:10122"
@@ -240,7 +240,7 @@ generate_netrc_config
 
 # Prepare the environment to run our services
 prepare_system() {
-  # These are needed for elasticsearch
+  # These are needed for opensearch
   mount --bind / / > /dev/null
   install_if_missing core/busybox-static sysctl > /dev/null
   sysctl -w net.ipv6.conf.all.disable_ipv6=1 > /dev/null

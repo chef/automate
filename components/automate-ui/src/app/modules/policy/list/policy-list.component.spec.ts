@@ -7,6 +7,11 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { PolicyListComponent } from './policy-list.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('PolicyListComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -39,7 +44,8 @@ describe('PolicyListComponent', () => {
         PolicyListComponent
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         ChefPipesModule,

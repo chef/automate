@@ -35,6 +35,7 @@ import (
 	"github.com/chef/automate/components/session-service/oidc"
 	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	util "github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
@@ -203,6 +204,10 @@ func initStore(pgDB *sql.DB) (scs.Store, error) {
 
 func (s *Server) initHandlers() {
 	r := mux.NewRouter()
+
+	//Middleware intercepter for HSTS
+	r.Use(httputils.HSTSMiddleware)
+
 	r.HandleFunc("/health", s.healthHandler).Methods("GET")
 	r.HandleFunc("/new", s.newHandler).Methods("GET")
 	r.HandleFunc("/refresh", s.refreshHandler).

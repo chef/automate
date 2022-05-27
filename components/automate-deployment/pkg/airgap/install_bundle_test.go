@@ -3,8 +3,11 @@ package airgap
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path"
 	"testing"
@@ -61,6 +64,16 @@ func (p *createProgressCollector) DownloadComplete(name string, wasCached bool) 
 func (p *createProgressCollector) RetriableDownloadError(_ string, _ string, _ time.Duration) {}
 
 func TestRoundTrip(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := []string{
+			"20180611145500",
+			"20180611145755",
+		}
+		bytes, _ := json.Marshal(resp)
+		w.Write(bytes)
+	}))
+	defer ts.Close()
+
 	tmpdir, err := ioutil.TempDir("", "a2-install-bundle-test")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpdir)
@@ -79,7 +92,10 @@ func TestRoundTrip(t *testing.T) {
 		WithInstallBundleManifestFile(manifestFile),
 		WithInstallBundleWorkspacePath(workspaceDir),
 		WithInstallBundleOutputPath(outputFile),
+		WithInstallBundleVersionsPath(""),
 	)
+	creator.optionalURL = ts.URL //mocking for GetMinimumCurrentManifestVersion.
+
 	_, err = creator.Create(progress)
 	require.NoError(t, err)
 
@@ -121,7 +137,7 @@ func TestRoundTrip(t *testing.T) {
 	assert.Equal(t, "", metadataHartsOnly.HabBinPath)
 
 	shasumsAutomate := map[string]string{
-		"0b9f27d820d54fef5a8418c0fc16ada222f65fc07eb5714dc7f898550f22707f": "hab/svc/deployment-service/data/airgap/manifest.json",
+		"92510240c6d0947519b4695b07e6845d7c8376f6737c0b9a65f53e0ce97fdf9c": "hab/svc/deployment-service/data/airgap/manifest.json",
 		"7d73666fd246819bd6925e7c50afeac6a6f27e2b3e970ea0e045855b7357536d": "hab/tmp/hab",
 	}
 

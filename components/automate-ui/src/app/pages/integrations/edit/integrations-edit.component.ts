@@ -23,6 +23,7 @@ import { managerFromRoute } from '../../../entities/managers/manager.selectors';
 import { UpdateManager } from '../../../entities/managers/manager.actions';
 import { Status } from './integrations-edit.reducer';
 import { integrationsEditState } from './integrations-edit.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations-edit',
@@ -41,7 +42,8 @@ export class IntegrationsEditComponent implements OnDestroy {
     private store: Store<NgrxStateAtom>,
     location: Location,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.createForm(fb);
@@ -149,6 +151,7 @@ export class IntegrationsEditComponent implements OnDestroy {
       instanceCredentials,
       ...isEmpty(credentialData) ? { credentialId: this.credentialId } : { credentialData }
     }));
+    this.telemetryService.track('Settings_NodeIntegrations_Edit');
   }
 
   getCredentials(formData) {

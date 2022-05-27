@@ -50,12 +50,6 @@ paths = [
   "components/automate-openjdk/*"
 ]
 
-[automate-elasticsearch]
-plan_path = "components/automate-elasticsearch"
-paths = [
-  "components/automate-elasticsearch/*"
-]
-
 [automate-postgresql]
 plan_path = "components/automate-postgresql"
 paths = [
@@ -191,6 +185,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
   "api/config/postgresql/*",
@@ -249,6 +244,7 @@ paths = [
   "lib/cereal/*",
   "lib/config/*",
   "lib/grpc/*",
+  "lib/httputils/*",
   "lib/io/*",
   "lib/license/*",
   "lib/platform/command/*",
@@ -393,6 +389,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
   "api/config/platform/*",
@@ -482,6 +479,7 @@ paths = [
   "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
+  "api/config/opensearch/*",
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
   "api/config/platform/*",
@@ -1121,22 +1119,10 @@ paths = [
   "lib/version/*"
 ]
 
-[automate-ha-elasticsearch]
-plan_path = "components/automate-backend-elasticsearch"
+[automate-ha-opensearch]
+plan_path = "components/automate-backend-opensearch"
 paths = [
-  "components/automate-backend-elasticsearch/*"
-]
-
-[automate-ha-metricbeat]
-plan_path = "components/automate-backend-metricbeat"
-paths = [
-  "components/automate-backend-metricbeat/*"
-]
-
-[automate-ha-journalbeat]
-plan_path = "components/automate-backend-journalbeat"
-paths = [
-  "components/automate-backend-journalbeat/*"
+  "components/automate-backend-opensearch/*"
 ]
 
 [automate-ha-haproxy]
@@ -1145,22 +1131,10 @@ paths = [
   "components/automate-backend-haproxy/*"
 ]
 
-[automate-ha-kibana]
-plan_path = "components/automate-backend-kibana"
-paths = [
-  "components/automate-backend-kibana/*"
-]
-
 [automate-ha-elasticsidecar]
 plan_path = "components/automate-backend-elasticsidecar"
 paths = [
   "components/automate-backend-elasticsidecar/*"
-]
-
-[automate-ha-curator]
-plan_path = "components/automate-backend-curator"
-paths = [
-  "components/automate-backend-curator/*"
 ]
 
 [automate-ha-postgresql]
@@ -1197,6 +1171,12 @@ paths = [
 plan_path = "components/automate-netcat"
 paths = [
   "components/automate-netcat/*"
+]
+
+[automate-opensearch]
+plan_path = "components/automate-opensearch"
+paths = [
+  "components/automate-opensearch/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

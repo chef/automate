@@ -6,10 +6,10 @@ SUP_KEY_SH = $(shell pwd)/../../scripts/sup-keys.sh
 TMPOUT = '/tmp/make.out'
 REPO_ROOT = $(shell pwd)
 DATESTAMP := $(shell date +"%Y%m%d%H%M%S")
-BUNDLEAIB = $(TERRAFORM_PATH)/transfer_files/bundle-$(DATESTAMP).aib
-BACKENDAIB = $(TERRAFORM_PATH)/transfer_files/backend-$(DATESTAMP).aib
+BUNDLEAIB = $(TERRAFORM_PATH)/transfer_files/bundle.aib
+BACKENDAIB = $(TERRAFORM_PATH)/transfer_files/backend.aib
 BACKENDAIB_TFVARS = $(shell pwd)/a2ha_aib_be.auto.tfvars
-FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend-$(DATESTAMP).aib
+FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend.aib
 FRONTENDAIB_TFVARS = $(shell pwd)/a2ha_aib_fe.auto.tfvars
 TMPFILE := $(shell mktemp)
 VARFILES := $(shell find $(TERRAFORM_PATH) -name variables.tf -o -name inputs.tf)
@@ -114,19 +114,15 @@ sort:
 
 $(BUNDLEAIB):
 	@echo "# Updating FE and BE component package versions" && \
-		$(AIRGAP_SH) -t all -o $(FRONTENDAIB) -b $(BACKENDAIB) -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)  && \
-	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 && \
-	  $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
+		$(AIRGAP_SH) -t all -o $(FRONTENDAIB) -b $(BACKENDAIB) -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)
 
 $(FRONTENDAIB):
 	@echo "# Updating FE component package versions: $(FRONTENDAIB_TFVARS)" && \
-		$(AIRGAP_SH) -t upgradefrontends -o $(FRONTENDAIB) -v $(FRONTENDAIB_TFVARS) && \
-	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 
+		$(AIRGAP_SH) -t upgradefrontends -o $(FRONTENDAIB) -v $(FRONTENDAIB_TFVARS) 
 
 $(BACKENDAIB):
 	@echo "# Updating BE component package versions: $(BACKENDAIB_TFVARS)" && \
-		$(AIRGAP_SH) -t upgradebackends -b $(BACKENDAIB) -q $(BACKENDAIB_TFVARS) && \
-	    $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
+		$(AIRGAP_SH) -t upgradebackends -b $(BACKENDAIB) -q $(BACKENDAIB_TFVARS)
 
 $(HABITAT_TFVARS):
 	@echo -e "# Generating habitat encryption keys in $(HABITAT_TFVARS)" && \

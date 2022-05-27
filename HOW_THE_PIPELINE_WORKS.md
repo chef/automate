@@ -1,4 +1,4 @@
-# Automate 2 Build and Test Pipeline
+# Automate Build and Test Pipeline
 
 This document describes the testing and build infrastructure for the
 Automate repository. The goal of this document is to provide a useful

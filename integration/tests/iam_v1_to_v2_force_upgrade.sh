@@ -49,3 +49,8 @@ do_deploy() {
         --skip-preflight \
         --debug
 }
+
+do_prepare_upgrade() {
+  # use latest current here
+  prepare_upgrade_milestone "current" "20220329091442"
+}

@@ -1,3 +1,0 @@
-{{toYaml cfg.kibana_yaml}}
-elasticsearch.username: {{bind.elasticsearch.first.cfg.admin_username}}
-elasticsearch.password: {{bind.elasticsearch.first.cfg.admin_password}}

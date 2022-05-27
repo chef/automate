@@ -21,6 +21,7 @@ import {
   getAllStatus as getAllRulesForProjectStatus,
   deleteStatus as deleteRuleStatus
 } from 'app/entities/rules/rule.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type ProjectTabName = 'rules' | 'details';
 
@@ -51,8 +52,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
-    private router: Router
-
+    private router: Router,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit(): void {
@@ -175,6 +176,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       id: this.ruleToDelete.id
     }));
     this.closeDeleteModal();
+    this.telemetryService.track('Settings_Projects_IngestRules_Delete');
   }
 
   getEditStatus(rule: Rule): string {
@@ -192,5 +194,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       id: this.project.id,
       name: this.projectForm.controls['name'].value.trim()
     }));
+    this.telemetryService.track('Settings_Projects_Details_Save');
   }
 }

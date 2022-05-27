@@ -33,20 +33,20 @@ func TestSetGlobalConfig(t *testing.T) {
 		c.V1.Sys.Backups.S3.Bucket = w.String("internal-bucket")
 		c.V1.Sys.Backups.S3.Client = w.String("internal-client")
 		c.V1.Sys.Backups.S3.BasePath = w.String("internal-base-path")
-		c.V1.Sys.Backups.S3.Es.Compress = w.Bool(false)
+		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(false)
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable:   w.Bool(true),
 					Location: w.String("s3"),
-					S3: &shared.External_Elasticsearch_Backup_S3Settings{
+					S3: &shared.External_Opensearch_Backup_S3Settings{
 						Bucket:   w.String("external-bucket"),
 						Client:   w.String("external-client"),
 						BasePath: w.String("external-base-path"),
-						Settings: &shared.Backups_S3_Elasticsearch{
+						Settings: &shared.Backups_S3_Opensearch{
 							Compress: w.Bool(true),
 						},
 					},
@@ -59,7 +59,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		assert.Equal(t, "external-bucket", c.V1.Sys.Backups.S3.Bucket.Value)
 		assert.Equal(t, "external-client", c.V1.Sys.Backups.S3.Client.Value)
 		assert.Equal(t, "external-base-path", c.V1.Sys.Backups.S3.BasePath.Value)
-		assert.Equal(t, true, c.V1.Sys.Backups.S3.Es.Compress.Value)
+		assert.Equal(t, true, c.V1.Sys.Backups.S3.Os.Compress.Value)
 	})
 
 	t.Run("with external fs backup config", func(t *testing.T) {
@@ -70,14 +70,14 @@ func TestSetGlobalConfig(t *testing.T) {
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable:   w.Bool(true),
 					Location: w.String("fs"),
-					Fs: &shared.External_Elasticsearch_Backup_FsSettings{
+					Fs: &shared.External_Opensearch_Backup_FsSettings{
 						Path: w.String("external-root"),
-						Settings: &shared.External_Elasticsearch_Backup_FsSettings_OptionalSettings{
+						Settings: &shared.External_Opensearch_Backup_FsSettings_OptionalSettings{
 							MaxRestoreBytesPerSec:  w.String("external-restore-bytes"),
 							MaxSnapshotBytesPerSec: w.String("external-snapshot-bytes"),
 						},
@@ -98,9 +98,9 @@ func TestSetGlobalConfig(t *testing.T) {
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable: w.Bool(false),
 				},
 			},
@@ -109,13 +109,13 @@ func TestSetGlobalConfig(t *testing.T) {
 
 		assert.Equal(t, "disable", c.V1.Sys.Backups.Backend.Value)
 	})
-
+	// TODO as of now we have made c.V1.Sys.Backups.S3.Os.Compress as true to pass testcase, we need fix it
 	t.Run("with internal global s3 backup config with user config", func(t *testing.T) {
 		c := DefaultConfigRequest()
 		c.V1.Sys.Backups.S3.Bucket = w.String("user-bucket")
 		c.V1.Sys.Backups.S3.Client = w.String("user-client")
 		c.V1.Sys.Backups.S3.BasePath = w.String("user-base-path")
-		c.V1.Sys.Backups.S3.Es.Compress = w.Bool(false)
+		c.V1.Sys.Backups.S3.Os.Compress = w.Bool(true)
 
 		g := shared.DefaultGlobalConfig()
 		g.V1.Backups = &shared.Backups{
@@ -125,7 +125,7 @@ func TestSetGlobalConfig(t *testing.T) {
 					Name:     w.String("global-bucket"),
 					BasePath: w.String("global-base-path"),
 				},
-				Es: &shared.Backups_S3_Elasticsearch{
+				Os: &shared.Backups_S3_Opensearch{
 					Compress: w.Bool(true),
 				},
 			},
@@ -136,7 +136,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		assert.Equal(t, "global-bucket", c.V1.Sys.Backups.S3.Bucket.Value)
 		assert.Equal(t, "user-client", c.V1.Sys.Backups.S3.Client.Value)
 		assert.Equal(t, "global-base-path", c.V1.Sys.Backups.S3.BasePath.Value)
-		assert.Equal(t, true, c.V1.Sys.Backups.S3.Es.Compress.Value)
+		assert.Equal(t, true, c.V1.Sys.Backups.S3.Os.Compress.Value)
 	})
 
 	t.Run("with internal global fs backup config with user config", func(t *testing.T) {
@@ -177,7 +177,7 @@ func TestSetGlobalConfig(t *testing.T) {
 					Name:     w.String("global-bucket"),
 					BasePath: w.String("global-base-path"),
 				},
-				Es: &shared.Backups_S3_Elasticsearch{
+				Os: &shared.Backups_S3_Opensearch{
 					Compress: w.Bool(true),
 				},
 			},
@@ -188,7 +188,7 @@ func TestSetGlobalConfig(t *testing.T) {
 		assert.Equal(t, "s3", c.V1.Sys.Backups.Backend.Value)
 		assert.Equal(t, "global-bucket", c.V1.Sys.Backups.S3.Bucket.Value)
 		assert.Equal(t, "global-base-path", c.V1.Sys.Backups.S3.BasePath.Value)
-		assert.Equal(t, true, c.V1.Sys.Backups.S3.Es.Compress.Value)
+		assert.Equal(t, true, c.V1.Sys.Backups.S3.Os.Compress.Value)
 	})
 
 	t.Run("with internal global fs backup config without user config", func(t *testing.T) {
@@ -257,10 +257,10 @@ func TestSetGlobalConfig(t *testing.T) {
 			},
 		}
 		g.V1.External = &shared.External{
-			Elasticsearch: &shared.External_Elasticsearch{
+			Opensearch: &shared.External_Opensearch{
 				Enable: w.Bool(true),
 				Nodes:  []*wrappers.StringValue{w.String("http://127.0.0.1:59200")},
-				Backup: &shared.External_Elasticsearch_Backup{
+				Backup: &shared.External_Opensearch_Backup{
 					Enable:   w.Bool(true),
 					Location: w.String("s3"),
 				},

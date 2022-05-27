@@ -11,6 +11,7 @@ import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { regions } from 'app/entities/destinations/destination.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
@@ -99,6 +100,10 @@ export class DataFeedCreateComponent {
     useHeaders: false,
     customToken: false
   };
+
+  constructor(
+    private telemetryService: TelemetryService
+  ) { }
 
   set saveDone(done: boolean) {
     this.saveInProgress = done;
@@ -281,6 +286,7 @@ export class DataFeedCreateComponent {
       auth: this.authSelected,
       region: this.dropDownVal
     });
+    this.telemetryService.track('Settings_DataFeeds_TestConnection_' + this.integTitle);
   }
 
   public validateForm() {
@@ -295,15 +301,13 @@ export class DataFeedCreateComponent {
           case AuthTypes.ACCESSTOKEN: {
           if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
             this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-              if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
-                this.validHeadersValue && this.flagHeaders) {
-                return true;
-            } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
-              !this.headerChecked && this.flagHeaders) {
-              return true;
-            } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
-            return true;
-            }
+              if ((this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                this.validHeadersValue && this.flagHeaders)
+                || (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                !this.headerChecked && this.flagHeaders) ||
+                (this.integTitle !== WebhookIntegrationTypes.CUSTOM)) {
+                  return true;
+              }
             }
             break;
           }
@@ -312,13 +316,11 @@ export class DataFeedCreateComponent {
 
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('username').valid && this.createForm.get('password').valid) {
-              if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
-                this.validHeadersValue && this.flagHeaders) {
-                return true;
-              } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
-                !this.headerChecked && this.flagHeaders) {
-                return true;
-              } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
+              if ((this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                    this.validHeadersValue && this.flagHeaders)
+                    || (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                    !this.headerChecked && this.flagHeaders) ||
+                    (this.integTitle !== WebhookIntegrationTypes.CUSTOM)) {
                 return true;
               }
             }
@@ -360,6 +362,7 @@ export class DataFeedCreateComponent {
       auth: this.authSelected,
       region: this.dropDownVal
     });
+    this.telemetryService.track('Settings_DataFeeds_NewIntegration_' + this.integTitle);
   }
 
   public dismissNotification() {

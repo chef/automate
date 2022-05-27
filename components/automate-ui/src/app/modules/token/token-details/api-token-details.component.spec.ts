@@ -21,6 +21,11 @@ import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.a
 import { GetTokenSuccess } from 'app/entities/api-tokens/api-token.actions';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { ApiTokenDetailsComponent } from './api-token-details.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ApiTokenDetailsComponent', () => {
   let component: ApiTokenDetailsComponent;
@@ -65,7 +70,8 @@ describe('ApiTokenDetailsComponent', () => {
         ApiTokenDetailsComponent
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         ReactiveFormsModule,

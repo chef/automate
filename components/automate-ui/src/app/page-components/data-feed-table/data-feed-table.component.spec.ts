@@ -8,8 +8,11 @@ import { DataFeedTableComponent } from './data-feed-table.component';
 import { DestinationRequests } from 'app/entities/destinations/destination.requests';
 import { StoreModule } from '@ngrx/store';
 import { Destination } from 'app/entities/destinations/destination.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
-//
+class MockTelemetryService {
+  track() { }
+}
 
 describe('DataFeedTableComponent', () => {
   let component: DataFeedTableComponent;
@@ -48,7 +51,8 @@ describe('DataFeedTableComponent', () => {
         MockComponent({ selector: 'a', inputs: ['routerLink'] })
       ],
       providers: [
-         DestinationRequests
+         DestinationRequests,
+         { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
          StoreModule.forRoot(ngrxReducers, { runtimeChecks })

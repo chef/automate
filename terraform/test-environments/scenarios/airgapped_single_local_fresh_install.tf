@@ -34,6 +34,8 @@ module "airgapped_single_local_fresh_install" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-LongRunning      = "true"
+    X-Sleep            = "off=(M-S,23);on=(M-S,7);tz=Asia/Kolkata"
   }
 }
 

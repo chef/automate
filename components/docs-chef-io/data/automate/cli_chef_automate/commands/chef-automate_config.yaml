@@ -10,6 +10,10 @@ options:
   shorthand: t
   default_value: "10"
   usage: Request timeout in seconds
+- name: "yes"
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
 inherited_options:
 - name: debug
   shorthand: d

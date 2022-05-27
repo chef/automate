@@ -24,6 +24,8 @@ import { NodeCredentialOrder, SortParams } from './node-credential-list.reducer'
 import { nodeCredentialListState } from './node-credential-list.selectors';
 import { SortNodeCredentialList } from './node-credential-list.actions';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
 @Component({
   selector: 'app-node-credential-list',
   templateUrl: './node-credential-list.component.html',
@@ -50,7 +52,8 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy, AfterView
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private telemetryService: TelemetryService
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
   }
@@ -154,6 +157,7 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy, AfterView
   deleteNodeCredential(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteNodeCredential(this.nodeCredentialToDelete));
+    this.telemetryService.track('Settings_NodeCredentials_Remove');
   }
 
   closeDeleteModal(): void {

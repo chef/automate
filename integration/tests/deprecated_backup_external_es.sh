@@ -21,17 +21,17 @@ do_create_config() {
 
     #shellcheck disable=SC2154
     cat <<EOF >> "$test_config_path"
-[elasticsearch.v1.sys.node]
+[opensearch.v1.sys.node]
 master=false
 data=false
 
-[elasticsearch.v1.sys.cluster]
+[opensearch.v1.sys.cluster]
 name = "external-network"
-[elasticsearch.v1.sys.network]
+[opensearch.v1.sys.network]
 host = "0.0.0.0"
-[elasticsearch.v1.sys.transport]
-port = "9300-9400"
-[elasticsearch.v1.sys.discovery]
+[opensearch.v1.sys.transport]
+port = "10168-10169"
+[opensearch.v1.sys.discovery]
 ping_unicast_hosts = '''["127.0.0.1:59300"]'''
 EOF
 }

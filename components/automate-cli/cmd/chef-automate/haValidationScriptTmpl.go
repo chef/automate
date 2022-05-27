@@ -44,7 +44,7 @@ chef_server_private_ip=${chef_server_private_ip##[}
 chef_server_private_ip=${chef_server_private_ip%]}
 eval chef_server_private_ip=($chef_server_private_ip)
 
-elasticsearch_private_ip=$(grep -E '(^|\s)elasticsearch_private_ips($|\s)' $CONFIG | cut -c29-)
+elasticsearch_private_ip=$(grep -E '(^|\s)opensearch_private_ips($|\s)' $CONFIG | cut -c29-)
 elasticsearch_private_ip=${elasticsearch_private_ip// /}
 elasticsearch_private_ip=${elasticsearch_private_ip//,/ }
 elasticsearch_private_ip=${elasticsearch_private_ip##[}

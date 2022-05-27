@@ -34,9 +34,7 @@ end
   chef/local-user-service
   chef/authn-service
   chef/license-control-service
-  chef/automate-elasticsearch
   chef/automate-pg-gateway
-  chef/automate-postgresql
   chef/deployment-service
   chef/ingest-service
   chef/automate-cs-oc-bifrost
@@ -58,11 +56,9 @@ control 'automate.service.status' do
     automate-cs-oc-bifrost
     automate-cs-oc-erchef
     automate-dex
-    automate-elasticsearch
     automate-es-gateway
     automate-gateway
     automate-pg-gateway
-    automate-postgresql
     automate-ui
     compliance-service
     config-mgmt-service

@@ -42,7 +42,7 @@ message ConfigRequest {
 				reserved 1 to 2;
 				google.protobuf.StringValue max_wal_size = 3;
 				google.protobuf.StringValue min_wal_size = 4;
-				google.protobuf.Int32Value wal_keep_segments = 5;
+				google.protobuf.Int32Value wal_keep_size = 5;
 				google.protobuf.StringValue checkpoint_timeout = 6;
 				google.protobuf.FloatValue checkpoint_completion_target = 7;
 				google.protobuf.StringValue checkpoint_warning = 8;

@@ -23,9 +23,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/jsonpb"
 	empty "github.com/golang/protobuf/ptypes/empty"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 var complianceReportIndex = fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")
@@ -52,11 +52,11 @@ func NewGlobalSuite() *Suite {
 
 	// Create a new elastic Client
 	esclient, err := elastic.NewClient(
-		elastic.SetURL(elasticsearchUrl),
+		elastic.SetURL(opensearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", opensearchUrl, err)
 		os.Exit(1)
 	}
 
@@ -85,11 +85,11 @@ func NewLocalSuite(t *testing.T) *Suite {
 
 	// Create a new elastic Client
 	esclient, err := elastic.NewClient(
-		elastic.SetURL(elasticsearchUrl),
+		elastic.SetURL(opensearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", opensearchUrl, err)
 		os.Exit(1)
 	}
 
@@ -179,11 +179,11 @@ func (s *Suite) GetAllReportsESInSpecReport() ([]*relaxting.ESInSpecReport, erro
 		).
 		Do(context.Background())
 
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecReport := relaxting.ESInSpecReport{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esInSpecReport)
+				err := json.Unmarshal(hit.Source, &esInSpecReport)
 				if err != nil {
 					logrus.Errorf("GetAllReportsESInSpecReport unmarshal error: %s", err.Error())
 					return reports, err
@@ -210,11 +210,11 @@ func (s *Suite) GetAllSummaryESInSpecSummary() ([]*relaxting.ESInSpecSummary, er
 		).
 		Do(context.Background())
 
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecSummary := relaxting.ESInSpecSummary{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esInSpecSummary)
+				err := json.Unmarshal(hit.Source, &esInSpecSummary)
 				if err != nil {
 					logrus.Errorf("GetAllSummaryESInSpecSummary unmarshal error: %s", err.Error())
 					return summaries, err
@@ -410,12 +410,19 @@ func (s *Suite) DeleteAllDocuments() {
 	var err error
 	// ES Query to match all documents
 	q := elastic.RawStringQuery("{\"match_all\":{}}")
-
+	indices, _ := s.elasticClient.IndexNames()
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	maxNumberOfTries := 3
 	tries := 0
 	for ; tries < maxNumberOfTries; tries++ {
-		_, err = s.elasticClient.DeleteByQuery("_all").
+		_, err = s.elasticClient.DeleteByQuery().
 			Query(q).
+			Index(indices...).
 			IgnoreUnavailable(true).
 			Refresh("true").
 			WaitForCompletion(true).

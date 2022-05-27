@@ -73,7 +73,7 @@ module AutomateCluster
       default :instance_count, 1
     end
 
-    config_context :elasticsearch do
+    config_context :opensearch do
       default :instance_count, 3
     end
 
@@ -85,8 +85,7 @@ module AutomateCluster
     config_context :existing_nodes do
       default :automate_private_ips, []
       default :chef_server_private_ips, []
-      default :elasticsearch_ips, []
-      default :elasticsearch_private_ips, []
+      default :opensearch_private_ips, []
       default :postgresql_private_ips, []
     end
 
@@ -96,8 +95,12 @@ module AutomateCluster
       default :region, 'us-east-1'
       default :vpc_id, " "
       default :cidr_block_addr, " "
+      default :private_custom_subnets, []
+      default :public_custom_subnets, []
       default :ssh_key_pair_name
       default :lb_access_logs, 'false'
+      default :backup_config, ' '
+      default :s3_bucketName, 'chef-automate-ha'
       default :setup_managed_services, false
       default :managed_elasticsearch_domain_url, ' '
       default :managed_elasticsearch_username, ' '
@@ -115,7 +118,7 @@ module AutomateCluster
       default :ami_id
       default :automate_server_instance_type, 't3a.medium'
       default :chef_server_instance_type, 't3a.medium'
-      default :elasticsearch_server_instance_type, 'm5a.large'
+      default :opensearch_server_instance_type, 'm5a.large'
       default :postgresql_server_instance_type, 't3a.medium'
       default :automate_lb_certificate_arn, "arn:aws:acm:...."
       default :chef_server_lb_certificate_arn, "arn:aws:acm:...."
@@ -125,9 +128,9 @@ module AutomateCluster
       default :chef_ebs_volume_iops, "100"
       default :chef_ebs_volume_size, "50"
       default :chef_ebs_volume_type, "gp3"
-      default :elasticsearch_ebs_volume_iops, "300"
-      default :elasticsearch_ebs_volume_size, "100"
-      default :elasticsearch_ebs_volume_type, "gp3"
+      default :opensearch_ebs_volume_iops, "300"
+      default :opensearch_ebs_volume_size, "100"
+      default :opensearch_ebs_volume_type, "gp3"
       default :postgresql_ebs_volume_iops, "150"
       default :postgresql_ebs_volume_size, "50"
       default :postgresql_ebs_volume_type, "gp3"

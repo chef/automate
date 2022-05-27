@@ -24,6 +24,12 @@ func newProvisionInfraCmd() *cobra.Command {
 		"airgap-bundle",
 		"",
 		"Path to an airgap install bundle")
+	provisionInfraCmd.PersistentFlags().BoolVarP(
+		&deployCmdFlags.acceptMLSA,
+		"yes",
+		"y",
+		false,
+		"Do not prompt for confirmation; accept defaults and continue")
 
 	return provisionInfraCmd
 }

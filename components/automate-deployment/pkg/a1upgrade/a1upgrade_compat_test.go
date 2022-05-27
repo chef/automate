@@ -261,7 +261,7 @@ func TestRunningMarketplaceImage(t *testing.T) {
 
 func TestCSElasticConfigValid(t *testing.T) {
 
-	a1EsConfig := NewA1Config().DeliveryRunning.Delivery.Elasticsearch
+	a1EsConfig := NewA1Config().DeliveryRunning.Delivery.Opensearch
 	a1EsConfig.NginxProxyURL = "http://localhost:8080/elasticsearch/"
 
 	erchefRawJSON := []byte(`{ "private_chef": { "opscode-erchef": { "search_provider": "elasticsearch", "search_queue_mode": "batch" } } }`)

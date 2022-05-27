@@ -1,6 +1,6 @@
 # Automate-HA-Elasticsidecar
 
-This is a sidecar service for automate-backend-elasticsearch that reads users and passwords off the [elasticsearch] binding and applies them to Elasticsearch using the odfe tooling.
+This is a sidecar service for automate-backend-opensearch that reads users and passwords off the [opensearch] binding and applies them to Opensearch using the odfe tooling.
 ## Maintainers
 
 The Habitat Maintainers humans@habitat.sh
@@ -11,4 +11,5 @@ This is a service package.
 
 ## Notes
 
-This package relies on strict bindings and will not start unless all credentials and ssl are available from Elasticsearch.
+This package relies on strict bindings and will not start unless all credentials and ssl are available from Opensearch.
+

@@ -8,6 +8,7 @@ import { Destination } from 'app/entities/destinations/destination.model';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-data-feed-table',
@@ -33,7 +34,8 @@ export class DataFeedTableComponent  {
   serviceShow = true;
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private telemetryService: TelemetryService
   ) {}
 
 
@@ -62,6 +64,7 @@ export class DataFeedTableComponent  {
   public deleteDataFeed(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteDestination(this.dataFeedToDelete));
+    this.telemetryService.track('Settings_DataFeeds_Delete');
   }
 
   public closeDeleteModal(): void {
@@ -92,6 +95,11 @@ export class DataFeedTableComponent  {
       enable: val
     };
     this.store.dispatch(new EnableDisableDestination({enableDisable: destinationEnableObj}));
+    if (val) {
+      this.telemetryService.track('Settings_DataFeeds_Enable');
+    } else {
+      this.telemetryService.track('Settings_DataFeeds_Disable');
+    }
   }
 
 

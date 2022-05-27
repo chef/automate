@@ -20,6 +20,7 @@ import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.action
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { ProjectConstants } from 'app/entities/projects/project.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-team-management',
@@ -41,7 +42,8 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
  constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
     ) {
       store.pipe(
         select(getAllStatus),
@@ -118,6 +120,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public deleteTeam(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteTeam(this.teamToDelete));
+    this.telemetryService.track('Settings_Teams_Delete');
   }
 
   public createTeam(): void {
@@ -132,6 +135,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public createTeamCommon(team: Team): void {
     this.creatingTeam = true;
     this.store.dispatch(new CreateTeam(team));
+    this.telemetryService.track('Settings_Teams_Create');
   }
 
   public openCreateModal(): void {

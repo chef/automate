@@ -119,3 +119,73 @@ EOF
   log_info "starting external elasticsearch"
   systemctl start elasticsearch.service
 }
+
+
+start_external_opensearch() {
+  local version
+  version="1.2.4"
+  downloadFile="opensearch-${version}-linux-x64.tar.gz"
+  if [ ! -f downloadFile ]; then
+    wget "https://artifacts.opensearch.org/releases/bundle/opensearch/${version}/${downloadFile}"
+  fi
+  tar -xvzf $downloadFile
+  opensearchHome="$(pwd)/opensearch-"${version}
+  adduser hab
+  chmod -R 0777 "${opensearchHome}"
+
+  cat >> "${opensearchHome}"/config/opensearch.yml <<EOF
+cluster.name: "external-network"
+network.host: 127.0.0.1
+http.port: 59200
+transport.tcp.port: "59300-59400"
+path.repo: "/var/opt/chef-automate/backups"
+EOF
+
+  local backup_type="$1"
+  if [[ "$#" -gt 0 ]]; then
+      shift
+  fi
+
+  case "${backup_type}" in
+    "")
+        log_info "no external backup configuration"
+        ;;
+    "s3")
+        log_info "s3 backup configuration"
+        local s3_endpoint="$1"
+
+        echo "y" | "${opensearchHome}"/bin/opensearch-plugin install -b repository-s3
+            
+
+        cat >> "${opensearchHome}"/config/opensearch.yml <<EOF
+s3.client.default.protocol: "https"
+s3.client.default.read_timeout: "50s"
+s3.client.default.max_retries: 3
+s3.client.default.use_throttle_retries: true
+s3.client.default.endpoint: "${s3_endpoint}"
+EOF
+
+        echo "$AWS_ACCESS_KEY_ID" | "${opensearchHome}"/bin/opensearch-keystore add s3.client.default.access_key
+        echo "$AWS_SECRET_ACCESS_KEY" | "${opensearchHome}"/bin/opensearch-keystore add s3.client.default.secret_key
+        echo "$AWS_SESSION_TOKEN" | "${opensearchHome}"/bin/opensearch-keystore add s3.client.default.session_token
+        ;;
+    "gcs")
+        log_info "gcs backup configuration"
+
+        local gcs_creds="$1"
+
+        echo "y" | "${opensearchHome}"/bin/opensearch-plugin install -b repository-s3
+
+        cat >> "${opensearchHome}"/config/opensearch.yml <<EOF
+gcs.client.default.read_timeout: "50s"
+EOF
+        "${opensearchHome}"/bin/opensearch-keystore add-file gcs.client.default.credentials_file "${gcs_creds}"
+        ;;
+    *)
+        log_error "Unknown backup type"
+        return 1
+  esac
+
+  log_info "starting external opensearch"
+  sh "${opensearchHome}"/opensearch-tar-install.sh
+}

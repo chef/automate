@@ -5,7 +5,7 @@
 #shellcheck disable=SC1091
 
 set -eo pipefail
-
+OLD_VERSION="latest"
 test_name=""
 test_upgrades=false
 test_backup_restore=false
@@ -70,6 +70,7 @@ test_with_s3=false
 # and before the upgrade. You should not normally need to change this
 # variable.
 declare -r test_manifest_path="local_manifest.json"
+declare -r test_versions_path="local_versions.json"
 #
 # test_manifest_dir is the directory where we save all manifests
 # to. You should not normally need to change this variable.
@@ -90,6 +91,11 @@ declare -r test_tmp_hartifacts_path="tmp_results/"
 set_test_manifest() {
     local target_manifest_name=$1
     cp "$test_manifest_dir/$target_manifest_name" "$test_manifest_path"
+}
+
+set_test_versions() {
+    local target_versions_name=$1
+    cp "$test_manifest_dir/$target_versions_name" "$test_versions_path"
 }
 
 do_setup() {
@@ -166,13 +172,13 @@ do_create_config_default() {
     if [ $test_upgrades = true ]; then
       # Install the automate CLI from current
       cli_bin="/bin/chef-automate-latest"
-      download_cli "latest" "${cli_bin}"
+      download_cli "${OLD_VERSION}" "${cli_bin}"
     fi
     ${cli_bin} init-config \
         --channel $test_channel \
         --file "$test_config_path" \
         --upgrade-strategy "$test_upgrade_strategy" \
-        --es-mem "1g"
+        --es-mem "2g"
     cat >> "$test_config_path" <<EOF
 [deployment.v1.sys.log]
   level = "debug"
@@ -228,7 +234,46 @@ do_test_deploy_default() {
 }
 
 do_prepare_upgrade() {
+    set_version_file
     do_prepare_upgrade_default
+    append_version_file
+}
+
+append_version_file() {
+    #prepare the versions.json file
+    #todo: vivek shankar build/version by schema_version
+    newversion=$(jq -r -c ".build"  "$test_manifest_path")
+    echo $newversion
+    jq --arg val $newversion '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
+}
+
+set_version_file() {
+    hab pkg install --binlink core/jq-static
+
+    #prepare the versions.json file
+    newversion=$(jq -r -c ".build"  "$test_manifest_path")
+    echo $newversion
+    versionsFile="/tmp/versions.json"
+    echo '[]' > $versionsFile
+    jq --arg val $newversion '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
+}
+
+prepare_upgrade_milestone(){
+  local channel="$1"
+  local version="$2"
+  # shellcheck disable=SC2154
+  download_manifest_version "$channel" "$version" "$test_manifest_dir/$version.json"
+  set_test_manifest "$version.json"
+  set_version_file
+}
+
+prepare_upgrade_milestone_append_version(){
+  local channel="$1"
+  local version="$2"
+  # shellcheck disable=SC2154
+  download_manifest_version "$channel" "$version" "$test_manifest_dir/$version.json"
+  set_test_manifest "$version.json"
+  append_version_file
 }
 
 do_prepare_upgrade_default() {

@@ -192,6 +192,7 @@ abstract class UserDetails {
     this.saveInProgress = true;
     const password = this.passwordForm.get('newPassword').value;
     this.store.dispatch(this.createUpdatePasswordUserAction(password));
+    this.telemetryService.track('Settings_Users_Details_ResetPassword');
   }
 
   public saveUserPreference(timeformat, userDetailsFormControl): void {
@@ -231,6 +232,7 @@ abstract class UserDetails {
     }
     userDetailsFormControl.isTimeformatDirty = false;
     userDetailsFormControl.isTelemetryCheckboxDirty = false;
+    this.telemetryService.track('Settings_Users_Details_Save');
   }
 
   protected abstract createPasswordForm(fb: FormBuilder): FormGroup;

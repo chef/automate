@@ -19,6 +19,7 @@ const (
 	pgGatewayServiceName     = "automate-pg-gateway"
 	esGatewayServiceName     = "automate-es-gateway"
 	elasticsearchServiceName = "automate-elasticsearch"
+	opensearchServiceName    = "automate-opensearch"
 )
 
 var (

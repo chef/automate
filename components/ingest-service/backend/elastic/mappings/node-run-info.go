@@ -19,21 +19,18 @@ var runInfoProps = `
 // NodeRunInfo mapping used to create the `config-mgmt-run-info index
 var NodeRunInfo = Mapping{
 	Index:      IndexNameNodeRunInfo,
-	Type:       DocType,
 	Timeseries: false,
 	Properties: fmt.Sprintf(`{ %s }`, runInfoProps),
 	Mapping: fmt.Sprintf(`
-	{ 
-		"template": "%s",
+	{
 		"settings": {
+			"number_of_shards": 5,
 			"index": {
 				"refresh_interval": "1s" 
 			} 
 		}, 
 		"mappings": {
-			"%s": { 
-				%s
-			} 
+				%s 
 		} 
-	}`, IndexNameNodeRunInfo, DocType, runInfoProps),
+	}`, runInfoProps),
 }

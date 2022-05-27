@@ -2,17 +2,17 @@
 title = "Upgrade Chef Automate"
 date = 2022-01-04T12:02:46-08:00
 draft = false
+gh_repo = "automate"
 
 [menu]
   [menu.automate]
     title = "Upgrade"
-    identifier = "automate/upgrade.md Upgrade"
-    parent = "automate"
+    identifier = "automate/upgrade/upgrade.md Upgrade"
+    parent = "automate/upgrade"
+    weight = 10
 +++
 
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/upgrade.md)
-
-By default, Chef Automate automatically upgrades to the latest version.
+Chef Automate upgrades from one minor version to another automatically, but you cannot directly upgrade to any major version of Chef Automate. Use the `--major` flag to upgrade from the latest to a major version. This section will talk about the major version upgrade of Chef Automate with its possible scenarios.
 
 ## Release Channels
 
@@ -32,10 +32,16 @@ You can disable automatic upgrades by changing the `upgrade_strategy` setting to
 upgrade_strategy = "none"
 ```
 
-To manually initiate an upgrade, run
+To manually initiate a minor upgrade, run:
 
 ```shell
 chef-automate upgrade run
+```
+
+To manually initiate a major upgrade, run:
+
+```shell
+chef-automate upgrade run --major
 ```
 
 This command upgrades Chef Automate to the latest version available from your release channel.

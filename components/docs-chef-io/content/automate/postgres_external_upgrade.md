@@ -79,32 +79,18 @@ sudo chef-automate stop
     ssh -i "<xyz.pem>" <sudo_username>@<postgres_machine_ip>
     ```
 
-1. Install PostgreSQL v13
+2. Install PostgreSQL v13
 
     ```bash
     sudo apt-get update
     sudo apt-get install postgresql-13
     ```
 
-1. If the PostgreSQL v9.6 config was modified or customized. Please check the differences and update the new PostgreSQL v13 config with similar changes. Please connect with your database administrator if you don't know these changes.
+3. If the PostgreSQL v9.6 config was modified or customized. Please check the differences and update the new PostgreSQL v13 config with similar changes. Please connect with your database administrator if you don't know these changes.
 
     ```bash
     sudo sdiff -s /etc/postgresql/9.6/main/postgresql.conf /etc/postgresql/13/main/postgresql.conf
     sudo sdiff -s /etc/postgresql/9.6/main/pg_hba.conf /etc/postgresql/13/main/pg_hba.conf
-    ```
-
-### Stop PostgreSQL Services
-
-1. Stop Both PostgreSQL Servers:
-
-    ```bash
-    sudo systemctl stop postgresql.service
-    ```
-
-1. Login as the `postgres` user
-
-    ```bash
-    sudo su - postgres
     ```
 
 ### Prepare the Database for Migration
@@ -113,7 +99,13 @@ Run `vacuumdb --all --full` on the PostgreSQL database if you don't have automat
 
 For more information on upgrading using `vacuumdb` see the PostgreSQL 13 documentation for [vacuumdb](https://www.postgresql.org/docs/13/app-vacuumdb.html).
 
-1. Run Vacuum DB before moving data from PostgreSQL v9.6 to v13
+1. Login as `postgres` user
+
+    ```bash
+    sudo su - postgres
+    ```
+
+2. Run Vacuum DB before moving data from PostgreSQL v9.6 to v13
 
     ```bash
     vacuumdb --all --full
@@ -146,11 +138,29 @@ For more information on upgrading using `vacuumdb` see the PostgreSQL 13 documen
     vacuumdb: vacuuming database "template1"
     ```
 
+3. Exit postgres user
+
+    ```bash
+    exit
+    ```
+
 #### Upgrade
 
 For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` see the PostgreSQL 13 documentation for [pg_upgrade](https://www.postgresql.org/docs/13/pgupgrade.html).
 
-1. Run pg_upgrade check command.
+1. Stop Both PostgreSQL Servers:
+
+    ```bash
+    sudo systemctl stop postgresql.service
+    ```
+
+2. Login as `postgres` user
+
+    ```bash
+    sudo su - postgres
+    ```
+
+3. Run pg_upgrade check command.
 
     ```bash
     cd ~
@@ -164,7 +174,7 @@ For more information on upgrading using `pg_upgrade` and `pg_upgrade --check` se
     --check
     ```
 
-1. Migrate the Data (run pg_upgrade command without --check):
+4. Migrate the Data (run pg_upgrade command without --check):
 
     ```bash
     cd ~

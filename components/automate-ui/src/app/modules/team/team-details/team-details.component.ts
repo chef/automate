@@ -32,6 +32,7 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -66,7 +67,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
     private router: Router,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.updateForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html.
@@ -195,6 +197,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       id: this.teamId,
       membership_ids: [user.membership_id]
     }));
+    this.telemetryService.track('Settings_Teams_Details_RemoveUser');
   }
 
   saveTeam(): void {
@@ -204,6 +207,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     const name: string = this.updateForm.controls.name.value.trim();
     const projects: string[] = this.updateForm.controls.projects.value;
     this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
+    this.telemetryService.track('Settings_Teams_Details_Save');
   }
 
   onSelectedTab(event: { target: { value: TeamTabName } }): void {

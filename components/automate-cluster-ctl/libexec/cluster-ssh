@@ -16,7 +16,7 @@ class AutomateClusterSSH < AutomateCluster::Command
     Integer(i)
   end
 
-  parameter "NAME", "Name of the server type to access, for example automate, chef_server, elasticsearch or postgresql", attribute_name: :name
+  parameter "NAME", "Name of the server type to access, for example automate, chef_server, opensearch or postgresql", attribute_name: :name
   parameter "[COMMAND]", "Command to run on the remote server", attribute_name: :remote_command
   def execute
     ssh_commands = AutomateCluster.terraform.output.ssh_commands(name, ssh_options)

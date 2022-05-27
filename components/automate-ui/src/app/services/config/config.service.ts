@@ -16,6 +16,7 @@ export interface Config {
   customerName: string;
   maxNodes: number;
   deploymentId: string;
+  deploymentType: string;
 }
 
 @Injectable()
@@ -34,7 +35,8 @@ export class ConfigService {
     customer_id: '',
     customer_name: '',
     max_nodes: 0,
-    deployment_id: this.defaultLicenseId
+    deployment_id: this.defaultLicenseId,
+    deployment_type: ''
   };
 
   constructor(private httpClient: HttpClient) { }
@@ -58,7 +60,8 @@ export class ConfigService {
         customerId: configJson.customer_id,
         customerName: configJson.customer_name,
         maxNodes: configJson.max_nodes,
-        deploymentId: configJson.deployment_id
+        deploymentId: configJson.deployment_id,
+        deploymentType: configJson.deployment_type
       })));
   }
 }

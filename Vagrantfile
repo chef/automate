@@ -24,7 +24,7 @@ EOF
 SCRIPT
 
 def hab_version_from_manifest
-  manifest = JSON.parse(open("https://packages.chef.io/manifests/dev/automate/latest.json").read)
+  manifest = JSON.parse(open("https://packages.chef.io/manifests/dev/automate/latest_semver.json").read)
   hab = manifest["hab"]
   hab.find {|x| x.start_with?("core/hab/") }.split("/")[2]
 end

@@ -531,7 +531,7 @@ func (p *PreflightRunner) getReindexer() (*Reindexer, error) {
 	if p.reindexer != nil {
 		return p.reindexer, nil
 	}
-	esURL := p.deliveryRunning.Delivery.Elasticsearch.NginxProxyURL
+	esURL := p.deliveryRunning.Delivery.Opensearch.NginxProxyURL
 	r, err := NewReindexer(p.writer, esURL)
 	if err != nil {
 		return nil, err

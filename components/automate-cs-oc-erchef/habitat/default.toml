@@ -21,6 +21,8 @@ bulk_fetch_batch_size=5
 base_resource_url="host_header"
 strict_search_result_acls=false
 actions_fqdn="localhost"
+cbv_cache_enabled=false
+cbv_cache_item_ttl=30000
 
 [keygen]
 cache_workers = 2
@@ -38,6 +40,10 @@ reindex_batch_size=10
 reindex_sleep_min_ms=50
 reindex_sleep_max_ms=2000
 reindex_item_retries=3
+search_provider="opensearch"
+search_queue_mode="batch"
+search_auth_username="admin"
+search_auth_password="admin"
 
 [authz]
 fanout = 20

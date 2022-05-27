@@ -17,10 +17,10 @@ import (
 	"github.com/chef/automate/api/config/cs_nginx"
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/dex"
-	es "github.com/chef/automate/api/config/elasticsearch"
 	"github.com/chef/automate/api/config/erchef"
 	lb "github.com/chef/automate/api/config/load_balancer"
 	ns "github.com/chef/automate/api/config/notifications"
+	oss "github.com/chef/automate/api/config/opensearch"
 	pg "github.com/chef/automate/api/config/postgresql"
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
@@ -780,28 +780,28 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets, cs 
 		},
 		// TODO: Actually override ES Settings instead of overriding with
 		// the defaults.
-		Elasticsearch: &es.ConfigRequest{
-			V1: &es.ConfigRequest_V1{
+		Opensearch: &oss.ConfigRequest{
+			V1: &oss.ConfigRequest_V1{
 				// TODO: apply the below config
-				// - r.Delivery.Elasticsearch.MaxMapCount
+				// - r.Delivery.Opensearch.MaxMapCount
 				//   in a1 this is set via sysctl in the run hook but is not exposed in
-				//   core/elasticsearch yet. we also have this as a preflight check which
+				//   core/opensearch yet. we also have this as a preflight check which
 				//   may be the correct approach instead of setting it for our users
-				// - r.Delivery.Elasticsearch.NewMemory
+				// - r.Delivery.Opensearch.NewMemory
 				//   set in the jvm options template and but this is not exposed in
-				//   core/elasticsearch yet
-				// - r.Delivery.Elasticsearch.RepoPath.{Data,Logs,Backup}
+				//   core/opensearch yet
+				// - r.Delivery.Opensearch.RepoPath.{Data,Logs,Backup}
 				//   in a1 these are going to be set to the default /var/opt/delivery
 				//   directories and it doesn't necessarily make sense to move them over
 				//   to a2, which will have its own different data directories
-				// - r.Delivery.Elasticsearch.ClusterURLS
+				// - r.Delivery.Opensearch.ClusterURLS
 				//   there's no analog yet in A2, and using the unicast hosts for external
-				//   elasticsearch isn't going to work in this way
-				Sys: &es.ConfigRequest_V1_System{
-					Runtime: &es.ConfigRequest_V1_Runtime{
-						MaxOpenFiles:    w.String(r.Delivery.Elasticsearch.MaxOpenFiles.String()),
-						MaxLockedMemory: w.String(r.Delivery.Elasticsearch.MaxLockedMemory),
-						Heapsize:        w.String(r.Delivery.Elasticsearch.HeapSize),
+				//   opensearch isn't going to work in this way
+				Sys: &oss.ConfigRequest_V1_System{
+					Runtime: &oss.ConfigRequest_V1_Runtime{
+						MaxOpenFiles:    w.String(r.Delivery.Opensearch.MaxOpenFiles.String()),
+						MaxLockedMemory: w.String(r.Delivery.Opensearch.MaxLockedMemory),
+						Heapsize:        w.String(r.Delivery.Opensearch.HeapSize),
 					},
 				},
 			},

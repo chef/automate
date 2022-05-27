@@ -9,6 +9,9 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for run
+- name: major
+  default_value: "false"
+  usage: This flag is only needed for major version upgrades
 - name: skip-deploy
   default_value: "false"
   usage: will only upgrade and not deploy the bundle
@@ -24,6 +27,14 @@ options:
   usage: upgrade Chef Automate HA  frontends version to install
 - name: version
   usage: The exact Chef Automate version to install
+- name: workspace-upgrade
+  shorthand: w
+  default_value: "false"
+  usage: Do not prompt for confirmation to accept workspace upgrade
+- name: "yes"
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
 inherited_options:
 - name: debug
   shorthand: d

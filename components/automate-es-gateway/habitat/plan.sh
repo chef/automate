@@ -70,7 +70,7 @@ pkg_exports=(
 )
 
 pkg_binds=(
-  [automate-elasticsearch]="http-port"
+  [automate-opensearch]="http-port"
 )
 
 pkg_exposes=(http-port)
@@ -131,3 +131,4 @@ do_install() {
   mkdir -p "${pkg_prefix}/sbin"
   cp "${HAB_CACHE_SRC_PATH}/${pkg_dirname}/objs/nginx" "${pkg_prefix}/sbin"
 }
+

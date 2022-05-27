@@ -405,7 +405,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
 
   onDeleteNodes(event): void {
     this.telemetryService.track('nodeDeletion', { count: event.nodeIds.length } );
-
     this.store.dispatch(new DeleteNodes( {nodeIdsToDelete: event.nodeIds} ));
   }
 
@@ -467,6 +466,8 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     }
 
     delete queryParams['page'];
+
+    this.telemetryService.track('InfraServer_ClientRuns_' + status + '_nodes');
 
     this.router.navigate([], {queryParams});
   }

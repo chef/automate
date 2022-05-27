@@ -144,8 +144,8 @@ resource "vsphere_virtual_machine" "chef_automate_postgresql" {
   }
 }
 
-resource "vsphere_virtual_machine" "chef_automate_elasticsearch" {
-  count = var.elasticsearch_instance_count
+resource "vsphere_virtual_machine" "chef_automate_opensearch" {
+  count = var.opensearch_instance_count
 
   name = format(
     "${var.tag_name}_${random_id.random.hex}_backend_elasticsearch_%02d",

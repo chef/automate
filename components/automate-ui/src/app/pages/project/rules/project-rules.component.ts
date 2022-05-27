@@ -29,6 +29,7 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject } from 'app/entities/projects/project.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 interface KVCondition {
   key: ConditionOperator;
@@ -76,7 +77,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
       this.ruleForm = this.fb.group({
         // Must stay in sync with error checks in project-rules.component.html
@@ -299,6 +301,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       this.saving = true;
       this.rule.id ? this.updateRule() : this.createRule();
     }
+    this.telemetryService.track('Settings_Projects_IngestRules_Create');
   }
 
   public handleNameInput(event: KeyboardEvent): void {

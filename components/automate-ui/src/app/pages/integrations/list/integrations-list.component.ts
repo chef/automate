@@ -12,6 +12,7 @@ import { Manager } from 'app/entities/managers/manager.model';
 import { automateManager, cloudManagers, managerStatus } from 'app/entities/managers/manager.selectors';
 import { DeleteManager } from 'app/entities/managers/manager.actions';
 import { routeParams } from 'app/route.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations',
@@ -32,7 +33,8 @@ export class IntegrationsListComponent {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.managers$ = store.select(cloudManagers);
@@ -63,6 +65,7 @@ export class IntegrationsListComponent {
   handleDelete(): void {
     this.store.dispatch(new DeleteManager({ id: this.managerIdForDeletion }));
     this.resetModal();
+    this.telemetryService.track('Settings_NodeIntegrations_Delete');
   }
 
   handleEdit(id) {

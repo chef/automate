@@ -17,7 +17,7 @@ require 'json'
 
 class AutomateClusterTest < AutomateCluster::Command
   INSPEC_PROFILES = {
-    elasticsearch: ['automate-backend-elasticsearch-smoke'],
+    opensearch: ['automate-backend-opensearch-smoke'],
     postgresql: ['automate-backend-postgresql-smoke'],
     automate: ['automate-frontend-smoke'],
     chef_server: ['automate-frontend-chef-server-smoke'],

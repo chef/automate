@@ -12,6 +12,11 @@ import { Rule, Condition, ConditionOperator, RuleType } from 'app/entities/rules
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectRulesComponent } from './project-rules.component';
 import { of as observableOf } from 'rxjs';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ProjectRulesComponent', () => {
   let component: ProjectRulesComponent;
@@ -89,7 +94,8 @@ describe('ProjectRulesComponent', () => {
         }, { runtimeChecks })
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ]
     }).compileComponents();
   }));

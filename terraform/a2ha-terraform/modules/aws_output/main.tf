@@ -2,11 +2,12 @@ locals {
   output_tfvars = templatefile("${path.module}/files/output.tfvars.tpl",{
       automate_private_ips      = join(", ", formatlist("\"%s\"", var.automate_private_ips)),
       chef_server_private_ips   = join(", ", formatlist("\"%s\"", var.chef_server_private_ips)),
-      elasticsearch_public_ips  = join(", ", formatlist("\"%s\"", var.elasticsearch_public_ips)),
-      elasticsearch_private_ips = join(", ", formatlist("\"%s\"", var.elasticsearch_private_ips)),
+      opensearch_public_ips  = join(", ", formatlist("\"%s\"", var.opensearch_public_ips)),
+      opensearch_private_ips = join(", ", formatlist("\"%s\"", var.opensearch_private_ips)),
       postgresql_private_ips    = join(", ", formatlist("\"%s\"", var.postgresql_private_ips)),
       automate_fqdn             = var.automate_fqdn
       automate_frontend_urls    = var.automate_frontend_urls
+      bucket_name               = var.bucket_name
     })
 
     copy_terraform_files_for_destroy = [

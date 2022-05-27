@@ -22,8 +22,8 @@ rm -rf {{pkg.svc_data_path}}/pgdata/*
 pg_basebackup --verbose --progress --wal-method=stream --checkpoint=fast --pgdata={{pkg.svc_data_path}}/pgdata --dbname='postgres://{{cfg.replication.name}}@{{svc.leader.sys.ip}}:{{svc.leader.cfg.port}}/postgres'
 {{/if}}
 
-cp {{pkg.svc_config_path}}/recovery.conf {{pkg.svc_data_path}}/pgdata/recovery.conf
-
+#cp {{pkg.svc_config_path}}/recovery.conf {{pkg.svc_data_path}}/pgdata/recovery.conf
+cp {{pkg.svc_config_path}}/standby.signal {{pkg.svc_data_path}}/pgdata/standby.signal
 echo "Starting PostgreSQL"
 
 {{#if cfg.wal_archive.enable }}

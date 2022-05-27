@@ -14,7 +14,9 @@ if [[ -z "${EXPEDITOR_ID:-}" ]]; then
     exit 1
 fi
 
-VERSION=$(date +"%Y%m%d%H%M%S")
+VERSION=$(cat VERSION)
+MAJOR_VERSION=${VERSION%%\.*}
+export MAJOR_VERSION
 export VERSION
 
 log "Using VERSION=$VERSION"
@@ -53,7 +55,7 @@ aws s3 cp "s3://chef-automate-artifacts/dev/latest/automate/releases.json" exist
 ruby .expeditor/create-manifest.rb
 
 # Append the new version to the dev channel versions file
-jq ". |= .+ [\"$VERSION\"]" existing-versions.json > updated-versions.json
+jq ". |= .+ [\"$VERSION\"] | sort" existing-versions.json > updated-versions.json
 
 # Append the new release to the dev channel releases file
 release_date=$(date -u +"%Y-%m-%dT%H:%M:%S+00:00")
@@ -63,23 +65,28 @@ licenses="https://packages.chef.io/licenses/automate/$VERSION.json"
 release=$(printf '{"version":"%s","release_date":"%s","_links":{"release_notes":"%s","manifest":"%s","licenses":"%s"}}' "$VERSION" "$release_date" "$release_notes" "$manifest" "$licenses")
 jq ". |= .+ [$release]" existing-releases.json > updated-releases.json
 
-
-log_section_start "Uploading new release manifest and release list"
-# Upload the manifest to the S3 bucket
-aws s3 cp "$VERSION.json" "s3://chef-automate-artifacts/manifests/automate/$VERSION.json" --acl public-read --profile chef-cd
-aws s3 cp "$VERSION.json" s3://chef-automate-artifacts/dev/latest/automate/manifest.json --acl public-read --profile chef-cd
-aws s3 cp updated-versions.json s3://chef-automate-artifacts/dev/latest/automate/versions.json --acl public-read --profile chef-cd
-aws s3 cp updated-releases.json s3://chef-automate-artifacts/dev/latest/automate/releases.json --acl public-read --profile chef-cd
-
 # Create gpg signature and sha256sum of the manifest
 gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "$VERSION.json.asc" --detach-sign "$VERSION.json"
 sha256sum "$VERSION.json" > "$VERSION.json.sha256sum"
 
-# Upload the manifest's gpg signature and sha256sum to the S3 bucket
+log_section_start "Uploading new release manifest and release list"
+# Upload the manifest to the S3 bucket
+# Update version file to the bucket either build style or X.Y.Z.json
+aws s3 cp "$VERSION.json" "s3://chef-automate-artifacts/manifests/automate/$VERSION.json" --acl public-read --profile chef-cd
 aws s3 cp "$VERSION.json.asc" "s3://chef-automate-artifacts/manifests/automate/$VERSION.json.asc" --acl public-read --profile chef-cd
 aws s3 cp "$VERSION.json.sha256sum" "s3://chef-automate-artifacts/manifests/automate/$VERSION.json.sha256sum" --acl public-read --profile chef-cd
-aws s3 cp "$VERSION.json.asc" s3://chef-automate-artifacts/dev/latest/automate/manifest.json.asc --acl public-read --profile chef-cd
-aws s3 cp "$VERSION.json.sha256sum" s3://chef-automate-artifacts/dev/latest/automate/manifest.json.sha256sum --acl public-read --profile chef-cd
+
+# Upload the manifests to the appropriate place
+version_array=(latest "${MAJOR_VERSION}")
+for destination in "${version_array[@]}"
+  do
+    aws s3 cp "$VERSION.json" "s3://chef-automate-artifacts/dev/${destination}/automate/manifest_semver.json" --acl public-read --profile chef-cd
+    aws s3 cp "$VERSION.json.asc" "s3://chef-automate-artifacts/dev/${destination}/automate/manifest_semver.json.asc" --acl public-read --profile chef-cd
+    aws s3 cp "$VERSION.json.sha256sum" "s3://chef-automate-artifacts/dev/${destination}/automate/manifest_semver.json.sha256sum" --acl public-read --profile chef-cd
+done
+
+aws s3 cp updated-versions.json s3://chef-automate-artifacts/dev/latest/automate/versions.json --acl public-read --profile chef-cd
+aws s3 cp updated-releases.json s3://chef-automate-artifacts/dev/latest/automate/releases.json --acl public-read --profile chef-cd
 
 #
 # Upload the chef-automate CLI

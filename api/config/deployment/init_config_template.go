@@ -58,6 +58,8 @@ const configTemplate = `
 #
 # https://automate.chef.io/docs/configuration/
 #
-[elasticsearch.v1.sys.runtime]
+
+[opensearch.v1.sys.runtime]
   heapsize = "{{ .ESHeapSize }}"
+
 `

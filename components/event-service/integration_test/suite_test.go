@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
-	olivere "gopkg.in/olivere/elastic.v6"
+	olivere "github.com/olivere/elastic/v7"
 
 	api "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/event-service/config"
@@ -34,10 +34,14 @@ func (s *Suite) GlobalTeardown() {
 func (s *Suite) deleteAllDocuments() {
 	// ES query to match all documents
 	q := olivere.RawStringQuery("{\"match_all\":{}}")
-
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	_, err := esClient.DeleteByQuery().
 		Index(indices...).
-		Type(types...).
 		Query(q).
 		IgnoreUnavailable(true).
 		Refresh("true").

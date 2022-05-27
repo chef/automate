@@ -1,4 +1,4 @@
-import { Component, OnInit, HostBinding } from '@angular/core';
+import { Component, OnInit, HostBinding, Output, EventEmitter } from '@angular/core';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 @Component({
@@ -9,14 +9,21 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
 export class WarningBannerComponent implements OnInit {
   bannerMessage: string;
   bannerTextColor: string;
+  showManualUpgradeContent = true;
+  @Output() close = new EventEmitter();
   @HostBinding('style.backgroundColor') bannerBackgroundColor: string;
 
   constructor(private appConfigService: AppConfigService) { }
 
   ngOnInit() {
-    this.bannerMessage = this.appConfigService.bannerMessage;
-    this.bannerBackgroundColor = this.appConfigService.bannerBackgroundColor;
-    this.bannerTextColor = this.appConfigService.bannerTextColor;
+    if (!this.showManualUpgradeContent) {
+      this.bannerMessage = this.appConfigService.bannerMessage;
+      this.bannerBackgroundColor = this.appConfigService.bannerBackgroundColor;
+      this.bannerTextColor = this.appConfigService.bannerTextColor;
+    }
   }
 
+  closeEvent() {
+    this.close.emit();
+  }
 }

@@ -23,7 +23,7 @@ import (
 )
 
 func TestReportingServerExport(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl})
 
 	/*
 	   Create a struct suitable for setting up a streaming server connection in a test environment.

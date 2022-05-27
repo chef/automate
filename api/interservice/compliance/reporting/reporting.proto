@@ -61,7 +61,8 @@ message ControlSummary {
 message ControlItemRequest {
 	string text = 1;
 	int32 size = 2;
-	repeated ListFilter filters = 3;
+	int32 page_number = 3;
+	repeated ListFilter filters = 4;
 }
 
 message WaiverData {

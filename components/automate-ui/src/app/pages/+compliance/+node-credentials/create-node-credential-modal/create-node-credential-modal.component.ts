@@ -17,6 +17,7 @@ import {
 } from 'app/entities/node-credentials/node-credential.selectors';
 import { SaveNodeCredential } from 'app/entities/node-credentials/node-credential.model';
 import { CreateNodeCredential, NodeCredentialsSearch } from 'app/entities/node-credentials/node-credential.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-node-credential-modal',
@@ -44,7 +45,8 @@ export class CreateNodeCredentialModalComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private saveNodeCred: SaveNodeCredential,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.sshForms = this.fb.group({
       username: ['', Validators.required],
@@ -118,6 +120,7 @@ export class CreateNodeCredentialModalComponent implements OnInit, OnDestroy {
     const userCreateReq = this.saveNodeCred.getNodeCredentialCreate(formValues);
 
     this.store.dispatch(new CreateNodeCredential(userCreateReq));
+    this.telemetryService.track('Settings_NodeCredentials_Create');
   }
 
   selectChangeHandlers(id: string): void {

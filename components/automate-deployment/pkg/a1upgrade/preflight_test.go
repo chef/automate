@@ -237,7 +237,7 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 		r.Delivery.Insights.DataDirectory = dir1
 		r.Delivery.Compliance.ProfilesPath = dir2
 		r.Delivery.Delivery.GitRepos = dir3
-		r.Delivery.Backup.Elasticsearch.Type = "s3"
+		r.Delivery.Backup.Opensearch.Type = "s3"
 		r.Delivery.Reaper.ArchiveDestination = "s3"
 
 		return func() {

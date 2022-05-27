@@ -2,15 +2,19 @@ package main
 
 import (
 	"context"
+	"strconv"
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -26,6 +30,10 @@ var upgradeRunCmdFlags = struct {
 	upgradebackends      bool
 	upgradeairgapbundles bool
 	skipDeploy           bool
+	isMajorUpgrade       bool
+	versionsPath         string
+	acceptMLSA           bool
+	upgradeHAWorkspace   bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -35,6 +43,10 @@ var upgradeRunCmd = &cobra.Command{
 	RunE:  runUpgradeCmd,
 	Args:  cobra.MaximumNArgs(0),
 }
+
+var upgradeStatusCmdFlags = struct {
+	versionsPath string
+}{}
 
 var upgradeStatusCmd = &cobra.Command{
 	Use:   "status",
@@ -80,6 +92,16 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
 	}
 
+	if airgap.AirgapInUse() {
+		res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+		if err != nil {
+			return err
+		}
+		if res.Config.Deployment.GetV1().GetSvc().GetUpgradeStrategy().GetValue() != "none" {
+			return status.New(status.InvalidCommandArgsError, "Before running the upgrade, set upgrade_strategy = 'none' and patch the config.")
+		}
+	}
+
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
 	}
@@ -96,8 +118,57 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
+	validatedResp, err := connection.IsValidUpgrade(context.Background(), &api.UpgradeRequest{
+		Version:        upgradeRunCmdFlags.version,
+		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
+	})
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") &&
+			!strings.Contains(err.Error(), "Unimplemented desc = unknown service chef.automate.domain.deployment.Deployment") {
+			return status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to start upgrade failed",
+			)
+		}
+	} else {
+		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
+			writer.Println("Chef Automate up-to-date")
+			return nil
+		}
+
+		pendingPostChecklist, err := GetPendingPostChecklist(validatedResp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+
+		if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
+			err = ci.RunChecklist()
+			if err != nil {
+				return status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to start upgrade failed",
+				)
+			}
+		}
+	}
+
 	resp, err := connection.Upgrade(context.Background(), &api.UpgradeRequest{
-		Version: upgradeRunCmdFlags.version,
+		Version:        upgradeRunCmdFlags.version,
+		IsMajorUpgrade: upgradeRunCmdFlags.isMajorUpgrade,
+		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 	if err != nil {
 		return status.Wrap(
@@ -125,34 +196,40 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 	}
-	response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
-	if err != nil {
-		return err
-	}
-	if !strings.Contains(response, "y") {
-		return errors.New("canceled upgrade")
+	if !upgradeRunCmdFlags.acceptMLSA {
+		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		if err != nil {
+			return err
+		}
+		if !strings.Contains(response, "y") {
+			return errors.New("canceled upgrade")
+		}
 	}
 
 	if offlineMode {
-		writer.Title("Installing airgap install bundle")
-		airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
-		if err != nil {
-			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
-		}
-		if upgradeRunCmdFlags.upgradefrontends {
-			err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+		upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap)
+
+		if !upgraded {
+			writer.Title("Installing airgap install bundle")
+			airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
 			if err != nil {
-				return err
+				return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 			}
-		} else if upgradeRunCmdFlags.upgradebackends {
-			err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
-			if err != nil {
-				return err
-			}
-		} else {
-			err := moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
-			if err != nil {
-				return err
+			if upgradeRunCmdFlags.upgradefrontends {
+				err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+				if err != nil {
+					return err
+				}
+			} else if upgradeRunCmdFlags.upgradebackends {
+				err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+				if err != nil {
+					return err
+				}
+			} else {
+				err := moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		args = append(args, "-y")
@@ -167,13 +244,19 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if upgradeRunCmdFlags.upgradebackends {
 			args = append(args, "--upgrade-backends", "-y")
 		}
-		if upgradeRunCmdFlags.upgradeairgapbundles {
+		//// NOT NEEDED will remove it in future, after further discussion,
+		//// as by core nature A2HA need airgap bundle to deploy,
+		//// so we can ask user it to provide airgap bundle,
+		//// which will be more convient
+
+		/* if upgradeRunCmdFlags.upgradeairgapbundles {
 			args = append(args, "--upgrade-airgap-bundles", "-y")
 		}
 		if upgradeRunCmdFlags.skipDeploy {
 			args = append(args, "--skip-deploy")
-		}
+		} */
 	}
+
 	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc)
 }
 
@@ -183,7 +266,9 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	resp, err := connection.UpgradeStatus(context.Background(), &api.UpgradeStatusRequest{})
+	resp, err := connection.UpgradeStatus(context.Background(), &api.UpgradeStatusRequest{
+		VersionsPath: upgradeStatusCmdFlags.versionsPath,
+	})
 	if err != nil {
 		return status.Wrap(
 			err,
@@ -205,12 +290,16 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	switch resp.State {
 	case api.UpgradeStatusResponse_IDLE:
 		switch {
-		case resp.CurrentVersion != "" && resp.CurrentVersion < resp.LatestAvailableVersion:
-			writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
-				resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+		//Todo(milestone) - update the comparison logic of current version and latest available version
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
 				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
+			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
+				writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
+					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+				if !resp.IsConvergeCompatable {
+					writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
+				}
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
 			}
@@ -221,6 +310,18 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
 			}
 		}
+
+		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		if len(pendingPostChecklist) > 0 {
+			writer.Println(majorupgradechecklist.POST_UPGRADE_HEADER)
+			for index, msg := range pendingPostChecklist {
+				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
+			}
+		}
+
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
 		if resp.DesiredVersion != "" {
@@ -312,8 +413,65 @@ func init() {
 		"skip-deploy",
 		false,
 		"will only upgrade and not deploy the bundle")
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.acceptMLSA,
+		"yes",
+		"y",
+		false,
+		"Do not prompt for confirmation; accept defaults and continue")
+
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.upgradeHAWorkspace,
+		"workspace-upgrade",
+		"w",
+		false,
+		"Do not prompt for confirmation to accept workspace upgrade")
+
+	upgradeRunCmd.PersistentFlags().BoolVar(
+		&upgradeRunCmdFlags.isMajorUpgrade,
+		"major",
+		false,
+		"This flag is only needed for major version upgrades")
+
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
+	upgradeStatusCmd.PersistentFlags().StringVar(
+		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
+		"Path to versions.json",
+	)
+
+	if !isDevMode() {
+		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+		err = upgradeRunCmd.PersistentFlags().MarkHidden("versions-file")
+		if err != nil {
+			writer.Printf("failed configuring cobra: %s\n", err.Error())
+		}
+	}
 
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
 	RootCmd.AddCommand(upgradeCmd)
+}
+
+func GetPendingPostChecklist(version string) ([]string, error) {
+
+	_, is_major_version := manifest.IsSemVersionFmt(version)
+
+	if is_major_version {
+		var err error
+		pmc, err := majorupgradechecklist.NewPostChecklistManager(version)
+		if err != nil {
+			return []string{}, err
+		}
+
+		pendingPostChecklist, _ := pmc.ReadPendingPostChecklistFile(majorupgradechecklist.UPGRADE_METADATA)
+		return pendingPostChecklist, nil
+	}
+	return []string{}, nil
 }

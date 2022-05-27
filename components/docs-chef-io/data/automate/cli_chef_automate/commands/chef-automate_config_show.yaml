@@ -27,5 +27,9 @@ inherited_options:
   shorthand: t
   default_value: "10"
   usage: Request timeout in seconds
+- name: "yes"
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
 see_also:
 - chef-automate config - Chef Automate configuration

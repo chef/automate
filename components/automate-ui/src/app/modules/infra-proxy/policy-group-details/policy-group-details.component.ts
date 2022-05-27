@@ -128,7 +128,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   }
 
   timeFromNow(epochFormat: string) {
-    const epchoTime = Number(epochFormat);
+    const epchoTime = Number(epochFormat) * 1000;
     const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
     return fromNowValue === '-' ? '--' : fromNowValue;
   }

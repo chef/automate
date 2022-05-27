@@ -10,6 +10,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Destination } from 'app/entities/destinations/destination.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { By } from '@angular/platform-browser';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('DataFeedDetailsComponent', () => {
     let component: DataFeedDetailsComponent;
@@ -22,7 +27,8 @@ describe('DataFeedDetailsComponent', () => {
           DataFeedDetailsComponent
         ],
         providers: [
-          FeatureFlagsService
+          FeatureFlagsService,
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ],
         imports: [
           FormsModule,

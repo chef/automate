@@ -189,7 +189,7 @@ func convertToSerializableDeployment(externalDeployment *deployment.Deployment) 
 		}
 
 		internalDeployment.CurrentReleaseManifest = &schema.ReleaseManifest{
-			Build:    externalDeployment.CurrentReleaseManifest.Build,
+			Build:    externalDeployment.CurrentReleaseManifest.Version(),
 			BuildSHA: externalDeployment.CurrentReleaseManifest.BuildSHA,
 			Packages: packages,
 			Harts:    hartifacts,

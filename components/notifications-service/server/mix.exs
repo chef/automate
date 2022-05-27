@@ -30,7 +30,6 @@ defmodule Notifications.Mixfile do
      included_applications: [
        :poison,
        :sqerl,
-       :pooler,
        :envy],
      extra_applications: [
        :logger,
@@ -52,7 +51,7 @@ defmodule Notifications.Mixfile do
       {:grpc, github: "elixir-grpc/grpc"},
       # database w/ pooling for pgsql access
       {:sqerl, github: "chef/sqerl"},
-      {:pooler, github: "seth/pooler",  erlopts: [{:d, :namespaced_types}, :debug_info, :inline], override: true},
+      {:pooler, github: "seth/pooler",  erlopts: [{:d, :namespaced_types}, :debug_info, :inline], override: true, runtime: false},
       # Used in utils for time formatting.
       {:timex, ">= 3.1.24"},
       # JSON conversion and posting over http (outbound webhooks)

@@ -6,6 +6,11 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { RolesListComponent } from './roles-list.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('RolesListComponent', () => {
   let component: RolesListComponent;
@@ -42,7 +47,8 @@ describe('RolesListComponent', () => {
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ]
     }).compileComponents();
   }));

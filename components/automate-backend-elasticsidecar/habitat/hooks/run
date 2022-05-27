@@ -5,9 +5,5 @@ exec 2>&1
 # Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
 export GODEBUG=x509ignoreCN=0
 
-echo "extracting ops dashboards"
-mkdir -p /hab/svc/automate-backend-elasticsidecar/config/dashboards/
-tar -xzf {{pkg.path}}/data/dashboards.tar.gz -C /hab/svc/automate-backend-elasticsidecar/config/dashboards/
-
 echo "starting elastic sidecar"
 GEM_PATH={{pkg.path}}/lib/gems exec {{pkgPathFor "core/ruby30"}}/bin/ruby {{pkg.path}}/bin/elastic_sidecar.rb

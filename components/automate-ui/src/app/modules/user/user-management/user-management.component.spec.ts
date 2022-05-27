@@ -5,6 +5,11 @@ import { MockComponent } from 'ng2-mock-component';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { UserManagementComponent } from './user-management.component';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('UserManagementComponent', () => {
   let component: UserManagementComponent;
@@ -34,7 +39,8 @@ describe('UserManagementComponent', () => {
         UserManagementComponent
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })

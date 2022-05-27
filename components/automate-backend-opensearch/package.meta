@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-ha-opensearch",
+  "data_service": true
+}
