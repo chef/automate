@@ -27,7 +27,8 @@
                 <li (click)="onDownloadOptPressed('csv')" data-cy="download-csv"><span>Download CSV</span></li>
                 <li *ngIf="appConfigService.isLargeReportingEnabled"
                   (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()" data-cy="open-report">
-                  <span>Open Report</span></li>
+                  <span>Open Report</span>
+                </li>
               </ul>
             </chef-click-outside>
           </chef-dropdown>
@@ -157,8 +158,8 @@
 
       <router-outlet></router-outlet>
 
-      <chef-modal *ngIf="!this.appConfigService.isLargeReportingEnabled" id="download-modal" title="download-title"
-        [visible]="downloadStatusVisible" (closeModal)="hideDownloadStatus()">
+      <chef-modal id="download-modal" title="download-title" [visible]="downloadStatusVisible"
+        (closeModal)="hideDownloadStatus()">
         <ng-container *ngIf="downloadInProgress">
           <h2 id="download-report" class="display4" slot="title">Downloading report...</h2>
         </ng-container>

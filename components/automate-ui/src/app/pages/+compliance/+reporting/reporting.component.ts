@@ -317,7 +317,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
     };
 
     this.downloadList = [filename];
-    this.showDownloadStatus();
+    if (!this.appConfigService.isLargeReportingEnabled){
+      this.showDownloadStatus();
+    }
     this.statsService.downloadReport(format, reportQuery).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
