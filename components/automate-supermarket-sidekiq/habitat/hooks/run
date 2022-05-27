@@ -1,14 +1,28 @@
-#!{{pkgPathFor "core/bash"}}/bin/bash
+#!{{ pkgPathFor "core/bash" }}/bin/bash
 
-# *** WARNING ***
-# Currently, the Habitat `init` and `health_check` hooks run directly from the main loop
-# of the Habitat supervisor. If these hooks hang or take too long to run, they can block
-# execution of the supervisor.
-#
-# Please put potentially long-running and/or complex operations in the run hook rather
-# than the init hook until the issue[0] has been resolved.
-#
-# [0] https://github.com/habitat-sh/habitat/issues/1973
-# PROCESS_NUM=$(ps -ef | grep redis-server | grep -v "grep" | wc -l)
+set -e
 
-# if [ $PROCESS_NUM -eq 0 ]; then
+HOME="{{ pkg.svc_data_path }}"
+export HOME
+
+if [ -f "{{ pkg.svc_config_path }}/app_env.sh" ]; then
+  . "{{ pkg.svc_config_path }}/app_env.sh"
+else
+  >&2 echo "No app env file found: '{{ pkg.svc_config_path }}/app_env.sh'"
+  >&2 echo "Have you not started this service (chef/supermarket) before?"
+  >&2 echo ""
+  >&2 echo "Aborting..."
+  exit 1
+fi
+
+chown -R "{{ cfg.app.user }}":"{{ cfg.app.group }}" {{ pkg.svc_path }}
+
+cd {{ pkg.path }}/app
+
+exec chpst \
+    -U {{ cfg.app.user }}:{{ cfg.app.group }} \
+    -u {{ cfg.app.user }}:{{ cfg.app.group }} \
+    bundle exec sidekiq \
+      --concurrency {{ cfg.app.concurrency }} \
+      --environment {{ cfg.rails_env }} \
+      --timeout {{ cfg.app.timeout }}

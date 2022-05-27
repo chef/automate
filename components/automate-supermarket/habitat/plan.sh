@@ -11,8 +11,6 @@ pkg_svc_group="root"
 pkg_version="5.1.5"
 vendor_origin="chef"
 scaffolding_ruby_pkg="core/ruby27"
-# pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
-# automate_scaffolding_include_templates=(sqerl.config)
 
 pkg_binds=(
   [automate-supermarket-redis]="port"
