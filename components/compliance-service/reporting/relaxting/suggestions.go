@@ -169,18 +169,24 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 	lowerText := strings.ToLower(text)
 
 	if len(text) >= 2 {
-		// Any(or) of the text words can match
-		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or")
-		boolQuery = boolQuery.Must(matchQuery)
-		// All(or) of the text words need to match to get a score boost from this condition
-		matchQuery = elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and")
-		boolQuery = boolQuery.Should(matchQuery)
-		// Give a score boost to values that equal the suggested text
-		termQuery := elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100)
-		boolQuery = boolQuery.Should(termQuery)
-		// Give a score boost to values that start with the suggested text
-		prefixQuery := elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100)
-		boolQuery = boolQuery.Should(prefixQuery)
+		if target == "node_name" {
+			text_string := "*" + lowerText + "*"
+			matchQuery := elastic.NewQueryStringQuery(text_string).Field(target)
+			boolQuery = boolQuery.Must(matchQuery)
+		} else {
+			// Any(or) of the text words can match
+			matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or")
+			boolQuery = boolQuery.Must(matchQuery)
+			// All(or) of the text words need to match to get a score boost from this condition
+			matchQuery = elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and")
+			boolQuery = boolQuery.Should(matchQuery)
+			// Give a score boost to values that equal the suggested text
+			termQuery := elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100)
+			boolQuery = boolQuery.Should(termQuery)
+			// Give a score boost to values that start with the suggested text
+			prefixQuery := elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100)
+			boolQuery = boolQuery.Should(prefixQuery)
+		}
 	}
 	// Create a term aggregation in order to group all the documents that have the same
 	// value and order by score. This is important for suggestions accuracy
