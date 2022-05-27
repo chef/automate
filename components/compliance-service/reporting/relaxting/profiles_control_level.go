@@ -18,17 +18,17 @@ func (depth *ControlDepth) getProfileMinsFromNodesAggs(filters map[string][]stri
 
 	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
 		Must(elastic.NewTermsQuery("profiles.controls.status", "passed")).
-		MustNot(waivedQuery))
+		MustNot(waivedQuery)).SubAggregation("most_recent", getLatestEndTimeForControlStatus())
 
 	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
 		Must(elastic.NewTermsQuery("profiles.controls.status", "failed")).
-		MustNot(waivedQuery))
+		MustNot(waivedQuery)).SubAggregation("most_recent", getLatestEndTimeForControlStatus())
 
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
 		Must(elastic.NewTermsQuery("profiles.controls.status", "skipped")).
-		MustNot(waivedQuery))
+		MustNot(waivedQuery)).SubAggregation("most_recent", getLatestEndTimeForControlStatus())
 
-	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery).SubAggregation("most_recent", getLatestEndTimeForControlStatus())
 
 	profileSha := elastic.NewTermsAggregation().Field("profiles.sha256").Size(int(1))
 	profileAgg := elastic.NewReverseNestedAggregation().Path("profiles").
@@ -58,6 +58,8 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 	profileMins := make([]reporting.ProfileMin, 0)
 	var counts *reportingapi.ProfileCounts
 	statusMap := make(map[string]int, 4)
+	latestTimeStamp := float64(0)
+	var latestStatus string
 
 	if aggRoot, found := depth.unwrap(&searchResult.Aggregations); found {
 		if impactBuckets, found := aggRoot.Aggregations.Terms("impact"); found && len(impactBuckets.Buckets) > 0 {
@@ -66,7 +68,7 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 			impact := impactBuckets.Buckets[0]
 			if failedResult, found := impact.Aggregations.Filter("noncompliant"); found {
 				summary.Failures = int32(failedResult.DocCount)
-
+				timestamp := getTimeStampFromFilterAgg(failedResult)
 				impactAsNumber, ok := impact.Key.(float64)
 				if !ok {
 					//todo - what should we do in this case? as it is now, we will just move forward and set it to low risk
@@ -80,15 +82,36 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 				} else {
 					summary.Criticals = summary.Failures
 				}
+				if timestamp > latestTimeStamp {
+					latestTimeStamp = timestamp
+					latestStatus = "failed"
+				}
+
 			}
 			if passedResult, found := impact.Aggregations.Filter("compliant"); found {
 				summary.Passed = int32(passedResult.DocCount)
+				timestamp := getTimeStampFromFilterAgg(passedResult)
+				if timestamp > latestTimeStamp {
+					latestTimeStamp = timestamp
+					latestStatus = "passed"
+				}
 			}
 			if skippedResult, found := impact.Aggregations.Filter("skipped"); found {
 				summary.Skipped = int32(skippedResult.DocCount)
+				timestamp := getTimeStampFromFilterAgg(skippedResult)
+				if timestamp > latestTimeStamp {
+					latestTimeStamp = timestamp
+					latestStatus = "passed"
+
+				}
 			}
 			if waivedResult, found := impact.Aggregations.Filter("waived"); found {
 				summary.Waived = int32(waivedResult.DocCount)
+				timestamp := getTimeStampFromFilterAgg(waivedResult)
+				if timestamp > latestTimeStamp {
+					latestTimeStamp = timestamp
+					latestStatus = "waived"
+				}
 			}
 			if profileResult, found := impact.Aggregations.ReverseNested("profile"); found {
 				if profileInfoResult, found := profileResult.Terms("profile-info"); found &&
@@ -103,7 +126,8 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 					}
 				}
 			}
-			profileStatus := computeStatus(summary.Failures, summary.Passed, summary.Skipped, summary.Waived)
+			//profileStatus := computeStatus(summary.Failures, summary.Passed, summary.Skipped, summary.Waived)
+			profileStatus := latestStatus
 			summaryRep := reporting.ProfileMin{
 				Name:   summary.Name,
 				ID:     summary.Id,
@@ -124,4 +148,21 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 	}
 
 	return profileMins, counts, nil
+}
+
+func getLatestEndTimeForControlStatus() elastic.Aggregation {
+	mostRecent := elastic.NewReverseNestedAggregation()
+	mostRecent.SubAggregation("end_time", elastic.NewTermsAggregation().Field("end_time").OrderByKeyDesc().Size(1))
+	return mostRecent
+}
+
+func getTimeStampFromFilterAgg(filter *elastic.AggregationSingleBucket) float64 {
+	var timestamp float64
+	latestTimeStampBucket, ok := filter.Aggregations.ReverseNested("most_recent")
+	if ok {
+		if endTimeBucket, present := latestTimeStampBucket.Aggregations.Terms("end_time"); present && len(endTimeBucket.Buckets) > 0 {
+			timestamp = endTimeBucket.Buckets[0].Key.(float64)
+		}
+	}
+	return timestamp
 }
