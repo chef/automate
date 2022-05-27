@@ -183,6 +183,7 @@ export class InfraNodeEffects {
   updateNodeTagsSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(NodeActionTypes.UPDATE_TAGS_SUCCESS),
+      // eslint-disable-next-line no-empty-pattern
       map(({ }: UpdateNodeTagsSuccess) => new CreateNotification({
         type: Type.info,
         message: 'Successfully updated node tags.'
