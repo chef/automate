@@ -401,36 +401,30 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 
 func (depth *ReportDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregation {
 
-	//Keeping the older code commented for reference
-	//aggCompliant := elastic.NewFilterAggregation().
-	//	Filter(elastic.NewTermQuery("status", "passed"))
+	aggPassed := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery("status", "passed"))
 
-	//aggSkipped := elastic.NewFilterAggregation().
-	//	Filter(elastic.NewTermQuery("status", "skipped"))
+	aggSkipped := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery("status", "skipped"))
 
-	//aggNoncompliant := elastic.NewFilterAggregation().
-	//	Filter(elastic.NewTermQuery("status", "failed"))
+	aggFailed := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery("status", "failed"))
 
-	//aggWaived := elastic.NewFilterAggregation().
-	//Filter(elastic.NewTermQuery("status", "waived"))
+	aggWaived := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery("status", "waived"))
 
-	//aggNoncompliant := elastic.NewFilterAggregation().
-	//	Filter(elastic.NewTermQuery("status", "failed"))
-
-	//aggWaived := elastic.NewFilterAggregation().
-	//	Filter(elastic.NewTermQuery("status", "waived")) aggs
-
+	/*//Keeping the older code commented for reference
 	//	aggs["compliant"] = aggCompliant
 	//	aggs["skipped"] = aggSkipped
-	//aggs["noncompliant"] = aggNoncompliant
+	//  aggs["noncompliant"] = aggNoncompliant
 	//	aggs["waived"] = aggWaived
 	//	aggs["high_risk"] = aggHighRisk
 	//	aggs["medium_risk"] = aggMediumRisk
 	//	aggs["low_risk"] = aggLowRisk
 
-	aggPassedAndFailed := getFailedPassedNodesCountsScript(10000)
+	aggPassedAndFailed := getFailedPassedNodesCountsScript(999999)
 
-	aggWaivedAndSkipped := getWaivedSkippedNodesCountsScript(10000)
+	aggWaivedAndSkipped := getWaivedSkippedNodesCountsScript(999999)
 
 	aggs := make(map[string]elastic.Aggregation)
 	for aggName, agg := range aggPassedAndFailed {
@@ -439,7 +433,35 @@ func (depth *ReportDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregat
 
 	for aggName, agg := range aggWaivedAndSkipped {
 		aggs[aggName] = agg
-	}
+	}*/
+
+	aggs := make(map[string]elastic.Aggregation)
+	nodesUuids := elastic.NewTermsAggregation().
+		Field("node_uuid").
+		Size(999999)
+
+	endTime := elastic.NewTermsAggregation().Field("end_time").OrderByKeyDesc().Size(1)
+	endTime.SubAggregation("passed", aggPassed)
+	endTime.SubAggregation("failed", aggFailed)
+	endTime.SubAggregation("skipped", aggSkipped)
+	endTime.SubAggregation("waived", aggWaived)
+
+	nodesUuids.SubAggregation("end_time", endTime)
+	nodesUuids.SubAggregation("failed_count", elastic.NewSumBucketAggregation().BucketsPath("end_time>failed._count"))
+	nodesUuids.SubAggregation("passed_count", elastic.NewSumBucketAggregation().BucketsPath("end_time>passed._count"))
+	nodesUuids.SubAggregation("skipped_count", elastic.NewSumBucketAggregation().BucketsPath("end_time>skipped._count"))
+	nodesUuids.SubAggregation("waived_count", elastic.NewSumBucketAggregation().BucketsPath("end_time>waived._count"))
+
+	failed := elastic.NewSumBucketAggregation().BucketsPath("node>failed_count")
+	passed := elastic.NewSumBucketAggregation().BucketsPath("node>passed_count")
+	skipped := elastic.NewSumBucketAggregation().BucketsPath("node>skipped_count")
+	waived := elastic.NewSumBucketAggregation().BucketsPath("node>waived_count")
+
+	aggs["node"] = nodesUuids
+	aggs["failed"] = failed
+	aggs["passed"] = passed
+	aggs["skipped"] = skipped
+	aggs["waived"] = waived
 
 	return aggs
 }
