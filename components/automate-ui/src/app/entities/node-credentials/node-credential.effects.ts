@@ -89,6 +89,7 @@ export class NodeCredentialEffects {
   createNodeCredentialSuccess$ = createEffect(() =>
     this.actions$.pipe(
     ofType(NodeCredentialActionTypes.CREATE_SUCCESS),
+    // eslint-disable-next-line no-empty-pattern  
     map(({ payload: { } }: CreateNodeCredentialSuccess) => new CreateNotification({
       type: Type.info,
       message: 'Created node credential.'
