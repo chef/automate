@@ -282,9 +282,9 @@ func TestDexUsersAdapter(t *testing.T) {
 
 	t.Run("validate user password, not verified", func(t *testing.T) {
 		email := "bob@chef.io"
-		password := "supercalifragilisticexpialidocious"
+		localUserPass := getPassword()
 
-		ok, err := adp.ValidatePassword(ctx, email, password)
+		ok, err := adp.ValidatePassword(ctx, email, localUserPass)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -404,6 +404,6 @@ func (d *dexAPI) RevokeRefresh(context.Context, *api.RevokeRefreshReq) (*api.Rev
 	return nil, errors.New("not implemented")
 }
 
-func getPassword()string{
+func getPassword() string {
 	return "supercalifragilisticexpialidocious"
 }
