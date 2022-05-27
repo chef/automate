@@ -618,6 +618,7 @@ func (es *Elastic) indicesAndShardsInSnapshot(ctx context.Context, repoName, sna
 	return indexesList, shardsToWaitFor, nil
 }
 
+
 func (es *Elastic) indicesSnapshotRecoveryStatus(ctx context.Context) (*indicesRecoveryStats, error) {
 	indicesRecoveryPath := "/_all/_recovery"
 
