@@ -1,25 +1,50 @@
+---
+# In this file users, backendroles and hosts can be mapped to Security roles.
+# Permissions for OpenSearch roles are configured in roles.yml
+
 _meta:
-  type: "config"
+  type: "rolesmapping"
   config_version: 2
 
-config:
-  dynamic:
-    http:
-      xff:
-        enabled: true
-        internalProxies: '.*' # the nginx proxy
-    authc:
-      proxy_auth_domain:
-        http_enabled: true
-        transport_enabled: true
-        order: 0
-        http_authenticator:
-          type: proxy
-          #type: extended-proxy
-          challenge: false
-          config:
-            user_header: "x-proxy-user"
-            roles_header: "x-proxy-roles"
-            #attr_header_prefix: "x-proxy-ext-"
-        authentication_backend:
-          type: noop
+# Define your roles mapping here
+
+## Demo roles mapping
+
+all_access:
+  reserved: false
+  backend_roles:
+  - "admin"
+  description: "Maps admin to all_access"
+
+own_index:
+  reserved: false
+  users:
+  - "*"
+  description: "Allow full access to an index named like the username"
+
+logstash:
+  reserved: false
+  backend_roles:
+  - "logstash"
+
+kibana_user:
+  reserved: false
+  backend_roles:
+  - "kibanauser"
+  description: "Maps kibanauser to kibana_user"
+
+readall:
+  reserved: false
+  backend_roles:
+  - "readall"
+
+manage_snapshots:
+  reserved: false
+  backend_roles:
+  - "snapshotrestore"
+
+kibana_server:
+  reserved: true
+  users:
+  - "kibanaserver"
+ s
