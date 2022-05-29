@@ -27,6 +27,10 @@ options:
   usage: upgrade Chef Automate HA  frontends version to install
 - name: version
   usage: The exact Chef Automate version to install
+- name: workspace-upgrade
+  shorthand: w
+  default_value: "false"
+  usage: Do not prompt for confirmation to accept workspace upgrade
 - name: "yes"
   shorthand: "y"
   default_value: "false"

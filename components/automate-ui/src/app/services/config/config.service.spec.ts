@@ -36,7 +36,8 @@ describe('ConfigService', () => {
         customerId: '',
         customerName: '',
         maxNodes: 0,
-        deploymentId: '00000000-0000-0000-0000-111111111111'
+        deploymentId: '00000000-0000-0000-0000-111111111111',
+        deploymentType: ''
       };
 
       service.getConfig().subscribe((config) => {

@@ -130,18 +130,7 @@ func tailFile(logFilePath string, executed chan struct{}) {
 
 	}
 }
-
-func bootstrapEnv(dm deployManager) error {
-	if !deployCmdFlags.acceptMLSA {
-		agree, err := writer.Confirm(promptMLSA)
-		if err != nil {
-			return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
-		}
-
-		if !agree {
-			return status.New(status.InvalidCommandArgsError, errMLSA)
-		}
-	}
+func doBootstrapEnv(airgapBundlePath string) error {
 	conf := new(dc.AutomateConfig)
 	if err := mergeFlagOverrides(conf); err != nil {
 		return status.Wrap(
@@ -151,12 +140,12 @@ func bootstrapEnv(dm deployManager) error {
 		)
 	}
 
-	offlineMode := deployCmdFlags.airgap != ""
+	offlineMode := airgapBundlePath != ""
 	manifestPath := ""
 	var airgapMetadata airgap.UnpackMetadata
 	if offlineMode {
 		writer.Title("Installing artifact")
-		metadata, err := airgap.Unpack(deployCmdFlags.airgap)
+		metadata, err := airgap.Unpack(airgapBundlePath)
 		if err != nil {
 			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 		}
@@ -185,10 +174,28 @@ func bootstrapEnv(dm deployManager) error {
 		return status.Annotate(err, status.DeployError)
 	}
 	if offlineMode {
-		err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, deployCmdFlags.airgap)
+		err := moveFrontendBackendAirgapToTransferDir(airgapMetadata, airgapBundlePath)
 		if err != nil {
 			return status.Annotate(err, status.DeployError)
 		}
+	}
+	return nil
+}
+
+func bootstrapEnv(dm deployManager, airgapBundlePath string) error {
+	if !deployCmdFlags.acceptMLSA {
+		agree, err := writer.Confirm(promptMLSA)
+		if err != nil {
+			return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
+		}
+
+		if !agree {
+			return status.New(status.InvalidCommandArgsError, errMLSA)
+		}
+	}
+	err := doBootstrapEnv(airgapBundlePath)
+	if err != nil {
+		return err
 	}
 	err = dm.generateConfig()
 	if err != nil {
@@ -488,6 +495,20 @@ func executeSecretsInitCommand(secretsKeyFilePath string) error {
 }
 
 func executeShellCommand(command string, args []string, workingDir string) error {
+	writer.Printf("\n%s command execution started \n\n\n", command)
+	c := exec.Command(command, args...)
+	c.Stdin = os.Stdin
+	if len(workingDir) > 0 {
+		c.Dir = workingDir
+	}
+	c.Stdout = io.MultiWriter(os.Stdout)
+	c.Stderr = io.MultiWriter(os.Stderr)
+	err := c.Run()
+	writer.Printf("%s command execution done, exiting\n", command)
+	return err
+}
+
+func executeShellCommandAndGet(command string, args []string, workingDir string) error {
 	writer.Printf("\n%s command execution started \n\n\n", command)
 	c := exec.Command(command, args...)
 	c.Stdin = os.Stdin

@@ -191,7 +191,8 @@ func (s *LicenseControlServer) GetDeploymentID(ctx context.Context, req *lc.GetD
 		return nil, err
 	}
 	return &lc.GetDeploymentIDResponse{
-		DeploymentId: deployment.ID,
+		DeploymentId:   deployment.ID,
+		DeploymentType: deployment.Type,
 	}, nil
 }
 

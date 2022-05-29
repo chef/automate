@@ -33,6 +33,7 @@ var upgradeRunCmdFlags = struct {
 	isMajorUpgrade       bool
 	versionsPath         string
 	acceptMLSA           bool
+	upgradeHAWorkspace   bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -206,25 +207,29 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	}
 
 	if offlineMode {
-		writer.Title("Installing airgap install bundle")
-		airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
-		if err != nil {
-			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
-		}
-		if upgradeRunCmdFlags.upgradefrontends {
-			err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+		upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap)
+
+		if !upgraded {
+			writer.Title("Installing airgap install bundle")
+			airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
 			if err != nil {
-				return err
+				return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 			}
-		} else if upgradeRunCmdFlags.upgradebackends {
-			err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
-			if err != nil {
-				return err
-			}
-		} else {
-			err := moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
-			if err != nil {
-				return err
+			if upgradeRunCmdFlags.upgradefrontends {
+				err := moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+				if err != nil {
+					return err
+				}
+			} else if upgradeRunCmdFlags.upgradebackends {
+				err := moveAirgapBackendBundlesOnlyToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+				if err != nil {
+					return err
+				}
+			} else {
+				err := moveFrontendBackendAirgapToTransferDir(airgapMetaData, upgradeRunCmdFlags.airgap)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		args = append(args, "-y")
@@ -239,13 +244,19 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 		if upgradeRunCmdFlags.upgradebackends {
 			args = append(args, "--upgrade-backends", "-y")
 		}
-		if upgradeRunCmdFlags.upgradeairgapbundles {
+		//// NOT NEEDED will remove it in future, after further discussion,
+		//// as by core nature A2HA need airgap bundle to deploy,
+		//// so we can ask user it to provide airgap bundle,
+		//// which will be more convient
+
+		/* if upgradeRunCmdFlags.upgradeairgapbundles {
 			args = append(args, "--upgrade-airgap-bundles", "-y")
 		}
 		if upgradeRunCmdFlags.skipDeploy {
 			args = append(args, "--skip-deploy")
-		}
+		} */
 	}
+
 	return executeAutomateClusterCtlCommandAsync("deploy", args, upgradeHaHelpDoc)
 }
 
@@ -408,6 +419,13 @@ func init() {
 		"y",
 		false,
 		"Do not prompt for confirmation; accept defaults and continue")
+
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.upgradeHAWorkspace,
+		"workspace-upgrade",
+		"w",
+		false,
+		"Do not prompt for confirmation to accept workspace upgrade")
 
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.isMajorUpgrade,

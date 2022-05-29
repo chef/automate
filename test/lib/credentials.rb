@@ -178,12 +178,12 @@ module AutomateCluster
                   admin_cert = """#{certificates[:opensearch_admin][:public][:value]}"""
                   admin_key = """#{certificates[:opensearch_admin][:private][:value]}"""
                 [plugins.security.authcz]
-                  admin_dn = [ "#{certificates[:opensearch_admin][:public][:full_cn_reversed]}" ]
+                  admin_dn = '- #{certificates[:opensearch_admin][:public][:full_cn_reversed]}'
                 [plugins.security.ssl.transport]
                   enforce_hostname_verification = false
                   resolve_hostname = false
                 [plugins.security]
-                  nodes_dn = [ "#{certificates[:opensearch][:public][:full_cn_reversed]}" ]
+                  nodes_dn = '- #{certificates[:opensearch][:public][:full_cn_reversed]}'
               ENDHEREDOC
             else
               utils.backend_logger.error 'Opensearch Certificate values were not set properly - aborting!'
@@ -385,14 +385,14 @@ module AutomateCluster
             },
             opensearch_admin: {
               public: {
-                filename: "#{utils.top_level_dir}/certs/es_admin_ssl_public.pem",
+                filename: "#{utils.top_level_dir}/certs/oser_admin_ssl_public.pem",
                 value: nil,
                 full_cn_reversed: nil,
                 short_cn: nil,
                 extendedKeyUsage_client_server: true
               },
               private: {
-                filename: "#{utils.top_level_dir}/certs/es_admin_ssl_private.key",
+                filename: "#{utils.top_level_dir}/certs/oser_admin_ssl_private.key",
                 value: nil
               }
             },

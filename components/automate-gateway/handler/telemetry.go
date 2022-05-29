@@ -47,7 +47,7 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 		return nil, err
 	}
 
-	deploymentID, err := t.getDeploymentID(ctx)
+	deploymentID, deploymentType, err := t.getDeploymentDetails(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -78,31 +78,33 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 			TelemetryUrl:     tel.TelemetryUrl,
 			MaxNodes:         maxNodes,
 			DeploymentId:     deploymentUUID,
+			DeploymentType:   deploymentType,
 		}, nil
 	}
 
 	return &telemetry.TelemetryResponse{
 		TelemetryEnabled: tel.TelemetryEnabled,
 		TelemetryUrl:     tel.TelemetryUrl,
-		DeploymentId:     deploymentUUID}, nil
+		DeploymentId:     deploymentUUID,
+		DeploymentType:   deploymentType}, nil
 }
 
-func (t *TelemetryServer) getDeploymentID(ctx context.Context) (string, error) {
+func (t *TelemetryServer) getDeploymentDetails(ctx context.Context) (string, string, error) {
 	deployIDResponse, err := t.client.GetDeploymentID(ctx, &license_control.GetDeploymentIDRequest{})
 	if err != nil {
 		if isServiceDownError(err) {
 			log.WithFields(log.Fields{
 				"err":  err,
-				"func": "getDeploymentID",
+				"func": "getDeploymentDetails",
 			}).Error("connecting to the license client")
-			return "", nil
+			return "", "", nil
 		}
-		return "", err
+		return "", "", err
 	}
 
-	log.Debugf("deployIDResponse.DeploymentId: %s", deployIDResponse.DeploymentId)
+	log.Debugf("deployIDResponse.DeploymentId: %s %s", deployIDResponse.DeploymentId, deployIDResponse.DeploymentType)
 
-	return deployIDResponse.DeploymentId, nil
+	return deployIDResponse.DeploymentId, deployIDResponse.DeploymentType, nil
 }
 
 func isServiceDownError(err error) bool {
