@@ -3,16 +3,15 @@ package client
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/google/martian/log"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -176,17 +175,8 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 
 	req = req.WithContext(ctx)
 
-	config := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: true,
-		},
-	}
-	httpClient := &http.Client{Transport: config}
-	response, err := httpClient.Do(req)
-	// response, err := c.HTTPClient.Do(req)
+	response, err := c.HTTPClient.Do(req)
 	if err != nil {
-		log.Errorf("Check 1: %+v, %+v", err, url)
 		return nil, err
 	}
 	defer response.Body.Close() // nolint: errcheck
@@ -206,11 +196,11 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 	}
 
 	if !c.noVerify {
-		log.Errorf("Check 2 No verify: %+v, %+v", err, url)
 		signatureURL := fmt.Sprintf("%s.asc", url)
 		logrus.WithField("url", signatureURL).Debug("Checking manifest signature")
 		sigReq, err := http.NewRequest("GET", signatureURL, nil)
 		if err != nil {
+			log.Errorf("Manifest couldn't be verified: %+v", err)
 			return nil, errors.Wrap(err, "failed to GET manifest signature")
 		}
 		sigReq = sigReq.WithContext(ctx)
