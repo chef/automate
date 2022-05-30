@@ -268,7 +268,7 @@
   max_locked_memory = "unlimited"
   es_startup_sleep_time = ""
   es_java_opts = ""
-  heapsize = "1g"
+  heapsize = "2g"
   g1ReservePercent = "25"
   initiatingHeapOccupancyPercent = "30"
 
