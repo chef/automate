@@ -29,7 +29,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -59,7 +59,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -90,7 +90,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -118,7 +118,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -146,7 +146,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -173,7 +173,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -201,7 +201,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -229,7 +229,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -257,7 +257,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -276,7 +276,7 @@ func TestExternalOpensearch(t *testing.T) {
 		require.Equal(t, c.V1.Sys.Ngx.Main.Resolvers.NameserversString.GetValue(), "111.11.11.11:50", "does not match with the nameserver passed")
 	})
 
-	t.Run("aws elasticsearch", func(t *testing.T) {
+	t.Run("aws opensearch", func(t *testing.T) {
 		c := DefaultConfigRequest()
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
@@ -287,7 +287,7 @@ func TestExternalOpensearch(t *testing.T) {
 							w.String("https://server1"),
 						},
 						Auth: &ac.External_Opensearch_Authentication{
-							Scheme: w.String("aws_es"),
+							Scheme: w.String("aws_os"),
 							AwsOs: &ac.External_Opensearch_Authentication_AwsOpensearchAuth{
 								Username: w.String("testuser"),
 								Password: w.String("testpassword"),
@@ -300,7 +300,7 @@ func TestExternalOpensearch(t *testing.T) {
 
 		require.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		require.Equal(t, "server1", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetAddress().GetValue())
 		require.Equal(t, "443", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetPort().GetValue())
