@@ -209,8 +209,8 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 		}
 		defer sigResp.Body.Close() // nolint: errcheck
 
-		logrus.WithField("ERR:", errors.Errorf("Response statuscode: %+v", sigResp))
-		if sigResp.StatusCode != http.StatusOK {
+		logrus.WithField("Statuscode: ", sigReq.Response.StatusCode)
+		if sigReq.Response.StatusCode != http.StatusOK {
 			return nil, errors.Errorf("Failed to GET manifest signature. status=%s", sigResp.Status)
 		}
 
