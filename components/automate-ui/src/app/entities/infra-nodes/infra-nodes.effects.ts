@@ -156,7 +156,7 @@ export class InfraNodeEffects {
   updateNodeEnvironmentSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(NodeActionTypes.UPDATE_ENVIRONMENT_SUCCESS),
-      map(({ }: UpdateNodeEnvironmentSuccess) => new CreateNotification({
+      map(() => new CreateNotification({
         type: Type.info,
         message: 'Successfully updated node environment.'
       }))));
@@ -182,7 +182,7 @@ export class InfraNodeEffects {
   updateNodeTagsSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(NodeActionTypes.UPDATE_TAGS_SUCCESS),
-      map(({ }: UpdateNodeTagsSuccess) => new CreateNotification({
+      map(() => new CreateNotification({
         type: Type.info,
         message: 'Successfully updated node tags.'
       }))));
