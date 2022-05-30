@@ -21,6 +21,7 @@ export class DownloadReportsService implements OnDestroy {
   downloadSubscription: Subscription;
   reportListSubscription: Subscription;
   notificationItems = {};
+  mySet = new Set();
   retryLongPoll = 0;
   private subject = new Subject();
   obs$ = this.subject.asObservable();
@@ -88,26 +89,29 @@ export class DownloadReportsService implements OnDestroy {
       let isLongPollNeededNextTime = false;
       for (const report of this.reportList) {
         if (report.status === 'running') {
+          this.mySet.add(report.acknowledgement_id)
           isLongPollNeededNextTime = true;
         } else {
           const status = report.status;
           const format = report.report_type.toUpperCase();
           if (status === 'success') {
-            if (this.notificationItems['ack_' + report.acknowledgement_id]) {
+            if (this.mySet.has(report.acknowledgement_id)) {
               this.store.dispatch(new ClearNotificationReport(report.acknowledgement_id));
               this.store.dispatch(new CreateNotification({
                 type: Type.info,
                 message: format + ' report is ready for download.'
               }));
+              this.mySet.delete(report.acknowledgement_id);
             }
           } else if (status === 'failed') {
-            if (this.notificationItems['ack_' + report.acknowledgement_id]) {
-              this.store.dispatch(new ClearNotificationReport(report.acknowledgement_id));
-              this.store.dispatch(new CreateNotification({
-                type: Type.error,
-                message: format + ' report is failed for download.'
-              }));
-            }
+            if (this.mySet.has(report.acknowledgement_id)) {
+                this.store.dispatch(new ClearNotificationReport(report.acknowledgement_id));
+                this.store.dispatch(new CreateNotification({
+                  type: Type.error,
+                  message: format + ' report is failed for download.'
+                }));
+                this.mySet.delete(report.acknowledgement_id);
+              }
           }
         }
       }
