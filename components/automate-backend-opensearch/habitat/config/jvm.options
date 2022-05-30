@@ -19,8 +19,8 @@
 # Xms represents the initial size of total heap space
 # Xmx represents the maximum size of total heap space
 
--Xms1g
--Xmx1g
+-Xms{{cfg.runtime.heapsize}}
+-Xmx{{cfg.runtime.heapsize}}
 
 ################################################################
 ## Expert settings
@@ -44,8 +44,8 @@
 # 10-13:-XX:-UseConcMarkSweepGC
 # 10-13:-XX:-UseCMSInitiatingOccupancyOnly
 14-:-XX:+UseG1GC
-14-:-XX:G1ReservePercent=25
-14-:-XX:InitiatingHeapOccupancyPercent=30
+14-:-XX:G1ReservePercent={{cfg.runtime.g1ReservePercent}}
+14-:-XX:InitiatingHeapOccupancyPercent={{cfg.runtime.initiatingHeapOccupancyPercent}}
 
 ## JVM temporary directory
 -Djava.io.tmpdir=${OPENSEARCH_TMPDIR}
