@@ -139,7 +139,7 @@ module AutomateCluster
             if args[:admin_pass] &&
                args[:kibana_pass]
               pass_conf = <<~ENDHEREDOC
-                [opendistro_auth]
+                [opensearch_auth]
                   admin_password = '#{args[:admin_pass]}'
                   dashboard_password = '#{args[:kibana_pass]}'
               ENDHEREDOC
