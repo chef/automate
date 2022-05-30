@@ -11,7 +11,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/openpgp"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -210,7 +209,7 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 		}
 		defer sigResp.Body.Close() // nolint: errcheck
 
-		log.Info("sigResp statuscode: %+v", sigResp)
+		logrus.WithField("ERR:", errors.Errorf("Response statuscode: %+v", sigResp))
 		if sigResp.StatusCode != http.StatusOK {
 			return nil, errors.Errorf("Failed to GET manifest signature. status=%s", sigResp.Status)
 		}
