@@ -20,7 +20,7 @@ test_detect_broken_cli=true
 # and fix it, but we try to identify common cases and fix them in the
 # tests.
 test_detect_broken_packages=true
-# core / hab / 1.6.288 / 20210402192338
+
 CURRENT_OLDEST_VERSION=20220329091442
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
