@@ -53,6 +53,7 @@ do_deploy() {
     $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
     sleep 5
 
+    export GODEBUG=x509ignore
     log_info "Generating Automate configuration"
     #shellcheck disable=SC2154
     /bin/chef-automate init-config \
