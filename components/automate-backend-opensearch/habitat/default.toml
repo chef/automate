@@ -252,13 +252,26 @@
     indices = "[\".opendistro-alerting-config\", \".opendistro-alerting-alert*\", \".opendistro-anomaly-results*\", \".opendistro-anomaly-detector*\", \".opendistro-anomaly-checkpoints\", \".opendistro-anomaly-detection-state\", \".opendistro-reports-*\", \".opendistro-notifications-*\", \".opendistro-notebooks\", \".opensearch-observability\", \".opendistro-asynchronous-search-response*\", \".replication-metadata-store\"]"
   cloud_aws_signer = ""
   #security.ssl.http.enabled = false
+
+# ======================== S3 Client Configuration =========================
+[s3]
+  [s3.client.default]
+    protocol = "https"
+    read_timeout = "60s"
+    max_retries = "3"
+    use_throttle_retries = true
+    endpoint = "s3.amazonaws.com"
+
 # ======================== Runtime Configuration =========================
 [runtime]
   max_open_files = ""
   max_locked_memory = "unlimited"
   es_startup_sleep_time = ""
   es_java_opts = ""
-  heapsize = "2g"
+  minHeapsize = "2g"
+  maxHeapsize = "3g"
+  g1ReservePercent = "25"
+  initiatingHeapOccupancyPercent = "30"
 
 [deprecated]
 external_os = false
