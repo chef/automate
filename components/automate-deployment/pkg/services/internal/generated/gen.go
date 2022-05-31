@@ -491,6 +491,37 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-supermarket-redis",
+      "metadata": {
+        "name": "chef/automate-supermarket-redis",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/automate-supermarket",
+      "metadata": {
+        "name": "chef/automate-supermarket",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": [
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "supermarket.access_key_id"
+          },
+          {
+            "type": "secret",
+            "optional": false,
+            "secret_spec": "supermarket.secret_access_key"
+          }
+        ]
+      }
+    },
+    {
       "name": "chef/automate-supermarket-nginx",
       "metadata": {
         "name": "chef/automate-supermarket-nginx",

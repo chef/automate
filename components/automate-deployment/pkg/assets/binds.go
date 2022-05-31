@@ -7,14 +7,14 @@ applications-service BINDING_MODE relaxed
 authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-service pg-sidecar-service session-service teams-service
 authn-service BINDING_MODE relaxed
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
-authz-service BINDING_MODE strict
-automate-ha-elasticsearch BINDING_MODE strict
+authz-service BINDING_MODE relaxed
+automate-ha-elasticsearch BINDING_MODE relaxed
 automate-ha-elasticsidecar REQUIRED opensearch
-automate-ha-elasticsidecar BINDING_MODE strict
+automate-ha-elasticsidecar BINDING_MODE relaxed
 automate-ha-haproxy OPTIONAL database pgleaderchk
-automate-ha-haproxy BINDING_MODE strict
-automate-ha-opensearch BINDING_MODE strict
-automate-ha-postgresql BINDING_MODE strict
+automate-ha-haproxy BINDING_MODE relaxed
+automate-ha-opensearch BINDING_MODE relaxed
+automate-ha-postgresql BINDING_MODE relaxed
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE relaxed
 automate-builder-api-proxy REQUIRED automate-builder-api
@@ -34,7 +34,7 @@ automate-cs-oc-erchef OPTIONAL automate-gateway
 automate-cs-oc-erchef BINDING_MODE relaxed
 deployment-service BINDING_MODE relaxed
 automate-dex REQUIRED automate-pg-gateway pg-sidecar-service
-automate-dex BINDING_MODE strict
+automate-dex BINDING_MODE relaxed
 automate-es-gateway REQUIRED automate-opensearch
 automate-es-gateway BINDING_MODE relaxed
 automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service user-settings-service
@@ -43,9 +43,9 @@ automate-ha-pgleaderchk OPTIONAL database
 automate-ha-pgleaderchk BINDING_MODE relaxed
 automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
-automate-minio BINDING_MODE strict
+automate-minio BINDING_MODE relaxed
 automate-opensearch REQUIRED backup-gateway
-automate-opensearch BINDING_MODE strict
+automate-opensearch BINDING_MODE relaxed
 automate-pg-gateway REQUIRED automate-postgresql
 automate-pg-gateway BINDING_MODE relaxed
 automate-postgresql BINDING_MODE relaxed
@@ -56,6 +56,7 @@ automate-supermarket BINDING_MODE relaxed
 automate-supermarket-nginx REQUIRED automate-supermarket
 automate-supermarket-nginx BINDING_MODE relaxed
 automate-supermarket-redis BINDING_MODE relaxed
+automate-supermarket-sidekiq BINDING_MODE relaxed
 automate-ui BINDING_MODE relaxed
 automate-workflow-nginx REQUIRED automate-workflow-server
 automate-workflow-nginx BINDING_MODE relaxed
