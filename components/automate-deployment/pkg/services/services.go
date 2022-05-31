@@ -4,6 +4,7 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -204,6 +205,7 @@ func getRequiredServices(collectionName string, visitedCollections map[string]bo
 	}
 
 	requiredServices = append(requiredServices, collection.Services...)
+	fmt.Println(requiredServices, "patchLog requiredServices")
 	return requiredServices
 
 }

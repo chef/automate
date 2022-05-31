@@ -39,6 +39,7 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 	}
 
 	getRes, err := GetAutomateConfig(timeout)
+	fmt.Println(getRes, "patchLog getRes")
 	if err != nil {
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to get Chef Automate configuration from the deployment-service")
 	}
@@ -50,8 +51,10 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 		Config: config,
 		Hash:   getRes.Hash,
 	}
+	fmt.Println(patchReq, "patchLog patchReq")
 
 	patchRes, err := con.PatchAutomateConfig(context.Background(), patchReq)
+	fmt.Println(patchReq, "patchLog patchRes")
 	if err != nil {
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to patch Chef Automate configuration")
 	}
@@ -83,7 +86,10 @@ func SetAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Form
 		Config: config,
 	}
 
+	fmt.Println(req, "patchLog req")
 	res, err := con.SetAutomateConfig(context.Background(), req)
+	fmt.Println(res, "patchLog res")
+
 	if err != nil {
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to set Chef Automate configuration")
 	}

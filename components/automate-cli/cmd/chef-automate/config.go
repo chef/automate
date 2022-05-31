@@ -120,6 +120,9 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 }
 func runPatchCommand(cmd *cobra.Command, args []string) error {
 	cfg, err := dc.LoadUserOverrideConfigFile(args[0])
+	fmt.Println(cfg, "patchLog log cfg")
+
+	// logrus.Println(cfg, "patchLog log cfg")
 	if err != nil {
 		return status.Annotate(err, status.ConfigError)
 	}

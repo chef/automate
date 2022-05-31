@@ -2,8 +2,10 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
@@ -28,6 +30,7 @@ func (s *server) GetAutomateConfig(ctx context.Context,
 
 	// Create a copy of our persisted config
 	copy, err := s.deployment.GetUserOverrideConfigForPersistence().NewDeepCopy()
+	logrus.Println(copy, "patchLog copy")
 	if err != nil {
 		return nil, status.Error(codes.FailedPrecondition, "Unable to acquire existing configuration")
 	}
@@ -60,6 +63,7 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 		// Use a copy to make sure none of our operations modifies the
 		// userOverrideConfig until we're sure it should change.
 		existingCopy, err := s.deployment.GetUserOverrideConfigForPersistence().NewDeepCopy()
+		fmt.Println(existingCopy, "patchLog existingCopy")
 		if err != nil {
 			return status.Error(codes.FailedPrecondition, "Unable to acquire existing configuration")
 		}
@@ -73,26 +77,32 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 		// that was returned to the client when the request was initiated. If
 		// they don't match then the configuration changed before they submitted
 		// the configuration update.
+		fmt.Println(existingHash, req.Hash, "patchLog existingHash req.ExistingHash")
 		if existingHash != req.Hash {
 			return status.Error(codes.DeadlineExceeded, "The configuration has changed since you initiated the update request. Please try again.")
 		}
+		fmt.Println(existingCopy.OverrideConfigValues(req.Config), "patchLog existingCopy.OverrideConfigValues(req.Config)")
 
 		if err = existingCopy.OverrideConfigValues(req.Config); err != nil {
 			return status.Error(codes.Internal, "Failed to merge configuration into existing configuration")
 		}
 
+		fmt.Println(existingCopy.ValidateWithGlobalAndDefaults(), "patchLog existingCopy.ValidateWithGlobalAndDefaults()")
 		if err = existingCopy.ValidateWithGlobalAndDefaults(); err != nil {
 			return status.Error(codes.InvalidArgument, err.Error())
 		}
 
+		fmt.Println(s.deployment.ReplaceUserOverrideConfig(existingCopy, s.secretStore), "patchLog s.deployment.ReplaceUserOverrideConfig(existingCopy, s.secretStore)")
 		if err = s.deployment.ReplaceUserOverrideConfig(existingCopy, s.secretStore); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
+		fmt.Println(s.updateExpectedServices(), "patchLog s.updateExpectedServices()")
 		if err = s.updateExpectedServices(); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
+		fmt.Println(s.persistDeployment(), "patchLog s.persistDeployment()")
 		if err = s.persistDeployment(); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}

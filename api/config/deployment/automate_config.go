@@ -34,11 +34,15 @@ type AutomateConfigOpt func(*AutomateConfig) error
 // - the resulting config, when merged with defaults, is a valid automate config
 func LoadUserOverrideConfigFile(file string, options ...AutomateConfigOpt) (*AutomateConfig, error) {
 	data, err := ioutil.ReadFile(file)
+	fmt.Println(string(data), "patchLog get data from file")
+
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to read config file located at %s", file)
 	}
 
 	cfg, err := NewUserOverrideConfigFromTOML(data)
+	fmt.Println(cfg, "patchLog data in LoadUserOverrideConfigFile")
+
 	if err != nil {
 		return nil, errors.Wrap(err, "Config file must be a valid automate config")
 	}
@@ -56,9 +60,13 @@ func LoadUserOverrideConfigFile(file string, options ...AutomateConfigOpt) (*Aut
 
 func (c *AutomateConfig) PopulateSecretsFromEnvironment() {
 	a2ServiceConfigType := reflect.TypeOf((*a2conf.A2ServiceConfig)(nil)).Elem()
+	fmt.Println(a2ServiceConfigType, "patchLog data in PopulateSecretsFromEnvironment a2ServiceConfigType")
 	a := reflect.ValueOf(c).Elem()
+	fmt.Println(a, "patchLog data in PopulateSecretsFromEnvironment a")
+
 	for i := 0; i < a.NumField(); i++ {
 		f := a.Field(i)
+		fmt.Println(f, "patchLog data in PopulateSecretsFromEnvironment for f")
 
 		if f.Type().Implements(a2ServiceConfigType) {
 			var v a2conf.A2ServiceConfig
@@ -66,22 +74,31 @@ func (c *AutomateConfig) PopulateSecretsFromEnvironment() {
 			var reflectVal reflect.Value
 			if f.IsNil() {
 				reflectVal = reflect.New(f.Type().Elem())
+				fmt.Println(reflectVal, "patchLog data in PopulateSecretsFromEnvironment for if f.IsNil() reflectVal")
+
 				v = (reflectVal.Interface()).(a2conf.A2ServiceConfig)
+				fmt.Println(v, "patchLog data in PopulateSecretsFromEnvironment for v")
+
 				isNew = true
 			} else {
 				v = (f.Interface()).(a2conf.A2ServiceConfig)
+				fmt.Println(v, "patchLog data in PopulateSecretsFromEnvironment for else else v")
+
 			}
 			for _, secret := range v.ListSecrets() {
 				if v.GetSecret(secret.Name) == nil {
 					envSecret := os.Getenv(secret.EnvironmentVariable)
+					fmt.Println(envSecret, "patchLog data in PopulateSecretsFromEnvironment env secret val outside if")
 					if envSecret != "" {
 						v.SetSecret(secret.Name, w.String(envSecret)) // nolint: errcheck
+						fmt.Println(secret.Name, w.String(envSecret), "patchLog data in PopulateSecretsFromEnvironment secret.Name, w.String(envSecret) val outside if")
 						if isNew {
 							f.Set(reflectVal)
 						}
 					}
 				}
 			}
+			fmt.Println(v, "patchLog data in PopulateSecretsFromEnvironment final v value")
 		}
 	}
 }
@@ -373,10 +390,12 @@ func expandAndValidateDirectory(path string, name string) (string, error) {
 // *WARN* Same warnings apply as NewUserOverrideConfig *WARN*
 func NewUserOverrideConfigFromTOML(data []byte) (*AutomateConfig, error) {
 	cfg := NewUserOverrideConfig()
+	fmt.Println(cfg, "patchLog new config to patch")
 	err := toml.StrictUnmarshal(data, cfg)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(cfg, "patchLog new config to patch res")
 	return cfg, nil
 }
 

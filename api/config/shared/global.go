@@ -300,7 +300,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			if p == "" {
 				args := []string{
 					"show",
-					"userconfig.es_password",
+					"userconfig.os_password",
 				}
 				execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
 				getPass, err := execGetPass.Output()

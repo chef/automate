@@ -982,6 +982,7 @@ func (s *server) DeployStatus(
 	}
 
 	sender, found := s.senderStore.Get(req.TaskId)
+	logrus.Println(&sender, &found, "patchLog sender found")
 	if !found {
 		return ErrorNoSuchTask
 	}

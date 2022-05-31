@@ -42,6 +42,7 @@ func (c *deployClientStreamer) StreamDeployEvents(taskID string, deployID *Deplo
 		DeploymentId: deployID,
 		TaskId:       taskID,
 	})
+	fmt.Println(&stream, err, "patchLog stream, err StreamDeployEvents")
 	if err != nil {
 		return errors.Wrap(err, "DeployStatus client call failed")
 	}

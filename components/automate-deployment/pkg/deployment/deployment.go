@@ -214,11 +214,16 @@ func CollectionsForConfig(c *dc.ConfigRequest) []string {
 
 func ExpectedServiceIDsForConfig(c *dc.ConfigRequest) ([]habpkg.HabPkg, error) {
 	collections := CollectionsForConfig(c)
+	fmt.Println(collections, "patchLog collections")
 	serviceIDs, err := services.ServicesInCollections(collections)
+	fmt.Println(serviceIDs, "patchLog serviceIDs")
+
 	if err != nil {
 		collectionsList := strings.Join(collections, ", ")
+		fmt.Println(collectionsList, "patchLog collectionsList")
 		return nil, errors.Wrapf(err, "unable to get list of services for collection(s) %s", collectionsList)
 	}
+	fmt.Println(serviceIDs, "patchLog serviceIDs")
 	return serviceIDs, nil
 }
 
@@ -337,6 +342,9 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 
 	// Add any new services
 	serviceMap := makeServiceMap(d.ExpectedServices)
+	fmt.Println("A2 upgrade detected. Fixing services in Skip state.", serviceMap)
+	// d.Config.Global.V1.External.Opensearch.Auth.BasicAuth.Password = &wrapperspb.StringValue{Value: "password"}
+	fmt.Println("A2 upgrade detected. Fixing services in Skip state11111.", d)
 	for _, pkg := range serviceIDs {
 		desiredSvc := NewServiceFromHabPackage(pkg)
 		_, found := serviceMap[pkg.Name()]
@@ -356,13 +364,16 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 	// NOTE(ssd) 2018-07-16: Fix for A1 upgrade bug where services are stuck in
 	// Skip state since they were added post-upgrade.
 	if ContainsAutomateCollection(d.Config.GetDeployment()) {
-		a2ServicesWayBackWhen := map[string]bool{"authn-service": true, "authz-service": true, "automate-cli": true, "automate-dex": true, "automate-elasticsearch": true, "automate-gateway": true, "automate-load-balancer": true, "automate-postgresql": true, "automate-ui": true, "compliance-service": true, "config-mgmt-service": true, "deployment-service": true, "es-sidecar-service": true, "ingest-service": true, "license-control-service": true, "local-user-service": true, "notifications-service": true, "session-service": true, "teams-service": true}
+		a2ServicesWayBackWhen := map[string]bool{"authn-service": true, "authz-service": true, "automate-cli": true, "automate-dex": true, "automate-opensearch": true, "automate-gateway": true, "automate-load-balancer": true, "automate-postgresql": true, "automate-ui": true, "compliance-service": true, "config-mgmt-service": true, "deployment-service": true, "es-sidecar-service": true, "ingest-service": true, "license-control-service": true, "local-user-service": true, "notifications-service": true, "session-service": true, "teams-service": true}
 		diff := make([]string, 0, len(serviceMap))
 		for key := range serviceMap {
 			if _, ok := a2ServicesWayBackWhen[key]; !ok {
 				diff = append(diff, key)
 			}
 		}
+		// logrus.Println("A2 upgrade detected. Fixing services in Skip state.", serviceMap)
+		// d.Config.Global.V1.External.Opensearch.Auth.BasicAuth.Password = &wrapperspb.StringValue{Value: "password"}
+		// logrus.Println("A2 upgrade detected. Fixing services in Skip state11111.", d)
 
 		for _, svc := range diff {
 			_, found := serviceMap[svc]
@@ -384,6 +395,10 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 		expectedServices[i] = serviceMap[pkg.Name()]
 	}
 	d.ExpectedServices = expectedServices
+	for _, v := range d.ExpectedServices {
+		fmt.Println(v.Name(), v.DeploymentState, v.Installable, "patchLog d.ExpectedServices")
+
+	}
 	return nil
 }
 
