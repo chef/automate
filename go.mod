@@ -79,6 +79,7 @@ require (
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/nats-streaming-server v0.17.0
 	github.com/nats-io/nats.go v1.9.1
+	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/stan.go v0.6.0
 	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.19.1
@@ -116,8 +117,10 @@ require (
 	go.uber.org/zap v1.15.0
 	gocloud.dev v0.19.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.0.0-20200806022845-90696ccdc692 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
