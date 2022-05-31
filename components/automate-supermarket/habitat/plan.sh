@@ -34,8 +34,6 @@ pkg_deps=(
   core/libarchive/3.5.2/20220311132828
   core/shared-mime-info/1.10/20220313111259 
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
-  # "${local_platform_tools_origin:-chef}/automate-platform-tools"
-  # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/supermarket/5.1.32/20220524075351"
 )
 

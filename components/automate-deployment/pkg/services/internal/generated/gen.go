@@ -501,6 +501,10 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-supermarket-sidekiq",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -675,7 +679,8 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-supermarket-redis",
         "chef/automate-supermarket",
-        "chef/automate-supermarket-nginx"
+        "chef/automate-supermarket-nginx",
+        "chef/automate-supermarket-sidekiq"
       ],
       "packages": null,
       "dependencies": [
