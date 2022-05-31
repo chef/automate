@@ -209,16 +209,6 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 		}
 		defer sigResp.Body.Close() // nolint: errcheck
 
-		// Remove the following lines
-		buf := new(bytes.Buffer)
-		_, err = buf.ReadFrom(sigResp.Body)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to read signature response")
-		}
-		newStr := buf.String()
-		logrus.Errorf("________________________________sigResp_________________________: %+v", sigResp)
-		logrus.Errorf("________________________________sigResp_________________________: %+v", newStr)
-		// Till here
 		if sigResp.StatusCode != http.StatusOK {
 			return nil, errors.Errorf("Failed to GET manifest signature. status=%s", sigResp.Status)
 		}
