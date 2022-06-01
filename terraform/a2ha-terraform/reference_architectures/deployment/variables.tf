@@ -90,19 +90,19 @@ variable "chef_server_private_ips" {
   default = []
 }
 
-variable "managed_elasticsearch_certificate" {
+variable "managed_opensearch_certificate" {
   default = ""
 }
 
-variable "managed_elasticsearch_domain_url" {
+variable "managed_opensearch_domain_url" {
   default = ""
 }
 
-variable "managed_elasticsearch_user_password" {
+variable "managed_opensearch_user_password" {
   default = ""
 }
 
-variable "managed_elasticsearch_username" {
+variable "managed_opensearch_username" {
   default = ""
 }
 
