@@ -306,6 +306,7 @@ module "postgresql" {
 module "bootstrap_automate" {
   source                              = "./modules/automate"
   airgap_info                         = module.airgap_bundle-automate.airgap_info
+  aws_region                          = var.aws_region
   automate_admin_email                = var.automate_admin_email
   automate_admin_username             = var.automate_admin_username
   automate_admin_password             = var.automate_admin_password
@@ -327,6 +328,9 @@ module "bootstrap_automate" {
   managed_opensearch_domain_url       = var.managed_opensearch_domain_url
   managed_opensearch_user_password    = var.managed_opensearch_user_password
   managed_opensearch_username         = var.managed_opensearch_username
+  aws_os_snapshot_role_arn            = var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id      = var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret  = var.os_snapshot_user_access_key_secret
   managed_rds_instance_url            = var.managed_rds_instance_url
   managed_rds_superuser_username      = var.managed_rds_superuser_username
   managed_rds_superuser_password      = var.managed_rds_superuser_password
@@ -355,6 +359,7 @@ module "bootstrap_automate" {
 module "automate" {
   source                              = "./modules/automate"
   airgap_info                         = module.airgap_bundle-automate.airgap_info
+  aws_region                          = var.aws_region
   automate_admin_email                = var.automate_admin_email
   automate_admin_username             = var.automate_admin_username
   automate_admin_password             = var.automate_admin_password
@@ -376,6 +381,9 @@ module "automate" {
   managed_opensearch_domain_url       = var.managed_opensearch_domain_url
   managed_opensearch_user_password    = var.managed_opensearch_user_password
   managed_opensearch_username         = var.managed_opensearch_username
+  aws_os_snapshot_role_arn            = var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id      = var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret  = var.os_snapshot_user_access_key_secret
   managed_rds_instance_url            = var.managed_rds_instance_url
   managed_rds_superuser_username      = var.managed_rds_superuser_username
   managed_rds_superuser_password      = var.managed_rds_superuser_password
@@ -408,6 +416,7 @@ module "automate" {
 module "chef_server" {
   source                              = "./modules/automate"
   airgap_info                         = module.airgap_bundle-chef_server.airgap_info
+  aws_region                          = var.aws_region
   automate_admin_email                = var.automate_admin_email
   automate_admin_username             = var.automate_admin_username
   automate_admin_password             = var.automate_admin_password
@@ -429,6 +438,9 @@ module "chef_server" {
   managed_opensearch_domain_url       = var.managed_opensearch_domain_url
   managed_opensearch_user_password    = var.managed_opensearch_user_password
   managed_opensearch_username         = var.managed_opensearch_username
+  aws_os_snapshot_role_arn            = var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id      = var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret  = var.os_snapshot_user_access_key_secret
   managed_rds_instance_url            = var.managed_rds_instance_url
   managed_rds_superuser_username      = var.managed_rds_superuser_username
   managed_rds_superuser_password      = var.managed_rds_superuser_password

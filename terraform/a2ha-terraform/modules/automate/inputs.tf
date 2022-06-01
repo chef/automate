@@ -32,6 +32,11 @@ variable "automate_role" {
   description = "Set the type of server role. can be one of: bootstrap_automate, automate or chef_api"
 }
 
+variable "aws_region" {
+  default     = "us-west-2"
+  description = "The name of the selected AWS region / datacenter."
+}
+
 variable "backend_aib_dest_file" {
 }
 
@@ -79,6 +84,18 @@ variable "managed_opensearch_user_password" {
 }
 
 variable "managed_opensearch_username" {
+  default = ""
+}
+
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
   default = ""
 }
 

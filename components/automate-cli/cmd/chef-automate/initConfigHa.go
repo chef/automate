@@ -78,6 +78,9 @@ type AwsConfigToml struct {
 			ElasticsearchUsername        string   `toml:"managed_opensearch_username"`
 			ElasticsearchUserPassword    string   `toml:"managed_opensearch_user_password"`
 			ElasticsearchCertificate     string   `toml:"managed_opensearch_certificate"`
+			AwsOsSnapshotRoleArn         string   `toml:"aws_os_snapshot_role_arn"`
+			OsUserAccessKeyId            string   `toml:"os_snapshot_user_access_key_id"`
+			OsUserAccessKeySecret        string   `toml:"os_snapshot_user_access_key_secret"`
 			RDSInstanceUrl               string   `toml:"managed_rds_instance_url"`
 			RDSSuperUserName             string   `toml:"managed_rds_superuser_username"`
 			RDSSuperUserPassword         string   `toml:"managed_rds_superuser_password"`

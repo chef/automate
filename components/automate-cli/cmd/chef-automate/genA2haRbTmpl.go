@@ -139,6 +139,9 @@ aws do
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ else }}#managed_opensearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ else }}#managed_opensearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ else }}#managed_opensearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}aws_os_snapshot_role_arn "{{ .Aws.Config.AwsOsSnapshotRoleArn }}" {{ else }}#aws_os_snapshot_role_arn "{{ .Aws.Config.AwsOsSnapshotRoleArn }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}os_snapshot_user_access_key_id "{{ .Aws.Config.OsUserAccessKeyId }}" {{ else }}#os_snapshot_user_access_key_id "{{ .Aws.Config.OsUserAccessKeyId }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}os_snapshot_user_access_key_secret "{{ .Aws.Config.OsUserAccessKeySecret }}" {{ else }}#os_snapshot_user_access_key_secret "{{ .Aws.Config.OsUserAccessKeySecret }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_instance_url "{{ .Aws.Config.RDSInstanceUrl }}" {{ else }}#managed_rds_instance_url "{{ .Aws.Config.RDSInstanceUrl }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_superuser_username "{{ .Aws.Config.RDSSuperUserName }}" {{ else }}#managed_rds_superuser_username "{{ .Aws.Config.RDSSuperUserName }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_superuser_password "{{ .Aws.Config.RDSSuperUserPassword }}" {{ else }}#managed_rds_superuser_password "{{ .Aws.Config.RDSSuperUserPassword }}" {{ end }}

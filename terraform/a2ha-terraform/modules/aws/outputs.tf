@@ -53,6 +53,18 @@ output "opensearch_private_ips" {
   value = aws_instance.chef_automate_opensearch.*.private_ip
 }
 
+output "aws_os_snapshot_role_arn" {
+  value = aws_iam_role.pass_es_role.arn
+}
+
+output "os_snapshot_user_access_key_id" {
+  value = aws_iam_access_key.snap_reg_user_key.id
+}
+
+output "os_snapshot_user_access_key_secret" {
+  value = aws_iam_access_key.snap_reg_user_key.secret
+}
+
 output "random_id" {
   value = random_id.random.hex
 }
