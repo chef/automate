@@ -9,14 +9,14 @@ pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_name=automate-openjdk
 # Release archive https://jdk.java.net/archive/
-pkg_version=11.0.13+8
-pkg_source=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.13%2B8/OpenJDK11U-jdk_x64_linux_hotspot_11.0.13_8.tar.gz
-pkg_shasum=3b1c0c34be4c894e64135a454f2d5aaa4bd10aea04ec2fa0c0efe6bb26528e30
-pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.13_8.tar.gz
+pkg_version=11.0.15+10
+pkg_source=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.15%2B10/OpenJDK11U-jdk_x64_linux_hotspot_11.0.15_10.tar.gz
+pkg_shasum=5fdb4d5a1662f0cca73fec30f99e67662350b1fa61460fa72e91eb9f66b54d0b
+pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.15_10.tar.gz
 pkg_dirname="jdk-${pkg_version}"
 pkg_license=("GPL-2.0-with-classpath-exception")
-pkg_description=('AdoptOpenJDK binaries are created from the unmodified source code at OpenJDK.')
-pkg_upstream_url=https://adoptopenjdk.net/
+pkg_description=('Eclipse Temurin is the open source Java SE build based upon OpenJDK.')
+pkg_upstream_url=https://adoptium.net/
 
 pkg_deps=(
   core/gcc-libs
