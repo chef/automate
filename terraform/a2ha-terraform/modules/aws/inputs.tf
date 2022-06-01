@@ -25,6 +25,11 @@ variable "automate_ebs_volume_type" {
 variable "automate_fqdn" {
 }
 
+variable "aws_region" {
+  default     = "us-west-2"
+  description = "The name of the selected AWS region / datacenter."
+}
+
 variable "automate_instance_count" {
   default = 1
 }
