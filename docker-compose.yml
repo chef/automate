@@ -1,0 +1,181 @@
+version: '3.8'
+services:
+  automate-postgresql:
+    image: postgres:13.5-alpine
+    container_name: automate-postgresql
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - '5432:5432'
+    volumes: 
+      - ./docker_configs/automate-postgresql:/docker-entrypoint-initdb.d/
+      - ./docker_certs/common/:/var/lib/postgresql/certs/
+      - automate-postgresql:/var/lib/postgresql/data
+  
+  # opensearch-node1:
+  #   image: opensearchproject/opensearch:1.2.4
+  #   container_name: opensearch-node1
+  #   environment:
+  #     - cluster.name=opensearch-cluster
+  #     - node.name=opensearch-node1
+  #     - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+  #     - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+  #     - "DISABLE_INSTALL_DEMO_CONFIG=true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+  #     - "DISABLE_SECURITY_PLUGIN=true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+  #     - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #     nofile:
+  #       soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+  #       hard: 65536
+  #   volumes:
+  #     - opensearch-data1:/usr/share/opensearch/data
+  #   ports:
+  #     - 9200:9200
+  #     - 9600:9600 # required for Performance Analyzer
+
+  # opensearch-dashboards:
+  #   image: opensearchproject/opensearch-dashboards:1.2.0
+  #   container_name: opensearch-dashboards
+  #   ports:
+  #     - 5601:5601
+  #   expose:
+  #     - "5601"
+  #   environment:
+  #     - 'OPENSEARCH_HOSTS=["http://opensearch-node1:9200"]'
+  #     - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
+  
+  automate-ui:
+    build: 
+      context: .
+      dockerfile: Dockerfile.automate-ui
+    container_name: automate-ui
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=automate-ui
+      - A2_SVC_PATH=/app
+    ports:
+      - 2015:2015
+
+  automate-pg-gateway:
+    build: 
+      context: .
+      dockerfile: Dockerfile.automate-pg-gateway
+    container_name: automate-pg-gateway
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=automate-pg-gateway
+      - A2_SVC_PATH=/app
+    ports:
+      - 10145:10145
+      - 10146:10146
+  
+  automate-dex:
+    build: 
+      context: .
+      dockerfile: Dockerfile.automate-dex
+    container_name: automate-dex
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=automate-dex
+      - A2_SVC_PATH=/app
+    ports:
+      - 10117:10117
+      - 10116:10116
+  
+  session-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile.session-service
+    container_name: session-service
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=session-service
+      - A2_SVC_PATH=/app
+    ports:
+      - 10115:10115
+      - 10108:10108
+  
+  authn-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile.authn-service
+    container_name: authn-service
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=authn-service
+      - A2_SVC_PATH=/app
+    ports:
+      - 10113:10113
+      - 10162:10162
+
+  authz-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile.authz-service
+    container_name: authz-service
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=authz-service
+      - A2_SVC_PATH=/app
+    ports:
+      - 10130:10130
+  
+  teams-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile.teams-service
+    container_name: teams-service
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=teams-service
+      - A2_SVC_PATH=/app
+    ports:
+      - 10128:10128
+
+  automate-load-balancer:
+    build: 
+      context: .
+      dockerfile: Dockerfile.automate-load-balancer
+    container_name: automate-load-balancer
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=automate-load-balancer
+      - A2_SVC_PATH=/app
+    ports:
+      - 10161:10161
+
+  cereal-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile.cereal-service
+    container_name: cereal-service
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=cereal-service
+      - A2_SVC_PATH=/app
+    ports:
+      - 10101:10101
+
+  pg-sidecar-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile.pg-sidecar-service
+    container_name: pg-sidecar-service
+    environment:
+      - GODEBUG=x509ignoreCN=0
+      - A2_SVC_NAME=pg-sidecar-service
+      - A2_SVC_PATH=/app
+    ports:
+      - 10100:10100
+
+volumes:
+  automate-postgresql:
+    driver: local
+  opensearch-data1:
+    driver: local

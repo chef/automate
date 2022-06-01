@@ -1,0 +1,42 @@
+FROM golang:1.15-alpine as builder
+
+WORKDIR /app/api/external
+COPY ./api/external/go.mod /app/api/external
+WORKDIR /app/api/external
+RUN go mod tidy
+
+WORKDIR /app/protovendor
+COPY ./protovendor/go.mod /app/protovendor
+RUN go mod tidy
+
+WORKDIR /app/components/docs-chef-io
+COPY ./components/docs-chef-io/go.mod /app/components/docs-chef-io
+RUN go mod tidy
+
+WORKDIR /app
+COPY ./go.mod /app/
+RUN go mod tidy
+
+COPY ./components/automate-gateway /app/components/automate-gateway
+COPY ./lib /app/lib
+COPY ./tools /app/tools
+COPY ./scripts /app/scripts
+COPY ./tools /app/tools
+COPY ./api /app/api
+COPY ./protovendor /app/protovendor
+COPY ./vendor.go /app/vendor.go
+
+RUN mkdir /output
+RUN go build -o /output/automate-gateway /app/components/automate-gateway/cmd/automate-gateway
+
+FROM alpine as server
+WORKDIR /app
+COPY --from=builder /output /app
+# COPY ./components/automate-gateway/migrations /app/migrations
+COPY ./docker_configs/automate-gateway /app/config
+COPY --chmod=600 ./docker_certs/common /app/certs
+COPY ./components/automate-gateway/third_party/swagger-ui /app/static/swagger-ui
+
+EXPOSE 2000
+EXPOSE 2001
+ENTRYPOINT [ "/app/automate-gateway", "serve", "--config", "/app/config/config.toml" ]

@@ -1,0 +1,17 @@
+---
+grpc: 127.0.0.1:10130
+log-level: info
+log-format: text
+
+tls:
+  cert_path: /app/certs/service.crt
+  key_path: /app/certs/service.key
+  root_ca_path: /app/certs/root_ca.crt
+
+database: chef_authz_service
+max_connections: 10
+max_idle_connections: 10
+migrations-path: /app/migrations
+data-migrations-path: /app/data-migrations
+project-limit: 300
+cereal-address: 127.0.0.1:10101

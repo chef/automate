@@ -1,0 +1,15 @@
+---
+grpc: 127.0.0.1:10128
+log-level: info
+log-format: text
+
+tls:
+  cert_path: /app/certs/service.crt
+  key_path: /app/certs/service.key
+  root_ca_path: /app/certs/root_ca.crt
+
+database: chef_teams_service
+migrations-path: /app/migrations
+data-migrations-path: /app/data-migrations
+authz-address: 127.0.0.1:10130
+cereal-address: 127.0.0.1:10101

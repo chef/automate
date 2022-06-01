@@ -1,0 +1,70 @@
+host = "127.0.0.1"
+port = 2000
+grpc_port = 2001
+external_fqdn = "https://a2-dev.test"
+trial_license_url = "https://licensing.chef.io/create-trial"
+open_api_ui_dir = "/app/static/swagger-ui/"
+
+[data_collector]
+[log]
+  level = "info"
+
+[tls]
+  cert_path = "/app/certs/service.crt"
+  key_path = "/app/certs/service.key"
+  root_ca_path ="/app/certs/root_ca.crt"
+
+[grpc_clients]
+  null_backend_sock = "/app/var/null_backend.sock"
+[grpc_clients.endpoints]
+  [grpc_clients.endpoints.applications-service]
+    target = "127.0.0.1:10133"
+    secure = true
+  [grpc_clients.endpoints.authz-service]
+    target = "127.0.0.1:10130"
+    secure = true
+  [grpc_clients.endpoints.authn-service]
+    target = "127.0.0.1:10113"
+    secure = true
+  [grpc_clients.endpoints.compliance-service]
+    target = "127.0.0.1:10121"
+    secure = true
+  [grpc_clients.endpoints.config-mgmt-service]
+    target = "127.0.0.1:10119"
+    secure = true
+  [grpc_clients.endpoints.data-feed-service]
+    target = "127.0.0.1:10105"
+    secure = true
+  [grpc_clients.endpoints.deployment-service]
+    target = "127.0.0.1:10160"
+    secure = true
+  [grpc_clients.endpoints.event-feed-service]
+    target = "127.0.0.1:10134"
+    secure = true
+  [grpc_clients.endpoints.infra-proxy-service]
+    target = "127.0.0.1:10153"
+    secure = true
+  [grpc_clients.endpoints.ingest-service]
+    target = "127.0.0.1:10122"
+    secure = true
+  [grpc_clients.endpoints.license-control-service]
+    target = "127.0.0.1:10124"
+    secure = true
+  [grpc_clients.endpoints.local-user-service]
+    target = "127.0.0.1:10127"
+    secure = true
+  [grpc_clients.endpoints.nodemanager-service]
+    target = "127.0.0.1:10120"
+    secure = true
+  [grpc_clients.endpoints.notifications-service]
+    target = "127.0.0.1:10125"
+    secure = true
+  [grpc_clients.endpoints.teams-service]
+    target = "127.0.0.1:10128"
+    secure = true
+  [grpc_clients.endpoints.secrets-service]
+    target = "127.0.0.1:10131"
+    secure = true
+  [grpc_clients.endpoints.user-settings-service]
+    target = "127.0.0.1:10107"
+    secure = true

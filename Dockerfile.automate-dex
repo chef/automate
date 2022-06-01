@@ -1,0 +1,32 @@
+FROM golang:1.15-alpine as builder
+
+RUN apk update
+RUN apk add build-base
+RUN apk add git
+
+WORKDIR /app
+RUN git clone --branch add_invalid_attempts "https://github.com/chef/dex-1" /app
+RUN go mod tidy
+
+RUN mkdir /output
+RUN ls /app
+RUN go build -o /output/automate-dex /app/cmd/dex
+
+FROM alpine as server
+WORKDIR /app
+COPY --from=builder /output /app
+
+
+COPY --from=builder /app/web/static /app/web/static
+COPY --from=builder /app/web/templates /app/web/templates
+
+COPY ./components/automate-dex/web/theme /app/web/themes/chef
+COPY ./components/automate-dex/web/static /app/web/static
+COPY ./components/automate-dex/web/templates /app/web/templates
+
+COPY ./docker_configs/session-service /app/config
+COPY --chmod=600 ./docker_certs/common /app/certs
+
+EXPOSE 10117
+EXPOSE 10116
+ENTRYPOINT [ "/app/automate-dex", "serve", "/app/config/config.yml" ]

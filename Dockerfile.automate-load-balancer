@@ -1,0 +1,10 @@
+FROM nginx
+COPY ./docker_configs/automate-load-balancer/nginx.conf /etc/nginx/nginx.conf
+COPY ./docker_configs/automate-load-balancer/ /app/config
+COPY --chmod=600 ./docker_certs/common /app/certs
+COPY --chmod=600 ./docker_certs/automate-load-balancer /app/certs
+
+EXPOSE 10161
+
+# BUILD Commands
+# docker build -t automate-ui -f Dockerfile.automate-ui .

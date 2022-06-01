@@ -1,0 +1,25 @@
+{
+    "package": {
+    "ident": "chef/pg-sidecar-service/0.0.1/20220525120357",
+    "path": "/app"
+    },
+    "service": {
+    "name": "pg-sidecar-service",
+    "path": "/app",
+    "tls": {
+    "cert_path": "/app/certs/service.crt",
+    "key_path": "/app/certs/service.key",
+    "root_ca_path": "/app/certs/root_ca.crt"
+    }
+    },
+    "postgresql": {
+    "ip": "127.0.0.1",
+    "cfg": {
+      "port": 10145
+    },
+    "__placeholder": {}
+    },
+    "pg_sidecar": {
+    },
+    "__placeholder": {}
+}

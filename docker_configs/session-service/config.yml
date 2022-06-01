@@ -1,0 +1,23 @@
+---
+issuer-url: https://automate-dex
+dex-url: https://127.0.0.1:10117
+redirect-url: /session/callback
+client-id: automate-session
+client-secret: secretchangeme
+http-port: 10115
+http-listen: "127.0.0.1"
+grpc-port: 10108
+signin-url: /signin
+bldr-signin-url: /bldr
+bldr-client-id: automate-builder-api
+bldr-client-secret: a23271a1ac57d961e853ec7525a7f27ff0961dfc55a16fd7861703421d2c6297
+log-level: info
+log-format: text
+database: chef_session_service
+migrations-path: /app/migrations
+persistent: true
+
+tls:
+  cert_path: /app/certs/service.crt
+  key_path: /app/certs/service.key
+  root_ca_path: /app/certs/root_ca.crt

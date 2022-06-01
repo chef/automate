@@ -1,0 +1,5 @@
+parseStaticAutomateConfig({
+    "products": [
+      "automate"
+    ]
+  })

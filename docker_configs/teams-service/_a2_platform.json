@@ -1,0 +1,30 @@
+{
+    "package": {
+    "ident": "chef/teams-service/0.1.0/20220525120240",
+    "path": "/app"
+    },
+    "service": {
+    "name": "teams-service",
+    "path": "/app",
+    "tls": {
+    "cert_path": "/app/certs/service.crt",
+    "key_path": "/app/certs/service.key",
+    "root_ca_path": "/app/certs/root_ca.crt"
+    }
+    },
+    "postgresql": {
+    "ip": "127.0.0.1",
+    "cfg": {
+      "port": 10145
+    },
+    "__placeholder": {}
+    },
+    "pg_sidecar": {
+    "ip": "127.0.0.1",
+    "cfg": {
+      "port": 10100
+    },
+    "__placeholder": {}
+    },
+    "__placeholder": {}
+}

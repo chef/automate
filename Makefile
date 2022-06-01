@@ -32,3 +32,36 @@ semgrep-legacy: ## runs full semgrep including findings for existing issues that
 SEMGREP_IGNORE := --exclude third_party --exclude *_test.go --exclude *.pb.go --exclude *.pb.*.go --exclude *.bindata.go --exclude *.spec.ts --exclude coverage --exclude modernizr-custom.js
 semgrep-test/%:
 	semgrep --config "p/$(@F)" $(SEMGREP_IGNORE)
+
+docker-build-ui:
+	DOCKER_BUILDKIT=1 docker build -t automate-ui -f Dockerfile.automate-ui .
+
+docker-run-ui:
+	docker run -d -p 10161:80 automate-ui
+
+docker-build-pg-gateway:
+	DOCKER_BUILDKIT=1 docker build -t automate-pg-gateway -f Dockerfile.automate-pg-gateway .
+
+docker-run-pg-gateway:
+	docker run -d -p 10145:10145 -p 10146:10146 automate-pg-gateway
+
+docker-build-dex:
+	DOCKER_BUILDKIT=1 docker build -t automate-dex -f Dockerfile.automate-dex .
+
+docker-build-authn:
+	DOCKER_BUILDKIT=1 docker build -t authn-service -f Dockerfile.authn-service .
+
+docker-build-authz:
+	DOCKER_BUILDKIT=1 docker build -t authz-service -f Dockerfile.authz-service .
+
+docker-build-gateway:
+	DOCKER_BUILDKIT=1 docker build -t automate-gateway -f Dockerfile.automate-gateway .
+
+docker-build-session:
+	DOCKER_BUILDKIT=1 docker build -t session-service -f Dockerfile.session-service .
+
+docker-build-teams:
+	DOCKER_BUILDKIT=1 docker build -t teams-service -f Dockerfile.teams-service .
+
+docker-build-cereal:
+	DOCKER_BUILDKIT=1 docker build -t cereal-service -f Dockerfile.cereal-service .

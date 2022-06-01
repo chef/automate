@@ -1,0 +1,41 @@
+FROM golang:1.15-alpine as builder
+
+WORKDIR /app/api/external
+COPY ./api/external/go.mod /app/api/external
+WORKDIR /app/api/external
+RUN go mod tidy
+
+WORKDIR /app/protovendor
+COPY ./protovendor/go.mod /app/protovendor
+RUN go mod tidy
+
+WORKDIR /app/components/docs-chef-io
+COPY ./components/docs-chef-io/go.mod /app/components/docs-chef-io
+RUN go mod tidy
+
+WORKDIR /app
+COPY ./go.mod /app/
+RUN go mod tidy
+
+COPY ./components/teams-service /app/components/teams-service
+COPY ./lib /app/lib
+COPY ./tools /app/tools
+COPY ./scripts /app/scripts
+COPY ./tools /app/tools
+COPY ./api /app/api
+COPY ./protovendor /app/protovendor
+COPY ./vendor.go /app/vendor.go
+
+RUN mkdir /output
+RUN go build -o /output/teams-service /app/components/teams-service/cmd/teams-service
+
+FROM alpine as server
+WORKDIR /app
+COPY --from=builder /output /app
+COPY ./components/teams-service/storage/postgres/migration/sql /app/migrations
+# COPY ./components/teams-service/storage/postgres/migration/sql /app/data-migrations
+COPY ./docker_configs/teams-service /app/config
+COPY --chmod=600 ./docker_certs/common /app/certs
+
+EXPOSE 10128
+ENTRYPOINT [ "/app/teams-service", "/app/config/config.yml" ]

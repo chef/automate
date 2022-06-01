@@ -1,0 +1,39 @@
+FROM golang:1.15-alpine as builder
+
+WORKDIR /app/api/external
+COPY ./api/external/go.mod /app/api/external
+WORKDIR /app/api/external
+RUN go mod tidy
+
+WORKDIR /app/protovendor
+COPY ./protovendor/go.mod /app/protovendor
+RUN go mod tidy
+
+WORKDIR /app/components/docs-chef-io
+COPY ./components/docs-chef-io/go.mod /app/components/docs-chef-io
+RUN go mod tidy
+
+WORKDIR /app
+COPY ./go.mod /app/
+RUN go mod tidy
+
+COPY ./components/pg-sidecar-service /app/components/pg-sidecar-service
+COPY ./lib /app/lib
+COPY ./tools /app/tools
+COPY ./scripts /app/scripts
+COPY ./tools /app/tools
+COPY ./api /app/api
+COPY ./protovendor /app/protovendor
+COPY ./vendor.go /app/vendor.go
+
+RUN mkdir /output
+RUN go build -o /output/teams-service /app/components/pg-sidecar-service/cmd/pg-sidecar-service
+
+FROM alpine as server
+WORKDIR /app
+COPY --from=builder /output /app
+COPY ./docker_configs/pg-sidecar-service /app/config
+COPY --chmod=600 ./docker_certs/common /app/certs
+
+EXPOSE 10100
+ENTRYPOINT [ "/app/pg-sidecar-service", "serve", "--config" "/app/config/config.toml" ]

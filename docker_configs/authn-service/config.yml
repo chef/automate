@@ -1,0 +1,44 @@
+---
+upstream: https://127.0.0.1:10117
+grpc: 127.0.0.1:10113
+http1: 127.0.0.1:10162
+
+tls:
+  cert_path: /app/certs/service.crt
+  key_path: /app/certs/service.key
+  root_ca_path: /app/certs/root_ca.crt
+
+authenticators:
+- id: oidc
+  type: oidc
+  config:
+    issuer: https://a2-dev.test/dex
+    client_id: automate-api
+    groups:
+    - users
+- id: token
+  type: header-token
+  config:
+    headers:
+      - x-data-collector-token
+      - api-token
+    storage:
+      type: postgresql
+      config:
+        database: chef_authn_service
+        migrations: /app/migrations
+        max_connections: 5
+
+tokens:
+  type: postgresql
+  config:
+    database: chef_authn_service
+    migrations: /app/migrations
+teams_address: 127.0.0.1:10128
+authz_address: 127.0.0.1:10130
+cereal_address: 127.0.0.1:10101
+session_address: 127.0.0.1:10108
+
+logger:
+  format: text
+  level: info

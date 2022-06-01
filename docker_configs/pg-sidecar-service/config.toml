@@ -1,0 +1,10 @@
+# If we have a config pointing to an specific host,
+# lets use it, otherwise use the ipaddress of the server
+host = "127.0.0.1"
+port = "10100"
+log_level = "info"
+
+[tls]
+  cert_path = "/app/certs/service.crt"
+  key_path = "/app/certs/service.key"
+  root_ca_path ="/app/certs/root_ca.crt"

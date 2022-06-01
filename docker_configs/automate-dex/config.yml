@@ -1,0 +1,63 @@
+issuer: https://a2-dev.test/dex
+enablePasswordDB: true
+storage:
+  type: postgres
+  config:
+    host: 127.0.0.1
+    port: 10145
+    database: dex
+    user: dex
+    ssl:
+      mode: verify-ca
+      certFile: /app/certs/service.crt
+      keyFile: /app/certs/service.key
+      caFile: /app/certs/root_ca.crt
+web:
+  https: 127.0.0.1:10117
+  tlsCert: /app/certs/service.crt
+  tlsKey: /app/certs/service.key
+grpc:
+  addr: 127.0.0.1:10116
+  tlsCert: /app/certs/service.crt
+  tlsKey: /app/certs/service.key
+  tlsClientCA: /app/certs/root_ca.crt
+logger:
+  level: info
+  format: text
+staticClients:
+  - id: automate-api # public, no secret, used by a2-api tests and l-u-s
+    name: Automate API
+    public: true
+  - id: automate-session
+    secret: secretchangeme # TODO
+    redirectURIs:
+      - /session/callback
+    name: Automate Session Service
+oauth2:
+  responseTypes:
+    - code
+    - token
+    - id_token
+  skipApprovalScreen: true
+  alwaysShowLoginScreen: true
+
+expiry:
+  signingKeys: 6h
+  idTokens: 3m
+
+invalidLoginAttempts:
+  enableInvalidLoginAttempts: true
+  blockedDurationInMinutes: 30
+  maxInvalidLoginAttemptsAllowed: 5
+
+frontend:
+  dir: /app/web
+  issuer: Chef Automate
+  theme: chef
+  extra:
+    showDisclosure: false
+    disclosureMessage: ""
+    showBanner: false
+    bannerMessage: ""
+    bannerBackgroundColor: #3864f2
+    bannerTextColor: #FFFFFF

@@ -1,0 +1,7 @@
+FROM haproxy:alpine
+
+RUN mkdir -p /etc/ssl
+COPY --chmod=600  ./docker_certs/common/ /etc/ssl/
+
+COPY ./docker_configs/automate-pg-gateway/haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+EXPOSE 10145

@@ -1,0 +1,21 @@
+#APP ========================================
+FROM node:12.21.0-alpine as builder
+
+WORKDIR /app/components/automate-ui
+COPY components/automate-ui/package.json /app/components/automate-ui
+RUN npm install
+
+COPY ./components/automate-ui /app/components/automate-ui
+
+RUN npm run build:prod
+
+FROM nginx as server
+COPY --from=builder /app/components/automate-ui/dist /app/dist
+COPY ./docker_configs/automate-ui/nginx.conf /etc/nginx/nginx.conf
+COPY ./docker_configs/automate-ui/ /app/config
+COPY --chmod=600 ./docker_certs/common /app/certs
+
+EXPOSE 2015
+
+# BUILD Commands
+# docker build -t automate-ui -f Dockerfile.automate-ui .
