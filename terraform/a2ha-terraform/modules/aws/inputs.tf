@@ -120,6 +120,10 @@ variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
 
+variable "managed_opensearch_domain_url" {
+  default = ""
+}
+
 variable "aws_os_snapshot_role_arn" {
   default = ""
 }
