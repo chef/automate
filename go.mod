@@ -48,6 +48,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gocarina/gocsv v0.0.0-20170928100509-7099e67763c2
 	github.com/gofrs/uuid v3.3.0+incompatible
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.5.2
@@ -60,6 +61,7 @@ require (
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20171214222146-0e7658f8ee99
 	github.com/hashicorp/go-hclog v1.2.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
+	github.com/hashicorp/go-msgpack v1.1.5 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/raft v1.3.9 // indirect
 	github.com/hpcloud/tail v1.0.0
@@ -80,9 +82,10 @@ require (
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
 	github.com/nats-io/go-nats v1.7.2 // indirect
 	github.com/nats-io/jwt v1.2.2 // indirect
-	github.com/nats-io/nats-streaming-server v0.21.2
-	github.com/nats-io/nats.go v1.16.0
-	github.com/nats-io/stan.go v0.10.2
+	github.com/nats-io/nats-streaming-server v0.17.0
+	github.com/nats-io/nats.go v1.9.1
+	github.com/nats-io/nkeys v0.3.0 // indirect
+	github.com/nats-io/stan.go v0.6.0
 	github.com/olivere/elastic/v7 v7.0.28
 	github.com/open-policy-agent/opa v0.19.1
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
