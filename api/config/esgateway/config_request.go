@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"os/exec"
 	"strings"
 
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
@@ -12,6 +13,10 @@ import (
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/lib/config"
+)
+
+const (
+	habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -147,11 +152,24 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 
 		switch auth := g.GetV1().GetExternal().GetOpensearch().GetAuth(); auth.GetScheme().GetValue() {
 		case "basic_auth":
+			password := auth.GetBasicAuth().GetPassword().GetValue()
+			if password == "" {
+				args := []string{
+					"show",
+					"userconfig.os_password",
+				}
+				execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil {
+					return
+				}
+				password = strings.TrimSpace(string(getPass))
+			}
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
 					"%s:%s",
 					auth.GetBasicAuth().GetUsername().GetValue(),
-					auth.GetBasicAuth().GetPassword().GetValue(),
+					password,
 				),
 			)))
 		case "aws_os":
@@ -226,4 +244,14 @@ func uriToEndpoint(uri string) (*ConfigRequest_V1_System_Endpoint, bool) {
 
 func isIPAddress(addr string) bool {
 	return net.ParseIP(addr) != nil
+}
+
+func getLatestPlatformToolsPath() string {
+	cmd, err := exec.Command("/bin/sh", "-c", habPkgPlatformToolsPath).Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	output := string(cmd)
+
+	return strings.TrimSpace(output)
 }
