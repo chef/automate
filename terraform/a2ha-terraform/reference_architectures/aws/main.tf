@@ -86,4 +86,7 @@ module "aws-output" {
   automate_fqdn           = module.aws.automate_fqdn
   automate_frontend_urls  = module.aws.automate_frontend_urls
   bucket_name             = var.backup_config_s3 == "true" ? module.s3[0].bucket_name : ""
+  aws_os_snapshot_role_arn           = module.aws.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id     = module.aws.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret = module.aws.os_snapshot_user_access_key_secret
 }

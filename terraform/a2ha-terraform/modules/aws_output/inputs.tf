@@ -26,6 +26,18 @@ variable "opensearch_public_ips" {
   default = []
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
+}
+
 variable "postgresql_private_ips" {
   default = []
 }

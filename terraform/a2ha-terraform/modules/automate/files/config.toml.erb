@@ -20,10 +20,12 @@
     enable = true
     nodes = <%= services[:opensearch][:ips].map { |ip| "https://#{ip}:#{services[:opensearch][:svc_port]}" } %>
     [global.v1.external.opensearch.auth]
-      scheme = "basic_auth"
-      [global.v1.external.opensearch.auth.basic_auth]
-        username = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_username'] -%>"
-        password = "<%= svc_configs[:opensearch]['opensearch_auth']['admin_password'] -%>"
+      scheme = "aws_os"
+      [global.v1.external.opensearch.auth.aws_os]
+        username = "<%= services[:opensearch][:opensearch_username] -%>"
+        password = "<%= services[:opensearch][:opensearch_password] -%>"
+        access_key = "<%= services[:opensearch][:os_snapshot_user_access_key_id] -%>"
+        secret_key = "<%= services[:opensearch][:os_snapshot_user_access_key_secret] -%>"
     [global.v1.external.opensearch.ssl]
       server_name = "<%= cn(svc_configs[:opensearch]['tls']['ssl_cert']) -%>"
       root_cert = """<%= svc_configs[:opensearch]['tls']['rootCA'] -%>"""
@@ -148,6 +150,8 @@
   client = "default"
 
 [global.v1.external.opensearch.backup.s3.settings]
+  region = "<%= overrides[:aws_region] %>"
+  role_arn = "<%= services[:opensearch][:aws_os_snapshot_role_arn] %>"
   ## The meaning of these settings is documented in the S3 Repository Plugin
   ## documentation. See the following links:
   ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html

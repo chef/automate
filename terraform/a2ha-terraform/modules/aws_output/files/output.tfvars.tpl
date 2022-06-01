@@ -6,3 +6,6 @@ opensearch_private_ips    = [${opensearch_private_ips}]
 automate_fqdn                = "${automate_fqdn}"
 automate_frontend_urls       = "${automate_frontend_urls}"
 bucket_name                  = "${bucket_name}"
+aws_os_snapshot_role_arn     = "${aws_os_snapshot_role_arn}"
+os_snapshot_user_access_key_id = "${os_snapshot_user_access_key_id}"
+os_snapshot_user_access_key_secret = "${os_snapshot_user_access_key_secret}"
