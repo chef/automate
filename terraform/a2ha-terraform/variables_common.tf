@@ -46,11 +46,6 @@ variable "automate_license" {
   default = "Contact Chef Sales at sales@chef.io to request a license."
 }
 
-variable "aws_region" {
-  default     = "us-west-2"
-  description = "The name of the selected AWS region / datacenter."
-}
-
 variable "backend_aib_dest_file" {
   default     = ""
   description = "The full path of the airgap bundle destination file."

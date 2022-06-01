@@ -54,15 +54,15 @@ output "opensearch_private_ips" {
 }
 
 output "aws_os_snapshot_role_arn" {
-  value = aws_iam_role.pass_es_role.arn
+  value = var.aws_os_snapshot_role_arn != "" ? var.aws_os_snapshot_role_arn : aws_iam_role.pass_es_role[0].arn
 }
 
 output "os_snapshot_user_access_key_id" {
-  value = aws_iam_access_key.snap_reg_user_key.id
+  value = var.os_snapshot_user_access_key_id != "" ? var.os_snapshot_user_access_key_id : aws_iam_access_key.snap_reg_user_key[0].id
 }
 
 output "os_snapshot_user_access_key_secret" {
-  value = aws_iam_access_key.snap_reg_user_key.secret
+  value = var.os_snapshot_user_access_key_secret != "" ? var.os_snapshot_user_access_key_secret : aws_iam_access_key.snap_reg_user_key[0].secret
 }
 
 output "random_id" {

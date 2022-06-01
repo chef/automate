@@ -1,4 +1,5 @@
 resource "aws_iam_policy" "s3_access_policy" {
+  count       =  var.aws_os_snapshot_role_arn != "" ? 0 : 1 
   name        = "automate-os-snapshot-access-policy-${random_id.random.hex}"
   path        = "/"
   description = "Policy to provide s3 access for AWS OS snapshots"
@@ -24,6 +25,7 @@ POLICY
 }
 
 resource "aws_iam_role" "pass_es_role" {
+  count               =  var.aws_os_snapshot_role_arn != "" ? 0 : 1
   name                = "automate-pass-es-role-${random_id.random.hex}"
   assume_role_policy  = <<TRUSTPOLICY
 {
@@ -42,14 +44,15 @@ resource "aws_iam_role" "pass_es_role" {
     ]
 }
 TRUSTPOLICY
-  managed_policy_arns = [aws_iam_policy.s3_access_policy.arn]
+  managed_policy_arns = [aws_iam_policy.s3_access_policy[0].arn]
   tags = merge(var.tags,
-    map("X-Application", "automate-elasticsearch")
+    map("X-Application", "automate-opensearch")
   )
 
 }
 
 resource "aws_iam_policy" "pass_es_role_policy" {
+  count       =  var.aws_os_snapshot_role_arn != "" ? 0 : 1
   name        = "pass-es-role-policy-${random_id.random.hex}"
   path        = "/"
   description = "Policy to pass ES access for Snapshot registry"
@@ -60,7 +63,7 @@ resource "aws_iam_policy" "pass_es_role_policy" {
         {
             "Effect": "Allow",
             "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::${local.account_id}:role/${aws_iam_role.pass_es_role.name}"
+            "Resource": "arn:aws:iam::${local.account_id}:role/${aws_iam_role.pass_es_role[0].name}"
         },
         {
             "Effect": "Allow",
@@ -71,38 +74,44 @@ resource "aws_iam_policy" "pass_es_role_policy" {
 }
 POLICY
   tags = merge(var.tags,
-    map("X-Application", "automate-elasticsearch")
+    map("X-Application", "automate-opensearch")
   )
 
 }
 
 resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
-  role       = aws_iam_role.pass_es_role.name
-  policy_arn = aws_iam_policy.s3_access_policy.arn
+  count      =  var.aws_os_snapshot_role_arn != "" ? 0 : 1
+  role       = aws_iam_role.pass_es_role[0].name
+  policy_arn = aws_iam_policy.s3_access_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "assume_role_policy_attachment" {
-  role       = aws_iam_role.pass_es_role.name
-  policy_arn = aws_iam_policy.pass_es_role_policy.arn
+  count      =  var.aws_os_snapshot_role_arn != "" ? 0 : 1
+  role       = aws_iam_role.pass_es_role[0].name
+  policy_arn = aws_iam_policy.pass_es_role_policy[0].arn
 }
 
 resource "aws_iam_user" "snap_reg_user" {
+  count  =  var.os_snapshot_user_access_key_id != "" ? 0 : 1
   name = "automate-os-snapshot-user-${random_id.random.hex}"
   tags = merge(var.tags,
-    map("X-Application", "automate-elasticsearch")
+    map("X-Application", "automate-opensearch")
   )
 }
 
 resource "aws_iam_user_policy_attachment" "snap_reg_user_policy_attachment" {
-  user       = aws_iam_user.snap_reg_user.name
-  policy_arn = aws_iam_policy.s3_access_policy.arn
+  count      =  var.os_snapshot_user_access_key_id != "" ? 0 : 1
+  user       = aws_iam_user.snap_reg_user[0].name
+  policy_arn = aws_iam_policy.s3_access_policy[0].arn
 }
 
 resource "aws_iam_user_policy_attachment" "assume_role_policy_attachment" {
-  user       = aws_iam_user.snap_reg_user.name
-  policy_arn = aws_iam_policy.pass_es_role_policy.arn
+  count      =  var.os_snapshot_user_access_key_id != "" ? 0 : 1
+  user       = aws_iam_user.snap_reg_user[0].name
+  policy_arn = aws_iam_policy.pass_es_role_policy[0].arn
 }
 
 resource "aws_iam_access_key" "snap_reg_user_key" {
-  user = aws_iam_user.snap_reg_user.name
+  count  =  var.os_snapshot_user_access_key_id != "" ? 0 : 1
+  user   = aws_iam_user.snap_reg_user[0].name
 }

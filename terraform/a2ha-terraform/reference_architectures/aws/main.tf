@@ -34,6 +34,9 @@ module "aws" {
   opensearch_instance_count       = var.opensearch_instance_count
   opensearch_listen_port          = var.opensearch_listen_port
   opensearch_server_instance_type = var.opensearch_server_instance_type
+  aws_os_snapshot_role_arn        = var.aws_os_snapshot_role_arn
+  os_snapshot_user_access_key_id  = var.os_snapshot_user_access_key_id
+  os_snapshot_user_access_key_secret = var.os_snapshot_user_access_key_secret
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   postgresql_ebs_volume_iops      = var.postgresql_ebs_volume_iops
   postgresql_ebs_volume_size      = var.postgresql_ebs_volume_size
