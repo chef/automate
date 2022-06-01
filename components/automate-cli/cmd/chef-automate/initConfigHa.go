@@ -74,10 +74,10 @@ type AwsConfigToml struct {
 			PublicCustomSubnets          []string `toml:"public_custom_subnets"`
 			SSHKeyPairName               string   `toml:"ssh_key_pair_name"`
 			SetupManagedServices         bool     `toml:"setup_managed_services"`
-			ElasticsearchDomainUrl       string   `toml:"managed_elasticsearch_domain_url"`
-			ElasticsearchUsername        string   `toml:"managed_elasticsearch_username"`
-			ElasticsearchUserPassword    string   `toml:"managed_elasticsearch_user_password"`
-			ElasticsearchCertificate     string   `toml:"managed_elasticsearch_certificate"`
+			ElasticsearchDomainUrl       string   `toml:"managed_opensearch_domain_url"`
+			ElasticsearchUsername        string   `toml:"managed_opensearch_username"`
+			ElasticsearchUserPassword    string   `toml:"managed_opensearch_user_password"`
+			ElasticsearchCertificate     string   `toml:"managed_opensearch_certificate"`
 			RDSInstanceUrl               string   `toml:"managed_rds_instance_url"`
 			RDSSuperUserName             string   `toml:"managed_rds_superuser_username"`
 			RDSSuperUserPassword         string   `toml:"managed_rds_superuser_password"`

@@ -135,10 +135,10 @@ aws do
   ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
   lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
   setup_managed_services {{ .Aws.Config.SetupManagedServices }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ else }}#managed_elasticsearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ end }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ else }}#managed_elasticsearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ end }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ else }}#managed_elasticsearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ end }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_elasticsearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ else }}#managed_elasticsearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ else }}#managed_opensearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ else }}#managed_opensearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ else }}#managed_opensearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ else }}#managed_opensearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_instance_url "{{ .Aws.Config.RDSInstanceUrl }}" {{ else }}#managed_rds_instance_url "{{ .Aws.Config.RDSInstanceUrl }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_superuser_username "{{ .Aws.Config.RDSSuperUserName }}" {{ else }}#managed_rds_superuser_username "{{ .Aws.Config.RDSSuperUserName }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_superuser_password "{{ .Aws.Config.RDSSuperUserPassword }}" {{ else }}#managed_rds_superuser_password "{{ .Aws.Config.RDSSuperUserPassword }}" {{ end }}

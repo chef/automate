@@ -54,10 +54,10 @@ public_custom_subnets = []
 # ssh key pair name in AWS to access instances
 ssh_key_pair_name = "A2HA"
 setup_managed_services = false
-managed_elasticsearch_domain_url = ""
-managed_elasticsearch_username = ""
-managed_elasticsearch_user_password = ""
-managed_elasticsearch_certificate = ""
+managed_opensearch_domain_url = ""
+managed_opensearch_username = ""
+managed_opensearch_user_password = ""
+managed_opensearch_certificate = ""
 managed_rds_instance_url = ""
 managed_rds_superuser_username = ""
 managed_rds_superuser_password = ""

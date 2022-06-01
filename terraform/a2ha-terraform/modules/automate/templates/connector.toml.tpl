@@ -22,10 +22,10 @@
   svc_group = "default"
   svc_name = "automate-ha-opensearch"
   svc_port = ${opensearch_listen_port}
-  managed_elasticsearch_certificate = "${managed_elasticsearch_certificate}"
-  managed_elasticsearch_domain_url = "${managed_elasticsearch_domain_url}"
-  managed_elasticsearch_user_password = "${managed_elasticsearch_user_password}"
-  managed_elasticsearch_username = "${managed_elasticsearch_username}"
+  managed_opensearch_certificate = "${managed_opensearch_certificate}"
+  managed_opensearch_domain_url = "${managed_opensearch_domain_url}"
+  managed_opensearch_user_password = "${managed_opensearch_user_password}"
+  managed_opensearch_username = "${managed_opensearch_username}"
 
   [services.postgresql]
   ips = ${postgresql_ips}
