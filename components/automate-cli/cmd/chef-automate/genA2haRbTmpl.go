@@ -135,10 +135,10 @@ aws do
   ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
   lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
   setup_managed_services {{ .Aws.Config.SetupManagedServices }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ else }}#managed_opensearch_domain_url "{{ .Aws.Config.ElasticsearchDomainUrl }}" {{ end }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ else }}#managed_opensearch_username "{{ .Aws.Config.ElasticsearchUsername }}" {{ end }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ else }}#managed_opensearch_user_password "{{ .Aws.Config.ElasticsearchUserPassword }}" {{ end }}
-  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ else }}#managed_opensearch_certificate "{{ .Aws.Config.ElasticsearchCertificate }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_domain_url "{{ .Aws.Config.OpensearchDomainUrl }}" {{ else }}#managed_opensearch_domain_url "{{ .Aws.Config.OpensearchDomainUrl }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_username "{{ .Aws.Config.OpensearchUsername }}" {{ else }}#managed_opensearch_username "{{ .Aws.Config.OpensearchUsername }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_user_password "{{ .Aws.Config.OpensearchUserPassword }}" {{ else }}#managed_opensearch_user_password "{{ .Aws.Config.OpensearchUserPassword }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_certificate "{{ .Aws.Config.OpensearchCertificate }}" {{ else }}#managed_opensearch_certificate "{{ .Aws.Config.OpensearchCertificate }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}aws_os_snapshot_role_arn "{{ .Aws.Config.AwsOsSnapshotRoleArn }}" {{ else }}#aws_os_snapshot_role_arn "{{ .Aws.Config.AwsOsSnapshotRoleArn }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}os_snapshot_user_access_key_id "{{ .Aws.Config.OsUserAccessKeyId }}" {{ else }}#os_snapshot_user_access_key_id "{{ .Aws.Config.OsUserAccessKeyId }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}os_snapshot_user_access_key_secret "{{ .Aws.Config.OsUserAccessKeySecret }}" {{ else }}#os_snapshot_user_access_key_secret "{{ .Aws.Config.OsUserAccessKeySecret }}" {{ end }}
@@ -160,7 +160,7 @@ aws do
   automate_server_instance_type "{{ .Aws.Config.AutomateServerInstanceType }}"
   ### EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod
   chef_server_instance_type "{{ .Aws.Config.ChefServerInstanceType }}"
-  ### EC2 instance type to use for Elasticsearch backends, minimum 8G of RAM for test, 16G for prod
+  ### EC2 instance type to use for Opensearch backends, minimum 8G of RAM for test, 16G for prod
   opensearch_server_instance_type "{{ .Aws.Config.OpensearchServerInstanceType }}"
   ### EC2 instance type to use for PostgreSQL backends, minimum 4G of RAM for test, 8G for prod
   postgresql_server_instance_type "{{ .Aws.Config.PostgresqlServerInstanceType }}"
@@ -174,9 +174,9 @@ aws do
   chef_ebs_volume_iops "{{ .Aws.Config.ChefEbsVolumeIops }}"
   chef_ebs_volume_size "{{ .Aws.Config.ChefEbsVolumeSize }}"
   chef_ebs_volume_type "{{ .Aws.Config.ChefEbsVolumeType }}"
-  opensearch_ebs_volume_iops "{{ .Aws.Config.ElasticsearchEbsVolumeIops }}"
-  opensearch_ebs_volume_size "{{ .Aws.Config.ElasticsearchEbsVolumeSize }}"
-  opensearch_ebs_volume_type "{{ .Aws.Config.ElasticsearchEbsVolumeType }}"
+  opensearch_ebs_volume_iops "{{ .Aws.Config.OpensearchEbsVolumeIops }}"
+  opensearch_ebs_volume_size "{{ .Aws.Config.OpensearchEbsVolumeSize }}"
+  opensearch_ebs_volume_type "{{ .Aws.Config.OpensearchEbsVolumeType }}"
   postgresql_ebs_volume_iops "{{ .Aws.Config.PostgresqlEbsVolumeIops }}"
   postgresql_ebs_volume_size "{{ .Aws.Config.PostgresqlEbsVolumeSize }}"
   postgresql_ebs_volume_type "{{ .Aws.Config.PostgresqlEbsVolumeType }}"

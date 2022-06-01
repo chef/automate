@@ -120,6 +120,18 @@ variable "opensearch_server_instance_type" {
   default = "m5a.large"
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
+}
+
 variable "pgleaderchk_listen_port" {
   default = 6432
 }

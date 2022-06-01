@@ -172,13 +172,13 @@ func (a *awsDeployment) validateEnvFields() *list.List {
 	if len(a.config.Aws.Config.ChefEbsVolumeType) < 1 {
 		errorList.PushBack("Invalid or empty aws chef_ebs_volume_type")
 	}
-	if len(a.config.Aws.Config.ElasticsearchEbsVolumeIops) < 1 {
+	if len(a.config.Aws.Config.OpensearchEbsVolumeIops) < 1 {
 		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_iops")
 	}
-	if len(a.config.Aws.Config.ElasticsearchEbsVolumeSize) < 1 {
+	if len(a.config.Aws.Config.OpensearchEbsVolumeSize) < 1 {
 		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_size")
 	}
-	if len(a.config.Aws.Config.ElasticsearchEbsVolumeType) < 1 {
+	if len(a.config.Aws.Config.OpensearchEbsVolumeType) < 1 {
 		errorList.PushBack("Invalid or empty aws opensearch_ebs_volume_type")
 	}
 	if len(a.config.Aws.Config.PostgresqlEbsVolumeIops) < 1 {
