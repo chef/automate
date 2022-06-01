@@ -11,8 +11,8 @@
   [global.v1.external.opensearch.auth]
     scheme = "aws_os"
     [global.v1.external.opensearch.auth.aws_os]
-      username = "<%= services[:opensearch][:opensearch_username] -%>"
-      password = "<%= services[:opensearch][:opensearch_password] -%>"
+      username = "<%= services[:opensearch][:managed_opensearch_username] -%>"
+      password = "<%= services[:opensearch][:managed_opensearch_user_password] -%>"
       access_key = "<%= services[:opensearch][:os_snapshot_user_access_key_id] -%>"
       secret_key = "<%= services[:opensearch][:os_snapshot_user_access_key_secret] -%>"
   [global.v1.external.opensearch.ssl]
