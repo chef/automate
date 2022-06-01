@@ -574,6 +574,7 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 		return nil, nil, errors.Wrapf(err, "%s, cannot get profileIDs from nodes", myName)
 	}
 	logrus.Debugf("Got from nodes profileMins=%+v", profileMins)
+	logrus.Info("Got from nodes profile Mins", profileMins)
 
 	profileIDs := make([]string, len(profileMins))
 	profileIDsStatusMap := make(map[string]string, len(profileMins))

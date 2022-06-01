@@ -704,7 +704,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	}
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
@@ -744,27 +744,27 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
-	controlTermsAgg.SubAggregation("skipped", skippedFilter)
-	controlTermsAgg.SubAggregation("failed", failedFilter)
-	controlTermsAgg.SubAggregation("passed", passedFilter)
-	controlTermsAgg.SubAggregation("waived", waivedFilter)
+	controlTermsAgg.SubAggregation("skipped", skippedFilter.SubAggregation("nodes", getSubAggregationForLatestRecordOverDateRange()))
+	controlTermsAgg.SubAggregation("failed", failedFilter.SubAggregation("nodes", getSubAggregationForLatestRecordOverDateRange()))
+	controlTermsAgg.SubAggregation("passed", passedFilter.SubAggregation("nodes", getSubAggregationForLatestRecordOverDateRange()))
+	controlTermsAgg.SubAggregation("waived", waivedFilter.SubAggregation("nodes", getSubAggregationForLatestRecordOverDateRange()))
 
-	waivedStrAgg := elastic.NewTermsAggregation().Field("profiles.controls.waived_str").Size(4) //there are 4 different waived_str states
-	waivedButNotRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes")
-	waivedAndRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes_run")
-	waiverDataPassedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
-		Must(waivedAndRunQuery))
+	//waivedStrAgg := elastic.NewTermsAggregation().Field("profiles.controls.waived_str").Size(4) //there are 4 different waived_str states
+	//waivedButNotRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes")
+	/*	//waivedAndRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes_run")
+		waiverDataPassedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+			Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+			Must(waivedAndRunQuery))
 
-	waiverDataFailedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
-		Must(waivedAndRunQuery))
+		waiverDataFailedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+			Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+			Must(waivedAndRunQuery))
 
-	waiverDataSkippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Should(elastic.NewTermQuery("profiles.controls.status", "skipped")).
-		Should(waivedButNotRunQuery))
+		waiverDataSkippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+			Should(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+			Should(waivedButNotRunQuery))*/
 
-	waiverDataWaivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+	/*waiverDataWaivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	waiverDataJustificationAgg := elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.justification").Size(reporting.ESize)
 	waiverDataJustificationAgg.SubAggregation("skipped", waiverDataSkippedFilter)
@@ -777,9 +777,9 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	waivedStrAgg.SubAggregation("expiration_date", waiverDataExpirationDateAgg)
 
 	waivedStrFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
-	waivedStrFilter.SubAggregation("waived_str", waivedStrAgg)
+	waivedStrFilter.SubAggregation("waived_str", waivedStrAgg)*/
 
-	controlTermsAgg.SubAggregation("filtered_waived_str", waivedStrFilter)
+	//controlTermsAgg.SubAggregation("filtered_waived_str", waivedStrFilter)
 
 	controlTermsAgg.SubAggregation("end_time", elastic.NewReverseNestedAggregation().SubAggregation("most_recent_report",
 		elastic.NewTermsAggregation().Field("end_time").Size(1)))
@@ -825,10 +825,10 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
 	filteredControls.SubAggregation("control", controlTermsAgg)
-	filteredControls.SubAggregation("skipped_total", skippedFilter)
-	filteredControls.SubAggregation("failed_total", failedFilter)
-	filteredControls.SubAggregation("passed_total", passedFilter)
-	filteredControls.SubAggregation("waived_total", waivedFilter)
+	/*	filteredControls.SubAggregation("skipped_total", skippedFilter)
+		filteredControls.SubAggregation("failed_total", failedFilter)
+		filteredControls.SubAggregation("passed_total", passedFilter)
+		filteredControls.SubAggregation("waived_total", waivedFilter)*/
 	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
 	controlsAgg.SubAggregation("filtered_controls", filteredControls)
 
@@ -908,6 +908,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 }
 
 func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem) (reportingapi.ControlItem, error) {
+
 	contListItem := reportingapi.ControlItem{}
 	id, ok := controlBucket.Key.(string)
 	if !ok {
@@ -974,7 +975,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 			}
 		}
 	}
-	if waived, found := controlBucket.Aggregations.Filter("waived"); found {
+	/*if waived, found := controlBucket.Aggregations.Filter("waived"); found {
 		controlSummary.Waived.Total = int32(waived.DocCount)
 	}
 	if passed, found := controlBucket.Aggregations.Filter("passed"); found {
@@ -993,7 +994,8 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		} else {
 			controlSummary.Failed.Critical = total
 		}
-	}
+	}*/
+	controlSummary = getControlNodeCountsOverDateRange(controlBucket, contListItem)
 
 	if filteredWaivedStr, found := controlBucket.Aggregations.Filter("filtered_waived_str"); found {
 		if waivedStrBuckets, found := filteredWaivedStr.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
@@ -1463,4 +1465,140 @@ func paginate(pageNum int, size int, length int) (int, int) {
 	}
 
 	return start, end
+}
+
+func getSubAggregationForLatestRecordOverDateRange() elastic.Aggregation {
+
+	nodes := elastic.NewReverseNestedAggregation().SubAggregation("node", elastic.NewTermsAggregation().
+		Field("node_uuid").Size(reporting.ESize).SubAggregation("end_time", elastic.NewTermsAggregation().Field("end_time").OrderByKeyDesc().Size(1)))
+
+	return nodes
+}
+
+func getControlNodeCountsOverDateRange(controlBucket *elastic.AggregationBucketKeyItem, controlListItem reportingapi.ControlItem) *reportingapi.ControlSummary {
+	logrus.Info("Inside the control summary report -------------")
+	controlSummary := &reportingapi.ControlSummary{
+		Passed:  &reportingapi.Total{},
+		Skipped: &reportingapi.Total{},
+		Failed:  &reportingapi.Failed{},
+		Waived:  &reportingapi.Total{},
+	}
+
+	var waivedCount, passedCount, skippedCount, failedCount int32
+
+	waived, found := controlBucket.Aggregations.Filter("waived")
+	if found {
+		//controlSummary.Waived.Total = int32(waived.DocCount)
+		waivedCount = int32(waived.DocCount)
+	}
+	passed, found := controlBucket.Aggregations.Filter("passed")
+	if found {
+		//controlSummary.Passed.Total = int32(passed.DocCount)
+		passedCount = int32(passed.DocCount)
+	}
+	skipped, found := controlBucket.Aggregations.Filter("skipped")
+	if found {
+		//controlSummary.Skipped.Total = int32(skipped.DocCount)
+		skippedCount = int32(skipped.DocCount)
+	}
+	failed, found := controlBucket.Aggregations.Filter("failed")
+	if found {
+		//total := int32(failed.DocCount)
+		//controlSummary.Failed.Total = total
+		failedCount = int32(failed.DocCount)
+	}
+
+	logrus.Info("Failed Count", failedCount)
+	logrus.Info("skipped Count", skippedCount)
+	logrus.Info("PassedCount ", passedCount)
+	logrus.Info("waived count", waivedCount)
+	failedBuckets := getNodeBucketsCountFromAgg(failed)
+	passedBuckets := getNodeBucketsCountFromAgg(passed)
+	waivedBuckets := getNodeBucketsCountFromAgg(waived)
+	skippedBuckets := getNodeBucketsCountFromAgg(skipped)
+
+	if failedCount > 0 && waivedCount == 0 && passedCount == 0 && skippedCount == 0 {
+		logrus.Info("inside failedCount > 0 && waivedCount == 0 && passedCount == 0 && skippedCount == 0 ")
+		controlSummary.Failed.Total = int32(len(failedBuckets))
+	} else if failedCount == 0 && waivedCount > 0 && passedCount == 0 && skippedCount == 0 {
+		logrus.Info("waivedCount > 0 && passedCount == 0 && skippedCount == 0 ")
+		controlSummary.Waived.Total = int32(len(waivedBuckets))
+	} else if failedCount == 0 && waivedCount == 0 && passedCount == 0 && skippedCount > 0 {
+		logrus.Info("passedCount == 0 && skippedCount > 0 ")
+		controlSummary.Skipped.Total = int32(len(skippedBuckets))
+	} else if failedCount == 0 && waivedCount == 0 && passedCount > 0 && skippedCount == 0 {
+		logrus.Info("passedCount > 0")
+		logrus.Info("lentg of buckets", len(passedBuckets))
+		controlSummary.Passed.Total = int32(len(passedBuckets))
+	} else {
+		logrus.Info("Inside else ------------------")
+		statusCountMap := make(map[string]int)
+		nodeStatusMap := make(map[string]reporting.Status)
+		getLatestCountForStatus(failedBuckets, statusCountMap, nodeStatusMap, reporting.FAILED)
+		getLatestCountForStatus(passedBuckets, statusCountMap, nodeStatusMap, reporting.PASSED)
+		getLatestCountForStatus(waivedBuckets, statusCountMap, nodeStatusMap, reporting.WAIVED)
+		getLatestCountForStatus(skippedBuckets, statusCountMap, nodeStatusMap, reporting.SKIPPED)
+
+		controlSummary.Failed.Total = int32(statusCountMap[reporting.FAILED])
+		controlSummary.Passed.Total = int32(statusCountMap[reporting.PASSED])
+		controlSummary.Skipped.Total = int32(statusCountMap[reporting.SKIPPED])
+		controlSummary.Waived.Total = int32(statusCountMap[reporting.WAIVED])
+	}
+
+	logrus.Info("-----------------------", controlSummary)
+	return controlSummary
+}
+
+func getNodeBucketsCountFromAgg(agg *elastic.AggregationSingleBucket) []*elastic.AggregationBucketKeyItem {
+
+	var buckets []*elastic.AggregationBucketKeyItem
+	if nodes, found := agg.ReverseNested("nodes"); found {
+		nodeBuckets, ok := nodes.Aggregations.Terms("node")
+		if ok {
+			buckets = nodeBuckets.Buckets
+		}
+	}
+
+	return buckets
+
+}
+
+func getEndTimeFromNodeBucket(node *elastic.AggregationBucketKeyItem) float64 {
+	var endTime float64
+
+	endTimeBuckets, found := node.Aggregations.Terms("end_time")
+	if found {
+		endTime = endTimeBuckets.Buckets[0].Key.(float64)
+	}
+
+	return endTime
+
+}
+
+func getLatestCountForStatus(aggBuckets []*elastic.AggregationBucketKeyItem, statusCountMap map[string]int, nodeStatusMap map[string]reporting.Status, status string) {
+	for _, bucket := range aggBuckets {
+		logrus.Info("inside agg buckets of nodes-------------", aggBuckets)
+		endTime := getEndTimeFromNodeBucket(bucket)
+
+		nodeName := bucket.Key.(string)
+		logrus.Info("for end time with node-----------------", nodeName, endTime)
+		if statusAndEndTime, ok := nodeStatusMap[nodeName]; ok {
+			if endTime > statusAndEndTime.EndTime {
+				if count, present := statusCountMap[statusAndEndTime.Status]; present {
+					statusCountMap[statusAndEndTime.Status] = count - 1
+				}
+			}
+		}
+		if count, present := statusCountMap[status]; present {
+			statusCountMap[status] = count + 1
+		} else {
+			statusCountMap[status] = 1
+		}
+		logrus.Info("staus count map after if else", statusCountMap)
+
+		nodeStatusMap[bucket.Key.(string)] = reporting.Status{EndTime: endTime, Status: status}
+
+		logrus.Info("---------------- Status" + status + "----------with status count map--------")
+		logrus.Info(statusCountMap)
+	}
 }
