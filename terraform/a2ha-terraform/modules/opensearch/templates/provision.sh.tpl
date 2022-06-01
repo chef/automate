@@ -52,7 +52,7 @@ export LOGCMD='>>${tmp_path}/svc-load.log 2>&1'
 if [ -e /hab/sup/default/specs/"$OS_PKG_NAME".spec ]; then
   if ! grep -q "ident *= *\"${opensearch_pkg_ident}\"" /hab/sup/default/specs/"$OS_PKG_NAME".spec; then
      # unload the old pkg_ident and then load in the new
-     bash -c 'source /hab/sup/default/SystemdEnvironmentFile.sh'
+     source /hab/sup/default/SystemdEnvironmentFile.sh
      automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > backend_config.toml
 
      bash -c 'sysctl -w vm.max_map_count=262144'
