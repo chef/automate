@@ -27,9 +27,9 @@
   managed_opensearch_domain_url = "${managed_opensearch_domain_url}"
   managed_opensearch_user_password = "${managed_opensearch_user_password}"
   managed_opensearch_username = "${managed_opensearch_username}"
-  aws_os_snapshot_role_arn = "{aws_os_snapshot_role_arn}"
-  os_snapshot_user_access_key_id = "{os_snapshot_user_access_key_id}"
-  os_snapshot_user_access_key_secret = "{os_snapshot_user_access_key_secret}"
+  aws_os_snapshot_role_arn = "${aws_os_snapshot_role_arn}"
+  os_snapshot_user_access_key_id = "${os_snapshot_user_access_key_id}"
+  os_snapshot_user_access_key_secret = "${os_snapshot_user_access_key_secret}"
 
   [services.postgresql]
   ips = ${postgresql_ips}
