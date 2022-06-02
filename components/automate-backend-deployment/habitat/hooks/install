@@ -39,6 +39,21 @@ automate-cluster-ctl secrets set be_sudo_password
 EOHELP
 }
 
+copy_cert_from_variable_to_cert() {
+
+OLD_WORKSPACE1=`readlink -f /hab/a2_deploy_workspace`
+
+LINE_FROM=$(awk '/hab_sup_http_gateway_ca_cert/{ print NR; exit }' $OLD_WORKSPACE1/terraform/variables_common.tf)
+LINE_TO=$(wc -l < $OLD_WORKSPACE1/terraform/variables_common.tf)
+TAIL_LINES_TO_BE_COPIED=$(expr $LINE_TO - $LINE_FROM + 1)
+
+cat <<EOF > $OLD_WORKSPACE1/terraform/cert.tf
+
+$(cat $OLD_WORKSPACE1/terraform/variables_common.tf | tail -n $TAIL_LINES_TO_BE_COPIED)
+
+EOF
+}
+
 # renames old workspace using the version info from its symlink destination for easy access
 if [ -L /hab/a2_deploy_workspace ]; then
   OLD_WORKSPACE=`readlink -f /hab/a2_deploy_workspace`
@@ -76,6 +91,19 @@ if [ -L /hab/a2_deploy_workspace ]; then
       echo "No TF_ARCH_DIR found"
     fi
   fi
+
+  if [[ -f $OLD_WORKSPACE/terraform/cert.tf ]]; then
+    echo "Copyinf old cert.tf to new workspace..."
+    # CERT_TF_DIR="$NEW_WORKSPACE/terraform/reference_architectures/$CERT_TF"
+    cp $OLD_WORKSPACE/terraform/cert.tf $NEW_WORKSPACE/terraform/cert.tf
+    # if [[ -d $CERT_TF_DIR ]]; then
+    #   # copy all files including the hidden cert.tf
+  else
+    echo "No CERT_TF_DIR found. Finding same in variable_common.tf and copying to new cert.tf file..."
+    copy_cert_from_variable_to_cert
+    cp -r $OLD_WORKSPACE/terraform/cert.tf $NEW_WORKSPACE/terraform/cert.tf
+  fi
+    # fi
 
   # copy over the automate-cluster-ctl configs
   if [[ -f $OLD_WORKSPACE/a2ha.rb ]]; then
