@@ -18,6 +18,8 @@ exit 0
 export ES_STARTUP_SLEEP_TIME={{cfg.runtime.es_startup_sleep_time}}
 {{/if ~}}
 
+export OPENSEARCH_PATH_CONF="{{pkg.svc_config_path}}"
+
 export TMPDIR="{{pkg.svc_var_path}}/tmp"
 export ES_TMPDIR="{{pkg.svc_var_path}}/tmp"
 export ES_PATH_CONF="{{pkg.svc_config_path}}"
@@ -30,61 +32,13 @@ source {{pkg.svc_config_path}}/init_ca
 
 # cp {{pkg.path}}/os/config/certificates/* {{pkg.svc_config_path}}/
 
-chmod 0600 {{pkg.svc_config_path}}/certificates/root-ca.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/admin.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/admin.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/node1.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/node2.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/client.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/admin-key.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/node1-key.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/node2-key.pem
-chmod 0600 {{pkg.svc_config_path}}/certificates/client-key.pem
-
 echo "JDK PATH"
 echo $JDK_PKG_PATH
-
-echo "Executing opensearch securityadmin"
-echo "......................................................................."
-echo {{pkg.path}}
-echo "......................................................................."
-echo {{pkg.svc_config_path}}
-echo "......................................................................."
-ls -ltrh {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh 
-echo "......................................................................."
-chmod 777 {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh
-echo "......................................................................."
-ls -ltrh {{pkg.svc_config_path}}
-echo "......................................................................."
 # /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh 
 
-echo "****** INSIDE OPENSEARCH PACKAGE RUN HOOK *******"
 
-echo " List of files in config/certificates folder"
-ls -lrt {{pkg.svc_config_path}}/certificates
 
-echo "{{pkg.svc_config_path}}/certificates/root-ca.pem -------------"
-cat {{pkg.svc_config_path}}/certificates/root-ca.pem
 
-echo "{{pkg.svc_config_path}}/certificates/admin.pem -------------"
-cat {{pkg.svc_config_path}}/certificates/admin.pem
-
-echo "{{pkg.svc_config_path}}/certificates/admin-key.pem -------------"
-cat {{pkg.svc_config_path}}/certificates/admin-key.pem
-
-echo "{{pkg.svc_config_path}}/certificates/node1.pem -----------------"
-cat {{pkg.svc_config_path}}/certificates/node1.pem
-
-echo "{{pkg.svc_config_path}}/certificates/node1-key.pem ------------"
-cat {{pkg.svc_config_path}}/certificates/node1-key.pem
-
-echo "Inserted default securityconfig opensearch"
-
-#hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.path}}/os/plugins/opensearch-security/securityconfig -icl -key {{pkg.svc_config_path}}/admin-key.pem -cert {{pkg.svc_config_path}}/admin.pem -cacert {{pkg.svc_config_path}}/admin-key.pem -nhnv
-export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
-hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/certificates/admin-key.pem -cert {{pkg.svc_config_path}}/certificates/admin.pem -cacert {{pkg.svc_config_path}}/certificates/root-ca.pem -nhnv
-
-echo "Done !!!! Executing opensearch securityadmin"
 
 hab pkg exec chef/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
 
