@@ -77,8 +77,8 @@ if [ -L /hab/a2_deploy_workspace ]; then
     fi
   fi
 
-  touch $OLD_WORKSPACE/terraform/old-workspace.txt
-  LOGGER=$OLD_WORKSPACE/terraform/old-workspace.txt
+  touch $OLD_WORKSPACE/terraform/workspace-logs.txt
+  LOGGER=$OLD_WORKSPACE/terraform/workspace-logs.txt
   if [[ -f $OLD_WORKSPACE/terraform/cert.tf ]]; then
     echo "Copying old cert.tf to new workspace..." >> $LOGGER
     # CERT_TF_DIR="$NEW_WORKSPACE/terraform/reference_architectures/$CERT_TF"
