@@ -233,10 +233,11 @@ Based on number of nodes
 
 |Instance|Type|RAM|Volume-size|
 | :- | :- | :- | :- |
-|PostgreSQL|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - 2.|50 GB (dedicated hard disk space assigned to ‘/').|
-|Elasticsearch|m5.large|8 GB RAM for test and 16 GB for production. vCPU - 2.|50 GB (dedicated hard disk space assigned to ‘/').|
-|Chef Automate|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - 2.|50 GB (dedicated hard disk space assigned to ‘/').|
-|Chef Infra Server|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - 2.|50 GB (dedicated hard disk space assigned to ‘/').|
+|PostgreSQL|t3.medium|8 GB RAM for test and 16 GB for production. vCPU - 2.|150 GB (dedicated hard disk space assigned to ‘/').|
+|Elasticsearch|m5.large|8 GB RAM for test and 32 GB for production. vCPU - 2.|1024 GB (dedicated hard disk space assigned to ‘/').|
+|Chef Automate|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - 2.|100 GB (dedicated hard disk space assigned to ‘/').|
+|Chef Infra Server|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - 2.|100 GB (dedicated hard disk space assigned to ‘/').|
+
 
 ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. The above table includes AWS instance types. However, for Bare-infra deployment or In-premises deployment types, you can choose the above requirements for VM like RAM.
 
@@ -272,7 +273,9 @@ CIDR block -Classless Inter-Domain Routing. An internet protocol address allocat
 
 VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv4 and IPv6 blocks. You can add primary and secondary CIDR blocks to your VPC, if the secondary CIDR block comes from the same address range as the primary block.
 
-## Configuration	
+## Configuration
+Down the Automate-HA bundle 
+./chef-automate airgap bundle create 
 Create a config for aws using below command
 
 ./chef-automate init-config-ha aws 
@@ -280,7 +283,7 @@ Create a config for aws using below command
 This step is only for cloud deployment. Using provisioning command, we provision the cloud infrastructure as per configuration provided for Automate HA.
 ### AWS provisioning
 **Setup configuration file for HA Deployment on AWS**
-`./chef-automate provision-infra config.toml`
+`./chef-automate provision-infra config.toml --airgap-bundle <Name-of-bundle>`
 
 This will create configuration for deployment on AWS. config.toml is the config file where you need to make changes for any change in Automate HA
 
@@ -370,7 +373,7 @@ X-Project = ""
 
 So here you should make all the changes required for AWS deployment. Refer this doc for config.toml [What to change in config.toml] 
 
-`./chef-automate provision-infra <path to config.toml>`
+`./chef-automate provision-infra <path to config.toml> --airgap-bundle <Name-of-bundle>`
 `This step will download habitat and create workspace /hab/a2\_deploy\_workspace for you and this will 	provision infrastructure for you on AWS
 
 ### Mandatory fields in config.toml for aws
@@ -814,7 +817,7 @@ Now second scenario is Internet environment. In that case you have to provide on
 
 `./chef-automate validate-ha-infrastructure /path/to/config.toml`
 # Installation
-`./chef-automate deploy  <path to config.toml>`
+`./chef-automate deploy  <path to config.toml> --airgap-bundle <Name-Of-bundle>`
 
 This will generate workspace and download the habitat on your system. 
 `./chef-automate info`
