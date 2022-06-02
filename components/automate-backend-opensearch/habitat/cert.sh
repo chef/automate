@@ -37,6 +37,57 @@
 # rm $configPath/client.csr
 
 
+echo "======================= Installing Vault ============================="
+
+export VAULT_ADDR=${VAULT_ADDR:-https://vault.ps.chef.co}
+export VAULT_CACERT=""
+export VAULT_NAMESPACE=root
+CHEF_USERNAME=${CHEF_USERNAME:-unknown}
+STUDIO_TYPE=${STUDIO_TYPE:-none}
+
+if [[ "$CHEF_USERNAME" = "unknown" ]]; then
+    error "CHEF_USERNAME not set. This command will only work for people with
+access to the Chef Software VPN. If you are not a Chef Software
+employee and require one of the secrets retrieved by this
+script, please open a GitHub issue."
+    exit 1
+fi
+
+# Install vault and other required packages
+if ! command -v vault >/dev/null; then
+    if [[ "$STUDIO_TYPE" == "none" ]];then
+        error "vault is not installed and is required for this script.
+If you run this command in the studio, vault will be installed automatically.
+Otherwise, please install vault on your local workstation from:
+
+    https://www.vaultproject.io/downloads.html
+"
+        exit 1
+    else
+        hab pkg install core/vault -b -f
+        hab pkg install core/cacerts
+    fi
+fi
+
+if [[ "$STUDIO_TYPE" != "none" ]];then
+    VAULT_CACERT="$(hab pkg path core/cacerts)/ssl/certs/cacert.pem"
+    export VAULT_CACERT
+fi
+
+echo "Using VAULT_ADDR=$VAULT_ADDR"
+echo "Using VAULT_CACERT=$VAULT_CACERT"
+echo "Using VAULT_NAMESPACE=$VAULT_NAMESPACE"
+echo "Using CHEF_USERNAME=$CHEF_USERNAME"
+
+if [[ ! -f "$HOME/.vault-token" ]]; then
+    echo "No cached token found. Attempting to log in."
+    echo "Please enter your Chef password:"
+    vault login -method=okta username="$CHEF_USERNAME"
+else
+    echo "Cached token found at $HOME/.vault-token, skipping login"
+fi
+
+
 ROOT_CA_PEM=$(vault kv get  -field=root-ca.pem secret/a2/a2ha/opensearch)
 echo ROOT_CA_PEM
 ADMIN_PEM=$(vault kv get  -field=admin.pem secret/a2/a2ha/opensearch)
