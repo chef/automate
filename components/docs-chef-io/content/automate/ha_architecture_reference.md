@@ -33,7 +33,7 @@ The Chef Automate HA architecture involves the following clusters part of the ma
 
 - Backend Cluster and Nodes
 
-The backend components connect into the frontend Chef Habitat supervisor cluster. The **postgres** and **elasticsearch** instances run in the Chef Habitat supervisor. The **Postgres** and **Elasticsearch** databases require a minimum of three nodes, where one becomes a leader, and the other two are followers.
+The backend components connect into the frontend Chef Habitat supervisor cluster. The **postgres** and **Elasticsearch** instances run in the Chef Habitat supervisor. The **Postgres** and **Elasticsearch** databases require a minimum of three nodes, where one becomes a leader, and the other two are followers.
 
 - Frontend Cluster and Nodes
 
@@ -43,7 +43,7 @@ Chef Automate and Chef Server act as frontend nodes and serve as a web UI with l
 
 The backend and frontend clusters comprise **four** different servers with HA mode, which are as follows:
 
-1. Chef-automate
+1. Chef Automate
 2. Chef Infra Server
 3. Elasticsearch - an open-source search and analytics engine based on Apache Lucene, built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and is used for indexing purposes.
 4. PostgreSQL - an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
