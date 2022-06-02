@@ -32,6 +32,10 @@ variable "automate_role" {
   description = "Set the type of server role. can be one of: bootstrap_automate, automate or chef_api"
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
 variable "aws_region" {
   default     = "us-west-2"
   description = "The name of the selected AWS region / datacenter."
@@ -87,18 +91,6 @@ variable "managed_opensearch_username" {
   default = ""
 }
 
-variable "aws_os_snapshot_role_arn" {
-  default = ""
-}
-
-variable "os_snapshot_user_access_key_id" {
-  default = ""
-}
-
-variable "os_snapshot_user_access_key_secret" {
-  default = ""
-}
-
 variable "managed_rds_certificate" {
   default = ""
 }
@@ -129,6 +121,14 @@ variable "opensearch_listen_port" {
 
 variable "opensearch_private_ips" {
   default = []
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
 }
 
 variable "postgresql_private_ips" {

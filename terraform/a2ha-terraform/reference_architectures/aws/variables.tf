@@ -42,6 +42,10 @@ variable "aws_instance_profile_name" {
   default = ""
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -109,18 +113,6 @@ variable "managed_opensearch_username" {
   default = ""
 }
 
-variable "aws_os_snapshot_role_arn" {
-  default = ""
-}
-
-variable "os_snapshot_user_access_key_id" {
-  default = ""
-}
-
-variable "os_snapshot_user_access_key_secret" {
-  default = ""
-}
-
 variable "managed_rds_certificate" {
   default = ""
 }
@@ -159,6 +151,14 @@ variable "opensearch_ebs_volume_type" {
 
 variable "opensearch_server_instance_type" {
   default = "m5a.large"
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
 }
 
 variable "postgresql_ebs_volume_iops" {
