@@ -39,6 +39,10 @@ variable "aws_ami_id" {
   description = "Setting this value overrides ami search features"
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -90,19 +94,19 @@ variable "chef_server_private_ips" {
   default = []
 }
 
-variable "managed_elasticsearch_certificate" {
+variable "managed_opensearch_certificate" {
   default = ""
 }
 
-variable "managed_elasticsearch_domain_url" {
+variable "managed_opensearch_domain_url" {
   default = ""
 }
 
-variable "managed_elasticsearch_user_password" {
+variable "managed_opensearch_user_password" {
   default = ""
 }
 
-variable "managed_elasticsearch_username" {
+variable "managed_opensearch_username" {
   default = ""
 }
 
@@ -152,6 +156,14 @@ variable "opensearch_public_ips" {
 
 variable "opensearch_server_instance_type" {
   default = "m5a.large"
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
 }
 
 variable "postgresql_ebs_volume_iops" {

@@ -74,10 +74,14 @@ type AwsConfigToml struct {
 			PublicCustomSubnets          []string `toml:"public_custom_subnets"`
 			SSHKeyPairName               string   `toml:"ssh_key_pair_name"`
 			SetupManagedServices         bool     `toml:"setup_managed_services"`
-			ElasticsearchDomainUrl       string   `toml:"managed_elasticsearch_domain_url"`
-			ElasticsearchUsername        string   `toml:"managed_elasticsearch_username"`
-			ElasticsearchUserPassword    string   `toml:"managed_elasticsearch_user_password"`
-			ElasticsearchCertificate     string   `toml:"managed_elasticsearch_certificate"`
+			OpensearchDomainName         string   `toml:"managed_opensearch_domain_name"`
+			OpensearchDomainUrl          string   `toml:"managed_opensearch_domain_url"`
+			OpensearchUsername           string   `toml:"managed_opensearch_username"`
+			OpensearchUserPassword       string   `toml:"managed_opensearch_user_password"`
+			OpensearchCertificate        string   `toml:"managed_opensearch_certificate"`
+			AwsOsSnapshotRoleArn         string   `toml:"aws_os_snapshot_role_arn"`
+			OsUserAccessKeyId            string   `toml:"os_snapshot_user_access_key_id"`
+			OsUserAccessKeySecret        string   `toml:"os_snapshot_user_access_key_secret"`
 			RDSInstanceUrl               string   `toml:"managed_rds_instance_url"`
 			RDSSuperUserName             string   `toml:"managed_rds_superuser_username"`
 			RDSSuperUserPassword         string   `toml:"managed_rds_superuser_password"`
@@ -101,9 +105,9 @@ type AwsConfigToml struct {
 			ChefEbsVolumeIops            string   `toml:"chef_ebs_volume_iops"`
 			ChefEbsVolumeSize            string   `toml:"chef_ebs_volume_size"`
 			ChefEbsVolumeType            string   `toml:"chef_ebs_volume_type"`
-			ElasticsearchEbsVolumeIops   string   `toml:"opensearch_ebs_volume_iops"`
-			ElasticsearchEbsVolumeSize   string   `toml:"opensearch_ebs_volume_size"`
-			ElasticsearchEbsVolumeType   string   `toml:"opensearch_ebs_volume_type"`
+			OpensearchEbsVolumeIops      string   `toml:"opensearch_ebs_volume_iops"`
+			OpensearchEbsVolumeSize      string   `toml:"opensearch_ebs_volume_size"`
+			OpensearchEbsVolumeType      string   `toml:"opensearch_ebs_volume_type"`
 			PostgresqlEbsVolumeIops      string   `toml:"postgresql_ebs_volume_iops"`
 			PostgresqlEbsVolumeSize      string   `toml:"postgresql_ebs_volume_size"`
 			PostgresqlEbsVolumeType      string   `toml:"postgresql_ebs_volume_type"`

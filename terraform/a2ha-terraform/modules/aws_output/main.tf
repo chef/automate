@@ -5,6 +5,9 @@ locals {
       opensearch_public_ips  = join(", ", formatlist("\"%s\"", var.opensearch_public_ips)),
       opensearch_private_ips = join(", ", formatlist("\"%s\"", var.opensearch_private_ips)),
       postgresql_private_ips    = join(", ", formatlist("\"%s\"", var.postgresql_private_ips)),
+      aws_os_snapshot_role_arn  = var.aws_os_snapshot_role_arn,
+      os_snapshot_user_access_key_id = var.os_snapshot_user_access_key_id,
+      os_snapshot_user_access_key_secret = var.os_snapshot_user_access_key_secret,
       automate_fqdn             = var.automate_fqdn
       automate_frontend_urls    = var.automate_frontend_urls
       bucket_name               = var.bucket_name

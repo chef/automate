@@ -42,6 +42,10 @@ variable "aws_instance_profile_name" {
   default = ""
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -93,19 +97,23 @@ variable "chef_server_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
 
-variable "managed_elasticsearch_certificate" {
+variable "managed_opensearch_certificate" {
   default = ""
 }
 
-variable "managed_elasticsearch_domain_url" {
+variable "managed_opensearch_domain_name" {
   default = ""
 }
 
-variable "managed_elasticsearch_user_password" {
+variable "managed_opensearch_domain_url" {
   default = ""
 }
 
-variable "managed_elasticsearch_username" {
+variable "managed_opensearch_user_password" {
+  default = ""
+}
+
+variable "managed_opensearch_username" {
   default = ""
 }
 
@@ -147,6 +155,14 @@ variable "opensearch_ebs_volume_type" {
 
 variable "opensearch_server_instance_type" {
   default = "m5a.large"
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
 }
 
 variable "postgresql_ebs_volume_iops" {
