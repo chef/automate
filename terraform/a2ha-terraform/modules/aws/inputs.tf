@@ -101,6 +101,10 @@ variable "lb_access_logs" {
   default = false
 }
 
+variable "managed_opensearch_domain_name" {
+  default = ""
+}
+
 variable "managed_opensearch_domain_url" {
   default = ""
 }

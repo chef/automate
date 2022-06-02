@@ -68,7 +68,7 @@ resource "aws_iam_policy" "pass_es_role_policy" {
         {
             "Effect": "Allow",
             "Action": "es:ESHttpPut",
-            "Resource": "arn:aws:es:${var.aws_region}:${local.account_id}:domain/${var.managed_opensearch_domain_url}/*"
+            "Resource": "arn:aws:es:${var.aws_region}:${local.account_id}:domain/${var.managed_opensearch_domain_name}/*"
         }
     ]
 }

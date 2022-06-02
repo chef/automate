@@ -74,6 +74,7 @@ type AwsConfigToml struct {
 			PublicCustomSubnets          []string `toml:"public_custom_subnets"`
 			SSHKeyPairName               string   `toml:"ssh_key_pair_name"`
 			SetupManagedServices         bool     `toml:"setup_managed_services"`
+			OpensearchDomainName         string   `toml:"managed_opensearch_domain_name"`
 			OpensearchDomainUrl          string   `toml:"managed_opensearch_domain_url"`
 			OpensearchUsername           string   `toml:"managed_opensearch_username"`
 			OpensearchUserPassword       string   `toml:"managed_opensearch_user_password"`

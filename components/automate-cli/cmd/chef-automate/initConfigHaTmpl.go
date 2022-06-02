@@ -54,6 +54,7 @@ public_custom_subnets = []
 # ssh key pair name in AWS to access instances
 ssh_key_pair_name = "A2HA"
 setup_managed_services = false
+managed_opensearch_domain_name = ""
 managed_opensearch_domain_url = ""
 managed_opensearch_username = ""
 managed_opensearch_user_password = ""

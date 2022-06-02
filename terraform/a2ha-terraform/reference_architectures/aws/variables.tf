@@ -101,6 +101,10 @@ variable "managed_opensearch_certificate" {
   default = ""
 }
 
+variable "managed_opensearch_domain_name" {
+  default = ""
+}
+
 variable "managed_opensearch_domain_url" {
   default = ""
 }

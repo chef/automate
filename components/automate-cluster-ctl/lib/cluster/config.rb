@@ -102,6 +102,7 @@ module AutomateCluster
       default :backup_config, ' '
       default :s3_bucketName, 'chef-automate-ha'
       default :setup_managed_services, false
+      default :managed_opensearch_domain_name, ' '
       default :managed_opensearch_domain_url, ' '
       default :managed_opensearch_username, ' '
       default :managed_opensearch_user_password, ' '

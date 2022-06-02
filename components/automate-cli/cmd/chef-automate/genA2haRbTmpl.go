@@ -135,6 +135,7 @@ aws do
   ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
   lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
   setup_managed_services {{ .Aws.Config.SetupManagedServices }}
+  {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_domain_name "{{ .Aws.Config.OpensearchDomainName }}" {{ else }}#managed_opensearch_domain_name "{{ .Aws.Config.OpensearchDomainName }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_domain_url "{{ .Aws.Config.OpensearchDomainUrl }}" {{ else }}#managed_opensearch_domain_url "{{ .Aws.Config.OpensearchDomainUrl }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_username "{{ .Aws.Config.OpensearchUsername }}" {{ else }}#managed_opensearch_username "{{ .Aws.Config.OpensearchUsername }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_user_password "{{ .Aws.Config.OpensearchUserPassword }}" {{ else }}#managed_opensearch_user_password "{{ .Aws.Config.OpensearchUserPassword }}" {{ end }}
