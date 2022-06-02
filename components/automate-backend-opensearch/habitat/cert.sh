@@ -36,6 +36,7 @@
 # rm $configPath/client-key-temp.pem
 # rm $configPath/client.csr
 
+echo " ================= Getting certs from vault using =============="
 echo $OPENSEARCH_ROOT_CA_PEM
 echo $OPENSEARCH_ADMIN_PEM
 echo $OPENSEARCH_ADMIN_KEY_PEM
