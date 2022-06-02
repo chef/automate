@@ -7,6 +7,7 @@ module "aws" {
   ami_filter_name                    = var.ami_filter_name
   ami_filter_owner                   = var.ami_filter_owner
   ami_filter_virt_type               = var.ami_filter_virt_type
+  aws_region                         = var.aws_region
   aws_vpc_id                         = var.aws_vpc_id
   aws_cidr_block_addr                = var.aws_cidr_block_addr
   automate_ebs_volume_iops           = var.automate_ebs_volume_iops
@@ -34,6 +35,7 @@ module "aws" {
   opensearch_instance_count          = var.opensearch_instance_count
   opensearch_listen_port             = var.opensearch_listen_port
   opensearch_server_instance_type    = var.opensearch_server_instance_type
+  managed_opensearch_domain_name     = var.managed_opensearch_domain_name
   managed_opensearch_domain_url      = var.managed_opensearch_domain_url
   aws_os_snapshot_role_arn           = var.aws_os_snapshot_role_arn
   os_snapshot_user_access_key_id     = var.os_snapshot_user_access_key_id
