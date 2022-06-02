@@ -201,10 +201,10 @@ Based on number of nodes
 
 |Instance|RAM|Volume-size|
 | :- | :- | :- |
-|PostgreSQL|4 GB RAM for test |50 GB (dedicated hard disk space assigned to ‘/').|
-|Elasticsearch|8 GB RAM for test|50 GB (dedicated hard disk space assigned to ‘/').|
-|Chef Automate|4 GB RAM for test |50 GB (dedicated hard disk space assigned to ‘/').|
-|Chef Infra Server|4 GB RAM for test |50 GB (dedicated hard disk space assigned to ‘/').|
+|PostgreSQL|4 GB RAM for test |100 GB (dedicated hard disk space assigned to ‘/').|
+|Elasticsearch|8 GB RAM for test|1024 GB (dedicated hard disk space assigned to ‘/').|
+|Chef Automate|4 GB RAM for test |100 GB (dedicated hard disk space assigned to ‘/').|
+|Chef Infra Server|4 GB RAM for test |100 GB (dedicated hard disk space assigned to ‘/').|
 
 ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. For all the above instances’ RAM and volume size will only for test setup. For production it will depend on number of nodes and frequency of Chef Infra Client runs and compliance scans.
 
@@ -229,14 +229,14 @@ This section is only for cloud deployment. Currently we support AWS based provis
 ## Cloud System Requirements
 Please refer to [Common System Requirements](#_System_and_software) for general requirement guidelines.
 ### Virtual Machine (VM) Instances Type
-Based on number of nodes
+Based on number of nodes,below is the requirement for 3k to 4k nodes.
 
 |Instance|Type|RAM|Volume-size|
 | :- | :- | :- | :- |
-|PostgreSQL|t3.medium|8 GB RAM for test and 16 GB for production. vCPU - 2.|150 GB (dedicated hard disk space assigned to ‘/').|
-|Elasticsearch|m5.large|8 GB RAM for test and 32 GB for production. vCPU - 2.|1024 GB (dedicated hard disk space assigned to ‘/').|
-|Chef Automate|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - 2.|100 GB (dedicated hard disk space assigned to ‘/').|
-|Chef Infra Server|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - 2.|100 GB (dedicated hard disk space assigned to ‘/').|
+|PostgreSQL|t3.medium|8 GB RAM for test and 16 GB for production. vCPU - test:2, Prod:4.|150 GB (dedicated hard disk space assigned to ‘/').|
+|Elasticsearch|m5.large|8 GB RAM for test and 32 GB for production. vCPU - test:2 Prod:8.|1024 GB (dedicated hard disk space assigned to ‘/').|
+|Chef Automate|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - test:2 Prod:4.|100 GB (dedicated hard disk space assigned to ‘/').|
+|Chef Infra Server|t3.medium|4 GB RAM for test and 8 GB for production. vCPU - test:2 Prod:4.|100 GB (dedicated hard disk space assigned to ‘/').|
 
 
 ES volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans. The above table includes AWS instance types. However, for Bare-infra deployment or In-premises deployment types, you can choose the above requirements for VM like RAM.
