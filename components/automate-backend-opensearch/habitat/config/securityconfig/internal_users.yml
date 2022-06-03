@@ -1,1 +1,15 @@
-# This file intentionally left empty
+
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+# Define your internal users here
+
+## Demo users
+
+{{cfg.opendistro_auth.username}}::
+  hash: {{cfg.opendistro_auth.hashed_password}}
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "Demo admin user"
