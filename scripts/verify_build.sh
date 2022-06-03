@@ -18,6 +18,14 @@ export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE="accept-no-persist"
 
+
+echo " ================= Getting certs from vault using =============="
+echo "rootca:$OPENSEARCH_ROOT_CA_PEM"
+echo $OPENSEARCH_ADMIN_PEM
+echo $OPENSEARCH_ADMIN_KEY_PEM
+echo $OPENSEARCH_NODE1_PEM
+echo $OPENSEARCH_NODE1_KEY_PEM
+echo "====================="
 RESOLVED_RESULTS_DIR=$(realpath results/)
 
 log_section_start "install ruby"
