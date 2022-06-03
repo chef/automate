@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # configPath=$1/os/config/certificates
-# basePath=$2
+basePath=$1
 # echo $configPath
 # 
 # openssl genrsa -out $configPath/root-ca-key.pem 2048
