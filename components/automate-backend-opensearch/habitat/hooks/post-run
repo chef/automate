@@ -9,15 +9,25 @@ echo "......................................................................."
 echo {{pkg.svc_config_path}}
 echo "......................................................................."
 ls -ltrh {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh 
-echo "......................................................................."
-chmod 777 {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh
-echo "......................................................................."
+#echo "......................................................................."
+#chmod 777 {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh
+#echo "......................................................................."
 ls -ltrh {{pkg.svc_config_path}}
 echo "......................................................................."
 echo "Inserted default securityconfig opensearch"
 hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/certificates/admin-key.pem -cert {{pkg.svc_config_path}}/certificates/admin.pem -cacert {{pkg.svc_config_path}}/certificates/root-ca.pem -nhnv
 echo "Done !!!! Executing opensearch securityadmin"
 
+
+echo "........................................................................"
+echo "generating hashed password for internal user role"
+"
+{{cfg.opensearch_auth.admin_username}}:
+  readonly: true
+  hash: {{cfg.opensearch_auth.hashed_password}}
+  roles:
+    - admin
+"
 
 source {{pkg.svc_config_path}}/health_check
 
@@ -72,7 +82,7 @@ curl \
   -s \
   -i \
   -H 'Content-Type: application/json'\
-  -X PUT "http://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
+  -X PUT "https://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
   -d '{
     "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
     "index.refresh_interval": "{{cfg.index.refresh_interval}}"

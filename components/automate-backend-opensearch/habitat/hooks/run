@@ -35,29 +35,11 @@ source {{pkg.svc_config_path}}/init_ca
 echo "JDK PATH"
 echo $JDK_PKG_PATH
 # /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh 
-
-
-
-
-
 hab pkg exec chef/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
 
 hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore {{pkg.svc_var_path}}/ca.jks -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
 
 hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore $JDK_PKG_PATH/lib/security/cacerts -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
-
-#exec opensearch
-#hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -h localhost -p 9201 -cacert {{pkg.svc_config_path}}/root-ca.pem -cert {{pkg.svc_config_path}}/admin.pem -key {{pkg.svc_config_path}}/admin-key.pem -nhnv -icl -cd {{pkg.svc_config_path}}/securityconfig
-#hab pkg exec core/bash {{pkg.path}}/os/opensearch-tar-install.sh
-
-#chmod +x {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh
-
-
-#Generate securityadmin_demo.sh
-# echo "#!/bin/bash" | tee securityadmin_demo.sh > /dev/null 
-
-# chmod +x {{pkg.path}}/os/securityadmin_demo.sh
-# hab pkg exec core/bash {{pkg.path}}/os/securityadmin_demo.sh
 exec opensearch
 
 

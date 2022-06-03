@@ -104,20 +104,20 @@ module AutomateCluster
       f.close
     end
 
-    =begin def insert_credentials
-      insert_command = "#{config['tool_path']}/securityadmin.sh -h #{config['opensearch_ip']} \
-        -p #{config['opensearch_port']} -cacert #{config['opensearch_ca']} \
-        -cert #{config['admin_cert']} -key #{config['admin_key']} -nhnv -icl \
-        -cd #{config['securityconfig_path']}"
-      result = run_command(insert_command)
-      if result.exitstatus.zero? && result.stdout !~ /ERR: /
-        logger.warn 'Credentials successfully rotated'
-        logger.warn result
-      else
-        logger.error "Credentials failed to rotate with error code #{result.exitstatus}"
-        logger.error result
-      end
-    end =end
+    #def insert_credentials
+    #  insert_command = "#{config['tool_path']}/securityadmin.sh -h #{config['opensearch_ip']} \
+    #    -p #{config['opensearch_port']} -cacert #{config['opensearch_ca']} \
+    #    -cert #{config['admin_cert']} -key #{config['admin_key']} -nhnv -icl \
+    #    -cd #{config['securityconfig_path']}"
+    #  result = run_command(insert_command)
+    #  if result.exitstatus.zero? && result.stdout !~ /ERR: /
+    #    logger.warn 'Credentials successfully rotated'
+    #    logger.warn result
+    #  else
+    #    logger.error "Credentials failed to rotate with error code #{result.exitstatus}"
+    #    logger.error result
+    #  end
+    #end
 
     def rotate_credentials
       logger.warn 'Preparing to rotate credentials'
