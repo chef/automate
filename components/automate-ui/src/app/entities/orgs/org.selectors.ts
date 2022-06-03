@@ -45,3 +45,43 @@ export const orgFromRoute = createSelector(
   routeParams,
   (state, { 'org-id': org_id }) => state[org_id]
 );
+
+export const uploadStatus = createSelector(
+  orgState,
+  (state) => state.uploadStatus
+);
+
+export const uploadDetails = createSelector(
+  orgState,
+  (state) => state.uploadDetails
+);
+
+export const cancelStatus = createSelector(
+  orgState,
+  (state) => state.cancelStatus
+);
+
+export const previewStatus = createSelector(
+  orgState,
+  (state) => state.previewStatus
+);
+
+export const previewData = createSelector(
+  orgState,
+  (state) => state.previewData
+);
+
+export const confirmPreviewStatus = createSelector(
+  orgState,
+  (state) => state.confirmPreviewStatus
+);
+
+export const checkUserStatus = createSelector(
+  orgState,
+  (state) => state.checkUserStatus
+);
+
+export const getCheckedUserStatus = createSelector(
+  orgState,
+  (state) => state.getCheckedUserStatus
+);

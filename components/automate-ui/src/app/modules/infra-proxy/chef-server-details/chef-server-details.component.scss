@@ -5,6 +5,92 @@ chef-page-header {
   padding-bottom: 0;
 }
 
+.meta-box {
+  border: 0.5px solid $chef-key-tab;
+  border-radius: 4px;
+  margin-bottom: 4em;
+  padding: 1em 0 2em;
+  background: $chef-white;
+
+  .summary-container {
+    display: grid;
+    grid-template-columns: 40% 46% 14%;
+
+    .summary-body {
+      font-size: 14px;
+      padding: 0 1em;
+
+      .heading {
+        display: inline-block;
+        font-weight: bold;
+        width: 30%;
+      }
+
+      .server-entity-value {
+        width: 70%;
+      }
+
+      &.last {
+        position: relative;
+      }
+    }
+
+    .meta-head {
+      text-transform: uppercase;
+      font-size: 15px;
+      font-weight: 600;
+      color: $chef-black;
+    }
+
+    ul {
+      color: $chef-primary-dark;
+      list-style: none;
+      padding: 0;
+
+      li {
+        display: flex;
+        margin-bottom: 15px;
+        height: 20px;
+
+        span {
+          font-size: 14px;
+          line-height: 21px;
+          letter-spacing: 0.2px;
+
+          &.webUIKeyStatus {
+            text-transform: uppercase;
+          }
+
+          &.update-link {
+            padding-left: 10px;
+            text-decoration: underline;
+
+            a {
+              cursor: pointer;
+            }
+          }
+        }
+
+        img {
+          margin: 2.5px 1.5px -2px 0px;
+          width: 14px;
+        }
+      }
+    }
+
+    .sync-button {
+      position: absolute;
+      right: 0;
+
+      .img-inline {
+        width: 17px;
+        height: 17px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
 chef-toolbar {
   display: block;
   position: relative;
@@ -41,9 +127,10 @@ th {
   padding: 0px;
 }
 
-tbody > .detail-row {
+tbody>.detail-row {
   padding-top: 0px;
   padding-bottom: 15px;
+  height: 50px;
 }
 
 .detail-row {
@@ -143,3 +230,74 @@ img {
   }
 }
 
+.circular-chart {
+  display: inline-block;
+  width: 30px;
+  justify-content: space-around;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+.circular-chart.blue .circle {
+  stroke: #3864F1;
+}
+
+.svg-block {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-icon-completed {
+  position: absolute;
+  margin-top: 0px;
+}
+
+.status-icon-failed {
+  position: absolute;
+  margin-top: 0px;
+}
+
+.preview-link {
+  cursor: pointer;
+}
+
+.tooltip {
+  --tooltip-color: #F9DBEA;
+  left: 1395.05px;
+  top: 280.766px;
+  font-size: 10px;
+  color: #ba1e6a;
+}
+
+.chef-server-info-text {
+  margin-left: 14px;
+}
+
+.migrationSlider-link {
+  padding-left: 10px;
+  text-decoration: underline;
+  float: right;
+
+  a {
+    cursor: pointer;
+  }
+}

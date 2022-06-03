@@ -4,12 +4,12 @@ describe('infra role', () => {
   let adminIdToken = '';
   const serverID = 'chef-manage';
   const serverName = 'chef manage';
-  const orgID = 'viveksingh_msys';
-  const orgName = 'viveksingh_msys';
-  const serverFQDN = 'api.chef.io';
-  const serverIP = '50.21.221.24';
-  const adminUser = 'viveksingh_msys';
+  const orgID = 'demoorg';
+  const orgName = 'demoorg';
+  const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
+  const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   const roleName = `${cypressPrefix}-role-${now}-1`;
   const roleDescription = 'role description';
   const roleRunlistName = `${cypressPrefix}-role-${now}-2`;
@@ -32,7 +32,8 @@ describe('infra role', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: '',
+          webui_key: webuiKey
         }
       }).then((resp) => {
         if (resp.status === 200 && resp.body.ok === true) {
@@ -255,8 +256,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
 
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
 
         // here we exit with the Cancel button
         cy.get('[data-cy=cancel-run-list-button]').contains('Cancel').should('be.visible')
@@ -296,8 +296,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -320,8 +319,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -338,8 +336,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -367,8 +364,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -398,8 +394,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(2).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -426,8 +421,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-description]').type(roleDescription);
 
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -449,8 +443,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();
@@ -482,8 +475,7 @@ describe('infra role', () => {
         cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
         cy.get('[data-cy=role-description]').type(roleDescription);
         cy.get('[data-cy=navbar]').contains('Run List').click();
-        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-          .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
         cy.get('[data-cy=drag-right]').click();
 
         cy.get('[data-cy=navbar]').contains('Default Attributes').click();

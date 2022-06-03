@@ -43,7 +43,6 @@ describe('ChefServerDetailsComponent', () => {
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),
@@ -263,6 +262,12 @@ describe('ChefServerDetailsComponent', () => {
           expect(errors['pattern']).toBeTruthy();
         });
       });
+    });
+  });
+
+  describe('validate server webui key on details page', () => {
+    it('when server webui key is valid', () => {
+      expect(element.query(By.css('.webUIKeyStatus'))).toBeDefined();
     });
   });
 });

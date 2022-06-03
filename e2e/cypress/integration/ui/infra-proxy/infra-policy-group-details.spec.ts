@@ -2,12 +2,12 @@ describe('infra policy group details', () => {
   let adminIdToken = '';
   const serverID = 'chef-manage';
   const serverName = 'chef manage';
-  const orgID = 'viveksingh_msys';
-  const orgName = 'viveksingh_msys';
-  const serverFQDN = 'api.chef.io';
-  const serverIP = '50.21.221.24';
-  const adminUser = 'viveksingh_msys';
+  const orgID = 'demoorg';
+  const orgName = 'demoorg';
+  const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
+  const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   let policies: any;
   let policyGroupName = '';
   let policyFilesCount: number;
@@ -29,7 +29,8 @@ describe('infra policy group details', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: '',
+          webui_key: webuiKey
         }
       }).then((resp) => {
         if (resp.status === 200 && resp.body.ok === true) {

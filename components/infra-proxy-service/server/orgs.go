@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -10,6 +11,8 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	"github.com/gofrs/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 // CreateOrg creates a new org
@@ -28,20 +31,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, err
 	}
 
-	newSecret := &secrets.Secret{
-		Name: "infra-proxy-service-admin-key",
-		Type: "chef-server",
-		Data: []*query.Kv{
-			{Key: "key", Value: req.AdminKey},
-		},
-	}
-
-	secretID, err := s.service.Secrets.Create(ctx, newSecret)
-	if err != nil {
-		return nil, err
-	}
-
-	org, err := s.service.Storage.StoreOrg(ctx, req.Id, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
+	org, err := s.service.Storage.StoreOrg(ctx, req.Id, req.Name, "", "", req.ServerId, req.Projects)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
@@ -119,14 +109,23 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 		return nil, err
 	}
 
+	// Delete users asscoiation with org
+	err = s.service.Storage.DeleteAutomateInfraOrgUsers(ctx, req.ServerId, req.Id)
+	if err != nil {
+		log.Errorf("Failed to delete the org users %s", err.Error())
+		return nil, err
+	}
+
 	org, err := s.service.Storage.DeleteOrg(ctx, req.Id, req.ServerId)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
-	_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.CredentialID})
-	if err != nil {
-		return nil, err
+	if org.CredentialID != "" {
+		_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.CredentialID})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &response.DeleteOrg{
@@ -181,23 +180,25 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 		return nil, service.ParseStorageError(err, *req, "org")
 	}
 
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
-	if err != nil {
-		return nil, err
-	}
+	if org.CredentialID != "" {
+		secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
+		if err != nil {
+			return nil, err
+		}
 
-	newSecret := &secrets.Secret{
-		Id:   secret.GetId(),
-		Name: "infra-proxy-service-admin-key",
-		Type: "chef-server",
-		Data: []*query.Kv{
-			{Key: "key", Value: req.AdminKey},
-		},
-	}
+		newSecret := &secrets.Secret{
+			Id:   secret.GetId(),
+			Name: "infra-proxy-service-admin-key",
+			Type: "chef-server",
+			Data: []*query.Kv{
+				{Key: "key", Value: req.AdminKey},
+			},
+		}
 
-	_, err = s.service.Secrets.Update(ctx, newSecret)
-	if err != nil {
-		return nil, err
+		_, err = s.service.Secrets.Update(ctx, newSecret)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	org, err = s.service.Storage.TouchOrg(ctx, req.Id, req.ServerId)
@@ -208,6 +209,69 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 	return &response.ResetOrgAdminKey{
 		Org: fromStorageOrg(org),
 	}, nil
+}
+
+//GetInfraServerOrgs: Fetches the list of automate infra server organisations from the chef server and save it into the automate back end DB
+func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
+
+	// Get chef client
+	client, err := s.getChefClient(ctx, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	// This is only for reference to use the migration_stage storage functions
+	parsedData, err := json.Marshal(&storage.Org{ID: "1234", Name: "demo_org"})
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.service.Migration.StoreMigrationStage(ctx, uuid.Must(uuid.NewV4()).String(), parsedData)
+	if err != nil {
+		return nil, err
+
+	}
+	_, _ = s.service.Migration.GetMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
+	_, _ = s.service.Migration.DeleteMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
+	_, _ = s.service.Migration.GetMigrationStage(ctx, "bfc4ebe1-1256-4cf1-aab8-557edcc48658")
+	migration, err := s.service.Migration.StartOrgMigration(ctx, uuid.Must(uuid.NewV4()).String(), req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get and save orgs in goroutine
+	go s.getInfraServerOrgs(client, req.ServerId, migration)
+
+	return &response.GetInfraServerOrgs{
+		MigrationId: migration.ID,
+	}, nil
+}
+
+func (s *Server) getInfraServerOrgs(c *ChefClient, serverId string, migration storage.Migration) {
+	//var migrationStatus string
+	var totalSucceeded, totalSkipped, totalFailed int64
+
+	defer func() {
+		_, _ = s.service.Migration.CompleteOrgMigration(context.Background(), migration.MigrationID, serverId, totalSucceeded, totalSkipped, totalFailed)
+	}()
+
+	// Get organisation list from chef server
+	orgsList, err := c.client.Organizations.List()
+	if err != nil {
+		//migrationStatus = "Failed"
+		return
+	}
+
+	// Save organisations in backend DB
+	for key := range orgsList {
+		_, err := s.service.Storage.StoreOrg(context.Background(), key, key, "", "", serverId, nil)
+		if err != nil {
+			totalFailed++
+			continue
+		}
+		totalSucceeded++
+	}
+	//migrationStatus = "Completed"
+	return
 }
 
 // Create a response.Org from a storage.Org

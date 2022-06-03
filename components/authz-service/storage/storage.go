@@ -92,7 +92,7 @@ func DefaultPolicies() ([]Policy, error) {
 		return nil, err
 	}
 
-	// editor policy statements
+	// editor allow policy statements
 	s3, err := NewStatement(Allow, constants.EditorRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err

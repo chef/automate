@@ -59,7 +59,7 @@ service Users {
     option (chef.automate.api.iam.policy).action = "iam:users:create";
   };
 
-  /*
+	/*
   List all users
 
   Lists all local users.

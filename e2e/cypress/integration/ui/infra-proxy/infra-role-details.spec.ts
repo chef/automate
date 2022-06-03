@@ -4,12 +4,12 @@ describe('infra role detail', () => {
   let adminIdToken = '';
   const serverID = 'chef-manage';
   const serverName = 'chef manage';
-  const orgID = 'viveksingh_msys';
-  const orgName = 'viveksingh_msys';
-  const serverFQDN = 'api.chef.io';
-  const serverIP = '50.21.221.24';
-  const adminUser = 'viveksingh_msys';
+  const orgID = 'demoorg';
+  const orgName = 'demoorg';
+  const serverFQDN = Cypress.env('AUTOMATE_INFRA_SERVER_FQDN');
+  const adminUser = 'kallol';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const webuiKey = Cypress.env('AUTOMATE_INFRA_WEBUI_KEY').replace(/\\n/g, '\n');
   const roleName = `${cypressPrefix}-role-${now}`;
   const roleDescription = 'role description';
   const defaultAttribute = {default: 'test'};
@@ -36,7 +36,8 @@ describe('infra role detail', () => {
           id: serverID,
           name: serverName,
           fqdn: serverFQDN,
-          ip_address: serverIP
+          ip_address: '',
+          webui_key: webuiKey
         }
       }).then((response) => {
         if (response.status === 200 && response.body.ok === true) {
@@ -316,10 +317,8 @@ describe('infra role detail', () => {
     it('can select multiple item from list, move to right then update the run list', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
-        .contains('audit::inspec').click();
-      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
-        .contains('chef-client').click();
+      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(1).click();
+      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').eq(2).click();
 
       cy.get('[data-cy=drag-right]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -374,8 +373,8 @@ describe('infra role detail', () => {
       () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('audit').click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('chef-client').click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(0).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
 
       cy.get('[data-cy=drag-left]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -402,8 +401,7 @@ describe('infra role detail', () => {
     it('can select a item from selected run list, move item up then update the run list', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('aix::nim_master_setup_standalone')
-        .click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
 
       cy.get('[data-cy=drag-up]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -433,9 +431,8 @@ describe('infra role detail', () => {
       () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('audit').click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('aix::nim_master_setup_standalone')
-        .click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(2).click();
       cy.wait(2000);
       cy.get('[data-cy=drag-up]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -479,7 +476,7 @@ describe('infra role detail', () => {
     xit('can select a item from selected run list, move item down then update the run list', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('centos-cookbook-file').click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
 
       cy.get('[data-cy=drag-down]').click();
       cy.get('[data-cy=update-run-list]').click();
@@ -509,10 +506,9 @@ describe('infra role detail', () => {
       () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical [data-cy=updated-run-list]').contains('aix::nim_master_setup_standalone')
-        .click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('centos-cookbook-file').click();
-      cy.get('.vertical [data-cy=updated-run-list]').contains('cron').click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(1).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(2).click();
+      cy.get('.vertical [data-cy=updated-run-list]').eq(3).click();
 
       cy.get('[data-cy=drag-down]').click();
       cy.get('[data-cy=update-run-list]').click();

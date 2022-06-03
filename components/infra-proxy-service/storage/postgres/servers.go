@@ -9,19 +9,19 @@ import (
 )
 
 // StoreServer saves a server to the DB.
-func (p *postgres) StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (storage.Server, error) {
-	return p.insertServer(ctx, id, name, fqdn, ipAddress)
+func (p *postgres) StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string, credentialId string) (storage.Server, error) {
+	return p.insertServer(ctx, id, name, fqdn, ipAddress, credentialId)
 }
 
 func (p *postgres) insertServer(ctx context.Context,
-	id string, name string, fqdn string, ipAddress string) (storage.Server, error) {
+	id string, name string, fqdn string, ipAddress string, credentialId string) (storage.Server, error) {
 
 	var server storage.Server
 	err := p.db.QueryRowContext(ctx,
-		`INSERT INTO servers (id, name, fqdn, ip_address, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, now(), now())
+		`INSERT INTO servers (id, name, fqdn, ip_address, credential_id, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, now(), now())
 		RETURNING id, name, fqdn, ip_address, created_at, updated_at`,
-		id, name, fqdn, ipAddress).
+		id, name, fqdn, ipAddress, credentialId).
 		Scan(&server.ID, &server.Name, &server.Fqdn, &server.IPAddress, &server.CreatedAt, &server.UpdatedAt)
 	if err != nil {
 		return storage.Server{}, p.processError(err)
@@ -38,11 +38,11 @@ func (p *postgres) GetServer(ctx context.Context, id string) (storage.Server, er
 func (p *postgres) getServer(ctx context.Context, q querier, id string) (storage.Server, error) {
 	var s storage.Server
 	err := q.QueryRowContext(ctx,
-		`SELECT s.id, s.name, s.fqdn, s.ip_address, s.updated_at, s.created_at,
+		`SELECT s.id, s.name, s.fqdn, s.ip_address, s.credential_id, s.updated_at, s.created_at,
 		COALESCE((SELECT count(*) FROM orgs o WHERE o.server_id = s.id), 0) AS orgs_count
 		FROM servers s
 		WHERE s.id = $1`, id).
-		Scan(&s.ID, &s.Name, &s.Fqdn, &s.IPAddress, &s.CreatedAt, &s.UpdatedAt, &s.OrgsCount)
+		Scan(&s.ID, &s.Name, &s.Fqdn, &s.IPAddress, &s.CredentialID, &s.CreatedAt, &s.UpdatedAt, &s.OrgsCount)
 	if err != nil {
 		return storage.Server{}, p.processError(err)
 	}
@@ -74,6 +74,24 @@ func (p *postgres) EditServer(ctx context.Context, id string, name string, fqdn 
 		RETURNING id, name, fqdn, ip_address, created_at, updated_at`,
 		id, name, fqdn, ipAddress).
 		Scan(&s.ID, &s.Name, &s.Fqdn, &s.IPAddress, &s.CreatedAt, &s.UpdatedAt)
+	if err != nil {
+		return storage.Server{}, p.processError(err)
+	}
+
+	return s, nil
+}
+
+// EditServerWebuiKey only update the credential id on a database server.
+func (p *postgres) EditServerWebuiKey(ctx context.Context, id, credentialId string) (storage.Server, error) {
+	var s storage.Server
+
+	err := p.db.QueryRowContext(ctx,
+		`UPDATE servers
+		SET credential_id = $2, updated_at = now()
+		WHERE id = $1
+		RETURNING id, name, fqdn, ip_address, credential_id, created_at, updated_at`,
+		id, credentialId).
+		Scan(&s.ID, &s.Name, &s.Fqdn, &s.IPAddress, &s.CredentialID, &s.CreatedAt, &s.UpdatedAt)
 	if err != nil {
 		return storage.Server{}, p.processError(err)
 	}

@@ -94,13 +94,13 @@ if ['up', 'ssh', 'destroy', 'halt'].include?(ARGV[0])
     aws_profile ||= 'chef-engineering'
     aws_creds_file = "#{ENV['HOME']}/.aws/credentials"
 
-    if find_executable('okta_aws')
+    if find_executable('saml2aws')
       puts " * okta_aws command detected, using it to refresh the temporary AWS credentials..."
-      unless File.exist?("#{ENV['HOME']}/.okta_aws.toml")
-        raise "#{ENV['HOME']}/.okta_aws.toml is not defined, cannot continue. Please read README.md for an example and usage details."
+      unless File.exist?("#{ENV['HOME']}/.saml2aws")
+        raise "#{ENV['HOME']}/.saml2aws is not defined, cannot continue. Please read README.md for an example and usage details."
       end
       puts " * You might be prompted for your Okta password now..."
-      `saml2aws login --profile chef-engineering`
+      `saml2aws login --profile "#{aws_profile}" --skip-prompt`
     end
 
     unless File.exist?(aws_creds_file)

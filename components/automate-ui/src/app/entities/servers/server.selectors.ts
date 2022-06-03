@@ -46,3 +46,38 @@ export const deleteStatus = createSelector(
   serverState,
   (state) => state.deleteStatus
 );
+
+export const getUsers = createSelector(
+  serverState,
+  (state) => state.getUsers
+);
+
+export const getUsersStatus = createSelector(
+  serverState,
+  (state) => state.getUsersStatus
+);
+
+export const updateWebUIKey = createSelector(
+  serverState,
+  (state) => state.updateWebUIKeyStatus
+);
+
+export const getValidateWebUIKeyStatus = createSelector(
+  serverState,
+  (state) => state.getvalidateWebUIKeyStatus
+);
+
+export const validateWebUIKeyStatus = createSelector(
+  serverState,
+  (state) => state.validateWebUIKeyStatus
+);
+
+export const getMigrationStatus = createSelector(
+  serverState,
+  (state) => state.getMigrationStatus
+);
+
+export const migrationStatus = createSelector(
+  serverState,
+  (state) => state.migrationStatus
+);

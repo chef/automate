@@ -1,0 +1,125 @@
+<div data-cy="migration-slider" ngClass="{slide : isSlideOpen1}">
+  <chef-loading-spinner *ngIf="!isPreview" size="50" fixed></chef-loading-spinner>
+  <div class="sidenav-header">
+    <chef-button class="back-button" secondary (click)="closeMigrationSlider()" data-cy="back-button">
+      <chef-icon>arrow_back</chef-icon>
+    </chef-button>
+    <h2 slot="title">Migration </h2>
+    <chef-button class="close" secondary (click)="closeMigrationSlider()" data-cy="close-chef-infra-button">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="sidenav-body">
+    <div class="flex-container">
+        <div class="meta-box">
+          <h3>You have the option to choose which users to migrate</h3>
+          <div class="meta-wrapper">
+            <div class="summary-body">
+              <p>We have found <span class="heading">Orgs</span> to be migrated, skipped and Updated . </p>
+              <ul>
+                <li>
+                  <span>Migrated Orgs</span>
+                  <span>{{previewData?.staged_data?.orgs_to_migrate}}</span>
+                </li>
+                <li>
+                  <span>Skipped Orgs</span>
+                  <span>{{previewData?.staged_data?.orgs_to_skip}}</span>
+                </li>
+                <li>
+                  <span>Updated Orgs</span>
+                  <span>{{previewData?.staged_data?.orgs_to_update}}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="summary-body">
+              <p>We have found <span class="heading">Users</span> to be migrated, skipped and Updated.</p>
+              <ul>
+                <li>
+                  <span>Users</span>
+                  <span>{{totalUsers?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Conflicting Users</span>
+                  <span>{{conflictedUsers?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Selected Users For Migration</span>
+                  <span>{{selectedUsersData?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Skipped Users</span>
+                  <span>{{skippedUsers?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Deleted Users</span>
+                  <span>{{deletedUsers?.length || 0}}</span>
+                </li>
+                <li>
+                  <span>Updated Users</span>
+                  <span>{{updatedUsers?.length || 0}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <form [formGroup]="migrationForm">
+        <div id="migration-table-container" *ngIf="previewData?.staged_data?.users.length > 0">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="no-border first">
+                  <chef-checkbox (change)="selectedAllUsers($event)" [checked]="usersData[0].is_selected"></chef-checkbox>
+                </chef-th>
+                <chef-th class="no-border middle">Chef Server User</chef-th>
+                <chef-th class="no-border middle">Automate User</chef-th>
+                <chef-th class="no-border middle"></chef-th>
+                <chef-th class="no-border last"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let user of usersData; let i = index;">
+                <chef-td class="first">
+                  <chef-checkbox id="{{user.email}}-chef-checkbox" (change)="selectedUser($event, user)" [checked]="user.is_selected" [value]="user.username"></chef-checkbox>
+                </chef-td>
+                <chef-td class="middle">
+                  {{user.username}}
+                </chef-td>
+                <chef-td class="middle">
+                    {{user.automate_username}}
+                </chef-td>
+                <chef-td class="middle">
+                  <input
+                    id="{{user.email}}-input"
+                    *ngIf="(user.connector === 'local')"
+                    chefInput
+                    formControlName="{{user.automate_username}}"
+                    type="text"
+                    attr.data-username="{{user.username}}"
+                    (blur)="handleName($event, user)"
+                    autocomplete="off" />
+                </chef-td>
+                <chef-td class="last">
+                  <p
+                    id="{{user.email}}-warning" 
+                    class="warning-msg" 
+                    *ngIf="!user.checking_conflcit && (user.connector === 'local') && user.is_conflicting">
+                    Warning. User already exists in current user list or Automate. This will overwrite this users IAM settings.
+                  </p>
+                  <p *ngIf="user.checking_conflcit">Checking...</p>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
+        </div>
+        <div id="button-bar">
+          <chef-button id="cancel-migration-slider" tertiary [disabled]="!isPreview" (click)="cancelMigrationclicked()">
+            Cancel Migration
+          </chef-button>
+          <chef-button primary [disabled]="!isPreview" data-cy="confirm-migration-button" id="migration-button" (click)="confirmPreviewData()">
+            <span *ngIf="isPreview">confirm Migration</span>
+          </chef-button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

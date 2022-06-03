@@ -2,6 +2,7 @@ package infra_proxy
 
 import (
 	"context"
+
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
@@ -32,8 +33,30 @@ func (a *InfraProxyServer) GetServer(ctx context.Context, r *gwreq.GetServer) (*
 	if err != nil {
 		return nil, err
 	}
+
 	return &gwres.GetServer{
 		Server: fromUpstreamServer(res.Server),
+	}, nil
+}
+
+// ValidateWebuiKey validates the webui key
+func (a *InfraProxyServer) ValidateWebuiKey(ctx context.Context, r *gwreq.ValidateWebuiKey) (*gwres.ValidateWebuiKey, error) {
+	req := &infra_req.ValidateWebuiKey{
+		Id:       r.Id,
+		Fqdn:     r.Fqdn,
+		WebuiKey: r.WebuiKey,
+	}
+
+	res, err := a.client.ValidateWebuiKey(ctx, req)
+	if err != nil {
+		return &gwres.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
+	}
+	return &gwres.ValidateWebuiKey{
+		Valid: res.Valid,
+		Error: res.Error,
 	}, nil
 }
 
@@ -44,6 +67,7 @@ func (a *InfraProxyServer) CreateServer(ctx context.Context, r *gwreq.CreateServ
 		Name:      r.Name,
 		Fqdn:      r.Fqdn,
 		IpAddress: r.IpAddress,
+		WebuiKey:  r.WebuiKey,
 	}
 	res, err := a.client.CreateServer(ctx, req)
 	if err != nil {
@@ -103,13 +127,31 @@ func (a *InfraProxyServer) GetServerStatus(ctx context.Context, request *gwreq.G
 	}, nil
 }
 
+// UpdateWebuiKey updates the webui key
+func (a *InfraProxyServer) UpdateWebuiKey(ctx context.Context, r *gwreq.UpdateWebuiKey) (*gwres.UpdateWebuiKey, error) {
+	req := &infra_req.UpdateWebuiKey{
+		Id:       r.Id,
+		WebuiKey: r.WebuiKey,
+	}
+
+	_, err := a.client.UpdateWebuiKey(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.UpdateWebuiKey{}, nil
+}
+
 func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 	return &gwres.Server{
-		Id:        t.GetId(),
-		Name:      t.GetName(),
-		Fqdn:      t.GetFqdn(),
-		IpAddress: t.GetIpAddress(),
-		OrgsCount: t.GetOrgsCount(),
+		Id:                t.GetId(),
+		Name:              t.GetName(),
+		Fqdn:              t.GetFqdn(),
+		IpAddress:         t.GetIpAddress(),
+		OrgsCount:         t.GetOrgsCount(),
+		MigrationId:       t.GetMigrationId(),
+		MigrationType:     t.GetMigrationType(),
+		MigrationStatus:   t.GetMigrationStatus(),
+		LastMigrationTime: t.GetLastMigrationTime(),
 	}
 }
 

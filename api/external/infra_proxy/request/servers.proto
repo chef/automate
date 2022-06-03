@@ -12,6 +12,8 @@ message CreateServer {
     string fqdn = 3;
     // Chef Infra Server IP address.
     string ip_address = 4;
+    // Chef Infra Server Webui key.
+    string webui_key = 5;
 }
 
 message UpdateServer {
@@ -40,4 +42,20 @@ message GetServer {
 message GetServerStatus {
     // Server FQDN
     string fqdn = 1;
+}
+
+message ValidateWebuiKey {
+    // Chef Infra Server ID.
+    string id = 1;
+    // Chef Server FQDN
+    string fqdn = 2;
+    // Optional Chef Server Webui Key
+    string webui_key = 3;
+}
+
+message UpdateWebuiKey {
+    // Chef Infra Server ID.
+    string id = 1;
+    // Chef Server Webui Key
+    string webui_key = 2;
 }

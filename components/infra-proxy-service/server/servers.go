@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/chef/automate/api/external/common/query"
+	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
@@ -27,8 +32,9 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		Target:  "server",
 		Request: *req,
 		Rules: validation.Rules{
-			"Id":   []string{"required"},
-			"Name": []string{"required"},
+			"Id":       []string{"required"},
+			"Name":     []string{"required"},
+			"WebuiKey": []string{"required"},
 		},
 	}).Validate()
 
@@ -38,6 +44,35 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 
 	if req.Fqdn == "" && req.IpAddress == "" {
 		return nil, errors.Wrap(err, "FQDN or IP required to add the server.")
+	}
+
+	// validate the new webui key
+	validateWebuiKey := request.ValidateWebuiKey{
+		Id:       req.Id,
+		Fqdn:     req.Fqdn,
+		WebuiKey: req.WebuiKey,
+	}
+
+	res, err := s.ValidateWebuiKey(ctx, &validateWebuiKey)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !res.Valid {
+		return nil, errors.New(res.Error)
+	}
+
+	newSecret := &secrets.Secret{
+		Name: "infra-proxy-service-webui-key",
+		Type: "chef-server",
+		Data: []*query.Kv{
+			{Key: "key", Value: req.WebuiKey},
+		},
+	}
+	credential, err := s.service.Secrets.Create(ctx, newSecret)
+	if err != nil {
+		return nil, err
 	}
 
 	// commenting this code because sometimes chef-services are down that time we can't able to check the server status and not able to add or update the server.
@@ -53,13 +88,60 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		}
 	*/
 
-	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
+	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress, credential.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
 	return &response.CreateServer{
 		Server: fromStorageServer(server),
+	}, nil
+}
+
+// ValidateWebuiKey validate the webui key
+func (s *Server) ValidateWebuiKey(ctx context.Context, req *request.ValidateWebuiKey) (*response.ValidateWebuiKey, error) {
+
+	webuiKey := req.WebuiKey
+	if req.WebuiKey == "" {
+		server, err := s.service.Storage.GetServer(ctx, req.Id)
+		if err != nil {
+			return nil, service.ParseStorageError(err, *req, "server")
+		}
+
+		if server.CredentialID == "" {
+			return &response.ValidateWebuiKey{
+				Valid: false,
+				Error: "Webui key is not available for this server.",
+			}, nil
+		}
+
+		// Get web ui key from secrets service
+		secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+		if err != nil {
+			return nil, err
+		}
+
+		webuiKey = GetAdminKeyFrom(secret)
+	}
+
+	c, err := s.createCSClientWithFqdn(ctx, req.Fqdn, webuiKey, "pivotal", true)
+	if err != nil {
+		return &response.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
+	}
+	_, err = c.client.License.Get()
+	if err != nil {
+		return &response.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
+	}
+
+	return &response.ValidateWebuiKey{
+		Valid: true,
+		Error: "",
 	}, nil
 }
 
@@ -99,9 +181,21 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
-	return &response.GetServer{
-		Server: fromStorageServer(server),
-	}, nil
+	lastMigration, err := s.service.Migration.GetLastSuccessfulMigration(ctx, req.Id)
+	if err != nil {
+		log.Errorf("Unable to fetch lastMigration status for server id:%s, err: %+v", req.Id, err)
+	}
+
+	migration, err := s.service.Migration.GetActiveMigration(ctx, req.Id)
+	if err != nil {
+		log.Errorf("Unable to fetch migration status for server id:%s, err: %+v", req.Id, err)
+	}
+
+	migration.Timestamp = lastMigration.Timestamp
+	resp := &response.GetServer{
+		Server: fromStorageServerWithMigrationDetails(server, migration),
+	}
+	return resp, nil
 }
 
 // DeleteServer deletes a server from the db
@@ -165,7 +259,6 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 			return nil, err
 		}
 	*/
-
 	server, err := s.service.Storage.EditServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
@@ -226,6 +319,64 @@ func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStat
 	return statusRes, nil
 }
 
+// UpdateWebuiKey updates the webui key
+func (s *Server) UpdateWebuiKey(ctx context.Context, req *request.UpdateWebuiKey) (*response.UpdateWebuiKey, error) {
+
+	// validate the new webui key
+	server, err := s.service.Storage.GetServer(ctx, req.Id)
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "server")
+	}
+	validateWebuiKeyReq := request.ValidateWebuiKey{
+		Id:       req.Id,
+		Fqdn:     server.Fqdn,
+		WebuiKey: req.WebuiKey,
+	}
+
+	res, err := s.ValidateWebuiKey(ctx, &validateWebuiKeyReq)
+	if err != nil {
+		return nil, err
+	}
+
+	if !res.Valid {
+		return nil, errors.New(res.Error)
+	}
+
+	newSecret := &secrets.Secret{
+		Name: "infra-proxy-service-webui-key",
+		Type: "chef-server",
+		Data: []*query.Kv{
+			{Key: "key", Value: req.WebuiKey},
+		},
+	}
+
+	//If server does not have web ui key then create secret and save the credential id into the DB
+	if server.CredentialID == "" {
+		credential, err := s.service.Secrets.Create(ctx, newSecret)
+		if err != nil {
+			return nil, err
+		}
+		_, err = s.service.Storage.EditServerWebuiKey(ctx, req.Id, credential.Id)
+		if err != nil {
+			return nil, service.ParseStorageError(err, *req, "server")
+		}
+		return &response.UpdateWebuiKey{}, nil
+	}
+
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+	if err != nil {
+		return nil, err
+	}
+	newSecret.Id = secret.GetId()
+
+	_, err = s.service.Secrets.Update(ctx, newSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.UpdateWebuiKey{}, nil
+}
+
 // Create a response.Server from a storage.Server
 func fromStorageServer(s storage.Server) *response.Server {
 	return &response.Server{
@@ -246,4 +397,28 @@ func fromStorageToListServers(sl []storage.Server) []*response.Server {
 	}
 
 	return tl
+}
+
+// Create a response.Server from a storage.Server with migration
+func fromStorageServerWithMigrationDetails(s storage.Server, m storage.MigrationStatus) *response.Server {
+	var timeStamp *timestamppb.Timestamp
+
+	// If timestamp is zero send nil value
+	if m.Timestamp.IsZero() {
+		timeStamp = nil
+	} else {
+		timeStamp = timestamppb.New(m.Timestamp)
+	}
+
+	return &response.Server{
+		Id:                s.ID,
+		Name:              s.Name,
+		Fqdn:              s.Fqdn,
+		IpAddress:         s.IPAddress,
+		OrgsCount:         s.OrgsCount,
+		MigrationId:       m.MigrationID,
+		MigrationType:     m.MigrationType,
+		MigrationStatus:   m.MigrationStatus,
+		LastMigrationTime: timeStamp,
+	}
 }

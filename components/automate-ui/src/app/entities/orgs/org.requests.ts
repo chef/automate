@@ -2,10 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { Org } from './org.model';
-
+import { Org, PreviewData } from './org.model';
 import {
-  OrgsSuccessPayload, OrgSuccessPayload, CreateOrgPayload
+  OrgsSuccessPayload,
+  OrgSuccessPayload,
+  CreateOrgPayload,
+  UploadSuccessPayload,
+  CancelSuccessPayload,
+  PreviewSuccessPayload,
+  ConfirmSuccessPayload,
+  CheckUserPayload
 } from './org.actions';
 
 @Injectable()
@@ -35,5 +41,33 @@ export class OrgRequests {
   public updateOrg(org: Org): Observable<OrgSuccessPayload> {
     return this.http.put<OrgSuccessPayload>(
       `${env.infra_proxy_url}/servers/${org.server_id}/orgs/${org.id}`, org);
+  }
+
+  public uploadZip(formData: FormData): Observable<UploadSuccessPayload> {
+    return this.http.post<UploadSuccessPayload>
+    (`${env.infra_proxy_url}/servers/migrations/upload`, formData);
+  }
+
+  public cancelMigration(server_id: string, migration_id: string)
+    : Observable<CancelSuccessPayload> {
+    return this.http.get<CancelSuccessPayload>(
+      `${env.infra_proxy_url}/servers/${server_id}/migrations/cancel_migration/${migration_id}`);
+  }
+
+  public getPreviewData(migration_id: string): Observable<PreviewSuccessPayload> {
+    return this.http.get<PreviewSuccessPayload>(`
+    ${env.infra_proxy_url}/servers/migrations/staged_data/${migration_id}`);
+  }
+
+  public confirmPreview(server_id: string, previewData: PreviewData)
+  : Observable<ConfirmSuccessPayload> {
+    return this.http.post<ConfirmSuccessPayload>(
+      `${env.infra_proxy_url}/servers/${server_id}/migrations/confirm_preview/${previewData.migration_id}`, previewData);
+  }
+
+  public checkUser(user: string): Observable<CheckUserPayload> {
+    return this.http.get<CheckUserPayload>(
+      `${env.iam_url}/users/${user}`
+    );
   }
 }

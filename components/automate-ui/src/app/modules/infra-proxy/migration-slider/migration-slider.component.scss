@@ -1,0 +1,146 @@
+@import "~styles/variables";
+@import "../infra_shared/slide-panel.scss";
+
+:host {
+  z-index: 101;
+  width: 80%;
+  box-shadow: 0 35.8px 140.2px $chef-gulf-blue;
+  padding: 25px;
+
+  .sidenav-header {
+    margin-bottom: 5vh;
+
+    h2 {
+      flex-grow: 2;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      color: $chef-primary-dark;
+      line-height: 27px;
+      margin-bottom: 10px;
+    }
+
+    .back-button {
+      margin-left: 0;
+    }
+  }
+
+  .sidenav-body {
+    .meta-box {
+      border: 0.5px solid $chef-key-tab;
+      border-radius: 4px;
+      margin-bottom: 1.5em;
+      padding: 1em 2em 1em;
+      background: $chef-white;
+
+      h3 {
+        font-size: 18px;
+        line-height: 27px;
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
+
+      .meta-wrapper {
+        display: flex;
+
+        .summary-body {
+          width: 50%;
+          font-size: 13px;
+
+          p {
+            height: 6vh;
+
+            .heading {
+              font-weight: bold;
+            }
+          }
+
+          ul {
+            color: $chef-primary-dark;
+            list-style: none;
+            padding: 0;
+
+            li {
+              display: flex;
+              margin-bottom: 5px;
+
+              span {
+                font-size: 13px;
+                line-height: 21px;
+                letter-spacing: 0.2px;
+
+                &:first-child {
+                  width: 50%;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    #migration-table-container {
+      margin-bottom: 6vh;
+
+      .no-border {
+        background-color: $chef-white;
+      }
+
+      chef-td {
+        padding: 6px 14px;
+      }
+
+      .first {
+        width: 5%;
+      }
+
+      .middle {
+        width: 30%;
+
+        input[type="text"] {
+          height: 35px;
+
+          &:disabled {
+            opacity: 0.5;
+            background-color: $chef-grey;
+            border: none;
+          }
+        }
+      }
+    }
+
+    .warning-msg {
+      margin-bottom: 0;
+      line-height: 21px;
+      letter-spacing: 0.2px;
+
+      &::before {
+        display: inline-block;
+        content: '';
+        background: url('/assets/img/warning.png');
+        width: 11px;
+        height: 13.5px;
+        background-size: 11px 13.5px;
+        margin-right: 7px;
+      }
+    }
+
+    ::ng-deep chef-checkbox .check-wrap {
+      min-width: 15px;
+      width: 15px;
+      height: 15px;
+    }
+
+    #button-bar {
+      text-align: right;
+    }
+  }
+
+  .user-exist-warning {
+    border: 1px solid rgba(220, 38, 127, 0.9);
+  }
+
+  .warning-msg-hide {
+    display: none;
+  }
+}

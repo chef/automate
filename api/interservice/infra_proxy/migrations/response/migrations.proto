@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.migrations.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/migrations/response";
+
+message UploadFileResponse {
+  // Success responce for zip upload.
+  bool success = 1;
+  // Chef infra server migration ID
+  string migration_id = 2;
+  // Error data in case of failure.
+  repeated string errors = 3;
+}
+
+message GetMigrationStatusResponse {
+  // Migration ID.
+  string migration_id = 1;
+  // Migration type
+  string migration_type = 2;
+  // Migration status
+  string migration_status = 3;
+}
+
+message CancelMigrationResponse {
+  //  migration ID
+  bool success = 1;
+  // Error message
+  repeated string errors = 2; 
+}
+
+message GetStagedDataResponse {
+  // Migration ID.
+  string migration_id =1;
+  // Staged data
+  StagedData staged_data = 2; 
+}
+
+message StagedData {
+  // Number of orgs to migrate
+  int32 orgs_to_migrate =1;
+  // Number of orgs to skip
+  int32 orgs_to_skip =2;
+  // Number of orgs to update
+  int32 orgs_to_update =3;
+  // Number of orgs to delete
+  int32 orgs_to_delete =4;
+  // Users
+  repeated User users =5;
+}
+
+message User {
+  // User's username
+  string  username =1;
+  // User's email ID
+  string email =2;
+  // User's display name
+  string display_name=3;
+  // User's first name
+  string first_name=4;
+  // User's last name
+  string last_name=5;
+  // User's middle name
+  string middle_name=6;
+  // User's username in automate
+  string automate_username =7;
+  // Local or ldap user
+  string connector=8;
+  // IsConflicting for user's existance in db
+  bool is_conflicting=9;
+  // user is admin or not
+  bool is_admin=10;
+  // Local User hash password
+  string hash_password=11;
+  // Local User actionops
+  int32 action_ops=12;
+}
+
+message ConfirmPreviewResponse {
+  // Migration ID
+  string migration_id = 1; 
+}
+
+message CreateBackupResponse {}
+
+message DeleteUserResponse{}

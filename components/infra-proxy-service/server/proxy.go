@@ -20,10 +20,11 @@ import (
 
 // ChefConfig is an infra-proxy server
 type ChefConfig struct {
-	Name    string
-	Key     string
-	SkipSSL bool
-	BaseURL string
+	Name       string
+	Key        string
+	SkipSSL    bool
+	BaseURL    string
+	IsWebuiKey bool
 }
 
 // ChefClient type definition for the chef client
@@ -81,10 +82,11 @@ func NewChefClient(config *ChefConfig) (*ChefClient, error) {
 
 	// build a client
 	client, err := chef.NewClient(&chef.Config{
-		Name:    config.Name,
-		Key:     config.Key,
-		SkipSSL: config.SkipSSL,
-		BaseURL: config.BaseURL,
+		Name:       config.Name,
+		Key:        config.Key,
+		SkipSSL:    config.SkipSSL,
+		BaseURL:    config.BaseURL,
+		IsWebuiKey: config.IsWebuiKey,
 	})
 
 	if err != nil {
@@ -99,6 +101,8 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	defer cancel()
 
 	// TODO: combine get server & org query in one statement.
+	var credentialID, adminUser string
+	var isWebuiKey bool
 	server, err := s.service.Storage.GetServer(ctx, serverID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, serverID, "server")
@@ -108,8 +112,14 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	if err != nil {
 		return nil, service.ParseStorageError(err, orgID, "org")
 	}
-
-	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.CredentialID})
+	// If web ui key is available with server then use it otherwise use org admin key
+	if server.CredentialID != "" {
+		credentialID = server.CredentialID
+		isWebuiKey = true
+	} else {
+		credentialID = org.CredentialID
+	}
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: credentialID})
 	if err != nil {
 		return nil, err
 	}
@@ -118,12 +128,18 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}
-
+	// If using web ui key then set admin user as pivotal otherwise use org admin user
+	if isWebuiKey {
+		adminUser = "pivotal"
+	} else {
+		adminUser = org.AdminUser
+	}
 	client, err := NewChefClient(&ChefConfig{
-		Name:    org.AdminUser,
-		Key:     GetOrgAdminKeyFrom(secret),
-		SkipSSL: true,
-		BaseURL: baseURL,
+		Name:       adminUser,
+		Key:        GetAdminKeyFrom(secret),
+		SkipSSL:    true,
+		BaseURL:    baseURL,
+		IsWebuiKey: isWebuiKey,
 	})
 
 	return client, err
@@ -146,8 +162,8 @@ func targetURL(fqdn string, IPAddress string, orgName string) (string, error) {
 	return baseURL.String(), nil
 }
 
-// GetOrgAdminKeyFrom returns AdminKey
-func GetOrgAdminKeyFrom(secret *secrets.Secret) string {
+// GetAdminKeyFrom returns AdminKey
+func GetAdminKeyFrom(secret *secrets.Secret) string {
 	adminKey := ""
 	if secret != nil {
 		for _, item := range secret.Data {
@@ -200,7 +216,7 @@ func StructToJSON(data *structpb.Struct) (interface{}, error) {
 }
 
 //createChefServerClient: Creates a client with only server details
-func (s *Server) createChefServerClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
+func (s *Server) createChefServerClient(ctx context.Context, serverID string, key string, adminName string, isWebuiKey bool) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -215,10 +231,30 @@ func (s *Server) createChefServerClient(ctx context.Context, serverID string, ad
 	}
 
 	client, err := NewChefClient(&ChefConfig{
-		Name:    adminName,
-		Key:     adminkey,
-		SkipSSL: true,
-		BaseURL: baseURL,
+		Name:       adminName,
+		Key:        key,
+		SkipSSL:    true,
+		BaseURL:    baseURL,
+		IsWebuiKey: isWebuiKey,
+	})
+
+	return client, err
+}
+
+// createCSClientWithFqdn: Creates a client with only server details
+func (s *Server) createCSClientWithFqdn(ctx context.Context, fqdn string, key string, adminName string, isWebuiKey bool) (*ChefClient, error) {
+
+	baseURL, err := targetServerURL(fqdn, "")
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
+	}
+
+	client, err := NewChefClient(&ChefConfig{
+		Name:       adminName,
+		Key:        key,
+		SkipSSL:    true,
+		BaseURL:    baseURL,
+		IsWebuiKey: isWebuiKey,
 	})
 
 	return client, err

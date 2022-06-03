@@ -12,7 +12,8 @@
     {
       "name": "Infra",
       "tags": [
-        "ConfigMgmt"
+        "ConfigMgmt",
+        "InfraProxy"
       ]
     },
     {
@@ -75,6 +76,10 @@
     {
       "name": "ConfigMgmt",
       "x-displayName": "Nodes"
+    },
+    {
+      "name": "InfraProxy",
+      "x-displayName": "Infra Server"
     },
     {
       "name": "NodesService",

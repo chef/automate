@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/chef/automate/api/interservice/local_user"
 	"net/url"
 	"os"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	secrets "github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/infra-proxy-service/config"
 	"github.com/chef/automate/components/infra-proxy-service/server"
@@ -35,6 +36,7 @@ func serve(cmd *cobra.Command, args []string) {
 	cmd.PersistentFlags().StringP("migrations-path", "m", "", "migrations path")
 	cmd.PersistentFlags().StringP("authz-address", "a", "", "authz-service GRPC address")
 	cmd.PersistentFlags().StringP("secrets-address", "s", "", "secrets-service GRPC address")
+	cmd.PersistentFlags().StringP("local-user-address", "u", "", "local-user-service GRPC address")
 
 	viper.SetConfigFile(args[0])
 	if err := viper.ReadInConfig(); err != nil {
@@ -86,6 +88,11 @@ func serve(cmd *cobra.Command, args []string) {
 	}
 	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
+	authzServiceClients := service.AuthzServiceClients{
+		AuthzPolicyClient:  authz.NewPoliciesServiceClient(authzConn),
+		AuthzProjectClient: authz.NewProjectsServiceClient(authzConn),
+	}
+
 	if cfg.SecretsAddress == "" {
 		fail(errors.New("missing required config secrets_address"))
 	}
@@ -97,7 +104,15 @@ func serve(cmd *cobra.Command, args []string) {
 	// get secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient)
+	localUserConn, err := connFactory.Dial("local-user-service", cfg.LocalUserAddress)
+	if err != nil {
+		fail(errors.Wrapf(err, "failed to dial local-user-service at (%s)", cfg.LocalUserAddress))
+	}
+
+	//Local user service client
+	localUserClient := local_user.NewUsersMgmtServiceClient(localUserConn)
+
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, localUserClient, authzServiceClients)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

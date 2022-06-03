@@ -494,6 +494,12 @@ steps:
         CYPRESS_AUTOMATE_INFRA_ADMIN_KEY:
           path: secret/a2/testing/infra_admin_key
           field: data
+        CYPRESS_AUTOMATE_INFRA_WEBUI_KEY:
+          path: secret/a2/testing/infra_webui_key
+          field: data
+        CYPRESS_AUTOMATE_INFRA_SERVER_FQDN:
+          path: secret/a2/testing/infra_server_fqdn
+          field: data
       executor:
         linux:
           privileged: true

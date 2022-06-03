@@ -1,0 +1,35 @@
+{
+  "migration_id": "1234",
+  "staged_data": {
+    "orgs_to_migrate": 2,
+    "orgs_to_skip": 1,
+    "orgs_to_update": 1,
+    "orgs_to_delete": 1,
+    "users": [
+      {
+        "username": "test1",
+        "email": "abc1@gmail.com",
+        "display_name": "test1",
+        "first_name": "first1",
+        "last_name": "last1",
+        "middle_name": "middle1",
+        "automate_username": "test1",
+        "connector": "local",
+        "is_conflicting": true,
+        "is_admin": true
+      },
+      {
+        "username": "test2",
+        "email": "abc2@gmail.com",
+        "display_name": "test2",
+        "first_name": "first2",
+        "last_name": "last2",
+        "middle_name": "middle2",
+        "automate_username": "testldap2",
+        "connector": "ldap",
+        "is_conflicting": false,
+        "is_admin": false
+      }
+    ]
+  }
+}

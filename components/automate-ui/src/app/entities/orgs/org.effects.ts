@@ -26,6 +26,22 @@ import {
   UpdateOrgFailure,
   UpdateOrgSuccess,
   OrgSuccessPayload,
+  UploadZip,
+  UploadZipSuccess,
+  UploadZipFailure,
+  UploadSuccessPayload,
+  CancelMigration,
+  CancelMigrationSuccess,
+  CancelMigrationFailure,
+  GetPreviewData,
+  GetPreviewDataSuccess,
+  GetPreviewDataFailure,
+  ConfirmPreview,
+  ConfirmPreviewSuccess,
+  ConfirmPreviewFailure,
+  CheckUser,
+  CheckUserSuccess,
+  CheckUserFailure,
   OrgActionTypes
 } from './org.actions';
 
@@ -160,5 +176,118 @@ export class OrgEffects {
           message: `Could not update organization: ${msg || payload.error}`
         });
       })));
+
+  uploadZip$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.UPLOAD),
+      mergeMap(({ payload: { formData } }: UploadZip) =>
+        this.requests.uploadZip(formData).pipe(
+          map((resp: UploadSuccessPayload) => new UploadZipSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new UploadZipFailure(error)))))));
+
+  uploadZipSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.UPLOAD_SUCCESS),
+      map((_UploadZipSuccess) => new CreateNotification({
+      type: Type.info,
+      message: 'Successfully uploaded file.'
+    }))));
+
+  uploadZipFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.UPLOAD_FAILURE),
+      map(({ payload }: UploadZipFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not upload file: ${msg || payload.error}`
+        });
+    })));
+
+  cancelMigration$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CANCEL_MIGRATION),
+      mergeMap(({ payload:  { server_id, migration_id } }: CancelMigration) =>
+        this.requests.cancelMigration(server_id, migration_id).pipe(
+          map((resp) => new CancelMigrationSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new CancelMigrationFailure(error)))))));
+
+  cancelMigrationSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CANCEL_MIGRATION_SUCCESS),
+      map((_) => new CreateNotification({
+      type: Type.info,
+      message: 'Cancelled migration.'
+    }))));
+
+  cancelMigrationFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CANCEL_MIGRATION_FAILURE),
+      map(({ payload }: CancelMigrationFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not cancel migration: ${msg || payload.error}`
+        });
+    })));
+
+  getPreviewData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.GET_PREVIEW_DATA),
+      mergeMap(({ payload:  { migration_id } }: GetPreviewData) =>
+        this.requests.getPreviewData(migration_id).pipe(
+          map((resp) => new GetPreviewDataSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new GetPreviewDataFailure(error)))))));
+
+  getPreviewDataFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.GET_PREVIEW_DATA_FAILURE),
+      map(({ payload }: GetPreviewDataFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get preview data: ${msg || payload.error}`
+      });
+    })));
+
+  confirmPreview$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CONFIRM_PREVIEW),
+      mergeMap(({ payload:  { server_id, previewData } }: ConfirmPreview) =>
+        this.requests.confirmPreview(server_id, previewData).pipe(
+          map((resp) => new ConfirmPreviewSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new ConfirmPreviewFailure(error)))))));
+
+  confirmPreviewSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CONFIRM_PREVIEW_SUCCESS),
+      map((_) => new CreateNotification({
+      type: Type.info,
+      message: 'Confirm preview successful.'
+    }))));
+
+  confirmPreviewFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CONFIRM_PREVIEW_FAILURE),
+      map(({ payload }: ConfirmPreviewFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not confirm preview: ${msg || payload.error}`
+        });
+    })));
+
+  CheckUser = createEffect(() =>
+    this.actions$.pipe(
+      ofType(OrgActionTypes.CHECK_USER),
+      mergeMap(({ payload:  { user } }: CheckUser) =>
+        this.requests.checkUser(user).pipe(
+          map((resp) => new CheckUserSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new CheckUserFailure(error)))))));
 
 }

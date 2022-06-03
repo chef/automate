@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/chef/automate/api/interservice/local_user"
 	"net/url"
 	"os"
 
@@ -20,15 +21,16 @@ import (
 
 // Service config options
 type Service struct {
-	GRPC            string `mapstructure:"grpc"`
-	LogFormat       string `mapstructure:"log-format"`
-	LogLevel        string `mapstructure:"log-level"`
-	certs.TLSConfig `mapstructure:"tls"`
-	PGURL           string `mapstructure:"pg_url"`
-	Database        string `mapstructure:"database"`
-	MigrationsPath  string `mapstructure:"migrations-path"`
-	AuthzAddress    string `mapstructure:"authz-address"`
-	SecretsAddress  string `mapstructure:"secrets-address"`
+	GRPC             string `mapstructure:"grpc"`
+	LogFormat        string `mapstructure:"log-format"`
+	LogLevel         string `mapstructure:"log-level"`
+	certs.TLSConfig  `mapstructure:"tls"`
+	PGURL            string `mapstructure:"pg_url"`
+	Database         string `mapstructure:"database"`
+	MigrationsPath   string `mapstructure:"migrations-path"`
+	AuthzAddress     string `mapstructure:"authz-address"`
+	SecretsAddress   string `mapstructure:"secrets-address"`
+	LocalUserAddress string `mapstructure:"local-user-address"`
 }
 
 // ConfigFromViper returns a Service instance from the current viper config
@@ -87,6 +89,11 @@ func ConfigFromViper(configFile string) (*service.Service, error) {
 	}
 	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
+	authzServiceClients := service.AuthzServiceClients{
+		AuthzPolicyClient:  authz.NewPoliciesServiceClient(authzConn),
+		AuthzProjectClient: authz.NewProjectsServiceClient(authzConn),
+	}
+
 	if cfg.SecretsAddress == "" {
 		fail(errors.New("missing required config secrets_address"))
 	}
@@ -98,7 +105,15 @@ func ConfigFromViper(configFile string) (*service.Service, error) {
 	// gets secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient)
+	localUserConn, err := connFactory.Dial("local-user-service", cfg.LocalUserAddress)
+	if err != nil {
+		fail(errors.Wrapf(err, "failed to dial local-user-service at (%s)", cfg.LocalUserAddress))
+	}
+
+	//Local user service client
+	localUserClient := local_user.NewUsersMgmtServiceClient(localUserConn)
+
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient, localUserClient, authzServiceClients)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

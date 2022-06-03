@@ -28,6 +28,11 @@ message GetOrg {
     Org org = 1;
 }
 
+message GetInfraServerOrgs {
+    // id of organisation migration
+    string migration_id = 1;
+}
+
 message Org {
     // Chef organization ID.
     string id = 1;

@@ -15,6 +15,8 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import * as selectors from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from '../projects-filter/projects-filter.reducer';
 
+import { Regex } from 'app/helpers/auth/regex';
+
 export const InterceptorSkipHeader = 'Skip-Interceptor';
 
 @Injectable()
@@ -34,28 +36,51 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let headers = request.headers;
-
     // TODO(sr): Sadly, our UI code depends on the API ignoring unknown fields in the
     //           request payloads in many places. We should not send any of those. But
     //           Fixing that blows the scope of my little API validation adventure, so
     //           we take a shortcut: ask the API not to be too strict on us.
-    headers = headers.set('Content-Type', 'application/json+lax');
+    // Infra Proxy Server API - restrict to set the headers for migration file upload
+    if (!request.url.includes('/migrations/upload')) {
+      headers = headers.set('Content-Type', 'application/json+lax');
+    }
     // Check and then remove `unfiltered` param; it is a piggybacked parameter
     // needed by this interceptor, not to be passed on.
     // It allows certain URLs to suppress sending the projects filter.
     const filtered = request.params.get('unfiltered') !== 'true';
     const params = request.params.delete('unfiltered');
+    if (request.url.includes('/orgs/')) {
+      let checkInfraOrgsURL = false;
+      const url = request.url;
+      const serverID = url.split('/')[5];
+      const orgID = url.split('/')[7];
+      let newServerID = serverID.replace(/[^a-zA-Z0-9]/g, '');
 
-    if (this.projects && filtered) {
-      headers = headers.set('projects', this.projects);
+      if (newServerID.length > 20) {
+        newServerID = newServerID.substring(0, 20);
+      }
+
+      const newHeader = newServerID + '_' + orgID;
+
+      if (url.includes('/infra/servers/') && Regex.patterns.VALID_URL.test(newServerID)) {
+        checkInfraOrgsURL = true;
+      }
+
+      if (checkInfraOrgsURL) {
+        headers = headers.set('projects', newHeader);
+      }
+    } else {
+      if (this.projects && filtered) {
+        headers = headers.set('projects', this.projects);
+      }
     }
 
     return this.chefSession.token_provider.pipe(
       take(1),
       mergeMap(id_token => {
         // TODO(sr): Can we check if the request is sent to some external API?
-        //           Right now, we're throwing the ID token across the internet for telemetry,
-        //           where it's not needed. It would be nice to _not_ do that.
+        // Right now, we're throwing the ID token across the internet for telemetry,
+        // where it's not needed. It would be nice to _not_ do that.
         headers = headers.set('Authorization', `Bearer ${id_token}`);
         // Check the interceptor skip header in API request
         // To avoid session logout if 401 raised from external API

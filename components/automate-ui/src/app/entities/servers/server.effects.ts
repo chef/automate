@@ -25,12 +25,27 @@ import {
   UpdateServerFailure,
   DeleteServer,
   DeleteServerSuccess,
-  DeleteServerFailure
+  DeleteServerFailure,
+  GetUsers,
+  GetUsersSuccess,
+  GetUsersFailure,
+  UsersSuccessPayload,
+  UpdateWebUIKey,
+  UpdateWebUIKeySuccess,
+  UpdateWebUIKeyFailure,
+  ValidateWebUIKey,
+  ValidateWebUIKeySuccess,
+  ValidateWebUIKeyFailure,
+  ValidateWebUIKeySuccessNot,
+  GetMigrationStatus,
+  GetMigrationStatusSuccess,
+  GetMigrationStatusFailure
 } from './server.actions';
 
 import {
   ServerRequests,
-  ServerResponse
+  ServerResponse,
+  ValidateWebUIKeyResponse
 } from './server.requests';
 
 @Injectable()
@@ -62,11 +77,11 @@ export class ServerEffects {
   getServer$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ServerActionTypes.GET),
-      mergeMap(({ payload: { id }}: GetServer) =>
-        this.requests.getServer(id).pipe(
+      mergeMap(({ payload: { server_id }}: GetServer) =>
+        this.requests.getServer(server_id).pipe(
           map((resp: ServerResponse) => new GetServerSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetServerFailure(error, id)))))));
+          observableOf(new GetServerFailure(error, server_id)))))));
 
   getServerFailure$ = createEffect(() =>
     this.actions$.pipe(
@@ -166,4 +181,95 @@ export class ServerEffects {
       });
     })));
 
+  getUsers$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(ServerActionTypes.GET_USERS),
+    mergeMap((action: GetUsers) =>
+      this.requests.getUser(action.payload).pipe(
+        map((resp: UsersSuccessPayload) => new GetUsersSuccess(resp)),
+        catchError((error: HttpErrorResponse) => observableOf(new GetUsersFailure(error)))))));
+
+  getUsersFailure$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(ServerActionTypes.GET_USERS_FAILURE),
+    map(({ payload: {error} }: GetUsersFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get users: ${msg || error}`
+      });
+    })));
+
+  UpdateWebUIKey$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.UPDATE_WEB_UI_KEY),
+    mergeMap(({ payload }: UpdateWebUIKey) =>
+      this.requests.updateWebUIKey(payload).pipe(
+        map((resp) => new UpdateWebUIKeySuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new UpdateWebUIKeyFailure(error)))))));
+
+  UpdateWebUIKeySuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS),
+    map(() => new CreateNotification({
+    type: Type.info,
+    message: 'Successfully updated Web UI Key.'
+  }))));
+
+  UpdateWebUIKeyFailure$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.UPDATE_WEB_UI_KEY_FAILURE),
+    map(({ payload }: UpdateWebUIKeyFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not update Web UI Key ${msg || payload.error}.`
+      });
+    })));
+
+  ValidateWebUIKey$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY),
+    mergeMap(({ payload }: ValidateWebUIKey) =>
+      this.requests.validateWebUIKey(payload).pipe(
+        map((resp: ValidateWebUIKeyResponse) =>
+        resp.valid ? new ValidateWebUIKeySuccess(resp) : new ValidateWebUIKeySuccessNot(resp)),
+        catchError((error: HttpErrorResponse) => observableOf(new ValidateWebUIKeyFailure(error))
+      )))));
+
+  ValidateWebUIKeySuccessNot$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS_NOT),
+    map(({ payload }: ValidateWebUIKeySuccessNot) => {
+      if (!payload.valid) {
+        return new CreateNotification({
+          type: Type.error,
+          message: `Invalid webui key: ${payload.error}`
+        });
+      }
+    })));
+
+  ValidateWebUIKeyFailure$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_FAILURE),
+    map(({ payload }: UpdateWebUIKeyFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not validated Web UI Key ${msg || payload.error}.`
+      });
+    })));
+
+  GetMigrationStatus$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.GET_MIGRATION_STATUS),
+    mergeMap(({ payload }: GetMigrationStatus) =>
+      this.requests.getMigrationStatus(payload).pipe(
+        map((resp) => new GetMigrationStatusSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetMigrationStatusFailure(error)))))));
+
+  GetMigrationStatusFailure$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.GET_MIGRATION_STATUS_FAILURE),
+    map(({ payload }: GetMigrationStatusFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not update Migration status: ${msg || payload.error}.`
+      });
+    })));
 }

@@ -1,0 +1,158 @@
+@import "~styles/variables";
+@import '../infra_shared/slide-panel';
+
+:host {
+  z-index: 1;
+  width: 50%;
+  box-shadow: 0 35.8px 140.2px $chef-gulf-blue;
+  padding: 25px;
+
+  .sidenav-header {
+    margin-bottom: 60px;
+
+    h2 {
+      flex-grow: 2;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      color: $chef-primary-dark;
+      line-height: 27px;
+      margin-bottom: 10px;
+    }
+
+    .back-button {
+      margin-left: 0;
+    }
+  }
+
+  .flex-container {
+    margin-top: 28px;
+    justify-content: center;
+
+    .input-margin, .id-margin {
+      margin-bottom: 20px;
+    }
+
+    form {
+      flex-basis: 60%;
+
+      .chef-input {
+        font-size: 13px;
+        height: 36px;
+        padding: 10px;
+      }
+
+      .object-id {
+        font-size: 13px;
+      }
+
+      .detail {
+        color: $chef-primary-dark;
+        font-size: 12px;
+      }
+
+      #webui_key {
+        height: 150px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+    }
+
+    #button-bar {
+      text-align: right;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .label {
+    font-size: 16px;
+    font-weight: 400;
+    padding-bottom: 0.50em;
+    color: $chef-black;
+    letter-spacing: 0.2px;
+    line-height: 24px;
+  }
+
+  chef-button {
+    height: 36px;
+    margin-top: 0;
+
+    .close {
+      margin: 0;
+      border: none;
+      color: var(--chef-primary-dark);
+      outline: none;
+
+      &:active {
+        background: none;
+        color: var(--chef-primary-dark);
+      }
+
+    }
+  }
+
+  chef-button#create-button-object-modal {
+    margin: 10px 0px 0px 0px;
+  }
+
+  chef-button#cancel-server-popup {
+    margin: 10px 15px 0px 0px;
+  }
+}
+
+.version-dropdown {
+  color: $chef-primary-dark;
+
+  ::ng-deep label {
+    display: inline;
+    color: $chef-primary-dark;
+    font-size: 15px;
+    margin-right: 15px;
+  }
+
+  ::ng-deep chef-select {
+    font-size: 14px;
+    font-weight: 100;
+    width: 96%;
+  }
+
+  ::ng-deep chef-select .selected-value {
+    height: 36px;
+    background: $chef-white;
+    padding: 0.5em;
+    border: 1px solid $chef-form-input;
+    box-sizing: border-box;
+    border-radius: 4px;
+  }
+
+  ::ng-deep chef-select chef-dropdown {
+    border: 1px solid $chef-key-tab;
+    box-sizing: border-box;
+    border-radius: 4px;
+  }
+
+  ::ng-deep chef-select chef-option {
+    height: 32px;
+    padding: 0.4em;
+  }
+
+  ::ng-deep chef-select .selected {
+    background: $chef-primary-bright;
+    border-radius: 4px;
+  }
+}
+
+.note_text {
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+.textarea-error {
+  margin-top: -6px;
+}

@@ -25,9 +25,12 @@ function compile_client_mocks() {
     pushd /src/api/interservice || return 1
       mockgen_debug -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
       mockgen_debug -source authz/project.pb.go -destination authz/project.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
+      mockgen_debug -source authz/policy.pb.go -destination authz/policy.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
       mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest
+      mockgen_debug -source local_user/users.pb.go -destination local_user/users.pb.client_mock.go -package local_user -self_package github.com/chef/automate/api/interservice/local_user
+
       # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt and event_feed because of
       # an issue with source-mode's ability to parse interfaces from the
       # grpc package. Details here:
@@ -53,6 +56,14 @@ function compile_client_mocks() {
     # NOTE(ssd) 2020-03-23: The secrets-service only has external protobuf definitions
     pushd /src/api/external || return 1
       mockgen_debug -source secrets/secrets.pb.go -destination secrets/secrets.pb.client_mock.go -package secrets -self_package github.com/chef/automate/api/external/secrets
+    popd || return 1
+
+     pushd /src/api/external || return 1
+      mockgen_debug -source infra_proxy/infra_proxy.pb.go -destination infra_proxy/infra_proxy.pb.client_mock.go -package infra_proxy -self_package github.com/chef/automate/api/external/infra_proxy
+    popd || return 1
+
+    pushd /src/api/external || return 1
+      mockgen_debug -source infra_proxy/migrations/migrations.pb.go -destination infra_proxy/migrations/migrations.pb.client_mock.go -package migrations -self_package github.com/chef/automate/api/external/infra_proxy/migrations
     popd || return 1
   )
 }
@@ -200,9 +211,7 @@ document "build" <<EOF
 EOF
 function build() {
   local hab_build
-  #set HAB_BLDR_CHANNEL to dev as part of the hab package refresh
-  local HAB_BLDR_CHANNEL=dev
-  
+  HAB_BLDR_CHANNEL=dev
   # Support for hab v.0.63.0
   if [ -f /bin/build ]; then
     hab_build=/bin/build

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/chef/automate/api/interservice/local_user"
 	"reflect"
 
 	"google.golang.org/grpc/codes"
@@ -9,6 +10,7 @@ import (
 
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authz"
+
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -18,25 +20,37 @@ import (
 
 // Service holds the internal state and configuration of the Infra proxy service.
 type Service struct {
-	Logger      logger.Logger
-	ConnFactory *secureconn.Factory
-	Storage     storage.Storage
-	Secrets     secrets.SecretsServiceClient
+	Logger             logger.Logger
+	ConnFactory        *secureconn.Factory
+	Storage            storage.Storage
+	Migration          storage.MigrationStorage
+	Secrets            secrets.SecretsServiceClient
+	LocalUser          local_user.UsersMgmtServiceClient
+	AuthzProjectClient authz.ProjectsServiceClient
+	AuthzPolicyClient  authz.PoliciesServiceClient
+}
+
+type AuthzServiceClients struct {
+	AuthzProjectClient authz.ProjectsServiceClient
+	AuthzPolicyClient  authz.PoliciesServiceClient
 }
 
 // Start returns an instance of Service that connects to a postgres storage backend.
 func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secureconn.Factory, secretsClient secrets.SecretsServiceClient,
-	authzClient authz.AuthorizationServiceClient) (*Service, error) {
-	p, err := postgres.New(l, migrationsConfig, authzClient)
+	authzClient authz.AuthorizationServiceClient, localUserClient local_user.UsersMgmtServiceClient, authzServiceClients AuthzServiceClients) (*Service, error) {
+	p, pObj, err := postgres.New(l, migrationsConfig, authzClient)
 	if err != nil {
 		return nil, err
 	}
-
 	return &Service{
-		Logger:      l,
-		ConnFactory: connFactory,
-		Storage:     p,
-		Secrets:     secretsClient,
+		Logger:             l,
+		ConnFactory:        connFactory,
+		Storage:            p,
+		Migration:          pObj,
+		Secrets:            secretsClient,
+		AuthzProjectClient: authzServiceClients.AuthzProjectClient,
+		LocalUser:          localUserClient,
+		AuthzPolicyClient:  authzServiceClients.AuthzPolicyClient,
 	}, nil
 }
 

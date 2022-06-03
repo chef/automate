@@ -3,7 +3,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { OrgActionTypes, OrgActions } from './org.actions';
+import { OrgActionTypes,
+  OrgActions,
+  UploadSuccessPayload,
+  PreviewSuccessPayload,
+  CheckUserPayload
+} from './org.actions';
 import { Org } from './org.model';
 
 export interface OrgEntityState extends EntityState<Org> {
@@ -13,6 +18,14 @@ export interface OrgEntityState extends EntityState<Org> {
   createError: HttpErrorResponse;
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
+  uploadStatus: EntityStatus;
+  uploadDetails: UploadSuccessPayload;
+  cancelStatus: EntityStatus;
+  previewStatus: EntityStatus;
+  previewData: PreviewSuccessPayload;
+  confirmPreviewStatus: EntityStatus;
+  checkUserStatus: EntityStatus;
+  getCheckedUserStatus: CheckUserPayload;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -21,6 +34,11 @@ const CREATE_STATUS = 'createStatus';
 const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
+const UPLOAD_STATUS = 'uploadStatus';
+const CANCEL_STATUS = 'cancelStatus';
+const PREVIEW_STATUS = 'previewStatus';
+const CONFIRM_PREVIEW_STATUS = 'confirmPreviewStatus';
+const CHECK_USER_STATUS = 'checkUserStatus';
 
 export const orgEntityAdapter: EntityAdapter<Org> = createEntityAdapter<Org>();
 
@@ -31,7 +49,14 @@ export const OrgEntityInitialState: OrgEntityState =
     createStatus: EntityStatus.notLoaded,
     createError: null,
     deleteStatus: EntityStatus.notLoaded,
-    updateStatus: EntityStatus.notLoaded
+    updateStatus: EntityStatus.notLoaded,
+    uploadStatus: EntityStatus.notLoaded,
+    uploadDetails: null,
+    cancelStatus: EntityStatus.notLoaded,
+    previewData: null,
+    confirmPreviewStatus: EntityStatus.notLoaded,
+    checkUserStatus: EntityStatus.notLoaded,
+    getCheckedUserStatus: null
   });
 
 export function orgEntityReducer(
@@ -97,6 +122,60 @@ export function orgEntityReducer(
 
     case OrgActionTypes.UPDATE_FAILURE:
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.UPLOAD:
+      return set(UPLOAD_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.UPLOAD_SUCCESS:
+      return pipe(
+        set(UPLOAD_STATUS, EntityStatus.loadingSuccess),
+        set('uploadDetails', action.payload || [])
+      )(state) as OrgEntityState;
+
+    case OrgActionTypes.UPLOAD_FAILURE:
+      return set(UPLOAD_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.CANCEL_MIGRATION:
+      return set(CANCEL_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.CANCEL_MIGRATION_SUCCESS:
+      return set(CANCEL_STATUS, EntityStatus.loadingSuccess, state);
+
+    case OrgActionTypes.CANCEL_MIGRATION_FAILURE:
+      return set(CANCEL_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.GET_PREVIEW_DATA:
+      return set(PREVIEW_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.GET_PREVIEW_DATA_SUCCESS:
+      return pipe(
+        set('previewData', action.payload),
+        set(PREVIEW_STATUS, EntityStatus.loadingSuccess)
+      )(state) as OrgEntityState;
+
+    case OrgActionTypes.GET_PREVIEW_DATA_FAILURE:
+      return set(PREVIEW_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.CONFIRM_PREVIEW:
+      return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.CONFIRM_PREVIEW_SUCCESS:
+      return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loadingSuccess, state);
+
+    case OrgActionTypes.CONFIRM_PREVIEW_FAILURE:
+      return set(CONFIRM_PREVIEW_STATUS, EntityStatus.loadingFailure, state);
+
+    case OrgActionTypes.CHECK_USER:
+      return set(CHECK_USER_STATUS, EntityStatus.loading, state);
+
+    case OrgActionTypes.CHECK_USER_SUCCESS:
+        return pipe(
+          set('getCheckedUserStatus', action.payload),
+          set(CHECK_USER_STATUS, EntityStatus.loadingSuccess)
+        )(state) as OrgEntityState;
+
+    case OrgActionTypes.CHECK_USER_FAILURE:
+      return set(CHECK_USER_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

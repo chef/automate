@@ -42,12 +42,10 @@ func (a *InfraProxyServer) GetOrg(ctx context.Context, r *gwreq.GetOrg) (*gwres.
 // CreateOrg posts an org upstream
 func (a *InfraProxyServer) CreateOrg(ctx context.Context, r *gwreq.CreateOrg) (*gwres.CreateOrg, error) {
 	req := &infra_req.CreateOrg{
-		Id:        r.Id,
-		Name:      r.Name,
-		AdminUser: r.AdminUser,
-		AdminKey:  r.AdminKey,
-		ServerId:  r.ServerId,
-		Projects:  r.Projects,
+		Id:       r.Id,
+		Name:     r.Name,
+		ServerId: r.ServerId,
+		Projects: r.Projects,
 	}
 	res, err := a.client.CreateOrg(ctx, req)
 	if err != nil {
@@ -108,6 +106,19 @@ func (a *InfraProxyServer) DeleteOrg(ctx context.Context, r *gwreq.DeleteOrg) (*
 	}, nil
 }
 
+//GetInfraServerOrgs: Fetches the list of automate infra server's organisations from the chef server and save it into the automate back end DB
+func (c *InfraProxyServer) GetInfraServerOrgs(ctx context.Context, r *gwreq.GetInfraServerOrgs) (*gwres.GetInfraServerOrgs, error) {
+	req := &infra_req.GetInfraServerOrgs{
+		ServerId: r.ServerId,
+	}
+	res, err := c.client.GetInfraServerOrgs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.GetInfraServerOrgs{
+		MigrationId: res.MigrationId,
+	}, nil
+}
 func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 	return &gwres.Org{
 		Id:           t.GetId(),
