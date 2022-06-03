@@ -31,6 +31,8 @@ Chef Automate requires
 * `useradd`
 * `curl` or `wget`
 * The shell that starts Automate should have a max open files setting of at least 65535
+* SELinux or other security modules should either be disabled, or running in a permissive mode.
+  For more detail, see [Security module details](https://docs.chef.io/server/install_server_pre/#security-modules)
 
 Commercial support for Chef Automate is available for platforms that satisfy these
 criteria.
