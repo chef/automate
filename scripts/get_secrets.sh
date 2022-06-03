@@ -67,7 +67,14 @@ target_host=$(vault kv get -field=data secret/a2/testing/target_host)
 target_user=$(vault kv get -field=data secret/a2/testing/target_user)
 target_key=$(vault kv get -field=data secret/a2/testing/target_key)
 infra_admin_key=$(vault kv get -field=data secret/a2/testing/infra_admin_key)
-
+rootca=$(vault kv get -field=root-ca.pem secret/a2/a2ha/opensearch)
+admin=$(vault kv get -field=admin.pem secret/a2/a2ha/opensearch)
+adminkey=$(vault kv get -field=admin-key.pem secret/a2/a2ha/opensearch)
+node1=$(vault kv get -field=node1.pem secret/a2/a2ha/opensearch)
+node1key=$(vault kv get -field=node1-key.pem secret/a2/a2ha/opensearch)
+echo "============================valut secret==========================="
+echo "rootca:$rootca"
+echo "==============================================="
 cat >dev/secrets-env.sh <<EOF
 # Secrets
 export AUTOMATE_ACCEPTANCE_TARGET_HOST=$target_host
@@ -80,4 +87,9 @@ export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST=$target_host
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER=$target_user
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY="$target_key"
 export CYPRESS_AUTOMATE_INFRA_ADMIN_KEY="$infra_admin_key"
+export OPENSEARCH_ROOT_CA_PEM=$rootca"
+export OPENSEARCH_ADMIN_PEM=$admin"
+export OPENSEARCH_ADMIN_KEY_PEM=$adminkey"
+export OPENSEARCH_NODE1_PEM=$node1"
+export OPENSEARCH_NODE1_KEY_PEM=$node1key" 
 EOF
