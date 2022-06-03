@@ -14,6 +14,8 @@ pkg_shasum=d40f2696623b6766aa235997e2847a6c661a226815d4ba173292a219754bd8a8
 
 pkg_build_deps=(
   core/patchelf
+  core/make
+  core/gcc
 )
 pkg_deps=(
   core/coreutils
@@ -24,7 +26,9 @@ pkg_deps=(
   core/curl # health_check
   chef/automate-openjdk
   chef/automate-platform-tools
+  core/ruby30
 )
+pkg_interpreters=(bin/ruby)
 pkg_bin_dirs=(os/bin)
 pkg_lib_dirs=(lib)
 
@@ -71,7 +75,7 @@ do_install() {
   chown -RL hab:hab ${pkg_prefix}/*
 
   mkdir "${pkg_prefix}/os/config/certificates"
-  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "${pkg_prefix}" "$PLAN_CONTEXT"
+  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "$PLAN_CONTEXT"
   chown -RL hab:hab ${pkg_prefix}/os/config/*
   chmod -R 777 ${pkg_prefix}/*
   
@@ -83,6 +87,24 @@ do_install() {
   chmod 755 "${pkg_prefix}/os/plugins/opensearch-security/tools/install_demo_configuration.sh"
   chmod 755 "${pkg_prefix}/os/plugins/opensearch-security/tools/audit_config_migrater.sh"
   echo "......................................................................."
+
+  #echo "hashing admin passowords"
+  #echo "......................................................................."
+  #gem update --system
+  #gem install bcrypt --no-document --install-dir "${pkg_prefix}/lib/gems"
+  #gem install http --no-document --install-dir "${pkg_prefix}/lib/gems"
+  #gem install json --no-document --install-dir "${pkg_prefix}/lib/gems"
+  #gem install toml-rb --no-document --install-dir "${pkg_prefix}/lib/gems"
+  #gem install mixlib-shellout --no-document --install-dir "${pkg_prefix}/lib/gems"
+  #gem install pry --no-document --install-dir "${pkg_prefix}/lib/gems"
+  #gem install chefstyle --no-document --install-dir "${pkg_prefix}/lib/gems"
+  #mkdir "${pkg_prefix}/bin"
+  #install "$PLAN_CONTEXT/bin/opensearch_sidecar.rb" "${pkg_prefix}/bin/opensearch_sidecar.rb"
+  #mkdir "${pkg_prefix}/data"
+  chmod 775 $PLAN_CONTEXT/config/securityconfig/internal_users.yml
+  chmod 775 $PLAN_CONTEXT/config/securityconfig/roles_mapping.yml
+  #echo "......................................................................."
+
 }
 
 do_strip() {

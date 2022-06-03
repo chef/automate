@@ -18,17 +18,6 @@ echo "Inserted default securityconfig opensearch"
 hab pkg exec core/bash {{pkg.path}}/os/plugins/opensearch-security/tools/securityadmin.sh -cd {{pkg.svc_config_path}}/securityconfig -icl -key {{pkg.svc_config_path}}/certificates/admin-key.pem -cert {{pkg.svc_config_path}}/certificates/admin.pem -cacert {{pkg.svc_config_path}}/certificates/root-ca.pem -nhnv
 echo "Done !!!! Executing opensearch securityadmin"
 
-
-echo "........................................................................"
-echo "generating hashed password for internal user role"
-"
-{{cfg.opensearch_auth.admin_username}}:
-  readonly: true
-  hash: {{cfg.opensearch_auth.hashed_password}}
-  roles:
-    - admin
-"
-
 source {{pkg.svc_config_path}}/health_check
 
 {{#if svc.me.cfg.http-host ~}}

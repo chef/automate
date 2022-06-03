@@ -34,7 +34,8 @@ source {{pkg.svc_config_path}}/init_ca
 
 echo "JDK PATH"
 echo $JDK_PKG_PATH
-# /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh 
+# /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh
+
 hab pkg exec chef/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
 
 hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore {{pkg.svc_var_path}}/ca.jks -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
