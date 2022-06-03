@@ -156,7 +156,7 @@ By default, Chef Automate includes a *project-owner* role, so the global admin m
 Two categories of resources exist for project assignment:
 
 - Ingested client run and compliance nodes
-- Teams, API Tokens, Policies, and Roles created in Automate
+- Teams, API Tokens, Policies, and Roles created in Chef Automate
 
 Any of these resources not explicitly assigned to a project is *unassigned*.
 After upgrading and before creating projects, all your resources exist as *unassigned*.

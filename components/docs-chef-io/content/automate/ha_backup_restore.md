@@ -194,9 +194,9 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
 1. Execute command, `./chef-automate patch configs/automate.toml`. This command triggers the deployment.
 
-1. Assign the created IAM role to all the elastic search instances.
+1. Assign the created IAM role to all the Elasticsearch instances.
 
-1. SSH into the automate instance by typing the command, `sudo automate-cluster-ctl ssh automate`.
+1. SSH into the Chef Automate instance by typing the command, `sudo automate-cluster-ctl ssh automate`.
 
 1. Execute command, `./chef-automate backup create`, from the Chef Automate front-end node. The backup gets created.
 
@@ -248,15 +248,15 @@ sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 
 {{< note >}}
 
-If the network is mounted correctly, you need to perform this step on a single Opensearch server.
+If the network is mounted correctly, you need to perform this step on a single OpenSearch server.
 
 {{< /note >}}
 
-1. Export the current Opensearch configuration from the Habitat supervisor.
+1. Export the current OpenSearch configuration from the Habitat supervisor.
 
 1. Log in as a root user.
 
-1. SSH to a single Opensearch server and configure Opensearch `path.repo` setting by executing the following commands:
+1. SSH to a single OpenSearch server and configure OpenSearch `path.repo` setting by executing the following commands:
 
 ```bash
 source /hab/sup/default/SystemdEnvironmentFile.sh

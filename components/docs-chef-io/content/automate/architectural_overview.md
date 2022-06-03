@@ -12,9 +12,9 @@ gh_repo = "automate"
     weight = 10
 +++
 
-## Automate 2 Architecture
+## Chef Automate 2 Architecture
 
-![Automate 2 Architecture](/images/automate/a2-architecture-os.png)
+![Chef Automate 2 Architecture](/images/automate/a2-architecture-os.png)
 
 ## Component overview
 
@@ -76,4 +76,4 @@ This service runs alongside OpenSearch. It provides standard OpenSearch function
 
 ### Dex
 
-[Dex](https://github.com/dexidp/dex) is a federated OpenID Connect (OIDC) provider that allows Automate to integrate with external identity providers via LDAP, SAML, or OpenID Connect.
+[Dex](https://github.com/dexidp/dex) is a federated OpenID Connect (OIDC) provider that allows Chef Automate to integrate with external identity providers via LDAP, SAML, or OpenID Connect.

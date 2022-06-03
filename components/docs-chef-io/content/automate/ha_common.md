@@ -97,7 +97,7 @@ The certificate rotation is also required when key for a node, client, or CA is 
 
 You can generate the required certificates on your own or you can use the existing certificates of your organization. Ensure you execute all the below commands from the `cd /hab/a2_deploy_workspace` path.
 
-Follow these steps to rotate your certificates that are to be used in CheF Automate High Availability (HA):
+Follow these steps to rotate your certificates that are to be used in Chef Automate High Availability (HA):
 
 1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
 1. Type the command, `./scripts/credentials set ssl --rotate all` and press **Enter**. This command rotates all the certificates of your organization.
@@ -110,7 +110,7 @@ When you run this command first time, a series of certificates are created and s
 
 1. For rotating the PostgreSQL certificates, type the command `./scripts/credentials set ssl --pg-ssl` and press **Enter**. .
 
-1. For rotating the elasticsearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
+1. For rotating the Elasticsearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
 
 <!-- 4. Copy your *x.509 SSL certs* into the appropriate files in `certs/` folder. -->
 
@@ -130,7 +130,7 @@ When you run this command first time, a series of certificates are created and s
 
 1. For rotating the PostgreSQL credentials, type the command `./scripts/credentials set postgresql --auto` and press **Enter**. .
 
-1. For rotating the elasticsearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
+1. For rotating the Elasticsearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
 
 ### What are Self Signed Certificates?
 

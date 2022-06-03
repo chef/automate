@@ -227,7 +227,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 ### Additional Configuration
 
-#### General Opensearch Configuration
+#### General OpenSearch Configuration
 
 To configure OpenSearch for your Chef Automate installation, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
@@ -250,11 +250,11 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 # destructive_requires_name = true
 ```
 
-#### Setting Opensearch Heap
+#### Setting OpenSearch Heap
 
-The OpenSearch heap size can, and in most cases, should be set to 50% of the available system memory. However, you should consider the essential caveats covered in the [Opensearch heap size documentation](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
+The OpenSearch heap size can, and in most cases, should be set to 50% of the available system memory. However, you should consider the essential caveats covered in the [OpenSearch heap size documentation](https://opensearch.org/docs/latest/opensearch/install/important-settings/).
 
-For example, a system with 32GB of memory can have its Opensearch heap size set to `16g`; to do so, one would first create a TOML file that contains the partial
+For example, a system with 32GB of memory can have its OpenSearch heap size set to `16g`; to do so, one would first create a TOML file that contains the partial
 configuration below, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
 
 ```toml
@@ -443,7 +443,7 @@ Content-Security-Policy is the name of a HTTP response header that modern browse
 
 Refer: https://owasp.org/www-community/controls/Content_Security_Policy
 
-In Automate, enable the Content Security Policy header by patching the following configuration.
+In Chef Automate, enable the Content Security Policy header by patching the following configuration.
 
 ```toml
 [load_balancer.v1.sys.ngx.http]

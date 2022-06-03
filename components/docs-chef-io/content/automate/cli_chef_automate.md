@@ -15,7 +15,7 @@ toc_layout = "cli_chef_automate_toc"
     weight = 20
 +++
 
-## Automate CLI Commands
+## Chef Automate CLI Commands
 
 {{< automate_cli_commands data_path="automate/cli_chef_automate/commands" >}}
 
