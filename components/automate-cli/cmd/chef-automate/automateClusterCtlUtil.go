@@ -285,7 +285,7 @@ func getFrontendBundleName(airgapPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return "frontend-" + version, nil
+	return "frontend-" + version + ".aib", nil
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
 	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))
