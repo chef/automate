@@ -85,7 +85,7 @@ do_install() {
   #sh ${pkg_prefix}/os/plugins/opensearch-security/tools/securityadmin.sh
   #chmod 777 -R ${pkg_prefix}/
   mkdir "${pkg_prefix}/os/config/certificates"
-  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "${pkg_prefix}" "$PLAN_CONTEXT"
+  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "$PLAN_CONTEXT"
   chown -RL hab:hab ${pkg_prefix}/os/config/*
   chmod -R 777 ${pkg_prefix}/*
 
