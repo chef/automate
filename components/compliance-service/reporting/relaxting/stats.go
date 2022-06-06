@@ -70,7 +70,13 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	myName := "GetStatsSummaryNodes"
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := true
+
+	if filters["job_id"] != nil {
+		latestOnly = false
+	}
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -119,7 +125,13 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := true
+
+	if filters["job_id"] != nil {
+		latestOnly = false
+	}
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -174,7 +186,16 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+
+	latestOnly := true
+
+	if filters["job_id"] != nil {
+		latestOnly = false
+	}
+
+	depth, err := backend.NewDepth(filters, latestOnly)
+	logrus.Println(latestOnly, filters["job_id"], "scanIssue reportType")
+
 	if err != nil {
 		return failures, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
