@@ -30,11 +30,8 @@ export JDK_PKG_PATH
 source {{pkg.svc_config_path}}/init_keystore
 source {{pkg.svc_config_path}}/init_ca
 
-# cp {{pkg.path}}/os/config/certificates/* {{pkg.svc_config_path}}/
-
 echo "JDK PATH"
 echo $JDK_PKG_PATH
-# /hab/pkgs/core/bash/5.0.16/20200305233030/bin/sh
 
 hab pkg exec chef/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
 

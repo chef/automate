@@ -88,22 +88,13 @@ do_install() {
   chmod 755 "${pkg_prefix}/os/plugins/opensearch-security/tools/audit_config_migrater.sh"
   echo "......................................................................."
 
-  #echo "hashing admin passowords"
-  #echo "......................................................................."
-  #gem update --system
-  #gem install bcrypt --no-document --install-dir "${pkg_prefix}/lib/gems"
-  #gem install http --no-document --install-dir "${pkg_prefix}/lib/gems"
-  #gem install json --no-document --install-dir "${pkg_prefix}/lib/gems"
-  #gem install toml-rb --no-document --install-dir "${pkg_prefix}/lib/gems"
-  #gem install mixlib-shellout --no-document --install-dir "${pkg_prefix}/lib/gems"
-  #gem install pry --no-document --install-dir "${pkg_prefix}/lib/gems"
-  #gem install chefstyle --no-document --install-dir "${pkg_prefix}/lib/gems"
-  #mkdir "${pkg_prefix}/bin"
-  #install "$PLAN_CONTEXT/bin/opensearch_sidecar.rb" "${pkg_prefix}/bin/opensearch_sidecar.rb"
-  #mkdir "${pkg_prefix}/data"
+  echo "changing permission for roles and internal user yml file."
   chmod 775 $PLAN_CONTEXT/config/securityconfig/internal_users.yml
   chmod 775 $PLAN_CONTEXT/config/securityconfig/roles_mapping.yml
-  #echo "......................................................................."
+  echo "......................................................................."
+
+  chmod 775 $(pkg_path_for chef/automate-openjdk)/lib/security/cacerts
+  
 
 }
 
