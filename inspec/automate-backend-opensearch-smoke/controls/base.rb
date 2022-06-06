@@ -17,10 +17,18 @@ describe bash("HAB_LICENSE=accept-no-persist /hab/svc/automate-ha-opensearch/hoo
   its('exit_status') { should eq 0 }
 end
 
-describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/odfe-ssl.pem') do
+describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/node1.pem') do
   its('validity_in_days') { should be > 30 }
 end
 
-describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/odfe-admin.pem') do
+describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/node1-key.pem') do
+  its('validity_in_days') { should be > 30 }
+end
+
+describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/admin.pem') do
+  its('validity_in_days') { should be > 30 }
+end
+
+describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem') do
   its('validity_in_days') { should be > 30 }
 end

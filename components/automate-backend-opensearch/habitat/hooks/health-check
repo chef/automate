@@ -1,11 +1,21 @@
-#!{{pkgPathFor "core/bash"}}/bin/bash
+#!/bin/sh
+#
+# Opensearch Health Check for Habitat
 
-# {{#if cfg.disable ~}}
-#exit 0
-#{{~else}}
-#source {{pkg.svc_config_path}}/health_check
+# For details on the Opensearch health colors, see:
+# https://opensearch.org/docs/latest/opensearch/rest-api/cluster-health/
+status="$({{pkgPathFor "core/curl"}}/bin/curl -sk --cacert {{pkg.svc_path}}/config/certificates/root-ca.pem  --key {{pkg.svc_path}}/config/certificates/admin-key.pem  --cert {{pkg.svc_path}}/config/certificates/admin.pem https://{{svc.me.sys.ip}}:{{svc.me.cfg.http-port}}/_cat/health)"
+color="$(echo "$status" | awk '{print $4}')"
 
-#health_check
+case $color in
+  "green")
+    rc=0 ;;                     # OK (200)
+  "yellow")
+    rc=1 ;;                     # WARNING (200)
+  "red")
+    rc=2 ;;                     # CRITICAL (503)
+  *)
+    rc=3 ;;                     # UNKNOWN (500)
+esac
 
-#exit $?
-# {{~/if}}
+exit $rc
