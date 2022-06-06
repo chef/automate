@@ -21,14 +21,6 @@ describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/n
   its('validity_in_days') { should be > 30 }
 end
 
-describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/node1-key.pem') do
-  its('validity_in_days') { should be > 30 }
-end
-
 describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/admin.pem') do
-  its('validity_in_days') { should be > 30 }
-end
-
-describe x509_certificate('/hab/svc/automate-ha-opensearch/config/certificates/admin-key.pem') do
   its('validity_in_days') { should be > 30 }
 end
