@@ -20,3 +20,31 @@ source {{pkg.svc_config_path}}/health_check
 mkdir -p {{pkg.svc_var_path}}/logs
 mkdir -p {{pkg.svc_var_path}}/plugins
 mkdir -p {{pkg.svc_var_path}}/tmp
+
+
+echo "****** INSIDE OPENSEARCH PACKAGE RUN HOOK *******"
+
+echo " List of files in config/certificates folder"
+ls -lrt {{pkg.svc_config_path}}/certificates
+
+echo "{{pkg.svc_config_path}}/certificates/root-ca.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/root-ca.pem
+
+echo "{{pkg.svc_config_path}}/certificates/admin.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/admin.pem
+
+echo "{{pkg.svc_config_path}}/certificates/admin-key.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/admin-key.pem
+
+echo "{{pkg.svc_config_path}}/certificates/node1.pem -----------------"
+cat {{pkg.svc_config_path}}/certificates/node1.pem
+
+echo "{{pkg.svc_config_path}}/certificates/node1-key.pem ------------"
+cat {{pkg.svc_config_path}}/certificates/node1-key.pem
+
+
+chmod 0600 {{pkg.svc_config_path}}/certificates/root-ca.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node1.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/admin-key.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node1-key.pem
