@@ -72,7 +72,13 @@ func (backend ES2Backend) GetTrend(filters map[string][]string, interval int, tr
 				myName, trendType))
 	}
 
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := true
+
+	if filters["job_id"] != nil {
+		latestOnly = false
+	}
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return trendStatsBuckets, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
