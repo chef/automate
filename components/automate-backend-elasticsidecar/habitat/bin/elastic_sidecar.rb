@@ -138,10 +138,10 @@ module AutomateCluster
   #    ], config['securityconfig_path']
   #  end
 #
-  #  def wait
-  #    logger.debug "Sleeping #{config['wait_period']}s"
-  #    sleep config['wait_period']
-  #  end
+    def wait
+      logger.debug "Sleeping 60s"
+      sleep 60
+    end
 #
   #  def run
   #    loop do
@@ -178,6 +178,10 @@ module AutomateCluster
   #  end
     def run
       logger.warn 'run AutomateCluster::ElasticSidecar'
+      loop do
+        logger.warn 'Service inilized.'
+        wait
+      end
     end
   end
 end
