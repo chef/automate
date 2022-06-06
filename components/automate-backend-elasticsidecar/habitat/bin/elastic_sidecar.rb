@@ -12,7 +12,7 @@ require 'chefstyle'
 module AutomateCluster
   class ElasticSidecar
     def initialize
-      logger.level = config['log_debug'] == true ? Logger::DEBUG : Logger::WARN
+      logger.level = Logger::WARN
       logger.warn 'AutomateCluster::ElasticSidecar initialized!'
     end
 
