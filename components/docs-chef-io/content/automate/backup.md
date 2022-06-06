@@ -26,7 +26,7 @@ This amount of space needed for a backup varies depending on your Chef Automate 
 
 * Complete copies of each Chef Automate service PostgreSQL database
 * Complete copies of your configuration files
-* Opensearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each Opensearch snapshot and the delta--or the list of changes--for each successive snapshot
+* OpenSearch snapshots of your Chef Automate configuration and data, such as converge, scan, and report data. You will need enough disk space for the each OpenSearch snapshot and the delta--or the list of changes--for each successive snapshot
 * Chef Habitat Builder artifacts
 
 ## Backup to a Filesystem
@@ -62,7 +62,7 @@ The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}
 
 A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
 
-To provide externally-deployed Opensearch nodes access to Chef Automate's built-in backup storage services, you must [configure Opensearch backup]({{< relref "install.md#configuring-external-opensearch" >}}) settings separately from Chef Automate's primary backup settings.
+To provide externally-deployed OpenSearch nodes access to Chef Automate's built-in backup storage services, you must [configure OpenSearch backup]({{< relref "install.md#configuring-external-opensearch" >}}) settings separately from Chef Automate's primary backup settings.
 
 ## Backup to AWS S3
 

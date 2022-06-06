@@ -5,5 +5,20 @@ studio_secrets:
   GITHUB_TOKEN:
     account: github/chef
     field: token
+OPENSEARCH_ROOT_CA_PEM:
+     path: secret/a2/a2ha/opensearch
+     field: root-ca.pem
+  OPENSEARCH_ADMIN_PEM:
+    path: secret/a2/a2ha/opensearch
+    field: admin.pem
+  OPENSEARCH_ADMIN_KEY_PEM:
+    path: secret/a2/a2ha/opensearch
+    field: admin-key.pem
+  OPENSEARCH_NODE1_PEM:
+    path: secret/a2/a2ha/opensearch
+    field: node1.pem
+  OPENSEARCH_NODE1_KEY_PEM:
+    path: secret/a2/a2ha/opensearch
+    field: node1-key.pem    
   HAB_FALLBACK_CHANNEL:
     value: "stable"

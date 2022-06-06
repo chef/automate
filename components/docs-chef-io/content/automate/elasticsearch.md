@@ -17,7 +17,7 @@ You can configure Chef Automate to use Elasticsearch clusters that are not deplo
 These configuration directions are intended for in the initial deployment of Chef Automate.
 
 {{% warning %}}
-Since automate releases after version 3.0.49 do not support elasticsearch and only supports opensearch, please make sure to use the configuration shown on this page only with automate 3.0.49 or below.
+Since Chef Automate releases after version 3.0.49 do not support Elasticsearch and only supports OpenSearch, please make sure to use the configuration shown on this page only with Chef Automate 3.0.49 or below.
 {{% /warning %}}
 
 {{< note >}}
@@ -35,8 +35,8 @@ Add the following to your config.toml:
 # [global.v1.external.elasticsearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.elasticsearch.auth.basic_auth]
-## Create this elasticsearch user before starting the Automate deployment;
-## Automate assumes it exists.
+## Create this Elasticsearch user before starting the Chef Automate deployment;
+## Chef Automate assumes it exists.
 #   username = "<admin username>"
 #   password = "<admin password>"
 # [global.v1.external.elasticsearch.ssl]
@@ -44,7 +44,7 @@ Add the following to your config.toml:
 #  root_cert = """$(cat </path/to/cert_file.crt>)"""
 #  server_name = "<elasticsearch server name>"
 
-# Uncomment and fill out if using external elasticsearch that uses hostname-based routing/load balancing
+# Uncomment and fill out if using external Elasticsearch that uses hostname-based routing/load balancing
 # [esgateway.v1.sys.ngx.http]
 #  proxy_set_header_host = "<your external es hostname>:1234"
 

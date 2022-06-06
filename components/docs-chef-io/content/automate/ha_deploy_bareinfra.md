@@ -36,7 +36,7 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 
 - Ensure you have [Chef Automate utility](( {{< relref "ha_bastion.md#Download and Install the Chef Automate Utility" >}})) installed, else download and install the latest version.
 - Servers provisioned and accessible through SSH from each other.
-- Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch.
+- Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Infra Server, Postgress, Elasticsearch.
 - Create the certificates for security and authentication purposes. _optional_
 - Rotate the certificates if the certificates are expired or compromised. _optional_
 

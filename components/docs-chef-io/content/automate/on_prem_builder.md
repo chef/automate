@@ -375,7 +375,7 @@ level = "debug"
 scoped_levels = ["tokio_core=error", "tokio_reactor=error", "zmq=error", "hyper=error" ]
 ```
 
-## Setting up Automate as an OAuth Provider for Habitat Builder (Deprecated)
+## Setting up Chef Automate as an OAuth Provider for Chef Habitat Builder (Deprecated)
 
 {{< warning >}}
 These instructions have been deprecated in favor of using the Chef Automate installer to deploy Chef Habitat on-prem.

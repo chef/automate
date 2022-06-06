@@ -265,9 +265,9 @@ If you would like to delegate ownership of a project to another user so that the
 
 #### Assigning Ingested Resources to Projects
 
-While Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
+While Chef Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
 
-Project ingest rules are used to associate ingested resources with projects within Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
+Project ingest rules are used to associate ingested resources with projects within Chef Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
 Each condition contains an attribute, operator, and value. See [IAM Project Rules API reference](/automate/api/#tag/rules) for details on how to manage project rules.
 
 In this example, after [creating a project]({{< relref "iam_v2_guide.md#creating-a-project" >}}) with the ID `project-devops`, you will add an ingest rule to this new project.
@@ -331,7 +331,7 @@ Avoid stopping an update unless absolutely necessary. It will leave your system 
 
 Once rules have been successfully applied, the banner will be dismissed until the next time there are *pending edits* to any project.
 
-To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate filters by the selected `project-devops` project.
+To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Chef Automate filters by the selected `project-devops` project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
 
 ![](/images/automate/global-projects-filter.png)

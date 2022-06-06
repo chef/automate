@@ -116,7 +116,7 @@ From Chef Automate:
 
 ### Share the TLS Certificate with Chef Habitat
 
-Share the automate certificate with the Chef Habitat supervisor.
+Share the Chef Automate certificate with the Chef Habitat supervisor.
 
 Use **one** of these three options:
 
@@ -243,8 +243,8 @@ bldr_client_id = "<your Habitat Builder Oauth2 Client ID>"
 bldr_client_secret = "<your Habitat Builder Oauth2 Client Secret>"
 ```
 
-You'll need to add Automate's TLS certificate to Builder's list of accepted certificates in addition to these configuration changes.
-Locate Automate's default self-signed certificate by running `cat /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert`
+You'll need to add Chef Automate's TLS certificate to Builder's list of accepted certificates in addition to these configuration changes.
+Locate Chef Automate's default self-signed certificate by running `cat /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert`
 You can copy this default certificate, and then add it to your Builder instance's list of accepted certs.
 
 ```text

@@ -28,8 +28,8 @@ The Chef Infra Client Run Status chart displays a summary of node statuses: fail
 
 The node list table shows all nodes connected to Chef Automate. Filter the node list table by selecting any status tabs below the **Chef Infra Client Run Status** box.
 Sort the nodes listed on the table by selecting the arrows to the right of the column headers: _Node Name_, _Check-In_, _Uptime_, _Platform_, _Environment_, or _Policy Group_. Selecting an entry in this table will take you to a _Node details_ page with more information about the Chef Infra Client runs associated with this node. A node may be present in this table without any associated run history. This situation happens when data retention settings erase the most recent run history for such a node.
-In this case, a **no data** icon appears, and you will be unable to view any node details. The node remains listed as a missing node until it is deleted from Automate.
-Automate automatically removes any nodes deleted from the Chef Infra Server.
+In this case, a **no data** icon appears, and you will be unable to view any node details. The node remains listed as a missing node until it is deleted from Chef Automate.
+Chef Automate automatically removes any nodes deleted from the Chef Infra Server.
 
 ## Node Details
 

@@ -22,7 +22,7 @@ Set *log-level* debug using the command `chef-automate debug set-log-level deplo
 
 ### How to perform infrastructure cleanup for on-premises nodes
 
-Execute the following commands to perform cleanup on the instances and nodes of the deployed Chef Automate HA infrastructure (Automate, Server, three instances of Postgres, three instances of Elastic search)
+Execute the following commands to perform cleanup on the instances and nodes of the deployed Chef Automate HA infrastructure (Chef Automate, Chef Infra Server, three instances of Postgres, three instances of Elasticsearch)
 
 ```bash
 
