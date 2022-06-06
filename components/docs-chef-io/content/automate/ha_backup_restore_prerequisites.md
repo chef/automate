@@ -171,7 +171,7 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 {{< note >}} If the credentials have never been rotated, the above file may be empty. {{< /note >}}
 
 ```sh
-[es_yaml.path]   
+[path]   
 # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb   
 repo = "/mnt/automate_backups/opensearch" 
 ```
