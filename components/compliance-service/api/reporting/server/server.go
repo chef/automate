@@ -411,7 +411,7 @@ func (srv *Server) GetReportListForReportManager(filters *reporting.ListFilters,
 		return status.Errorf(codes.Internal, errString)
 	}
 
-	for idx := 0; idx < total; idx++ {
+	for idx := total - 1; idx >= 0; idx-- {
 		if result, ok := respMap[idx]; ok {
 			resp.Reports = append(resp.Reports, result.reportResp)
 		}
