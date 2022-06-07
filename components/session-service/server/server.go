@@ -435,9 +435,11 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	*u = *s.signInURL
 
 	cookie := &http.Cookie{
-		Name:  "id_token",
-		Value: rawIDToken,
-		Path:  "/",
+		Name:     "id_token",
+		Value:    rawIDToken,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: false, // true will not work as id_token needs to be stored in the browser's local storage using javascript.
 	}
 
 	http.SetCookie(w, cookie)
