@@ -12,7 +12,7 @@ options:
   usage: hostname of the ES host
 - name: es_port
   shorthand: p
-  default_value: "10141"
+  default_value: "10144"
   usage: port of the ES host
 - name: help
   shorthand: h
