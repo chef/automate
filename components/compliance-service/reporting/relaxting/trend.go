@@ -72,11 +72,7 @@ func (backend ES2Backend) GetTrend(filters map[string][]string, interval int, tr
 				myName, trendType))
 	}
 
-	latestOnly := true
-
-	if filters["job_id"] != nil {
-		latestOnly = false
-	}
+	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
