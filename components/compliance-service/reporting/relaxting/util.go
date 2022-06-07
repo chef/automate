@@ -293,11 +293,8 @@ func StringTagsFromProtoFields(tKey string, tValue *structpb.Value) *ESInSpecRep
 }
 
 func FetchLatestDataOrNot(filters map[string][]string) bool {
-	fmt.Println(filters)
 	latestOnly := true
 	if filters["job_id"] != nil {
-		fmt.Println(filters, 222)
-
 		latestOnly = false
 	}
 	return latestOnly

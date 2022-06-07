@@ -179,7 +179,6 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
-	logrus.Println(latestOnly, filters["job_id"], "scanIssue reportType")
 
 	if err != nil {
 		return failures, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
