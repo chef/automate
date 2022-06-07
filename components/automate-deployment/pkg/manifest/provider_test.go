@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path"
 	"testing"
 	"time"
@@ -422,11 +421,9 @@ var versions = `
 `
 
 func TestGetAllVersionsFromPath(t *testing.T) {
-	dir, err := ioutil.TempDir("", "VersionsFromFileTest")
-	assert.NoError(t, err, "creating temporary dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	filename := path.Join(dir, "versions.json")
-	err = ioutil.WriteFile(filename, []byte(versions), 0700)
+	err := ioutil.WriteFile(filename, []byte(versions), 0700)
 	assert.NoError(t, err, "writing test data")
 
 	resp, err := GetAllVersions(context.Background(), "", filename)

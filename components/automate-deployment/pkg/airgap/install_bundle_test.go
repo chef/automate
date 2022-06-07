@@ -74,9 +74,7 @@ func TestRoundTrip(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	tmpdir, err := ioutil.TempDir("", "a2-install-bundle-test")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	workspaceDir := path.Join(tmpdir, "workspace")
 	manifestFile := path.Join(tmpdir, "manifest.json")
@@ -84,7 +82,7 @@ func TestRoundTrip(t *testing.T) {
 	unpackRoot := path.Join(tmpdir, "unpack")
 	unpackRootHartsOnly := path.Join(tmpdir, "unpack_harts")
 
-	err = ioutil.WriteFile(manifestFile, []byte(sampleManifest), 0644)
+	err := ioutil.WriteFile(manifestFile, []byte(sampleManifest), 0644)
 	require.NoError(t, err)
 
 	progress := newCreateInstallBundleProgressCollector()

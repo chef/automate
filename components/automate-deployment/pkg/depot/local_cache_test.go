@@ -1,8 +1,6 @@
 package depot
 
 import (
-	"io/ioutil"
-	"os"
 	"os/exec"
 	"path"
 	"testing"
@@ -35,8 +33,7 @@ func TestLocalCacheListAll(t *testing.T) {
 
 func TestLocalCacheDelete(t *testing.T) {
 	t.Run("deleting a non-fully-qualified package is an error", func(t *testing.T) {
-		cache, _, cleanup := newTestLocalCache(t)
-		defer cleanup()
+		cache, _ := newTestLocalCache(t)
 		err := cache.Delete(habpkg.New("chef", "mlsa"))
 		require.Error(t, err)
 
@@ -45,15 +42,13 @@ func TestLocalCacheDelete(t *testing.T) {
 	})
 
 	t.Run("deleteing a non-existent package is not an error", func(t *testing.T) {
-		cache, _, cleanup := newTestLocalCache(t)
-		defer cleanup()
+		cache, _ := newTestLocalCache(t)
 		err := cache.Delete(habpkg.NewFQ("chef", "foobar", "1.0.1", "20181011015551"))
 		require.NoError(t, err)
 	})
 
 	t.Run("deleting a package removes both the installed package and the hart", func(t *testing.T) {
-		cache, tmpdir, cleanup := newTestLocalCache(t)
-		defer cleanup()
+		cache, tmpdir := newTestLocalCache(t)
 		err := cache.Delete(habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"))
 		require.NoError(t, err)
 
@@ -77,15 +72,12 @@ func TestLocalCacheDelete(t *testing.T) {
 	})
 }
 
-func newTestLocalCache(t *testing.T) (*LocalCache, string, func()) {
-	tmpdir, err := ioutil.TempDir("", "habpkg-cache-test")
-	require.NoError(t, err, "failed to create temp dir")
+func newTestLocalCache(t *testing.T) (*LocalCache, string) {
+	tmpdir := t.TempDir()
 	cache := FromLocalCache(WithLocalHabRoot(tmpdir))
 
-	err = exec.Command("cp", "-r", "testdata/local/pkgs", tmpdir).Run()
+	err := exec.Command("cp", "-r", "testdata/local/pkgs", tmpdir).Run()
 	err = exec.Command("cp", "-r", "testdata/local/cache", tmpdir).Run()
 	require.NoError(t, err, "failed to copy fixture")
-	return cache, tmpdir, func() {
-		os.RemoveAll(tmpdir)
-	}
+	return cache, tmpdir
 }

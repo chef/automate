@@ -10,18 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newTestTempDir(t *testing.T) (string, func()) {
-	t.Helper()
-	tempdir, err := ioutil.TempDir("", "test-probe")
-	require.NoError(t, err, "could not create temporary test directory")
-	f := func() { os.RemoveAll(tempdir) }
-
-	return tempdir, f
-}
-
 func TestLocalProbeFileThings(t *testing.T) {
-	tmpdir, cleanup := newTestTempDir(t)
-	defer cleanup()
+	tmpdir := t.TempDir()
 
 	testData := []byte("blah")
 	filePath := path.Join(tmpdir, "file")

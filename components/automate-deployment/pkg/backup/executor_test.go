@@ -2,8 +2,6 @@ package backup
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
@@ -17,8 +15,7 @@ import (
 // TestBackup tests the backup execution
 func TestBackup(t *testing.T) {
 	t.Run("with failing operations", func(t *testing.T) {
-		exec, bctx, _, cleanup := testBackupExecutor(testFailSyncSpec)
-		defer cleanup()
+		exec, bctx, _ := testBackupExecutor(t, testFailSyncSpec)
 
 		err := exec.Backup(bctx)
 
@@ -27,15 +24,13 @@ func TestBackup(t *testing.T) {
 	})
 
 	t.Run("with successful operations", func(t *testing.T) {
-		exec, bctx, _, cleanup := testBackupExecutor(testSuccessSpec)
-		defer cleanup()
+		exec, bctx, _ := testBackupExecutor(t, testSuccessSpec)
 
 		require.NoError(t, exec.Backup(bctx))
 	})
 
 	t.Run("timeout doesn't hang", func(t *testing.T) {
-		exec, bctx, _, cleanup := testBackupExecutorWithTimeout(testSuccessSpec, 0)
-		defer cleanup()
+		exec, bctx, _ := testBackupExecutorWithTimeout(t, testSuccessSpec, 0)
 
 		err := exec.Backup(bctx)
 		require.Error(t, err, "a timeout has happened")
@@ -62,11 +57,11 @@ func testLocationSpec(tmpdir string) LocationSpecification {
 	}
 }
 
-func testBackupExecutorWithTimeout(spec Spec, timeout time.Duration) (*Executor, Context, chan api.DeployEvent_Backup_Operation, func()) {
+func testBackupExecutorWithTimeout(t testing.TB, spec Spec, timeout time.Duration) (*Executor, Context, chan api.DeployEvent_Backup_Operation) {
 	// buffer the event channel so we don't block on events
 	eventChan := make(chan api.DeployEvent_Backup_Operation, 100)
 	errChan := make(chan error)
-	tmpDir, _ := ioutil.TempDir("", "backup-executor")
+	tmpDir := t.TempDir()
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	parsed, _ := time.Parse(api.BackupTaskFormat, "20060102150405")
 	ts, _ := ptypes.TimestampProto(parsed)
@@ -81,11 +76,11 @@ func testBackupExecutorWithTimeout(spec Spec, timeout time.Duration) (*Executor,
 		WithErrorChan(errChan),
 		WithSpec(spec),
 		WithCancel(cancel),
-	), bctx, eventChan, func() { os.RemoveAll(tmpDir) }
+	), bctx, eventChan
 }
 
-func testBackupExecutor(spec Spec) (*Executor, Context, chan api.DeployEvent_Backup_Operation, func()) {
-	return testBackupExecutorWithTimeout(spec, 2*time.Second)
+func testBackupExecutor(t testing.TB, spec Spec) (*Executor, Context, chan api.DeployEvent_Backup_Operation) {
+	return testBackupExecutorWithTimeout(t, spec, 2*time.Second)
 }
 
 var testSuccessSpec = Spec{

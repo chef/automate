@@ -3,7 +3,6 @@ package backup
 import (
 	"context"
 	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -212,12 +211,8 @@ func (suite *BucketTestSuite) AfterTest(suiteName, testName string) {
 func TestFilesystemBucket(t *testing.T) {
 	suite.Run(t, &BucketTestSuite{
 		beforeTest: func(suite *BucketTestSuite) {
-			tmpDir, err := ioutil.TempDir("", "fs-bucket-test")
-			suite.Require().NoError(err)
+			tmpDir := t.TempDir()
 			suite.locationSpec = FilesystemLocationSpecification{Path: tmpDir}
-			suite.afterTest = func(*BucketTestSuite) {
-				os.RemoveAll(tmpDir)
-			}
 		},
 	})
 }

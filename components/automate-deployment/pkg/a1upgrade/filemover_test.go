@@ -26,9 +26,9 @@ var myUser = strconv.FormatInt(int64(os.Geteuid()), 10)
 var testServiceName = "test-service"
 
 func TestResumeMove(t *testing.T) {
-	setup := func(opts ...FileMoverOpt) (*FileMover, string, string, func()) {
-		tmpSrc, _ := ioutil.TempDir("", "FileMoverTestSrc")
-		tmpDst, _ := ioutil.TempDir("", "FileMoverTestDst")
+	setup := func(opts ...FileMoverOpt) (*FileMover, string, string) {
+		tmpSrc := t.TempDir()
+		tmpDst := t.TempDir()
 		srcPath := filepath.Join(tmpSrc, "some_dir")
 		dstPath := "data/some_dir"
 		mover := NewFileMover(srcPath, testServiceName, dstPath, opts...)
@@ -38,17 +38,13 @@ func TestResumeMove(t *testing.T) {
 
 		os.MkdirAll(srcPath, os.ModePerm)
 		require.NoError(t, ioutil.WriteFile(filepath.Join(srcPath, "testfile"), []byte("test context"), os.ModePerm))
-		return mover, srcPath, path.Join(tmpDst, testServiceName, dstPath), func() {
-			os.RemoveAll(tmpSrc)
-			os.RemoveAll(tmpDst)
-		}
+		return mover, srcPath, path.Join(tmpDst, testServiceName, dstPath)
 	}
 
 	w := cli.NewWriter(os.Stdout, os.Stderr, new(bytes.Buffer))
 
 	t.Run("it renames the src directory to the new directory when possible", func(t *testing.T) {
-		mover, src, dst, cleanup := setup()
-		defer cleanup()
+		mover, src, dst := setup()
 
 		err := mover.Move(w)
 		require.NoError(t, err)
@@ -61,8 +57,7 @@ func TestResumeMove(t *testing.T) {
 		if err != nil {
 			t.Fatal("rsync does not exist, cannot run rsync test")
 		}
-		mover, src, dst, cleanup := setup()
-		defer cleanup()
+		mover, src, dst := setup()
 		os.MkdirAll(dst, os.ModePerm)
 
 		mover.RsyncCmd = "rsync"
@@ -77,8 +72,7 @@ func TestResumeMove(t *testing.T) {
 		if err != nil {
 			t.Fatal("rsync does not exist, cannot run rsync test")
 		}
-		mover, src, dst, cleanup := setup(ForceCopy())
-		defer cleanup()
+		mover, src, dst := setup(ForceCopy())
 		os.MkdirAll(dst, os.ModePerm)
 		mover.SrcPath = path.Join(mover.SrcPath, "testfile")
 		mover.RelDestPath = path.Join(mover.RelDestPath, "testfile")
@@ -91,8 +85,7 @@ func TestResumeMove(t *testing.T) {
 	})
 
 	t.Run("it doesn't move the directory again if the move is already complete", func(t *testing.T) {
-		mover, src, dst, cleanup := setup()
-		defer cleanup()
+		mover, src, dst := setup()
 
 		err := mover.Move(w)
 		require.NoError(t, err)

@@ -4,7 +4,6 @@ package server
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -232,8 +231,7 @@ func TestConvergeDisabled(t *testing.T) {
 	svr.serverConfig = &Config{}
 
 	t.Run("disabled when disable file exists", func(t *testing.T) {
-		tempDir, _ := ioutil.TempDir("", "converge-disabled")
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 		disableFile := filepath.Join(tempDir, "converge_disabled")
 		// create the file
 		os.OpenFile(disableFile, os.O_RDONLY|os.O_CREATE, 0750)
@@ -243,8 +241,7 @@ func TestConvergeDisabled(t *testing.T) {
 	})
 
 	t.Run("enabled when disable file does not exist", func(t *testing.T) {
-		tempDir, _ := ioutil.TempDir("", "converge-disabled")
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 		disableFile := filepath.Join(tempDir, "converge_disabled")
 
 		svr.serverConfig.ConvergeDisableFile = disableFile
