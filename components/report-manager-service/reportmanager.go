@@ -120,7 +120,7 @@ func getObjectStoreConnection(ctx context.Context, conf config.ReportManager) (*
 func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *minio.Client,
 	connFactory *secureconn.Factory, cerealManager *cereal.Manager, db *storage.DB) error {
 
-	grpcBinding := fmt.Sprintf("%s:%d", conf.Service.Host, conf.Service.Port)
+	grpcBinding := net.JoinHostPort(conf.Service.Host, fmt.Sprint(conf.Service.Port))
 	lis, err := net.Listen("tcp", grpcBinding)
 	if err != nil {
 		logrus.Fatalf("failed to listen: %v", err)
