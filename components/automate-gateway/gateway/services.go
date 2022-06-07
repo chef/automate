@@ -1034,7 +1034,8 @@ func (s *Server) ReportManagerExportHandler(w http.ResponseWriter, r *http.Reque
 		client = http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
-					RootCAs: caCertPool,
+					MinVersion: tls.VersionTLS12,
+					RootCAs:    caCertPool,
 				},
 			},
 		}

@@ -89,7 +89,7 @@ export class DownloadReportsService implements OnDestroy {
       let isLongPollNeededNextTime = false;
       for (const report of this.reportList) {
         if (report.status === 'running') {
-          this.mySet.add(report.acknowledgement_id)
+          this.mySet.add(report.acknowledgement_id);
           isLongPollNeededNextTime = true;
         } else {
           const status = report.status;
