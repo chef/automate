@@ -77,7 +77,7 @@ func upgradeWorspace(bundle string) bool {
 		}
 		if upgradeAccepted {
 			writer.Println("Bootstraping for new version.")
-			err := doBootstrapEnv(bundle)
+			err := doBootstrapEnv(bundle, false)
 			if err != nil {
 				writer.Println(err.Error())
 				return false

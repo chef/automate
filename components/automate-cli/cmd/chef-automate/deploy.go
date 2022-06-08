@@ -62,6 +62,7 @@ var deployCmdFlags = struct {
 	products                        []string
 	bootstrapBundlePath             string
 	userAuth                        bool
+	saas                            bool
 }{}
 
 // deployCmd represents the new command

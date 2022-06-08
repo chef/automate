@@ -33,7 +33,7 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 
 func (a *awsDeployment) doProvisionJob(args []string) error {
 	writer.Print("AWS Provision")
-	err := bootstrapEnv(a, deployCmdFlags.airgap)
+	err := bootstrapEnv(a, deployCmdFlags.airgap, deployCmdFlags.saas)
 	if err != nil {
 		return err
 	}

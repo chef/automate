@@ -278,7 +278,7 @@ func DeployHA(writer cli.FormatWriter,
 	overrideConfig *dc.AutomateConfig,
 	manifestProvider manifest.ReleaseManifestProvider,
 	cliVersion string,
-	airgap bool) error {
+	airgap bool, saas bool) error {
 	d := newDeployer(writer, overrideConfig, manifestProvider, cliVersion, airgap)
 	d.genMergedConfig()
 	ctx := context.Background()
@@ -287,7 +287,7 @@ func DeployHA(writer cli.FormatWriter,
 		logrus.Debug("Failed to get manifest for current channel")
 	}
 	b := bootstrap.NewCompatBootstrapper(d.target)
-	err = bootstrap.FullBootstrapHA(context.Background(), b, d.mergedCfg.Deployment, currentM, writer)
+	err = bootstrap.FullBootstrapHA(context.Background(), b, d.mergedCfg.Deployment, currentM, writer, saas)
 	return err
 }
 
