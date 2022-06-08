@@ -13,7 +13,7 @@ func FullBootstrapHA(ctx context.Context,
 	b target.Bootstrapper,
 	config *dc.ConfigRequest,
 	currentM manifest.ReleaseManifest,
-	writer cli.FormatWriter) error {
+	writer cli.FormatWriter, saas bool) error {
 
 	writer.Body("Installing Habitat")
 	err := b.InstallHabitat(ctx, currentM, writer)
@@ -22,7 +22,7 @@ func FullBootstrapHA(ctx context.Context,
 	}
 
 	writer.Body("Installing the Chef Automate backend deployment")
-	err = b.InstallAutomateBackendDeployment(ctx, config, currentM)
+	err = b.InstallAutomateBackendDeployment(ctx, config, currentM, saas)
 	if err != nil {
 		writer.Printf("Some error occurred %s\n", err.Error())
 		return err

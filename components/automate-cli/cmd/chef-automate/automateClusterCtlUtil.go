@@ -130,7 +130,7 @@ func tailFile(logFilePath string, executed chan struct{}) {
 
 	}
 }
-func doBootstrapEnv(airgapBundlePath string) error {
+func doBootstrapEnv(airgapBundlePath string, saas bool) error {
 	conf := new(dc.AutomateConfig)
 	if err := mergeFlagOverrides(conf); err != nil {
 		return status.Wrap(
@@ -169,7 +169,7 @@ func doBootstrapEnv(airgapBundlePath string) error {
 		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
 		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
 
-	err := client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode)
+	err := client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode, saas)
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
@@ -182,7 +182,7 @@ func doBootstrapEnv(airgapBundlePath string) error {
 	return nil
 }
 
-func bootstrapEnv(dm deployManager, airgapBundlePath string) error {
+func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool) error {
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
@@ -193,7 +193,7 @@ func bootstrapEnv(dm deployManager, airgapBundlePath string) error {
 			return status.New(status.InvalidCommandArgsError, errMLSA)
 		}
 	}
-	err := doBootstrapEnv(airgapBundlePath)
+	err := doBootstrapEnv(airgapBundlePath, saas)
 	if err != nil {
 		return err
 	}
