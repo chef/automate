@@ -44,6 +44,9 @@ func (m *GlobalConfig) ListSecrets() []a2conf.SecretInfo {
 	}, a2conf.SecretInfo{
 		EnvironmentVariable: "AUTOMATE_SECRET_OS_PASSWORD",
 		Name:                "os_password",
+	}, a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_LCR_MINIO_PASSWORD",
+		Name:                "lcr_minio_password",
 	}}
 }
 
@@ -99,6 +102,21 @@ func (m *GlobalConfig) GetSecret(name string) *wrappers.StringValue {
 		}
 		v5 := v4.Password
 		return v5
+	case "lcr_minio_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.External
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Minio
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.RootPassword
+		return v3
 	default:
 		return nil
 	}
@@ -159,6 +177,24 @@ func (m *GlobalConfig) SetSecret(name string, value *wrappers.StringValue) error
 			*v5 = &wrapperspb.StringValue{}
 		}
 		*v5 = value
+	case "lcr_minio_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &V1{}
+		}
+		v1 := &(*v0).External
+		if *v1 == nil {
+			*v1 = &External{}
+		}
+		v2 := &(*v1).Minio
+		if *v2 == nil {
+			*v2 = &External_Minio{}
+		}
+		v3 := &(*v2).RootPassword
+		if *v3 == nil {
+			*v3 = &wrapperspb.StringValue{}
+		}
+		*v3 = value
 	default:
 		return a2conf.ErrSecretNotFound
 	}
