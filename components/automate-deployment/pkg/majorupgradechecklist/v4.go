@@ -473,50 +473,61 @@ func getDataFromUrl(url string) ([]byte, error) {
 }
 
 func checkIndexVersion() error {
-
 	const basePath = "http://localhost:10144/"
 	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
 	if err != nil {
 		return err
 	}
 
-	IndexDetailsArray := []indexDetails{}
-
+	indexDetailsArray := []indexDetails{}
 	for _, index := range strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n") {
 		versionData, err := getDataFromUrl(basePath + index + "/_settings/index.version.created*?&human")
 		if err != nil {
 			return err
 		}
-		data := map[string]interface{}{}
-		json.Unmarshal(versionData, &data)
-		dataIdx := indexVersion{}
-		b, err := json.Marshal(data[index])
+		i, createdString, err := getMajorVersion(versionData, index)
 		if err != nil {
-			return errors.Wrap(err, "failed to marshal index data")
-		}
-		err = json.Unmarshal(b, &dataIdx)
-		if err != nil {
-			return errors.Wrap(err, "failed to unmarshal index data")
-		}
-		i, err := strconv.ParseInt(dataIdx.Settings.Index.Version.CreatedString[0:1], 10, 64)
-		if err != nil {
-			return errors.Wrap(err, "failed to parse index version")
+			return err
 		}
 		if i < 6 {
-			IndexDetailsArray = append(IndexDetailsArray, indexDetails{Name: index, Version: dataIdx.Settings.Index.Version.CreatedString})
+			indexDetailsArray = append(indexDetailsArray, indexDetails{Name: index, Version: createdString})
 		}
 	}
-
-	if len(IndexDetailsArray) > 0 {
-		msg := "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n"
-		for _, version := range IndexDetailsArray {
-			msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", version.Name, version.Version)
-		}
-		msg += "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
-		return fmt.Errorf(msg)
+	if len(indexDetailsArray) > 0 {
+		return formErrorMsg(indexDetailsArray)
 	}
-
 	return nil
+}
+
+func formErrorMsg(IndexDetailsArray []indexDetails) error {
+	msg := "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n"
+	for _, version := range IndexDetailsArray {
+		msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", version.Name, version.Version)
+	}
+	msg += "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
+	return fmt.Errorf(msg)
+}
+
+func getMajorVersion(versionData []byte, index string) (int64, string, error) {
+	data := map[string]interface{}{}
+	json.Unmarshal(versionData, &data)
+	dataIdx := indexVersion{}
+	b, err := json.Marshal(data[index])
+	if err != nil {
+		return -1, "", errors.Wrap(err, "failed to marshal index data")
+	}
+	err = json.Unmarshal(b, &dataIdx)
+	if err != nil {
+		return -1, "", errors.Wrap(err, "failed to unmarshal index data")
+	}
+	if dataIdx.Settings.Index.Version.CreatedString == "" {
+		return -1, "", errors.New("version not found for index")
+	}
+	i, err := strconv.ParseInt(dataIdx.Settings.Index.Version.CreatedString[0:1], 10, 64)
+	if err != nil {
+		return -1, "", errors.Wrap(err, "failed to parse index version")
+	}
+	return i, dataIdx.Settings.Index.Version.CreatedString, nil
 }
 
 func runIndexCheck() Checklist {
