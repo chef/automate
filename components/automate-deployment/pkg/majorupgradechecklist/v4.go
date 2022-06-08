@@ -1,9 +1,11 @@
 package majorupgradechecklist
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -144,7 +146,7 @@ func (ci *V4ChecklistManager) RunChecklist() error {
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
+		checklists = append(checklists, []Checklist{runIndexCheck(), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
@@ -423,6 +425,101 @@ func disableSharding() Checklist {
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.DatabaseError, err.Error())
+			}
+			return nil
+		},
+	}
+}
+
+func getDataFromUrl(url string) ([]byte, error) {
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil) // nosemgrep
+
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body) // nosemgrep
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
+type indexVersion struct {
+	Settings struct {
+		Index struct {
+			Version struct {
+				CreatedString string `json:"created_string"`
+				Created       string `json:"created"`
+			} `json:"version"`
+		} `json:"index"`
+	} `json:"settings"`
+}
+
+type indexNameVersion struct {
+	Name    string
+	Version string
+}
+
+func checkIndexVersion() error {
+
+	indexList, err := getDataFromUrl("http://localhost:10144/_cat/indices?h=index")
+	if err != nil {
+		return err
+	}
+
+	indexNameVersionArray := []indexNameVersion{}
+
+	for _, line := range strings.Split(strings.TrimSuffix(string(indexList), "\n"), "\n") {
+		versionData, err := getDataFromUrl("http://localhost:10144/" + line + "/_settings/index.version.created*?&human")
+		if err != nil {
+			return err
+		}
+		data := map[string]interface{}{}
+		json.Unmarshal(versionData, &data)
+		dataIdx := indexVersion{}
+		b, _ := json.Marshal(data[line])
+		json.Unmarshal(b, &dataIdx)
+		i, err := strconv.ParseInt(dataIdx.Settings.Index.Version.CreatedString[0:1], 10, 64)
+		if err != nil {
+			return err
+		}
+		if i < 6 {
+			indexNameVersionArray = append(indexNameVersionArray, indexNameVersion{Name: line, Version: dataIdx.Settings.Index.Version.CreatedString})
+			// return fmt.Errorf("\nMigration failed. One of the indices with name %s is created using version %s which is not supported by opensearch 1.2.4", line, dataIdx.Settings.Index.Version.CreatedString)
+		}
+	}
+
+	if len(indexNameVersionArray) > 0 {
+		msg := "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n"
+		for _, version := range indexNameVersionArray {
+			msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", version.Name, version.Version)
+		}
+		return fmt.Errorf(msg)
+	}
+
+	return nil
+}
+
+func runIndexCheck() Checklist {
+	return Checklist{
+		Name:        "check index version",
+		Description: "confirmation check index version",
+		TestFunc: func(h ChecklistHelper) error {
+			err := checkIndexVersion()
+			if err != nil {
+				return err
 			}
 			return nil
 		},
