@@ -13,6 +13,28 @@ import (
 	"github.com/pkg/errors"
 )
 
+type indexVersion struct {
+	Settings struct {
+		Index struct {
+			Version struct {
+				CreatedString string `json:"created_string"`
+				Created       string `json:"created"`
+			} `json:"version"`
+		} `json:"index"`
+	} `json:"settings"`
+}
+
+type indexDetails struct {
+	Name    string
+	Version string
+}
+
+type V4ChecklistManager struct {
+	writer       cli.FormatWriter
+	version      string
+	isExternalES bool
+}
+
 const (
 	initMsgV4 = `This is a Major upgrade. 
 ========================
@@ -107,12 +129,6 @@ var postChecklistV4External = []PostCheckListItem{
 		Optional:   true,
 		IsExecuted: false,
 	},
-}
-
-type V4ChecklistManager struct {
-	writer       cli.FormatWriter
-	version      string
-	isExternalES bool
 }
 
 func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4ChecklistManager {
@@ -456,56 +472,47 @@ func getDataFromUrl(url string) ([]byte, error) {
 	return body, nil
 }
 
-type indexVersion struct {
-	Settings struct {
-		Index struct {
-			Version struct {
-				CreatedString string `json:"created_string"`
-				Created       string `json:"created"`
-			} `json:"version"`
-		} `json:"index"`
-	} `json:"settings"`
-}
-
-type indexNameVersion struct {
-	Name    string
-	Version string
-}
-
 func checkIndexVersion() error {
 
-	indexList, err := getDataFromUrl("http://localhost:10144/_cat/indices?h=index")
+	const basePath = "http://localhost:10144/"
+	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
 	if err != nil {
 		return err
 	}
 
-	indexNameVersionArray := []indexNameVersion{}
+	IndexDetailsArray := []indexDetails{}
 
-	for _, line := range strings.Split(strings.TrimSuffix(string(indexList), "\n"), "\n") {
-		versionData, err := getDataFromUrl("http://localhost:10144/" + line + "/_settings/index.version.created*?&human")
+	for _, index := range strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n") {
+		versionData, err := getDataFromUrl(basePath + index + "/_settings/index.version.created*?&human")
 		if err != nil {
 			return err
 		}
 		data := map[string]interface{}{}
 		json.Unmarshal(versionData, &data)
 		dataIdx := indexVersion{}
-		b, _ := json.Marshal(data[line])
-		json.Unmarshal(b, &dataIdx)
+		b, err := json.Marshal(data[index])
+		if err != nil {
+			return errors.Wrap(err, "failed to marshal index data")
+		}
+		err = json.Unmarshal(b, &dataIdx)
+		if err != nil {
+			return errors.Wrap(err, "failed to unmarshal index data")
+		}
 		i, err := strconv.ParseInt(dataIdx.Settings.Index.Version.CreatedString[0:1], 10, 64)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to parse index version")
 		}
 		if i < 6 {
-			indexNameVersionArray = append(indexNameVersionArray, indexNameVersion{Name: line, Version: dataIdx.Settings.Index.Version.CreatedString})
-			// return fmt.Errorf("\nMigration failed. One of the indices with name %s is created using version %s which is not supported by opensearch 1.2.4", line, dataIdx.Settings.Index.Version.CreatedString)
+			IndexDetailsArray = append(IndexDetailsArray, indexDetails{Name: index, Version: dataIdx.Settings.Index.Version.CreatedString})
 		}
 	}
 
-	if len(indexNameVersionArray) > 0 {
+	if len(IndexDetailsArray) > 0 {
 		msg := "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n"
-		for _, version := range indexNameVersionArray {
+		for _, version := range IndexDetailsArray {
 			msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", version.Name, version.Version)
 		}
+		msg += "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
 		return fmt.Errorf(msg)
 	}
 
