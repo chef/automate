@@ -119,7 +119,8 @@ describe('DownloadReportsService', () => {
   });
 
   it('should fetch the downloaded report', () => {
-    const expectedData = 'report';
+    const expectedData = new Blob();
+    // const expectedData = 'report';
     const ackId = '32f9a9c6-fe1f-456e-86de-6f5e308bab7e';
     const expectedUrl = `${REPORT_LIST_API_URL}/export/${ackId}`;
 
@@ -130,7 +131,7 @@ describe('DownloadReportsService', () => {
     const req = httpTestingController.expectOne(expectedUrl);
 
     expect(req.request.method).toEqual('GET');
-    expect(req.request.responseType).toEqual('text');
+    expect(req.request.responseType).toEqual('blob');
 
     req.flush(expectedData);
   });
