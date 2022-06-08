@@ -13,16 +13,16 @@ gh_repo = "automate"
     weight = 220
 +++
 
-This document lists the results of the performance testing done in Chef Automate HA for different type of HA cluster configurations and load testing with compliance/node data.
+This document lists the results of the performance testing done in Chef Automate HA for different HA cluster configurations and load testing with compliance/node data.
 
-The performance testing pushes four types of node data at the same time, mentioned below:
+The performance testing pushes four types of node data at the same time, as mentioned below:
 
 - Infrastructure Node Success
 - Infrastructure Node Failure
 - Compliance Success
 - Compliance Failure
 
-Below are the different cluster configuration used to do performace testing:
+Below are the different cluster configurations used to do performance testing:
 
 ### Cluster Configuration 1
 
@@ -51,7 +51,7 @@ Total 100k nodes:
 
 Following are the results:
 
-| Node Type | Total No. of Nodes | concurrency | passed | failed | Total TIme Taken |
+| Node Type | Total No. of Nodes | concurrency | passed | failed | Total Time Taken |
 | :--------------- | :---- | :--- | :------ | :----- | :--------------- |
 | Compliance success | 25000 | 250 | 24974 | 26 | 3 minutes |
 | Node Failure | 25000 | 250 | 24947 | 53 | 9 minutes |
@@ -69,7 +69,7 @@ Total 10k nodes
 
 Following are the results:
 
-| Node Type | Total No. of Nodes | concurrency | passed | failed | Total TIme Taken |
+| Node Type | Total No. of Nodes | concurrency | passed | failed | Total Time Taken |
 | :--------------- | :---- | :--- | :------ | :----- | :--------------- |
 | Compliance success | 2500 | 50 | 2500 | 0 | 1 minute |
 | Node Failure | 2500 | 50       | 2500 | 0 | 1.5 minutes |
@@ -85,7 +85,7 @@ Total 20k nodes
 
 Following are the results:
 
-| Node Type | Total No. of Nodes | concurrency | passed | failed | Total TIme Taken |
+| Node Type | Total No. of Nodes | concurrency | passed | failed | Total Time Taken |
 | :--------------- | :---- | :--- | :------ | :----- | :--------------- |
 | Compliance success | 5000 | 250 | 4743 | 257 | 1 minute |
 | Node Failure | 5000 | 250       | 4818 | 182 | 2 minutes |
