@@ -11,6 +11,11 @@ import { Observable, of as observableOf } from 'rxjs';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { StatsService, ReportQueryService, ScanResultsService } from '../../shared/reporting';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+} 
 
 describe('ReportingNodeComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -33,6 +38,7 @@ describe('ReportingNodeComponent', () => {
         DatetimePipe
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         ChefSessionService,
         StatsService,
         ReportQueryService,
