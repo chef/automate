@@ -15,8 +15,7 @@ import { TelemetryService } from '../../../../services/telemetry/telemetry.servi
 
 class MockTelemetryService {
   track() { }
-} 
-
+}
 describe('ReportingNodeComponent', () => {
   let store: Store<NgrxStateAtom>;
   let fixture: ComponentFixture<ReportingNodeComponent>;
