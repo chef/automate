@@ -1,5 +1,5 @@
 #!/bin/bash
-echo " ================= Getting certs from vault using =============="
+echo " ================= Getting certs from vault using ==============="
 echo $OPENSEARCH_ROOT_CA_PEM
 echo $OPENSEARCH_NODE1_PEM
 echo $OPENSEARCH_NODE1_KEY_PEM
