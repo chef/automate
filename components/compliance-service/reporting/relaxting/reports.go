@@ -712,7 +712,9 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
-	filtQuery := backend.getFiltersQuery(filters, true)
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	filtQuery := backend.getFiltersQuery(filters, latestOnly)
 
 	searchSource := elastic.NewSearchSource().
 		Query(filtQuery).

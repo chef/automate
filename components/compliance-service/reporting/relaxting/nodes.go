@@ -46,7 +46,9 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, emptyTotals, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
