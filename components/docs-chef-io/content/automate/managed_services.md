@@ -1,53 +1,65 @@
++++
+title = "Managed Services"
+
+draft = false
+
+gh_repo = "automate"
+[menu]
+  [menu.automate]
+    title = "Managed Services"
+    parent = "automate/configuring_automate"
+    identifier = "automate/configuring_automate/managed_services.md Managed Services"
+    weight = 80
++++
+
 ## Prerequisites
 
 ### PostgreSQL Setup
 
-- Setup PostgreSQL RDS DB instance in AWS. Please refer the following documentation link to create it:
-  [PostgreSQL RDS Setup](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html)
+- Setup PostgreSQL RDS DB instance in AWS. Click [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html) to know more.
 
-- Before you attempt to connect to the DB instance, make sure that the DB instance is associated with a security group that provides access to it. Ensure External RDS is accessible from Automate instances.
+- To connect to the DB instance, the DB instance should be associated with a security group that provides access to it. Ensure External RDS is accessible from Automate instances.
 
 ### OpenSearch Setup
 
-- Create an Opensearch domain. Please refer the following documentation link to create it:
-  [Amazon OpenSearch Service domains Creation](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html)
+- Create an Opensearch domain. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
 
-Please make sure to follow below steps while creating domain:
+To create the domain, follow the steps given below:
 
-- Please use version 1.2 and above.
+- Use version 1.2 and above.
 
-- Under `Dedicated master nodes` section, do not opt for `Enable dedicated master nodes` and make it unchecked.
+- Uncheck the **Enable Dedicated Master Nodes** option under the **Dedicated Master Nodes** section.
 
-- Under `Fine-grained access control section`, select `Enable fine-grained access control` and only choose `create master user`. Add master username and master password for your master user.
+- Select **Enable Fine-grained Access Control** and choose **Create Master User**, under **Fine-grained Access Control Section**. Add `master username` and `master password` for the master user.
 
-- Under `Access policy` section, select `Configure domain level access policy` and modify the "Effect" from "Deny" to "Allow".
+- Select **Configure Domain Level Access Policy** under the `Access policy` section and modify the `Effect` from *Deny* to *Allow*.
 
-Following steps are required for opensearch s3 backup/restore:
+The steps to backup and restore the OpenSearch S3 is:
 
-- Create an IAM role with below two Permission policies. The rest of this document refers to this role as `TheSnapshotRole`.
+- Create an IAM role with a couple of Permission Policies listed below. The rest of the document refers to the role as `TheSnapshotRole`.
 
   - AmazonS3FullAccess
-  - In order to register the snapshot repository, you need to be able to pass TheSnapshotRole to OpenSearch Service. You also need access to the es:ESHttpPut action. To grant both of these permissions, attach the following policy to the IAM user or role whose credentials are being used to sign the request as shown in below example:
+  - To register the snapshot repository, pass the `TheSnapshotRole` to OpenSearch Service. Access the **es:ESHttpPut** action. To grant these permissions, attach the following policy to the IAM user or role whose credentials are being used to sign the request, as shown below example:
 
-    ```json
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": "iam:PassRole",
-          "Resource": "arn:aws:iam::123456789012:role/TheSnapshotRole" // ARN of IAM role i.e. TheSnapshotRole
-        },
-        {
-          "Effect": "Allow",
-          "Action": "es:ESHttpPut",
-          "Resource": "arn:aws:es:region:123456789012:domain/domain-name/*" // ARN of opensearch domain
-        }
-      ]
-    }
-    ```
+  ```json
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": "iam:PassRole",
+        "Resource": "arn:aws:iam::123456789012:role/TheSnapshotRole" // ARN of IAM role i.e. TheSnapshotRole
+      },
+      {
+        "Effect": "Allow",
+        "Action": "es:ESHttpPut",
+        "Resource": "arn:aws:es:region:123456789012:domain/domain-name/*" // ARN of opensearch domain
+      }
+    ]
+  }
+  ```
 
-- Edit the trust relationship of TheSnapshotRole to specify OpenSearch Service in the Principal statement as shown in the following example:
+- Edit the trust relationship of `TheSnapshotRole` to specify the OpenSearch Service in the Principal statement as shown in the following example:
 
   ```json
   {
@@ -64,27 +76,28 @@ Following steps are required for opensearch s3 backup/restore:
   }
   ```
 
-- Crete an IAM user and attach same above two permission policies which are added for TheSnapshotRole. Save the security credentials for this IAM user for S3 backup/restore.
+- Create an IAM user and attach the above permission policies, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore.
 
-- Map the snapshot role in OpenSearch Dashboards
-  Fine-grained access control introduces an additional step when registering a repository. Even if you use HTTP basic authentication for all other purposes, you need to map the manage_snapshots role to your IAM user or role that has iam:PassRole permissions to pass TheSnapshotRole.
+- Map the snapshot role in OpenSearch Dashboards.
+
+  Fine-grained access control introduces an additional step when registering a repository. Even if you use HTTP basic authentication for other purposes, map the `manage_snapshots` role to your IAM user or role with `iam:PassRole` permissions to pass `TheSnapshotRole`.
 
   1. Navigate to the OpenSearch Dashboards plugin for your OpenSearch Service domain. You can find the Dashboards endpoint on your domain dashboard on the OpenSearch Service console.
-  2. From the main menu choose Security, Roles, and select the manage_snapshots role.
+  2. From the main menu, choose *Security*, *Roles*, and select the `manage_snapshots` role.
   3. Choose Mapped users, Manage mapping.
-  4. Add the domain ARN of the user and role that has permissions to pass TheSnapshotRole. Put user ARNs under Users and role ARNs under Backend roles.
+  4. Add the domain ARN of the user and role that has permissions to pass `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
 
-     ```
-     arn:aws:iam::123456789123:user/user-name
-     ```
+  ```bash
+  arn:aws:iam::123456789123:user/user-name
+  ```
 
-     ```
-     arn:aws:iam::123456789123:role/role-name
-     ```
+  ```bash
+  arn:aws:iam::123456789123:role/role-name
+  ```
 
-  5. Select Map and confirm the user and role shows up under Mapped users.
+  5. Select Map and confirm the user and role showing up under Mapped users.
 
-{{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, users must have access to the VPC. This process varies by network configuration, but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Refer [Launching your Amazon OpenSearch Service domains within a VPC](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security)
+{{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security) to know more.
 
 From the terminal, run the following command:
 
@@ -92,32 +105,31 @@ From the terminal, run the following command:
 ssh -i ~/.ssh/your-key.pem ec2-user@your-ec2-instance-public-ip -N -L 9200:vpc-domain-name.region.es.amazonaws.com:443
 ```
 
-This command creates an SSH tunnel that forwards requests to https://localhost:9200 to your OpenSearch Service domain through the EC2 instance. Specifying port 9200 in the command simulates a local OpenSearch install, but use whichever port you'd like. OpenSearch Service only accepts connections over port 80 (HTTP) or 443 (HTTPS).
+The above command creates an SSH tunnel that forwards requests to `https://localhost:9200` to your OpenSearch Service domain through the EC2 instance. Specifying port `9200` in the command simulates a local OpenSearch install, but you can any port. OpenSearch Service only accepts connections over port `80 (HTTP)` or `443 (HTTPS)`.
 
-The command provides no feedback and runs indefinitely. To stop it, press Ctrl + C.
+The command provides no feedback and runs indefinitely. Select *Ctrl + C* to stop the command.
 
-Navigate to https://localhost:9200/\_dashboards/ in your web browser. You might need to acknowledge a security exception.
+Navigate to `https://localhost:9200/\_dashboards/` in your web browser. To navigate, acknowledge a security exception.
 
-Alternately, you can send requests to https://localhost:9200 using curl, Postman, or your favorite programming language. {{< /note >}}
+Alternately, you can send requests to `https://localhost:9200` using curl, Postman, or any programming language. {{< /note >}}
 
 ## Chef Automate Backup from Embedded PostgreSQL/OpenSearch and restore to External AWS PostgreSQL/OpenSearch
 
-If you are currently using standalone Chef Automate with internal automate postgresql and opensearch and wants to switch over to AWS managed PostgreSQL RDS/OpenSearch services then refer to following steps:
+This section will let you switch over to an AWS managed PostgreSQL RDS/OpenSearch services. The steps are applicable only if you are currently using standalone Chef Automate with internal automate PostgreSQL and OpenSearch.
 
-The following steps assumes that you already have Chef Automate setup running with embedded PostgreSQL/OpenSearch services and S3 backup configuration.
+If you already have Chef Automate setup running with embedded PostgreSQL/OpenSearch services and S3 backup configuration, follow the step below:
 
-Before switching to external AWS PostgreSQL RDS/OpenSearch services, please take s3 backup by following below steps:
+Before switching to external AWS PostgreSQL RDS/OpenSearch services, take s3 backup by following the below steps:
 
 ### Create a Backup
 
-Make a backup with the [`backup create`]({{< ref "cli_chef_automate/#chef-automate-backup-create" >}}) command:
+Make a backup with the [backup create]({{< ref "cli_chef_automate/#chef-automate-backup-create" >}}) command:
 
 ```shell
 chef-automate backup create
 ```
 
-The output shows the backup progress for each service.
-A successful backup displays a success message containing the timestamp of the backup:
+The output shows the backup progress for each service. A successful backup displays a success message containing the timestamp of the backup:
 
 ```shell
 Success: Created backup 20180518010336
@@ -125,7 +137,7 @@ Success: Created backup 20180518010336
 
 ### List Backups
 
-You can list existing backups with the [`backup list`]({{< ref "cli_chef_automate/#chef-automate-backup-list" >}}) command:
+You can list existing backups with the [backup list]({{< ref "cli_chef_automate/#chef-automate-backup-list" >}}) command:
 
 ```shell
 chef-automate backup list
@@ -140,24 +152,23 @@ The output shows each backup and its age:
 20180508201952    completed  4 minutes old
 ```
 
-By default, this command communicates with your running Chef Automate installation to list the backups.
-If the Chef Automate installation is down, you can still list the backups.
+By default, this command communicates with the running Chef Automate installation to list the backups. If the Chef Automate installation is down, you can still list the backups.
 
-For backups stored in an AWS S3 bucket, use:
+For backups stored in an AWS S3 bucket, use the following command:
 
 ```shell
 chef-automate backup list s3://bucket_name/base_path
 ```
 
-where `bucket_name` is the name of the S3 bucket and `base_path` is an optional path within the bucket where the backups live.
+In the above code, `bucket_name` is the name of the S3 bucket and `base_path` is an optional path within the bucket where the backups live.
 
-In next steps we will configure Chef AUtomate to run with external AWS PostgreSQL RDS/OpenSearch services:
+Follow the steps below to configure Chef Automate to run with external AWS PostgreSQL RDS/OpenSearch services:
 
 ### Configuring External AWS PostgreSQL RDS
 
 These configuration directions are intended for in the initial deployment of Chef Automate.
 
-Create `postgresql.toml` file and add following details of your AWS PostgreSQL RDS:
+Create `postgresql.toml` file and add the following details of your AWS PostgreSQL RDS:
 
 ```toml
 [global.v1.external.postgresql]
@@ -191,23 +202,23 @@ Run the following command to apply your configuration:
 chef-automate config patch postgresql.toml
 ```
 
-Verify whether all services are running:
+Verify whether all services are running using:
 
 ```shell
 chef-automate status
 ```
 
-Verify if the Chef Automate is running with external Opensearch by running below command:
+Verify if the Chef Automate is running with external Opensearch by running the command below:
 
 ```shell
 chef-automate config show
 ```
 
-### Configure External AWS Opensearch
+### Configure External AWS OpenSearch
 
 These configuration directions are intended for External AWS managed OpensSearch service.
 
-Create `opensearch.toml` file and add following information of your AWS OpenSearch:
+Create `opensearch.toml` file and add the following information of your AWS OpenSearch:
 
 ```toml
 [global.v1.external.opensearch]
@@ -252,27 +263,27 @@ Run the following command to apply your configuration:
 chef-automate config patch opensearch.toml
 ```
 
-Verify whether all services are running:
+Verify whether all services are running using:
 
 ```shell
 chef-automate status
 ```
 
-Verify if the Chef Automate is running with external Opensearch by running below command:
+Verify if the Chef Automate is running with external OpenSearch by running the below command:
 
 ```shell
 chef-automate config show
 ```
 
-If you have taken backup from Chef Automate's internal automate opensearch service and restoring to external AWS OpenSearch service then please follow below steps to register snapshot repository manually before restoring data to external AWS OpenSearch service.
+If you have taken backup from Chef Automate's internal automate opensearch service and restoring it to the external AWS OpenSearch service, follow the steps shown below to register the snapshot repository manually before restoring data to the external AWS OpenSearch service.
 
 ### Registering Snapshot Repository
 
-To register a snapshot repository, send a PUT request to the OpenSearch Service domain endpoint. You can't use curl to perform this operation because it doesn't support AWS request signing. Instead, use the [sample Python client](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-client-python), Postman, or some other method to send a signed request to register the snapshot repository.
+To register a snapshot repository, send a PUT request to the OpenSearch Service domain endpoint. Do not use curl to perform the operation as it doesn't support AWS request signing. Instead, use the [sample Python client](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-client-python), Postman, or some other method to send a signed request to register the snapshot repository.
 
-Make sure to follow steps mentioned in prerequisite while setting up amazon opensearch domain. Use the same role_arn and IAM user credentials mapped to manage_snapshots role on opensearch dashboards
+Make sure to follow the steps mentioned in the prerequisite while setting up the amazon opensearch domain. Use the same `role_arn` and `IAM user` credentials mapped to the `manage_snapshots` role on opensearch dashboards
 
-While using postman to send below API request, Select type `AWS Signature` under Authorization Tab and fill AccessKey, SecretKey, AWS Region and Service Name as `es`
+If using postman to send the below API request, select type `AWS Signature` under the **Authorization** Tab and fill *AccessKey*, *SecretKey*, *AWS Region*, and *Service Name* as `es`.
 
 The request takes the following format:
 
@@ -289,9 +300,9 @@ PUT domain-endpoint/_snapshot/<snapshot-repo-name>
 }
 ```
 
-Register following repositories by replacing `<snapshot-repo-name>` in above request sample and send request for each of following repositories:
+Register the following repositories by replacing `<snapshot-repo-name>` in the above request sample and send a request for each of the following repositories:
 
-```
+```bash
 chef-automate-es5-automate-cs-oc-erchef
 chef-automate-es5-compliance-service
 chef-automate-es5-event-feed-service
@@ -302,15 +313,15 @@ chef-automate-es6-event-feed-service
 chef-automate-es6-ingest-service
 ```
 
-If your domain resides within a virtual private cloud (VPC), your computer must be connected to the VPC for the request to successfully register the snapshot repository. Accessing a VPC varies by network configuration, but likely involves connecting to a VPN or corporate network. To check that you can reach the OpenSearch Service domain, navigate to https://your-vpc-domain.region.es.amazonaws.com in a web browser and verify that you receive the default JSON response.
+If your domain resides within a virtual private cloud (VPC), your computer must be connected to the VPC for the request to successfully register the snapshot repository. Accessing a VPC varies by network configuration, but likely involves connecting to a VPN or corporate network. Reach the OpenSearch Service domain, navigate to https://your-vpc-domain.region.es.amazonaws.com in a web browser and verify that you receive the default JSON response.
 
-You can get the information about all snapshot repositories registered in the cluster, by using below API:
+You can get the information about all snapshot repositories registered in the cluster, by using the following API:
 
 ```shell
 GET _snapshot/_all
 ```
 
-Take backup of chef automate updated config with details of external PostgreSQL/Opensearch to new file like `full_config.toml` by running below command:
+Take a backup of chef automate updated config with details of external PostgreSQL/Opensearch to a new file like `full_config.toml` by running the following command:
 
 ```shell
 chef-automate config show > full_config.toml
@@ -320,7 +331,7 @@ chef-automate config show > full_config.toml
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
-See how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
+See how to [backup to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
 
 Pass s3 access key and s3 secret key to restore command.
 
@@ -344,11 +355,11 @@ A successful restore shows the timestamp of the backup used at the end of the st
 Success: Restored backup 20180517223558
 ```
 
-{{< note >}} `automate-opensearch` and `automate-postgresql` services comes up for short time while running restore operation but they will get deactivated after restore is successful and data will be restore on external managed RDS/ Amazon RDS. {{< /note >}}
+{{< note >}} `automate-opensearch` and `automate-postgresql` services come up for a short time while running restore operation but they will get deactivated after restore is successful and data will be restored on externally managed RDS/ Amazon RDS. {{< /note >}}
 
 ## Chef Automate with External AWS PostgreSQL/OpenSearch Backup/Restore
 
-If you are planning to setup Chef Automate with External AWS PostgreSQL/OpenSearch services and use backup/restore on these external managed services then follow below steps:
+If you are planning to setup Chef Automate with External AWS PostgreSQL/OpenSearch services and use backup/restore on these external managed services, follow the steps below:
 
 ### Download the Chef Automate Command-Line Tool
 
@@ -366,11 +377,11 @@ Create a `config.toml` file with default values for your Chef Automate installat
 chef-automate init-config
 ```
 
-You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor.
+You can customize your *FQDN*, *login name*, and other values, by changing the values in the `config.toml` in your editor.
 
 ### Configuring External AWS PostgreSQL RDS
 
-These configuration directions are intended for External AWS managed PostgreSQL RDS service..
+These configuration directions are intended for External AWS managed PostgreSQL RDS service.
 
 Add the following settings to your `config.toml`:
 
@@ -404,7 +415,7 @@ enable = true
 
 These configuration directions are intended for External AWS managed OpensSearch service.
 
-Add the following to your config.toml:
+Add the following to your `config.toml` file:
 
 ```toml
 [global.v1.external.opensearch]
@@ -445,7 +456,7 @@ role_arn = "<IAM role ARN to access s3 for backup/restore i.e. TheSnapshotRole>"
 
 ### Configure S3 backup
 
-To store backups in an existing AWS S3 bucket, add the following to your config.toml:
+To store backups in an existing AWS S3 bucket, add the following to your `config.toml` file:
 
 ```toml
 [global.v1.backups]
@@ -480,7 +491,7 @@ To store backups in an existing AWS S3 bucket, add the following to your config.
   -----END CERTIFICATE-----
 ```
 
-You can provide the same user credentials with AmazonS3FullAccess permission created during prerequisites steps of opensearch setup.
+You can provide the same user credentials with AmazonS3FullAccess permission created during the prerequisites steps of opensearch setup.
 
 ### Deploy Chef Automate
 
@@ -501,7 +512,7 @@ Deploy complete
 The deployment process writes login credentials to the `automate-credentials.toml` in your current working directory.
 
 {{< note >}}
-In case you already have Chef Automate setup with AWS PostgreSQL/OpenSearch. To change or move to new AWS PostgreSQL or OpenSearch service, you can create patch files with updated AWS services config information and patch it into existing Chef Automate using below command:
+In case you already have Chef Automate setup with AWS PostgreSQL/OpenSearch. To change or move to new AWS PostgreSQL or OpenSearch service, you can create patch files with updated AWS services config information and patch it into existing Chef Automate using the command below:
 
 ```shell
 chef-automate config patch </path/to/patch.toml>
@@ -511,12 +522,9 @@ chef-automate config patch </path/to/patch.toml>
 
 ### Open Chef Automate
 
-Navigate to `https://{{< example_fqdn "automate" >}}` in a browser and log in to Chef Automate with
-the credentials provided in `automate-credentials.toml`. Once you log in, Chef Automate
-prompts you for a license.
+Navigate to `https://{{< example_fqdn "automate" >}}` in a browser and log in to Chef Automate with the credentials provided in `automate-credentials.toml`. Once you log in, Chef Automate prompts you for a license.
 
-When your Chef Automate instance is equipped with internet connectivity, you can get a 60-day trial license from there.
-Alternatively, a license obtained by other means can be applied.
+When your Chef Automate instance is equipped with internet connectivity, you can get a 60-day trial license from there. Alternatively, a license obtained by other means can be applied.
 
 ### Create a Backup
 
@@ -550,8 +558,7 @@ The output shows each backup and its age:
 20180508201952    completed  4 minutes old
 ```
 
-By default, this command communicates with your running Chef Automate installation to list the backups.
-If the Chef Automate installation is down, you can still list the backups.
+By default, the command communicates with your running Chef Automate installation to list the backups. If the Chef Automate installation is down, you can still list the backups.
 
 For backups stored in an AWS S3 bucket, use:
 
@@ -559,14 +566,13 @@ For backups stored in an AWS S3 bucket, use:
 chef-automate backup list s3://bucket_name/base_path
 ```
 
-where `bucket_name` is the name of the S3 bucket and `base_path` is an optional path within the bucket where the backups live.
+Here, `bucket_name` is the name of the S3 bucket and `base_path` is an optional path within the bucket where the backups live.
 
 ### Restore From an AWS S3 Backup
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
 
-See how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}).
-Pass s3 access key and s3 secret key to restore command.
+See how to [back up to AWS S3]({{< ref "backup/#backup-to-aws-s3" >}}). Pass s3 access key and s3 secret key to restore command.
 
 To restore from an AWS S3 bucket backup on a new host, run:
 
@@ -593,5 +599,5 @@ Success: Restored backup 20180517223558
 ```
 
 {{< note >}}
-If you are taking backup from backup from existing OpenSearch domain for ex: domain1 and restoring data to new Opensearch domain for ex: domain2 then please follow manual steps of registering snapshot repositories in new OpenSearch domain mentioned here: [Registering Snapshot Repository]({{< ref "managed_services.md#registering-snapshot-repository" >}}) before restoring backup into new OpenSearch domain. 
+If you are taking backup from existing OpenSearch domain for ex: domain1 and restoring data to new Opensearch domain for ex: domain2 then please follow manual steps of registering snapshot repositories in new OpenSearch domain mentioned here: [Registering Snapshot Repository]({{< ref "managed_services.md#registering-snapshot-repository" >}}) before restoring backup into new OpenSearch domain.
 {{< /note >}}
