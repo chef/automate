@@ -1,15 +1,40 @@
 package majorupgradechecklist
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/pkg/errors"
 )
+
+type indexVersion struct {
+	Settings struct {
+		Index struct {
+			Version struct {
+				CreatedString string `json:"created_string"`
+				Created       string `json:"created"`
+			} `json:"version"`
+		} `json:"index"`
+	} `json:"settings"`
+}
+
+type indexDetails struct {
+	Name    string
+	Version string
+}
+
+type V4ChecklistManager struct {
+	writer       cli.FormatWriter
+	version      string
+	isExternalES bool
+}
 
 const (
 	initMsgV4 = `This is a Major upgrade. 
@@ -107,12 +132,6 @@ var postChecklistV4External = []PostCheckListItem{
 	},
 }
 
-type V4ChecklistManager struct {
-	writer       cli.FormatWriter
-	version      string
-	isExternalES bool
-}
-
 func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4ChecklistManager {
 	return &V4ChecklistManager{
 		writer:       writer,
@@ -144,7 +163,7 @@ func (ci *V4ChecklistManager) RunChecklist() error {
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
+		checklists = append(checklists, []Checklist{runIndexCheck(), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
@@ -423,6 +442,131 @@ func disableSharding() Checklist {
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.DatabaseError, err.Error())
+			}
+			return nil
+		},
+	}
+}
+
+func getDataFromUrl(url string) ([]byte, error) {
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil) // nosemgrep
+
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body) // nosemgrep
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
+const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+
+func getHabRootPath(habrootcmd string) string {
+	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
+	if err != nil {
+		return "/hab/"
+	}
+	pkgPath := string(out) // /a/b/c/hab    /hab/svc
+	habIndex := strings.Index(string(pkgPath), "hab")
+	rootHab := pkgPath[0 : habIndex+4] // this will give <>/<>/hab/
+	if rootHab == "" {
+		rootHab = "/hab/"
+	}
+	return rootHab
+}
+
+func checkIndexVersion() error {
+	var basePath = "http://localhost:10144/"
+
+	habpath := getHabRootPath(habrootcmd)
+
+	input, err := ioutil.ReadFile(habpath + "svc/automate-es-gateway/config/URL") // nosemgrep
+	if err != nil {
+		fmt.Printf("Failed to read URL file")
+	}
+	url := strings.TrimSuffix(string(input), "\n")
+	if url != "" {
+		basePath = "http://" + url + "/"
+	}
+
+	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
+	if err != nil {
+		return err
+	}
+
+	indexDetailsArray := []indexDetails{}
+	for _, index := range strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n") {
+		versionData, err := getDataFromUrl(basePath + index + "/_settings/index.version.created*?&human")
+		if err != nil {
+			return err
+		}
+		i, createdString, err := getMajorVersion(versionData, index)
+		if err != nil {
+			return err
+		}
+		if i < 6 {
+			indexDetailsArray = append(indexDetailsArray, indexDetails{Name: index, Version: createdString})
+		}
+	}
+	if len(indexDetailsArray) > 0 {
+		return formErrorMsg(indexDetailsArray)
+	}
+	return nil
+}
+
+func formErrorMsg(IndexDetailsArray []indexDetails) error {
+	msg := "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n"
+	for _, version := range IndexDetailsArray {
+		msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", version.Name, version.Version)
+	}
+	msg += "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
+	return fmt.Errorf(msg)
+}
+
+func getMajorVersion(versionData []byte, index string) (int64, string, error) {
+	data := map[string]interface{}{}
+	json.Unmarshal(versionData, &data)
+	dataIdx := indexVersion{}
+	b, err := json.Marshal(data[index])
+	if err != nil {
+		return -1, "", errors.Wrap(err, "failed to marshal index data")
+	}
+	err = json.Unmarshal(b, &dataIdx)
+	if err != nil {
+		return -1, "", errors.Wrap(err, "failed to unmarshal index data")
+	}
+	if dataIdx.Settings.Index.Version.CreatedString == "" {
+		return -1, "", errors.New("version not found for index")
+	}
+	i, err := strconv.ParseInt(dataIdx.Settings.Index.Version.CreatedString[0:1], 10, 64)
+	if err != nil {
+		return -1, "", errors.Wrap(err, "failed to parse index version")
+	}
+	return i, dataIdx.Settings.Index.Version.CreatedString, nil
+}
+
+func runIndexCheck() Checklist {
+	return Checklist{
+		Name:        "check index version",
+		Description: "confirmation check index version",
+		TestFunc: func(h ChecklistHelper) error {
+			err := checkIndexVersion()
+			if err != nil {
+				return err
 			}
 			return nil
 		},
