@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -472,8 +473,36 @@ func getDataFromUrl(url string) ([]byte, error) {
 	return body, nil
 }
 
+const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+
+func getHabRootPath(habrootcmd string) string {
+	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
+	if err != nil {
+		return "/hab/"
+	}
+	pkgPath := string(out) // /a/b/c/hab    /hab/svc
+	habIndex := strings.Index(string(pkgPath), "hab")
+	rootHab := pkgPath[0 : habIndex+4] // this will give <>/<>/hab/
+	if rootHab == "" {
+		rootHab = "/hab/"
+	}
+	return rootHab
+}
+
 func checkIndexVersion() error {
-	const basePath = "http://localhost:10144/"
+	var basePath = "http://localhost:10144/"
+
+	habpath := getHabRootPath(habrootcmd)
+
+	input, err := ioutil.ReadFile(habpath + "svc/automate-es-gateway/config/URL") // nosemgrep
+	if err != nil {
+		fmt.Printf("Failed to read URL file")
+	}
+	url := strings.TrimSuffix(string(input), "\n")
+	if url != "" {
+		basePath = "http://" + url + "/"
+	}
+
 	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
 	if err != nil {
 		return err
