@@ -24,6 +24,12 @@ func TestGetMajorVersion(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, int64(-1), majorVersion)
 	assert.Equal(t, "", version)
+
+	versionData = []byte(`{"comp-2-run-info":{"settings":{"index":{"creation_date_string":"2022-06-06T10:50:55.477Z","refresh_interval":"1s","number_of_shards":"5","provided_name":"comp-2-run-info","creation_date":"1654512655477","number_of_replicas":"1","uuid":"cYlQeyHNRn2mnsvIRZ1-rg"}}}}`)
+	majorVersion, version, err = getMajorVersion(versionData, "comp-2-run-info")
+	assert.Error(t, err)
+	assert.Equal(t, int64(-1), majorVersion)
+	assert.Equal(t, "", version)
 }
 
 func TestFormErrorMsg(t *testing.T) {
