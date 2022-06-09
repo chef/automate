@@ -1,16 +1,17 @@
 {{ $data_path := index $.Site.Data (split (.Get "data_path") "/") }}
 <table>
+  <caption>Chef Automate CLI Status Error Codes</caption>
   <tr>
-    <th>Exit Code</th>
-    <th>Name</th>
-    <th>Description</th>
+    <th scope="col">Exit Code</th>
+    <th scope="col">Name</th>
+    <th scope="col">Description</th>
   </tr>
 {{ range $data_path }}
 {{ range . }}
   <tr>
-    <th>{{ .code }}</th>
-    <th>{{ .name }}</th>
-    <th>{{ .description }}</th>
+    <td style="text-align:center">{{ .code }}</th>
+    <td style="text-align:center">{{ .name }}</th>
+    <td>{{ .description }}</th>
   </tr>
 {{ end }}
 {{ end }}
