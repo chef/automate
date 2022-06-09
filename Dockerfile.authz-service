@@ -19,14 +19,7 @@ RUN go mod tidy
 
 RUN go get -u github.com/jteeuwen/go-bindata/...
 
-COPY ./components/authz-service /app/components/authz-service
-COPY ./lib /app/lib
-COPY ./tools /app/tools
-COPY ./scripts /app/scripts
-COPY ./tools /app/tools
-COPY ./api /app/api
-COPY ./protovendor /app/protovendor
-COPY ./vendor.go /app/vendor.go
+COPY . /app
 
 RUN mkdir /output
 RUN go build -o /output/authz-service /app/components/authz-service/cmd/authz-service
