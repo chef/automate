@@ -84,7 +84,7 @@ The steps to backup and restore the OpenSearch S3 is:
 
   1. Navigate to the OpenSearch Dashboards plugin for your OpenSearch Service domain. You can find the Dashboards endpoint on your domain dashboard on the OpenSearch Service console.
   2. From the main menu, choose *Security*, *Roles*, and select the `manage_snapshots` role.
-  3. Choose Mapped users, Manage mapping.
+  3. Choose Mapped users, and Manage mapping.
   4. Add the domain ARN of the user and role that has permissions to pass `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
 
   ```bash
@@ -115,7 +115,7 @@ Alternately, you can send requests to `https://localhost:9200` using curl, Postm
 
 ## Chef Automate Backup from Embedded PostgreSQL/OpenSearch and restore to External AWS PostgreSQL/OpenSearch
 
-This section will let you switch over to an AWS managed PostgreSQL RDS/OpenSearch services. The steps are applicable only if you are currently using standalone Chef Automate with internal automate PostgreSQL and OpenSearch.
+This section lets you switch to an AWS-managed PostgreSQL RDS/OpenSearch services. The steps are applied only if you currently use standalone Chef Automate with internal automated PostgreSQL and OpenSearch.
 
 If you already have Chef Automate setup running with embedded PostgreSQL/OpenSearch services and S3 backup configuration, follow the step below:
 
@@ -152,7 +152,7 @@ The output shows each backup and its age:
 20180508201952    completed  4 minutes old
 ```
 
-By default, this command communicates with the running Chef Automate installation to list the backups. If the Chef Automate installation is down, you can still list the backups.
+This command default communicates with the running Chef Automate installation to list the backups. You can still record the backups if the Chef Automate installation is down.
 
 For backups stored in an AWS S3 bucket, use the following command:
 
@@ -166,7 +166,7 @@ Follow the steps below to configure Chef Automate to run with external AWS Postg
 
 ### Configuring External AWS PostgreSQL RDS
 
-These configuration directions are intended for in the initial deployment of Chef Automate.
+These configuration directions are intended for the initial deployment of Chef Automate.
 
 Create `postgresql.toml` file and add the following details of your AWS PostgreSQL RDS:
 
@@ -208,7 +208,7 @@ Verify whether all services are running using:
 chef-automate status
 ```
 
-Verify if the Chef Automate is running with external Opensearch by running the command below:
+Verify if the Chef Automate is running with an external Opensearch by running the command below:
 
 ```shell
 chef-automate config show
@@ -275,15 +275,15 @@ Verify if the Chef Automate is running with external OpenSearch by running the b
 chef-automate config show
 ```
 
-If you have taken backup from Chef Automate's internal automate opensearch service and restoring it to the external AWS OpenSearch service, follow the steps shown below to register the snapshot repository manually before restoring data to the external AWS OpenSearch service.
+If you have taken backup from Chef Automate's internal automated OpenSearch service and restored it to the external AWS OpenSearch service, follow the steps below to register the snapshot repository manually before restoring data to the external AWS OpenSearch service.
 
 ### Registering Snapshot Repository
 
-To register a snapshot repository, send a PUT request to the OpenSearch Service domain endpoint. Do not use curl to perform the operation as it doesn't support AWS request signing. Instead, use the [sample Python client](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-client-python), Postman, or some other method to send a signed request to register the snapshot repository.
+To register a snapshot repository, send a PUT request to the OpenSearch Service domain endpoint. Do not use curl to operate as it doesn't support AWS request signing. Instead, use the [sample Python client](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-client-python), Postman, or some other method to send a signed request to register the snapshot repository.
 
-Make sure to follow the steps mentioned in the prerequisite while setting up the amazon opensearch domain. Use the same `role_arn` and `IAM user` credentials mapped to the `manage_snapshots` role on opensearch dashboards
+Make sure to follow the steps mentioned in the prerequisite while setting up the amazon opensearch domain. Use the same `role_arn` and `IAM user` credentials mapped to the `manage_snapshots` role on opensearch dashboards.
 
-If using postman to send the below API request, select type `AWS Signature` under the **Authorization** Tab and fill *AccessKey*, *SecretKey*, *AWS Region*, and *Service Name* as `es`.
+If using postman to send the API request below, select `AWS Signature` under the **Authorization** Tab and fill *AccessKey*, *SecretKey*, *AWS Region*, and *Service Name* as `es`.
 
 The request takes the following format:
 
@@ -313,9 +313,9 @@ chef-automate-es6-event-feed-service
 chef-automate-es6-ingest-service
 ```
 
-If your domain resides within a virtual private cloud (VPC), your computer must be connected to the VPC for the request to successfully register the snapshot repository. Accessing a VPC varies by network configuration, but likely involves connecting to a VPN or corporate network. Reach the OpenSearch Service domain, navigate to https://your-vpc-domain.region.es.amazonaws.com in a web browser and verify that you receive the default JSON response.
+If your domain resides within a virtual private cloud (VPC), your computer must be connected to the VPC for the request to register the snapshot repository successfully. Accessing a VPC varies by network configuration but likely involves connecting to a VPN or corporate network. Reach the OpenSearch Service domain, navigate to https://your-vpc-domain.region.es.amazonaws.com in a web browser and verify that you receive the default JSON response.
 
-You can get the information about all snapshot repositories registered in the cluster, by using the following API:
+You can get the information about all snapshot repositories registered in the cluster by using the following API:
 
 ```shell
 GET _snapshot/_all
@@ -355,7 +355,7 @@ A successful restore shows the timestamp of the backup used at the end of the st
 Success: Restored backup 20180517223558
 ```
 
-{{< note >}} `automate-opensearch` and `automate-postgresql` services come up for a short time while running restore operation but they will get deactivated after restore is successful and data will be restored on externally managed RDS/ Amazon RDS. {{< /note >}}
+{{< note >}} `automate-opensearch` and `automate-postgresql` services come up for a short time while running the restore operation but they will get deactivated after restore is successful and data will be restored on externally managed RDS/ Amazon RDS. {{< /note >}}
 
 ## Chef Automate with External AWS PostgreSQL/OpenSearch Backup/Restore
 
