@@ -292,7 +292,7 @@ Follow any of the step to destroy terraform or infrastructure created while depl
 
 The deployment destroy does not remove any remote server configuration made, however it taints the terraform and thus you need to redo the configurations.
 
-{{ < /note >}}
+{{< /note >}}
 
 - If you have deployed the Chef Automate HA successfully and wanted to destroy the entire infrastructure instances, execute these commands:
 

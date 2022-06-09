@@ -40,7 +40,7 @@ Refer [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/se
 If the DNS attributes, *enableDnsSupport* and *enableDnsHostnames* are true, instances in the VPC is set with public DNS hostnames.
 The default for these attributes are `false` when the VPC is a default VPC or the VPC is created using the VPC console wizard.
 
-{{ < /note >}}
+{{< /note >}}
 
 1. Execute the [Chef Automate HA deployment commands](( {{< relref "#AWS Cloud Deployment Procedured" >}} )).
 

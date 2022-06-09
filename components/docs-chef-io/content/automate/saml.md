@@ -142,9 +142,9 @@ k2WFcoiiKyeIznNScx/K6AeykKR/lPrJedanSA==
 """
 ```
 
-{{% warning %}}
+{{< warning >}}
 The `groups_attr` setting is optional, but if not provided, users authenticating via SAML will not be members of any teams.
-{{% /warning %}}
+{{< /warning >}}
 
 Setting `allowed_groups` provides SAML sign-in for members of the listed groups and discards all user groups that are _not_ in the list. Groups must be on the `allowed_groups` list to access Chef Automate.
 

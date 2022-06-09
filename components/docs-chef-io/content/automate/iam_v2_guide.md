@@ -288,9 +288,9 @@ Navigate to the project details page of `project-devops`, by selecting the proje
 Select the `Create Rule` button to create a new project rule. Choose the resource type `Node`, then fill in the first condition's fields.
 Feel free to create fake ingest data that corresponds to the example json below, or come up with a condition that matches your existing data set.
 
-{{% warning %}}
+{{< warning >}}
 Compliance reports must be using **audit cookbook 7.5+** in order to make use of all of the available project rule attributes. Older reports will only have **Environment** and **Chef Role** available as attributes.
-{{% /warning %}}
+{{< /warning >}}
 
 ```json
 {
@@ -325,9 +325,9 @@ Only these resources will appear in Automate's dashboards when the `project-devo
 A percentage count appears in the bottom banner while the operation takes place.
 You may cancel the update at any time by selecting the `Stop Project Update` button in the banner and confirming the cancel in the modal that pops up.
 
-{{% warning %}}
+{{< warning >}}
 Avoid stopping an update unless absolutely necessary. It will leave your system in an unknown state where only some resources have been moved into their projects while others still remain in old projects. Only another successful update will restore the system to an up-to-date state.
-{{% /warning %}}
+{{< /warning >}}
 
 Once rules have been successfully applied, the banner will be dismissed until the next time there are *pending edits* to any project.
 

@@ -18,7 +18,7 @@ Reference the chart on this page when creating a *Role* to know which action gra
 Use `*` in these actions to give broad permissions to perform all associated actions such as get, list, create, delete, etc.
 Specify the action to restrict user access to the specific action.
 
-{{% responsive-table %}}
+{{< responsive-table >}}
 |  Task           | Browser Tab     | IAM Action       | API endpoint  | URL       |
 | --------------- | --------------- | ---------------- | ------------- | --------- |
 | View Events | Dashboards | event:* | /event_feed | https://{{< example_fqdn "automate" >}}/dashboards/event-feed |
@@ -41,4 +41,4 @@ Specify the action to restrict user access to the specific action.
 | Manage Policies | Settings | iam:policies:* | /iam/v2/policies | https://{{< example_fqdn "automate" >}}/settings/policies |
 | Manage Roles | Settings | iam:roles:* | /iam/v2/roles | https://{{< example_fqdn "automate" >}}/settings/roles |
 | Manage Projects | Settings | iam:projects:* | /iam/v2/projects | https://{{< example_fqdn "automate" >}}/settings/projects |
-{{% /responsive-table %}}
+{{< /responsive-table >}}

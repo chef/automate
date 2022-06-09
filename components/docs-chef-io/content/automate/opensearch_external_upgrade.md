@@ -26,9 +26,9 @@ The upgrade process for Elasticsearch to OpenSearch requires a one-time downtime
 
 ### Requirements
 
-{{% warning %}}
+{{< warning >}}
 Upgrading Elasticsearch to OpenSearch upgrades the database for all connected services. If you have multiple services connected to Elasticsearch, make sure that you have stopped the other services and prepared them for the upgrade.
-{{% /warning %}}
+{{< /warning >}}
 
 This upgrade guide is for systems running:
 
@@ -39,9 +39,9 @@ This upgrade guide is for systems running:
 
 ### Backup Chef Automate
 
-{{% danger %}}
+{{< danger >}}
 **BACKUP CHEF AUTOMATE AND SECURE THE DATA**. Preserve your backup at all costs. Copy the backup to a second and separate location.
-{{% /danger %}}
+{{< /danger >}}
 
 Database migrations have inherent risk to your system. Create a backup before beginning any migration or update. This ensures that you have a recoverable state in case any step in the process fails. Copy the backup to a another disk that is not connected to Chef Automate. This ensures that you have state to restore, in case of a failure in the upgrade process.
 
