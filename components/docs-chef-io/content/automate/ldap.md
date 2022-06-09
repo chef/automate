@@ -26,10 +26,10 @@ Chef Automate uses [Dex](https://github.com/dexidp/dex) to support LDAP integrat
 To configure authentication for your Chef Automate installation, create a TOML file that contains the partial LDAP configuration.
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
-{{% warning %}}
+{{< warning >}}
 You may only integrate one IdP using SAML and one IdP using LDAP at a time.
 Chef Automate does not support using _two_ SAML IdPs or _two_ LDAP services simultaneously.
-{{% /warning %}}
+{{< /warning >}}
 
 Switching between a Microsoft AD configuration and generic LDAP configuration will
 not affect your policies, as they are both LDAP configurations.
@@ -129,9 +129,9 @@ group_display_name_attr
 
 insecure_no_ssl
 : false
-{{% warning %}}
+{{< warning >}}
 Connecting to an LDAP service without TLS is not recommended.
-{{% /warning %}}
+{{< /warning >}}
 
 user_display_name_attr
 : "displayName"
@@ -250,9 +250,9 @@ group_display_name_attr = "<group display name attribute>"
 See the [LDAP]({{< relref "ldap.md" >}}) for more information on configuration fields.
 You have the full extent of TOML is at your disposal for declaring configuration fields.
 
-{{% warning %}}
+{{< warning >}}
 Connecting to an LDAP service without TLS is not recommended.
-{{% /warning %}}
+{{< /warning >}}
 
 However, if you wish to integrate with an LDAP server with TLS disabled:
 
@@ -293,9 +293,9 @@ Whether the validity of the server's TLS certificate will be enforced depends on
 
 
 
-{{% warning %}}
+{{< warning >}}
 Connecting to an LDAP service without TLS is not recommended.
-{{% /warning %}}
+{{< /warning >}}
 
 However, if you wish to integrate with an LDAP server with TLS disabled:
 
@@ -360,9 +360,9 @@ where `username` is what was typed into the **username input box** in the Sign i
 form.
 {{< /note >}}
 
-{{% warning %}}
+{{< warning >}}
 If the LDAP search fails to retrieve the configured attributes, the sign in process will fail.
-{{% /warning %}}
+{{< /warning >}}
 
 See [Troubleshoot User Search]({{< relref "#troubleshoot-user-search" >}})
 for common issues related to _User Search_.
@@ -460,10 +460,10 @@ group_query_filter = "(objectClass=group)"
 The correct configuration settings again depend on your directory server's schema;
 see the example configs below.
 
-{{% warning %}}
+{{< warning >}}
 The `base_group_search_dn` setting is optional. However, if it is not provided,
 users authenticating via LDAP (or MSAD) will not be members of any teams.
-{{% /warning %}}
+{{< /warning >}}
 
 {{< note >}}
 The `ldapsearch` command line corresponding to _Group Search_ is
@@ -783,9 +783,9 @@ level=info msg="performing ldap search ou=People,dc=example,dc=org sub (&(object
 level=error msg="ldap: no results returned for filter: \"(&(objectClass=person(cn=jane))\"" connector=LDAP
 ```
 
-{{% warning %}}
+{{< warning >}}
 User search also fails if more than one user is returned.
-{{% /warning %}}
+{{< /warning >}}
 
 Ensure that a search for `username_attr` with the given search base can only
 return one user. Something like this could happen (simplified for
@@ -817,10 +817,10 @@ This situation would be averted by setting `username_attr = "cn"`; or by
 restricting `base_user_search_dn`, if you only want to allow people from one of
 either cities to use Chef Automate.
 
-{{% warning %}}
+{{< warning >}}
 Attributes that have been configured, but are not found in the results, lead to
 user search failures, too. Note that this also affects default values.
-{{% /warning %}}
+{{< /warning >}}
 
 Finally, a successful user search logs a line like the following:
 
