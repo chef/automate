@@ -816,6 +816,8 @@ steps:
     command:
       - integration/run_test integration/tests/deep_upgrade.sh
     timeout_in_minutes: 25
+    env:
+      HAB_BLDR_CHANNEL: "dev"
     expeditor:
       executor:
         linux:
