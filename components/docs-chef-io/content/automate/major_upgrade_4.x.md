@@ -111,15 +111,36 @@ For Example:
 If Elasticsearch configuration was:
 
 ```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
+[elasticsearch]
+  [elasticsearch.v1]
+    [elasticsearch.v1.sys]
+      [elasticsearch.v1.sys.cluster]
+        max_shards_per_node = 6000  
+      [elasticsearch.v1.sys.indices]
+        [elasticsearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [elasticsearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM```
 ```
 
 Then add in OpenSearch configuration as:
 
 ```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch. 
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [opensearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM 
+        
 ```
 
 Apply this using the `config patch` command.
@@ -164,23 +185,8 @@ sudo chef-automate status
 
 4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
-For Example:
-
-If Elasticsearch configuration was:
-
-```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Then add in OpenSearch configuration as:
-
-```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Apply this using `config patch` command.
+    Please refer `elasticsearch.yml` file to get the applied configuration on your external elasticsearch.
+    Add the releavent configuration from external elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external opensearch.
 
 5. Turn off maintenance mode:
 
@@ -245,15 +251,36 @@ For Example:
 If Elasticsearch configuration was:
 
 ```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
+[elasticsearch]
+  [elasticsearch.v1]
+    [elasticsearch.v1.sys]
+      [elasticsearch.v1.sys.cluster]
+        max_shards_per_node = 6000  
+      [elasticsearch.v1.sys.indices]
+        [elasticsearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [elasticsearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM```
 ```
 
 Then add in OpenSearch configuration as:
 
 ```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch. 
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [opensearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM 
+        
 ```
 
 Apply this using `config patch` command.
@@ -322,23 +349,8 @@ sudo chef-automate status
 
 5. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
-For Example:
-
-If Elasticsearch configuration was:
-
-```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Then add in OpenSearch configuration as:
-
-```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Apply this using `config patch` command.
+    Please refer `elasticsearch.yml` file to get the applied configuration on your external elasticsearch.
+    Add the releavent configuration from external elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external opensearch.
 
 6. Turn off maintenance mode using following command:
 
