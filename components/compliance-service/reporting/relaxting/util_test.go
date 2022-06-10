@@ -64,3 +64,15 @@ func TestGetEsIndexWithStartAndEndTime(t *testing.T) {
 	assert.Equal(t, rep+"-2019.01.02*,"+rep+"-2019.01.03*,"+rep+"-2019.01.04*,"+rep+"-2019.01.05*", index)
 	assert.NoError(t, err)
 }
+
+func TestFetchLatestDataOrNot(t *testing.T) {
+	filters := make(map[string][]string)
+	filters["start_time"] = []string{"2019-01-02T23:59:59Z"}
+	filters["end_time"] = []string{"2019-01-03T23:59:59Z"}
+	latestOnly := FetchLatestDataOrNot(filters)
+	assert.Equal(t, true, latestOnly)
+
+	filters["job_id"] = []string{"job 1"}
+	latestOnly = FetchLatestDataOrNot(filters)
+	assert.Equal(t, false, latestOnly)
+}

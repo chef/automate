@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
@@ -94,7 +95,7 @@ func testSetup(t *testing.T) (string, func()) {
 
 	testConnInfo.InitPgPassfile()
 
-	exporterDataDir, _ := ioutil.TempDir("", "DatabaseExporterIntegrationDBDir")
+	exporterDataDir := t.TempDir()
 	ioutil.WriteFile(path.Join(exporterDataDir, "good.sql"), []byte(goodSQL), 0700)
 	ioutil.WriteFile(path.Join(exporterDataDir, "bad.sql"), []byte(badSQL), 0700)
 
@@ -104,8 +105,6 @@ func testSetup(t *testing.T) (string, func()) {
 		pg.DefaultPSQLCmd = originalPSQLCmd
 		testConnInfo.CleanupPgPassfile()
 		stopPostgreSQL(dbDataDir)
-		os.RemoveAll(dbDataDir)
-		os.RemoveAll(exporterDataDir)
 	}
 }
 
@@ -121,7 +120,9 @@ func setupPostgreSQL(t *testing.T) string {
 		userOpt = command.AsUser(pgUser)
 	}
 
-	dbDataDir, _ := ioutil.TempDir("", "DatabaseExporterIntegrationDBDir")
+	dbDataDir := t.TempDir()
+	require.NoError(t, os.Chmod(filepath.Dir(dbDataDir), 0777))
+
 	if pgUser != "" {
 		u, err := user.Lookup(pgUser)
 		require.NoError(t, err, "looking up uid/gid for PG_USER")

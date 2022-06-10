@@ -1,28 +1,20 @@
 #!/bin/bash
- 
-openssl genrsa -out MyRootCA.key 2048
- 
-openssl req -x509 -new -days 1095 -key MyRootCA.key -sha256 -out MyRootCA.pem -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca'
- 
-openssl genrsa -out ssl-pkcs12.key 2048
- 
-openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "ssl-pkcs12.key" -topk8 -out "ssl.key" -nocrypt
- 
-openssl req -new -key ssl.key -out ssl.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
- 
-openssl x509 -days 1095 -req -in ssl.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out ssl.pem -sha256
- 
+echo " ================= Getting certs from vault using ==============="
+echo $OPENSEARCH_ROOT_CA_PEM
+echo $OPENSEARCH_NODE1_PEM
+echo $OPENSEARCH_NODE1_KEY_PEM
+
 cat <<EOF >> habitat/default.toml
 # server public cert used for ssl listener
-ssl_cert = """$(cat ssl.pem)"""
+ssl_cert = """$OPENSEARCH_NODE1_PEM"""
 EOF
  
 cat <<EOF >> habitat/default.toml
 # server private key
-ssl_key = """$(cat ssl.key)"""
+ssl_key = """$OPENSEARCH_NODE1_KEY_PEM"""
 EOF
 
 cat <<EOF >> habitat/default.toml
 # issuer public cert that signed the above server public cert
-issuer_cert = """$(cat MyRootCA.pem)"""
+issuer_cert = """$OPENSEARCH_ROOT_CA_PEM"""
 EOF

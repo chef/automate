@@ -1,7 +1,6 @@
 package depot
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -15,8 +14,7 @@ import (
 
 func TestDisabledGarbageCollector(t *testing.T) {
 	t.Run("it never does anything", func(t *testing.T) {
-		gc, tmpdir, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, tmpdir := newTestGarbageCollector(t)
 
 		assert.Nil(t, gc.Collect([]habpkg.HabPkg{}, "disabled"))
 
@@ -31,16 +29,14 @@ func TestDisabledGarbageCollector(t *testing.T) {
 
 func TestAggroGarbageCollector(t *testing.T) {
 	t.Run("fails if no gc roots are specified", func(t *testing.T) {
-		gc, _, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, _ := newTestGarbageCollector(t)
 
 		require.Error(t, gc.AggressiveCollect(nil))
 		require.Error(t, gc.AggressiveCollect([]habpkg.HabPkg{}))
 	})
 
 	t.Run("delete test with mlsa as root", func(t *testing.T) {
-		gc, tmpdir, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, tmpdir := newTestGarbageCollector(t)
 		err := gc.AggressiveCollect([]habpkg.HabPkg{
 			habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"),
 		})
@@ -63,8 +59,7 @@ func TestAggroGarbageCollector(t *testing.T) {
 	})
 
 	t.Run("doesn't delete tdeps of root packages but does delete older versions", func(t *testing.T) {
-		gc, tmpdir, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, tmpdir := newTestGarbageCollector(t)
 		err := gc.AggressiveCollect([]habpkg.HabPkg{
 			habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"),
 			habpkg.NewFQ("chef", "deployment-service", "0.1.0", "20181019225550"),
@@ -93,8 +88,7 @@ func TestAggroGarbageCollector(t *testing.T) {
 	})
 
 	t.Run("delete test with linux-headers as root", func(t *testing.T) {
-		gc, tmpdir, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, tmpdir := newTestGarbageCollector(t)
 		err := gc.AggressiveCollect([]habpkg.HabPkg{
 			habpkg.NewFQ("core", "linux-headers", "4.3", "20170513200956"),
 		})
@@ -117,15 +111,13 @@ func TestAggroGarbageCollector(t *testing.T) {
 
 func TestConservativeGarbageCollector(t *testing.T) {
 	t.Run("does nothing if  no root packages are specified", func(t *testing.T) {
-		gc, _, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, _ := newTestGarbageCollector(t)
 
 		require.NoError(t, gc.ConservativeCollect([]habpkg.HabPkg{}))
 	})
 
 	t.Run("does not delete packages that are not different versions of the given roots", func(t *testing.T) {
-		gc, tmpdir, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, tmpdir := newTestGarbageCollector(t)
 		err := gc.ConservativeCollect([]habpkg.HabPkg{
 			habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"),
 		})
@@ -158,8 +150,7 @@ func TestConservativeGarbageCollector(t *testing.T) {
 	})
 
 	t.Run("deletes packages that are different versions of the given roots unless they are dependencies of another root", func(t *testing.T) {
-		gc, tmpdir, cleanup := newTestGarbageCollector(t)
-		defer cleanup()
+		gc, tmpdir := newTestGarbageCollector(t)
 		err := gc.ConservativeCollect([]habpkg.HabPkg{
 			habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"),
 			habpkg.NewFQ("chef", "deployment-service", "0.1.0", "20181019225550"),
@@ -196,17 +187,14 @@ func TestConservativeGarbageCollector(t *testing.T) {
 	})
 
 }
-func newTestGarbageCollector(t *testing.T) (*GarbageCollector, string, func()) {
-	tmpdir, err := ioutil.TempDir("", "habpkg-gc-test")
-	require.NoError(t, err, "failed to create temp dir")
+func newTestGarbageCollector(t *testing.T) (*GarbageCollector, string) {
+	tmpdir := t.TempDir()
 	cache := FromLocalCache(WithLocalHabRoot(tmpdir))
 
-	err = exec.Command("cp", "-r", "testdata/local/pkgs", tmpdir).Run()
+	err := exec.Command("cp", "-r", "testdata/local/pkgs", tmpdir).Run()
 	err = exec.Command("cp", "-r", "testdata/local/cache", tmpdir).Run()
 	require.NoError(t, err, "failed to copy fixture")
-	return NewGarbageCollector(cache), tmpdir, func() {
-		os.RemoveAll(tmpdir)
-	}
+	return NewGarbageCollector(cache), tmpdir
 }
 
 func FileNotExists(t *testing.T, path string) {

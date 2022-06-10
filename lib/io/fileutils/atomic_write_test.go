@@ -16,13 +16,11 @@ import (
 )
 
 func TestAtomicWriteSuccess(t *testing.T) {
-	dir, err := ioutil.TempDir("", "AtomicWriteTest")
-	require.NoError(t, err, "creating temporary dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := path.Join(dir, "foo")
 	reader := strings.NewReader("bar")
-	err = fileutils.AtomicWrite(filename, reader)
+	err := fileutils.AtomicWrite(filename, reader)
 	require.NoError(t, err)
 	data, err := ioutil.ReadFile(filename)
 	require.NoError(t, err)
@@ -30,16 +28,14 @@ func TestAtomicWriteSuccess(t *testing.T) {
 }
 
 func TestAtomicWriteExecutableSuccess(t *testing.T) {
-	dir, err := ioutil.TempDir("", "AtomicWriteTest")
-	require.NoError(t, err, "creating temporary dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := path.Join(dir, "foo")
 	reader := strings.NewReader(`#!/bin/bash
 
 		echo bar
 	`)
-	err = fileutils.AtomicWrite(filename, reader, fileutils.WithAtomicWriteFileMode(0755))
+	err := fileutils.AtomicWrite(filename, reader, fileutils.WithAtomicWriteFileMode(0755))
 	require.NoError(t, err)
 	cmd := exec.Command(filename)
 	data, err := cmd.CombinedOutput()
@@ -48,13 +44,11 @@ func TestAtomicWriteExecutableSuccess(t *testing.T) {
 }
 
 func TestAtomicWriteFail(t *testing.T) {
-	dir, err := ioutil.TempDir("", "AtomicWriteTest")
-	require.NoError(t, err, "creating temporary dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := path.Join(dir, "foo")
 	reader := iotest.TimeoutReader(iotest.OneByteReader(strings.NewReader("bar")))
-	err = fileutils.AtomicWrite(filename, reader)
+	err := fileutils.AtomicWrite(filename, reader)
 	require.Error(t, err)
 	_, err = os.Stat(filename)
 	assert.True(t, os.IsNotExist(err), "The file should not have been created because there was an error")

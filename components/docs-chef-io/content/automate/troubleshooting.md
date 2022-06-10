@@ -13,6 +13,43 @@ gh_repo = "automate"
     weight = 100
 +++
 
+## Index issues
+
+### Indices with bad default mappings
+
+Status of the root cause fix for this can be found at: https://chef-software.ideas.aha.io/ideas/AUTO-I-91
+
+A complaint in the `journalctl -u chef-automate` output that has to do with bad default index mappings may look like
+
+```bash
+ingest-service.default(O): time="2022-03-03T00:32:40Z" level=error msg="Failed initializing elasticsearch" error="Error creating index node-1-run-info with error: elastic: Error 400 (Bad Request): mapper [node_uuid] of different type, current_type [text], merged_type [keyword] [type=illegal_argument_exception]"
+```
+
+As a result, ingest-service can never properly start up, which also breaks automate-cs-nginx and automate-cs-oc-erchef processes, as they need to connect to port 10122, where ingest-service would be listening if it were not restarting continuously.
+
+The list of INDEX_NAME given here can be used in the following command sequence to rebuild whichever index has bad mappings
+
+* node-1-run-info
+* converge-history-DATE-STAMP
+* node-attribute
+* node-state-7
+
+First, stop traffic coming in to the Automate system. You can turn off your Chef Server, for example.
+If you are running a combined Automate and Chef Server system, use `chef-server-ctl maintenance on`
+Choose a method that is comfortable for you.
+
+Then, perform the deletion with the following commands, remembering to substitute the desired INDEX_NAME from the list above.
+
+```bash
+chef-automate dev stop-converge
+hab svc unload chef/ingest-service
+curl -XDELETE localhost:10141/INDEX_NAME
+chef-automate dev start-converge
+```
+
+Afterwards, the ingest-service will start back up.
+If you continue to see mapping errors, it may be best to contact Support to get a better idea what is going on.
+
 ## chef-automate CLI Errors
 
 ### Error: Unable to make a request to the deployment-service

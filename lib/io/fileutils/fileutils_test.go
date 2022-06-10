@@ -14,9 +14,7 @@ import (
 
 func TestPathExist(t *testing.T) {
 	t.Run("it returns true if the path exists", func(t *testing.T) {
-		tmpdir, err := ioutil.TempDir("", "FileUtilsTestDir")
-		require.NoError(t, err)
-		defer os.RemoveAll(tmpdir)
+		tmpdir := t.TempDir()
 
 		res, err := fileutils.PathExists(tmpdir)
 		require.NoError(t, err)
@@ -31,15 +29,13 @@ func TestPathExist(t *testing.T) {
 }
 
 func TestIsSymlink(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "FileUtilsTestDir")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	testData := []byte("test data")
 	filePath := path.Join(tmpdir, "file")
 	ioutil.WriteFile(filePath, testData, 0700)
 	symlinkPath := path.Join(tmpdir, "symlink")
-	err = os.Symlink(filePath, symlinkPath)
+	err := os.Symlink(filePath, symlinkPath)
 	require.NoError(t, err)
 
 	t.Run("it returns true for a symlink", func(t *testing.T) {

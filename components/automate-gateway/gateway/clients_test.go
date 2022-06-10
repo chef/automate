@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -94,8 +93,7 @@ func TestDialWithNoEndpoints(t *testing.T) {
 // Assert that we can initialize a null backend and a clients factory and that
 // the null backend returns no errors.
 func TestDialWithNoEndpointsAndNullBackendSock(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "null_backend_test")
-	require.NoError(t, err)
+	tmpDir := t.TempDir()
 
 	sockName := "backend.sock"
 	sockPath := filepath.Join(tmpDir, sockName)
@@ -116,7 +114,7 @@ func TestDialWithNoEndpointsAndNullBackendSock(t *testing.T) {
 		os.RemoveAll(tmpDir)
 	}()
 
-	err = svr.startNullBackendServer()
+	err := svr.startNullBackendServer()
 	require.NoError(t, err)
 
 	f, err := NewClientsFactory(clientCfg, connFactory)

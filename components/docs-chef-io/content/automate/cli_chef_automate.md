@@ -17,11 +17,11 @@ toc_layout = "cli_chef_automate_toc"
 
 ## Chef Automate CLI Commands
 
-{{< automate_cli_commands data_path="automate/cli_chef_automate/commands" >}}
+{{< automate/automate_cli_commands data_path="automate/cli_chef_automate/commands" >}}
 
 ## Error Codes
 
 If `chef-automate` encounters an error during execution, it exits with a non-zero
 error code. Here's what our error codes mean:
 
-{{< automate_cli_status_errors data_path="automate/cli_chef_automate/status/errors" >}}
+{{< automate/automate_cli_status_errors data_path="automate/cli_chef_automate/status/errors" >}}

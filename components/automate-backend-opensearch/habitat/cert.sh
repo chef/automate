@@ -1,6 +1,6 @@
 #!/bin/bash
 basePath=$1
-echo " ================= Getting certs from vault using =============="
+echo " ================= Getting certs from vault using ==============="
 echo $OPENSEARCH_ROOT_CA_PEM
 echo $OPENSEARCH_ADMIN_PEM
 echo $OPENSEARCH_ADMIN_KEY_PEM

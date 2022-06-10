@@ -14,18 +14,18 @@ gh_repo = "automate"
     weight = 60
 +++
 
-{{% warning %}}
+{{< warning >}}
 
 Chef Automate will not deploy the Chef Manage add-on for Chef Infra Server.
 
-{{% /warning %}}
+{{< /warning >}}
 
-{{% warning %}}
+{{< warning >}}
 
 Supermarket cannot authenticate users on Chef Infra Server deployed
 with Chef Automate.
 
-{{% /warning %}}
+{{< /warning >}}
 
 Use Chef Automate to install Chef Infra Server either for a single-host installation that contains both Chef Infra Server and Chef Automate, or for a standalone Chef Infra Server instance.
 See the [Chef Infra Server documentation]({{< relref "server.md" >}}) for instructions and guidance on using and managing your Chef Infra Server.

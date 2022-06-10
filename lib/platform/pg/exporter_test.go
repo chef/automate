@@ -3,7 +3,6 @@ package pg_test
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path"
 	"testing"
 
@@ -157,7 +156,7 @@ func TestImport(t *testing.T) {
 		mockDB.On("Close").Return(nil)
 		pg.CurrentDBProvider = provider
 
-		tmpDataDir, _ := ioutil.TempDir("", "DatabaseExporterTestDir")
+		tmpDataDir := t.TempDir()
 
 		mockExec := command.NewMockExecutor(t)
 		exporter := pg.DatabaseExporter{
@@ -168,7 +167,6 @@ func TestImport(t *testing.T) {
 		}
 
 		cleanup := func() {
-			os.RemoveAll(tmpDataDir)
 			pg.CurrentDBProvider = pg.DefaultDBProvider
 		}
 

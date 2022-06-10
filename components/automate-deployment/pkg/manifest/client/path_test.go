@@ -3,7 +3,6 @@ package client_test
 import (
 	"context"
 	"io/ioutil"
-	"os"
 	"path"
 	"testing"
 
@@ -28,11 +27,9 @@ var goodA2Manifest = `
 }`
 
 func TestDirectoryGetCurrentManifest(t *testing.T) {
-	dir, err := ioutil.TempDir("", "DirectoryManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
-	err = ioutil.WriteFile(path.Join(dir, "current.json"), []byte(goodV1Manifest), 0700)
+	err := ioutil.WriteFile(path.Join(dir, "current.json"), []byte(goodV1Manifest), 0700)
 	require.NoError(t, err, "writing test data")
 
 	client := client.NewPathClient(dir)
@@ -49,23 +46,19 @@ func TestDirectoryGetCurrentManifest(t *testing.T) {
 }
 
 func TestDirectoryGetCurrentManifestWhenDoesntExist(t *testing.T) {
-	dir, err := ioutil.TempDir("", "DirectoryManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	client := client.NewPathClient(dir)
-	_, err = client.GetCurrentManifest(context.Background(), "current")
+	_, err := client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
 	_, ok := err.(*manifest.NoSuchManifestError)
 	require.True(t, ok, "error should be a NoSuchManifestError")
 }
 
 func TestDirectoryGetCurrentManifestWhenInvalid(t *testing.T) {
-	dir, err := ioutil.TempDir("", "DirectoryManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
-	err = ioutil.WriteFile(path.Join(dir, "current.json"), []byte("::::::"), 0700)
+	err := ioutil.WriteFile(path.Join(dir, "current.json"), []byte("::::::"), 0700)
 	require.NoError(t, err, "writing test data")
 
 	client := client.NewPathClient(dir)
@@ -76,13 +69,11 @@ func TestDirectoryGetCurrentManifestWhenInvalid(t *testing.T) {
 }
 
 func TestFileGetCurrentManifestA2(t *testing.T) {
-	dir, err := ioutil.TempDir("", "FileManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	filename := path.Join(dir, "manifest.json")
 	client := client.NewPathClient(filename)
 
-	err = ioutil.WriteFile(filename, []byte(goodA2Manifest), 0700)
+	err := ioutil.WriteFile(filename, []byte(goodA2Manifest), 0700)
 	require.NoError(t, err, "writing test data")
 
 	manifest, err := client.GetCurrentManifest(context.Background(), "current")
@@ -115,13 +106,11 @@ func TestFileGetCurrentManifestA2(t *testing.T) {
 }
 
 func TestFileGetCurrentManifestV1(t *testing.T) {
-	dir, err := ioutil.TempDir("", "FileManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	filename := path.Join(dir, "manifest.json")
 	client := client.NewPathClient(filename)
 
-	err = ioutil.WriteFile(filename, []byte(goodV1Manifest), 0700)
+	err := ioutil.WriteFile(filename, []byte(goodV1Manifest), 0700)
 	require.NoError(t, err, "writing test data")
 
 	manifest, err := client.GetCurrentManifest(context.Background(), "current")
@@ -137,26 +126,22 @@ func TestFileGetCurrentManifestV1(t *testing.T) {
 }
 
 func TestFileGetCurrentManifestWhenDoesntExist(t *testing.T) {
-	dir, err := ioutil.TempDir("", "FileManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	filename := path.Join(dir, "manifest.json")
 	client := client.NewPathClient(filename)
-	_, err = client.GetCurrentManifest(context.Background(), "current")
+	_, err := client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
 	_, ok := err.(*manifest.NoSuchManifestError)
 	require.True(t, ok, "error should be a NoSuchManifestError")
 }
 
 func TestFileGetCurrentManifestWhenInvalid(t *testing.T) {
-	dir, err := ioutil.TempDir("", "FileManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := path.Join(dir, "manifest.json")
 	client := client.NewPathClient(filename)
 
-	err = ioutil.WriteFile(filename, []byte("::::::"), 0700)
+	err := ioutil.WriteFile(filename, []byte("::::::"), 0700)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
 	_, ok := err.(*manifest.InvalidSchemaError)
@@ -164,12 +149,10 @@ func TestFileGetCurrentManifestWhenInvalid(t *testing.T) {
 }
 
 func TestFileGetManifest(t *testing.T) {
-	dir, err := ioutil.TempDir("", "DirectoryManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	filename := path.Join(dir, "manifest.json")
-	err = ioutil.WriteFile(filename, []byte(goodV1Manifest), 0700)
+	err := ioutil.WriteFile(filename, []byte(goodV1Manifest), 0700)
 	require.NoError(t, err, "writing test data")
 
 	client := client.NewPathClient(filename)
@@ -186,11 +169,9 @@ func TestFileGetManifest(t *testing.T) {
 }
 
 func TestDirectoryGetManifest(t *testing.T) {
-	dir, err := ioutil.TempDir("", "DirectoryManifestProviderTest")
-	require.NoError(t, err, "creating temporary manifest dir")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
-	err = ioutil.WriteFile(path.Join(dir, "20180207073125.json"), []byte(goodV1Manifest), 0700)
+	err := ioutil.WriteFile(path.Join(dir, "20180207073125.json"), []byte(goodV1Manifest), 0700)
 	require.NoError(t, err, "writing test data")
 
 	client := client.NewPathClient(dir)

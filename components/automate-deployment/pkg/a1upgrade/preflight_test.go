@@ -225,13 +225,10 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 	s := newMockDeliverySecrets(t)
 	w := cli.NewWriter(ioutil.Discard, ioutil.Discard, bytes.NewBuffer(nil))
 
-	setup := func(t *testing.T) func() {
-		dir1, err := ioutil.TempDir("", "PreflightTempDir")
-		require.NoError(t, err)
-		dir2, err := ioutil.TempDir("", "PreflightTempDir")
-		require.NoError(t, err)
-		dir3, err := ioutil.TempDir("", "PreflightTempDir")
-		require.NoError(t, err)
+	setup := func(t *testing.T) {
+		dir1 := t.TempDir()
+		dir2 := t.TempDir()
+		dir3 := t.TempDir()
 
 		// Setup config to require the 3 tmp dirs. Shut off optional dirs
 		r.Delivery.Insights.DataDirectory = dir1
@@ -239,16 +236,10 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 		r.Delivery.Delivery.GitRepos = dir3
 		r.Delivery.Backup.Opensearch.Type = "s3"
 		r.Delivery.Reaper.ArchiveDestination = "s3"
-
-		return func() {
-			os.RemoveAll(dir1)
-			os.RemoveAll(dir2)
-		}
 	}
 
 	t.Run("it doesn't error if all source directories exist", func(t *testing.T) {
-		cleanup := setup(t)
-		defer cleanup()
+		setup(t)
 
 		p := NewPreflightRunner(w, r, s, false, false)
 		p.checkExpectedDataPaths()
@@ -262,16 +253,13 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 	})
 
 	t.Run("it raises an error if a destination directory is non-empty with no sentinel", func(t *testing.T) {
-		cleanup := setup(t)
-		defer cleanup()
+		setup(t)
 
-		dir4, err := ioutil.TempDir("", "PreflightTempDir")
-		require.NoError(t, err)
-		defer os.RemoveAll(dir4)
+		dir4 := t.TempDir()
 
 		defaultHabBaseDir = dir4
 		esDataDir := filepath.Join(defaultHabBaseDir, "automate-elasticsearch", "data")
-		err = os.MkdirAll(esDataDir, os.ModePerm)
+		err := os.MkdirAll(esDataDir, os.ModePerm)
 		require.NoError(t, err)
 		err = ioutil.WriteFile(filepath.Join(esDataDir, "testfile"), []byte("test context"), os.ModePerm)
 		require.NoError(t, err)
@@ -282,17 +270,14 @@ func TestCheckExpectedDataPaths(t *testing.T) {
 	})
 
 	t.Run("it doesn't raise an error if a destination directory is non-empty with done sentinel", func(t *testing.T) {
-		cleanup := setup(t)
-		defer cleanup()
+		setup(t)
 
-		dir4, err := ioutil.TempDir("", "PreflightTempDir")
-		require.NoError(t, err)
-		defer os.RemoveAll(dir4)
+		dir4 := t.TempDir()
 
 		esDataDir := filepath.Join(dir4, "automate-elasticsearch", "data")
 		os.MkdirAll(esDataDir, os.ModePerm)
 		defaultHabBaseDir = dir4
-		err = os.MkdirAll(esDataDir, os.ModePerm)
+		err := os.MkdirAll(esDataDir, os.ModePerm)
 		require.NoError(t, err)
 
 		err = ioutil.WriteFile(filepath.Join(esDataDir, "testfile"), []byte("test context"), os.ModePerm)
