@@ -56,8 +56,6 @@
     "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
     "chef/automate-elasticsearch",
-    "chef/report-manager-service",
-    "chef/report-manager-minio-gateway",
     "core/rsync"
   ],
 
