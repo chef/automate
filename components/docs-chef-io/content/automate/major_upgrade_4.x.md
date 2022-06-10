@@ -68,11 +68,11 @@ There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
 
 - [Chef Automate in Air-Gapped Environment With External Elasticsearch]({{< relref "#chef-automate-in-air-gapped-environment-with-external-elasticsearch" >}})
 
-{{< note >}} Confirm whether your installation is using an external elasticsearch but running the `chef-automate config show` command. It `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external elasticsearch. {{< /note >}}
+{{< note >}} Confirm whether your installation is using an external Elasticsearch but running the `chef-automate config show` command. It `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
 
 {{< warning >}} You drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
 
-{{< warning >}} Disable the **sharding** for automate running embedded elasticsearch.
+{{< warning >}} Disable the **sharding** for automate running embedded Elasticsearch.
 
 Also, accept the checklist item asking permission to disable sharding. {{< /warning >}}
 
@@ -111,15 +111,36 @@ For Example:
 If Elasticsearch configuration was:
 
 ```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
+[elasticsearch]
+  [elasticsearch.v1]
+    [elasticsearch.v1.sys]
+      [elasticsearch.v1.sys.cluster]
+        max_shards_per_node = 6000
+      [elasticsearch.v1.sys.indices]
+        [elasticsearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [elasticsearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM```
 ```
 
 Then add in OpenSearch configuration as:
 
 ```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch.
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [opensearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM
+
 ```
 
 Apply this using the `config patch` command.
@@ -144,7 +165,7 @@ sudo chef-automate post-major-upgrade clear-data --data=es
 
 ### Chef Automate with External ElasticSearch
 
-To upgrade Chef Automate with external elasticsearch, follow the steps given below:
+To upgrade Chef Automate with external Elasticsearch, follow the steps given below:
 
 **Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
@@ -162,25 +183,10 @@ sudo chef-automate status
 
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
+4. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
-For Example:
-
-If Elasticsearch configuration was:
-
-```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Then add in OpenSearch configuration as:
-
-```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Apply this using `config patch` command.
+    Please refer to the `elasticsearch.yml` file to get the applied configuration on your external Elasticsearch.
+    Add the releavent configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
 
 5. Turn off maintenance mode:
 
@@ -245,15 +251,36 @@ For Example:
 If Elasticsearch configuration was:
 
 ```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
+[elasticsearch]
+  [elasticsearch.v1]
+    [elasticsearch.v1.sys]
+      [elasticsearch.v1.sys.cluster]
+        max_shards_per_node = 6000
+      [elasticsearch.v1.sys.indices]
+        [elasticsearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [elasticsearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM```
 ```
 
 Then add in OpenSearch configuration as:
 
 ```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch.
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [opensearch.v1.sys.runtime]
+        max_open_files = "65536"
+        max_locked_memory = "unlimited"
+        heapsize = "8g" # This should be the 50% of RAM
+
 ```
 
 Apply this using `config patch` command.
@@ -322,23 +349,8 @@ sudo chef-automate status
 
 5. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
-For Example:
-
-If Elasticsearch configuration was:
-
-```bash
-[elasticsearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Then add in OpenSearch configuration as:
-
-```bash
-[opensearch.v1.sys.runtime]
-    heapsize = "8g"
-```
-
-Apply this using `config patch` command.
+    Please refer to the `elasticsearch.yml` file to get the applied configuration on your external Elasticsearch.
+    Add the releavent configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
 
 6. Turn off maintenance mode using following command:
 
