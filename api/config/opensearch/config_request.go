@@ -193,7 +193,7 @@ const (
 	OSHeapMaxGB = 16
 	// ESHeapPortion is the proportion of system memory we
 	// recommend for ES Heap
-	OSHeapPortion = 0.25
+	OSHeapPortion = 0.5
 	// KBPerGB is the number of KB in a GB, used for conversions
 	KBPerGB = 1048576
 )
