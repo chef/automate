@@ -884,7 +884,7 @@ steps:
   - label: "ha cluster"
     command:
       - integration/run_test integration/tests/cluster.sh
-    timeout_in_minutes: 35
+    timeout_in_minutes: 50
     expeditor:
       executor:
         linux:
