@@ -1,3 +1,6 @@
+
+### Automate Support for Large Compliance Report ###
+
 Automate DataCollector URL is a HTTP endpoint to be used by external software like Chef Server/Inspec/Infra Clients to send different types of data to Automate. This data after coming to the Data Collector HTTP end point is sent to the compliance-service through a GRPC call. This data then goes through a pipeline where the data processed and finally stored to Elastic Search.
 
 # What is Large Compliance Report issue in Automate?
