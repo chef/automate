@@ -65,6 +65,7 @@ func (c *DeployPreflightChecker) Run(probe TestProbe) error {
 	checks := []Check{
 		RootUserRequiredCheck(),
 		DefaultMinimumDiskCheck(c.automateConfig),
+		SELinuxPermissiveCheck(),
 		chefAutomateInBinCheck,
 		isA2DeployedCheck,
 		IsSystemdCheck(),

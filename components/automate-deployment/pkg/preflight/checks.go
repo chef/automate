@@ -34,6 +34,40 @@ func RootUserRequiredCheck() Check {
 	}
 }
 
+const selinuxEnabledSummary = `SELinux is enabled.
+In order to deploy Chef Automate SELinux must be
+set to either 'permissive' or 'disabled'. To set
+SELinux to Permissive mode, run: setenforce Permissive
+`
+
+func SELinuxPermissiveCheck() Check {
+	return Check{
+		Name:        "selinux_permissive_required",
+		Description: "selinux should be permissive or disabled",
+		TestFunc: func(t TestProbe) error {
+			_, err := t.LookPath("getenforce")
+			if err != nil {
+				t.ReportSuccess("SELinux is not enabled")
+				return nil
+			}
+			out, err := t.SELinuxStatus()
+			if err != nil {
+				logrus.WithError(err).Debug("Unable to determine SELinux status using 'getenforce'")
+				t.ReportFailure("Failed to determine if SELinux is enabled")
+				return nil
+			}
+			if strings.EqualFold(string(out), "disabled") || strings.EqualFold(string(out), "permissive") {
+				t.ReportSuccess("SELinux is not enabled")
+				return nil
+			}
+			t.ReportFailure("SELinux is enabled")
+			t.ReportSummary(selinuxEnabledSummary)
+			return nil
+		},
+	}
+}
+
+
 const GB = 1 << 30
 
 func minDiskBytesForConfig(c *dc.AutomateConfig) uint64 {
