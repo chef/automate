@@ -100,13 +100,13 @@ X-Project = ""
 #Deprecated Config - below config is not supported
 #aws_automate_route53_prefix = ""
 #aws_chef_server_route53_prefix = ""
-#aws_route53_hosted_zone = "automatesaas.chef.co"
+#aws_route53_hosted_zone = "saas.chef.io"
 #postgresql_db_identifier = ""
 #elasticsearch_domain_name = ""
 #rds_postgresql_instance_type = "db.t3.medium"
 #rds_postgresql_restore_identifier = ""
 #datadog_api_key = "DATADOG_API_KEY"
-#use_existing_managed_infra = "false"
+#use_existing_managed_infra = false
 #X-Production = "false"
 #X-Customer = ""
 `

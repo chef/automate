@@ -125,7 +125,7 @@ type AwsConfigToml struct {
 			RDSInstanceType              string   `toml:"rds_postgresql_instance_type"`
 			RDSRestoreIdentifier         string   `toml:"rds_postgresql_restore_identifier"`
 			DatadogAPIKey                string   `toml:"datadog_api_key"`
-			UseExistingManagedInfra      string   `toml:"use_existing_managed_infra"`
+			UseExistingManagedInfra      bool     `toml:"use_existing_managed_infra"`
 		} `toml:"config"`
 	} `toml:"aws"`
 }
