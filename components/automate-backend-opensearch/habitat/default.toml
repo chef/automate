@@ -269,7 +269,7 @@
   es_startup_sleep_time = ""
   es_java_opts = ""
   minHeapsize = "2g"
-  maxHeapsize = "2g"
+  maxHeapsize = "3g"
   g1ReservePercent = "25"
   initiatingHeapOccupancyPercent = "15"
 
