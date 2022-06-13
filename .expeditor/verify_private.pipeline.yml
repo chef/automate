@@ -156,7 +156,7 @@ steps:
 #   # Wait for the build to complete before starting anything below this
 #   # directive. All tests below this wait either require build assets
 #   # or take a long time.
-#   - wait
+  - wait
 
 #   - label: "automate-load-balancer"
 #     command:
