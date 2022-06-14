@@ -22,25 +22,29 @@ Thus, HA is designed to avoid loss of service by reducing or managing failures a
 The Chef Automate HA equates to reliability, efficiency, and productivity. Chef Automate HA is built on the following characteristics, **Redundancy**, and **Failover**. It aids in addressing major issues like service failure, and zone failure.
 
 ## Chef Automate HA Architecture
-The following Chef Automate HA Architecture diagram shows the Chef Automate HA components. This architecture includes the cluster of the _Chef Automate_, _Chef Server_, _Postgres_, and _OpenSearch_.
+This architecture includes the cluster of the _Chef Automate_, _Chef Server_, _Postgres_, and _OpenSearch_.
+
+### Chef Automate HA Architecture for OnPremise / AWS Non-Managed
+
+![High Availability Architecture](../../static/images/automate/ha_arch_onpremise.png)
+![High Availability Architecture](/images/automate/ha_arch_onpremise.png)
+
+### Chef Automate HA Architecture for AWS Managed
+![High Availability Architecture](../../static/images/automate/ha_arch_aws_managed.png)
+![High Availability Architecture](/images/automate/ha_arch_aws_managed.png)
 
 ## Chef Automate HA Topology
 
 The Chef Automate HA Architecture involves the following clusters part of the main cluster:
 
-- **Backend Cluster**
+- **Backend Cluster** (Persistant Services)
+  - **Postgres:** Database requires a minimum of three nodes. Postgres database uses *Leader-Follower* strategy, where one becomes a leader, and the other two are the followers.
 
-- **Postgres:** Database requires a minimum of three nodes. Postgres database uses *Leader-Follower* strategy, where one becomes a leader, and the other two are the followers.
+  - **OpenSearch:** Database requires a minimum of three nodes. OpenSearch database manages the [cluster internally](https://opensearch.org/docs/latest/opensearch/cluster/).
 
-- **OpenSearch:** Database requires a minimum of three nodes. OpenSearch database manages the [cluster internally](https://opensearch.org/docs/latest/opensearch/cluster/).
-
-- **Frontend Cluster**
-
-Chef Automate and Chef Server act as frontend nodes and serve as a web UI with Load Balancer configurations.
-
-- [Chef Automate](https://docs.chef.io/automate/)
-
-- [Chef Server](https://docs.chef.io/server/)
+- **Frontend Cluster** (Application Services)
+  - [Chef Automate](https://docs.chef.io/automate/)
+  - [Chef Server](https://docs.chef.io/server/)
 
 ## Deployment Methods
 
@@ -52,31 +56,13 @@ Chef Automate High Availability (HA) supports two types of deployment:
 
 ### On-premise Deployment (Existing Node/Bare Infrastructure)
 
-![High Availability Architecture](../../static/images/automate/ha_arch_onpremise.png)
-![High Availability Architecture](/images/automate/ha_arch_onpremise.png)
+In this we expect VM (Virtual machine) or Bare Metal machines (Physical machine) are already created and having intial Operating System (OS) setup done. Including Ports and Security policies changed according to requirements.
 
-A **Bare Metal computer** is generally without any software (OS or applications). However, when contrasted with a virtualized server environment, bare metal may imply a regular, non-virtual server that does include an OS.
+After this, installation steps will Deploy Chef Automate, Chef Infra Server, Postgresql DB and Opensearch DB to the relvant VMs or Physical Machines as provided in Config.
 
-A bare-metal server is a non-shared computer dedicated to one customer in cloud computing. It generally implies a non-virtual machine (VM) environment. The difference between bare metal servers and cloud servers is that a cloud server is a virtual machine. In contrast, a bare metal server is a physical machine identified within a data center.
-
-Bare Infrastructure deployments are operating system installations to targets that either have no operating system installed or must be re-installed without preserving any existing data or settings. You can install and manage Chef Automate HA by creating profiles for bare metal deployments.
-
-Some customers already have basic network infrastructure with VMs, networks, and load balancers in their environment. This environment can be on-premises or in the cloud, and the respective organizations might not want to provide access to create items like VMs. In such cases, IPs of their instances are used to set up Chef Automate HA on their network premises.
-
-As an AWS setup, **Terraform** creates all components from scratch, like EC2 and Load Balancer. If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers want to configure Chef Automate HA (**automate**, **chef-server**, **opensearch**, **postgresql**) in HA servers, then the customer should choose **Existing Node** reference architecture.
-
-You can also execute the **Terraform** script for the bare infra deployment scenario. However, this script only handles installing and configuring components and does not create instances on the cloud providers.
 ### Cloud Deployment using Amazon Web Services (AWS)
 
-![High Availability Architecture](../../static/images/automate/ha_arch_aws_managed.png)
-![High Availability Architecture](/images/automate/ha_arch_aws_managed.png)
-
-AWS is a comprehensive, evolving cloud computing platform provided by Amazon that includes a mixture of infrastructure as a service (IaaS), platform as a service (PaaS), and packaged software as a service (SaaS) offerings. AWS services can offer an organization tools such as compute power, database storage, and content delivery services. Click [here](https://aws.amazon.com/what-is-cloud-computing/) to learn more.
-
-The entire Chef Automate HA infrastructure is built into the AWS cloud in AWS deployment. A standard **Terraform** script handles AWS deployment if you choose AWS as a reference architecture. This deployment terraform script sets up all the prerequisites like creating an EC2, load balancer, security groups, and subnets.
-
 The two step deployment process is as shown below:
-
-- Provisioning Infrastructure.
+- Provisioning Infrastructure. (Optional, if already manually done)
 - Deployment of services on provisioned infrastructure.
-  - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, *Chef Server* will be done in this step.
+  - Installation of *PostgreSQL*, *OpenSearch*, *Chef Automate*, *Chef Infra Server* will be done in this step.
