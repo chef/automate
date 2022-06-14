@@ -53,9 +53,21 @@ To enable Automate to ingest Large Compliance report:
     endpoint = "<minio server end point>:<port>" 
     root_user = "<username>"
     root_password = "<password>"
+    ## Uncomment and fill out if want to modify the number of workers to run in parallel to communicate with OpenSearch for preparing the doc for export, default value is 50
+    #concurrent_open_search_requests = 50
+    ## Uncomment and fill out if want to modify the number of workers to run in parallel to communicate with MINIO server for preparing the doc for export, default value is 10
+    #concurrent_minio_requests = 10
+    ## Uncomment and fill out if using external MINIO with SSL
+    #enable_ssl = true
+    #cert = """$(cat </path/to/cert_file.crt>)"""
+
    
 [global.v1.large_reporting]                                
     enable_large_reporting = true
+    
+## Uncomment and fill out if want to modify the bucket name used to store data in MINIO server, default name is 'default'
+#[report_manager.v1.sys.objstore]
+#  bucket = "default"
 ```
 3. Patch the config by running   
 `chef-automate config patch patch.toml`
