@@ -127,10 +127,31 @@ Hover over the control's Waived icon under the Node Status column in _Controls_ 
 
 Use Chef InSpec to configure [waivers](https://docs.chef.io/inspec/waivers/).
 
-### Download Report Results
+### Download Report Results (Default Configuration)
 
 The download button located to the right of the search bar allows users to download a JSON or CSV format of the reports.
 The downloaded contents are the result of all of the applied filters--including end time selected in calendar.
+
+### Download Report Results (With Large Compliance Report Configuration)  
+
+In case Automate is configured to ingest large compliance report of size more than 4MB, the download of report becomes a two-step engagement:
+* Step1: Generate the report in the requested format from the object storage with all the applied filers including the end time selected
+* Step2: Make the report available for download
+
+#### Generate Report
+Clicking the **Download JSON** or **Download CSV** buttons will trigger the report generation process.  
+A notification pops up to confirm that the Generation has started.  
+
+The status of the report can always be viewed by clicking the **Report Status** link.
+
+
+The status of the report shows up the generation and processing status of the Reports on a sidebar.
+
+A popup notification is produced to users when a requested report is generated to make aware of the report generation status.
+
+#### Downloading Report  
+A generated report can be downloaded any time from the Status sidebar by clicking **Download Report** link
+
 
 ## Compliance Status and Report Metadata
 

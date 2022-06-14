@@ -43,19 +43,35 @@ MinIO is a High Performance Object Storage released under GNU Affero General Pub
 
 Refer https://min.io for more details and https://docs.min.io/minio/baremetal/ instructions to setup Minio on a baremetal server.
 
-### Enabling Automate to ingest Large Compliance Report
+### Enabling Automate to Ingest Large Compliance Report
 
 To enable Automate to ingest Large Compliance report:
 1. Create a patch.toml if one does not already exist for your Chef Automate installation.
 2. Add the following configuration to the `patch.toml` file:
 ```toml
+[global.v1.external.minio]
+    endpoint = "<minio server end point>:<port>" 
+    root_user = "<username>"
+    root_password = "<password>"
+   
 [global.v1.large_reporting]                                
-enable_large_reporting = true
+    enable_large_reporting = true
 ```
 3. Patch the config by running   
 `chef-automate config patch patch.toml`
 
-### 
 
+### Storing Reports in Cloud Object Storage
+
+Minio can work as a gateway to Object storage in different public clouds:
+- AWS
+- Azure
+- GCP
+
+In this case, Minio needs to be deployed as a gateway.
+Please refer to the document here:
+
+
+The Automate configuration will be the same as above.
 
 
