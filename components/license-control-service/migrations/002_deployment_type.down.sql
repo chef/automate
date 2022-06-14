@@ -1,0 +1,7 @@
+BEGIN;
+
+ALTER TABLE IF EXISTS deployment DROP COLUMN IF EXISTS type;
+
+DROP TABLE IF EXISTS deployment_type;
+
+COMMIT;

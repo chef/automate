@@ -131,17 +131,17 @@ To migrate to Chef Automate 2 without these features, invoke the migration with 
 
 These flags enable you to migrate by skipping preflight checks for unsupported features.
 
-### External Opensearch cluster
+### External OpenSearch Cluster
 
-The Chef Automate 2 migration process requires manual intervention to migrate a Chef Automate 1 installation that uses external Opensearch.
+The Chef Automate 2 migration process requires manual intervention to migrate a Chef Automate 1 installation that uses external OpenSearch.
 
-To migrate an external Opensearch cluster, please reach out to a Customer Success or Customer Support representative for assistance.
+To migrate an external OpenSearch cluster, please reach out to a Customer Success or Customer Support representative for assistance.
 
 ### New Data Paths
 
 Chef Automate 2 stores its data in directories named `/hab/svc/$service-name/data`. In particular:
 
-* Opensearch data is stored in `/hab/svc/automate-elasticsearch/data/`
+* OpenSearch data is stored in `/hab/svc/automate-elasticsearch/data/`
 * PostgreSQL data is stored in `/hab/svc/automate-postgresql/data/`
 
 If you use dedicated disks or partitions for either of these applications in Chef Automate 1, you must modify your disk mount configuration to make these disks/partitions available to Chef Automate 2.

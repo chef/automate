@@ -618,8 +618,9 @@ func (es *Elastic) indicesAndShardsInSnapshot(ctx context.Context, repoName, sna
 	return indexesList, shardsToWaitFor, nil
 }
 
+
 func (es *Elastic) indicesSnapshotRecoveryStatus(ctx context.Context) (*indicesRecoveryStats, error) {
-	indicesRecoveryPath := "/_recovery"
+	indicesRecoveryPath := "/_all/_recovery"
 
 	response, err := es.client.PerformRequest(ctx, elastic.PerformRequestOptions{
 		Method: "GET",

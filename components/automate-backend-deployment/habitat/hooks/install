@@ -77,6 +77,35 @@ if [ -L /hab/a2_deploy_workspace ]; then
     fi
   fi
 
+  touch $OLD_WORKSPACE/terraform/workspace-logs.txt
+  LOGGER=$OLD_WORKSPACE/terraform/workspace-logs.txt
+  if [[ -f $OLD_WORKSPACE/terraform/cert.tf ]]; then
+    echo "Copying old cert.tf to new workspace..." >> $LOGGER
+    # CERT_TF_DIR="$NEW_WORKSPACE/terraform/reference_architectures/$CERT_TF"
+    cp $OLD_WORKSPACE/terraform/cert.tf $NEW_WORKSPACE/terraform/cert.tf
+    # if [[ -d $CERT_TF_DIR ]]; then
+    #   # copy all files including the hidden cert.tf
+  else
+    echo "Creating new cert.tf to new workspace..." >> $LOGGER
+    
+
+    LINE_FROM=$(awk '/hab_sup_http_gateway_ca_cert/{ print NR; exit }' $OLD_WORKSPACE/terraform/variables_common.tf)
+    echo "From : $LINE_FROM" >> $LOGGER
+    LINE_TO=$(wc -l < $OLD_WORKSPACE/terraform/variables_common.tf)
+    echo "To : $LINE_TO" >> $LOGGER
+    TAIL_LINES_TO_BE_COPIED=$(expr $LINE_TO - $LINE_FROM + 1)
+    echo "TAIL_LINES_TO_BE_COPIED :  $TAIL_LINES_TO_BE_COPIED" >> $LOGGER
+
+    touch $OLD_WORKSPACE/terraform/cert.tf
+    cat <<EOF >> "$OLD_WORKSPACE/terraform/cert.tf"
+
+$(cat $OLD_WORKSPACE/terraform/variables_common.tf | tail -n $TAIL_LINES_TO_BE_COPIED)
+
+EOF
+    cp -r $OLD_WORKSPACE/terraform/cert.tf $NEW_WORKSPACE/terraform/cert.tf
+  fi
+    # fi
+
   # copy over the automate-cluster-ctl configs
   if [[ -f $OLD_WORKSPACE/a2ha.rb ]]; then
     echo "Copying previous 'automate-cluster-ctl' config and secrets to new workspace"
@@ -86,6 +115,8 @@ if [ -L /hab/a2_deploy_workspace ]; then
     display_upgrade_help $(cat $OLD_WORKSPACE/terraform/.tf_arch)
   fi
 fi
+
+cp -r $OLD_WORKSPACE/terraform/destroy/aws/* $NEW_WORKSPACE/terraform/destroy/aws;
 
 # shellcheck disable=SC1083
 ln -nsf $NEW_WORKSPACE /hab/a2_deploy_workspace

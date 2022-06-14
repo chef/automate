@@ -32,6 +32,15 @@ variable "automate_role" {
   description = "Set the type of server role. can be one of: bootstrap_automate, automate or chef_api"
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
+variable "aws_region" {
+  default     = "us-west-2"
+  description = "The name of the selected AWS region / datacenter."
+}
+
 variable "backend_aib_dest_file" {
 }
 
@@ -66,19 +75,19 @@ variable "hab_sup_http_gateway_auth_token" {
 variable "habitat_info" {
 }
 
-variable "managed_elasticsearch_certificate" {
+variable "managed_opensearch_certificate" {
   default = ""
 }
 
-variable "managed_elasticsearch_domain_url" {
+variable "managed_opensearch_domain_url" {
   default = ""
 }
 
-variable "managed_elasticsearch_user_password" {
+variable "managed_opensearch_user_password" {
   default = ""
 }
 
-variable "managed_elasticsearch_username" {
+variable "managed_opensearch_username" {
   default = ""
 }
 
@@ -112,6 +121,14 @@ variable "opensearch_listen_port" {
 
 variable "opensearch_private_ips" {
   default = []
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
 }
 
 variable "postgresql_private_ips" {

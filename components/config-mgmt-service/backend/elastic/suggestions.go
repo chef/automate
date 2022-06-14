@@ -118,18 +118,24 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 
 	// return all unless text has at least 2 chars
 	if len(text) >= 2 {
-		// Any(or) of the text words can match
-		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), text).Operator("or")
-		boolQuery = boolQuery.Must(matchQuery)
-		// All(or) of the text words need to match to get a score boost from this condition
-		matchQuery = elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), text).Operator("and")
-		boolQuery = boolQuery.Must(matchQuery)
-		// Give a score boost to values that equal the suggested text
-		termQuery := elastic.NewTermQuery(fmt.Sprintf("%s.lower", term), lowerText).Boost(200)
-		boolQuery = boolQuery.Should(termQuery)
-		// Give a score boost to values that start with the suggested text
-		prefixQuery := elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", term), lowerText).Boost(100)
-		boolQuery = boolQuery.Should(prefixQuery)
+		if term == "node_name" {
+			text_string := "*" + lowerText + "*"
+			matchQuery := elastic.NewQueryStringQuery(text_string).Field(term)
+			boolQuery = boolQuery.Must(matchQuery)
+		} else {
+			// Any(or) of the text words can match
+			matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), text).Operator("or")
+			boolQuery = boolQuery.Must(matchQuery)
+			// All(or) of the text words need to match to get a score boost from this condition
+			matchQuery = elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), text).Operator("and")
+			boolQuery = boolQuery.Must(matchQuery)
+			// Give a score boost to values that equal the suggested text
+			termQuery := elastic.NewTermQuery(fmt.Sprintf("%s.lower", term), lowerText).Boost(200)
+			boolQuery = boolQuery.Should(termQuery)
+			// Give a score boost to values that start with the suggested text
+			prefixQuery := elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", term), lowerText).Boost(100)
+			boolQuery = boolQuery.Should(prefixQuery)
+		}
 	}
 	//aggs
 	aggs := elastic.NewTermsAggregation().Field(term).Size(SuggestionQuerySize).Order("mymaxscore", false)

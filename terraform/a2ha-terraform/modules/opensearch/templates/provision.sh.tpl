@@ -52,10 +52,27 @@ export LOGCMD='>>${tmp_path}/svc-load.log 2>&1'
 if [ -e /hab/sup/default/specs/"$OS_PKG_NAME".spec ]; then
   if ! grep -q "ident *= *\"${opensearch_pkg_ident}\"" /hab/sup/default/specs/"$OS_PKG_NAME".spec; then
      # unload the old pkg_ident and then load in the new
+     #echo "Upgrading the backend package"
+     #source /hab/sup/default/SystemdEnvironmentFile.sh
+     #appliedConfigFile="config.$RANDOM.toml"
+     #automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > $appliedConfigFile
+
      bash -c 'sysctl -w vm.max_map_count=262144'
      hab svc unload "$OS_ORIGIN_NAME/$OS_PKG_NAME"
      sleep 10
      bash -c 'eval hab svc load ${opensearch_pkg_ident} ${opensearch_svc_load_args} "$LOGCMD"'
+     # 1. need to remove the backend_config
+     # 2. apply only when it has size > 0 byte
+     #if [  ! -s  $appliedConfigFile ]
+     # then
+     #   echo "$FILE has zero size, no need to apply the config"
+     # else
+	   #   echo "external config is present lets put some sleep and apply the config"
+     #   sleep 10
+     #   bash -c 'hab config apply automate-ha-opensearch.default $(date '+%s') $appliedConfigFile'
+     #   echo "Config Applied"
+     #   #rm $appliedConfigFile
+     #fi
   fi
 else
   bash -c 'sysctl -w vm.max_map_count=262144'

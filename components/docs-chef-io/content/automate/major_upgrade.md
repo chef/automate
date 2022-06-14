@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 20
 +++
 
-{{< warning >}} Existing A2 HA customers should NOT upgrade to 3.x now. Please wait for Automate HA release. {{< /warning >}}
+{{< warning >}} Existing A2 HA customers should NOT upgrade to 3.x now. Please wait for Chef Automate HA release. {{< /warning >}}
 
 Chef Automate provides an entire suite of enterprise capabilities for node visibility and compliance. Chef Automate upgrades from one minor version to another automatically. However, Chef Automate will not automatically upgrade to a major version. See the instructions below for manually upgrading Chef Automate from date-based versions to Chef Automate 3.x.
 
@@ -39,12 +39,15 @@ For example, if today you are on version 2021201164433, then your upgrade journe
 ## Upgrade to version 20220329091442
 
 Check your current version:
+
 ```sh
 sudo chef-automate version
 ```
+
 If your Server Version is less than 20220329091442.
 Please upgrade to latest date pattern version number.
 ### Airgapped upgrade to 20220329091442
+
 - On Internet connected machine
   - Download latest chef-automate cli.
   ```sh
@@ -54,28 +57,32 @@ Please upgrade to latest date pattern version number.
   ```sh
   ./chef-automate airgap bundle create --version 20220329091442
   ```
-  - Copy this bundle file automate-20220329091442.aib and latest downloaded cli `chef-automate` to Automate Machine in airgap.
-- On Automate Machine in Airgap
+  - Copy the bundle file `automate-20220329091442.aib` and latest downloaded cli `chef-automate` to the airgapped machine runnning Chef Automate.
+- On the airgapped machine running Chef Automate
   - Upgrade Automate with bundle
   ```sh
   sudo ./chef-automate upgrade run --airgap-bundle automate-20220329091442.aib
   ```
-  - Check all services are up and running
+
+  - Check all services are up and running:
+
   ```sh
   sudo chef-automate status
   ```
+
 ### Normal Upgrade to 20220329091442
-- Upgrade Chef Automate to latest minor version (20220329091442)
+
+- Upgrade Chef Automate to latest minor version (20220329091442):
 
   ```sh
   sudo chef-automate upgrade run
   ```
-- Check all services are up and running
+
+- Check all services are up and running:
 
   ```sh
   sudo chef-automate status
   ```
-
 
 ## Upgrade Path to version 3.0.x from 20220329091442
 
@@ -169,7 +176,7 @@ To upgrade to 3.0.x, follow the steps below:
 2. Create an Airgap Installation Bundle (AIB):
 
     ```sh
-    sudo ./chef-automate airgap bundle create
+    sudo ./chef-automate airgap bundle create --version 3.0.49
     ```
 
 3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_3.0.x.aib`) to the air-gapped machine running Chef Automate.
@@ -227,7 +234,7 @@ To upgrade to 3.0.x, follow the steps below:
 2. Create an Airgap Installation Bundle (AIB):
 
     ```sh
-    sudo ./chef-automate airgap bundle create
+    sudo ./chef-automate airgap bundle create --version 3.0.49
     ```
 
 3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_3.0.x.aib`) to the air-gapped machine running Chef Automate.

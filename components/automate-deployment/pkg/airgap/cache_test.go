@@ -3,7 +3,6 @@ package airgap
 import (
 	"io"
 	"io/ioutil"
-	"os"
 	"path"
 	"testing"
 
@@ -15,10 +14,7 @@ import (
 )
 
 func TestFileCache(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "a2-install-bundle-test")
-	require.NoError(t, err)
-
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 	cacher := fileCacher{cacheDir: tmpdir}
 	t.Run("non existing file is not cached", func(t *testing.T) {
 		assert.False(t, cacher.IsCached("does-not-exist"))
@@ -48,10 +44,7 @@ func TestFileCache(t *testing.T) {
 }
 
 func TestKeyCache(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "a2-install-bundle-test")
-	require.NoError(t, err)
-
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	keyCache := NewKeyCache(tmpdir)
 
@@ -73,10 +66,7 @@ func TestKeyCache(t *testing.T) {
 }
 
 func TestHartifactCache(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "a2-install-bundle-test")
-	require.NoError(t, err)
-
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	hartCache := NewHartifactCache(tmpdir)
 

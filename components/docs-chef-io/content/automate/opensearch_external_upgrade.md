@@ -1,11 +1,11 @@
 +++
-title = "Upgrade to External Opensearch"
+title = "Upgrade to External OpenSearch"
 date = 2022-01-04T12:09:09-08:00
 draft = false
 
 [menu]
   [menu.automate]
-    title = "Upgrade to Opensearch"
+    title = "Upgrade to OpenSearch"
     identifier = "automate/configuring_automate/elasticsearch/opensearch_external_upgrade.md opensearch_external_upgrade.md"
     parent = "automate/configuring_automate/elasticsearch"
 +++
@@ -13,22 +13,22 @@ draft = false
 
 This guide covers upgrading services used by Chef Automate.
 
-## Upgrade Elasticsearch to Opensearch
+## Upgrade Elasticsearch to OpenSearch
 
 On January 21, 2021, Elastic NV announced that they would change their software licensing strategy and not release new versions of Elasticsearch and Kibana under the permissive ALv2 license. Instead, Elastic is releasing Elasticsearch and Kibana under the Elastic license, with source code available under the Elastic License or Server Side Public License (SSPL). These licenses are not open source and do not offer users the same freedoms. Because of this, AWS made the decision to create and maintain a fork from the last ALv2 version of Elasticsearch and Kibana. The fork is called OpenSearch and is available under ALv2.
 
-To upgrade AWS elasticsearch, please follow instructions on [Upgrading to AWS Opensearch](https://aws.amazon.com/blogs/aws/amazon-elasticsearch-service-is-now-amazon-opensearch-service-and-supports-opensearch-10/)
+To upgrade AWS Elasticsearch, please follow instructions on [Upgrading to AWS OpenSearch](https://aws.amazon.com/blogs/aws/amazon-elasticsearch-service-is-now-amazon-opensearch-service-and-supports-opensearch-10/)
 
 
 ### Migration Planning
 
-The upgrade process for Elasticsearch to Opensearch requires a one-time downtime and takes about 10 mins. This process may take longer depending on your server hardware and the size of the node objects in Chef Automate.
+The upgrade process for Elasticsearch to OpenSearch requires a one-time downtime and takes about 10 mins. This process may take longer depending on your server hardware and the size of the node objects in Chef Automate.
 
 ### Requirements
 
-{{% warning %}}
-Upgrading Elasticsearch to Opensearch upgrades the database for all connected services. If you have multiple services connected to Elasticsearch, make sure that you have stopped the other services and prepared them for the upgrade.
-{{% /warning %}}
+{{< warning >}}
+Upgrading Elasticsearch to OpenSearch upgrades the database for all connected services. If you have multiple services connected to Elasticsearch, make sure that you have stopped the other services and prepared them for the upgrade.
+{{< /warning >}}
 
 This upgrade guide is for systems running:
 
@@ -39,9 +39,9 @@ This upgrade guide is for systems running:
 
 ### Backup Chef Automate
 
-{{% danger %}}
+{{< danger >}}
 **BACKUP CHEF AUTOMATE AND SECURE THE DATA**. Preserve your backup at all costs. Copy the backup to a second and separate location.
-{{% /danger %}}
+{{< /danger >}}
 
 Database migrations have inherent risk to your system. Create a backup before beginning any migration or update. This ensures that you have a recoverable state in case any step in the process fails. Copy the backup to a another disk that is not connected to Chef Automate. This ensures that you have state to restore, in case of a failure in the upgrade process.
 
@@ -49,7 +49,7 @@ Follow the [Backup]({{< relref "backup.md" >}}) documentation to make a copy of 
 
 ### Upgrade Chef Automate
 
-- Follow instructions to upgrade to automate 4.x or higher. opensearch support is available on automate version 4.x or higher. [Click here to know how to upgrade to automate 4.x]({{< ref "major_upgrade.md" >}})
+- Follow instructions to upgrade to Chef Automate 4.x or higher. OpenSearch support is available on Chef Automate version 4.x or higher. [Click here to know how to upgrade to Chef Automate 4.x]({{< ref "major_upgrade.md" >}})
 ```
 
 ### Stop Chef Automate
@@ -60,7 +60,8 @@ After successful upgrade, stop Chef Automate Services.
 sudo chef-automate stop
 ```
 
-## Upgrading Elasticsearch to Opensearch
+## Upgrading Elasticsearch to OpenSearch
+
 Chef Automate 4.x supports external OpenSearch. Please follow the migration section below to migrate from external Elasticsearch to external OpenSearch.
 
 Steps To Enable External OpenSearch
@@ -82,8 +83,8 @@ For example:
 # [global.v1.external.opensearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.opensearch.auth.basic_auth]
-## Create this opensearch user before starting the Automate deployment;
-## Automate assumes it exists.
+## Create this opensearch user before starting the Chef Automate deployment;
+## Chef Automate assumes it exists.
 #   username = "<admin username>"
 #   password = "<admin password>"
 # [global.v1.external.opensearch.ssl]
@@ -100,14 +101,14 @@ For example:
 ```
 
 ## Steps To Migrate from External Elasticsearch to External OpenSearch
-Please refer the documententation for the elastic search migration to opensearch.
+
+Please refer the documententation for the Elasticsearch migration to OpenSearch.
 
 [OpenSearch's documentation on upgrading to OpenSearch](https://opensearch.org/docs/latest/upgrade-to/upgrade-to/#upgrade-to-opensearch).
 
-Once the migration of the data is complete, you can now configure Chef Automate to use Opensearch clusters,
+Once the migration of the data is complete, you can now configure Chef Automate to use OpenSearch clusters,
 using `chef-automate config patch` command.
 
 {{< note >}}
-After upgrading to version 4.x, Automate will continue to have both the configuration for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
+After upgrading to version 4.x, Chef Automate will have the configurations both for OpenSearch and Elasticsearch. We recommend removing the Elasticsearch configuration after upgrading to external OpenSearch.
 {{< /note >}}
-

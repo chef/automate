@@ -43,9 +43,7 @@ external_fqdn = "{{.Fqdn}}"
     target = "{{.LicenseTarget}}"
     secure = {{.LicenseSecure}}
 `
-	tempDir, err := ioutil.TempDir("", "config-from-viper-test")
-	require.NoError(t, err, "could not create temporary test directory")
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	testConfig := struct {
 		Host          string
@@ -76,7 +74,7 @@ external_fqdn = "{{.Fqdn}}"
 	tomlPath := filepath.Join(tempDir, "config.toml")
 	tmpl := template.Must(template.New("Config").Parse(cfgTemplate))
 	var rendered bytes.Buffer
-	err = tmpl.Execute(&rendered, testConfig)
+	err := tmpl.Execute(&rendered, testConfig)
 	require.NoError(t, err, "Failed to render test config template into string")
 	err = ioutil.WriteFile(tomlPath, rendered.Bytes(), 0755)
 	require.NoError(t, err, fmt.Sprintf("Failed to create %s", tomlPath))

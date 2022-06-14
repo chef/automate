@@ -14,9 +14,7 @@ import (
 
 func TestCopyDir(t *testing.T) {
 	t.Run("it fails when src directory isn't a directory", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "TestCopyDir")
-		defer os.RemoveAll(tmpDir)
-		require.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		srcData := []byte("src data")
 		srcPath := path.Join(tmpDir, "src")
@@ -27,9 +25,7 @@ func TestCopyDir(t *testing.T) {
 	})
 
 	t.Run("it recursively copies files", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "TestCopyDir")
-		defer os.RemoveAll(tmpDir)
-		require.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		srcDir := filepath.Join(tmpDir, "src")
 		dstDir := filepath.Join(tmpDir, "dst")
@@ -62,9 +58,7 @@ func TestCopyDir(t *testing.T) {
 	})
 
 	t.Run("it recursively copies directories to given depth", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "TestCopyDir")
-		defer os.RemoveAll(tmpDir)
-		require.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		srcDir := filepath.Join(tmpDir, "src")
 		dstDir := filepath.Join(tmpDir, "dst")
@@ -96,9 +90,7 @@ func TestCopyDir(t *testing.T) {
 	})
 
 	t.Run("it doesn't recursively copy with no recursive set", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "TestCopyDir")
-		defer os.RemoveAll(tmpDir)
-		require.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		srcDir := filepath.Join(tmpDir, "src")
 		dstDir := filepath.Join(tmpDir, "dst")
@@ -122,9 +114,7 @@ func TestCopyDir(t *testing.T) {
 	})
 
 	t.Run("it fails when the dest directory exists", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "TestCopyDir")
-		defer os.RemoveAll(tmpDir)
-		require.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		srcDir := filepath.Join(tmpDir, "src")
 		dstDir := filepath.Join(tmpDir, "dst")
@@ -136,9 +126,7 @@ func TestCopyDir(t *testing.T) {
 	})
 
 	t.Run("it overwrites dest files when overwrite is set", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "TestCopyDir")
-		defer os.RemoveAll(tmpDir)
-		require.NoError(t, err)
+		tmpDir := t.TempDir()
 
 		srcDir := filepath.Join(tmpDir, "src")
 		dstDir := filepath.Join(tmpDir, "dst")
@@ -160,7 +148,7 @@ func TestCopyDir(t *testing.T) {
 
 		require.NoError(t, fileutils.CopyDir(srcDir, dstDir, fileutils.Overwrite()))
 
-		file1DataDst, err = ioutil.ReadFile(file1PathDst)
+		file1DataDst, err := ioutil.ReadFile(file1PathDst)
 		require.NoError(t, err)
 		file2DataDst, err = ioutil.ReadFile(file2PathDst)
 		require.NoError(t, err)

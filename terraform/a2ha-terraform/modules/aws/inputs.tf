@@ -48,6 +48,15 @@ variable "aws_instance_profile_name" {
   default = ""
 }
 
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
+
+variable "aws_region" {
+  default     = "us-west-2"
+  description = "The name of the selected AWS region / datacenter."
+}
+
 variable "aws_ssh_key_file" {
 }
 
@@ -92,6 +101,14 @@ variable "lb_access_logs" {
   default = false
 }
 
+variable "managed_opensearch_domain_name" {
+  default = ""
+}
+
+variable "managed_opensearch_domain_url" {
+  default = ""
+}
+
 variable "nfs_mount_path" {
   default = "/mnt/automate_backups"
 }
@@ -118,6 +135,14 @@ variable "opensearch_listen_port" {
 
 variable "opensearch_server_instance_type" {
   default = "m5a.large"
+}
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
 }
 
 variable "pgleaderchk_listen_port" {

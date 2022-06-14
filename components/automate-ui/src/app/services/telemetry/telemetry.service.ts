@@ -57,6 +57,7 @@ export class TelemetryService {
   private currentUrl: string;
   private  telemetryCheckboxObservable = new Subject<boolean>();
   private isSkipNotification = false;
+  private deploymentType: string;
 
   constructor(private httpClient: HttpClient,
     private configService: ConfigService,
@@ -91,6 +92,7 @@ export class TelemetryService {
         this.maxNodes = config.maxNodes;
         this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
         this.instanceId = config.deploymentId || configService.defaultDeployId;
+        this.deploymentType = config.deploymentType;
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
@@ -273,6 +275,7 @@ export class TelemetryService {
       "product": "${this.product}",
       "product_version": "${this.buildVersion}",
       "install_context": "habitat",
+      "deployment_type": "${this.deploymentType}",
       "timestamp": "${this.getCurrentDateTime()}",
       "payload": ${JSON.stringify(payload)}
     }`;

@@ -110,6 +110,12 @@ func exit(err error) {
 	os.Exit(0)
 }
 
+func errorCondition(err error) {
+	if err != nil {
+		exit(err)
+	}
+}
+
 func main() {
 	var (
 		uniqID       bool
@@ -258,28 +264,20 @@ func main() {
 	// Publish a single raw message
 	if len(rawMessage) > 0 {
 		err := client.Connect()
-		if err != nil {
-			exit(err)
-		}
+		errorCondition(err)
 
 		err = client.PublishBytes([]byte(rawMessage))
-		if err != nil {
-			exit(err)
-		}
+		errorCondition(err)
 		os.Exit(0)
 	}
 
 	if infiniteLoop {
 		err := client.Connect()
-		if err != nil {
-			exit(err)
-		}
+		errorCondition(err)
 
 		for {
 			err = client.PublishHabEvent(&event)
-			if err != nil {
-				exit(err)
-			}
+			errorCondition(err)
 
 			time.Sleep(1 * time.Second)
 
@@ -291,9 +289,7 @@ func main() {
 
 		// Publish a single message
 		err := client.ConnectAndPublish(&event)
-		if err != nil {
-			exit(err)
-		}
+		errorCondition(err)
 
 	}
 }

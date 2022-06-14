@@ -16,11 +16,11 @@ gh_repo = "automate"
 The _Reports_ page (Compliance > Reports) provides comprehensive insight into the compliance status of all scanned infrastructure.
 Scan results for audit cookbook configurations also appear in this view.
 
-{{% note %}}
+{{< note >}}
 
 If the size of a Compliance Report is over 4MB, then the _Reports_ page may not display as expected.
 
-{{% /note %}}
+{{< /note >}}
 
 ![Reports](/images/automate/reports.png)
 
@@ -166,9 +166,9 @@ Top Platform Failures
 
 The _Profile Status_ view shows your system's compliance status from the compliance perspective of Compliance profiles run during scans.
 
-{{% note %}}
+{{< note >}}
 The control count in the _Profile Status_ pane (Reports > Profile Status) shows the total number of executed controls, not the total number of unique controls.
-{{% /note %}}
+{{< /note >}}
 
 Control Status
 : Shows the number of controls in your system, grouped by passing, failing, and skipped controls.

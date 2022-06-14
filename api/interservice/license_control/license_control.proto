@@ -85,4 +85,5 @@ message GetDeploymentIDRequest {
 
 message GetDeploymentIDResponse {
   string deployment_id = 1;
+  string deployment_type = 2;
 }

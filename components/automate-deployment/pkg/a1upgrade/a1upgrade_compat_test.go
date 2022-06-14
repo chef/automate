@@ -115,8 +115,7 @@ func TestLocalBackupDirectoryDoesNotExist(t *testing.T) {
 }
 
 func TestLocalBackupDirectoryExistsAndIsEmpty(t *testing.T) {
-	testDir, _ := ioutil.TempDir("", "TestEmptyBackupDir")
-	defer os.Remove(testDir)
+	testDir := t.TempDir()
 
 	checker := NewCompatChecker()
 	err := checker.BackupConfigured("fs", false, testDir, "")
@@ -128,10 +127,9 @@ func TestLocalBackupDirectoryExistsAndIsEmpty(t *testing.T) {
 }
 
 func TestLocalBackupDirNonEmpty(t *testing.T) {
-	testDir, _ := ioutil.TempDir("", "TestBackupDir")
+	testDir := t.TempDir()
 	testFile, _ := ioutil.TempFile(testDir, "TestFile")
 	defer os.Remove(testFile.Name())
-	defer os.Remove(testDir)
 
 	checker := NewCompatChecker()
 	err := checker.BackupConfigured("fs", false, testDir, "")
@@ -203,11 +201,10 @@ func TestWorkflowGitReposDirDoesNotExist(t *testing.T) {
 }
 
 func TestWorkflowGitReposDirExistWithData(t *testing.T) {
-	gitReposDir, _ := ioutil.TempDir("", "TestGitReposDir")
+	gitReposDir := t.TempDir()
 	// Create a subdirectory of the workflow directory so that the workflow
 	// directory will be non-empty. We don't use this subdirectory otherwise.
 	_, _ = ioutil.TempDir(gitReposDir, "WorkflowSubdir")
-	defer os.RemoveAll(gitReposDir)
 
 	checker := NewCompatChecker()
 	err := checker.WorkflowGitReposValid(gitReposDir)
@@ -219,8 +216,7 @@ func TestWorkflowGitReposDirExistWithData(t *testing.T) {
 
 // @afiune Do we care if the git_repos dir is empty?
 func TestWorkflowGitReposDirExistWithNOData(t *testing.T) {
-	gitReposDir, _ := ioutil.TempDir("", "TestGitReposDir")
-	defer os.Remove(gitReposDir)
+	gitReposDir := t.TempDir()
 
 	checker := NewCompatChecker()
 	err := checker.WorkflowGitReposValid(gitReposDir)
@@ -232,11 +228,9 @@ func TestWorkflowGitReposDirExistWithNOData(t *testing.T) {
 
 func TestRunningMarketplaceImage(t *testing.T) {
 	t.Run("the config is invalid when chef-marketplace is installed", func(t *testing.T) {
-		testDirBase, _ := ioutil.TempDir("", "")
+		testDirBase := t.TempDir()
 		testDir := path.Join(testDirBase, "chef-marketplace")
 		_ = os.Mkdir(testDir, 0755)
-
-		defer os.RemoveAll(testDirBase)
 
 		checker := NewCompatChecker()
 		err := checker.RunningMarketplaceImage(path.Dir(testDir))
@@ -245,12 +239,10 @@ func TestRunningMarketplaceImage(t *testing.T) {
 	})
 
 	t.Run("the config is valid when chef-marketplace is not installed", func(t *testing.T) {
-		testDirBase, _ := ioutil.TempDir("", "")
+		testDirBase := t.TempDir()
 		// some other omnibus package that is not explicitly banned
 		testDir := path.Join(testDirBase, "chef-client")
 		_ = os.Mkdir(testDir, 0755)
-
-		defer os.Remove(testDir)
 
 		checker := NewCompatChecker()
 		err := checker.RunningMarketplaceImage(path.Dir(testDir))
@@ -454,11 +446,9 @@ func TestCSBookshelfConfigValid(t *testing.T) {
 
 func TestUnsupportedCSAddOnsNotUsed(t *testing.T) {
 	t.Run("the config is invalid when chef-manage is used", func(t *testing.T) {
-		testDirBase, _ := ioutil.TempDir("", "")
+		testDirBase := t.TempDir()
 		testDir := path.Join(testDirBase, "chef-manage")
 		_ = os.Mkdir(testDir, 0755)
-
-		defer os.RemoveAll(testDirBase)
 
 		checker := NewCompatChecker()
 		err := checker.UnsupportedCSAddOnsNotUsed(path.Dir(testDir))
@@ -467,11 +457,9 @@ func TestUnsupportedCSAddOnsNotUsed(t *testing.T) {
 	})
 
 	t.Run("the config is invalid when opscode-push-jobs-server is used", func(t *testing.T) {
-		testDirBase, _ := ioutil.TempDir("", "")
+		testDirBase := t.TempDir()
 		testDir := path.Join(testDirBase, "opscode-push-jobs-server")
 		_ = os.Mkdir(testDir, 0755)
-
-		defer os.Remove(testDir)
 
 		checker := NewCompatChecker()
 		err := checker.UnsupportedCSAddOnsNotUsed(path.Dir(testDir))
@@ -480,11 +468,9 @@ func TestUnsupportedCSAddOnsNotUsed(t *testing.T) {
 	})
 
 	t.Run("the config is invalid when opscode-reporting is used", func(t *testing.T) {
-		testDirBase, _ := ioutil.TempDir("", "")
+		testDirBase := t.TempDir()
 		testDir := path.Join(testDirBase, "opscode-reporting")
 		_ = os.Mkdir(testDir, 0755)
-
-		defer os.Remove(testDir)
 
 		checker := NewCompatChecker()
 		err := checker.UnsupportedCSAddOnsNotUsed(path.Dir(testDir))
@@ -493,11 +479,9 @@ func TestUnsupportedCSAddOnsNotUsed(t *testing.T) {
 	})
 
 	t.Run("the config is invalid when opscode-analytics is used", func(t *testing.T) {
-		testDirBase, _ := ioutil.TempDir("", "")
+		testDirBase := t.TempDir()
 		testDir := path.Join(testDirBase, "opscode-analytics")
 		_ = os.Mkdir(testDir, 0755)
-
-		defer os.Remove(testDir)
 
 		checker := NewCompatChecker()
 		err := checker.UnsupportedCSAddOnsNotUsed(path.Dir(testDir))
@@ -506,12 +490,10 @@ func TestUnsupportedCSAddOnsNotUsed(t *testing.T) {
 	})
 
 	t.Run("the config is valid when no unsupported add-ons are used", func(t *testing.T) {
-		testDirBase, _ := ioutil.TempDir("", "")
+		testDirBase := t.TempDir()
 		// some other omnibus package that is not explicitly banned
 		testDir := path.Join(testDirBase, "chef-client")
 		_ = os.Mkdir(testDir, 0755)
-
-		defer os.Remove(testDir)
 
 		checker := NewCompatChecker()
 		err := checker.UnsupportedCSAddOnsNotUsed(path.Dir(testDir))

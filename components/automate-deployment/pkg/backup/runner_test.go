@@ -3,7 +3,6 @@ package backup
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -98,9 +97,7 @@ func operationByName(name string, ops []*api.DeployEvent_Backup_Operation) *api.
 
 func TestListBackups(t *testing.T) {
 	t.Run("lists the backups", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "list-backups-test")
-		require.NoError(t, err, "test backup directory")
-		defer os.RemoveAll(dir)
+		dir := t.TempDir()
 
 		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
@@ -119,9 +116,7 @@ func TestListBackups(t *testing.T) {
 	})
 
 	t.Run("lists backup only requires the runner to be configured with a backupDir to work", func(t *testing.T) {
-		dir, err := ioutil.TempDir("", "list-backups-test")
-		require.NoError(t, err, "test backup directory")
-		defer os.RemoveAll(dir)
+		dir := t.TempDir()
 
 		// Fake out a backup dir
 		os.MkdirAll(filepath.Join(dir, "20180418151753"), defaultDirPerms)
@@ -137,9 +132,7 @@ func TestListBackups(t *testing.T) {
 func TestBackupDelete(t *testing.T) {
 	t.Run("round-trip create/delete", func(t *testing.T) {
 		t.Skip()
-		dir, err := ioutil.TempDir("", "delete-backups-test")
-		require.NoError(t, err, "test backup directory")
-		defer os.RemoveAll(dir)
+		dir := t.TempDir()
 
 		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
@@ -213,17 +206,15 @@ func waitForBackup(e events.EventSender) error {
 }
 
 func testBackupRunner(specs []Spec, timeout time.Duration) (*Runner, context.Context, *deployment.Deployment, events.EventSender, func()) {
-	tmpDir, _ := ioutil.TempDir("", "runner-test")
-
 	sender := events.NewMemoryEventSender("test-backup")
-	ctx, _ := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	dep, _ := deployment.CreateDeployment()
 	dep.Lock()
 
 	return NewRunner(
 		WithSpecs(specs),
 		WithBackupLocationSpecification(testLocationSpec("/tmp")),
-	), ctx, dep, sender, func() { os.RemoveAll(tmpDir) }
+	), ctx, dep, sender, cancel
 }
 
 func testDefaultSpecs() []Spec {

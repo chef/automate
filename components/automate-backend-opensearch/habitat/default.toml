@@ -1,4 +1,4 @@
-# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING 
 #
 # If you are modifying this file, you almost surely also want to
 # modify pkg/es/config_request.go. The DefaultConfigRequest() function
@@ -252,13 +252,26 @@
     indices = "[\".opendistro-alerting-config\", \".opendistro-alerting-alert*\", \".opendistro-anomaly-results*\", \".opendistro-anomaly-detector*\", \".opendistro-anomaly-checkpoints\", \".opendistro-anomaly-detection-state\", \".opendistro-reports-*\", \".opendistro-notifications-*\", \".opendistro-notebooks\", \".opensearch-observability\", \".opendistro-asynchronous-search-response*\", \".replication-metadata-store\"]"
   cloud_aws_signer = ""
   #security.ssl.http.enabled = false
+
+# ======================== S3 Client Configuration =========================
+[s3]
+  [s3.client.default]
+    protocol = "https"
+    read_timeout = "60s"
+    max_retries = "3"
+    use_throttle_retries = true
+    endpoint = "s3.amazonaws.com"
+
 # ======================== Runtime Configuration =========================
 [runtime]
   max_open_files = ""
   max_locked_memory = "unlimited"
   es_startup_sleep_time = ""
   es_java_opts = ""
-  heapsize = "2g"
+  minHeapsize = "2g"
+  maxHeapsize = "2g"
+  g1ReservePercent = "25"
+  initiatingHeapOccupancyPercent = "30"
 
 [deprecated]
 external_os = false
@@ -266,5 +279,7 @@ external_os = false
 [opensearch_auth]
   admin_username = "admin"
   admin_password = "admin"
+  #Bcrypt hashed password
+  hashed_password = "$2a$12$yObdBmd8JFy2ar7nRjv46OYs3P3q5uB9llsrLRppWyAO/YOQ2JW3m"
 
 [tls]

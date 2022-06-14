@@ -1,5 +1,6 @@
 [overrides]
   automate_fqdn = "${automate_fqdn}"
+  aws_region = "${aws_region}"
   automate_admin_email = "${automate_admin_email}"
   automate_admin_username = "${automate_admin_username}"
   automate_admin_password = "${automate_admin_password}"
@@ -22,10 +23,13 @@
   svc_group = "default"
   svc_name = "automate-ha-opensearch"
   svc_port = ${opensearch_listen_port}
-  managed_elasticsearch_certificate = "${managed_elasticsearch_certificate}"
-  managed_elasticsearch_domain_url = "${managed_elasticsearch_domain_url}"
-  managed_elasticsearch_user_password = "${managed_elasticsearch_user_password}"
-  managed_elasticsearch_username = "${managed_elasticsearch_username}"
+  managed_opensearch_certificate = "${managed_opensearch_certificate}"
+  managed_opensearch_domain_url = "${managed_opensearch_domain_url}"
+  managed_opensearch_user_password = "${managed_opensearch_user_password}"
+  managed_opensearch_username = "${managed_opensearch_username}"
+  aws_os_snapshot_role_arn = "${aws_os_snapshot_role_arn}"
+  os_snapshot_user_access_key_id = "${os_snapshot_user_access_key_id}"
+  os_snapshot_user_access_key_secret = "${os_snapshot_user_access_key_secret}"
 
   [services.postgresql]
   ips = ${postgresql_ips}

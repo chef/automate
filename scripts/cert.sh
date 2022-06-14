@@ -17,7 +17,12 @@ openssl x509 -req -in admin.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreatese
  
 # root pem cert that signed the below cert/key pairs below
 # Used for hab_sup_http_gateway_ca_cert 
-cat <<EOF >> terraform/variables_common.tf
+
+touch terraform/cert.tf
+
+echo "cert.tf is created and will be added with valuse"
+
+cat <<EOF >> terraform/cert.tf
 
 variable "hab_sup_http_gateway_ca_cert" {
   default = <<CERT

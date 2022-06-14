@@ -17,7 +17,57 @@ gh_repo = "automate"
 
 This page explains how to deploy Chef Automate High Availability (HA) in your network premises/ infrastructure using Amazon Web Services (AWS).
 
+<<<<<<< HEAD
 ## Prerequisite
+=======
+1. Set up the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_architecture_reference.md#System Requirements" >}} )).
+1. Obtain an AWS account or if you already have one, sign on to your AWS account.
+1. Setup the [Bastion Host AWS requirements](( {{< relref "ha_bastion.md#Bastion Host Requirements for AWS (Amazon Web Services)" >}} )).
+1. Ensure you have [Chef Automate utility](( {{< relref "ha_bastion.md#Download and Install the Chef Automate Utility" >}})) installed, else download and install the latest version.
+1. Configure [Bastion Host for AWS ](( {{< relref "ha_bastion.md#Configuring Bastion for AWS Deployment Type" >}} )).
+1. Connect your [Bastion host to your AWS instance](( {{< relref "#Establishing SSH Connection with Bastion Host" >}} )).
+1. Create an [AWS Identity and Access Management IAM user](( {{< relref "ha_common.md#IAM Users.md" >}} )).
+1. Create the certificate for the Chef Automate and Chef Server load balancers.
+1. Create the certificates for security and authentication purposes. *optional*
+1. Rotate the certificates if the certificates are expired or compromised. *optional*
+1. Enable *dnshostname* in VPC, which determines whether the VPC supports assigning public DNS hostnames to instances with public IP addresses.
+1. Execute [AWS Deployment commands](( {{< relref "#AWS Cloud Deployment Procedure" >}} )) to provision the Chef Automate HA on your cloud  network infrastructure.
+
+{{< note >}}
+
+A DNS hostname uniquely names a computer and consists of a host name and a domain name. DNS servers resolve DNS hostnames to their
+corresponding IP addresses. To set up DNS in your VPC, ensure that DNS hostnames and DNS resolution are both enabled in your VPC.
+
+Refer [Setting up DNS in Your VPC](https://docs.aws.amazon.com/glue/latest/dg/set-up-vpc-dns.html) page.
+
+If the DNS attributes, *enableDnsSupport* and *enableDnsHostnames* are true, instances in the VPC is set with public DNS hostnames.
+The default for these attributes are `false` when the VPC is a default VPC or the VPC is created using the VPC console wizard.
+
+{{< /note >}}
+
+1. Execute the [Chef Automate HA deployment commands](( {{< relref "#AWS Cloud Deployment Procedured" >}} )).
+
+## Establishing SSH Connection with Bastion Host
+
+This section explains the procedure to establish the connection between your bastion host and an AWS account. A key pair consists of a public key that AWS stores and a private key file you store. Together, they allow you to connect to your instance securely.
+
+1. Navigate to the AWS Management Console.
+1. Select **Instances** > **EC2** option from the left menu.
+1. Search your instance and select the corresponding Instance ID. The **AWS Console** displays the **Instance Summary** screen.
+1. Select **Connect**. The AWS console displays various methods to connect to your instance. Here, we have used the Mac system.
+1. Open an **SSH client**.
+1. Locate your private key file and navigate to that directory.
+1. Run the `chmod 400 key.pem` command (`key.pem` is the name of the key pair file name) to ensure your key is not publicly viewable.
+
+![AWS EC2 Launch Status](/images/automate/ha_aws_connect.png)
+
+{{< figure src="/images/automate/ha-aws-launch-status.png" alt="AWS EC2 Launch Status">}}
+
+1. Connect to your instance using its public DNS. For example, `ssh -i "doc-bastion.pem" ubuntu@ec2-3-24-212-25.ap-southeast-2.compute.amazonaws.com`.
+1. Select `yes` when the terminal prompts you to connect.
+
+{{< figure src="/images/automate/ha_aws_ssh_connection.png" alt="AWS SSH Connection Details">}}
+>>>>>>> main
 
 Based on the number of nodes, the virtual machine requirements for AWS deployment are as follows:
 

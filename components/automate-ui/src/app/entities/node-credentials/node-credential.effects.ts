@@ -89,7 +89,7 @@ export class NodeCredentialEffects {
   createNodeCredentialSuccess$ = createEffect(() =>
     this.actions$.pipe(
     ofType(NodeCredentialActionTypes.CREATE_SUCCESS),
-    map(({ payload: { } }: CreateNodeCredentialSuccess) => new CreateNotification({
+    map(() => new CreateNotification({
       type: Type.info,
       message: 'Created node credential.'
     }))));

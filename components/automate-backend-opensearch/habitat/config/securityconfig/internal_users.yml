@@ -1,1 +1,14 @@
-# This file intentionally left empty
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+# Define your internal users here
+
+## Demo users
+
+{{cfg.opensearch_auth.admin_username}}:
+  hash: "{{cfg.opensearch_auth.hashed_password}}"
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "admin user"

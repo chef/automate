@@ -2,8 +2,6 @@ package selfupdater
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
 	"path"
 	"testing"
 
@@ -36,9 +34,7 @@ func (m *mockUpdateSource) ExpectExecutableFetch(ctx context.Context, desiredVer
 
 func TestExecutableIsFetchedAndCachedWhenUpdateRequired(t *testing.T) {
 	ctx := context.Background()
-	tmpdir, err := ioutil.TempDir("", "TestExecutableCache")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 	executablecache := executablecache.New(executablecache.WithCacheDir(tmpdir))
 	updateSource := &mockUpdateSource{}
 	updateSource.ExpectExecutableFetch(ctx, "1", "#!/bin/sh\n")
@@ -59,9 +55,7 @@ func TestExecutableIsFetchedAndCachedWhenUpdateRequired(t *testing.T) {
 
 func TestExecutableIsTakenFromCacheIfExists(t *testing.T) {
 	ctx := context.Background()
-	tmpdir, err := ioutil.TempDir("", "TestExecutableCache")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 	executablecache := executablecache.New(executablecache.WithCacheDir(tmpdir))
 	updateSource := &mockUpdateSource{}
 	updateSource.ExpectExecutableFetch(ctx, "1", "#!/bin/sh\n")
@@ -72,7 +66,7 @@ func TestExecutableIsTakenFromCacheIfExists(t *testing.T) {
 		myVersion:       "0",
 	}
 
-	_, err = updater.NextExecutable(ctx)
+	_, err := updater.NextExecutable(ctx)
 	require.NoError(t, err)
 
 	_, err = updater.NextExecutable(ctx)
@@ -84,9 +78,7 @@ func TestExecutableIsTakenFromCacheIfExists(t *testing.T) {
 
 func TestNextExecutableIsNotAvailableWhenVersionsMatch(t *testing.T) {
 	ctx := context.Background()
-	tmpdir, err := ioutil.TempDir("", "TestExecutableCache")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 	executablecache := executablecache.New(executablecache.WithCacheDir(tmpdir))
 	updateSource := &mockUpdateSource{}
 	updateSource.ExpectExecutableFetch(ctx, "1", "#!/bin/sh\n")

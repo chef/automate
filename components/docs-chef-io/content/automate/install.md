@@ -38,7 +38,7 @@ You can customize your FQDN, login name, and other values, by changing the value
 If you have requirements around data size and/or redundancy, see [Configuring External
 Data Stores]({{< relref "#configuring-external-data-stores" >}}) for information on
 configuring Chef Automate to use an externally-deployed PostgreSQL database cluster
-and/or Opensearch cluster. If you have requirements around a highly-available
+and/or OpenSearch cluster. If you have requirements around a highly-available
 deployment of Chef Automate, please reach out to a Customer Success or Professional
 Services representative for assistance.
 
@@ -133,13 +133,13 @@ and retry opening Chef Automate in your browser.
 
 ### Configuring External Data Stores
 
-You can configure Chef Automate to use PostgreSQL and Opensearch clusters that are not deployed via Chef Automate itself.
+You can configure Chef Automate to use PostgreSQL and OpenSearch clusters that are not deployed via Chef Automate itself.
 The directions provided below are intended for use only during initial deployment of Chef Automate.
 
-#### Configuring External Opensearch
+#### Configuring External OpenSearch
 
 {{< note >}}
-Chef Automate supports the official Opensearch Service by Amazon Web Services. Chef Automate does not test or support alternative services, such as Amazon Opensearch Service (Amazon OS).
+Chef Automate supports the official OpenSearch Service by Amazon Web Services. Chef Automate does not test or support alternative services, such as Amazon OpenSearch Service (Amazon OS).
 {{< /note >}}
 
 Add the following to your config.toml:
@@ -153,8 +153,8 @@ Add the following to your config.toml:
 # [global.v1.external.opensearch.auth]
 #   scheme = "basic_auth"
 # [global.v1.external.opensearch.auth.basic_auth]
-## Create this opensearch user before starting the Automate deployment;
-## Automate assumes it exists.
+## Create this OpenSearch user before starting the Automate deployment;
+## Chef Automate assumes it exists.
 #   username = "<admin username>"
 #   password = "<admin password>"
 # [global.v1.external.opensearch.ssl]
@@ -162,7 +162,7 @@ Add the following to your config.toml:
 #  root_cert = """$(cat </path/to/cert_file.crt>)"""
 #  server_name = "<opensearch server name>"
 
-# Uncomment and fill out if using external opensearch that uses hostname-based routing/load balancing
+# Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
 # [esgateway.v1.sys.ngx.http]
 #  proxy_set_header_host = "<your external es hostname>:1234"
 
@@ -170,15 +170,15 @@ Add the following to your config.toml:
 #  ssl_verify_depth = "2"
 ```
 
-Because externally-deployed Opensearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure Opensearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
+Because externally-deployed OpenSearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure OpenSearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
-##### Adding Resolvers for Opensearch
+##### Adding Resolvers for OpenSearch
 
-In case you want to resolve the Opensearch node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
+In case you want to resolve the OpenSearch node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
 
 Name Servers can be added in two ways:
 
-1. **Add nameserver IPs:** Add the nameservers to your `config.toml` file to resolve the Opensearch nodes.
+1. **Add nameserver IPs:** Add the nameservers to your `config.toml` file to resolve the OpenSearch nodes.
 
     ```toml
     [esgateway.v1.sys.ngx.main.resolvers]
@@ -207,12 +207,12 @@ If you wish to reset to the default configuration or to modify the configuration
 1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
 1. Run `chef-automate config set config.toml` to apply your changes.
 
-##### Backup Externally-Deployed Opensearch to Local Filesystem
+##### Backup Externally-Deployed OpenSearch to Local Filesystem
 
-To configure local filesystem backups of Chef Automate data stored in an externally-deployed Opensearch cluster:
+To configure local filesystem backups of Chef Automate data stored in an externally-deployed OpenSearch cluster:
 
-1. Ensure that the filesystems you intend to use for backups are mounted to the same path on all Opensearch master and data nodes.
-1. Configure the Opensearch `path.repo` setting on each node as described in the [Opensearch documentation](https://opensearch.org/docs/latest/monitoring-plugins/pa/reference/).
+1. Ensure that the filesystems you intend to use for backups are mounted to the same path on all OpenSearch master and data nodes.
+1. Configure the OpenSearch `path.repo` setting on each node as described in the [OpenSearch documentation](https://opensearch.org/docs/latest/monitoring-plugins/pa/reference/).
 1. Add the following to your `config.toml`:
 
 ```toml
@@ -221,18 +221,18 @@ enable = true
 location = "fs"
 
 [global.v1.external.opensearch.backup.fs]
-# The `path.repo` setting you've configured on your Opensearch nodes must be
+# The `path.repo` setting you've configured on your OpenSearch nodes must be
 # a parent directory of the setting you configure here:
 path = "/var/opt/chef-automate/backups"
 ```
 
-##### Backup Externally-Deployed Opensearch to AWS S3
+##### Backup Externally-Deployed OpenSearch to AWS S3
 
-To configure AWS S3 backups of Chef Automate data stored in an externally-deployed Opensearch cluster:
+To configure AWS S3 backups of Chef Automate data stored in an externally-deployed OpenSearch cluster:
 
-1. Install the `repository-s3` plugin on all nodes in your Opensearch cluster.
-1. If you wish to use IAM authentication to provide your Opensearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
-1. Configure each Opensearch node with a S3 client configuration containing the proper S3 endpoint, credentials, and other settings as described in the Opensearch documentation.
+1. Install the `repository-s3` plugin on all nodes in your OpenSearch cluster.
+1. If you wish to use IAM authentication to provide your OpenSearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
+1. Configure each OpenSearch node with a S3 client configuration containing the proper S3 endpoint, credentials, and other settings as described in the OpenSearch documentation.
 1. Enable S3 backups by adding the following settings to your `config.toml`:
 
     ```toml
@@ -251,7 +251,7 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
 
       # name of an s3 client configuration you create in your opensearch.yml
       # for full documentation on how to configure client settings on your
-      # Opensearch nodes
+      # OpenSearch nodes
       client = "<client name>"
 
     [global.v1.external.opensearch.backup.s3.settings]
@@ -275,13 +275,13 @@ To configure AWS S3 backups of Chef Automate data stored in an externally-deploy
     # protocol = "https"
     ```
 
-##### Backup Externally-Deployed Opensearch to GCS
+##### Backup Externally-Deployed OpenSearch to GCS
 
-To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data stored in an externally-deployed Opensearch cluster:
+To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data stored in an externally-deployed OpenSearch cluster:
 
-1. Install the `repository-gcs` plugin on all nodes in your Opensearch cluster.
-1. Create a storage bucket and configure a service account to access it per the steps described in the Opensearch documentation.
-1. Configure each Opensearch node with a GCS client configuration that contains the proper GCS settings as described in the Opensearch documentation.
+1. Install the `repository-gcs` plugin on all nodes in your OpenSearch cluster.
+1. Create a storage bucket and configure a service account to access it per the steps described in the OpenSearch documentation.
+1. Configure each OpenSearch node with a GCS client configuration that contains the proper GCS settings as described in the OpenSearch documentation.
 1. Enable GCS backups by adding the following settings to your `config.toml`:
 
     ```toml
@@ -291,7 +291,7 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
       ## If multiple
       # nodes = ["https://my-es.node-1", "https://my-es.node-2", "etc..."]
 
-    ## The following settings are required if you have Opensearch setup with basic auth
+    ## The following settings are required if you have OpenSearch setup with basic auth
     #[global.v1.external.opensearch.auth]
     #  scheme = "basic_auth"
     #

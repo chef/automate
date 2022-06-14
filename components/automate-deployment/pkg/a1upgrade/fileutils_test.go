@@ -14,9 +14,7 @@ import (
 
 func TestIsEmptyDir(t *testing.T) {
 	t.Run("it returns true if the path is an empty directory", func(t *testing.T) {
-		tmpdir, err := ioutil.TempDir("", "FileUtilsTestDir")
-		require.NoError(t, err)
-		defer os.RemoveAll(tmpdir)
+		tmpdir := t.TempDir()
 
 		res, err := a1upgrade.IsEmptyDir(tmpdir)
 		require.NoError(t, err)
@@ -24,9 +22,7 @@ func TestIsEmptyDir(t *testing.T) {
 	})
 
 	t.Run("it returns false if the path is a nonempty directory", func(t *testing.T) {
-		tmpdir, err := ioutil.TempDir("", "FileutilsTestDir")
-		require.NoError(t, err)
-		defer os.RemoveAll(tmpdir)
+		tmpdir := t.TempDir()
 		ioutil.WriteFile(filepath.Join(tmpdir, "testfile"), []byte("test context"), os.ModePerm)
 
 		res, err := a1upgrade.IsEmptyDir(tmpdir)
