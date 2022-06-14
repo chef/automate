@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { IDToken, Jwt } from 'app/helpers/jwt/jwt';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-signin',
@@ -15,22 +16,27 @@ export class SigninComponent implements OnInit {
   private id: IDToken;
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
-    private session: ChefSessionService
+    private session: ChefSessionService,
+    private http: HttpClient
   ) { }
 
   ngOnInit() {
-    // Reminder: URL fragment has to be treated as user-provided input, and can
-    //           NOT be trusted in any way. /!\
-    this.route.fragment.subscribe((fragment: string) => {
-      if (fragment === null) {
+    const path = `/session/callback${window.location.search}`;
+    console.log('get path: ' + path + `${window.location.origin}${path}`);
+    // this.router.navigateByUrl(path);
+    console.log(this.http)
+    this.http.get<any>(`${window.location.origin}${path}`).subscribe((res) => {
+      console.log(res);
+      let state: string;
+      state = res.state || '';
+      if (state === '') {
         this.error = true;
         return;
       }
-      let state: string;
-      [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
-      if (this.idToken === null) {
+      this.idToken = res.id_token || '';
+      // [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
+      if (this.idToken === '') {
         this.error = true;
         return;
       }
@@ -46,7 +52,36 @@ export class SigninComponent implements OnInit {
       localStorage.setItem('manual-upgrade-banner', 'true');
       this.deleteIdTokenFromCookie(this.idToken);
       this.router.navigateByUrl(this.path);
+    }, () => {
+      this.error = true;
+      return;
     });
+    // Reminder: URL fragment has to be treated as user-provided input, and can
+    //           NOT be trusted in any way. /!\
+    // this.route.fragment.subscribe((fragment: string) => {
+    //   if (fragment === null) {
+    //     this.error = true;
+    //     return;
+    //   }
+    //   let state: string;
+    //   [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
+    //   if (this.idToken === null) {
+    //     this.error = true;
+    //     return;
+    //   }
+    //   this.id = Jwt.parseIDToken(this.idToken);
+    //   if (this.id === null) {
+    //     this.error = true;
+    //     return;
+    //   }
+    //   this.path = this.pathFromState(state);
+
+    //   this.error = false;
+    //   this.setSession();
+    //   localStorage.setItem('manual-upgrade-banner', 'true');
+    //   this.deleteIdTokenFromCookie(this.idToken);
+    //   this.router.navigateByUrl(this.path);
+    // });
   }
 
   deleteIdTokenFromCookie(token: string): void {

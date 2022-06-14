@@ -26,8 +26,6 @@ import { NotificationDetailsComponent } from './pages/notification-details/notif
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
-import { CallbackComponent } from './pages/callback/callback.components';
-
 // Components
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
@@ -375,10 +373,6 @@ const routes: Routes = [
     // since for signin, we don't want any of chef-session etc initialized.
     path: 'signin',
     component: SigninComponent
-  },
-  { 
-    path: 'callback',
-    component: CallbackComponent
   },
   // START Deprecated routes. Redirected for backwards compatibility.
   {
