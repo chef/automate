@@ -47,8 +47,8 @@ do_deploy() {
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
-    # docker exec -t "$_frontend2_container_name" \
-    #     "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
+    docker exec -t "$_frontend2_container_name" \
+        "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
 
 
     #shellcheck disable=SC2154
@@ -63,14 +63,14 @@ do_deploy() {
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
 
-    # docker exec -t "$_frontend2_container_name" \
-    #     "$cli_bin" deploy config.toml \
-    #         --hartifacts "$test_hartifacts_path" \
-    #         --override-origin "$HAB_ORIGIN" \
-    #         --manifest-dir "$test_manifest_path" \
-    #         --admin-password chefautomate \
-    #         --bootstrap-bundle bootstrap.abb \
-    #         --accept-terms-and-mlsa
+    docker exec -t "$_frontend2_container_name" \
+        "$cli_bin" deploy config.toml \
+            --hartifacts "$test_hartifacts_path" \
+            --override-origin "$HAB_ORIGIN" \
+            --manifest-dir "$test_manifest_path" \
+            --admin-password chefautomate \
+            --bootstrap-bundle bootstrap.abb \
+            --accept-terms-and-mlsa
 
     # start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 
@@ -78,7 +78,8 @@ do_deploy() {
 }
 
 
-# do_test_deploy() {
+do_test_deploy() {
+    :
 #     local test_container_ip frontend1_ip frontend2_ip
 
 #     #shellcheck disable=SC2154
@@ -121,7 +122,7 @@ do_deploy() {
 
 #     "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~purge" "~cli" "~grpc" "~deployment" "~applications"
 
-# }
+}
 
 do_dump_logs() {
     do_dump_logs_default
