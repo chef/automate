@@ -56,7 +56,6 @@
     "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
     "chef/automate-elasticsearch",
-    "chef/report-manager-service",
     "core/rsync"
   ],
 
