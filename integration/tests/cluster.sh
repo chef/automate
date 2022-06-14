@@ -47,34 +47,34 @@ do_deploy() {
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
-    docker exec -t "$_frontend2_container_name" \
-        "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
+    # docker exec -t "$_frontend2_container_name" \
+    #     "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
 
 
     #shellcheck disable=SC2154
-    docker exec -t "$_frontend1_container_name" \
-        "$cli_bin" deploy config.toml \
-            --hartifacts "$test_hartifacts_path" \
-            --override-origin "$HAB_ORIGIN" \
-            --manifest-dir "$test_manifest_path" \
-            --admin-password chefautomate \
-            --accept-terms-and-mlsa
+    # docker exec -t "$_frontend1_container_name" \
+    #     "$cli_bin" deploy config.toml \
+    #         --hartifacts "$test_hartifacts_path" \
+    #         --override-origin "$HAB_ORIGIN" \
+    #         --manifest-dir "$test_manifest_path" \
+    #         --admin-password chefautomate \
+    #         --accept-terms-and-mlsa
 
-    docker exec -t "$_frontend1_container_name" \
-        "$cli_bin" bootstrap bundle create -o bootstrap.abb
+    # docker exec -t "$_frontend1_container_name" \
+    #     "$cli_bin" bootstrap bundle create -o bootstrap.abb
 
-    docker exec -t "$_frontend2_container_name" \
-        "$cli_bin" deploy config.toml \
-            --hartifacts "$test_hartifacts_path" \
-            --override-origin "$HAB_ORIGIN" \
-            --manifest-dir "$test_manifest_path" \
-            --admin-password chefautomate \
-            --bootstrap-bundle bootstrap.abb \
-            --accept-terms-and-mlsa
+    # docker exec -t "$_frontend2_container_name" \
+    #     "$cli_bin" deploy config.toml \
+    #         --hartifacts "$test_hartifacts_path" \
+    #         --override-origin "$HAB_ORIGIN" \
+    #         --manifest-dir "$test_manifest_path" \
+    #         --admin-password chefautomate \
+    #         --bootstrap-bundle bootstrap.abb \
+    #         --accept-terms-and-mlsa
 
-    start_loadbalancer "$frontend1_ip" "$frontend2_ip"
+    # start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 
-    start_ssh_node
+    # start_ssh_node
 }
 
 
@@ -82,13 +82,13 @@ do_test_deploy() {
     local test_container_ip frontend1_ip frontend2_ip
 
     #shellcheck disable=SC2154
-    # test_container_ip=$(container_ip "$test_container_name")
-    # frontend1_ip=$(container_ip "$_frontend1_container_name")
-    # frontend2_ip=$(container_ip "$_frontend2_container_name")
+    test_container_ip=$(container_ip "$test_container_name")
+    frontend1_ip=$(container_ip "$_frontend1_container_name")
+    frontend2_ip=$(container_ip "$_frontend2_container_name")
 
-    # export ELASTICSEARCH_URL="http://$frontend1_ip:10144"
-    # export OPENSEARCH_URL="http://$frontend1_ip:10144"
-    # test_notifications_endpoint="http://$test_container_ip:15555"
+    export ELASTICSEARCH_URL="http://$frontend1_ip:10144"
+    export OPENSEARCH_URL="http://$frontend1_ip:10144"
+    test_notifications_endpoint="http://$test_container_ip:15555"
 
     # The backend will timeout pg connections after 5 minutes, which will
     # result in an EPIPE error in the services when they attempt to use the
@@ -101,25 +101,25 @@ do_test_deploy() {
     # * https://github.com/lib/pq/issues/870
     # * https://github.com/lib/pq/pull/871
     # * https://github.com/lib/pq/issues/939
-    # docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)-1a" || true
-    # docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)-1b" || true
-    # docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)-2a" || true
-    # docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)-2b" || true
+    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)-1a" || true
+    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)-1b" || true
+    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)-2a" || true
+    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)-2b" || true
 
     local admin_token
-    # admin_token=$(docker exec -t "$_frontend1_container_name" \
-    #     "$cli_bin" iam token create --admin "diagnostics-test-$RANDOM")
+    admin_token=$(docker exec -t "$_frontend1_container_name" \
+        "$cli_bin" iam token create --admin "diagnostics-test-$RANDOM")
 
-    # docker exec -t "$_frontend1_container_name" \
-    #     "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~applications"
+    docker exec -t "$_frontend1_container_name" \
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~applications"
 
-    # docker exec -t "$_frontend2_container_name" \
-    #     "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~applications"
+    docker exec -t "$_frontend2_container_name" \
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~applications"
 
-    # declare -a inspec_tests=(a2-api-integration a2-iam-no-legacy-integration);
-    # run_inspec_tests "${A2_ROOT_DIR}" "${inspec_tests[@]}"
+    declare -a inspec_tests=(a2-api-integration a2-iam-no-legacy-integration);
+    run_inspec_tests "${A2_ROOT_DIR}" "${inspec_tests[@]}"
 
-    # "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~purge" "~cli" "~grpc" "~deployment" "~applications"
+    "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~purge" "~cli" "~grpc" "~deployment" "~applications"
 
 }
 
