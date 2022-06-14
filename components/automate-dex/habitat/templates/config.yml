@@ -56,7 +56,7 @@ staticClients:
   - id: automate-session
     secret: secretchangeme # TODO
     redirectURIs:
-      - /callback
+      - /signin
     name: Automate Session Service
 {{- if cfg.connectors}}
 connectors:

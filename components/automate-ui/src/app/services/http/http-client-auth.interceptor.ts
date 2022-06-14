@@ -33,6 +33,9 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (request.url.includes('session/callback')) {
+      return next.handle(request);
+    }
     let headers = request.headers;
 
     // TODO(sr): Sadly, our UI code depends on the API ignoring unknown fields in the
