@@ -56,7 +56,8 @@ func SELinuxPermissiveCheck() Check {
 				t.ReportFailure("Failed to determine if SELinux is enabled")
 				return nil
 			}
-			if strings.EqualFold(string(out), "disabled") || strings.EqualFold(string(out), "permissive") {
+			var outValue = strings.TrimSuffix(string(out), "\n")
+			if strings.EqualFold(outValue,"disabled") || strings.EqualFold(outValue , "permissive") {
 				t.ReportSuccess("SELinux is not enabled")
 				return nil
 			}
