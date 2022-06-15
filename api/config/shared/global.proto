@@ -169,7 +169,7 @@ message External {
   message Minio {
     google.protobuf.StringValue endpoint = 1;
     google.protobuf.StringValue root_user = 2;
-    google.protobuf.StringValue root_password = 3;
+    google.protobuf.StringValue root_password = 3 [(chef.automate.api.secret) = { name: "lcr_minio_password" }];
     google.protobuf.BoolValue enable_ssl = 4;
     google.protobuf.StringValue cert = 5;
     google.protobuf.Int32Value concurrent_open_search_requests = 6;

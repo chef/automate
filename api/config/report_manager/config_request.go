@@ -1,8 +1,16 @@
 package report_manager
 
 import (
+	"fmt"
+	"os/exec"
+	"strings"
+
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+)
+
+const (
+	habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -90,14 +98,38 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	}
 
 	if minio := g.GetV1().GetExternal().GetMinio(); minio != nil {
+		rootPassword := minio.GetRootPassword()
+		if rootPassword.GetValue() == "" {
+			args := []string{
+				"show",
+				"userconfig.lcr_minio_password",
+			}
+			execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+			getPass, err := execGetPass.Output()
+			if err != nil {
+				return
+			}
+			rootPassword = w.String(strings.TrimSpace(string(getPass)))
+		}
+
 		c.V1.Sys.Minio = &ConfigRequest_V1_System_Minio{
 			Endpoint:                     minio.GetEndpoint(),
 			RootUser:                     minio.GetRootUser(),
-			RootPassword:                 minio.GetRootPassword(),
+			RootPassword:                 rootPassword,
 			EnableSsl:                    minio.GetEnableSsl(),
 			Cert:                         minio.GetCert(),
 			ConcurrentOpenSearchRequests: minio.ConcurrentOpenSearchRequests,
 			ConcurrentMinioRequests:      minio.ConcurrentMinioRequests,
 		}
 	}
+}
+
+func getLatestPlatformToolsPath() string {
+	cmd, err := exec.Command("/bin/sh", "-c", habPkgPlatformToolsPath).Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	output := string(cmd)
+
+	return strings.TrimSpace(output)
 }
