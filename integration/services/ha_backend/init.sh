@@ -57,7 +57,7 @@ ha_backend_setup() {
     # #the rsa keys for odfe and postgresql
     # openssl genrsa -out "$certdir"/odfe-node-pkcs12.key 2048
     # openssl genrsa -out "$certdir"/odfe-admin-pkcs12.key 2048
-    # openssl genrsa -out "$certdir"/postgresql.key 2048
+    openssl genrsa -out "$certdir"/postgresql.key 2048
 
     # #IMPORTANT: Convert these to PKCS#5 v1.5 to work correctly with the JDK.
     # openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "$certdir/odfe-node-pkcs12.key" -topk8 -out "$certdir/odfe-node.key" -nocrypt
@@ -66,7 +66,7 @@ ha_backend_setup() {
     # #Create the CSR and enter the organization and server details for the odfe and postgresql keys
     # openssl req -new -key "$certdir/odfe-node.key" -out "$certdir/odfe-${ha_backend_container1}.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container1_ip},DNS:${ha_backend_container1_ip}")
     # openssl req -new -key "$certdir/odfe-node.key" -out "$certdir/odfe-${ha_backend_container2}.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container2_ip},DNS:${ha_backend_container2_ip}")
-    # openssl req -new -key "$certdir/postgresql.key" -out "$certdir/postgresql.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefpostgresql' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container1_ip},IP:${ha_backend_container2_ip},DNS:${ha_backend_container1_ip},DNS:${ha_backend_container2_ip}")
+    openssl req -new -key "$certdir/postgresql.key" -out "$certdir/postgresql.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefpostgresql' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container1_ip},IP:${ha_backend_container2_ip},DNS:${ha_backend_container1_ip},DNS:${ha_backend_container2_ip}")
 
     # #Create the CSR and enter the organization and server details for the admin key
     # openssl req -new -key "$certdir/odfe-admin.key" -out "$certdir/odfe-admin.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
@@ -74,7 +74,7 @@ ha_backend_setup() {
     # #Use the CSR to generate the signed odfe and postgresql Certificates:
     # openssl x509 -req -in "$certdir/odfe-${ha_backend_container1}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container1}.pem" -sha256
     # openssl x509 -req -in "$certdir/odfe-${ha_backend_container2}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container2}.pem" -sha256
-    # openssl x509 -req -in "$certdir/postgresql.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/postgresql.pem" -sha256
+    openssl x509 -req -in "$certdir/postgresql.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/postgresql.pem" -sha256
 
     # #Use the CSR to generate the signed admin Certificate:
     # openssl x509 -req -in "$certdir/odfe-admin.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-admin.pem" -sha256
