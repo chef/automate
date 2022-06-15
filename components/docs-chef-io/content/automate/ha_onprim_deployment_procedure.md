@@ -89,7 +89,7 @@ In this section, we'll discuss about the steps to deploy Chef Automate HA on-pre
    ```
    If deploying specific version of Chef Automate, example: Deploy `automate-4.0.91.aib` with set `config.toml`
    ```bash
-   chef-automate deploy config.toml --airgap-bundle latest.aib
+   chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
    ```
 9. After Deployment is done successfully. \
    Check status of Chef Automate HA services:
