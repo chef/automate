@@ -48,6 +48,11 @@ type BldrClient struct {
 	ClientSecret string
 }
 
+type CallbackResponse struct {
+	state    string
+	id_token string
+}
+
 // Server holds the server state
 type Server struct {
 	mux                http.Handler
@@ -432,7 +437,7 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"id_token": rawIDToken, "state": clientState})
+	json.NewEncoder(w).Encode(&CallbackResponse{id_token: rawIDToken, state: clientState})
 }
 
 func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
