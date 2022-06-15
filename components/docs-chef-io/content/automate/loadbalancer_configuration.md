@@ -26,14 +26,14 @@ Assuming you have DNS configured with domain names:
 
 For Debian / Ubuntu :
 ```bash
-sudo apt-get update  
-sudo apt-get install nginx 
+sudo apt-get update
+sudo apt-get install nginx
 ```
 For Centos or Redhat :
 ```bash
-sudo yum install epel-release 
-sudo yum update 
-sudo yum install nginx 
+sudo yum install epel-release
+sudo yum update
+sudo yum install nginx
 ```
 
 ## Configure
@@ -41,7 +41,7 @@ sudo yum install nginx
 1. Create new file `/etc/nginx/sites-available/chef-automate-lb.conf`
 ```bash
 upstream chef-automate-servers {
-   server 10.1.0.101:443; 
+   server 10.1.0.101:443;
    server 10.1.0.102:443;
    server 10.1.0.103:443;
 }
@@ -69,7 +69,7 @@ server {
 2. Create new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
 ```bash
 upstream chef-infra-servers {
-   server 10.1.0.101:443; 
+   server 10.1.0.101:443;
    server 10.1.0.102:443;
    server 10.1.0.103:443;
 }

@@ -12,13 +12,6 @@ gh_repo = "automate"
     weight = 230
 +++
 
-itle = "Chef Automate High Availability"
-    parent = "automate/install"
-    identifier = "automate/install/high_availability/introduction/ha.md Chef Automate High Availability"
-    weight = 200
-
-
-
 This page lists the commands that aid in upgrading the Chef Automate High Availability (HA) frontend and backend clusters in your network infrastructure.
 
 {{< note >}}
