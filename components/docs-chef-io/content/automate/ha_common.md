@@ -1,7 +1,7 @@
 +++
 title = "Reference Topics"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
