@@ -7,9 +7,15 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Health Check Commands"
+<<<<<<< HEAD
     parent = "automate/deploy_high_availability"
     identifier = "automate/deploy_high_availability/ha_healthcheck.md Health Check Commands"
     weight = 200
+=======
+    parent = "automate/install/high_availability/common_features"
+    identifier = "automate/install/high_availability/common_features/ha_healthcheck.md Health Check Commands"
+    weight = 230
+>>>>>>> 44f338624... submenus
 +++
 
 This page includes commands that can be executed for the Chef Automate cluster part of the Chef Automate High Availability (HA) system. These commands aid you in assessing the health and status of the components part of the HA cluster. It is highly recommended to run these commands on a test cluster before using them in a production environment.

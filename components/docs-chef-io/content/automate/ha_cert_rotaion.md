@@ -8,9 +8,15 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Certificate Rotation"
+<<<<<<< HEAD
     parent = "automate/deploy_high_availability/certificates"
     identifier = "automate/deploy_high_availability/certificates/ha_cert_rotaion.md Certificate Rotation"
     weight = 220
+=======
+    parent = "automate/install/high_availability/certificates"
+    identifier = "automate/install/high_availability/certificates/ha_cert_rotaion.md Certificate Rotation"
+    weight = 340
+>>>>>>> 44f338624... submenus
 +++
 
 Certificate rotation is the replacement of existing certificates with new ones when any certificate expires or is based on your organization's policy. A new CA authority is substituted for the old, requiring a replacement of the root certificate for the cluster.
