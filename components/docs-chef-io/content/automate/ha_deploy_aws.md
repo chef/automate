@@ -8,15 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "AWS Deployment Model"
-<<<<<<< HEAD
     parent = "automate/deploy_high_availability/aws_deployment"
     identifier = "automate/deploy_high_availability/aws_deployment/ha_deploy_aws.md AWS Deployment Model"
     weight = 210
-=======
-    parent = "automate/install/high_availability/aws_deployment"
-    identifier = "automate/install/high_availability/aws_deployment/ha_deploy_aws.md AWS Deployment Model"
-    weight = 270
->>>>>>> 44f338624... submenus
 +++
 
 <!-- !-- Chef going to give storage calculator for a customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page?? -->
