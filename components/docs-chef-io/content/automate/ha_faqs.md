@@ -7,14 +7,6 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "FAQs"
-<<<<<<< HEAD
-    parent = "automate/deploy_high_availability/faqs"
-    identifier = "automate/deploy_high_availability/faqs/ha_faqs.md FAQs"
-    weight = 200
-+++
-
-TO BE ADDED
-=======
     parent = "automate/install/high_availability/faqs"
     identifier = "automate/install/high_availability/faqs/ha_faq.md FAQs"
     weight = 460
@@ -200,4 +192,3 @@ The possible error looks like as shown below:
 	terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 
 ```
->>>>>>> 44f338624... submenus
