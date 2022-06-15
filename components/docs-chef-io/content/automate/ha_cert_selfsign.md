@@ -8,9 +8,15 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Self Sign Certificates"
+<<<<<<< HEAD
     parent = "automate/deploy_high_availability/certificates"
     identifier = "automate/deploy_high_availability/certificates/ha_cert_selfsign.md Self Sign Certificates"
     weight = 210
+=======
+    parent = "automate/install/high_availability/certificates"
+    identifier = "automate/install/high_availability/certificates/ha_cert_selfsign.md Self Sign Certificates"
+    weight = 335
+>>>>>>> 44f338624... submenus
 +++
 
 ## What are Certificates?

@@ -8,9 +8,15 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "VPC and CIDR Setup"
+<<<<<<< HEAD
     parent = "automate/deploy_high_availability/reference"
     identifier = "automate/deploy_high_availability/reference/ha_vpc_setup.md VPC and CIDR Setup"
     weight = 200
+=======
+    parent = "automate/install/high_availability/aws_deployment"
+    identifier = "automate/install/high_availability/aws_deployment/ha_vpc_setup.md VPC and CIDR Setup"
+    weight = 290
+>>>>>>> 44f338624... submenus
 +++
 
 This page explains the Amazon VPC and CIDR notations concepts. You need to provide these values in `config.toml` values to deploy Chef Automate High Availability (HA) using AWS.

@@ -8,9 +8,15 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Destroying Infrastructure"
+<<<<<<< HEAD
     parent = "automate/deploy_high_availability/reference"
     identifier = "automate/deploy_high_availability/reference/ha_destroy.md Destroying Infrastructure"
     weight = 240
+=======
+    parent = "automate/install/high_availability/common_features"
+    identifier = "automate/install/high_availability/common_features/ha_destroy.md Destroying Infrastructure"
+    weight = 370
+>>>>>>> 44f338624... submenus
 +++
 
 To destroy **terraform** or **infrastructure** created while deploying **Chef Automate High Availability (HA)** using AWS or on-premises model, follow the steps below:
