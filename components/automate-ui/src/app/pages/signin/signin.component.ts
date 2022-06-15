@@ -1,42 +1,43 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { IDToken, Jwt } from 'app/helpers/jwt/jwt';
-import { HttpClient } from '@angular/common/http';
+import { ReplaySubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { CallbackService } from 'app/services/signin/signin.service';
+
 
 @Component({
   selector: 'app-signin',
   templateUrl: './signin.component.html',
   styleUrls: ['./signin.component.scss']
 })
-export class SigninComponent implements OnInit {
+export class SigninComponent implements OnInit, OnDestroy {
   public error = false;
   public path: string; // from OIDC redirect, but sanitized
   private idToken: string;
   private id: IDToken;
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+  private searchParams: Params;
 
   constructor(
     private router: Router,
     private session: ChefSessionService,
-    private http: HttpClient
-  ) { }
+    private callbackService: CallbackService,
+    private route: ActivatedRoute
+  ) {
+    this.route.queryParams.subscribe(params => {
+      this.searchParams = params;
+    });
+  }
 
   ngOnInit() {
-    const path = `/session/callback${window.location.search}`;
-    console.log('get path: ' + path + `${window.location.origin}${path}`);
-    // this.router.navigateByUrl(path);
-    console.log(this.http)
-    this.http.get<any>(`${window.location.origin}${path}`).subscribe((res) => {
-      console.log(res);
-      let state: string;
-      state = res.state || '';
-      if (state === '') {
-        this.error = true;
-        return;
-      }
-      this.idToken = res.id_token || '';
-      // [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
-      if (this.idToken === '') {
+    this.callbackService.callback(this.searchParams)
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe((res) => {
+      const state: string = res.state;
+      this.idToken = res.id_token;
+      if (state === '' || this.idToken === '') {
         this.error = true;
         return;
       }
@@ -56,32 +57,11 @@ export class SigninComponent implements OnInit {
       this.error = true;
       return;
     });
-    // Reminder: URL fragment has to be treated as user-provided input, and can
-    //           NOT be trusted in any way. /!\
-    // this.route.fragment.subscribe((fragment: string) => {
-    //   if (fragment === null) {
-    //     this.error = true;
-    //     return;
-    //   }
-    //   let state: string;
-    //   [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
-    //   if (this.idToken === null) {
-    //     this.error = true;
-    //     return;
-    //   }
-    //   this.id = Jwt.parseIDToken(this.idToken);
-    //   if (this.id === null) {
-    //     this.error = true;
-    //     return;
-    //   }
-    //   this.path = this.pathFromState(state);
+  }
 
-    //   this.error = false;
-    //   this.setSession();
-    //   localStorage.setItem('manual-upgrade-banner', 'true');
-    //   this.deleteIdTokenFromCookie(this.idToken);
-    //   this.router.navigateByUrl(this.path);
-    // });
+  ngOnDestroy() {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 
   deleteIdTokenFromCookie(token: string): void {

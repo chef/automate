@@ -33,7 +33,7 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (request.url.includes('session/callback')) {
+    if (request.headers.get('skip')) {
       return next.handle(request);
     }
     let headers = request.headers;

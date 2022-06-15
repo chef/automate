@@ -217,6 +217,7 @@ import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details
 import {
   DataFeedTableComponent
 } from './page-components/data-feed-table/data-feed-table.component';
+import { CallbackService } from './services/signin/signin.service';
 
 
 
@@ -395,7 +396,8 @@ import {
     TelemetryService,
     UserPermsRequests,
     UserPreferencesRequests,
-    UserRequests
+    UserRequests,
+    CallbackService
   ],
   bootstrap: [ AppComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
