@@ -7,10 +7,10 @@ Automate fails to ingest Compliance report larger than 4MB size sent through dat
 Automate data collector sends back error to the client.
 
 The following change in architecture enables Automate to ingest reports larger than 4MB without any failure.
-![](../../static/images/automate/lcr_architecture.jpg)
+![LCR Architecture](/images/automate/lcr_architecture.jpg)
 
 Automate with the configuration to allow ingestion of a large compliance report allow the data not only to be sent to 
-the OpenSearch data but also in an externally deployed Minio Service. Automate in this configuration expects that the 
+the OpenSearch data but also in an externally deployed Minio Service. Automate in this configuration expects that 
 a Minio Server is running externally to Automate ecosystem which Automate can connect and transact to.
   
 Automate with the configuration will enable Automate to:  
@@ -23,12 +23,17 @@ This change has implications in the performance of Automate data ingestion becau
 - Automate has to upload the data to an external service over network
 
 The impact depends on different factors like network configuration, machine configuration.
-Here is a benchmark test report run on
+Here is a benchmark test summary report run on
 
+- Instance Type: c4.4xlarge
+- Reports uploaded: 20K
 
-
-
-
+| Report Size | Supported Concurrency |
+| --- | --- |
+| 1 MB | 100 |
+5 MB | 50 |
+8 MB | 30 |
+12 MB | 20 | 
 
 ### Prerequisite
 {{< note >}}  
@@ -50,6 +55,7 @@ To enable Automate to ingest Large Compliance report:
 2. Add the following configuration to the `patch.toml` file:
 ```toml
 [global.v1.external.minio]
+    ##Do not add the protocol(http or https) for minio server end point. ex. mydomain.com:1234 
     endpoint = "<minio server end point>:<port>" 
     root_user = "<username>"
     root_password = "<password>"
@@ -65,7 +71,8 @@ To enable Automate to ingest Large Compliance report:
 [global.v1.large_reporting]                                
     enable_large_reporting = true
     
-## Uncomment and fill out if want to modify the bucket name used to store data in MINIO server, default name is 'default'
+## Uncomment and fill out if want to modify the bucket name used to store data in MINIO server, default name is 'default'.
+## If MINIO is configured to use any public cloud platforms like S3, Azure blob storage or Google Cloud Storage, It is mandatory to modify the bucket name other than `default`
 #[report_manager.v1.sys.objstore]
 #  bucket = "default"
 ```

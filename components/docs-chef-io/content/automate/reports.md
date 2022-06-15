@@ -140,18 +140,22 @@ In case Automate is configured to ingest large compliance report of size more th
 
 #### Generate Report
 Clicking the **Download JSON** or **Download CSV** buttons will trigger the report generation process.  
-A notification pops up to confirm that the Generation has started.  
+A notification pops up to confirm that the Generation has started. 
+![Notification upon Download request submitted](/images/automate/lcr-acknowledgement.png)
 
-The status of the report can always be viewed by clicking the **Report Status** link.
 
+The status of the report can always be viewed by clicking the **Open Report** link.
+![Report Status Link](/images/automate/lcr-request-view.png)
 
 The status of the report shows up the generation and processing status of the Reports on a sidebar.
+![Report Generation Status Check Panel](/images/automate/lcr-request-view-panel.png)
 
 A popup notification is produced to users when a requested report is generated to make aware of the report generation status.
+![Report Generation Completed Successfully and Ready for Download](/images/automate/lcr-report-ready.png)
 
 #### Downloading Report  
-A generated report can be downloaded any time from the Status sidebar by clicking **Download Report** link
-
+A generated report can be downloaded any time from the Status sidebar by clicking corresponding link on sidebar.
+![Report Download](/images/automate/lcr-report-download.png)
 
 ## Compliance Status and Report Metadata
 
