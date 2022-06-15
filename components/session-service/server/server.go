@@ -430,23 +430,6 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// u := new(url.URL)
-
-	// *u = *s.signInURL
-
-	// cookie := &http.Cookie{
-	// 	Name:   "id_token",
-	// 	Value:  rawIDToken,
-	// 	Path:   "/",
-	// 	Secure: true,
-	// 	// true will not work as id_token needs to be stored in the browser's local storage using javascript.
-	// 	HttpOnly: false,
-	// }
-
-	// http.SetCookie(w, cookie)
-
-	// u.Fragment = fmt.Sprintf("state=%s", clientState)
-	// http.Redirect(w, r, u.String(), http.StatusSeeOther)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"id_token": rawIDToken, "state": clientState})
