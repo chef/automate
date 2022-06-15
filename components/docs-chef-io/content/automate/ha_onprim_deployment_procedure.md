@@ -13,65 +13,87 @@ gh_repo = "automate"
     weight = 220
 +++
 
-In this section, we'll discuss about the steps to deploy Chef Automate HA on-premise server or on existing nodes. The steps are as follows:
+In this section, we'll discuss about the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:
 
-1. Open **Command Prompt** and log in as a **root** user by typing `sudo su -`.
-2. Run the command `./chef-automate init-config-ha existing_infra` and select **Enter** to set up the configuration for deployment. The `config.toml` configuration file gets generated with default settings.
+## Steps to install Chef Automate HA
 
-3. Open the `config.toml` file in any editor and:
-
-   - Specify the on-premise IPs list of IP addresses for the cluster separated by a comma.
-   - Specify public IPs for the virtual machines. In case you do not have the public IPs, provide the private IPs. The `config.toml` configuration file gets generated with default settings.
-
-4. Run the `cat config.toml` command and select **Enter** to view the generated configuration file.
-
-5. Run the `./chef-automate deploy config.toml` command and select **Enter**. The command creates a deployment workspace (`/hab/a2_deploy_workspace`), downloads Habitat, and establishes cluster provisioning in your workspace.
-
-{{< figure src="/images/automate/ha_bare_chef_automate_config.png" alt="Chef Automate Bare Infra Deployment">}}
-
-6. Type `y` to confirm the terms of service and license agreement.
-
-7. Log in as a root user using `sudo su` command.
-
-8. Run the `cd /hab/a2_deploy_workspace` command and select **Enter**. This command sets up the initial workspace directory and changes the working directory to the Chef Automate workspace configured.
-
-9. Open the `config.toml` file in the editor and execute the following changes:
-
-   - Specify the `ssh username` and the `ssh key file path`. The ssh key must reside in the bastion host.
-   - Ensure `ssh_key_pair_name` and `ssh key file path` have the same value.
-   - Assign permission to the **ssh key file** by running the `chmod 400 /root/.ssh/id_rsa` command.
-   - Specify the number of nodes for the Chef Automate and Chef Infra server clusters. By default, the deployment takes the value `1`.
-   - Ensure not to modify the cluster number value as `3` for PostgreSQL and OpenSearch.
-   - Ensure the instance type supports the respective AWS region.
-   - Add *Load Balancer Certificate* details for Chef Automate and Chef Server as shown below:
-
-<!-- automate_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e"
-chef_server_lb_certificate_arn = "arn:aws:acm:ap-south-1:510367013858:certificate/1aae9fce-60df-4791-9bec-ef6a0f723f3e" -->
-
-   {{< figure src="/images/automate/ha_bare_lb.png" alt="Load Balancer Details">}}
-
-10. Setup the secret management key and the required passwords.
-
-   - The default location for the secrets key and secret storage is set in the `config.toml` file.
-   - The default location for the key is `/etc/chef-automate/secrets.key`.
-   - The secret store file is in `/hab/a2_deploy_workspace/secrets.json`.
-
-{{< figure src="/images/automate/ha_bare_chef_automate_configtoml_file.png" alt="Chef Automate Bare Infra `config.toml` file">}}
-
-11. Run the `./chef-automate deploy` command and select **Enter**. This command installs the latest deployment package and deploys (by provisioning with terraform) airgap bundles on the created infrastructure. The deployment procedure by default creates the **HAB** user.
-
-{{< figure src="/images/automate/ha_bare_chef_automate_complete.png" alt="Chef Automate Bare Infra Deployment Confirmation">}}
-
-12. Create a **uid** or **gid** for HAB users. Habitat automatically sets a **uid** and **gid** for the HAB user. If required, you can override it or leave the field `_habitat_uid_gid=""_ blank`. (*Optional*)
-
-13. Run the `./scripts/credentials set postgresql -auto` command and select **Enter**. This command rotates the credentials for Postgresql.
-
-14. Run the `./scripts/credentials set opensearch -auto` command and select **Enter**. This command rotates the credentials for OpenSearch.
-
-15. Run the `chef-automate test -full` command and select **Enter**. This command runs smoke tests on the setup.
-
-<!-- The default location for the secrets key and secret storage is set in the config file. The default location for the key is /etc/chef-automate/secrets.key and the secret store file is in /hab/a2_deploy_workspace/secrets.json -->
-
-## Clear the Bare Metal Infrastructure
-
-{{< note >}} You can clear the Bare-metal deployment workspace as per your requirements. {{< /note >}}
+### Prerequsite
+- All VM's or Machines are up and running.
+- A Common user has access to all machines.
+- This common user should have sudo privileges.
+- This common user uses same SSH Private Key file to access all machines.
+- LoadBalancers are setup according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
+- Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
+- DNS is configured to redirect `chefautomate.example.com` to Primary Load Balancer.
+- DNS is configured to redirect `chefinfraserver.example.com` to Primary Load Balancer.
+- Certificates are created and added for `chefautomate.example.com`, `chefinfraserver.example.com` in the Load Balancers.
+- If DNS is not used, then these records should be added to `/etc/hosts` in all the machines including Bastion:
+   ```bash
+   sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<Primary_LoadBalancer_IP> chefinfraserver.example.com\n' -i /etc/hosts
+   ```
+- If the instance is **RedHat**, set SElinux config `enforcing` to `permissive` in all the nodes.\
+  SSH to each node then run:
+  ```bash
+  sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+  ```
+### Run these steps on Bastion Host Machine
+1. Before starting, switch to sudo:
+   ```bash
+   sudo su -
+   ```
+2. Download Chef Automate CLI
+   ```bash
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
+   ```
+3. Download Airgapped Bundle \
+   Download latest Bundle with this:
+   ```bash
+   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
+   ```
+   Download specific version bundle with this, example version: 4.0.91:
+   ```bash
+   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
+   ```
+4. If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command. \
+   After transfering, in Airgapped Bastion, swtich to sudo:
+   ```bash
+   sudo su -
+   ```
+   Move the Chef Automate CLI to `/usr/bin` by running below command:
+   ```bash
+   cp -f chef-automate /usr/bin/chef-automate
+   ```
+5. Generate init config \
+   Then generate init config for existing infra structure:
+   ```bash
+   chef-automate init-config-ha existing_infra
+   ```
+6. Update Config with relevant data
+   ```bash
+   vi config.toml
+   ```
+   - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
+   - Add IP address of each machine in relevant service section, multiple IP's shoud be in double quotes (`"`) and separated with comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
+   - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
+   - Give `ssh_key_file` path, this key should have access to all the Machines or VM's
+   - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
+   - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
+7. Confirm all the data in the config is correct:
+   ```bash
+   cat config.toml
+   ```
+8. Run Deploy Command \
+   Deploy `latest.aib` with set `config.toml`
+   ```bash
+   chef-automate deploy config.toml --airgap-bundle latest.aib
+   ```
+   If deploying specific version of Chef Automate, example: Deploy `automate-4.0.91.aib` with set `config.toml`
+   ```bash
+   chef-automate deploy config.toml --airgap-bundle latest.aib
+   ```
+9. After Deployment is done successfully. \
+   Check status of Chef Automate HA services:
+   ```bash
+   chef-automate status
+   ```
+   Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
