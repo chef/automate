@@ -53,7 +53,7 @@ resource "aws_security_group_rule" "ingress_allow_22_tcp_all" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = [var.json_data]
   security_group_id = aws_security_group.base_linux.id
 }
 
@@ -170,6 +170,7 @@ resource "aws_security_group_rule" "ingress_allow_80_tcp_all" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.load_balancer.id
+  # source_security_group_id = aws_security_group.load_balancer.id
 }
 
 resource "aws_security_group_rule" "ingress_allow_443_tcp_all" {
@@ -179,6 +180,7 @@ resource "aws_security_group_rule" "ingress_allow_443_tcp_all" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.load_balancer.id
+  # source_security_group_id = aws_security_group.load_balancer.id
 }
 
 resource "aws_security_group_rule" "load_balancer_egress_allow_0-65535_all" {
@@ -216,6 +218,7 @@ resource "aws_security_group_rule" "egress_allow_443_tcp_all" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.base_linux.id
+  # source_security_group_id = aws_security_group.base_linux.id
 }
 
 resource "aws_security_group_rule" "egress_allow_6432_tcp_all" {
