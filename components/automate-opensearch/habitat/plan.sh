@@ -19,6 +19,7 @@ pkg_deps=(
   core/coreutils
   core/glibc
   core/zlib
+  core/bash # hooks
   chef/mlsa
   core/curl # health_check
   chef/automate-openjdk
@@ -54,7 +55,7 @@ do_install() {
   cd "$HAB_CACHE_SRC_PATH/opensearch-${pkg_version}"
   chown -RL hab:hab ${pkg_prefix}
   mkdir -p "${pkg_prefix}/os"
-  ls -ltrh 
+  ls -ltrh
   cp -ra ./* "${pkg_prefix}/os"
   # jvm.options needs to live relative to the binary.
   # mkdir -p "$pkg_prefix/es/config"

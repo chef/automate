@@ -21,7 +21,7 @@ pkg_deps=(
   core/coreutils
   core/glibc
   core/zlib
-
+  core/bash # hooks
   chef/mlsa
   core/curl # health_check
   chef/automate-openjdk
@@ -67,9 +67,9 @@ do_install() {
   cp -ra "$HAB_CACHE_SRC_PATH/opensearch-${pkg_version}"/* "${pkg_prefix}/os"
   echo "what is HAB_CACHE_SRC_PATH : "$HAB_CACHE_SRC_PATH
   echo "what is pkg_prefix : "${pkg_prefix}
-  echo "where i am : " 
+  echo "where i am : "
   pwd
-  
+
   "${pkg_prefix}/os/bin/opensearch-plugin" install -b repository-s3
   chown -RL hab:hab ${pkg_prefix}
   chown -RL hab:hab ${pkg_prefix}/*
@@ -78,7 +78,7 @@ do_install() {
   $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh "$PLAN_CONTEXT"
   chown -RL hab:hab ${pkg_prefix}/os/config/*
   chmod -R 777 ${pkg_prefix}/*
-  
+
   echo "changing permission for securityadmin.sh file"
   echo "......................................................................."
   chown -RL hab:hab ${pkg_prefix}
@@ -94,7 +94,7 @@ do_install() {
   echo "......................................................................."
 
   chmod 775 $(pkg_path_for chef/automate-openjdk)/lib/security/cacerts
-  
+
 
 }
 
