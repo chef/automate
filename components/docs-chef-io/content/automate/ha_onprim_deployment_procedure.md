@@ -13,6 +13,8 @@ gh_repo = "automate"
     weight = 200
 +++
 
+TRY
+
 In this section, we'll discuss about the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:
 
 ## Steps to install Chef Automate HA
