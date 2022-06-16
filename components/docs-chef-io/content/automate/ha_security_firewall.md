@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 210
 +++
 
-Chef Automate High Availability (HA) cluster requires multiple ports for the frontend and backend servers to operate effectively and reduce possible network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
+The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
 
 ## Ports required for all Machines
 
@@ -27,10 +27,10 @@ Chef Automate High Availability (HA) cluster requires multiple ports for the fro
 | Protocol | Port Number | Usage                                                                                            |
 |----------|-------------|--------------------------------------------------------------------------------------------------|
 | TCP      | 22          | SSH to configure services                                                                        |
-| TCP      | 9631        | Habitat http API                                                        |
+| TCP      | 9631        | Habitat HTTP API                                                        |
 | TCP      | 443         | Allow Users to reach UI / API                                                                    |
 | TCP      | 80          | Optional, Allows users to redirect to 443                                                        |
-| TCP      | 9200        | OpenSearch API https Access                                                                            |
+| TCP      | 9200        | OpenSearch API HTTPS Access                                                                      |
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
 | TCP/UDP  | 9638        | Habitat gossip (UDP) |
-| TCP      | 7432        | HAProxy which redirect to Postgresql Leader |
+| TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |

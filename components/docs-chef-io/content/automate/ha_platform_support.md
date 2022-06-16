@@ -22,9 +22,10 @@ This section lists the recommended requirements for operating systems, virtual m
 | Centos (64 Bit OS)                       | 7                         |
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 
-## Hardware Requirments
+## Hardware Requirements
 
-Based on our peformance benchmarking tests according to below assumptions we get these results.
+We get these results based on our performance benchmarking tests according to the assumptions below.
+
 ### Assumption
 | Assumption                            | Value | Unit     |
 |---------------------------------------|-------|----------|
@@ -36,9 +37,9 @@ Based on our peformance benchmarking tests according to below assumptions we get
 | Compliance scan report size           | 400   | KB       |
 | Client Run (Infra run) size           | 300   | KB       |
 | Event Feed update size                | 2     | KB       |
-| No. of Shards in Opensearch Index     | 2     |
+| No. of Shards in OpenSearch Index     | 2     |
 
-Based on the above assumption machine requirment will be:
+The machine requirements based on the above assumptions are listed below:
 
 | Instance          | Count | vCPU | RAM | Storage Size | AWS Machine Type |
 |-------------------|-------|------|-----|--------------|------------------|
@@ -48,12 +49,11 @@ Based on the above assumption machine requirment will be:
 | Opensearch DB     | 3     | 2    | 8   | 58.9 GB      | m5.large         |
 | Bastion Machine   | 1     | 2    | 8   | 150 GB       | m5.large         |
 
-The above hardware configuration is based on above assumption. Customer should calculate based on there actual estimate using the sample calculation provided: [Excel Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx).
+The configuration is based on the assumptions listed above. Using the sample calculation given [here](/calculator/automate_ha_hardware_calculator.xlsx), you can calculate it based on the actual estimate.
 
 {{< note >}}
 
 - For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
-- For production OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
+- For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
 
 {{< /note >}}
-
