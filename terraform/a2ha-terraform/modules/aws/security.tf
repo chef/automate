@@ -109,7 +109,6 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_80_tcp" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.chef_automate_ui.id
-  # source_security_group_id = aws_security_group.chef_automate.id
 }
 
 # HTTPS (nginx)
@@ -120,7 +119,6 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_443_tcp" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.chef_automate_ui.id
-  # source_security_group_id = aws_security_group.chef_automate.id
 }
 
 # Allow elasticsearch clients
@@ -132,16 +130,6 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_elasticsearch_tc
   security_group_id        = aws_security_group.chef_automate.id
   source_security_group_id = aws_security_group.chef_automate.id
 }
-
-# Allow Kibana Login
-# resource "aws_security_group_rule" "ingress_chef_automate_allow_kibana_tcp" {
-#   type              = "ingress"
-#   from_port         = var.kibana_listen_port
-#   to_port           = var.kibana_listen_port
-#   protocol          = "tcp"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = aws_security_group.chef_automate.id
-# }
 
 # Allow postgresql connections
 resource "aws_security_group_rule" "ingress_chef_automate_allow_postgres_tcp" {
@@ -182,7 +170,6 @@ resource "aws_security_group_rule" "ingress_allow_80_tcp_all" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.load_balancer.id
-  # source_security_group_id = aws_security_group.load_balancer.id
 }
 
 resource "aws_security_group_rule" "ingress_allow_443_tcp_all" {
@@ -192,7 +179,6 @@ resource "aws_security_group_rule" "ingress_allow_443_tcp_all" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.load_balancer.id
-  # source_security_group_id = aws_security_group.load_balancer.id
 }
 
 resource "aws_security_group_rule" "load_balancer_egress_allow_0-65535_all" {
@@ -230,17 +216,7 @@ resource "aws_security_group_rule" "egress_allow_443_tcp_all" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.base_linux.id
-  # source_security_group_id = aws_security_group.base_linux.id
 }
-
-# resource "aws_security_group_rule" "egress_allow_5601_tcp_all" {
-#   type              = "egress"
-#   from_port         = 5601
-#   to_port           = 5601
-#   protocol          = "tcp"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = aws_security_group.base_linux.id
-# }
 
 resource "aws_security_group_rule" "egress_allow_6432_tcp_all" {
   type              = "egress"

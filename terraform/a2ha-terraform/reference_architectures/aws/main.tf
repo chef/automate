@@ -1,9 +1,9 @@
-data "http" "getTodos" {
+data "http" "getEc2PrivateIP" {
   url = "http://169.254.169.254/latest/meta-data/local-ipv4"
 }
 
 locals {
-  json_data = "${join(".", [for i, s in split(".", data.http.getTodos.response_body) : (
+  json_data = "${join(".", [for i, s in split(".", data.http.getEc2PrivateIP.response_body) : (
     i == 3 ? 0 : s
   )])}/26"
 }
