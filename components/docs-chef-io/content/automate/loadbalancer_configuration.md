@@ -10,11 +10,10 @@ gh_repo = "automate"
     title = "Loadbalancer Configuration"
     parent = "automate/deploy_high_availability/ha_system_requirements"
     identifier = "automate/deploy_high_availability/ha_system_requirements/loadbalancer_configuration.md Loadbalancer Configuration"
-    weight = 230
+    weight = 220
 +++
 
 This guide details how to set up the load balancer configuration for Chef Automate and Chef Infra Server.
-
 
 ## Load Balancer
 

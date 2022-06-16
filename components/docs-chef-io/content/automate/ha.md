@@ -1,15 +1,15 @@
 +++
-title = "Chef Automate High Availability Architecture"
+title = "High Availability Architecture"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Chef Automate High Availability Architecture"
+    title = "Architecture"
     parent = "automate/deploy_high_availability"
-    identifier = "automate/deploy_high_availability/ha.md HA Architecture"
-    weight = 200
+    identifier = "automate/deploy_high_availability/ha.md High Availability Architecture"
+    weight = 50
 +++
 
 **High availability (HA)** refers to a system or application that offers a high level of operational availability. This means that if one server goes down, whether due to traffic overload or other issues, the entire site or application will not be down. HA means the application remains available with no interruption. We achieve high availability when an application continues to operate even when one or more underlying components fail.
