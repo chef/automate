@@ -1,5 +1,5 @@
 +++
-title = "On Premise Deployment"
+title = "On-Premise Deployment"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "On Premise Deployment"
+    title = "On-Premise Deployment"
     parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On Premise Deployment"
+    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-Premise Deployment"
     weight = 200
 +++
 
@@ -40,6 +40,7 @@ sudo sed '/127.0.0.1/a \\n<Primary_LoadBalancer_IP> chefautomate.example.com\n<P
 ```bash
 sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 ```
+
 ### Run these steps on Bastion Host Machine
 
 1. Before starting, switch to sudo:
