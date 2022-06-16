@@ -53,7 +53,7 @@ resource "aws_security_group_rule" "ingress_allow_22_tcp_all" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [var.json_data]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.base_linux.id
 }
 
