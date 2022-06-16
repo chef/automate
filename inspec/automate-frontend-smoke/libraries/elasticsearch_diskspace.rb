@@ -36,7 +36,7 @@ class ElasticsearchDiskspace < Inspec.resource(1)
   end
 
   def to_s
-    max_length = nodes.map{ |d| d['host'].length }.max
+    max_length = nodes.map{ |d| d['fs'].length }.max
 
     format = "%#{max_length+1}s - Total:%-3.1fGb Available:%3.1fGb (%-0.2f%%)"
 
