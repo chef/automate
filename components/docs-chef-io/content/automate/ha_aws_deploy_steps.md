@@ -8,12 +8,38 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "AWS Deployment"
-    parent = "automate/deploy_high_availability/deployment"
-    identifier = "automate/deploy_high_availability/deployment/ha_aws_deploy_steps.md AWS"
+    parent = "automate/deploy_high_availability/aws_deployment"
+    identifier = "automate/deploy_high_availability/aws_deployment/ha_aws_deploy_steps.md AWS"
     weight = 210
 +++
 
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud.
+
+## Steps to install Chef Automate HA on AWS
+
+## Prerequisite:
+- Virtual Private Cloud (VPC) should be created in AWS before starting or use default.
+- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) \
+  Set these in `~/.aws/credentials` in Bastion Host:
+  ```bash
+  sudo su -
+  ```
+  ```bash
+  mkdir -p ~/.aws
+  echo "aws_access_key_id=<ACCESS_KEY_ID>" >> ~/.aws/credentials
+  echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
+  ```
+- DNS certificate in ACM and get arn of the 2 cretificates : chefautomate.example.com, chefinfraserver.example.com
+- SSH Key Pair
+
+
+
+
+
+
+
+
+
 
 1. Open **Command Prompt**.
 2. Log in as a *Root* user by typing `sudo su -`.
