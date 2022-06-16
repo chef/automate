@@ -22,6 +22,14 @@ resource "aws_security_group" "chef_automate" {
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_automate_security_group"))
 }
 
+resource "aws_security_group" "chef_automate_ui" {
+  name        = "chef_automate_ui_${random_id.random.hex}"
+  description = "Chef Automate Server protocol"
+  vpc_id      = data.aws_vpc.default.id
+
+  tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_automate_security_group"))
+}
+
 resource "aws_security_group" "efs_mount" {
   name        = "efs_${random_id.random.hex}"
   description = "NFS for EFS"
@@ -100,7 +108,7 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_80_tcp" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.chef_automate.id
+  security_group_id = aws_security_group.chef_automate_ui.id
 }
 
 # HTTPS (nginx)
@@ -110,7 +118,7 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_443_tcp" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.chef_automate.id
+  security_group_id = aws_security_group.chef_automate_ui.id
 }
 
 # Allow elasticsearch clients
@@ -121,16 +129,6 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_elasticsearch_tc
   protocol                 = "tcp"
   security_group_id        = aws_security_group.chef_automate.id
   source_security_group_id = aws_security_group.chef_automate.id
-}
-
-# Allow Kibana Login
-resource "aws_security_group_rule" "ingress_chef_automate_allow_kibana_tcp" {
-  type              = "ingress"
-  from_port         = var.kibana_listen_port
-  to_port           = var.kibana_listen_port
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.chef_automate.id
 }
 
 # Allow postgresql connections
@@ -215,15 +213,6 @@ resource "aws_security_group_rule" "egress_allow_443_tcp_all" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.base_linux.id
-}
-
-resource "aws_security_group_rule" "egress_allow_5601_tcp_all" {
-  type              = "egress"
-  from_port         = 5601
-  to_port           = 5601
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.base_linux.id
@@ -315,7 +304,7 @@ resource "aws_security_group_rule" "egress_allow_22_tcp_all" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = [var.json_data]
   security_group_id = aws_security_group.base_linux.id
 }
 //////////////////////////
