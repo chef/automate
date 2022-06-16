@@ -34,19 +34,11 @@ This section explains the Bare Metal (on-premises) Infrastructure Deployment (ex
    | Kibana                                   |     5601                |
    | Automate,ES-Node                         |     22,443              |
 
-<<<<<<< HEAD
-- Ensure you have [Chef Automate utility]({{< relref "ha_auto_install.md" >}}) installed, else download and install the latest version.
-- Servers are provisioned and accessible through SSH from each other.
-- Obtain load balancer IP addresses for all four instances - *Chef Automate, Chef Server, Postgress, OpenSearch*.
-- Create the certificates for security and authentication purposes. (*Optional*)
-- Rotate the certificates if the certificates are expired or compromised. (*Optional*)
-=======
 - Ensure you have [Chef Automate utility](( {{< relref "ha_bastion.md#Download and Install the Chef Automate Utility" >}})) installed, else download and install the latest version.
 - Servers provisioned and accessible through SSH from each other.
 - Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Infra Server, Postgress, Elasticsearch.
 - Create the certificates for security and authentication purposes. _optional_
 - Rotate the certificates if the certificates are expired or compromised. _optional_
-
 ## Deployment Procedure on Bare Infrastructure
 
 Follow the steps below to deploy Chef Automate HA on-premise server or on existing nodes:
@@ -113,4 +105,3 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 You can clear the Bare-metal deployment workspace as per your requirements.
 
 {{< /note >}}
->>>>>>> main

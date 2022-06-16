@@ -16,10 +16,8 @@ gh_repo = "automate"
 <!-- !-- Chef going to give storage calculator for a customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page?? -->
 
 This page explains how to deploy Chef Automate High Availability (HA) in your network premises/ infrastructure using Amazon Web Services (AWS).
-
-<<<<<<< HEAD
 ## Prerequisite
-=======
+
 1. Set up the [Prerequisites for Chef Automate HA Deployment](( {{< relref "ha_architecture_reference.md#System Requirements" >}} )).
 1. Obtain an AWS account or if you already have one, sign on to your AWS account.
 1. Setup the [Bastion Host AWS requirements](( {{< relref "ha_bastion.md#Bastion Host Requirements for AWS (Amazon Web Services)" >}} )).
@@ -46,7 +44,6 @@ The default for these attributes are `false` when the VPC is a default VPC or th
 {{< /note >}}
 
 1. Execute the [Chef Automate HA deployment commands](( {{< relref "#AWS Cloud Deployment Procedured" >}} )).
-
 ## Establishing SSH Connection with Bastion Host
 
 This section explains the procedure to establish the connection between your bastion host and an AWS account. A key pair consists of a public key that AWS stores and a private key file you store. Together, they allow you to connect to your instance securely.
@@ -67,7 +64,6 @@ This section explains the procedure to establish the connection between your bas
 1. Select `yes` when the terminal prompts you to connect.
 
 {{< figure src="/images/automate/ha_aws_ssh_connection.png" alt="AWS SSH Connection Details">}}
->>>>>>> main
 
 Based on the number of nodes, the virtual machine requirements for AWS deployment are as follows:
 

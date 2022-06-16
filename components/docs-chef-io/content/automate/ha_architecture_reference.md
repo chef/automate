@@ -21,11 +21,9 @@ The following Chef Automate HA Architecture diagram shows the Chef Automate HA c
 
 The Chef Automate HA Architecture involves the following clusters part of the main cluster:
 
-<<<<<<< HEAD
 - **Backend Cluster**
-=======
+
 The backend components connect into the frontend Chef Habitat supervisor cluster. The **postgres** and **Elasticsearch** instances run in the Chef Habitat supervisor. The **Postgres** and **Elasticsearch** databases require a minimum of three nodes, where one becomes a leader, and the other two are followers.
->>>>>>> main
 
 - **Postgres:** Database requires a minimum of three nodes. Postgres database uses *Leader-Follower* strategy, where one becomes a leader, and the other two are the followers.
 
@@ -35,31 +33,21 @@ The backend components connect into the frontend Chef Habitat supervisor cluster
 
 Chef Automate and Chef Server act as frontend nodes and serve as a web UI with Load Balancer configurations.
 
-<<<<<<< HEAD
 - [Chef Automate](https://docs.chef.io/automate/)
-=======
+
 1. Chef Automate
 2. Chef Infra Server
 3. Elasticsearch - an open-source search and analytics engine based on Apache Lucene, built with Java. It is a time-series and NoSQL database that stores data in an unstructured way and is used for indexing purposes.
 4. PostgreSQL - an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
->>>>>>> main
 
 - [Chef Server](https://docs.chef.io/server/)
 
-<<<<<<< HEAD
 ## Deployment Methods
-=======
-{{< note >}}
->>>>>>> main
 
 Chef Automate High Availability (HA) supports two types of deployment:
 
-<<<<<<< HEAD
 - [Amazon Web Services (AWS) Deployment](/automate/ha_auto_install)
 - [On-premise Deployment (Existing Node) Deployment](/automate/ha_deploy_bareinfra)
-=======
-{{< /note >}}
->>>>>>> main
 
 ### Cloud Deployment using Amazon Web Services (AWS)
 
