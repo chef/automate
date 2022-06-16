@@ -19,8 +19,8 @@
 # Xms represents the initial size of total heap space
 # Xmx represents the maximum size of total heap space
 
--Xms{{cfg.runtime.minHeapsize}}
--Xmx{{cfg.runtime.maxHeapsize}}
+# -Xms{{cfg.runtime.minHeapsize}}
+# -Xmx{{cfg.runtime.maxHeapsize}}
 
 ################################################################
 ## Expert settings
@@ -34,7 +34,7 @@
 
 ## GC configuration
 8-13:-XX:+UseConcMarkSweepGC
-8-13:-XX:CMSInitiatingOccupancyFraction=75
+8-13:-XX:CMSInitiatingOccupancyFraction=95
 8-13:-XX:+UseCMSInitiatingOccupancyOnly
 
 ## G1GC Configuration

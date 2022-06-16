@@ -271,7 +271,7 @@
   minHeapsize = "2g"
   maxHeapsize = "2g"
   g1ReservePercent = "25"
-  initiatingHeapOccupancyPercent = "30"
+  initiatingHeapOccupancyPercent = "15"
 
 [deprecated]
 external_os = false
