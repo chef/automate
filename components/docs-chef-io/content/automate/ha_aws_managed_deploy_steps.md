@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "AWS Managed Services Deployment"
     parent = "automate/deploy_high_availability/aws_deployment"
-    identifier = "automate/deploy_high_availability/aws_deployment/ha_aws_deploy_steps.md AWS Managed Services"
+    identifier = "automate/deploy_high_availability/aws_deployment/ha_aws_managed_deploy_steps.md AWS Managed Services"
     weight = 220
 +++
 
