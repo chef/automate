@@ -26,7 +26,9 @@ export class SigninComponent implements OnInit, OnDestroy {
     private callbackService: CallbackService,
     private route: ActivatedRoute
   ) {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(params => {
       this.searchParams = params;
     });
   }
