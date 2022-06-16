@@ -49,8 +49,8 @@ The Chef Automate HA Architecture involves the following clusters part of the ma
 
 Chef Automate High Availability (HA) supports two types of deployment:
 
-- [On-premise Deployment (Existing Node) Deployment](/automate/ha_deploy_bareinfra)
-- [Amazon Web Services (AWS) Deployment](/automate/ha_auto_install)
+- [On-premise Deployment (Existing Node) Deployment](/automate/ha_onprim_deployment_procedure/)
+- [Amazon Web Services (AWS) Deployment](/automate/ha_aws_deploy_steps/)
 
 ### On-premise Deployment (Existing Node/Bare Infrastructure)
 
