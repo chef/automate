@@ -82,16 +82,17 @@ To enable Automate to ingest Large Compliance report:
 3. Patch the config by running   
 `chef-automate config patch patch.toml`
 
-### Using Public Cloud Object Storage 
+### Using AWS S3 as Object Storage
 {{< warning >}}  
 The below configuration is not tested to determine benchmark numbers. 
 We recommend doing benchmark testing before considering this approach.
 {{< /warning >}}
 
-Automate can connect to Automate with AWS S3 if you reuse the Minio Configuration in the following manner:
+Automate can connect to AWS S3 for large compliance report if you reuse the Minio Configuration in the following manner:
 ```toml
 [global.v1.external.minio]
-        endpoint = "<region endpoint stripping https>"
+        ## endpoint has to be s3.amazonaws.com
+        endpoint = "s3.amazonaws.com"
         root_user = "<access_key>"
         root_password = "<secret_key>"
 ```
