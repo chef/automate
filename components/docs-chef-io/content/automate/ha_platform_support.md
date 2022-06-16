@@ -48,7 +48,7 @@ Based on the above assumption machine requirment will be:
 | Opensearch DB     | 3     | 2    | 8   | 58.9 GB      | m5.large         |
 | Bastion Machine   | 1     | 2    | 8   | 150 GB       | m5.large         |
 
-The above hardware configuration is based on above assumption. Customer should calculate based on there actual estimate using the sample calculation provided: [Excel Calculator sheet](../../static/calculator/automate_ha_hardware_calculator.xlsx) [Excel Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx).
+The above hardware configuration is based on above assumption. Customer should calculate based on there actual estimate using the sample calculation provided: [Excel Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx).
 
 {{< note >}}
 

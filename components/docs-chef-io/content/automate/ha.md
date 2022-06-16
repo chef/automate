@@ -26,12 +26,10 @@ This architecture includes the cluster of the *Chef Automate*, *Chef Server*, *P
 
 ### Chef Automate HA Architecture for OnPremise / AWS Non-Managed
 
-![High Availability Architecture](../../static/images/automate/ha_arch_onpremise.png)
 ![High Availability Architecture](/images/automate/ha_arch_onpremise.png)
 
 ### Chef Automate HA Architecture for AWS Managed
 
-![High Availability Architecture](../../static/images/automate/ha_arch_aws_managed.png)
 ![High Availability Architecture](/images/automate/ha_arch_aws_managed.png)
 
 ## Chef Automate HA Topology
