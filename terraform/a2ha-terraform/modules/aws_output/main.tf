@@ -34,6 +34,10 @@ resource "local_file" "output" {
 #For starting deployment process after provisioning, we have to set deployment flag in tfvars and tf_arch file.
 resource "null_resource" "output" {
     count = 1
+
+    triggers = {
+      always_run = timestamp()
+    }
     
     provisioner "local-exec" {
         command = "mv ${path.root}/terraform.tfvars ${path.root}/aws.auto.tfvars;sed  -i 's/aws/deployment/' ${path.root}/.tf_arch;sed  -i 's/architecture \"aws\"/architecture \"deployment\"/' ${path.root}/../a2ha.rb"
@@ -44,6 +48,10 @@ resource "null_resource" "output" {
 
 resource "null_resource" "setup_destroy_directory" {
   for_each = toset(local.copy_terraform_files_for_destroy)
+
+  triggers = {
+    always_run = timestamp()
+  }
 
   provisioner "local-exec" {
     command = "cp ${each.value} ${local.destination_path}"
