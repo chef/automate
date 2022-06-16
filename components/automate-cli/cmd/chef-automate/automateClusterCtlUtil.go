@@ -548,3 +548,29 @@ func extractPackageName(filename string) string {
 	}
 	return match[0][1 : len(match[0])-(len(match[0])-(strings.LastIndexAny(match[0], "-")))]
 }
+
+func grepFromFile(searchEle string, filepath string) (string, error) {
+	command := "grep \"" + searchEle + "\" " + filepath + " | awk '{print $2}'"
+	out, err := exec.Command("/bin/sh", "-c", command).Output()
+	if err != nil {
+		writer.Fail(err.Error())
+		return "", nil
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
+func isManagedServicesOn() bool {
+	isManagedService, err := grepFromFile("setup_managed_services", "/hab/a2_deploy_workspace/a2ha.rb")
+	if err != nil {
+		return false
+	}
+	if isManagedService != "" {
+		managedServKeyPair := strings.Split(isManagedService, " ")
+		fmt.Println(managedServKeyPair)
+		if managedServKeyPair[1] == "true" {
+			return true
+		}
+		return false
+	}
+	return false
+}
