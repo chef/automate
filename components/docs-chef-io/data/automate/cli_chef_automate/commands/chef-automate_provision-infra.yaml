@@ -11,6 +11,9 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for provision-infra
+- name: saas
+  default_value: "false"
+  usage: Flag for saas setup
 - name: "yes"
   shorthand: "y"
   default_value: "false"
