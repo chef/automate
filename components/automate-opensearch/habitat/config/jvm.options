@@ -45,7 +45,7 @@
 # 10-13:-XX:-UseCMSInitiatingOccupancyOnly
 14-:-XX:+UseG1GC
 14-:-XX:G1ReservePercent=25
-14-:-XX:InitiatingHeapOccupancyPercent=30
+14-:-XX:InitiatingHeapOccupancyPercent=15
 
 ## JVM temporary directory
 -Djava.io.tmpdir=${OPENSEARCH_TMPDIR}
