@@ -323,8 +323,7 @@ Add the following settings to your `config.toml`:
 enable = true
 nodes = ["<pghostname1>:<port1>", "<pghostname2>:<port2>", "..."]
 
-# To use postgres with SSL, uncomment root_cert and fill out the certificate value and 
-# change enable = true:
+# To use postgres with SSL, Set enable = true then, uncomment root_cert and fill out the certificate value. 
 [global.v1.external.postgresql.ssl]
 enable = false
 # root_cert = """$(cat </path/to/root/cert.pem>)"""
