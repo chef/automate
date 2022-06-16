@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const habpkgcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/automate-backend-deployment"
+const habpkgcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/automate-ha-deployment"
 const pkgName = "automate-ha-deployment"
 
 const workspaceUpgradeHelpDocs = `

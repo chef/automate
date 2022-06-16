@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
 
@@ -255,7 +256,7 @@ func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]str
 		return d.Outputs.ChefServerSSH.Value, nil
 	case "postgresql", "pg":
 		if isManagedServices {
-			return d.Outputs.PostgresqlSSH.Value, errors.New("can not ssh managed service")
+			return d.Outputs.PostgresqlSSH.Value, status.Annotate(errors.New("can not ssh managed service"), status.InvalidCommandArgsError)
 		}
 		return d.Outputs.PostgresqlSSH.Value, nil
 	case "opensearch", "os":

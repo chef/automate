@@ -196,7 +196,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	isManagedServices := isManagedServicesOn()
 	if isManagedServices && !upgradeRunCmdFlags.upgradefrontends {
 		return status.Annotate(
-			errors.New("Backend can not be upgraded incase of managed services, please use with flag upgrade-frontends"), status.UpgradeError)
+			errors.New("Backend can not be upgraded incase of managed services, please use with flag upgrade-frontends"), status.InvalidCommandArgsError)
 	}
 	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
@@ -422,7 +422,7 @@ func init() {
 		"will only upgrade and not deploy the bundle")
 	upgradeRunCmd.PersistentFlags().BoolVarP(
 		&upgradeRunCmdFlags.acceptMLSA,
-		"acceptMLSA",
+		"auto-approve",
 		"y",
 		false,
 		"Do not prompt for confirmation; accept defaults and continue")

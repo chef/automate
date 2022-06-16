@@ -564,13 +564,8 @@ func isManagedServicesOn() bool {
 	if err != nil {
 		return false
 	}
-	if isManagedService != "" {
-		managedServKeyPair := strings.Split(isManagedService, " ")
-		fmt.Println(managedServKeyPair)
-		if managedServKeyPair[1] == "true" {
-			return true
-		}
-		return false
+	if isManagedService != "" && isManagedService == "true" {
+		return true
 	}
 	return false
 }
