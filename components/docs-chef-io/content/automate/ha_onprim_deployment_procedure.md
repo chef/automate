@@ -95,7 +95,9 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
    - Add IP address of each machine in relevant service section, multiple IP's shoud be in double quotes (`"`) and separated with comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
-      - If we want to use same machine for OpenSearch and Postgresql then provide same IP for both the config fields.
+      - If we want to use same machine for OpenSearch and Postgresql then provide same IP for both the config fields. Which means overall there will 3 machines or VM's running both OpenSearch and Postgresql. A reduced performance should be expected with this. Minimum 3 VM's or Machines will be used for Both OpenSearch and Postgresql running together on all 3 machines.
+      - Also, you can use same machines for Chef Automate and Chef Infra Server. Which means overall there will be 2 machines or VM's running both Chef Automate and Chef Infra Server. A reduced performance should be expected with this. Minimum 2 VM's or Machines will be used by both Chef Automate and Chef Infra Server running together on both 2 machines.
+      - Thus, overall minimum machines needed will be 5.
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_key_file` path, this key should have access to all the Machines or VM's
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`

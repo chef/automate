@@ -109,8 +109,8 @@ Refer to the content for the `automate.toml` file below:
     base_path = "automate"
 
 [global.v1.backups.s3.credentials]
-    access_key = "AKIARUQHMSKV6BXLAXHO"
-    secret_key = "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"
+    access_key = "AKIAO"
+    secret_key = "s3kQ"
 ```
 
 Execute the command given below to trigger the deployment.
@@ -119,7 +119,7 @@ Execute the command given below to trigger the deployment.
 ./chef-automate config patch configs/automate.toml
 ```
 
-Take a [back-up](/automate/ha_backup_for_backup_restore) of the configurations once the cluster has been deployed.
+Take a [back-up](/automate/ha_restore/) of the configurations once the cluster has been deployed.
 
 {{< note >}} **IAM Role:** Assign the IAM Role to all the OpenSearch instances in the cluster created above. {{< /note >}}
 

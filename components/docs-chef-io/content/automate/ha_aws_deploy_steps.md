@@ -20,7 +20,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 ### Prerequisite:
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) \
+- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. \
   Set these in `~/.aws/credentials` in Bastion Host:
 
   ```bash

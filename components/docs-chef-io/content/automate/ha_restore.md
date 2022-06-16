@@ -1,5 +1,5 @@
 +++
-title = "Restore"
+title = "Backup and Restore"
 
 draft = false
 
@@ -7,15 +7,25 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Restore"
-    identifier = "automate/deploy_high_availability/backup_and_restore/ha_restore_s3.md Restore"
+    title = "Backup and Restore"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_restore_s3.md Backup and Restore"
     parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 230
 +++
 
-This page includes the procedure to restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS) and the Amazon Web Services (AWS) S3 bucket.
+## Backup
 
-## Restoring the S3 Backed-up Data
+Chef Automate let's you create a new backup. You can create it by running the backup command from a Chef Automate front-end node. The backup command is as shown below:
+
+```cmd
+chef-automate backup create
+```
+
+## Restore
+
+This section includes the procedure to restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS) and the Amazon Web Services (AWS) S3 bucket.
+
+### Restoring the S3 Backed-up Data
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
@@ -29,7 +39,7 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 - Start all Chef Automate and Chef Infra Server front-end nodes by executing the `sudo systemctl start chef-automate` command.
 
-## Restoring the EFS Backed-up Data
+### Restoring the EFS Backed-up Data
 
 To restore backed-up data of the Chef Automate High Availability (HA) using the Amazon Web Services (AWS) S3 bucket, follow the steps given below:
 

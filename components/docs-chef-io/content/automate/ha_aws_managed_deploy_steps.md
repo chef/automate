@@ -18,10 +18,10 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 ## Steps to install Chef Automate HA on AWS with Managed AWS Services
 
 ### Prerequisite:
-- Setup AWS RDS Postgresql ([Ref link](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html))
-- Setup AWS OpenSearch ([Ref link](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html)).
+- Setup AWS RDS Postgresql 13.5 ([Ref link](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html))
+- Setup AWS OpenSearch 1.2 ([Ref link](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html)).
 - Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) \
+- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. Ref. to [create IAM Users](/automate/ha_iam_user/) \
   Set these in `~/.aws/credentials` in Bastion Host:
   ```bash
   sudo su -
@@ -78,7 +78,10 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
       - If AWS VPC uses CIDR then set `aws_cidr_block_addr`.
       - If AWS VPC uses Subnet then set `private_custom_subnets` and `public_custom_subnets` Example: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
       - Set `ssh_key_pair_name`, this is the SSH Key Pair we created as Prerequsite. This Value should be just name of the AWS SSH Key Pair, not having `.pem` extention. The ssh key content should be same as content of `ssh_key_file`.
-      - Set `setup_managed_services` as `false`, As these deployment steps are for Non-Managed Services AWS Deployment. Default value is `false`.
+      - Set `setup_managed_services` as `true`, As these deployment steps are for Managed Services AWS Deployment. Default value is `false` which should be changed.
+        - Set `managed_opensearch_domain_name`, `managed_opensearch_domain_url`, `managed_opensearch_username`, `managed_opensearch_user_password` from the Managed AWS OpenSearch which you created in the Prerequsite steps.
+        - Set `managed_rds_instance_url` as the URL with Port No. Example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
+        - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the Managed AWS RDS Postgresql which you created in the Prerequsite steps.
       - Set `ami_id`, this value depends on your AWS Region and the Operating System Image you want to use.
       - Please use the [Hardware Requirement Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx) to get information for which instance type you will need for your load.
       - Set Instance Type for Chef Automate in `automate_server_instance_type`.
@@ -89,9 +92,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
       - Set `chef_server_lb_certificate_arn` with the arn value of the Certificate created in AWS ACM for DNS entry of `chefinfraserver.example.com`.
       - Set `automate_ebs_volume_iops`, `automate_ebs_volume_size` based on your load needs.
       - Set `chef_ebs_volume_iops`, `chef_ebs_volume_size` based on your load needs.
-      - Set `opensearch_ebs_volume_iops`, `opensearch_ebs_volume_size` based on your load needs.
-      - Set `postgresql_ebs_volume_iops`, `postgresql_ebs_volume_size` based on your load needs.
-      - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`, `opensearch_ebs_volume_type`, `postgresql_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
+      - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 7. Confirm all the data in the config is correct:
    ```bash
    cat config.toml
