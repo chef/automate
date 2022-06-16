@@ -18,6 +18,8 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 ## Steps to install Chef Automate HA on AWS with Managed AWS Services
 
 ### Prerequisite:
+- Setup AWS RDS Postgresql ([Ref link](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html))
+- Setup AWS OpenSearch ([Ref link](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html)).
 - Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) \
   Set these in `~/.aws/credentials` in Bastion Host:
