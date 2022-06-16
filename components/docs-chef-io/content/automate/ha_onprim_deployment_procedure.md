@@ -74,6 +74,7 @@ In this section, we'll discuss about the steps to deploy Chef Automate HA on-pre
    ```
    - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
    - Add IP address of each machine in relevant service section, multiple IP's shoud be in double quotes (`"`) and separated with comma (`,`). Example: `["10.0.0.101","10,0.0.102"]`
+      - If we want to use same machine for OpenSearch and Postgresql then provide same IP for both the config fields.
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_key_file` path, this key should have access to all the Machines or VM's
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
