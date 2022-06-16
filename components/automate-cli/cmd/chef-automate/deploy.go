@@ -227,7 +227,6 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 			args = append(args, "--"+deployCmdFlags.channel)
 			return deployer.doDeployWork(args)
 		} else if len(deployCmdFlags.channel) == 0 {
-			writer.Printf("deploying with default channel \n")
 			return deployer.doDeployWork(args)
 		} else {
 			return status.Wrap(derr, status.ConfigError, invalidChannelName)

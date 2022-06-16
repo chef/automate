@@ -30,7 +30,7 @@ func runTestCmd(cmd *cobra.Command, args []string) error {
 		if testCommandFlags.full {
 			args = append(args, "--full")
 		}
-		return executeAutomateClusterCtlCommand("test", args, testHAHelpDocs)
+		return executeAutomateClusterCtlCommandAsync("test", args, testHAHelpDocs)
 	} else {
 		return status.Wrap(errors.New(AUTOMATE_HA_INVALID_BASTION), status.ConfigError, testHAHelpDocs)
 	}

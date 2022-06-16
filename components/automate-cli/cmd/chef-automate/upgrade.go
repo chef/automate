@@ -33,7 +33,7 @@ var upgradeRunCmdFlags = struct {
 	isMajorUpgrade       bool
 	versionsPath         string
 	acceptMLSA           bool
-	upgradeHAWorkspace   bool
+	upgradeHAWorkspace   string
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -193,6 +193,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 }
 
 func runAutomateHAFlow(args []string, offlineMode bool) error {
+	isManagedServices := isManagedServicesOn()
+	if isManagedServices && !upgradeRunCmdFlags.upgradefrontends {
+		return status.Annotate(
+			errors.New("Backend can not be upgraded incase of managed services, please use with flag --upgrade-frontends"), status.InvalidCommandArgsError)
+	}
 	if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 		return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 	}
@@ -207,8 +212,10 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	}
 
 	if offlineMode {
-		upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap)
-
+		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap)
+		if uperr != nil {
+			return status.Annotate(uperr, status.UpgradeError)
+		}
 		if !upgraded {
 			writer.Title("Installing airgap install bundle")
 			airgapMetaData, err := airgap.Unpack(upgradeRunCmdFlags.airgap)
@@ -415,16 +422,16 @@ func init() {
 		"will only upgrade and not deploy the bundle")
 	upgradeRunCmd.PersistentFlags().BoolVarP(
 		&upgradeRunCmdFlags.acceptMLSA,
-		"yes",
+		"auto-approve",
 		"y",
 		false,
 		"Do not prompt for confirmation; accept defaults and continue")
 
-	upgradeRunCmd.PersistentFlags().BoolVarP(
+	upgradeRunCmd.PersistentFlags().StringVarP(
 		&upgradeRunCmdFlags.upgradeHAWorkspace,
 		"workspace-upgrade",
 		"w",
-		false,
+		"",
 		"Do not prompt for confirmation to accept workspace upgrade")
 
 	upgradeRunCmd.PersistentFlags().BoolVar(

@@ -19,8 +19,8 @@
 # Xms represents the initial size of total heap space
 # Xmx represents the maximum size of total heap space
 
--Xms{{cfg.runtime.minHeapsize}}
--Xmx{{cfg.runtime.maxHeapsize}}
+# -Xms{{cfg.runtime.minHeapsize}}
+# -Xmx{{cfg.runtime.maxHeapsize}}
 
 ################################################################
 ## Expert settings
