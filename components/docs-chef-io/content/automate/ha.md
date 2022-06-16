@@ -32,9 +32,6 @@ Thus, HA clusters strive to support the system or application, or services to ru
 
 ## Chef Automate High Availability (HA)
 
-<<<<<<< HEAD
-The Chef Automate HA equates to reliability, intending to increase functionality, efficiency, and productivity. HA is built on the following characteristics, **Redundancy**, and **Failover**. The Chef Automate HA architecture is an approach to defining the components, modules, or implementation of services of a system that ensures optimal operational performance, even at times of high loads. It aids in addressing major issues, service failure, and zone failure.
-=======
 The Chef Automate HA equates to reliability, intending to increase functionality, efficiency, and productivity. It is built on the following three characteristics, **Redundancy**, **Monitoring**, and **Failover**. The Chef Automate HA architecture is an approach of defining the components, modules, or implementation of services of a system that ensures optimal operational performance, even at times of high loads. It aids in addressing three major issues, server failure, zone failure, and cloud failure. It also allows you to automate and test everything in your network.
 
 ### What are Chef Automate Clusters?
@@ -94,4 +91,3 @@ Both Chef Automate and Chef Infra Server have a load balancer with a UI. For exa
 - Automate Backend
 
 The **Elasticsearch** and **PostgreSQL** database instances act as an automated backend component. Chef Habitat's Supervisor makes a cluster for the database instance. Chef Automate backend cluster rests in the Chef Habitat Supervisor ring. For **Postgresql**, **pgleaderchk** service runs in all the **PostgreSQL** instances and ensures to choose a leader in case the leader database fails. For **Elasticsearch**, there is a **msae** concept of leader-follower, and for any database failure, a leader election occurs, and a new leader is chosen.
->>>>>>> main
