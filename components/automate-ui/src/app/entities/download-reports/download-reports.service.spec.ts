@@ -125,7 +125,7 @@ describe('DownloadReportsService', () => {
     const expectedUrl = `${REPORT_LIST_API_URL}/export/${ackId}`;
 
     service.downloadReport(ackId).subscribe((data) => {
-      expect(data.size).toBeGreaterThan(0);
+      expect(data).toEqual(expectedData);
     });
 
     const req = httpTestingController.expectOne(expectedUrl);
