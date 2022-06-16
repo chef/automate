@@ -8,13 +8,15 @@ gh_repo = "automate"
   [menu.automate]
     title = "Upgrade"
     parent = "automate/deploy_high_availability"
-    identifier = "automate/deploy_high_availability/ha_upgrade_introduction.md Introduction"
-    weight = 199
+    identifier = "automate/deploy_high_availability/ha_upgrade_introduction.md Upgrade HA"
+    weight = 70
 +++
 
-## Upgrade Steps
+Steps to upgrade the Chef Automate HA are as shown below:
+
 - Download Airgapped Bundle \
   Download latest Bundle with this:
+
   ```bash
   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
   ```

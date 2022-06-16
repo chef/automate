@@ -9,9 +9,9 @@ gh_repo = "automate"
     title = "Automate to Automate HA"
     parent = "automate/deploy_high_availability/migration"
     identifier = "automate/deploy_high_availability/migration/ha_automate_to_automate_ha.md Automate to Automate HA"
-    weight = 230
+    weight = 220
 +++
-
+ 
 ## Upgrading with FileSystem Backup
 
 Here we expect both the versions of Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version 4.x.

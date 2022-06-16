@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Architecture"
     parent = "automate/deploy_high_availability"
     identifier = "automate/deploy_high_availability/ha.md High Availability Architecture"
-    weight = 50
+    weight = 10
 +++
 
 **High availability (HA)** refers to a system or application that offers a high level of operational availability. This means that if one server goes down, whether due to traffic overload or other issues, the entire site or application will not be down. HA means the application remains available with no interruption. We achieve high availability when an application continues to operate even when one or more underlying components fail.

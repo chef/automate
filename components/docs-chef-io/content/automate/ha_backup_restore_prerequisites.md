@@ -8,7 +8,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Prerequisites"
-    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Prerequisites"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore_prerequisites.md Backup and Restore Prerequisites"
     parent = "automate/deploy_high_availability/backup_and_restore"
     weight = 210
 +++

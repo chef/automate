@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Existing A2HA to Automate HA"
     parent = "automate/deploy_high_availability/migration"
     identifier = "automate/deploy_high_availability/migration/ha_existing_a2ha_to_automate_ha.md Existing A2HA to Automate HA"
-    weight = 210
+    weight = 200
 +++
 
 This page explains the procedure to migrate the existing A2HA data to the newly deployed Chef Automate HA. This migration involves the following steps:

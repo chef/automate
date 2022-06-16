@@ -8,12 +8,14 @@ gh_repo = "automate"
   [menu.automate]
     title = "FAQs"
     parent = "automate/deploy_high_availability/faqs"
-    identifier = "automate/deploy_high_availability/faqs/ha_faqs.md FAQs"
-    weight = 200
+    identifier = "automate/deploy_high_availability/faqs/ha_faqs.md HA FAQs"
+    weight = 130
 +++
 
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) feature and the steps to resolve them. In addition, this page also lists the health check commands.
+
 ## Frequently Asked Questions
+
 ### How to check logs while doing backup or restore?
 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.

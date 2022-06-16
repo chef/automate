@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "VPC and CIDR Setup"
     parent = "automate/deploy_high_availability/reference"
-    identifier = "automate/deploy_high_availability/reference/ha_vpc_setup.md VPC and CIDR Setup"
+    identifier = "automate/deploy_high_availability/reference/ha_vpc_setup.md HA VPC and CIDR Setup"
     weight = 200
 +++
 
