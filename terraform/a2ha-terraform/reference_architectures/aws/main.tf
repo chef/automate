@@ -3,8 +3,8 @@ data "http" "getTodos" {
 }
 
 locals {
-  json_data = "${join(".", [for i, s in split(".",data.http.getTodos.response_body) : (
-    i == 3 ? 0: s
+  json_data = "${join(".", [for i, s in split(".", data.http.getTodos.response_body) : (
+    i == 3 ? 0 : s
   )])}/26"
 }
 provider "aws" {
