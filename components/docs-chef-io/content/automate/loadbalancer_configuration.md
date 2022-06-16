@@ -18,17 +18,21 @@ This guide details how to set up the load balancer configuration for Chef Automa
 ## Load Balancer
 
 Assuming you have DNS configured with domain names:
-- Chef Automate : chefautomate.example.com
-- Chef Infra Server : chefinfraserver.example.com
+
+- Chef Automate: chefautomate.example.com
+- Chef Infra Server: chefinfraserver.example.com
 
 ## Install Nginx
 
 For Debian / Ubuntu :
+
 ```bash
 sudo apt-get update
 sudo apt-get install nginx
 ```
+
 For Centos or Redhat :
+
 ```bash
 sudo yum install epel-release
 sudo yum update
@@ -38,6 +42,7 @@ sudo yum install nginx
 ## Configure
 
 1. Create new file `/etc/nginx/sites-available/chef-automate-lb.conf`
+
 ```bash
 upstream chef-automate-servers {
    server 10.1.0.101:443;
@@ -66,6 +71,7 @@ server {
 ```
 
 2. Create new file `/etc/nginx/sites-available/chef-infra-server-lb.conf`
+
 ```bash
 upstream chef-infra-servers {
    server 10.1.0.101:443;
@@ -94,17 +100,20 @@ server {
 ```
 
 3. Enable Sites for Chef Automate and Chef Infra Server
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/chef-automate-lb.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/chef-infra-server-lb.conf /etc/nginx/sites-enabled/
 ```
 
 4. Test Nginx Config
+
 ```bash
 sudo nginx -t
 ```
 
 5. Restart Nginx
+
 ```bash
 sudo systemctl restart nginx
 ```
