@@ -143,6 +143,9 @@ Then add in OpenSearch configuration as:
 
 ```
 
+{{< warning >}} Configure the OpenSearch Heap size to **50%** of RAM.{{< /warning >}}
+
+
 Apply this using the `config patch` command.
 
 5. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
