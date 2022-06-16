@@ -6,7 +6,7 @@ title = "Large Compliance Report Ingestion"
 Automate fails to ingest Compliance report larger than 4MB size sent through data collector endpoint.
 Automate data collector sends back error to the client.
 
-The following change in architecture enables Automate to ingest reports larger than 4MB without any failure.
+The following change in architecture enables Automate to ingest reports larger than 4MB without any failure.  
 ![LCR Architecture](/images/automate/lcr_architecture.jpg)
 
 Automate with the configuration to allow ingestion of a large compliance report allow the data not only to be sent to 
@@ -25,8 +25,9 @@ This change has implications in the performance of Automate data ingestion becau
 The impact depends on different factors like network configuration, machine configuration.
 Here is a benchmark test summary report run on
 
-- Instance Type: c4.4xlarge
-- Reports uploaded: 20K
+- Instance Type: 16 vCpu, 30 GiB memory   
+- Number of Compliance Targets: 20K
+- OpenSearch and Postgres are deployed internally  
 
 | Report Size | Supported Concurrency |
 | --- | --- |
@@ -59,11 +60,12 @@ To enable Automate to ingest Large Compliance report:
     endpoint = "<minio server end point>:<port>" 
     root_user = "<username>"
     root_password = "<password>"
+    
     ## Uncomment and fill out if want to modify the number of workers to run in parallel to communicate with OpenSearch for preparing the doc for export, default value is 50
     #concurrent_open_search_requests = 50
     ## Uncomment and fill out if want to modify the number of workers to run in parallel to communicate with MINIO server for preparing the doc for export, default value is 10
     #concurrent_minio_requests = 10
-    ## Uncomment and fill out if using external MINIO with SSL
+    ## Uncomment and fill out if external MINIO is configured with SSL
     #enable_ssl = true
     #cert = """$(cat </path/to/cert_file.crt>)"""
 
@@ -76,7 +78,24 @@ To enable Automate to ingest Large Compliance report:
 #[report_manager.v1.sys.objstore]
 #  bucket = "default"
 ```
+
 3. Patch the config by running   
 `chef-automate config patch patch.toml`
+
+### Using Public Cloud Object Storage 
+{{< warning >}}  
+The below configuration is not tested to determine benchmark numbers. 
+We recommend doing benchmark testing before considering this approach.
+{{< /warning >}}
+
+Automate can connect to Automate with AWS S3 if you reuse the Minio Configuration in the following manner:
+```toml
+[global.v1.external.minio]
+        endpoint = "<region endpoint stripping https>"
+        root_user = "<access_key>"
+        root_password = "<secret_key>"
+```
+
+
 
 
