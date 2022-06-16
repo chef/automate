@@ -8,8 +8,13 @@ import * as moment from 'moment/moment';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 const COMPLIANCE_URL = environment.compliance_url;
+
+class MockTelemetryService {
+  track() { }
+}
 
 class MockAppConfigService {
   get isLargeReportingEnabled(): boolean {
@@ -26,6 +31,7 @@ describe('StatsService', () => {
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },
         { provide: AppConfigService, useClass: MockAppConfigService },
+        { provide: TelemetryService, useClass: MockTelemetryService },
         StatsService
       ],
       imports: [
