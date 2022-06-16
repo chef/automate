@@ -53,7 +53,6 @@ export class SigninComponent implements OnInit, OnDestroy {
       this.error = false;
       this.setSession();
       localStorage.setItem('manual-upgrade-banner', 'true');
-      this.deleteIdTokenFromCookie(this.idToken);
       this.router.navigateByUrl(this.path);
     }, () => {
       this.error = true;
