@@ -80,17 +80,3 @@ To enable Automate to ingest Large Compliance report:
 `chef-automate config patch patch.toml`
 
 
-### Storing Reports in Cloud Object Storage
-
-Minio can work as a gateway to Object storage in different public clouds:
-- AWS
-- Azure
-- GCP
-
-In this case, Minio needs to be deployed as a gateway.
-Please refer to the document here:
-
-
-The Automate configuration will be the same as above.
-
-
