@@ -94,6 +94,8 @@ automate do
   {{ if .Automate.Config.AdminPassword }} admin_password "{{ .Automate.Config.AdminPassword }}" {{ else }} # admin_password "{{ .Automate.Config.AdminPassword }}" {{ end }}
   ### Leave commented out if using AWS infrastructure
   {{ if .Automate.Config.Fqdn }} fqdn "{{ .Automate.Config.Fqdn }}" {{ else }} # fqdn "{{ .Automate.Config.Fqdn }}" {{ end }}
+  #Deprecated Config - automate_setup_type is not supported
+  automate_setup_type {{ .Automate.Config.AutomateSetupType }}
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.
   {{ if .Automate.Config.TeamsPort }} teams_port "{{ .Automate.Config.TeamsPort }}" {{ else }} # teams_port "{{ .Automate.Config.TeamsPort }}" {{ end }}
@@ -132,9 +134,13 @@ aws do
   private_custom_subnets [{{ range $index, $element := .Aws.Config.PrivateCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   public_custom_subnets [{{ range $index, $element := .Aws.Config.PublicCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
+  aws_automate_route53_prefix "{{ .Aws.Config.AwsAutomateRoute53Prefix }}"
+  aws_chef_server_route53_prefix "{{ .Aws.Config.AwsChefServerRoute53Prefix }}"
+  aws_route53_hosted_zone "{{ .Aws.Config.AwsRoute53HostedZone }}"
   ### If lb_access logs is true then provide your s3 bucket name in next field s3_bucket_name_lb_access otherwise make it false
   lb_access_logs "{{ .Aws.Config.LBAccessLogs }}"
   setup_managed_services {{ .Aws.Config.SetupManagedServices }}
+  use_existing_managed_infra {{ .Aws.Config.UseExistingManagedInfra }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_domain_name "{{ .Aws.Config.OpensearchDomainName }}" {{ else }}#managed_opensearch_domain_name "{{ .Aws.Config.OpensearchDomainName }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_domain_url "{{ .Aws.Config.OpensearchDomainUrl }}" {{ else }}#managed_opensearch_domain_url "{{ .Aws.Config.OpensearchDomainUrl }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_opensearch_username "{{ .Aws.Config.OpensearchUsername }}" {{ else }}#managed_opensearch_username "{{ .Aws.Config.OpensearchUsername }}" {{ end }}
@@ -149,6 +155,11 @@ aws do
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_dbuser_username "{{ .Aws.Config.RDSDBUserName }}" {{ else }}#managed_rds_dbuser_username "{{ .Aws.Config.RDSDBUserName }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_dbuser_password "{{ .Aws.Config.RDSDBUserPassword }}" {{ else }}#managed_rds_dbuser_password "{{ .Aws.Config.RDSDBUserPassword }}" {{ end }}
   {{ if .Aws.Config.SetupManagedServices }}managed_rds_certificate "{{ .Aws.Config.RDSCertificate }}" {{ else }}#managed_rds_certificate "{{ .Aws.Config.RDSCertificate }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}postgresql_db_identifier "{{ .Aws.Config.PostrgesqlDbIdentifier }}" {{ else }}#postgresql_db_identifier "{{ .Aws.Config.PostrgesqlDbIdentifier }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}elasticsearch_domain_name "{{ .Aws.Config.ElasticsearchDomainName }}" {{ else }}#elasticsearch_domain_name "{{ .Aws.Config.ElasticsearchDomainName }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}rds_postgresql_instance_type "{{ .Aws.Config.RDSInstanceType }}" {{ else }}#rds_postgresql_instance_type "{{ .Aws.Config.RDSInstanceType }}" {{ end }}
+  {{ if .Aws.Config.SetupManagedServices }}rds_postgresql_restore_identifier "{{ .Aws.Config.RDSRestoreIdentifier }}" {{ else }}#rds_postgresql_restore_identifier "{{ .Aws.Config.RDSRestoreIdentifier }}" {{ end }}
+
   ### Filter settings default to CentOS if left blank
   {{ if .Aws.Config.AmiFilterName }} ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ else }} # ami_filter_name "{{ .Aws.Config.AmiFilterName }}" {{ end }}
   ### Filter settings default to CentOS if left blank
@@ -181,12 +192,17 @@ aws do
   postgresql_ebs_volume_iops "{{ .Aws.Config.PostgresqlEbsVolumeIops }}"
   postgresql_ebs_volume_size "{{ .Aws.Config.PostgresqlEbsVolumeSize }}"
   postgresql_ebs_volume_type "{{ .Aws.Config.PostgresqlEbsVolumeType }}"
+  datadog_api_key "{{ .Aws.Config.DatadogAPIKey }}"
   ### DEPRECATED: AWS Tag: Contact email to apply to AWS insfrastructure tags
   {{ if .Aws.Config.XContact }} contact "{{ .Aws.Config.XContact }}" {{ else }} # contact "{{ .Aws.Config.XContact }}" {{ end }}
   ### DEPRECATED: AWS Tag: Department name to apply to AWS insfrastructure tags
   {{ if .Aws.Config.XDept }} dept "{{ .Aws.Config.XDept }}" {{ else }} # dept "{{ .Aws.Config.XDept }}" {{ end }}
   ### DEPRECATED: AWS Tag: Project name to apply to AWS insfrastructure tags
   {{ if .Aws.Config.XProject }} project "{{ .Aws.Config.XProject }}" {{ else }}  project "{{ .Aws.Config.XProject }}" {{ end }}
-  tags({"X-Contact"=>"{{ .Aws.Config.XContact }}", "X-Dept"=>"{{ .Aws.Config.XDept }}", "X-Project"=>"{{ .Aws.Config.XProject }}"})
+  ### DEPRECATED: AWS Tag: Customer name to apply to AWS insfrastructure tags
+  {{ if .Aws.Config.XCustomer }} customer "{{ .Aws.Config.XCustomer }}" {{ else }}  customer "{{ .Aws.Config.XCustomer }}" {{ end }}
+  ### DEPRECATED: AWS Tag: Production flag - set true for production environment
+  {{ if .Aws.Config.XProduction }} production "{{ .Aws.Config.XProduction }}" {{ else }}  production "{{ .Aws.Config.XProduction }}" {{ end }}
+  tags({"X-Contact"=>"{{ .Aws.Config.XContact }}", "X-Dept"=>"{{ .Aws.Config.XDept }}", "X-Project"=>"{{ .Aws.Config.XProject }}", "X-Customer"=>"{{ .Aws.Config.XCustomer }}", "X-Production"=>"{{ .Aws.Config.XProduction }}"})
 end
 `

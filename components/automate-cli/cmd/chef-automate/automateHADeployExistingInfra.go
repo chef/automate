@@ -20,7 +20,7 @@ func newExistingInfa(configPath string) *existingInfra {
 }
 
 func (e *existingInfra) doDeployWork(args []string) error {
-	var err = bootstrapEnv(e, deployCmdFlags.airgap)
+	var err = bootstrapEnv(e, deployCmdFlags.airgap, false)
 	if err != nil {
 		return err
 	}

@@ -359,13 +359,13 @@ func (_m *MockTarget) IPs() []net.IP {
 	return r0
 }
 
-// InstallAutomateBackendDeployment provides a mock function with given fields: ctx, cfg, releaseManifest
-func (_m *MockTarget) InstallAutomateBackendDeployment(ctx context.Context, cfg *deployment.ConfigRequest, releaseManifest manifest.ReleaseManifest) error {
-	ret := _m.Called(ctx, cfg, releaseManifest)
+// InstallAutomateBackendDeployment provides a mock function with given fields: ctx, cfg, releaseManifest,saas
+func (_m *MockTarget) InstallAutomateBackendDeployment(ctx context.Context, cfg *deployment.ConfigRequest, releaseManifest manifest.ReleaseManifest, saas bool) error {
+	ret := _m.Called(ctx, cfg, releaseManifest, saas)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *deployment.ConfigRequest, manifest.ReleaseManifest) error); ok {
-		r0 = rf(ctx, cfg, releaseManifest)
+	if rf, ok := ret.Get(0).(func(context.Context, *deployment.ConfigRequest, manifest.ReleaseManifest, bool) error); ok {
+		r0 = rf(ctx, cfg, releaseManifest, saas)
 	} else {
 		r0 = ret.Error(0)
 	}

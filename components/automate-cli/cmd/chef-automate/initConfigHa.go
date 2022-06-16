@@ -42,11 +42,12 @@ type AwsConfigToml struct {
 	} `toml:"architecture"`
 	Automate struct {
 		Config struct {
-			AdminPassword string `toml:"admin_password"`
-			Fqdn          string `toml:"fqdn"`
-			InstanceCount string `toml:"instance_count"`
-			TeamsPort     string `toml:"teams_port"`
-			ConfigFile    string `toml:"config_file"`
+			AdminPassword     string `toml:"admin_password"`
+			Fqdn              string `toml:"fqdn"`
+			AutomateSetupType string `toml:"automate_setup_type"`
+			InstanceCount     string `toml:"instance_count"`
+			TeamsPort         string `toml:"teams_port"`
+			ConfigFile        string `toml:"config_file"`
 		} `toml:"config"`
 	} `toml:"automate"`
 	ChefServer struct {
@@ -114,6 +115,17 @@ type AwsConfigToml struct {
 			XContact                     string   `toml:"X-Contact"`
 			XDept                        string   `toml:"X-Dept"`
 			XProject                     string   `toml:"X-Project"`
+			XProduction                  string   `toml:"X-Production"`
+			XCustomer                    string   `toml:"X-Customer"`
+			AwsAutomateRoute53Prefix     string   `toml:"aws_automate_route53_prefix"`
+			AwsChefServerRoute53Prefix   string   `toml:"aws_chef_server_route53_prefix"`
+			AwsRoute53HostedZone         string   `toml:"aws_route53_hosted_zone"`
+			PostrgesqlDbIdentifier       string   `toml:"postgresql_db_identifier"`
+			ElasticsearchDomainName      string   `toml:"elasticsearch_domain_name"`
+			RDSInstanceType              string   `toml:"rds_postgresql_instance_type"`
+			RDSRestoreIdentifier         string   `toml:"rds_postgresql_restore_identifier"`
+			DatadogAPIKey                string   `toml:"datadog_api_key"`
+			UseExistingManagedInfra      bool     `toml:"use_existing_managed_infra"`
 		} `toml:"config"`
 	} `toml:"aws"`
 }

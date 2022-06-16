@@ -56,7 +56,7 @@ type Bootstrapper interface {
 	// and hab-sup. This should be called after SetupSupervisor.
 	SetHabitatEnvironment(manifest.ReleaseManifest) error
 
-	InstallAutomateBackendDeployment(ctx context.Context, cfg *dc.ConfigRequest, releaseManifest manifest.ReleaseManifest) error
+	InstallAutomateBackendDeployment(ctx context.Context, cfg *dc.ConfigRequest, releaseManifest manifest.ReleaseManifest, saas bool) error
 }
 
 // NOTE(ssd) 2018-10-08: This is mostly the HabCmd interface
