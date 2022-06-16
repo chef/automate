@@ -99,7 +99,7 @@
     #
     # Starting limit for overall parent breaker, defaults to 70% of JVM heap.
     #
-    total_limit =                    "70%"
+    total_limit =                    "95%"
     #
     # Limit for fielddata breaker, defaults to 60% of JVM heap.
     #

@@ -34,7 +34,7 @@
 
 ## GC configuration
 8-13:-XX:+UseConcMarkSweepGC
-8-13:-XX:CMSInitiatingOccupancyFraction=95
+8-13:-XX:CMSInitiatingOccupancyFraction=75
 8-13:-XX:+UseCMSInitiatingOccupancyOnly
 
 ## G1GC Configuration

@@ -15,6 +15,7 @@ ulimit -l {{cfg.runtime.max_locked_memory}}
 {{#if cfg.runtime.max_open_files ~}}
 ulimit -n {{cfg.runtime.max_open_files}}
 {{/if ~}}
+# https://opensearch.org/docs/latest/opensearch/install/important-settings/
 {{#if cfg.runtime.es_java_opts ~}}
 export OPENSEARCH_JAVA_OPTS="{{cfg.runtime.es_java_opts}}"
 {{else ~}}
