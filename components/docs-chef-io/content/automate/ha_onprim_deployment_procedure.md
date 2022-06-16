@@ -1,5 +1,5 @@
 +++
-title = "Deployment Procedure"
+title = "On Premise Deployment"
 
 draft = false
 
@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Deployment Procedure"
-    parent = "automate/deploy_high_availability/on_premises_deployment"
-    identifier = "automate/deploy_high_availability/on_premises_deployment/ha_onprim_deployment_procedure.md Deployment Procedure"
-    weight = 220
+    title = "On Premise Deployment"
+    parent = "automate/deploy_high_availability/deployment"
+    identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On Premise"
+    weight = 200
 +++
 
 In this section, we'll discuss about the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:
