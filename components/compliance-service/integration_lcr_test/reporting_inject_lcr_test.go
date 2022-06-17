@@ -1,4 +1,4 @@
-package integration_test
+package integration_lcr_test
 
 import (
 	"errors"

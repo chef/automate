@@ -526,7 +526,7 @@ test-polling: start-ssh-node
 
 test-unit:
 	@printf "\n ===> ${blue}Running compliance-service go unit-tests...${reset}\n"
-	@go test $(shell GOFLAGS='$(GOFLAGS)' go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\)') -cover
+	@go test $(shell GOFLAGS='$(GOFLAGS)' go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\|integration_lcr_test\)') -cover
 
 send-ingest-report:
 	@printf "\n===> ${blue}Sending report to ingestion endpoint...${reset}\n"
