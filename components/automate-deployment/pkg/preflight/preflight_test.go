@@ -15,6 +15,8 @@ import (
 	"github.com/chef/automate/lib/user"
 )
 
+const check_has_correct_name = "check has correct name"
+
 type fileOrError struct {
 	data []byte
 	err  error
@@ -49,10 +51,10 @@ type mockTestProbe struct {
 	lookupUser       map[string]userOrError
 	httpConnectivity map[string]bool
 	euid             int
-
-	successes []string
-	failures  []string
-	summaries []string
+	selinux          []byte
+	successes        []string
+	failures         []string
+	summaries        []string
 }
 
 func NewMockTestProbe(t *testing.T) *mockTestProbe {
@@ -65,6 +67,7 @@ func NewMockTestProbe(t *testing.T) *mockTestProbe {
 		httpConnectivity: make(map[string]bool),
 		symlinks:         make(map[string]symlinkOrError),
 		euid:             -1,
+		selinux:          []byte{},
 	}
 }
 func (m *mockTestProbe) ReportSuccess(s string) { m.successes = append(m.successes, s) }
@@ -94,6 +97,11 @@ func (m *mockTestProbe) IsSymlink(path string) (bool, error) {
 }
 
 func (m *mockTestProbe) Euid() int { return m.euid }
+
+func (m *mockTestProbe) SELinuxStatus() ([]byte, error) {
+	return m.selinux, nil
+}
+
 func (m *mockTestProbe) AvailableDiskSpace(path string) (uint64, error) {
 	d, exists := m.availableDisk[path]
 	if !exists {
@@ -198,6 +206,10 @@ func (m *mockTestProbe) ConnectionSevered(url string) {
 
 func (m *mockTestProbe) WithEuid(euid int) {
 	m.euid = euid
+}
+
+func (m *mockTestProbe) WithSELinuxStatus(selinux []byte) {
+	m.selinux = selinux
 }
 
 func (m *mockTestProbe) WithSymlink(path string) {
@@ -398,7 +410,7 @@ func TestCLIInBinCheck(t *testing.T) {
 func TestUseraddCheck(t *testing.T) {
 	check := preflight.HasUseraddCheck()
 
-	t.Run("check has correct name", func(t *testing.T) {
+	t.Run(check_has_correct_name, func(t *testing.T) {
 		assert.Equal(t, "has_cmd_useradd", check.Name)
 	})
 
@@ -422,7 +434,7 @@ func TestUseraddCheck(t *testing.T) {
 func TestNobodyCheck(t *testing.T) {
 	check := preflight.HasNobodyCheck()
 
-	t.Run("check has correct name", func(t *testing.T) {
+	t.Run(check_has_correct_name, func(t *testing.T) {
 		assert.Equal(t, "has_user_nobody", check.Name)
 	})
 
@@ -727,5 +739,49 @@ sl  local_address                         remote_address                        
 			require.NoError(t, err)
 			probe.AssertFailure()
 		})
+	})
+}
+
+func TestSELinuxPermissiveCheck(t *testing.T) {
+	check := preflight.SELinuxPermissiveCheck()
+
+	t.Run(check_has_correct_name, func(t *testing.T) {
+		assert.Equal(t, "selinux_permissive_required", check.Name)
+	})
+
+	t.Run("succeeds if getenforce is not found", func(t *testing.T) {
+		probe := NewMockTestProbe(t)
+		probe.WithCommandNotFound("getenforce")
+		err := check.TestFunc(probe)
+		require.NoError(t, err)
+		probe.AssertSuccess()
+	})
+
+	t.Run("succeeds if getenforce returns disabled", func(t *testing.T) {
+		probe := NewMockTestProbe(t)
+		probe.WithCommandFound("getenforce")
+		probe.WithSELinuxStatus([]byte("disabled"))
+		err := check.TestFunc(probe)
+		require.NoError(t, err)
+		probe.AssertSuccess()
+	})
+
+	t.Run("succeeds if getenforce returns permissive", func(t *testing.T) {
+		probe := NewMockTestProbe(t)
+		probe.WithCommandFound("getenforce")
+		probe.WithSELinuxStatus([]byte("permissive"))
+		err := check.TestFunc(probe)
+		require.NoError(t, err)
+		probe.AssertSuccess()
+	})
+
+	t.Run("fails if getenforce returns enabled", func(t *testing.T) {
+		probe := NewMockTestProbe(t)
+		probe.WithCommandFound("getenforce")
+		probe.WithSELinuxStatus([]byte("enabled"))
+		err := check.TestFunc(probe)
+		require.NoError(t, err)
+		probe.AssertFailure()
+		probe.AssertSummary()
 	})
 }
