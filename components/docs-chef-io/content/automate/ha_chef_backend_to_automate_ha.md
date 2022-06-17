@@ -57,3 +57,24 @@ For example, `hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+
 -   Execute the `hab pkg install chef/knife-ec-backup` command to install the habitat package for _knife-ec-backup_.
 
 -   Execute the `hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb` command to restore the backup.
+
+## In place migration (Chef Backend to Automate HA)
+
+As part of this scenario, customer will migrate from chef-backend (5 machines) to Automate HA in-place, i.e. Automate HA will be deployed in those 5 machines only where Chef-backend is running. One extra bastion node will be required which will be managing the deployment of Automate HA on the chef backend infrastructure.
+
+
+
+{{< note >}}
+This will require downtime, so plan accordingly. A reduced performance should be expected with this. 
+{{< /note >}}
+
+- ssh to all the backend nodes of chef-backend and run `$chef-backend-ctl stop`
+- ssh to all frontend nodes of chef-backend and run `$chef-server-ctl stop`
+- Create one bastion machine in same vpc as chef-infra-server is in.
+- Login to bastion machine and download chef-automate cli. https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
+- Extract downloaded zip file
+- Create a airgap bundle using command `$ ./chef-automate airgap bundle create `
+- Geneate config.toml file using `$ ./chef-automate init-config-ha existing_infra `
+- Edit config.toml and your ips and fqdn, and update your keys. Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server. Make sure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
+- Deploy using `$ ./chef-automate deploy config.toml <airgapped bundle name>
+- Clean up the old packages from chef-backend (like Elasticsearch and postgres data)

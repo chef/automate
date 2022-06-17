@@ -112,8 +112,19 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    ```bash
    cat config.toml
    ```
+8. Run Provision Command \
+ 
+   ```bash
+   chef-automate provision-infra config.toml --airgap-bundle latest.aib
+   ```
 
-8. Run Deploy Command \
+   Using specific version of Chef Automate, example: `automate-4.0.91.aib` 
+
+   ```bash
+   chef-automate provision-infra config.toml --airgap-bundle automate-4.0.91.aib
+   ```
+
+9. Run Deploy Command \
    Deploy `latest.aib` with set `config.toml`
 
    ```bash
@@ -126,21 +137,21 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
    ```
 
-9. After Deployment is done successfully. \
+10. After Deployment is done successfully. \
    Check status of Chef Automate HA services:
 
    ```bash
    chef-automate status
    ```
 
-10. Check Chef Automate HA deployment info, using the command below:
+11. Check Chef Automate HA deployment info, using the command below:
 
    ```bash
    chef-automate info
    ```
 
-11. Set DNS entries: \
+12. Set DNS entries: \
 
    DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
 
-12. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+13. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
