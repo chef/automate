@@ -1,42 +1,36 @@
 +++
-title = "Backup and Restore"
+title = "Overview"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Backup and Restore"
-    identifier = "automate/install/ha_backup_restore.md Backup and Restore"
-    parent = "automate/install/ha"
-    weight = 70
+    title = "Overview"
+    identifier = "automate/deploy_high_availability/backup_and_restore/ha_backup_restore.md Overview Of Backup and Restore"
+    parent = "automate/deploy_high_availability/backup_and_restore"
+    weight = 200
 +++
 
-Computer security is the safeguarding of computer systems and data against theft, illegal access, or any disaster. It's the method of guarding against and detecting illegal access to your computer system. Data security refers to the process of securing data from illegal access or any disaster. This process includes the following terms:
+Computer security safeguards the computer system and data against theft, unlawful access, or any disaster. It's guarding against and detecting unlawful access to your computer system. Data security refers to securing data from unlawful access or any disaster. This process includes the following terms:
 
 - Data Backup
 - Data Restore
 
-## What is Data Backup?
+## Data Backup
 
-Backup refers to the process of making copies of data or data files to use in the event the original data or data files are lost or destroyed.
+Backup refers to making copies of data or data files to use in the event the original data or data files are lost or destroyed.
 
-In information technology, a backup or data backup is a copy of computer data taken and stored elsewhere to restore the original after a data loss event. A backup system contains at least one copy of all data considered worth saving. The data storage requirements can be large. An information repository model may be used to provide structure to this storage. Typically, backup data includes all the data such as documents, media files, configuration and registry files, and machine images.
+In information technology, a data backup is a copy of computer data taken and stored elsewhere to restore the original after a data loss event. A backup system contains at least one copy of all data considered worth saving. The data storage requirements can be extensive. An information repository model may be used to provide structure to this storage. Typically, backup data includes all the data such as documents, media files, configuration and registry files, and machine images.
 
-## What is Data Restore?
+## Data Restore
 
-Data restore is the process of copying backup data from secondary storage and restoring it to its original location or a new location. A restoring process is carried out to return lost, stolen, or damaged data to its original condition or to move data to a new location.
+Data restore is the process of copying backup data from secondary storage and restoring it to its original location or a new location. A restoring process is carried out to return lost, stolen, or damaged data to its original condition or move it to a new location.
 
-## What is the Difference Between Backup and Restore?
+## Chef Automate High Availability (HA) Backups
 
-Backup and recovery are the process of duplicating data and storing it in a secure place in case of loss or damage, and then restoring that data to a location, the original one or a safe alternative that can be again used in operations to avoid downtime. Backup and recovery is also a category of onsite and cloud-based technology solutions that automate and support this process, enabling organizations to protect and retain the data for business and compliance reasons.
-
-The key difference between backup and recovery is that the backup process is how you save and protect your production data and safely store it. Reliable backups and fast recovery together ensure business continuity and business resilience.
-
-## What are Chef Automate High Availability (HA) Backups?
-
-The Elastic Search, Postgres, and Chef Automate Server data and configurations can be backed up manually. There is no automated backup procedure built-in Chef Automate CLI that periodically backups the data.
+You can manually back up the OpenSearch, Postgres, and Chef Automate Server data and configurations. The built-in Chef Automate CLI has no automated backup procedure that periodically backups the data.
 
 ## Backup Types
 
@@ -266,7 +260,7 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 1. Edit `es_config.toml` to add the following settings at the end of the file:
 
 ```ruby
-[es_yaml.path]
+[path]
    # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
    repo = "/mnt/automate_backups/elasticsearch"
 ```
@@ -309,16 +303,17 @@ You can perform this application only once, which triggers a restart of the Elas
 
 1. Enter the `chef-automate backup create` command from a Chef Automate front-end node to create a backup.
 
-### Restoring the EFS Backed-up Data
+- External File-System (EFS) OR
+- Amazon's S3 Bucket
 
-This section includes the procedure to restore backed-up data of the Chef Automate High Availability [HA] using AWS [Amazon Web Services] S3 bucket.
+### EFS System
 
-1. Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the command, `chef-automate status`.
+*External File System* refers to any non-volatile storage device external to the computer. It can be any storage device that serves as an addition to the computer's primary storage, RAM, and cache memory. EFS aids in backing up the data used for future restores or disaster recovery, long-term archiving of data that is not frequently accessed, and storage of non-critical data in lower-performing, less expensive drives. These systems do not directly interact with the computer's CPU (Central Processing Unit).
 
-1. Shutdown Chef Automate service on all front-end nodes by executing the command, `sudo systemctl stop chef-automate`.
+External file systems include devices such as Solid-state drives (SSDs), Hard disk drives (HDDs), Cloud storage, CD-ROM drives, DVD drives, Blu-ray drives, USB flash drives, SD cards, and Tape drives.
 
-1. Login to the same instance of Chef Automate front-end node from which backup is taken.
+### Amazon's S3 Bucket
 
-1. Execute the restore command, `chef-automate backup restore <BACKUP-ID> --yes -b /mnt/automate_backups/backups --patch-config /etc/chef-automate/config.toml`.
+An *Amazon S3 Bucket* is a public cloud storage resource available in Amazon Web Services (AWS) Simple Storage Service (S3), an object storage offering. Amazon S3 buckets, similar to file folders, store objects consisting of data and its descriptive metadata. Amazon S3 is a program built to store, protect, and retrieve data from *buckets* anytime from anywhere on any device. The devices can be websites, mobile apps, archiving, data backups and restorations, IoT devices, enterprise application storage, and providing the underlying storage layer for your data lake.
 
-1. Start all Chef Automate and Chef Infra Server front-end nodes by executing the command, `sudo systemctl start chef-automate`.
+With the AWS Free Usage Tier*, you can get started with Amazon S3 for free in all regions except the AWS GovCloud Regions. Click [here](https://aws.amazon.com/s3/) to know more.
