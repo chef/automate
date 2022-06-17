@@ -13,7 +13,12 @@ gh_repo = "automate"
     weight = 210
 +++
 
-This page explains the prerequisites of the AWS and on-premise backup.
+This page explains the prerequisites of the backup.
+If We choose AWS Deployment Procedure to deploy Automate-HA and we have choosen the `backup_config = efs OR s3` in config.toml, in that case below  
+steps are not required. Below steps are taken care by the deployment. 
+If we have kept the `backup_config` blank, in that case to need to perform the below steps. 
+
+
 
 {{< note >}} You can take backup on EFS system through DNS or IP. {{< /note >}}
 
@@ -53,11 +58,12 @@ Once done with the above steps, `.toml` file and patch the `.config`. In the fil
 Refer to the content for the `automate.toml` file below:
 
 ```sh
-[global.v1.external.opensearch.backup]
+[global.v1]
+  [global.v1.external.opensearch.backup]
     enable = true
     location = "s3"
 
-[global.v1.external.opensearch.backup.s3]
+  [global.v1.external.opensearch.backup.s3]
 
     # bucket (required): The name of the bucket
     bucket = "bucket-name"
@@ -72,7 +78,7 @@ Refer to the content for the `automate.toml` file below:
     # OpenSearch nodes
     client = "default"
 
-[global.v1.external.opensearch.backup.s3.settings]
+  [global.v1.external.opensearch.backup.s3.settings]
     ## The meaning of these settings is documented in the S3 Repository Plugin
     ## documentation. See the following links:
     ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
@@ -93,10 +99,10 @@ Refer to the content for the `automate.toml` file below:
     # use_throttle_retries = true
     # protocol = "https"
 
-[global.v1.backups]
+  [global.v1.backups]
     location = "s3"
 
-[global.v1.backups.s3.bucket]
+  [global.v1.backups.s3.bucket]
     # name (required): The name of the bucket
     name = "bucket-name"
 
@@ -108,7 +114,7 @@ Refer to the content for the `automate.toml` file below:
     # If base_path is not set, backups will be stored at the root of the bucket.
     base_path = "automate"
 
-[global.v1.backups.s3.credentials]
+  [global.v1.backups.s3.credentials]
     access_key = "AKIAO"
     secret_key = "s3kQ"
 ```
