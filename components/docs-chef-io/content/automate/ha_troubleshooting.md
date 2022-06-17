@@ -136,7 +136,7 @@ Follow the steps to fix the above issue:
 - Remove all the files from the */var/tmp* folder of all frontend nodes.
 
 ```bash
-rm –rf /hab && cd /var/tmp && rm –rf
+rm -rf hab && cd /var/tmp && rm -rf
 sudo kill -9 $(sudo lsof -t -i:9631)
 sudo kill -9 $(sudo lsof -t -i:9638)
 ```
