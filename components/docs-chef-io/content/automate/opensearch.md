@@ -19,8 +19,6 @@ You can configure Chef Automate to use OpenSearch clusters that are not deployed
 
 These configuration directions are intended for in the initial deployment of Chef Automate.
 
-{{< note >}} Chef Automate does not support managed OpenSearch like AWS OpenSearch service. {{< /note >}}
-
 Add the following to your config.toml:
 
 ```toml
