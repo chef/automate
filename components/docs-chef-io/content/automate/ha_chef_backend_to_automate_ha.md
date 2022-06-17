@@ -11,7 +11,11 @@ gh_repo = "automate"
     identifier = "automate/deploy_high_availability/migration/ha_chef_backend_to_automate_ha.md Chef Backend to Automate HA"
     weight = 210
 +++
- 
+
+{{< warning >}}
+Customers who are using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate now.
+{{< /warning >}}
+
 This page explains the procedure to migrate the existing Chef infrastructure data to the newly deployed Chef Automate HA. This migration involves two steps:
 
 -   Back up the data from an existing network infrastructure (chef-server) that has Chef Automate installed.
@@ -27,7 +31,10 @@ Take backup using the _knife-ec-backup_ utility and move the backup folder to th
 
 `knife-ec-backup` utility backups and restores the data in an Enterprise Chef Server installation, preserving the data in an intermediate, editable text format. It is similar to the knife download and knife upload commands and uses the same underlying libraries. It includes workarounds for unsupported objects by the tools and various Server API deficiencies. The goal is to improve knife download, knife upload, and the Chef Infra Server API to deprecate the tool.
 
-{{< note >}} The migration procedure is tested on Chef Server version 14+. {{< /note >}}
+{{< note >}}
+- The migration procedure is tested on Chef Server version 14+.
+- The migration procedure is possible above Chef Backend version 2.1.0.
+{{< /note >}}
 
 ## Backup the Existing Chef Server Data
 
@@ -68,6 +75,11 @@ As part of this scenario, customer will migrate from chef-backend (5 machines) t
 This will require downtime, so plan accordingly. A reduced performance should be expected with this. 
 {{< /note >}}
 
+{{< note >}}
+- Need to setup your workstation based on newly created Autoamte-HA's chef-server. Only needed if you have setup the workstation earlier. 
+- This inplace migration works only when cookbook are stored at database. This do not support use-case, where cookbooks are stored at filesystem. 
+{{< /note >}}
+
 - ssh to all the backend nodes of chef-backend and run `$chef-backend-ctl stop`
 - ssh to all frontend nodes of chef-backend and run `$chef-server-ctl stop`
 - Create one bastion machine in same vpc as chef-infra-server is in.
@@ -77,4 +89,4 @@ This will require downtime, so plan accordingly. A reduced performance should be
 - Geneate config.toml file using `$ ./chef-automate init-config-ha existing_infra `
 - Edit config.toml and your ips and fqdn, and update your keys. Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server. Make sure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
 - Deploy using `$ ./chef-automate deploy config.toml <airgapped bundle name>
-- Clean up the old packages from chef-backend (like Elasticsearch and postgres data)
+- Clean up the old packages from chef-backend (like Elasticsearch and postgres)
