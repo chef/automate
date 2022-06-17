@@ -20,6 +20,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 ### Prerequisite:
 - Setup AWS RDS Postgresql 13.5 ([Ref link](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html))
 - Setup AWS OpenSearch 1.2 ([Ref link](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html)).
+- For Backup and Restore with Managed Service ([Ref link](https://docs.chef.io/managed_services/#prerequisites)).
 - Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
 - Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. Ref. to [create IAM Users](/automate/ha_iam_user/) \
   Set these in `~/.aws/credentials` in Bastion Host:
@@ -97,7 +98,18 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    ```bash
    cat config.toml
    ```
-8. Run Deploy Command \
+8. Run Provision Command \
+ 
+   ```bash
+   chef-automate provision-infra config.toml --airgap-bundle latest.aib
+   ```
+
+   Using specific version of Chef Automate, example: `automate-4.0.91.aib` 
+
+   ```bash
+   chef-automate provision-infra config.toml --airgap-bundle automate-4.0.91.aib
+   ```
+9. Run Deploy Command \
    Deploy `latest.aib` with set `config.toml`
    ```bash
    chef-automate deploy config.toml --airgap-bundle latest.aib
@@ -106,16 +118,16 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    ```bash
    chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
    ```
-9. After Deployment is done successfully. \
+10. After Deployment is done successfully. \
    Check status of Chef Automate HA services:
    ```bash
    chef-automate status
    ```
-10. Check Chef Automate HA deployment info, using the command below:
+11. Check Chef Automate HA deployment info, using the command below:
    ```bash
    chef-automate info
    ```
-11. Set DNS entries: \
+12. Set DNS entries: \
    DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to repective Load Balancers as shown in `chef-automate info` command.
-12. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+13. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
