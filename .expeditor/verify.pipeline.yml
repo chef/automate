@@ -319,7 +319,6 @@ steps:
       - cd components/automate-ui
       - make install lint unit
     timeout_in_minutes: 20
-    soft_fail: true
     retry:
       automatic:
         limit: 1
