@@ -36,11 +36,8 @@ To create the domain, follow the steps given below:
 
 The steps to backup and restore the OpenSearch S3 is:
 
-- Create an IAM role with a couple of Permission Policies listed below. The rest of the document refers to the role as `TheSnapshotRole`.
-
   - AmazonS3FullAccess
-  - To register the snapshot repository, pass the `TheSnapshotRole` to OpenSearch Service. Access the **es:ESHttpPut** action. To grant these permissions, attach the following policy to the IAM user or role whose credentials are being used to sign the request, as shown below example:
-
+  
   ```json
   {
     "Version": "2012-10-17",
@@ -59,8 +56,6 @@ The steps to backup and restore the OpenSearch S3 is:
   }
   ```
 
-- Edit the trust relationship of `TheSnapshotRole` to specify the OpenSearch Service in the Principal statement as shown in the following example:
-
   ```json
   {
     "Version": "2012-10-17",
@@ -76,16 +71,11 @@ The steps to backup and restore the OpenSearch S3 is:
   }
   ```
 
-- Create an IAM user and attach the above permission policies, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore.
-
 - Map the snapshot role in OpenSearch Dashboards.
 
   Fine-grained access control introduces an additional step when registering a repository. Even if you use HTTP basic authentication for other purposes, map the `manage_snapshots` role to your IAM user or role with `iam:PassRole` permissions to pass `TheSnapshotRole`.
 
   1. Navigate to the OpenSearch Dashboards plugin for your OpenSearch Service domain. You can find the Dashboards endpoint on your domain dashboard on the OpenSearch Service console.
-  2. From the main menu, choose *Security*, *Roles*, and select the `manage_snapshots` role.
-  3. Choose Mapped users, and Manage mapping.
-  4. Add the domain ARN of the user and role that has permissions to pass `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
 
   ```bash
   arn:aws:iam::123456789123:user/user-name
@@ -94,8 +84,6 @@ The steps to backup and restore the OpenSearch S3 is:
   ```bash
   arn:aws:iam::123456789123:role/role-name
   ```
-
-  5. Select Map and confirm the user and role showing up under Mapped users.
 
 {{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security) to know more.
 
@@ -280,8 +268,6 @@ If you have taken backup from Chef Automate's internal automated OpenSearch serv
 ### Registering Snapshot Repository
 
 To register a snapshot repository, send a PUT request to the OpenSearch Service domain endpoint. Do not use curl to operate as it doesn't support AWS request signing. Instead, use the [sample Python client](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-client-python), Postman, or some other method to send a signed request to register the snapshot repository.
-
-Make sure to follow the steps mentioned in the prerequisite while setting up the amazon opensearch domain. Use the same `role_arn` and `IAM user` credentials mapped to the `manage_snapshots` role on opensearch dashboards.
 
 If using postman to send the API request below, select `AWS Signature` under the **Authorization** Tab and fill *AccessKey*, *SecretKey*, *AWS Region*, and *Service Name* as `es`.
 
