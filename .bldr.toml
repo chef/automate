@@ -1202,6 +1202,34 @@ plan_path = "components/automate-opensearch"
 paths = [
   "components/automate-opensearch/*"
 ]
+
+[report-manager-service]
+plan_path = "components/report-manager-service"
+paths = [
+  "components/report-manager-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/annotations/*",
+  "api/external/iam/*",
+  "api/interservice/cereal/*",
+  "api/interservice/compliance/*",
+  "api/interservice/report_manager/*",
+  "components/automate-grpc/*",
+  "lib/cereal/*",
+  "lib/db/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/pcmp/*",
+  "lib/platform/config/*",
+  "lib/proxy/*",
+  "lib/secrets/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/user/*",
+  "lib/version/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
