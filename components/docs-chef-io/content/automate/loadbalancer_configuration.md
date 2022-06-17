@@ -58,7 +58,7 @@ server {
    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
    location / {
-      proxy_pass http://chef-automate-servers;
+      proxy_pass https://chef-automate-servers;
       proxy_set_header Host $host;
    }
 }
@@ -87,7 +87,7 @@ server {
    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
    location / {
-      proxy_pass http://chef-infra-servers;
+      proxy_pass https://chef-infra-servers;
       proxy_set_header Host $host;
    }
 }

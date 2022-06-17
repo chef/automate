@@ -171,7 +171,7 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 {{< note >}} If the credentials have never been rotated, the above file may be empty. {{< /note >}}
 
 ```sh
-[es_yaml.path]   
+[path]   
 # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb   
 repo = "/mnt/automate_backups/opensearch" 
 ```
@@ -266,8 +266,13 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 - Edit the created `es_config.toml` file and add the following settings at the end of the file. (*The file will be empty if the credentials have not been rotated*)
 
 ```sh
-[es_yaml.s3.client.default]
-endpoint = "< S3 endpoint, e.g. xyz.s3.com>"
+[s3]
+  [s3.client.default]
+    protocol = "https"
+    read_timeout = "60s"
+    max_retries = "3"
+    use_throttle_retries = true
+    endpoint = "s3.amazonaws.com"
 ```
 
 - Run the following command to apply the updated `es_config.toml` changes. Run this command only once. (*This will trigger a restart of the OpenSearch services on each server*)

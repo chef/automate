@@ -260,7 +260,7 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
 1. Edit `es_config.toml` to add the following settings at the end of the file:
 
 ```ruby
-[es_yaml.path]
+[path]
    # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
    repo = "/mnt/automate_backups/elasticsearch"
 ```
