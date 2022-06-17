@@ -36,7 +36,12 @@ func newProvisionInfraCmd() *cobra.Command {
 		"",
 		false,
 		"Flag for saas setup")
-
+	provisionInfraCmd.SetHelpFunc(func(command *cobra.Command, strings []string) {
+		// Hide flag for this command
+		command.Flags().MarkHidden("saas")
+		// Call parent help func
+		command.Parent().HelpFunc()(command, strings)
+	})
 	return provisionInfraCmd
 }
 
