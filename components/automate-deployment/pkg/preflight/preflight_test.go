@@ -51,10 +51,10 @@ type mockTestProbe struct {
 	lookupUser       map[string]userOrError
 	httpConnectivity map[string]bool
 	euid             int
-  selinux          []byte
-	successes []string
-	failures  []string
-	summaries []string
+	selinux          []byte
+	successes        []string
+	failures         []string
+	summaries        []string
 }
 
 func NewMockTestProbe(t *testing.T) *mockTestProbe {
