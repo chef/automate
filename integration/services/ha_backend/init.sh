@@ -50,38 +50,6 @@ ha_backend_setup() {
     echo -e "-----BEGIN CERTIFICATE-----\nMIIDdzCCAl+gAwIBAgIUDsi0qPmptSvcCCXXJ2Fm1pFmv0AwDQYJKoZIhvcNAQEL\nBQAwZTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcM\nB1NlYXR0bGUxGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMRMwEQYDVQQDDApj\naGVmcm9vdGNhMB4XDTIyMDYwMTA3MzMwMVoXDTI1MDUzMTA3MzMwMVowYzELMAkG\nA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUx\nGjAYBgNVBAoMEUNoZWYgU29mdHdhcmUgSW5jMREwDwYDVQQDDAhjaGVmbm9kZTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM5iKA88y2M7T+OSD2vPTPFJ\nmSoKHEyZ3U8qW1ZL9ORY9c5yLpHazWIQ48S1Ad/OeggrrZG7JWOjBY1aYuXWgPe8\nZQ9nS3mUdEu3QjW52zJb5Tp8qO7MJGVXFNaBGoKDSvIuGpnlruNYLiwJbTj0mzkC\nRKvSXCg7iOszHt72VUkfRQM59iXh3LjNup6TPVMmW8Iamze7/NB9DMz4Ixjkknfc\nO9v1Fp2E+GJonpbIPBZGItBelMOH0g/EIBMASl3GX4+eBLndhcdjsdtzEV/fJE6H\nwgMtJGahb+17ztLK54dkZKQ7ES7WVlIq3Bfw+yepqaI6tnfIprqSaPclmeW+asUC\nAwEAAaMhMB8wHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMA0GCSqGSIb3\nDQEBCwUAA4IBAQBYhcyhj/PeVIcV7uWTK7lZxfEjEwG2Pydch+z8ElVuT8iYjuSE\nUMvJTjrX5topd+u9P1INUJAmjyXI8kJ42AoozCsH79iMwkX51O6Ri8GsAufDVeDf\nuTlNCxpnE2O1W1/l9UVUloTGW515KguPcC4xYdNwA6scN8rlhTtH8vvBteDUE+fq\nucRUikrbokEfgzHl3la0QlvQ8JnKprOAxK2eme815IK75ygpcLWKjveHFdC2VknY\nwbdG/4UzmsZbI2q5raa9nY3pSJ/kQ3IYg0lRyEAtIC1LsDw7aW1+Vlw5VR4arHRo\nLOEtF2OEtA1uREZpdtoViv7K36rTwDYwMDS+\n-----END CERTIFICATE-----" > "$certdir/postgresql.pem"
     echo -e "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDOYigPPMtjO0/j\nkg9rz0zxSZkqChxMmd1PKltWS/TkWPXOci6R2s1iEOPEtQHfznoIK62RuyVjowWN\nWmLl1oD3vGUPZ0t5lHRLt0I1udsyW+U6fKjuzCRlVxTWgRqCg0ryLhqZ5a7jWC4s\nCW049Js5AkSr0lwoO4jrMx7e9lVJH0UDOfYl4dy4zbqekz1TJlvCGps3u/zQfQzM\n+CMY5JJ33Dvb9RadhPhiaJ6WyDwWRiLQXpTDh9IPxCATAEpdxl+PngS53YXHY7Hb\ncxFf3yROh8IDLSRmoW/te87SyueHZGSkOxEu1lZSKtwX8PsnqamiOrZ3yKa6kmj3\nJZnlvmrFAgMBAAECggEBAJMQRtN00smHPko/jlWYho95jnbydW/wRE9hM2yu+3as\nHZxaqOyuKaQzvNoy0X8VtseTuD8cSGxTgmVTfx2gWI4v5SOwy4t7SdOaZse6BIRC\nD3o50nc3aMf94Y9ot+dAf2tLhxEbJiBCecRPg1EOnH1nLF/zqk/Q/KP87YabqfJL\n2hV/+ZbUtRzyC88X7zgfHOIPjKF6qZYj2rBF9d6J/nyk4+RGTQXuYMRXRfMa/+Vg\nPQA8vHLOF1ZGbDfLkATcRFy8bVaCHbESRJuVxx377mK3fsZJwP3en3dsANkurJFU\npf0hdW2rL+XoKyBgkd5ZC1XMW6nLBJkhnyuDkWSLwIECgYEA77vdAyXOBIrykR0P\nTnG7d79h3iccYtMEJt3+yK+i/z4xvJ4kUyujXfld+DC2EpudGvAfcPqswMcEfASU\nz7/S7Fjs1DoNqhzVQ2AbLtiXv6gDDqtxRhiQsRebDrCMsy3ak9S+qwx1po/GbAI4\n+Jyd1Ej7nFbr1jaRDE5v/NCkpWkCgYEA3GMAglhMyiiZIp1SCTyZlw/JsgeounW8\nKpCeJW6sRGeKhjU63K6JAKRVH8ZN4BCZAslHgyBlqFavRP1iNGz8aVzijuE3LYv9\ndjClbTKDeL5BVQCMZmMeHRx26A6C2VR3bCeogKCLG2p2w2e6aNyC/5vRswPQ9fHN\n9oQTdP+3Iv0CgYBhsaoARWCuQz1UW4ZITlq6Eti8Ii4UK6/uctsIR2LiJyM3nS5q\nYkch3aQopxkbfiTIvH/jl5Pcv32ZWHiYLLC0tgxU9A9renKCEWEidwtoA/yy9rSj\nfxE/ycHbe6Dqx83iHnlQ1TQAm2idzU4QKiq7Pr6iWF2lHvl/DVvfp9rguQKBgHeX\nNZCFr+3HiAmziu++Na42gAGejF3aQ6hpX5f6bXqVISNgwTc9ctSpWBPs/RdIim9r\nn+W079UgbO2n/eFq/rGCGOLlrZaGr5yyGyKdVaBwxW0F5iotQQsVBiU4sqKSZleH\nUbWy6KmQ5S92Gz6J4oAoIuvcd0ju1RAfbZuAo/VVAoGBAOPXGcUiDIonDKVPTB9l\nW7AYWGXC2qaSCzM5B0A6+Nb4ZqKs1zjtjT1a2JC+EHY9alFo2ccBvkjux8gQmPyX\nuR4wX6ynzUxYIzs6aTPbvxe6d8U8lGK1LpsgLFPxBb9BKIHQ9d62/QUOrb75n2/H\nDEJQGW+rrJ+d9XyEozpuIv+I\n-----END PRIVATE KEY-----" > "$certdir/postgresql.key"
     chmod 777 "$certdir"/*
-    #First, create a private key for the CA:
-    # openssl genrsa -out "$certdir"/MyRootCA.key 2048
-
-
-    # #Create the CA and enter the Organization details:
-    # openssl req -x509 -req -in "$certdir"/MyRootCA.key -sha256 -out "$certdir"/MyRootCA.pem -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca'
-
-    # #the rsa keys for odfe and postgresql
-    # openssl genrsa -out "$certdir"/odfe-node-pkcs12.key 2048
-    # openssl genrsa -out "$certdir"/odfe-admin-pkcs12.key 2048
-    # openssl genrsa -out "$certdir"/postgresql.key 2048
-
-    # #IMPORTANT: Convert these to PKCS#5 v1.5 to work correctly with the JDK.
-    # openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "$certdir/odfe-node-pkcs12.key" -topk8 -out "$certdir/odfe-node.key" -nocrypt
-    # openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "$certdir/odfe-admin-pkcs12.key" -topk8 -out "$certdir/odfe-admin.key" -nocrypt
-
-    # #Create the CSR and enter the organization and server details for the odfe and postgresql keys
-    # openssl req -new -key "$certdir/odfe-node.key" -out "$certdir/odfe-${ha_backend_container1}.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container1_ip},DNS:${ha_backend_container1_ip}")
-    # openssl req -new -key "$certdir/odfe-node.key" -out "$certdir/odfe-${ha_backend_container2}.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container2_ip},DNS:${ha_backend_container2_ip}")
-    # openssl req -new -key "$certdir/postgresql.key" -out "$certdir/postgresql.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefpostgresql' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container1_ip},IP:${ha_backend_container2_ip},DNS:${ha_backend_container1_ip},DNS:${ha_backend_container2_ip}")
-
-    # #Create the CSR and enter the organization and server details for the admin key
-    # openssl req -new -key "$certdir/odfe-admin.key" -out "$certdir/odfe-admin.csr" -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
-
-    # #Use the CSR to generate the signed odfe and postgresql Certificates:
-    # openssl x509 -req -in "$certdir/odfe-${ha_backend_container1}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container1}.pem" -sha256
-    # openssl x509 -req -in "$certdir/odfe-${ha_backend_container2}.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-${ha_backend_container2}.pem" -sha256
-    # openssl x509 -req -in "$certdir/postgresql.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/postgresql.pem" -sha256
-
-    # #Use the CSR to generate the signed admin Certificate:
-    # openssl x509 -req -in "$certdir/odfe-admin.csr" -CA "$certdir/MyRootCA.pem" -CAkey "$certdir/MyRootCA.key" -CAcreateserial -out "$certdir/odfe-admin.pem" -sha256
-
 
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container1}:/setup.sh"
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container2}:/setup.sh"
