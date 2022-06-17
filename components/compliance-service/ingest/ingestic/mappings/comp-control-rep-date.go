@@ -1,5 +1,6 @@
 package mappings
 
+// ComplianceControlRepData Compliance mapping used to create the `comp-<version>-control-<date>` index
 var ComplianceControlRepData = Mapping{
 	Index:      IndexNameControl,
 	Timeseries: true,
