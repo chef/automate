@@ -8,6 +8,6 @@
   [es_yaml.discovery.zen.ping.unicast]
     hosts = [ ${private_ips} ]
 
-[es_yaml.transport]
+  [es_yaml.transport]
     host = "${private_ip}"
     tcp.port = 9300
