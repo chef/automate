@@ -12,6 +12,8 @@ const (
 )
 
 const (
-	AutomatePGService     = "automate-postgresql"
-	AutomateSearchService = "automate-opensearch"
+	AutomatePGService        = "automate-postgresql"
+	AutomateSearchService    = "automate-opensearch"
+	HABackendDeploymentPkg   = "automate-ha-deployment"
+	SaasBackendDeploymentPkg = "chef-saas-deployment"
 )

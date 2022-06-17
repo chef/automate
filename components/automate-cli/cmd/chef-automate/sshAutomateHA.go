@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
 
@@ -199,7 +200,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	}
 	sshStrings, err := getIPOfRequestedServers(sshFlags.hostname, infra)
 	if err != nil {
-		return nil
+		return err
 	}
 	idx, err := writer.Prompt(strings.Join(sshStrings, "\n") + "\n press  1  to " + strconv.Itoa(len(sshStrings)))
 	if err != nil {
@@ -247,14 +248,21 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 }
 
 func getIPOfRequestedServers(servername string, d *AutomteHAInfraDetails) ([]string, error) {
+	isManagedServices := isManagedServicesOn()
 	switch strings.ToLower(servername) {
 	case "automate", "a2":
 		return d.Outputs.AutomateSSH.Value, nil
 	case "chef_server", "cs":
 		return d.Outputs.ChefServerSSH.Value, nil
 	case "postgresql", "pg":
+		if isManagedServices {
+			return d.Outputs.PostgresqlSSH.Value, status.Annotate(errors.New("can not ssh managed service"), status.InvalidCommandArgsError)
+		}
 		return d.Outputs.PostgresqlSSH.Value, nil
 	case "opensearch", "os":
+		if isManagedServices {
+			return d.Outputs.OpensearchSSH.Value, errors.New("can not ssh managed service")
+		}
 		return d.Outputs.OpensearchSSH.Value, nil
 	default:
 		return nil, errors.New("invalid hostname possible values should be any one of automate/a2, chef_server/cs, postgresql/pg or opensearch/os")

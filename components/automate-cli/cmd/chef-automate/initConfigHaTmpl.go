@@ -28,6 +28,8 @@ backup_mount = "/mnt/automate_backups"
 # admin_password = ""
 # automate load balancer fqdn IP or path
 # fqdn = ""
+#Deprecated Config - automate_setup_type is not supported
+# automate_setup_type = "automate"
 instance_count = "1"
 # teams_port = ""
 config_file = "configs/automate.toml"
@@ -95,6 +97,18 @@ postgresql_ebs_volume_type = "gp3"
 X-Contact = ""
 X-Dept = ""
 X-Project = ""
+#Deprecated Config - below config is not supported
+#aws_automate_route53_prefix = ""
+#aws_chef_server_route53_prefix = ""
+#aws_route53_hosted_zone = "saas.chef.io"
+#postgresql_db_identifier = ""
+#elasticsearch_domain_name = ""
+#rds_postgresql_instance_type = "db.t3.medium"
+#rds_postgresql_restore_identifier = ""
+#datadog_api_key = "DATADOG_API_KEY"
+#use_existing_managed_infra = false
+#X-Production = "false"
+#X-Customer = ""
 `
 
 const haExistingNodesConfigTemplate = `

@@ -1,3 +1,12 @@
+data "http" "getEc2PrivateIP" {
+  url = "http://169.254.169.254/latest/meta-data/local-ipv4"
+}
+
+locals {
+  json_data = "${join(".", [for i, s in split(".",data.http.getEc2PrivateIP.response_body) : (
+    i == 3 ? 0: s
+  )])}/26"
+}
 provider "aws" {
   region  = var.aws_region
   profile = var.aws_profile
@@ -47,6 +56,7 @@ module "aws" {
   lb_access_logs                  = var.lb_access_logs
   tags                            = var.aws_tags
   aws_instance_profile_name       = var.backup_config_s3 == "true" ? module.s3[0].instance_profile_name : null
+  json_data                          = local.json_data
 }
 
 module "efs" {

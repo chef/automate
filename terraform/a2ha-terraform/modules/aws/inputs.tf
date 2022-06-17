@@ -93,6 +93,9 @@ variable "chef_server_instance_type" {
 variable "chef_server_lb_certificate_arn" {
 }
 
+variable "json_data" {
+}
+
 variable "kibana_listen_port" {
   default = 5601
 }

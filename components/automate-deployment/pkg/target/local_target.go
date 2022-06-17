@@ -25,6 +25,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/bootstrapbundle"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-deployment/pkg/depot"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -1521,11 +1522,18 @@ func (t *LocalTarget) HabCache() depot.HabCache {
 	return depot.FromLocalCache()
 }
 
-func (t *LocalTarget) InstallAutomateBackendDeployment(ctx context.Context, c *dc.ConfigRequest, m manifest.ReleaseManifest) error {
-	pkg := manifest.InstallableFromManifest(m, "automate-ha-deployment")
+func (t *LocalTarget) InstallAutomateBackendDeployment(ctx context.Context, c *dc.ConfigRequest, m manifest.ReleaseManifest, saas bool) error {
+	backendDeploymentPkg := ""
+	if saas {
+		backendDeploymentPkg = constants.SaasBackendDeploymentPkg
+	} else {
+		backendDeploymentPkg = constants.HABackendDeploymentPkg
+	}
+	//logrus.Info("=====" + backendDeploymentPkg + "=====")
+	pkg := manifest.InstallableFromManifest(m, backendDeploymentPkg)
 	if pkg == nil {
-		logrus.Info("(HA) unable to find automate-ha-deployment package in manifest")
-		return errors.New("automate-ha-deployment (HA) was not found in the manifest")
+		logrus.Info("unable to find " + backendDeploymentPkg + " package in manifest")
+		return errors.New(backendDeploymentPkg + " was not found in the manifest")
 	}
 	output, err := t.InstallPackage(ctx, pkg, c.GetV1().GetSvc().GetChannel().GetValue())
 	if err != nil {
@@ -1535,6 +1543,6 @@ func (t *LocalTarget) InstallAutomateBackendDeployment(ctx context.Context, c *d
 		}).Error("install failed")
 		return errors.Wrapf(err, "msg=\"failed to install\" package=%s output=%s", pkg.InstallIdent(), output)
 	}
-	logrus.Info("Chef Automate backend deployment Installed")
+	logrus.Info(backendDeploymentPkg + " Installed")
 	return nil
 }

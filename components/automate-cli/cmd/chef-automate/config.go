@@ -28,7 +28,7 @@ func init() {
 
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "o", false, "Overwrite existing config.toml")
 
-	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "yes", "y", false, "Do not prompt for confirmation; accept defaults and continue")
+	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
 

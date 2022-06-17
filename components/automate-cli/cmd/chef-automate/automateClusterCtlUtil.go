@@ -130,7 +130,7 @@ func tailFile(logFilePath string, executed chan struct{}) {
 
 	}
 }
-func doBootstrapEnv(airgapBundlePath string) error {
+func doBootstrapEnv(airgapBundlePath string, saas bool) error {
 	conf := new(dc.AutomateConfig)
 	if err := mergeFlagOverrides(conf); err != nil {
 		return status.Wrap(
@@ -169,7 +169,7 @@ func doBootstrapEnv(airgapBundlePath string) error {
 		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
 		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
 
-	err := client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode)
+	err := client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode, saas)
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
@@ -182,7 +182,7 @@ func doBootstrapEnv(airgapBundlePath string) error {
 	return nil
 }
 
-func bootstrapEnv(dm deployManager, airgapBundlePath string) error {
+func bootstrapEnv(dm deployManager, airgapBundlePath string, saas bool) error {
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
@@ -193,7 +193,7 @@ func bootstrapEnv(dm deployManager, airgapBundlePath string) error {
 			return status.New(status.InvalidCommandArgsError, errMLSA)
 		}
 	}
-	err := doBootstrapEnv(airgapBundlePath)
+	err := doBootstrapEnv(airgapBundlePath, saas)
 	if err != nil {
 		return err
 	}
@@ -547,4 +547,25 @@ func extractPackageName(filename string) string {
 		logrus.Debugf("failed to parse package name of hart %s", filename)
 	}
 	return match[0][1 : len(match[0])-(len(match[0])-(strings.LastIndexAny(match[0], "-")))]
+}
+
+func grepFromFile(searchEle string, filepath string) (string, error) {
+	command := "grep \"" + searchEle + "\" " + filepath + " | awk '{print $2}'"
+	out, err := exec.Command("/bin/sh", "-c", command).Output()
+	if err != nil {
+		writer.Fail(err.Error())
+		return "", nil
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
+func isManagedServicesOn() bool {
+	isManagedService, err := grepFromFile("setup_managed_services", "/hab/a2_deploy_workspace/a2ha.rb")
+	if err != nil {
+		return false
+	}
+	if isManagedService != "" && isManagedService == "true" {
+		return true
+	}
+	return false
 }

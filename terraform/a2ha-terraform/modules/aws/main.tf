@@ -260,7 +260,7 @@ resource "aws_instance" "chef_automate" {
   instance_type               = var.automate_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
   subnet_id                   = length(var.private_custom_subnets) > 0 ? element(data.aws_subnet.default.*.id, count.index) : element(aws_subnet.default.*.id, count.index)
-  vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
+  vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id, aws_security_group.chef_automate_ui.id]
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name
@@ -291,7 +291,7 @@ resource "aws_instance" "chef_server" {
   instance_type               = var.chef_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
   subnet_id                   = length(var.private_custom_subnets) > 0 ? element(data.aws_subnet.default.*.id, count.index) : element(aws_subnet.default.*.id, count.index)
-  vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
+  vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id, aws_security_group.chef_automate_ui.id]
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = var.aws_instance_profile_name

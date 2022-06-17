@@ -43,7 +43,10 @@ func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {
 		return status.Wrap(errors.New("Incorrect command usage"), 0, workspaceUpgradeHelpDocs)
 	}
 	if isA2HARBFileExist() {
-		upgraded := upgradeWorspace(args[0])
+		err, upgraded := upgradeWorspace(args[0])
+		if err != nil {
+			return status.Annotate(err, status.UpgradeError)
+		}
 		if !upgraded {
 			return errors.New("No upgrade available in airgap bundle")
 		} else {
@@ -54,14 +57,14 @@ func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {
 	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }
 
-func upgradeWorspace(bundle string) bool {
+func upgradeWorspace(bundle string) (error, bool) {
 	updateAvailabe, err := checkIfNewBundleHaveWorkspaceUpdate(bundle)
 	if err != nil {
 		writer.Println(err.Error())
 	}
 	if updateAvailabe {
 		upgradeAccepted := false
-		if !upgradeRunCmdFlags.upgradeHAWorkspace {
+		if upgradeRunCmdFlags.upgradeHAWorkspace == "" {
 			response, err := writer.Prompt("Automate HA workspace will get updated to latest version press y to agree, n to to disagree? [y/n]")
 			if err != nil {
 				upgradeAccepted = false
@@ -72,20 +75,24 @@ func upgradeWorspace(bundle string) bool {
 			} else {
 				upgradeAccepted = true
 			}
-		} else {
+		} else if upgradeRunCmdFlags.upgradeHAWorkspace == "no" {
+			upgradeAccepted = false
+		} else if upgradeRunCmdFlags.upgradeHAWorkspace == "yes" {
 			upgradeAccepted = true
+		} else {
+			return errors.New("Not a vaild argumnet for workspace-upgrade"), false
 		}
 		if upgradeAccepted {
 			writer.Println("Bootstraping for new version.")
-			err := doBootstrapEnv(bundle)
+			err := doBootstrapEnv(bundle, false)
 			if err != nil {
 				writer.Println(err.Error())
-				return false
+				return nil, false
 			}
-			return true
+			return nil, true
 		}
 	}
-	return false
+	return nil, false
 }
 func checkIfNewBundleHaveWorkspaceUpdate(bundle string) (bool, error) {
 	currVerAndRel := getCurrentInstalledWorsapceVersion()

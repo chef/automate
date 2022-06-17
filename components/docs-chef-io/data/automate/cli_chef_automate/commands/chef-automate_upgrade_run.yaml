@@ -5,6 +5,10 @@ description: Run an upgrade of Chef Automate
 options:
 - name: airgap-bundle
   usage: Path to an airgap install bundle
+- name: auto-approve
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
 - name: help
   shorthand: h
   default_value: "false"
@@ -29,12 +33,7 @@ options:
   usage: The exact Chef Automate version to install
 - name: workspace-upgrade
   shorthand: w
-  default_value: "false"
   usage: Do not prompt for confirmation to accept workspace upgrade
-- name: "yes"
-  shorthand: "y"
-  default_value: "false"
-  usage: Do not prompt for confirmation; accept defaults and continue
 inherited_options:
 - name: debug
   shorthand: d
