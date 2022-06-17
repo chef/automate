@@ -15,6 +15,8 @@ import (
 	"github.com/chef/automate/lib/user"
 )
 
+const check_has_correct_name = "check has correct name"
+
 type fileOrError struct {
 	data []byte
 	err  error
@@ -408,7 +410,7 @@ func TestCLIInBinCheck(t *testing.T) {
 func TestUseraddCheck(t *testing.T) {
 	check := preflight.HasUseraddCheck()
 
-	t.Run("check has correct name", func(t *testing.T) {
+	t.Run(check_has_correct_name, func(t *testing.T) {
 		assert.Equal(t, "has_cmd_useradd", check.Name)
 	})
 
@@ -432,7 +434,7 @@ func TestUseraddCheck(t *testing.T) {
 func TestNobodyCheck(t *testing.T) {
 	check := preflight.HasNobodyCheck()
 
-	t.Run("check has correct name", func(t *testing.T) {
+	t.Run(check_has_correct_name, func(t *testing.T) {
 		assert.Equal(t, "has_user_nobody", check.Name)
 	})
 
@@ -743,7 +745,7 @@ sl  local_address                         remote_address                        
 func TestSELinuxPermissiveCheck(t *testing.T) {
 	check := preflight.SELinuxPermissiveCheck()
 
-	t.Run("check has correct name", func(t *testing.T) {
+	t.Run(check_has_correct_name, func(t *testing.T) {
 		assert.Equal(t, "selinux_permissive_required", check.Name)
 	})
 
