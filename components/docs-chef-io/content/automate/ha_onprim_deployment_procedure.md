@@ -13,11 +13,9 @@ gh_repo = "automate"
     weight = 200
 +++
 
-TRY
+In this section, we'll discuss the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:
 
-In this section, we'll discuss about the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:
-
-## Steps to install Chef Automate HA
+## Install Chef Automate HA
 
 ### Prerequsite
 
@@ -133,4 +131,3 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    ```
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-   

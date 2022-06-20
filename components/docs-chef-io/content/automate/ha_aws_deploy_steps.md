@@ -15,12 +15,12 @@ gh_repo = "automate"
 
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud.
 
-## Steps to install Chef Automate HA on AWS
+## Install Chef Automate HA on AWS
 
-### Prerequisite:
+### Prerequisites
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. \
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. \
   Set these in `~/.aws/credentials` in Bastion Host:
 
   ```bash
@@ -52,7 +52,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
    ```
 
-3. Download Airgapped Bundle \
+3. Download Airgapped Bundle
    Download latest Bundle with this:
 
    ```bash
@@ -65,14 +65,14 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
    ```
 
-5. Generate init config \
+4. Generate init config
    Then generate init config for existing infra structure:
 
    ```bash
    chef-automate init-config-ha aws
    ```
 
-6. Update Config with relevant data
+5. Update Config with relevant data
 
    ```bash
    vi config.toml
@@ -107,12 +107,13 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
       - Set `postgresql_ebs_volume_iops`, `postgresql_ebs_volume_size` based on your load needs.
       - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`, `opensearch_ebs_volume_type`, `postgresql_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-7. Confirm all the data in the config is correct:
+6. Confirm all the data in the config is correct:
 
    ```bash
    cat config.toml
    ```
-8. Run Provision Command \
+
+7. Run Provision Command
  
    ```bash
    chef-automate provision-infra config.toml --airgap-bundle latest.aib
@@ -124,7 +125,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    chef-automate provision-infra config.toml --airgap-bundle automate-4.0.91.aib
    ```
 
-9. Run Deploy Command \
+8. Run Deploy Command
    Deploy `latest.aib` with set `config.toml`
 
    ```bash
@@ -137,21 +138,21 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
    ```
 
-10. After Deployment is done successfully. \
+9. After Deployment is done successfully.
    Check status of Chef Automate HA services:
 
    ```bash
    chef-automate status
    ```
 
-11. Check Chef Automate HA deployment info, using the command below:
+10. Check Chef Automate HA deployment info, using the command below:
 
    ```bash
    chef-automate info
    ```
 
-12. Set DNS entries: \
+11. Set DNS entries:
 
    DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
 
-13. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+12. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
