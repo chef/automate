@@ -142,9 +142,6 @@ var ComplianceControlRepData = Mapping{
       "day_latest": {
         "type": "boolean"
       },
-      "latest": {
-        "type": "boolean"
-      },
       "end_time": {
         "type": "date"
       },
@@ -159,8 +156,11 @@ var ComplianceControlRepData = Mapping{
           "status": {
             "type": "keyword"
           },
-          "latest": {
-            "type": "boolean"
+           "daily_latest": {
+             "type": "boolean"
+          },
+         "day_latest": {
+           "type": "boolean"
           },
           "node_name": {
             "type": "keyword",
