@@ -17,7 +17,7 @@ In this section, we'll discuss the steps to deploy Chef Automate HA on-premise m
 
 ## Install Chef Automate HA
 
-### Prerequsite
+### Prerequisites
 
 - All VM's or Machines are up and running.
 - A Common user has access to all machines.

@@ -54,7 +54,7 @@ The machine requirements based on the above assumptions are listed below:
 
 Click [here](/calculator/automate_ha_hardware_calculator.xlsx) to calculate the actual estimate of the configuration using the sample calculator.
 
-{{< note >}}
+{{< /note >}}
 
 {{< note >}}
 
