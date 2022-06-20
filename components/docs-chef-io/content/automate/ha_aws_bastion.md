@@ -61,4 +61,4 @@ Or launch an EC2 instance, which is available and already defined.
 
 You can test the connectivity to the bastion server by navigating to the AWS Console under the **Instances** > **EC2** option and view the new bastion server running.
 
-Refer detailed information on deploying Linux bastion hosts to manage your [AWS Cloud deployments remotely](https://aws.amazon.com/quickstart/architecture/linux-bastion/) page.
+Refer to the detailed information on deploying Linux bastion hosts to manage your [AWS Cloud deployments remotely](https://aws.amazon.com/quickstart/architecture/linux-bastion/) page.
