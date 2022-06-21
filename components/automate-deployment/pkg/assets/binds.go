@@ -37,7 +37,7 @@ automate-dex REQUIRED automate-pg-gateway pg-sidecar-service
 automate-dex BINDING_MODE strict
 automate-es-gateway REQUIRED automate-opensearch
 automate-es-gateway BINDING_MODE relaxed
-automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service user-settings-service
+automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service report-manager-service secrets-service teams-service user-settings-service
 automate-gateway BINDING_MODE relaxed
 automate-ha-pgleaderchk OPTIONAL database
 automate-ha-pgleaderchk BINDING_MODE strict
@@ -90,6 +90,9 @@ notifications-service REQUIRED automate-pg-gateway pg-sidecar-service secrets-se
 notifications-service BINDING_MODE strict
 pg-sidecar-service REQUIRED automate-pg-gateway
 pg-sidecar-service BINDING_MODE strict
+report-manager-minio-gateway BINDING_MODE strict
+report-manager-service REQUIRED automate-pg-gateway cereal-service compliance-service pg-sidecar-service report-manager-minio-gateway
+report-manager-service BINDING_MODE strict
 sample-data-service BINDING_MODE strict
 secrets-service REQUIRED automate-pg-gateway pg-sidecar-service
 secrets-service BINDING_MODE strict

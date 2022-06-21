@@ -8,15 +8,19 @@
 package gateway
 
 import (
+	"bufio"
 	"bytes"
 	"context"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	ingestReq "github.com/chef/automate/api/external/ingest/request"
 	mock_compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
+	reportData "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/ingest"
 	mock_notifier "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_notifier"
 	"github.com/chef/automate/lib/pcmp/passert"
@@ -25,6 +29,7 @@ import (
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -259,28 +264,41 @@ func TestDataCollectorHandlerLivenessAgentMsg(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.StatusCode)
 }
 
+func testExecute(t *testing.T, client mock_compliance_ingest.ComplianceIngesterServiceClient, body []byte) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	stream, err := client.ProcessComplianceReport(ctx)
+	assert.NoError(t, err)
+	reader := bufio.NewReader(bytes.NewBuffer(body))
+	buffer := make([]byte, 1<<10)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+
+		assert.NoError(t, err)
+		data := &reportData.ReportData{Content: buffer[:n]}
+		err = stream.Send(data)
+		require.NoError(t, err)
+	}
+	_, err = stream.CloseAndRecv()
+	assert.NoError(t, err)
+}
+
 func TestDataCollectorHandlerComplianceReportMsg(t *testing.T) {
 	for r, body := range rawreports {
 		t.Run("compliance_report: "+r, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 			// Mock the ComplianceIngester
 			mockComplianceIngester := mock_compliance_ingest.NewMockComplianceIngesterServiceClient(ctrl)
-			// Assert that we will call the ProcessComplianceReport() func
-			mockComplianceIngester.EXPECT().ProcessComplianceReport(gomock.Any(), gomock.Any())
-
-			// Create a new gateway.Server instance with mocked Clients
-			subject := newMockGatewayServerWithAuth(t, mockComplianceIngester)
-
-			// Generate a mock Request & Response
-			w, r := newResponseAndRequestFromBytes(body)
-
-			// Call the subject handler
-			subject.dataCollectorHandler(w, r)
-
-			// Assert the ResponseWriter
-			response := w.Result()
-			assert.Equal(t, "200 OK", response.Status)
-			assert.Equal(t, http.StatusOK, response.StatusCode)
+			mockClientStream := mock_compliance_ingest.NewMockComplianceIngesterService_ProcessComplianceReportClient(ctrl)
+			mockClientStream.EXPECT().Send(gomock.Any()).Return(nil).AnyTimes()
+			mockClientStream.EXPECT().CloseAndRecv().Return(nil, nil)
+			mockComplianceIngester.EXPECT().ProcessComplianceReport(gomock.Any()).Return(mockClientStream, nil)
+			testExecute(t, mockComplianceIngester, body)
 		})
 	}
 }

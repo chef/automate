@@ -9,6 +9,11 @@ import {
   ReportQueryService, SuggestionsService, StatsService
 } from 'app/pages/+compliance/shared/reporting';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ReportingSearchbarComponent', () => {
   let fixture: ComponentFixture<ReportingSearchbarComponent>,
@@ -25,6 +30,7 @@ describe('ReportingSearchbarComponent', () => {
         DatetimePipe
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         ReportQueryService,
         SuggestionsService,
         StatsService

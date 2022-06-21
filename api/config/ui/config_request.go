@@ -19,6 +19,7 @@ func NewConfigRequest() *ConfigRequest {
 				CustomSettings: &ConfigRequest_V1_System_CustomSettings{
 					Banner:          &ConfigRequest_V1_Banner{},
 					SessionSettings: &ConfigRequest_V1_SessionSettings{},
+					LargeReporting:  &ConfigRequest_V1_LargeReporting{},
 				},
 			},
 			Svc: &ConfigRequest_V1_Service{},
@@ -46,6 +47,8 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.CustomSettings.SessionSettings.EnableIdleTimeout = w.Bool(false)
 	c.V1.Sys.CustomSettings.SessionSettings.IdleTimeoutMinutes = w.Int32(30)
+
+	c.V1.Sys.CustomSettings.LargeReporting.EnableLargeReporting = w.Bool(false)
 
 	return c
 }
@@ -104,5 +107,9 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	if g.GetV1().GetSessionSettings().GetEnableIdleTimeout() != nil {
 		c.V1.Sys.CustomSettings.SessionSettings.EnableIdleTimeout = w.Bool(g.GetV1().GetSessionSettings().GetEnableIdleTimeout().GetValue())
 		c.V1.Sys.CustomSettings.SessionSettings.IdleTimeoutMinutes = w.Int32(g.GetV1().GetSessionSettings().GetIdleTimeoutMinutes().GetValue())
+	}
+
+	if g.GetV1().GetLargeReporting().GetEnableLargeReporting() != nil {
+		c.V1.Sys.CustomSettings.LargeReporting.EnableLargeReporting = w.Bool(g.GetV1().GetLargeReporting().GetEnableLargeReporting().GetValue())
 	}
 }
