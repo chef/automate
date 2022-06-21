@@ -3,57 +3,58 @@ title = "Large Compliance Report Ingestion"
 
 +++
 
-Automate fails to ingest Compliance report larger than 4MB size sent through data collector endpoint.
-Automate data collector sends back error to the client.
+Automate fails to ingest Compliance reports larger than 4MB sent through the data collector endpoint. Automate data collector sends a back error to the client.
 
-The following change in architecture enables Automate to ingest reports larger than 4MB without any failure.  
+The following change in architecture enables Automate to ingest reports larger than 4MB without failure.
+
 ![LCR Architecture](/images/automate/lcr_architecture.jpg)
 
-Automate with the configuration to allow ingestion of a large compliance report allow the data not only to be sent to 
-the OpenSearch data but also in an externally deployed Minio Service. Automate in this configuration expects that 
-a Minio Server is running externally to Automate ecosystem which Automate can connect and transact to.
+Automate with the configuration to allow ingestion of an extensive compliance report and allow the data to be sent to the OpenSearch data and in an externally deployed Minio Service. Automate in the configuration expects that a Minio Server is running externally to Automate ecosystem, which Automate can connect and transact to.
   
 Automate with the configuration will enable Automate to:  
 
-- allow ingestion of compliance report larger than 4MB
-- exporting or download complete report of larger than 4MB size
+- Allow ingestion of compliance reports larger than 4MB,
+- Exporting or downloading complete reports larger than 4MB in size.
 
-This change has implications in the performance of Automate data ingestion because:
-- Automate has to process much larger data than the usual
-- Automate has to upload the data to an external service over network
+This change has implications for the performance of Automate data ingestion because:
 
-The impact depends on different factors like network configuration, machine configuration.
+- Automate processes much more extensive data than the usual.
+- Automate uploads the data to an external service over a network.
+
+The impact depends on different factors like network configuration and machine configuration.
 Here is a benchmark test summary report run on
 
-- Instance Type: 16 vCpu, 30 GiB memory   
-- Number of Compliance Targets: 20K
-- OpenSearch and Postgres are deployed internally  
+- Instance Type: **16 vCPU, 30 GB memory**
+- Number of Compliance Targets: **20K**
+- **OpenSearch** and **Postgres** are deployed internally  
 
 | Report Size | Supported Concurrency |
 | --- | --- |
 | 1 MB | 100 |
 5 MB | 50 |
 8 MB | 30 |
-12 MB | 20 | 
+12 MB | 20 |
 
-### Prerequisite
-{{< note >}}  
-Automate installation does not include Minio server.  
-{{< /note >}}
+## Prerequisites
 
-- An external Minio server needs to be setup and available to connect
+{{< note >}} Automate installation does not include Minio server. {{< /note >}}
 
-#### Minio
+- An external Minio server needs to be set up and available to connect
 
-MinIO is a High Performance Object Storage released under GNU Affero General Public License v3.0. It is API compatible with Amazon S3 cloud storage service. MinIO is the only object storage suite available on every public cloud, every Kubernetes distribution, the private cloud and the edge.  
+### MinIO
 
-Refer https://min.io for more details and https://docs.min.io/minio/baremetal/ instructions to setup Minio on a baremetal server.
+MinIO is a High-Performance Object Storage released under GNU Affero General Public License v3.0. It is API compatible with the Amazon S3 cloud storage service. MinIO is the only object storage suite available on public cloud, every Kubernetes distribution, the private cloud, and the edge.  
 
-### Enabling Automate to Ingest Large Compliance Report
+Click [here](https://min.io) to learn more about MinIO and [set up](https://docs.min.io/minio/baremetal/) the MinIO on a baremetal server.
 
-To enable Automate to ingest Large Compliance report:
-1. Create a patch.toml if one does not already exist for your Chef Automate installation.
+## Enable Automate to Ingest Large Compliance Report
+
+To enable Automate to ingest Large Compliance reports:
+
+1. Create a `patch.toml` if one does not already exist for your Chef Automate installation.
+
 2. Add the following configuration to the `patch.toml` file:
+
 ```toml
 [global.v1.external.minio]
     ##Do not add the protocol(http or https) for minio server end point. ex. mydomain.com:1234 
@@ -73,22 +74,24 @@ To enable Automate to ingest Large Compliance report:
 [global.v1.large_reporting]                                
     enable_large_reporting = true
     
-## Uncomment and fill out if want to modify the bucket name used to store data in MINIO server, default name is 'default'.
-## If MINIO is configured to use any public cloud platforms like S3, Azure blob storage or Google Cloud Storage, It is mandatory to modify the bucket name other than `default`
+## Uncomment and fill out if you want to modify the bucket name used to store data in the MinIO server; the default name is 'default'.
+## If MINIO is configured to use any public cloud platforms like S3, Azure blob storage, or Google Cloud Storage, It is mandatory to modify the bucket name other than `default`
 #[report_manager.v1.sys.objstore]
 #  bucket = "default"
 ```
 
-3. Patch the config by running   
+3. Patch the config by running the following command:
+
+```toml
 `chef-automate config patch patch.toml`
+```
 
-### Using AWS S3 as Object Storage
-{{< warning >}}  
-The below configuration is not tested to determine benchmark numbers. 
-We recommend doing benchmark testing before considering this approach.
-{{< /warning >}}
+## AWS S3 as Object Storage
 
-Automate can connect to AWS S3 for large compliance report if you reuse the Minio Configuration in the following manner:
+{{< warning >}}  The below configuration is not tested to determine benchmark numbers. We recommend doing benchmark testing before considering the approach. {{< /warning >}}
+
+Automate can connect to AWS S3 for extensive compliance reports if you reuse the Minio Configuration in the following manner:
+
 ```toml
 [global.v1.external.minio]
         ## endpoint has to be s3.amazonaws.com
@@ -96,7 +99,3 @@ Automate can connect to AWS S3 for large compliance report if you reuse the Mini
         root_user = "<access_key>"
         root_password = "<secret_key>"
 ```
-
-
-
-
