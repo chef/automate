@@ -158,7 +158,6 @@ type GenerateControlParameters struct {
 
 func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 
-	logrus.Info("OnStartYashviTask inside")
 	var job GenerateControlParameters
 	if err := task.GetParameters(&job); err != nil {
 		err = errors.Wrap(err, "could not unmarshal GenerateReportParameters")
