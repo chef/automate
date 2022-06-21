@@ -6,12 +6,10 @@ var ComplianceControlRepData = Mapping{
 	Timeseries: true,
 	Mapping: `
 {
-  "index_patterns": [
-    "` + IndexNameControl + `-20*"
-  ],
-  "settings": {
-    "analysis": {
-      "analyzer": {
+    "index_patterns": ["` + IndexNameControl + `-20*"],
+    "settings": {
+      "analysis": {
+        "analyzer": {
         "autocomplete": {
           "filter": [
             "lowercase"
@@ -152,18 +150,17 @@ var ComplianceControlRepData = Mapping{
           "node_uuid": {
             "type": "keyword"
           },
-          "environment": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
+          "end_time": {
+            "type": "date"
+          },
+          "status": {
             "type": "keyword"
+          },
+           "daily_latest": {
+             "type": "boolean"
+          },
+         "day_latest": {
+           "type": "boolean"
           },
           "node_name": {
             "type": "keyword",
@@ -178,152 +175,6 @@ var ComplianceControlRepData = Mapping{
               }
             }
           },
-          "platform": {
-            "properties": {
-              "name": {
-                "fields": {
-                  "engram": {
-                    "analyzer": "autocomplete",
-                    "type": "text"
-                  },
-                  "lower": {
-                    "normalizer": "case_insensitive",
-                    "type": "keyword"
-                  }
-                },
-                "type": "keyword"
-              },
-              "release": {
-                "fields": {
-                  "engram": {
-                    "analyzer": "autocomplete",
-                    "type": "text"
-                  },
-                  "lower": {
-                    "normalizer": "case_insensitive",
-                    "type": "keyword"
-                  }
-                },
-                "type": "keyword"
-              },
-              "full": {
-                "fields": {
-                  "engram": {
-                    "analyzer": "autocomplete_version_numbers",
-                    "type": "text"
-                  },
-                  "lower": {
-                    "normalizer": "case_insensitive",
-                    "type": "keyword"
-                  }
-                },
-                "type": "keyword"
-              }
-            }
-          },
-          "recipes": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
-            "type": "keyword"
-          },
-          "roles": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
-            "type": "keyword"
-          },
-          "policy_name": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
-            "type": "keyword"
-          },
-          "policy_group": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
-            "type": "keyword"
-          },
-          "organization_name": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
-            "type": "keyword"
-          },
-          "source_fqdn": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
-            "type": "keyword"
-          },
-          "chef_tags": {
-            "fields": {
-              "engram": {
-                "analyzer": "autocomplete",
-                "type": "text"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            },
-            "type": "keyword"
-          },
-          "end_time": {
-            "type": "date"
-          },
-          "status": {
-            "type": "keyword"
-          },
-          "daily_latest": {
-            "type": "boolean"
-          },
-          "day_latest": {
-            "type": "boolean"
-          },
           "report_uuid": {
             "type": "keyword"
           }
@@ -337,22 +188,6 @@ var ComplianceControlRepData = Mapping{
           },
           "sha256": {
             "type": "keyword"
-          },
-          "name": {
-            "type": "keyword"
-          },
-          "title": {
-            "type": "keyword",
-            "fields": {
-              "engram": {
-                "type": "text",
-                "analyzer": "autocomplete"
-              },
-              "lower": {
-                "normalizer": "case_insensitive",
-                "type": "keyword"
-              }
-            }
           }
         }
       },
