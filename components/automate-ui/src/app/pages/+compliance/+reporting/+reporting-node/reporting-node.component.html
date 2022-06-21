@@ -194,7 +194,7 @@
             </chef-tr>
           </chef-thead>
           <chef-tbody>
-            <ng-container *ngFor="let control of controlList.control_elements"> 
+            <ng-container *ngFor="let control of controlList.control_elements; let i = index"> 
               <chef-tr>
                 <chef-td>
                   <chef-icon *ngIf="control.status !== 'waived'" class="status-icon" [ngClass]="control.status">
@@ -209,7 +209,7 @@
                 <chef-td >{{control.profile}}</chef-td>
                 <chef-td >{{control.results}}</chef-td>
                 <chef-td >
-                  <chef-button secondary (click)="toggleControl(control)">
+                  <chef-button secondary (click)="toggleControl(i, control)">
                     <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
                     <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
                   </chef-button>
@@ -218,25 +218,25 @@
               <div class="control-detail" *ngIf="!isError && isOpenControl(control)">
                 <chef-loading-spinner *ngIf="controlDetailsLoading" size="50"></chef-loading-spinner>
                 <div *ngIf="!controlDetailsLoading">
-                  <p *ngIf="currentControl.desc">{{ currentControl.desc }}</p>
-                  <chef-toggle [value]="openControls[currentControl.id]?.pane"
-                    (change)="showControlPane(currentControl, $event.target.value)">
+                  <p *ngIf="control.desc">{{ control.desc }}</p>
+                  <chef-toggle [value]="openControls[control.id]?.pane"
+                    (change)="showControlPane(control, $event.target.value)">
                     <chef-option value='results'>Results</chef-option>
                     <chef-option value='source'>Source</chef-option>
                   </chef-toggle>
-                  <ng-container [ngSwitch]="openControlPane(currentControl)">
+                  <ng-container [ngSwitch]="openControlPane(control)">
                     <div *ngSwitchCase="'results'">
-                      <div *ngIf="currentControl.status === 'waived'">
+                      <div *ngIf="control.status === 'waived'">
                         <p>This control was waived.</p>
                         <dl class="waiver-details">
                           <dt>Expires:</dt>
-                          <dd>{{ currentControl.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
+                          <dd>{{ control.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
                           <dt>Reason:</dt>
-                          <dd>{{ currentControl.waiver_data.justification }}</dd>
+                          <dd>{{ control.waiver_data.justification }}</dd>
                         </dl>
                       </div>
                       <!-- show results of control even if waived -->
-                      <div class="result-item" *ngFor="let result of currentControl.results ">
+                      <div class="result-item" *ngFor="let result of control.results ">
                         <div class="result-item-header">
                           <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
                           <p>{{ result.code_desc }}</p>
@@ -246,13 +246,13 @@
                         </div>
                       </div>
                       <!-- display message when there are no results -->
-                      <div class="result-item" *ngIf="currentControl.results.length === 0">
+                      <div class="result-item" *ngIf="control.results.length === 0">
                         <div class="result-item-header">
                           <p>No tests were executed</p>
                         </div>
                       </div>
                     </div>
-                    <chef-snippet class="source" *ngSwitchCase="'source'" [code]="currentControl.code"
+                    <chef-snippet class="source" *ngSwitchCase="'source'" [code]="control.code"
                       lang="ruby">
                     </chef-snippet>
                   </ng-container>
