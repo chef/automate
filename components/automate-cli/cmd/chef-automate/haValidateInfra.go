@@ -45,7 +45,8 @@ var validateCmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
-	RunE: runValidateCmd,
+	RunE:   runValidateCmd,
+	Hidden: true,
 }
 
 func runValidateCmd(cmd *cobra.Command, args []string) error {
