@@ -3,9 +3,7 @@ data "http" "getEc2PrivateIP" {
 }
 
 locals {
-  json_data = "${join(".", [for i, s in split(".", data.http.getEc2PrivateIP.response_body) : (
-    i == 3 ? 0 : s
-  )])}/26"
+  json_data = "${data.http.getEc2PrivateIP.response_body}/32"
 }
 provider "aws" {
   region  = var.aws_region
