@@ -363,7 +363,3 @@ func TestOnTaskComplete(t *testing.T) {
 		})
 	}
 }
-
-func setWorkflowParameters(isGetPayloadFailure bool, isRetriesLeft bool, isEnqueueFailure bool, isParameterFailure bool) {
-
-}
