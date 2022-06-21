@@ -853,3 +853,55 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 
 	return map[string]interface{}{"projects": esProjectCollection}
 }
+
+func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInSpecReportA2v2) (*relaxting.ESInSpecReportA2v2, error) {
+	logrus.Debug("Fetching project by UUID")
+	var inspReporting relaxting.ESInSpecReportA2v2
+	var YYYYMMDD = "2006.01.02"
+	now := time.Now()
+	index := "comp-7-r-" + now.Format(YYYYMMDD)
+
+	termQuery := elastic.NewTermQuery("report_uuid", data.ReportID)
+
+	searchResult, err := backend.client.Search().
+		Index(index).     // search in index
+		Query(termQuery). // specify the query
+		Pretty(true).     // pretty print request and response JSON
+		Do(ctx)           // execute
+	if err != nil {
+		switch {
+		case elastic.IsNotFound(err):
+			logrus.Errorf("Document not found: %v", err)
+			return nil, err
+		case elastic.IsTimeout(err):
+			logrus.Errorf("Timeout retrieving document: %v", err)
+			return nil, err
+		case elastic.IsConnErr(err):
+			logrus.Errorf("Connection problem: %v", err)
+			return nil, err
+		default:
+			logrus.Errorf("Received error", err)
+			return nil, err
+		}
+	}
+
+	if searchResult.Hits.TotalHits.Value > 0 {
+		logrus.Printf("Found a total of %d ESInSpecReportA2v2\n", searchResult.Hits.TotalHits)
+
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			// hit.Index contains the name of the index
+
+			// Deserialize hit.Source into a ESInSpecReportA2v2 (could also be just a map[string]interface{}).
+			err := json.Unmarshal(hit.Source, &inspReporting)
+			if err != nil {
+				logrus.Errorf("Received error while unmarshling %+v", err)
+			}
+
+		}
+	} else {
+		// No hits
+		logrus.Debug("Found no record")
+	}
+	return &inspReporting, nil
+}
