@@ -41,13 +41,13 @@ We get these results based on our performance benchmarking tests according to th
 
 The machine requirements based on the above assumptions are listed below:
 
-| Instance          | Count | vCPU | RAM | Storage Size | AWS Machine Type |
-|-------------------|-------|------|-----|--------------|------------------|
-| Chef Automate     | 2     | 2    | 8   | 80 GB        | m5.large         |
-| Chef Infra Server | 2     | 2    | 8   | 80 GB        | m5.large         |
-| Postgresql DB     | 3     | 2    | 8   | 150 GB       | m5.large         |
-| Opensearch DB     | 3     | 2    | 8   | 58.9 GB      | m5.large         |
-| Bastion Machine   | 1     | 2    | 8   | 150 GB       | m5.large         |
+| Instance          | Count | vCPU | RAM | Storage Size | AWS Machine Type | Partition                |
+|-------------------|-------|------|-----|--------------|------------------|--------------------------|
+| Chef Automate     | 2     | 2    | 8   | 80 GB        | m5.large         |/tmp=5% /hab=75% /root=20%|
+| Chef Infra Server | 2     | 2    | 8   | 80 GB        | m5.large         |/tmp=5% /hab=75% /root=20%|
+| Postgresql DB     | 3     | 2    | 8   | 150 GB       | m5.large         |/tmp=5% /hab=75% /root=20%|
+| Opensearch DB     | 3     | 2    | 8   | 58.9 GB      | m5.large         |/tmp=5% /hab=75% /root=20%|
+| Bastion Machine   | 1     | 2    | 8   | 150 GB       | m5.large         |/tmp=5% /hab=75% /root=20%|
 
 The configuration is based on the assumptions listed above. Using the sample calculation given [here](/calculator/automate_ha_hardware_calculator.xlsx), you can calculate it based on the actual estimate.
 

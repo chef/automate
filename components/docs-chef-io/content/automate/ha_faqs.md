@@ -63,6 +63,11 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 {{< note >}}
   Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
 {{< /note >}}  
+
+### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
+ - No, Automate HA support https connection only with Managed services. 
+
+
 ### How to check logs while doing backup or restore?
 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
