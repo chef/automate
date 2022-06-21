@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 The _Reports_ page provides a comprehensive insight into all scanned infrastructure compliance status. Scan results for audit cookbook configurations also appear in this view.
 
-{{< note >}} If the size of a Compliance Report is over 4MB, then the *Reports* page may not display as expected. {{< /note >}}
+{{< note >}} If the size of a report goes over 4GB, enable the **Large Compliance Report** feature to make the **Reports Page** and **Download Report** work as expected. {{< /note >}}
 
 ![Reports](/images/automate/reports.png)
 
