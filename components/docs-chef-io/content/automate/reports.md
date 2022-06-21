@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 10
 +++
 
-The _Reports_ page (Compliance > Reports) provides a comprehensive insight into all scanned infrastructure compliance status. Scan results for audit cookbook configurations also appear in this view.
+The _Reports_ page provides a comprehensive insight into all scanned infrastructure compliance status. Scan results for audit cookbook configurations also appear in this view.
 
 {{< note >}} If the size of a Compliance Report is over 4MB, then the *Reports* page may not display as expected. {{< /note >}}
 

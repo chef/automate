@@ -1,6 +1,15 @@
 +++
 title = "Large Compliance Report Ingestion"
 
+draft = false
+
+gh_repo = "automate"
+[menu]
+  [menu.automate]
+    title = "Large Compliance Report Ingestion"
+    parent = "automate/configure"
+    identifier = "automate/configure/large_compliance_report.md Large Compliance Report Ingestion"
+    weight = 70
 +++
 
 Automate fails to ingest Compliance reports larger than 4MB sent through the data collector endpoint. Automate data collector sends a back error to the client.
