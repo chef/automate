@@ -7,6 +7,7 @@ import { SigninComponent } from './signin.component';
 import { MockComponent } from 'ng2-mock-component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
+import { CallbackService } from 'app/services/signin/signin.service';
 
 class MockActivatedRoute {
   private subject = new ReplaySubject<string>();
@@ -49,7 +50,8 @@ describe('SigninComponent', () => {
       providers: [
         // Note: the [routerLink] in the template requires snapshot to exist
         { provide: ActivatedRoute, useValue: activatedRoute },
-        { provide: ChefSessionService, useClass: MockChefSessionService }
+        { provide: ChefSessionService, useClass: MockChefSessionService },
+        { provide: CallbackService, useClass: {} }
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
