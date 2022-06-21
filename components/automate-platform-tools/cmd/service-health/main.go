@@ -35,15 +35,20 @@ func main() {
 	host, port, svc := os.Args[1], os.Args[2], os.Args[3]
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
+	fmt.Println(" **  Going to read tls config ** ** ")
+	fmt.Println(" OS ARGS HERE #### ", os.Args)
 	tlsCfg := certs.TLSConfig{
 		CertPath:       os.Args[4],
 		KeyPath:        os.Args[5],
 		RootCACertPath: os.Args[6],
 	}
+
+	fmt.Println(" ### Going to call fixup ##", os.Args[0])
 	tlsCfg.FixupRelativeTLSPaths(os.Args[0]) // fix paths relative to executable
+
 	certs, err := tlsCfg.ReadCerts()
 	if err != nil {
+		fmt.Println(" *** ERROR IS NOT NIL *** ")
 		criticalExit(err)
 	}
 

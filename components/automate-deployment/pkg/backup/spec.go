@@ -393,6 +393,21 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{Name: "local-user-service", WriteMetadata: false},
 		{Name: "pg-sidecar-service", WriteMetadata: false},
 		{Name: "automate-cds", WriteMetadata: false},
+		{Name: "automate-supermarket-redis", WriteMetadata: false},
+		{Name: "automate-supermarket-nginx", WriteMetadata: false},
+		{Name: "automate-supermarket-sidekiq", WriteMetadata: false},
+
+		// Supermarket
+		{
+			Name:          "automate-supermarket",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "automate-supermarket",
+					User: "automate-supermarket",
+				},
+			},
+		},
 
 		// Chef Server Stuff
 		{

@@ -98,6 +98,11 @@ func TestDefaultSpecs(t *testing.T) {
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "automate-cs-bookshelf", "automate-cs-bookshelf")
 	})
+	t.Run("automate-supermarket", func(t *testing.T) {
+		spec := testSpecFor(t, "automate-supermarket")
+		testRequireMetadata(t, spec)
+		testRequireDb(t, spec, "automate-supermarket", "automate-supermarket")
+	})
 	t.Run("automate-cs-oc-bifrost", func(t *testing.T) {
 		spec := testSpecFor(t, "automate-cs-oc-bifrost")
 		testRequireMetadata(t, spec)

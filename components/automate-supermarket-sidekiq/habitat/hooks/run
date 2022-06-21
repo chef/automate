@@ -1,0 +1,28 @@
+#!{{ pkgPathFor "core/bash" }}/bin/bash
+
+set -e
+
+HOME="{{ pkg.svc_data_path }}"
+export HOME
+
+if [ -f "{{ pkg.svc_config_path }}/app_env.sh" ]; then
+  . "{{ pkg.svc_config_path }}/app_env.sh"
+else
+  >&2 echo "No app env file found: '{{ pkg.svc_config_path }}/app_env.sh'"
+  >&2 echo "Have you not started this service (chef/supermarket) before?"
+  >&2 echo ""
+  >&2 echo "Aborting..."
+  exit 1
+fi
+
+chown -R "{{ cfg.app.user }}":"{{ cfg.app.group }}" {{ pkg.svc_path }}
+
+cd {{ pkg.path }}/app
+
+exec chpst \
+    -U {{ cfg.app.user }}:{{ cfg.app.group }} \
+    -u {{ cfg.app.user }}:{{ cfg.app.group }} \
+    bundle exec sidekiq \
+      --concurrency {{ cfg.app.concurrency }} \
+      --environment {{ cfg.rails_env }} \
+      --timeout {{ cfg.app.timeout }}

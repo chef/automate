@@ -1,0 +1,46 @@
+rails_env       = "production"
+secret_key_base = ""
+rack_env        = "production"
+lang            = "en_US.UTF-8"
+
+[app]
+concurrency = 25
+timeout     = 30
+user        = "supermarket"
+group       = "supermarket"
+
+[github]
+key                  = ""
+secret               = ""
+option_site          = ""
+option_authorize_url = ""
+access_token_url     = ""
+enterprise_url       = ""
+access_token         = ""
+url                  = "https://github.com/"
+
+[db]
+host     = "localhost"
+name     = "supermarket"
+user     = "supermarket"
+password = "supermarket"
+port     = 15432
+
+[redis]
+host     = 'localhost'
+port     = 16379
+database = '0/supermarket'
+jobq_url = ''
+
+[smtp]
+address  = ""
+port     = 0
+username = ""
+password = ""
+
+[fieri]
+url = 'http://localhost:13000/fieri/jobs'
+key = ''
+
+[rails]
+fqdn = ''

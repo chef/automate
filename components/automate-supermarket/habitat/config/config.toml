@@ -1,0 +1,22 @@
+[service]
+host = "127.0.0.1"
+port = "{{cfg.service.port}}"
+message = "{{cfg.service.message}}"
+
+[log]
+format = "{{cfg.log.format}}"
+level = "{{cfg.log.level}}"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+[storage]
+database = "{{cfg.sql.dbname}}"
+user = "{{cfg.db.user}}"
+max_open_conns = {{cfg.db.max_open_conns}}
+max_idle_conns = {{cfg.db.max_idle_conns}}
+
+
+

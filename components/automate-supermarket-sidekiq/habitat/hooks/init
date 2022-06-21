@@ -1,0 +1,69 @@
+#!{{ pkgPathFor "core/bash" }}/bin/bash
+set -e
+
+export HOME="{{ pkg.svc_data_path }}"
+
+if [ -f "{{ pkg.svc_config_path }}/app_env.sh" ]; then
+  . "{{ pkg.svc_config_path }}/app_env.sh"
+else
+  >&2 echo "No app env file found: '{{ pkg.svc_config_path }}/app_env.sh'"
+  >&2 echo "Have you not started this service (chef/supermarket) before?"
+  >&2 echo ""
+  >&2 echo "Aborting..."
+  exit 1
+fi
+
+# Create a directory for each app symlinked dir under {{ pkg.svc_var_path }}
+mkdir -pv '{{ pkg.svc_var_path }}/log'
+mkdir -pv '{{ pkg.svc_var_path }}/tmp'
+mkdir -pv '{{ pkg.svc_var_path }}/public/system'
+
+env_file="{{ pkg.path }}/app/.env.{{ cfg.rails_env }}"
+if [ -f "${env_file}" ]; then
+  rm -f "${env_file}"
+fi
+ln -sv "{{ pkg.svc_config_path }}/app_env.sh" "${env_file}"
+
+# Check that the 'SECRET_KEY_BASE' environment variable is non-empty
+if [ -z "${SECRET_KEY_BASE:-}" ]; then
+  >&2 echo "Required environment variable SECRET_KEY_BASE is not set."
+  >&2 echo "Set this package's config setting 'secret_key_base' to a"
+  >&2 echo "non-empty value. You can run 'rails secret' in development"
+  >&2 echo "to generate a random key string."
+  >&2 echo ""
+  >&2 echo "Aborting..."
+  exit 5
+fi
+
+# Confirm an initial database connection
+if ! {{ pkg.path }}/libexec/is_db_connected; then
+  >&2 echo ""
+  >&2 echo "A database connection is required for this app to properly boot."
+  >&2 echo "Is the database not running or are the database connection"
+  >&2 echo "credentials incorrect?"
+  >&2 echo ""
+{{~#if bind.database}}
+  >&2 echo "This app started with a database bind and will discovery the"
+  >&2 echo "hostname and port number in the Habitat ring."
+  >&2 echo ""
+  >&2 echo "There are 3 remaining config settings which must be set correctly:"
+{{else}}
+  >&2 echo "This app started without a database bind meaning that the"
+  >&2 echo "database is assumed to be running outside of a Habitat ring."
+  >&2 echo "Therefore, you must provide all the database connection values."
+  >&2 echo ""
+  >&2 echo "There are 5 config settings which must be set correctly:"
+{{~/if}}
+  >&2 echo ""
+{{~#unless bind.database}}
+  >&2 echo " * db.host      - The database hostname or IP address (Current: {{#if cfg.db.host}}{{cfg.db.host}}{{else}}<unset>{{/if}})"
+  >&2 echo " * db.port      - The database listen port number (Current: {{#if cfg.db.port}}{{cfg.db.port}}{{else}}5432{{/if}})"
+{{~/unless}}
+  >&2 echo " * db.adapter   - The database adapter (Current: {{#if cfg.db.adapter}}{{cfg.db.adapter}}{{else}}postgresql{{/if}})"
+  >&2 echo " * db.user      - The database username (Current: {{#if cfg.db.user}}{{cfg.db.user}}{{else}}<unset>{{/if}})"
+  >&2 echo " * db.password  - The database password (Current: {{#if cfg.db.password}}<set>{{else}}<unset>{{/if}})"
+  >&2 echo " * db.name      - The database name (Current: {{#if cfg.db.name}}{{cfg.db.name}}{{else}}<unset>{{/if}})"
+  >&2 echo ""
+  >&2 echo "Aborting..."
+  exit 15
+fi

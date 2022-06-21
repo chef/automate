@@ -4,6 +4,7 @@ package habpkg
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -112,6 +113,7 @@ func sortableHartsFromPaths(origin string, name string, paths []string) (Sortabl
 		v, err := HartFromPath(path)
 
 		if err != nil {
+			errors.Wrap(err, " We are returning error for path "+path)
 			return ret, err
 		}
 
@@ -179,6 +181,8 @@ func (h *Hart) UnmarshalText(text []byte) error {
 
 // HartFromPath parses a path into a Hart
 func HartFromPath(path string) (Hart, error) {
+	log.Println(" PATH IS *** ", path)
+
 	filename := filepath.Base(path)
 	// The hartifact filename is in the form of
 	//

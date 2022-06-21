@@ -1,0 +1,16 @@
+server {
+  listen 4000 ssl;
+  server_name  localhost;
+  ssl_certificate {{pkg.svc_config_path}}/service.crt;
+  ssl_certificate_key {{pkg.svc_config_path}}/service.key;
+
+  location / {
+      proxy_pass http://localhost:10200/;
+      proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header X-Forwarded-Ssl on;
+      proxy_set_header X-Forwarded-Host $http_host;
+      proxy_set_header X-Forwarded-Port $http_port;
+      proxy_set_header origin 'https://localhost:4000';
+  }
+}

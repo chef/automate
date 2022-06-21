@@ -1,0 +1,1 @@
+#!{{ pkgPathFor "core/bash" }}/bin/bash

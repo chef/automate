@@ -56,6 +56,10 @@
     "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
     "chef/automate-elasticsearch",
+    "chef/automate-supermarket-redis",
+    "chef/automate-supermarket",
+    "chef/automate-supermarket-nginx",
+    "chef/automate-supermarket-sidekiq",
     "core/rsync"
   ],
 
@@ -175,6 +179,18 @@
         "chef/automate-cs-oc-bifrost",
         "chef/automate-cs-oc-erchef",
         "chef/automate-cs-nginx"
+      ]
+    },
+    {
+      "name": "chef-supermarket",
+      "type": "product",
+      "aliases": ["supermarket"],
+      "dependencies": ["core","postgresql"],
+      "services": [
+        "chef/automate-supermarket-redis",
+        "chef/automate-supermarket",
+        "chef/automate-supermarket-nginx",
+        "chef/automate-supermarket-sidekiq"
       ]
     },
     {

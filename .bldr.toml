@@ -197,6 +197,7 @@ paths = [
   "api/config/secrets/*",
   "api/config/session/*",
   "api/config/shared/*",
+  "api/config/supermarket/*",
   "api/config/teams/*",
   "api/config/ui/*",
   "api/config/user_settings/*",
@@ -404,6 +405,7 @@ paths = [
   "api/config/secrets/*",
   "api/config/session/*",
   "api/config/shared/*",
+  "api/config/supermarket/*",
   "api/config/teams/*",
   "api/config/ui/*",
   "api/config/user_settings/*",
@@ -494,6 +496,7 @@ paths = [
   "api/config/secrets/*",
   "api/config/session/*",
   "api/config/shared/*",
+  "api/config/supermarket/*",
   "api/config/teams/*",
   "api/config/ui/*",
   "api/config/user_settings/*",
@@ -923,6 +926,25 @@ paths = [
 plan_path = "components/automate-workflow-web"
 paths = [
   "components/automate-workflow-web/*"
+]
+
+[automate-supermarket]
+plan_path = "components/automate-supermarket"
+paths = [
+  "components/automate-supermarket/*",
+  "lib/tls/*"
+]
+
+[automate-supermarket-redis]
+plan_path = "components/automate-supermarket-redis"
+paths = [
+  "components/automate-supermarket-redis/*"
+]
+
+[automate-supermarket-nginx]
+plan_path = "components/automate-supermarket-nginx"
+paths = [
+  "components/automate-supermarket-nginx/*"
 ]
 
 [data-feed-service]
