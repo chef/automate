@@ -14,7 +14,7 @@ gh_repo = "automate"
  
 ## Upgrading with FileSystem Backup
 
-Here we expect both the versions of Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version 4.x.
+Here we expect both the versions of Chef Automate and Chef Automate in HA are same. Chef Automate HA is only available in version 4.x.
 
 1. Create Backup of Chef Automate using command:
   ```bash
@@ -33,12 +33,12 @@ Here we expect both the versions of Chef Automate and Chef Automate HA are same.
   ```bash
   tar -xf backup.tar.gz -C /mnt/automate_backups
   ```
-5. Restore using this command:
+5. Restore in Chef-Automate HA using this command:
   ```bash
   automate_version_number=4.0.91 ## please chnage this based on the version of Chef Automate running.
   chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
   ```
-6. Upack the `.abb` file on all the Frontend nodes: \
+6. Upack the `.abb` file on all the Frontend nodes of Chef-Automate HA: \
   Login to Each Frontend Node and then run after copying the `.abb` file.
   ```bash
   chef-automate bootstrap bundle unpack bootstrap.abb
