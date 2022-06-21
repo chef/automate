@@ -52,7 +52,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   reportId: string;
   reportIdArray: Array<string | number> = [];
   allControlList = [];
-  currentControl;
+  index: number;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -99,7 +99,12 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.controlDetailsLoading = false;
         this.isError = false;
         this.controlDetails = detailsListState;
-        this.currentControl = this.controlDetails['profiles'][0].controls[0];
+        const res = this.controlDetails['profiles'][0].controls[0].results;
+        const code = this.controlDetails['profiles'][0].controls[0].code;
+        const desc = this.controlDetails['profiles'][0].controls[0].desc;
+        this.controlList.control_elements[this.index].results = res;
+        this.controlList.control_elements[this.index].code = code;
+        this.controlList.control_elements[this.index].desc = desc;
       } else if (detailsStatusSt === EntityStatus.loadingFailure) {
         this.isError = true;
         this.reportIdArray = this.reportIdArray.slice(0, -1);
@@ -185,7 +190,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return this.openControls[id] && this.openControls[id].open;
   }
 
-  toggleControl(control: { id: string | number; profile_id: string; }) {
+  toggleControl(i: number, ctrl: any) {
+    const control = ctrl;
+    this.index = i;
     this.controlDetailsLoading = true;
     const state = this.openControls[control.id];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
@@ -212,7 +219,12 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
               if (c.id === control.id) {
                 this.controlDetailsLoading = false;
                 this.controlDetails = data;
-                this.currentControl = this.controlDetails['profiles'][0].controls[0];
+                const res = this.controlDetails['profiles'][0].controls[0].results;
+                const code = this.controlDetails['profiles'][0].controls[0].code;
+                const desc = this.controlDetails['profiles'][0].controls[0].desc;
+                this.controlList.control_elements[this.index].results = res;
+                this.controlList.control_elements[this.index].code = code;
+                this.controlList.control_elements[this.index].desc = desc;
               }
             });
           });
