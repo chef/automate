@@ -140,12 +140,15 @@ func TestMain(t *testing.T) {
 		defer resp.Body.Close()
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		// This final redirect means we've successfully logged in, so we'll want to
-		// capture that id_token
-		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
-			id_token, err := resp.Request.Cookie("id_token")
-			require.NoError(t, err)
-			idToken = id_token.Value
+		body, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err, "read new response")
+		data := struct {
+			IDToken string `json:"id_token"`
+		}{}
+		err = json.Unmarshal(body, &data)
+		require.NoError(t, err, "parse new response")
+		if assert.NotEmpty(t, data.IDToken) {
+			idToken = data.IDToken
 
 		}
 	})
@@ -183,13 +186,17 @@ func TestMain(t *testing.T) {
 		require.NoError(t, err, "GET /new")
 		defer resp.Body.Close()
 
-		// This final redirect means we've successfully logged in, so we'll want to
-		// capture that id_token
-		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
-			id_token, err := resp.Request.Cookie("id_token")
-			require.NoError(t, err)
-			idToken = id_token.Value
+		body, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err, "read refresh response")
+		data := struct {
+			IDToken string `json:"id_token"`
+		}{}
+		err = json.Unmarshal(body, &data)
+		require.NoError(t, err, "parse refresh response")
+		if assert.NotEmpty(t, data.IDToken) {
+			idToken = data.IDToken
 		}
+
 		req, err := http.NewRequest("GET", refreshEndpoint.String(), nil)
 		require.NoError(t, err, "create refresh request")
 		req.Header.Set("Authorization", fmt.Sprintf("bearer %s", idToken))
@@ -197,11 +204,9 @@ func TestMain(t *testing.T) {
 		require.NoError(t, err, "send refresh request")
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err = ioutil.ReadAll(resp.Body)
 		require.NoError(t, err, "read refresh response")
-		data := struct {
-			IDToken string `json:"id_token"`
-		}{}
+
 		err = json.Unmarshal(body, &data)
 		require.NoError(t, err, "parse refresh response")
 
@@ -223,13 +228,17 @@ func TestMain(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		// This indicates that the new-session dance with dex has succeeded
-		require.Contains(t, resp.Request.URL.Path, "/signin")
-		// This final redirect means we've successfully logged in, so we'll want to
-		// capture that id_token
-		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
-			id_token, err := resp.Request.Cookie("id_token")
-			require.NoError(t, err)
-			oldIDToken = id_token.Value
+		if assert.Contains(t, resp.Request.URL.Path, "/callback") {
+			body, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err, "read new response")
+			data := struct {
+				IDToken string `json:"id_token"`
+			}{}
+			err = json.Unmarshal(body, &data)
+			require.NoError(t, err, "parse new response")
+			if assert.NotEmpty(t, data.IDToken) {
+				oldIDToken = data.IDToken
+			}
 		}
 
 		// save cookie for re-use below
@@ -349,7 +358,7 @@ func TestMain(t *testing.T) {
 					Sub string `json:"sub"`
 					PU  string `json:"preferred_username"`
 				}{}
-				err = json.NewDecoder(resp.Body).Decode(&respMsg)
+				_ = json.NewDecoder(resp.Body).Decode(&respMsg)
 				assert.Equal(t, "Cg0wLTM4NS0yODA4OS0wEgRtb2Nr", respMsg.Sub)
 				assert.Equal(t, "kilgore@kilgore.trout", respMsg.PU)
 			})

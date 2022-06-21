@@ -488,8 +488,8 @@ func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
 	// need to grab 'code' from the request body, exchange for token, return token
 	code := r.PostFormValue("code")
 	fmt.Printf("code:%s\n", code)
-	if "" == code {
-		http.Error(w, fmt.Sprint("no code in request"), http.StatusBadRequest)
+	if code == "" {
+		http.Error(w, "no code in request", http.StatusBadRequest)
 		return
 	}
 
