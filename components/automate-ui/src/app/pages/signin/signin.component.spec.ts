@@ -61,6 +61,7 @@ describe('SigninComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SigninComponent);
     chefSessionService = TestBed.inject(ChefSessionService);
+    TestBed.inject(CallbackService);
     component = fixture.componentInstance;
   });
 

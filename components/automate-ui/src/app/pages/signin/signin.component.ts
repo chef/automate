@@ -37,8 +37,8 @@ export class SigninComponent implements OnInit, OnDestroy {
     this.callbackService.callback(this.searchParams)
     .pipe(takeUntil(this.destroyed$))
     .subscribe((res) => {
-      this.setIdAndPath(res.id_token, res.state);
-      this.error = false;
+      this.error = this.setIdAndPath(res.id_token, res.state);
+      if(this.error) return;
       this.setSession();
       localStorage.setItem('manual-upgrade-banner', 'true');
       this.router.navigateByUrl(this.path);
@@ -56,18 +56,18 @@ export class SigninComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
-  setIdAndPath(idToken: string, state: string): void {
+  setIdAndPath(idToken: string, state: string): boolean {
+    let error = false;
     this.idToken = idToken;
     this.path = this.pathFromState(state);
     if (state === '' || this.idToken === '') {
-      this.error = true;
-      return;
+      error = true;
     }
     this.id = Jwt.parseIDToken(this.idToken);
     if (this.id === null) {
-      this.error = true;
-      return;
+      error = true;
     }
+    return error;
   }
 
   setSession(): void {
