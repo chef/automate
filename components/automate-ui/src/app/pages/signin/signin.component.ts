@@ -38,7 +38,9 @@ export class SigninComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.destroyed$))
     .subscribe((res) => {
       this.error = this.setIdAndPath(res.id_token, res.state);
-      if(this.error) return;
+      if (this.error) {
+        return;
+      }
       this.setSession();
       localStorage.setItem('manual-upgrade-banner', 'true');
       this.router.navigateByUrl(this.path);
