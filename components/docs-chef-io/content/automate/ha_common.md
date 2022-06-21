@@ -38,44 +38,44 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 ### Creating an IAM User
 
 1. Navigate to your AWS account.
-1. Select *IAM* from the list of services from the AWS console. The *IAM dashboard* screen appears.
+2. Select *IAM* from the list of services from the AWS console. The *IAM dashboard* screen appears.
 
 {{< figure src="/images/automate/ha_aws_iam.png" alt="AWS IAM Dashboard">}}
 
-1. Select *Users* from the *Access management* menu on the left.
-1. Select *Add Users*. The *Set User Details* screen appears.
-1. Type the user name for the new user and other necessary details.
+3. Select *Users* from the *Access management* menu on the left.
+4. Select *Add Users*. The *Set User Details* screen appears.
+5. Type the user name for the new user and other necessary details.
 
 {{< figure src="/images/automate/ha_aws_iam_user.png" alt="AWS IAM User Creation">}}
 
-1. Check the *Access key - Programmatic access* box under *Select AWS access type* section.
+6. Check the *Access key - Programmatic access* box under *Select AWS access type* section.
 
 {{< figure src="/images/automate/ha_aws_iam_paccess.png" alt="AWS IAM User - Programmetic Access">}}
 
-  This is the sign-in name for AWS. If you want to add multiple users, choose to Add another user for each additional user and type their user names. You can add up to 10 users at one time.
+This is the sign-in name for AWS. If you want to add multiple users, choose to Add another user for each additional user and type their user names. You can add up to 10 users at one time.
 
-  This account will be used by your AWS CLI and will be connecting to the AWS API directly by not using the Management Console.
+This account will be used by your AWS CLI and will be connecting to the AWS API directly by not using the Management Console.
 
-1. Select *Next: Permissions*.
-1. Select *Attach existing policies directly*. Filter the policies by keyword: IAM. For this user, select IAMFullAccess from the list of available policies. The IAMFullAccess policy enables this user to create and manage user permissions in AWS.
+7. Select *Next: Permissions*.
+8. Select *Attach existing policies directly*. Filter the policies by keyword: IAM. For this user, select IAMFullAccess from the list of available policies. The IAMFullAccess policy enables this user to create and manage user permissions in AWS.
 
 {{< figure src="/images/automate/ha_aws_iam_policy.png" alt="AWS IAM User Policy">}}
 
-1. Set the user permissions.
-1. Search for **AdministratorAccess* and select the policy.
-1. Select *Next: Tags*.
-1. Provide key name and value as tagging for the user been created.
-1. Select *Next: Review*.
+9. Set the user permissions.
+10. Search for **AdministratorAccess* and select the policy.
+11. Select *Next: Tags*.
+12. Provide key name and value as tagging for the user been created.
+13. Select *Next: Review*.
 
 {{< figure src="/images/automate/ha_aws_iam_user_review.png" alt="AWS IAM User Review with permissions">}}
 
-1. Select *Create user*.
-1. Select *show* to reveal the secret access key.
-1. Download and save the *Secret access key*.
+14. Select *Create user*.
+15. Select *show* to reveal the secret access key.
+16. Download and save the *Secret access key*.
 
 {{< figure src="/images/automate/ha_aws_iam_user_created.png" alt="AWS IAM User Created with Access Key">}}
 
-1. Take a note of the Access key ID and Secret access key.
+17. Take a note of the Access key ID and Secret access key.
 
 Now let's configure our AWS CLI to deploy our applications from our command line.
 
@@ -91,7 +91,7 @@ Certificates should be rotated periodically, to ensure optimal security.
 
 Certificate rotation means the replacement of existing certificates with new ones when any certificate expires or based on your organization policy. A new CA authority is substituted for the old requiring a replacement of root certificate for the cluster.
 
-The certificate rotation is also required when key for a node, client, or CA is compromised. Then, you need to modify the contents of a certificate, for example, to add another DNS name or the IP address of a load balancer through which a node can be reached.  In this case, you  would need to rotate only the node certificates.
+The certificate rotation is also required when key for a node, client, or CA is compromised. Then, you need to modify the contents of a certificate, for example, to add another DNS name or the IP address of a load balancer through which a node can be reached. In this case, you  would need to rotate only the node certificates.
 
 #### How to Rotate the Certificates?
 
@@ -100,7 +100,7 @@ You can generate the required certificates on your own or you can use the existi
 Follow these steps to rotate your certificates that are to be used in Chef Automate High Availability (HA):
 
 1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
-1. Type the command, `./scripts/credentials set ssl --rotate all` and press **Enter**. This command rotates all the certificates of your organization.
+2. Type the command, `./scripts/credentials set ssl --rotate all` and press **Enter**. This command rotates all the certificates of your organization.
 
 {{< note >}}
 
@@ -108,9 +108,9 @@ When you run this command first time, a series of certificates are created and s
 
 {{< /note >}}
 
-1. For rotating the PostgreSQL certificates, type the command `./scripts/credentials set ssl --pg-ssl` and press **Enter**. .
+3. For rotating the PostgreSQL certificates, type the command `./scripts/credentials set ssl --pg-ssl` and press **Enter**. .
 
-1. For rotating the Elasticsearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
+4. For rotating the Elasticsearch certificates, type the command, `./scripts/credentials set ssl --es-ssl` and press **Enter**.
 
 <!-- 4. Copy your *x.509 SSL certs* into the appropriate files in `certs/` folder. -->
 
@@ -118,19 +118,19 @@ When you run this command first time, a series of certificates are created and s
 
 <!-- - Place your intermediate CA into the `pem` file. -->
 
-1. If your organization issues certificate from an intermediate CA, then place the respective certificate after the server certificate as per order listed. For example, in `certs/pg_ssl_public.pem`, paste it as them as listed:
+5. If your organization issues certificate from an intermediate CA, then place the respective certificate after the server certificate as per order listed. For example, in `certs/pg_ssl_public.pem`, paste it as them as listed:
 
 - Server Certificate
 - Intermediate CA Certificate 1
 - Intermediate CA Certificate n
 
-1. Type the command, `./scripts/credentials set ssl` (with the appropriate options) and press **Enter**. This command deploys the nodes.
+6. Type the command, `./scripts/credentials set ssl` (with the appropriate options) and press **Enter**. This command deploys the nodes.
 
-1. Type the command, `./scripts/credentials set ssl  --help` and press **Enter**. This command provides you information and list of commands related to certificate rotation.
+7. Type the command, `./scripts/credentials set ssl  --help` and press **Enter**. This command provides you information and list of commands related to certificate rotation.
 
-1. For rotating the PostgreSQL credentials, type the command `./scripts/credentials set postgresql --auto` and press **Enter**. .
+8. For rotating the PostgreSQL credentials, type the command `./scripts/credentials set postgresql --auto` and press **Enter**. .
 
-1. For rotating the Elasticsearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
+9. For rotating the Elasticsearch credentials, type the command, `./scripts/credentials set elasticsearch --auto` and press **Enter**.
 
 ### What are Self Signed Certificates?
 
@@ -144,11 +144,11 @@ Follow these steps to create a self-sign certificate:
 
 1. Install an *openssl* utility.
 
-1. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
+2. Navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
 
-1. Type the command, `./scripts/credentials set ssl --rotate-all`. This command creates a skeleton of certificates.
+3. Type the command, `./scripts/credentials set ssl --rotate-all`. This command creates a skeleton of certificates.
 
-1. Copy the below *bash script* to a new file:
+4. Copy the below *bash script* to a new file:
 
 ```bash
 
@@ -198,13 +198,13 @@ cp es_ssl_public.pem /hab/a2_deploy_workspace/certs/pg_ssl_public.pem
 
 ```
 
-1. Navigate to your bastion host.
+5. Navigate to your bastion host.
 
-1. Execute the new file that has the copied bash script. The script generates the certificates at `/hab/a2_deploy_worspace/certs` directory. For example, `bash cert.sh`, where *cert.sh is the name of the newly created bash script file.
+6. Execute the new file that has the copied bash script. The script generates the certificates at `/hab/a2_deploy_worspace/certs` directory. For example, `bash cert.sh`, where *cert.sh is the name of the newly created bash script file.
 
-1. Again, navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
+7. Again, navigate to your workspace folder. For example, `cd /hab/a2_deploy_workspace`.
 
-1. Execute following commands in the same order as listed to apply the generated certificates:
+8. Execute following commands in the same order as listed to apply the generated certificates:
 
 - ./scripts/credentials set ssl --es-ssl
 - ./scripts/credentials set ssl --pg-ssl
@@ -214,7 +214,7 @@ Once the certificates are applied successfully, the following confirmation messa
 
 {{< figure src="/images/automate/ha_self_sign_certificate.png" alt="Certification Creation using openssl utility">}}
 
-1. Navigate to the Chef Automate and Chef Server instances and check the Chef Service health status. If the service is down or critical, then  wait for three to four minutes for the instances to be up.
+9. Navigate to the Chef Automate and Chef Server instances and check the Chef Service health status. If the service is down or critical, then  wait for three to four minutes for the instances to be up.
 
 ## AWS Certificate Manager
 
@@ -230,25 +230,25 @@ Follow these steps if you want to request an ACM public certificate:
 
 1. Sign in to the **AWS Management Console**.
 
-1. Open the [ACM console](https://console.aws.amazon.com/acm/home).
+2. Open the [ACM console](https://console.aws.amazon.com/acm/home).
 
-1. Select your region from the top-right corner of the console.
+3. Select your region from the top-right corner of the console.
 
-1. Select **Request a certificate**.
+4. Select **Request a certificate**.
 
 {{< figure src="/images/automate/ha_aws_cert_mngr_console.png" alt="AWS ACM">}}
 
-1. Select the **Request a public certificate** option from the **Certificate type** page, and select **Next**.
+5. Select the **Request a public certificate** option from the **Certificate type** page, and select **Next**.
 
-1. In the **Domain names** section, enter your domain name. You can use a fully qualified domain name (FQDN), such as `www.example.com`, or a bare domain name such as `example.com`.
+6. In the **Domain names** section, enter your domain name. You can use a fully qualified domain name (FQDN), such as `www.example.com`, or a bare domain name such as `example.com`.
 
 Before ACM issues a certificate, it validates that you own or control the domain names in your certificate request. You can use either email validation or DNS validation.
 
-1. In the **Select validation method** section, select either *DNS validation* or *Email validation*.
+7. In the **Select validation method** section, select either *DNS validation* or *Email validation*.
 
-1. From the **Tags** page, you can optionally tag your certificate. Tags are key-value pairs that serve as metadata for identifying and organizing AWS resources.
+8. From the **Tags** page, you can optionally tag your certificate. Tags are key-value pairs that serve as metadata for identifying and organizing AWS resources.
 
-1. Select **Request**. The console returns you to your certificate list after processing the request, where your new certificate displays with status, *Pending validation*.
+9. Select **Request**. The console returns you to your certificate list after processing the request, where your new certificate displays with status, *Pending validation*.
 
 You can also request a public certificate using the Command Line Interface (CLI). For detailed information on requesting these certificates, refer  [AWS documentation on requesting a public certificate](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html).
 
@@ -258,17 +258,17 @@ Follow these steps if you want to use the AWS certificates in your network infra
 
 1. Log in as a Sudo user by using `su-` command.
 
-1. Navigate to the `hab` workspace directory.
+2. Navigate to the `hab` workspace directory.
 
-1. Open the `a2ha.rb` file in any editor of your choice.
+3. Open the `a2ha.rb` file in any editor of your choice.
 
 {{< figure src="/images/automate/ha_load_balancer.png" alt="AWS Certificate ARN Value">}}
 
-1. Copy the existing or generated ARN value from AWS console to the `chef_server_lb_certificate_arn` and `automate_server_lb_certificate_arn` fields in the *a2ha.rb* file.
+4. Copy the existing or generated ARN value from AWS console to the `chef_server_lb_certificate_arn` and `automate_server_lb_certificate_arn` fields in the *a2ha.rb* file.
 
 {{< figure src="/images/automate/ha_a2rb_lb_certificate.png" alt="AWS Certificate ARN Value">}}
 
-1. Save and close the file.
+5. Save and close the file.
 
 ## Destroying Chef Automate HA Infrastructure
 
@@ -282,7 +282,7 @@ Follow any of the step to destroy terraform or infrastructure created while depl
 
 1. `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform init;cd $i;done`.
 
-1. `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done`.
+2. `for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done`.
 
 - If you have deployed the Chef Automate HA successffuly and wanted to destroy the deployment part alone, execute the command:
 
@@ -308,7 +308,7 @@ Follow these steps to examine the firewall rules are stateful, and ports are ope
 
 1. Download hab, *hab-x86_64-linux.tar.gz* by executing the command, `sudo wget https://packages.chef.io/files/stable/habitat/latest/hab-x86_64-linux.tar.gz`.
 
-1. Install hab package in your internet environment by executing the following commands that generate *netcate package*:
+2. Install hab package in your internet environment by executing the following commands that generate *netcate package*:
 
 ```bash
 
@@ -322,7 +322,7 @@ ls -dtr1 /hab/cache/artifacts/core-netcat-*
 
 ```
 
-1. Provide the path of the `config.toml` file, `hab-utitlity` and `netcate` package in the command, ./chef-automate validate-ha-infrastructure */path/to/config.toml* */path/to/hab.tar.gz* */path/to/netcat.hart*  as parameters.
+3. Provide the path of the `config.toml` file, `hab-utitlity` and `netcate` package in the command, ./chef-automate validate-ha-infrastructure */path/to/config.toml* */path/to/hab.tar.gz* */path/to/netcat.hart*  as parameters.
 
 ```bash
 
@@ -378,13 +378,13 @@ VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv
 
 1. Navigate to the *AWS Management Console*.
 
-1. Select your *AWS Region* from the top toolbar.
+2. Select your *AWS Region* from the top toolbar.
 
-1. From the navigation pane, select *VPC Dashboard* in the upper-left corner.
+3. From the navigation pane, select *VPC Dashboard* in the upper-left corner.
 
-1. Select *Your VPCs*.
+4. Select *Your VPCs*.
 
-1. Copy any available *VPC ID* from the *Your VPCs* screen.
+5. Copy any available *VPC ID* from the *Your VPCs* screen.
 
 {{< figure src="/images/automate/ha_aws_vpc_existing.png" alt="Using Existing VPC">}}
 
@@ -392,9 +392,9 @@ VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv
 
 1. From the navigation pane, select *Subnets*.
 
-1. Search your *VPC ID* in the *Subnets* screen.
+2. Search your *VPC ID* in the *Subnets* screen.
 
-1. Copy the corresponding *IPv4 CIDR* value.
+3. Copy the corresponding *IPv4 CIDR* value.
 
 {{< figure src="/images/automate/ha_aws_vpc_existing_subnet.png" alt="Using Existing VPC Subnet Value">}}
 
@@ -402,21 +402,21 @@ VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv
 
 1. Navigate to the *AWS Management Console*.
 
-1. Select your *AWS Region* from the top toolbar.
+2. Select your *AWS Region* from the top toolbar.
 
-1. From the navigation pane, select *VPC Dashboard* in the upper-left corner.
+3. From the navigation pane, select *VPC Dashboard* in the upper-left corner.
 
-1. Select *Your VPCs*.
+4. Select *Your VPCs*.
 
-1. Select *Create VPC* from the left.
+5. Select *Create VPC* from the left.
 
-1. For *IPv4 CIDR* block, enter the CIDR block for the VPC. We recommend that you use a CIDR block from the private (non-publicly routable) IP address ranges. For example, 10.0.0.0/16. For more information, refer [VPC and Subnet Sizing for IPv4 page](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv4).
+6. For *IPv4 CIDR* block, enter the CIDR block for the VPC. We recommend that you use a CIDR block from the private (non-publicly routable) IP address ranges. For example, 10.0.0.0/16. For more information, refer [VPC and Subnet Sizing for IPv4 page](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv4).
 
-1. For *IPv6 CIDR* block, keep No IPv6 CIDR Block.
+7. For *IPv6 CIDR* block, keep No IPv6 CIDR Block.
 
-1. For VPC name, enter a *tag name*.
+8. For VPC name, enter a *tag name*.
 
-1. Select *Create VPC*. After the VPC is created, choose OK.
+9. Select *Create VPC*. After the VPC is created, choose OK.
 
 {{< figure src="/images/automate/ha_aws_vpc.png" alt="VPC Creation">}}
 
@@ -424,17 +424,17 @@ VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv
 
 1. From the navigation pane, select *Subnets*.
 
-1. Select *Create Subnet*.
+2. Select *Create Subnet*.
 
-1. Select your *VPC ID* from the drop-down.
+3. Select your *VPC ID* from the drop-down.
 
-1. Enter *Subnet name* for the private subnet (for example, WorkSpaces Private Subnet 2).
+4. Enter *Subnet name* for the private subnet (for example, WorkSpaces Private Subnet 2).
 
-1. To make an appropriate selection for *Availability Zone*, see Availability Zones for Amazon WorkSpaces.
+5. To make an appropriate selection for *Availability Zone*, see Availability Zones for Amazon WorkSpaces.
 
-1. Enter the CIDR block for the subnet in the *IPv4 CIDR block*. For example, 10.0.2.0/24. Ensure you provide a unique value.
+6. Enter the CIDR block for the subnet in the *IPv4 CIDR block*. For example, 10.0.2.0/24. Ensure you provide a unique value.
 
-1. Select *Create Subnet*.
+7. Select *Create Subnet*.
 
 {{< figure src="/images/automate/ha_aws_subnet.png" alt="VPC Subnets">}}
 

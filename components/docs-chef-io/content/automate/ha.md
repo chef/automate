@@ -1,28 +1,28 @@
 +++
-title = "High Availability Architecture"
+title = "High Availability Overview"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Architecture"
+    title = "Overview"
     parent = "automate/deploy_high_availability"
-    identifier = "automate/deploy_high_availability/ha.md High Availability Architecture"
+    identifier = "automate/deploy_high_availability/ha.md High Availability Overview"
     weight = 10
 +++
 
-**High availability (HA)** refers to a system or application that offers a high level of operational availability. This means that the entire site or application will not be down if one server goes down, whether due to traffic overload or other issues. HA represents the application remains available with no interruption. We achieve high availability when an application continues to operate even when one or more underlying components fail.
+**High availability (HA)** refers to a system or application that offers a high level of operational availability. This means that the entire site or application will not be down if one server goes down due to traffic overload or other issues. HA represents the application remains available with no interruption. We achieve high availability when an application continues to operate even when one or more underlying components fail.
 
 Thus, HA is designed to avoid loss of service by reducing or managing failures and minimizing unscheduled downtime (when your system or network is not available for use or is unresponsive) that happens due to power outages or failure of a component.
 
 ## Chef Automate High Availability (HA)
 
-The Chef Automate HA equates to reliability, efficiency, and productivity. Chef Automate HA is built on the following characteristics, **Redundancy** and **Failover**. It aids in addressing significant issues like service failure and zone failure.
+The Chef Automate HA equates to reliability, efficiency, and productivity, built on **Redundancy** and **Failover**. It aids in addressing significant issues like service failure and zone failure.
 
 ## Chef Automate HA Architecture
 
-This architecture includes the cluster of the *Chef Automate*, *Chef Server*, *Postgres*, and *OpenSearch*.
+HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *Postgres*, and *OpenSearch*.
 
 ### Chef Automate HA Architecture for OnPremise / AWS Non-Managed
 

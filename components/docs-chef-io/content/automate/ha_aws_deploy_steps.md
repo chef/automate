@@ -15,12 +15,12 @@ gh_repo = "automate"
 
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud.
 
-## Steps to install Chef Automate HA on AWS
+## Install Chef Automate HA on AWS
 
-### Prerequisite:
+### Prerequisites
 
 - Virtual Private Cloud (VPC) should be created in AWS before starting or use default. Reference for [VPC and CIDR creation](/automate/ha_vpc_setup/)
-- Get AWS credetials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. \
+- Get AWS credentials (`aws_access_key_id` and `aws_secret_access_key`) which have privileges like: `AmazonS3FullAccess`, `AdministratorAccess`, `AmazonAPIGatewayAdministrator`. \
   Set these in `~/.aws/credentials` in Bastion Host:
 
   ```bash
@@ -33,50 +33,50 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
   echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
   ```
 
-- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
+- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`
   Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
-- Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
+- Have SSH Key Pair ready in AWS, so new VM's are created using that pair.
   Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
 
-### Run these steps on Bastion Host Machine
+### Deployment
 
-1. Before starting, switch to sudo:
+Run the following steps on Bastion Host Machine:
 
-   ```bash
-   sudo su -
-   ```
+1. Switch to `sudo` using the following command:
+
+```bash
+sudo su -
+```
 
 2. Download Chef Automate CLI
 
-   ```bash
-   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
-   ```
+```bash
+curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
+```
 
-3. Download Airgapped Bundle \
-   Download latest Bundle with this:
+3. Download the Airgapped Bundle and the latest Bundle using the following command:
 
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
-   ```
+```bash
+curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
+```
 
-   Download specific version bundle with this, example version: 4.0.91:
+Download the specific version of the bundle using the following command (`for example : version: 4.0.91`):,
 
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
-   ```
+```bash
+curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
+```
 
-5. Generate init config \
-   Then generate init config for existing infra structure:
+4. Generate `init` config and  generate it for existing infra structure using the following command:
 
-   ```bash
-   chef-automate init-config-ha aws
-   ```
+```bash
+chef-automate init-config-ha aws
+```
 
-6. Update Config with relevant data
+5. Update Config with relevant data.
 
-   ```bash
-   vi config.toml
-   ```
+```bash
+vi config.toml
+```
 
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
@@ -91,7 +91,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
       - Set `aws_vpc_id`, which you had created as Prerequisite step. Example: `"vpc12318h"`
       - If AWS VPC uses CIDR then set `aws_cidr_block_addr`.
       - If AWS VPC uses Subnet then set `private_custom_subnets` and `public_custom_subnets` Example: example : `["subnet-07e469d218301533","subnet-07e469d218041534","subnet-07e469d283041535"]`
-      - Set `ssh_key_pair_name`, this is the SSH Key Pair we created as Prerequsite. This Value should be just name of the AWS SSH Key Pair, not having `.pem` extention. The ssh key content should be same as content of `ssh_key_file`.
+      - Set `ssh_key_pair_name`, this is the SSH Key Pair we created as Prerequsite. This value should be just name of the AWS SSH Key Pair, not having `.pem` extention. The ssh key content should be same as content of `ssh_key_file`.
       - Set `setup_managed_services` as `false`, As these deployment steps are for Non-Managed Services AWS Deployment. Default value is `false`.
       - Set `ami_id`, this value depends on your AWS Region and the Operating System Image you want to use.
       - Please use the [Hardware Requirement Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx) to get information for which instance type you will need for your load.
@@ -107,51 +107,50 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
       - Set `postgresql_ebs_volume_iops`, `postgresql_ebs_volume_size` based on your load needs.
       - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`, `opensearch_ebs_volume_type`, `postgresql_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-7. Confirm all the data in the config is correct:
+6. Confirm all the data in the config is correct using the following command:
 
-   ```bash
-   cat config.toml
-   ```
-8. Run Provision Command \
- 
-   ```bash
-   chef-automate provision-infra config.toml --airgap-bundle latest.aib
-   ```
+```bash
+cat config.toml
+```
 
-   Using specific version of Chef Automate, example: `automate-4.0.91.aib` 
+7. Run Provision Command
 
-   ```bash
-   chef-automate provision-infra config.toml --airgap-bundle automate-4.0.91.aib
-   ```
+```bash
+chef-automate provision-infra config.toml --airgap-bundle latest.aib
+```
 
-9. Run Deploy Command \
-   Deploy `latest.aib` with set `config.toml`
+Use the specific version of Chef Automate, example: `automate-4.0.91.aib`
 
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle latest.aib
-   ```
+```bash
+chef-automate provision-infra config.toml --airgap-bundle automate-4.0.91.aib
+```
 
-   If deploying specific version of Chef Automate, example: Deploy `automate-4.0.91.aib` with set `config.toml`
+8. Run deploy command and deploy `latest.aib` with set `config.toml`.
 
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
-   ```
+```bash
+chef-automate deploy config.toml --airgap-bundle latest.aib
+```
 
-10. After Deployment is done successfully. \
-   Check status of Chef Automate HA services:
+Deploy the specific version of the Chef Automate, example: Deploy `automate-4.0.91.aib` with set `config.toml`
 
-   ```bash
-   chef-automate status
-   ```
+```bash
+chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
+```
 
-11. Check Chef Automate HA deployment info, using the command below:
+9. After Deployment is done successfully check the status of Chef Automate HA services using the following command:
 
-   ```bash
-   chef-automate info
-   ```
+```bash
+chef-automate status
+```
 
-12. Set DNS entries: \
+10. Check Chef Automate HA deployment information, using the following command:
 
-   DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
+```bash
+chef-automate info
+```
 
-13. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+11. Set DNS entries:
+
+DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
+
+12. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).

@@ -15,18 +15,19 @@ gh_repo = "automate"
 
 This section lists the recommended requirements for operating systems, virtual machine instances, and VPC for implementing the Chef Automate High Availability (HA) in your network infrastructure.
 
+## Software Requirements
+
 | Operating Systems                        | Supported Version         |
 | :--------------------------------------  | :-----------------------  |
 | Red Hat Enterprise Linux (64 Bit OS)     | 7, 8. For 8 or above versions, the **SELinux** configuration must be permissive. The **SELinux** configuration is enforced in RHEL 8. Red Hat Enterprise Linux derivatives include Amazon Linux v1 (using RHEL 6 packages) and v2 (using RHEL 7packages). |
-| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x          |
+| Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
 | Centos (64 Bit OS)                       | 7                         |
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 
 ## Hardware Requirements
 
-We get these results based on our performance benchmarking tests according to the assumptions below.
+The hardware configuration is according to the performance benchmarking tests based on the assumptions listed below:
 
-### Assumption
 | Assumption                            | Value | Unit     |
 |---------------------------------------|-------|----------|
 | Number of Nodes sending data          | 5000  |          |
@@ -49,7 +50,11 @@ The machine requirements based on the above assumptions are listed below:
 | Opensearch DB     | 3     | 2    | 8   | 58.9 GB      | m5.large         |
 | Bastion Machine   | 1     | 2    | 8   | 150 GB       | m5.large         |
 
-The configuration is based on the assumptions listed above. Using the sample calculation given [here](/calculator/automate_ha_hardware_calculator.xlsx), you can calculate it based on the actual estimate.
+{{< note >}}
+
+Click [here](/calculator/automate_ha_hardware_calculator.xlsx) to calculate the actual estimate of the configuration using the sample calculator.
+
+{{< /note >}}
 
 {{< note >}}
 
