@@ -128,31 +128,31 @@ In case Automate is configured to ingest an extensive compliance report of size 
 
 ### Generate Report
 
-Clicking the **Download JSON** or **Download CSV** buttons will trigger the report generation process. A notification pops up to confirm that the generation has started.
+- Select **Download JSON** or **Download CSV** buttons to trigger the report generation process. A notification pops up to confirm that the generation has started.
 
 ![Notification upon Download request submitted](/images/automate/lcr-acknowledgement.png)
 
-The report's status can always be viewed by clicking the **Open Report** link.
+- Select **Open Report** link to view the report status.
 
 ![Report Status Link](/images/automate/lcr-request-view.png)
 
-The report's status shows the generation and processing status of the Reports on a sidebar.
+- The report's status shows the generation and processing status of the Reports on a sidebar.
 
 ![Report Generation Status Check Panel](/images/automate/lcr-request-view-panel.png)
 
-A popup notification is produced to users when a requested report is generated to make them aware of the report generation status.
+- A popup notification is produced when a requested report is generated to make you aware about the report generation status.
 
 ![Report Generation Completed Successfully and Ready for Download](/images/automate/lcr-report-ready.png)
 
 ### Download Report
 
-A generated report can be downloaded any time from the Status sidebar by clicking the corresponding link on the sidebar.
+Select the corresponding link on the status sidebar to download the genrated report.
 
 ![Report Download](/images/automate/lcr-report-download.png)
 
 ## Compliance Status and Report Metadata
 
-The _Compliance Status and Report Metadata_ bars are directly beneath the search bar. Expand the `Report Metadata` information by selecting the compliance status bar. The report metadata summarizes the nodes, report date, duration, status, number of platforms, number of environments, and number of profiles used in your scan.
+The _Compliance Status and Report Metadata_ bars are directly beneath the search bar. Select the compliance status bar to expand the `Report Metadata` information. The report metadata summarizes the nodes, report date, duration, status, number of platforms, number of environments, and number of profiles used in your scan.
 
 ![Reports Metadata](/images/automate/reports-metadata.png)
 
