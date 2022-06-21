@@ -12,7 +12,7 @@ gh_repo = "automate"
     weight = 220
 +++
  
-## Upgrading with FileSystem Backup
+## Upgrading with FileSystem Backup locally
 
 Here we expect both the versions of Standalone Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version 4.x.
 
@@ -39,11 +39,37 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
 6. Restore in Chef-Automate HA using this command:
     ```bash
      automate_version_number=4.0.91 ## please change this based on the version of Chef Automate running.
-    
      chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
     ```
-7. Upack the `.abb` file on all the Frontend nodes: \
-  Login to Each Frontend Node and then run after copying the `.abb` file.
+7. Upack the `bootstrap.abb` file on all the Frontend nodes: \
+  Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
     ```bash
      chef-automate bootstrap bundle unpack bootstrap.abb
     ```
+
+## Upgrading with FileSystem Backup via file mount
+
+Here we expect both the versions of Standalone Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version 4.x.
+
+1. Create Backup of Chef Automate Standalone using command:
+    ```bash
+     chef-automate backup create
+     chef-automate bootstrap bundle create bootstrap.abb
+    ```
+  -   First command will create the backup at the file mount location mention in the `config.toml`
+  -   Second command will create the `bootstrap.abb` 
+
+2. Mount the same file system to the Automate-HA all the nodes:
+  - Make sure that it should have permission for hab user
+
+3. Run the restore command in one of the chef-automate node in Chef-Automate HA cluster using below steps:
+    ```bash
+     chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
+    ```
+4. Transfer `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
+
+5. Upack the `bootstrap.abb` file on all the Frontend nodes: \
+  Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
+    ```bash
+     chef-automate bootstrap bundle unpack bootstrap.abb
+    ```    
