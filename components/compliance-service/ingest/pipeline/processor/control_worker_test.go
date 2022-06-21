@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+var expectedGenericError = "failed to unmarshal control-workflow parameters: error in fetching parameters"
+
 func TestOnStart(t *testing.T) {
 	tests := []struct {
 		name                  string
@@ -32,7 +34,7 @@ func TestOnStart(t *testing.T) {
 			isEnqueueFailure:      false,
 			isFailedExpected:      true,
 			isContinueExpected:    false,
-			expectedError:         "failed to unmarshal control-workflow parameters: error in fetching parameters",
+			expectedError:         expectedGenericError,
 		},
 		{
 			name:                  "testOnStart_Enqueue_Fail",
@@ -302,7 +304,7 @@ func TestOnTaskComplete(t *testing.T) {
 			isTaskError:         true,
 			isRetryTest:         true,
 			isParameterFailure:  true,
-			expectedError:       "failed to unmarshal control-workflow parameters: error in fetching parameters",
+			expectedError:       expectedGenericError,
 		},
 		{
 			name:                "testOnTaskComplete_RetriesLeft_GetParameter_Fail",
@@ -315,7 +317,7 @@ func TestOnTaskComplete(t *testing.T) {
 			isTaskError:         true,
 			isRetryTest:         true,
 			isParameterFailure:  true,
-			expectedError:       "failed to unmarshal control-workflow parameters: error in fetching parameters",
+			expectedError:       expectedGenericError,
 		},
 		{
 			name:                "testOnTaskComplete_RetriesLeft_EnqueueFail",
@@ -340,18 +342,11 @@ func TestOnTaskComplete(t *testing.T) {
 				t:           t,
 				isRetryTest: tc.isRetryTest,
 			}
-			if tc.isGetPayloadFailure {
-				workflowInstance.failGetPayload = true
-			}
-			if tc.isRetriesLeft {
-				workflowInstance.isRetriesLeft = true
-			}
-			if tc.isEnqueueFailure {
-				workflowInstance.failEnqueueTask = true
-			}
-			if tc.isParameterFailure {
-				workflowInstance.failGetParameters = true
-			}
+			workflowInstance.failGetPayload = tc.isGetPayloadFailure
+			workflowInstance.isRetriesLeft = tc.isRetriesLeft
+			workflowInstance.failEnqueueTask = tc.isEnqueueFailure
+			workflowInstance.failGetParameters = tc.isParameterFailure
+
 			result := workFlow.OnTaskComplete(workflowInstance, cereal.TaskCompleteEvent{
 				Result: &TaskResult{
 					isError: tc.isTaskError,
@@ -367,4 +362,8 @@ func TestOnTaskComplete(t *testing.T) {
 			}
 		})
 	}
+}
+
+func setWorkflowParameters(isGetPayloadFailure bool, isRetriesLeft bool, isEnqueueFailure bool, isParameterFailure bool) {
+
 }
