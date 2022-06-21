@@ -11,6 +11,15 @@ gh_repo = "automate"
     identifier = "automate/deploy_high_availability/ha_upgrade_introduction.md Upgrade HA"
     weight = 70
 +++
+Upgrade will also check for new version of bashtion workspace, if new version is available, it will promt for a confirmation for workspace upgrade before upgrading, 
+
+In case of yes, it will do workspace upgrade and no will skip this.
+
+you can also pass a flag in upgade command to avoid promt. 
+
+``` 
+--workspace-upgrade yes/no 
+```
 
 Steps to upgrade the Chef Automate HA are as shown below:
 
@@ -38,5 +47,10 @@ Steps to upgrade the Chef Automate HA are as shown below:
   chef-automate upgrade run --airgap-bundle latest.aib
   ```
   BackEnd upgrades take time to restart.
+
+  to skip user confirmation promt in upgrade pass a flag
+  ```
+  --auto-approve
+  ```
 
 
