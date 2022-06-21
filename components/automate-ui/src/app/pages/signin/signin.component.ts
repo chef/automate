@@ -37,19 +37,7 @@ export class SigninComponent implements OnInit, OnDestroy {
     this.callbackService.callback(this.searchParams)
     .pipe(takeUntil(this.destroyed$))
     .subscribe((res) => {
-      const state: string = res.state;
-      this.idToken = res.id_token;
-      if (state === '' || this.idToken === '') {
-        this.error = true;
-        return;
-      }
-      this.id = Jwt.parseIDToken(this.idToken);
-      if (this.id === null) {
-        this.error = true;
-        return;
-      }
-      this.path = this.pathFromState(state);
-
+      this.setIdAndPath(res.id_token, res.state);
       this.error = false;
       this.setSession();
       localStorage.setItem('manual-upgrade-banner', 'true');
@@ -68,9 +56,18 @@ export class SigninComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
-  deleteIdTokenFromCookie(token: string): void {
-    // Expire id_token cookie once it's set in localStorage
-    document.cookie = `id_token=${token}; Path=/; Expires=${new Date().toUTCString()};`;
+  setIdAndPath(idToken: string, state: string): void {
+    this.idToken = idToken;
+    this.path = this.pathFromState(state);
+    if (state === '' || this.idToken === '') {
+      this.error = true;
+      return;
+    }
+    this.id = Jwt.parseIDToken(this.idToken);
+    if (this.id === null) {
+      this.error = true;
+      return;
+    }
   }
 
   setSession(): void {
@@ -100,14 +97,5 @@ export class SigninComponent implements OnInit, OnDestroy {
       }
     }
     return path;
-  }
-
-  idTokenAndStateFromCookieAndFragment(fragment: string): [string | null, string | null] {
-    // Note: we only get an ID token and state now, so we match from ^ to $
-    const state_match = fragment.match('^state=([^&]*)$');
-    const id_token_match = `; ${document.cookie}`.match(';\\s*id_token=([^;]+)');
-    const id_token = id_token_match ? id_token_match[1] : null;
-    const state = state_match ? state_match[1] : null;
-    return [id_token, state];
   }
 }
