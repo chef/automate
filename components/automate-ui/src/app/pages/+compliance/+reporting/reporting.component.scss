@@ -32,6 +32,25 @@ chef-subheading {
 
     .dropdown {
       right: 0;
+      z-index: 1;
+
+      .menu-list {
+        padding-left: 0px;
+        width: 140px;
+
+        li {
+          list-style-type: none;
+          font-size: 14px;
+          padding: 10px 10px 10px 10px;
+          color: $chef-primary-bright;
+        }
+
+        li:hover {
+          background: rgba($chef-primary-bright, 0.2);
+          cursor: pointer;
+          outline: 0;
+        }
+      }
     }
   }
 
@@ -258,4 +277,83 @@ chef-subheading {
 
 #download-modal {
   text-align: center;
+}
+
+.reporting-download-side-panel {
+
+  z-index: 10;
+
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background: $chef-white;
+    border-bottom: 1px solid $chef-grey;
+
+    .header-text {
+      margin: 0 1em;
+      flex-grow: 1;
+      word-break: break-all;
+    }
+  }
+
+  .side-panel-body {
+    font-size: 14px;
+    background: $chef-white;
+
+    chef-tooltip {
+      width: 400px;
+      border: 1px solid $chef-grey;
+    }
+
+    chef-tooltip.top {
+      transform: translate(-65%, calc(-100% - .75em));
+    }
+
+    chef-tooltip::after {
+      border-bottom: 1px solid $chef-grey;
+      border-right: 1px solid $chef-grey;
+      transform: translateX(275%) translateY(-50%) rotate(45deg);
+    }
+
+    .table {
+      width: 100%;
+    }
+
+    .table-header {
+      font-size: 16px;
+    }
+
+    .failed-status {
+      color: $status-error;
+    }
+
+    .running-status {
+      color: $chef-dark-grey;
+    }
+
+    .success-status {
+      color: $chef-primary-bright;
+    }
+
+    .error-message {
+      white-space: nowrap;
+      max-width: 30px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    .no-reports-message {
+      text-align: center;
+      border-bottom: 5px solid $chef-white;
+    }
+
+    .download-link {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
 }

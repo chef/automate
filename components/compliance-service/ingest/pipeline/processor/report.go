@@ -15,15 +15,17 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
+	"github.com/chef/automate/lib/stringutils"
 )
 
-func ComplianceReport(notifierClient notifier.Notifier, automateURL string) message.CompliancePipe {
+func ComplianceReport(notifierClient notifier.Notifier, automateURL string, enableLargeReporting bool) message.CompliancePipe {
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
-		return complianceReport(in, notifierClient, automateURL)
+		return complianceReport(in, notifierClient, automateURL, enableLargeReporting)
 	}
 }
 
-func complianceReport(in <-chan message.Compliance, notifierClient notifier.Notifier, automateURL string) <-chan message.Compliance {
+func complianceReport(in <-chan message.Compliance, notifierClient notifier.Notifier, automateURL string,
+	enableLargeReporting bool) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
@@ -53,7 +55,7 @@ func complianceReport(in <-chan message.Compliance, notifierClient notifier.Noti
 				Roles:            msg.Report.Roles,
 				Recipes:          msg.Report.Recipes,
 				ControlsSums:     *msg.Shared.AllProfileSums,
-				Profiles:         compliance.ReportProfilesFromInSpecProfiles(msg.Report.Profiles, msg.Shared.PerProfileSums),
+				Profiles:         compliance.ReportProfilesFromInSpecProfiles(msg.Report.Profiles, msg.Shared.PerProfileSums, enableLargeReporting),
 				Status:           msg.Shared.Status,
 				StatusMessage:    msg.Shared.StatusMessage,
 				InSpecVersion:    msg.Report.Version,
@@ -78,7 +80,7 @@ func complianceReport(in <-chan message.Compliance, notifierClient notifier.Noti
 			msg.InspecReport.Platform.Name = msg.Report.GetPlatform().GetName()
 			msg.InspecReport.Platform.Release = msg.Report.GetPlatform().GetRelease()
 			msg.InspecReport.Statistics.Duration = msg.Report.GetStatistics().GetDuration()
-			msg.InspecReport.Platform.Full = fmt.Sprintf("%s %s",
+			msg.InspecReport.Platform.Full = stringutils.GetFullPlatformName(
 				msg.InspecReport.Platform.Name, msg.InspecReport.Platform.Release)
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processed Compliance Report")
 			message.Propagate(out, &msg)

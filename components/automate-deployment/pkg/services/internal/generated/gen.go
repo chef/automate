@@ -269,6 +269,16 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/report-manager-service",
+      "metadata": {
+        "name": "chef/report-manager-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/user-settings-service",
       "metadata": {
         "name": "chef/user-settings-service",
@@ -627,6 +637,7 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-cds",
         "chef/automate-opensearch",
+        "chef/report-manager-service",
         "chef/user-settings-service"
       ],
       "packages": null,

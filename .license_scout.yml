@@ -119,6 +119,15 @@ fallbacks:
     - name: golang.org/x/net
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
+    - name: github.com/DATA-DOG/go-sqlmock
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/DATA-DOG/go-sqlmock/master/LICENSE
+    - name: github.com/dustin/go-humanize
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/dustin/go-humanize/master/LICENSE
+    - name: github.com/sirupsen/logrus
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/sirupsen/logrus/master/LICENSE
     - name: golang.org/x/sys
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE

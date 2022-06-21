@@ -6,9 +6,14 @@ import { SuggestionsService } from './suggestions.service';
 import { StatsService } from './stats.service';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 import * as moment from 'moment/moment';
 
 const COMPLIANCE_URL = environment.compliance_url;
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('SuggestionsService', () => {
   let httpTestingController: HttpTestingController;
@@ -22,6 +27,7 @@ describe('SuggestionsService', () => {
         HttpClientTestingModule
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         SuggestionsService,
         StatsService
       ]

@@ -13,6 +13,11 @@ import { StatsService, ReportQueryService,
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of as observableOf } from 'rxjs';
 import * as moment from 'moment/moment';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ReportingProfileComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -31,6 +36,7 @@ describe('ReportingProfileComponent', () => {
       ],
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },
+        { provide: TelemetryService, useClass: MockTelemetryService },
         StatsService,
         ReportQueryService,
         ScanResultsService,
