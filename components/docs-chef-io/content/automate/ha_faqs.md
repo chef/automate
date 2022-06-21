@@ -47,6 +47,22 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 ### How to Pass the custom config for the Frontend node (Automate / ChefInfraServer)?
 - Create a file with say `customconfig.toml`, pass the absolute path `config_file=/ABSOLUTE_PATH/customconfig.toml`
 
+### How to Add more nodes In AWS Deployment, post deployment. 
+- Move `/hab/a2_deploy_workspace/terraform/aws.auto.tfvars` to `/hab/a2_deploy_workspace/terraform/destroy/aws/`
+- Modify `/hab/a2_deploy_workspace/terraform/.tf_arch` from `deployment` to `aws`
+- Modify the `instance_count` in config.toml
+- Run the Provision command (This will create or destroy the resources):
+  ``` bash 
+  chef-automate provision-infra config.toml --airgap-bundle <BUNDLE_NAME>
+  ```
+  
+- Redeploy the cluster
+  ``` bash
+  chef-automate deploy config.toml --airgap-bundle <BUNDLE_NAME>
+  ```
+{{< note >}}
+  Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
+{{< /note >}}  
 ### How to check logs while doing backup or restore?
 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
