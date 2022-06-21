@@ -221,8 +221,8 @@
                 </chef-td>
               </chef-tr>
               <div class="control-detail" *ngIf="!isError && isOpenControl(control)">
-                <chef-loading-spinner *ngIf="controlDetailsLoading" size="50"></chef-loading-spinner>
-                <div *ngIf="!controlDetailsLoading">
+                <chef-loading-spinner *ngIf="control.controlDetailsLoading" size="50"></chef-loading-spinner>
+                <div *ngIf="!control.controlDetailsLoading">
                   <p *ngIf="control.desc">{{ control.desc }}</p>
                   <chef-toggle [value]="openControls[control.id]?.pane"
                     (change)="showControlPane(control, $event.target.value)">
@@ -241,7 +241,7 @@
                         </dl>
                       </div>
                       <!-- show results of control even if waived -->
-                      <div class="result-item" *ngFor="let result of control.results ">
+                      <div class="result-item" *ngFor="let result of control.result ">
                         <div class="result-item-header">
                           <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}
                           </chef-icon>
@@ -252,7 +252,7 @@
                         </div>
                       </div>
                       <!-- display message when there are no results -->
-                      <div class="result-item" *ngIf="control.results.length === 0">
+                      <div class="result-item" *ngIf="control.result.length === 0">
                         <div class="result-item-header">
                           <p>No tests were executed</p>
                         </div>

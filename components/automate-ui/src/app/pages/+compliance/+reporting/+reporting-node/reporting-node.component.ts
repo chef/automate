@@ -96,13 +96,13 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([detailsStatusSt, detailsListState]) => {
       if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)) {
-        this.controlDetailsLoading = false;
+        this.controlList.control_elements[this.index].controlDetailsLoading = false;
         this.isError = false;
         this.controlDetails = detailsListState;
         const res = this.controlDetails['profiles'][0].controls[0].results;
         const code = this.controlDetails['profiles'][0].controls[0].code;
         const desc = this.controlDetails['profiles'][0].controls[0].desc;
-        this.controlList.control_elements[this.index].results = res;
+        this.controlList.control_elements[this.index].result = res;
         this.controlList.control_elements[this.index].code = code;
         this.controlList.control_elements[this.index].desc = desc;
       } else if (detailsStatusSt === EntityStatus.loadingFailure) {
@@ -193,7 +193,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   toggleControl(i: number, ctrl: any) {
     const control = ctrl;
     this.index = i;
-    this.controlDetailsLoading = true;
+    this.controlList.control_elements[this.index].controlDetailsLoading = false;
     const state = this.openControls[control.id];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
@@ -217,12 +217,12 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
           data.profiles.forEach(p => {
             p.controls.forEach(c => {
               if (c.id === control.id) {
-                this.controlDetailsLoading = false;
+                this.controlList.control_elements[this.index].controlDetailsLoading = false;
                 this.controlDetails = data;
                 const res = this.controlDetails['profiles'][0].controls[0].results;
                 const code = this.controlDetails['profiles'][0].controls[0].code;
                 const desc = this.controlDetails['profiles'][0].controls[0].desc;
-                this.controlList.control_elements[this.index].results = res;
+                this.controlList.control_elements[this.index].result = res;
                 this.controlList.control_elements[this.index].code = code;
                 this.controlList.control_elements[this.index].desc = desc;
               }
@@ -230,6 +230,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
           });
         });
       }
+    } else {
+      this.controlList.control_elements[this.index].controlDetailsLoading = false;
     }
   }
 
