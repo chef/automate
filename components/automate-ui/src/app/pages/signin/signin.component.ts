@@ -4,7 +4,7 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import { IDToken, Jwt } from 'app/helpers/jwt/jwt';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { CallbackService } from 'app/services/signin/signin.service';
+import { SigninService } from 'app/services/signin/signin.service';
 
 
 @Component({
@@ -23,7 +23,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private session: ChefSessionService,
-    private callbackService: CallbackService,
+    private signinService: SigninService,
     private route: ActivatedRoute
   ) {
     this.route.queryParams
@@ -34,7 +34,7 @@ export class SigninComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.callbackService.callback(this.searchParams)
+    this.signinService.callback(this.searchParams)
     .pipe(takeUntil(this.destroyed$))
     .subscribe((res) => {
       this.error = this.setIdAndPath(res.id_token, res.state);

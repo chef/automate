@@ -1,4 +1,6 @@
 import { IDToken } from 'app/helpers/jwt/jwt';
+import { Params } from '@angular/router';
+import { Observable, of } from 'rxjs';
 
 export class MockChefSessionService {
   fullname = 'Test Mock';
@@ -39,4 +41,15 @@ export class MockChefSessionServiceEnabledUndefined {
   public logout(): void {}
   public setSession(): void {}
   public deleteSession(): void {}
+}
+
+interface CallbackResponse {
+  state: string;
+  id_token: string;
+}
+export class MockSigninService {
+  callback(params: Params): Observable<CallbackResponse> {
+    console.log(params); 
+    return of<CallbackResponse>();
+  }
 }

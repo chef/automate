@@ -10,7 +10,7 @@ interface CallbackResponse {
 }
 
 @Injectable()
-export class CallbackService {
+export class SigninService {
 
   constructor(private httpClient: HttpClient) {}
 
