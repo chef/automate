@@ -110,10 +110,8 @@ This will require downtime, so plan accordingly. A reduced performance should be
 {{< note >}}
 
 - Need to setup your workstation based on newly created Autoamte-HA's chef-server. Only needed if you have setup the workstation earlier. 
-
 - This inplace migration works only when cookbook are stored at database. This do not support use-case, where cookbooks are stored at filesystem. 
-
-- Take the backup of the system, in case of 
+- Take the backup of the system to avoid the data loss.
 {{< /note >}}
 
 1. ssh to all the backend nodes of chef-backend and run 
