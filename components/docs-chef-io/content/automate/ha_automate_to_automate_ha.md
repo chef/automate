@@ -71,7 +71,9 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
   -   First command will create the backup at the file mount location mention in the `config.toml`
   -   Second command will create the `bootstrap.abb` 
 
-2. Mount the same file system to the Automate-HA all the nodes:
+2. Detach the File system from Standlalone Chef-Automate. 
+
+3. Attach and Mount the same file system to the Automate-HA all the nodes:
   - Make sure that it should have permission for hab user
 
 3. Stop all the service's at frontend nodes in Automate HA Cluster.
@@ -80,15 +82,17 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
       sudo chef-automate stop
     ``` 
 
-4. Run the restore command in one of the chef-automate node in Chef-Automate HA cluster using below steps:
+4. Please Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`
+
+5. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster :
     ```bash
      chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
-4. Transfer `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
+4. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
-5. Upack the `bootstrap.abb` file on all the Frontend nodes: \
-  Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
+5. Upack the `bootstrap.abb` file on all the Frontend nodes.
+   ssh to Each Frontend Node and then run below command
     ```bash
      chef-automate bootstrap bundle unpack bootstrap.abb
     ```

@@ -16,8 +16,26 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ## Issues and Solutions
 
+### Post Automate HA deployment, if chef-server service is in critical state.
+- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
+  if gettign an 500 internal server error with data-collector endpoint, it means that
+  Chef Infra Server not able to communicate to the Chef Automate data-collector endpoint
+  
+  ssh to the Automate HA Chef Infra Server, and get token and automate-lb-url from the config.
+  run `chef-automate config show` go get the config.
+  
+```cmd
+  export endpoint="AUTOMATE LB URL"
+  export token="GET_THIS_TOKEN_FROM_CHEF_SERVER_CONFIG"
+  curl -H "api-token:$token" https://$endpoint/api/v0/events/data-collector -k
+```
+
+To make the service health, make sure that chef server able to curl the data collector endpoint from chef server node.
+
 ### Deployment doesn't exit Gracefully
-- There are some 
+- There are some cases in which deployment doesn't exited successfully.
+
+
 ### Issue: Database Accessed by Other Users
 
 The restore command fails when other users or services access the nodes' databases. This happens when restore service tries to drop the database when some services are still running and are referring to database.
