@@ -21,8 +21,9 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
      chef-automate backup create
      chef-automate bootstrap bundle create bootstrap.abb
     ```
-  -   The First command will create the backup to the `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml`
-  -   Second command will create the `bootstrap.abb` 
+  - The First command will create the backup to the `/var/opt/chef-automate/backup` location unless you specify the location in `config.toml`
+  - Second command will create the `bootstrap.abb` 
+  - Once the backup is completed successfully, please save the backup Id. Example : `20210622065515`
 
 2. Create Bundle using this command:
     ```bash
@@ -68,8 +69,9 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
      chef-automate backup create
      chef-automate bootstrap bundle create bootstrap.abb
     ```
-  -   First command will create the backup at the file mount location mention in the `config.toml`
-  -   Second command will create the `bootstrap.abb` 
+  - First command will create the backup at the file mount location mention in the `config.toml`
+  - Second command will create the `bootstrap.abb` 
+  - Once the backup is completed successfully, please save the backup Id. Example : `20210622065515`
 
 2. Detach the File system from Standlalone Chef-Automate. 
 
@@ -97,6 +99,6 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
      chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 6. Start the Service in All the Frontend Nodes with below command.
-  ``` bash
-    sudo chef-automate start
-  ``` 
+    ``` bash
+      sudo chef-automate start
+    ``` 

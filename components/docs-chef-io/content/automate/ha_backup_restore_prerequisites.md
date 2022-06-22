@@ -14,11 +14,9 @@ gh_repo = "automate"
 +++
 
 This page explains the prerequisites of the backup.
-If We choose AWS Deployment Procedure to deploy Automate-HA and we have choosen the `backup_config = efs OR s3` in config.toml, in that case below  
-steps are not required. Below steps are taken care by the deployment. 
+If We choose AWS Deployment Procedure to deploy Automate-HA and we have choosen the `backup_config = efs OR s3` 
+in `config.toml`, in that case below steps are not required. Below steps are taken care by the deployment. 
 If we have kept the `backup_config` blank, in that case to need to perform the below steps. 
-
-
 
 {{< note >}} You can take backup on EFS system through DNS or IP. {{< /note >}}
 

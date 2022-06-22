@@ -13,25 +13,72 @@ gh_repo = "automate"
 +++
 
 This page includes commands that you can execute for the Chef Automate cluster part of the Chef Automate High Availability (HA) system. These commands aid you in assessing the health and status of the components part of the HA cluster. It is highly recommended to run these commands on a test cluster before using them in a production environment.
+## Automate HA Service Commands
 
-## Log Check Commands
+- Get the Automate HA cluster Information 
+```cmd
+  chef-automate info 
+```
 
-The Chef Automate frontend and backend nodes service logs are available via `journalctl` from each node. You can identify the service by the name in the generated output preceding with the logline.
+- Post Deployment, run smoke test cases on Automate HA cluster, please run the command from bation node
 
-- Execute the following command, `journalctl --follow --unit hab-sup`, to view the backend logs related to all hab services.
+```cmd
+  chef-automate test --full 
+```
 
-Where the *--unit* displays the logs from the specified unit, and *--follow* means to follow the journal.
+- Validate the cluster but skip “chef-automate diagnostic run” when performing the smoke tests
 
-- Use the *grep* command to filter the logs related to a specific service. For example, run this command `journalctl --follow --unit hab-sup | grep 'automate-ha-elasticsearch'` to view the log of the habitat component in the Chef Automate frontend node.
+```cmd
+  chef-automate test  
+```
 
-- Execute the following command, `journalctl --follow --unit chef-automate`, to view the log of the frontend (chef-automate and chef-server instances) nodes.
+- Run the smoke test on specific cluster 
+```cmd
+  chef-automate test automate
+  chef-automate test chef_server
+  chef-automate test opensearch
+  chef-automate test postgresql 
+```
 
-- Use the *grep* command to filter the logs for a single service. For example, run this command, `journactl --follow --unit chef-automate | grep ingest.service` to view the ingest logs of the Chef Automate frontend node.
 
-## Health Check Service Commands
+- To get the status of the cluster, run the command from bastion node. 
 
-- Execute the following command, `chef-automate status`, to SSH the frontend node.
+```cmd
+  chef-automate status 
+```
 
-- Execute the following command, `hab svc status`, to SSH the backend node.
+- Check the service status on frontend nodes (Automate), ssh to the frontend node.
+ ```cmd 
+  chef-automate ssh --hostname a2
+  chef-automate status
+```
 
-- Execute the following command, `hab svc status`, to verify the health of any services on a node,
+- Check the service status on frontend nodes (Chef Infra Server), ssh to the frontend node.
+ ```cmd 
+  chef-automate ssh --hostname cs
+  chef-automate status
+```
+
+- Check the service status on backend nodes (Postgres nodes), ssh to the backend node.
+ ```cmd 
+  chef-automate ssh --hostname pg
+  hab svc status
+```
+
+- Check the service status on backend nodes (Opensearch nodes), ssh to the backend node.
+```cmd 
+  chef-automate ssh --hostname os
+  hab svc status
+```
+
+- Patch a config to the Front end nodes 
+  - add the config to the location `/hab/a2_deploy_workspace/config/<automate.toml>`
+``` cmd
+  chef-automate config patch /hab/a2_deploy_workspace/config/automate.toml
+```
+
+- Collect the Gatherlogs for Automate HA cluster,run the command from bastion node.  
+    - logs are collected at `/var/tmp`
+```cmd
+  chef-automate gather-logs
+```
