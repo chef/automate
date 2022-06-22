@@ -29,7 +29,7 @@ class SignIn {
     };
     return of(data);
   }
-};
+}
 
 describe('SigninComponent', () => {
   let component: SigninComponent;
