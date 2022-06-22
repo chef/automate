@@ -54,7 +54,7 @@ type ControlWorkflowPayload struct {
 func (s *ControlWorkflow) OnStart(w cereal.WorkflowInstance,
 	ev cereal.StartEvent) cereal.Decision {
 
-	logrus.Info("In control-workflow start method")
+	logrus.Debug("In control-workflow start method")
 
 	startTime := time.Now()
 	workflowPayload := ControlWorkflowPayload{
@@ -69,7 +69,7 @@ func (s *ControlWorkflow) OnStart(w cereal.WorkflowInstance,
 		return w.Fail(err)
 	}
 
-	logrus.Infof("In On Start Method %s", workflowParams.ReportUuid)
+	logrus.Debugf("In On Start Method %s", workflowParams.ReportUuid)
 
 	workflowPayload.ReportUuid = workflowParams.ReportUuid
 	workflowPayload.RetriesLeft = workflowParams.Retries
@@ -97,13 +97,13 @@ func (s *ControlWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		return w.Fail(err)
 	}
 
-	logrus.Infof("Entered ControlWorkflow > OnTaskComplete with payload %+v", payload)
+	logrus.Debugf("Entered ControlWorkflow > OnTaskComplete with payload %+v", payload)
 
 	if err := ev.Result.Err(); err != nil {
 		//received error, if the retries are available enqueue the task
 		if payload.RetriesLeft > 0 {
 			logrus.Debugf("retring control-task %s", payload.ReportUuid)
-
+			payload.RetriesLeft--
 			workflowParams := ControlWorkflowParameters{}
 			err := w.GetParameters(&workflowParams)
 			if err != nil {
@@ -120,8 +120,6 @@ func (s *ControlWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 				logrus.WithError(err).Error()
 				return w.Fail(err)
 			}
-
-			payload.RetriesLeft--
 			return w.Continue(&payload)
 		}
 		err = errors.Wrap(err, "failed to run control-task")

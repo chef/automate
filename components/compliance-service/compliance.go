@@ -203,7 +203,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
-	err = processor.InitCerealManager(cerealManager, 2, ingesticESClient)
+	err = processor.InitCerealManager(cerealManager, conf.CerealConfig.Workers, ingesticESClient)
 	if err != nil {
 		logrus.Fatalf("failed to initiate cereal manager: %v", err)
 	}
@@ -654,6 +654,14 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		err := cerealManager.Stop()
+		if err != nil {
+			logrus.WithError(err).Error("could not stop cereal manager")
+		}
+	}()
+
 	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, cerealManager) // nolint: errcheck
 
 	cfg := NewServiceConfig(&conf, connFactory)
