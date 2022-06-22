@@ -854,20 +854,21 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	return map[string]interface{}{"projects": esProjectCollection}
 }
 
-func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInSpecReport) (*relaxting.ESInSpecReport, error) {
+func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInSpecReport, index string) (*relaxting.ESInSpecReport, error) {
 	logrus.Debug("Fetching project by UUID")
 	var item relaxting.ESInSpecReport
-	var YYYYMMDD = "2006.01.02"
-	now := time.Now()
-	index := "comp-7-r-" + now.Format(YYYYMMDD)
 
-	termQuery := elastic.NewTermQuery("report_uuid", data.ReportID)
+	boolQuery := elastic.NewBoolQuery()
+	mustQueries := make([]elastic.Query, 0)
+	mustQueries = append(mustQueries, elastic.NewMatchQuery("report_uuid", data.ReportID))
+	boolQuery.Must(mustQueries...)
 
 	searchResult, err := backend.client.Search().
-		Index(index).     // search in index
-		Query(termQuery). // specify the query
-		Pretty(true).     // pretty print request and response JSON
-		Do(ctx)           // execute
+		Index("comp-7-r-2022.06.22").
+		Type("_search").
+		Query(boolQuery).
+		Do(context.Background())
+
 	if err != nil {
 		switch {
 		case elastic.IsNotFound(err):
@@ -885,6 +886,8 @@ func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInS
 		}
 	}
 
+	logrus.Printf("Query: %+v", boolQuery)
+	logrus.Printf("Search Result: %+v", searchResult)
 	if searchResult.TotalHits() > 0 {
 		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 

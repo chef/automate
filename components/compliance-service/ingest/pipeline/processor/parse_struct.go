@@ -2,6 +2,8 @@ package processor
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
@@ -36,14 +38,27 @@ type Profile struct {
 	ProfileID string `json:"profile_id"`
 }
 
-func ParseReportCtrlStruct(client *ingestic.ESClient, data *relaxting.ESInSpecReport) ([]Control, error) {
+func ParseReportCtrlStruct(client *ingestic.ESClient, data *relaxting.ESInSpecReport, index string) ([]Control, error) {
 	var controls []Control
-	inspecReport, err := client.GetDocByUUID(context.Background(), data)
+	inspecReport, err := client.GetDocByUUID(context.Background(), data, index)
 	if err != nil {
 		logrus.Errorf("cannnot find inspec report: %v", err)
 		return nil, err
 	}
-             
+
+	xb, _ := json.MarshalIndent(inspecReport, "", "    ")
+	ioutil.WriteFile("abc.json", xb, 0777)
+
+	controls, err = MapStructs(inspecReport)
+	if err != nil {
+		return nil, err
+	}
+	return controls, err
+}
+
+func MapStructs(inspecReport *relaxting.ESInSpecReport) ([]Control, error) {
+	var controls []Control
+
 	// Get the nodes
 	node := Node{}
 	node.NodeUUID = inspecReport.NodeID
@@ -70,5 +85,5 @@ func ParseReportCtrlStruct(client *ingestic.ESClient, data *relaxting.ESInSpecRe
 			controls = append(controls, ctrl)
 		}
 	}
-	return controls, err
+	return controls, nil
 }
