@@ -43,7 +43,7 @@ func ParseReportCtrlStruct(client *ingestic.ESClient, data *relaxting.ESInSpecRe
 		logrus.Errorf("cannnot find inspec report: %v", err)
 		return nil, err
 	}
-
+             
 	// Get the nodes
 	node := Node{}
 	node.NodeUUID = inspecReport.NodeID
