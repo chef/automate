@@ -20,7 +20,7 @@ service ReportManagerService {
 	reportmanager:requests:list
 	```
 	*/
-    rpc ListDownloadReportRequests(google.protobuf.Empty) returns (ListDownloadReportRequestsResponse) {
+	rpc ListDownloadReportRequests(google.protobuf.Empty) returns (ListDownloadReportRequestsResponse) {
 		option (google.api.http) = {
 			get: "/api/v0/reportmanager/requests"
 		};
@@ -29,7 +29,7 @@ service ReportManagerService {
 			action: "reportmanager:requests:list"
 		};
 	};
-
+	
 	rpc ExportFromReportManager(ExportFromReportManagerRequest) returns (stream chef.automate.api.common.ExportData) {};
 }
 
