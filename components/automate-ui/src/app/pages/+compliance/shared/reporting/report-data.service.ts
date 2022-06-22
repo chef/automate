@@ -116,7 +116,7 @@ export class ReportDataService {
         if (profileFilterStatus === 'all') {
           status = 'total';
         } else {
-          status = profileFilterStatus;
+          status = 'total_' + profileFilterStatus;
         }
         this.profilesList = Object.assign({}, this.profilesList, data);
         if (status in this.profilesList) {
