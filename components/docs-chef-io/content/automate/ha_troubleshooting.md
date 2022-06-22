@@ -14,26 +14,10 @@ gh_repo = "automate"
 
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) functionality and the steps to resolve them.
 
-## Frequently Asked Questions
-
-### How to check logs while doing backup or restore?
-
-Set *log-level* debug using the `chef-automate debug set-log-level deployment-service debug` command, and execute the *journalctl* `journalctl --follow --unit chef-automate` command.
-
-### How to perform infrastructure cleanup for on-premises nodes
-
-To perform cleanup on the instances and nodes of the deployed Chef Automate HA infrastructure(Automate, Server, three instances of Postgres, three instances of OpenSearch), execute the following command:
-
-```bash
-rm -rf /hab
-cd /var/tmp && rm -f frontend-* && rm -f backend-*
-sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}')
-```
-
-Run `rm -rf /hab` on Bastion node.
-
 ## Issues and Solutions
 
+### Deployment doesn't exit Gracefully
+- There are some 
 ### Issue: Database Accessed by Other Users
 
 The restore command fails when other users or services access the nodes' databases. This happens when restore service tries to drop the database when some services are still running and are referring to database.
@@ -43,8 +27,6 @@ The restore command fails when other users or services access the nodes' databas
 #### Solution
 
 - Stop the frontend and backend services.
-
-- Step the *datadog* agent.
 
 - Perform the following steps on all frontend and backend nodes:
 
@@ -59,7 +41,7 @@ The cached artifact does not exist in offline mode. This issue occurs in an air 
 
 #### Solution
 
-Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-20210908093242.aib*.
+Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-4.x.y.aib*.
 
 ##### Command Example
 

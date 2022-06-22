@@ -29,11 +29,6 @@ Steps to upgrade the Chef Automate HA are as shown below:
   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
   ```
 
-- To upgrade full Chef Automate HA System run this command from Bation Host: 
-  ```bash
-  chef-automate upgrade run --airgap-bundle latest.aib
-  ```
-
 - If we want to only upgrade FrontEnd Services i.e. Chef Automate and Chef Infra Server.
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends
@@ -43,13 +38,20 @@ Steps to upgrade the Chef Automate HA are as shown below:
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends
   ```
+
+- To upgrade full Chef Automate HA System run this command from Bation Host: 
+  ```bash
+  chef-automate upgrade run --airgap-bundle latest.aib
+  ```
+
+
 {{< note >}}
 
   - BackEnd upgrades will restart the backend service, which take time for cluster to be in health state.
-
+  - Upgrade command, currently only supports minor upgrade.  
 {{< /note >}}
 
-- To skip user confirmation promt in upgrade, you can pass a flag
+- To skip user confirmation prompt in upgrade, you can pass a flag
   ```bash 
     chef-automate upgrade run --airgap-bundle latest.aib --auto-approve
     OR 

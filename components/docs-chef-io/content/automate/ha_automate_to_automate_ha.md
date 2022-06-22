@@ -59,7 +59,7 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
      sudo chef-automate start
     ``` 
 
-## Upgrading with FileSystem Backup via file mount
+## Upgrading with FileSystem Backup via volume mount
 
 Here we expect both the versions of Standalone Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version 4.x.
 

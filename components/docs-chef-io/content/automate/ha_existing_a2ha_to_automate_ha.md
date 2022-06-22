@@ -25,30 +25,34 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
     sudo chef-automate backup create
     sudo chef-automate bootstrap bundle create bootstrap.abb
   ```
-  - First command will take the backup at mount file system. you can find the backup_config value from the file `/hab/a2_deploy_workspace/a2ha.rb`
+  - First command will take the backup at mount file system. you can get the mount path from the file `/hab/a2_deploy_workspace/a2ha.rb`
   - Second command will create the bootstrap bundle, which we need to copy all the frontend nodes of Automate HA cluster. 
+  - Once the backup is completed successfully, please save the backup Id. Example : `20210622065515`
+2. Detach the File system from old A2HA cluster. 
 
-2. Mount the same file system to Automate HA frontend and backend nodes.
+3. Attach and Mount the same file system to Automate HA frontend and backend nodes at the location mention in the `config.toml` at field `backup_mount` 
 
-3. Stop all the service's at frontend nodes in Automate HA Cluster.
+4. Stop all the service's at frontend nodes in Automate HA Cluster.
   - Run the below command to all the Automate and Chef Infra Server nodes
   ``` bash
     sudo chef-automate stop
   ``` 
 
-4. To restore the A2HA backup on Chef Automate HA, run the following command from any chef-automate instance of Chef Automate HA:
+5. Please Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`
+
+6. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of Chef Automate HA cluster:
 
   ```cmd
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
   ```
 
-5. Copy the `bootstrap.abb` bundle to all the Frontend nodes of Chef Automate HA. Unpack the bundle using below command on all the Frondend nodes.
+7. Copy the `bootstrap.abb` bundle to all the Frontend nodes of Chef Automate HA cluster. Unpack the bundle using below command on all the Frondend nodes.
  
   ```cmd
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
   ```
 
-6. Start the Service in All the Frontend Nodes with below command.
+8. Start the Service in all the frontend nodes with below command.
   ``` bash
     sudo chef-automate start
   ``` 
