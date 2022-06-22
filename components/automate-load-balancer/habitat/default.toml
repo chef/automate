@@ -45,3 +45,4 @@ ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-E
 ssl_protocols = "TLSv1.2 TLSv1.3"
 tcp_nopush = "on"
 tcp_nodelay = "on"
+enable_csp_header = false

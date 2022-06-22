@@ -13,6 +13,7 @@ import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies } from 'app/entities/policies/policy.selectors';
 import { ResourceCheckedSection } from 'app/components/resource-dropdown/resource-dropdown.component';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 const INGEST_POLICY_ID = 'ingest-access';
 
@@ -113,7 +114,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event)) {
+    if (!this.modifyID && !Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.createForm.controls.id.setValue(
         IdMapper.transform(this.createForm.controls.name.value.trim()));
@@ -121,7 +122,7 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   handleIDInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -136,7 +137,4 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
     this.createClicked.emit();
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }

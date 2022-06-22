@@ -1,5 +1,6 @@
 @import "~styles/variables";
 @import 'app/page-components/json-tree/json-tree.component.scss';
+@import '../infra_shared/shared';
 
 chef-page-header {
   padding-bottom: 0;
@@ -59,7 +60,7 @@ chef-table {
   }
 
   .header-color {
-    background-color: #FFFFFF;
+    background-color: $chef-white;
   }
 
   .no-border-th {
@@ -167,7 +168,7 @@ img {
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.5px;
-  color: #000000;
+  color: $chef-black;
 }
 
 .constraint {
@@ -189,8 +190,8 @@ img {
 .constraint-table {
   margin-top: 15px;
   margin-left: 28px;
-  background: #FFFFFF;
-  border: 1.8px solid #CFD2D2;
+  background: $chef-white;
+  border: 1px solid $chef-key-tab;
   box-sizing: border-box;
   border-radius: 2px;
 
@@ -204,22 +205,10 @@ img {
   margin-left: 28px;
   margin-right: 33px;
   margin-top: 16px;
-  background: #FFFFFF;
-  border: 1.8px solid #CFD2D2;
+  background: $chef-white;
+  border: 1px solid $chef-key-tab;
   box-sizing: border-box;
   border-radius: 2px;
-}
-
-.action {
-  float: right;
-  margin-right: 32px;
-  border: none;
-  background-color: white;
-
-  img {
-    width: 47px;
-    height: 20px;
-  }
 }
 
 .json-container {
@@ -227,8 +216,7 @@ img {
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.5px;
-  text-transform: capitalize;
-  color: #000000;
+  color: $chef-black;
 }
 
 .scroll {
@@ -254,8 +242,11 @@ img {
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.5px;
-  text-transform: capitalize;
-  color: #000000;
+  color: $chef-black;
+}
+
+.edit {
+  overflow: auto;
 }
 
 .divider {
@@ -266,7 +257,7 @@ img {
 
 .divider-constraint {
   margin-left: 16px;
-  margin-top: 42px;
+  margin-top: 0;
   margin-right: 18px;
 }
 
@@ -274,10 +265,6 @@ img {
   margin-left: 16px;
   margin-top: 2px;
   margin-right: 18px;
-}
-
-chef-button:hover {
-  background-color: $chef-modal-scrollbar;
 }
 
 chef-button:focus {
@@ -288,11 +275,52 @@ chef-button:focus {
 chef-button {
   ::ng-deep button:focus {
     outline: none;
-    border: none;
+    border: 1px solid $chef-primary-bright;
+    border-radius: 4px;
   }
 
   img:focus {
     outline: none;
     border: none;
   }
+}
+
+.expand-collapse {
+  font-size: 14px;
+  color: $royal-blue;
+  padding: 0 10px;
+
+  .action {
+    cursor: pointer;
+
+    &:first-child {
+      margin-right: 45px;
+    }
+
+    chef-icon {
+      position: relative;
+      top: 0;
+    }
+  }
+
+}
+
+.right-button-box {
+  cursor: pointer;
+  position: relative;
+  float: right;
+}
+
+.edit-item {
+  margin: 0 8px 0 -4px;
+  font-size: 13px;
+}
+
+.edit-text {
+  margin-top: 0px;
+}
+
+.img-section {
+  margin-top: 27px;
+  text-align: center;
 }

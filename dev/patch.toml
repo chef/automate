@@ -1,0 +1,12 @@
+[global.v1]
+  [global.v1.disclosure]
+    show = true
+    message_file_path = "/src/dev/banner_message.txt"
+  [global.v1.banner]
+    show = true
+    message = "Changing the text around"
+    background_color = "3864f2" # Must be a hex value minus the hash symbol
+    text_color = "FFF" # Must be a hex value minus the hash symbol
+
+    # Find valid HEX codes at https://htmlcolorcodes.com/
+    # check your HTML validation at https://validator.w3.org/

@@ -2,14 +2,14 @@
 
 ## You will need
 
-* Vagrant
-* VirtualBox
+* HashiCorp Vagrant
+* Oracle VirtualBox
 
 You can install these using Homebrew cask:
 
 ```
-brew cask install virtualbox
-brew cask install vagrant
+brew install --cask virtualbox
+brew install --cask vagrant
 ```
 
 ## Create your workspace
@@ -23,7 +23,7 @@ cd ~/a2-testing
 
 Create `Vagrantfile` with the following contents:
 
-```
+```ruby
 Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |v|
     v.memory = 2048

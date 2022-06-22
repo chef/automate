@@ -5,8 +5,8 @@ import (
 	"time"
 
 	uuid "github.com/gofrs/uuid"
+	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/components/ingest-service/backend"
@@ -29,6 +29,7 @@ type ChefRun struct {
 	Node             backend.Node
 	NodeRun          backend.Run
 	NodeAttribute    backend.NodeAttribute
+	NodeRunDateInfo  backend.NodeRunDateInfo
 	BulkableRequests []elastic.BulkableRequest
 	Platform         string
 	Ctx              context.Context
@@ -43,6 +44,7 @@ func NewChefRun(ctx context.Context, run *chef.Run, err chan<- error) ChefRun {
 		backend.Node{},
 		backend.Run{},
 		backend.NodeAttribute{},
+		backend.NodeRunDateInfo{},
 		[]elastic.BulkableRequest{},
 		"",
 		ctx,

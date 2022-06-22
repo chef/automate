@@ -142,11 +142,15 @@ describe('CookbookDetailsComponent', () => {
   it('Remote HTTP call when README file URL exists', () => {
     store.dispatch(new GetCookbookDetailsSuccess(cookbookDetails));
     fixture.detectChanges();
+
     const fileUrl = encodeURIComponent(cookbookDetails.root_files[0].url);
-    const req = httpMock.expectOne(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${current_version}/file-content?url=${fileUrl}`);
+    const expectedUrl = `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${current_version}/file-content?url=${fileUrl}`;
+    const req = httpMock.match(expectedUrl)[1];
+
     expect(req.request.method).toBe('GET');
-    httpMock.verify();
     req.flush(readme_content);
+    httpMock.verify();
+
     expect(component.readFileContent).toEqual(readme_content);
   });
 

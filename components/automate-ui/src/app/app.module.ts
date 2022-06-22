@@ -9,7 +9,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { CookieModule } from 'ngx-cookie';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, APP_INITIALIZER } from '@angular/core';
 import { environment } from '../environments/environment';
 
 // ngrx/store
@@ -31,18 +31,23 @@ import { ChefComponentsModule } from './components/chef-components.module';
 import { ChefPipesModule } from './pipes/chef-pipes.module';
 import { ComplianceModule } from './pages/+compliance/compliance.module';
 import { ComplianceSharedModule } from './pages/+compliance/shared/shared.module';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { IntegrationsModule } from './pages/integrations/integrations.module';
 import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
 import { RoleModule } from './modules/roles/roles.module';
 import { LicenseModule } from 'app/modules/license/license.module';
+import { TelemetryCheckboxModule } from 'app/page-components/telemetry-checkbox/telemetry-checkbox.module';
 import { UserModule } from 'app/modules/user/user.module';
 import { TeamModule } from 'app/modules/team/team.module';
 import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 
 // Services
+import { ApplicationStatsService } from './services/telemetry/application-stats/application-stats.service';
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
+import { ClientRunsStatsService } from './services/telemetry/client-runs-stats/client-runs-stats.service';
+import { ComplianceStatsService } from './services/telemetry/compliance-stats/compliance-stats.service';
 import { ConfigService } from './services/config/config.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';
@@ -76,23 +81,30 @@ import { CookbookDetailsRequests } from './entities/cookbooks/cookbook-details.r
 import { CookbookVersionsRequests } from './entities/cookbooks/cookbook-versions.requests';
 import { ClientRequests } from './entities/clients/client.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
+import { ControlDetailRequests } from './entities/control-details/control-details.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { DestinationRequests } from './entities/destinations/destination.requests';
+import { DataFeedGlobalConfigRequests } from './entities/global-config/destination-config.requests';
 import { EnvironmentRequests } from './entities/environments/environment.requests';
+import { InfraNodeRequests } from './entities/infra-nodes/infra-nodes.requests';
 import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
 import { NodesRequests } from './entities/nodes/nodes.requests';
+import { NodeRunlistRequests } from './entities/nodeRunlists/nodeRunlists.requests';
 import { NotificationRuleRequests } from './entities/notification_rules/notification_rule.requests';
 import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
 import { RecipeRequests } from './entities/recipes/recipe.requests';
+import { RevisionRequests } from './entities/revisions/revision.requests';
+import { RoleEnvironmentRequests } from './entities/role-environments/role-environments.requests';
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
+import { RunlistRequests } from './entities/runlists/runlists.requests';
 import { ServerRequests } from './entities/servers/server.requests';
 import { NodeCredentialRequests } from './entities/node-credentials/node-credential.requests';
 import { OrgRequests } from './entities/orgs/org.requests';
@@ -100,6 +112,7 @@ import { PolicyFileRequests } from './entities/policy-files/policy-file.requests
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
+import { UserPreferencesRequests } from './services/user-preferences/user-preferences.requests';
 import { UserRequests } from './entities/users/user.requests';
 import { ProjectsFilterRequests } from './services/projects-filter/projects-filter.requests';
 
@@ -192,13 +205,20 @@ import { SigninComponent } from './pages/signin/signin.component';
 import {
   ServicesSidebarComponent
 } from './page-components/services-sidebar/services-sidebar.component';
-import {
-  TelemetryCheckboxComponent
-} from './page-components/telemetry-checkbox/telemetry-checkbox.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
-
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
+
+// Warning Banner
+import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-create.component';
+import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details/data-feed-config-details.component';
+import {
+  DataFeedTableComponent
+} from './page-components/data-feed-table/data-feed-table.component';
+
+
 
 @NgModule({
   declarations: [
@@ -213,6 +233,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CreateDataFeedModalComponent,
     CreateNotificationModalComponent,
     DataFeedComponent,
+    DataFeedCreateComponent,
     DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
@@ -254,10 +275,12 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ServicesSidebarComponent,
     SettingsLandingComponent,
     SigninComponent,
-    TelemetryCheckboxComponent,
     TopNavLandingComponent,
     UIComponent,
-    WelcomeModalComponent
+    WelcomeModalComponent,
+    WarningBannerComponent,
+    DataFeedConfigDetailsComponent,
+    DataFeedTableComponent
   ],
   imports: [
     ApiTokenModule,
@@ -271,12 +294,14 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CookieModule.forRoot(),
     FormsModule,
     HttpClientModule,
+    InfiniteScrollModule,
     InfraProxyModule,
     IntegrationsModule,
     NgrxEffectsModule,
     PolicyModule,
     ProjectModule,
     LicenseModule,
+    TelemetryCheckboxModule,
     UserModule,
     TeamModule,
     ReactiveFormsModule,
@@ -289,14 +314,29 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
       : StoreDevtoolsModule.instrument({ maxAge: 25 /* states */, actionSanitizer, stateSanitizer })
   ],
   providers: [
+    // Initilization for warning banner component
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [AppConfigService],
+      useFactory: (appConfigService: AppConfigService) => {
+        return () => {
+          return appConfigService.loadAppConfig();
+        };
+      }
+    },
     AdminKeyRequests,
     ApiTokenRequests,
+    ApplicationStatsService,
     AttributesService,
     AutomateSettingsRequests,
     CdsRequests,
     ChefSessionService,
+    ClientRunsStatsService,
+    ComplianceStatsService,
     ConfigService,
     ClientRunsRequests,
+    ControlDetailRequests,
     CookbookDetailsRequests,
     CookbookRequests,
     CookbookVersionsRequests,
@@ -305,6 +345,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DataBagsRequests,
     DesktopRequests,
     DestinationRequests,
+    DataFeedGlobalConfigRequests,
     EnvironmentRequests,
     EventFeedService,
     FeatureFlagsService,
@@ -314,6 +355,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
       useClass: HttpClientAuthInterceptor,
       multi: true
     },
+    InfraNodeRequests,
     InfraRoleRequests,
     JobRequests,
     LayoutSidebarService,
@@ -322,6 +364,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ManagerRequests,
     MetadataService,
     NodesRequests,
+    NodeRunlistRequests,
     NotificationRuleRequests,
     NodeDetailsResolverService,
     NodeNoRunsDetailsResolverService,
@@ -336,8 +379,11 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectsFilterRequests,
     ProjectsFilterService,
     RecipeRequests,
+    RevisionRequests,
+    RoleEnvironmentRequests,
     RoleRequests,
     RuleRequests,
+    RunlistRequests,
     RunHistoryStore,
     ServerRequests,
     NodeCredentialRequests,
@@ -348,6 +394,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TeamRequests,
     TelemetryService,
     UserPermsRequests,
+    UserPreferencesRequests,
     UserRequests
   ],
   bootstrap: [ AppComponent ],

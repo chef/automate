@@ -30,7 +30,7 @@ describe("creating node attribute", function () {
           return chakram.all([chakram.get(nodeAttributeUrl())]).then(function(responses) {
             let response = responses[0];
             expect(response).to.have.status(200);
-            expect(response.body.hits.total).to.equal(1);
+            expect(response.body.hits.total.value).to.equal(1);
             let source = response.body.hits.hits[0]._source;
             expect(source.entity_uuid).to.equal(entityUuid);
             expect(source.name).to.equal('supermarket-rhel-7-builder-45f356');
@@ -79,7 +79,7 @@ describe("creating node attribute", function () {
 
             let response = responses[0];
             expect(response).to.have.status(200);
-            expect(response.body.hits.total).to.equal(2);
+            expect(response.body.hits.total.value).to.equal(2);
             let sources = response.body.hits.hits;
             expect(sources[0]._source.entity_uuid === entityUuid1 || sources[0]._source.entity_uuid === entityUuid2).to.be.true
             expect(sources[1]._source.entity_uuid === entityUuid1 || sources[1]._source.entity_uuid === entityUuid2).to.be.true
@@ -121,7 +121,7 @@ describe("creating node attribute", function () {
               return chakram.all([chakram.get(nodeAttributeUrl())]).then(function(responses) {
                 let response = responses[0];
                 expect(response).to.have.status(200);
-                expect(response.body.hits.total).to.equal(1);
+                expect(response.body.hits.total.value).to.equal(1);
                 let source = response.body.hits.hits[0];
                 expect(source._source.entity_uuid === entityUuid).to.be.true
               });

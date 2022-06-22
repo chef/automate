@@ -118,6 +118,10 @@ func serve(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("missing address for cereal service")
 	}
 
+	if c.SessionAddress == "" {
+		return fmt.Errorf("missing grpc address for session service")
+	}
+
 	factory := secureconn.NewFactory(*serviceCerts, secureconn.WithVersionInfo(
 		version.Version,
 		version.GitSHA,
@@ -144,6 +148,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		TeamsAddress:             c.TeamsAddress,
 		AuthzAddress:             c.AuthzAddress,
 		LegacyDataCollectorToken: c.LegacyDataCollectorToken,
+		SessionAddress:           c.SessionAddress,
 	}
 
 	serv, err := server.NewServer(context.Background(), serverConfig)

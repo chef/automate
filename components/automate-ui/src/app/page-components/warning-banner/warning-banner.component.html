@@ -1,0 +1,18 @@
+<p [ngStyle]="{'color': bannerTextColor}" *ngIf="!showManualUpgradeContent">
+  {{ bannerMessage }}
+</p>
+
+<div class="banner-container" *ngIf="showManualUpgradeContent">
+  <div class="logo-wrapper">
+    <a class="logo" title="Manual Upgrade">
+      <img alt="Manual Upgrade" src="/assets/img/logos/BannerLogo.svg" />
+    </a>
+  </div>
+  <div class="manual-upgrade-text">
+    <h2 class="display2">Manual Upgrade for Next Release</h2>
+    <p>Please check the <a href="https://docs.chef.io/release_notes_automate/" target="_blank" rel="noreferrer noopener">
+      Release Notes</a> for new Chef Automate release and steps to upgrade.</p>
+  </div>
+</div>
+
+<chef-icon role="button" class="close-icon" (click)="closeEvent()">close</chef-icon>

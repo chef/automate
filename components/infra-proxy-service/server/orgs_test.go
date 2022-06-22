@@ -47,7 +47,7 @@ func TestOrgs(t *testing.T) {
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      "domain.com",
-			IpAddress: "0.0.0.0",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -218,7 +218,7 @@ func TestOrgs(t *testing.T) {
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      "domain.com",
-			IpAddress: "0.0.0.0",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -517,7 +517,7 @@ func TestOrgs(t *testing.T) {
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      "domain.com",
-			IpAddress: "0.0.0.0",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -625,7 +625,7 @@ func TestOrgs(t *testing.T) {
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      "domain.com",
-			IpAddress: "0.0.0.0",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -979,7 +979,7 @@ func TestOrgs(t *testing.T) {
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
 			Fqdn:      "domain.com",
-			IpAddress: "0.0.0.0",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -1129,7 +1129,7 @@ func TestOrgs(t *testing.T) {
 			Id:        "chef-infra-server",
 			Name:      "Chef Infra Server",
 			Fqdn:      "domain.com",
-			IpAddress: "0.0.0.0",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)

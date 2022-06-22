@@ -138,7 +138,7 @@ func TestIncludeIPAddressWhenDisableTrue(t *testing.T) {
 }
 
 func TestResolveResourceIdNodeId(t *testing.T) {
-	report := &reporting.Report{NodeId: reportNodeId}
+	report := &reporting.ReportSummaryLevelOne{NodeId: reportNodeId}
 	resourceId := resolveResourceId(report)
 	if resourceId != reportNodeId {
 		t.Logf("expected %s, got: %s", reportNodeId, resourceId)
@@ -147,7 +147,7 @@ func TestResolveResourceIdNodeId(t *testing.T) {
 }
 
 func TestResolveResourceIdIPAddress(t *testing.T) {
-	report := &reporting.Report{NodeId: reportNodeId, Ipaddress: ipAttr}
+	report := &reporting.ReportSummaryLevelOne{NodeId: reportNodeId, Ipaddress: ipAttr}
 	resourceId := resolveResourceId(report)
 	if resourceId != ipAttr {
 		t.Logf("expected %s, got: %s", ipAttr, resourceId)

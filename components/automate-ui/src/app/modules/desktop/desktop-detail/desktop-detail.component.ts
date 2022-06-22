@@ -28,6 +28,7 @@ export class DesktopDetailComponent {
   public DateTime = DateTime;
   public showCheckinDebug = false;
   public downloadDropdownVisible = false;
+  public checkInPeriodDropdownVisible = false;
   public downloadInProgress = false;
   public downloadFailed = false;
   public twoWeekNumDays = 15; // 14 days + 1 offset
@@ -48,10 +49,18 @@ export class DesktopDetailComponent {
     private nodeRunsService: NodeRunsService
   ) {}
 
-  updateCheckInDays() {
-    const numDaysChanged =
-      this.checkInNumDays === this.twoWeekNumDays ? this.fourWeekNumDays : this.twoWeekNumDays;
-    this.checkInNumDaysChanged.emit(numDaysChanged);
+  updateCheckInDays(value) {
+    this.toggleCheckInPeriodDropdown();
+    this.checkInNumDays = value;
+    this.checkInNumDaysChanged.emit(value);
+  }
+
+  toggleCheckInPeriodDropdown() {
+    this.checkInPeriodDropdownVisible = !this.checkInPeriodDropdownVisible;
+  }
+
+  closeCheckInPeriodDropdown() {
+    this.checkInPeriodDropdownVisible = false;
   }
 
   onDownloadCheckInHistory(format) {
@@ -90,10 +99,14 @@ export class DesktopDetailComponent {
       const startOfWeekLabelText = `${numWeeks} week${numWeeks !== 1 ? 's' : ''} ago`;
       const isToday = index === (buckets.length - 1);
       const labelText = isToday ? 'Today' : '';
-      history.label = isStartOfWeek ? startOfWeekLabelText : labelText;
+      const label = isStartOfWeek ? startOfWeekLabelText : labelText;
       if (isStartOfWeek) { --numWeeks; }
-      return history;
+      return { ...history, label };
     });
+  }
+
+  trackByFunction(_, item) {
+    return item.run_id;
   }
 
   public close(): void {

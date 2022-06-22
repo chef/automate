@@ -43,3 +43,50 @@ chef-loading-spinner {
   width: 100px;
   z-index: 199;
 }
+
+.policy-file-list-paging {
+  margin: 0 0 35px;
+}
+
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+    height: 36px;
+    margin-top: 4px;
+  }
+
+}
+
+::ng-deep .mat-select-panel .mat-option {
+
+  &.secondary {
+    width: 150px;
+    height: 2.3em;
+    background: $chef-white;
+    color: $chef-critical;
+  }
+
+  chef-icon.primary {
+    float: right;
+    margin-top: 15px;
+  }
+
+  &:hover {
+    background: $chef-primary-bright;
+    color: $chef-white;
+
+    chef-icon.primary {
+      color: $chef-white;
+    }
+
+  }
+}

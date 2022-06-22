@@ -149,7 +149,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   getData(filters) {
     if (filters.length === 0) { return; }
     const params = this.reportData.nodesListParams;
-    this.reportData.getReportingNodesList(filters, params);
+    this.reportData.getReportingNodesList(filters, params, this.nodeFilterStatus);
   }
 
   // scan results component data

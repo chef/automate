@@ -1,0 +1,9 @@
+all_access:
+  cluster:
+    - UNLIMITED
+  indices:
+    '*':
+      '*':
+        - UNLIMITED
+  tenants:
+    admin_tenant: RW

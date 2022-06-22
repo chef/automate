@@ -3,13 +3,13 @@ package server
 import (
 	"context"
 	"encoding/json"
-
+	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/chef/automate/api/interservice/infra_proxy/request"
-	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"strings"
 )
 
 // GetPolicyfiles gets a list of all policy files
@@ -76,7 +76,65 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 		CookbookLocks:       fromAPICookbookLocks(policy.CookbookLocks),
 		DefaultAttributes:   string(defaultAttrs),
 		OverrideAttributes:  string(overrideAttrs),
+		SolutionDependecies: FromAPIIncludedSolutionDependencies(policy.SolutionDependencies),
 	}, nil
+
+}
+
+func FromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.SolutionDependencies {
+	dData := make([]*response.SolutionDependencies, 0)
+	for _, p := range sp.PolicyFile {
+		if len(p) == 0 {
+			continue
+		}
+		dependencies := make([]*response.DepedenciesData, 0)
+		name := strings.TrimSpace(p[0])
+		ver := "0.0.0"
+		if len(p) == 2 {
+			ver = strings.TrimSpace(p[1])
+		}
+
+		value, ok := sp.Dependencies.(map[string]interface{})
+		// Check for type conversion failure
+		if ok {
+			for key, v := range value {
+				val, ok := v.([]interface{})
+				if !ok {
+					continue
+				}
+				cookBookName := strings.Split(key, " ")[0]
+				if cookBookName == name {
+					for _, value := range val {
+						cookDeps := value.([]interface{})
+						if len(cookDeps) == 0 {
+							continue
+						}
+						dependencyName, ok := cookDeps[0].(string)
+						if !ok {
+							continue
+						}
+						dependencyVersion := "0.0.0"
+						if len(cookDeps) > 1 {
+							dependencyVersion = cookDeps[1].(string)
+						}
+						item1 := &response.DepedenciesData{
+							Name:    dependencyName,
+							Version: dependencyVersion,
+						}
+						dependencies = append(dependencies, item1)
+					}
+				}
+			}
+
+		}
+		solDep := &response.SolutionDependencies{
+			Name:         name,
+			Version:      ver,
+			Dependencies: dependencies,
+		}
+		dData = append(dData, solDep)
+	}
+	return dData
 
 }
 
@@ -158,4 +216,99 @@ func fromAPICookbookLocks(cLocks map[string]chef.CookbookLock) []*response.Cookb
 	}
 
 	return cl
+}
+
+// DeletePolicyfile deletes the policyfile
+func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicyfile) (*response.DeletePolicyfile, error) {
+	err := validation.New(validation.Options{
+		Target:          "policyfile",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = c.client.Policies.Delete(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.DeletePolicyfile{
+		Name: req.GetName(),
+	}, nil
+}
+
+// GetPolicyfileRevisions gets a policy file revisions
+func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.PolicyfileRevisions) (*response.PolicyfileRevisions, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	policyfileRevision, err := c.client.Policies.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.PolicyfileRevisions{
+		Revisions: fromAPIIncludedPolicyfileRevisions(policyfileRevision),
+	}, nil
+}
+
+// fromAPIIncludedPolicyfileRevisions a response included policyfile revision
+func fromAPIIncludedPolicyfileRevisions(p chef.PolicyGetResponse) []*response.PolicyfileRevision {
+	var revisions []*response.PolicyfileRevision
+
+	for _, rev := range p {
+		for key, _ := range rev {
+			revision := &response.PolicyfileRevision{
+				RevisionId: key,
+			}
+			revisions = append(revisions, revision)
+		}
+	}
+
+	return revisions
+}
+
+// GetPolicygroup gets a policy group
+func (s *Server) GetPolicygroup(ctx context.Context, req *request.Policygroup) (*response.Policygroup, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	policygroup, err := c.client.PolicyGroups.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.Policygroup{
+		Name:     req.GetName(),
+		Uri:      policygroup.Uri,
+		Policies: fromAPIGroupPolicies(policygroup),
+	}, nil
+
+}
+
+// fromAPIGroupPolicies a response included policy revision
+func fromAPIGroupPolicies(pg chef.PolicyGroup) []*response.GroupPolicy {
+	policies := make([]*response.GroupPolicy, 0)
+
+	for p, rev := range pg.Policies {
+		item := &response.GroupPolicy{
+			Name:       p,
+			RevisionId: rev["revision_id"],
+		}
+		policies = append(policies, item)
+	}
+
+	return policies
 }

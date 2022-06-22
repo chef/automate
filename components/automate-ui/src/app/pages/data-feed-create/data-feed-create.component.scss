@@ -1,0 +1,260 @@
+@import "~styles/variables";
+@import "../shared/slide-panel";
+
+main {
+  margin: 0 32px 32px 32px;
+
+  .flex-container {
+    display: flex;
+    flex-direction: column;
+    padding: 54px 54px;
+
+    .flex-child {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 186px);
+      grid-column-gap: 66px;
+      column-gap: 66px;
+
+      .card {
+        display: flex;
+        margin: 20px 0;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+        overflow: hidden;
+        border-radius: 4px;
+        min-width: 190px;
+        flex-direction: column;
+        cursor: pointer;
+        position: relative;
+
+        .overlay {
+          position: absolute;
+          bottom: 100%;
+          left: 0;
+          right: 0;
+          background-color: #008CBA;
+          overflow: hidden;
+          width: 100%;
+          height: 0;
+          transition: 0.5s ease;
+          opacity: 0.8;
+          font-weight: 900;
+          letter-spacing: 1.2px;
+
+          .text {
+            color: white;
+            font-size: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            text-align: center;
+          }
+        }
+
+        img {
+          width: 100%;
+          height: 130px;
+        }
+
+        .image-footer {
+          padding: 10px;
+        }
+      }
+
+      .card:hover {
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+
+        .overlay {
+          bottom: 0;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  .flex-container2 {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 12px;
+
+    .divider {
+      margin: 2em 0;
+    }
+
+    .button-bar {
+      float: right;
+
+      chef-button {
+        margin-right: 0;
+      }
+    }
+
+    .input-margin {
+      display: inline-block;
+      margin: 15px 0;
+      vertical-align: top;
+      width: 70%;
+      flex-direction: row-reverse;
+
+      #testConnection[disabled] {
+        border-color: $chef-med-grey;
+        background-color: $chef-med-grey;
+      }
+
+      .name-margin {
+        width: 100%;
+
+        .version-dropdown {
+          color: $chef-primary-dark;
+
+          ::ng-deep label {
+            display: inline;
+            margin-right: 15px;
+            color: $chef-primary-dark;
+            font-size: 15px;
+          }
+
+          chef-select {
+            margin-bottom: 12px;
+            width: 100%;
+            font-size: 12px;
+
+            ::ng-deep .selected-value {
+              padding: 0.5em 3.5em 0.5em 1em;
+              font-size: 14px;
+
+              chef-icon {
+                color: $chef-primary-bright;
+              }
+            }
+
+            chef-option {
+              padding: 0.7em 3.5em 0.3em 1em;
+            }
+          }
+        }
+      }
+
+      .chef-input {
+        height: 36px;
+      }
+
+      .input-and-btn {
+        display: flex;
+
+        chef-button {
+          margin: 0;
+          border-radius: 0 5px 5px 0;
+        }
+
+        input[readonly] {
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .customtokenblock {
+      width: 40%;
+    }
+
+    .customtokentypeblock {
+      width: calc(30% - 16px);
+      margin-right: 16px;
+    }
+
+    .custompasswordblock {
+      width: 34%;
+      margin-right: 16px;
+    }
+  }
+}
+
+.chef-inputtextarea {
+  width: 100%;
+  height: auto;
+  background-color: #FFFFFF;
+  padding: 1em;
+  font-size: 14px;
+  border: 1px solid #E6EBEE;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border 0.4s ease;
+}
+
+.error {
+  .chef-inputtextarea {
+    border-color: #DC267F;
+    border-radius: 4px 4px 0 0;
+    outline: none;
+    margin-bottom: -7px;
+  }
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: auto;
+  z-index: 199;
+}
+
+app-notification {
+  position: absolute;
+}
+
+.sidenav-header-data-feed {
+  display: flex;
+  margin: 15px 32px 0 32px;
+  flex-direction: row;
+  border-bottom: 0.5px solid $chef-key-tab;
+
+  h1 {
+    margin: 0.4em 0;
+    flex-grow: 2;
+    text-align: left;
+    font-weight: bold;
+    letter-spacing: 1.2px;
+    color: $chef-black;
+    font-size: 18px;
+  }
+
+  chef-button {
+    margin-left: 16px;
+    margin-top: 4px;
+    border: none;
+    color: $chef-black;
+  }
+
+  .arrow-btn {
+    margin: 0 20px 0 0;
+  }
+
+  .close {
+    margin-top: 0;
+  }
+}
+
+.bolder-font {
+  text-shadow: 0.5px 0 #000000;
+  letter-spacing: 1.2px;
+  font-weight: bold;
+}
+
+.hide {
+  display: none;
+}
+
+::ng-deep [panelClass="chef-dropdown"] {
+  font-size: inherit;
+  font-weight: 100;
+}
+
+.dropdown-menu {
+  ::ng-deep chef-dropdown {
+    max-height: 256px;
+    overflow: scroll;
+  }
+}

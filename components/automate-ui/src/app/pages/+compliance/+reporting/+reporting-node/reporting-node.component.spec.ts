@@ -11,7 +11,11 @@ import { Observable, of as observableOf } from 'rxjs';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { StatsService, ReportQueryService, ScanResultsService } from '../../shared/reporting';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
+class MockTelemetryService {
+  track() { }
+}
 describe('ReportingNodeComponent', () => {
   let store: Store<NgrxStateAtom>;
   let fixture: ComponentFixture<ReportingNodeComponent>;
@@ -33,6 +37,7 @@ describe('ReportingNodeComponent', () => {
         DatetimePipe
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         ChefSessionService,
         StatsService,
         ReportQueryService,
@@ -58,7 +63,7 @@ describe('ReportingNodeComponent', () => {
     beforeEach(() => {
       spyOn(statsService, 'getReportsWithPages').and.returnValue(observableOf(
         { reports: [ {id: '123'}, {id: '456'} ], totalReports: 2}));
-      spyOn(statsService, 'getSingleReport').and.returnValue(observableOf(
+      spyOn(statsService, 'getNodeHeader').and.returnValue(observableOf(
         { node_name: 'teal' } ));
       spyOn(reportQueryService, 'formatReturnParams');
       component.ngOnInit();
@@ -67,8 +72,8 @@ describe('ReportingNodeComponent', () => {
     it('calls getReportsWithPages', () => {
       expect(statsService.getReportsWithPages).toHaveBeenCalled();
     });
-    it('calls getSingleReport with the first report id', () => {
-      expect(statsService.getSingleReport).toHaveBeenCalledWith('123', jasmine.any(Object));
+    it('calls getNodeHeader with the first report id', () => {
+      expect(statsService.getNodeHeader).toHaveBeenCalledWith('123', jasmine.any(Object));
     });
     it('sets reportLoading to false', () => {
       expect(component.reportLoading).toBe(false);

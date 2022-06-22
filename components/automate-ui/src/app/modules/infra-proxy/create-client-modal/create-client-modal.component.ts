@@ -10,6 +10,8 @@ import { CreateClient, GetClients } from 'app/entities/clients/client.action';
 import { saveError, createClient } from 'app/entities/clients/client.selectors';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
+import { Utilities } from 'app/helpers/utilities/utilities';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-client-modal',
@@ -42,10 +44,12 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private telemetryService: TelemetryService
   ) {
     this.createForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]],
       validator: ['']
     });
   }
@@ -89,7 +93,7 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.isNavigationKey(event)) {
+    if (!Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.error = '';
       this.createForm.controls.name.setValue(
@@ -98,7 +102,7 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -142,6 +146,7 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
       create_key : true
     };
     this.store.dispatch(new CreateClient(client));
+    this.telemetryService.track('InfraServer_Clients_Create');
   }
 
   downloadKey() {
@@ -153,9 +158,7 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
 
     const blob = new Blob([template], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, this.createdClient + '.pem');
+    this.telemetryService.track('InfraServer_Clients_Download_PrivateKey');
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }

@@ -264,6 +264,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     });
 
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
+    this.telemetryService.track('Settings_DataLifecycle_Save');
   }
 
   // Hides the notification banner

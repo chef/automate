@@ -1,0 +1,36 @@
+<div ngClass="{slide : isSlideOpen}">
+  <div class="sidenav-header">
+    <h1 slot="title" data-cy="policyfile-heading">{{cookbookName}}
+      <span data-cy="policyfile-details" [ngClass]="error ? 'details-link disabled-link' : 'details-link'">
+        <a
+          [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'cookbooks', cookbookName]"
+          >
+          Go to Cookbook Details &gt;
+        </a>
+      </span>
+    </h1>
+    <chef-button
+      class="close"
+      secondary
+      (click)="closeCookbookDependencies()"
+      data-cy="close-cookbook-detail-button">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <chef-loading-spinner *ngIf="cookbookDetailsLoading" size="50"></chef-loading-spinner>
+  <div *ngIf="!cookbookDetailsLoading">
+    <div data-cy="empty-list" *ngIf="error">
+      <div class="url-failed">
+        <chef-icon class="url-failed-icon">warning</chef-icon>
+        <span>Unable to connect: check cookbook name and version.</span>
+      </div>
+      <div class="empty-section">
+        <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p>No Cookbook details available</p>
+      </div>
+    </div>
+    <div class="sidenav-body" *ngIf="!error">
+      <chef-markdown *ngIf="readFileContent" [text]="readFileContent.content"></chef-markdown>
+    </div>
+  </div>
+</div>

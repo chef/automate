@@ -11,8 +11,10 @@ import { Regex } from 'app/helpers/auth/regex';
 import { UsernameMapper } from 'app/helpers/auth/username-mapper';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus } from 'app/entities/entities';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import { CreateUserPayload, CreateUser } from 'app/entities/users/user.actions';
 import { createStatus, createError } from 'app/entities/users/user.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -36,7 +38,8 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    fb: FormBuilder
+    fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in create-user-modal.component.html
@@ -109,17 +112,18 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new CreateUser(userCreateReq));
+    this.telemetryService.track('Settings_Users_Create');
   }
 
   handleUsernameInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyUsername && !this.isNavigationKey(event)) {
+    if (!this.modifyUsername && !Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.createUserForm.controls.username.setValue(
         UsernameMapper.transform(this.createUserForm.controls.displayName.value.trim()));
@@ -132,7 +136,7 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
     // Since the match validator is only activated by changes to confirmPassword,
     // we have to manually revalidate confirmPassword here
     this.createUserForm.get('confirmPassword').updateValueAndValidity();
-    if (!this.isNavigationKey(event)) {
+    if (!Utilities.isNavigationKey(event)) {
       this.passwordError = false;
     }
   }
@@ -151,7 +155,4 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
       (this.createUserForm.get(field).touched || this.createUserForm.get(field).dirty));
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }

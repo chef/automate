@@ -1,0 +1,24 @@
+name: chef-automate test
+synopsis: Run Automate HA smoke tests
+usage: chef-automate test [flags]
+description: Run smoke test for Automate HA services.
+options:
+- name: full
+  default_value: "false"
+  usage: Automate ha cluster test full
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for test
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI

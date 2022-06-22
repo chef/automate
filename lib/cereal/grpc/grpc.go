@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"time"
 
@@ -69,6 +70,11 @@ type workflowCompleter struct {
 	tasks  []*grpccereal.Task
 	cancel context.CancelFunc
 }
+type workflowCompleterChunk struct {
+	s      grpccereal.CerealService_DequeueWorkflowChunkClient
+	tasks  []*grpccereal.Task
+	cancel context.CancelFunc
+}
 
 var _ cereal.WorkflowCompleter = &workflowCompleter{}
 
@@ -96,7 +102,7 @@ func (c *workflowCompleter) finish(err error) error {
 	}
 
 	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("Failed to continue workflow")
+		logrus.WithError(err).Error("Failed to continue workflow!!!")
 		return err
 	}
 	committedMsg, err := c.s.Recv()
@@ -149,18 +155,101 @@ func (c *workflowCompleter) Close() error {
 	defer c.cancel()
 	return c.s.CloseSend()
 }
+func (c *workflowCompleterChunk) EnqueueTask(task *cereal.TaskData, opts cereal.TaskEnqueueOptions) error {
+	t := &grpccereal.Task{
+		Name:       task.Name,
+		Parameters: task.Parameters,
+	}
+	if !opts.StartAfter.IsZero() {
+		ts, err := ptypes.TimestampProto(opts.StartAfter)
+		if err != nil {
+			return err
+		}
+		t.StartAfter = ts
+	}
+	c.tasks = append(c.tasks, t)
+	return nil
+}
+
+func (c *workflowCompleterChunk) finish(err error) error {
+	defer c.Close() // nolint: errcheck
+
+	if err != nil {
+		return err
+	}
+
+	if err := c.s.CloseSend(); err != nil {
+		logrus.WithError(err).Error("Failed to continue chunk workflow!")
+		return err
+	}
+
+	blob, err := recieveChunk(c.s)
+	if err != nil {
+		logrus.WithError(err).Error("Did not get committed message in chunk workflow")
+		return err
+	}
+
+	deq := &grpccereal.DequeueWorkflowResponse_Committed{}
+	err = json.Unmarshal(blob, deq)
+	if err != nil {
+		return err
+	}
+	if deq == nil {
+		return errUnknownMessage
+	}
+	return nil
+}
+
+func (c *workflowCompleterChunk) Continue(payload []byte) error {
+	err := c.s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Continue_{
+			Continue: &grpccereal.DequeueWorkflowChunkRequest_Continue{
+				Payload: payload,
+				Tasks:   c.tasks,
+			},
+		},
+	})
+	return c.finish(err)
+}
+
+func (c *workflowCompleterChunk) Fail(errMsg error) error {
+	err := c.s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Fail_{
+			Fail: &grpccereal.DequeueWorkflowChunkRequest_Fail{
+				Err: errMsg.Error(),
+			},
+		},
+	})
+	return c.finish(err)
+}
+
+func (c *workflowCompleterChunk) Done(result []byte) error {
+	err := c.s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Done_{
+			Done: &grpccereal.DequeueWorkflowChunkRequest_Done{
+				Result: result,
+			},
+		},
+	})
+	return c.finish(err)
+}
+
+func (c *workflowCompleterChunk) Close() error {
+	defer c.cancel()
+	return c.s.CloseSend()
+}
 
 func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*cereal.WorkflowEvent, cereal.WorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
-	s, err := g.client.DequeueWorkflow(ctx)
+	s, err := g.client.DequeueWorkflowChunk(ctx)
 	if err != nil {
 		cancel()
 		return nil, nil, err
 	}
 
-	if err := s.Send(&grpccereal.DequeueWorkflowRequest{
-		Cmd: &grpccereal.DequeueWorkflowRequest_Dequeue_{
-			Dequeue: &grpccereal.DequeueWorkflowRequest_Dequeue{
+	if err := s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Dequeue_{
+			Dequeue: &grpccereal.DequeueWorkflowChunkRequest_Dequeue{
 				Domain:        g.domain,
 				WorkflowNames: workflowNames,
 			},
@@ -170,21 +259,17 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		return nil, nil, err
 	}
 
-	resp, err := s.Recv()
+	blob, err := recieveChunk(s)
 	if err != nil {
 		cancel()
-		if st, ok := status.FromError(err); ok {
-			if st.Code() == codes.NotFound {
-				return nil, nil, cereal.ErrNoWorkflowInstances
-			}
-		}
 		return nil, nil, err
 	}
 
-	deq := resp.GetDequeue()
-	if deq == nil {
+	deq := &grpccereal.DequeueWorkflowResponse_Dequeue{}
+	err = json.Unmarshal(blob, deq)
+	if err != nil {
 		cancel()
-		return nil, nil, errors.New("unexpected")
+		return nil, nil, err
 	}
 
 	tsProto := deq.GetEvent().GetEnqueuedAt()
@@ -217,10 +302,34 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		EnqueuedAt:         ts,
 	}
 
-	return wevt, &workflowCompleter{
+	return wevt, &workflowCompleterChunk{
 		s:      s,
 		cancel: cancel,
 	}, nil
+}
+
+func recieveChunk(s grpccereal.CerealService_DequeueWorkflowChunkClient) ([]byte, error) {
+	var blob []byte
+	var resp *grpccereal.DequeueWorkflowChunkResponse
+	var err error
+	for {
+		resp, err = s.Recv()
+		chunk := resp.GetChunk()
+		if len(chunk) == 3 && string(chunk) == "EOF" {
+			logrus.Debugln("Got EOF")
+			break
+		}
+		if err != nil {
+			if st, ok := status.FromError(err); ok {
+				if st.Code() == codes.NotFound {
+					return nil, cereal.ErrNoWorkflowInstances
+				}
+			}
+			return nil, err
+		}
+		blob = append(blob, chunk...)
+	}
+	return blob, nil
 }
 
 func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) cereal.WorkflowInstanceData {

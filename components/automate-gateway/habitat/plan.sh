@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=automate-gateway
 pkg_description="Automate API Gateway"
@@ -38,6 +39,8 @@ pkg_binds_optional=(
   [teams-service]="port"
   [secrets-service]="port"
   [automate-cds]="port"
+  [user-settings-service]="port"
+  [report-manager-service]="port"
 )
 pkg_exposes=(port)
 pkg_bin_dirs=(bin)
@@ -62,3 +65,4 @@ do_strip() {
     do_default_strip
   fi
 }
+

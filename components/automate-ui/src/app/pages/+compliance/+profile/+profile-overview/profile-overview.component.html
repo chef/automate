@@ -24,13 +24,25 @@
         <chef-heading>Profiles</chef-heading>
         <chef-subheading>Compliance profiles manage security and compliance scans.</chef-subheading>
 
-        <div class="profiles-search" *ngIf="!profilesEmpty || isAvailableProfilesVisible">
+        <div class="profiles-search" *ngIf="!profilesEmpty || isAvailableProfilesVisible"
+        [class.active]="formActive">
           <input
+            #search_box
             chefInput
             type="text"
             aria-label="Search profiles"
             placeholder="Search profiles..."
-            (input)="onSearchInput($event)"/>
+            autocomplete="off"
+            (focus)="toggleFocus()"
+            (blur)="toggleFocus()"/>
+          <button
+          type="submit"
+          class="primary"
+          primary
+          (click)="onSearchInput(search_box.value)">
+            <span aria-hidden="true" class="hidden">Submit Search</span>
+            <chef-icon>search</chef-icon>
+          </button>
         </div>
 
         <chef-tab-selector *ngIf="isAvailableProfilesVisible" class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">

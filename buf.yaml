@@ -5,7 +5,7 @@
 # This file configures the `buf` tool, you run buf's linter as `buf check lint`, or
 # use `lint_all_protobuf_components` in the habitat studio.
 #
-# ## References:
+# ## References: 
 # 
 # - Style Guide: https://buf.build/docs/style-guide/
 # - Docs for individual checkers: https://buf.build/docs/lint-checkers
@@ -125,6 +125,8 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
+      - external/report_manager/report_manager.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
@@ -144,6 +146,7 @@ lint:
       - interservice/deployment/certificate_authority.proto
       - interservice/es_sidecar/service.proto
       - interservice/event_feed/event_feed.proto
+      - interservice/id_token/id_token.proto
       - interservice/infra_proxy/service/infra_proxy.proto
       - interservice/ingest/automate_event.proto
       - interservice/ingest/chef.proto
@@ -154,6 +157,8 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
+      - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -189,6 +194,8 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
+      - external/report_manager/report_manager.proto      
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
@@ -218,6 +225,8 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
+      - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -253,6 +262,8 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
+      - external/report_manager/report_manager.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
@@ -282,6 +293,8 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
+      - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -339,6 +352,8 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
+      - external/report_manager/report_manager.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # Used to parse external JSON:
@@ -357,6 +372,8 @@ lint:
       - interservice/nodemanager/manager/manager.proto
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
+      - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -379,6 +396,8 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
+      - external/report_manager/report_manager.proto
       # deployment protos are used by the CLI and can't be changed
       - interservice/authz/policy.proto
       # compliance protos used to parse external JSON:
@@ -396,6 +415,8 @@ lint:
       - interservice/nodemanager/manager/manager.proto
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
+      - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -424,4 +445,16 @@ breaking:
     # it's the best/least bad option, you can add it here and remove it in a
     # later PR:
     # - external/oops/oops.proto
+    - external/infra_proxy/request/nodes.proto
+    - external/infra_proxy/response/nodes.proto
     - external/infra_proxy/infra_proxy.proto
+    - external/infra_proxy/request/roles.proto
+    - external/infra_proxy/response/roles.proto
+    - external/compliance/reporting/reporting.proto
+    - config/ui/config_request.proto
+    - external/compliance/reporting/stats/stats.proto
+    - config/compliance/config_request.proto
+    - config/postgresql/config_request.proto
+    # elasticsearch to opensearch movemnt changes
+    - config/es_sidecar/config_request.proto
+

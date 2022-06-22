@@ -117,6 +117,9 @@ describe('team details', () => {
     context('when only the unassigned project is selected', () => {
       beforeEach(() => {
         cy.applyProjectsFilter([unassigned]);
+        if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+          cy.get('[data-cy=close-x]').click();
+        }
       });
 
       it('cannot access projects dropdown but can still update name', () => {

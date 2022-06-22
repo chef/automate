@@ -6,6 +6,11 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { EditDataBagItemModalComponent } from './edit-data-bag-item-modal.component';
 import { DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
 import { EventEmitter } from '@angular/core';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('EditDataBagItemModalComponent', () => {
   let component: EditDataBagItemModalComponent;
@@ -19,6 +24,9 @@ describe('EditDataBagItemModalComponent', () => {
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         EditDataBagItemModalComponent
+      ],
+      providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         ReactiveFormsModule,

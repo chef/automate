@@ -33,6 +33,15 @@ https://www.chef.io/online-master-agreement
 I agree to the Terms of Service and the Master License and Services Agreement
 `
 var errMLSA = "Chef Software Terms of Service and Master License and Services Agreement were not accepted"
+var errProvisonInfra = `Architecture does not match with the requested one. 
+If you want to provision cluster then you have to first run provision command.
+
+		chef-automate provision-infra
+
+After that you can run this command`
+
+var invalidConfig = "Invalid toml config file, please check your toml file."
+var invalidChannelName = "Invalid channel permited channels are dev and stable"
 
 var deployCmdFlags = struct {
 	channel                         string
@@ -52,6 +61,8 @@ var deployCmdFlags = struct {
 	enableWorkflow                  bool
 	products                        []string
 	bootstrapBundlePath             string
+	userAuth                        bool
+	saas                            bool
 }{}
 
 // deployCmd represents the new command
@@ -159,6 +170,12 @@ func newDeployCmd() *cobra.Command {
 		"bootstrap-bundle",
 		"",
 		"Path to bootstrap bundle")
+	cmd.PersistentFlags().BoolVarP(
+		&deployCmdFlags.userAuth,
+		"yes",
+		"y",
+		false,
+		"Do not prompt for confirmation; accept defaults and continue")
 
 	if !isDevMode() {
 		for _, flagName := range []string{
@@ -185,6 +202,37 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
+	var configPath = ""
+	if len(args) > 0 {
+		configPath = args[0]
+	}
+	var deployer, derr = getDeployer(configPath)
+	if derr != nil {
+		return status.Wrap(derr, status.ConfigError, invalidConfig)
+	}
+	if deployer != nil {
+		conf := new(dc.AutomateConfig)
+		if err := mergeFlagOverrides(conf); err != nil {
+			return status.Wrap(
+				err,
+				status.ConfigError,
+				"Merging command flag overrides into Chef Automate config failed",
+			)
+		}
+		if deployCmdFlags.userAuth {
+			deployCmdFlags.acceptMLSA = deployCmdFlags.userAuth
+		}
+		if len(deployCmdFlags.channel) > 0 && (deployCmdFlags.channel == "dev" || deployCmdFlags.channel == "current") {
+			writer.Printf("deploying with channel : %s \n", deployCmdFlags.channel)
+			args = append(args, "--"+deployCmdFlags.channel)
+			return deployer.doDeployWork(args)
+		} else if len(deployCmdFlags.channel) == 0 {
+			return deployer.doDeployWork(args)
+		} else {
+			return status.Wrap(derr, status.ConfigError, invalidChannelName)
+		}
+	}
+	writer.Printf("Automate deployment non HA mode proceeding...")
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
@@ -277,7 +325,6 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
-
 	return err
 }
 
@@ -288,11 +335,9 @@ func generatedConfig() (*dc.AutomateConfig, error) {
 		dc.InitialTLSCerts(deployCmdFlags.keyPath, deployCmdFlags.certPath),
 		dc.InitialFQDN(deployCmdFlags.fqdn),
 	)
-
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "Generating initial default configuration failed")
 	}
-
 	return cfg.AutomateConfig(), nil
 }
 

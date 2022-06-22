@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=teams-service
 pkg_description="A2 team management service"
@@ -45,3 +46,4 @@ do_install() {
   build_line "Copying migration files"
   cp -r storage/postgres/migration/sql "${pkg_prefix}/migrations"
 }
+

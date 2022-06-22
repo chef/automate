@@ -44,7 +44,7 @@ func TestJSONExportWithEndTime(t *testing.T) {
 		Type: "json",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 		},
 	}
 	stream, err := reporting.Export(context.Background(), &query)
@@ -75,7 +75,7 @@ func TestJSONExportWithProfileFilter(t *testing.T) {
 		Type: "json",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
 		},
 	}
@@ -107,7 +107,7 @@ func TestJSONExportWithTwoProfileFiltersReturnsError(t *testing.T) {
 		Type: "json",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
 			{Type: "profile_id", Values: []string{"41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9"}},
 		},
@@ -125,7 +125,7 @@ func TestJSONExportWithTwoProfileFiltersReturnsError(t *testing.T) {
 		Type: "json",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 			{Type: "profile_name", Values: []string{"apache-baseline"}},
 			{Type: "profile_name", Values: []string{"fake-baseline"}},
 		},
@@ -143,7 +143,7 @@ func TestJSONExportWithTwoProfileFiltersReturnsError(t *testing.T) {
 		Type: "json",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
 			{Type: "profile_name", Values: []string{"fake-baseline"}},
 		},
@@ -172,7 +172,7 @@ func TestCSVExportWithEndTime(t *testing.T) {
 		Type: "csv",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 		},
 	}
 
@@ -198,7 +198,7 @@ func TestCSVExportWithEndTime(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 20, len(records))
 
-	assert.Equal(t, []string{"centos-beta", "2018-03-04T09:18:41Z", "centos", "5.11", "DevSec Prod beta", "10.3.4.5", "web-cent.example.com", "nginx-baseline", "DevSec Nginx Baseline", "2.1.0", "Test-suite for best-practice nginx hardening", "nginx-01", "Running worker process as non-privileged user", "1.00", "false", "passed", "0.000", "Worked like a charm baby!", "", "", "", ""}, records[1])
+	assert.Equal(t, []string{"centos-beta", "2018-03-04T00:00:10Z", "centos", "5.11", "DevSec Prod beta", "10.3.4.5", "web-cent.example.com", "nginx-baseline", "DevSec Nginx Baseline", "2.1.0", "Test-suite for best-practice nginx hardening", "nginx-01", "Running worker process as non-privileged user", "1.00", "false", "passed", "0.000", "Worked like a charm baby!", "", "", "", ""}, records[1])
 }
 
 func TestCSVExportWithEndTimeAndMissingFields(t *testing.T) {
@@ -261,7 +261,7 @@ func TestJSONExportWithControlFilter(t *testing.T) {
 		Type: "json",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 			{Type: "control", Values: []string{"nginx-02"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
 		},
@@ -297,7 +297,7 @@ func TestJSONExportWithTwoControlsOnlyReturnsThoseTwoControls(t *testing.T) {
 		Type: "json",
 		Filters: []*rs.ListFilter{
 			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
-			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
+			{Type: "end_time", Values: []string{"2018-03-04T00:00:10Z"}},
 			{Type: "control", Values: []string{"nginx-01"}},
 			{Type: "control", Values: []string{"nginx-02"}},
 		},
@@ -358,7 +358,7 @@ func TestJSONNodeExportReturnsAllExpectedReportsForNode(t *testing.T) {
 
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", reports[2].GetId())
 	endTime = ptypes.TimestampString(reports[2].GetEndTime())
-	assert.Equal(t, "2018-03-04T09:18:41Z", endTime)
+	assert.Equal(t, "2018-03-04T00:00:10Z", endTime)
 }
 
 func TestJSONNodeExportRespectsTimeFilters(t *testing.T) {
@@ -394,7 +394,7 @@ func TestJSONNodeExportRespectsTimeFilters(t *testing.T) {
 
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", reports[1].GetId())
 	endTime = ptypes.TimestampString(reports[1].GetEndTime())
-	assert.Equal(t, "2018-03-04T09:18:41Z", endTime)
+	assert.Equal(t, "2018-03-04T00:00:10Z", endTime)
 }
 
 func TestJSONNodeExportRequiresOneNodeFilter(t *testing.T) {

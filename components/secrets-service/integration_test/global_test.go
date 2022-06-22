@@ -38,6 +38,7 @@ var (
 func createDatabaseObject() *dao.DB {
 	connectionString := "postgresql://secrets@" + postgresqlUrl +
 		"/secrets_service?sslmode=verify-ca&sslcert=/hab/svc/secrets-service/config/service.crt&sslkey=/hab/svc/secrets-service/config/service.key&sslrootcert=/hab/svc/secrets-service/config/root_ca.crt"
+	fmt.Printf("-------!!!------ Secret Service postgres conn str: %s", connectionString)
 	postgresConfig := config.Postgres{ConnectionString: connectionString, MigrationsPath: "/src/components/secrets-service/dao/migration/sql"}
 	db, err := dao.New(&postgresConfig, "75e79c17ae62445e9771cd13fc4216f4")
 	if err != nil {

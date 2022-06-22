@@ -14,6 +14,11 @@ import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { By } from '@angular/platform-browser';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ChefServersListComponent', () => {
   let component: ChefServersListComponent;
@@ -61,6 +66,7 @@ describe('ChefServersListComponent', () => {
         ChefServersListComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         FeatureFlagsService
       ],
       imports: [
@@ -135,20 +141,20 @@ describe('ChefServersListComponent', () => {
     it('opening create modal resets id, name, fqdn and ip_address to empty string', () => {
       component.createChefServerForm.controls['id'].setValue('any');
       component.createChefServerForm.controls['name'].setValue('any');
-      component.createChefServerForm.controls['fqdn'].setValue('any');
-      component.createChefServerForm.controls['ip_address'].setValue('any');
+      component.fqdnForm.controls['fqdn'].setValue('any');
+      component.ipForm.controls['ip_address'].setValue('any');
       component.openCreateModal();
       expect(component.createChefServerForm.controls['id'].value).toBe(null);
       expect(component.createChefServerForm.controls['name'].value).toBe(null);
-      expect(component.createChefServerForm.controls['fqdn'].value).toBe(null);
-      expect(component.createChefServerForm.controls['ip_address'].value).toBe(null);
+      expect(component.fqdnForm.controls['fqdn'].value).toBe(null);
+      expect(component.ipForm.controls['ip_address'].value).toBe(null);
     });
 
     it('on success, closes modal and adds new server', () => {
       component.createChefServerForm.controls['id'].setValue(server.id);
       component.createChefServerForm.controls['name'].setValue(server.name);
-      component.createChefServerForm.controls['fqdn'].setValue(server.fqdn);
-      component.createChefServerForm.controls['ip_address'].setValue(server.ip_address);
+      component.fqdnForm.controls['fqdn'].setValue(server.fqdn);
+      component.ipForm.controls['ip_address'].setValue(server.ip_address);
       component.createChefServer();
 
       store.dispatch(new CreateServerSuccess({ 'server': server }));
@@ -161,8 +167,8 @@ describe('ChefServersListComponent', () => {
       component.openCreateModal();
       component.createChefServerForm.controls['id'].setValue(server.id);
       component.createChefServerForm.controls['name'].setValue(server.name);
-      component.createChefServerForm.controls['fqdn'].setValue(server.fqdn);
-      component.createChefServerForm.controls['ip_address'].setValue(server.ip_address);
+      component.fqdnForm.controls['fqdn'].setValue(server.fqdn);
+      component.ipForm.controls['ip_address'].setValue(server.ip_address);
       component.createChefServer();
 
       const conflict = <HttpErrorResponse>{
@@ -180,8 +186,8 @@ describe('ChefServersListComponent', () => {
       component.openCreateModal();
       component.createChefServerForm.controls['id'].setValue(server.id);
       component.createChefServerForm.controls['name'].setValue(server.name);
-      component.createChefServerForm.controls['fqdn'].setValue(server.fqdn);
-      component.createChefServerForm.controls['ip_address'].setValue(server.ip_address);
+      component.fqdnForm.controls['fqdn'].setValue(server.fqdn);
+      component.ipForm.controls['ip_address'].setValue(server.ip_address);
       component.createChefServer();
 
       const error = <HttpErrorResponse>{
@@ -202,7 +208,7 @@ describe('ChefServersListComponent', () => {
       component.openCreateModal();
 
       let errors = {};
-      const fqdn = component.createChefServerForm.controls['fqdn'];
+      const fqdn = component.fqdnForm.controls['fqdn'];
       expect(fqdn.valid).toBeFalsy();
 
       // FQDN field is required

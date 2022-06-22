@@ -25,4 +25,17 @@ describe('InfraSearchBarComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  describe('When a user toggles focus', () => {
+    // Toggling focus provides an active class to the form
+    // which gives our form an accessibilty ring
+    it('By default, the form should not be active', () => {
+      expect(component.formActive).toBe(false);
+    });
+
+    it('Should activate the form when input is focused', () => {
+      component.toggleFocus();
+      expect(component.formActive).toBe(true);
+    });
+  });
 });

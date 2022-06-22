@@ -1,0 +1,17 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+set -Exeuo pipefail
+
+source {{pkg.svc_config_path}}/functions.sh
+
+ensure_dir_ownership
+
+{{#if svc.me.leader }}
+primary_ready
+pg_reload_config
+promote_to_leader
+checkpoint
+setup_replication_user_in_primary
+{{ else }}
+remove_promotion_trigger
+{{/if}}

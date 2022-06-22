@@ -30,7 +30,6 @@ defmodule Notifications.Mixfile do
      included_applications: [
        :poison,
        :sqerl,
-       :pooler,
        :envy],
      extra_applications: [
        :logger,
@@ -47,12 +46,12 @@ defmodule Notifications.Mixfile do
       # GRPC endpoint: service to service, currently
       #                used by ingest service to trigger
       #                notifications
-      {:protobuf, github: "tony612/protobuf-elixir", override: true},
+      {:protobuf, github: "tony612/protobuf-elixir", branch: "main", override: true},
       {:google_protos, github: "tony612/google-protos", override: true},
       {:grpc, github: "elixir-grpc/grpc"},
       # database w/ pooling for pgsql access
       {:sqerl, github: "chef/sqerl"},
-      {:pooler, github: "seth/pooler",  erlopts: [{:d, :namespaced_types}, :debug_info, :inline], override: true},
+      {:pooler, github: "seth/pooler",  erlopts: [{:d, :namespaced_types}, :debug_info, :inline], override: true, runtime: false},
       # Used in utils for time formatting.
       {:timex, ">= 3.1.24"},
       # JSON conversion and posting over http (outbound webhooks)

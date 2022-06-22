@@ -32,6 +32,14 @@ upload_dep_manifest() {
 
 trap upload_dep_manifest EXIT
 
+log_section_start "Uninstalling License Scout"
+gem uninstall license_scout -x
+log "Finished Uninstalling License Scout"
+
+log_section_start "Installing License Scout"
+gem install license_scout -v 2.5.1
+log "Finished Installing License Scout"
+
 log_section_start "Installing Chef UI Library dependencies"
 pushd components/chef-ui-library
   log "BEGIN npm install"
@@ -51,6 +59,11 @@ log "Finished installing Automate UI dependencies"
 
 log_section_start "Installing Elixir dependencies"
 pushd components/notifications-service/server
+  git config --global url."https://github.com/".insteadOf git://github.com/
+  log "git config updated"
+  log "Print mix.lock file:"
+  cat mix.lock
+  log "End of mix.lock file"
   mix local.hex --force
   mix deps.get
 popd

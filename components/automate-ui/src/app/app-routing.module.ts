@@ -16,6 +16,7 @@ import {
 import { IntegrationsEditComponent } from './pages/integrations/edit/integrations-edit.component';
 import { IntegrationsListComponent } from './pages/integrations/list/integrations-list.component';
 import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-details/infra-role-details.component';
+import { InfraNodeDetailsComponent } from './modules/infra-proxy/infra-node-details/infra-node-details.component';
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
@@ -42,6 +43,8 @@ import { OrgDetailsComponent } from './modules/infra-proxy/org-details/org-detai
 import { PolicyListComponent } from './modules/policy/list/policy-list.component';
 import { PolicyDetailsComponent } from './modules/policy/details/policy-details.component';
 import { PolicyAddMembersComponent } from './modules/policy/add-members/policy-add-members.component';
+import { PolicyFileDetailsComponent } from './modules/infra-proxy/policy-file-details/policy-file-details.component';
+import { PolicyGroupDetailsComponent } from './modules/infra-proxy/policy-group-details/policy-group-details.component';
 import { ProjectDetailsComponent } from './pages/project/details/project-details.component';
 import { ProjectListComponent } from './pages/project/list/project-list.component';
 import { ProjectRulesComponent } from './pages/project/rules/project-rules.component';
@@ -265,6 +268,10 @@ const routes: Routes = [
               component: CookbookDetailsComponent
             },
             {
+              path: ':id/organizations/:org-id/nodes/:name',
+              component: InfraNodeDetailsComponent
+            },
+            {
               path: ':id/organizations/:org-id/roles/:name',
               component: InfraRoleDetailsComponent
             },
@@ -279,6 +286,14 @@ const routes: Routes = [
             {
               path: ':id/organizations/:orgid/clients/:name',
               component: ClientDetailsComponent
+            },
+            {
+              path: ':id/organizations/:org-id/policyfiles/:name/revision/:revision',
+              component: PolicyFileDetailsComponent
+            },
+            {
+              path: ':id/organizations/:org-id/policyGroups/:name',
+              component: PolicyGroupDetailsComponent
             }
           ]
         }

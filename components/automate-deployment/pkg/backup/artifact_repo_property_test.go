@@ -359,9 +359,7 @@ func TestArtifactRepo(t *testing.T) {
 	parameters.MaxSize = 80
 	properties := gopter.NewProperties(parameters)
 
-	baseDir, err := ioutil.TempDir("", "artifact-repo-test")
-	require.NoError(t, err)
-	defer os.RemoveAll(baseDir)
+	baseDir := t.TempDir()
 
 	repoCommands := &commands.ProtoCommands{
 		NewSystemUnderTestFunc: func(initialState commands.State) commands.SystemUnderTest {

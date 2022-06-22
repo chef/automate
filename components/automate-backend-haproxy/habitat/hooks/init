@@ -1,0 +1,5 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+mkdir -p {{pkg.svc_var_path}}/run

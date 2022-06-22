@@ -192,7 +192,7 @@ describe File.basename(__FILE__) do
                 "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => "2018-03-04T09:18:41Z",
+                "endTime" => "2018-03-04T00:00:10Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -352,7 +352,7 @@ describe File.basename(__FILE__) do
                 "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => "2018-03-04T09:18:41Z",
+                "endTime" => "2018-03-04T00:00:10Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -547,7 +547,7 @@ describe File.basename(__FILE__) do
                 "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => "2018-03-04T09:18:41Z",
+                "endTime" => "2018-03-04T00:00:10Z",
                 "status" => "passed",
                 "controls" => {
                     "total" => 18,
@@ -626,7 +626,7 @@ describe File.basename(__FILE__) do
                     "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => "2018-03-04T09:18:41Z",
+                    "endTime" => "2018-03-04T00:00:10Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -762,7 +762,7 @@ describe File.basename(__FILE__) do
                     "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => "2018-03-04T09:18:41Z",
+                    "endTime" => "2018-03-04T00:00:10Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -898,7 +898,7 @@ describe File.basename(__FILE__) do
     assert_equal('centos-beta', res['node_name'])
     assert_equal('DevSec Prod beta', res['environment'])
     assert_equal('passed', res['status'])
-    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520155121, nanos: 0), res['end_time'])
+    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520121610, nanos: 0), res['end_time'])
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
@@ -947,7 +947,7 @@ describe File.basename(__FILE__) do
     assert_equal('centos-beta', res['node_name'])
     assert_equal('DevSec Prod beta', res['environment'])
     assert_equal('skipped', res['status'])
-    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520155121, nanos: 0), res['end_time'])
+    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520121610, nanos: 0), res['end_time'])
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
@@ -995,7 +995,7 @@ describe File.basename(__FILE__) do
     assert_equal('centos-beta', res['node_name'])
     assert_equal('DevSec Prod beta', res['environment'])
     assert_equal('skipped', res['status'])
-    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520155121, nanos: 0), res['end_time'])
+    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520121610, nanos: 0), res['end_time'])
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)

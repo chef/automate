@@ -1,0 +1,146 @@
+@import "~styles/variables";
+
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+  }
+}
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
+
+th {
+  text-align: left;
+  padding: 0px;
+}
+
+tbody > .detail-row {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
+
+chef-table-new {
+  .controls {
+    text-align: right;
+  }
+
+  a {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+chef-loading-spinner.spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
+}
+
+.empty-section {
+  text-align: center;
+}
+
+img {
+  width: 70px;
+  margin-top: 130px;
+}
+
+.nodes-list-paging {
+  margin: 0 0 35px;
+}
+
+.three-dot-column {
+  text-align: right;
+}
+
+.infra-nodes {
+  position: relative;
+
+  .search-items {
+    margin-bottom: 18px;
+    height: 55px;
+  }
+
+  .wrapper {
+    position: relative;
+  }
+
+  .full-screen-spinner {
+    margin: -34px;
+    margin-top: -20px;
+  }
+}
+
+::ng-deep .mat-select-panel .mat-option {
+
+  &.primary {
+    width: 158px;
+    height: 2.3em;
+    background: $chef-white;
+    color: $chef-black;
+  }
+
+  &.secondary {
+    height: 2.3em;
+    background: $chef-white;
+    color: $chef-critical;
+  }
+
+  &:hover {
+    background: $chef-primary-bright;
+    color: $chef-white;
+
+    chef-icon.primary {
+      color: $chef-white;
+    }
+
+  }
+}
+
+// reest key
+
+chef-icon.primary {
+  color: $chef-primary-bright;
+  float: right;
+  margin-top: 15px;
+
+  &:hover {
+    color: $chef-white;
+
+    .add-icon {
+      background: $chef-primary-bright;
+      color: $chef-white;
+    }
+  }
+}
+
+::ng-deep {
+  .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
+    background: #3864F2;
+    color: #FFFFFF;
+  }
+}
+
+// sass-lint:disable no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -12px !important;
+  transform: none !important;
+}
+
+::ng-deep .chef-control-menu {
+  margin-top: 29px;
+  right: -43px;
+}

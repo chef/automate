@@ -95,7 +95,7 @@ describe File.basename(__FILE__) do
       type: 'profile',
       text: 'ngin',
       filters: [
-        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:59:59Z']),
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:09Z']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
         Reporting::ListFilter.new(type: 'platform', values: ['centos', 'windows-missing']),
         Reporting::ListFilter.new(type: 'recipe', values: ['apache_extras', 'java::default']),

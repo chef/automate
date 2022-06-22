@@ -1,0 +1,96 @@
+@import "~styles/variables";
+@import '../infra_shared/shared';
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+.meta-box {
+  display: flex;
+  border: 0.5px solid $chef-key-tab;
+  border-radius: 4px;
+  margin-bottom: 36px;
+  padding: 1em 0 5em;
+  background: $chef-white;
+
+  .summary-body {
+    width: 50%;
+    font-size: 14px;
+    padding: 0 1em;
+
+    .meta-head {
+      text-transform: uppercase;
+      font-size: 15px;
+      font-weight: 600;
+      color: $chef-black;
+    }
+
+    ul {
+      color: $chef-primary-dark;
+      list-style: none;
+      padding: 0;
+
+      li {
+        display: flex;
+        margin-bottom: 5px;
+
+        span {
+          font-size: 14px;
+          line-height: 21px;
+          letter-spacing: 0.2px;
+
+          &.heading {
+            display: inline-block;
+            font-weight: bold;
+            width: 50%;
+          }
+
+        }
+      }
+    }
+
+    .summary-body:first-child {
+      border-right: 1px solid $chef-grey;
+    }
+  }
+}
+
+chef-tab-selector chef-option {
+  width: 130px;
+}
+
+.policyfiles-tab {
+  chef-table {
+    chef-th:first-child, chef-td:first-child {
+      width: 40%;
+    }
+
+    chef-th:first-child, chef-th:last-child {
+      border-left: none;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
+.page-body .no_border_th,
+.no_border_tr,
+.no_border_th:first-child,
+.no_border_th:last-child {
+  border: none;
+  border-left: none;
+  font-size: 12px;
+}
+
+.empty-section {
+  margin-top: 50px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+.nodes-list-paging {
+  margin: 0 0 35px;
+}

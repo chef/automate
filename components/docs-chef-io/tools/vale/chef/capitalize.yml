@@ -1,0 +1,10 @@
+extends: substitution
+message: "Use '%s' instead of '%s'"
+level: error
+ignorecase: false
+swap:
+  'Microsoft Windows': Windows
+  'windows': Windows
+  'linux': Linux
+  'Chef Infra Client Run': Chef Infra Client run
+

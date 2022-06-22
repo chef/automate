@@ -19,7 +19,7 @@ service ReportingService {
 
 	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	Supports pagination, filtering, and sorting.
-	Limited to 10k results.
+	Max return payload size is 4MB, use pagination to fetch remaining data.
 
 	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 
@@ -40,7 +40,7 @@ service ReportingService {
 	compliance:reports:list
 	```
 	*/
-	rpc ListReports(Query) returns (Reports) {
+	rpc ListReports(Query) returns (ReportsSummaryLevelOne) {
 		option (google.api.http) = {
 			post: "/api/v0/compliance/reporting/reports"
 			body: "*"
@@ -58,7 +58,7 @@ service ReportingService {
 	Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
-	Not limited to 10k results.
+	Max return payload size is 4MB.
 
 	Authorization Action:
 	```
@@ -80,7 +80,7 @@ service ReportingService {
 	List Controls
 
 	Lists controls from the last run, with optional filtering.
-	Supports filtering, but not pagination or sorting.
+	Supports filtering,pagination but not sorting.
 	Limited to 100 results by default.
 
 	Authorization Action:
@@ -96,6 +96,28 @@ service ReportingService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:control"
 			action: "compliance:controlItems:list"
+		};
+	};
+
+	/*
+	List Control info
+	Lists controls from the last run, with optional filtering.
+	Supports filtering and pagination. Maximum 100 search can be 
+	made when specifying the pagination from and size. Sum of from+size
+	should be less that 100. By default 10 results will be returned.
+	Authorization Action:
+	```
+	compliance:ControlElements:list
+	```
+	*/
+	rpc ListControlInfo(Query) returns (ControlElements) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/reportcontrols/id/{id}"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:reportcontrols:{id}"
+			action: "compliance:reportcontrols:list"
 		};
 	};
 
@@ -119,6 +141,28 @@ service ReportingService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:reports:{id}"
 			action: "compliance:reports:get"
+		};
+	};
+
+	/*
+	Show Node Header Info From Report ID
+
+	Show specific details about node, report and metadate provided the report ID.
+	Supports filtering, but not pagination or sorting.
+
+	Authorization Action:
+	```
+	compliance:nodeheader:get
+	```
+	*/
+	rpc ReadNodeHeader(Query) returns (NodeHeaderInfo) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/nodeheader/id/{id}"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:nodeheader:{id}"
+			action: "compliance:nodeheader:get"
 		};
 	};
 
@@ -205,6 +249,28 @@ service ReportingService {
 	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
 
 	/*
+	Export reports
+
+	Export multiple reports.
+	Supports filtering by profile or control. API returns an acknowledgement ID.
+
+	Authorization Action:
+	```
+	compliance:reports:list
+	```
+	*/
+	rpc ExportReportManager(Query) returns (CustomReportResponse) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/reportmanager/export"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:reports"
+			action: "compliance:reports:list"
+		};
+	};
+
+	/*
 	Show Node by ID
 
 	Show a specific node by ID.
@@ -230,7 +296,7 @@ service ReportingService {
 	List Nodes
 
 	List all nodes, with optional filtering, pagination, and sorting.
-	Limited to 10k results.
+	Max return payload size is 4MB, use pagination to fetch remaining data.
 
 	| Sort parameter | Sort value |
 	| --- | --- |
@@ -301,8 +367,10 @@ message ControlItemRequest {
 	string text = 1;
 	// The maximum number of controls to return (Default 100).
 	int32 size = 2;
+	// The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results. (Default 1)
+	int32 page_number =3;
 	// The criteria used to filter the controls returned.
-	repeated ListFilter filters = 3;
+	repeated ListFilter filters = 4;
 }
 
 message WaiverData {
@@ -418,25 +486,36 @@ message ControlSummary {
 	Total  waived = 5;
 }
 
+//ReportsSummaryLevelOne used for ListReports call
+message ReportsSummaryLevelOne {
+	// Paginated results of summary level reports matching the filters.
+	repeated ReportSummaryLevelOne reports = 1;
+	// Total number of reports matching the filters.
+	int32 total = 2;
+}
+
+message ReportSummaryLevelOne {
+	// A unique report identifier.
+	string id = 1;
+	// The reporting node's unique ID.
+	string node_id = 2;
+	// The reporting node name.
+	string node_name = 3;
+	// The time that the report was completed.
+	google.protobuf.Timestamp end_time = 4;
+	// The status of the run the report was made from.
+	string status = 5;
+	// Intentionally blank.
+	ControlSummary controls = 6;
+	// The reporting node IP address.
+	string ipaddress = 7;
+}
+
 message Reports {
 	// Paginated results of reports matching the filters.
 	repeated Report reports = 1;
 	// Total number of reports matching the filters.
 	int32 total = 2;
-}
-
-message ReportIds {
-	// The list of unique report identifiers found matching the query.
-	repeated string ids = 1;
-	// The list of unique report identifiers with their respective end_time, found matching the query.
-	repeated ReportData report_data = 2;
-}
-
-message ReportData{
-	// The report run_uuid
-	string id = 1;
-	// The time in UTC that the scan was completed
-	google.protobuf.Timestamp end_time = 2;
 }
 
 message Report {
@@ -482,6 +561,43 @@ message Report {
 	string status_message = 21;
 }
 
+message NodeHeaderInfo {
+	// The reporting node's unique ID.
+	string node_id = 1;
+	// The reporting node name.
+	string node_name = 2;
+	// The time that the report was completed.
+	google.protobuf.Timestamp end_time = 3;
+	// The status of the run the report was made from.
+	string status = 4;
+	// The environment of the node making the report.
+	string environment = 5;
+	// The version of the report.
+	string version = 6;
+	// Intentionally blank.
+	Platform platform = 7;
+	// The profiles run as part of this report.
+	repeated NodeHeaderProfileInfo profiles = 8;
+	// The Roles associated with the node.
+	repeated string roles = 9;
+	// The status message of the report.
+	string status_message = 10;
+}
+
+message ReportIds {
+	// The list of unique report identifiers found matching the query.
+	repeated string ids = 1;
+	// The list of unique report identifiers with their respective end_time, found matching the query.
+	repeated ReportData report_data = 2;
+}
+
+message ReportData{
+	// The report run_uuid
+	string id = 1;
+	// The time in UTC that the scan was completed
+	google.protobuf.Timestamp end_time = 2;
+}
+
 message Profile {
 	// The name of the profile. Must be unique.
 	string name = 1;
@@ -523,6 +639,15 @@ message Profile {
 	string skip_message = 24;
 	// A message to detail the reason why a profile is skipped or failed in the generated report.
 	string status_message = 25;
+}
+
+message NodeHeaderProfileInfo {
+	// The name of the profile. Must be unique.
+	string name = 1;
+	// The status of the profile in the generated report.
+	string status = 2;
+	// A message to detail the reason why a profile is skipped or failed in the generated report.
+	string status_message = 3;
 }
 
 message Ref {
@@ -630,7 +755,7 @@ message Control {
 	// External supporting documents for the control.
 	repeated Ref refs = 8;
 	// Metadata defined on the control in key-value format.
-	map<string, string> tags = 9;
+	string tags = 9;
 	// Indicates if the control has been waived or not
 	string waived_str = 11;
 	// Additional details for waived controls
@@ -798,4 +923,30 @@ message ProfileMeta {
 	string status = 4;
 	// The combined name and version of the profile.
 	string full = 5;
+}
+
+message ControlElement {
+	// The control's unique ID.
+	string id = 1;
+	// The control's compact description.
+	string title= 2;
+	// Profile name.
+	string profile = 3;
+	// The severity of the control.
+	float impact = 4;
+	// The total number of results.
+	int32 results = 5;
+	// The control's status
+	string status = 6;
+	// Profile id
+	string profile_id = 7;
+}
+
+message ControlElements {
+	// List of control elements
+	repeated ControlElement control_elements = 1;
+}
+
+message CustomReportResponse {
+	string acknowledgement_id = 1;
 }

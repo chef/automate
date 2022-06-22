@@ -1,0 +1,8 @@
+# This is the internal user database
+# The hash value is a bcrypt hash and can be generated with plugin/tools/hash.sh
+
+{{cfg.opendistro_auth.username}}:
+  readonly: true
+  hash: {{cfg.opendistro_auth.hashed_password}}
+  roles:
+    - admin

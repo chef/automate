@@ -22,6 +22,8 @@ import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import {
   CreateDataBag
 } from 'app/entities/data-bags/data-bags.actions';
+import { Utilities } from 'app/helpers/utilities/utilities';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-data-bag-modal',
@@ -44,11 +46,13 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.createForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      name: ['', [Validators.required,
+              Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]]
     });
   }
 
@@ -93,7 +97,7 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -114,6 +118,7 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new CreateDataBag({dataBag: dataBag}));
+    this.telemetryService.track('InfraServer_Databags_Create');
   }
 
   private resetCreateModal(): void {
@@ -122,7 +127,4 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
     this.conflictError = false;
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }

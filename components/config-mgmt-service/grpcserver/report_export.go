@@ -78,7 +78,7 @@ func (s *CfgMgmtServer) ReportExport(request *pRequest.ReportExport, stream serv
 	streamCtx := stream.Context()
 	deadline, ok := streamCtx.Deadline()
 	if !ok {
-		deadline = time.Now().Add(time.Minute)
+		deadline = time.Now().Add(5 * time.Minute)
 	}
 	ctx, cancel := context.WithDeadline(streamCtx, deadline)
 	defer cancel()

@@ -27,7 +27,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => "2018-03-04T09:18:41Z",
+                    "endTime" => "2018-03-04T00:00:10Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -95,7 +95,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => "2018-03-04T09:18:41Z",
+                        "endTime" => "2018-03-04T00:00:10Z",
                         "status" => "passed",
                         "controls" => {
                             "total"=> 1,
@@ -374,7 +374,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => "2018-03-04T09:18:41Z",
+                        "endTime" => "2018-03-04T00:00:10Z",
                         "status" => "passed",
                         "controls" => {
                             "total" => 4,
@@ -657,7 +657,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => "2018-03-04T09:18:41Z",
+                        "endTime" => "2018-03-04T00:00:10Z",
                         "status" => "skipped",
                         "controls" => {
                             "total" => 14,
@@ -879,7 +879,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => "2018-03-04T09:18:41Z",
+                        "endTime" => "2018-03-04T00:00:10Z",
                         "status" => "passed",
                         "controls" => {
                             "total" => 18,

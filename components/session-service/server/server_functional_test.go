@@ -142,10 +142,11 @@ func TestMain(t *testing.T) {
 
 		// This final redirect means we've successfully logged in, so we'll want to
 		// capture that id_token
-		if assert.Contains(t, resp.Request.URL.String(), "/signin#id_token=") {
-			vals, err := url.ParseQuery(resp.Request.URL.Fragment)
+		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
+			id_token, err := resp.Request.Cookie("id_token")
 			require.NoError(t, err)
-			idToken = vals.Get("id_token")
+			idToken = id_token.Value
+
 		}
 	})
 
@@ -184,10 +185,10 @@ func TestMain(t *testing.T) {
 
 		// This final redirect means we've successfully logged in, so we'll want to
 		// capture that id_token
-		if assert.Contains(t, resp.Request.URL.String(), "/signin#id_token=") {
-			vals, err := url.ParseQuery(resp.Request.URL.Fragment)
-			require.NoError(t, err, "parse fragment")
-			idToken = vals.Get("id_token")
+		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
+			id_token, err := resp.Request.Cookie("id_token")
+			require.NoError(t, err)
+			idToken = id_token.Value
 		}
 		req, err := http.NewRequest("GET", refreshEndpoint.String(), nil)
 		require.NoError(t, err, "create refresh request")
@@ -208,24 +209,6 @@ func TestMain(t *testing.T) {
 			"the token has expired, so we're given a new one")
 	})
 
-	t.Run("GET /session/new?id_token_hint=ID_TOKEN", func(t *testing.T) {
-		// no redirect we just want to see the dex URL we're sent to
-		cl := http.Client{
-			CheckRedirect: func(*http.Request, []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-			Jar:       c.Jar,
-			Transport: c.Transport, // copy custom TLS stuff from httptest's client
-		}
-
-		resp, err := cl.Get(fmt.Sprintf("%s?id_token_hint=%s", newEndpoint.String(), idToken))
-		require.NoError(t, err, "GET /new?id_token_hint=...")
-		defer resp.Body.Close()
-		require.Equal(t, http.StatusSeeOther, resp.StatusCode)
-		require.Contains(t, resp.Header.Get("Location"), "/dex/auth?")
-		require.Contains(t, resp.Header.Get("Location"), "connector_id=mock")
-	})
-
 	t.Run("GET /session/new (login, logout, try reusing old session", func(t *testing.T) {
 		var oldIDToken string
 
@@ -243,10 +226,10 @@ func TestMain(t *testing.T) {
 		require.Contains(t, resp.Request.URL.Path, "/signin")
 		// This final redirect means we've successfully logged in, so we'll want to
 		// capture that id_token
-		if assert.Contains(t, resp.Request.URL.String(), "/signin#id_token=") {
-			vals, err := url.ParseQuery(resp.Request.URL.Fragment)
-			require.NoError(t, err, "parse fragment")
-			oldIDToken = vals.Get("id_token") // we need this below
+		if assert.Contains(t, resp.Request.URL.String(), "/signin") {
+			id_token, err := resp.Request.Cookie("id_token")
+			require.NoError(t, err)
+			oldIDToken = id_token.Value
 		}
 
 		// save cookie for re-use below

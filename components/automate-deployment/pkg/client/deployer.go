@@ -131,13 +131,13 @@ Chef Automate v1 from backup if you wish to revert the upgrade after the stage
 2 migrations begin.
 `
 
-const optedInToTelemetry = `Users of this Automate deployment may elect to share anonymized usage data with
+const optedInToTelemetry = `Users of this Automate deployment may elect to share user-anonymized usage data with
 Chef Software, Inc. Chef uses this shared data to improve Automate.
 Please visit https://chef.io/privacy-policy for more information about the
 information Chef collects, and how that information is used.
 `
 
-const pleaseOptInToTelemetry = `Users of this Automate deployment cannot choose to share anonymized usage data
+const pleaseOptInToTelemetry = `Users of this Automate deployment cannot choose to share user-anonymized usage data
 with Chef Software, Inc. Chef uses this shared data to improve Automate
 Please consider allowing your users to share this data enabling telemetry.
 See the Chef Automate v2 telemetry docs for details.
@@ -271,8 +271,24 @@ func Deploy(writer cli.FormatWriter,
 	d.deployAll()
 	d.saveDeploymentCreds()
 	d.showTelemetryNotice()
-
 	return d.err
+}
+
+func DeployHA(writer cli.FormatWriter,
+	overrideConfig *dc.AutomateConfig,
+	manifestProvider manifest.ReleaseManifestProvider,
+	cliVersion string,
+	airgap bool, saas bool) error {
+	d := newDeployer(writer, overrideConfig, manifestProvider, cliVersion, airgap)
+	d.genMergedConfig()
+	ctx := context.Background()
+	currentM, err := manifestProvider.GetCurrentManifest(ctx, d.mergedCfg.Deployment.V1.Svc.Channel.GetValue())
+	if err != nil {
+		logrus.Debug("Failed to get manifest for current channel")
+	}
+	b := bootstrap.NewCompatBootstrapper(d.target)
+	err = bootstrap.FullBootstrapHA(context.Background(), b, d.mergedCfg.Deployment, currentM, writer, saas)
+	return err
 }
 
 func Destroy(writer cli.FormatWriter, opts UninstallOpts) error {
@@ -950,7 +966,7 @@ When you can backup your Chef Automate v1 installation successfully, run the upg
 		return
 	}
 
-	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Elasticsearch.NginxProxyURL
+	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Opensearch.NginxProxyURL
 	repoType := d.upgrade.A1Config.DeliveryRunning.Delivery.Backup.Type
 
 	if err := a1upgrade.WaitForEsSnapshot(d.writer, esURL, repoType, d.a1BackupName()); err != nil {
@@ -987,7 +1003,7 @@ func (d *deployer) migrateEs2Indices() {
 
 	d.writer.Title("Ensuring Elasticsearch data is compatible with Chef Automate v2")
 
-	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Elasticsearch.NginxProxyURL
+	esURL := d.upgrade.A1Config.DeliveryRunning.Delivery.Opensearch.NginxProxyURL
 	w := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
 
 	r, err := a1upgrade.NewReindexer(w, esURL)

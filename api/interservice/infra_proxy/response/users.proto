@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
+
+
+message OrgUsers {
+    // Users list
+    repeated UsersListItem users=1;
+}
+
+message UsersListItem {
+    // User username
+    string username =1;
+    // User first name
+    string first_name=2;
+    // User Last name
+    string last_name=3;
+    // User email
+    string email=4;
+}
+
+message ServerUsers {
+    // Users list
+    repeated UsersListItem users=1;
+}

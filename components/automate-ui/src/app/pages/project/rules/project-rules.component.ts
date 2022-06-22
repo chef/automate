@@ -13,6 +13,7 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
 import { AuthorizedChecker } from 'app/helpers/auth/authorized';
 import { EntityStatus } from 'app/entities/entities';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
@@ -28,6 +29,7 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject } from 'app/entities/projects/project.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 interface KVCondition {
   key: ConditionOperator;
@@ -75,7 +77,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
       this.ruleForm = this.fb.group({
         // Must stay in sync with error checks in project-rules.component.html
@@ -298,10 +301,11 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       this.saving = true;
       this.rule.id ? this.updateRule() : this.createRule();
     }
+    this.telemetryService.track('Settings_Projects_IngestRules_Create');
   }
 
   public handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event) && !this.editingRule) {
+    if (!this.modifyID && !Utilities.isNavigationKey(event) && !this.editingRule) {
       this.conflictError = false;
       this.ruleForm.controls.id.setValue(
         IdMapper.transform(this.ruleForm.controls.name.value.trim()));
@@ -309,14 +313,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   handleIDInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 
   get conditionControls(): { [key: string]: AbstractControl } {

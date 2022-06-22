@@ -11,7 +11,7 @@
             <span class="i-desc">Don't worry, data feed names can be changed later.</span>
             <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
-            Display Name is required.
+            Name is required.
           </chef-error>
           <chef-error *ngIf="conflictError">
             Name "{{createForm.get('name').value}}" already exists.

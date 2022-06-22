@@ -29,6 +29,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -450,6 +451,11 @@ func (s *Server) startHTTPServer() error {
 	// custom mux route for export of all reports for a single node
 	mux.HandleFunc("/api/v0/compliance/reporting/node/export", s.NodeExportHandler)
 
+	//custom mux for export report from report manager
+	// needed b/c gateway does not support stream; corresponds to
+	// `rpc ExportFromReportManager(ExportFromReportManagerRequest) returns (stream ExportData) {};`
+	mux.HandleFunc("/api/v0/reportmanager/export/", s.ReportManagerExportHandler)
+
 	// custom mux route for export (ignores its request method)
 	// needed b/c gateway does not support stream; corresponds to
 	// https://github.com/chef/automate/blob/master/api/interservice/cfgmgmt/service/cfgmgmt.proto
@@ -479,7 +485,7 @@ func (s *Server) startHTTPServer() error {
 	uri := fmt.Sprintf("%s:%d", s.Config.Hostname, s.Config.Port)
 	s.httpServer = &http.Server{
 		Addr:    uri,
-		Handler: mux,
+		Handler: httputils.HSTSHandler(mux),
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{*s.serviceKeyPair},
 			NextProtos:   []string{"h2"},

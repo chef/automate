@@ -1,27 +1,52 @@
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
-import { Component, OnInit } from '@angular/core';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { filter, map, startWith, takeUntil } from 'rxjs/operators';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { environment as env } from '../../../../../../environments/environment';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { select, Store } from '@ngrx/store';
+import { NodeCredentialsSearchPayload, SearchCredentials } from 'app/entities/credentials/credential.actions';
+import { allCredentials, credStatus, credtotal } from 'app/entities/credentials/credential.selectors';
+import { Credential } from 'app/entities/credentials/credential.model';
+import { pending, EntityStatus } from 'app/entities/entities';
 
 @Component({
   templateUrl: './nodes-add.component.html',
   styleUrls: ['./nodes-add.component.scss']
 })
-export class NodesAddComponent implements OnInit {
+export class NodesAddComponent implements OnInit, OnDestroy {
+  isScroll: any;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private httpClient: HttpClient,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private store: Store<NgrxStateAtom>
   ) {}
 
+  private isDestroyed = new Subject<boolean>();
+  public secretType: string;
+  public secrets: Credential[] = [];
+  public sortBy: string;
+  public total: number;
+  public scrollLoadingValue: boolean;
+  public instanceNodeCredentials$: Observable<Credential[]>;
+  public dataCy = 'cred-accordion';
+  public credentialType = [
+     {name: 'SSH', asset: 'ssh'},
+     {name: 'WinRM', asset: 'winrm'}
+    ];
+
+  public typeFieldName = 'type';
+  public uniqueFiledName = 'id';
   form: FormGroup;
   activeStep = 1;
   isLoading = false;
+  accordionTitle = 'Add credentials to connect to your nodes';
 
   addTypeControl: FormGroup;
   backendControl: FormGroup;
@@ -29,14 +54,14 @@ export class NodesAddComponent implements OnInit {
   sslControl: FormGroup;
   sslValue$: Observable<boolean>;
 
-  // Array of secrets available for user to select
-  // TODO make ngrx/store selection
-  secrets$: Observable<any[]>;
-
   // Array of nodes to add (nodesToAdd == POST request body)
   nodesToAdd$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-
+  searchData: string;
+  pageNumber = 0;
+  secretFilter: NodeCredentialsSearchPayload;
   ngOnInit() {
+    this.scrollLoadingValue = false;
+    this.searchData = '';
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.form = this.createForm();
 
@@ -49,7 +74,7 @@ export class NodesAddComponent implements OnInit {
     // Swap fields based on selected "backend" value (ssh, winrm)
     this.backendControl = this.form.get('wizardStep2').get('backend') as FormGroup;
     this.backendValue$ =
-      this.backendControl.valueChanges.pipe(startWith(this.backendControl.value));
+    this.backendControl.valueChanges.pipe(startWith(this.backendControl.value));
     this.backendValue$.subscribe(backend => {
       const step = this.form.get('wizardStep2') as FormGroup;
       step.get('secrets').setValue([]);
@@ -68,15 +93,64 @@ export class NodesAddComponent implements OnInit {
           break;
       }
     });
-
-    // Switch selectable secrets based on selected "backend" value (ssh, winrm)
-    this.secrets$ = combineLatest([
-      this.fetchSecrets(),
-      this.backendValue$
-    ]).pipe(
-      map(([secrets, backend]: [{ type: string }[], string]) =>
-        secrets.filter(s => s.type === backend || s.type === 'sudo'))
+    this.searchData = '';
+    this.secrets = [];
+    this.pageNumber = 1;
+    this.secretType = 'ssh';
+    let secretCred$;
+    this.scrollLoadingValue = false;
+    secretCred$ = this.store.pipe(
+      takeUntil(this.isDestroyed),
+      select(allCredentials)
     );
+    this.store.select(credtotal).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe((total) => {
+      this.total = total;
+    });
+    secretCred$.subscribe((secret) => {
+      if (this.isScroll) {
+        this.secrets = [...this.secrets, ...secret];
+      } else {
+        this.secrets = secret;
+      }
+    });
+    this.store.pipe(
+      select(credStatus),
+      takeUntil(this.isDestroyed),
+      filter(status => !pending(status)))
+      .subscribe(response => {
+        if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
+            this.scrollLoadingValue = false;
+        }
+      });
+
+    this.getCredList(false);
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
+  getCredList(isScroll: boolean): void {
+    this.secretFilter = {
+      filters:  [
+        {
+            key: 'name',
+            values: [this.searchData]
+        },
+        {
+            key: 'type',
+            values: [this.secretType ]
+        }
+    ],
+    page: this.pageNumber,
+    per_page: 100
+    };
+
+    this.store.dispatch(new SearchCredentials(this.secretFilter));
+    this.isScroll = isScroll;
   }
 
   setWinRmPort(): void {
@@ -89,6 +163,33 @@ export class NodesAddComponent implements OnInit {
         this.form.get('wizardStep2').get('port').patchValue(5985);
       }
     });
+  }
+
+  search(data: any) {
+    this.searchData = data;
+    this.pageNumber = 1;
+    this.getCredList(false);
+  }
+
+  selected(data: any) {
+    const secretIds: string[] = [];
+    data.forEach((listOfSecrets) => {
+      secretIds.push(listOfSecrets.id);
+    });
+    if (secretIds.length === data.length) {
+      this.form.controls['wizardStep2']['controls']['secrets'].setValue(secretIds);
+    }
+  }
+
+  scroll() {
+    this.scrollLoadingValue = true;
+    if (this.secrets.length === this.total) {
+      this.scrollLoadingValue = false;
+    }
+    if (this.secrets.length < this.total) {
+      this.pageNumber++;
+      this.getCredList(true);
+    }
   }
 
   private createForm(): FormGroup {
@@ -185,10 +286,13 @@ export class NodesAddComponent implements OnInit {
       });
   }
 
-  // TODO move to ngrx/effects
-  fetchSecrets(): Observable<any[]> {
-    return this.httpClient.post<any>(`${env.secrets_url}/search`, {}).pipe(
-      map(({secrets}) => secrets));
+
+
+  onTypeSelect(type: string) {
+    this.secretType = type;
+    this.pageNumber = 1;
+    this.form.controls['wizardStep2']['controls']['backend'].setValue(this.secretType);
+    this.getCredList(false);
   }
 
   // TODO move to ngrx/effects

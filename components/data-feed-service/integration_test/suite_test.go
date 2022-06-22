@@ -44,7 +44,7 @@ func (s *Suite) GlobalSetup() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	destination := []byte(`{"name":"integration_test_suite", "url":"http://localhost:38080/asset", "secret":"` + suite.secretId + `"}`)
+	destination := []byte(`{"url":"http://localhost:38080/asset", "name":"integration_test_suite", "secret":"` + suite.secretId + `", "services":"Service Now", "integration_types": "Webhook"}`)
 	response, err := addDestinationRequest(destination, 200)
 	if err != nil {
 		log.Fatal(err)

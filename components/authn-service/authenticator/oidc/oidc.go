@@ -14,6 +14,7 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/pkg/errors"
 
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/lib/httputils"
@@ -28,6 +29,10 @@ type requestor struct {
 
 func (r *requestor) Subject() string {
 	return fmt.Sprintf("user:%s:%s", r.connID, r.userID)
+}
+
+func (r *requestor) Requestor() string {
+	return r.userID
 }
 
 func (r *requestor) Teams() []string {
@@ -51,6 +56,10 @@ func (l *localRequestor) Subject() string {
 	return fmt.Sprintf("user:local:%s", l.email)
 }
 
+func (l *localRequestor) Requestor() string {
+	return l.userID
+}
+
 func (l *localRequestor) AppendTeams(teams []string) {
 	l.teams = append(l.teams, teams...)
 }
@@ -67,10 +76,11 @@ type Config struct {
 
 // Authenticator is used for configuring oidc authenticators
 type Authenticator struct {
-	ctx      context.Context
-	cancel   context.CancelFunc
-	verifier IDTokenVerifier
-	logger   *zap.Logger
+	ctx                    context.Context
+	cancel                 context.CancelFunc
+	verifier               IDTokenVerifier
+	logger                 *zap.Logger
+	idTokenValidatorClient id_token.ValidateIdTokenServiceClient
 }
 
 // NewAuthenticator returns an oidc authenticator that does full ID token
@@ -81,7 +91,8 @@ func NewAuthenticator(
 	skipExpiry bool,
 	retrySeconds time.Duration,
 	serviceCerts *certs.ServiceCerts,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger,
+	idTokenValidatorClient id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// inject custom client based on well-known context key (oauth2.HTTPClient)
@@ -107,10 +118,11 @@ func NewAuthenticator(
 	}
 	logger.Info("success connecting to issuer")
 	return &Authenticator{
-		verifier: newVerifier(provider, clientID, skipExpiry),
-		ctx:      ctx,
-		cancel:   cancel,
-		logger:   logger,
+		verifier:               newVerifier(provider, clientID, skipExpiry),
+		ctx:                    ctx,
+		cancel:                 cancel,
+		logger:                 logger,
+		idTokenValidatorClient: idTokenValidatorClient,
 	}, nil
 }
 
@@ -159,13 +171,13 @@ func (tr *overrideLocalTransport) RoundTrip(req *http.Request) (*http.Response, 
 
 // Open returns an OIDC authenticator for the configured settings
 func (c *Config) Open(upstream *url.URL, serviceCerts *certs.ServiceCerts,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger, idTokenValidatorClient id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 
 	// create child logger, with added fields
 	logger = logger.With(
 		zap.String("issuer", c.Issuer),
 		zap.String("client_id", c.ClientID))
-	return NewAuthenticator(c.Issuer, c.ClientID, upstream, false, 1, serviceCerts, logger)
+	return NewAuthenticator(c.Issuer, c.ClientID, upstream, false, 1, serviceCerts, logger, idTokenValidatorClient)
 }
 
 // Authenticate processes the passed request, validating its ID token in the
@@ -176,6 +188,16 @@ func (a *Authenticator) Authenticate(r *http.Request) (authenticator.Requestor, 
 	if err != nil {
 		return nil, errors.Wrap(err, "oidc: failed to extract bearer token")
 	}
+
+	validateTokenResponse, err := a.idTokenValidatorClient.ValidateIdToken(r.Context(), &id_token.ValidateIdTokenRequest{Token: rawIDToken})
+	if err != nil {
+		return nil, errors.Wrap(err, "oidc: Failed to call ValidateToken Client")
+	}
+
+	if validateTokenResponse.IsInvalid {
+		return nil, errors.Wrap(nil, "Unauthorized access")
+	}
+
 	idToken, err := a.verifier.Verify(r.Context(), rawIDToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "oidc: failed to verify ID Token")

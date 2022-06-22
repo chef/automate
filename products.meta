@@ -3,7 +3,6 @@
     "chef/backup-gateway",
     "chef/automate-postgresql",
     "chef/automate-pg-gateway",
-    "chef/automate-elasticsearch",
     "chef/automate-es-gateway",
     "chef/automate-minio",
     "chef/automate-ui",
@@ -45,6 +44,19 @@
     "chef/automate-prometheus",
     "chef/sample-data-service",
     "chef/automate-cli",
+    "chef/user-settings-service",
+    "chef/automate-ha-deployment",
+    "chef/automate-ha-elasticsidecar",
+    "chef/automate-ha-ctl",
+    "chef/automate-ha-haproxy",
+    "chef/automate-ha-pgleaderchk",
+    "chef/automate-ha-postgresql",
+    "chef/automate-ha-cluster-ctl",
+    "chef/automate-netcat",
+    "chef/automate-ha-opensearch",
+    "chef/automate-opensearch",
+    "chef/automate-elasticsearch",
+    "chef/report-manager-service",
     "core/rsync"
   ],
 
@@ -77,10 +89,10 @@
       ]
     },
     {
-      "name": "elasticsearch",
+      "name": "opensearch",
       "type": "base",
       "services": [
-        "chef/automate-elasticsearch",
+        "chef/automate-opensearch",
         "chef/automate-es-gateway",
         "chef/es-sidecar-service"
       ]
@@ -112,7 +124,8 @@
       "dependencies": ["core"],
       "services": [
         "chef/automate-gateway",
-        "chef/automate-ui"
+        "chef/automate-ui",
+        "chef/user-settings-service"
       ]
     },
     {
@@ -121,7 +134,7 @@
       "dependencies": [
         "core",
         "postgresql",
-        "elasticsearch",
+        "opensearch",
         "cereal",
         "auth",
         "ui"
@@ -139,6 +152,7 @@
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
+        "chef/report-manager-service",
         "chef/event-gateway"
       ]
     },
@@ -148,14 +162,17 @@
       "hidden": true,
       "dependencies": ["automate"],
       "services": [
-        "chef/automate-cds"
+        "chef/automate-cds",
+        "chef/automate-opensearch",
+        "chef/report-manager-service",
+        "chef/user-settings-service"
       ]
     },
     {
       "name": "chef-server",
       "type": "product",
       "aliases": ["chef-infra-server", "infra-server"],
-      "dependencies": ["core", "postgresql", "elasticsearch"],
+      "dependencies": ["core", "postgresql", "opensearch"],
       "services": [
         "chef/automate-cs-bookshelf",
         "chef/automate-cs-oc-bifrost",

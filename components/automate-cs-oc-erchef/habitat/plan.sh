@@ -1,22 +1,24 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2039
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name="automate-cs-oc-erchef"
 pkg_description="Wrapper package for chef/oc_erchef"
 pkg_origin="chef"
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.1.0"
+pkg_version="14.15.10"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
+  #core/runit/2.1.2/20200403133549
   core/runit
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_erchef/14.1.0/20210225010013"
+  "${vendor_origin}/oc_erchef/14.15.10/20220516074924"
 )
 
 pkg_build_deps=(
@@ -55,3 +57,4 @@ scaffolding_go_binary_list=(
 )
 
 chef_automate_hab_binding_mode="relaxed"
+

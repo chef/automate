@@ -10,7 +10,7 @@ options:
   usage: help for delete
 - name: wait-timeout
   shorthand: t
-  default_value: "120"
+  default_value: "43200"
   usage: |
     How long to wait for a operation to complete before raising an error
 - name: "yes"

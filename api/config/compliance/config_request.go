@@ -17,6 +17,7 @@ func NewConfigRequest() *ConfigRequest {
 				Logger:   &ConfigRequest_V1_System_Logger{},
 				Agent:    &ConfigRequest_V1_System_Agent{},
 				Profiles: &ConfigRequest_V1_System_Profiles{},
+				Proxy:    &ConfigRequest_V1_System_Proxy{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -82,6 +83,8 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *config.TLSCredentials) (confi
 // SetGlobalConfig imports settings from the global configuration
 func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	c.V1.Sys.Mlsa = g.V1.Mlsa
+	c.V1.Sys.Proxy.ConnectionString = g.ProxyString()
+	c.V1.Sys.Proxy.NoProxyString = g.NoProxyString()
 	c.V1.Sys.Service.ExternalFqdn = g.V1.GetFqdn()
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
@@ -90,6 +93,11 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 
 	if logFormat := g.GetV1().GetLog().GetFormat().GetValue(); logFormat != "" {
 		c.V1.Sys.Logger.Format.Value = logFormat
+	}
+
+	if largeReporting := g.GetV1().GetLargeReporting().GetEnableLargeReporting(); largeReporting != nil {
+		c.V1.Sys.Service.EnableLargeReporting = largeReporting
+		c.V1.Sys.Service.LcrOpenSearchRequests = g.GetV1().GetExternal().GetMinio().GetConcurrentOpenSearchRequests()
 	}
 }
 

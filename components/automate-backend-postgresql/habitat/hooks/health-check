@@ -1,0 +1,80 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+set -Eeuo pipefail
+
+source {{pkg.svc_config_path}}/functions.sh
+
+
+{{#if svc.me.follower}}
+# This is the health check for a follower node
+
+# Calculate replica lag in bytes
+# TODO: Perhaps in the future we should instead calculate in seconds
+if primary_ready >/dev/null; then
+  leader_uptime=$(leader_uptime_seconds)
+  last_replay=$(replica_last_replay_seconds)
+  echo "Primary server is available at {{svc.leader.sys.ip}} with uptime: ${leader_uptime}s"
+  local_xlog=$(local_xlog_position)
+  primary_xlog=$(primary_xlog_position)
+  xlog_diff=$((primary_xlog-local_xlog))
+  lag_seconds=${last_replay:-<ERR_LAST_REPLAY_UNKNOWN>}
+  echo "Local replica {{svc.me.sys.ip}} is ${xlog_diff} bytes and ${lag_seconds} seconds behind the primary"
+  if [ "$xlog_diff" -gt "{{cfg.replication.lag_health_threshold}}" ]; then
+    echo "Replica is lagging: ${xlog_diff} bytes is greater than threshold {{cfg.replication.lag_health_threshold}}"
+    if [ "${leader_uptime}" -gt 120 ]; then
+      if [[ "${last_replay}" == "" ]] || [ "${last_replay}" -gt {{cfg.replication.max_replay_lag_before_restart_s}} ]; then
+        # Leader has been up 2 minutes, this replica is lagging greater than threshold and replication has either
+        # never been applied or is greater than the max_replay_lag_before_restart_s
+        if [ -s /hab/svc/automate-ha-postgresql/var/postgresql.pid ]; then
+          echo "CRITICAL: No Replication changes have been applied within a reasonble threshold ({{cfg.replication.max_replay_lag_before_restart_s}}s). Restarting this replica immediately as a preemptive measure!"
+          # SIGINT will result in Fast Shutdown mode
+          kill -INT $(cat /hab/svc/automate-ha-postgresql/var/postgresql.pid)
+        fi
+      fi
+    fi
+    exit 2
+  fi
+else
+  echo "Primary server is unavailable at {{svc.leader.sys.ip}} ! Health State for follower is critical"
+  exit 2
+fi
+
+{{else}}
+# This is the health check for a leader node
+
+# pg_isready returns 0 to the shell if the server is accepting connections
+# normally, 1 if the server is rejecting connections (for example during
+# startup), 2 if there was no response to the connection attempt, and 3 if no
+# attempt was made (for example due to invalid parameters).
+#
+# The options --dbname and --username are used to avoid gratuitous
+# error messages in the logs, but are not necessary for proper
+# functionality.
+#
+# We return CRITICAL if we can't connect as well as if the server is
+# rejecting connections (not yet ready).
+{ pg_isready ${local_connect_string} --dbname postgres --quiet; err="$?"; } || true
+case "$err" in
+    "0")                        # OK (200)
+      if [[ "{{cfg.print_db_statistics}}" == "true" ]]; then print_statistics; fi
+      ;;
+    "3") exit 3;;               # UNKNOWN (500)
+    *)   exit 2;;               # CRITICAL (503)
+esac
+
+# check if the leader is in a read-only state
+# when querying pg_is_in_recovery(), a response of f means false, and t means true.
+# f means not in recovery or not in read-only mode. f is desirable for the leader
+# t means in recovery or read-only mode which is only normal for replicas
+pg_recovery_state=$(psql ${local_connect_string} --dbname postgres -tAc 'SELECT pg_is_in_recovery()') || \
+  { echo "ERROR: Unable to query PostgreSQL service - possibly an authentication error"; exit 3; }
+
+regex="^ *t$"
+if [[ "${pg_recovery_state}" =~ $regex ]]; then
+  echo "ERROR: Leader is in recovery or read-only mode, which might mean it thinks it is a follower. pg_is_in_recovery() returned 't'"
+  exit 2
+else
+  echo "OK : pg_is_in_recovery() = $pg_recovery_state"
+fi
+
+{{/if}}

@@ -1,0 +1,11 @@
+steps:
+  - label: Renew Certificate
+    command:
+      - scripts/renew_wildcard_certs.sh
+    timeout_in_minutes: 5
+    expeditor:
+      accounts:
+        - aws/chef-cd
+      executor:
+        linux:
+          privileged: true

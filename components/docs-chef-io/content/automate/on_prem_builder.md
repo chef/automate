@@ -1,5 +1,5 @@
 +++
-title = "Install Chef Habitat Builder On-prem"
+title = "Install Chef Automate with Chef Habitat Builder On-prem"
 
 date = 2019-11-19T14:10:15-08:00
 
@@ -9,10 +9,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Install Chef Habitat Builder On-prem"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/on_prem_builder.md Install Chef Habitat Builder On-prem"
-    weight = 50
+    title = "Install Habitat Builder On-prem"
+    parent = "automate/install"
+    identifier = "automate/install/on_prem_builder.md Install Chef Habitat Builder On-prem"
+    weight = 40
 +++
 
 This guide details how to install Chef Automate and deploy Chef Habitat Builder on-prem together. Enterprise customers may wish to set up an on-premises Chef Habitat Builder depot to store Chef Habitat packages for use by their own Chef Habitat Studios and Supervisors.
@@ -140,7 +140,7 @@ If you wish to enable all of Chef Automate at a later time, you can update the p
     Updating deployment configuration
 
     Applying deployment configuration
-      Installed automate-elasticsearch
+      Installed automate-opensearch
       Installed automate-es-gateway
       Installed event-service
       Installed es-sidecar-service
@@ -154,7 +154,7 @@ If you wish to enable all of Chef Automate at a later time, you can update the p
       Installed config-mgmt-service
       Installed data-feed-service
       Installed event-gateway
-      Started automate-elasticsearch
+      Started automate-opensearch
       Started automate-es-gateway
       Started event-service
       Started es-sidecar-service
@@ -270,8 +270,8 @@ Prerequisites:
 * Public Chef Habitat Builder account
 * Public Chef Habitat Builder personal access token
 
-Use [seed lists](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/README.md) to populate your on-premises Chef Habitat Builder installation with the packages required by your builds.
-[Sample seed lists](https://github.com/habitat-sh/on-prem-builder/tree/master/package_seed_lists) exist for the following scenarios:
+Use [seed lists](https://github.com/habitat-sh/on-prem-builder/blob/main/package_seed_lists/README.md) to populate your on-premises Chef Habitat Builder installation with the packages required by your builds.
+[Sample seed lists](https://github.com/habitat-sh/on-prem-builder/tree/main/package_seed_lists) exist for the following scenarios:
 
 * Full `core`: the full contents of the upstream `core` origin. The x86_64 Linux set expands to 12GB, the Linux kernel2 set to 1GB, and the Windows set to 3.5GB.
 * Core dependencies: a subset of `core` consisting of commonly-used buildtime dependencies.
@@ -375,7 +375,7 @@ level = "debug"
 scoped_levels = ["tokio_core=error", "tokio_reactor=error", "zmq=error", "hyper=error" ]
 ```
 
-## Setting up Automate as an OAuth Provider for Habitat Builder (Deprecated)
+## Setting up Chef Automate as an OAuth Provider for Chef Habitat Builder (Deprecated)
 
 {{< warning >}}
 These instructions have been deprecated in favor of using the Chef Automate installer to deploy Chef Habitat on-prem.

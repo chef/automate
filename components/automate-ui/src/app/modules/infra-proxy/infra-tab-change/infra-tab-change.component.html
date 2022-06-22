@@ -1,4 +1,4 @@
-<div class="navbar">
+<div class="navbar" data-cy="navbar">
     <a (click)="selectTab(tab)" *ngFor="let tab of tabs" [class.active]="tab.active"
     [class.disabled]="tab.disabled" tabindex="0">
         {{tab.tabTitle}}

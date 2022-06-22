@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative 'gather-logs'
+
+AutomateCluster::GatherLogs::CLI.start(ARGV)

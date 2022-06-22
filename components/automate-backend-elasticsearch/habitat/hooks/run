@@ -1,0 +1,39 @@
+#!/bin/bash
+
+exec 2>&1
+
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
+
+half_mem=$(echo $(( $(free -m | grep Mem | awk '{print $2}') / 2 )))
+if [ $half_mem -lt 26624 ]; then heapsize=$half_mem; heapsize+=m;else heapsize=26624m; fi
+export ES_JAVA_HEAP="-Xms$heapsize -Xmx$heapsize"
+
+{{#if cfg.runtime.es_startup_sleep_time ~}}
+export ES_STARTUP_SLEEP_TIME={{cfg.runtime.es_startup_sleep_time}}
+{{/if ~}}
+{{#if cfg.runtime.max_locked_memory ~}}
+ulimit -l {{cfg.runtime.max_locked_memory}}
+{{/if ~}}
+{{#if cfg.runtime.max_open_files ~}}
+ulimit -n {{cfg.runtime.max_open_files}}
+{{/if ~}}
+{{#if cfg.runtime.es_java_opts ~}}
+export ES_JAVA_OPTS="{{cfg.runtime.es_java_opts}}"
+{{else ~}}
+export ES_JAVA_OPTS="${ES_JAVA_HEAP}"
+{{/if ~}}
+
+#export ES_HOME="{{pkg.svc_path}}"
+export ES_PATH_CONF="{{pkg.svc_config_path}}"
+
+# Clean up any elasticsearch temp dirs
+# this prevents the service from filling up /tmp if it's in a bootloop
+rmdir /tmp/elasticsearch.* > /dev/null 2>&1
+# Create a temporary folder for Elastic Search ourselves.
+# Ref: https://github.com/elastic/elasticsearch/pull/27659
+ES_TMPDIR=$(mktemp -d -t elasticsearch.XXXXXXXX)
+export ES_TMPDIR
+
+exec elasticsearch

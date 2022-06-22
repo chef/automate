@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=ingest-service
 pkg_description="Ingestion service of Chef data"
@@ -46,3 +47,4 @@ do_strip() {
     do_default_strip
   fi
 }
+

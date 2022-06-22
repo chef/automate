@@ -1,0 +1,73 @@
+<div class="page-body">
+  <div id="servers-table-container" *ngIf="destinations.length != 0">
+    <chef-table class="node-list">
+      <caption class="visually-hidden">Node List Table with Node States</caption>
+      <chef-thead>
+        <chef-tr>
+          <chef-th scope="col" class="node-name sort"  (click)="onToggleSort('name')">
+            Data Feed Name<em class="sort-icon {{sortIcon('name')}}"></em>
+          </chef-th>
+          <chef-th scope="col" class="node-name sort" *ngIf="serviceShow" (click)="onToggleSort('services')">
+            Service <em class="sort-icon {{sortIcon('services')}}"></em>
+          </chef-th>
+          <chef-th scope="col" class="node-name sort" *ngIf="integration_typeShow" (click)="onToggleSort('integration_types')" >
+            Integration Type <em class="sort-icon {{sortIcon('integration_types')}}"></em>
+          </chef-th>
+          <chef-th class="view-more column-dropdown">
+            <chef-button tertiary class="column-dropdown-toggle" (click)="toggleColumnDropdown()">
+              <mat-select panelClass="chef-control-menu" ></mat-select>
+            </chef-button>
+            <chef-click-outside omit="column-dropdown-toggle" (clickOutside)="closeColumnDropdown()">
+              <chef-dropdown [attr.visible]="columnDropdownVisible" class="remove_overlap">
+                <chef-checkbox [checked]=serviceShow
+                  (change)="checkValue($event,'serviceShow')">
+                  Service
+                </chef-checkbox>
+                <chef-checkbox [checked]=integration_typeShow
+                  (change)="checkValue($event,'integration_typeShow')">
+                  Integration Type
+                </chef-checkbox>
+              </chef-dropdown>
+            </chef-click-outside>
+          </chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor= "let destination of destinations; index as i" [ngClass]="!destination?.enable ? 'disable-body' : null">
+          <chef-td class="node-name sort">
+            <a [routerLink]="['/settings/data-feeds/', destination.id]">{{ destination.name }}</a>
+          </chef-td>
+          <chef-td class="node-name sort" *ngIf="serviceShow" >
+            {{destination.services}}
+          </chef-td>
+          <chef-td class="node-name sort" *ngIf="integration_typeShow" >
+            {{destination.integration_types}}
+          </chef-td>
+          <chef-td class="three-dot-column">
+            <mat-select panelClass="chef-control-menu" id="menu-{{destination.id}}" class="test_icon" [ngClass]="!destination?.enable ? 'disable-body' : 'button_css'">
+              <mat-option (click)="enableDestination(!destination.enable,destination.id)" class="button_css border_css eyeChange border_enable">
+                <span *ngIf="destination.enable"><span data-cy=disable-btn >Disable</span><img src="assets/img/eye.svg" alt= "" class="eyeIcon"></span>
+                <span *ngIf="!destination.enable"><span data-cy=enable-btn>Enable</span><img src="assets/img/eye.svg" alt="" class="eyeIcon"></span>
+              </mat-option>
+              <mat-option (onSelectionChange)="startDataFeedDelete($event, destination)" data-cy="remove-data-feed" class="eyeChange border_delete">Delete
+                <img src="assets/img/bin.svg" alt="" class="binIcon">
+              </mat-option>
+            </mat-select>
+          </chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </div>
+  <div class="empty-section" *ngIf="(destinations.length === 0)">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p>No Data feeds Preview Available</p>
+  </div>
+</div>
+<app-delete-object-modal
+  [visible]="deleteModalVisible"
+  objectNoun="data feed"
+  [objectName]="dataFeedToDelete?.name"
+  (close)="closeDeleteModal()"
+  (deleteClicked)="deleteDataFeed()"
+  objectAction="Delete">
+</app-delete-object-modal>

@@ -7,13 +7,11 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"regexp"
-	"strconv"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 /*
@@ -32,8 +30,10 @@ const (
 	// deleteRetryInterval is the time to sleep between retrying snapshot deletes
 	deleteInterval = 5 * time.Second
 	// maxDeleteWaitTime is the maximum amount of time we'll wait for a delete to
-	// be acknowledged
-	maxDeleteWaitTime = 10 * time.Minute
+	// be acknowledged. Since the acknowledgement doesn't come from ES (6.8.1) until
+	// the deletion is complete, and deletions can take hours in deployments with a
+	// large number of nodes or cloud targets, we need this to be quite long
+	maxDeleteWaitTime = 12 * time.Hour
 )
 
 // BackupsConfig contains settings for Es snapshot repo type and options, as
@@ -618,8 +618,9 @@ func (es *Elastic) indicesAndShardsInSnapshot(ctx context.Context, repoName, sna
 	return indexesList, shardsToWaitFor, nil
 }
 
+
 func (es *Elastic) indicesSnapshotRecoveryStatus(ctx context.Context) (*indicesRecoveryStats, error) {
-	indicesRecoveryPath := "/_recovery"
+	indicesRecoveryPath := "/_all/_recovery"
 
 	response, err := es.client.PerformRequest(ctx, elastic.PerformRequestOptions{
 		Method: "GET",
@@ -742,15 +743,16 @@ func (es *Elastic) snapshotExist(ctx context.Context, repoName, snapshotName str
 // This follows elastic's recommendations:
 // https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories
 func (es *Elastic) repoNamesFor(ctx context.Context, serviceName string) ([]string, error) {
-	stats, err := es.client.ClusterStats().Do(ctx)
+	/* stats, err := es.client.ClusterStats().Do(ctx)
 	if err != nil {
 		return nil, err
-	}
+	} */
 
-	major, err := clusterVersion(stats.Nodes.Versions)
-	if err != nil {
+	//major, err := clusterVersion(stats.Nodes.Versions)
+	major := 6
+	/* if err != nil {
 		return nil, err
-	}
+	} */
 
 	return []string{
 		fmt.Sprintf("chef-automate-es%d-%s", major, serviceName),
@@ -781,7 +783,7 @@ func (fs *FsBackupsConfig) createRepoReq(repoName string) createRepoReq {
 // clusterVersion takes a slice of semantic version strings and returns the
 // highest major version. If any of the versions are not valid semantic versions,
 // or there are multiple different major version it will return an error.
-func clusterVersion(versions []string) (int, error) {
+/* func clusterVersion(versions []string) (int, error) {
 	verRegex := regexp.MustCompile(`(\d+)\.\d+\.\d+`)
 	var version int
 
@@ -806,4 +808,4 @@ func clusterVersion(versions []string) (int, error) {
 	}
 
 	return version, nil
-}
+} */

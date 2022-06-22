@@ -11,6 +11,7 @@ import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions'
 import { allPolicies, getAllStatus } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-policy-list',
@@ -25,7 +26,8 @@ export class PolicyListComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     store.pipe(
       select(getAllStatus),
@@ -68,6 +70,7 @@ export class PolicyListComponent implements OnInit, OnDestroy {
   public deletePolicy(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeletePolicy({id: this.policyToDelete.id}));
+    this.telemetryService.track('Settings_Policies_Delete');
   }
 
   public inUseMessage(): string {

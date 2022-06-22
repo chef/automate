@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative 'smoke-test'
+
+AutomateCluster::SmokeTest::CLI.start(ARGV)

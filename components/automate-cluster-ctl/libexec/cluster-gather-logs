@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl gather-logs
+# Summary: Generate and collect gather-log bundles for nodes in the Automate cluster
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+require 'cluster/terraform'
+require 'cluster/ssh'
+require 'fileutils'
+
+class AutomateClusterGatherlogs < AutomateCluster::Command
+  option ['-o', '--ssh-options'], 'OPTIONS', 'Additional options to pass to ssh'
+  option ['-c', '--sudo-command'], 'SUDO_COMMAND', 'Alternate command for sudo', default: 'sudo'
+  option ['-s', '--sudo-options'], 'SUDO_OPTIONS', 'Additional options for remote sudo'
+  option ['-r', '--remote-log-dir'], 'DIRECTORY', 'Where to temporarily store remote log files', default: '/var/tmp'
+  option ['-l', '--local-log-dir'], 'DIRECTORY', 'Where to store the logs locally', default: '/var/tmp'
+  option ['-n', '--log-lines'], 'NUMBER', 'How many journalctl lines to capture'
+
+  def execute
+    ssh = AutomateCluster::SSH.new
+    timestamp = Time.now.strftime('%Y%m%d%H%M%S')
+
+    ssh.connections do |type, conn|
+      frontend = %w{automate chef_server}.include?(type)
+
+      logfile = "#{type}-#{conn.hostname}-logs.tar.gz"
+      remote_logfile = File.join(remote_log_dir, logfile)
+      local_logfile = File.join(local_log_dir, timestamp, logfile)
+      FileUtils.mkdir_p(File.dirname(local_logfile))
+      cmd = gatherlog_command(remote_logfile, !frontend)
+
+      logger.info "Running chef-automate gather-logs", hostname: conn.hostname
+      if !conn.run(cmd)
+        logger.error "Failed to generate gather-log bundle for #{type} @ #{conn.hostname}", hostname: conn.hostname
+        next
+      end
+
+      logger.info "Downloading gather-log bundle to #{local_logfile}", hostname: conn.hostname
+      conn.download(remote_logfile, local_logfile)
+
+      logger.debug "Cleaning up remote logfile #{remote_logfile}", hostname: conn.hostname
+      conn.run cleanup_cmd(remote_logfile, !frontend)
+    ensure
+      conn.close
+    end
+  end
+
+  private
+
+  def be_sudo_password
+    @be_sudo_password ||= AutomateCluster.secrets['be_sudo_password'] || AutomateCluster.secrets['sudo_password']
+  end
+
+  def fe_sudo_password
+    @fe_sudo_password ||= AutomateCluster.secrets['fe_sudo_password'] || AutomateCluster.secrets['sudo_password']
+  end
+
+  def sudo_password(backend)
+    if backend
+      be_sudo_password
+    else
+      fe_sudo_password
+    end
+  end
+
+  def sudo_cmd(backend)
+    ["echo #{sudo_password(backend)} |", sudo_command, '-S', sudo_options]
+  end
+
+  def cleanup_cmd(filename, backend)
+    cmd = sudo_cmd(backend) + ['rm -f', filename]
+  end
+
+  def gatherlog_command(logfile, backend)
+    cmd = sudo_cmd(backend)
+    cmd << "chef-automate gather-logs #{logfile} -o"
+    cmd << "-l" if backend
+    cmd << "--log-line #{log_lines}" unless log_lines.nil?
+    cmd << "&&"
+    cmd << sudo_cmd(backend)
+    cmd << "chmod 644 #{logfile}"
+
+    cmd.flatten
+  end
+end
+
+AutomateClusterGatherlogs.run

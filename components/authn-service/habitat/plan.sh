@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=authn-service
 pkg_description="Authn API service"
@@ -26,6 +27,7 @@ pkg_binds=(
   [teams-service]="port"
   [authz-service]="port"
   [cereal-service]="port"
+  [session-service]="grpc-port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
@@ -48,3 +50,5 @@ do_install() {
   build_line "Copying migration files"
   cp -r tokens/pg/sql "${pkg_prefix}/migrations"
 }
+
+

@@ -61,6 +61,7 @@ type Client interface {
 		endDate string) ([]TypeCount, error)
 	GetNodeRunsDailyStatusTimeSeries(string, time.Time, time.Time) ([]RunDurationStatus, error)
 	GetLatestRunRolloutBreakdownCounts() (*NodeSegmentRolloutProgress, error)
+	GetUniqueNodesCount(int64, time.Time) (int64, error)
 }
 
 // Types that we consume from the ingest-service

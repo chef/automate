@@ -6,9 +6,9 @@ package gateway
 import (
 	"context"
 
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // verify that the mock satisfies the GatewayServer interface (at compile time)
@@ -30,11 +30,11 @@ func NewGatewayServerMockWithoutValidation() *GatewayServerMock {
 // methods with "not implemented" returns
 type GatewayServerMock struct {
 	validateRequests bool
-	GetVersionFunc   func(context.Context, *empty.Empty) (*Version, error)
-	GetHealthFunc    func(context.Context, *empty.Empty) (*Health, error)
+	GetVersionFunc   func(context.Context, *emptypb.Empty) (*Version, error)
+	GetHealthFunc    func(context.Context, *emptypb.Empty) (*Health, error)
 }
 
-func (m *GatewayServerMock) GetVersion(ctx context.Context, req *empty.Empty) (*Version, error) {
+func (m *GatewayServerMock) GetVersion(ctx context.Context, req *emptypb.Empty) (*Version, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -46,7 +46,7 @@ func (m *GatewayServerMock) GetVersion(ctx context.Context, req *empty.Empty) (*
 	return nil, status.Error(codes.Internal, "mock: 'GetVersion' not implemented")
 }
 
-func (m *GatewayServerMock) GetHealth(ctx context.Context, req *empty.Empty) (*Health, error) {
+func (m *GatewayServerMock) GetHealth(ctx context.Context, req *emptypb.Empty) (*Health, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())

@@ -1,0 +1,301 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl setup
+# Summary: Deploy Automate cluster
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+require 'cluster/terraform'
+
+class AutomateClusterSetup < AutomateCluster::Command
+  include AutomateCluster::Terraform::Helpers
+
+  option ["-o", "--okta-aws"], :flag, 'Use okta_aws cli to authenticate with AWS'
+  option ["-p", "--parallelism"], "WORKERS", "Number of workers used for the terraform apply", default: 50 do |s|
+    Integer(s)
+  end
+
+  option ["--tf-destroy"], :flag, "Run terraform destroy before the applying any changes (DANGER)", default: false, hidden: true
+  option ["-u", "--upgrade-airgap-bundles"], :flag, "Update all airgap bundle files before deploying"
+  option ["-f", "--upgrade-frontends"], :flag, "Update to latest FE airgap bundle files before deploying"
+  option ["-b", "--upgrade-backends"], :flag, "Update to latest BE airgap bundle files before deploying"
+  option ["-d", "--force-deploy"], :flag, "Force terraform deploy even if no changes have been detected. This is used when needing to update the tfstate"
+  option ["-y", "--accept-changes"], :flag, "Automatically accept and apply terraform changes"
+  option ["-n", "--skip-changes"], :flag, "Only show what changes are needed, don't apply them"
+  option ["-s", "--skip-deploy"], :flag, "Skip the deploy step, this this if you only want to update terraform plans or airgap bundles."
+  option ["-t", "--timeout"], 'MINUTES', "Set timeout value for commands to finish running", default: 10
+  option ["-c", "--dev"], :flag, "Downloads the dev channel manifest"
+
+  def valid_bundle?
+    tf_aib_valid?
+  end
+
+  def valid_fe_bundle?
+    tf_manifest_exist? && tf_fe_aib_valid?
+  end
+
+  def valid_be_bundle?
+    tf_manifest_exist? && tf_be_aib_valid?
+  end
+
+  def need_bundle?
+    !valid_bundle? || upgrade_airgap_bundles? || dev? 
+  end
+  
+  def need_fe_bundle?
+    !valid_fe_bundle? || upgrade_frontends? || upgrade_airgap_bundles?
+  end
+
+  def need_be_bundle?
+    !valid_be_bundle? || upgrade_backends? || upgrade_airgap_bundles?
+  end
+
+  def command_opts(opts = {})
+    # convert timeout to seconds
+    { timeout: timeout.to_i * 60 }.merge(opts)
+  end
+  
+  def generate_bundle
+    wait_while 'Generating airgap bundles', true do |spin|
+      status = run_make_cmd('bundle', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to generate airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_bundle?
+ 
+  end
+
+  def generate_dev_bundle
+    wait_while 'Generating airgap bundles for dev channel ', true do |spin|
+      status = run_make_cmd('bundle-dev', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating  airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to generate airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_bundle?
+ 
+  end
+
+
+  def upgrade_FE_bundle
+    wait_while 'upgrading FE airgap bundle', true do |spin|
+      status = run_make_cmd('fe-bundle', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating FE airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to upgrade FE airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_fe_bundle?
+ 
+  end
+
+  def upgrade_BE_bundle
+    wait_while 'upgrading BE airgap bundle', true do |spin|
+      status = run_make_cmd('be-bundle', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating BE airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to upgrade BE airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_be_bundle?
+ 
+  end
+
+
+
+  def generate_airgap_bundle
+    wait_while 'Generating FE airgap bundle', true do |spin|
+      status = run_make_cmd('manifest fe-bundle', command_opts)
+
+      if status.error? || !valid_fe_bundle?
+        logger.error "Error encountered generating FE airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to generate FE airgap bundles"
+        exit 1
+      end
+
+      valid_fe_bundle?
+    end if need_fe_bundle?
+
+    wait_while 'Generating BE airgap bundle', true do |spin|
+      status = run_make_cmd('manifest be-bundle', command_opts)
+
+      if status.error? || !valid_be_bundle?
+        logger.error "Error encountered generating BE airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to generate BE airgap bundles"
+        exit 1
+      end
+
+      valid_be_bundle?
+    end if need_be_bundle?
+  end
+
+  def predeploy_checks?
+    unless File.exists?(config.automate.config_file)
+      logger.error "Unable to find #{config.automate.config_file}"
+      return false
+    end
+
+    logger.debug "Checking contents of #{config.automate.config_file}"
+    unless File.readlines(config.automate.config_file).length > 0
+      logger.debug "#{config.automate.config_file} empty, adding comment"
+      File.open(config.automate.config_file, 'a') do |fp|
+        fp << "# No config set"
+      end
+    end
+
+    return true
+  end
+
+  def execute
+    if AutomateCluster::Config.architecture == "aws"
+      logger.info "Architecture does not match with requested one. If you want to provision cluster then you have to first run provision command. After that you can run this command."
+      exit
+    end
+    
+    AutomateCluster.terraform.setup.run(config.architecture)
+
+    unless predeploy_checks?
+      logger.error "Pre-Deploy checks failed"
+      exit 1
+    end
+
+    if dev?
+        generate_dev_bundle
+    elsif upgrade_frontends? 
+        upgrade_FE_bundle
+    elsif upgrade_backends?
+        upgrade_BE_bundle
+    else 
+        generate_bundle
+    end
+
+    wait_while 'Logging into AWS using okta_aws' do |spinner|
+      so = login_with_okta
+      unless so.error?
+        spinner.success "(#{term.green("#{so.stderr.lines.last.chomp}")})"
+      end
+    end if okta_aws?
+
+    changes_found = true
+    plan_output = nil
+
+    # TODO: this feels akward to have a skip-deploy for the deploy command.
+    #       we should probably have the above logic live in an `airgap update` command instead.
+    return if skip_deploy?
+
+    terraform_destroy if tf_destroy? && !prompt.no?("Are you sure you want to run `terraform destroy`? This cannot be undone")
+
+    wait_while 'Checking terraform state' do |spinner|
+      opts = command_opts({ returns: [0,2], environment: terraform_secret_envs })
+      plan = terraform_run("plan -detailed-exitcode -input=false", opts)
+
+      if plan.error?
+        spinner.error("(#{term.red("Error checking terraform state")})")
+        prompt.error "Please check the `a2ha.rb` config and ensure all settings are correct"
+        exit(1)
+      end
+
+      changes_found = plan.exitstatus == 2
+      plan_output = plan.stdout.lines
+    end
+
+    if changes_found || force_deploy?
+      puts "" # intentionally left blank
+      puts "The following modules will be changed:"
+      puts plan_output.inject([]) { |c,l| c << l.strip if l.match?(/# module/); c }
+      puts "" # intentionally left blank
+
+      prompt.ok "Infrastructure changes detected: #{plan_output.last.chomp}"
+      prompt.ok "To see all changes use the `-v` option when running the deploy command\n" unless verbose?
+      apply_terraform_changes(plan_output)
+    else
+      logger.info "No changes detected, infrastructure up-to-date"
+    end
+      
+  end
+
+  def terraform_secret_envs
+    secrets.inject({}) do |col, item|
+      col["TF_VAR_#{item[0]}"] = item[1]
+      col
+    end
+  end
+
+  def ask_for_action
+    prompt.expand("Do you want to apply these changes?", auto_hint: true) do |q|
+      q.choice key: 'y', name: 'Apply changes',       value: true
+      q.choice key: 'n', name: "Don't apply changes", value: false
+      q.choice key: 'v', name: 'View Changes',        value: :view
+    end
+  end
+
+  def terraform_destroy
+    opts = command_opts({
+      live_stdout: STDOUT,
+      environment: { TF_LOG: ENV['TF_LOG'] }.merge(terraform_secret_envs)
+    })
+    tfrun = terraform_run("destroy -auto-approve", opts)
+
+    if tfrun.error?
+      spinner.error("(#{term.red("Error running terraform destroy")})")
+      prompt.error "There was a problem trying to perform `terraform destroy`"
+      exit(1)
+    end
+  end
+
+  def apply_terraform_changes(changes)
+    run_apply = false
+
+    while !skip_changes?
+      choice = accept_changes? || ask_for_action
+      if choice == :view
+        puts changes
+      else
+        run_apply = choice
+        break
+      end
+    end
+
+    if run_apply
+      opts = command_opts({
+        live_stdout: STDOUT,
+        environment: { TF_LOG: ENV['TF_LOG'] }.merge(terraform_secret_envs)
+      })
+
+      terraform_run("apply -parallelism=#{parallelism} -input=false -auto-approve", opts)
+    else
+      prompt.warn "Skipped applying changes..."
+      return false
+    end
+  end
+end
+
+AutomateClusterSetup.run

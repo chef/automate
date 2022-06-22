@@ -10,3 +10,10 @@ const (
 	// RootCertPath for deployment-service
 	RootCertPath = "/hab/svc/deployment-service/data/root.crt"
 )
+
+const (
+	AutomatePGService        = "automate-postgresql"
+	AutomateSearchService    = "automate-opensearch"
+	HABackendDeploymentPkg   = "automate-ha-deployment"
+	SaasBackendDeploymentPkg = "chef-saas-deployment"
+)

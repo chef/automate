@@ -1,0 +1,35 @@
+@import "~styles/variables";
+
+
+
+.acc-header {
+  display: flow-root;
+  background: #FFFFFF;
+  cursor: pointer;
+  padding: 1em;
+  border: 0.5px solid #CFD2D2;
+  border-radius: 2px;
+  width: 100%;
+  height: auto;
+}
+
+.arrow {
+  float: right;
+}
+
+.acc-body {
+  padding: 1em;
+}
+
+.headerTitle {
+  float: left;
+}
+
+.open-acc {
+  background-color: #DEE5FD;
+}
+
+.headerTitle {
+  font-weight: 400;
+  font-size: 12px;
+}

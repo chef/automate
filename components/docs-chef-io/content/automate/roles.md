@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Roles"
-    identifier = "automate/settings/roles.md Roles"
-    parent = "automate/settings"
-    weight = 100
+    identifier = "automate/users/roles.md Roles"
+    parent = "automate/users"
+    weight = 60
 +++
 
 ## Overview
@@ -44,7 +44,7 @@ Ingest             | ingest        | infra:ingest:\*, compliance:profiles:get, c
 
 ### Custom Roles
 
-Custom roles are roles that any user with the permission for `iam:roles:update` can change. 
+Custom roles are roles that any user with the permission for `iam:roles:update` can change.
 In addition to the Chef-managed roles above, Chef Automate includes two custom roles by default.
 
 Role              | Description

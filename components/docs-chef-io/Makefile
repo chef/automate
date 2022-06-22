@@ -12,15 +12,15 @@ preview_netlify: chef_web_docs
 	cp -R layouts/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/layouts
 	cp -R static/* chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/static
 	cp -R config.toml chef-web-docs/_vendor/github.com/chef/automate/components/docs-chef-io/
-	pushd chef-web-docs && make assets; hugo --buildFuture --gc --minify && popd
+	pushd chef-web-docs && make bundle; hugo --buildFuture --gc --minify && popd
 
 serve: generate_swagger chef_web_docs
 	echo "replace github.com/chef/automate/components/docs-chef-io => ../" >> chef-web-docs/go.mod
-	pushd chef-web-docs && make assets; hugo server --buildDrafts --buildFuture --noHTTPCache --ignoreVendorPaths "github.com/chef/automate/**" && popd
+	pushd chef-web-docs && make bundle; hugo server --buildDrafts --buildFuture --noHTTPCache --ignoreVendorPaths "github.com/chef/automate/**" && popd
 
 chef_web_docs:
 	if [ -d "chef-web-docs/" ]; then \
-		pushd chef-web-docs && git reset HEAD --hard; git pull origin master && popd; \
+		pushd chef-web-docs && git reset HEAD --hard; git clean -fd; git pull --ff-only origin main; rm -rf public && popd; \
 	else \
 		git clone https://github.com/chef/chef-web-docs.git; \
 	fi

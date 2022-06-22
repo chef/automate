@@ -9,6 +9,8 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/chef/automate/api/interservice/id_token"
+
 	"go.uber.org/zap"
 
 	"github.com/chef/automate/components/authn-service/authenticator"
@@ -47,6 +49,10 @@ func (a *apiClient) Subject() string {
 	return "token:" + a.id
 }
 
+func (a *apiClient) Requestor() string {
+	return a.id
+}
+
 func (a *apiClient) Teams() []string {
 	return nil
 }
@@ -63,7 +69,7 @@ func NewHeaderTokenAuthenticator(headers []string, ts types.Storage, logger *zap
 
 // Open returns an storage-adapter-based header token authenticator
 func (c *HeaderTokenConfig) Open(u *url.URL, serviceCerts *certs.ServiceCerts,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger, _ id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 
 	ts, err := c.Storage.Config.Open(serviceCerts, logger, nil)
 	if err != nil {

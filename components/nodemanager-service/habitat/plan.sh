@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=nodemanager-service
 pkg_description="Nodemanager Service"
@@ -50,3 +51,4 @@ do_strip() {
     do_default_strip
   fi
 }
+

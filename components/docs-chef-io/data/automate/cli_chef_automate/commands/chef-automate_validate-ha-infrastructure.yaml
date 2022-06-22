@@ -1,0 +1,25 @@
+name: chef-automate validate-ha-infrastructure
+synopsis: Validate existing infrastructure of Automate HA
+usage: chef-automate validate-ha-infrastructure [flags]
+description: Validate existing infrastructure of automate HA
+options:
+- name: airgap-bundle
+  usage: Path to airgap bundle
+- name: habitat-bundle
+  usage: Path to haitat tar bundle
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for validate-ha-infrastructure
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI

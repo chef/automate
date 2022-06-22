@@ -1,0 +1,161 @@
+@import "~styles/variables";
+@import '../infra_shared/slide-panel';
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+.url-failed {
+  font-size: 13px;
+  background-color: $chef-critical;
+  color: $chef-white;
+  border-radius: 4px;
+  padding: 2px;
+  margin-top: -22px;
+
+  .url-failed-icon {
+    margin-left: 16px;
+  }
+
+  span {
+    margin-left: 16px;
+  }
+}
+
+.disabled-link {
+  color: $chef-nevada;
+  cursor: default;
+  text-decoration: underline;
+}
+
+.disabled-link:hover {
+  color: $chef-nevada;
+  cursor: default;
+  text-decoration: underline;
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
+}
+
+.details-link {
+  margin-left: 30px;
+}
+
+.sidenav-body {
+  margin-left: 22px;
+}
+
+.policy-file-info {
+  margin-top: 43px;
+  font-size: 15px;
+  line-height: 21px;
+  color: $chef-black;
+  font-weight: 600;
+}
+
+.policy-file {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    text-align: left;
+    color: $chef-primary-dark;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.2px;
+  }
+
+  p {
+    margin-top: 3px;
+    margin-left: 43px;
+  }
+
+  .revision-id-info {
+    margin-left: 43px;
+  }
+
+  .server-id-info {
+    margin-left: 70px;
+  }
+
+  .org-id-info {
+    margin-left: 26px;
+  }
+}
+
+.meta-info {
+  border-top: 0.5px solid $chef-key-tab;
+  padding-top: 43px;
+}
+
+.revision-id {
+  width: 23%;
+  vertical-align: text-top;
+}
+
+table {
+  font-size: 14px;
+
+  &:first-child {
+    border-right: 1px solid $chef-grey;
+
+    tr {
+      td {
+        padding-right: 2.25em;
+      }
+    }
+  }
+
+  &:last-child {
+    tr {
+      th {
+        padding-left: 2.25em;
+      }
+    }
+  }
+
+  tr {
+    margin: 0;
+
+    th,
+    td {
+      padding: 0.25em 0;
+      border: none;
+      background-color: transparent;
+      word-break: break-all;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    td {
+      flex-grow: 2;
+      padding-right: 5em;
+    }
+
+    chef-icon {
+      margin-right: 10px;
+      color: $chef-light-grey;
+    }
+  }
+}
+
+.bottom {
+  chef-button {
+    float: right;
+    border: none;
+    color: $chef-primary-bright;
+    background-color: $chef-white;
+  }
+}

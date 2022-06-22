@@ -1,0 +1,268 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Policy files</chef-breadcrumb>
+          {{PolicyFile?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <div class="header">
+          <chef-heading data-cy="policy-file-head">{{PolicyFile?.name}}</chef-heading>
+          <chef-button secondary (click)="slide.slidePanel(name)" data-cy="revisions">
+            Revisions
+          </chef-button>
+        </div>
+        <div class="meta-box" *ngIf="!policyFileDetailsLoading">
+          <div class="summary-body">
+            <table summary="Policy file information">
+              <tr>
+                <th id="information" colspan="2">
+                  <p class="meta-head">POLICYFILE INFORMATION</p>
+                </th>
+              </tr>
+              <tr>
+                <th id="revision-id" class="revision-id">
+                  Revision Id
+                </th>
+                <td>{{PolicyFile?.revision_id}}</td>
+              </tr>
+            </table>
+            <table summary="Policy file meta data">
+              <tr>
+                <th id="metadata">
+                  <p class="meta-head">METADATA</p>
+                </th>
+              </tr>
+              <tr>
+                <th id="chef-server">
+                  Chef Infra Server
+                </th>
+                <td data-cy="policy-file-server">
+                  {{serverId}}
+                </td>
+              </tr>
+              <tr>
+                <th id="chef-organization">
+                  Chef Infra Organization
+                </th>
+                <td data-cy="policy-file-org">
+                  {{orgId}}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='details' data-cy="details-tab">Content</chef-option>
+          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <chef-loading-spinner class="top-spinner" *ngIf="policyFileDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="cookbook-button" *ngIf="!policyFileDetailsLoading">
+          <chef-button
+            id="cookbook-dependencies"
+            primary
+            (click)="cookbook.slidePanel(cookbookRuleList, cookbookDependencyList, cookbookList)"
+            data-cy="cookbook-dependencies-button">
+            Cookbook Dependencies
+          </chef-button>
+        </div>
+        <div class="accordion-section" *ngIf="!policyFileDetailsLoading">
+          <ul id="included-policy-accordion" class="accordion" >
+            <li class="items" [class.active]="showIncludedPolicies">
+              <div class="menu" (click)="handlePolicyFileSelected()">
+                <div class="data-bag-name" data-cy="included-policy">
+                  Included Policies
+                </div>
+                <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+              </div>
+              <div class="submenu" [ngClass]="showIncludedPolicies ? activeIncludedPolicies : ''">
+                <div class="item-details">
+                  <div data-cy="empty-list" class="empty-section" *ngIf="!included_policy_locks.length">
+                    <img alt="No preview" src="/assets/img/no_preview.gif" />
+                    <p>No Included Policyfiles</p>
+                  </div>
+                  <div id="included-policy-table-container" *ngIf="included_policy_locks.length" data-cy="included-policy-table-container">
+                    <chef-table>
+                      <chef-thead>
+                        <chef-tr class="no_border_tr">
+                          <chef-th class="no_border_th">Policyfiles</chef-th>
+                          <chef-th class="no_border_th">Revision ID</chef-th>
+                          <chef-th class="no_border_th"></chef-th>
+                          <chef-th class="no_border_th three-dot-column"></chef-th>
+                        </chef-tr>
+                      </chef-thead>
+                      <chef-tbody>
+                        <chef-tr *ngFor="let included_policy_lock of included_policy_locks">
+                          <chef-td>
+                            <a
+                              (click)="policyfile.slidePanel(included_policy_lock.name, included_policy_lock.revision_id)"
+                              class="details-link">
+                              {{included_policy_lock.name}}
+                            </a>
+                          </chef-td>
+                          <chef-td>{{included_policy_lock.revision_id}}</chef-td>
+                          <chef-td></chef-td>
+                          <chef-td class="three-dot-column"></chef-td>
+                        </chef-tr>
+                      </chef-tbody>
+                    </chef-table>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <ul id="run-list-accordion" class="accordion" >
+            <li class="items" [class.active]="showRunList">
+              <div class="menu" (click)="handleRunListSelected()">
+                <div class="data-bag-name"  data-cy="run-list">
+                  Run List
+                </div>
+                <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+              </div>
+              <div class="submenu" [ngClass]="showRunList ? activeRunlist : ''">
+                <div class="item-details">
+                  <div data-cy="empty-list" class="empty-section" *ngIf="!cookbook_locks.length">
+                    <img alt="No preview" src="/assets/img/no_preview.gif" />
+                    <p>No Policyfiles available</p>
+                  </div>
+                  <div id="run-list-table-container" *ngIf="cookbook_locks.length" data-cy="run-list-table-container">
+                    <chef-table>
+                      <chef-thead>
+                        <chef-tr class="no_border_tr">
+                          <chef-th class="no_border_th">Run Items</chef-th>
+                          <chef-th class="no_border_th">Current Version</chef-th>
+                          <chef-th class="no_border_th">Source</chef-th>
+                          <chef-th class="no_border_th three-dot-column"></chef-th>
+                        </chef-tr>
+                      </chef-thead>
+                      <chef-tbody>
+                        <chef-tr *ngFor="let cookbook_lock of cookbook_locks">
+                          <chef-td>
+                            <a
+                            (click)="cookbooksDetails.slidePanel(cookbook_lock.name, cookbook_lock.version)"
+                            class="details-link">
+                            {{cookbook_lock.name}}
+                            </a>
+                          </chef-td>
+                          <chef-td>{{cookbook_lock.version}}</chef-td>
+                          <chef-td>{{cookbook_lock.source === '' ? '--' : cookbook_lock.source}}</chef-td>
+                          <chef-td class="three-dot-column"></chef-td>
+                        </chef-tr>
+                      </chef-tbody>
+                    </chef-table>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="page-body" *ngIf="tabValue === 'attributes'">
+        <chef-loading-spinner class="top-spinner" *ngIf="policyFileDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="attributes-tab" *ngIf="!policyFileDetailsLoading">
+          <label>
+            <span class="label default">Default Attributes</span>
+          </label>
+          <div class="attr">
+            <div class="expand-collapse">
+              <chef-button tertiary class="action"
+                [disabled]= !hasDefaultattributes
+                (click)="tree.expand()"
+                data-cy="expand-default-attribute">
+                <chef-icon>add_circle</chef-icon>
+                <span>Expand All</span>
+              </chef-button>
+              <chef-button tertiary class="action"
+                [disabled]= !hasDefaultattributes
+                (click)="tree.collapse()"
+                data-cy="collapse-default-attribute">
+                <chef-icon>remove_circle</chef-icon>
+                <span>Collapse All</span>
+              </chef-button>
+            </div>
+            <hr class="divider-constraints" />
+            <div class="json-container">
+              <div class="scroll">
+                <app-json-tree-table
+                  class="json-tree-container"
+                  [hidden]="hasDefaultattributes? false : true"
+                  #tree
+                  [json]="defaultAttributes">
+                </app-json-tree-table>
+                <div
+                 *ngIf="!hasDefaultattributes"
+                  class="empty-section empty-default-attribute">
+                  <img alt="No preview" src="/assets/img/no_preview.gif" />
+                  <p>There are no items to display.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <label class="override">
+            <span class="label">Override Attributes</span>
+          </label>
+          <div class="attr">
+            <div class="expand-collapse">
+              <chef-button tertiary class="action"
+                [disabled]= !hasOverrideattributes
+                (click)="override.expand()"
+                data-cy="expand-override-attribute">
+                <chef-icon>add_circle</chef-icon>
+                <span>Expand All</span>
+              </chef-button>
+              <chef-button tertiary class="action"
+                [disabled]= !hasOverrideattributes
+                (click)="override.collapse()"
+                data-cy="collapse-override-attribute">
+                <chef-icon>remove_circle</chef-icon>
+                <span>Collapse All</span>
+              </chef-button>
+            </div>
+            <hr class="divider-constraints" />
+            <div class="json-container">
+              <div class="scroll">
+                <app-json-tree-table
+                  class="json-tree-container"
+                  [hidden]="hasOverrideattributes? false : true"
+                  #override
+                  [json]="overrideAttributes">
+                </app-json-tree-table>
+                <div
+                 *ngIf="!hasOverrideattributes"
+                  class="empty-section empty-override-attribute">
+                  <img alt="No preview" src="/assets/img/no_preview.gif" />
+                  <p>There are no items to display.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <app-revision-id
+        #slide
+        [serverId]="serverId"
+        [orgId]="orgId">
+      </app-revision-id>
+      <app-included-policies-details
+        #policyfile
+        [serverId]="serverId"
+        [orgId]="orgId">
+      </app-included-policies-details>
+      <app-cookbook-dependencies
+        #cookbook
+        [serverId]="serverId"
+        [orgId]="orgId">
+      </app-cookbook-dependencies>
+      <app-cookbook-dependencies-details
+        #cookbooksDetails
+        [serverId]="serverId"
+        [orgId]="orgId">
+      </app-cookbook-dependencies-details>
+    </main>
+  </div>
+</div>

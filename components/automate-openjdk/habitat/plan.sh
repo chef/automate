@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+# stable channel
 
 # Instead of wrapping the core/openjdk11 package, we're using our own so that
 # we don't need to depend on ALSA or FreeType, which have non-compatible licenses.
@@ -8,14 +9,15 @@ pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_name=automate-openjdk
 # Release archive https://jdk.java.net/archive/
-pkg_version=11.0.10+9
-pkg_source=https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_x64_linux_hotspot_11.0.10_9.tar.gz
-pkg_shasum=ae78aa45f84642545c01e8ef786dfd700d2226f8b12881c844d6a1f71789cb99
-pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.10_9.tar.gz
+pkg_version=11.0.15+10
+pkg_source=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.15%2B10/OpenJDK11U-jdk_x64_linux_hotspot_11.0.15_10.tar.gz
+pkg_shasum=5fdb4d5a1662f0cca73fec30f99e67662350b1fa61460fa72e91eb9f66b54d0b
+pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.15_10.tar.gz
 pkg_dirname="jdk-${pkg_version}"
 pkg_license=("GPL-2.0-with-classpath-exception")
-pkg_description=('AdoptOpenJDK binaries are created from the unmodified source code at OpenJDK.')
-pkg_upstream_url=https://adoptopenjdk.net/
+pkg_description=('Eclipse Temurin is the open source Java SE build based upon OpenJDK.')
+pkg_upstream_url=https://adoptium.net/
+
 pkg_deps=(
   core/gcc-libs
   core/glibc
@@ -45,6 +47,7 @@ do_build() {
 }
 
 do_install() {
+
   pushd "${pkg_prefix}" || return 1
   rsync -avz "${source_dir}/" .
 

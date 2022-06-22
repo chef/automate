@@ -7,7 +7,6 @@ import { filter, takeUntil, map } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
@@ -27,6 +26,7 @@ import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selecto
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
 import { stringToMember } from 'app/entities/policies/policy.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-api-tokens',
@@ -45,12 +45,12 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
 
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public readonly RFC2822 = DateTime.RFC2822;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
     store.pipe(
       select(apiTokenStatus),
@@ -128,6 +128,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public deleteToken(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteToken(this.tokenToDelete));
+    this.telemetryService.track('Settings_APItokens_Delete');
   }
 
   public createToken(): void {
@@ -138,6 +139,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       projects: this.createTokenForm.controls.projects.value
     };
     this.store.dispatch(new CreateToken(tok));
+    this.telemetryService.track('Settings_APItokens_Create');
   }
 
   private assignPolicies(): void {
@@ -152,6 +154,11 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public toggleActive($event: MatOptionSelectionChange, token: ApiToken): void {
     if ($event.isUserInput) {
       this.store.dispatch(new ToggleTokenActive(token));
+    }
+    if (token && token.active) {
+      this.telemetryService.track('Settings_APItokens_ToggleInActive');
+    } else {
+      this.telemetryService.track('Settings_APItokens_ToggleActive');
     }
   }
 

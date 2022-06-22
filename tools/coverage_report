@@ -1,0 +1,12 @@
+#!/bin/bash
+
+  echo "Getting NPM Coverage"
+  pushd ./components/automate-ui >/dev/null || return 1
+    npm test
+  popd >/dev/null || return 1
+  cp ./components/automate-ui/lconv.info Coverage_report
+  echo "Got NPM Coverage"
+
+  echo "Getting Go Coverage"
+  go test --count 1 ./... --coverprofile Coverage_report/cover.out
+  echo "Got Go Coverage"

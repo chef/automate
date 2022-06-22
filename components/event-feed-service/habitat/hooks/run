@@ -3,6 +3,10 @@
 set -e
 
 exec 2>&1
+
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 export ZONEINFO={{pkgPathFor "core/glibc"}}/share/zoneinfo
 
 # Call the script to block until user accepts the MLSA via the package's config

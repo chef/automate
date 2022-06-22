@@ -1,0 +1,5 @@
+# This file intentionally left empty
+all_access:
+  readonly: true
+  backendroles:
+    - admin

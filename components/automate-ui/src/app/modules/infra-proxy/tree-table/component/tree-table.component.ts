@@ -26,10 +26,12 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
   @Input() tree: Node<T> | Node<T>[];
   @Input() options: Options<T> = {};
   @Output() nodeClicked: Subject<TreeTableNode<T>> = new Subject();
-  private searchableTree: SearchableNode<T>[];
-  private treeTable: TreeTableNode<T>[];
+
   displayedColumns: string[];
   dataSource: MatTableDataSource<TreeTableNode<T>>;
+  private searchableTree: SearchableNode<T>[];
+  private treeTable: TreeTableNode<T>[];
+
   constructor(
     private treeService: TreeService,
     private validatorService: ValidatorService,
@@ -39,21 +41,26 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
   ngOnInit() {
     this.tree = Array.isArray(this.tree) ? this.tree : [this.tree];
     this.options = this.parseOptions(defaultOptions);
-    const customOrderValidator =
-    this.validatorService.validateCustomOrder(this.tree[0], this.options.customColumnOrder);
-    if (this.options.customColumnOrder && !customOrderValidator.valid) {
-      throw new Error(
-        `Properties ${customOrderValidator.xor.map(x => `'${x}'`).join(', ')} incorrect or missing in customColumnOrder`
-      );
+    if (this.tree.length > 0) {
+      const customOrderValidator =
+      this.validatorService.validateCustomOrder(this.tree[0], this.options.customColumnOrder);
+      if (this.options.customColumnOrder && !customOrderValidator.valid) {
+        throw new Error(
+          `Properties ${customOrderValidator.xor.map(x => `'${x}'`).join(', ')} incorrect or missing in customColumnOrder`
+        );
+      }
+      this.displayedColumns = this.options.customColumnOrder
+        ? this.options.customColumnOrder
+        : this.extractNodeProps(this.tree[0]);
+      const filterColumns = ['type', 'no_version', 'error', 'skipped'];
+      this.displayedColumns = this.displayedColumns.filter(v => !filterColumns.includes(v));
+      this.searchableTree = this.tree.map(t => this.converterService.toSearchableTree(t));
+      const treeTableTree =
+        this.searchableTree.map(st => this.converterService.toTreeTableTree(st));
+      this.treeTable = flatMap(treeTableTree, this.treeService.flatten);
+      this.treeCollapsed();
+      this.dataSource = this.generateDataSource();
     }
-    this.displayedColumns = this.options.customColumnOrder
-      ? this.options.customColumnOrder
-      : this.extractNodeProps(this.tree[0]);
-    this.searchableTree = this.tree.map(t => this.converterService.toSearchableTree(t));
-    const treeTableTree = this.searchableTree.map(st => this.converterService.toTreeTableTree(st));
-    this.treeTable = flatMap(treeTableTree, this.treeService.flatten);
-    this.treeCollapsed();
-    this.dataSource = this.generateDataSource();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -97,6 +104,17 @@ export class TreeTableComponent<T> implements OnInit, OnChanges {
         item.isVisible = false;
       }
     });
+    this.dataSource = this.generateDataSource();
+  }
+
+  expand() {
+    this.treeTable.forEach((item, index) => {
+      item.isExpanded = true;
+      if (item.depth > 0 && index > 0) {
+        item.isVisible = true;
+      }
+    });
+    this.dataSource = this.generateDataSource();
   }
 
   // Overrides default options with those specified by the user

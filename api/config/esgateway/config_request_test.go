@@ -11,13 +11,13 @@ import (
 	w "github.com/chef/automate/api/config/shared/wrappers"
 )
 
-func TestExternalElasticsearch(t *testing.T) {
+func TestExternalOpensearch(t *testing.T) {
 	t.Run("single http endpoint", func(t *testing.T) {
 		c := DefaultConfigRequest()
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://server1:9200"),
@@ -29,7 +29,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -46,7 +46,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://server1:9200"),
@@ -59,7 +59,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -78,7 +78,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://server1:9200"),
@@ -90,7 +90,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -106,7 +106,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://server1"),
@@ -118,7 +118,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -134,7 +134,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://server1"),
@@ -146,7 +146,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -161,7 +161,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://10.0.0.1:1120"),
@@ -173,7 +173,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -189,7 +189,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("http://10.0.0.1"),
@@ -201,7 +201,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.False(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -217,7 +217,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://10.0.0.1:1120"),
@@ -229,7 +229,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -245,7 +245,7 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://10.0.0.1"),
@@ -257,7 +257,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		assert.True(t,
 			c.GetV1().GetSys().GetExternal().GetSslUpstream().GetValue(),
@@ -276,19 +276,19 @@ func TestExternalElasticsearch(t *testing.T) {
 		require.Equal(t, c.V1.Sys.Ngx.Main.Resolvers.NameserversString.GetValue(), "111.11.11.11:50", "does not match with the nameserver passed")
 	})
 
-	t.Run("aws elasticsearch", func(t *testing.T) {
+	t.Run("aws opensearch", func(t *testing.T) {
 		c := DefaultConfigRequest()
 		c.SetGlobalConfig(&ac.GlobalConfig{
 			V1: &ac.V1{
 				External: &ac.External{
-					Elasticsearch: &ac.External_Elasticsearch{
+					Opensearch: &ac.External_Opensearch{
 						Enable: w.Bool(true),
 						Nodes: []*wrappers.StringValue{
 							w.String("https://server1"),
 						},
-						Auth: &ac.External_Elasticsearch_Authentication{
-							Scheme: w.String("aws_es"),
-							AwsEs: &ac.External_Elasticsearch_Authentication_AwsElasticsearchAuth{
+						Auth: &ac.External_Opensearch_Authentication{
+							Scheme: w.String("aws_os"),
+							AwsOs: &ac.External_Opensearch_Authentication_AwsOpensearchAuth{
 								Username: w.String("testuser"),
 								Password: w.String("testpassword"),
 							},
@@ -300,7 +300,7 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		require.True(t,
 			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
-			"expected external ES to be enabled")
+			"expected external OS to be enabled")
 
 		require.Equal(t, "server1", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetAddress().GetValue())
 		require.Equal(t, "443", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetPort().GetValue())

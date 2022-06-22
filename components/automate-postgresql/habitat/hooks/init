@@ -27,13 +27,13 @@ mkdir -p {{pkg.svc_var_path}}/pg_stat_tmp
 
 # Auto-detect pg data in the root of svc_data_path, where older versions of this plan had it
 if [[ -f "{{pkg.svc_data_path}}/PG_VERSION" ]]; then
-  echo "PGDATA detected in the root of the data path ( {{pkg.svc_data_path}} ), relocating it to {{pkg.svc_data_path}}/pgdata"
-  mkdir -p {{pkg.svc_data_path}}/pgdata
+  echo "PGDATA detected in the root of the data path ( {{pkg.svc_data_path}} ), relocating it to {{pkg.svc_data_path}}/pgdata13"
+  mkdir -p {{pkg.svc_data_path}}/pgdata13
   # bash extended globbing can cleanly move everything under a subfolder http://www.linuxjournal.com/content/bash-extended-globbing
-  mv {{pkg.svc_data_path}}/!(pgdata) {{pkg.svc_data_path}}/pgdata/
-  chmod 0700 {{pkg.svc_data_path}}/pgdata
+  mv {{pkg.svc_data_path}}/!(pgdata13) {{pkg.svc_data_path}}/pgdata13/
+  chmod 0700 {{pkg.svc_data_path}}/pgdata13
 else
-  mkdir -p {{pkg.svc_data_path}}/pgdata
+  mkdir -p {{pkg.svc_data_path}}/pgdata13
 fi
 
 mkdir -p {{pkg.svc_data_path}}/archive
@@ -41,11 +41,11 @@ mkdir -p {{pkg.svc_data_path}}/archive
 ensure_dir_ownership
 ensure_key_ownership
 
-if [[ ! -f "{{pkg.svc_data_path}}/pgdata/PG_VERSION" ]]; then
+if [[ ! -f "{{pkg.svc_data_path}}/pgdata13/PG_VERSION" ]]; then
   echo " Database does not exist, creating with 'initdb'"
     initdb -U {{cfg.superuser.name}} \
     -E utf8 \
-    -D {{pkg.svc_data_path}}/pgdata \
+    -D {{pkg.svc_data_path}}/pgdata13 \
     --locale POSIX \
     --data-checksums
 fi

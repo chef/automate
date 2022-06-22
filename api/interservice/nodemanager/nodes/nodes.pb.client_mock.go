@@ -7,8 +7,8 @@ package nodes
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 )
 
@@ -76,14 +76,14 @@ func (mr *MockNodesServiceClientMockRecorder) Read(ctx, in interface{}, opts ...
 }
 
 // Update mocks base method
-func (m *MockNodesServiceClient) Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodesServiceClient) Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Update", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -96,14 +96,14 @@ func (mr *MockNodesServiceClientMockRecorder) Update(ctx, in interface{}, opts .
 }
 
 // Delete mocks base method
-func (m *MockNodesServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodesServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Delete", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -176,14 +176,14 @@ func (mr *MockNodesServiceClientMockRecorder) BulkCreate(ctx, in interface{}, op
 }
 
 // UpdateNodeDetectInfo mocks base method
-func (m *MockNodesServiceClient) UpdateNodeDetectInfo(ctx context.Context, in *NodeDetectJobInfo, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodesServiceClient) UpdateNodeDetectInfo(ctx context.Context, in *NodeDetectJobInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "UpdateNodeDetectInfo", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -196,14 +196,14 @@ func (mr *MockNodesServiceClientMockRecorder) UpdateNodeDetectInfo(ctx, in inter
 }
 
 // UpdateNodeConnectionError mocks base method
-func (m *MockNodesServiceClient) UpdateNodeConnectionError(ctx context.Context, in *NodeError, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (m *MockNodesServiceClient) UpdateNodeConnectionError(ctx context.Context, in *NodeError, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "UpdateNodeConnectionError", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -289,10 +289,10 @@ func (mr *MockNodesServiceServerMockRecorder) Read(arg0, arg1 interface{}) *gomo
 }
 
 // Update mocks base method
-func (m *MockNodesServiceServer) Update(arg0 context.Context, arg1 *Node) (*empty.Empty, error) {
+func (m *MockNodesServiceServer) Update(arg0 context.Context, arg1 *Node) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -304,10 +304,10 @@ func (mr *MockNodesServiceServerMockRecorder) Update(arg0, arg1 interface{}) *go
 }
 
 // Delete mocks base method
-func (m *MockNodesServiceServer) Delete(arg0 context.Context, arg1 *Id) (*empty.Empty, error) {
+func (m *MockNodesServiceServer) Delete(arg0 context.Context, arg1 *Id) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -364,10 +364,10 @@ func (mr *MockNodesServiceServerMockRecorder) BulkCreate(arg0, arg1 interface{})
 }
 
 // UpdateNodeDetectInfo mocks base method
-func (m *MockNodesServiceServer) UpdateNodeDetectInfo(arg0 context.Context, arg1 *NodeDetectJobInfo) (*empty.Empty, error) {
+func (m *MockNodesServiceServer) UpdateNodeDetectInfo(arg0 context.Context, arg1 *NodeDetectJobInfo) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateNodeDetectInfo", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -379,10 +379,10 @@ func (mr *MockNodesServiceServerMockRecorder) UpdateNodeDetectInfo(arg0, arg1 in
 }
 
 // UpdateNodeConnectionError mocks base method
-func (m *MockNodesServiceServer) UpdateNodeConnectionError(arg0 context.Context, arg1 *NodeError) (*empty.Empty, error) {
+func (m *MockNodesServiceServer) UpdateNodeConnectionError(arg0 context.Context, arg1 *NodeError) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateNodeConnectionError", arg0, arg1)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

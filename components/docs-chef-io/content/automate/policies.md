@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Policies"
-    identifier = "automate/settings/policies.md Policies"
-    parent = "automate/settings"
-    weight = 90
+    identifier = "automate/users/policies.md Policies"
+    parent = "automate/users"
+    weight = 50
 +++
 
 ## Overview

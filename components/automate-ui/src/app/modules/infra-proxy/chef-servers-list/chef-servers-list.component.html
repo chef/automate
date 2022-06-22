@@ -3,13 +3,15 @@
     <chef-loading-spinner *ngIf="chefServersLoading" size="50" fixed></chef-loading-spinner>
     <main>
       <chef-page-header>
-        <chef-heading>Chef Servers</chef-heading>
+        <chef-heading>Chef Infra Servers</chef-heading>
         <chef-subheading>Manage Chef Infra Servers with Chef Automate.</chef-subheading>
       </chef-page-header>
       <app-create-chef-server-modal 
         [visible]="createModalVisible" 
         [creating]="creatingChefServer"
-        [createForm]="createChefServerForm" 
+        [createForm]="createChefServerForm"
+        [fqdnForm]="fqdnForm"
+        [ipForm]="ipForm"
         (close)="closeCreateModal()" 
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createChefServer()">
@@ -31,18 +33,18 @@
       <div class="page-body">
         <chef-toolbar>
           <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
-            <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
+            <chef-button primary (click)="openCreateModal()" data-cy="add-server-button">Add Chef Infra Server</chef-button>
           </app-authorized>
         </chef-toolbar>
-        <div *ngIf="servers.length != 0">
+        <div id="servers-table-container" *ngIf="servers.length != 0">
           <chef-table>
             <chef-thead>
               <chef-tr>
-                <chef-th class="no-border-th">Name</chef-th>
-                <chef-th class="no-border-th">FQDN</chef-th>
-                <chef-th class="no-border-th">IP Address</chef-th>
-                <chef-th class="no-border-th">Number Of Orgs</chef-th>
-                <chef-th class="three-dot-column  no-border-th"></chef-th>
+                <chef-th class="no-border">Name</chef-th>
+                <chef-th class="no-border">FQDN</chef-th>
+                <chef-th class="no-border">IP Address</chef-th>
+                <chef-th class="no-border">Number Of Orgs</chef-th>
+                <chef-th class="three-dot-column no-border"></chef-th>
               </chef-tr>
             </chef-thead>
             <chef-tbody>
@@ -56,7 +58,7 @@
                 <chef-td class="three-dot-column">
                   <!-- <app-authorized [allOf]="['/api/v0/infra/servers/{id}', 'delete', server.id]"> -->
                     <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
-                      <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Delete</mat-option>
+                      <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="delete-server">Delete</mat-option>
                     </mat-select>
                   <!-- </app-authorized>   -->
                 </chef-td>
@@ -66,7 +68,7 @@
         </div>
         <div class="empty-section" *ngIf="(servers.length === 0) && !chefServersLoading">
           <img alt="No preview" src="/assets/img/no_preview.gif" />
-          <p>No chef servers available.</p>
+          <p>No chef infra servers available.</p>
         </div>
       </div>
     </main>

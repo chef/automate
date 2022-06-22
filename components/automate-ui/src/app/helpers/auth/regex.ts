@@ -12,6 +12,13 @@ export class Regex {
     // NB: neither \S nor ^\s work inside the brackets in this regex language.
     NON_BLANK: '.*[^ ].*',
 
+    // Only allows words or numbers or hyphen or underscore also combined
+    // Will Not allow wildcard alone also not combination also not space
+    // Legal Values: _, -, chef, _state, -chef, 19test, tes-1-9-A_test etc.
+    // Illegal Values: abc*, *chef, c*h*e*f, **, * chef
+    // Allows no special characters except hyphen and underscore.
+    NO_WILDCARD_ALLOW_HYPHEN: /^[0-9a-zA-Z-_]+$/,
+
     // Only allows wildcard alone or words and numbers, but not combined
     // Legal Values: *, chef, _state, etc.
     // Illegal Values: abc*, *chef, c*h*e*f, **
@@ -23,12 +30,17 @@ export class Regex {
     NO_MIXED_WILDCARD_ALLOW_SPECIAL: '^(\\*|[^:*]+)$',
 
     // Allows valid FQDN only
-    VALID_FQDN: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-zA-Z0-9_]+([\-\.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,5}(:[0-9]{1,5})?(\/.*)?$/,
+    // Top level domain is limited to a maximum number of 25 characters
+    VALID_FQDN: /^(https?:\/\/)?[a-zA-Z0-9_]+([\-\.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,25}(:[0-9]{1,5})?(\/.*)?$/,
+
     // Allows valid IP Address only (ipv4)
     VALID_IP_ADDRESS: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
 
-    // Allow valid versions only Eg: 1.2.3
-    VALID_VERSION: /^\d{1,9}\.\d{1,9}\.\d{1,9}$/
+    // Allow valid versions only Eg: 1.2.3 or 1.2
+    VALID_VERSION: /^(0|[1-9]\d*)(\.(0|[1-9]\d*)){0,2}$/,
+
+    // Allow valid header input for Custom webhook
+    VALID_HEADER: /([a-zA-Z]):([a-zA-Z])[^\r\n]/
   };
 
 }

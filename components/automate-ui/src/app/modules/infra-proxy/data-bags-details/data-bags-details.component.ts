@@ -16,6 +16,8 @@ import { DataBagItems, DataBagsItemDetails } from 'app/entities/data-bags/data-b
 import { getAllStatus, dataBagItemList, deleteStatus } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus  } from 'app/entities/data-bags/data-bag-item-details.selector';
+import { Regex } from 'app/helpers/auth/regex';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type DataBagsDetailsTab = 'details';
 
@@ -40,20 +42,23 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
   public activeClassName: string;
-  public searching = false;
+  public loading = false;
   public searchValue = '';
   public current_page = 1;
-  public per_page = 9;
+  public per_page = 100;
   public total: number;
   public dataBagItemToDelete: DataBagItems;
   public deleteModalVisible = false;
+  public deleting = false;
+  public editDisable = false;
   public openDataBagModal = new EventEmitter<void>();
   public openEditDataBagItemModal = new EventEmitter<void>();
   public openDataBagItemModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit() {
@@ -86,14 +91,15 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         this.total = dataBagItemsState.total;
         this.appendActiveToItems(this.dataBagItems);
         this.dataBagsDetailsLoading = false;
-        this.searching = false;
+        this.loading = false;
+        this.deleting = false;
       });
 
     this.store.select(deleteStatus).pipe(
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.searching = true;
+        this.loading = true;
         if (this.dataBagItems &&
           this.dataBagItems.length === 0 &&
           this.current_page !== 1) {
@@ -113,6 +119,17 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) => {
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
+        delete this.selectedItemDetails['id'];
+        this.editDisable = false;
+        for (const item in this.selectedItemDetails) {
+          if (this.selectedItemDetails[item]) {
+            for (const property in this.selectedItemDetails[item]) {
+              if (property === 'encrypted_data' || property === 'cipher') {
+                this.editDisable = true;
+              }
+            }
+          }
+        }
         this.dataBagsItemDetailsLoading = false;
       });
   }
@@ -133,6 +150,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
     this.dataBagItems[index].active = !this.dataBagItems[index].active;
     this.activeClassName = 'autoHeight';
+    this.telemetryService.track('InfraServer_Databags_Details_GetItems');
   }
 
   refreshData(data: string) {
@@ -156,14 +174,21 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   searchDataBagItems(currentText: string) {
-    this.searching = true;
+    this.loading = true;
     this.current_page = 1;
     this.searchValue = currentText;
-    this.getDataBagItemsData();
+    if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
+      this.loading = false;
+      this.dataBagItems.length = 0;
+      this.total = 0;
+    } else {
+      this.getDataBagItemsData();
+      this.telemetryService.track('InfraServer_Databags_Details_Search');
+    }
   }
 
   onPageChange(event: number): void {
-    this.searching = true;
+    this.loading = true;
     this.current_page = event;
     this.getDataBagItemsData();
   }
@@ -193,10 +218,12 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       databag_name: this.dataBagName,
       name: this.dataBagItemToDelete.name
     }));
+    this.telemetryService.track('InfraServer_Databags_Details_DeleteDatabagItem');
   }
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+    this.deleting = true;
   }
 
   public openCreateModal(): void {
@@ -205,11 +232,19 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   public startUpdateDataBagItem(item: DataBagItems, jsonData: Object): void {
     this.dataBagItemName = item.name;
-    this.itemDataJson = JSON.stringify(jsonData, undefined, 4);
+    delete jsonData['id'];
+    this.itemDataJson = JSON.stringify(jsonData, null, 4);
     this.openEditDataBagItemModal.emit();
   }
 
   openDatabagItemModal(): void {
     this.openDataBagItemModal.emit();
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.current_page = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.loading = true;
+    this.getDataBagItemsData();
   }
 }

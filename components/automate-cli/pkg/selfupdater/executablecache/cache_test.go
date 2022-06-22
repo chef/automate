@@ -1,8 +1,6 @@
 package executablecache
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,9 +18,7 @@ const testVersionOld = "20180522150600"
 const testVersionOlder = "20180522150500"
 
 func TestExecutableCacheRoundTrip(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "TestExecutableCache")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	ec := New(WithCacheDir(tmpdir))
 	exists, err := ec.Exists(testVersion)
@@ -44,9 +40,7 @@ func TestExecutableCacheRoundTrip(t *testing.T) {
 }
 
 func TestExecutableCacheRoundLatest(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "TestExecutableCache")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	ec := New(WithCacheDir(tmpdir))
 	exists, err := ec.Exists(testVersion)

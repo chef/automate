@@ -1,0 +1,114 @@
+<chef-modal [visible]="visible" (closeModal)="closeEditModal()">
+  <div class="text-right">
+    <h2 slot="title">Edit Role {{label}}</h2>
+  </div>
+  <div class="flex-container">
+    <div class="main pages-body">
+      <label class="edit-label">
+        <span class="constraint">{{role?.name}}</span>
+      </label>
+      <div *ngIf="label === 'Default'">
+        <form [formGroup]="defaultAttributeForm">
+          <div class="input-margin">
+            <chef-form-field>
+              <label>
+                <textarea
+                  chefInput
+                  name="default"
+                  formControlName="default"
+                  id="default"
+                  type="text"
+                  autocomplete="off"
+                  (keyup)="onChangeDefaultJson($event)"
+                  data-cy="default-attribute">
+                </textarea>
+              </label>
+              <chef-error *ngIf="defaultAttrParseError">
+                Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
+          </div>
+        </form>
+        <div class="button-bar-box">
+          <chef-button tertiary [disabled]="updateInProgress"
+           (click)="closeEditModal()" data-cy="cancel-default-attr-button">Cancel</chef-button>
+          <chef-button
+            primary
+            id="create-default-button-object-modal"
+            (click)="updateInfrarole()"
+            data-cy="update-default-attribute"
+            [disabled]="defaultAttrParseError || !defaultAttributeForm?.valid ||
+              !defaultAttributeForm.dirty || conflictError || updateInProgress">
+            <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+            <span *ngIf="updateInProgress">Saving...</span>
+            <span *ngIf="!updateInProgress">Save</span>
+          </chef-button>
+        </div>
+      </div>
+      <div *ngIf="label === 'Override'">
+        <form [formGroup]="overrideAttributeForm">
+          <div class="input-margin">
+            <chef-form-field>
+              <label>
+                <textarea
+                  chefInput
+                  name="override"
+                  formControlName="override"
+                  id="override"
+                  type="text"
+                  autocomplete="off"
+                  (keyup)="onChangeOverrideJson($event)"
+                  data-cy="override-attribute">
+                </textarea>
+              </label>
+              <chef-error *ngIf="overrideAttrParseError">
+                Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
+          </div>
+        </form>
+        <div class="button-bar-box">
+          <chef-button tertiary [disabled]="updateInProgress"
+           (click)="closeEditModal()" data-cy="cancel-override-attr-button">Cancel</chef-button>
+          <chef-button
+            primary
+            id="create-override-button-object-modal"
+            (click)="updateInfrarole()"
+            data-cy="update-override-attribute"
+            [disabled]="
+              overrideAttrParseError || !overrideAttributeForm?.valid ||
+              !overrideAttributeForm.dirty || conflictError || updateInProgress">
+            <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+            <span *ngIf="updateInProgress">Saving...</span>
+            <span *ngIf="!updateInProgress">Save</span>
+          </chef-button>
+        </div>
+      </div>
+      <div *ngIf="label === 'Run List' && showbutton">
+        <app-select-box id="myListBox"
+          [serverId]="server"
+          [orgId]="org"
+          [list]="availablelist"
+          search="true"
+          [currentRunList]="currentRunList"
+          [currentPage]="current_Page"
+          (selectedValues)="dragDropHandler($event)">
+        </app-select-box>
+        <div class="button-bar-box">
+          <chef-button tertiary [disabled]="updateInProgress"
+           (click)="closeEditModal()" data-cy="cancel-button">Cancel</chef-button>
+          <chef-button
+            primary
+            id="create-runlist-button-object-modal"
+            (click)="updateInfrarole()"
+            data-cy="update-run-list"
+            [disabled]="!isRunlist || conflictError || updateInProgress">
+            <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+            <span *ngIf="updateInProgress">Saving...</span>
+            <span *ngIf="!updateInProgress">Save</span>
+          </chef-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</chef-modal>

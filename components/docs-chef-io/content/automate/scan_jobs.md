@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 ## Overview
 
-A scan job is the equivalent of running `inspec exec` against a given set of targets.  The results of a scan job are sent to compliance reporting. Any profiles installed to the user's namespace may be used in a scan job.
+A scan job is the equivalent of running `inspec exec` against a given set of targets. The results of a scan job are sent to compliance reporting. Any profiles installed to the user's namespace may be used in a scan job.
 
 ### Scanning
 

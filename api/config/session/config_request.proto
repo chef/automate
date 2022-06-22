@@ -39,6 +39,7 @@ message ConfigRequest {
 				google.protobuf.StringValue bldr_client_secret = 7;
 
 				google.protobuf.BoolValue persistent = 8;
+				google.protobuf.Int32Value grpc_port = 9 [ (chef.automate.api.port) = { name: "grpcservice", default: 10108, protocol: "grpc" } ];
 			}
 
 			message Oidc {

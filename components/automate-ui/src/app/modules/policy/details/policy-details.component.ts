@@ -16,6 +16,7 @@ import {
   Policy, Member, Type, stringToMember
 } from 'app/entities/policies/policy.model';
 import { RemovePolicyMembers } from 'app/entities/policies/policy.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type PolicyTabName = 'definition' | 'members';
 
@@ -41,7 +42,8 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {  }
 
   ngOnInit(): void {
@@ -118,6 +120,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
         members: [member]
       }));
     }
+    this.telemetryService.track('Settings_Policies_Members_RemoveMember');
   }
 
   onSelectedTab(event: { target: { value: PolicyTabName } } ): void {

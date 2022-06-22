@@ -2,11 +2,14 @@ package server
 
 import (
 	"context"
+	"os"
+	"strconv"
 
 	"github.com/pkg/errors"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
+	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -24,34 +27,67 @@ import (
 // I think this should get a lot more simple as we integrate the
 // converger. In that world we can potentially have a function that
 // takes an expected state and tells us if it is true or not.
-func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest) (*api.UpgradeStatusResponse, error) {
+func (s *server) UpgradeStatus(ctx context.Context, req *api.UpgradeStatusRequest) (*api.UpgradeStatusResponse, error) {
 	if !s.HasConfiguredDeployment() {
 		return nil, ErrorNotConfigured
 	}
 
-	response := &api.UpgradeStatusResponse{}
-	latestManifest, err := s.releaseManifestProvider.GetCurrentManifest(ctx, s.deployment.Channel())
-	if err != nil {
-		return response, err
+	response := &api.UpgradeStatusResponse{
+		IsAirgapped: airgap.AirgapInUse(),
 	}
-
-	desiredManifest := s.deployment.CurrentReleaseManifest
-	if s.shouldFetchManifest() {
-		if desiredManifest == nil || latestManifest.Version() > desiredManifest.Version() {
-			desiredManifest = latestManifest
-		}
-	}
-
-	response.LatestAvailableVersion = latestManifest.Version()
-	response.DesiredVersion = desiredManifest.Version()
-	response.IsAirgapped = airgap.AirgapInUse()
-	response.IsConvergeDisable = (s.convergeLoop != nil && !s.convergeLoop.IsRunning()) || s.convergeDisabled()
-
 	if s.deployment.CurrentReleaseManifest == nil {
 		response.CurrentVersion = ""
 	} else {
 		response.CurrentVersion = s.deployment.CurrentReleaseManifest.Version()
 	}
+
+	var latestManifest *manifest.A2
+	if response.CurrentVersion != "" && !response.IsAirgapped {
+		isMinorAvailable, isMajorAvailable, compVersion, err := s.releaseManifestProvider.GetCompatibleVersion(ctx,
+			s.deployment.Channel(), response.CurrentVersion, req.VersionsPath)
+		if err != nil {
+			return response, err
+		}
+
+		response.LatestAvailableVersion = compVersion
+		latestManifest, err = s.releaseManifestProvider.GetManifest(ctx, compVersion)
+		if err != nil {
+			return response, err
+		}
+
+		var isMajorUpgrade bool
+		env := os.Getenv(isUpgradeMajorEnv)
+		if env == "" {
+			isMajorUpgrade = false
+		} else {
+			var err error
+			isMajorUpgrade, err = strconv.ParseBool(env)
+			if err != nil {
+				return response, err
+			}
+		}
+
+		if isMajorAvailable && isMajorUpgrade || isMinorAvailable {
+			response.IsConvergeCompatable = true
+		}
+
+	} else {
+		var err error
+		latestManifest, err = s.releaseManifestProvider.GetCurrentManifest(ctx, s.deployment.Channel())
+		if err != nil {
+			return response, err
+		}
+		response.LatestAvailableVersion = latestManifest.Version()
+	}
+
+	desiredManifest := s.deployment.CurrentReleaseManifest
+	if s.shouldFetchManifest() {
+		if desiredManifest == nil || s.isCompatibleForConverge(desiredManifest.Version(), response.LatestAvailableVersion) {
+			desiredManifest = latestManifest
+		}
+	}
+	response.DesiredVersion = desiredManifest.Version()
+	response.IsConvergeDisable = (s.convergeLoop != nil && !s.convergeLoop.IsRunning()) || s.convergeDisabled()
 
 	// TODO(ssd) 2018-02-06: This address now exists in a few
 	// places, would be nice to make it configurable and refer to
@@ -67,7 +103,18 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 		return response, errors.Wrap(err, "unable to get list of services for automate-full")
 	}
 
-	response.RemainingServices, err = detectUpgradingServices(desiredManifest, runningServices, serviceIDs)
+	//generate the map with omitted services
+	omittedServices := make(map[string]interface{})
+	enableExternalPg := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+	if enableExternalPg {
+		omittedServices[constants.AutomatePGService] = ""
+	}
+	enableExternalES := s.deployment.Config.GetGlobal().GetV1().GetExternal().GetOpensearch().GetEnable().GetValue()
+	if enableExternalES {
+		omittedServices[constants.AutomateSearchService] = ""
+	}
+
+	response.RemainingServices, err = detectUpgradingServices(desiredManifest, runningServices, serviceIDs, omittedServices)
 	if err != nil {
 		return response, err
 	}
@@ -85,7 +132,7 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 // upgrade per the current manifest.
 func detectUpgradingServices(a2Manifest *manifest.A2,
 	runningServices []habapi.ServiceInfo,
-	canonicalServices []habpkg.HabPkg) ([]*api.UpgradingService, error) {
+	canonicalServices []habpkg.HabPkg, omittedServices map[string]interface{}) ([]*api.UpgradingService, error) {
 
 	ret := make([]*api.UpgradingService, 0, len(runningServices))
 	// The manifest currently contains both service- and
@@ -120,6 +167,9 @@ func detectUpgradingServices(a2Manifest *manifest.A2,
 	}
 
 	for _, svc := range canonicalServices {
+		if _, ok := omittedServices[svc.Name()]; ok {
+			continue
+		}
 		manifestSvc := manifest.VersionedPackageFromManifest(a2Manifest, svc.Name())
 		if manifestSvc == nil {
 			return ret, errors.Errorf("required service %s not found in manifest", svc.Name())

@@ -3,13 +3,13 @@
 package sys
 
 import (
-	"bytes"
-	"io/ioutil"
-	"syscall"
-
-	"github.com/pkg/errors"
-
+	bytes "bytes"
 	"github.com/chef/automate/lib/proc"
+	"github.com/pkg/errors"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"syscall"
 )
 
 const (
@@ -42,6 +42,22 @@ func SpaceAvailForPath(path string) (uint64, error) {
 		return 0, err
 	}
 	return (uint64(stat.Frsize) * stat.Bavail) / 1024, nil
+}
+
+// DirSize return size of the directory in bytes
+// path.
+func DirSize(path string) (int64, error) {
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	return size, err
 }
 
 // SystemMemoryKB returns the total system memory in KB

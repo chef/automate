@@ -1,0 +1,334 @@
+<div ngClass="{slide : isSlideOpen}" class="data-feed-slider">
+  <div class="sidenav-header-data-feed">
+    <div *ngIf="integrationSelected">
+      <chef-button class="arrow-btn" secondary (click)="returnToMenu()" data-cy="close-data-feed-button">
+        <chef-icon>arrow_back</chef-icon>
+      </chef-button>
+    </div>
+    <h1 slot="title" class="bolder-font" *ngIf="!integrationSelected">Choose a Data Feed Integration</h1>
+    <h1 slot="title" class="bolder-font" data-cy="title-integration" *ngIf="integrationSelected">{{integTitle}}</h1>
+    <chef-button class="close" secondary (click)="closeCreateSlider()" data-cy="close-feed-button">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <app-notification
+    *ngIf="notificationShow"
+    type="{{notificationType}}"
+    timeout="5"
+    (dismissed)="dismissNotification()">
+    <span>{{notificationMessage}}</span>
+  </app-notification>
+  <main *ngIf="!integrationSelected" data-cy="interation-menu">
+    <div class="flex-container">
+        <h2 class="bolder-font">Webhook Integration</h2>
+        <div class="flex-child">
+          <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.webhook" [attr.data-cy]="item.name">
+            <img src="/assets/img/{{item.asset}}.png" alt="Avatar">
+            <div class="container image-footer">
+              <h3 class="bolder-font">{{item.name}}</h3>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="flex-container">
+        <h2 class="bolder-font">Storage Integration </h2>
+        <div class="flex-child">
+          <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.storage" [attr.data-cy]="item.name">
+            <img src="/assets/img/{{item.asset}}.png" alt="Avatar">
+            <div class="container image-footer">
+              <h3 class="bolder-font">{{item.name}}</h3>
+            </div>
+          </div>
+        </div>
+    </div>
+  </main>
+  <main [class.hide]="!integrationSelected">
+    <div class="flex-container2">
+      <form [formGroup]="createForm" data-cy="data-feed-create-form">
+        <div class="input-margin" [class.hide]="!showFields.name">
+          <chef-form-field>
+            <label>
+              <span class="label">Name <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                #name
+                formControlName="name"
+                data-cy="add-name"
+                type="text"
+                id="name-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
+              Name is required.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showFields.endpoint">
+          <chef-form-field>
+            <label>
+              <span class="label">Endpoint <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="endpoint"
+                data-cy="add-endpoint"
+                type="text"
+                id="endpoint-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="(createForm.get('endpoint').hasError('required') || createForm.get('endpoint').hasError('pattern')) && createForm.get('endpoint').dirty">
+              Endpoint is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('url').hasError('pattern')">
+              Endpoint is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <hr class="divider">
+        <div class="input-margin" *ngIf="showFields.url">
+          <chef-form-field>
+            <label>
+              <span class="label">URL<span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="url"
+                data-cy="add-url"
+                type="text"
+                id="url-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="createForm.get('url').hasError('required') && createForm.get('url').dirty">
+              URL is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('url').hasError('pattern')">
+              URL is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showAuthDropdown()">
+          <div class="name-margin">
+            <label for="version">Authentication</label>
+            <div class="version-dropdown">
+              <chef-select #ty [value]="authSelected" (change)="selectChangeHandlers(ty.value)" data-cy="select-auth-type">
+                <chef-option value="Access Token" data-cy="select-access-token">Access Token</chef-option>
+                <chef-option value="Username and Password" data-cy="select-username-password">Username and Password</chef-option>
+              </chef-select>
+            </div>
+          </div>
+        </div>
+        <div class="input-margin" *ngIf="showFields.region && showSelect">
+          <div class="name-margin">
+            <label for="version">Region *</label>
+            <div class="version-dropdown dropdown-menu">
+              <chef-select #reg [value]="dropDownVal" (change)="dropDownChangeHandlers(reg.value)" data-cy="select-region-type">
+                <chef-option *ngFor="let region of awsRegions" value="{{region.code}}"  data-cy="select-region">{{region.name}}</chef-option>
+              </chef-select>
+            </div>
+          </div>
+        </div>
+        <div class="input-margin" *ngIf="showTokenInput('tokenType')" [ngClass]="{'customtokentypeblock' : showFields.customToken}">
+          <chef-form-field>
+            <label>
+              <span class="label">Token Type (Prefix)<span aria-hidden="true">*</span></span>
+              <div class="input-and-btn">
+                <input
+                  chefInput
+                  formControlName="tokenType"
+                  type="text"
+                  data-cy="add-token-type"
+                  id="token-type-input"
+                  autocomplete="off"
+                  [readonly]="tokenToggle && !showFields.customToken"/>
+                <chef-button secondary data-cy="toggle-type" (click)="toggleTokenType()" *ngIf="!showFields.customToken">
+                  Edit
+                </chef-button>
+              </div>
+            </label>
+            <chef-error
+              *ngIf="createForm.get('tokenType').hasError('required') && createForm.get('tokenType').dirty">
+              token type is required.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showTokenInput('token')" [ngClass]="{'customtokenblock' : showFields.customToken}">
+          <chef-form-field>
+            <label>
+              <span class="label">Token <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="token"
+                type="text"
+                data-cy="add-token"
+                id="token-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="createForm.get('token').hasError('required') && createForm.get('token').dirty">
+              token is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('token').hasError('pattern')">
+              token is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showUserPassInput('username')" [ngClass]="{'custompasswordblock' : showFields.customToken}">
+          <chef-form-field>
+            <label>
+              <span class="label">Username <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="username"
+                type="text"
+                data-cy="add-username"
+                id="username-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
+              Username is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('username').hasError('pattern')">
+              Username is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showUserPassInput('password')" [ngClass]="{'custompasswordblock' : showFields.customToken}">
+          <chef-form-field>
+            <label>
+              <span class="label">Password <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="password"
+                type="password"
+                data-cy="add-password"
+                id="password-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="createForm.get('password').hasError('required') && createForm.get('password').dirty">
+              Password is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('password').hasError('pattern')">
+              Password is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showFields.bucketName">
+          <chef-form-field>
+            <label>
+              <span class="label">Bucket Name <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="bucketName"
+                data-cy="add-bucket-name"
+                type="text"
+                id="bucketName-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="(createForm.get('bucketName').hasError('required') || createForm.get('bucketName').hasError('pattern')) && createForm.get('bucketName').dirty">
+              Bucket Name is required.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div *ngIf="showFields.useHeaders" class="input-margin" [ngClass]="{'error' : !flagHeaders}">
+          <chef-form-field>
+            <label>
+              <chef-checkbox id="headers-checkbox" (change)="updateHeaderCheckbox($event.detail)" [checked]="headerChecked"> Use Headers?</chef-checkbox>
+                <div *ngIf="headerChecked">
+                  <textarea
+                    class="chef-inputtextarea"
+                    formControlName="headers"
+                    data-cy="add-headers"
+                    type="text"
+                    id="headers-input"
+                    placeholder="key:value"
+                    autocomplete="off"
+                    (input)="validateHeaders($event.target.value)"
+                    rows="5"
+                    ></textarea>
+                </div>
+            </label>
+            <chef-error
+              *ngIf="!flagHeaders && headerChecked">
+              Headers are invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showFields.accessKey">
+          <chef-form-field>
+            <label>
+              <span class="label">Access Key <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="accessKey"
+                type="password"
+                data-cy="add-access-key"
+                id="accessKey-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="createForm.get('accessKey').hasError('required') && createForm.get('accessKey').dirty">
+              Access Key is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('accessKey').hasError('pattern')">
+              Access Key is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showFields.secretKey">
+          <chef-form-field>
+            <label>
+              <span class="label">Secret Key <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="secretKey"
+                type="password"
+                data-cy="add-secret-key"
+                id="secretKey-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="createForm.get('secretKey').hasError('required') && createForm.get('secretKey').dirty">
+              Secret Key is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('secretKey').hasError('pattern')">
+              Secret Key is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin">
+          <div class="button-bar">
+            <chef-button data-cy="test-button" id="testConnection" (click)="testConnection()" primary [disabled]="!validateForm()">
+              <span *ngIf="!testDoneGetter">Test Connection</span>
+              <chef-loading-spinner *ngIf="testDoneGetter"></chef-loading-spinner>
+              <span *ngIf="testDoneGetter">Testing...</span>
+            </chef-button>
+          </div>
+        </div>
+        <hr>
+        <div class="button-bar">
+          <chef-button id="cancel-server-popup" (click)="returnToMenu()" data-cy="cancel-button" tertiary>Cancel</chef-button>
+          <chef-button [disabled]="!validateForm()"
+            primary
+            data-cy="add-button"
+            id="create-button-object-modal"
+            (click)="saveDestination()">
+            <chef-loading-spinner *ngIf="saveDoneGetter"></chef-loading-spinner>
+            <span *ngIf="saveDoneGetter">Saving...</span>
+            <span *ngIf="!saveDoneGetter">Save</span>
+          </chef-button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>

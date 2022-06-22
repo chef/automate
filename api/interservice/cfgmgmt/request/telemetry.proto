@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
+
+message UpdateTelemetryReportedRequest {
+	// last client run telemetry reported date
+	string last_telemetry_reported_at = 1;
+}
+
+message GetNodesUsageCountRequest {}

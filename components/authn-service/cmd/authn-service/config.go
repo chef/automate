@@ -22,6 +22,7 @@ type Config struct {
 	TeamsAddress             string          `json:"teams_address"`
 	AuthzAddress             string          `json:"authz_address"`
 	CerealAddress            string          `json:"cereal_address"`
+	SessionAddress           string          `json:"session_address"`
 	LegacyDataCollectorToken string          `json:"legacy_data_collector_token"`
 	certs.TLSConfig          `json:"tls"`
 }

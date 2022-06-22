@@ -9,14 +9,25 @@ export enum CredentialActionTypes {
   SEARCH_FAILURE = 'CREDENTIAL::SEARCH::FAILURE'
 }
 
+export interface NodeCredentialsSearchPayload {
+  filters?: any[];
+  page?: number;
+  per_page?: number;
+}
+
+export interface CredentialsSearchSuccessPayload {
+  secrets: Credential[];
+  total?: number;
+}
+
 export class SearchCredentials implements Action {
   readonly type = CredentialActionTypes.SEARCH;
-  constructor(public payload: {}) {}
+  constructor(public payload: NodeCredentialsSearchPayload) {}
 }
 
 export class SearchCredentialsSuccess implements Action {
   readonly type = CredentialActionTypes.SEARCH_SUCCESS;
-  constructor(public payload: Credential[]) {}
+  constructor(public payload: CredentialsSearchSuccessPayload) {}
 }
 
 export class SearchCredentialsFailure implements Action {

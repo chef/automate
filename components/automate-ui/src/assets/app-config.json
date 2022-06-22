@@ -1,0 +1,6 @@
+{
+  "showBanner": true,
+  "bannerMessage": "This is my banner message that I want everyone to see",
+  "bannerBackgroundColor": "#7cc39f",
+  "bannerTextColor": "black"
+}

@@ -1,0 +1,66 @@
+<section class="policy-groups">
+  <chef-loading-spinner *ngIf="policyGroupsListLoading" size="50"></chef-loading-spinner>
+  <app-empty-state *ngIf="authFailure" moduleTitle="policyGroups" (resetKeyRedirection)="resetKeyTabRedirection($event)">
+  </app-empty-state>
+  <ng-container *ngIf="!policyGroupsListLoading && !authFailure">
+    <div class="search-create-container">
+      <app-infra-search-bar
+        (searchButtonClick)="searchPolicyFiles($event)"
+        placeHolder="policy groups by name...">
+      </app-infra-search-bar>
+      <app-paginator *ngIf="!searchFlag && policyGroups.length"
+        [length]= "total"
+        [pageSize]= "per_page"
+        [pageIndex]= "currentPage"
+        (changePage)= "onUpdatePage($event)"
+      ></app-paginator>
+      <app-paginator *ngIf="searchFlag && policyGroups.length"
+        [length]= "searchArrayLength"
+        [pageSize]= "per_page"
+        [pageIndex]= "currentPage"
+        (changePage)= "onUpdatePage($event)"
+      ></app-paginator>
+    </div>
+    <div data-cy="empty-list" class="empty-section" *ngIf="!groupList.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+      <p *ngIf="searchValue === ''">No policy groups available</p>
+    </div>
+
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
+    <div id="policy-group-table-container" *ngIf="policyFiles.length" data-cy="policy-group-table-container">
+      <app-policy-groups-list
+        *ngIf="!searchFlag"
+        [serverId]="serverId"
+        [orgId]="orgId"
+        [policyGroups]= "policyGroups"
+        [pageOfItems]= "pageOfItems">
+      </app-policy-groups-list>
+      <app-policy-groups-list
+        *ngIf="searchFlag"
+        [serverId]="serverId"
+        [orgId]="orgId"
+        [policyGroups]= "groupList"
+        [pageOfItems]= "pageOfItems">
+      </app-policy-groups-list>
+    </div>
+  </ng-container>
+  <app-pagination
+    *ngIf="searchFlag"
+    [items]="groupList"
+    [pageSize]="per_page"
+    [pageIndex]="currentPage"
+    class="policy-group-list-paging"
+    label="name"
+    (changePage)="onChangePage($event)">
+  </app-pagination>
+  <app-pagination
+    *ngIf="!searchFlag"
+    [items]="policyGroups"
+    [pageSize]="per_page"
+    [pageIndex]="currentPage"
+    class="policy-group-list-paging"
+    label="name"
+    (changePage)="onChangePage($event)">
+  </app-pagination>
+</section>

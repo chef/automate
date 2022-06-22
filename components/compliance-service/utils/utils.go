@@ -3,6 +3,7 @@ package utils
 import (
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/common"
 )
@@ -92,4 +93,19 @@ func DeDupFilters(filters map[string][]string) {
 			filters[key] = deDupSlice(value)
 		}
 	}
+}
+
+// DaysBetween get the calendar days between two timestamp
+func DaysBetween(fromTime, toTime time.Time) int {
+	if fromTime.After(toTime) {
+		fromTime, toTime = toTime, fromTime
+	}
+
+	days := -fromTime.YearDay()
+	for year := fromTime.Year(); year < toTime.Year(); year++ {
+		days += time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay()
+	}
+	days += toTime.YearDay()
+
+	return days
 }

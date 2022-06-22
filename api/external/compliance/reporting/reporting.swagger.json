@@ -14,7 +14,7 @@
     "/api/v0/compliance/reporting/controls": {
       "post": {
         "summary": "List Controls",
-        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering, but not pagination or sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n```\ncompliance:controlItems:list\n```",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n```\ncompliance:controlItems:list\n```",
         "operationId": "ReportingService_ListControlItems",
         "responses": {
           "200": {
@@ -37,6 +37,47 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlItemRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/nodeheader/id/{id}": {
+      "post": {
+        "summary": "Show Node Header Info From Report ID",
+        "description": "Show specific details about node, report and metadate provided the report ID.\nSupports filtering, but not pagination or sorting.\n\nAuthorization Action:\n```\ncompliance:nodeheader:get\n```",
+        "operationId": "ReportingService_ReadNodeHeader",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.NodeHeaderInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
             }
           }
         ],
@@ -81,7 +122,7 @@
     "/api/v0/compliance/reporting/nodes/search": {
       "post": {
         "summary": "List Nodes",
-        "description": "List all nodes, with optional filtering, pagination, and sorting.\nLimited to 10k results.\n\n| Sort parameter | Sort value |\n| --- | --- |\n| environment | environment.lower |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| name | node_name.lower |\n| platform | platform.full |\n| status | status |\n\nExample:\n```\n{\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n],\n\"page\":1,\"per_page\":100,\n\"sort\":\"environment\",\"order\":\"ASC\"\n}\n```\n\nAuthorization Action:\n```\ncompliance:reportNodes:list\n```",
+        "description": "List all nodes, with optional filtering, pagination, and sorting.\nMax return payload size is 4MB, use pagination to fetch remaining data.\n\n| Sort parameter | Sort value |\n| --- | --- |\n| environment | environment.lower |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| name | node_name.lower |\n| platform | platform.full |\n| status | status |\n\nExample:\n```\n{\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n],\n\"page\":1,\"per_page\":100,\n\"sort\":\"environment\",\"order\":\"ASC\"\n}\n```\n\nAuthorization Action:\n```\ncompliance:reportNodes:list\n```",
         "operationId": "ReportingService_ListNodes",
         "responses": {
           "200": {
@@ -149,7 +190,7 @@
     "/api/v0/compliance/reporting/report-ids": {
       "post": {
         "summary": "List Report IDs",
-        "description": "List all IDs for the latest report for each node, with optional filtering.\nSupports filtering, but not pagination or sorting.\nIncluding more than one value for `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.\nNot limited to 10k results.\n\nAuthorization Action:\n```\ncompliance:reportids:list\n```",
+        "description": "List all IDs for the latest report for each node, with optional filtering.\nSupports filtering, but not pagination or sorting.\nIncluding more than one value for `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.\nMax return payload size is 4MB.\n\nAuthorization Action:\n```\ncompliance:reportids:list\n```",
         "operationId": "ReportingService_ListReportIds",
         "responses": {
           "200": {
@@ -180,16 +221,90 @@
         ]
       }
     },
+    "/api/v0/compliance/reporting/reportcontrols/id/{id}": {
+      "post": {
+        "summary": "List Control info\nLists controls from the last run, with optional filtering.\nSupports filtering and pagination. Maximum 100 search can be \nmade when specifying the pagination from and size. Sum of from+size\nshould be less that 100. By default 10 results will be returned.\nAuthorization Action:\n```\ncompliance:ControlElements:list\n```",
+        "operationId": "ReportingService_ListControlInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElements"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/reportmanager/export": {
+      "post": {
+        "summary": "Export reports",
+        "description": "Export multiple reports.\nSupports filtering by profile or control. API returns an acknowledgement ID.\n\nAuthorization Action:\n```\ncompliance:reports:list\n```",
+        "operationId": "ReportingService_ExportReportManager",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.CustomReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/reports": {
       "post": {
         "summary": "List Reports",
-        "description": "Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.\nSupports pagination, filtering, and sorting.\nLimited to 10k results.\n\nValid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name\n\nExample:\n```\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n],\n\"page\":1, \"per_page\": 3,\n\"sort\": \"latest_report.status\", \"order\": \"ASC\"\n}\n```\n\nAuthorization Action:\n```\ncompliance:reports:list\n```",
+        "description": "Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.\nSupports pagination, filtering, and sorting.\nMax return payload size is 4MB, use pagination to fetch remaining data.\n\nValid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name\n\nExample:\n```\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n],\n\"page\":1, \"per_page\": 3,\n\"sort\": \"latest_report.status\", \"order\": \"ASC\"\n}\n```\n\nAuthorization Action:\n```\ncompliance:reports:list\n```",
         "operationId": "ReportingService_ListReports",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Reports"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne"
             }
           },
           "default": {
@@ -396,10 +511,7 @@
           "description": "External supporting documents for the control."
         },
         "tags": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
+          "type": "string",
           "description": "Metadata defined on the control in key-value format."
         },
         "waived_str": {
@@ -413,6 +525,53 @@
         "removed_results_counts": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.RemovedResultsCounts",
           "description": "When the control results are removed to reduce the size of the report, this summarize the status of the trimmed results."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ControlElement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The control's unique ID."
+        },
+        "title": {
+          "type": "string",
+          "description": "The control's compact description."
+        },
+        "profile": {
+          "type": "string",
+          "description": "Profile name."
+        },
+        "impact": {
+          "type": "number",
+          "format": "float",
+          "description": "The severity of the control."
+        },
+        "results": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The total number of results."
+        },
+        "status": {
+          "type": "string",
+          "title": "The control's status"
+        },
+        "profile_id": {
+          "type": "string",
+          "title": "Profile id"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ControlElements": {
+      "type": "object",
+      "properties": {
+        "control_elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElement"
+          },
+          "title": "List of control elements"
         }
       }
     },
@@ -466,6 +625,11 @@
           "format": "int32",
           "description": "The maximum number of controls to return (Default 100)."
         },
+        "page_number": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results. (Default 1)"
+        },
         "filters": {
           "type": "array",
           "items": {
@@ -517,6 +681,14 @@
         }
       },
       "description": "A minimal representation of the statuses of the controls in the report."
+    },
+    "chef.automate.api.compliance.reporting.v1.CustomReportResponse": {
+      "type": "object",
+      "properties": {
+        "acknowledgement_id": {
+          "type": "string"
+        }
+      }
     },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
@@ -709,6 +881,75 @@
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMeta"
           },
           "description": "A minimal representation of the compliance profiles run against the node."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.NodeHeaderInfo": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "description": "The reporting node's unique ID."
+        },
+        "node_name": {
+          "type": "string",
+          "description": "The reporting node name."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time that the report was completed."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the run the report was made from."
+        },
+        "environment": {
+          "type": "string",
+          "description": "The environment of the node making the report."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the report."
+        },
+        "platform": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Platform",
+          "description": "Intentionally blank."
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.NodeHeaderProfileInfo"
+          },
+          "description": "The profiles run as part of this report."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The Roles associated with the node."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "The status message of the report."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.NodeHeaderProfileInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the profile. Must be unique."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the profile in the generated report."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "A message to detail the reason why a profile is skipped or failed in the generated report."
         }
       }
     },
@@ -1211,6 +1452,40 @@
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "A unique report identifier."
+        },
+        "node_id": {
+          "type": "string",
+          "description": "The reporting node's unique ID."
+        },
+        "node_name": {
+          "type": "string",
+          "description": "The reporting node name."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time that the report was completed."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the run the report was made from."
+        },
+        "controls": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
+          "description": "Intentionally blank."
+        },
+        "ipaddress": {
+          "type": "string",
+          "description": "The reporting node IP address."
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.Reports": {
       "type": "object",
       "properties": {
@@ -1227,6 +1502,24 @@
           "description": "Total number of reports matching the filters."
         }
       }
+    },
+    "chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne": {
+      "type": "object",
+      "properties": {
+        "reports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne"
+          },
+          "description": "Paginated results of summary level reports matching the filters."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of reports matching the filters."
+        }
+      },
+      "title": "ReportsSummaryLevelOne used for ListReports call"
     },
     "chef.automate.api.compliance.reporting.v1.Result": {
       "type": "object",
@@ -1416,7 +1709,7 @@
           "description": "Must be a valid serialized protocol buffer of the above specified type."
         }
       },
-      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "grpc.gateway.runtime.Error": {
       "type": "object",

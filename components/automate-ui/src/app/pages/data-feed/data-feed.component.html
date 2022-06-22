@@ -2,19 +2,10 @@
   <div class="container">
     <main>
       <chef-page-header>
-        <chef-heading>Data Feeds</chef-heading>
-        <chef-subheading>Data Feed for bulk client data and compliance reports.</chef-subheading>
-        <app-create-data-feed-modal
-          [visible]="createModalVisible"
-          [creating]="creatingDataFeed"
-          [sending]="sendingDataFeed"
-          [hookStatus]="hookStatus"
-          [createForm]="createDataFeedForm"
-          (close)="closeCreateModal()"
-          [conflictErrorEvent]="conflictErrorEvent"
-          (createClicked)="createDataFeed()"
-          (sendTestClicked)="sendTestForDataFeed()">
-        </app-create-data-feed-modal>
+        <div class="header-class">
+        <chef-heading>Data Feeds</chef-heading></div>
+        <chef-subheading><strong>Disclaimer Text</strong>: We suggest no more than 5 Feeds, depending on your fleet size. Please check the
+          reference matrix on recommended feed counts.</chef-subheading>
         <app-delete-object-modal
           [visible]="deleteModalVisible"
           objectNoun="data feed"
@@ -25,36 +16,18 @@
         </app-delete-object-modal>
       </chef-page-header>
       <div class="page-body">
-        <div *ngIf="(sortedDestinations$ | async)?.length === 0" class="empty-state">
-          <p>Create a data feed to get started!</p>
-        </div>
-        <div [ngClass]="(sortedDestinations$ | async)?.length === 0 ? 'empty-state' : ''">
-          <!-- <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Data Feed</chef-button> -->
-          <chef-button primary (click)="openCreateModal()">Create Data Feed</chef-button>
-        </div>
-
-        <chef-table *ngIf="(sortedDestinations$ | async)?.length !== 0">
-          <chef-thead>
-            <chef-tr>
-              <chef-th>Name</chef-th>
-              <chef-th class="three-dot-column"></chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor= "let destination of sortedDestinations$ | async">
-              <chef-td>
-                <a [routerLink]="['/settings/data-feeds/', destination.id]">{{ destination.name }}</a>
-              </chef-td>
-              <chef-td class="three-dot-column">
-                <mat-select panelClass="chef-control-menu" id="menu-{{destination.id}}">
-                  <mat-option (onSelectionChange)="startDataFeedSendTest($event, destination)" data-cy="test-data-feed">Test Data Feed</mat-option>
-                  <mat-option (onSelectionChange)="startDataFeedDelete($event, destination)" data-cy="remove-data-feed">Delete Data Feed</mat-option>
-                </mat-select>
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table>
+        <chef-button primary (click)="slidePanel()" data-cy="create-data-feed"><img alt="" class="svg-inline--fa" src="/assets/img/data-feed.svg">&nbsp;New Integration</chef-button>
+        <app-data-feed-table [destinations]="sortedDestinations$ | async"
+          [selectedFieldDirection]="fieldDirection$ | async"
+          [selectedSortField]="sortField$ | async">
+        </app-data-feed-table>
       </div>
+      <app-data-feed-create
+        [createForm]="createDataFeedForm"
+        (saveDestinationEvent)="saveDestination($event)"
+        (testDestinationEvent)="sendTestForDataFeed($event)"
+        (checkEvent)="setCheck($event)">
+      </app-data-feed-create>
     </main>
   </div>
 </div>

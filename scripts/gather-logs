@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+[ -d "./test/vendor/bundle" ] || (cd test && $(hab pkg path core30)/bin/bundle install --path vendor/bundle)
+cd test && $(hab pkg path core/ruby30)/bin/bundle exec $(hab pkg path core/ruby30)/bin/ruby lib/gather-logs "$@"

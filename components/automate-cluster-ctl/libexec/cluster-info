@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl info
+# Summary: Show Automate cluster resource information
+# Built-in help
+# provide completions
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+require 'cluster/terraform'
+require 'tty/table'
+
+class AutomateClusterInfo < AutomateCluster::Command
+  parameter "[FILTER]", "Only show values with names matching the filter", attribute_name: :name
+  def execute
+    return show_all if name.nil?
+
+    output = AutomateCluster.terraform.output.map do |k,v|
+      format_values(k, v) if k.match?(name)
+    end
+    render_table output.compact
+  end
+
+  private
+
+  def show_all
+    data = AutomateCluster.terraform.output.map do |name, value|
+      format_values(name, value)
+    end
+    render_table data
+  end
+
+  def format_values(name, value)
+    ["#{name}:",Array(value).join("\n")]
+  end
+
+  def render_table(data)
+    table = TTY::Table.new(data)
+    puts table.render(:basic,
+                      multiline: true,
+                      padding: [0,0,0,0],
+                      alignments: [:right, :left],
+                      width: 150,
+                      resize: true)
+  end
+end
+
+AutomateClusterInfo.run

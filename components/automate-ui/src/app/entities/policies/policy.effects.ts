@@ -97,7 +97,7 @@ export class PolicyEffects {
       const removeStr = removed.length === 1 ? removed[0].displayName : `${removed.length} members`;
       return new CreateNotification({
           type: Type.info,
-          message: `Removed ${removeStr}.`
+          message: `Removed member(s) ${removeStr}.`
       });
     })));
 

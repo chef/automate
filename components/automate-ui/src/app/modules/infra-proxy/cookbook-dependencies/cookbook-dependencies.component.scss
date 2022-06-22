@@ -1,0 +1,309 @@
+@import "~styles/variables";
+@import '../infra_shared/slide-panel';
+
+img {
+  width: 70px;
+}
+
+.url-failed {
+  font-size: 13px;
+  background-color: $chef-critical;
+  color: $chef-white;
+  border-radius: 4px;
+  padding: 2px;
+  margin-top: -22px;
+
+  .url-failed-icon {
+    margin-left: 16px;
+  }
+
+  span {
+    margin-left: 16px;
+  }
+}
+
+.disabled-link {
+  color: $chef-nevada;
+  cursor: default;
+  text-decoration: underline;
+}
+
+.disabled-link:hover {
+  color: $chef-nevada;
+  cursor: default;
+  text-decoration: underline;
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
+}
+
+.details-link {
+  margin-left: 30px;
+}
+
+.sidenav-body {
+  margin-left: 22px;
+}
+
+.policy-file-info {
+  margin-top: 43px;
+  font-size: 15px;
+  line-height: 21px;
+  color: $chef-black;
+  font-weight: 600;
+}
+
+.policy-file {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    text-align: left;
+    color: $chef-primary-dark;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.2px;
+  }
+
+  p {
+    margin-top: 3px;
+    margin-left: 43px;
+  }
+
+  .revision-id-info {
+    margin-left: 43px;
+  }
+
+  .server-id-info {
+    margin-left: 70px;
+  }
+
+  .org-id-info {
+    margin-left: 26px;
+  }
+}
+
+.meta-info {
+  border-top: 0.5px solid $chef-key-tab;
+  padding-top: 43px;
+}
+
+.revision-id {
+  width: 23%;
+  vertical-align: text-top;
+}
+
+table {
+  font-size: 14px;
+
+  &:first-child {
+    border-right: 1px solid $chef-grey;
+
+    tr {
+      td {
+        padding-right: 2.25em;
+      }
+    }
+  }
+
+  &:last-child {
+    tr {
+      th {
+        padding-left: 2.25em;
+      }
+    }
+  }
+
+  tr {
+    margin: 0;
+
+    th,
+    td {
+      padding: 0.25em 0;
+      border: none;
+      background-color: transparent;
+      word-break: break-all;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    td {
+      flex-grow: 2;
+      padding-right: 5em;
+    }
+
+    chef-icon {
+      margin-right: 10px;
+      color: $chef-light-grey;
+    }
+  }
+}
+
+.bottom {
+  chef-button {
+    float: right;
+    border: none;
+    color: $chef-primary-bright;
+    background-color: $chef-white;
+  }
+}
+
+// CSS for accordion
+
+.accordion {
+  margin: auto;
+  border-radius: 4px;
+  padding-inline-start: 0px;
+  width: 100%;
+
+  ul {
+    list-style-type: none;
+  }
+
+  li {
+    list-style-type: none;
+    margin-bottom: 10px;
+  }
+}
+
+.accordion .menu {
+  background-color: $chef-white;
+  border-radius: 4px 4px 0px 0px;
+  border: 1px solid $chef-light-grey-2;
+  border-bottom: none;
+  cursor: pointer;
+  font-weight: bold;
+  height: 40px;
+  position: relative;
+  padding: 10px 10px 10px 15px;
+  transition: all 0.4s ease;
+}
+
+.accordion li:last-child .menu {
+  border-bottom: 0;
+}
+
+.accordion li .arrows {
+  right: 1rem;
+  left: auto;
+  float: right;
+}
+
+.accordion li .cookbook-name {
+  float: left;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.accordion li.active .arrows {
+  transform: rotate(180deg);
+}
+
+.accordion li.active .menu {
+  background: var(--chef-badge-primary-background);
+}
+
+.submenu {
+  background-color: $chef-white;
+  border: 1px solid $chef-light-grey-2;
+  border-top: none;
+  border-radius: 0px 0px 4px 4px;
+  font-size: 12px;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.4s ease;
+}
+
+.submenu .item-details {
+  padding: 0 15px 15px;
+}
+
+.submenu .dependencies {
+  padding: 0 15px 15px;
+}
+
+.accordion .submenu {
+  border-radius: 0 0 4px 4px;
+}
+
+.accordion li:last-child .submenu li:last-child {
+  border-bottom: 0;
+}
+
+.autoHeight {
+  height: auto;
+}
+
+.item-details {
+  ::ng-deep .no_border_th,
+  .no_border_tr,
+  .no_border_tr:first-child,
+  .no_border_tr:last-child {
+    border: none;
+    font-size: 12px;
+    padding-bottom: 2px;
+    background-color: $chef-white;
+  }
+
+  .no_border_td {
+    border: none;
+    padding: 0px;
+    margin-left: 17px;
+  }
+
+
+  .cookbook-margin {
+    margin-left: 400px;
+  }
+
+  .depend-margin {
+    margin-left: 300px;
+  }
+
+  .cookbook-row {
+    margin-left: 430px;
+  }
+
+  .depend-row {
+    margin-left: 320px;
+  }
+}
+
+.empty-section {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.dependencies {
+  background: #F3F6F8;
+
+  ::ng-deep .no_border_th,
+  .no_border_tr,
+  .no_border_tr:first-child,
+  .no_border_tr:last-child {
+    border: none;
+    font-size: 12px;
+    padding-bottom: 2px;
+    background: #F3F6F8;
+  }
+
+  .empty-section {
+    height: 132px;
+  }
+
+  img {
+    margin-top: 20px;
+  }
+}
+
+.cookbook-dependencies-link {
+  cursor: pointer;
+  text-decoration: underline;
+}

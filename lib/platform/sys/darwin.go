@@ -2,7 +2,11 @@
 
 package sys
 
-import "syscall"
+import (
+	"os"
+	"path/filepath"
+	"syscall"
+)
 
 // SetUmask sets the process umask. Returns the old umask.
 func SetUmask(newUmask int) int {
@@ -40,6 +44,22 @@ func SpaceAvailForPath(path string) (uint64, error) {
 		return 0, err
 	}
 	return (uint64(stat.Bsize) * stat.Bavail) / 1024, nil
+}
+
+// DirSize return size of the directory in bytes
+// path.
+func DirSize(path string) (int64, error) {
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	return size, err
 }
 
 // SystemMemoryKB returns the total memory in KB. Unimplemented on

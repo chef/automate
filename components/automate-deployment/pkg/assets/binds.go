@@ -4,10 +4,17 @@ package assets
 const BindData = `applications-load-gen BINDING_MODE strict
 applications-service REQUIRED automate-pg-gateway cereal-service event-service pg-sidecar-service
 applications-service BINDING_MODE strict
-authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-service pg-sidecar-service teams-service
+authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-service pg-sidecar-service session-service teams-service
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
+automate-ha-elasticsearch BINDING_MODE strict
+automate-ha-elasticsidecar REQUIRED opensearch
+automate-ha-elasticsidecar BINDING_MODE strict
+automate-ha-haproxy OPTIONAL database pgleaderchk
+automate-ha-haproxy BINDING_MODE strict
+automate-ha-opensearch BINDING_MODE strict
+automate-ha-postgresql BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE strict
 automate-builder-api-proxy REQUIRED automate-builder-api
@@ -28,15 +35,17 @@ automate-cs-oc-erchef BINDING_MODE relaxed
 deployment-service BINDING_MODE strict
 automate-dex REQUIRED automate-pg-gateway pg-sidecar-service
 automate-dex BINDING_MODE strict
-automate-elasticsearch REQUIRED backup-gateway
-automate-elasticsearch BINDING_MODE strict
-automate-es-gateway REQUIRED automate-elasticsearch
+automate-es-gateway REQUIRED automate-opensearch
 automate-es-gateway BINDING_MODE relaxed
-automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
+automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service report-manager-service secrets-service teams-service user-settings-service
 automate-gateway BINDING_MODE relaxed
+automate-ha-pgleaderchk OPTIONAL database
+automate-ha-pgleaderchk BINDING_MODE strict
 automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
 automate-minio BINDING_MODE strict
+automate-opensearch REQUIRED backup-gateway
+automate-opensearch BINDING_MODE strict
 automate-pg-gateway REQUIRED automate-postgresql
 automate-pg-gateway BINDING_MODE relaxed
 automate-postgresql BINDING_MODE strict
@@ -57,8 +66,9 @@ config-mgmt-service REQUIRED automate-es-gateway automate-pg-gateway pg-sidecar-
 config-mgmt-service BINDING_MODE strict
 data-feed-service REQUIRED automate-pg-gateway cereal-service compliance-service config-mgmt-service pg-sidecar-service secrets-service
 data-feed-service BINDING_MODE strict
-es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
-es-sidecar-service BINDING_MODE strict
+es-sidecar-service REQUIRED automate-es-gateway
+es-sidecar-service OPTIONAL automate-opensearch
+es-sidecar-service BINDING_MODE relaxed
 event-feed-service REQUIRED authz-service automate-es-gateway cereal-service
 event-feed-service OPTIONAL es-sidecar-service
 event-feed-service BINDING_MODE strict
@@ -80,6 +90,8 @@ notifications-service REQUIRED automate-pg-gateway pg-sidecar-service secrets-se
 notifications-service BINDING_MODE strict
 pg-sidecar-service REQUIRED automate-pg-gateway
 pg-sidecar-service BINDING_MODE strict
+report-manager-service REQUIRED automate-pg-gateway cereal-service compliance-service pg-sidecar-service
+report-manager-service BINDING_MODE strict
 sample-data-service BINDING_MODE strict
 secrets-service REQUIRED automate-pg-gateway pg-sidecar-service
 secrets-service BINDING_MODE strict
@@ -88,4 +100,6 @@ session-service BINDING_MODE strict
 teams-service REQUIRED authz-service automate-pg-gateway cereal-service pg-sidecar-service
 teams-service BINDING_MODE strict
 trial-license-service BINDING_MODE strict
+user-settings-service REQUIRED automate-pg-gateway pg-sidecar-service
+user-settings-service BINDING_MODE strict
 `

@@ -22,14 +22,25 @@ class MockActivatedRoute {
     this.subject.next(frag);
   }
 }
+function setCookie(key: string, value: string): void {
+  document.cookie = `${key}=${value}; Path=/;`;
+}
+
+function deleteIdTokenFromCookie(): void {
+  // Expire id_token cookie once it's set in localStorage
+  document.cookie = `id_token=; Path=/; Expires=${new Date().toUTCString()};`;
+}
 
 describe('SigninComponent', () => {
   let component: SigninComponent;
   let fixture: ComponentFixture<SigninComponent>;
   let chefSessionService: ChefSessionService;
   let activatedRoute: MockActivatedRoute;
+
+  const valid_id_token_key = 'id_token';
   // tslint:disable-next-line:max-line-length
   const valid_id_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImJkOWY5ZGFkZDc4ZDEyOWFlN2I2ODZhZTU0NjJhOWYzY2JmMDY1MTUifQ.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAvZGV4Iiwic3ViIjoiQ2cwd0xUTTROUzB5T0RBNE9TMHdFZ1J0YjJOciIsImF1ZCI6ImF1dG9tYXRlLXVpIiwiZXhwIjoxNTA5NzIwMTgzLCJpYXQiOjE1MDk2MzM3ODMsImF0X2hhc2giOiJ4ck1fTXNmLUd1dmY1dzRGeWY1THVRIiwiZW1haWwiOiJraWxnb3JlQGtpbGdvcmUudHJvdXQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZ3JvdXBzIjpbImF1dGhvcnMiXSwibmFtZSI6IktpbGdvcmUgVHJvdXQifQ.CsBjk47MdwpkneBsbc9NEIx8TskokPDrd3Bp-C4GhcdC-eZH-vOKBnRytMi7_GcOchevo7KCmwjzZllC-AgJMd7b5SBWVjDzLQuS8D9zIX_t_vf3c_wwl4R_fYjBiO7wmm3u-VQGCmxX4UjqyfzWCT-FYwLH5WctVusM3bdlAF0FiLndkmiyAaNFbxMznlDwmrys39in4oV9srxZnXrK-ydlhpJJzETrwBVmAhDzKJO62GC6WcFQYFeQ0Dtb6eBSFaRBi7LmM5TUT_qcIW-LRGcfa7h2DfifKEgCFuv6QjUXb8B7fxRZNMQyAcoVV9qZK8Nd51l-anDD1PI4J12hyw';
+
 
   beforeEach(() => {
     activatedRoute = new MockActivatedRoute('');
@@ -73,30 +84,44 @@ describe('SigninComponent', () => {
         expect((component as any).error).toEqual(true);
       });
 
-      it('to true when id token is missing from fragment', () => {
-        activatedRoute.setFragment('id_token=&state=foo');
+      it('to true when id_token does not exist in cookie', () => {
+        const [id_token, state] = component.idTokenAndStateFromCookieAndFragment('');
+        deleteIdTokenFromCookie();
         fixture.detectChanges();
+        expect(id_token).toEqual(null);
+        expect(state).toEqual(null);
 
         expect((component as any).error).toEqual(true);
       });
 
-      it('to true when id token from fragment cannot be decoded', () => {
-        activatedRoute.setFragment('id_token=NOTAJWT&state=foo');
+      it('to false when id_token exists in cookie', () => {
+        setCookie(valid_id_token_key, valid_id_token);
+        const [id_token, state] = component.idTokenAndStateFromCookieAndFragment('state=');
         fixture.detectChanges();
-
-        expect((component as any).error).toEqual(true);
-      });
-
-      it('to false when id token from fragment can be decoded', () => {
-        activatedRoute.setFragment('id_token=' + valid_id_token + '&state=foo');
-        fixture.detectChanges();
+        expect(id_token).toBe(valid_id_token);
+        expect(state).toBe('');
 
         expect((component as any).error).toEqual(false);
+      });
+
+      it('to true when id token from cookie cannot be decoded', () => {
+        const not_a_jwt_value = 'NOTAJWT';
+        setCookie(valid_id_token_key, not_a_jwt_value);
+        fixture.detectChanges();
+        const [id_token, state] = component.idTokenAndStateFromCookieAndFragment('state=');
+        fixture.detectChanges();
+        expect(id_token).toBe(not_a_jwt_value);
+        expect(state).toBe('');
+
+        expect((component as any).error).toEqual(true);
       });
     });
 
     it('stores information on success', () => {
-      activatedRoute.setFragment('id_token=' + valid_id_token + '&state=foo');
+      activatedRoute.setFragment('state=foo');
+      setCookie(valid_id_token_key, valid_id_token);
+      fixture.detectChanges();
+      const [id_token, state] = component.idTokenAndStateFromCookieAndFragment('state=foo');
       fixture.detectChanges();
 
       const id = (component as any).id;
@@ -104,8 +129,8 @@ describe('SigninComponent', () => {
       expect(id.name).toEqual('Kilgore Trout');
       expect(id.email).toEqual('kilgore@kilgore.trout');
       expect(id.groups).toEqual(['authors']);
-      expect((component as any).idToken).toEqual(valid_id_token);
-      expect((component as any).error).toEqual(false);
+      expect((component as any).idToken).toEqual(id_token);
+      expect(state).toEqual('foo');
     });
   });
 
@@ -180,22 +205,21 @@ describe('SigninComponent', () => {
     });
   });
 
-  describe('#idTokenAndStateFromFragment', () => {
+  describe('#idTokenFromCookieAndstateFromFragment', () => {
     // empty state: not special, but common
-    it('matches an empty state', () => {
-      const actual = component.idTokenAndStateFromFragment('id_token=JWT&state=');
-
-      expect(actual).toEqual(['JWT', '']);
+    it('returns empty id_token and matches an empty state', () => {
+      const actual = component.idTokenAndStateFromCookieAndFragment('state=');
+      expect(actual).toEqual([null, '']);
     });
 
     it('if the match fails returns nothing', () => {
-      const actual = component.idTokenAndStateFromFragment('notwhatweexpect');
+      const actual = component.idTokenAndStateFromCookieAndFragment('notwhatweexpect');
       expect(actual).toEqual([null, null]);
     });
 
     it('expects the ID token to be non-empty', () => {
-      const actual = component.idTokenAndStateFromFragment('id_token=&state=%2Fnodes');
-      expect(actual).toEqual([null, null]);
+      const actual = component.idTokenAndStateFromCookieAndFragment('state=%2Fnodes');
+      expect(actual).toEqual([null, '%2Fnodes']);
     });
   });
 });

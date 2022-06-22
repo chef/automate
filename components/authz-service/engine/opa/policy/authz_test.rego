@@ -394,8 +394,12 @@ test_authorized_project_returning_set_value {
 # those are not de-duplicated at present (see https://github.com/open-policy-agent/opa/issues/429)
 # This unit test just shows that duplicates might occur so the Go code needs to de-duplicate.
 # The OPA folks are considering a change to remove duplicates in the future, though.
+
+# It is not returning duplicates as per OPA version 0.27.1
+# if in case it is returning duplicate then change below count to 2
+# (see https://github.com/open-policy-agent/opa/blob/main/CHANGELOG.md#backwards-compatibility-5)
 test_authorized_project_returning_multiple_values {
-	count([p | authorized_project[p]; p == "foo-project"]) == 2 with data.roles.project.actions as ["iam:teams:list"]
+	count([p | authorized_project[p]; p == "foo-project"]) == 1 with data.roles.project.actions as ["iam:teams:list"]
 		 with data.policies.polid1 as {
 			"members": ["user:local:dave"],
 			"statements": {"sid1": {"effect": "allow", "actions": ["*"], "resources": ["*"], "projects": ["foo-project"]}},

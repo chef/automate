@@ -1,0 +1,56 @@
+/* CSS For Slide panel */
+:host {
+  display: block;
+  height: 100%;
+  width: 70%;
+  position: fixed;
+  top: 0;
+  right: 0;
+  background-color: $chef-white;
+  overflow-x: hidden;
+  transition: all 0.5s ease-in-out;
+  padding: 32px;
+  box-shadow: 0 35.8px 173.2px $eggplant-dark-1;
+  margin-right: -90%;
+}
+
+:host.active {
+  margin-right: 0;
+}
+
+.sidenav-header {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 0.5px solid $chef-key-tab;
+  line-height: 3;
+  margin-bottom: 20px;
+
+  h1 {
+    flex-grow: 2;
+    text-align: left;
+    font-weight: bold;
+    letter-spacing: 0.15px;
+    color: $chef-black;
+    margin-bottom: 17px;
+    font-size: 18px;
+  }
+
+  chef-button {
+    margin-left: 16px;
+    margin-top: 4px;
+    border: none;
+    color: $chef-black;
+  }
+}
+
+.sidenav-body {
+  ::ng-deep .no_border_th,
+  .no_border_tr,
+  .no_border_tr:first-child,
+  .no_border_tr:last-child {
+    border: none;
+    font-size: 12px;
+    padding-bottom: 2px;
+    background-color: $chef-white;
+  }
+}

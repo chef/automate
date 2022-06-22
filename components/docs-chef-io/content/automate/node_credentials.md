@@ -44,6 +44,27 @@ Select _Add Credential_ and a dialog box appears as shown below. Select the _Cre
 
 **WinRM** requires a credential name, a user name, and a WinRM password.
 
+Windows machines **must have** the following configurations:
+
+* Ports 3389(RDP), 80(HTTP), 443(HTTPS), 5985(WinRM) and 5986(WinRM) must be open and reachable from Chef Automate.
+* Use the below script to configure WinRM:
+  ```powershell
+  winrm quickconfig -q
+  winrm create winrm/config/Listener?Address=*+Transport=HTTP
+  winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="1024"}'
+  winrm set winrm/config '@{MaxTimeoutms="1800000"}'
+  winrm set winrm/config/winrs '@{MaxShellsPerUser="50"}'
+  winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="1024"}'
+  winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+  winrm set winrm/config/service/auth '@{Basic="true"}'
+  netsh advfirewall firewall add rule name="WinRM 5985" protocol=TCP dir=in localport=5985 action=allow
+  netsh advfirewall firewall add rule name="WinRM 5986" protocol=TCP dir=in localport=5986 action=allow
+  NetSh Advfirewall set allprofiles state off
+  net stop winrm
+  sc.exe config winrm start=auto
+  net start winrm
+  ```
+
 ### Add a Sudo Credential
 
 ![Sudo Credential Form](/images/automate/credentials-sudo.png)

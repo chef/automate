@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Store, select, Action } from '@ngrx/store';
 
-import { combineLatest, Subject, Observable } from 'rxjs';
+import { combineLatest, Subject, Observable, Subscription } from 'rxjs';
 import { filter, pluck, takeUntil, first, map } from 'rxjs/operators';
 
 import { identity, isNil } from 'lodash/fp';
@@ -32,6 +32,11 @@ import {
 } from 'app/entities/users/userself.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import { UpdateUserPreferences, UpdateUserPreferencesSuccess } from 'app/services/user-preferences/user-preferences.actions';
+import { userPreferencesStatus } from 'app/services/user-preferences/user-preferences.selector';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type UserTabName = 'password' | 'details';
 
@@ -46,13 +51,29 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public tabValue: UserTabName = 'details';
   private url: string;
   public userDetails: UserDetails;
+  public timeformat: string;
+  public userDetailsFormControl = {
+    isTimeformatDirty: false,
+    isTelemetryCheckboxDirty: false,
+    isTelemetryCheckboxEnabled: false,
+    timeformatValues: [],
+    timeformat: ''
+  };
+  public isResetPwdTab = true;
+  public userType = 'local';
+  public isDisplayNameEditable = true;
+  private timeformatSubscription: Subscription;
+  private telemetryCheckboxSubscription: Subscription;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService,
+    private chefSessionService: ChefSessionService,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit(): void {
@@ -64,7 +85,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       if (data.isNonAdmin) {
         this.layoutFacade.showSidebar(Sidebar.Settings);
         this.userDetails = new UserProfileDetails(
-          this.store, this.layoutFacade, this.isDestroyed, this.fb);
+          this.store, this.layoutFacade, this.isDestroyed, this.fb,
+          this.userPrefsService, this.chefSessionService, this.telemetryService);
         this.loading = false;
       } else {
         this.layoutFacade.showSidebar(Sidebar.Profile);
@@ -81,10 +103,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         ]).subscribe(([routeId, currentUserId]: [string, string]) => {
           if (routeId === currentUserId) {
             this.userDetails = new UserAdminSelfDetails(
-              this.store, this.layoutFacade, this.isDestroyed, this.fb);
+              this.store, this.layoutFacade, this.isDestroyed, this.fb,
+              this.userPrefsService, this.chefSessionService, this.telemetryService);
           } else {
             this.userDetails = new UserAdminDetails(routeId,
-              this.store, this.layoutFacade, this.isDestroyed, this.fb);
+              this.store, this.layoutFacade, this.isDestroyed, this.fb,
+              this.userPrefsService, this.chefSessionService, this.telemetryService);
           }
           this.loading = false;
         });
@@ -98,11 +122,35 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       const [, fragment] = url.split('#');
       this.tabValue = (fragment === 'password') ? 'password' : 'details';
     });
+
+    if (this.userPrefsService.uiSettings) {
+      this.isResetPwdTab = this.userPrefsService.uiSettings.isResetPasswordTabVisible;
+      this.userType = this.userPrefsService.uiSettings.userType;
+      this.isDisplayNameEditable = this.userPrefsService.uiSettings.isDisplayNameEditable;
+    }
+    this.timeformatSubscription = this.userPrefsService.timeformat$.subscribe((timeformat) => {
+      this.userDetailsFormControl.timeformat = timeformat.value;
+      if (this.userDetailsFormControl.timeformatValues.length === 0 &&
+         timeformat && timeformat.valid_values && timeformat.valid_values.length > 0) {
+        this.userDetailsFormControl.timeformatValues = timeformat.valid_values;
+      }
+    });
+    this.telemetryCheckboxSubscription = this.telemetryService.getTelemetryCheckboxObservable()
+    .subscribe((telemetryChecked) => {
+      this.userDetailsFormControl.isTelemetryCheckboxEnabled = telemetryChecked;
+      if (this.userDetailsFormControl.isTelemetryCheckboxDirty) {
+        this.userDetailsFormControl.isTelemetryCheckboxDirty = false;
+      } else if (!this.userDetailsFormControl.isTelemetryCheckboxDirty) {
+        this.userDetailsFormControl.isTelemetryCheckboxDirty = true;
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+    this.timeformatSubscription.unsubscribe();
+    this.telemetryCheckboxSubscription.unsubscribe();
   }
 
   public onSelectedTab(event: { target: { value: UserTabName } }): void {
@@ -113,6 +161,14 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public handlePasswordInput(): void {
     this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
+  }
+
+  public handleTimeFormatChange(event): void {
+    if (event.value !== this.userDetailsFormControl.timeformat) {
+      this.userDetailsFormControl.isTimeformatDirty = true;
+    } else {
+      this.userDetailsFormControl.isTimeformatDirty = false;
+    }
   }
 }
 
@@ -126,20 +182,57 @@ abstract class UserDetails {
   abstract showBreadcrumbs: boolean;
   abstract showPreviousPassword: boolean;
 
-  constructor(private store: Store<NgrxStateAtom>) {}
+  constructor(private store: Store<NgrxStateAtom>,
+     private userPrefsService: UserPreferencesService,
+     private chefSessionService: ChefSessionService,
+     private telemetryService: TelemetryService) {}
 
   public savePassword(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
     const password = this.passwordForm.get('newPassword').value;
     this.store.dispatch(this.createUpdatePasswordUserAction(password));
+    this.telemetryService.track('Settings_Users_Details_ResetPassword');
   }
 
-  public saveDisplayName(): void {
+  public saveUserPreference(timeformat, userDetailsFormControl): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    const name = this.displayNameForm.get('displayName').value.trim();
-    this.store.dispatch(this.createUpdateNameUserAction(name));
+    if (this.userPrefsService.uiSettings &&
+        this.userPrefsService.uiSettings.isDisplayNameEditable && this.displayNameForm.dirty) {
+      const name = this.displayNameForm.get('displayName').value.trim();
+      this.store.dispatch(this.createUpdateNameUserAction(name));
+      this.resetForms();
+    }
+    if (userDetailsFormControl.isTimeformatDirty) {
+      const payload = {
+        user: {
+           name: this.chefSessionService.username,
+           connector: this.chefSessionService.connector
+        },
+        settings: {
+         date_format: {
+           value: timeformat.value
+         }
+        }
+      };
+      this.store.dispatch(new UpdateUserPreferences(payload));
+      this.userPrefsService.setUserTimeformatInternal(
+        {value: timeformat.value, valid_values: userDetailsFormControl.timeformatValues});
+      userDetailsFormControl.timeformat = timeformat.value;
+      this.saveInProgress = false;
+      this.saveSuccessful = true;
+    }
+    if (userDetailsFormControl.isTelemetryCheckboxDirty) {
+      this.telemetryService
+        .setUserTelemetryPreference(userDetailsFormControl.isTelemetryCheckboxEnabled);
+      this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
+      this.saveInProgress = false;
+      this.saveSuccessful = true;
+    }
+    userDetailsFormControl.isTimeformatDirty = false;
+    userDetailsFormControl.isTelemetryCheckboxDirty = false;
+    this.telemetryService.track('Settings_Users_Details_Save');
   }
 
   protected abstract createPasswordForm(fb: FormBuilder): FormGroup;
@@ -174,8 +267,12 @@ class UserAdminDetails extends UserDetails {
     store: Store<NgrxStateAtom>,
     layoutFacade: LayoutFacadeService,
     isDestroyed: Subject<boolean>,
-    fb: FormBuilder) {
-      super(store);
+    fb: FormBuilder,
+    userPrefsService: UserPreferencesService,
+    chefSessionService: ChefSessionService,
+    telemetryService: TelemetryService
+    ) {
+      super(store, userPrefsService, chefSessionService, telemetryService);
 
       store.dispatch(new GetUser({ id: userId }));
       layoutFacade.showSidebar(Sidebar.Settings);
@@ -242,8 +339,11 @@ class UserAdminSelfDetails extends UserDetails {
     store: Store<NgrxStateAtom>,
     layoutFacade: LayoutFacadeService,
     isDestroyed: Subject<boolean>,
-    fb: FormBuilder) {
-      super(store);
+    fb: FormBuilder,
+    userPrefsService: UserPreferencesService,
+    chefSessionService: ChefSessionService,
+    telemetryService: TelemetryService) {
+      super(store, userPrefsService, chefSessionService, telemetryService);
 
       store.dispatch(new GetUserSelf());
       layoutFacade.showSidebar(Sidebar.Settings);
@@ -321,10 +421,15 @@ class UserProfileDetails extends UserDetails {
     store: Store<NgrxStateAtom>,
     layoutFacade: LayoutFacadeService,
     isDestroyed: Subject<boolean>,
-    fb: FormBuilder) {
-      super(store);
+    fb: FormBuilder,
+    userPrefsService: UserPreferencesService,
+    chefSessionService: ChefSessionService,
+    telemetryService: TelemetryService) {
+      super(store, userPrefsService, chefSessionService, telemetryService);
 
-      store.dispatch(new GetUserSelf());
+      if (userPrefsService.uiSettings.userType === 'local') {
+        store.dispatch(new GetUserSelf());
+      }
       layoutFacade.showSidebar(Sidebar.Profile);
 
       this.createForms(fb);
@@ -356,6 +461,14 @@ class UserProfileDetails extends UserDetails {
             this.resetForms();
           }
       });
+
+      store.select(userPreferencesStatus).pipe(
+        filter(status => this.saveInProgress && !loading(status)),
+        takeUntil(isDestroyed)
+      ).subscribe(() => {
+          this.saveInProgress = false;
+      });
+
   }
 
   protected createUpdatePasswordUserAction(password: string): Action {

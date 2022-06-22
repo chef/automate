@@ -2,6 +2,9 @@
 
 exec 2>&1
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
 mkdir -p {{pkg.svc_var_path}}/logs

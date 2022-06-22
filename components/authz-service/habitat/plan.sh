@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=authz-service
 pkg_description="A2 authorization service"
@@ -45,3 +46,4 @@ do_install() {
   cp -r storage/postgres/migration/sql "${pkg_prefix}/migrations"
   cp -r storage/postgres/datamigration/sql "${pkg_prefix}/data-migrations"
 }
+

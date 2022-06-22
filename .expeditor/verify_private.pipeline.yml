@@ -2,6 +2,11 @@
 # here and not in the public verify pipeline. The more jobs we have in
 # this pipeline, the harder it is for external contributors.
 
+env:
+  DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
+  HAB_BLDR_CHANNEL: "stable"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
+
 expeditor:
   defaults:
     executor:
@@ -58,6 +63,21 @@ steps:
         HAB_STUDIO_SECRET_GITHUB_TOKEN:
           account: github/chef
           field: token
+        OPENSEARCH_ROOT_CA_PEM:
+          path: secret/a2/a2ha/opensearch
+          field: root-ca.pem
+        OPENSEARCH_ADMIN_PEM:
+          path: secret/a2/a2ha/opensearch
+          field: admin.pem
+        OPENSEARCH_ADMIN_KEY_PEM:
+          path: secret/a2/a2ha/opensearch
+          field: admin-key.pem
+        OPENSEARCH_NODE1_PEM:
+          path: secret/a2/a2ha/opensearch
+          field: node1.pem
+        OPENSEARCH_NODE1_KEY_PEM:
+          path: secret/a2/a2ha/opensearch
+          field: node1-key.pem
       executor:
         linux:
           privileged: true
@@ -71,6 +91,7 @@ steps:
       - cd components/license-control-service
       - make lint test
     timeout_in_minutes: 10
+    soft_fail: true
     retry:
       automatic:
         limit: 1
@@ -173,12 +194,25 @@ steps:
   - label: "data-feed-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && datafeed_init_integration_tests && datafeed_run_integration_tests"
+      - source integration/helpers/setup_minio.sh && start_minio_background
+      - source integration/helpers/setup_minio.sh && TIMEOUT=400 wait_for_success curl localhost:9000/minio/health/live && hab studio run "source scripts/verify_studio_init.sh && datafeed_init_integration_tests && datafeed_run_integration_tests"
     timeout_in_minutes: 20
     retry:
       automatic:
         limit: 1
     expeditor:
+      accounts:
+        - aws/chef-cd
+      secrets:
+        HAB_STUDIO_SECRET_AWS_ACCESS_KEY_ID:
+          account: aws/chef-cd
+          field: access_key_id
+        HAB_STUDIO_SECRET_AWS_SECRET_ACCESS_KEY:
+          account: aws/chef-cd
+          field: secret_access_key
+        HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
       executor:
         docker:
           privileged: true
@@ -454,7 +488,10 @@ steps:
   - label: "cypress :cypress:"
     command:
       - FLAKY=no integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 35
+    timeout_in_minutes: 45
+    retry:
+      automatic:
+        limit: 2
     expeditor:
       secrets: &cypress_secrets
         A2_LICENSE:
@@ -469,6 +506,35 @@ steps:
         CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY:
           path: secret/a2/testing/target_key
           field: data
+        CYPRESS_AUTOMATE_INFRA_ADMIN_KEY:
+          path: secret/a2/testing/infra_admin_key
+          field: data
+      executor:
+        linux:
+          privileged: true
+
+  - label: "v2 to v3 upgrade"
+    command:
+      - integration/run_test integration/tests/v2_to_v3_upgrade.sh
+    timeout_in_minutes: 25
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+  
+  - label: "v3 to v4 upgrade"
+    command:
+      - integration/run_test integration/tests/v3_to_v4_upgrade.sh
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
       executor:
         linux:
           privileged: true
@@ -538,25 +604,25 @@ steps:
         linux:
           privileged: true
 
-  - label: "a1migration"
-    command:
-      - integration/run_test integration/tests/a1migration.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
+#  - label: "a1migration"
+#    command:
+#      - integration/run_test integration/tests/a1migration.sh
+#    timeout_in_minutes: 30
+#    expeditor:
+#      executor:
+#        linux:
+#          single-use: true
+#          privileged: true
 
-  - label: "airgap a1migration"
-    command:
-      - integration/run_test integration/tests/airgap_a1migration.sh
-    timeout_in_minutes: 25
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
+#  - label: "airgap a1migration"
+#    command:
+#      - integration/run_test integration/tests/airgap_a1migration.sh
+#    timeout_in_minutes: 25
+#    expeditor:
+#      executor:
+#        linux:
+#          single-use: true
+#          privileged: true
 
   - label: "product"
     command:
@@ -597,7 +663,7 @@ steps:
   - label: "airgap ow upgrade"
     command:
       - integration/run_test integration/tests/airgap_ow_upgrade.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       executor:
         linux:
@@ -605,7 +671,7 @@ steps:
   - label: "airgap backup"
     command:
       - integration/run_test integration/tests/airgap_backup.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       executor:
         linux:
@@ -693,7 +759,7 @@ steps:
   - label: "ontop backup"
     command:
       - integration/run_test integration/tests/backup_ontop.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       executor:
         linux:
@@ -777,7 +843,7 @@ steps:
   - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       secrets:
         A2_LICENSE:
@@ -828,7 +894,7 @@ steps:
   - label: "builder smoke"
     command:
       - integration/run_test integration/tests/bldr_smoke.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       secrets:
         A2_LICENSE:

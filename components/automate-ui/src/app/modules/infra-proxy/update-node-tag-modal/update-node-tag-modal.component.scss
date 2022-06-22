@@ -1,0 +1,137 @@
+@import "~styles/variables";
+
+chef-modal {
+
+  [slot=title] {
+    text-align: left;
+    font-weight: bold;
+    padding-bottom: 44px;
+    margin-top: 0px;
+  }
+
+  .flex-container {
+    justify-content: center;
+
+    .input-margin {
+      margin-bottom: 20px;
+    }
+
+    .button-bar-box {
+      text-align: right;
+      margin-top: 35px;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+
+    }
+  }
+
+  ::ng-deep {
+    .modal {
+      overflow-x: hidden;
+      padding: 32px;
+      outline: none;
+      box-shadow: 0px 0px 30px 0px $chef-modal;
+      width: 708px;
+    }
+
+    .modal::-webkit-scrollbar {
+      width: 8px;
+      background-color: $chef-modal-scrollbar;
+    }
+
+    .modal::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: $chef-modal;
+    }
+
+    .label {
+      font-size: 16px;
+      font-weight: 400;
+      padding-bottom: 0px;
+    }
+  }
+}
+
+.constraint {
+  width: 61px;
+  height: 20px;
+  left: 398px;
+  top: 278px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  margin-top: 50px;
+}
+
+.divider-constraint {
+  margin-top: 9px;
+  border-color: $chef-key-tab;
+}
+
+chef-modal ::ng-deep .modal-overlay {
+  background-color: $chef-white;
+  mix-blend-mode: normal;
+  opacity: 0.7;
+}
+
+.pages-body {
+  padding-top: 0;
+
+  ::ng-deep button.nav-tab.active {
+    background: $chef-primary-bright;
+  }
+
+  ::ng-deep button.nav-tab:focus {
+    outline: none;
+  }
+
+  ::ng-deep .nav-tab:before {
+    height: 4px;
+    background: $chef-tab-hover;
+  }
+}
+
+.button-bar-box {
+  chef-button {
+    height: 36px;
+  }
+
+  chef-button#update-button-modal {
+    margin: 8px 0px 0px 16px;
+  }
+
+  chef-button.close {
+    border: none;
+    color: var(--chef-primary-dark);
+    outline: none;
+    margin-top: 18px;
+    margin-right: 18px;
+  }
+
+  chef-button.close:active {
+    background: none;
+    color: var(--chef-primary-dark);
+  }
+}
+
+chef-button {
+  ::ng-deep button:focus {
+    outline: none;
+    border: 1px solid $chef-primary-bright;
+    border-radius: 4px;
+  }
+}
+
+.tag-input {
+  margin-top: 31px;
+}
+
+.tag-note {
+  margin-top: 4px;
+}

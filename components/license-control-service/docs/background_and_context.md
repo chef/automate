@@ -1,14 +1,14 @@
 # Background and Context
 
-In the [Licensing](https://github.com/chef/automate/tree/master/docs#licensing) portion of the domains definition we do a good job of explaining what each piece is, but it feels useful to talk about how we get here from there.
+In the [Licensing](https://github.com/chef/automate/blob/main/docs#licensing) portion of the domains definition we do a good job of explaining what each piece is, but it feels useful to talk about how we get here from there.
 
 ## Understanding How We Go From Sale to License to Features
 
-In Salesforce terms, Chef sells subscriptions. Subscriptions are described by a product, a quantity of that product, and the date range during which it is active. Subscriptions and products have a one-to-one relationship in the system but are not interchangeable concepts; they are distinct entities.
+In Salesforce terms, Chef sells subscriptions. Subscriptions contain a product, the quantity of that product authorized for use, and the date range the subscription is valid. Subscriptions and products have a one-to-one relationship in the system but are not interchangeable concepts; they are distinct entities.
 
-Subscriptions purchased by a customer are represented within a license as "entitlements". However, we currently we use only one entitlement, "base", representing the entire base platform, as a placeholder until entitlement use can be better defined and implemented.
+Subscriptions purchased by a customer are represented within a license as "entitlements". However, we currently use only one entitlement, "base", representing the entire base platform, as a placeholder until entitlement use can be better defined and implemented.
 
-A license includes purchaser information along with the list of non-expired entitlements (current at the time the license is generated). We encode all of that information as a JWT (JavaScript Web Token) for portability and signature validation. A license token is fed to the license-control-service which constructs a Policy of application behavior based on the type of license, entitlements and their active date range versus current date, and so on. The policy is returned to requesting services so that they may alter behavior as appropriate, such as showing banners when a subscription is expiring, or disabling features when there are no longer active entitlements for them.
+A license includes purchaser information along with the list of non-expired entitlements (current at the time the license is generated). We encode this information as a JWT (JavaScript Web Token) for portability and signature validation. A license token is fed to the license-control-service, which constructs a Policy of application behavior based on the type of license, entitlements, and their active date range versus current date, and so on. The policy is returned to requesting services so that they may alter behavior as appropriate, such as showing banners when a subscription is expiring soon or disabling features when there are no longer active entitlements for them.
 
 ## Understanding How We Arrived at the Shape
 
@@ -33,12 +33,12 @@ For better or for worse, that is a lot of stuff. In the end, while the license f
 
 ### Token vs File
 
-By moving to a token, we were able to use something that felt like a license but was actually parsable. We are using a signed JWT to encode the license. By not using a file, it makes the license more portable and easier to move around is the concept. It is important to mention that the distinction is between what was a tarball and what is now a string. There is no reason we cant end up with a file in the long run, but this gives us the flexibility to choose to do something different as we build out deployment mechanisms.
+By moving to a token, we could use something that felt like a license but was actually parsable. We are using a signed JWT to encode the license. Not utilizing files makes the license more portable and easier to move around for customers. It is important to note that the distinction is between what was a tarball and what is now a string. There is no reason we can't end up with a file in the long run, but this gives us the flexibility to do something different as we build out deployment mechanisms.
 
 ### Expiration in Entitlements
 
-The idea here is that it is supper common for our customers to have more than one subscription that is outstanding at any given time. By adding the expiration to the entitlement itself, we are able to add all the entitlements from all the subscriptions that are active.
+The idea here is that it is super common for our customers to have more than one outstanding subscription at any given time. By adding the expiration to the entitlement itself, we can add all the entitlements from all the active subscriptions.
 
 ### Why Entitlements and Not SKUs or Products
 
-One of the larger concepts we wanted to decouple is that a product can contain multiple entitlements. Think about the ability to sell a standard version vs an enterprise version, where the difference is wether or not someone was entitled to SAML. This separation gives us that power.
+One of the more significant concepts we wanted to decouple is that a product can contain multiple entitlements. Think about the ability to sell a standard version vs. an enterprise version, where the difference is whether or not someone was entitled to SAML. This separation gives us that power.

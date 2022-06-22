@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name="automate-workflow-server"
 pkg_origin="chef"
 vendor_origin=${vendor_origin:-chef}
@@ -8,19 +10,19 @@ pkg_description="Chef Automate Workflow server"
 pkg_upstream_url="https://www.chef.io/automate"
 
 pkg_deps=(
-  core/bash
-  core/coreutils
-  core/curl
-  core/erlang18
-  core/gawk
-  core/gcc-libs
-  core/grep
-  core/git
-  core/glibc
-  core/openssh
-  core/tzdata
-  core/jq-static
-  chef/mlsa
+  core/bash/5.0.16/20200305233030
+  core/coreutils/8.30/20200305231640
+  core/curl/7.68.0/20200319191535
+  core/erlang18/18.3/20200404000818
+  core/gawk/5.0.1/20200305233704
+  core/gcc-libs/9.1.0/20200305225533
+  core/grep/3.3/20200305232635
+  core/git/2.26.2/20200501062454
+  core/glibc/2.29/20200305172459
+  core/openssh/7.5p1/20200319192011
+  core/tzdata/2018g/20200403124218
+  core/jq-static/1.6/20190703002933
+  chef/mlsa/1.0.1/20200421170200
 
   # NOTE(ssd) 2019-04-03: Any in-repo dependencies added here MUST be
   # shared with automate-workflow-ctl until we either combine these
@@ -28,8 +30,8 @@ pkg_deps=(
   # packages.
   ${local_platform_tools_origin:-chef}/automate-platform-tools
 
-  core/bundler
-  core/ruby
+  core/bundler/2.1.4/20200504102934
+  core/ruby/2.5.7/20200404130135
   "${vendor_origin}/automate-workflow-ctl"
 )
 
@@ -71,6 +73,7 @@ do_unpack() {
 }
 
 do_prepare() {
+  git config --global url."https://github.com/".insteadOf git://github.com/
   build_line "Setting ERL_FLAGS=-smp enable"
   export ERL_FLAGS="-smp enable"
 
@@ -97,6 +100,7 @@ do_prepare() {
 
 
 do_build() {
+  git config --global url."https://github.com/".insteadOf git://github.com/
   make --directory="$CACHE_PATH" distclean lean_rel with_patches
 }
 
@@ -107,6 +111,7 @@ do_install() {
   # exist in that path. Creating broken symlinks signals that these files
   # should exist at these locations. The working links are created in the init
   # hook.
+  git config --global url."https://github.com/".insteadOf git://github.com/
   rm "$pkg_prefix/delivery/releases/0.0.1/sys.config" \
     "$pkg_prefix/delivery/releases/0.0.1/vm.args"
   ln -sf "$pkg_svc_config_path/sys.config" "$pkg_prefix/delivery/releases/0.0.1/"

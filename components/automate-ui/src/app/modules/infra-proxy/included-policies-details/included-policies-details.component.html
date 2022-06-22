@@ -1,0 +1,72 @@
+<div ngClass="{slide : isSlideOpen}">
+  <div class="sidenav-header">
+    <h1 slot="title" data-cy="policyfile-heading">{{policyfileName}}
+      <span class="details-link" data-cy="policyfile-details" *ngIf="!error">
+        <a
+          (click)="policyfiledetails()"
+          [routerLink]="['/infrastructure','chef-servers', serverId,
+          'organizations', orgId, 'policyfiles', policyfileName, 'revision',revisionId]">
+          Go to Policyfile Details &gt;
+        </a>
+      </span>
+      <span class="details-link" data-cy="policyfile-details" *ngIf="error">
+        <a class="disabled-link">
+          Go to Policyfile Details &gt;
+        </a>
+      </span>
+    </h1>
+    <chef-button
+      class="close"
+      secondary
+      (click)="closeIncludedPolicyDetails()"
+      data-cy="close-policy-button">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <chef-loading-spinner *ngIf="policyfileLoading" size="50"></chef-loading-spinner>
+  <div *ngIf="!policyfileLoading">
+    <div data-cy="empty-list" *ngIf="error">
+      <div class="url-failed">
+        <chef-icon class="url-failed-icon">warning</chef-icon>
+        <span>Unable to connect: check policy name and revision id.</span>
+      </div>
+      <div class="empty-section">
+        <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p>No Policyfile details available</p>
+      </div>
+    </div>
+    <div class="sidenav-body" *ngIf="!error">
+      <p class="policy-file-info" data-cy="policyfile-info">POLICYFILE INFORMATION</p>
+      <table summary="Policy file information">
+        <tr>
+          <th id="revision-id" class="revision-id">
+            Revision Id
+          </th>
+          <td>{{Policyfile?.revision_id}}</td>
+        </tr>
+      </table>
+      <p class="policy-file-info meta-info" data-cy="policyfile-meta-info">METADATA</p>
+      <div class="policy-file">
+        <div>Chef Infra Server</div>
+        <p class="server-id-info">{{serverId}}</p>
+      </div>
+      <div class="policy-file">
+        <div>Chef Infra Organization</div>
+        <p class="org-id-info">{{orgId}}</p>
+      </div>
+      <div class="bottom">
+        <chef-button
+          secondary
+          (click)="slide.slidePanel(policyfileName)"
+          data-cy="included-policy-revisions">
+          Revisions
+        </chef-button>
+      </div>
+      <app-revision-id
+        #slide
+        [serverId]="serverId"
+        [orgId]="orgId">
+      </app-revision-id>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+name: chef-automate init-config-ha
+synopsis: Initialize default config for Automate HA
+usage: chef-automate init-config-ha [flags]
+description: |
+  Initialized default configuration for HA and save it to a file.
+options:
+- name: file
+  default_value: config.toml
+  usage: File path to write the config
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for init-config-ha
+- name: path
+  default_value: /hab/a2_deploy_workspace/
+  usage: a2ha hab workspace dir path
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI

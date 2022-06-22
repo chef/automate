@@ -56,7 +56,7 @@
       </chef-tr>
     </chef-thead>
     <chef-tbody *ngIf="!reportData.profilesListLoading">
-      <chef-tr *ngFor="let profile of filteredProfiles(reportData.profilesList.items)">
+      <chef-tr *ngFor="let profile of reportData.profilesList.items">
         <chef-td class="title-cell">
           <!-- Material Icon Font -->
           <chef-icon *ngIf="profile.status !== 'waived'" class="status-icon" [ngClass]="profile.status">
@@ -83,7 +83,7 @@
   <app-page-picker
     class="reporting-profiles-paging"
     [perPage]="reportData.profilesListParams.perPage"
-    [total]="reportData.profilesList.total"
+    [total]="reportData.filteredProfileCount"
     [page]="reportData.profilesListParams.page"
     (pageChanged)="onProfilesListPageChanged($event)">
   </app-page-picker>

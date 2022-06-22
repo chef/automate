@@ -898,7 +898,8 @@ export enum HttpStatus {
   NOT_FOUND = 404,
   CONFLICT = 409,
   PRECONDITION_FAILED = 412, // Warning! Grpc.FailedPrecondition maps to 400, not 412!
-  INTERNAL_SERVER_ERROR = 500
+  INTERNAL_SERVER_ERROR = 500,
+  TIME_OUT_ERROR = 504
 }
 
 // Map of gRPC codes to HTTP codes is available at:

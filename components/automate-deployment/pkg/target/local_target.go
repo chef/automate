@@ -25,6 +25,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/bootstrapbundle"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-deployment/pkg/depot"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -1357,22 +1358,7 @@ func (t *LocalTarget) installHabViaInstallScript(ctx context.Context, requiredVe
 		return err
 	}
 
-	// TODO(ssd) 2019-12-03: HACK until we remove the use of install.sh
-	lastBintrayVersion := "0.89.0"
-	targetVersion, err := habpkg.ParseSemverishVersion(requiredVersion.Version())
-	if err != nil {
-		return err
-	}
-
-	switchoverVersion, err := habpkg.ParseSemverishVersion(lastBintrayVersion)
-	if err != nil {
-		return err
-	}
-
 	version := requiredVersion.Version()
-	if habpkg.CompareSemverish(targetVersion, switchoverVersion) != habpkg.SemverishGreater {
-		version = habpkg.VersionString(requiredVersion)
-	}
 
 	output, execErr := t.Executor.CombinedOutput(
 		"bash",
@@ -1534,4 +1520,29 @@ func (t *LocalTarget) IPs() []net.IP {
 
 func (t *LocalTarget) HabCache() depot.HabCache {
 	return depot.FromLocalCache()
+}
+
+func (t *LocalTarget) InstallAutomateBackendDeployment(ctx context.Context, c *dc.ConfigRequest, m manifest.ReleaseManifest, saas bool) error {
+	backendDeploymentPkg := ""
+	if saas {
+		backendDeploymentPkg = constants.SaasBackendDeploymentPkg
+	} else {
+		backendDeploymentPkg = constants.HABackendDeploymentPkg
+	}
+	//logrus.Info("=====" + backendDeploymentPkg + "=====")
+	pkg := manifest.InstallableFromManifest(m, backendDeploymentPkg)
+	if pkg == nil {
+		logrus.Info("unable to find " + backendDeploymentPkg + " package in manifest")
+		return errors.New(backendDeploymentPkg + " was not found in the manifest")
+	}
+	output, err := t.InstallPackage(ctx, pkg, c.GetV1().GetSvc().GetChannel().GetValue())
+	if err != nil {
+		logrus.WithError(err).WithFields(logrus.Fields{
+			"package": pkg.InstallIdent(),
+			"output":  output,
+		}).Error("install failed")
+		return errors.Wrapf(err, "msg=\"failed to install\" package=%s output=%s", pkg.InstallIdent(), output)
+	}
+	logrus.Info(backendDeploymentPkg + " Installed")
+	return nil
 }

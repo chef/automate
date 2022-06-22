@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-manifest_url="https://packages.chef.io/manifests/${EXPEDITOR_TARGET_CHANNEL}/automate/latest.json"
+manifest_url="https://packages.chef.io/manifests/${EXPEDITOR_TARGET_CHANNEL}/automate/latest_semver.json"
 echo "Downloading latest manifest from $manifest_url"
 curl -o manifest.json "$manifest_url"
 
@@ -22,5 +22,5 @@ if [[ -z "$build_version" ]]; then
     exit 1
 fi
 
-git tag "$build_version" "$git_sha"
-git push origin "$build_version"
+git tag "$build_version-released" "$git_sha"
+git push origin "$build_version-released"

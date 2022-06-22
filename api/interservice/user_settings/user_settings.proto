@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package chef.automate.domain.user_settings.service;
+option go_package = "github.com/chef/automate/api/interservice/user_settings";
+import "google/protobuf/empty.proto";
+
+
+// UserSettings allows accessing of user settings
+service UserSettingsService {
+	rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse) {};
+	rpc PutUserSettings(PutUserSettingsRequest) returns (PutUserSettingsResponse) {};
+	rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (google.protobuf.Empty){};
+}
+
+message User {
+	string name = 1;
+	string connector = 2;
+}
+
+message GetUserSettingsRequest{
+	User user = 1;
+}
+
+message PutUserSettingsRequest{
+	User user = 1;
+	map<string, UserSettingValue> settings = 2;
+}
+
+message DeleteUserSettingsRequest{
+	User user = 1;
+}
+
+message GetUserSettingsResponse {
+	User user = 1;
+	map<string, UserSettingValue> settings = 2;
+}
+
+message PutUserSettingsResponse {
+	User user = 1;
+}
+
+message UserSettingValue {
+	string default_value = 1;
+	string value = 2;
+	bool enabled = 3;
+	repeated string valid_values = 4;
+}

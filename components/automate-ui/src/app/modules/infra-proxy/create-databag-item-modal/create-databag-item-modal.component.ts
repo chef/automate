@@ -15,6 +15,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import {
   saveStatus,
   saveError
@@ -22,8 +23,10 @@ import {
 import { DataBagItem } from 'app/entities/data-bags/data-bags.model';
 import {
   CreateDataBagItem,
+  DataBagItemPayload,
   GetDataBagItems
 } from 'app/entities/data-bags/data-bag-details.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-create-databag-item-modal',
@@ -53,10 +56,12 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.createForm = this.fb.group({
-      itemId: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      itemId: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]],
       itemAttr: ['{}']
     });
   }
@@ -102,7 +107,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   }
 
   handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -111,7 +116,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   closeCreateModal(): void {
     this.resetCreateModal();
     this.visible = false;
-    const payload = {
+    const payload: DataBagItemPayload = {
       databagName: '',
       server_id: this.server_Id,
       org_id: this.org_Id,
@@ -123,14 +128,11 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   }
 
   onChangeJSON(event: { target: { value: string } }) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.itemAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.itemAttrParseError = true;
     }
   }
@@ -141,7 +143,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
       this.attr = JSON.parse(this.createForm.controls['itemAttr'].value.trim());
     }
     this.id = {'id': this.createForm.controls['itemId'].value.trim()};
-    const dataBagItem = {
+    const dataBagItem: DataBagItem = {
       server_id: this.server_Id,
       org_id: this.org_Id,
       name: this.name,
@@ -151,7 +153,8 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.store.dispatch(new CreateDataBagItem({dataBagItem: dataBagItem}));
+    this.store.dispatch(new CreateDataBagItem({dataBagItem}));
+    this.telemetryService.track('InfraServer_Databags_Details_Create');
   }
 
   private resetCreateModal(): void {
@@ -162,7 +165,4 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
     this.itemAttrParseError = false;
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }

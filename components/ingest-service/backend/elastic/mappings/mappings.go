@@ -13,6 +13,10 @@ import (
 const (
 	// The format of the date string on the end of the index name
 	TimeseriesDateFmt = "2006.01.02"
+	//run info for telematics
+	NodeCurrentRunInfoVersion = "1"
+	nodeAndVersionRunInfo     = "node-" + NodeCurrentRunInfoVersion
+	IndexNameNodeRunInfo      = nodeAndVersionRunInfo + "-run-info"
 )
 
 // AllMappings is the list of all mappings that we currently have
@@ -23,6 +27,7 @@ var AllMappings = []Mapping{
 	NodeState,
 	ConvergeHistory,
 	NodeAttribute,
+	NodeRunInfo,
 }
 
 // Mapping type is the representation of an ES mapping, it contains
@@ -31,7 +36,6 @@ var AllMappings = []Mapping{
 type Mapping struct {
 	Index      string
 	Alias      string
-	Type       string
 	Timeseries bool
 	Mapping    string
 	Properties string

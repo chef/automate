@@ -1,5 +1,7 @@
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
+  HAB_BLDR_CHANNEL: "stable"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable"
 
 expeditor:
   defaults:
@@ -15,6 +17,7 @@ steps:
     command:
       - hab studio run "source .studiorc && verify_all_protobuf_components"
     timeout_in_minutes: 10
+    soft_fail: true
     retry:
       automatic:
         limit: 1
@@ -63,6 +66,27 @@ steps:
           environment:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
+
+  #A2ha pipeline
+  - label: ":terraform: :buildkite: a2-ha-backend/terraform"
+    commands:
+      - tfenv install 0.14.11
+      - tfenv use 0.14.11
+      - cd terraform/a2ha-terraform
+      - make check
+    expeditor:
+      executor:
+        docker:
+
+  - label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
+    commands:
+      - gem install bundler:1.16.6
+      - cd components/automate-cluster-ctl/; bundle install --jobs=3 --retry=3
+      - bundle exec rspec
+    expeditor:
+      executor:
+        docker:
+          image: rubydistros/ubuntu-18.04
 
   #
   # Static & Unit tests
@@ -172,7 +196,7 @@ steps:
       - scripts/install_golang.sh
       - scripts/setup_buildkite_pg.sh cereal_test
       - cd lib
-      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit cereal_integration
+      - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH GODEBUG=x509ignoreCN=0 make lint unit cereal_integration
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -186,7 +210,7 @@ steps:
       - scripts/install_golang.sh
       - scripts/setup_buildkite_pg.sh cereal_test
       - cd components/cereal-service/
-      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit integration
+      - PG_USER="postgres" PATH=/usr/lib/postgresql/13/bin/:\$PATH make lint unit integration
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -226,19 +250,6 @@ steps:
       - scripts/install_golang.sh
       - cd components/event-gateway
       - make ci
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-
-  - label: "[cross-compile] automate-cli"
-    command:
-      - scripts/install_golang.sh
-      - cd components/automate-cli
-      - make cross
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -450,6 +461,7 @@ steps:
   - label: "[unit] notifications-service"
     command:
       - cd components/notifications-service/server
+      - git config --global url."https://github.com/".insteadOf git://github.com/
       - make static unit
     timeout_in_minutes: 10
     retry:
@@ -535,35 +547,6 @@ steps:
     expeditor:
       executor:
         docker:
-
-  # TODO(ssd) 2019-03-19: I've added a couple of basic tests here but
-  # there are a number of A1 tests we might want to integrate.
-  #
-  # I'm holding off on most as other cleanups we want to do might
-  # impact them.
-  #
-  # Tests to port:
-  # - schema tests
-  # - erlang dialyzer tests
-  # - web unit tests
-  # - web e2e test
-  # - workflow-web-jshint
-  - label: "[unit] automate-workflow-server"
-    command:
-      - export PATH=/opt/asdf/shims:/opt/asdf/bin:\$PATH
-      - asdf global erlang 18.3
-      - cd components/automate-workflow-server
-      - ./rebar get-deps
-      - make compile
-      - make syntax_elvis
-      # - make dialyzer
-      - cd apps/enterprise_ctl
-      - make .concrete/DEV_MODE compile eunit
-    expeditor:
-      executor:
-        docker:
-          # a1-buildkite has erlang 18 pre-installed
-          image: chefes/a1-buildkite
 
   - label: "[unit] automate-cds"
     command:
@@ -661,7 +644,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
+      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log

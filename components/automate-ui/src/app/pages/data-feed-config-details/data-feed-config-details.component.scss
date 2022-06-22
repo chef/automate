@@ -1,0 +1,54 @@
+th {
+  text-align: left;
+  padding: 0px;
+}
+
+table {
+  table-layout: fixed;
+}
+
+table td {
+  padding: 0em 3em 1em;
+}
+
+.config-heading {
+  font-size: 14px;
+  padding: 0em 2.4em 2em;
+}
+
+.config-sub-heading {
+  font-size: 12px;
+  font-weight: 600;
+  vertical-align: top;
+}
+
+.config-sub-heading-value {
+  font-size: 12px;
+}
+
+.cidr-filters,
+.status-code {
+  display: flex;
+  float: left;
+
+  .compress-data {
+    max-height: 11em;
+    overflow: overlay;
+  }
+
+  a {
+    margin: 0 0 0.1em 0.5em;
+    color: #3864F2;
+    align-self: flex-end;
+  }
+
+}
+
+.empty-state {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}

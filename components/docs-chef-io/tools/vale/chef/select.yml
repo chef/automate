@@ -1,0 +1,5 @@
+extends: substitution
+message: "Use Use '%s' instead of 'click'."
+level: error
+swap:
+  'click': select

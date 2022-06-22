@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Restore"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/restore.md Restore"
-    weight = 80
+    parent = "automate/configuring_automate"
+    identifier = "automate/configuring_automate/restore.md Restore"
+    weight = 70
 +++
 
 Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-from-a-filesystem-backup" >}}), an [Amazon S3 bucket backup]({{< ref "restore.md#restore-from-an-aws-s3-backup" >}}), or a [Google Cloud Storage (GCS) bucket backup]({{< ref "restore.md#restore-from-a-google-cloud-storage-backup" >}}).
@@ -57,7 +57,7 @@ Ensure access for the backup type used:
 1. To restore a backup to a machine with less memory than the original system, adjust for the appropriate lower memory settings by creating a `patch.toml` file that specifies the heapsize, and providing the file at restore time:
 
      ```toml
-       [elasticsearch.v1.sys.runtime]
+       [opensearch.v1.sys.runtime]
          heapsize = "4096m"
          # Use "m" for megabytes and "g" for gigabytes
      ```

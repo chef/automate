@@ -1,5 +1,21 @@
 @import "~styles/variables";
 
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+    margin-top: 4px;
+  }
+}
+
 thead {
   font-size: 14px;
   letter-spacing: 0.2px;
@@ -27,7 +43,7 @@ chef-table-new {
   }
 }
 
-chef-loading-spinner {
+chef-loading-spinner.spinner {
   display: block;
   margin: 100px auto;
   width: 100px;
@@ -43,14 +59,13 @@ img {
   margin-top: 130px;
 }
 
+.wrapper {
+  position: relative;
+}
+
 .full-screen-spinner {
-  display: flex;
-  margin: auto;
-  margin-top: 239px;
-  background-color: $chef-white;
-  opacity: 0.7;
-  width: initial;
-  height: 100%;
+  margin: -34px;
+  margin-top: -20px;
 }
 
 .roles-list-paging {
@@ -65,22 +80,5 @@ img {
   .search-items {
     margin-bottom: 18px;
     height: 55px;
-  }
-
-  chef-toolbar chef-button:first-child {
-    margin: 4px 0px 0px 32px;
-    float: right;
-
-    button {
-      padding: 7px 16px;
-      letter-spacing: 0.5px;
-    }
-  }
-
-  ::ng-deep {
-    .search-items app-infra-search-bar .search-wrapper {
-      float: left;
-      width: calc(100% - 135px);
-    }
   }
 }

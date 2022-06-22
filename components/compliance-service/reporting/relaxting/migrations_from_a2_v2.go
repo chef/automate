@@ -9,12 +9,13 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 const (
@@ -125,7 +126,7 @@ func getProfileA2v2(client *elastic.Client, ctx context.Context, profileId strin
 		for _, hit := range searchResult.Hits.Hits {
 			esProfile = ESInSpecReportProfileA2v2{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esProfile)
+				err := json.Unmarshal(hit.Source, &esProfile)
 				if err != nil {
 					return nil, errors.Wrap(err, fmt.Sprintf("getProfileA2v2 unable to unmarshall profile with ID=%s", hit.Id))
 				}
@@ -168,7 +169,7 @@ func getReportsA2v2(client *elastic.Client, ctx context.Context, esIndex string,
 		for _, hit := range searchResult.Hits.Hits {
 			esReports[hit.Id] = &ESInSpecReportA2v2{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, esReports[hit.Id])
+				err := json.Unmarshal(hit.Source, esReports[hit.Id])
 				if err != nil {
 					return nil, errors.Wrap(err, fmt.Sprintf("getReportsA2v2 unable to unmarshall report with ID=%s", hit.Id))
 				}
@@ -230,7 +231,7 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) (*ESInSpecSummary, 
 			Status:       profileStatus,
 			ControlsSums: dstControlSums,
 			Name:         profileName,
-			Full:         fmt.Sprintf("%s, v%s", profileTitle, profileVersion),
+			Full:         stringutils.GetFullProfileName(profileTitle, profileVersion),
 			Title:        profileTitle,
 			SHA256:       profileId,
 			Version:      profileVersion,
@@ -298,7 +299,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 			ControlsSums: profilesSumsMap[srcProfileMin.SHA256],
 			Name:         srcProfileMin.Name,
 			Title:        profileTitle,
-			Full:         fmt.Sprintf("%s, v%s", profileTitle, srcProfileMin.Version),
+			Full:         stringutils.GetFullProfileName(profileTitle, srcProfileMin.Version),
 			SHA256:       srcProfileMin.SHA256,
 			Version:      srcProfileMin.Version,
 		}

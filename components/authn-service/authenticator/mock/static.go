@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/chef/automate/api/interservice/id_token"
+
 	"go.uber.org/zap"
 
 	"github.com/chef/automate/components/authn-service/authenticator"
@@ -45,6 +47,10 @@ func (r *staticRequestor) Subject() string {
 	return "user:" + r.connID + ":" + r.userID
 }
 
+func (r *staticRequestor) Requestor() string {
+	return r.userID
+}
+
 func (r *staticRequestor) Teams() []string {
 	teams := make([]string, len(r.teams))
 	for i, team := range r.teams {
@@ -81,7 +87,7 @@ func NewStaticAuthenticator(externalID, connID, userID, email string, teams []st
 // Open returns an authentication strategy that always returns the configured
 // requestor.
 func (c *StaticConfig) Open(u *url.URL, _ *certs.ServiceCerts,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger, _ id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 
 	return NewStaticAuthenticator(c.ExternalID, c.ConnID, c.UserID, c.Email, c.Teams, logger), nil
 }

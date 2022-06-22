@@ -3,19 +3,19 @@ provider "aws" {
   profile = "chef-cd"
 }
 
+provider "vault" {
+  address   = "https://vault.ps.chef.co"
+  namespace = "root"
+  version   = "2.24.1"
+}
+
+data "vault_generic_secret" "wildcard_chef" {
+  path = "secret/a2/testing/wildcard_cert"
+}
+
 data "aws_s3_bucket_object" "aws_private_key" {
   bucket = "chef-cd-citadel"
   key    = "cd-infrastructure-aws"
-}
-
-data "aws_s3_bucket_object" "wilcard_chef_co_crt" {
-  bucket = "chef-cd-citadel"
-  key    = "wildcard.chef.co.crt"
-}
-
-data "aws_s3_bucket_object" "wilcard_chef_co_key" {
-  bucket = "chef-cd-citadel"
-  key    = "wildcard.chef.co.key"
 }
 
 data "aws_s3_bucket_object" "internal_license" {
@@ -41,18 +41,6 @@ data "template_file" "install_chef_automate_cli" {
     workflow_enterprise       = "${var.workflow_enterprise}"
     enable_builder            = "${var.enable_builder}"
   }
-}
-
-module "chef_baseline" {
-  source = "github.com/chef/es-terraform//modules/cd_base"
-
-  instance_id   = "${var.instance_id}"
-  instance_fqdn = "${var.instance_fqdn}"
-  ssh_username  = "${var.ssh_username}"
-
-  enable_email      = "${var.enable_email}"
-  enable_monitoring = "${var.enable_monitoring}"
-  chef_environment  = "${var.chef_environment}"
 }
 
 locals {
@@ -87,8 +75,6 @@ SAML
 }
 
 resource "null_resource" "soften_mounts" {
-  depends_on = ["module.chef_baseline"]
-
   triggers = {
     always_do = "${uuid()}"
   }
@@ -286,8 +272,8 @@ EOF
   trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
 
 [[load_balancer.v1.sys.frontend_tls]]
-  cert = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_crt.body)))}"""
-  key = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_key.body)))}"""
+  cert = """${data.vault_generic_secret.wildcard_chef.data["crt"]}"""
+  key = """${data.vault_generic_secret.wildcard_chef.data["key"]}"""
 
 [license_control.v1.svc]
   license = """${data.aws_s3_bucket_object.internal_license.body}"""
@@ -299,9 +285,9 @@ EOF
 
 ${var.saml == "true" ? local.saml_config : ""}
 
-[elasticsearch.v1.sys.runtime]
+[opensearch.v1.sys.runtime]
   heapsize = "${var.enable_cloudwatch_metrics == "true" ? "16g" : "2g"}"
-[elasticsearch.v1.sys.cluster]
+[opensearch.v1.sys.cluster]
   max_shards_per_node = ${var.enable_cloudwatch_metrics == "true" ? "1500" : "1000"}
 TOML
   }

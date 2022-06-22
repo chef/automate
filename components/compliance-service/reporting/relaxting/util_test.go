@@ -1,23 +1,31 @@
 package relaxting
 
 import (
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetEsIndexNoTimeLast24h(t *testing.T) {
 	sum := mappings.IndexNameSum
 	filters := make(map[string][]string)
 
+	todayTime := time.Now().UTC()
+
 	index, err := GetEsIndex(filters, true)
-
-	today := time.Now().UTC().Format("2006.01.02")
-	yesterday := time.Now().Add(-24 * time.Hour).UTC().Format("2006.01.02")
-
-	assert.Equal(t, sum+"-"+yesterday+"*,"+sum+"-"+today+"*", index)
 	assert.NoError(t, err)
+
+	today := todayTime.Format("2006.01.02")
+	if todayTime.Day() == 31 {
+		today = todayTime.Format("2006.01.")
+		//if it's the 31st, shave off the 1 and make it 3*, which will be the 30th and 31st
+		assert.Equal(t, sum+"-"+today+"3*", index)
+	} else {
+		yesterday := todayTime.Add(-24 * time.Hour).Format("2006.01.02")
+		assert.Equal(t, sum+"-"+yesterday+"*,"+sum+"-"+today+"*", index)
+	}
 }
 
 func TestGetEsIndexWithOnlyEndTimeFilter(t *testing.T) {
@@ -55,4 +63,16 @@ func TestGetEsIndexWithStartAndEndTime(t *testing.T) {
 	index, err = GetEsIndex(filters, false)
 	assert.Equal(t, rep+"-2019.01.02*,"+rep+"-2019.01.03*,"+rep+"-2019.01.04*,"+rep+"-2019.01.05*", index)
 	assert.NoError(t, err)
+}
+
+func TestFetchLatestDataOrNot(t *testing.T) {
+	filters := make(map[string][]string)
+	filters["start_time"] = []string{"2019-01-02T23:59:59Z"}
+	filters["end_time"] = []string{"2019-01-03T23:59:59Z"}
+	latestOnly := FetchLatestDataOrNot(filters)
+	assert.Equal(t, true, latestOnly)
+
+	filters["job_id"] = []string{"job 1"}
+	latestOnly = FetchLatestDataOrNot(filters)
+	assert.Equal(t, false, latestOnly)
 }

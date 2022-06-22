@@ -1,0 +1,22 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
+export PGLEADERCHK_PORT
+
+{{~#if bind.pgleaderchk}}
+  {{~#eachAlive bind.pgleaderchk.members as |pgchkmember|}}
+    {{~#if @last}}
+# this variable is defined here then used in haproxy.conf where
+# haproxy interpolates it at load time.
+PGLEADERCHK_PORT={{pgchkmember.cfg.port}}
+    {{~/if}}
+  {{~/eachAlive}}
+{{~else}}
+PGLEADERCHK_PORT={{cfg.pgleaderchk.port}}
+{{~/if}}
+
+exec {{pkgPathFor "core/haproxy"}}/bin/haproxy -f {{pkg.svc_config_path}}/haproxy.conf -db

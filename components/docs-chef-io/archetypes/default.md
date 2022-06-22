@@ -12,4 +12,4 @@ draft = false
     weight = 10
 +++
 
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/{{ .Name }}.md)
+[\[edit on GitHub\]](https://github.com/chef/automate/blob/main/components/docs-chef-io/content/automate/{{ .Name }}.md)

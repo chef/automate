@@ -20,6 +20,7 @@ import {
 import { GetProjects, CreateProject, DeleteProject, ProjectPayload  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-project-list',
@@ -48,7 +49,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
     public projects: ProjectService,
-    fb: FormBuilder
+    fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.createProjectForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
@@ -134,6 +136,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public deleteProject(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteProject({id: this.projectToDelete.id}));
+    this.telemetryService.track('Settings_Projects_Delete');
   }
 
   public createProject(): void {
@@ -148,6 +151,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       skip_policies: !this.createProjectForm.controls['addPolicies'].value
     };
     this.store.dispatch(new CreateProject(project));
+    this.telemetryService.track('Settings_Projects_Create');
   }
 
   public openCreateModal(): void {

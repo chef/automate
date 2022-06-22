@@ -6,9 +6,9 @@ package legacy
 import (
 	"context"
 
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // verify that the mock satisfies the LegacyDataCollectorServer interface (at compile time)
@@ -30,10 +30,10 @@ func NewLegacyDataCollectorServerMockWithoutValidation() *LegacyDataCollectorSer
 // methods with "not implemented" returns
 type LegacyDataCollectorServerMock struct {
 	validateRequests bool
-	StatusFunc       func(context.Context, *empty.Empty) (*StatusResponse, error)
+	StatusFunc       func(context.Context, *emptypb.Empty) (*StatusResponse, error)
 }
 
-func (m *LegacyDataCollectorServerMock) Status(ctx context.Context, req *empty.Empty) (*StatusResponse, error) {
+func (m *LegacyDataCollectorServerMock) Status(ctx context.Context, req *emptypb.Empty) (*StatusResponse, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())

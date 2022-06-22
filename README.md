@@ -3,8 +3,7 @@
 [![Build Status](https://badge.buildkite.com/9c37160ef9872fbdcf42628586fabfbb3048239a99c1f60e3a.svg?branch=master)](https://buildkite.com/chef-oss/chef-automate-master-verify)
 [![Build Status](https://badge.buildkite.com/b550988ee153942e2ed1ad2741ab652b6d9efa76992d022cf8.svg?branch=master)](https://buildkite.com/chef/chef-automate-master-verify-private)
 
-Automate provides a unified view into infrastructure managed by
-Chef, Inspec, and Habitat.
+Automate provides a unified view into infrastructure managed by Chef Infra, InSpec, and Habitat.
 
 Key features include:
 
@@ -54,8 +53,8 @@ developed independently.
 * [Backup Gateway](components/backup-gateway)
 * [Data Lifecycle Service](components/data-lifecycle-service)
 * [Deployment Service](components/automate-deployment)
-* [Elasticsearch Gateway](components/automate-es-gateway)
-* [Elasticsearch Sidecar](components/es-sidecar-service)
+* [Opensearch Gateway](components/automate-es-gateway)
+* [Opensearch Sidecar](components/es-sidecar-service)
 * [License Control Service](components/license-control-service)
 * [PostgreSQL Gateway](components/automate-pg-gateway)
 * [PostgreSQL Sidecar](components/pg-sidecar-service)
@@ -80,9 +79,9 @@ document](./dev-docs/DEV_ENVIRONMENT.md).
 
 ## Architecture
 
-The following picture illustrates the Automate 2.0 architecture
+The following picture illustrates the Automate architecture
 
-![Automate 2 Architecture](dev-docs/diagrams/a2-architecture.png)
+![Automate Architecture](dev-docs/diagrams/a2-architecture.png)
 
 ## API Compatibility
 

@@ -2,9 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
 export enum RecipeActionTypes {
-  GET_ALL = 'RECIPES::GET_ALL',
-  GET_ALL_SUCCESS = 'RECIPES::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE = 'RECIPES::GET_ALL::FAILURE'
+  GET_ALL          = 'RECIPES::GET_ALL',
+  GET_ALL_SUCCESS  = 'RECIPES::GET_ALL::SUCCESS',
+  GET_ALL_FAILURE  = 'RECIPES::GET_ALL::FAILURE'
 }
 
 export interface RecipesSuccessPayload {

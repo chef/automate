@@ -1,0 +1,32 @@
+<div ngClass="{slide : isSlideOpen}">
+  <div class="sidenav-header">
+    <h1 slot="title">Revisions for "{{policyfileName}}" Policyfile</h1>
+    <chef-button class="close" secondary (click)="closeRevisionId()" data-cy="close-revision-id-button">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <chef-loading-spinner *ngIf="revisionsListLoading" size="50"></chef-loading-spinner>
+  <div *ngIf="!revisionsListLoading" data-cy="revision-id-table-container">
+    <div data-cy="empty-list" class="empty-section" *ngIf="!revisions.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p>No revision id available</p>
+    </div>
+    <div class="sidenav-body" *ngIf="revisions.length">
+      <chef-table>
+        <chef-thead>
+          <chef-tr class="no_border_tr">
+            <chef-th class="no_border_th">Revision ID</chef-th>
+            <chef-th class="no_border_th three-dot-column"></chef-th>
+          </chef-tr>
+        </chef-thead>
+        <chef-tbody>
+          <chef-tr *ngFor="let revsion of revisions">
+            <chef-td>{{revsion.revision_id}}</chef-td>
+            <chef-td class="three-dot-column">
+            </chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+    </div>
+  </div>
+</div>

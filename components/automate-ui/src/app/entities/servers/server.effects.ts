@@ -92,17 +92,21 @@ export class ServerEffects {
       ofType(ServerActionTypes.CREATE_SUCCESS),
       map(({ payload: { server } }: CreateServerSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Successfully Created Server - ${server.name}`
+      message: `Successfully created server - ${server.name}`
     }))));
 
   createServerFailure$ = createEffect(() =>
     this.actions$.pipe(
     ofType(ServerActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateServerFailure) => payload.status !== HttpStatus.CONFLICT),
-    map(({ payload }: CreateServerFailure) => new CreateNotification({
+    map(({ payload }: CreateServerFailure) => {
+      const msg = payload.status ===
+        HttpStatus.TIME_OUT_ERROR ? 'Gateway Time out ' : payload.error.error;
+      return new CreateNotification({
         type: Type.error,
-        message: `Could not create server: ${payload.error.error || payload}`
-      }))));
+        message: `Could not create server: ${msg || payload}`
+      });
+    })));
 
   updateServer$ = createEffect(() =>
     this.actions$.pipe(
@@ -118,7 +122,7 @@ export class ServerEffects {
       ofType(ServerActionTypes.UPDATE_SUCCESS),
       map(({ payload: { server } }: UpdateServerSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Successfully Updated Server - ${server.name}.`
+      message: `Successfully updated server - ${server.name}.`
     }))));
 
   updateServerFailure$ = createEffect(() =>
@@ -147,7 +151,7 @@ export class ServerEffects {
       map(({ payload: { name } }: DeleteServerSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Successfully Deleted Server - ${name}.`
+          message: `Successfully deleted server - ${name}.`
         });
       })));
 

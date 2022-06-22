@@ -20,37 +20,14 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 		return nil, err
 	}
 
-	perPage := int(req.GetSearchQuery().GetPerPage())
-	if perPage == 0 {
-		perPage = 1000
-	}
-
-	searchStr := req.GetSearchQuery().GetQ()
-	if searchStr == "" {
-		searchStr = "*:*"
-	}
-	query, err := c.client.Search.NewQuery("environment", searchStr)
-	if err != nil {
-		return &response.Environments{Environments: []*response.EnvironmentListItem{}}, nil
-	}
-	query.Rows = perPage
-
-	// Query accepts start param, The row at which return results begin.
-	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
-
-	res, err := query.Do(c.client)
+	res, err := c.SearchObjectsWithDefaults("environment", req.SearchQuery, nil)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
-	page := res.Start
-	if page != 0 {
-		page = page / perPage
-	}
-
 	return &response.Environments{
 		Environments: fromAPIToListEnvironments(res.Rows),
-		Page:         int32(page),
+		Page:         int32(res.Start),
 		Total:        int32(res.Total),
 	}, nil
 }

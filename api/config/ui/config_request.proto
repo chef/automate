@@ -26,6 +26,13 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 3;
 			Nginx ngx = 4;
 			Log log = 5;
+			CustomSettings custom_settings = 6;
+
+			message CustomSettings {
+				Banner banner = 1;
+				SessionSettings session_settings = 2;
+				LargeReporting large_reporting = 3;
+			}
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
@@ -66,6 +73,22 @@ message ConfigRequest {
 		}
 
 		message Service {
+		}
+
+		message Banner {
+			google.protobuf.BoolValue show = 1;
+			google.protobuf.StringValue message = 2;
+			google.protobuf.StringValue background_color = 3;
+			google.protobuf.StringValue text_color = 4;
+		}
+
+		message SessionSettings {
+			google.protobuf.BoolValue enable_idle_timeout = 1;
+			google.protobuf.Int32Value idle_timeout_minutes = 2;
+		}
+
+		message LargeReporting {
+			google.protobuf.BoolValue enable_large_reporting = 1;
 		}
 	}
 }

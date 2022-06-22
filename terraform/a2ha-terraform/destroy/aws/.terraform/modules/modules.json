@@ -1,0 +1,19 @@
+{
+    "Modules": [
+        {
+            "Key": "",
+            "Source": "",
+            "Dir": "."
+        },
+        {
+            "Key": "aws",
+            "Source": "../../modules/aws",
+            "Dir": "../../modules/aws"
+        },
+        {
+            "Key": "aws-destroy",
+            "Source": "../../modules/aws_destroy",
+            "Dir": "../../modules/aws_destroy"
+        }
+    ]
+}

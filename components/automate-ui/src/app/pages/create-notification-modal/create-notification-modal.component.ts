@@ -14,6 +14,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import {
   saveStatus,
   saveError
@@ -29,6 +30,7 @@ import {
 import {
   NotificationRuleRequests
 } from 'app/entities/notification_rules/notification_rule.requests';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 enum UrlTestState {
   Inactive,
@@ -62,7 +64,8 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
-    private notificationRuleRequests: NotificationRuleRequests
+    private notificationRuleRequests: NotificationRuleRequests,
+    private telemetryService: TelemetryService
   ) {
     this.createForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
@@ -123,7 +126,7 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -141,6 +144,7 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
     const username: string = this.createForm.value.username || '';
     const password: string = this.createForm.value.password || '';
     this.store.dispatch(new CreateNotificationRule(this.notificationRule, username, password));
+    this.telemetryService.track('Settings_Notifications_Create');
   }
 
   private resetCreateModal(): void {
@@ -173,6 +177,7 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
         );
     }
     this.sending = false;
+    this.telemetryService.track('Settings_Notifications_CreateTestNotification');
   }
 
   public updateTargetType(): void {
@@ -221,8 +226,5 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
     this.notificationRule.ruleType === 'ComplianceFailure';
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }
 

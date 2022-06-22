@@ -2,6 +2,10 @@ name: chef-automate config
 synopsis: Chef Automate configuration
 usage: chef-automate config COMMAND [flags]
 options:
+- name: auto-approve
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
 - name: help
   shorthand: h
   default_value: "false"

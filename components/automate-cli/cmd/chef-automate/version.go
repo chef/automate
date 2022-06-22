@@ -59,6 +59,12 @@ func printServerVersion() error {
 		)
 	}
 
+	// Check for bastion
+	if isA2HARBFileExist() {
+		writer.Bodyf("Server Build : For getting chef-automate version, Please login to chef-automate and use command chef-automate version ")
+		return nil
+	}
+
 	// Connect to the server to get the server version.
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {

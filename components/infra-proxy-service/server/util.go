@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
+
+	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	chef "github.com/go-chef/chef"
 )
 
 // SafeStringFromMap returns the value referenced by `key` in `values`. as a string.
@@ -82,4 +86,77 @@ func Unique(a []string) []string {
 	}
 
 	return b
+}
+
+func ToResponseExpandedRunList(client *ChefClient, runlist []string, cookbooks chef.EnvironmentCookbookResult, runlistCache RunListCache) ([]*response.RunList, error) {
+	resRunList := make([]*response.RunList, len(runlist))
+	var pos int32
+	for i, item := range runlist {
+		newItem, err := chef.NewRunListItem(item)
+		if err != nil {
+			return nil, err
+		}
+		newRunList := response.RunList{
+			Type: newItem.Type,
+			Name: newItem.Name,
+		}
+
+		if newItem.IsRecipe() {
+			newRunList.Version = newItem.Version
+			if newRunList.Version == "" {
+				cookbookVersion := cookbooks[strings.Split(newItem.Name, "::")[0]]
+				if len(cookbookVersion.Versions) > 0 {
+					newRunList.Version = cookbookVersion.Versions[0].Version
+				}
+			}
+
+			if runlistCache[newItem.Type] != nil {
+				if runlistCache[newItem.Type][newItem.Name] {
+					newRunList.Skipped = true
+					newRunList.Position = -1
+				}
+				runlistCache[newItem.Type][newItem.Name] = true
+			} else {
+				runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
+			}
+
+			if !newRunList.Skipped {
+				newRunList.Position = pos
+				pos++
+			}
+		}
+
+		if newItem.IsRole() {
+			newRunList.Position = -1 // Ignore the position for a role.
+			currentRole, err1 := client.client.Roles.Get(newItem.Name)
+			chefError, _ := chef.ChefError(err1)
+			if chefError != nil {
+				newRunList.Error = chefError.StatusMsg()
+			} else {
+				if runlistCache[newItem.Type] != nil {
+					if !runlistCache[newItem.Type][newItem.Name] {
+						runlistCache[newItem.Type][newItem.Name] = true
+						children, err := ToResponseExpandedRunList(client, currentRole.RunList, cookbooks, runlistCache)
+						newRunList.Children = children
+						if err != nil {
+							newRunList.Error = err.Error()
+						}
+					} else {
+						newRunList.Skipped = true
+					}
+				} else {
+					runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
+					children, err := ToResponseExpandedRunList(client, currentRole.RunList, cookbooks, runlistCache)
+					newRunList.Children = children
+					if err != nil {
+						newRunList.Error = err.Error()
+					}
+				}
+			}
+		}
+
+		resRunList[i] = &newRunList
+	}
+
+	return resRunList, nil
 }

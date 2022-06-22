@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=infra-proxy-service
 pkg_description="Automate infra views"
@@ -46,3 +47,4 @@ do_install() {
 do_strip() {
   return 0
 }
+

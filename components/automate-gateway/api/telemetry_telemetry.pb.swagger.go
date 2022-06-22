@@ -66,6 +66,9 @@ func init() {
         },
         "deployment_id": {
           "type": "string"
+        },
+        "deployment_type": {
+          "type": "string"
         }
       }
     },

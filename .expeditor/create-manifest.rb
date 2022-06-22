@@ -220,9 +220,10 @@ class ManifestGenerator
     # of an implementation mistake in deployment-service, changing this
     # version is impossible without major feature work in
     # deployment-service to manage the upgrade.
-    manifest["schema_version"] = "1"
+    manifest["schema_version"] = "2"
     manifest["hab_build"] = local_hab_version
     manifest["build"] = version
+    manifest["version"] = version
     manifest["hab"] = []
 
     ["hab", "hab-sup", "hab-launcher"].each do |p|
@@ -299,7 +300,7 @@ pins = {
   # This will pin the services that we package and start with the deployment service,
   # while still allowing the clients of these databases to upgrade their client
   # libraries if any fixes are shipped there.
-  "automate-postgresql"    => {"origin" => "chef", "name" => "automate-postgresql",    "version" => "9.6.11", "release" => "20200929122522"},
+  # "automate-postgresql"    => {"origin" => "chef", "name" => "automate-postgresql",    "version" => "9.6.24", "release" => "20220218015755"},
   # "automate-elasticsearch" => {"origin" => "chef", "name" => "automate-elasticsearch", "version" => "6.8.3",  "release" => "20200929123629"},
 }
 

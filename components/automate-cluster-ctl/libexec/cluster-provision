@@ -1,0 +1,137 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl setup
+# Summary: Deploy Automate cluster
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+require 'cluster/terraform'
+
+class AutomateClusterSetup < AutomateCluster::Command
+  include AutomateCluster::Terraform::Helpers
+
+  option ["-o", "--okta-aws"], :flag, 'Use okta_aws cli to authenticate with AWS'
+  option ["-p", "--parallelism"], "WORKERS", "Number of workers used for the terraform apply", default: 50 do |s|
+    Integer(s)
+  end
+
+  option ["--tf-destroy"], :flag, "Run terraform destroy before the applying any changes (DANGER)", default: false, hidden: true
+  option ["-d", "--force-deploy"], :flag, "Force terraform deploy even if no changes have been detected. This is used when needing to update the tfstate"
+  option ["-y", "--accept-changes"], :flag, "Automatically accept and apply terraform changes"
+  option ["-n", "--skip-changes"], :flag, "Only show what changes are needed, don't apply them"
+  option ["-t", "--timeout"], 'MINUTES', "Set timeout value for commands to finish running", default: 10
+  
+  def command_opts(opts = {})
+  # convert timeout to seconds
+  { timeout: timeout.to_i * 60 }.merge(opts)
+  end
+  
+  def execute
+    if AutomateCluster::Config.architecture != "aws"
+      logger.info "Architecture does not match with requested one. Please run below command to set it.\n"
+      puts "           sed  -i \'s/deployment/aws/\' ./terraform/.tf_arch"
+      puts "           sed  -i 's/architecture \"deployment\"/architecture \"aws\"/' a2ha.rb"
+      exit
+    end
+
+    AutomateCluster.terraform.setup.run(config.architecture)
+
+    wait_while 'Logging into AWS using okta_aws' do |spinner|
+      so = login_with_okta
+      unless so.error?
+        spinner.success "(#{term.green("#{so.stderr.lines.last.chomp}")})"
+      end
+    end if okta_aws?
+
+    changes_found = true
+    plan_output = nil
+
+    terraform_destroy if tf_destroy? && !prompt.no?("Are you sure you want to run `terraform destroy`? This cannot be undone")
+
+    wait_while 'Checking terraform state' do |spinner|
+      opts = command_opts({ returns: [0,2], environment: terraform_secret_envs })
+      plan = terraform_run("plan -detailed-exitcode -input=false -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate", opts)
+
+      if plan.error?
+        spinner.error("(#{term.red("Error checking terraform state")})")
+        prompt.error "Please check the `a2ha.rb` config and ensure all settings are correct"
+        exit(1)
+      end
+
+      changes_found = plan.exitstatus == 2
+      plan_output = plan.stdout.lines
+    end
+
+    if changes_found || force_deploy?
+      puts "" # intentionally left blank
+      puts "The following modules will be changed:"
+      puts plan_output.inject([]) { |c,l| c << l.strip if l.match?(/# module/); c }
+      puts "" # intentionally left blank
+
+      prompt.ok "Infrastructure changes detected: #{plan_output.last.chomp}"
+      prompt.ok "To see all changes use the `-v` option when running the deploy command\n" unless verbose?
+      apply_terraform_changes(plan_output)
+    else
+      logger.info "No changes detected, infrastructure up-to-date"
+    end
+
+  end
+
+  def terraform_secret_envs
+    secrets.inject({}) do |col, item|
+      col["TF_VAR_#{item[0]}"] = item[1]
+      col
+    end
+  end
+
+  def ask_for_action
+    prompt.expand("Do you want to apply these changes?", auto_hint: true) do |q|
+      q.choice key: 'y', name: 'Apply changes',       value: true
+      q.choice key: 'n', name: "Don't apply changes", value: false
+      q.choice key: 'v', name: 'View Changes',        value: :view
+    end
+  end
+
+  def terraform_destroy
+    opts = command_opts({
+      live_stdout: STDOUT,
+      environment: { TF_LOG: ENV['TF_LOG'] }.merge(terraform_secret_envs)
+    })
+    tfrun = terraform_run("destroy -state-out=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -auto-approve", opts)
+
+    if tfrun.error?
+      spinner.error("(#{term.red("Error running terraform destroy")})")
+      prompt.error "There was a problem trying to perform `terraform destroy`"
+      exit(1)
+    end
+  end
+
+  def apply_terraform_changes(changes)
+    run_apply = false
+
+    while !skip_changes?
+      choice = accept_changes? || ask_for_action
+      if choice == :view
+        puts changes
+      else
+        run_apply = choice
+        break
+      end
+    end
+
+    if run_apply
+      opts = command_opts({
+        live_stdout: STDOUT,
+        environment: { TF_LOG: ENV['TF_LOG'] }.merge(terraform_secret_envs)
+      })
+
+      terraform_run("apply -parallelism=#{parallelism} -input=false -auto-approve -state-out=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate -state=/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate", opts)
+    else
+      prompt.warn "Skipped applying changes..."
+      return false
+    end
+  end
+end
+
+AutomateClusterSetup.run

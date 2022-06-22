@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=secrets-service
 pkg_description="Secrets API Service"
@@ -37,3 +38,4 @@ do_install() {
   mkdir "${pkg_prefix}/migrations"
   cp -r dao/migration/sql/* "${pkg_prefix}/migrations"
 }
+

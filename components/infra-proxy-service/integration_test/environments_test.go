@@ -76,10 +76,8 @@ func TestGetEnvironments(t *testing.T) {
 			PerPage: 5,
 		}
 		res, err := infraProxy.GetEnvironments(ctx, req)
-		assert.NoError(t, err)
-		assert.Equal(t, 0, int(res.Page))
-		assert.Equal(t, 0, int(res.Total))
-		assert.Equal(t, 0, len(res.Environments))
+		assert.Error(t, err)
+		assert.Nil(t, res)
 	})
 
 	t.Run("Environments list with a valid query search param", func(t *testing.T) {

@@ -1,0 +1,312 @@
+@import "~styles/variables";
+@import '../infra_shared/shared';
+@import '../../../../app/page-components/json-tree/json-tree.component.scss';
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+chef-loading-spinner {
+  z-index: 199;
+}
+
+.revision-id {
+  width: 30%;
+  vertical-align: text-top;
+}
+
+.accordion-section {
+  margin-top: 20px;
+}
+
+.page-body {
+
+  .top-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+
+  .cookbook-button {
+    float: right;
+    margin-bottom: -19px;
+    margin-top: -12px;
+  }
+
+  .accordion-section {
+    margin-top: 51px;
+  }
+}
+
+.summary-body {
+  display: flex;
+  padding: 1em;
+  background: $chef-white;
+
+  table {
+    font-size: 14px;
+
+    &:first-child {
+      border-right: 1px solid $chef-grey;
+
+      tr {
+        td {
+          padding-right: 2.25em;
+        }
+      }
+    }
+
+    &:last-child {
+      tr {
+        th {
+          padding-left: 2.25em;
+        }
+      }
+    }
+
+    tr {
+      margin: 0;
+
+      th,
+      td {
+        padding: 0.25em 0;
+        border: none;
+        background-color: transparent;
+        word-break: break-all;
+      }
+
+      th {
+        text-align: left;
+      }
+
+      td {
+        flex-grow: 2;
+        padding-right: 5em;
+      }
+
+      chef-icon {
+        margin-right: 10px;
+        color: $chef-light-grey;
+      }
+    }
+  }
+}
+
+.meta-box {
+  border: 0.5px solid $chef-key-tab;
+  border-radius: 4px;
+  color: $chef-black;
+  margin-bottom: 36px;
+}
+
+::ng-deep mat-select {
+  width: 277px;
+}
+
+::ng-deep .chef-dropdown {
+  margin-top: 27px;
+
+  .mat-option {
+    border: 1px solid $chef-key-tab;
+  }
+}
+
+// CSS for accordion
+
+.accordion {
+  margin: auto;
+  border-radius: 4px;
+  padding-inline-start: 0px;
+  width: 100%;
+
+  ul {
+    list-style-type: none;
+  }
+
+  li {
+    list-style-type: none;
+    margin-bottom: 10px;
+  }
+}
+
+.accordion .menu {
+  background-color: $chef-white;
+  border-radius: 4px 4px 0px 0px;
+  border: 1px solid $chef-light-grey-2;
+  border-bottom: none;
+  cursor: pointer;
+  font-weight: bold;
+  height: 40px;
+  position: relative;
+  padding: 10px 10px 10px 15px;
+  transition: all 0.4s ease;
+}
+
+.accordion li:last-child .menu {
+  border-bottom: 0;
+}
+
+.accordion li .arrows {
+  right: 1rem;
+  left: auto;
+  float: right;
+}
+
+.accordion li .data-bag-name {
+  float: left;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.accordion li.active .arrows {
+  transform: rotate(180deg);
+}
+
+.accordion li.active .menu {
+  background: var(--chef-badge-primary-background);
+}
+
+.submenu {
+  background-color: $chef-white;
+  border: 1px solid $chef-light-grey-2;
+  border-top: none;
+  border-radius: 0px 0px 4px 4px;
+  font-size: 12px;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.4s ease;
+}
+
+.submenu .item-details {
+  padding: 0 15px 15px;
+}
+
+.accordion .submenu {
+  border-radius: 0 0 4px 4px;
+}
+
+.accordion li:last-child .submenu li:last-child {
+  border-bottom: 0;
+}
+
+.autoHeight {
+  height: auto;
+}
+
+.items-list-paging {
+  margin: 0 0 35px;
+}
+
+.item-details {
+  ::ng-deep .no_border_th,
+  .no_border_tr,
+  .no_border_tr:first-child,
+  .no_border_tr:last-child {
+    border: none;
+    font-size: 12px;
+    padding-bottom: 2px;
+    background-color: $chef-white;
+  }
+}
+
+.empty-section {
+  margin-top: 50px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+.attr {
+  height: 242px;
+  margin-top: 5px;
+  background: $chef-white;
+  border: 1px solid $chef-key-tab;
+  box-sizing: border-box;
+  border-radius: 2px;
+}
+
+.label {
+  padding-left: 10px;
+}
+
+.json-container {
+  height: 169px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  color: $chef-black;
+}
+
+.scroll {
+  max-height: 158px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+::ng-deep .scroll::-webkit-scrollbar {
+  width: 5px;
+  background-color: $chef-modal-scrollbar;
+}
+
+::ng-deep .scroll::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
+}
+
+.expand-collapse {
+  font-size: 14px;
+  color: $royal-blue;
+  padding: 0 10px;
+
+  .action {
+    cursor: pointer;
+
+    &:first-child {
+      margin-right: 10px;
+    }
+
+    chef-icon {
+      position: relative;
+      top: 0;
+    }
+  }
+}
+
+.divider-constraints {
+  margin-left: 16px;
+  margin-top: 2px;
+  margin-right: 18px;
+}
+
+.override {
+  margin-top: 40px;
+}
+
+chef-tab-selector chef-option {
+  width: 130px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+
+  chef-heading {
+    flex-grow: 2;
+    text-align: left;
+  }
+
+  chef-button {
+    margin-left: 16px;
+    margin-top: -4px;
+    border: none;
+    color: $chef-primary-bright;
+    background-color: $chef-white;
+  }
+}
+
+.details-link {
+  cursor: pointer;
+  text-decoration: underline;
+}

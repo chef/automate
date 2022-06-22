@@ -107,9 +107,8 @@ span.example-text {
 
     mat-select {
       margin-bottom: 12px;
-      width: 88px;
+      width: 86px;
       font-size: 12px;
-      margin-left: 4px;
     }
   }
 }
@@ -129,7 +128,7 @@ span.example-text {
 }
 
 .row-version-margin {
-  margin-left: 16px;
+  margin-left: 22px;
 
   input {
     height: 36px;
@@ -173,7 +172,7 @@ span.example-text {
 
 ::ng-deep .scroll::-webkit-scrollbar {
   width: 5px;
-  background: #B4C3CC;
+  background: $chef-cyan-blue;
   border-radius: 5px;
 }
 
@@ -272,7 +271,7 @@ span.example-text {
 }
 
 ::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar-thumb {
-  background: #B4C3CC;
+  background: $chef-cyan-blue;
   border-radius: 5px;
 }
 

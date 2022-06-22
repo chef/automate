@@ -66,6 +66,7 @@ func (c *DeployPreflightChecker) Run(probe TestProbe) error {
 		RootUserRequiredCheck(),
 		SELinuxPermissiveCheck(),
 		DefaultMinimumDiskCheck(c.automateConfig),
+		SELinuxPermissiveCheck(),
 		chefAutomateInBinCheck,
 		isA2DeployedCheck,
 		IsSystemdCheck(),

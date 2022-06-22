@@ -9,6 +9,7 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { UserTableComponent } from './user-table/user-table.component';
 import { UserDetailsNonAdminResolve } from './user-details/user-details.resolver';
 
+import { TelemetryCheckboxModule } from 'app/page-components/telemetry-checkbox/telemetry-checkbox.module';
 import { UserRoutingModule } from './user-routing.module';
 
 @NgModule({
@@ -17,6 +18,7 @@ import { UserRoutingModule } from './user-routing.module';
     FormsModule,
     ReactiveFormsModule,
     ChefComponentsModule,
+    TelemetryCheckboxModule,
     UserRoutingModule
   ],
   exports: [

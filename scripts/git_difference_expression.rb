@@ -6,7 +6,7 @@ require "openssl"
 require "yaml"
 
 MANIFEST_HOST = "packages.chef.io".freeze
-MANIFEST_URL = "/manifests/dev/automate/latest.json".freeze
+MANIFEST_URL = "/manifests/dev/automate/latest_semver.json".freeze
 
 def get_dev_manifest_sha
   http = Net::HTTP.new(MANIFEST_HOST, 443)

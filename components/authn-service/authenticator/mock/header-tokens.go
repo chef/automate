@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/chef/automate/api/interservice/id_token"
+
 	"go.uber.org/zap"
 
 	"github.com/chef/automate/components/authn-service/authenticator"
@@ -34,6 +36,10 @@ func (r *htaRequestor) Subject() string {
 	return "token:" + r.id
 }
 
+func (r *htaRequestor) Requestor() string {
+	return r.id
+}
+
 func (*htaRequestor) Teams() []string {
 	return nil
 }
@@ -53,7 +59,7 @@ func NewHeaderTokenAuthenticator(
 
 // Open returns an header token authenticator
 func (c *HeaderTokenConfig) Open(u *url.URL, _ *certs.ServiceCerts,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger, _ id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 
 	return NewHeaderTokenAuthenticator(c.Header, c.Tokens, logger), nil
 }

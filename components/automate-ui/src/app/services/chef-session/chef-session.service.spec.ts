@@ -87,7 +87,7 @@ describe('ChefSessionService', () => {
           expect(service.username).toEqual('testchefuser');
           expect(service.groups).toEqual(['group1', 'group2', 'group3']);
           expect(service.id_token).toEqual('test_id_token');
-          expect(service.telemetry_enabled).toEqual(null);
+          expect(service.telemetry_enabled).toEqual(true);
         });
       });
     });

@@ -47,7 +47,9 @@
             <chef-icon [ngClass]="history.status">{{ history.status | chefStatusIcon }}</chef-icon>
             <div class="list-item-text">
               <p>
-                <strong>{{ history.startTime | datetime: RFC2822 }}</strong>
+                <strong>
+                  <app-time [time]="history.startTime"></app-time>
+                </strong>
               </p>
               <p><span>Duration: </span>{{ getDuration(history.startTime, history.endTime) }}</p>
             </div>

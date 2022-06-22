@@ -12,11 +12,9 @@ gh_repo = "automate"
     weight = 30
 +++
 
-Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports and scans in Chef Automate.
-Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in Elasticsearch or PostgreSQL.
-Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
+Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports, and scans in Chef Automate. Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in OpenSearch or PostgreSQL. Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
-## Data Lifecycle UI
+## Data Lifecycle
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
@@ -47,7 +45,7 @@ The default is to remove compliance reports after 60 days, and to remove complia
 
 ## Data Lifecycle API
 
-Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in Elasticsearch or PostgreSQL.
+Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in OpenSearch or PostgreSQL.
 
 The `data-lifecycle` API allows configuring and running lifecycle jobs by data type:
 
@@ -62,14 +60,25 @@ To see the data lifecycle job statuses, configure jobs, or run jobs requires an 
 
 To see the combined status and configuration for all data lifecycle jobs, you can use the global status endpoint:
 
+These examples use the Unix/Linux [`curl` command](https://man7.org/linux/man-pages/man1/curl.1.html) with the options:
+
+| Short Option | Long Option  | Definition                                                                                         |
+|--------------|--------------|---------------------------------------------------------------------------------------------------|
+| -s           | --silent     | Silent or quiet mode, does not show progress meter or error messages.                             |
+| -S           | --show-error | When used with -s, --silent, it makes curl show an error message if it fails.                     |
+| -k           | --insecure   | Instructs curl to proceed and operate even for server connections otherwise considered insecure.  |
+| -H           | --header     | Sends a header with the request. In this case, the header is your API token.                      |
+
+`curl -s -S` shows errors but does not show the progress meter:
+
 ```bash
-curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
+curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
 ```
 
 To see individual statuses by data type, you can access the data type sub-status endpoints:
 
 ```bash
-curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
+curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
 ```
 
 Swap `event-feed` for `infra` or `compliance` or `services` to see their corresponding jobs.
@@ -102,7 +111,7 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
         "disabled": false,
         "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
         "purge_policies": {
-          "elasticsearch": [
+          "opensearch": [
             {
               "policy_name": "actions",
               "older_than_days": 30,
@@ -125,7 +134,7 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
         "disabled": false,
         "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
         "purge_policies": {
-          "elasticsearch": [
+          "opensearch": [
             {
               "policy_name": "compliance-reports",
               "older_than_days": 100,
@@ -148,7 +157,7 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
         "disabled": false,
         "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
         "purge_policies": {
-          "elasticsearch": [
+          "opensearch": [
             {
               "policy_name": "feed",
               "older_than_days": 90,
@@ -188,7 +197,7 @@ You cannot read the data on the `status` endpoint, change some values, and feed 
 Save the JSON file as `config.json` in the current working directory:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
+curl -s -S -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
 ```
 
 If you wish to configure a specific endpoint, you can specify the `job_settings` for that data type and configure it using data types sub-resource.
@@ -201,7 +210,7 @@ For example, if you want to configure compliance settings, create a smaller JSON
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
           {
             "policy_name": "compliance-reports",
             "older_than_days": 100,
@@ -222,7 +231,7 @@ For example, if you want to configure compliance settings, create a smaller JSON
 And update the specific endpoint using the `compliance` sub-resource:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/compliance/config
+curl -s -S -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/compliance/config
 ```
 
 #### Job Settings
@@ -238,8 +247,8 @@ Infra node lifecycle jobs have the following options:
 
 Purge jobs have the following options:
 
-* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage backend before purging occurs.
-  * `elasticsearch` (array) - An array of Elasticsearch purge policies
+* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage before purging occurs.
+  * `opensearch` (array) - An array of OpenSearch purge policies
     * `disabled` (bool) - True or false if this job is enabled.
     * `policy_name` (string) - The name of the purge policy you wish to update.
     * `older_than_days` (int) - The threshold for what qualifies for deletion.
@@ -250,7 +259,7 @@ Services jobs have the following options:
 
 ##### Infra Job Settings
 
-The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two Elasticsearch purge policies.
+The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two OpenSearch purge policies.
 
 ```json
 { "job_settings": [
@@ -273,7 +282,7 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
         {
           "policy_name": "actions",
           "older_than_days": 30,
@@ -300,7 +309,7 @@ The `infra` data type has four data lifecycle jobs: three are for node lifecycle
 
 ##### Compliance Job Settings
 
-The `compliance` data type has one compliance purge job with two Elasticsearch purge policies.
+The `compliance` data type has one compliance purge job with two OpenSearch purge policies.
 
 ```json
 { "job_settings": [
@@ -309,7 +318,7 @@ The `compliance` data type has one compliance purge job with two Elasticsearch p
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=1",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
           {
             "policy_name": "compliance-reports",
             "older_than_days": 100,
@@ -333,7 +342,7 @@ The `compliance` data type has one compliance purge job with two Elasticsearch p
 
 ##### Event Feed Job Settings
 
-The `event_feed` data type has one event feed purge job with one Elasticsearch purge policy.
+The `event_feed` data type has one event feed purge job with one OpenSearch purge policy.
 
 ```json
 { "job_settings": [
@@ -341,7 +350,7 @@ The `event_feed` data type has one event feed purge job with one Elasticsearch p
       "disabled": false,
       "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
       "purge_policies": {
-        "elasticsearch": [
+        "opensearch": [
         {
           "policy_name": "feed",
           "older_than_days": 90,
@@ -389,13 +398,13 @@ As with `status` and `configure`, you can run data lifecycle jobs globally acros
 To run all data lifecycle jobs, run the following command:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
+curl -s -S -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
 ```
 
 To run jobs for a specific data type, you can make the request to the sub-resource:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
+curl -s -S -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
 ```
 
 Swap `infra` for `event-feed` or `compliance` to run their corresponding jobs.

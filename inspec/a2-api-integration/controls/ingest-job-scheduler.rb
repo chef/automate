@@ -56,7 +56,7 @@ control 'ingest-job-scheduler' do
       end
 
       let(:elasticsearch_url) do
-        ENV['ELASTICSEARCH_URL'] || "http://localhost:10144"
+        ENV['OPENSEARCH_URL'] || "http://localhost:10144"
       end
 
       def refresh_elasticsearch()

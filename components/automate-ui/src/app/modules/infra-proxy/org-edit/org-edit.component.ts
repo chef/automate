@@ -24,6 +24,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
 
   public org: Org;
+  public orgDetailsLoading = true;
   public saveSuccessful = false;
   public saveInProgress = false;
   public isLoading = true;
@@ -70,6 +71,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
       this.updateOrgForm.controls['name'].setValue(this.org.name);
       this.updateOrgForm.controls['admin_user'].setValue(this.org.admin_user);
       this.updateOrgForm.controls.projects.setValue(this.org.projects);
+      this.orgDetailsLoading = false;
     });
 
     this.store.select(updateStatus).pipe(

@@ -30,6 +30,9 @@ message ConfigRequest {
 			Bootstrap bootstrap = 7;
 			Connectors connectors = 8;
 			chef.automate.infra.config.TLSCredentials tls = 9;
+			Disclosure disclosure = 10;
+			Banner banner = 11;
+			InvalidLoginAttempts invalid_login_attempts = 12;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
@@ -125,6 +128,24 @@ message ConfigRequest {
 			google.protobuf.StringValue entity_issuer = 6;
 			google.protobuf.StringValue name_id_policy_format = 7;
 			repeated string allowed_groups = 8;
+		}
+
+		message Disclosure {
+			google.protobuf.BoolValue show = 1;
+			google.protobuf.StringValue disclosure_message = 2;
+		}
+
+		message Banner {
+			google.protobuf.BoolValue show = 1;
+			google.protobuf.StringValue message = 2;
+			google.protobuf.StringValue background_color = 3;
+			google.protobuf.StringValue text_color = 4;
+		}
+
+		message InvalidLoginAttempts {
+			google.protobuf.BoolValue enable_invalid_login_attempts = 1;
+			google.protobuf.Int32Value blocked_duration_in_minutes = 2;
+			google.protobuf.Int32Value max_invalid_login_attempts_allowed = 3;
 		}
 	}
 }

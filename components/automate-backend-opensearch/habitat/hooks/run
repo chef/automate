@@ -1,0 +1,61 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
+half_mem=$(echo $(( $(free -m | grep Mem | awk '{print $2}') / 2 )))
+if [ $half_mem -lt 26624 ]; then heapsize=$half_mem; heapsize+=m;else heapsize=26624m; fi
+export ES_JAVA_HEAP="-Xms$heapsize -Xmx$heapsize"
+
+{{#if cfg.runtime.max_locked_memory ~}}
+ulimit -l {{cfg.runtime.max_locked_memory}}
+{{/if ~}}
+{{#if cfg.runtime.max_open_files ~}}
+ulimit -n {{cfg.runtime.max_open_files}}
+{{/if ~}}
+# https://opensearch.org/docs/latest/opensearch/install/important-settings/
+{{#if cfg.runtime.es_java_opts ~}}
+export OPENSEARCH_JAVA_OPTS="{{cfg.runtime.es_java_opts}}"
+{{else ~}}
+export OPENSEARCH_JAVA_OPTS="${ES_JAVA_HEAP}"
+{{/if ~}}
+
+{{#if cfg.disable ~}}
+while true
+do
+  sleep 60
+done
+
+exit 0
+{{~else}}
+
+{{#if cfg.runtime.es_startup_sleep_time ~}}
+export ES_STARTUP_SLEEP_TIME={{cfg.runtime.es_startup_sleep_time}}
+{{/if ~}}
+
+export OPENSEARCH_PATH_CONF="{{pkg.svc_config_path}}"
+
+export TMPDIR="{{pkg.svc_var_path}}/tmp"
+export ES_TMPDIR="{{pkg.svc_var_path}}/tmp"
+export ES_PATH_CONF="{{pkg.svc_config_path}}"
+JDK_PKG_PATH=`HAB_LICENSE=accept-no-persist hab pkg path chef/automate-openjdk`
+export JDK_PKG_PATH
+
+# Initialize the secrets keystore and trusted certs ca keystore
+source {{pkg.svc_config_path}}/init_keystore
+source {{pkg.svc_config_path}}/init_ca
+
+echo "JDK PATH"
+echo $JDK_PKG_PATH
+
+hab pkg exec chef/automate-openjdk keytool -printcert -sslserver s3.amazonaws.com:443 -rfc >> {{pkg.svc_config_path}}/aws-s3.crt
+
+hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore {{pkg.svc_var_path}}/ca.jks -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
+
+hab pkg exec chef/automate-openjdk keytool -noprompt -importcert -alias s3.amazonaws.com -keystore $JDK_PKG_PATH/lib/security/cacerts -storepass changeit -file {{pkg.svc_config_path}}/aws-s3.crt
+exec opensearch
+
+
+{{~/if}}

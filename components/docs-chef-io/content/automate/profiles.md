@@ -36,7 +36,7 @@ and the _Available_ page, which displays all of the ready-to-use compliance prof
 Locate profiles by browsing the list, or by using the search bar.
 To install a compliance profile into your namespace, simply select **Get** on the right side of the profile name.
 
-Download compliance profiles to your workstation for use with [_Scan Jobs_]({{< relref "scan_jobs.md" >}}) and the [_Audit Cookbook_](https://github.com/chef-cookbooks/audit/blob/master/README.md), or as a basis for your own customizations. Start by selecting the arrow on the far right side of the profile, which redirects you to the _Profile Details_ view. Select the download button on the upper right corner of the profile description and download your selected profile as a tarball compressed with gzip ('.tar.gz').
+Download compliance profiles to your workstation for use with [_Scan Jobs_]({{< relref "scan_jobs.md" >}}) and the [_Audit Cookbook_](https://github.com/chef-cookbooks/audit/blob/main/README.md), or as a basis for your own customizations. Start by selecting the arrow on the far right side of the profile, which redirects you to the _Profile Details_ view. Select the download button on the upper right corner of the profile description and download your selected profile as a tarball compressed with gzip ('.tar.gz').
 
 ### Uploading profiles
 

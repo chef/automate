@@ -1,0 +1,38 @@
+<chef-modal [visible]="visible" (closeModal)="closeEditModal()">
+  <div class="text-right">
+    <h2 slot="title">Manage Node Tags</h2>
+  </div>
+  <div class="flex-container">
+    <div class="main pages-body">
+      <label>
+        <span class="constraint">{{name}}</span>
+      </label>
+      <hr class="divider-constraint" />
+
+      <div class="tag-input">
+        <input 
+        chefInput
+        type="text"
+        firstFocus
+        id="update-tag-input"
+        autocomplete="off"
+        data-cy="update-node-tag"
+        [(ngModel)]="inputTxt"/>
+        <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
+        <div class="button-bar-box">
+          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button
+            primary
+            id="update-button-modal"
+            (click)="addTags()"
+            data-cy="update-node-tag-button"
+            [disabled]="conflictError || updatingTags || (inputTxt === '')">
+            <chef-loading-spinner *ngIf="updatingTags"></chef-loading-spinner>
+            <span *ngIf="updatingTags">Updating...</span>
+            <span *ngIf="!updatingTags">Update Tags</span>
+          </chef-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</chef-modal>

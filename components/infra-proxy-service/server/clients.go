@@ -26,37 +26,14 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 		return nil, err
 	}
 
-	perPage := int(req.GetSearchQuery().GetPerPage())
-	if perPage == 0 {
-		perPage = 1000
-	}
-
-	searchStr := req.GetSearchQuery().GetQ()
-	if searchStr == "" {
-		searchStr = "*:*"
-	}
-	query, err := c.client.Search.NewQuery("client", searchStr)
-	if err != nil {
-		return &response.Clients{Clients: []*response.ClientListItem{}}, nil
-	}
-	query.Rows = perPage
-
-	// Query accepts start param, The row at which return results begin.
-	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
-
-	res, err := query.Do(c.client)
+	res, err := c.SearchObjectsWithDefaults("client", req.SearchQuery, nil)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
-	page := res.Start
-	if page != 0 {
-		page = page / perPage
-	}
-
 	return &response.Clients{
 		Clients: fromAPIToListClients(res.Rows),
-		Page:    int32(page),
+		Page:    int32(res.Start),
 		Total:   int32(res.Total),
 	}, nil
 }

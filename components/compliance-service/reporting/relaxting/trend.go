@@ -7,8 +7,8 @@ import (
 	"sort"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
@@ -72,7 +72,9 @@ func (backend ES2Backend) GetTrend(filters map[string][]string, interval int, tr
 				myName, trendType))
 	}
 
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return trendStatsBuckets, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}

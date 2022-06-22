@@ -75,18 +75,18 @@ channel="dev"
 # version="/0.1.150"
 version=""
 
-PG_PKG_NAME="automate-backend-postgresql"
+PG_PKG_NAME="automate-ha-postgresql"
 postgresql_pkg_ident="chef/$PG_PKG_NAME"
-PGLEADERCHK_PKG_NAME="automate-backend-pgleaderchk"
+PGLEADERCHK_PKG_NAME="automate-ha-pgleaderchk"
 pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME"
-proxy_pkg_ident="chef/automate-backend-haproxy"
-ELASTICSEARCH_PKG_NAME="automate-backend-elasticsearch"
-elasticsearch_pkg_ident="chef/automate-backend-elasticsearch"
-ELASTICSIDECAR_PKG_NAME="automate-backend-elasticsidecar"
+proxy_pkg_ident="chef/automate-ha-haproxy"
+OPENSEARCH_PKG_NAME="automate-ha-opensearch"
+opensearch_pkg_ident="chef/automate-ha-opensearch"
+ELASTICSIDECAR_PKG_NAME="automate-ha-elasticsidecar"
 elasticsidecar_pkg_ident="chef/$ELASTICSIDECAR_PKG_NAME"
 
 echo "Installing HA Backend Habitat packages from $channel"
-HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsearch_pkg_ident}${version}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${opensearch_pkg_ident}${version}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${proxy_pkg_ident}${version}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${pgleaderchk_pkg_ident}${version}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${postgresql_pkg_ident}${version}"
@@ -98,36 +98,39 @@ hostname=$(hostname)
 # copy the certs to the correct names
 mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
+echo "INSIDE integration/services/ha_backend/setup.sh"
+
+echo "list of files in certificates folder"
+ls -lrt /certificates
+
 echo "Configuring HA Backend Services"
-mkdir -p "/hab/user/${ELASTICSEARCH_PKG_NAME}/config/"
-cat > "/hab/user/${ELASTICSEARCH_PKG_NAME}/config/user.toml" <<EOF
+
+mkdir -p "/hab/user/${OPENSEARCH_PKG_NAME}/config/"
+cat > "/hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml" <<EOF
 [runtime]
 es_java_opts = "-Xms1024m -Xmx1024m"
 
-[es_yaml.network]
+[network]
 host = "0.0.0.0"
 
-[es_yaml.transport]
+[transport]
 host = "0.0.0.0"
 
-[es_yaml.bootstrap]
+[bootstrap]
 memory_lock = false
 
-[es_yaml.path]
+[path]
 repo = "/services/ha_backend_backups"
 
-[es_yaml.discovery.zen.ping.unicast]
-hosts = ["$(head -n 1 /services/ha_backend_peers)"]
-[es_yaml.cluster.routing.allocation.disk.watermark]
+[discovery]
+ping_unicast_hosts = ["$(head -n 1 /services/ha_backend_peers)"]
+
+[cluster.routing.allocation.disk.watermark]
 low = "95%"
 high = "98%"
 flood_stage = "99%"
 
-[es_yaml.opendistro_security]
-enable_snapshot_restore_privilege = true
-
-[opendistro_ssl]
-
+[tls]
 # root pem cert that signed the two cert/key pairs below
 rootCA = """$(cat /certificates/MyRootCA.pem)"""
 
@@ -139,6 +142,9 @@ admin_key    = """$(cat /certificates/odfe-admin.key)"""
 ssl_cert    = """$(cat /certificates/odfe-node.pem)"""
 ssl_key     = """$(cat /certificates/odfe-node.key)"""
 EOF
+
+echo "Checking user.toml of OPENSEARCH CONFIG"
+cat /hab/user/${OPENSEARCH_PKG_NAME}/config/user.toml
 
 mkdir -p "/hab/user/${ELASTICSIDECAR_PKG_NAME}/config/"
 cat > "/hab/user/${ELASTICSIDECAR_PKG_NAME}/config/user.toml" <<EOF
@@ -159,5 +165,5 @@ echo "Starting HA Backend Habitat services"
 HAB_LICENSE="accept-no-persist" hab svc load ${postgresql_pkg_ident} --topology leader --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${pgleaderchk_pkg_ident} --bind database:"$PG_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${proxy_pkg_ident} --bind database:"$PG_PKG_NAME".default --bind pgleaderchk:"$PGLEADERCHK_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
-HAB_LICENSE="accept-no-persist" hab svc load ${elasticsearch_pkg_ident} --channel ${channel}
-HAB_LICENSE="accept-no-persist" hab svc load ${elasticsidecar_pkg_ident} --bind elasticsearch:"$ELASTICSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${opensearch_pkg_ident} --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${elasticsidecar_pkg_ident} --bind opensearch:"$OPENSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}

@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -16,6 +18,7 @@ import (
 var configCmdFlags = struct {
 	overwriteFile bool
 	timeout       int64
+	acceptMLSA    bool
 }{}
 
 func init() {
@@ -24,6 +27,8 @@ func init() {
 	configCmd.AddCommand(setConfigCmd)
 
 	showConfigCmd.Flags().BoolVarP(&configCmdFlags.overwriteFile, "overwrite", "o", false, "Overwrite existing config.toml")
+
+	configCmd.PersistentFlags().BoolVarP(&configCmdFlags.acceptMLSA, "auto-approve", "y", false, "Do not prompt for confirmation; accept defaults and continue")
 
 	configCmd.PersistentFlags().Int64VarP(&configCmdFlags.timeout, "timeout", "t", 10, "Request timeout in seconds")
 
@@ -117,6 +122,34 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	cfg, err := dc.LoadUserOverrideConfigFile(args[0])
 	if err != nil {
 		return status.Annotate(err, status.ConfigError)
+	}
+	/*
+		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
+		then automate cluster ctl deploy will patch the config to automate
+	*/
+	if isA2HARBFileExist() {
+		if !configCmdFlags.acceptMLSA {
+			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
+			this command will deploy that new airgap bundle with patching of configuration. 
+			Press y to agree, n to to disagree? [y/n]`)
+			if err != nil {
+				return err
+			}
+
+			if !strings.Contains(response, "y") {
+				return errors.New("canceled Patching")
+			}
+		}
+		input, err := ioutil.ReadFile(args[0])
+		if err != nil {
+			return nil
+		}
+		err = ioutil.WriteFile(AUTOMATE_HA_AUTOMATE_CONFIG_FILE, input, 0644)
+		if err != nil {
+			writer.Printf("error in patching automate config to automate HA")
+			return err
+		}
+		return executeDeployment(args)
 	}
 
 	if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {

@@ -2,7 +2,6 @@ package fileutils_test
 
 import (
 	"io/ioutil"
-	"os"
 	"path"
 	"testing"
 
@@ -13,8 +12,7 @@ import (
 
 func TestCopyFile(t *testing.T) {
 	t.Run("it copies the file", func(t *testing.T) {
-		d1, d2, cleanup := setupCopy(t)
-		defer cleanup()
+		d1, d2 := setupCopy(t)
 
 		srcData := []byte("test data")
 		srcPath := path.Join(d1, "src")
@@ -27,8 +25,7 @@ func TestCopyFile(t *testing.T) {
 	})
 
 	t.Run("it fails when file exists", func(t *testing.T) {
-		d1, d2, cleanup := setupCopy(t)
-		defer cleanup()
+		d1, d2 := setupCopy(t)
 
 		srcData := []byte("src data")
 		srcPath := path.Join(d1, "src")
@@ -40,8 +37,7 @@ func TestCopyFile(t *testing.T) {
 	})
 
 	t.Run("it copies over existing file when overwrite is set", func(t *testing.T) {
-		d1, d2, cleanup := setupCopy(t)
-		defer cleanup()
+		d1, d2 := setupCopy(t)
 
 		srcData := []byte("src data")
 		srcPath := path.Join(d1, "src")
@@ -56,21 +52,9 @@ func TestCopyFile(t *testing.T) {
 	})
 }
 
-func setupCopy(t *testing.T) (string, string, func()) {
-	tmpDir, err := ioutil.TempDir("", "TestCopy1")
-	if err != nil {
-		t.Fatal("creating temp dir")
-		os.RemoveAll(tmpDir)
-	}
+func setupCopy(t *testing.T) (string, string) {
+	tmpDir := t.TempDir()
+	tmpDir2 := t.TempDir()
 
-	tmpDir2, err := ioutil.TempDir("", "TestCopy2")
-	if err != nil {
-		t.Fatal("creating temp dir")
-		os.RemoveAll(tmpDir2)
-	}
-
-	return tmpDir, tmpDir2, func() {
-		_ = os.RemoveAll(tmpDir)
-		_ = os.RemoveAll(tmpDir2)
-	}
+	return tmpDir, tmpDir2
 }

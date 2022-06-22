@@ -1,0 +1,126 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Server</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Policy Groups
+        </chef-breadcrumb>
+        {{policyGroup?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <div class="header">
+          <chef-heading data-cy="policy-group-head">{{policyGroup?.name}}</chef-heading>
+        </div>
+        <div class="meta-box">
+          <div class="summary-body">
+            <h3 class="meta-head">Policy Group Information</h3>
+            <ul>
+              <li id="revision-id" class="revision-id">
+                <span class="heading">No. of Policyfiles</span>
+                <span>{{policyCount}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="summary-body">
+            <h3 class="meta-head">Metadata</h3>
+            <ul>
+              <li id="chef-server">
+                <span class="heading">Chef Infra Server</span>
+                <span data-cy="policy-group-server">{{serverId}}</span>
+              </li>
+              <li>
+                <span class="heading" id="chef-organization">Chef Infra Organization</span>
+                <span data-cy="policy-group-org">{{orgId}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='policyfiles' data-cy="policyfiles-tab">Policyfiles</chef-option>
+          <chef-option value='nodes' data-cy="nodes-tab">Nodes</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      
+      <section class="page-body" *ngIf="tabValue === 'policyfiles'">
+        <div class="policyfiles-tab" *ngIf="!policyGroupDetailsLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="policyGroupDetailsLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <div data-cy="empty-list" class="empty-section" *ngIf="!isPolicyfileAvailable">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p>No policyfiles available</p>
+          </div>
+          <div *ngIf="!policyGroupDetailsLoading || isPolicyfileAvailable">
+            <chef-table data-cy="policy-group-details-table-container">
+              <chef-thead>
+                <chef-tr class="no_border_tr">
+                  <chef-th class="no_border_th">Policyfiles</chef-th>
+                  <chef-th class="no_border_th">Revision ID</chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let policyFile of policies">
+                  <chef-td>
+                    <a [routerLink]="['/infrastructure','chef-servers', serverId,
+                      'organizations', orgId, 'policyfiles', policyFile.name,
+                      'revision',policyFile.revision_id]">{{ policyFile.name }}</a>
+                  </chef-td>
+                  <chef-td>{{policyFile.revision_id}}</chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-body" *ngIf="tabValue === 'nodes'">
+        <div class="nodes-tab" *ngIf="!policyGroupNodesLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="policyGroupNodesLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <div data-cy="empty-list" class="empty-section" *ngIf="!isNodesAvailable">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p data-cy="no-nodes">No nodes available.</p>
+          </div>
+          <div id="nodes-table-container" data-cy="nodes-table-container" *ngIf="isNodesAvailable">
+            <chef-table>
+              <chef-thead>
+                <chef-tr class="no_border_tr">
+                  <chef-th class="no_border_th">Node</chef-th>
+                  <chef-th class="no_border_th">Platform</chef-th>
+                  <chef-th class="no_border_th">FQDN</chef-th>
+                  <chef-th class="no_border_th">IP Address</chef-th>
+                  <chef-th class="no_border_th">Uptime</chef-th>
+                  <chef-th class="no_border_th">Last Check-In</chef-th>
+                  <chef-th class="no_border_th">Environment</chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let node of nodes.items">
+                  <chef-td>
+                    <a [routerLink]="['/infrastructure','chef-servers', serverId,
+                    'organizations', orgId, 'nodes', node.name]">{{node.name === '' ? '--' : node.name}}</a>
+                  </chef-td>
+                  <chef-td>{{node.platform === '' ? '--' : node.platform}}</chef-td>
+                  <chef-td>{{node.fqdn === '' ? '--' : node.fqdn}}</chef-td>
+                  <chef-td>{{node.ip_address === '' ? '--' : node.ip_address}}</chef-td>
+                  <chef-td>{{node.uptime === '' ? '--' : node.uptime}}</chef-td>
+                  <chef-td>{{timeFromNow(node.check_in)}}</chef-td>
+                  <chef-td>{{node.environment === '' ? '--' : node.environment}}</chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
+            <app-page-picker
+              class="nodes-list-paging"
+              [total]="total"
+              [perPage]="per_page"
+              [page]="current_page"
+              (pageChanged)="onPageChange($event)">
+            </app-page-picker>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

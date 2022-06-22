@@ -1,0 +1,50 @@
+@import "~styles/variables";
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+
+  th {
+    text-align: left;
+    padding: 0px;
+    letter-spacing: 0.2px;
+  }
+}
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
+}
+
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+    height: 36px;
+    margin-top: 4px;
+  }
+}
+
+.policy-group-list-paging {
+  margin: 0 0 35px;
+}

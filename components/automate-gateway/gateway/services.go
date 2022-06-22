@@ -3,6 +3,8 @@ package gateway
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,13 +41,16 @@ import (
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
+	pb_report_manager "github.com/chef/automate/api/external/report_manager"
 	pb_secrets "github.com/chef/automate/api/external/secrets"
+	pb_user_settings "github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/api/interservice/authn"
 	cfgmgmt_request "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/compliance/profiles"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	inter_eventfeed_Req "github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/api/interservice/report_manager"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
@@ -318,6 +323,18 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
 
+	userSettingsClient, err := clients.UserSettingsClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for user-settings service")
+	}
+	pb_user_settings.RegisterUserSettingsServiceServer(grpcServer, handler.NewUserSettingsHandler(userSettingsClient))
+
+	reportManagerClient, err := clients.ReportManagerClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for report-manager service")
+	}
+	pb_report_manager.RegisterReportManagerServiceServer(grpcServer, handler.NewReportManagerHandler(reportManagerClient))
+
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
@@ -365,6 +382,8 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"data-lifecycle":           pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
 		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
 		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
+		"user-settings":            pb_user_settings.RegisterUserSettingsServiceHandlerFromEndpoint,
+		"report-manager":           pb_report_manager.RegisterReportManagerServiceHandlerFromEndpoint,
 	})
 }
 
@@ -438,6 +457,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var fileData []byte
 	var cType, profileName, profileVersion string
 	contentTypeString := strings.Split(r.Header.Get("Content-type"), ";")
+	log.Info("Content type string for profileCreateHandler received is ", contentTypeString)
 	switch contentTypeString[0] {
 	case "application/json", "application/json+lax":
 		cType = r.Header.Get("Content-type")
@@ -454,6 +474,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		var content bytes.Buffer
 		file, _, err := r.FormFile("file")
 		if err != nil {
+			log.Errorf("Received error while getting file from request : %s", err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -467,6 +488,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 		fileData = content.Bytes()
 		cType = r.URL.Query().Get("contentType")
+		log.Info("File successfully read from the request")
 	default: // no match
 		http.Error(w, "invalid content-type header", http.StatusBadRequest)
 		return
@@ -483,6 +505,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Info("Request successfully authenticated and authorised for the resource  ", resource)
+
 	profilesClient, err := s.clientsFactory.ComplianceProfilesServiceClient()
 	if err != nil {
 		http.Error(w, "grpc service for compliance unavailable", http.StatusServiceUnavailable)
@@ -494,6 +518,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	log.Info("Request stream created for profile create handler with profile name ", profileName)
 
 	request := profiles.ProfilePostRequest{
 		Owner: owner,
@@ -509,6 +535,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	log.Info("Request successfully sent to backend service")
+
 	reply, err := stream.CloseAndRecv()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -519,6 +547,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	log.Info("Response successfully received from the stream")
 	w.Write(data) // nolint: errcheck
 }
 
@@ -950,6 +980,89 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+func (s *Server) ReportManagerExportHandler(w http.ResponseWriter, r *http.Request) {
+
+	url := r.URL.Path
+	splitURL := strings.Split(url, "/")
+	if len(splitURL) <= 5 {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+
+	const (
+		resource = "reportmanager:reports:download:{id}"
+		action   = "reportmanager:requests:list"
+	)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	requestor := ctx.Value("requestorid")
+	if requestor == nil || requestor.(string) == "" {
+		http.Error(w, "invalid request, missing requestor info", http.StatusBadRequest)
+		return
+	}
+
+	reportMgrClient, err := s.clientsFactory.ReportManagerClient()
+	if err != nil {
+		http.Error(w, "grpc service for report manager unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	resp, err := reportMgrClient.GetPresignedURL(ctx, &report_manager.GetPresignedURLRequest{
+		Id:          splitURL[5],
+		RequestorId: requestor.(string),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	//incase of no records available, return error message
+	if resp.Url == "" {
+		http.Error(w, "either the record not exist or the requestor doesn't have access", http.StatusForbidden)
+		return
+	}
+
+	client := http.Client{}
+
+	if resp.EnabledSsl {
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM([]byte(resp.ClientCert))
+
+		client = http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					MinVersion: tls.VersionTLS12,
+					RootCAs:    caCertPool,
+				},
+			},
+		}
+	}
+
+	req, err := http.NewRequest(http.MethodGet, resp.GetUrl(), nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer res.Body.Close() // nolint: errcheck
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.%s", "export", resp.ReportType))
+	w.Header().Set("Content-Type", "application/octet-stream; charset=UTF-8")
+	w.Header().Set("Content-Length", strconv.FormatInt(resp.ReportSize, 10))
+	_, err = io.Copy(w, res.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func init() {
 	// Register streaming methods for introspection.
 	// - Almost all calls of this method are in *.pb.go files, auto-generated from proto files.
@@ -962,6 +1075,7 @@ func init() {
 }
 
 func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
+	log.Info("Authentication request for the resource", resource)
 	subjects := []string{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
@@ -989,17 +1103,24 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 			}
 		}
 	}
-
 	if len(subjects) < 1 {
+		log.Info("Length of subjects is less than 1 for the resource")
 		authnClient, err := s.clientsFactory.AuthenticationClient()
 		if err != nil {
 			return nil, errors.Wrap(err, "authn-service unavailable")
 		}
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
+
+		ctx = context.WithValue(ctx, "requestorid", authnResp.Requestor)
+
 		if err != nil {
+			log.Errorf("User not authenticated to perform the action: %s", err.Error())
 			return nil, errors.Wrap(err, "authn-service error")
 		}
+
+		log.Info("User authenticated to perform the action", action)
+		ctx = context.WithValue(ctx, "requestorID", authnResp.Requestor)
 
 		subjects = append(authnResp.Teams, authnResp.Subject)
 	}
@@ -1011,6 +1132,7 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 	projects := auth_context.ProjectsFromMetadata(md)
 
 	newCtx, authorized, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
+
 	if err != nil {
 		// If authorization can't be determined because of some error, we return that error.
 		// Upstream services, however, will consider it equivalent to an explicit permission
@@ -1021,10 +1143,12 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 			action, resource, projects, subjects, err.Error())
 	}
 	if authorized {
+		log.Info("User authorized for the action", action)
 		// Note: if we need all the auth info, use auth_context.NewOutgoingContext
 		return auth_context.NewOutgoingProjectsContext(newCtx), nil
 	}
 
+	log.Info("User not authorized for the action", action)
 	return nil, errors.Errorf("unauthorized: members %q cannot perform action %q on resource %q filtered by projects %q",
 		subjects, action, resource, projects)
 }

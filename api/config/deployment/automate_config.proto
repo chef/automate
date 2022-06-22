@@ -18,7 +18,7 @@ import "config/shared/global.proto";
 import "config/cs_nginx/config_request.proto";
 import "config/deployment/config_request.proto";
 import "config/dex/config_request.proto";
-import "config/elasticsearch/config_request.proto";
+import "config/opensearch/config_request.proto";
 import "config/esgateway/config_request.proto";
 import "config/es_sidecar/config_request.proto";
 import "config/gateway/config_request.proto";
@@ -49,6 +49,9 @@ import "config/builder_api_proxy/config_request.proto";
 import "config/minio/config_request.proto";
 import "config/builder_memcached/config_request.proto";
 import "config/sample_data/config_request.proto";
+import "config/user_settings/config_request.proto";
+import "config/elasticsearch/config_request.proto";
+import "config/report_manager/config_request.proto";
 
 message AutomateConfig {
 	reserved 26; // automate-blob-store
@@ -102,4 +105,7 @@ message AutomateConfig {
 	chef.automate.domain.infra_proxy.ConfigRequest infra_proxy = 45;
 	chef.automate.domain.cds.ConfigRequest cds = 46;
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
+	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
+	chef.automate.infra.opensearch.ConfigRequest opensearch = 49;
+	chef.automate.domain.report_manager.ConfigRequest report_manager = 50;
 }

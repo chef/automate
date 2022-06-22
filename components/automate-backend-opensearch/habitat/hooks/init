@@ -1,0 +1,50 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+# *** WARNING ***
+# Please put potentially long-running and/or complex operations in the run
+# hook rather than the run init until the issue described in
+#
+# https://github.com/habitat-sh/habitat/issues/1973
+#
+# has been resolved.
+#
+# Currently, the Habitat `init` hook runs directly from the main loop of the
+# Habitat supervisor. If these hooks hang or take too long to run, they can block
+# execution of the supervisor.
+#
+
+# Make sure the old post-run sentinel file does not exist
+source {{pkg.svc_config_path}}/health_check
+[[ -f ${POST_RUN_SENTINEL} ]] && rm ${POST_RUN_SENTINEL}
+
+mkdir -p {{pkg.svc_var_path}}/logs
+mkdir -p {{pkg.svc_var_path}}/plugins
+mkdir -p {{pkg.svc_var_path}}/tmp
+
+
+echo "****** INSIDE OPENSEARCH PACKAGE RUN HOOK *******"
+
+echo " List of files in config/certificates folder"
+ls -lrt {{pkg.svc_config_path}}/certificates
+
+echo "{{pkg.svc_config_path}}/certificates/root-ca.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/root-ca.pem
+
+echo "{{pkg.svc_config_path}}/certificates/admin.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/admin.pem
+
+echo "{{pkg.svc_config_path}}/certificates/admin-key.pem -------------"
+cat {{pkg.svc_config_path}}/certificates/admin-key.pem
+
+echo "{{pkg.svc_config_path}}/certificates/node1.pem -----------------"
+cat {{pkg.svc_config_path}}/certificates/node1.pem
+
+echo "{{pkg.svc_config_path}}/certificates/node1-key.pem ------------"
+cat {{pkg.svc_config_path}}/certificates/node1-key.pem
+
+
+chmod 0600 {{pkg.svc_config_path}}/certificates/root-ca.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/admin.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node1.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/admin-key.pem
+chmod 0600 {{pkg.svc_config_path}}/certificates/node1-key.pem

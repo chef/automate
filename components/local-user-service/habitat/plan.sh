@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=local-user-service
 pkg_description="GRPC API that wraps dex's local user service"

@@ -1,0 +1,25 @@
+#!/bin/bash -xe
+
+echo "A2 deployment workspace will be created in ${PWD}/a2_deploy_workspace.  Please enter your sudo password if prompted"
+sudo rsync -avz  $(hab pkg path chef/automate-ha-deployment)/workspace/ a2_deploy_workspace
+sudo chown -R $(id -u) a2_deploy_workspace
+
+echo "Preparing the airgap bundle"
+cd a2_deploy_workspace
+make airgap
+make sup-keys
+
+echo "Preparing the terraform variables - please edit ${PWD}/terraform/terraform.tfvars after completion"
+cd terraform
+sed -e '/^#\ AIB/,/^\s*$/{d}' -e '/^#\ Backend\ Component/,/^\s*$/{d}' terraform.tfvars.example > terraform.tfvars
+sed -i -e '/^#\ AWS/,/^\s*$/{d}' -e '/^#\ vSphere/,/^\s*$/{d}' terraform.tfvars
+cat ../.fe_airgap_info >> terraform.tfvars
+cat ../.be_airgap_info >> terraform.tfvars
+cat ../.supkeys_info >> terraform.tfvars
+
+# Pick the simplest and most commonly used topology for starters, can be changed later
+cp reference_architectures/existing_nodes/*.tf .
+
+terraform init
+
+echo "Now go edit your terraform.tfvars file to match your environment"

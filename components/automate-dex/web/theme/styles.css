@@ -20,6 +20,11 @@ html, body {
   font-weight: 400;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 button, div.dex-btn {
     background-color: #3864f2;
     color: #fff;
@@ -58,16 +63,19 @@ main.password {
 }
 
 .dex-error-box {
-  background-color: #dc267f;
+  display: flex;
+  background-color: #F9DBEA;
   width: 250px;
   border-radius: 3px;
-  margin: 12px auto;
+  margin: 60px auto;
+  padding: 12px;
 }
 
 .dex-error-text {
   font-size: 12px;
   top: -1px;
   position: relative;
+  color: #DC267F;
 }
 
 .dex-btn-text {
@@ -99,14 +107,7 @@ main.password {
   width: 150px;
   font-weight: 400;
   font-size: 14px;
-  margin-top: 10px;
-}
-
-.theme-panel {
-  text-align: center;
-  position: relative;
-  top: 40%;
-  transform: translateY(-50%);
+  margin-top: 22px;
 }
 
 .theme-body {
@@ -176,4 +177,65 @@ main.password {
   position: relative;
   text-align: left;
   width: 250px;
+}
+
+.warning-text {
+  margin: 0;
+  padding: 8px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.theme-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 2;
+}
+
+/* for login page */
+.password .theme-panel {
+  margin-top: 140px;
+}
+
+.signin-login-container {
+  padding-top: 1em;
+  text-align: center;
+}
+
+.disclosure {
+  margin: 38px 35px 0px 35px;
+  padding: 2em;
+  width: 90%;
+  max-width: 588px;
+  min-width: 279px;
+  max-height: 350px;
+  border: 2px solid #E6EBEE;
+  border-radius: 4px;
+  overflow-y: scroll;
+  text-align: left;
+}
+
+.disclosure h3 {
+  margin-top: 0;
+}
+
+/* Force the scrollbars to show for UX */
+.disclosure::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+.disclosure::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+i.eye-position {
+  margin-top: -26px;
+  cursor: pointer;
+  left: -10px;
+  position: relative;
+  float: right;
 }

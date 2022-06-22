@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
@@ -10,6 +11,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	gp "github.com/golang/protobuf/ptypes/struct"
 	google_protobuf1 "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/sirupsen/logrus"
 )
 
 // messageArrayToListValue Casts a 'Proto Message Array' into a 'Proto ListValue'
@@ -51,4 +53,34 @@ func filterByProjects(ctx context.Context, filters map[string][]string) (map[str
 
 	filters[backend.Project] = projectsFilter
 	return filters, nil
+}
+
+// DaysBetween get the calendar days between two timestamp
+func DaysBetween(fromTime, toTime time.Time) int {
+	if fromTime.After(toTime) {
+		fromTime, toTime = toTime, fromTime
+	}
+
+	days := -fromTime.YearDay()
+	for year := fromTime.Year(); year < toTime.Year(); year++ {
+		days += time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay()
+	}
+	days += toTime.YearDay()
+
+	return days
+}
+
+func LogQueryPartMin(indices string, partToPrint interface{}, name string) {
+	part, err := json.Marshal(partToPrint)
+	if err != nil {
+		logrus.Errorf("%s", err)
+	}
+	stringPart := string(part)
+	if stringPart == "null" {
+		stringPart = ""
+	} else {
+		stringPart = "\n" + stringPart
+	}
+	logrus.Debugf("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
+		name, indices, stringPart, name)
 }

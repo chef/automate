@@ -1,6 +1,7 @@
 @import "~styles/variables";
 @import 'app/page-components/json-tree/json-tree.component.scss';
 @import "~styles/mixins";
+@import '../infra_shared/shared';
 
 chef-page-header {
   padding-bottom: 0;
@@ -115,12 +116,6 @@ img {
     background: $chef-white;
     border-bottom: 0.5px solid $chef-key-tab;
     text-align: right;
-
-    ::ng-deep {
-      chef-button button:focus {
-        outline: 0.5px solid $chef-primary-bright;
-      }
-    }
   }
 
   .key-tab-head {

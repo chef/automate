@@ -1,0 +1,170 @@
+<% if config.architecture == 'aws' %>
+# AWS
+################################################################################
+aws_profile = "<%= config.aws.profile %>"
+aws_region  = "<%= config.aws.region %>"
+aws_vpc_id  = "<%= config.aws.vpc_id %>"
+aws_cidr_block_addr  = "<%= config.aws.cidr_block_addr %>"
+private_custom_subnets = <%= config.aws.private_custom_subnets %>
+public_custom_subnets  = <%= config.aws.public_custom_subnets %>
+aws_tags    = {
+        <%= config.aws.tags.map { |k,v| "#{k} = \"#{v}\"" }.join("\n\t") %>
+}
+
+<% if config.aws.ssh_key_pair_name %>
+aws_ssh_key_pair_name = "<%= config.aws.ssh_key_pair_name %>"
+<% end %>
+
+<% if config.backup_config == 'efs' %>
+ backup_config_efs = "true"
+<% end %>
+
+<% if config.backup_config == 's3' %>
+ backup_config_s3 = "true"
+<% end %>
+
+<% if config.s3_bucketName %>
+aws_s3_bucketName = "<%= config.s3_bucketName %>"
+<% end %>
+
+setup_managed_services = <%= config.aws.setup_managed_services %>
+managed_opensearch_domain_name = "<%= config.aws.managed_opensearch_domain_name %>"
+managed_opensearch_domain_url = "<%= config.aws.managed_opensearch_domain_url %>"
+managed_opensearch_username = "<%= config.aws.managed_opensearch_username %>"
+managed_opensearch_user_password = "<%= config.aws.managed_opensearch_user_password %>"
+managed_opensearch_certificate = "<%= config.aws.managed_opensearch_certificate %>"
+aws_os_snapshot_role_arn = "<%= config.aws.aws_os_snapshot_role_arn %>"
+os_snapshot_user_access_key_id = "<%= config.aws.os_snapshot_user_access_key_id %>"
+os_snapshot_user_access_key_secret = "<%= config.aws.os_snapshot_user_access_key_secret %>"
+managed_rds_instance_url = "<%= config.aws.managed_rds_instance_url %>"
+managed_rds_superuser_username = "<%= config.aws.managed_rds_superuser_username %>"
+managed_rds_superuser_password = "<%= config.aws.managed_rds_superuser_password %>"
+managed_rds_dbuser_username = "<%= config.aws.managed_rds_dbuser_username %>"
+managed_rds_dbuser_password = "<%= config.aws.managed_rds_dbuser_password %>"
+managed_rds_certificate = "<%= config.aws.managed_rds_certificate %>"
+<% if config.aws.ami_filter_name %>
+ami_filter_name = "<%= config.aws.ami_filter_name %>"
+<% end %>
+<% if config.aws.ami_filter_virt_type %>
+ami_filter_virt_type = "<%= config.aws.ami_filter_virt_type %>"
+<% end %>
+<% if config.aws.ami_filter_owner %>
+ami_filter_owner = "<%= config.aws.ami_filter_owner %>"
+<% end %>
+<% if config.aws.ami_id %>
+aws_ami_id = "<%= config.aws.ami_id %>"
+<% end %>
+<% if config.aws.lb_access_logs %>
+lb_access_logs = "<%= config.aws.lb_access_logs %>"
+<% end %>
+<% if config.aws.automate_lb_certificate_arn %>
+automate_lb_certificate_arn = "<%= config.aws.automate_lb_certificate_arn %>"
+<% end %>
+<% if config.aws.chef_server_lb_certificate_arn %>
+chef_server_lb_certificate_arn = "<%= config.aws.chef_server_lb_certificate_arn %>"
+<% end %>
+
+automate_server_instance_type = "<%= config.aws.automate_server_instance_type %>"
+
+<% if config.aws.automate_ebs_volume_iops %>
+automate_ebs_volume_iops = "<%= config.aws.automate_ebs_volume_iops %>"
+<% end %>
+
+<% if config.aws.automate_ebs_volume_size %>
+automate_ebs_volume_size = "<%= config.aws.automate_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.automate_ebs_volume_type %>
+automate_ebs_volume_type = "<%= config.aws.automate_ebs_volume_type %>"
+<% end %>
+
+chef_server_instance_type = "<%= config.aws.chef_server_instance_type %>"
+
+<% if config.aws.chef_ebs_volume_size %>
+chef_ebs_volume_size = "<%= config.aws.chef_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.chef_ebs_volume_type %>
+chef_ebs_volume_type = "<%= config.aws.chef_ebs_volume_type %>"
+<% end %>
+
+opensearch_server_instance_type = "<%= config.aws.opensearch_server_instance_type %>"
+
+<% if config.aws.opensearch_ebs_volume_iops %>
+opensearch_ebs_volume_iops = "<%= config.aws.opensearch_ebs_volume_iops %>"
+<% end %>
+
+<% if config.aws.opensearch_ebs_volume_size %>
+opensearch_ebs_volume_size = "<%= config.aws.opensearch_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.opensearch_ebs_volume_type %>
+opensearch_ebs_volume_type = "<%= config.aws.opensearch_ebs_volume_type %>"
+<% end %>
+
+postgresql_server_instance_type = "<%= config.aws.postgresql_server_instance_type %>"
+
+<% if config.aws.postgresql_ebs_volume_iops %>
+postgresql_ebs_volume_iops = "<%= config.aws.postgresql_ebs_volume_iops %>"
+<% end %>
+
+<% if config.aws.postgresql_ebs_volume_size %>
+postgresql_ebs_volume_size = "<%= config.aws.postgresql_ebs_volume_size %>"
+<% end %>
+
+<% if config.aws.postgresql_ebs_volume_type %>
+postgresql_ebs_volume_type = "<%= config.aws.postgresql_ebs_volume_type %>"
+<% end %>
+
+<% end %>
+
+<% if config.architecture == 'vsphere' %>
+# vSphere
+################################################################################
+vsphere_server = "<%= config.vsphere.server %>"
+vsphere_user = "<%= config.vsphere.user %>"
+vsphere_password = "<%= config.vsphere.password %>"
+vsphere_datacenter = "<%= config.vsphere.datacenter %>"
+vsphere_datastore = "<%= config.vsphere.datastore %>"
+vsphere_resource_pool = "<%= config.vsphere.resource_pool %>"
+vsphere_network = "<%= config.vsphere.network %>"
+vsphere_linux_template = "<%= config.vsphere.linux_template %>"
+<% end %>
+
+<% if config.architecture == 'existing_nodes' %>
+# Existing nodes
+################################################################################
+existing_automate_private_ips = <%= config.existing_nodes.automate_private_ips %>
+existing_chef_server_private_ips = <%= config.existing_nodes.chef_server_private_ips %>
+existing_opensearch_private_ips = <%= config.existing_nodes.opensearch_private_ips %>
+existing_postgresql_private_ips = <%= config.existing_nodes.postgresql_private_ips %>
+<% end %>
+
+# Common
+################################################################################
+<% unless config.automate.admin_password.empty? %>
+automate_admin_password = "<%= config.automate.admin_password %>"
+<% end %>
+automate_config_file = "<%= config.automate.config_file %>"
+<% if config.architecture != 'aws' %>
+automate_fqdn = "<%= config.automate.fqdn %>" # leave commented out for AWS, othewise must be assigned
+<% end %>
+automate_instance_count = <%= config.automate.instance_count %>
+chef_server_instance_count = <%= config.chef_server.instance_count %>
+opensearch_instance_count = <%= config.opensearch.instance_count %>
+nfs_mount_path = "<%= config.backup_mount %>"
+postgresql_instance_count = <%= config.postgresql.instance_count %>
+postgresql_archive_disk_fs_path = "<%= config.backup_mount %>/postgresql"
+
+habitat_uid_gid = "<%= config.habitat_uid_gid %>"
+ssh_user = "<%= config.ssh_user %>"
+ssh_key_file = "<%= config.ssh_key_file %>"
+
+<% %w{ contact dept project }.each do |tag| %>
+<% next unless config.aws[tag] %>
+tag_<%= tag.to_s %> = "<%= config.aws[tag] %>"
+<% end %>
+
+<% if config.automate.teams_port %>
+teams_port = <%= config.automate.teams_port.to_i %>
+<% end %>

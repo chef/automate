@@ -1,0 +1,43 @@
+port = 5432
+host = '0.0.0.0'
+
+print_db_statistics = true
+
+max_connections = 350
+max_locks_per_transaction = 64
+max_wal_size = "1GB"
+min_wal_size = "80MB"
+wal_keep_size = 1600
+checkpoint_timeout = "5min"
+checkpoint_completion_target = 0.5
+
+log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,client=%h %r (%x:%e)'
+log_level = 'ERROR'
+logging_collector = 'on'
+
+[superuser]
+name = 'admin'
+password = 'admin'
+
+# options for hot standby
+[replication]
+name = 'replication'
+password = 'replication'
+# note: lag_health_threshold is in bytes - default to 20MB
+# this is just greater than 1 WAL segment
+lag_health_threshold = 20480
+# maximum lag time in seconds since log was last replayed before replica is eligible for a restart
+max_replay_lag_before_restart_s = 180
+
+[wal_archive]
+enable = false
+path = "/hab/svc/automate-ha-postgresql/data/archive"
+
+[pg_dump]
+enable = true
+path = "/hab/svc/automate-ha-postgresql/data/pg_dump"
+
+[ssl]
+enable = true
+# tls 1.2 ciphersuite (to exclude tlsv1 and tlsv1.1)
+tls_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"

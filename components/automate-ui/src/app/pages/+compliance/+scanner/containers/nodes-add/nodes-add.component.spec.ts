@@ -10,6 +10,10 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { NodesAddComponent } from './nodes-add.component';
+import { MockComponent } from 'ng2-mock-component';
+import { AccordionComponent } from 'app/page-components/accordion/accordion.component';
+import { AccordionItemComponent } from 'app/page-components/accordion/accordion-item/accordion-item.component';
+import { SearchCredentials } from 'app/entities/credentials/credential.actions';
 
 describe('NodesAddComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -27,11 +31,21 @@ describe('NodesAddComponent', () => {
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
-        NodesAddComponent
+        NodesAddComponent,
+        AccordionComponent,
+        AccordionItemComponent
       ],
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },
-        FeatureFlagsService
+        FeatureFlagsService,
+        MockComponent({ selector: 'app-accordion'}),
+        MockComponent({ selector: 'app-accordion-item', inputs: ['title']}),
+        MockComponent({ selector: 'app-selectbox', inputs: [
+          'data', 'searchFlag', 'combination', 'scrollLoadingRightSide',
+          'uniqueFiledName', 'typeValue', 'typeFieldName'
+        ], outputs: ['searchData', 'selectData', 'onScrollListData']}),
+        MockComponent({ selector: 'chef-select' }),
+        MockComponent({ selector: 'chef-option' })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
@@ -66,5 +80,47 @@ describe('NodesAddComponent', () => {
       expect(component.stepIsValid(1))
         .toEqual(component.form.controls['wizardStep1'].valid);
     });
+  });
+
+  describe('Add nodes', () => {
+    it('onTypeSelect', () => {
+      component.onTypeSelect('ssh');
+      expect(component.secretType).toEqual('ssh');
+    });
+
+    it('getCredList', () => {
+      component.getCredList(true);
+      component.searchData = '';
+      component.secretType = 'ssh';
+      component.pageNumber = 1;
+      const data = {
+        filters:  [
+          {
+              key: 'name',
+              values: ['']
+          },
+          {
+              key: 'type',
+              values: ['ssh']
+          }
+      ],
+      page: 1,
+      per_page: 100
+      };
+      expect(store.dispatch).toHaveBeenCalledWith(new SearchCredentials(data));
+      expect(component.isScroll).toEqual(true);
+    });
+
+    it('search', () => {
+      component.search('data');
+      expect(component.searchData).toEqual('data');
+      expect(component.pageNumber).toEqual(1);
+    });
+
+    it('search', () => {
+      component.search('data');
+      expect(component.searchData).toEqual('data');
+    });
+
   });
 });

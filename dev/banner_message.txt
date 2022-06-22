@@ -1,0 +1,10 @@
+<h1>Warning</h1>
+<p><b style="color: blue">Lorem ipsum</b> dolor sit amet, consectetur adipiscing elit. Nulla a diam porttitor, dignissim tortor eu, cursus urna. Aenean sit amet lorem tincidunt, imperdiet lacus eget, finibus sem. Suspendisse quis odio tempor, semper lorem ac, viverra purus. Ut suscipit mollis libero ac venenatis. Nulla facilisi. Nam imperdiet mi magna, eu molestie mauris eleifend quis. Nam placerat mauris massa, vel dapibus sapien venenatis ac. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vestibulum at congue nibh, non egestas tellus.<p>
+
+<p>Nullam et nulla ornare, viverra augue sit amet, malesuada nisl. Mauris nulla lectus, molestie eget auctor id, pharetra eu eros. Proin non nisi varius, convallis libero id, ullamcorper purus. Mauris hendrerit auctor felis non faucibus. Vestibulum mollis ligula odio, eu vestibulum ante ullamcorper sed. In condimentum elit sapien, nec porttitor mi porttitor et. Donec condimentum posuere lorem, molestie ultricies quam eleifend quis. Sed volutpat purus ante, eu tristique lorem efficitur efficitur.</p>
+
+<p>Nunc nibh eros, malesuada posuere molestie nec, pharetra eleifend magna. Nulla mollis vitae dui ac placerat. In nec pulvinar ex. Cras sodales at sapien finibus fermentum. Sed laoreet tempus velit sit amet condimentum. Ut sed risus id justo pulvinar sodales. Nunc eros velit, sollicitudin sit amet posuere vitae, vulputate in nunc. Maecenas quis risus maximus, finibus augue in, faucibus est.<p>
+
+<p>Nam aliquet maximus hendrerit. Duis lacinia faucibus vulputate. Donec id turpis arcu. Nullam pellentesque lobortis justo id lobortis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Proin in ornare urna. Mauris id arcu enim. In nisi lectus, porta a aliquam in, porta sit amet urna. Suspendisse sollicitudin purus vitae lorem faucibus, a accumsan leo malesuada. Pellentesque egestas vitae nisi eu pulvinar. Proin magna arcu, ullamcorper eget venenatis ut, vehicula ac mi.</p>
+
+<p>Here is a link to <a href="https://google.com" rel="noopener noreferrer" target="_blank">google</a></p>

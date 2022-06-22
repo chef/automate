@@ -1,0 +1,62 @@
+
+<ng-container *ngIf="configNotFound; else showTable">
+  <label class="config-heading">Global Settings</label>
+  <div class="empty-state">
+    <img alt="No preview" src="/assets/img/no_preview.gif" />
+    <p>No global config found</p>
+  </div>
+</ng-container>
+<ng-template #showTable>
+  <table  summary="Data feed global config"> <!-- Global Config -->
+    <thead>
+      <tr>
+        <th class="config-heading" id="header">
+          Global Settings
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="config-sub-heading">Feed Interval</td>
+        <td class="config-sub-heading-value" data-cy="feed-interval">{{ finalFeedIntervaloutput }}</td>
+      </tr>
+      <tr>
+        <td class="config-sub-heading">Node Batch Size</td>
+        <td class="config-sub-heading-value" data-cy="node-batch-size">{{ config?.node_batch_size }}</td>
+      </tr>
+      <tr>
+        <td class="config-sub-heading">Update Nodes Only</td>
+        <td class="config-sub-heading-value" data-cy="updated-nodes-only">{{ config?.updated_nodes_only }}</td>
+      </tr>
+      <tr>
+        <td class="config-sub-heading">Disable CIDR Filter</td>
+        <td class="config-sub-heading-value" data-cy="disable-cidr-filter">{{ config?.disable_cidr_filter }}</td>
+      </tr>
+      <tr>
+        <td class="config-sub-heading">CIDR Filters</td>
+        <td class="config-sub-heading-value cidr-filters" data-cy="cidr_filter">
+
+            <div class="compress-data">
+                <div *ngFor="let cidr_filter of getCidrFilters">
+                    <div>{{ cidr_filter }}</div>
+                </div>
+            </div>
+            <a (click)="getAlldata('DataCidrFilters')" *ngIf="!getFirstFiveDataCidrFiltersShow" data-cy="get-allData-cidr_filter">more filters</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="config-sub-heading">Accepted Status Codes</td>
+        <td class="config-sub-heading-value status-code" data-cy="accepted-status-codes">
+            <div class="compress-data" data-cy="accepted-status-codes">
+                <div *ngFor="let status_codes of getStatusCodes">
+                    <div>{{status_codes}}</div>
+                </div>
+            </div>
+            <a (click)="getAlldata('StatusCodes')" *ngIf="!getFirstFiveDataStatusCodesShow" data-cy="get-allData-accepted-status-codes">more Codes</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>
+    
+

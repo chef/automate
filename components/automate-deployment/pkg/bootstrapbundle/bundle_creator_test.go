@@ -172,9 +172,7 @@ func TestAllowMissingBootstrapSpec(t *testing.T) {
 }
 
 func TestRoundTrip(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "a2-bootstrap-bundle-test")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpdir)
+	tmpdir := t.TempDir()
 
 	bundleCreator := createBundleCreator(t)
 
@@ -216,7 +214,7 @@ func TestRoundTrip(t *testing.T) {
 	}
 
 	b := bytes.NewBuffer(nil)
-	err = bundleCreator.Create(metadata, b)
+	err := bundleCreator.Create(metadata, b)
 	require.NoError(t, err)
 
 	err = bundleUnpacker.Unpack(b)

@@ -1,0 +1,52 @@
+<chef-modal [visible]="visible" (closeModal)="closeEditModal()">
+  <div class="text-right">
+    <h2 slot="title">Edit Node Attributes</h2>
+  </div>
+  <div class="flex-container">
+    <div class="main pages-body">
+      <label>
+        <span class="pageLabel">{{node?.name}}</span>
+      </label>
+      <hr class="divider-pageLabel" />
+
+      <form [formGroup]="attributeForm">
+        <div class="input-margin">
+          <chef-form-field>
+            <label>
+              <textarea chefInput 
+              name="default" 
+              formControlName="default" 
+              id="default"
+              type="text" 
+              autocomplete="off"
+              data-cy="attributes"
+              (keyup)="onChangeDefaultJson($event)">
+              </textarea>
+            </label>
+            <chef-error *ngIf="attrParseError">
+              Must be a valid JSON object
+            </chef-error>
+          </chef-form-field>
+        </div>
+      </form>
+      <div class="button-bar-box">
+        <chef-button 
+          data-cy="cancel-attribute-button"
+          tertiary
+          [disabled]="updateInProgress"
+          (click)="closeEditModal()">
+          Cancel
+        </chef-button>
+        <chef-button data-cy="save-attribute"
+          primary id="create-default-button-object-modal"
+          (click)="updateNodeAttribute()"
+          [disabled]="attrParseError || !attributeForm?.valid ||
+           !attributeForm.dirty || conflictError || updateInProgress">
+          <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+          <span *ngIf="updateInProgress">Saving...</span>
+          <span *ngIf="!updateInProgress">Save</span>
+        </chef-button>
+      </div>
+    </div>
+  </div>
+</chef-modal>

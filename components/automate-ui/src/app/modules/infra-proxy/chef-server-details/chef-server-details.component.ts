@@ -28,22 +28,23 @@ import {
   deleteStatus as deleteOrgStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type ChefServerTabName = 'orgs' | 'details';
-
-
-
 @Component({
   selector: 'app-chef-server-details',
   templateUrl: './chef-server-details.component.html',
   styleUrls: ['./chef-server-details.component.scss']
 })
+
 export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public server: Server;
   public orgs: Org[] = [];
   public tabValue: ChefServerTabName = 'orgs';
   public url: string;
   public updateServerForm: FormGroup;
+  public fqdnForm: FormGroup;
+  public ipForm: FormGroup;
   public orgForm: FormGroup;
   public createModalVisible = false;
   public creatingServerOrg = false;
@@ -58,14 +59,14 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public isLoading = true;
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-
+  public selected = 'fqdn';
 
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService
-
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) {
 
     this.orgForm = fb.group({
@@ -89,9 +90,20 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     });
 
     this.updateServerForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      ip_address: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    });
+
+    this.fqdnForm = this.fb.group({
+      fqdn: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_FQDN)
+      ]]
+    });
+    this.ipForm = this.fb.group({
+      ip_address: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
+      ]]
     });
 
     this.store.select(routeParams).pipe(
@@ -130,8 +142,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.server = { ...ServerState };
       this.orgs = allOrgsState;
       this.updateServerForm.controls['name'].setValue(this.server.name);
-      this.updateServerForm.controls['fqdn'].setValue(this.server.fqdn);
-      this.updateServerForm.controls['ip_address'].setValue(this.server.ip_address);
+      this.fqdnForm.controls['fqdn'].setValue(this.server.fqdn);
+      this.ipForm.controls['ip_address'].setValue(this.server.ip_address);
       this.creatingServerOrg = false;
       this.orgsListLoading = false;
       this.closeCreateModal();
@@ -170,6 +182,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.saveSuccessful = (state === EntityStatus.loadingSuccess);
       if (this.saveSuccessful) {
         this.updateServerForm.markAsPristine();
+        this.fqdnForm.markAsPristine();
+        this.ipForm.markAsPristine();
       }
     });
   }
@@ -182,6 +196,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   onSelectedTab(event: { target: { value: ChefServerTabName } }) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
+  }
+
+  updateFormDisplay(id: string): void {
+    this.selected = id;
   }
 
   public openCreateModal(): void {
@@ -204,6 +222,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       projects: this.orgForm.controls.projects.value
     };
     this.store.dispatch(new CreateOrg( serverOrg ));
+    this.telemetryService.track('InfraServer_Add_Chef_Organization');
   }
 
   private resetCreateModal(): void {
@@ -234,8 +253,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     const updatedServer = {
       id: this.server.id,
       name: this.updateServerForm.controls.name.value.trim(),
-      fqdn: this.updateServerForm.controls.fqdn.value.trim(),
-      ip_address: this.updateServerForm.controls.ip_address.value.trim()
+      fqdn: this.fqdnForm.controls.fqdn.value?.trim() || '',
+      ip_address: this.ipForm.controls.ip_address.value?.trim() || ''
     };
     this.store.dispatch(new UpdateServer({server: updatedServer}));
   }

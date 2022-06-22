@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package chef.automate.api.infra_proxy.request;
+option go_package = "github.com/chef/automate/api/external/infra_proxy/request";
+
+message OrgUsers {
+    // Chef Organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+}
+
+message ServerUsers {
+    // Chef Infra Server ID.
+    string server_id = 1;
+    // Chef Infra server admin name.
+    string admin_name =2;
+    // Chef Infra server admin key.
+    string admin_key =3;
+}

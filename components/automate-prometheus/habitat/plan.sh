@@ -1,5 +1,6 @@
 # shellcheck disable=SC2034
 # shellcheck disable=SC2039
+# stable channel
 
 pkg_name=automate-prometheus
 pkg_description="metrics collection for Automate 2.0"

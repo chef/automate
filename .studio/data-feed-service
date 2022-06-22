@@ -55,5 +55,8 @@ function datafeed_run_integration_tests() {
   chef-automate config patch components/data-feed-service/integration_test/patch.toml
   api_token=$(get_admin_token)
   export AUTOMATE_API_TOKEN="${api_token}"
+  export AWS_REGION="${AWS_REGION}"
+  export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
+  export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
   go_test -v github.com/chef/automate/components/data-feed-service/integration_test/...
 }

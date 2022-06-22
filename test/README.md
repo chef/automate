@@ -1,0 +1,1 @@
+Before A2ha deployment and mid deployment's test is written here. After a2ha deployment test is written in inspec module.

@@ -14,6 +14,7 @@ import {
   getAllStatus as getAllDatabagsForOrgStatus,
   deleteStatus
 } from 'app/entities/data-bags/data-bags.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-data-bags-list',
@@ -31,12 +32,18 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   public dataBagsListLoading = true;
   public dataBagToDelete: DataBag;
   public deleteModalVisible = false;
+  public searchValue = '';
+  public searchFlag = false;
+  public searching = false;
+  public deleting = false;
+  public serachArr: DataBag[];
   public openDataBagModal = new EventEmitter<void>();
   private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit() {
@@ -54,6 +61,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
       if (getDataBagsSt === EntityStatus.loadingSuccess && !isNil(allDataBagsState)) {
         this.dataBags = allDataBagsState;
         this.dataBagsListLoading = false;
+        this.deleting = false;
       } else if (getDataBagsSt === EntityStatus.loadingFailure) {
         this.dataBagsListLoading = false;
         this.authFailure = true;
@@ -90,13 +98,32 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteDataBag({
       server_id: this.serverId, org_id: this.orgId, name: this.dataBagToDelete.name
     }));
+    this.telemetryService.track('InfraServer_Databags_Delete');
   }
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+    this.deleting = true;
   }
 
   public openCreateModal(): void {
     this.openDataBagModal.emit();
+  }
+
+  public searchDataBags(searchText: string): void {
+    this.searching = true;
+    this.searchValue = searchText;
+    if (!this.dataBags || !searchText) {
+      this.searchFlag = false;
+    } else {
+      this.serachArr = this.dataBags.filter((key) => {
+        this.searchFlag = true;
+        if (key) {
+          return key.name.includes(searchText);
+        }
+      });
+    }
+    this.searching = false;
+    this.telemetryService.track('InfraServer_Databags_Search');
   }
 }

@@ -1,3 +1,5 @@
+#stable channel
+
 pkg_name=automate-minio
 pkg_version="0.1.0"
 pkg_origin=chef
@@ -32,3 +34,4 @@ do_install() {
 do_strip() {
     return 0
 }
+

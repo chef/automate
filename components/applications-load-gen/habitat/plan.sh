@@ -1,6 +1,7 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
 #shellcheck disable=SC2039
+#stable channel
 
 pkg_name=applications-load-gen
 pkg_description="Applications Load Generator"
@@ -27,4 +28,5 @@ scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_na
 scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
+
 

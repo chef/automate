@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 enum UrlTestState {
   Inactive,
@@ -34,7 +35,7 @@ export class CreateDataFeedModalComponent implements OnInit {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -56,8 +57,5 @@ export class CreateDataFeedModalComponent implements OnInit {
     return this.createForm.controls.url.value !== '' ? true : false;
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }
 

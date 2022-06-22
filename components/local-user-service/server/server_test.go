@@ -53,14 +53,13 @@ func setupWithAdapter(t *testing.T, usersFile, rolesFile, teamsAddress string) (
 	return serv, users
 }
 
-func setupDataFile(t *testing.T, data string) (string, func()) {
+func setupDataFile(t *testing.T, data string) string {
 	t.Helper()
-	tmp, err := ioutil.TempDir(os.TempDir(), "data")
-	require.NoError(t, err)
+	tmp := t.TempDir()
 	dataFile := filepath.Join(tmp, "a1_user_data.json")
 	require.NoError(t, ioutil.WriteFile(dataFile, []byte(data), 0x755))
 
-	return dataFile, func() { os.RemoveAll(tmp) }
+	return dataFile
 }
 
 // Note: where there's an assert.FileExists in testify, there's no
@@ -72,17 +71,15 @@ func fileExists(path string) bool {
 }
 
 func TestA1MigrationFileDoesNotExist(t *testing.T) {
-	tmp, err := ioutil.TempDir(os.TempDir(), "nope-does-not-exist")
-	require.NoError(t, err)
+	tmp := t.TempDir()
 	nonExistent := filepath.Join(tmp, "a1_user_data.json")
 	serv, _ := setupUsersFile(t, nonExistent)
-	err = serv.MigrateA1Users(context.Background())
+	err := serv.MigrateA1Users(context.Background())
 	require.NoError(t, err)
 }
 
 func TestA1MigrationFileIsGibberish(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t, "gibberish")
-	defer cleanup()
+	dataFile := setupDataFile(t, "gibberish")
 
 	serv, _ := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -92,8 +89,7 @@ func TestA1MigrationFileIsGibberish(t *testing.T) {
 }
 
 func TestA1MigrationFileIsMissingHashedPassField(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t, `[{"name": "alice"}]`)
-	defer cleanup()
+	dataFile := setupDataFile(t, `[{"name": "alice"}]`)
 
 	serv, _ := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -103,9 +99,8 @@ func TestA1MigrationFileIsMissingHashedPassField(t *testing.T) {
 }
 
 func TestA1MigrationFileIsMissingNameField(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"}]`)
-	defer cleanup()
 
 	serv, _ := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -115,10 +110,9 @@ func TestA1MigrationFileIsMissingNameField(t *testing.T) {
 }
 
 func TestA1MigrationFileIsMinimallyComplete(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"name":"alice", "first_name": null, "last_name": null,
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"}]`)
-	defer cleanup()
 
 	serv, adp := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -133,10 +127,9 @@ func TestA1MigrationFileIsMinimallyComplete(t *testing.T) {
 }
 
 func TestA1MigrationWithFirstName(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"name":"alice", "first_name": "Alice", "last_name": null,
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"}]`)
-	defer cleanup()
 
 	serv, adp := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -151,10 +144,9 @@ func TestA1MigrationWithFirstName(t *testing.T) {
 }
 
 func TestA1MigrationWithLastName(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"name":"alice", "first_name": null, "last_name": "Schmidt",
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"}]`)
-	defer cleanup()
 
 	serv, adp := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -169,10 +161,9 @@ func TestA1MigrationWithLastName(t *testing.T) {
 }
 
 func TestA1MigrationWithBothFirstAndLastName(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"name":"alice", "first_name": "Alice", "last_name": "Schmidt",
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"}]`)
-	defer cleanup()
 
 	serv, adp := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -187,12 +178,11 @@ func TestA1MigrationWithBothFirstAndLastName(t *testing.T) {
 }
 
 func TestA1MigrationWithTwoUsers(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"name":"alice", "first_name": "Alice", "last_name": "Schmidt",
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"},
 {"name":"bob", "first_name": "Bobby", "last_name": "Tables",
 "hashed_pass": "$2a$12$dYDC4DZbFKL/WNVJPJvBnOa5MzgEHOt8XbW07x.Bw9mV4Y6qs10Py"}]`)
-	defer cleanup()
 
 	serv, adp := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -211,14 +201,13 @@ func TestA1MigrationWithTwoUsers(t *testing.T) {
 }
 
 func TestA1MigrationSkipsBuilderUserButMigratesOtherUsers(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"name":"alice", "first_name": "Alice", "last_name": "Schmidt",
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"},
 {"name":"builder", "first_name": null, "last_name": null,
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"},
 {"name":"bob", "first_name": "Bobby", "last_name": "Tables",
 "hashed_pass": "$2a$12$dYDC4DZbFKL/WNVJPJvBnOa5MzgEHOt8XbW07x.Bw9mV4Y6qs10Py"}]`)
-	defer cleanup()
 
 	serv, adp := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -245,8 +234,7 @@ func TestA1MigrationSkipsBuilderUserButMigratesOtherUsers(t *testing.T) {
 func TestA1MigrationOnSuccessMovesFile(t *testing.T) {
 	data := `[{"name":"alice", "first_name": null, "last_name": null,
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"}]`
-	dataFile, cleanup := setupDataFile(t, data)
-	defer cleanup()
+	dataFile := setupDataFile(t, data)
 
 	serv, _ := setupUsersFile(t, dataFile)
 	err := serv.MigrateA1Users(context.Background())
@@ -269,12 +257,11 @@ func TestA1MigrationOnSuccessMovesFile(t *testing.T) {
 // a) skips the existing users, and
 // b) keeps going with the rest
 func TestA1MigrationAfterFailure(t *testing.T) {
-	dataFile, cleanup := setupDataFile(t,
+	dataFile := setupDataFile(t,
 		`[{"name":"alice", "first_name": "Alice", "last_name": "Schmidt",
 "hashed_pass": "$2a$12$UBigIaaNCKZqkCKRmRta0.5/zi.X4lzxvXzqJL27iOaD5eslhZx1G"},
 {"name":"bob", "first_name": "Bobby", "last_name": "Tables",
 "hashed_pass": "$2a$12$dYDC4DZbFKL/WNVJPJvBnOa5MzgEHOt8XbW07x.Bw9mV4Y6qs10Py"}]`)
-	defer cleanup()
 
 	serv, adp := setupUsersFile(t, dataFile)
 
@@ -305,16 +292,14 @@ func TestA1MigrationAfterFailure(t *testing.T) {
 
 func TestA1RoleMigrationFileExistence(t *testing.T) {
 	t.Run("when file doesn't exist, does not error", func(t *testing.T) {
-		tmp, err := ioutil.TempDir(os.TempDir(), "nope-does-not-exist")
-		require.NoError(t, err)
+		tmp := t.TempDir()
 		nonExistent := filepath.Join(tmp, "a1_user_roles_data.json")
 		serv, _ := setupRolesFile(t, nonExistent, "")
 		require.NoError(t, serv.MigrateA1UserRoles(context.Background()))
 	})
 
 	t.Run("when file is gibbery, returns error", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, "gibberish")
-		defer cleanup()
+		dataFile := setupDataFile(t, "gibberish")
 
 		serv, _ := setupRolesFile(t, dataFile, "")
 		require.Error(t, serv.MigrateA1UserRoles(context.Background()))
@@ -324,8 +309,7 @@ func TestA1RoleMigrationFileExistence(t *testing.T) {
 
 func TestA1RoleMigrationNothingToDo(t *testing.T) {
 	t.Run("when user has no roles", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"alice","roles":[]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"alice","roles":[]}]`)
 
 		serv, _ := setupRolesFile(t, dataFile, "")
 		require.NoError(t, serv.MigrateA1UserRoles(context.Background()))
@@ -333,16 +317,14 @@ func TestA1RoleMigrationNothingToDo(t *testing.T) {
 	})
 
 	t.Run("when user has no admin role", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"alice","roles":["committer", "shipper"]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"alice","roles":["committer", "shipper"]}]`)
 
 		serv, _ := setupRolesFile(t, dataFile, "")
 		require.NoError(t, serv.MigrateA1UserRoles(context.Background()))
 		assert.False(t, fileExists(dataFile))
 	})
 	t.Run("builder user is skipped", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"builder","roles":["admin"]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"builder","roles":["admin"]}]`)
 
 		serv, _ := setupRolesFile(t, dataFile, "")
 		require.NoError(t, serv.MigrateA1UserRoles(context.Background()))
@@ -352,8 +334,7 @@ func TestA1RoleMigrationNothingToDo(t *testing.T) {
 
 func TestA1RoleMigrationHappyPath(t *testing.T) {
 	t.Run("when admins team exists and user has admin role", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
 
 		teamsServer, mock := setupTeamsMock(t)
 		defer teamsServer.Close()
@@ -387,12 +368,11 @@ func TestA1RoleMigrationHappyPath(t *testing.T) {
 	})
 
 	t.Run("when admins team exists and multiple users have admin role (among others)", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t,
+		dataFile := setupDataFile(t,
 			`[{"name":"admin","roles":["admin"]},
 {"name":"alice","roles":["admin", "committer"]},
 {"name":"bob","roles":["shipper", "committer"]},
 {"name":"cathy","roles":["shipper", "admin"]}]`)
-		defer cleanup()
 
 		teamsServer, mock := setupTeamsMock(t)
 		defer teamsServer.Close()
@@ -458,8 +438,7 @@ func TestA1RoleMigrationHappyPath(t *testing.T) {
 	})
 
 	t.Run("when admins team does not exist and user has admin role", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
 
 		teamsServer, mock := setupTeamsMock(t)
 		defer teamsServer.Close()
@@ -500,8 +479,7 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 	// fails. If this fact changes, a similar setup as in the last subtest of this
 	// set has to be added in the other tests.
 	t.Run("when admins team lookup fails", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
 
 		teamsServer, mock := setupTeamsMock(t)
 		defer teamsServer.Close()
@@ -517,8 +495,7 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 	})
 
 	t.Run("when admins team creation fails", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
 
 		teamsServer, mock := setupTeamsMock(t)
 		defer teamsServer.Close()
@@ -536,8 +513,7 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 	})
 
 	t.Run("when adding the user to the admins team fails", func(t *testing.T) {
-		dataFile, cleanup := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
-		defer cleanup()
+		dataFile := setupDataFile(t, `[{"name":"alice","roles":["admin"]}]`)
 
 		teamsServer, mock := setupTeamsMock(t)
 		defer teamsServer.Close()

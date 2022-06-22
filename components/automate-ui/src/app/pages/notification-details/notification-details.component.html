@@ -44,6 +44,7 @@
             <label>
               <span class="label">Webhook Type <span aria-hidden="true">*</span></span>
               <chef-select
+                *ngIf="notification.targetType != null"
                 (change)="changeSelectionForWebhookType($event)"
                 class="notification-select-menu"
                 [value]="notification.targetType">
@@ -59,6 +60,7 @@
             <label>
               <span class="label">Failure Type  <span aria-hidden="true">*</span></span>
               <chef-select
+                *ngIf="notification.ruleType != null"
                 (change)="setFailureType($event)"
                 class="notification-select-menu"
                 [value]="notification.ruleType">

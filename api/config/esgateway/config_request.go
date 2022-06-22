@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"os/exec"
 	"strings"
 
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
@@ -12,6 +13,10 @@ import (
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/lib/config"
+)
+
+const (
+	habPkgPlatformToolsPath = "hab pkg path chef/automate-platform-tools"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -72,9 +77,10 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
 	c.V1.Sys.Ngx.Http.SslCiphers = w.String(ac.InternalCipherSuite)
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
-	c.V1.Sys.Ngx.Http.ProxyReadTimeout = w.Int32(600)
+	c.V1.Sys.Ngx.Http.ProxyReadTimeout = w.Int32(7200)
 	c.V1.Sys.Ngx.Http.ProxySendTimeout = w.Int32(600)
 	c.V1.Sys.Ngx.Http.ProxySetHeaderHost = w.String("$http_host")
+	c.V1.Sys.Ngx.Http.ProxySslVerify = w.String("off")
 
 	return c
 }
@@ -117,8 +123,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = ac.GlobalLogLevelToNginxLevel(logLevel)
 	}
 
-	if externalES := g.GetV1().GetExternal().GetElasticsearch(); externalES.GetEnable().GetValue() {
-		nodes := externalES.GetNodes()
+	if externalOS := g.GetV1().GetExternal().GetOpensearch(); externalOS.GetEnable().GetValue() {
+		nodes := externalOS.GetNodes()
 		c.V1.Sys.External = &ConfigRequest_V1_System_External{
 			Enable: w.Bool(true),
 		}
@@ -135,7 +141,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			c.V1.Sys.External.ParsedEndpoints = endpoints
 
 			if isSSL {
-				if serverName := externalES.GetSsl().GetServerName().GetValue(); serverName != "" {
+				if serverName := externalOS.GetSsl().GetServerName().GetValue(); serverName != "" {
 					c.V1.Sys.External.ServerName = w.String(serverName)
 				} else {
 					endpoint := endpoints[0].Address.GetValue()
@@ -144,17 +150,30 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			}
 		}
 
-		switch auth := g.GetV1().GetExternal().GetElasticsearch().GetAuth(); auth.GetScheme().GetValue() {
+		switch auth := g.GetV1().GetExternal().GetOpensearch().GetAuth(); auth.GetScheme().GetValue() {
 		case "basic_auth":
+			password := auth.GetBasicAuth().GetPassword().GetValue()
+			if password == "" {
+				args := []string{
+					"show",
+					"userconfig.os_password",
+				}
+				execGetPass := exec.Command(getLatestPlatformToolsPath()+"/bin/secrets-helper", args...)
+				getPass, err := execGetPass.Output()
+				if err != nil {
+					return
+				}
+				password = strings.TrimSpace(string(getPass))
+			}
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
 					"%s:%s",
 					auth.GetBasicAuth().GetUsername().GetValue(),
-					auth.GetBasicAuth().GetPassword().GetValue(),
+					password,
 				),
 			)))
-		case "aws_es":
-			// If we only have 1 AWS Elasticsearch Service endpoint specified, we can assume that
+		case "aws_os":
+			// If we only have 1 AWS Opensearch Service endpoint specified, we can assume that
 			// the host header should be the name of that endpoint.
 			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(endpoints) == 1 {
 				c.V1.Sys.Ngx.Http.ProxySetHeaderHost = endpoints[0].Address
@@ -162,15 +181,15 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
 					"%s:%s",
-					auth.GetAwsEs().GetUsername().GetValue(),
-					auth.GetAwsEs().GetPassword().GetValue(),
+					auth.GetAwsOs().GetUsername().GetValue(),
+					auth.GetAwsOs().GetPassword().GetValue(),
 				),
 			)))
 		default:
 		}
 
-		c.V1.Sys.External.RootCert = g.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCert()
-		c.V1.Sys.External.RootCertFile = g.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCertFile()
+		c.V1.Sys.External.RootCert = g.GetV1().GetExternal().GetOpensearch().GetSsl().GetRootCert()
+		c.V1.Sys.External.RootCertFile = g.GetV1().GetExternal().GetOpensearch().GetSsl().GetRootCertFile()
 	}
 }
 
@@ -225,4 +244,14 @@ func uriToEndpoint(uri string) (*ConfigRequest_V1_System_Endpoint, bool) {
 
 func isIPAddress(addr string) bool {
 	return net.ParseIP(addr) != nil
+}
+
+func getLatestPlatformToolsPath() string {
+	cmd, err := exec.Command("/bin/sh", "-c", habPkgPlatformToolsPath).Output()
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	output := string(cmd)
+
+	return strings.TrimSpace(output)
 }

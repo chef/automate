@@ -1,0 +1,11 @@
+name: automate-backend-postgresql-smoke
+title: InSpec Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: success@chef.io
+license: All Rights Reserved
+summary: An InSpec Compliance Profile for testing PostgreSQL backends
+version: 0.1.0
+depends:
+  - name: automate-backend-resources
+    path: ../automate-backend-resources

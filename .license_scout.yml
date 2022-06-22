@@ -14,7 +14,7 @@ directories:
   - ./components/automate-debug
   - ./components/automate-deployment
   - ./components/automate-dex
-  - ./components/automate-elasticsearch
+  - ./components/automate-opensearch
   - ./components/automate-es-gateway
   - ./components/automate-gateway
   - ./components/automate-grpc
@@ -52,11 +52,19 @@ directories:
   - ./components/session-service
   - ./components/teams-service
   - ./components/trial-license-service
+  - ./components/automate-backend-opensearch
+  - ./components/automate-backend-elasticsidecar
+  - ./components/automate-backend-haproxy
+  - ./components/automate-backend-postgresql
+  - ./components/automate-backend-deployment
+  - ./components/automate-ha-pgleaderchk
 
 habitat:
   channel_for_origin:
     - origin: chef
       channel: dev
+    - origin: core
+      channel: stable
 allowed_licenses:
   - 0BSD
   - Apache-1.0
@@ -108,6 +116,24 @@ fallbacks:
     - name: github.com/ghodss/yaml
       license_id: MIT
       license_content: https://raw.githubusercontent.com/ghodss/yaml/master/LICENSE
+    - name: golang.org/x/net
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
+    - name: github.com/DATA-DOG/go-sqlmock
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/DATA-DOG/go-sqlmock/master/LICENSE
+    - name: github.com/dustin/go-humanize
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/dustin/go-humanize/master/LICENSE
+    - name: github.com/sirupsen/logrus
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/sirupsen/logrus/master/LICENSE
+    - name: golang.org/x/sys
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
+    - name: golang.org/x/text
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
     - name: github.com/golang/protobuf
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
@@ -231,6 +257,24 @@ fallbacks:
     - name: github.com/envoyproxy/protoc-gen-validate
       license_id: Apache-2.0
       license_content: https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/master/LICENSE
+    - name: github.com/cncf/udpa/go
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/cncf/udpa/main/LICENSE
+    - name: github.com/envoyproxy/go-control-plane
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/envoyproxy/go-control-plane/main/LICENSE
+    - name: github.com/smartystreets/go-aws-auth
+      license_id: Unlicense
+      license_content: https://raw.githubusercontent.com/smarty-archives/go-aws-auth/master/LICENSE.md
+    - name: github.com/smartystreets/gunit
+      license_id: Unlicense
+      license_content: https://raw.githubusercontent.com/smartystreets/gunit/master/LICENSE.md
+    - name: google.golang.org/grpc
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/grpc/grpc-go/master/LICENSE
+    - name: google.golang.org/protobuf
+      license_id: Gocov-Authors
+      license_content: https://raw.githubusercontent.com/protocolbuffers/protobuf-go/master/LICENSE
     - name: github.com/google/go-cmp
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/google/go-cmp/master/LICENSE
@@ -273,6 +317,15 @@ fallbacks:
     - name: github.com/shirou/w32
       license_id: w32-Authors
       license_content: https://raw.githubusercontent.com/shirou/w32/master/LICENSE
+    - name: github.com/go-ldap/ldap
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/go-ldap/ldap/master/LICENSE
+    - name: github.com/tinylib/msgp
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/tinylib/msgp/master/LICENSE
+    - name: golang.org/x/crypto
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/crypto/master/LICENSE
 
   habitat:
     - name: chef/mlsa
@@ -282,6 +335,9 @@ fallbacks:
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/ruby26
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
+    - name: core/ruby27
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/cacerts
@@ -407,6 +463,37 @@ exceptions:
       reason: (rc) dep of core/git, used by Workflow and sqitch. Exception made by Stephen Delano, 4/23/20
     - name: core/procps-ng
       reason: Exception made by Chef Legal
+    - name: core/alsa-lib
+      reason:  Exception made by Chef Legal
+    - name: core/freetype
+      reason:  Exception made by Chef Legal
+    - name: core/groff
+      reason:  Exception made by Chef Legal
+    - name: core/gzip
+      reason:  Exception made by Chef Legal
+    - name: core/libiconv
+      reason:  Exception made by Chef Legal
+    - name: core/libidn2
+      reason:  Exception made by Chef Legal
+    - name: core/libpng
+      reason:  Exception made by Chef Legal
+    - name: core/libunistring
+      reason:  Exception made by Chef Legal
+    - name: core/lz4
+      reason:  Exception made by Chef Legal
+    - name: core/make
+      reason:  Exception made by Chef Legal
+    - name: core/openjdk11
+      reason:  Exception made by Chef Legal
+    - name: core/pkg-config
+      reason:  Exception made by Chef Legal
+    - name: core/systemd
+      reason:  Exception made by Chef Legal
+    - name: core/ruby30
+      reason: Ruby license (previously shipped in Automate 1)
+    - name: core/ruby27
+      reason:  Exception made for chef server upgrade
+
 
   ruby:
     - name: highline

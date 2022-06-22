@@ -29,9 +29,9 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-elasticsearch",
+      "name": "chef/automate-opensearch",
       "metadata": {
-        "name": "chef/automate-elasticsearch",
+        "name": "chef/automate-opensearch",
         "data_service": true,
         "binlinks": null,
         "uses_platform_scaffolding": false,
@@ -125,6 +125,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/session-service",
+      "metadata": {
+        "name": "chef/session-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/authn-service",
       "metadata": {
         "name": "chef/authn-service",
@@ -205,16 +215,6 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/session-service",
-      "metadata": {
-        "name": "chef/session-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "chef/config-mgmt-service",
       "metadata": {
         "name": "chef/config-mgmt-service",
@@ -267,6 +267,26 @@ var ProductMetadataJSON = `
     {
       "name": "chef/event-gateway",
       "metadata": null
+    },
+    {
+      "name": "chef/report-manager-service",
+      "metadata": {
+        "name": "chef/report-manager-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/user-settings-service",
+      "metadata": {
+        "name": "chef/user-settings-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/automate-gateway",
@@ -435,6 +455,52 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-ha-deployment",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-elasticsidecar",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-ctl",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-haproxy",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-pgleaderchk",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-postgresql",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-cluster-ctl",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-netcat",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-ha-opensearch",
+      "metadata": {
+        "name": "chef/automate-ha-opensearch",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/automate-elasticsearch",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -473,11 +539,11 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
-      "name": "elasticsearch",
+      "name": "opensearch",
       "aliases": null,
       "type": "base",
       "services": [
-        "chef/automate-elasticsearch",
+        "chef/automate-opensearch",
         "chef/automate-es-gateway",
         "chef/es-sidecar-service"
       ],
@@ -524,7 +590,8 @@ var ProductMetadataJSON = `
       "type": "base",
       "services": [
         "chef/automate-gateway",
-        "chef/automate-ui"
+        "chef/automate-ui",
+        "chef/user-settings-service"
       ],
       "packages": null,
       "dependencies": [
@@ -550,13 +617,14 @@ var ProductMetadataJSON = `
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
+        "chef/report-manager-service",
         "chef/event-gateway"
       ],
       "packages": null,
       "dependencies": [
         "core",
         "postgresql",
-        "elasticsearch",
+        "opensearch",
         "cereal",
         "auth",
         "ui"
@@ -568,7 +636,10 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [
-        "chef/automate-cds"
+        "chef/automate-cds",
+        "chef/automate-opensearch",
+        "chef/report-manager-service",
+        "chef/user-settings-service"
       ],
       "packages": null,
       "dependencies": [
@@ -593,7 +664,7 @@ var ProductMetadataJSON = `
       "dependencies": [
         "core",
         "postgresql",
-        "elasticsearch"
+        "opensearch"
       ],
       "hidden": false
     },

@@ -1,5 +1,21 @@
 @import "~styles/variables";
 
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+    margin-top: 4px;
+  }
+}
+
 thead {
   font-size: 14px;
   letter-spacing: 0.2px;
@@ -27,20 +43,20 @@ chef-table-new {
   }
 }
 
-chef-loading-spinner {
+chef-loading-spinner.spinner {
   display: block;
   margin: 100px auto;
   width: 100px;
   z-index: 199;
 }
 
+.wrapper {
+  position: relative;
+}
+
 .full-screen-spinner {
-  display: flex;
-  margin: auto;
-  margin-top: 239px;
-  background-color: $chef-white;
-  opacity: 0.7;
-  width: initial;
+  margin: -34px;
+  margin-top: -20px;
 }
 
 .empty-section {
@@ -66,27 +82,15 @@ img {
     height: 55px;
   }
 
-  span chef-toolbar chef-button:first-child {
-    margin: 4px 0px 0px 32px;
-    float: right;
+}
 
-    button {
-      padding: 7px 16px;
-      letter-spacing: 0.5px;
-    }
-  }
+// sass-lint:disable no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -12px !important;
+  transform: none !important;
+}
 
-  ::ng-deep {
-    .search-items app-infra-search-bar .search-wrapper {
-      float: left;
-      margin-top: 10px;
-      width: calc(100% - 187px);
-      margin-right: 32px;
-    }
-  }
-
-  chef-toolbar chef-button:first-child {
-    margin: 18px 0px 0px 0px;
-    float: right;
-  }
+::ng-deep .chef-control-menu {
+  margin-top: 29px;
+  right: -43px;
 }

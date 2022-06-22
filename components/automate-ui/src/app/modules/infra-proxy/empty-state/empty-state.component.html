@@ -1,6 +1,7 @@
 <chef-toolbar>
-  <div class="empty-state">
+  <div class="empty-state" data-cy="empty-state">
     <p>Unable to show {{ moduleTitle }} because admin key is invalid.</p>
-    <chef-button primary (click)="resetKeyTabRedirection()">Reset Admin Key</chef-button>
+    <!-- TODO - right now we do not require this, because `reset admin key` tab is behind feature flags, we will show this again in future work -->
+    <!-- <chef-button primary (click)="resetKeyTabRedirection()">Reset Admin Key</chef-button> -->
   </div>
 </chef-toolbar>

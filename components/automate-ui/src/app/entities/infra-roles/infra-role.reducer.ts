@@ -72,7 +72,6 @@ export function infraRoleEntityReducer(
       )(state) as InfraRoleEntityState;
     }
 
-
     case RoleActionTypes.DELETE:
       return set(DELETE_STATUS, EntityStatus.loading, state);
 

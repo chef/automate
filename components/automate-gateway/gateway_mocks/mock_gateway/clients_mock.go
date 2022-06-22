@@ -27,7 +27,9 @@ import (
 	local_user "github.com/chef/automate/api/interservice/local_user"
 	manager "github.com/chef/automate/api/interservice/nodemanager/manager"
 	nodes "github.com/chef/automate/api/interservice/nodemanager/nodes"
+	report_manager "github.com/chef/automate/api/interservice/report_manager"
 	teams "github.com/chef/automate/api/interservice/teams"
+	user_settings "github.com/chef/automate/api/interservice/user_settings"
 	api "github.com/chef/automate/components/notifications-client/api"
 	notifier "github.com/chef/automate/components/notifications-client/notifier"
 	gomock "github.com/golang/mock/gomock"
@@ -505,6 +507,36 @@ func (m *MockClientsFactory) CdsClient() (service.AutomateCdsServiceClient, erro
 func (mr *MockClientsFactoryMockRecorder) CdsClient() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CdsClient", reflect.TypeOf((*MockClientsFactory)(nil).CdsClient))
+}
+
+// UserSettingsClient mocks base method
+func (m *MockClientsFactory) UserSettingsClient() (user_settings.UserSettingsServiceClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserSettingsClient")
+	ret0, _ := ret[0].(user_settings.UserSettingsServiceClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UserSettingsClient indicates an expected call of UserSettingsClient
+func (mr *MockClientsFactoryMockRecorder) UserSettingsClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserSettingsClient", reflect.TypeOf((*MockClientsFactory)(nil).UserSettingsClient))
+}
+
+// ReportManagerClient mocks base method
+func (m *MockClientsFactory) ReportManagerClient() (report_manager.ReportManagerServiceClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReportManagerClient")
+	ret0, _ := ret[0].(report_manager.ReportManagerServiceClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReportManagerClient indicates an expected call of ReportManagerClient
+func (mr *MockClientsFactoryMockRecorder) ReportManagerClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReportManagerClient", reflect.TypeOf((*MockClientsFactory)(nil).ReportManagerClient))
 }
 
 // Close mocks base method

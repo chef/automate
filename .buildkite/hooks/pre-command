@@ -5,11 +5,11 @@ set -eu
 docker ps || true
 free -m
 
-# We've now seen cases where origin/master on the build hosts can get
+# We've now seen cases where origin/main on the build hosts can get
 # out of date. This causes us to build components unnecessarily.
 # Fetching it here hopefully will prevent this situation.
-echo "Fetching origin/master"
-git fetch origin master
+echo "Fetching origin/main"
+git fetch origin main
 
 # DEBUGGING FOR RELENG
 # Fetch the git tags to see if that addresses the weird smart build behavior for Habitat

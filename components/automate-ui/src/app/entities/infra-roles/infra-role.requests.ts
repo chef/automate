@@ -12,11 +12,6 @@ export interface RoleResponse {
   role: InfraRole;
 }
 
-export interface RoleSearchResponse {
-  roles: InfraRole[];
-  total: number;
-}
-
 @Injectable()
 export class InfraRoleRequests {
 
@@ -51,5 +46,11 @@ export class InfraRoleRequests {
   public deleteRole(server_id: string, org_id: string, name: string): Observable<{}> {
     return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`,
     {headers});
+  }
+
+  public updateRole(role: InfraRole): Observable<InfraRole> {
+    return this.http.put<InfraRole>(
+      `${env.infra_proxy_url}/servers/${role.server_id}/orgs/${role.org_id}/roles/${role.name}`,
+      role);
   }
 }

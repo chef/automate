@@ -1,9 +1,10 @@
 package integration_test
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -17,8 +18,8 @@ import (
 func TestListProfiles(t *testing.T) {
 	suite.DeleteAllDocuments()
 
-	es2Backend := relaxting.ES2Backend{ESUrl: elasticsearchUrl}
-	server := reportingServer.New(&es2Backend)
+	es2Backend := relaxting.ES2Backend{ESUrl: opensearchUrl}
+	server := reportingServer.New(&es2Backend, nil, 5)
 
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})

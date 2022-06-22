@@ -10,7 +10,11 @@ import { SaveNodeCredential, NodeCredential, NodeCredentialTypes } from 'app/ent
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpStatus } from 'app/types/types';
 import { CreateNodeCredentialFailure, CreateNodeCredentialSuccess } from 'app/entities/node-credentials/node-credential.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
+class MockTelemetryService {
+  track() { }
+}
 
 describe('CreateNodeCredentialModalComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -31,7 +35,8 @@ describe('CreateNodeCredentialModalComponent', () => {
       ],
       providers: [
         FeatureFlagsService,
-        SaveNodeCredential
+        SaveNodeCredential,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         ReactiveFormsModule,

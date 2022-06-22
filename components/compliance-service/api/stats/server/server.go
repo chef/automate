@@ -3,23 +3,30 @@ package server
 import (
 	"context"
 	"fmt"
+	"time"
 
+	utils "github.com/chef/automate/components/compliance-service/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/stats"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
 // Server implementation for stats
 type Server struct {
 	es *relaxting.ES2Backend
+	pg *pgdb.DB
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend) *Server {
-	return &Server{es: es}
+func New(es *relaxting.ES2Backend, pg *pgdb.DB) *Server {
+	return &Server{
+		es: es,
+		pg: pg,
+	}
 }
 
 // ReadSummary returns summary, nodes-summary, or controls-summary information
@@ -151,6 +158,41 @@ func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Fa
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return failures, nil
+}
+
+//UpdateTelemetryReported Updates the last compliance telemetry reported date in postgres after the telemetry data is sent
+func (srv *Server) UpdateTelemetryReported(ctx context.Context, in *stats.UpdateTelemetryReportedRequest) (*stats.UpdateTelemetryReportedResponse, error) {
+	err := srv.pg.UpdateLastTelemetryReported(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return &stats.UpdateTelemetryReportedResponse{}, nil
+}
+
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
+	var count int64
+	// Get last telemetry reported date from postgres
+	telemetry, err := srv.pg.GetTelemetry(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var daysSinceLastPost int
+	if telemetry.LastTelemetryReportedAt.IsZero() {
+		daysSinceLastPost = 15
+	} else {
+		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+	}
+	if daysSinceLastPost > 0 {
+		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), telemetry.LastTelemetryReportedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &stats.GetNodesUsageCountResponse{
+		DaysSinceLastPost: int64(daysSinceLastPost),
+		NodeCnt:           count,
+	}, nil
 }
 
 func validateTrendData(in *stats.Query, filters map[string][]string) (err error) {

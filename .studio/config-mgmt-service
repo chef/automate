@@ -28,6 +28,14 @@ function config_mgmt_integration() {
   go_test "github.com/chef/automate/components/config-mgmt-service/integration_test"
 }
 
+document "config_mgmt_run_info_integration" <<DOC
+  Runs the integration tests for the config_mgmt_run_info_integration
+DOC
+function config_mgmt_run_info_integration() {
+  # Go based integration tests
+  go_test -run TestNodeRunInfoDateTime -v "github.com/chef/automate/components/config-mgmt-service/integration_test"
+}
+
 document "debug_cfgmgmt" <<DOC
   Attaches a remote debugger to config-mgmt-service
 DOC

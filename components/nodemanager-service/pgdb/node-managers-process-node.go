@@ -118,6 +118,9 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		}
 
 		if !hasCloudInformation(node) {
+			if node.GetManagerType() == "azure-api" && node.SourceRegion == "" {
+				node.SourceRegion = "azure-api-region"
+			}
 			err = tx.upsertByID(node, nodeDetails)
 		} else {
 			node.Uuid, err = tx.upsertByCloudDetails(node, nodeDetails)

@@ -15,6 +15,7 @@ import {
 import { NodeCredentialDetailsScreenComponent } from './node-credential-details/node-credential-details.component';
 import { CreateNodeCredentialModalComponent } from './create-node-credential-modal/create-node-credential-modal.component';
 import { SaveNodeCredential } from 'app/entities/node-credentials/node-credential.model';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 @NgModule({
   imports: [
     CommonModule,
@@ -23,18 +24,15 @@ import { SaveNodeCredential } from 'app/entities/node-credentials/node-credentia
     NodeCredentialsRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    InfiniteScrollModule
   ],
   declarations: [
     NodeCredentialListComponent,
     NodeCredentialDetailsScreenComponent,
     CreateNodeCredentialModalComponent
   ],
-  providers: [
-    SaveNodeCredential
-  ],
-  schemas: [
-    CUSTOM_ELEMENTS_SCHEMA
-  ]
+  providers: [SaveNodeCredential],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class NodeCredentialsModule {}

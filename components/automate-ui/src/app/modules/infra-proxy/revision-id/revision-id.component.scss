@@ -1,0 +1,18 @@
+@import "~styles/variables";
+@import '../infra_shared/slide-panel';
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
+}

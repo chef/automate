@@ -33,6 +33,10 @@ options:
 - name: upgrade-strategy
   default_value: at-once
   usage: Upgrade strategy to use for this deployment.
+- name: "yes"
+  shorthand: "y"
+  default_value: "false"
+  usage: Do not prompt for confirmation; accept defaults and continue
 inherited_options:
 - name: debug
   shorthand: d

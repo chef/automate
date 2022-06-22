@@ -3,14 +3,15 @@ syntax = "proto3";
 package chef.automate.api.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
 
+import "external/infra_proxy/response/common.proto";
+
 message Nodes {
     // Node list.
     repeated NodeAttribute nodes = 1;
-}
-
-message AffectedNodes {
-    // List of the nodes which are affected by the chef object.
-    repeated NodeAttribute nodes = 1;
+    // Starting page for the results.
+    int32 page = 2;
+    // Total number of records.
+    int32 total = 3;
 }
 
 message NodeAttribute {
@@ -67,4 +68,25 @@ message Node {
 message UpdateNodeTags {
     // Node tags.
     repeated string tags = 5;
+}
+
+message UpdateNodeEnvironment {
+    // Node name.
+    string name = 1;
+    // Node environment name.
+    string environment = 2;
+}
+
+message UpdateNodeAttributes {
+    // Node name.
+    string name = 1;
+    // Node attributes JSON.
+    string attributes = 2;
+}
+
+message NodeExpandedRunList {
+    // ID of the run list collection.
+    string id = 1;
+    // List of the run list.
+    repeated RunList run_list = 2;
 }

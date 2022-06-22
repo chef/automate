@@ -5,7 +5,7 @@ var fs = require('fs');
 
 // Global variables
 var REST_SERVICE_URI = process.env.REST_SERVICE || 'http://0.0.0.0:2192';
-var ELASTICSEARCH_URI = process.env.ELASTICSEARCH_URL || 'http://elasticsearch:9200';
+var ELASTICSEARCH_URI = process.env.OPENSEARCH_URL || 'http://elasticsearch:9200';
 var DEBUG = process.env.DEBUG || false;
 
 var ChefRun = {

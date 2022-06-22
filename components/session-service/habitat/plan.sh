@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=session-service
 pkg_description="A2 session service"
@@ -16,9 +17,11 @@ pkg_deps=(
 )
 pkg_exports=(
   [port]=service.port # default service is http
+  [grpc-port]=service.grpc_port
 )
 pkg_exposes=(
   port
+  grpc-port
 )
 pkg_binds=(
   [automate-dex]="port"
@@ -44,3 +47,4 @@ do_install() {
   build_line "Copying migration files"
   cp -r migration/sql "${pkg_prefix}/migrations"
 }
+

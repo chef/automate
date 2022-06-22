@@ -3,7 +3,7 @@
     <main>
       <chef-loading-spinner *ngIf="cookbookVersionsLoading" size="50" fixed></chef-loading-spinner>
       <chef-breadcrumbs>
-        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Cookbooks
         </chef-breadcrumb>
@@ -29,10 +29,10 @@
             <ul class="list" *ngIf="menuList.length">
               <li *ngFor="let item of menuList; let i = index;">
                 <span (click)="listClickEvent($event)" 
-                [ngClass]="{'extend-list': i === 0}">
+                [ngClass]="{'extend-list': i === menuIndex}">
                   {{ item.menu | titlecase  }} ({{ item.subMenu.length }})
                 </span>
-                <ul class="sub-list" [ngClass]="{'show': i === 0}">
+                <ul class="sub-list" [ngClass]="{'show': i === menuIndex}">
                   <li *ngFor="let content of item.subMenu; let j = index;" 
                   [ngClass]="{'active-sub-list': j === 0 && i === 0}" 
                   (click)="subListClickEvent($event, content)">

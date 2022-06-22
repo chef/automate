@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Usage: automate-cluster-ctl help [COMMAND]
+# Summary: Display help for the given command
+
+set -e
+
+print_summaries() {
+  local commands=()
+  local summaries=()
+  local longest_command=0
+  local command
+
+  for command in $(cluster-commands); do
+    local file="$(command_path "$command")"
+    if [ ! -h "$file" ]; then
+      local summary="$(summary_from "$file")"
+      if [ -n "$summary" ]; then
+        commands["${#commands[@]}"]="$command"
+        summaries["${#summaries[@]}"]="$summary"
+
+        if [ "${#command}" -gt "$longest_command" ]; then
+          longest_command="${#command}"
+        fi
+      fi
+    fi
+  done
+
+  local index
+  local columns="$(tput cols)"
+  local summary_length=$(( $columns - $longest_command - 5 ))
+  for (( index=0; index < ${#commands[@]}; index++ )); do
+    printf "   %-${longest_command}s  %s\n" "${commands[$index]}" \
+      "${summaries[$index]}" | cut -c 1-${summary_length}
+  done
+}
+
+print_help() {
+  if grep -i "^# built-in help" "$(command_path)" >/dev/null; then
+    exec "$(command_path)" --help
+  else
+    print_generic_help $1
+  fi
+}
+
+print_generic_help() {
+  local file="$1"
+  local usage="$(usage_from "$file")"
+
+  if [ -n "$usage" ]; then
+    echo "$usage"
+
+    local help="$(help_from "$file")"
+    [ -n "$help" ] && echo && echo "$help"
+  else
+    echo "Sorry, this command isn't documented yet."
+  fi
+}
+
+summary_from() {
+  sed -n "s/^# Summary: \(.*\)/\1/p" "$1"
+}
+
+usage_from() {
+  sed -n "s/^# \(Usage: .*\)/\1/p" "$1"
+}
+
+help_from() {
+  awk '/^[^#]/{p=0} /^# Help:/{p=1} p' "$1" | sed "s/^# Help: //;s/^# //;s/^#//"
+}
+
+command_path() {
+  command -v "cluster-$command" || command -v "cluster-sh-$command" || true
+}
+
+command="$1"
+case "$command" in
+"") echo "Usage: automate-cluster-ctl <command> [<args>]
+
+Available automate-cluster-ctl commands are:
+$(print_summaries)
+
+See 'automate-cluster-ctl help <command>' for information on a specific command."
+;;
+*)
+  file="$(command_path "$command")"
+
+  if [ -n "$file" ]; then
+    print_help "$file"
+  else
+    echo "automate-cluster-ctl: no such command \`$command'" >&2
+    exit 1
+  fi
+esac

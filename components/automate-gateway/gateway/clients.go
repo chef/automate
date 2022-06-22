@@ -3,6 +3,8 @@ package gateway
 import (
 	"fmt"
 
+	"github.com/chef/automate/api/interservice/user_settings"
+
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -30,6 +32,7 @@ import (
 	"github.com/chef/automate/api/interservice/local_user"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
+	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/api/interservice/teams"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
@@ -58,6 +61,8 @@ var grpcServices = []string{
 	"notifications-service",
 	"teams-service",
 	"secrets-service",
+	"user-settings-service",
+	"report-manager-service",
 }
 
 // clientMetrics holds the clients (identified by service) for which we'll
@@ -120,6 +125,8 @@ type ClientsFactory interface {
 	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
 	InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error)
 	CdsClient() (cds.AutomateCdsServiceClient, error)
+	UserSettingsClient() (user_settings.UserSettingsServiceClient, error)
+	ReportManagerClient() (report_manager.ReportManagerServiceClient, error)
 	Close() error
 }
 
@@ -446,6 +453,22 @@ func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyServiceClient
 		return nil, err
 	}
 	return infra_proxy.NewInfraProxyServiceClient(conn), nil
+}
+
+func (c *clientsFactory) UserSettingsClient() (user_settings.UserSettingsServiceClient, error) {
+	conn, err := c.connectionByName("user-settings-service")
+	if err != nil {
+		return nil, err
+	}
+	return user_settings.NewUserSettingsServiceClient(conn), nil
+}
+
+func (c *clientsFactory) ReportManagerClient() (report_manager.ReportManagerServiceClient, error) {
+	conn, err := c.connectionByName("report-manager-service")
+	if err != nil {
+		return nil, err
+	}
+	return report_manager.NewReportManagerServiceClient(conn), nil
 }
 
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {

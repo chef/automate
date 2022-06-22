@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -260,4 +261,15 @@ func GlobalLogLevelToZapLevel(level string) string {
 	default:
 		return "info"
 	}
+}
+
+func ValidateDisclaimerFilePath(filePath string) error {
+	if filePath == "" {
+		return errors.Errorf("empty message_file_path with login_banner.show enabled is invalid")
+	} else {
+		if _, err := os.Stat(filePath); err != nil {
+			return errors.Errorf("Message file %s does not exist", filePath)
+		}
+	}
+	return nil
 }

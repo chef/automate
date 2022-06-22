@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Event Feed"
     parent = "automate"
     identifier = "automate/event_feed.md Event Feed"
-    weight = 40
+    weight = 70
 +++
 
 Use the _Event Feed_ for actionable insights and operational visibility.

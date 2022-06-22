@@ -4,6 +4,19 @@ require 'vagrant-aws'
 require 'resolv'
 require 'mkmf'
 
+#Undefined HashMap method except with Vagrant 2.2.7
+# work around was found here: https://github.com/mitchellh/vagrant-aws/issues/566#issuecomment-580812210
+class Hash
+  def slice(*keep_keys)
+    h = {}
+    keep_keys.each { |key| h[key] = fetch(key) if has_key?(key) }
+    h
+  end unless Hash.method_defined?(:slice)
+  def except(*less_keys)
+    slice(*keys - less_keys)
+  end unless Hash.method_defined?(:except)
+end
+
 home_dir="/home/ubuntu"
 current_branch=`git rev-parse --abbrev-ref HEAD`
 latest_head_commit=`git rev-parse HEAD`
@@ -64,7 +77,7 @@ def latest_build_from_versions(channel)
   puts " * Getting latest build from #{versions_url}"
   versions_json = JSON.parse(open(versions_url).read)
   build = versions_json.last
-  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^\d+$/
+  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^(\d+\.)?(\d+\.)?(\*|\d+)$/
   return build
 end
 
@@ -87,7 +100,7 @@ if ['up', 'ssh', 'destroy', 'halt'].include?(ARGV[0])
         raise "#{ENV['HOME']}/.okta_aws.toml is not defined, cannot continue. Please read README.md for an example and usage details."
       end
       puts " * You might be prompted for your Okta password now..."
-      `okta_aws "#{aws_profile}"`
+      `saml2aws login --profile chef-engineering`
     end
 
     unless File.exist?(aws_creds_file)
@@ -241,6 +254,7 @@ EC2HOSTNAME=`curl -Ss http://169.254.169.254/latest/meta-data/public-hostname`
 sed -i "s/fqdn = .*/fqdn = '$EC2HOSTNAME'/" dev/config.toml
 sed -i "s/heapsize = .*/heapsize = '#{ENV['ES_HEAP_SIZE']}g'/" dev/config.toml
 echo "#{automate_license}" > dev/license.jwt
+chown -R ubuntu:ubuntu /home/ubuntu/automate
 SCRIPT
 
 $enter_hab_studio = <<SCRIPT
@@ -315,9 +329,9 @@ Vagrant.configure('2') do |config|
     aws.secret_access_key = "#{aws_secret_access_key}"
     aws.session_token = "#{aws_session_token}" if aws_session_token
     aws.keypair_name = ENV['AWS_SSH_KEY_NAME']
-    aws.instance_type = 'm5.large'      # 2CPU, 8GB RAM
+    #aws.instance_type = 'm5.large'      # 2CPU, 8GB RAM
     #aws.instance_type = 'm5.xlarge'    # 4CPU, 16GB RAM
-    #aws.instance_type = 'm5.2xlarge'   # 8CPU, 32GB RAM
+    aws.instance_type = 'm5.2xlarge'   # 8CPU, 32GB RAM
     aws.region = 'us-east-2'            # US East (Ohio)
     aws.ami = 'ami-026f49896b1af2759'   # Ubuntu 18.04 LTS in region 'us-east-2'
     aws.tags = {

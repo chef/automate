@@ -1,0 +1,144 @@
+<section class="infra-nodes">
+  <chef-loading-spinner class="spinner" *ngIf="nodesListLoading" size="50"></chef-loading-spinner>
+  <app-delete-infra-object-modal
+    [visible]="deleteModalVisible"
+    objectNoun="node"
+    [objectName]="nodeToDelete?.name"
+    (close)="closeDeleteModal()"
+    (deleteClicked)="deleteNode()"
+    objectAction="Delete">
+  </app-delete-infra-object-modal>
+  <app-reset-node-key
+    [openEvent]="openNotificationModal"
+    [serverId]="serverId"
+    [orgId]="orgId"
+    [name]="nodeName">
+  </app-reset-node-key>
+  <app-update-node-tag-modal
+    [openEvent]="openTagModal"
+    [serverId]="serverId"
+    [orgId]="orgId"
+    [name]="updateNodeName">
+  </app-update-node-tag-modal>
+  <app-edit-infra-node-modal
+    [label]="label"
+    [openEvent]="editRunlistModalVisible"
+    [orgId]="orgId"
+    [availableType]="availableType"
+    [node]="nodeToEditRunlist"
+    [serverId]="serverId"
+    [selected]="selected"
+    [runlistError]="runlistError"
+    (closeRunlist)="closeRunlistModal()">
+  </app-edit-infra-node-modal>
+  <app-edit-infra-node-attribute-modal
+    [jsonText]="jsonText"
+    [openEvent]="openAttributeModal"
+    [orgId]="orgId"
+    [node]="node"
+    [serverId]="serverId"
+    [isGetNode]="isGetNode">
+  </app-edit-infra-node-attribute-modal>
+  <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
+  </app-empty-state>
+  <ng-container *ngIf="!nodesListLoading && !authFailure">
+    <div class="wrapper">
+      <div class="search-create-container">
+        <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name...">
+        </app-infra-search-bar>
+        <app-paginator *ngIf="nodes.length"
+          [length]= "total"
+          [pageSize]= "per_page"
+          [pageIndex]= "currentPage"
+          (changePage)= "onUpdatePage($event)"
+        ></app-paginator>
+      </div>
+      <chef-loading-spinner class="full-screen-spinner" *ngIf="loading || editRunlistLoading || deleting" size="50" fixed></chef-loading-spinner>
+      <div *ngIf="!authFailure">
+        <div data-cy="empty-list" class="empty-section" *ngIf="!loading && !nodes.length">
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p data-cy="no-nodes" *ngIf="searchValue === ''">No nodes available.</p>
+          <p data-cy="no-records" *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+        </div>
+      </div>
+      <div id="nodes-table-container" *ngIf="nodes.length" data-cy="nodes-table-container">
+        <chef-table>
+          <chef-thead>
+            <chef-tr class="no_border_tr">
+              <chef-th class="no_border_th">Node</chef-th>
+              <chef-th class="no_border_th">Platform</chef-th>
+              <chef-th class="no_border_th">FQDN</chef-th>
+              <chef-th class="no_border_th">IP Address</chef-th>
+              <chef-th class="no_border_th">Uptime</chef-th>
+              <chef-th class="no_border_th">Last Check-In</chef-th>
+              <chef-th class="no_border_th">Environment</chef-th>
+              <chef-th class="no_border_th three-dot-column"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let node of nodes">
+              <chef-td>
+                <a [routerLink]="['/infrastructure','chef-servers', serverId,
+                'organizations', orgId, 'nodes', node.name]">{{ node.name }}</a>
+              </chef-td>
+              <chef-td>{{ node.platform === '' ? '--' : node.platform }}</chef-td>
+              <chef-td>{{ node.fqdn === '' ? '--' : node.fqdn }}</chef-td>
+              <chef-td>{{ node.ip_address === '' ? '--' : node.ip_address }}</chef-td>
+              <chef-td>{{ node.uptime === '' ? '--' : node.uptime.split(' ').slice(0,2).join(' ') }}</chef-td>
+              <chef-td>{{ timeFromNow(node.check_in) }}</chef-td>
+              <chef-td>{{ node.environment === '' ? '--' : node.environment}}</chef-td>
+              <chef-td class="three-dot-column">
+                <mat-select panelClass="chef-control-menu">
+                  <mat-option
+                    data-cy="update-tag"
+                    class="primary"
+                    (onSelectionChange)="openManageTagModal(node.name)">
+                    Manage Tags
+                    <chef-icon class="primary">add</chef-icon>
+                  </mat-option>
+                  <mat-option
+                    data-cy="runlist"
+                    class="primary"
+                    (onSelectionChange)="editRunlist(node)">
+                    Edit Run list
+                    <chef-icon class="primary">add</chef-icon>
+                  </mat-option>
+                  <mat-option
+                    data-cy="attribute"
+                    class="primary"
+                    (onSelectionChange)="editAttributes(node)">
+                    Edit Attributes
+                    <chef-icon class="primary">add</chef-icon>
+                  </mat-option>
+                  <mat-option
+                    data-cy="reset-key"
+                    class="secondary"
+                    (onSelectionChange)="openResetKeyModal(node.name)">
+                    Reset Key
+                    <chef-icon aria-hidden="true" class="primary">add</chef-icon>
+                  </mat-option>
+                  <mat-option
+                    data-cy="delete"
+                    class="secondary"
+                    (onSelectionChange)="startNodeDelete(node)">
+                    Delete
+                    <chef-icon aria-hidden="true" class="primary">remove</chef-icon>
+                  </mat-option>
+                </mat-select>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
+
+      <app-page-picker
+        *ngIf="!loading"
+        class="nodes-list-paging"
+        [total]="total"
+        [perPage]="per_page"
+        [page]="currentPage"
+        (pageChanged)="onPageChange($event)">
+      </app-page-picker>
+    </div>
+  </ng-container>
+</section>

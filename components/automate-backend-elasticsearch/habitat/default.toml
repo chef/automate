@@ -1,0 +1,97 @@
+# ======================== Elasticsearch Configuration =========================
+# The es_yaml top level key contains whatever data will be written to elasticsearch.yml
+#
+[es_yaml]
+  [es_yaml.bootstrap]
+    memory_lock = false  #true
+
+  [es_yaml.cluster]
+    name = "chef-insights"
+    [es_yaml.cluster.routing.allocation.disk.watermark]
+      low = "85%"
+      high = "90%"
+      flood_stage = "95%"
+
+  [es_yaml.discovery.zen]
+    minimum_master_nodes = 1
+
+  [es_yaml.http]
+    port = 9200
+
+  [es_yaml.transport.tcp]
+    port = 9300
+
+  [es_yaml.indices.recovery]
+    max_bytes_per_sec = "250mb"
+
+  [es_yaml.network]
+    host = "0.0.0.0"
+
+  [es_yaml.node]
+    max_local_storage_nodes = 1
+
+  [es_yaml.path]
+    data = "/hab/svc/automate-ha-elasticsearch/data"
+    logs = "/hab/svc/automate-ha-elasticsearch/logs"
+
+  [es_yaml.opendistro_security]
+    enable_snapshot_restore_privilege = true
+    check_snapshot_restore_write_privileges = true
+    # These are the dns we use for our generated certificates. Override if you're generating your own
+    nodes_dn = [ "CN=chefnode,O=Chef Software Inc,L=Seattle,ST=Washington,C=US" ]
+    [es_yaml.opendistro_security.authcz]
+      admin_dn = [ "CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US" ]
+    [es_yaml.opendistro_security.ssl]
+      [es_yaml.opendistro_security.ssl.http]
+        enabled = true
+        pemcert_filepath = "certificates/odfe-ssl.pem"
+        pemkey_filepath = "certificates/odfe-ssl.key"
+        pemtrustedcas_filepath = "certificates/MyRootCA.pem"
+
+        enabled_ciphers = [
+          "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        ]
+        enabled_protocols = [
+          "TLSv1.2"
+        ]
+
+      [es_yaml.opendistro_security.ssl.transport]
+        enabled = true
+        pemcert_filepath = "certificates/odfe-ssl.pem"
+        pemkey_filepath = "certificates/odfe-ssl.key"
+        pemtrustedcas_filepath = "certificates/MyRootCA.pem"
+        enforce_hostname_verification = false
+
+# Runtime settings for jvm.options and the systemd service
+[runtime]
+  max_open_files = ""
+  max_locked_memory = ""
+  es_startup_sleep_time = ""
+  # This config variable becomes the value of ES_JAVA_OPTS.
+  # Note: JVM values for -Xms and -Xmx are auto calculated in the run hook.
+  # Any value defined here will override the calculation in the hook.
+  es_java_opts = ""
+  # It looks like the default NewRatio is ignored when setting UseConcMarkSweepGC
+  # https://bugs.openjdk.java.net/browse/JDK-8153578. If we set it explicitly we
+  # can get the expected behavior
+  new_ratio = 2
+
+# This section contains any settings that need to applied on startup for opendistro.
+# Any values put under this hash will be rendered into yaml and applied with
+# securityadmin.sh. These should be your basic admin credentials, as long term you
+# can manage your creds outside of habitat with securityadmin.sh.
+
+[opendistro_auth]
+  admin_username = "admin"
+  admin_password = "admin"
+  dashboard_username = "kibana"
+  dashboard_password = "kibana"
+
+# Fill these in in your user.toml to override automatic SSL Cert generation
+[opendistro_ssl]
+

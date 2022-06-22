@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.response;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
+
+message UpdateTelemetryReportedResponse {
+}
+
+message	GetNodesUsageCountResponse {
+	// number of days since telematics was last posted
+	int64 days_since_last_post =1;
+	// unique nodes count in a duration
+	int64 node_cnt =2;
+}

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#shellcheck disable=SC2154
 #shellcheck disable=SC2034
 test_name="manual upgrade"
 test_upgrades=true
@@ -28,12 +29,17 @@ EOF
 
 do_deploy() {
     set_test_manifest "current.json"
+    #shellcheck disable=SC2154
+    download_version "current" "$test_manifest_dir/current.json"
+    set_test_versions "current.json-versions"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
     #shellcheck disable=SC2154
     $upgrade_scaffold_bin setup "$test_manifest_path"
-    $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
+    #shellcheck disable=SC2154
+    $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" "$test_versions_path" &
     sleep 5
     export CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION=true
+    export GODEBUG=x509ignoreCN=0
     #shellcheck disable=SC2154
     echo -e "[load_balancer.v1.sys.service]\\nhttps_port = 4443" >> "$test_config_path"
     #shellcheck disable=SC2154
@@ -67,13 +73,33 @@ do_upgrade() {
         return 1
     fi
 
+    set_version_file
+    #shellcheck disable=SC2154
+    jq --arg val "$release" '. + [$val]' "$versionsFile" > tmp.$$.json && mv tmp.$$.json "$versionsFile"
+
     curl -vv --insecure "https://packages.chef.io/set/$release" -X POST -d @"$target_manifest"
     log_info "Upgrading to $release"
     # Uncomment once the --version flag is on dev
-    # chef-automate upgrade run --version "$release"
-    chef-automate dev grpcurl deployment-service -- \
-        chef.automate.domain.deployment.Deployment.Upgrade -d "{\"version\": \"$release\"}"
-    wait_for_upgrade "false"
+    ERROR=$(chef-automate upgrade run  --version "$release" 2>&1 >/dev/null) || true
+    echo "$ERROR"
+    if echo "${ERROR}" | grep 'This is a Major upgrade'; then
+        echo "major normal upgrade"
+        echo "y
+y
+y
+y
+y
+y" | chef-automate upgrade run --major  --version "$release"
+        sleep 45
+        #shellcheck disable=SC2154
+        wait_for_upgrade "false"
+        echo "y" | chef-automate post-major-upgrade migrate --data=ES
+    else
+        echo "regular normal upgrade"
+        sleep 45
+        #shellcheck disable=SC2154
+        wait_for_upgrade "false"
+    fi
 }
 
 do_test_upgrade() {
@@ -87,7 +113,7 @@ do_test_upgrade() {
     fi
 
     # Make sure the release is correct
-    chef-automate upgrade status
-    chef-automate upgrade status | grep "Automate is up-to-date ($release)"
+    chef-automate upgrade status --versions-file "$versionsFile"
+    chef-automate upgrade status --versions-file "$versionsFile" | grep "Automate is up-to-date ($release)"
     do_test_upgrade_default
 }

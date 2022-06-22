@@ -2,12 +2,14 @@ package integration_test
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 
+	olivere "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	olivere "gopkg.in/olivere/elastic.v6"
 
 	"path"
 
@@ -51,16 +53,42 @@ func NewSuite(url string) (*Suite, error) {
 
 	s.elasticsearchUrl = url
 
+	/* cert, err := tls.LoadX509KeyPair("/hab/svc/automate-opensearch/config/root-ca.pem", "/hab/svc/automate-opensearch/config/root-ca-key.pem")
+	if err != nil {
+		return nil, err
+	}
+	caCert, err := ioutil.ReadFile("/hab/svc/automate-opensearch/config/root-ca.pem")
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+	tlsConfig := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		RootCAs:            caCertPool,
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
+	}
+	tlsConfig.BuildNameToCertificate() */
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
+
 	esClient, err := olivere.NewClient(
 		olivere.SetURL(s.elasticsearchUrl),
 		olivere.SetSniff(false),
+		olivere.SetHttpClient(client),
+		olivere.SetBasicAuth("admin", "admin"),
 	)
 	if err != nil {
-		return nil, errors.Wrapf(err, "connecting to elasticsearch (%s)", url)
+		return nil, errors.Wrapf(err, "connecting to opensearch (%s)", url)
 	}
 	s.esClient = esClient
 	s.indices = []string{persistence.IndexNameFeeds}
-	s.types = []string{persistence.DocType}
 
 	s.feedBackend = persistence.NewFeedStore(esClient)
 	err = s.feedBackend.InitializeStore(context.Background())
@@ -104,7 +132,12 @@ func (s *Suite) GlobalTeardown() {
 	if len(toDelete) == 0 {
 		return
 	}
-
+	for i, v := range toDelete {
+		if v == ".opendistro_security" {
+			toDelete = append(toDelete[:i], toDelete[i+1:]...)
+			break
+		}
+	}
 	_, err := s.esClient.DeleteIndex(toDelete...).Do(context.Background())
 	if err != nil {
 		fmt.Printf("Could not 'delete' ES indices: '%s'\nError: %s", s.indices, err)
@@ -132,7 +165,12 @@ func (s *Suite) DeleteAllDocuments() {
 
 	// Make sure we clean them all!
 	indices := s.indices
-
+	for i, v := range indices {
+		if v == ".opendistro_security" {
+			indices = append(indices[:i], indices[i+1:]...)
+			break
+		}
+	}
 	_, err := s.esClient.DeleteByQuery().
 		Index(indices...).
 		Type(s.types...).

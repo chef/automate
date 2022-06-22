@@ -4,6 +4,7 @@ import { Action } from '@ngrx/store';
 import { set, get, pipe, map } from 'lodash/fp';
 
 import * as destinationEntity from './entities/destinations/destination.reducer';
+import * as destinationConfigEntity from './entities/global-config/destination-config.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
@@ -14,6 +15,7 @@ import * as cdsEntity from './entities/cds/cds.reducer';
 import * as clientEntity from './entities/clients/client.reducer';
 import * as clientDetailsEntity from './entities/clients/client-details.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
+import * as controlDetailsEntity from './entities/control-details/control-details.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
@@ -22,8 +24,11 @@ import * as dataBagEntity from './entities/data-bags/data-bags.reducer';
 import * as dataBagItemsEntity from './entities/data-bags/data-bag-details.reducer';
 import * as dataBagItemDetailsEntity from './entities/data-bags/data-bag-item-details.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
+import * as downloadReportsEntity from './entities/download-reports/download-reports.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
 import * as environmentDetailsEntity from './entities/environments/environment-details.reducer';
+import * as infraNodeEntity from './entities/infra-nodes/infra-nodes.reducer';
+import * as infraNodeDetailsEntity from './entities/infra-nodes/infra-node-details.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
@@ -36,17 +41,24 @@ import * as jobEdit from './pages/job-edit/job-edit.reducer';
 import * as jobEntity from './entities/jobs/job.reducer';
 import * as jobList from './pages/job-list/job-list.reducer';
 import * as manager from './entities/managers/manager.reducer';
+import * as nodeRunlistEntity from './entities/nodeRunlists/nodeRunlists.reducer';
 import * as notificationEntity from './entities/notifications/notification.reducer';
 import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as orgEntity from './entities/orgs/org.reducer';
 import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
 import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
+import * as policyFileDetailsEntity from './entities/policy-files/policy-file-details.reducer';
+import * as policyGroupEntity from './entities/policy-files/policy-group.reducer';
+import * as policyGroupDetailsEntity from './entities/policy-files/policy-group-details.reducer';
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
 import * as recipeEntity from './entities/recipes/recipe.reducer';
+import * as revisionEntity from './entities/revisions/revision.reducer';
+import * as roleEnvironmentEntity from './entities/role-environments/role-environments.reducer';
 import * as roleEntity from './entities/roles/role.reducer';
 import * as ruleEntity from './entities/rules/rule.reducer';
+import * as runlistEntity from './entities/runlists/runlists.reducer';
 import * as serverEntity from './entities/servers/server.reducer';
 import * as serviceGroups from './entities/service-groups/service-groups.reducer';
 import * as nodesEntity from './entities/nodes/nodes.reducer';
@@ -55,6 +67,7 @@ import * as nodeCredentialDetailsEntity from './entities/node-credentials/node-c
 import * as nodeCredentialList from './pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
+import * as userPreferencesEntity from './services/user-preferences/user-preferences.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
 
 import { LayoutActionTypes, UpdateSidebars } from './entities/layout/layout.actions';
@@ -83,6 +96,7 @@ export interface NgrxStateAtom {
   automateSettings: automateSettings.AutomateSettingsEntityState;
   cds: cdsEntity.CdsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
+  controlDetails: controlDetailsEntity.ControlDetailEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   clients: clientEntity.ClientEntityState;
   clientDetail: clientDetailsEntity.ClientDetailsEntityState;
@@ -95,24 +109,35 @@ export interface NgrxStateAtom {
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityState;
   desktops: desktopEntity.DesktopEntityState;
   destinations: destinationEntity.DestinationEntityState;
+  downloadReports: downloadReportsEntity.DownloadReportsEntityState;
+  globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
+  infraNodes: infraNodeEntity.InfraNodeEntityState;
+  infraNodeDetails: infraNodeDetailsEntity.InfraNodeDetailsEntityState;
   infraRoles: infraRoleEntity.InfraRoleEntityState;
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
   nodes: nodesEntity.NodesEntityState;
+  nodeRunlist: nodeRunlistEntity.NodeRunlistEntityState;
   notifications: notificationEntity.NotificationEntityState;
   notificationRules: NotificationRuleEntity.NotificationRuleEntityState;
   orgs: orgEntity.OrgEntityState;
   policies: policyEntity.PolicyEntityState;
   policyFiles: policyFileEntity.PolicyFileEntityState;
+  policyFileDetails: policyFileDetailsEntity.PolicyFileDetailsEntityState;
+  policyGroups: policyGroupEntity.PolicyGroupEntityState;
+  policyGroupDetails: policyGroupDetailsEntity.PolicyGroupDetailsEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
   recipes: recipeEntity.RecipeEntityState;
+  revisions: revisionEntity.RevisionEntityState;
+  roleEnvironments: roleEnvironmentEntity.RoleEnvironmentEntityState;
   roles: roleEntity.RoleEntityState;
   rules: ruleEntity.RuleEntityState;
+  runlist: runlistEntity.RunlistEntityState;
   servers: serverEntity.ServerEntityState;
   nodeCredential: nodeCredentialEntity.NodeCredentialEntityState;
   nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialDetailsEntityState;
@@ -120,6 +145,7 @@ export interface NgrxStateAtom {
   teams: teamEntity.TeamEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
+  userPreferences: userPreferencesEntity.UserPreferencesEntityState;
   userSelf: userSelfEntity.UserSelfEntityState;
 }
 
@@ -214,6 +240,7 @@ export const defaultInitialState = {
   clients: clientEntity.ClientEntityInitialState,
   clientDetails: clientDetailsEntity.ClientEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
+  controlDetails: controlDetailsEntity.ControlDetailEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
@@ -221,23 +248,34 @@ export const defaultInitialState = {
   dataBagItems: dataBagItemsEntity.DataBagItemsEntityInitialState,
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
+  downloadReports: downloadReportsEntity.DownloadReportsEntityInitialState,
+  globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
   environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
+  infraNodes: infraNodeEntity.InfraNodeEntityInitialState,
+  infraNodeDetails: infraNodeDetailsEntity.InfraNodeEntityInitialState,
   infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
   nodes: nodesEntity.NodesEntityInitialState,
+  nodeRunlist: nodeRunlistEntity.NodeRunlistEntityInitialState,
   notifications: notificationEntity.InitialState,
   notificationRules: NotificationRuleEntity.NotificationRuleEntityInitialState,
   policies: policyEntity.PolicyEntityInitialState,
   policyFiles: policyFileEntity.PolicyFileEntityInitialState,
+  policyFileDetails: policyFileDetailsEntity.PolicyFileEntityInitialState,
+  policyGroups: policyGroupEntity.PolicyFileEntityInitialState,
+  policyGroupDetails: policyGroupDetailsEntity.PolicyFileEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
   recipes: recipeEntity.RecipeEntityInitialState,
+  revisions: revisionEntity.RevisionEntityInitialState,
+  roleEnvironments: roleEnvironmentEntity.RoleEnvironmentEntityInitialState,
   roles: roleEntity.RoleEntityInitialState,
   rules: ruleEntity.RuleEntityInitialState,
+  runlist: runlistEntity.RunlistEntityInitialState,
   nodeCredential: nodeCredentialEntity.NodeCredentialEntityInitialState,
   nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialEntityInitialState,
   servers: serverEntity.ServerEntityInitialState,
@@ -247,6 +285,7 @@ export const defaultInitialState = {
   desktops: desktopEntity.desktopEntityInitialState,
   userperms: permEntity.initialState,
   users: userEntity.UserEntityInitialState,
+  userPreferences: userPreferencesEntity.UserPreferencesEntityInitialState,
   userSelf: userSelfEntity.UserSelfEntityInitialState
 };
 
@@ -276,6 +315,7 @@ export const ngrxReducers = {
   clients: clientEntity.clientEntityReducer,
   clientDetails: clientDetailsEntity.clientDetailsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
+  controlDetails: controlDetailsEntity.controlDetailEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
   cookbookDetails: cookbookDetailsEntity.cookbookDetailsEntityReducer,
   cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
@@ -284,23 +324,34 @@ export const ngrxReducers = {
   dataBagItems: dataBagItemsEntity.dataBagItemsEntityReducer,
   dataBagItemDetails: dataBagItemDetailsEntity.dataBagItemDetailsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
+  downloadReports: downloadReportsEntity.downloadReportsEntityReducer,
+  globalDataFeedConfig: destinationConfigEntity.globalConfigEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
   environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,
+  infraNodes: infraNodeEntity.infraNodeEntityReducer,
+  infraNodeDetails: infraNodeDetailsEntity.infraNodeDetailsEntityReducer,
   infraRoles: infraRoleEntity.infraRoleEntityReducer,
   infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
   nodes: nodesEntity.nodesEntityReducer,
+  nodeRunlist: nodeRunlistEntity.nodeRunlistEntityReducer,
   licenseStatus: license.licenseStatusEntityReducer,
   notifications: notificationEntity.notificationEntityReducer,
   notificationRules: NotificationRuleEntity.notificationRuleEntityReducer,
   policies: policyEntity.policyEntityReducer,
   policyFiles: policyFileEntity.policyFileEntityReducer,
+  policyFileDetails: policyFileDetailsEntity.policyFileDetailsEntityReducer,
+  policyGroups: policyGroupEntity.policyGroupsEntityReducer,
+  policyGroupDetails: policyGroupDetailsEntity.policyGroupDetailsEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
   recipes: recipeEntity.recipeEntityReducer,
+  revisions: revisionEntity.revisionEntityReducer,
+  roleEnvironments: roleEnvironmentEntity.roleEnvironmentEntityReducer,
   roles: roleEntity.roleEntityReducer,
   rules: ruleEntity.ruleEntityReducer,
+  runlist: runlistEntity.runlistEntityReducer,
   servers: serverEntity.serverEntityReducer,
   orgs: orgEntity.orgEntityReducer,
   nodeCredential: nodeCredentialEntity.nodeCredentialEntityReducer,
@@ -310,6 +361,7 @@ export const ngrxReducers = {
   desktops: desktopEntity.desktopEntityReducer,
   userperms: permEntity.permEntityReducer,
   users: userEntity.userEntityReducer,
+  userPreferences: userPreferencesEntity.userPreferencesEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer
 };
 

@@ -113,6 +113,8 @@ func (m *AuthenticateResponse) Validate() error {
 
 	// no validation rules for Subject
 
+	// no validation rules for Requestor
+
 	return nil
 }
 

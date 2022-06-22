@@ -29,8 +29,8 @@ func TestDefaultSpecs(t *testing.T) {
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "dex", "dex")
 	})
-	t.Run("automate-elasticsearch", func(t *testing.T) {
-		testSpecFor(t, "automate-elasticsearch")
+	t.Run("automate-opensearch", func(t *testing.T) {
+		testSpecFor(t, "automate-opensearch")
 	})
 	t.Run("automate-gateway", func(t *testing.T) {
 		testSpecFor(t, "automate-gateway")

@@ -61,6 +61,11 @@ cereal_address: 127.0.0.1:{{cereal-service.cfg.port}}
 legacy_data_collector_token: {{cfg.service.a1_data_collector_token}}
 {{~/if}}
 
+{{~#eachAlive bind.session-service.members as |session-service|}}
+{{~#if @last}}
+session_address: 127.0.0.1:{{session-service.cfg.grpc-port}}
+{{~/if}}
+{{~/eachAlive}}
 
 logger:
   format: {{cfg.logger.format}}

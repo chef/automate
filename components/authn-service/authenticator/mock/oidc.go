@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/chef/automate/api/interservice/id_token"
+
 	"go.uber.org/zap"
 	jose "gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
@@ -71,6 +73,10 @@ func (r *oidcRequestor) Subject() string {
 	}
 }
 
+func (r *oidcRequestor) Requestor() string {
+	return r.userID
+}
+
 func (r *oidcRequestor) Teams() []string {
 	teams := make([]string, len(r.teams))
 	for i, team := range r.teams {
@@ -103,7 +109,7 @@ func NewAuthenticator(iss, aud string, groups []string,
 
 // Open returns an authentication strategy that statically checks the iss and
 // aud claims only
-func (c *OidcConfig) Open(_ *url.URL, _ *certs.ServiceCerts, logger *zap.Logger) (authenticator.Authenticator, error) {
+func (c *OidcConfig) Open(_ *url.URL, _ *certs.ServiceCerts, logger *zap.Logger, _ id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 	return NewAuthenticator(c.Issuer, c.Audience, c.Groups, c.ConnID, c.UserID, c.Email, logger), nil
 }
 

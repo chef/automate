@@ -4,6 +4,9 @@ exec 2>&1
 
 set -e
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 {{#if cfg.required_recipe.enabled ~}}
 # Copy the required_recipe into the service's data directory and
 # ensure it has permissions that the service user can read.

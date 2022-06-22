@@ -29,12 +29,22 @@ do_build() {
         bundle.aib
 
     log_info "Creating update airgap bundle"
+
+    set_version_file
+
+    # shellcheck disable=SC2154
+    download_manifest_version "current" "20220329091442" "$test_manifest_dir/20220329091442.json"
+    set_test_manifest "20220329091442.json"
+    append_version_file
+
     #shellcheck disable=SC2154
     chef-automate airgap bundle create \
         --manifest "$test_manifest_dir/build.json" \
         --hartifacts "${test_hartifacts_path}" \
         --override-origin "$HAB_ORIGIN" \
+        --versions-file "$versionsFile" \
         update.aib
+
 
     # Installation of the artifact should create /hab
     rm -rf /hab

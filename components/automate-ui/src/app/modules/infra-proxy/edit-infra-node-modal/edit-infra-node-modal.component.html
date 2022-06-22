@@ -1,0 +1,42 @@
+<chef-modal [visible]="visible" (closeModal)="closeEditModal()">
+  <div class="text-right">
+    <h2 slot="title">Edit Node {{label}}</h2>
+  </div>
+  <div class="flex-container">
+    <div class="main pages-body">
+      <label class="edit-label">
+        <span class="constraint">{{node?.name}}</span>
+      </label>
+      <div *ngIf="label === 'Run List' && showbutton">
+        <div *ngIf="runlistError" class="empty-section">
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p>Cannot load environment - <strong>{{node?.environment}}</strong></p>
+        </div>
+        <div *ngIf="!runlistError">
+          <app-select-box id="myListBox"
+            [serverId]="server"
+            [orgId]="org"
+            [list]="availablelist"
+            search="true"
+            [currentRunList]="currentRunList"
+            [currentPage]="current_Page"
+            (selectedValues)="dragDropHandler($event)">
+          </app-select-box>
+        </div>
+        <div class="button-bar-box">
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()" data-cy="cancel-button">Cancel</chef-button>
+          <chef-button
+            primary
+            id="create-runlist-button-object-modal"
+            (click)="updateNode()"
+            data-cy="update-run-list"
+            [disabled]="!isRunlist || conflictError || updateInProgress">
+            <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+            <span *ngIf="updateInProgress">Creating...</span>
+            <span *ngIf="!updateInProgress">Create</span>
+          </chef-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</chef-modal>

@@ -5,12 +5,22 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"crypto/tls"
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
+
+	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
+
+	"github.com/chef/automate/api/interservice/id_token"
+	"github.com/chef/automate/lib/version"
 
 	"github.com/alexedwards/scs"
 	"github.com/alexedwards/scs/stores/memstore"
@@ -18,11 +28,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
+	"google.golang.org/grpc"
+	"gopkg.in/robfig/cron.v2"
 
 	"github.com/chef/automate/components/session-service/migration"
 	"github.com/chef/automate/components/session-service/oidc"
 	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/logger"
 	util "github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
@@ -37,14 +50,21 @@ type BldrClient struct {
 
 // Server holds the server state
 type Server struct {
-	mux               http.Handler
-	log               logger.Logger
-	mgr               *scs.Manager
-	client            oidc.Client
-	bldrClient        *BldrClient
-	signInURL         *url.URL
-	remainingDuration time.Duration
-	serviceCerts      *certs.ServiceCerts
+	mux                http.Handler
+	log                logger.Logger
+	pgDB               *sql.DB
+	mgr                *scs.Manager
+	client             oidc.Client
+	bldrClient         *BldrClient
+	signInURL          *url.URL
+	remainingDuration  time.Duration
+	serviceCerts       *certs.ServiceCerts
+	connFactory        *secureconn.Factory
+	grpcServer         *grpc.Server
+	httpServer         *http.Server
+	errC               chan error
+	sigC               chan os.Signal
+	idTokenBlackLister IdTokenBlackLister.IdTokenBlackLister
 }
 
 const (
@@ -60,6 +80,12 @@ const (
 	// already expired are dropped.
 	// Note 2017/12/07 (sr): 12hrs here is completely arbitrary.
 	dbCleanupInterval = 12 * time.Hour
+
+	// Expired blacklistedIdTokens cleanup interval
+	blacklistedIdTokensCleanupInterval = "@every 24h"
+
+	// IdTokens inserted_at comparison time
+	insertedAtComparisionMinutes = 24 * 60
 
 	// This duration drives the refresh process: if the token expires within the
 	// next minute, we'll refresh. This is a first guess and might need tweaking.
@@ -80,6 +106,11 @@ func New(
 	serviceCerts *certs.ServiceCerts,
 	persistent bool) (*Server, error) {
 
+	factory := secureconn.NewFactory(*serviceCerts, secureconn.WithVersionInfo(
+		version.Version,
+		version.GitSHA,
+	))
+
 	oidcClient, err := oidc.New(oidcCfg, 1, serviceCerts, l)
 	if err != nil {
 		return nil, errors.Wrap(err, "OIDC client")
@@ -89,7 +120,12 @@ func New(
 		return nil, errors.Wrap(err, "migrations")
 	}
 
-	store, err := initStore(migrationConfig.PG)
+	pgDB, err := db.PGOpen(migrationConfig.PG.String())
+	if err != nil {
+		return nil, errors.Wrap(err, "open DB")
+	}
+
+	store, err := initStore(pgDB)
 	if err != nil {
 		return nil, errors.Wrap(err, "init store")
 	}
@@ -99,14 +135,32 @@ func New(
 	s := Server{
 		log:               l,
 		client:            oidcClient,
+		pgDB:              pgDB,
 		signInURL:         signInURL,
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
-		mgr:          scsManager,
-		serviceCerts: serviceCerts,
+		mgr:                scsManager,
+		serviceCerts:       serviceCerts,
+		connFactory:        factory,
+		errC:               make(chan error, 5),
+		sigC:               make(chan os.Signal, 2),
+		idTokenBlackLister: IdTokenBlackLister.NewPgBlackLister(pgDB),
 	}
+	signal.Notify(s.sigC, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGINT, syscall.SIGUSR1)
+
 	s.initHandlers()
+
+	// Clear psql blackListIdTokens table rows
+	c := cron.New()
+	cron_id, err := c.AddFunc(blacklistedIdTokensCleanupInterval, func() {
+		ClearExpiredTokens(pgDB)
+	})
+	if err != nil {
+		s.log.Debug(err, cron_id)
+		return nil, errors.Wrap(err, "cron scheduler")
+	}
+	c.Start()
 
 	return &s, nil
 }
@@ -136,24 +190,24 @@ func NewInMemory(
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
-		mgr: scsManager,
+		mgr:                scsManager,
+		idTokenBlackLister: IdTokenBlackLister.NewInMemoryBlackLister(),
 	}
 	s.initHandlers()
 
 	return &s, nil
 }
 
-func initStore(pgURL *url.URL) (scs.Store, error) {
-	d, err := db.PGOpen(pgURL.String())
-	if err != nil {
-		return nil, errors.Wrap(err, "open DB")
-	}
-
-	return pgstore.New(d, dbCleanupInterval), nil
+func initStore(pgDB *sql.DB) (scs.Store, error) {
+	return pgstore.New(pgDB, dbCleanupInterval), nil
 }
 
 func (s *Server) initHandlers() {
 	r := mux.NewRouter()
+
+	//Middleware intercepter for HSTS
+	r.Use(httputils.HSTSMiddleware)
+
 	r.HandleFunc("/health", s.healthHandler).Methods("GET")
 	r.HandleFunc("/new", s.newHandler).Methods("GET")
 	r.HandleFunc("/refresh", s.refreshHandler).
@@ -162,6 +216,8 @@ func (s *Server) initHandlers() {
 	r.HandleFunc("/callback", s.callbackHandler).
 		Methods("GET").
 		HeadersRegexp("Cookie", "session=.+")
+	r.HandleFunc("/logout", s.logoutHandler).
+		Methods("GET")
 
 	// these are only to be used if Builder is configured to authenticate with Automate
 	r.HandleFunc("/token", s.tokenHandler).
@@ -178,7 +234,7 @@ func (s *Server) initHandlers() {
 // http.ServeMux. Only ever returns with non-nil error.
 func (s *Server) ListenAndServe(addr string) error {
 	s.log.Debugf("listening (https) on %s", addr)
-	httpServer := http.Server{
+	s.httpServer = &http.Server{
 		Addr:    addr,
 		Handler: s.mux,
 		TLSConfig: &tls.Config{
@@ -188,15 +244,73 @@ func (s *Server) ListenAndServe(addr string) error {
 			CipherSuites:             secureconn.DefaultCipherSuites(),
 		},
 	}
-	return httpServer.ListenAndServeTLS("", "")
+	go func() {
+		err := s.httpServer.ListenAndServeTLS("", "")
+		if err != nil {
+			s.errC <- errors.Wrap(err, "serve HTTPS")
+		}
+	}()
+	return nil
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
+func (s *Server) StartGRPCServer(addr string) error {
+	s.log.Debugf("listening (grpc) on %s", addr)
+	s.grpcServer = s.connFactory.NewServer()
+
+	id_token.RegisterValidateIdTokenServiceServer(s.grpcServer, &IdTokenValidator{pgDB: s.pgDB, idTokenBlackLister: s.idTokenBlackLister})
+
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		return fmt.Errorf("failed to listen on port %v: %v", addr, err)
+	}
+	fmt.Println("listening on port", addr)
+	go func() {
+		err := s.grpcServer.Serve(lis)
+		if err != nil {
+			s.errC <- errors.Wrap(err, "serve gRPC")
+		}
+	}()
+
+	return nil
+}
+
 func (s *Server) catchAllElseHandler(w http.ResponseWriter, _ *http.Request) {
 	httpError(w, http.StatusUnauthorized)
+}
+
+func ClearExpiredTokens(pgDB *sql.DB) {
+	const (
+		deleteExpiredIdTokens = `DELETE FROM blacklisted_id_tokens where inserted_at < now() - ($1 || ' minutes')::interval`
+	)
+	res, err := pgDB.Exec(deleteExpiredIdTokens, insertedAtComparisionMinutes)
+	if err != nil {
+		panic(err)
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Rows Deleted:", count)
+}
+
+func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	idToken, err := util.ExtractBearerToken(r)
+	if err != nil {
+		s.log.Debug("no bearer token")
+		httpError(w, http.StatusUnauthorized)
+		return
+	}
+	err = s.idTokenBlackLister.InsertToBlackListedStore(idToken)
+	if err != nil {
+		s.log.Debug("Failed to blacklist token:")
+		httpError(w, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
@@ -320,7 +434,15 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	*u = *s.signInURL
 
-	u.Fragment = fmt.Sprintf("id_token=%s&state=%s", rawIDToken, clientState)
+	cookie := &http.Cookie{
+		Name:  "id_token",
+		Value: rawIDToken,
+		Path:  "/",
+	}
+
+	http.SetCookie(w, cookie)
+
+	u.Fragment = fmt.Sprintf("state=%s", clientState)
 	http.Redirect(w, r, u.String(), http.StatusSeeOther)
 }
 
@@ -474,6 +596,24 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isBlacklisted, err := s.idTokenBlackLister.IsIdTokenBlacklisted(idToken)
+	if err != nil {
+		httpError(w, http.StatusInternalServerError)
+		return
+	}
+	if isBlacklisted {
+		s.log.Debug("bearer token blacklisted")
+		// In this flow, we don't need to keep a session -- there's no refresh yet.
+		err = sess.Destroy(w)
+		if err != nil {
+			s.log.Debugf("failed to destroy session: %v", err)
+			http.Error(w, "failed to destroy session", http.StatusInternalServerError)
+			return
+		}
+		httpError(w, http.StatusUnauthorized)
+		return
+	}
+
 	// Renew session: This ensures the old session is gone and cannot be re-used
 	if err := sess.RenewToken(w); err != nil { // nolint: vetshadow
 		s.log.Error("failed to renew token for session") // TODO this is too unspecific
@@ -599,9 +739,6 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	s.log.Debugf("stored relayState %s", relayState)
 
 	opts := []oauth2.AuthCodeOption{}
-	if connectorID := s.connectorIDFromRequest(r); connectorID != "" {
-		opts = append(opts, oauth2.SetAuthURLParam("connector_id", connectorID))
-	}
 	authCodeURL := s.client.AuthCodeURL(relayState, opts...)
 
 	if err := sess.PutBool(w, aliveKey, true); err != nil {
@@ -611,32 +748,6 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, authCodeURL, http.StatusSeeOther)
-}
-
-func (s *Server) connectorIDFromRequest(r *http.Request) string {
-	token := r.FormValue("id_token_hint")
-	if token == "" { // ignore errors, we just use this as a hint
-		s.log.Error("no id_token_hint")
-		return ""
-	}
-	// Note(sr): The way the verifier is set up, this allows for expired tokens --
-	// so, this wouldn't fail unless we're given something that is not a JWT at all.
-	idToken, err := s.client.Verify(r.Context(), token)
-	if err != nil {
-		s.log.Errorf("failed to verify id_token_hint: %v", err)
-		return ""
-	}
-	var claims struct {
-		Federated struct {
-			ConnectorID string `json:"connector_id"`
-		} `json:"federated_claims"`
-	}
-	err = idToken.Claims(&claims)
-	if err != nil {
-		s.log.Errorf("failed to read claims from id_token_hint: %v", err)
-		return ""
-	}
-	return claims.Federated.ConnectorID
 }
 
 func httpError(w http.ResponseWriter, code int) {
@@ -676,6 +787,8 @@ func generateRelayState() (string, error) {
 
 func createSCSManager(store scs.Store, persistent bool) *scs.Manager {
 	manager := scs.NewManager(store)
+	manager.SameSite("Lax")
+
 	if persistent {
 		manager.Persist(true)
 	}
@@ -702,4 +815,66 @@ func (s *Server) invalidRedirectURIError(w http.ResponseWriter, clientID, expect
 		fmt.Sprintf("failed to pass valid redirect_uri for client_id: %s, expected: %s, registered for client: %s",
 			clientID, expected, actual),
 		http.StatusUnauthorized)
+}
+
+func (s *Server) stopHTTPServer() error {
+	s.log.Info("stopping HTTPS server")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := s.httpServer.Shutdown(ctx)
+	if err != nil {
+		return errors.Wrap(err, "shutting down https server")
+	}
+
+	return nil
+}
+
+func (s *Server) stopGRPCServer() {
+	s.log.Info("stopping gRPC server")
+	s.grpcServer.GracefulStop()
+}
+
+func (s *Server) stop() error {
+	s.log.Info("stopping automate-gateway")
+
+	err := s.stopHTTPServer()
+
+	s.stopGRPCServer()
+
+	return err
+}
+
+func (s *Server) StartSignalHandler() error {
+	s.log.Info("starting signal handlers")
+
+	for {
+		select {
+		case err := <-s.errC:
+			switch errors.Cause(err) {
+			// ErrServerClosed is returned if an HTTP server is shutdown, which
+			// can only happen if it's triggered by a shutdown signal or a
+			// reconfigure signal, in which case the server shutting down is
+			// intended. The is only returned nothing goes wrong when shutting
+			// down, therefore we'll log it and move on.
+			case http.ErrServerClosed:
+				s.log.Debug("HTTP server was recently shutdown")
+			default:
+				s.log.WithError(err).Error("exiting")
+				err1 := s.stop()
+				if err1 != nil {
+					return errors.Wrap(err, err1.Error())
+				}
+				return err
+			}
+		case sig := <-s.sigC:
+			switch sig {
+			case syscall.SIGUSR1, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP:
+				s.log.WithField("signal", sig).Info("handling received signal")
+				return s.stop()
+			default:
+				s.log.WithField("signal", sig).Warn("unable to handle received signal")
+			}
+		}
+	}
 }

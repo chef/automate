@@ -11,9 +11,9 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 type ESClient struct {
@@ -37,9 +37,28 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 	_, err := backend.client.Index().
 		Index(mapping.Index).
 		Id(ID).
-		Type(mapping.Type).
 		BodyJson(data).
 		Do(ctx)
+	return err
+}
+
+// This method will support adding a document with a specified id
+func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+
+	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
+
+	_, err := backend.client.Update().
+		Index(mapping.Index).
+		Id(id).
+		Script(script).
+		Upsert(map[string]interface{}{
+			"node_uuid": id,
+			"first_run": runDateTime,
+			"last_run":  runDateTime,
+		}).
+		Do(ctx)
+
 	return err
 }
 
@@ -103,7 +122,7 @@ func (backend *ESClient) createStore(ctx context.Context, indexName string, mapp
 
 // ProfileExists returns true if profile exists already in ES.. false if not
 func (backend *ESClient) ProfileExists(hash string) (bool, error) {
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(hash)
 
 	searchResult, err := backend.client.Search().
@@ -125,7 +144,7 @@ func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 // the ones that are missing from the profiles metadata index
 //
 func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []string, err error) {
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(allHashes...)
 	docVersionQuery := elastic.NewMatchQuery("doc_version", "1")
 
@@ -160,7 +179,7 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 	logrus.Debugf("ProfilesMissing got %d meta profiles in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
 	existingHashes := make(map[string]struct{}, searchResult.TotalHits())
 
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			existingHashes[hit.Id] = struct{}{}
 		}
@@ -180,7 +199,7 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 // reports being ingested without profile metadata information
 func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[string]*relaxting.ESInspecProfile, error) {
 	esProfilesMeta := make(map[string]*relaxting.ESInspecProfile, 0)
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(profileIDs...)
 	esIndex := relaxting.CompProfilesIndex
 
@@ -222,7 +241,7 @@ func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[st
 
 			for _, hit := range results.Hits.Hits {
 				esProfile := &relaxting.ESInspecProfile{}
-				if err := json.Unmarshal(*hit.Source, &esProfile); err != nil {
+				if err := json.Unmarshal(hit.Source, &esProfile); err != nil {
 					logrus.Errorf("GetProfilesMissingMetadata unmarshal error: %s", err.Error())
 				}
 				esProfilesMeta[hit.Id] = esProfile
@@ -245,7 +264,6 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	_, err := backend.client.Index().
 		Index(index).
 		Id(id).
-		Type(mappings.DocType).
 		BodyJson(*data).
 		Refresh("false").
 		Do(ctx)
@@ -263,7 +281,6 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 }
 
 func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endTime time.Time, data *relaxting.ESInSpecReport) error {
-	docType := mappings.DocType
 	mapping := mappings.ComplianceRepDate
 	index := mapping.IndexTimeseriesFmt(endTime)
 	data.DayLatest = false
@@ -277,7 +294,6 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	_, err := backend.client.Index().
 		Index(index).
 		Id(id).
-		Type(docType).
 		BodyJson(*data).
 		Refresh("false").
 		Do(ctx)
@@ -303,6 +319,12 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 		data.DocVersion = "0"
 	}
 	err := backend.addDataToIndexWithID(ctx, mapping, data.Sha256, data)
+	return err
+}
+
+func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, nodeId string, runDateTime time.Time) error {
+	mapping := mappings.ComplianceRunInfo
+	err := backend.upsertComplianceRunInfo(ctx, mapping, nodeId, runDateTime)
 	return err
 }
 
@@ -520,11 +542,8 @@ func (backend *ESClient) UpdateReportProjectsTagsForIndex(ctx context.Context, i
 		ctx._source.projects = matchingProjects.toArray();
  `
 
-	docType := mappings.DocType
-
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
-		Type(docType).
 		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
 		WaitForCompletion(false).
@@ -665,11 +684,8 @@ func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, 
 		ctx._source.projects = matchingProjects.toArray();
  `
 
-	docType := mappings.DocType
-
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
-		Type(docType).
 		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
 		WaitForCompletion(false).

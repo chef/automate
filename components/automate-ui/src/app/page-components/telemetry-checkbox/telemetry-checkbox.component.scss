@@ -4,5 +4,10 @@
   chef-checkbox {
     white-space: normal;
     margin-bottom: 7px;
+    align-items: normal;
   }
+}
+
+chef-checkbox ::ng-deep .check-wrap {
+  margin-top: 6px;
 }

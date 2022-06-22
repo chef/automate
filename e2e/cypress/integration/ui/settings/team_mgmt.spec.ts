@@ -171,6 +171,9 @@ describe('team management', () => {
 
       it(`can create a team with no projects (unassigned)
         and cannot access projects dropdown`, () => {
+        if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+          cy.get('[data-cy=close-x]').click();
+        }
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
         cy.get('[data-cy=create-name]').type(unassignedTeam1ID);
@@ -198,6 +201,9 @@ describe('team management', () => {
       filter (including the unassigned project)`, () => {
       beforeEach(() => {
         cy.applyProjectsFilter([unassigned, project1Name, project2Name]);
+        if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+          cy.get('[data-cy=close-x]').click();
+        }
       });
 
       it('can create a team with multiple projects', () => {

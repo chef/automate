@@ -1,12 +1,15 @@
 import {
   Component,
   OnInit,
+  OnChanges,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
+  SimpleChanges
 } from '@angular/core';
 
 import { FormGroup } from '@angular/forms';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 import { CookbookConstraintGrid } from '../create-environment-modal/create-environment-modal.component';
 
@@ -16,20 +19,20 @@ import { CookbookConstraintGrid } from '../create-environment-modal/create-envir
   styleUrls: ['./infra-environment-constraint.component.scss']
 })
 
-export class InfraEnvironmentConstraintComponent implements OnInit {
+export class InfraEnvironmentConstraintComponent implements OnInit, OnChanges {
 
   @Input() constraintKeys: string[] = [];
   @Input() cookbookConstraints: Array<CookbookConstraintGrid> = [];
   @Input() name_id: string;
   @Input() nameKeys: string[] = [];
-  @Input() selectedCookbookNames: string[] = [];
+  @Input() selectedCookbookNames: string[] = []; // curent runlist
   @Input() constraintFormGroup: FormGroup;
   @Output() constraintValues: EventEmitter<CookbookConstraintGrid[]> = new EventEmitter();
 
   public conflictError = false;
   public operator_id = '';
   public operators: string[] = [];
-
+  public cookbookKeys: string[] = [];
   constructor(
   ) {
     this.operators = [
@@ -41,6 +44,14 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
 
   ngOnInit() {
     this.conflictError = false;
+    this.getCookbookKeys();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.cookbookKeys = [];
+    if (changes) {
+      this.getCookbookKeys();
+    }
   }
 
   public addCookbookVersion() {
@@ -50,14 +61,14 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
       operator: this.operator_id,
       version: this.constraintFormGroup.controls['version'].value
     });
-    this.constraintKeys.forEach((element, index) => {
+    this.cookbookKeys.forEach((element, index) => {
       if (element === this.name_id) {
         this.selectedCookbookNames.unshift(element);
-        this.constraintKeys.splice(index, 1);
+        this.cookbookKeys.splice(index, 1);
       }
     });
 
-    this.name_id = this.constraintKeys[0];
+    this.name_id = this.cookbookKeys[0];
     this.operator_id = this.operators[0];
 
     this.constraintFormGroup.controls.version.setValue('');
@@ -65,18 +76,18 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
   }
 
   public deleteCookbookVersion(cookbookIndex: number, cookbookConstraint: CookbookConstraintGrid) {
-    this.constraintKeys.push(cookbookConstraint.name);
-    this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+    this.cookbookKeys.push(cookbookConstraint.name);
+    this.cookbookKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
 
     this.selectedCookbookNames.splice(cookbookIndex, 1);
 
-    this.name_id = this.constraintKeys[0];
+    this.name_id = this.cookbookKeys[0];
     this.cookbookConstraints.splice(cookbookIndex, 1);
     this.toUpdateCookbookData(this.cookbookConstraints);
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -91,9 +102,9 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
 
     this.toUpdateCookbookKeys(newName);
 
-    this.constraintKeys.push(previousName);
-    this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
-    this.name_id = this.constraintKeys[0];
+    this.cookbookKeys.push(previousName);
+    this.cookbookKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+    this.name_id = this.cookbookKeys[0];
     this.toUpdateCookbookData(this.cookbookConstraints);
   }
 
@@ -115,14 +126,36 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     return this.selectedCookbookNames.includes(name);
   }
 
+  private getCookbookKeys() {
+    this.cookbookKeys = [];
+    this.constraintKeys?.forEach(element => {
+      this.cookbookKeys.push(element);
+    });
+    this.removeSelectedKeys();
+  }
+
+  private removeSelectedKeys() {
+    if (this.cookbookConstraints.length > 0) {
+      this.cookbookConstraints.forEach(elm => {
+        this.cookbookKeys.forEach((avail, index) => {
+          if (avail === elm.name) {
+            this.cookbookKeys.splice(index, 1);
+          }
+        });
+      });
+    }
+    this.name_id = this.cookbookKeys[0];
+    this.operator_id = this.operators[0];
+  }
+
   private toUpdateCookbookData(cookbookConstraints: CookbookConstraintGrid[]) {
     this.constraintValues.emit(cookbookConstraints);
   }
 
   private toUpdateCookbookKeys(newName: string) {
-    this.constraintKeys.forEach((element, index) => {
+    this.cookbookKeys.forEach((element, index) => {
       if (element === newName) {
-        this.constraintKeys.splice(index, 1);
+        this.cookbookKeys.splice(index, 1);
       }
     });
   }
@@ -138,10 +171,6 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
       }
     });
     return previousName;
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 
 }

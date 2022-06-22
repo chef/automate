@@ -45,7 +45,7 @@ export class DataBagsEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get infra data bags: ${msg || payload.error}`
+        message: `Could not get data bags: ${msg || payload.error}`
       });
     })));
 
@@ -64,7 +64,7 @@ export class DataBagsEffects {
     map(({ payload: { databag: dataBag } }: CreateDataBagSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully Created Data Bag ${dataBag.name}.`
+        message: `Successfully created data bag - ${dataBag.name}.`
       });
     })));
 
@@ -75,7 +75,7 @@ export class DataBagsEffects {
     map(({ payload }: CreateDataBagFailure) => {
       return new CreateNotification({
         type: Type.error,
-        message: `Could Not Create Data Bag: ${payload.error.error || payload}.`
+        message: `Could not create data bag: ${payload.error.error || payload}.`
       });
     })));
 
@@ -94,7 +94,7 @@ export class DataBagsEffects {
     map(({ payload: { name } }: DeleteDataBagSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully Deleted Data Bag - ${name}.`
+        message: `Successfully deleted data bag - ${name}.`
       });
     })));
 

@@ -6,9 +6,9 @@ package deployment
 import (
 	"context"
 
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // verify that the mock satisfies the DeploymentServer interface (at compile time)
@@ -30,11 +30,11 @@ func NewDeploymentServerMockWithoutValidation() *DeploymentServerMock {
 // methods with "not implemented" returns
 type DeploymentServerMock struct {
 	validateRequests    bool
-	GetVersionFunc      func(context.Context, *empty.Empty) (*Version, error)
+	GetVersionFunc      func(context.Context, *emptypb.Empty) (*Version, error)
 	ServiceVersionsFunc func(context.Context, *ServiceVersionsRequest) (*ServiceVersionsResponse, error)
 }
 
-func (m *DeploymentServerMock) GetVersion(ctx context.Context, req *empty.Empty) (*Version, error) {
+func (m *DeploymentServerMock) GetVersion(ctx context.Context, req *emptypb.Empty) (*Version, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())

@@ -46,10 +46,6 @@ grpc:
   tlsCert: {{svc_cert_path}}
   tlsKey: {{svc_key_path}}
   tlsClientCA: {{svc_root_ca_path}}
-frontend:
-  dir: {{cfg.frontend_dir}}
-  issuer: Chef Automate
-  theme: chef
 logger:
   level: {{cfg.log.level}}
   format: text
@@ -225,9 +221,7 @@ oauth2:
     - token
     - id_token
   skipApprovalScreen: true
-{{- if cfg.connectors.saml}}
   alwaysShowLoginScreen: true
-{{- end}}
 
 {{- if cfg.bootstrap.insecure_admin}}
 staticPasswords:
@@ -240,3 +234,20 @@ staticPasswords:
 expiry:
   signingKeys: {{cfg.expiry.signing_keys}}
   idTokens: {{cfg.expiry.id_tokens}}
+
+invalidLoginAttempts:
+  enableInvalidLoginAttempts: {{cfg.invalid_login_attempts.enable_invalid_login_attempts}}
+  blockedDurationInMinutes: {{cfg.invalid_login_attempts.blocked_duration_in_minutes}}
+  maxInvalidLoginAttemptsAllowed: {{cfg.invalid_login_attempts.max_invalid_login_attempts_allowed}}
+
+frontend:
+  dir: {{cfg.frontend_dir}}
+  issuer: Chef Automate
+  theme: chef
+  extra:
+    showDisclosure: {{cfg.login_disclosure.show}} 
+    disclosureMessage: "{{cfg.login_disclosure.disclosure_message}}"
+    showBanner: {{cfg.banner.show}}
+    bannerMessage: "{{cfg.banner.message}}"
+    bannerBackgroundColor: {{cfg.banner.background_color}}
+    bannerTextColor: {{cfg.banner.text_color}}

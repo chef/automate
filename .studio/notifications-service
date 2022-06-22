@@ -8,7 +8,7 @@ function notifications_unit_test() {
   pushd /src/components/notifications-service/server >/dev/null || return 1
 	  mix local.hex --force
 	  mix local.rebar --force
-	  mix escript.install github tony612/protobuf-elixir --force
+	  mix escript.install github tony612/protobuf-elixir branch main --force
 
     mix deps.get
     mix test --no-start
@@ -26,7 +26,7 @@ function notifications_lint() {
   pushd /src/components/notifications-service/server >/dev/null || return 1
 	  mix local.hex --force
 	  mix local.rebar --force
-	  mix escript.install github tony612/protobuf-elixir --force
+	  mix escript.install github tony612/protobuf-elixir branch main --force
 
     mix deps.get
     mix compile
@@ -76,7 +76,7 @@ function notifications_compile_protobuf() {
 
     log_line "installing elixir tools to compile protobuf files"
     mix local.hex --force
-    mix escript.install github tony612/protobuf-elixir --force
+    mix escript.install github tony612/protobuf-elixir branch main --force
     mix deps.get --force
     mix escript.install hex protobuf --force
 

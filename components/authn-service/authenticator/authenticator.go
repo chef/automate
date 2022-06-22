@@ -26,6 +26,8 @@ type Requestor interface {
 
 	// Teams returns the namespaced array of teams, if present (tokens don't have any)
 	Teams() []string
+
+	Requestor() string
 }
 
 // LocalUser allows for changing their teams, and only local users implement

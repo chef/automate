@@ -63,6 +63,25 @@ message DequeueWorkflowRequest {
   }
 }
 
+message DequeueWorkflowChunkRequest {
+  message Dequeue {
+    string domain = 1;
+    repeated string workflow_names = 2;
+  }
+  message Continue {
+    bytes payload = 1;
+    repeated Task tasks = 2;
+  }
+  message Fail { string err = 1; }
+  message Done { bytes result = 1; }
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Continue continue = 2;
+    Done done = 3;
+    Fail fail = 4;
+  }
+}
+
 message DequeueWorkflowResponse {
   message Dequeue {
     WorkflowInstance instance = 1;
@@ -75,6 +94,10 @@ message DequeueWorkflowResponse {
     Status status = 2;
     Committed committed = 3;
   }
+}
+
+message DequeueWorkflowChunkResponse {
+  bytes chunk = 1;
 }
 
 message EnqueueWorkflowRequest {
@@ -211,6 +234,8 @@ service CerealService {
   rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
   rpc DequeueWorkflow(stream DequeueWorkflowRequest)
       returns (stream DequeueWorkflowResponse);
+  rpc DequeueWorkflowChunk(stream DequeueWorkflowChunkRequest)
+      returns (stream DequeueWorkflowChunkResponse);
   rpc CancelWorkflow(CancelWorkflowRequest) returns (CancelWorkflowResponse);
   rpc KillWorkflow(KillWorkflowRequest) returns (KillWorkflowResponse);
   rpc DequeueTask(stream DequeueTaskRequest)

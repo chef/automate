@@ -1,5 +1,6 @@
 @import "~styles/variables";
 @import 'app/page-components/json-tree/json-tree.component.scss';
+@import '../infra_shared/shared';
 
 chef-page-header {
   padding-bottom: 0;
@@ -19,7 +20,7 @@ chef-loading-spinner {
   }
 
   .item-details {
-    chef-loading-spinner {
+    chef-loading-spinner.spinner {
       display: flex;
       margin: auto auto;
       width: 100%;
@@ -52,8 +53,6 @@ chef-loading-spinner {
   }
 
   li {
-    cursor: pointer;
-
     &:hover, &.selected {
       color: $chef-primary-bright;
 
@@ -108,25 +107,17 @@ tbody > .detail-row {
   font-size: 14px;
 }
 
-.expand-collapse {
-  border-bottom: 0.5px solid #CFD2D2;
+.expand-collapse.edited {
+  border-bottom: 0.5px solid $chef-key-tab;
   font-size: 14px;
   color: $royal-blue;
   margin-bottom: 10px;
-  padding-bottom: 10px;
+  padding: 4px 0;
   padding-left: 17px;
 
-  .action {
-    cursor: pointer;
-
-    &:first-child {
-      margin-right: 45px;
-    }
-
-    chef-icon {
-      position: relative;
-      top: 3px;
-    }
+  chef-button {
+    margin: 0;
+    height: 25px;
   }
 
 }
@@ -135,26 +126,21 @@ tbody > .detail-row {
   color: $royal-blue;
 }
 
-.search-button {
-  box-shadow: 0 1px 14px #E6EBEE;
-  border: 1px solid $chef-light-grey-2;
-  border-left: none;
-  border-radius: 0px 4px 4px 0px;
-  background: #E6EBEE;
-  width: 2.6%;
-  height: 45px;
-  float: right;
-}
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
 
-.chef-input {
-  border-radius: 4px 0px 0px 4px;
-  // border-right: none;
-  width: 97.4%;
-}
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
 
-.search-items {
-  margin-bottom: 8px;
-  width: 100%;
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+    height: 36px;
+    margin-top: 4px;
+  }
 }
 
 // CSS for accordion
@@ -226,7 +212,7 @@ tbody > .detail-row {
 }
 
 .submenu .item-details {
-  padding: 15px;
+  padding: 0 15px 15px;
 }
 
 .accordion .submenu {
@@ -246,68 +232,21 @@ tbody > .detail-row {
 }
 
 .full-screen-spinner {
-  display: flex;
-  margin: auto;
-  margin-top: 188px;
-  background-color: $chef-white;
-  opacity: 0.7;
-  width: initial;
-  height: 100%;
+  margin: -34px;
+  margin-top: -20px;
 }
 
-.float-right {
-  position: relative;
+.right-button-box {
   float: right;
-}
 
-.edit-item {
-  font-size: 18px;
-  position: absolute;
-  right: 150px;
-}
-
-.edit-text {
-  margin-top: 0px;
-  position: absolute;
-  right: 120px;
-}
-
-.del-item {
-  font-size: 18px;
-  position: absolute;
-  right: 60px;
-}
-
-.del-text {
-  margin-top: 0px;
-  position: absolute;
-  right: 12px;
+  .material-icons {
+    font-size: 16px;
+  }
 }
 
 .dataBagItems {
   .page-body {
-    padding: 25px 30px;
-  }
-
-  .search-items {
-    margin-bottom: 18px;
-    height: 55px;
-  }
-
-  chef-toolbar chef-button:first-child {
-    margin: 4px 0px 0px 32px;
-    float: right;
-
-    button {
-      padding: 7px 16px;
-      letter-spacing: 0.5px;
-    }
-  }
-
-  ::ng-deep {
-    .search-items app-infra-search-bar .search-wrapper {
-      float: left;
-      width: calc(100% - 135px);
-    }
+    padding: 0 25px 30px;
+    position: relative;
   }
 }

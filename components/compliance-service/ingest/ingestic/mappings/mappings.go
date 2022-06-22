@@ -18,6 +18,7 @@ var AllMappings = []Mapping{
 	ComplianceRepDate,
 	ComplianceSumDate,
 	ComplianceProfiles,
+	ComplianceRunInfo,
 }
 
 const (
@@ -29,12 +30,14 @@ const (
 	ComplianceCurrentTimeSeriesIndicesVersion = "7"
 	//ComplianceCurrentProfilesIndicesVersion allows us to know, for any version of compliance, what level we are at with our profiles and profiles-mappings indices
 	ComplianceCurrentProfilesIndicesVersion = "3"
+	ComplianceCurrentRunInfoVersion         = "2"
 
 	compAndVersionTimeSeries = "comp-" + ComplianceCurrentTimeSeriesIndicesVersion
 	compAndVersionProfiles   = "comp-" + ComplianceCurrentProfilesIndicesVersion
+	compAndVersionRunInfo    = "comp-" + ComplianceCurrentRunInfoVersion
 
-	DocType       = "_doc"
-	IndexNameProf = compAndVersionProfiles + "-profiles"
+	IndexNameProf              = compAndVersionProfiles + "-profiles"
+	IndexNameComplianceRunInfo = compAndVersionRunInfo + "-run-info"
 
 	IndexNameRep = compAndVersionTimeSeries + "-r"
 	IndexNameSum = compAndVersionTimeSeries + "-s"
@@ -46,7 +49,6 @@ const (
 type Mapping struct {
 	Index      string
 	Alias      string
-	Type       string
 	Timeseries bool
 	Mapping    string
 }

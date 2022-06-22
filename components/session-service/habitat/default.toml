@@ -7,6 +7,7 @@ port = 7777
 signin_url = "/signin"
 external_fqdn = "localhost"
 persistent = true
+grpc_port = 10108
 
 [oidc]
 # issuer is constructed from external-fqdn config + "/dex"

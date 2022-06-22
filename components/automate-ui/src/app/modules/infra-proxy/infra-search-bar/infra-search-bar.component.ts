@@ -2,10 +2,9 @@ import {
   Component,
   EventEmitter,
   Output,
-  ViewChild,
-  ElementRef,
   Input
 } from '@angular/core';
+// import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-infra-search-bar',
@@ -15,24 +14,17 @@ import {
 
 export class InfraSearchBarComponent {
   inputText = '';
+  formActive = false;
+  error = false;
 
   @Input() placeHolder: string;
   @Output() searchButtonClick = new EventEmitter<string>();
-  @ViewChild('search_box', { static: true }) inputField: ElementRef;
 
-  handleFiltersClick(currentText: string): void {
+  onSubmit(currentText: string): void {
     this.searchButtonClick.emit(currentText);
   }
 
-  pressEnter(currentText: string): void {
-    this.searchButtonClick.emit(currentText);
-  }
-
-  handleInput(key, currentText): void {
-    switch (key.toLowerCase()) {
-      case 'enter':
-        this.pressEnter(currentText);
-        break;
-    }
+  toggleFocus(): void {
+    this.formActive = !this.formActive;
   }
 }

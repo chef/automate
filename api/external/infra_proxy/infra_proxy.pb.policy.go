@@ -12,6 +12,19 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServers", "infra:infraServers", "infra:infraServers:list", "GET", "/api/v0/infra/servers", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServerStatus", "infra:infraServers", "infra:infraServers:get", "GET", "/api/v0/infra/servers/server_status", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.GetServerStatus); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "fqdn":
+					return m.Fqdn
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServer", "infra:infraServers:{id}", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetServer); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
@@ -264,6 +277,42 @@ func init() {
 		return ""
 	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetRole", "infra:infraServers:{server_id}:orgs:{org_id}:roles", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Role); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetRoleExpandedRunList", "infra:infraServers:{server_id}:orgs:{org_id}:roles", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.ExpandedRunList); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				case "environment":
+					return m.Environment
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetRoleEnvironments", "infra:infraServers:{server_id}:orgs:{org_id}:roles", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Role); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -683,27 +732,6 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetAffectedNodes", "infra:infraServers:{server_id}:orgs:{org_id}:nodes", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.AffectedNodes); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "org_id":
-					return m.OrgId
-				case "server_id":
-					return m.ServerId
-				case "chef_type":
-					return m.ChefType
-				case "name":
-					return m.Name
-				case "version":
-					return m.Version
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/DeleteNode", "infra:infraServers:{server_id}:orgs:{org_id}:nodes", "infra:infraServers:update", "DELETE", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Node); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
@@ -744,6 +772,23 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/UpdateNodeAttributes", "infra:infraServers:{server_id}:orgs:{org_id}:nodes", "infra:infraServers:update", "PUT", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.UpdateNodeAttributes); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetNode", "infra:infraServers:{server_id}:orgs:{org_id}:nodes", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Node); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
@@ -754,6 +799,25 @@ func init() {
 					return m.ServerId
 				case "name":
 					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetNodeExpandedRunList", "infra:infraServers:{server_id}:orgs:{org_id}:nodes", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.NodeExpandedRunList); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				case "environment":
+					return m.Environment
 				default:
 					return ""
 				}
@@ -773,6 +837,25 @@ func init() {
 					return m.Name
 				case "action":
 					return m.Action
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/UpdateNodeEnvironment", "infra:infraServers:{server_id}:orgs:{org_id}:nodes", "infra:infraServers:update", "PUT", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.UpdateNodeEnvironment); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				case "environment":
+					return m.Environment
 				default:
 					return ""
 				}
@@ -807,6 +890,89 @@ func init() {
 					return m.Name
 				case "revision_id":
 					return m.RevisionId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/DeletePolicyfile", "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServers:update", "DELETE", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.DeletePolicyfile); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicyfileRevisions", "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}/revisions", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.PolicyfileRevisions); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetPolicygroup", "infra:infraServers:{server_id}:orgs:{org_id}:policygroups", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Policygroup); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetOrgUsersList", "infra:infraServers:{server_id}:orgs:{org_id}:users", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.OrgUsers); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServerUsersList", "infra:infraServers:{server_id}:users", "infra:infraServers:get", "POST", "/api/v0/infra/servers/{server_id}/users", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.ServerUsers); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "server_id":
+					return m.ServerId
+				case "admin_name":
+					return m.AdminName
+				case "admin_key":
+					return m.AdminKey
 				default:
 					return ""
 				}

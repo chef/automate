@@ -1,0 +1,110 @@
+.selectbox-main-section {
+  display: flex;
+}
+
+ul {
+  margin: 0;
+  margin-top: 1em;
+  overflow: auto;
+  padding: 0em 0.4em 0.6em 0.4em;
+  list-style-type: none;
+  height: 20em;
+
+  li {
+    margin: 0em 0em 1em 0em;
+    padding: 0.792em;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+  }
+}
+
+.select-item-list {
+  height: 24em;
+}
+
+
+.Search {
+  margin: 1em;
+  position: relative;
+  list-style-type: none;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  margin-bottom: 0;
+  width: stretch;
+
+}
+
+.list-item,
+.select-item-list-block {
+  margin: 1em 0 1em 0;
+  border: 1px solid #DEE6F7;
+  border-radius: 4px;
+
+  chef-input ::ng-deep input {
+    padding: 1em 1em 1em 3em;
+  }
+
+}
+
+.list-item,
+.select-item {
+  width: 100%;
+
+}
+
+.button-group {
+  display: grid;
+  margin-bottom: 1em;
+  margin-top: auto;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.select-item {
+  display: inline-block;
+
+  label {
+    position: absolute;
+    margin-top: -20px;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    font-weight: normal;
+    font-style: normal;
+  }
+}
+
+.active {
+  background-color: rgba(56, 100, 242, 0.5);
+}
+
+.arrow-right {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid #3864F2;
+}
+
+.arrow-left {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 5px solid #3864F2;
+}
+
+
+.search-Icon {
+  margin: 0em .5em 0em .5em;
+  font-size: 1.5em;
+  float: left;
+  position: absolute;
+  top: 12px;
+}

@@ -27,6 +27,7 @@ import {
   getAllStatus as getAllCookbooksForOrgStatus
 } from 'app/entities/cookbooks/cookbook.selectors';
 import { CreateEnvironment, GetEnvironments, GetEnvironmentsPayload, CreateEnvironmentPayload } from 'app/entities/environments/environment.action';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 const CREATE_TAB_NAME = 'environmentTab';
 
@@ -52,19 +53,19 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   @Input() currentPage: number;
 
   public conflictError = false;
+  public cookbookVersionError = false;
   public constraintsTab = false;
   public creating = false;
   public defaultAttrParseError = false;
   public defaultTab = false;
   public detailsTab = true;
-  public nameExist = false;
   public overrideAttrParseError = false;
   public overrideTab = false;
   public showConstraint = false;
   public visible = false;
 
   public attr_value = '{}';
-  public constraintArray: Array<CookbookConstraintGrid> = [];
+  public constraints: Array<CookbookConstraintGrid> = [];
   public constraintKeys: string[] = [];
   public cookbooks: Cookbook[] = [];
   public cookbookConstraints: Array<CookbookConstraintGrid> = [];
@@ -96,7 +97,8 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     });
 
     this.detailsFormGroup = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: ['', [Validators.required,
+           Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
@@ -114,6 +116,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.openEvent.pipe(takeUntil(this.isDestroyed))
       .subscribe(() => {
       this.conflictError = false;
+      this.cookbookVersionError = false;
       this.visible = true;
       this.items = this.environmentsList;
       this.showConstraint = true;
@@ -153,10 +156,12 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
           this.conflictError = true;
+          this.defaultTab = false;
+          this.detailsTab = true;
+          this.constraintsTab = false;
+          this.overrideTab = false;
         } else {
           this.store.dispatch(new GetEnvironments(payload));
-          this.creating = false;
-
           // Close the modal on any other error because it will be displayed in the banner.
           this.closeCreateModal();
         }
@@ -181,7 +186,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       name: this.detailsFormGroup.controls['name'].value,
       description: this.detailsFormGroup.controls['description'].value,
-      cookbook_versions: this.constraintArray.length ? this.toDisplay(this.constraintArray) : {},
+      cookbook_versions: this.constraints.length ? this.toDisplay(this.constraints) : {},
       default_attributes: JSON.parse(this.defaultAttrFormGroup.controls['default'].value),
       override_attributes: JSON.parse(this.overrideAttrFormGroup.controls['override'].value)
     };
@@ -189,10 +194,14 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new CreateEnvironment({environment: environment})
     );
+    this.telemetryService.track('InfraServer_Environments_Create');
   }
 
-  handleInput(event: { target: { value: string } } ): void {
-    this.nameExist = this.environmentsList.some(el => el.name === event.target.value);
+  handleInput(event: KeyboardEvent): void {
+    if (Utilities.isNavigationKey(event)) {
+      return;
+    }
+    this.conflictError = false;
   }
 
   onChangeDefaultJson(event: { target: { value: string } } ) {
@@ -244,8 +253,18 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
 
   // Handles the data of cookbook version array coming from constraint tab.
-  constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
-    this.constraintArray = value;
+  constraintItemsHandler(values: Array<CookbookConstraintGrid> = []    ) {
+    for ( const value of values ) {
+      if (!Regex.patterns.VALID_VERSION.test(value.version)) {
+        this.cookbookVersionError = true;
+        break;
+      } else {
+        this.cookbookVersionError = false;
+      }
+    }
+    if (!this.cookbookVersionError) {
+      this.constraints = values;
+    }
   }
 
   // Getting list of cookbook names
@@ -285,8 +304,8 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
   private resetCreateModal(): void {
     this.cookbookConstraints = [];
-
     this.constraintsTab = false;
+    this.cookbookVersionError = false;
     this.creating = false;
     this.defaultAttrParseError = false;
     this.defaultTab = false;

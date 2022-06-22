@@ -1,0 +1,245 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl workspace
+# Summary: Setup the Automate cluster workspace
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster'
+require 'cluster/command'
+require 'cluster/config/generator'
+require 'cluster/workspace'
+require 'fileutils'
+
+class AutomateClusterWorkspaceSetup < AutomateCluster::SubCommand
+  option ['-s', '--source'], 'SOURCE_PATH', 'Workspace source files to copy', attribute_name: :workspace_source_path
+  option ['-b', '--bundle'], 'BUNDLE_FILE', 'Workspace bundle that was created using export command'
+  option ['-o', '--owner'], 'USER', 'Workspace owner, defaults to current user'
+  option ['-c', '--channel'], 'CHANNEL', 'Channel to use when updating deployment package', default: 'stable'
+  option ['--version'], 'VERSION', 'Version to use when updating deployment package'
+  option ['-u', '--[no-]upgrade-package'], :flag, 'Upgrade deployment package', default: true
+  option ['-c', '--[no-]copy-aibs'], :flag, 'Copy AIB files if they exist'
+
+  parameter "[WORKSPACE_PATH]", "Path for workspace to setup/update", attribute_name: :new_workspace_path
+
+  skip_config_file
+
+  def default_new_workspace_path
+    Dir.pwd
+  end
+
+  def workspace_needs_updating?
+    !File.exist?(new_workspace_path) || File.realpath(new_workspace_path) != File.realpath(latest_workspace)
+  end
+
+  def workspace
+    @workspace ||= AutomateCluster::Workspace.new(new_workspace_path)
+  end
+
+  def update_workspace_files
+    workspace.set_source(latest_workspace)
+
+    opts = {}
+
+    logger.debug "Workspace Path: #{workspace.path}"
+
+    if workspace_needs_updating?
+      logger.debug "New workspace? #{workspace.new_workspace?}"
+      logger.debug "Source configs? #{workspace.source.a2ha_config_exist?}"
+
+      if workspace.new_workspace? && workspace.source.a2ha_config_exist?
+        opts[:copy_configs] = prompt.yes?("Migrate existing settings from #{latest_workspace}?")
+      end
+
+      # Don't copy aibs if we were given a bundle to use or there are no aibs to copy
+      if !bundle && workspace.source.aibs_exist?
+        opts[:copy_aibs] = copy_aibs? || prompt.yes?("Copy AIB files from #{latest_workspace}?")
+      end
+    end
+
+    workspace.sync_configs(opts)
+
+    wait_while "Syncing files from #{workspace.source.path} to #{workspace.path}" do |spinner|
+      workspace.clone(opts)
+      spinner.success("(#{term.green("Updated to #{new_workspace_version}")})")
+    end if workspace_needs_updating?
+
+    wait_while "Applying workspace bundle #{bundle} to #{workspace.path}" do
+      so = shellout!("/usr/bin/tar xvfz #{bundle} -C #{workspace.path}")
+      !so.error?
+    end if bundle
+
+    wait_while "Updating ownership of #{workspace.path} to #{owner}" do
+      workspace.set_owner(owner)
+    end if owner
+
+    show_completion_message(workspace.path) if workspace.new_workspace?
+
+    prompt.ok "\nWorkspace updated"
+    return true
+  end
+
+  def execute
+    if bundle && !File.exist?(bundle)
+      signal_usage_error "Bundle not found: #{bundle}"
+    end
+
+    # initialize here to fix variable scoping
+    force_workspace_chdir = false
+
+    if !bundle && upgrade_package?
+      # save this out cause it will change when we upgrade the package
+      force_workspace_chdir = inside_workspace_symlink?
+      pkg = ['chef/automate-ha-deployment', version].compact.join('/')
+      wait_while "Updating #{term.green("automate-ha-deployment")} habitat package" do
+        so = shellout!("hab pkg install #{pkg} --channel #{channel} --binlink --force")
+        !so.error?
+      end
+    end
+
+    # Force chdir inside the ruby process so we make sure to we are working in the correct
+    # location.
+    if force_workspace_chdir
+      logger.debug "Current working directory is inside '/hab/a2_deploy_workspace' symlink, forcing chdir"
+      Dir.chdir '/hab/a2_deploy_workspace'
+    end
+
+    update_workspace_files
+
+    # Need to force update of pwd for existing shell
+    if force_workspace_chdir
+      prompt.error <<~EOMSG
+      ------------------------------------------------------------
+      A symlink for the current working directory has been changed
+      ------------------------------------------------------------
+      Please run the following command to ensure your shell is using the correct location:
+      EOMSG
+
+      prompt.say "cd /hab/a2_deploy_workspace"
+    end
+  end
+
+  def new_workspace_version
+    ENV['_CLUSTER_CTL_VERSION']
+  end
+
+  def latest_workspace
+    workspace_source_path || default_source_workspace
+  end
+
+  def default_source_workspace
+    new_workspace_version == 'DEV' ? '/src' : '/hab/a2_deploy_workspace'
+  end
+
+  def inside_workspace_symlink?
+    Dir.pwd == File.realpath('/hab/a2_deploy_workspace')
+  end
+
+  def show_completion_message(path)
+    prompt.say <<~EOHELP
+
+#{term.bold "To finish configuring the new workspace walk throught the following steps"}
+#{term.bold "-----------------------------------------------"}
+cd #{path}
+
+# Update configs with new settings
+vim a2ha.rb
+
+#{term.bold "Setup secrets store"}
+#{term.bold "-----------------------------------------------"}
+cd #{path}
+
+#{term.bold "# Create new encryption key and secret store"}
+automate-cluster-ctl secrets init
+
+#{term.bold "# Set Automate admin password"}
+automate-cluster-ctl secrets set automate_admin_password
+
+#{term.bold "# If a sudo password is required add it using"}
+automate-cluster-ctl secrets set sudo_password
+
+#{term.bold "# If you need separate sudo passwords for FE and BE nodes"}
+
+automate-cluster-ctl secrets set fe_sudo_password
+automate-cluster-ctl secrets set be_sudo_password
+    EOHELP
+  end
+end
+
+class AutomateClusterWorkspaceExport < AutomateCluster::SubCommand
+  option ['-w', '--working-dir'], 'WORK_DIR', 'Working directory to create the export bundle'
+  option ['-o', '--overwrite'], :flag, 'Overwrite existing output file', default: false
+  parameter "[OUTPUT]", "File to save workspace as (tar.gz)", attribute_name: :output_file
+
+  def execute
+    full_output_path = File.expand_path(output_file, Dir.pwd)
+
+    if File.exist?(full_output_path) && !overwrite?
+      signal_usage_error "Error #{full_output_path} already exists, use '--overwrite' to overwrite the file"
+    end
+    FileUtils.rm(output_file) if File.exist?(full_output_path) && overwrite?
+
+    new_workspace = AutomateCluster::Workspace.new(working_directory)
+    new_workspace.set_source(config.workspace_path)
+
+    wait_while "Syncing files from #{new_workspace.source.path} to #{new_workspace.path}" do
+      new_workspace.clone(copy_aibs: true, copy_terraform_files: false, copy_tools: false)
+    end
+
+    wait_while "Creating workspace bundle #{full_output_path}" do
+      create_tar(new_workspace.path, full_output_path)
+    end
+  ensure
+    clean_up
+  end
+
+  def create_tar(workingdir, dest)
+    cmd = ['/usr/bin/tar', '-czf', dest, '*'].join(' ')
+    so = shellout!(cmd, cwd: workingdir)
+
+    if so.error?
+      logger.error "Creating tar #{dest} failed"
+      logger.error "STDOUT: #{so.stdout.chomp}" unless so.stdout.empty?
+      logger.error "STDERR: #{so.stderr.chomp}" unless so.stderr.empty?
+      return false
+    else
+      logger.debug "STDOUT: #{so.stdout.chomp}" unless so.stdout.empty?
+      logger.debug "STDERR: #{so.stderr.chomp}" unless so.stderr.empty?
+    end
+
+    true
+  end
+
+  def working_directory
+    return @working_directory if @working_directory
+
+    @working_directory ||= Dir.mktmpdir('a2ha_workspace', working_dir)
+    add_clean_up(@working_directory)
+
+    @working_directory
+  end
+
+  def add_clean_up(path)
+    @clean_up_dirs ||= []
+    @clean_up_dirs << path
+  end
+
+  def clean_up
+    @clean_up_dirs ||= []
+    @clean_up_dirs.each do |dir|
+      FileUtils.rm_rf(dir)
+    end
+  end
+end
+
+
+class AutomateClusterWorkspace < AutomateCluster::Command
+  skip_config_file
+
+  subcommand "setup",   "Setup a new workspace", AutomateClusterWorkspaceSetup
+  subcommand "update",  "Update existing workspace", AutomateClusterWorkspaceSetup
+  subcommand "export",  "Export workspace bundle for use in other environments", AutomateClusterWorkspaceExport
+end
+
+
+AutomateClusterWorkspace.run

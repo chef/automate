@@ -16,6 +16,8 @@ message AuthenticateResponse {
   // IdP (in which case they're extracted from the id_token; TODO), or, for local
   // users, by teams-service (TODO).
   repeated string teams = 2;
+
+  string requestor = 3;
 };
 
 service AuthenticationService {

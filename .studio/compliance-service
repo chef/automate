@@ -34,6 +34,23 @@ DOC
 function compliance_integration() {
   # Go based integration tests
   go_test -v "github.com/chef/automate/components/compliance-service/integration_test"
+  go_test -v "github.com/chef/automate/components/compliance-service/integration_lcr_test"
+}
+
+document "compliance_run_info_integration" <<DOC
+  Runs the integration tests for the compliance_run_info_integration
+DOC
+function compliance_run_info_integration() {
+  # Go based integration tests
+  go_test -run TestReportingServerRunInfo -v "github.com/chef/automate/components/compliance-service/integration_test"
+}
+
+document "compliance_run_info_load_16_days" <<DOC
+  Runs the integration tests for the compliance_run_info_load_16_days
+DOC
+function compliance_run_info_load_16_days() {
+  # Go based integration tests for 16 days
+  go_test -run TestReportingServerRunInfoLoadSixteenDaysOfData -v "github.com/chef/automate/components/compliance-service/integration_test"
 }
 
 document "go_update_compliance_service" <<DOC
@@ -103,6 +120,16 @@ function load_compliance_reports() {
     generate_chef_run_failure_example | jq '.entity_uuid = "34cbbb55-c502-4971-2222-999999999999"' | jq '.node_name = "osx(1)-omega-pro2(w)-waived"' | send_chef_data_raw
     generate_chef_run_failure_example | jq '.entity_uuid = "34cbbb4c-c502-4971-1111-888888888888"' | jq '.node_name = "osx(2)-omega-pro1(f)-pro2(w)-failed"' | send_chef_data_raw
     pushd components/compliance-service/test_data/audit_reports &> /dev/null
+    ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
+    popd &> /dev/null
+}
+
+document "load_one_compliance_report" <<DOC
+  Loads compliance report.
+DOC
+function load_one_compliance_report() {
+    generate_chef_run_example | jq '.entity_uuid = "34cbbb4c-c502-4971-b193-00e987b4678c"' | jq '.node_name = "debian(2)-zeta-linux(f)-apache(p)-failed"' | send_chef_data_raw
+    pushd components/compliance-service/test_data/audit_reports_one &> /dev/null
     ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
     popd &> /dev/null
 }

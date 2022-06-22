@@ -8,8 +8,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "IAM Users Guide"
-    parent = "automate/authorization"
-    identifier = "automate/authorization/iam_v2_guide.md IAM Users Guide"
+    parent = "automate/users/authorization"
+    identifier = "automate/users/authorization/iam_v2_guide.md IAM Users Guide"
     weight = 20
 +++
 
@@ -265,9 +265,9 @@ If you would like to delegate ownership of a project to another user so that the
 
 #### Assigning Ingested Resources to Projects
 
-While Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
+While Chef Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
 
-Project ingest rules are used to associate ingested resources with projects within Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
+Project ingest rules are used to associate ingested resources with projects within Chef Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
 Each condition contains an attribute, operator, and value. See [IAM Project Rules API reference](/automate/api/#tag/rules) for details on how to manage project rules.
 
 In this example, after [creating a project]({{< relref "iam_v2_guide.md#creating-a-project" >}}) with the ID `project-devops`, you will add an ingest rule to this new project.
@@ -288,9 +288,9 @@ Navigate to the project details page of `project-devops`, by selecting the proje
 Select the `Create Rule` button to create a new project rule. Choose the resource type `Node`, then fill in the first condition's fields.
 Feel free to create fake ingest data that corresponds to the example json below, or come up with a condition that matches your existing data set.
 
-{{% warning %}}
+{{< warning >}}
 Compliance reports must be using **audit cookbook 7.5+** in order to make use of all of the available project rule attributes. Older reports will only have **Environment** and **Chef Role** available as attributes.
-{{% /warning %}}
+{{< /warning >}}
 
 ```json
 {
@@ -325,13 +325,13 @@ Only these resources will appear in Automate's dashboards when the `project-devo
 A percentage count appears in the bottom banner while the operation takes place.
 You may cancel the update at any time by selecting the `Stop Project Update` button in the banner and confirming the cancel in the modal that pops up.
 
-{{% warning %}}
+{{< warning >}}
 Avoid stopping an update unless absolutely necessary. It will leave your system in an unknown state where only some resources have been moved into their projects while others still remain in old projects. Only another successful update will restore the system to an up-to-date state.
-{{% /warning %}}
+{{< /warning >}}
 
 Once rules have been successfully applied, the banner will be dismissed until the next time there are *pending edits* to any project.
 
-To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate filters by the selected `project-devops` project.
+To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Chef Automate filters by the selected `project-devops` project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
 
 ![](/images/automate/global-projects-filter.png)
@@ -374,7 +374,7 @@ To create a project that contains all Effortless Infra nodes, create a ingest ru
 
 ![](/images/automate/effortless-project-rule.png)
 
-The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Infra Server` attribute as `localhost`. 
+The above rule matches on a node's Chef Infra Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Infra Server` attribute as `localhost`.
 
 If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`.
 

@@ -12,6 +12,7 @@ import "interservice/infra_proxy/request/databags.proto";
 import "interservice/infra_proxy/request/environments.proto";
 import "interservice/infra_proxy/request/nodes.proto";
 import "interservice/infra_proxy/request/policyfiles.proto";
+import "interservice/infra_proxy/request/users.proto";
 
 import "interservice/infra_proxy/response/servers.proto";
 import "interservice/infra_proxy/response/orgs.proto";
@@ -22,6 +23,7 @@ import "interservice/infra_proxy/response/databags.proto";
 import "interservice/infra_proxy/response/environments.proto";
 import "interservice/infra_proxy/response/nodes.proto";
 import "interservice/infra_proxy/response/policyfiles.proto";
+import "interservice/infra_proxy/response/users.proto";
 
 service InfraProxyService {
     rpc CreateServer    (chef.automate.domain.infra_proxy.request.CreateServer) returns (chef.automate.domain.infra_proxy.response.CreateServer) {};
@@ -29,6 +31,7 @@ service InfraProxyService {
     rpc UpdateServer    (chef.automate.domain.infra_proxy.request.UpdateServer) returns (chef.automate.domain.infra_proxy.response.UpdateServer) {};
     rpc GetServers      (chef.automate.domain.infra_proxy.request.GetServers) returns (chef.automate.domain.infra_proxy.response.GetServers) {};
     rpc GetServer       (chef.automate.domain.infra_proxy.request.GetServer) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
+    rpc GetServerStatus (chef.automate.domain.infra_proxy.request.GetServerStatus) returns (chef.automate.domain.infra_proxy.response.GetServerStatus) {};
 
     rpc CreateOrg    (chef.automate.domain.infra_proxy.request.CreateOrg) returns (chef.automate.domain.infra_proxy.response.CreateOrg) {};
     rpc DeleteOrg    (chef.automate.domain.infra_proxy.request.DeleteOrg) returns (chef.automate.domain.infra_proxy.response.DeleteOrg) {};
@@ -44,6 +47,8 @@ service InfraProxyService {
 
     rpc GetRoles (chef.automate.domain.infra_proxy.request.Roles) returns (chef.automate.domain.infra_proxy.response.Roles) {};
     rpc GetRole (chef.automate.domain.infra_proxy.request.Role) returns (chef.automate.domain.infra_proxy.response.Role) {};
+    rpc GetRoleExpandedRunList (chef.automate.domain.infra_proxy.request.ExpandedRunList) returns (chef.automate.domain.infra_proxy.response.ExpandedRunList) {};
+    rpc GetRoleEnvironments (chef.automate.domain.infra_proxy.request.Role) returns (chef.automate.domain.infra_proxy.response.RoleEnvironments) {};
     rpc CreateRole (chef.automate.domain.infra_proxy.request.CreateRole) returns (chef.automate.domain.infra_proxy.response.Role) {};
     rpc DeleteRole (chef.automate.domain.infra_proxy.request.Role) returns (chef.automate.domain.infra_proxy.response.Role) {};
     rpc UpdateRole (chef.automate.domain.infra_proxy.request.UpdateRole) returns (chef.automate.domain.infra_proxy.response.Role) {};
@@ -71,13 +76,22 @@ service InfraProxyService {
     rpc GetEnvironmentRecipes (chef.automate.domain.infra_proxy.request.Environment) returns (chef.automate.domain.infra_proxy.response.EnvironmentRecipesList) {};
 
     rpc GetNodes (chef.automate.domain.infra_proxy.request.Nodes) returns (chef.automate.domain.infra_proxy.response.Nodes) {};
-    rpc GetAffectedNodes (chef.automate.domain.infra_proxy.request.AffectedNodes) returns (chef.automate.domain.infra_proxy.response.AffectedNodes) {};
     rpc GetNode (chef.automate.domain.infra_proxy.request.Node) returns (chef.automate.domain.infra_proxy.response.Node) {};
+    rpc GetNodeExpandedRunList (chef.automate.domain.infra_proxy.request.NodeExpandedRunList) returns (chef.automate.domain.infra_proxy.response.NodeExpandedRunList) {};
     rpc CreateNode (chef.automate.domain.infra_proxy.request.NodeDetails) returns (chef.automate.domain.infra_proxy.response.Node) {};
     rpc DeleteNode (chef.automate.domain.infra_proxy.request.Node) returns (chef.automate.domain.infra_proxy.response.DeleteNode) {};
     rpc UpdateNode (chef.automate.domain.infra_proxy.request.NodeDetails) returns (chef.automate.domain.infra_proxy.response.Node) {};
     rpc UpdateNodeTags (chef.automate.domain.infra_proxy.request.UpdateNodeTags) returns (chef.automate.domain.infra_proxy.response.UpdateNodeTags) {};
+    rpc UpdateNodeEnvironment (chef.automate.domain.infra_proxy.request.UpdateNodeEnvironment) returns (chef.automate.domain.infra_proxy.response.UpdateNodeEnvironment) {};
+    rpc UpdateNodeAttributes (chef.automate.domain.infra_proxy.request.UpdateNodeAttributes) returns (chef.automate.domain.infra_proxy.response.UpdateNodeAttributes) {};
 
     rpc GetPolicyfiles (chef.automate.domain.infra_proxy.request.Policyfiles) returns (chef.automate.domain.infra_proxy.response.Policyfiles) {};
     rpc GetPolicyfile (chef.automate.domain.infra_proxy.request.Policyfile) returns (chef.automate.domain.infra_proxy.response.Policyfile) {};
+    rpc DeletePolicyfile (chef.automate.domain.infra_proxy.request.DeletePolicyfile) returns (chef.automate.domain.infra_proxy.response.DeletePolicyfile) {};
+    rpc GetPolicyfileRevisions (chef.automate.domain.infra_proxy.request.PolicyfileRevisions) returns (chef.automate.domain.infra_proxy.response.PolicyfileRevisions) {};
+    rpc GetPolicygroup (chef.automate.domain.infra_proxy.request.Policygroup) returns (chef.automate.domain.infra_proxy.response.Policygroup) {};
+
+    rpc GetOrgUsersList (chef.automate.domain.infra_proxy.request.OrgUsers) returns (chef.automate.domain.infra_proxy.response.OrgUsers) {};
+    rpc GetServerUsersList (chef.automate.domain.infra_proxy.request.ServerUsers) returns (chef.automate.domain.infra_proxy.response.ServerUsers) {};
+
 }

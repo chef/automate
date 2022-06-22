@@ -282,7 +282,7 @@ From the root of the automate repository you have these `make` targets that will
 * semgrep-legacy -- same as `semgrep-all` but reveals legacy issues, too
 
 Note that these targets all run Semgrep exactly the way Buildkite does, using a Docker container and using the .semgrepignore file for things to exclude.
-Before you can use the above targets, though, you need to define `SEMGREP_TOKEN` and `SEMGREP_ID` environment variables; the values for these come from the `id` and `token` defined here in [Vault](https://vault.es.chef.co/ui/vault/secrets/secret/show/semgrep?namespace=releng).
+Before you can use the above targets, though, you need to define `SEMGREP_TOKEN` and `SEMGREP_ID` environment variables; the values for these come from the `id` and `token` defined here in [Vault](https://vault.ps.chef.co/ui/vault/secrets/secret/show/semgrep?namespace=root).
 
 * semgrep-test/`<ruleset-name>` -- useful for trying out new rulesets
 

@@ -15,8 +15,7 @@ import (
 )
 
 func TestGenerateMigrationOverrideConfig(t *testing.T) {
-	tmpDir, cleanup := newTestTempDir(t, "migration-override")
-	defer cleanup()
+	tmpDir := t.TempDir()
 
 	certPath := newTestTempFile(t, tmpDir, "user.crt", "cert-value")
 	keyPath := newTestTempFile(t, tmpDir, "user.key", "key-value")
@@ -63,8 +62,7 @@ func TestGenerateMigrationOverrideConfig(t *testing.T) {
 func TestGetFrontendTLSCreds(t *testing.T) {
 	t.Run("User provided SSL Cert and Key exist", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
-		tmpDir, cleanup := newTestTempDir(t, "user-provided-ssl-cert")
-		defer cleanup()
+		tmpDir := t.TempDir()
 
 		certPath := newTestTempFile(t, tmpDir, "user.crt", "cert-value")
 		keyPath := newTestTempFile(t, tmpDir, "user.key", "key-value")
@@ -85,8 +83,7 @@ func TestGetFrontendTLSCreds(t *testing.T) {
 	})
 	t.Run("User provided SSL Cert and Key exist and uses file:// uri", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
-		tmpDir, cleanup := newTestTempDir(t, "user-provided-ssl-cert")
-		defer cleanup()
+		tmpDir := t.TempDir()
 
 		certPath := newTestTempFile(t, tmpDir, "user.crt", "cert-value")
 		keyPath := newTestTempFile(t, tmpDir, "user.key", "key-value")
@@ -107,8 +104,7 @@ func TestGetFrontendTLSCreds(t *testing.T) {
 	})
 	t.Run("User provided SSL Cert doesn't exist", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
-		tmpDir, cleanup := newTestTempDir(t, "user-provided-ssl-cert")
-		defer cleanup()
+		tmpDir := t.TempDir()
 
 		certPath := filepath.Join(tmpDir, "user.crt")
 		keyPath := newTestTempFile(t, tmpDir, "user.key", "key-value")
@@ -125,8 +121,7 @@ func TestGetFrontendTLSCreds(t *testing.T) {
 	})
 	t.Run("User provided SSL Key doesn't exist", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
-		tmpDir, cleanup := newTestTempDir(t, "user-provided-ssl-cert")
-		defer cleanup()
+		tmpDir := t.TempDir()
 
 		certPath := newTestTempFile(t, tmpDir, "user.crt", "cert-value")
 		keyPath := filepath.Join(tmpDir, "user.key")
@@ -143,8 +138,7 @@ func TestGetFrontendTLSCreds(t *testing.T) {
 	})
 	t.Run("Self-signed SSL Cert and Key exist", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
-		tmpDir, cleanup := newTestTempDir(t, "self-signed-ssl-cert")
-		defer cleanup()
+		tmpDir := t.TempDir()
 		caDir := filepath.Join(tmpDir, "ca")
 		err := os.MkdirAll(caDir, 0755)
 		require.NoError(t, err, "Failed to create fake nginx ca dir")
@@ -165,8 +159,7 @@ func TestGetFrontendTLSCreds(t *testing.T) {
 	})
 	t.Run("Self-signed SSL Cert doesn't exist", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
-		tmpDir, cleanup := newTestTempDir(t, "self-signed-ssl-cert")
-		defer cleanup()
+		tmpDir := t.TempDir()
 		caDir := filepath.Join(tmpDir, "ca")
 		err := os.MkdirAll(caDir, 0755)
 		require.NoError(t, err, "Failed to create fake nginx ca dir")
@@ -181,8 +174,7 @@ func TestGetFrontendTLSCreds(t *testing.T) {
 	})
 	t.Run("Self-signed SSL Key doesn't exist", func(t *testing.T) {
 		r := newMockDeliveryRunning(t)
-		tmpDir, cleanup := newTestTempDir(t, "self-signed-ssl-cert")
-		defer cleanup()
+		tmpDir := t.TempDir()
 		caDir := filepath.Join(tmpDir, "ca")
 		err := os.MkdirAll(caDir, 0755)
 		require.NoError(t, err, "Failed to create fake nginx ca dir")
@@ -365,14 +357,6 @@ func newMockChefServerRunnig(t *testing.T) *ChefServerRunning {
 	require.NoError(t, err, "failed to load chef-server-running.json")
 
 	return config.ChefServerRunning
-}
-
-func newTestTempDir(t *testing.T, msg string) (string, func()) {
-	tempdir, err := ioutil.TempDir("", msg)
-	require.NoError(t, err, "could not create temporary test directory")
-	f := func() { os.RemoveAll(tempdir) }
-
-	return tempdir, f
 }
 
 func newTestTempFile(t *testing.T, dirName, name, value string) string {

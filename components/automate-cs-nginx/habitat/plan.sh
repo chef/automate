@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=automate-cs-nginx
 pkg_origin=chef
@@ -7,7 +8,7 @@ vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.1.0"
+pkg_version="14.15.10"
 pkg_deps=(
   core/coreutils
   chef/mlsa
@@ -17,11 +18,11 @@ pkg_deps=(
   # chef-server-* packages are pinned to the versions required by the
   # chef-server-* packages.
   #
-  core/curl/7.68.0/20200601114640
-  core/ruby26/2.6.5/20200404043345
+  core/curl
+  core/ruby27
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/14.1.0/20210225010828"
-  "${vendor_origin}/chef-server-ctl/14.1.0/20210225010004"
+  "${vendor_origin}/chef-server-nginx/14.15.10/20220516084446"
+  "${vendor_origin}/chef-server-ctl/14.15.10/20220516082536"
 )
 
 pkg_bin_dirs=(bin)
@@ -63,7 +64,7 @@ scaffolding_go_binary_list=(
 chef_automate_hab_binding_mode="relaxed"
 
 do_prepare() {
-  GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby26)"
+  GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby27)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for chef/chef-server-ctl)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.KnifePath=${pkg_prefix}/bin/knife"
   GO_LDFLAGS="$GO_LDFLAGS -X main.Version=${pkg_version}/${pkg_release}"
@@ -79,5 +80,5 @@ do_install() {
   install "$PLAN_CONTEXT/bin/knife" "$wrapper_bin_path/knife"
 
   sed -i "s!__BUILDTIME_HAB_PKG_PATH_CHEF_SERVER_CTL__!$(pkg_path_for chef/chef-server-ctl)!g" "$wrapper_bin_path/knife"
-  sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby26)!g" "$wrapper_bin_path/knife"
+  sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby27)!g" "$wrapper_bin_path/knife"
 }

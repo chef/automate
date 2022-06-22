@@ -1,0 +1,299 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Nodes</chef-breadcrumb>
+          {{InfraNode?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading data-cy="infra-node-head">{{InfraNode?.name}}</chef-heading>
+        <div class="meta-box" *ngIf="!nodeDetailsLoading">
+          <div class="summary-body">
+            <h3 class="meta-head">Node Information</h3>
+            <ul>
+              <li>
+                <span class="heading">Environment</span>
+                <span data-cy="node-env">{{environmentName}}</span>
+              </li>
+              <li>
+                <span class="heading">Policy Group</span>
+                <span>{{InfraNode?.policy_group === '' ? '--' : InfraNode?.policy_group}}</span>
+              </li>
+              <li>
+                <span class="heading">Policy Name</span>
+                <span>{{InfraNode?.policy_name === '' ? '--' : InfraNode?.policy_name}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="summary-body">
+            <h3 class="meta-head">Metadata</h3>
+            <ul>
+              <li>
+                <span class="heading">Chef Infra Server</span>
+                <span data-cy="node-server">{{serverId}}</span>
+              </li>
+              <li>
+                <span class="heading">Chef Infra Organization</span>
+                <span data-cy="node-org">{{orgId}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+          <chef-option value='runList' data-cy="run-list-tab">Run list</chef-option>
+          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+
+      <app-edit-infra-node-modal
+        [label]="label"
+        [openEvent]="openEnvironmentModal"
+        [orgId]="orgId"
+        [availableType]="availableType"
+        [node]="InfraNode"
+        [serverId]="serverId"
+        [selected]="selected"
+        [runlistError]="conflictError"
+        (runlistUpdated)="updateRunlist()">
+      </app-edit-infra-node-modal>
+
+      <app-edit-infra-node-attribute-modal
+        [jsonText]="jsonText"
+        [openEvent]="openAttributeModal"
+        [orgId]="orgId" [node]="InfraNode"
+        [serverId]="serverId"
+        [attrParseError]="conflictError"
+        [isGetNode]="isGetNode">
+      </app-edit-infra-node-attribute-modal>
+
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <chef-loading-spinner class="full-screen-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="details-tab" *ngIf="!nodeDetailsLoading">
+          <div class="spinner">
+            <chef-loading-spinner class="full-screen-spinner" *ngIf="nodeDetailsLoading" size="50" fixed></chef-loading-spinner>
+            <chef-loading-spinner class="full-screen-spinner" *ngIf="updatingTags" size="50" fixed></chef-loading-spinner>
+          </div>
+          <ng-container *ngIf="!nodeDetailsLoading">
+            <div class="node-details-section">
+              <form [ngClass]="confirming === true ? 'auto-height' : ''" [formGroup]="updateNodeForm">
+                <chef-form-field>
+                  <span class="label">Environment</span>
+                  <ng-select
+                    formControlName="environment"
+                    [items]="environmentsBuffer"
+                    [virtualScroll]="true"
+                    [loading]="loading"
+                    bindLabel="name"
+                    bindValue="name"
+                    appendTo="body"
+                    [searchable]="false"
+                    [clearable]="false"
+                    (scroll)="onScroll($event)"
+                    (change)="selectChangeHandler($event)"
+                    (scrollToEnd)="onScrollToEnd()">
+                    <ng-template ng-option-tmp let-item="item" let-index="index">
+                      {{item.name}}
+                    </ng-template>
+                  </ng-select>
+                </chef-form-field>
+                <div *ngIf="confirming" class="changes-confirmation" data-cy="change-confirm">
+                  <p class="change-node-text">Change Node Environment?</p>
+                  <div id="button-env">
+                    <chef-button
+                      tertiary
+                      id="cancel"
+                      data-cy="cancel-button"
+                      [disabled]="saving"
+                      (click)="closeConfirmationBox()">Cancel</chef-button>
+                    <chef-button
+                      primary
+                      data-cy="save-button"
+                      id="save-btn"
+                      [disabled]="saving"
+                      (click)="saveEnvironment()">
+                      <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+                      <span *ngIf="!saving">Save</span>
+                      <span *ngIf="saving">Saving</span>
+                    </chef-button>
+                  </div>
+                </div>
+              </form>
+              <span class="label">Tags</span>
+              <div class="node-tags-box">
+                <input
+                  chefInput
+                  type="text"
+                  id="tag-input"
+                  autocomplete="off"
+                  data-cy="add-tag"
+                  [ngClass]="saving ? 'disable' : ''"
+                  [(ngModel)]="inputTxt"/>
+                <button
+                  primary
+                  type="submit"
+                  class="primary"
+                  [disabled]= "(inputTxt === '') || saving"
+                  data-cy="add-tag-button"
+                  (click)="addTags()"> Add </button>
+              </div>
+              <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
+              <div
+                *ngIf="nodeTags?.length"
+                class="display-node-tags"
+                [ngClass]="saving ? 'disable' : ''"
+                data-cy="tag-box">
+              <span *ngFor="let tag of nodeTags" class="tag">
+                {{tag}}
+                <a class="removeTag" (click)="removeTag(tag)" data-cy="remove-tag"></a>
+              </span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </section>
+      <section class="page-body runlist" *ngIf="tabValue === 'runList'">
+        <chef-loading-spinner class="top-spinner" *ngIf="nodeRunlistLoading" size="50"></chef-loading-spinner>
+        <div class="details-tab" *ngIf="!nodeRunlistLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="nodeRunlistLoading" size="50" fixed></chef-loading-spinner>
+            <chef-loading-spinner *ngIf="runListLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <div *ngIf="!nodeRunlistLoading">
+            <div class="label-items" *ngIf="!runListLoading">
+              <label>
+                <span class="label default">Run List</span>
+              </label>
+            </div>
+            <div class="attr" *ngIf="!runListLoading">
+              <div class="expand-collapse" *ngIf="!hasRun_List">
+                <chef-button
+                  tertiary
+                  class="action"
+                  (click)="''"
+                  [disabled]="true"
+                  data-cy="empty-expand-runlist">
+                  <chef-icon>add_circle</chef-icon>
+                  <span>Expand All</span>
+                </chef-button>
+                <chef-button
+                  tertiary
+                  class="action"
+                  (click)="''"
+                  [disabled]="true"
+                  data-cy="empty-collapse-runlist">
+                  <chef-icon>remove_circle</chef-icon>
+                  <span>Collapse All</span>
+                </chef-button>
+                <chef-button
+                  tertiary
+                  class="float-right action"
+                  (click)="openEditModal('Run List')"
+                  [disabled]="runListLoading || conflictError"
+                  data-cy="node-edit-runlist">
+                  <span class="material-icons edit-item">mode_edit</span>
+                  <span class="edit-text">Edit</span>
+                </chef-button>
+              </div>
+              <div *ngIf="hasRun_List">
+                <div class="expand-collapse">
+                  <chef-button
+                    tertiary
+                    class="action"
+                    (click)="trees ? trees.expand() : ''"
+                    data-cy="node-expand-runlist">
+                    <chef-icon>add_circle</chef-icon>
+                    <span>Expand All</span>
+                  </chef-button>
+                  <chef-button
+                    tertiary
+                    class="action"
+                    (click)="trees ? trees.treeCollapsed() : ''"
+                    data-cy="node-collapse-runlist">
+                    <chef-icon>remove_circle</chef-icon>
+                    <span>Collapse All</span>
+                  </chef-button>
+                  <chef-button
+                    tertiary
+                    class="float-right action"
+                    (click)="openEditModal('Run List')"
+                    data-cy="node-edit-runlist">
+                    <span class="material-icons edit-item">mode_edit</span>
+                    <span class="edit-text">Edit</span>
+                  </chef-button>
+                </div>
+                <app-tree-table
+                  [hidden]="hasRun_List ? false : true"
+                  [tree]="arrayOfNodesTree"
+                  #trees
+                  [options]="treeOptions">
+                </app-tree-table>
+              </div>
+              <div data-cy="empty-runlist" *ngIf="!hasRun_List && !runListLoading && !conflictError" class="empty-section">
+                <img alt="No preview" src="/assets/img/no_preview.gif" />
+                <p>No run list is set for the node.</p>
+              </div>
+              <div data-cy="error-runlist" *ngIf="!hasRun_List && !runListLoading && conflictError" class="empty-section">
+                <img alt="No preview" src="/assets/img/no_preview.gif" />
+                <p>Cannot load run_list!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="page-body attributes" *ngIf="tabValue === 'attributes'">
+        <chef-loading-spinner class="top-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="attributes-tab" *ngIf="!nodeAttributesLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="nodeAttributesLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <ng-container *ngIf="!nodeAttributesLoading">
+            <div class="node-attributes-section">
+              <label>
+                <span class="label default">Attributes</span>
+              </label>
+              <div class="attr">
+                <div class="expand-collapse">
+                  <chef-button tertiary class="action"
+                   (click)="tree.expand()" [disabled]=!hasattributes
+                    data-cy="expand-attributes">
+                    <chef-icon>add_circle</chef-icon>
+                    <span>Expand All</span>
+                  </chef-button>
+                  <chef-button tertiary class="action"
+                   (click)="tree.collapse()" [disabled]=!hasattributes
+                    data-cy="collapse-attributes">
+                    <chef-icon>remove_circle</chef-icon>
+                    <span>Collapse All</span>
+                  </chef-button>
+                  <chef-button tertiary class="right-button-box"
+                    (click)="openEditAttrModal(InfraNode.normal_attributes)"
+                    data-cy="node-edit-attributes">
+                    <span class="material-icons edit-item">mode_edit</span>
+                    <span class="edit-text">Edit</span>
+                  </chef-button>
+                </div>
+                <hr class="divider-constraints" />
+                <div class="json-container">
+                  <div class="scroll">
+                    <app-json-tree-table class="json-tree-container"
+                    [hidden]="hasattributes? false : true"
+                    #tree
+                    [json]="attributes">
+                    </app-json-tree-table>
+                    <div *ngIf="!hasattributes" class="img-section">
+                      <img alt="No preview" src="/assets/img/no_preview.gif" />
+                      <p>There are no items to display.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

@@ -26,7 +26,13 @@ func (a *InfraProxyServer) CreateRole(ctx context.Context, r *gwreq.CreateRole) 
 	}
 
 	return &gwres.Role{
-		Name: res.GetName(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
+		RunList:            res.GetRunList(),
+		JsonClass:          res.GetJsonClass(),
 	}, nil
 }
 
@@ -72,8 +78,43 @@ func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.R
 		DefaultAttributes:  res.GetDefaultAttributes(),
 		OverrideAttributes: res.GetOverrideAttributes(),
 		RunList:            res.GetRunList(),
-		ExpandedRunList:    GetUpstreamExpandedRunList(res.GetExpandedRunList()),
 		JsonClass:          res.GetJsonClass(),
+	}, nil
+}
+
+// GetRoleEnvironments gets the role environments
+func (a *InfraProxyServer) GetRoleEnvironments(ctx context.Context, r *gwreq.Role) (*gwres.RoleEnvironments, error) {
+	req := &infra_req.Role{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.GetRoleEnvironments(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.RoleEnvironments{
+		Environments: res.GetEnvironments(),
+	}, nil
+}
+
+// GetRoleExpandedRunList gets the role expanded run-list
+func (a *InfraProxyServer) GetRoleExpandedRunList(ctx context.Context, r *gwreq.ExpandedRunList) (*gwres.ExpandedRunList, error) {
+	req := &infra_req.ExpandedRunList{
+		OrgId:       r.OrgId,
+		ServerId:    r.ServerId,
+		Name:        r.Name,
+		Environment: r.Environment,
+	}
+	res, err := a.client.GetRoleExpandedRunList(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.ExpandedRunList{
+		Id:      res.GetId(),
+		RunList: fromUpsteamRunList(res.GetRunList()),
 	}, nil
 }
 
@@ -90,7 +131,13 @@ func (a *InfraProxyServer) DeleteRole(ctx context.Context, r *gwreq.Role) (*gwre
 	}
 
 	return &gwres.Role{
-		Name: res.GetName(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
+		RunList:            res.GetRunList(),
+		JsonClass:          res.GetJsonClass(),
 	}, nil
 }
 
@@ -111,7 +158,13 @@ func (a *InfraProxyServer) UpdateRole(ctx context.Context, r *gwreq.UpdateRole) 
 	}
 
 	return &gwres.Role{
-		Name: res.GetName(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
+		RunList:            res.GetRunList(),
+		JsonClass:          res.GetJsonClass(),
 	}, nil
 }
 
@@ -127,34 +180,4 @@ func fromUpstreamRoles(roles []*infra_res.RoleListItem) []*gwres.RoleListItem {
 	}
 
 	return ts
-}
-
-// GetUpstreamExpandedRunList gets the expanded run-list from upstream API.
-func GetUpstreamExpandedRunList(expRunList []*infra_res.ExpandedRunList) []*gwres.ExpandedRunList {
-	exp := make([]*gwres.ExpandedRunList, len(expRunList))
-
-	for i, e := range expRunList {
-		exp[i] = &gwres.ExpandedRunList{
-			Id:      e.GetId(),
-			RunList: fromUpsteamRunList(e.GetRunList()),
-		}
-	}
-
-	return exp
-}
-
-func fromUpsteamRunList(runList []*infra_res.RunList) []*gwres.RunList {
-	resRunList := make([]*gwres.RunList, len(runList))
-
-	for i, item := range runList {
-		resRunListItem := gwres.RunList{
-			Type:     item.GetType(),
-			Name:     item.GetName(),
-			Version:  item.GetVersion(),
-			Children: fromUpsteamRunList(item.GetChildren()),
-		}
-		resRunList[i] = &resRunListItem
-	}
-
-	return resRunList
 }

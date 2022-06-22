@@ -6,6 +6,7 @@ set -e
 export HAB_NONINTERACTIVE="true"
 export HAB_NOCOLORING="true"
 export HAB_LICENSE=accept-no-persist
+export PATH="/usr/local/bin:$PATH"
 
 automate_deployed() {
     [[ -f /hab/user/deployment-service/config/user.toml ]]
@@ -171,22 +172,67 @@ fi
 
 if [[ "${airgapped}" == "false" ]]; then
     if (! automate_deployed) || upgrade_automate || automate_needs_redeploy; then
+        echo "installing automate cli"
         install_automate_cmd
     fi
 fi
 
 if ! automate_deployed; then
+    echo "deploying automate"
     deploy
 else
     if automate_needs_redeploy; then
+        echo "redeploying automate"
         redeploy
     fi
     if upgrade_automate; then
+        echo "inside upgrade_automate"
         if [[ "${airgapped}" == "true" ]]; then
-            chef-automate upgrade run --airgap-bundle /tmp/automate.aib
+            echo "inside upgrade_automate airgapped true"
+            ERROR=$(chef-automate upgrade run --airgap-bundle /tmp/automate.aib 2>&1 >/dev/null) || true
+            if echo "$ERROR" | grep 'This is a Major upgrade'; then
+              echo "inside upgrade_automate airgapped true major upgrade"
+              echo "y
+y
+y
+y
+y
+y" | chef-automate upgrade run --major --airgap-bundle /tmp/automate.aib
+              sleep 45
+              #shellcheck disable=SC2154
+              wait_for_upgrade
+              echo "y" | chef-automate post-major-upgrade migrate --data=ES
+            else
+              echo "regular normal upgrade airgap"
+              sleep 45
+              #shellcheck disable=SC2154
+              wait_for_upgrade
+            fi
             rm -f /tmp/automate.aib
+        else
+          echo "inside upgrade_automate airgapped false"
+          ERROR=$(chef-automate upgrade run 2>&1 >/dev/null) || true
+          if echo "$ERROR" | grep 'This is a Major upgrade'; then
+            echo "inside upgrade_automate airgapped false major upgrade"
+            echo "y
+y
+y
+y
+y
+y" | chef-automate upgrade run --major
+            sleep 45
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+            echo "y" |chef-automate post-major-upgrade migrate --data=ES
+          else
+            echo "regular normal upgrade airgap false"
+            sleep 45
+
+            #shellcheck disable=SC2154
+            wait_for_upgrade
+          fi
         fi
-        wait_for_upgrade
+
         cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
         chef-automate config set /etc/chef-automate/config.toml
     fi
@@ -273,7 +319,37 @@ fi
 
 if [[ "${enable_workflow}" == "true" ]]; then
     if ! workflow-ctl list-enterprises | grep "${workflow_enterprise}"; then
-        ssh-keygen -t rsa -b 4096 -N '' -f /root/builder_key
+        echo "y" | ssh-keygen -t rsa -b 4096 -N '' -f /root/builder_key
         workflow-ctl create-enterprise "${workflow_enterprise}" --ssh-pub-key-file=/root/builder_key.pub
     fi
+fi
+
+# Create the chef-ci user (if missing)
+if ! getent passwd chef-ci &> /dev/null; then
+  sudo useradd chef-ci --create-home
+fi
+
+# Add chef-ci's public key to authorized list
+sudo mkdir -p /home/chef-ci/.ssh
+sudo chown 0700 /home/chef-ci/.ssh
+cat << EOH > /tmp/.ssh-chef-ci
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8cKl0sNhpxdOVm2T/3wfwmSExaaDUCNSKJ15D146Y2tQygRdxGY5eHkOrFET8ssnetBFrSB9B+uQYPD9+KpLkupXtL2Sx4EtyuVnUUyoEXgAC7Sr6bxwo+FqfBAkrW1vNakss/WknmaXIDYsHhI16wYTr7nIE41oGPIbcdRDAXp4u56m3tQ2kfiTkg104D2TL50z2YT6I7B1h8CUpz9aAOtd+BYGueX5rdmOATIrPydcLdvWmqrO3GXZKV3zCHG2S/Se+ULC+EhbBMZkICYo3Jre7fedkCIIGhla71h9wg7q6b3eBWowfRWCCKskJ+rkO72zSZsL9EhY/9bcg7leP8hzwmWApeddVVlumqjkPpMkGfU26TKi52gevHW6fsyxCqDR9qhjBOGxSgiqNBQuOEg/9PVLlWBcsrgNhNxsysQEZTi0jv9FdONY3c1zQ+AXHH9HtxjBnx1xD59uzEYG1hUF1MsRwpWswH3Thnd/zbSxKKOdGRqoqy52Icaf7Z96D9XKAOpDQj4pTW0fS3uJP8AL16CNSkHUZSn0vxZCS9lJS+dDxwkDk1NInQqmpJ1NPwoTPlhMEsggqPuzyh+9R38NTE6cIAddq4gqJvbRLvc4jtARoz1D123QuLPTN1Ie41xhHvSI5I2gROz20rfKp57DOuLov5nzlvbb5mH/Z6Q== chef-ci-2021-07-01
+EOH
+sudo mv /tmp/.ssh-chef-ci /home/chef-ci/.ssh/authorized_keys
+sudo chown 0600 /home/chef-ci/.ssh/authorized_keys
+sudo chown -R "chef-ci:" /home/chef-ci
+
+# Add chef-ci to sudoers
+cat << EOH > /tmp/chef-ci-sudoer
+# The chef-ci user is used by InSpec to validate the system
+chef-ci ALL=(ALL) NOPASSWD:ALL
+EOH
+sudo mv /tmp/chef-ci-sudoer /etc/sudoers.d/10-chef-ci
+sudo chmod 0440 /etc/sudoers.d/10-chef-ci
+
+# Add chef-ci to sshd_config in hardened image
+if [[ "${hardened_security}" == "true" ]]; then
+    sudo sed  -i -r "s/^AllowUsers (.*)/AllowUsers \\1 chef-ci/" /etc/ssh/sshd_config
+    sudo chmod 0644  /etc/ssh/sshd_config
+    sudo systemctl restart sshd.service
 fi

@@ -1,0 +1,14 @@
+[database]
+port = 5432
+username = "admin"
+password = "admin"
+dbname = "postgres"
+# valid modes: https://www.postgresql.org/docs/11/libpq-connect.html
+sslmode = "require"
+
+[httpd]
+bind = "127.0.0.1"
+port = 9191
+
+[log]
+level = "debug"

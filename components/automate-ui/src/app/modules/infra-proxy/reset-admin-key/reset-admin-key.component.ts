@@ -2,7 +2,6 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
 import { Subject } from 'rxjs';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -27,6 +26,7 @@ export class ResetAdminKeyComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public saveInProgress = false;
   public isLoading = true;
+  public resetKeyLoading = true;
   public resetKeyForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
 
@@ -36,13 +36,13 @@ export class ResetAdminKeyComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService
   ) {
     this.resetKeyForm = this.fb.group({
-      admin_key: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      admin_key: ['', [Validators.required]]
     });
   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-
+    this.resetKeyLoading = false;
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe(([status]) => {

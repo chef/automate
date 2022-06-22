@@ -6,6 +6,7 @@ client-id: {{ cfg.conf.oidc.client_id }}
 client-secret: {{ cfg.conf.oidc.client_secret }}
 http-port: {{ cfg.conf.service.port }}
 http-listen: "127.0.0.1"
+grpc-port: {{ cfg.conf.service.grpc_port }}
 signin-url: {{ cfg.conf.service.signin_url }}
 {{- if cfg.conf.service.bldr_signin_url }}
 bldr-signin-url: {{ cfg.conf.service.bldr_signin_url }}

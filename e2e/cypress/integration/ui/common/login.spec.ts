@@ -116,6 +116,13 @@ if (Cypress.env('SKIP_SSO')) {
         });
       });
 
+      it('chef-automate-user object is created in localStorage', () => {
+          cy.adminLogin('/').then(() => {
+          const user = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
+          cy.wrap(user).should('be.a', 'object');
+        });
+      });
+
       it('can log out and return to SSO page', () => {
         cy.get('[data-cy=user-profile-button]').click().then(() => {
           cy.get('[data-cy=sign-out-button]').click().then(() => {

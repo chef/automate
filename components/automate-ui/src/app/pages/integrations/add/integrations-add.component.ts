@@ -17,6 +17,7 @@ import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { CreateManager } from '../../../entities/managers/manager.actions';
 import { integrationsAddState } from './integrations-add.selectors';
 import { Status } from './integration-add.reducer';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-integrations-add',
@@ -33,7 +34,8 @@ export class IntegrationsAddComponent implements OnDestroy {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     location: Location,
-    fb: FormBuilder
+    fb: FormBuilder,
+    private telemetryService: TelemetryService
   ) {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.sub = store.select(integrationsAddState).subscribe(({status}) => {
@@ -61,7 +63,8 @@ export class IntegrationsAddComponent implements OnDestroy {
         credentials: fb.group({
           azure_client_id: '',
           azure_client_secret: '',
-          azure_tenant_id: ''
+          azure_tenant_id: '',
+          azure_subscription_id: ''
         })
       }),
       gcp: fb.group({
@@ -98,7 +101,7 @@ export class IntegrationsAddComponent implements OnDestroy {
       credentialData,
       instanceCredentials
     }));
-
+    this.telemetryService.track('Settings_NodeIntegrations_Create');
   }
 
   getCredentials(formData) {

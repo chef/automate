@@ -2,13 +2,17 @@ package relaxting
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
-	elastic "gopkg.in/olivere/elastic.v6"
+	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/stats"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 )
 
 //GetStatsSummary - Report #16
@@ -16,7 +20,9 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -37,15 +43,18 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-
+	b, _ := json.Marshal(source)
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -57,7 +66,9 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	myName := "GetStatsSummaryNodes"
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -78,15 +89,22 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-
+	logrus.Info(source)
+	b, _ := json.Marshal(source)
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
+		if searchResult != nil {
+			logrus.Error(searchResult.Error)
+		}
+		logrus.Info(err)
 		return nil, err
 	}
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -99,7 +117,10 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := FetchLatestDataOrNot(filters)
+
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -120,15 +141,18 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-
+	b, _ := json.Marshal(source)
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -151,7 +175,11 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	depth, err := backend.NewDepth(filters, latestOnly)
+
 	if err != nil {
 		return failures, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -176,15 +204,18 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
-
+	b, _ := json.Marshal(source)
+	logrus.Info(string(b))
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
 		Index(queryInfo.esIndex).
 		Size(0).
 		Do(context.Background())
 	if err != nil {
+		logrus.Error(err)
 		return failures, err
 	}
+	logrus.Info(searchResult)
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -249,7 +280,9 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
-	depth, err := backend.NewDepth(filters, true)
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
@@ -284,3 +317,39 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 
 	return depth.getControlListStatsByProfileIdResults(&backend, searchResult, profileID)
 }
+
+//GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
+func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelemetryReportedAt time.Time) (int64, error) {
+	client, err := backend.ES2Client()
+	if err != nil {
+		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
+		return 0, err
+	}
+
+	var rangeQueryThreshold *elastic.RangeQuery
+	t := time.Now().AddDate(0, 0, -1)
+	yesterdayEODTimeStamp := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, t.Nanosecond(), t.Location())
+	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02")
+
+	// if daysSinceLastPost >= three months then take the unique nodes count from last three months
+	// and if daysSinceLastPost > 15 and < three months then take unique nodes count from lastTelemetryReportedDate to yesterday EOD
+	// else take the unique nodes count from last 15 days
+	if daysSinceLastPost >= 90 {
+		startTimeStamp := yesterdayEODTimeStamp.AddDate(0, 0, -91)
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(yesterdayEODTimeStamp)
+	} else if daysSinceLastPost > 15 {
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(lastTelemetryReportedDate).To(yesterdayEODTimeStamp)
+	} else {
+		startTimeStamp := yesterdayEODTimeStamp.AddDate(0, 0, -16)
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(yesterdayEODTimeStamp)
+	}
+	boolQuery := elastic.NewBoolQuery().
+		Must(rangeQueryThreshold)
+
+	count, err := client.Count(mappings.IndexNameComplianceRunInfo).Query(boolQuery).Do(context.Background())
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+

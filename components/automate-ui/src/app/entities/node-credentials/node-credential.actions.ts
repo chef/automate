@@ -20,7 +20,8 @@ export enum NodeCredentialActionTypes {
   UPDATE_FAILURE        = 'NODECREDENTIAL::UPDATE::FAILURE',
   DELETE                = 'NODECREDENTIAL::DELETE',
   DELETE_SUCCESS        = 'NODECREDENTIAL::DELETE::SUCCESS',
-  DELETE_FAILURE        = 'NODECREDENTIAL::DELETE::FAILURE'
+  DELETE_FAILURE        = 'NODECREDENTIAL::DELETE::FAILURE',
+  RESET                 = 'NODECREDENTIAL::RESET'
 
 }
 
@@ -153,6 +154,12 @@ export class DeleteNodeCredentialFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class ResetStore implements Action {
+  readonly type = NodeCredentialActionTypes.RESET;
+  constructor() { }
+}
+
+
 export type NodeCredentialActions =
   NodeCredentialsSearch
   | NodeCredentialsSearchSuccess
@@ -171,4 +178,5 @@ export type NodeCredentialActions =
   | UpdateNodeCredentialFailure
   | DeleteNodeCredential
   | DeleteNodeCredentialSuccess
-  | DeleteNodeCredentialFailure;
+  | DeleteNodeCredentialFailure
+  | ResetStore;

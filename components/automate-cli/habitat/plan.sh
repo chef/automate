@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+#stable channel
 
 pkg_name=automate-cli
 pkg_origin=chef
@@ -41,3 +42,4 @@ do_after() {
     sha256sum "${bin_path}" | cut -d ' ' -f1 > "${bin_sha_path}"
   done
 }
+

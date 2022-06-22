@@ -231,7 +231,7 @@ start-es-pg: start-pg create-es-data-dir
 	ls -la "$$data_dir";
 	@$(MAKE) start-es
 
-start-es: start-es$(ES_VER)
+start-es: start-os124
 
 start-es5: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 5 container...${reset}\n"
@@ -241,6 +241,11 @@ start-es5: create-es-data-dir
 start-es6: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
 	docker rm -f cc_es6 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+	@$(MAKE) wait-for-es
+
+start-os124: create-es-data-dir
+	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
+	docker rm -f cc_os124 2> /dev/null; sleep 1; docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "DISABLE_SECURITY_PLUGIN=true" opensearchproject/opensearch:1.2.4
 	@$(MAKE) wait-for-es
 
 create-es-data-dir:
@@ -521,7 +526,7 @@ test-polling: start-ssh-node
 
 test-unit:
 	@printf "\n ===> ${blue}Running compliance-service go unit-tests...${reset}\n"
-	@go test $(shell GOFLAGS='$(GOFLAGS)' go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\)') -cover
+	@go test $(shell GOFLAGS='$(GOFLAGS)' go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\|integration_lcr_test\)') -cover
 
 send-ingest-report:
 	@printf "\n===> ${blue}Sending report to ingestion endpoint...${reset}\n"

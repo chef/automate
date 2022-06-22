@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	elastic "gopkg.in/olivere/elastic.v6"
+	elastic "github.com/olivere/elastic/v7"
 
 	"github.com/chef/automate/api/interservice/authz"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -24,6 +24,8 @@ type Client interface {
 	InsertRun(context.Context, Run) error
 	// @param (context, UTC time, data)
 	InsertNodeAttribute(context.Context, NodeAttribute) error
+	// @param (context, UTC time)
+	InsertNodeRunDateInfo(context.Context, Run) error
 	// @param (context, threshold)
 	MarkNodesMissing(context.Context, string) ([]string, error)
 	// @param (context, threshold)
@@ -62,6 +64,8 @@ type Client interface {
 	CreateBulkNodeUpdateRequest(Node) elastic.BulkableRequest
 	// @param (data)
 	CreateBulkNodeAttributeUpdateRequest(NodeAttribute) elastic.BulkableRequest
+	// @param (data)
+	CreateBulkNodeRunInfoUpdateRequest(Run) elastic.BulkableRequest
 	// @param (data)
 	CreateBulkRunUpdateRequest(Run) elastic.BulkableRequest
 	// @param (context, bulkableRequests)

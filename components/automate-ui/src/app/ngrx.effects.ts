@@ -6,6 +6,7 @@ import { ApiTokenEffects } from './entities/api-tokens/api-token.effects';
 import { AutomateSettingsEffects } from './entities/automate-settings/automate-settings.effects';
 import { CdsEffects } from './entities/cds/cds.effects';
 import { ClientRunsEffects } from './entities/client-runs/client-runs.effects';
+import { ControlDetailEffects } from './entities/control-details/control-details.effects';
 import { CookbookEffects } from './entities/cookbooks/cookbook.effects';
 import { CookbookDetailsEffects } from './entities/cookbooks/cookbook-details.effects';
 import { CookbookVersionsEffects } from './entities/cookbooks/cookbook-versions.effects';
@@ -18,14 +19,19 @@ import { DataBagItemsEffects } from './entities/data-bags/data-bag-details.effec
 import { DataBagItemDetailsEffects } from './entities/data-bags/data-bag-item-details.effects';
 import { DesktopEffects } from './entities/desktop/desktop.effects';
 import { DestinationEffects } from './entities/destinations/destination.effects';
+import {
+  DestinationGlobalConfigEffects
+} from './entities/global-config/destination-config.effects';
 import { EnvironmentEffects } from './entities/environments/environment.effects';
 import { EventFeedEffects } from './services/event-feed/event-feed.effects';
+import { InfraNodeEffects } from './entities/infra-nodes/infra-nodes.effects';
 import { InfraRoleEffects } from './entities/infra-roles/infra-role.effects';
 import { JobEffects } from './entities/jobs/job.effects';
 import { LicenseStatusEffects } from './entities/license/license.effects';
 import { ManagerEffects } from './entities/managers/manager.effects';
 import { NodesEffects } from './entities/nodes/nodes.effects';
 import { NodeCredentialEffects } from './entities/node-credentials/node-credential.effects';
+import { NodeRunlistEffects } from './entities/nodeRunlists/nodeRunlists.effects';
 import { NotificationRuleEffects } from './entities/notification_rules/notification_rule.effects';
 import { OrgEffects } from './entities/orgs/org.effects';
 import { PolicyEffects } from './entities/policies/policy.effects';
@@ -34,8 +40,11 @@ import { ProfileEffects } from './entities/profiles/profile.effects';
 import { ProjectEffects } from './entities/projects/project.effects';
 import { ProjectsFilterEffects } from './services/projects-filter/projects-filter.effects';
 import { RecipeEffects } from './entities/recipes/recipe.effects';
+import { RevisionEffects } from './entities/revisions/revision.effects';
+import { RoleEnvironmentEffects } from './entities/role-environments/role-environments.effects';
 import { RoleEffects } from './entities/roles/role.effects';
 import { RuleEffects } from './entities/rules/rule.effects';
+import { RunlistEffects } from './entities/runlists/runlists.effects';
 import { ServerEffects } from './entities/servers/server.effects';
 import { ServiceGroupsEffects } from './entities/service-groups/service-groups.effects';
 import { ScannerEffects } from './pages/+compliance/+scanner/state/scanner.effects';
@@ -43,6 +52,7 @@ import { TeamEffects } from './entities/teams/team.effects';
 import { UserEffects } from './entities/users/user.effects';
 import { UserSelfEffects } from './entities/users/userself.effects';
 import { UserPermEffects } from './entities/userperms/userperms.effects';
+import { UserPreferencesEffects } from './services/user-preferences/user-preferences.effects';
 
 @NgModule({
   imports: [
@@ -52,6 +62,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       AutomateSettingsEffects,
       CdsEffects,
       ClientRunsEffects,
+      ControlDetailEffects,
       CookbookEffects,
       CookbookDetailsEffects,
       CookbookVersionsEffects,
@@ -62,14 +73,17 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       DataBagItemDetailsEffects,
       DesktopEffects,
       DestinationEffects,
+      DestinationGlobalConfigEffects,
       EnvironmentEffects,
       EventFeedEffects,
+      InfraNodeEffects,
       InfraRoleEffects,
       JobEffects,
       LicenseStatusEffects,
       ManagerEffects,
       NodesEffects,
       NodeCredentialEffects,
+      NodeRunlistEffects,
       NotificationRuleEffects,
       OrgEffects,
       PolicyEffects,
@@ -78,15 +92,19 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       ProjectEffects,
       ProjectsFilterEffects,
       RecipeEffects,
+      RevisionEffects,
+      RoleEnvironmentEffects,
       RoleEffects,
       RuleEffects,
+      RunlistEffects,
       ServerEffects,
       ServiceGroupsEffects,
       ScannerEffects,
       TeamEffects,
       UserEffects,
       UserSelfEffects,
-      UserPermEffects
+      UserPermEffects,
+      UserPreferencesEffects
     ])
   ],
   exports: [

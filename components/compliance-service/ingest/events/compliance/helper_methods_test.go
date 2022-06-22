@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"io/ioutil"
+	"math/rand"
 	"testing"
 
 	"encoding/json"
@@ -260,7 +261,7 @@ func TestSummary(t *testing.T) {
 
 	// ------------------------------- ReportProfilesFromInSpecProfiles test --------------------------------- //
 
-	actualProfilesMin := ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles)
+	actualProfilesMin := ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, false)
 	profilesJson := fileContents("test_data/inspec_report_profiles_min_out.json")
 	expectedProfilesMin := parseProfilesMin(&profilesJson)
 
@@ -311,6 +312,36 @@ func TestSummary(t *testing.T) {
 	expectedProfiles := parseESProfiles(fileContents("test_data/inspec_report_profiles_out.json"))
 
 	passert.Equal(t, expectedProfiles, actualProfiles, "profiles doc match")
+
+	// ------------------------------- ReportProfilesFromInSpecProfiles string limit test --------------------------------- //
+	for _, profile := range []*inspec.Profile{profile1, profile2} {
+		for _, control := range profile.Controls {
+			for _, result := range control.Results {
+				result.CodeDesc = randomString(maxESKeywordBytesv1 + 10)
+				result.Message = randomString(maxESKeywordBytesv1 + 11)
+				result.SkipMessage = randomString(maxESKeywordBytesv1 + 12)
+			}
+		}
+	}
+	actualProfilesMin = ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, false)
+	for _, profile := range actualProfilesMin {
+		for _, control := range profile.Controls {
+			for _, result := range control.Results {
+				assert.Len(t, result.Message, maxESKeywordBytesv1)
+				assert.Len(t, result.SkipMessage, maxESKeywordBytesv1)
+			}
+		}
+	}
+
+	actualProfilesMin = ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, true)
+	for _, profile := range actualProfilesMin {
+		for _, control := range profile.Controls {
+			for _, result := range control.Results {
+				assert.Len(t, result.Message, maxESKeywordBytesv2)
+				assert.Len(t, result.SkipMessage, maxESKeywordBytesv2)
+			}
+		}
+	}
 }
 
 // ------------------------------- Inherited test --------------------------------- //
@@ -447,4 +478,13 @@ func profilesToJsonMin(profiles []*relaxting.ESInspecProfile) (str string) {
 		panic(fmt.Sprintf("Error marshalling profiles: %s", err))
 	}
 	return string(profsBytes)
+}
+
+func randomString(length int) string {
+	var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	byteArr := make([]byte, length)
+	for i := range byteArr {
+		byteArr[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(byteArr)
 }
