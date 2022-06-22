@@ -854,9 +854,9 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	return map[string]interface{}{"projects": esProjectCollection}
 }
 
-func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInSpecReportA2v2) (*relaxting.ESInSpecReportA2v2, error) {
+func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInSpecReport) (*relaxting.ESInSpecReport, error) {
 	logrus.Debug("Fetching project by UUID")
-	var inspReporting relaxting.ESInSpecReportA2v2
+	var item relaxting.ESInSpecReport
 	var YYYYMMDD = "2006.01.02"
 	now := time.Now()
 	index := "comp-7-r-" + now.Format(YYYYMMDD)
@@ -885,17 +885,18 @@ func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInS
 		}
 	}
 
-	if searchResult.Hits.TotalHits.Value > 0 {
-		logrus.Printf("Found a total of %d ESInSpecReportA2v2\n", searchResult.Hits.TotalHits)
+	if searchResult.TotalHits() > 0 {
+		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 
 		// Iterate through results
 		for _, hit := range searchResult.Hits.Hits {
 			// hit.Index contains the name of the index
-
-			// Deserialize hit.Source into a ESInSpecReportA2v2 (could also be just a map[string]interface{}).
-			err := json.Unmarshal(hit.Source, &inspReporting)
-			if err != nil {
-				logrus.Errorf("Received error while unmarshling %+v", err)
+			if hit.Source != nil {
+				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
+				err := json.Unmarshal(hit.Source, &item)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling %+v", err)
+				}
 			}
 
 		}
@@ -903,5 +904,5 @@ func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInS
 		// No hits
 		logrus.Debug("Found no record")
 	}
-	return &inspReporting, nil
+	return &item, nil
 }
