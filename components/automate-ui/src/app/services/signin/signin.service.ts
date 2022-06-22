@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Params } from '@angular/router';
 
 const callbackPath = '/session/callback';
-interface CallbackResponse {
+export interface CallbackResponse {
     state: string;
     id_token: string;
 }

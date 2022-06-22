@@ -42,14 +42,3 @@ export class MockChefSessionServiceEnabledUndefined {
   public setSession(): void {}
   public deleteSession(): void {}
 }
-
-interface CallbackResponse {
-  state: string;
-  id_token: string;
-}
-export class MockSigninService {
-  callback(params: Params): Observable<CallbackResponse> {
-    console.log(params); 
-    return of<CallbackResponse>();
-  }
-}

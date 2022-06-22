@@ -2,45 +2,47 @@ import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { MockChefSessionService, MockSigninService } from 'app/testing/mock-chef-session.service';
+import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { SigninComponent } from './signin.component';
 import { MockComponent } from 'ng2-mock-component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
-import { SigninService } from 'app/services/signin/signin.service';
+import { Observable, of } from 'rxjs';
+import { CallbackResponse, SigninService } from 'app/services/signin/signin.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-class MockActivatedRoute {
-  private subject = new ReplaySubject<string>();
-
-  constructor(initialFragment: string = '') {
-    this.setFragment(initialFragment);
-  }
-
-  readonly fragment = this.subject.asObservable();
-  readonly snapshot = {};
-
-  setFragment(frag: string) {
-    this.subject.next(frag);
-  }
+class ActivatedRouteMock {
+  queryParams = new Observable(observer => {
+    const urlParams = {
+      param1: 'some',
+      param2: 'params'
+    };
+    observer.next(urlParams);
+    observer.complete();
+  });
 }
+
+class SignIn {
+  callback() {
+    const data: CallbackResponse = {
+      state: 'test',
+      id_token: 'test'
+    };
+    return of(data);
+  }
+};
 
 describe('SigninComponent', () => {
   let component: SigninComponent;
   let fixture: ComponentFixture<SigninComponent>;
   let chefSessionService: ChefSessionService;
-  let activatedRoute: MockActivatedRoute;
 
   // tslint:disable-next-line:max-line-length
   const valid_id_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImJkOWY5ZGFkZDc4ZDEyOWFlN2I2ODZhZTU0NjJhOWYzY2JmMDY1MTUifQ.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAvZGV4Iiwic3ViIjoiQ2cwd0xUTTROUzB5T0RBNE9TMHdFZ1J0YjJOciIsImF1ZCI6ImF1dG9tYXRlLXVpIiwiZXhwIjoxNTA5NzIwMTgzLCJpYXQiOjE1MDk2MzM3ODMsImF0X2hhc2giOiJ4ck1fTXNmLUd1dmY1dzRGeWY1THVRIiwiZW1haWwiOiJraWxnb3JlQGtpbGdvcmUudHJvdXQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZ3JvdXBzIjpbImF1dGhvcnMiXSwibmFtZSI6IktpbGdvcmUgVHJvdXQifQ.CsBjk47MdwpkneBsbc9NEIx8TskokPDrd3Bp-C4GhcdC-eZH-vOKBnRytMi7_GcOchevo7KCmwjzZllC-AgJMd7b5SBWVjDzLQuS8D9zIX_t_vf3c_wwl4R_fYjBiO7wmm3u-VQGCmxX4UjqyfzWCT-FYwLH5WctVusM3bdlAF0FiLndkmiyAaNFbxMznlDwmrys39in4oV9srxZnXrK-ydlhpJJzETrwBVmAhDzKJO62GC6WcFQYFeQ0Dtb6eBSFaRBi7LmM5TUT_qcIW-LRGcfa7h2DfifKEgCFuv6QjUXb8B7fxRZNMQyAcoVV9qZK8Nd51l-anDD1PI4J12hyw';
 
-
-  beforeEach(() => {
-    activatedRoute = new MockActivatedRoute('');
-  });
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         RouterTestingModule.withRoutes([{ path: '**', component: SigninComponent }]) // match all
       ],
       declarations: [
@@ -49,9 +51,9 @@ describe('SigninComponent', () => {
       ],
       providers: [
         // Note: the [routerLink] in the template requires snapshot to exist
-        { provide: ActivatedRoute, useValue: activatedRoute },
+        { provide: ActivatedRoute, useClass: ActivatedRouteMock},
         { provide: ChefSessionService, useClass: MockChefSessionService },
-        { provide: SigninService, useClass: MockSigninService }
+        { provide: SigninService, userClass: SignIn}
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
@@ -61,7 +63,6 @@ describe('SigninComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SigninComponent);
     chefSessionService = TestBed.inject(ChefSessionService);
-    TestBed.inject(SigninService);
     component = fixture.componentInstance;
   });
 
@@ -71,45 +72,38 @@ describe('SigninComponent', () => {
 
   describe('ngOnInit', () => {
     describe('sets error', () => {
-      it('to true when fragment is missing', () => {
-        activatedRoute.setFragment(null);
-        fixture.detectChanges();
-
-        expect((component as any).error).toEqual(true);
-      });
 
       it('to true when id_token does not exist', () => {
-        component.setIdAndPath('', '');
+        const err = component.setIdAndPath('', '');
         fixture.detectChanges();
         const id_token = (component as any).idToken;
         const path = (component as any).path;
         expect(id_token).toEqual('');
         expect(path).toEqual('');
 
-        expect((component as any).error).toEqual(true);
+        expect(err).toEqual(true);
       });
 
       it('to false when id_token exists', () => {
-        component.setIdAndPath(valid_id_token, '');
+        const err = component.setIdAndPath(valid_id_token, '');
         fixture.detectChanges();
         const id_token = (component as any).idToken;
         const path = (component as any).path;
         expect(id_token).toBe(valid_id_token);
         expect(path).toBe('');
 
-        expect((component as any).error).toEqual(false);
+        expect(err).toEqual(false);
       });
 
       it('to true when id token cannot be decoded', () => {
         const not_a_jwt_value = 'NOTAJWT';
-        component.setIdAndPath(not_a_jwt_value, '');
+        const error = component.setIdAndPath(not_a_jwt_value, '');
         fixture.detectChanges();
         const id_token = (component as any).idToken;
         const path = (component as any).path;
         expect(id_token).toBe(not_a_jwt_value);
         expect(path).toBe('');
-
-        expect((component as any).error).toEqual(true);
+        expect(error).toEqual(true);
       });
     });
 
