@@ -221,14 +221,5 @@ func TestFilterQuerychange(t *testing.T) {
 	filters1["end_time"] = []string{"2022-06-21T00:00:00Z"}
 	a, err := filterQuerychange(filters1)
 	assert.Equal(t, []string{"daily_latest"}, a)
-	filters2 := map[string][]string{}
-	filters2["start_time"] = []string{"2022-06-22T00:00:00Z"}
-	filters2["end_time"] = []string{"2022-09-22T00:00:00Z"}
-	b, err := filterQuerychange(filters2)
-	assert.Equal(t, []string{"Range should be less than 90 days"}, b)
-	filters3 := map[string][]string{}
-	filters3["start_time"] = []string{"2022-09-23T00:00:00Z"}
-	filters3["end_time"] = []string{"2022-09-22T00:00:00Z"}
-	c, err := filterQuerychange(filters3)
-	assert.Equal(t, []string{"Start date should not be greater than end date"}, c)
+
 }

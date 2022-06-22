@@ -1275,15 +1275,6 @@ func filterQuerychange(filters map[string][]string) ([]string, error) {
 		panic(err)
 	}
 	diff := endtime.Sub(starttime).Hours() / 24
-
-	if diff > 90 {
-		logrus.Error("Range should be less than 90 days")
-		return []string{"Range should be less than 90 days"}, err
-	}
-	if diff < 0 {
-		logrus.Error("Start date should not be greater than end date")
-		return []string{"Start date should not be greater than end date"}, err
-	}
 	if diff == 0 {
 		return []string{"daily_latest"}, nil
 	} else {
@@ -1350,7 +1341,20 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
 		endTime := firstOrEmpty(filters["end_time"])
 		startTime := firstOrEmpty(filters["start_time"])
-		filterQuerychange(filters)
+		layout := "2006-01-02T15:04:05Z"
+		endtime, err := time.Parse(layout, endTime)
+		starttime, err := time.Parse(layout, startTime)
+		if err != nil {
+			panic(err)
+		}
+		diff := endtime.Sub(starttime).Hours() / 24
+
+		if diff > 90 {
+			logrus.Error("Range should be less than 90 days")
+		}
+		if diff < 0 {
+			logrus.Error("Start date should not be greater than end date")
+		}
 		timeRangeQuery := elastic.NewRangeQuery("end_time")
 		if len(startTime) > 0 {
 			timeRangeQuery.Gte(startTime)
@@ -1390,16 +1394,28 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	if latestOnly {
 		// only if there is no job_id filter set, do we want the daily latest
+		s, err := filterQuerychange(filters)
+		if err != nil {
+			panic(err)
+		}
 		if len(filters["end_time"]) > 0 {
-			// If we have an end_time filter, we use the daily_latest filter dedicated to the UTC timeseries indices
-			termQuery := elastic.NewTermsQuery("daily_latest", true)
-			boolQuery = boolQuery.Must(termQuery)
-			filterQuerychange(filters)
+			if len(s) == 1 && s[0] == "daily_latest" {
+				// If we have an end_time filter, we use the daily_latest filter dedicated to the UTC timeseries indices
+				termQuery := elastic.NewTermsQuery("daily_latest", true)
+				boolQuery = boolQuery.Must(termQuery)
+			}
+			if len(s) == 2 {
+				termQuery := elastic.NewTermsQuery("daily_latest", true)
+				boolQuery = boolQuery.Must(termQuery)
+				termQuery1 := elastic.NewTermsQuery("day_latest", true)
+				boolQuery = boolQuery.Must(termQuery1)
+			}
 		} else {
 			// If we don't have an end_time filter, we use the day_latest filter
 			termQuery := elastic.NewTermsQuery("day_latest", true)
 			boolQuery = boolQuery.Must(termQuery)
-			filterQuerychange(filters)
+			termQuery1 := elastic.NewTermsQuery("daily_latest", true)
+			boolQuery = boolQuery.Must(termQuery1)
 		}
 	}
 
