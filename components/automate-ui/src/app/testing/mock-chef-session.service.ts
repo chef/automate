@@ -1,6 +1,4 @@
 import { IDToken } from 'app/helpers/jwt/jwt';
-import { Params } from '@angular/router';
-import { Observable, of } from 'rxjs';
 
 export class MockChefSessionService {
   fullname = 'Test Mock';
