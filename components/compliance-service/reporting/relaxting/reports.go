@@ -813,7 +813,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	}
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
@@ -1265,6 +1265,31 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 
 	return waiverDataCollection, nil
 }
+func filterQuerychange(filters map[string][]string) ([]string, error) {
+	endTime := firstOrEmpty(filters["end_time"])
+	startTime := firstOrEmpty(filters["start_time"])
+	layout := "2006-01-02T15:04:05Z"
+	endtime, err := time.Parse(layout, endTime)
+	starttime, err := time.Parse(layout, startTime)
+	if err != nil {
+		panic(err)
+	}
+	diff := endtime.Sub(starttime).Hours() / 24
+
+	if diff > 90 {
+		logrus.Error("Range should be less than 90 days")
+		return []string{"Range should be less than 90 days"}, err
+	}
+	if diff < 0 {
+		logrus.Error("Start date should not be greater than end date")
+		return []string{"Start date should not be greater than end date"}, err
+	}
+	if diff == 0 {
+		return []string{"daily_latest"}, nil
+	} else {
+		return []string{"day_latest", "daily_latest"}, nil
+	}
+}
 
 //getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
 //  arguments: filters - is a map of filters that serve as the source for generated es query filters
@@ -1325,7 +1350,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
 		endTime := firstOrEmpty(filters["end_time"])
 		startTime := firstOrEmpty(filters["start_time"])
-
+		filterQuerychange(filters)
 		timeRangeQuery := elastic.NewRangeQuery("end_time")
 		if len(startTime) > 0 {
 			timeRangeQuery.Gte(startTime)
@@ -1369,10 +1394,12 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 			// If we have an end_time filter, we use the daily_latest filter dedicated to the UTC timeseries indices
 			termQuery := elastic.NewTermsQuery("daily_latest", true)
 			boolQuery = boolQuery.Must(termQuery)
+			filterQuerychange(filters)
 		} else {
 			// If we don't have an end_time filter, we use the day_latest filter
 			termQuery := elastic.NewTermsQuery("day_latest", true)
 			boolQuery = boolQuery.Must(termQuery)
+			filterQuerychange(filters)
 		}
 	}
 
