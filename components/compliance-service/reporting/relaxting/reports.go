@@ -1265,6 +1265,31 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 
 	return waiverDataCollection, nil
 }
+func filterQuerychange(filters map[string][]string) ([]string, error) {
+	endTime := firstOrEmpty(filters["end_time"])
+	startTime := firstOrEmpty(filters["start_time"])
+	layout := "2006-01-02T15:04:05Z"
+	endtime, err := time.Parse(layout, endTime)
+	starttime, err := time.Parse(layout, startTime)
+	if err != nil {
+		panic(err)
+	}
+	diff := endtime.Sub(starttime).Hours() / 24
+
+	if diff > 90 {
+		logrus.Error("Range should be less than 90 days")
+		return []string{"Range should be less than 90 days"}, err
+	}
+	if diff < 0 {
+		logrus.Error("Start date should not be greater than end date")
+		return []string{"Start date should not be greater than end date"}, err
+	}
+	if diff == 0 {
+		return []string{"daily_latest"}, nil
+	} else {
+		return []string{"day_latest", "daily_latest"}, nil
+	}
+}
 
 //getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
 //  arguments: filters - is a map of filters that serve as the source for generated es query filters
@@ -1372,6 +1397,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		for _, flag := range setFlags {
 			termQuery := elastic.NewTermsQuery(flag, true)
 			boolQuery = boolQuery.Must(termQuery)
+			filterQuerychange(filters)
 		}
 
 	}
