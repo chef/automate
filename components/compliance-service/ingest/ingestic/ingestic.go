@@ -858,15 +858,17 @@ func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInS
 	logrus.Debug("Fetching project by UUID")
 	var item relaxting.ESInSpecReport
 
+	fsc := elastic.NewFetchSourceContext(false)
+	termQueryNotThisReport := elastic.NewTermsQuery("_id", data.ReportID)
 	boolQuery := elastic.NewBoolQuery()
-	mustQueries := make([]elastic.Query, 0)
-	mustQueries = append(mustQueries, elastic.NewMatchQuery("report_uuid", data.ReportID))
-	boolQuery.Must(mustQueries...)
-
-	searchResult, err := backend.client.Search().
-		Index("comp-7-r-2022.06.22").
-		Type("_search").
+	boolQuery = boolQuery.Must(termQueryNotThisReport)
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
 		Query(boolQuery).
+		Size(1000)
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index("comp-7-r-2022.06.22").
 		Do(context.Background())
 
 	if err != nil {
