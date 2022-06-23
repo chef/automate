@@ -20834,6 +20834,10 @@
       "x-displayName": "Reporting"
     },
     {
+      "name": "ReportManagerService",
+      "x-displayName": "Report Manager"
+    },
+    {
       "name": "ProfilesService",
       "x-displayName": "Profiles"
     },
@@ -20917,6 +20921,12 @@
         "StatsService",
         "JobsService",
         "ProfilesService"
+      ]
+    },
+    {
+      "name": "Report Manager",
+      "tags": [
+        "ReportManagerService"
       ]
     },
     {

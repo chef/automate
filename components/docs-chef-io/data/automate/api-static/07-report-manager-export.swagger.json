@@ -7,7 +7,7 @@
         "tags": [
           "ReportManagerService"
         ],
-        "operationId": "Export",
+        "operationId": "Report Manager Export",
         "responses": {
           "200": {
             "description": "A successful response.",
