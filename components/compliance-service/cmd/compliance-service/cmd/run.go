@@ -104,6 +104,9 @@ func init() {
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.CertPath, "cert", "", "Service certificate")
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.KeyPath, "key", "", "Service certificate key")
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.RootCACertPath, "root-cert", "", "Root CA Cert to use to verify clients")
+	runCmd.Flags().BoolVar(&conf.Service.EnableLargeReporting, "enable-large-reporting", false, "upgrade to support large reporting")
+	runCmd.Flags().IntVar(&conf.Service.LcrOpenSearchRequests, "lcr-open-search-requests", conf.Service.LcrOpenSearchRequests, "number of concurrent requests to communicate with open search for large compliance reporting")
+
 	runCmd.Flags().Int32Var(&conf.DataRetention.ComplianceReportDays, "reports-retention-days", 60, "Number of days to keep compliance reports")
 	runCmd.Flags().StringVar(&conf.Service.ConfigFilePath, "config", "", "config file")
 	runCmd.Flags().IntVar(&conf.Service.MessageBufferSize, "message-buffer-size", 100, "Number of ingest messages allowed to buffer")
@@ -162,4 +165,8 @@ func init() {
 
 	// Cereal Service Flags
 	runCmd.Flags().StringVar(&conf.CerealConfig.Endpoint, "cereal-endpoint", conf.CerealConfig.Endpoint, "Cereal Service Endpoint")
+
+	// Report Manager Flags
+	runCmd.Flags().StringVar(&conf.ReportConfig.Endpoint, "report-manager-endpoint", conf.ReportConfig.Endpoint, "Report Manager Service Endpoint")
+
 }
