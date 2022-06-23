@@ -7,14 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// func TestParseReportCtrlStruct(t *testing.T) {
-// 	suit := integration_test.NewGlobalSuite()
-
-// 	inspecReport := relaxting.ESInSpecReport{ReportID: "efd46e48-5751-40a2-a705-1182356908c1"}
-// 	controls, err := ParseReportCtrlStruct(suit.ingesticESClient, &inspecReport, "comp-7-r-2022.06.22")
-// 	assert.NoError(t, err)
-// 	assert.Nil(t, controls)
-// }
+const(
+	UUID = "efd46e48-5751-40a2-a705-1182356908c1"
+)
 
 func TestMapStructs(t *testing.T) {
 	type args struct {
@@ -39,7 +34,7 @@ func TestMapStructs(t *testing.T) {
 			args: args{
 				inspecReport: &relaxting.ESInSpecReport{
 					NodeID:      "",
-					ReportID:    "efd46e48-5751-40a2-a705-1182356908c1",
+					ReportID:    UUID,
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
@@ -80,7 +75,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Nodes:       Node{NodeUUID: "", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: "efd46e48-5751-40a2-a705-1182356908c1"},
+					Nodes:       Node{NodeUUID: "", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
 					Profile:     Profile{ProfileID: ""},
 				},
 				{
@@ -92,7 +87,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "failed",
-					Nodes:       Node{NodeUUID: "", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: "efd46e48-5751-40a2-a705-1182356908c1"},
+					Nodes:       Node{NodeUUID: "", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
 					Profile:     Profile{ProfileID: ""},
 				},
 			},
