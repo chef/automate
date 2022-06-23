@@ -10,6 +10,12 @@
       ]
     },
     {
+      "name": "Report Manager",
+      "tags": [
+        "ReportManagerService"
+      ]
+    },
+    {
       "name": "Infra",
       "tags": [
         "ConfigMgmt"
@@ -63,6 +69,10 @@
     {
       "name": "ReportingService",
       "x-displayName": "Reporting"
+    },
+    {
+      "name": "ReportManagerService",
+      "x-displayName": "Report Manager"
     },
     {
       "name": "ProfilesService",
