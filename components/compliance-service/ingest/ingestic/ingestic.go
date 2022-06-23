@@ -854,7 +854,7 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	return map[string]interface{}{"projects": esProjectCollection}
 }
 
-func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInSpecReport, index string) (*relaxting.ESInSpecReport, error) {
+func (backend *ESClient) GetDocByReportUUId(ctx context.Context, data *relaxting.ESInSpecReport, index string) (*relaxting.ESInSpecReport, error) {
 	logrus.Debug("Fetching project by UUID")
 	var item relaxting.ESInSpecReport
 
@@ -905,9 +905,6 @@ func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInS
 			}
 
 		}
-	} else {
-		// No hits
-		logrus.Debug("Found no record")
 	}
 	return &item, nil
 }

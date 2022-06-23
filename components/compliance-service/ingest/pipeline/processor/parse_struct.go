@@ -38,20 +38,20 @@ type Profile struct {
 
 func ParseReportCtrlStruct(client *ingestic.ESClient, data *relaxting.ESInSpecReport, index string) ([]Control, error) {
 	var controls []Control
-	inspecReport, err := client.GetDocByUUID(context.Background(), data, index)
+	inspecReport, err := client.GetDocByReportUUId(context.Background(), data, index)
 	if err != nil {
 		logrus.Errorf("cannnot find inspec report: %v", err)
 		return nil, err
 	}
 
-	controls, err = MapStructs(inspecReport)
+	controls, err = MapStructsESInSpecReportToControls(inspecReport)
 	if err != nil {
 		return nil, err
 	}
 	return controls, err
 }
 
-func MapStructs(inspecReport *relaxting.ESInSpecReport) ([]Control, error) {
+func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) ([]Control, error) {
 	var controls []Control
 
 	// Get the nodes
@@ -76,7 +76,7 @@ func MapStructs(inspecReport *relaxting.ESInSpecReport) ([]Control, error) {
 			ctrl.DayLatest = inspecReport.DailyLatest
 			ctrl.Status = value2.Status
 			ctrl.Nodes = node
-			ctrl.Profile = Profile{ProfileID: ""}
+			ctrl.Profile = Profile{ProfileID: value.Profile}
 			controls = append(controls, ctrl)
 		}
 	}

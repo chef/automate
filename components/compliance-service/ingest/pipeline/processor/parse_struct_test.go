@@ -1,23 +1,20 @@
 package processor
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/chef/automate/components/compliance-service/integration_test"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseReportCtrlStruct(t *testing.T) {
-	suit := integration_test.NewGlobalSuite()
+// func TestParseReportCtrlStruct(t *testing.T) {
+// 	suit := integration_test.NewGlobalSuite()
 
-	inspecReport := relaxting.ESInSpecReport{ReportID: "efd46e48-5751-40a2-a705-1182356908c1"}
-	controls, err := ParseReportCtrlStruct(suit.ingesticESClient, &inspecReport, "comp-7-r-2022.06.22")
-	assert.NoError(t, err)
-	assert.Nil(t, controls)
-}
+// 	inspecReport := relaxting.ESInSpecReport{ReportID: "efd46e48-5751-40a2-a705-1182356908c1"}
+// 	controls, err := ParseReportCtrlStruct(suit.ingesticESClient, &inspecReport, "comp-7-r-2022.06.22")
+// 	assert.NoError(t, err)
+// 	assert.Nil(t, controls)
+// }
 
 func TestMapStructs(t *testing.T) {
 	type args struct {
@@ -104,15 +101,13 @@ func TestMapStructs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MapStructs(tt.args.inspecReport)
+			got, err := MapStructsESInSpecReportToControls(tt.args.inspecReport)
 			if tt.name == "Test 1" {
 				require.NoError(t, err)
 				require.Empty(t, got)
 			}
 
 			if tt.name == "Test with Value" {
-				fmt.Printf("Alpha: %+v", got)
-				fmt.Printf("Beta: %+v", err)
 				require.NoError(t, err)
 				require.NotEmpty(t, got)
 				require.Equal(t, got, tt.want)
