@@ -73,7 +73,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	var repIds reportingapi.ReportIds
 
 	//nodeReport := make(map[string]reportingapi.ReportData, 0)
-	boolQuery, err := backend.getFiltersQuery(filters, latestOnly)
+	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
 	fsc := elastic.NewFetchSourceContext(true).Include("end_time")
 
@@ -820,7 +820,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
 	latestOnly := FetchLatestDataOrNot(filters)
 
-	filtQuery, err := backend.getFiltersQuery(filters, latestOnly)
+	filtQuery := backend.getFiltersQuery(filters, latestOnly)
 
 	searchSource := elastic.NewSearchSource().
 		Query(filtQuery).
@@ -1267,7 +1267,7 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 //  arguments: filters - is a map of filters that serve as the source for generated es query filters
 //             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
 //  return *elastic.BoolQuery
-func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) (*elastic.BoolQuery, error) {
+func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
 	utils.DeDupFilters(filters)
 	logrus.Debugf("????? Called getFiltersQuery with filters=%+v, latestOnly=%t", filters, latestOnly)
 	boolQuery := elastic.NewBoolQuery()
@@ -1322,14 +1322,14 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
 		endTime := firstOrEmpty(filters["end_time"])
 		startTime := firstOrEmpty(filters["start_time"])
-		diff, _, err := filterQuerychange(endTime, startTime)
+		diff, _, _ := filterQuerychange(endTime, startTime)
 		if diff > 90 {
 			logrus.Error("Range should be less than 90 days")
-			return nil, err
+			return nil
 		}
 		if diff < 0 {
 			logrus.Error("Start date should not be greater than end date")
-			return nil, err
+			return nil
 		}
 		timeRangeQuery := elastic.NewRangeQuery("end_time")
 		if len(startTime) > 0 {
@@ -1373,7 +1373,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		_, setFlag, err := filterQuerychange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 		if err != nil {
 			errors.Errorf("cannot parse the time %v", err)
-			return nil, err
+			return nil
 		}
 		if len(filters["end_time"]) > 0 {
 			if setFlag == "daily_latest" {
@@ -1411,7 +1411,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		}
 	}
 
-	return boolQuery, nil
+	return boolQuery
 }
 
 func (backend ES2Backend) getESFieldName(filterType string) string {

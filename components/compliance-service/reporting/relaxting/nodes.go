@@ -249,7 +249,7 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 		"controls_sums")
 
 	filters["node_id"] = []string{nodeUuid}
-	query, err := backend.getFiltersQuery(filters, false)
+	query := backend.getFiltersQuery(filters, false)
 
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
