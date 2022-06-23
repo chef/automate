@@ -329,7 +329,7 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	}
 
 	// We are not filtering by ProfileID, we are passing it in as a uri resource.
-	filtQuery, err := backend.getFiltersQuery(filters, true)
+	filtQuery := backend.getFiltersQuery(filters, true)
 
 	profileIDQuery := elastic.NewTermQuery("profiles.sha256", profileId)
 
