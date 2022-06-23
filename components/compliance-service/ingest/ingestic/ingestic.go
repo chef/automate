@@ -868,7 +868,7 @@ func (backend *ESClient) GetDocByUUID(ctx context.Context, data *relaxting.ESInS
 		Size(1000)
 	searchResult, err := backend.client.Search().
 		SearchSource(searchSource).
-		Index("comp-7-r-2022.06.22").
+		Index(index).
 		Do(context.Background())
 
 	if err != nil {

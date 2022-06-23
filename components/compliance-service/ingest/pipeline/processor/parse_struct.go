@@ -2,8 +2,6 @@ package processor
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
@@ -46,9 +44,6 @@ func ParseReportCtrlStruct(client *ingestic.ESClient, data *relaxting.ESInSpecRe
 		return nil, err
 	}
 
-	xb, _ := json.MarshalIndent(inspecReport, "", "    ")
-	ioutil.WriteFile("abc.json", xb, 0777)
-
 	controls, err = MapStructs(inspecReport)
 	if err != nil {
 		return nil, err
@@ -79,7 +74,7 @@ func MapStructs(inspecReport *relaxting.ESInSpecReport) ([]Control, error) {
 			ctrl.EndTime = inspecReport.EndTime
 			ctrl.DailyLatest = inspecReport.DailyLatest
 			ctrl.DayLatest = inspecReport.DailyLatest
-			ctrl.Status = inspecReport.Status
+			ctrl.Status = value2.Status
 			ctrl.Nodes = node
 			ctrl.Profile = Profile{ProfileID: ""}
 			controls = append(controls, ctrl)
