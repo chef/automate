@@ -42,13 +42,14 @@ The hardware configuration is according to the performance benchmarking tests ba
 
 The machine requirements based on the above assumptions are listed below:
 
-| Instance          | Count | vCPU | RAM | Storage Size | AWS Machine Type |
-|-------------------|-------|------|-----|--------------|------------------|
-| Chef Automate     | 2     | 2    | 8   | 80 GB        | m5.large         |
-| Chef Infra Server | 2     | 2    | 8   | 80 GB        | m5.large         |
-| Postgresql DB     | 3     | 2    | 8   | 150 GB       | m5.large         |
-| Opensearch DB     | 3     | 2    | 8   | 58.9 GB      | m5.large         |
-| Bastion Machine   | 1     | 2    | 8   | 150 GB       | m5.large         |
+| Instance          | Count | vCPU | RAM | Storage Size(/hab) | AWS Machine Type | Additional Space |
+|-------------------|-------|------|-----|------------------- |------------------|------------------|
+| Chef Automate     | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
+| Chef Infra Server | 2     | 2    | 8   | 80 GB              | m5.large         |/tmp=5%  /root=20%|
+| Postgresql DB     | 3     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
+| Opensearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
+| Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
+
 
 {{< note >}}
 

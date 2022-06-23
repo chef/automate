@@ -14,25 +14,27 @@ gh_repo = "automate"
 
 This page explains the frequently encountered issues in Chef Automate High Availability (HA) functionality and the steps to resolve them.
 
-## Frequently Asked Questions
+## Issues and Solutions
 
-### How to check logs while doing backup or restore?
-
-Set *log-level* debug using the `chef-automate debug set-log-level deployment-service debug` command, and execute the *journalctl* `journalctl --follow --unit chef-automate` command.
-
-### How to perform infrastructure cleanup for on-premises nodes
-
-To perform cleanup on the instances and nodes of the deployed Chef Automate HA infrastructure(Automate, Server, three instances of Postgres, three instances of OpenSearch), execute the following command:
-
-```bash
-rm -rf /hab
-cd /var/tmp && rm -f frontend-* && rm -f backend-*
-sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}')
+### Post Automate HA deployment, if chef-server service is in critical state.
+- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
+  if gettign an 500 internal server error with data-collector endpoint, it means that
+  Chef Infra Server not able to communicate to the Chef Automate data-collector endpoint
+  
+  ssh to the Automate HA Chef Infra Server, and get token and automate-lb-url from the config.
+  run `chef-automate config show` go get the config.
+  
+```cmd
+  export endpoint="AUTOMATE LB URL"
+  export token="GET_THIS_TOKEN_FROM_CHEF_SERVER_CONFIG"
+  curl -H "api-token:$token" https://$endpoint/api/v0/events/data-collector -k
 ```
 
-Run `rm -rf /hab` on Bastion node.
+To make the service health, make sure that chef server able to curl the data collector endpoint from chef server node.
 
-## Issues and Solutions
+### Deployment doesn't exit Gracefully
+- There are some cases in which deployment doesn't exited successfully.
+
 
 ### Issue: Database Accessed by Other Users
 
@@ -43,8 +45,6 @@ The restore command fails when other users or services access the nodes' databas
 #### Solution
 
 - Stop the frontend and backend services.
-
-- Step the *datadog* agent.
 
 - Perform the following steps on all frontend and backend nodes:
 
@@ -59,7 +59,7 @@ The cached artifact does not exist in offline mode. This issue occurs in an air 
 
 #### Solution
 
-Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-20210908093242.aib*.
+Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-4.x.y.aib*.
 
 ##### Command Example
 

@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 230
 +++
 
-This page explains how to use the **AWS Certificate Manager (ACM)** console to generate a public ACM certificate to create a Load Balancer (LB).
+This page explains how to use the **AWS Certificate Manager (ACM)** console to generate a public ACM certificate for your domain.
 
 You can either generate a new public certificate or copy an existing Amazon Resource Name (ARN) value of the certificate of your selected region in the AWS console.
 
@@ -49,7 +49,7 @@ Follow these steps if you want to request an ACM public certificate:
 
 You can also request a public certificate using the Command Line Interface (CLI). For detailed information on requesting these certificates, refer  [AWS documentation on requesting a public certificate](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html).
 
-## Providing Certificate ARN Value in `a2ha.rb` Configuration file
+## Providing Certificate ARN Value in `config.toml` Configuration file
 
 Follow these steps if you want to use the AWS certificates in your network infrastructure:
 
@@ -57,11 +57,11 @@ Follow these steps if you want to use the AWS certificates in your network infra
 
 2. Navigate to the `hab` workspace directory.
 
-3. Open the `a2ha.rb` file in any editor you like.
+3. Open the `config.toml` file in any editor of your choice.
 
 {{< figure src="/images/automate/ha_load_balancer.png" alt="AWS Certificate ARN Value">}}
 
-4. Copy the existing or generated ARN value from AWS console to the `chef_server_lb_certificate_arn` and `automate_server_lb_certificate_arn` fields in the *a2ha.rb* file.
+4. Copy the existing or generated ARN value from AWS console to the `chef_server_lb_certificate_arn` and `automate_server_lb_certificate_arn` fields in the *config.toml* file.
 
 {{< figure src="/images/automate/ha_a2rb_lb_certificate.png" alt="AWS Certificate ARN Value">}}
 

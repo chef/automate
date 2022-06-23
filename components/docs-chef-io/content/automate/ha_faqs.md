@@ -16,9 +16,64 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ## Frequently Asked Questions
 
+### How to check logs For automate nodes?
+- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+`./chef-automate ssh --hostname a2`
+
+- choose the Instace based on the output. To view the logs run the command 
+`journalctl --follow --unit chef-automate` 
+
+### How to check logs For Chef Infra Server nodes?
+- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+`./chef-automate ssh --hostname cs`
+
+- choose the Instace based on the output. To view the logs run the command 
+`journalctl --follow --unit chef-automate` 
+
+### How to check logs For Postgres nodes?
+- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+`./chef-automate ssh --hostname pg`
+
+- choose the Instace based on the output. To view the logs run the command 
+`journalctl --follow --unit hab-sup` 
+
+### How to check logs For Opensearch nodes?
+- To view the logs please do ssh to the respective node by runnig the command from bastion node 
+`./chef-automate ssh --hostname os`
+
+- choose the Instace based on the output. To view the logs run the command 
+`journalctl --follow --unit hab-sup` 
+
+### How to Pass the custom config for the Frontend node (Automate / ChefInfraServer)?
+- Create a file with say `customconfig.toml`, pass the absolute path `config_file=/ABSOLUTE_PATH/customconfig.toml`
+
+
+
+### How to Add more nodes In AWS Deployment, post deployment. 
+- Move `/hab/a2_deploy_workspace/terraform/aws.auto.tfvars` to `/hab/a2_deploy_workspace/terraform/destroy/aws/`
+- Modify `/hab/a2_deploy_workspace/terraform/.tf_arch` from `deployment` to `aws`
+- Modify the `instance_count` in config.toml
+- Run the Provision command (This will create or destroy the resources):
+  ``` bash 
+  chef-automate provision-infra config.toml --airgap-bundle <BUNDLE_NAME>
+  ```
+  
+- Redeploy the cluster
+  ``` bash
+  chef-automate deploy config.toml --airgap-bundle <BUNDLE_NAME>
+  ```
+{{< note >}}
+  Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
+{{< /note >}}  
+
+### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
+ - No, Automate HA support https connection only with Managed services. 
+
+
 ### How to check logs while doing backup or restore?
 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
+
 
 ### How to perform infrastructure cleanup for on-premises nodes
 
@@ -45,8 +100,6 @@ Restore command fails when the databases of the nodes are accessed by other user
 #### Resolution
 
 - Ensure the frontend and backend services are stopped.
-
-- Ensure the *datadog* agent is stopped.
 
 - Perform the following steps on all frontend and backend nodes:
 
@@ -200,7 +253,7 @@ The Chef Automate frontend and backend nodes service logs are available via `jou
 
 Where the *--unit* displays the logs from the specified unit, and *--follow* means to follow the journal.
 
-- Use the *grep* command to filter the logs related to a specific service. For example, run this command `journalctl --follow --unit hab-sup | grep 'automate-ha-elasticsearch'` to view the log of the habitat component in the Chef Automate frontend node.
+- Use the *grep* command to filter the logs related to a specific service. For example, run this command `journalctl --follow --unit hab-sup | grep 'automate-ha-opensearch'` to view the log of the habitat component in the Chef Automate frontend node.
 
 - Execute the following command, `journalctl --follow --unit chef-automate`, to view the log of the frontend (chef-automate and chef-server instances) nodes.
 

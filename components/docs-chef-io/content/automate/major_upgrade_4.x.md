@@ -214,10 +214,15 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 2. Create an Airgap Installation Bundle (AIB).
 
 ```sh
-sudo ./chef-automate airgap bundle create
+sudo ./chef-automate airgap bundle create 
+```
+OR we can directly download via curl request
+
+```sh
+curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-4.x.y.aib
 ```
 
-3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_4.0.x.aib`) to the air-gapped machine running Chef Automate.
+3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate-4.x.y.aib`) to the air-gapped machine running Chef Automate.
 
 #### On Air-Gapped machine running Chef Automate
 
@@ -230,7 +235,7 @@ sudo ./chef-automate config show
 2. Upgrade using new AIB and Chef Automate CLI:
 
 ```sh
-sudo ./chef-automate upgrade run --airgap-bundle automate_4.0.x.aib --major
+sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```
 
 **Post Upgrade**
@@ -325,8 +330,13 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 ```sh
 sudo ./chef-automate airgap bundle create
 ```
+OR we can directly download via curl request
 
-3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate_4.0.x.aib`) to the air-gapped machine running Chef Automate.
+```sh
+curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-4.x.y.aib
+```
+
+3. Copy the latest Chef Automate CLI (`chef-automate`) and AIB (`automate-4.x.y.aib`) to the air-gapped machine running Chef Automate.
 
 #### On Air-Gapped machine running Chef Automate
 
@@ -339,7 +349,7 @@ sudo ./chef-automate config show
 2. Upgrade using new AIB and Chef Automate CLI:
 
 ```sh
-sudo ./chef-automate upgrade run --airgap-bundle automate_4.0.x.aib --major
+sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```
 
 3. Check whether upgrade status is up-to-date

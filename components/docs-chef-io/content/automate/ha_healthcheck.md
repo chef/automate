@@ -14,24 +14,81 @@ gh_repo = "automate"
 
 This page includes commands that can be executed for the Chef Automate cluster part of the Chef Automate High Availability (HA) system. These commands aid you in assessing the health and status of the components part of the HA cluster. It is highly recommended to run these commands on a test cluster before using them in a production environment.
 
-## Log Check Commands
+## Automate HA Service Commands
 
-The Chef Automate frontend and backend nodes service logs are available via `journalctl` from each node. You can identify the service by the name in the generated output preceding the logline.
+- Get the Automate HA cluster Information 
+  ```cmd
+    chef-automate info 
+  ```
 
-- Execute the `journalctl --follow --unit hab-sup` command to view the backend logs related to all hab services. Here, *--unit* displays the logs from the specified unit, and *--follow* means to follow the journal.
+- Post Deployment, run smoke test cases on Automate HA cluster, please run the command from bation node
+  ```cmd
+    chef-automate test --full 
+  ```
 
-- Use the *grep* command to filter the logs related to a specific service. For example, execute the `journalctl --follow --unit hab-sup | grep 'automate-ha-elasticsearch'` command to view the log of the habitat component in the Chef Automate frontend node.
+- Validate the cluster but skip "chef-automate diagnostic run" when performing the smoke tests
+  ```cmd
+    chef-automate test  
+  ```
 
-- Execute the `journalctl --follow --unit chef-automate` command to view the log of the frontend (chef-automate and chef-server instances) nodes.
+- Run the smoke test on specific cluster 
+  ```cmd
+    chef-automate test automate
+    chef-automate test chef_server
+    chef-automate test opensearch
+    chef-automate test postgresql 
+  ```
 
-- Use the *grep* command to filter the logs for a single service. For example, run the `journactl --follow --unit chef-automate | grep ingest.service` command to view the ingest logs of the Chef Automate frontend node.
 
-## Health Check Service Commands
+- To get the status of the cluster, run the command from bastion node. 
+  ```cmd
+    chef-automate status 
+  ```
 
-- Execute the `chef-automate status`, command to SSH the frontend node.
+- Check the service status on frontend nodes (Automate), ssh to the frontend node.
+   ```cmd 
+    chef-automate ssh --hostname a2
+    chef-automate status
+  ```
 
-- Execute the `hab svc status`, command to SSH the backend node.
+- Check the service status on frontend nodes (Chef Infra Server), ssh to the frontend node.
+   ```cmd 
+    chef-automate ssh --hostname cs
+    chef-automate status
+  ```
 
-- Execute the `hab svc status`, command to verify the health of any services on a node.
+- Check the service status on backend nodes (Postgres nodes), ssh to the backend node.
+  ```cmd 
+   chef-automate ssh --hostname pg
+   hab svc status
+  ```
 
- {{< figure src="/images/automate/ha_status.png" alt="HA Nodes Status">}}
+- Check the service status on backend nodes (Opensearch nodes), ssh to the backend node.
+  ```cmd 
+    chef-automate ssh --hostname os
+    hab svc status
+  ```
+
+- Patch a config to the Front end nodes 
+  - add the config to the location `/hab/a2_deploy_workspace/config/<automate.toml>`
+  ``` cmd
+    chef-automate config patch /hab/a2_deploy_workspace/config/automate.toml
+  ```
+
+- Collect the Gatherlogs for Automate HA cluster,run the command from bastion node.  
+  - logs are collected at `/var/tmp`
+  ```cmd
+    chef-automate gather-logs
+  ```
+
+- View the active Habitat gossiped toml config for any locally loaded service:
+  - ssh to the backend opensearch nodes `chef-automate ssh --hostname os`
+  ```cmd
+    source /hab/sup/default/SystemdEnvironmentFile.sh
+    automate-backend-ctl show --svc=automate-ha-opensearch
+  ```
+  - ssh to the backend postgres nodes `chef-automate ssh --hostname pg`
+  ```cmd
+    source /hab/sup/default/SystemdEnvironmentFile.sh
+    automate-backend-ctl show --svc=automate-ha-postgresql
+  ```

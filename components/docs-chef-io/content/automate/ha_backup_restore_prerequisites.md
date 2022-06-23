@@ -14,11 +14,9 @@ gh_repo = "automate"
 +++
 
 This page explains the prerequisites of the backup.
-If We choose AWS Deployment Procedure to deploy Automate-HA and we have choosen the `backup_config = efs OR s3` in config.toml, in that case below  
-steps are not required. Below steps are taken care by the deployment. 
+If We choose AWS Deployment Procedure to deploy Automate-HA and we have choosen the `backup_config = efs OR s3` 
+in `config.toml`, in that case below steps are not required. Below steps are taken care by the deployment. 
 If we have kept the `backup_config` blank, in that case to need to perform the below steps. 
-
-
 
 {{< note >}} You can take backup on EFS system through DNS or IP. {{< /note >}}
 
@@ -231,10 +229,10 @@ This section provides the pre-backup configuration required to backup the data o
 1. Log in to all the opensearch nodes and follow the steps on all the opensearch nodes.
   
   - Export `ES_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
-  - Hab pkg `exec chef/opensearch-odfe opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
-  - Hab pkg `exec chef/opensearch-odfe opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
-  - Chown `hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
-  - Curl `-k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+  - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
+  - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
+  - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
+  - `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
 
 The final output after running the command 1.5 on the third node is given below:
 
