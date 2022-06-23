@@ -883,13 +883,11 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, data *relaxting
 			logrus.Errorf("Connection problem: %v", err)
 			return nil, err
 		default:
-			logrus.Errorf("Received error", err)
+			logrus.Errorf("Received error: %v", err)
 			return nil, err
 		}
 	}
 
-	logrus.Printf("Query: %+v", boolQuery)
-	logrus.Printf("Search Result: %+v", searchResult)
 	if searchResult.TotalHits() > 0 {
 		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 
