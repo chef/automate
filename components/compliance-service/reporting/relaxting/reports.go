@@ -73,7 +73,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	var repIds reportingapi.ReportIds
 
 	//nodeReport := make(map[string]reportingapi.ReportData, 0)
-	boolQuery := backend.getFiltersQuery(filters, latestOnly)
+	boolQuery, err := backend.getFiltersQuery(filters, latestOnly)
 
 	fsc := elastic.NewFetchSourceContext(true).Include("end_time")
 
@@ -823,7 +823,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
 	latestOnly := FetchLatestDataOrNot(filters)
 
-	filtQuery := backend.getFiltersQuery(filters, latestOnly)
+	filtQuery, err := backend.getFiltersQuery(filters, latestOnly)
 
 	searchSource := elastic.NewSearchSource().
 		Query(filtQuery).
@@ -1270,7 +1270,7 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 //  arguments: filters - is a map of filters that serve as the source for generated es query filters
 //             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
 //  return *elastic.BoolQuery
-func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
+func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) (*elastic.BoolQuery, error) {
 	utils.DeDupFilters(filters)
 	logrus.Debugf("????? Called getFiltersQuery with filters=%+v, latestOnly=%t", filters, latestOnly)
 	boolQuery := elastic.NewBoolQuery()
@@ -1367,7 +1367,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 		if err != nil {
 			errors.Errorf("cannot parse the time %v", err)
-			return nil
+			return nil, err
 		}
 		for _, flag := range setFlags {
 			termQuery := elastic.NewTermsQuery(flag, true)
@@ -1393,7 +1393,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		}
 	}
 
-	return boolQuery
+	return boolQuery, nil
 }
 
 func (backend ES2Backend) getESFieldName(filterType string) string {

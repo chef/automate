@@ -165,7 +165,7 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 		return nil, errors.Wrap(err, "getAggSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, true)
+	boolQuery, err := backend.getFiltersQuery(filters, true)
 	lowerText := strings.ToLower(text)
 
 	if len(text) >= 2 {
@@ -269,7 +269,7 @@ func (backend ES2Backend) getArrayAggSuggestions(ctx context.Context, client *el
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, true)
+	boolQuery, err := backend.getFiltersQuery(filters, true)
 
 	// We don't filter unless the text has at least 2 chars
 	if len(text) >= 2 {
@@ -346,7 +346,7 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, true)
+	boolQuery, err := backend.getFiltersQuery(filters, true)
 	lowerText := strings.ToLower(text)
 
 	var innerQuery elastic.Query
@@ -444,7 +444,7 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, true)
+	boolQuery, err := backend.getFiltersQuery(filters, true)
 	lowerText := strings.ToLower(text)
 
 	var innerQuery elastic.Query
@@ -540,7 +540,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 	}
 
 	removeControlLevelFilters(filters)
-	boolQuery := backend.getFiltersQuery(filters, true)
+	boolQuery, err := backend.getFiltersQuery(filters, true)
 
 	var innerQuery elastic.Query
 	if len(text) >= 2 {
@@ -656,7 +656,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	}
 
 	removeControlLevelFilters(filters)
-	boolQuery := backend.getFiltersQuery(filters, true)
+	boolQuery, err := backend.getFiltersQuery(filters, true)
 	text = strings.ToLower(text)
 
 	finalInnerBoolQuery := elastic.NewBoolQuery()
