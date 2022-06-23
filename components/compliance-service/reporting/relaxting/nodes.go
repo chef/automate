@@ -44,7 +44,6 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 	emptyTotals := TotalNodeCounts{Total: 0, Passed: 0, Skipped: 0, Failed: 0, Waived: 0}
 	myName := "GetNodes"
 
-	//filters["start_time"] = []string{}
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
@@ -250,7 +249,7 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 		"controls_sums")
 
 	filters["node_id"] = []string{nodeUuid}
-	query := backend.getFiltersQuery(filters, false)
+	query, err := backend.getFiltersQuery(filters, false)
 
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).

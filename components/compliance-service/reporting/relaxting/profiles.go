@@ -310,7 +310,7 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 // todo - deep filtering - this should be made depth aware as this still needs to be consumed by api users
 // todo - do we need to handle waiver info in here too?
 func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters map[string][]string) (*stats.ProfileSummary, error) {
-	//filters["start_time"] = []string{}
+
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetProfileSummaryByProfileId, unable to get index")
@@ -326,7 +326,7 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	}
 
 	// We are not filtering by ProfileID, we are passing it in as a uri resource.
-	filtQuery := backend.getFiltersQuery(filters, true)
+	filtQuery, err := backend.getFiltersQuery(filters, true)
 
 	profileIDQuery := elastic.NewTermQuery("profiles.sha256", profileId)
 

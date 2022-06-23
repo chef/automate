@@ -208,6 +208,7 @@ func TestDoesControlTagMatchFilter(t *testing.T) {
 }
 
 func TestFilterQuerychange(t *testing.T) {
+
 	endTime := "2022-06-21T00:00:00Z"
 	startTime := "2022-06-21T00:00:00Z"
 	_, setFlag1, _ := filterQuerychange(endTime, startTime)
