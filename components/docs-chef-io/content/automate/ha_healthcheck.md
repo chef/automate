@@ -26,7 +26,7 @@ This page includes commands that can be executed for the Chef Automate cluster p
     chef-automate test --full 
   ```
 
-- Validate the cluster but skip “chef-automate diagnostic run” when performing the smoke tests
+- Validate the cluster but skip "chef-automate diagnostic run" when performing the smoke tests
   ```cmd
     chef-automate test  
   ```
