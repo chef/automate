@@ -208,18 +208,18 @@ func TestDoesControlTagMatchFilter(t *testing.T) {
 }
 
 func TestFilterQuerychange(t *testing.T) {
-	filters := map[string][]string{}
-	filters["start_time"] = []string{"2022-06-22T00:00:00Z"}
-	filters["end_time"] = []string{"2022-06-23T00:00:00Z"}
-	s, err := filterQuerychange(filters)
-	if err != nil {
-		return
-	}
-	assert.Equal(t, []string{"day_latest", "daily_latest"}, s)
-	filters1 := map[string][]string{}
-	filters1["start_time"] = []string{"2022-06-21T00:00:00Z"}
-	filters1["end_time"] = []string{"2022-06-21T00:00:00Z"}
-	a, err := filterQuerychange(filters1)
-	assert.Equal(t, []string{"daily_latest"}, a)
+	endTime := "2022-06-21T00:00:00Z"
+	startTime := "2022-06-21T00:00:00Z"
+	_, setFlag1, _ := filterQuerychange(endTime, startTime)
+	assert.Equal(t, "daily_latest", setFlag1)
 
+	endTime1 := "2022-06-23T00:00:00Z"
+	startTime1 := "2022-06-22T00:00:00Z"
+	_, setFlag, _ := filterQuerychange(endTime1, startTime1)
+	assert.Equal(t, "day_latest", setFlag)
+
+	endTime2 := "2022-06-23T00:00:00Z"
+	startTime2 := "2022-06-24T00:00:00Z"
+	_, _, err := filterQuerychange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "Give the correct range for start date and end date", "")
 }

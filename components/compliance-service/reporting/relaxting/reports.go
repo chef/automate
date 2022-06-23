@@ -811,8 +811,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
-
-	// Only end_time matters for this call
 	//filters["start_time"] = []string{}
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
@@ -1265,22 +1263,6 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 
 	return waiverDataCollection, nil
 }
-func filterQuerychange(filters map[string][]string) ([]string, error) {
-	endTime := firstOrEmpty(filters["end_time"])
-	startTime := firstOrEmpty(filters["start_time"])
-	layout := "2006-01-02T15:04:05Z"
-	endtime, err := time.Parse(layout, endTime)
-	starttime, err := time.Parse(layout, startTime)
-	if err != nil {
-		panic(err)
-	}
-	diff := endtime.Sub(starttime).Hours() / 24
-	if diff == 0 {
-		return []string{"daily_latest"}, nil
-	} else {
-		return []string{"day_latest", "daily_latest"}, nil
-	}
-}
 
 //getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
 //  arguments: filters - is a map of filters that serve as the source for generated es query filters
@@ -1341,19 +1323,14 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
 		endTime := firstOrEmpty(filters["end_time"])
 		startTime := firstOrEmpty(filters["start_time"])
-		layout := "2006-01-02T15:04:05Z"
-		endtime, err := time.Parse(layout, endTime)
-		starttime, err := time.Parse(layout, startTime)
-		if err != nil {
-			panic(err)
-		}
-		diff := endtime.Sub(starttime).Hours() / 24
-
+		diff, _, _ := filterQuerychange(endTime, startTime)
 		if diff > 90 {
 			logrus.Error("Range should be less than 90 days")
+			return nil
 		}
 		if diff < 0 {
 			logrus.Error("Start date should not be greater than end date")
+			return nil
 		}
 		timeRangeQuery := elastic.NewRangeQuery("end_time")
 		if len(startTime) > 0 {
@@ -1394,28 +1371,28 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	if latestOnly {
 		// only if there is no job_id filter set, do we want the daily latest
-		s, err := filterQuerychange(filters)
+		_, setFlag, err := filterQuerychange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 		if err != nil {
-			panic(err)
+			errors.Errorf("cannot parse the time %v", err)
+			return nil
 		}
 		if len(filters["end_time"]) > 0 {
-			if len(s) == 1 && s[0] == "daily_latest" {
+			if setFlag == "daily_latest" {
 				// If we have an end_time filter, we use the daily_latest filter dedicated to the UTC timeseries indices
-				termQuery := elastic.NewTermsQuery("daily_latest", true)
+				termQuery := elastic.NewTermsQuery(setFlag, true)
 				boolQuery = boolQuery.Must(termQuery)
 			}
-			if len(s) == 2 {
-				termQuery := elastic.NewTermsQuery("daily_latest", true)
-				boolQuery = boolQuery.Must(termQuery)
-				termQuery1 := elastic.NewTermsQuery("day_latest", true)
-				boolQuery = boolQuery.Must(termQuery1)
+			if setFlag == "day_latest" {
+				for _, s_field := range []string{"day_latest", "daily_latest"} {
+					termQuery := elastic.NewTermsQuery(s_field, true)
+					boolQuery = boolQuery.Must(termQuery)
+				}
+
 			}
 		} else {
 			// If we don't have an end_time filter, we use the day_latest filter
 			termQuery := elastic.NewTermsQuery("day_latest", true)
 			boolQuery = boolQuery.Must(termQuery)
-			termQuery1 := elastic.NewTermsQuery("daily_latest", true)
-			boolQuery = boolQuery.Must(termQuery1)
 		}
 	}
 
@@ -2026,4 +2003,19 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 		searchResult.TookInMillis)
 
 	return searchResult, queryInfo, nil
+}
+
+func filterQuerychange(endTime string, startTime string) (int, string, error) {
+	eTime, err := time.Parse("2006-01-02T15:04:05Z", endTime)
+	sTime, err := time.Parse("2006-01-02T15:04:05Z", startTime)
+	diff := int(eTime.Sub(sTime).Hours() / 24)
+	if err != nil {
+		return 0, "", errors.Errorf("cannot parse the time %v", err)
+	}
+	if diff == 0 {
+		return diff, "daily_latest", nil
+	} else if diff > 0 && diff <= 90 {
+		return diff, "day_latest", nil
+	}
+	return 0, "", errors.Errorf("Give the correct range for start date and end date")
 }

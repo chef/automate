@@ -119,7 +119,6 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 	filters["start_time"] = []string{}
 	latestOnly := FetchLatestDataOrNot(filters)
 
-
 	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -352,4 +351,3 @@ func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelem
 	}
 	return count, nil
 }
-
