@@ -12,7 +12,12 @@ gh_repo = "automate"
     weight = 70
 +++
 
-{{< note >}} The Large Compliance Report is supported from Chef Automate Version **4.2.x** and above. {{< /note >}}
+{{< note >}} 
+
+- The Large Compliance Report is supported from Chef Automate Version **4.2.x** and above.
+- The Large Compliance Report feature is not available for Chef Automate High Availability (HA) as of now.
+
+{{< /note >}}
 
 Automate fails to ingest Compliance reports larger than 4MB sent through the data collector endpoint. Chef Automate data collector sends the error back to the client.
 
