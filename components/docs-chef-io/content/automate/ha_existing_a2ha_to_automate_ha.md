@@ -40,19 +40,24 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
 
 5. Please Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`
 
-6. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of Chef Automate HA cluster:
+6. Run the command at Chef-Automate node of Automate HA cluster to get the applied config
+   ```bash
+     sudo chef-automate config show > current_config.toml 
+   ``` 
+
+7. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of Chef Automate HA cluster:
 
   ```cmd
-    sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
+    sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
   ```
 
-7. Copy the `bootstrap.abb` bundle to all the Frontend nodes of Chef Automate HA cluster. Unpack the bundle using below command on all the Frondend nodes.
+8. Copy the `bootstrap.abb` bundle to all the Frontend nodes of Chef Automate HA cluster. Unpack the bundle using below command on all the Frondend nodes.
  
   ```cmd
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
   ```
 
-8. Start the Service in all the frontend nodes with below command.
+9. Start the Service in all the frontend nodes with below command.
   ``` bash
     sudo chef-automate start
   ``` 

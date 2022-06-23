@@ -44,18 +44,23 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
       sudo chef-automate stop
     ``` 
 
-7. Restore in Chef-Automate HA using this command:
+7. Run the command at Chef-Automate node of Automate HA cluster to get the applied config
+   ```bash
+     sudo chef-automate config show > current_config.toml 
+   ``` 
+
+8. Restore in Chef-Automate HA using this command:
     ```bash
      automate_version_number=4.0.91 ## please change this based on the version of Chef Automate running.
      
-     chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+     chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
     ```
-8. Upack the `bootstrap.abb` file on all the Frontend nodes: \
+9. Upack the `bootstrap.abb` file on all the Frontend nodes: \
   Login to Each Frontend Node and then run after copying the `bootstrap.abb` file.
     ```bash
      chef-automate bootstrap bundle unpack bootstrap.abb
     ```
-9. Start the Service in All the Frontend Nodes with below command.
+10. Start the Service in All the Frontend Nodes with below command.
     ``` bash
      sudo chef-automate start
     ``` 
@@ -86,19 +91,24 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
 
 4. Please Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`
 
-5. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster :
+5. Run the command at Chef-Automate node of Automate HA cluster to get the applied config
+   ```bash
+     sudo chef-automate config show > current_config.toml 
+   ``` 
+
+6. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster :
     ```bash
-     chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config /etc/chef-automate/config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
+     chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
     ```
 
-4. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
+7. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
 
-5. Upack the `bootstrap.abb` file on all the Frontend nodes.
+8. Upack the `bootstrap.abb` file on all the Frontend nodes.
    ssh to Each Frontend Node and then run below command
     ```bash
      chef-automate bootstrap bundle unpack bootstrap.abb
     ```
-6. Start the Service in All the Frontend Nodes with below command.
+9. Start the Service in All the Frontend Nodes with below command.
     ``` bash
       sudo chef-automate start
     ``` 
