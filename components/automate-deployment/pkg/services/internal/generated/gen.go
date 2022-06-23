@@ -269,6 +269,16 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/report-manager-service",
+      "metadata": {
+        "name": "chef/report-manager-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/user-settings-service",
       "metadata": {
         "name": "chef/user-settings-service",
@@ -607,6 +617,7 @@ var ProductMetadataJSON = `
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
+        "chef/report-manager-service",
         "chef/event-gateway"
       ],
       "packages": null,
@@ -627,6 +638,7 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-cds",
         "chef/automate-opensearch",
+        "chef/report-manager-service",
         "chef/user-settings-service"
       ],
       "packages": null,

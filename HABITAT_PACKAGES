@@ -87,3 +87,4 @@ automate-ha-pgleaderchk components/automate-ha-pgleaderchk
 automate-ha-cluster-ctl components/automate-cluster-ctl
 automate-netcat components/automate-netcat
 automate-opensearch components/automate-opensearch
+report-manager-service components/report-manager-service

@@ -94,6 +94,11 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	if logFormat := g.GetV1().GetLog().GetFormat().GetValue(); logFormat != "" {
 		c.V1.Sys.Logger.Format.Value = logFormat
 	}
+
+	if largeReporting := g.GetV1().GetLargeReporting().GetEnableLargeReporting(); largeReporting != nil {
+		c.V1.Sys.Service.EnableLargeReporting = largeReporting
+		c.V1.Sys.Service.LcrOpenSearchRequests = g.GetV1().GetExternal().GetMinio().GetConcurrentOpenSearchRequests()
+	}
 }
 
 func (c *ConfigRequest) ConfigureProduct(productConfig *config.ProductConfig) {

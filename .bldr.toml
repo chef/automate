@@ -193,6 +193,7 @@ paths = [
   "api/config/pg_sidecar/*",
   "api/config/postgresql/*",
   "api/config/prometheus/*",
+  "api/config/report_manager/*",
   "api/config/sample_data/*",
   "api/config/secrets/*",
   "api/config/session/*",
@@ -216,6 +217,7 @@ paths = [
   "api/external/ingest/*",
   "api/external/lib/*",
   "api/external/nodes/*",
+  "api/external/report_manager/*",
   "api/external/secrets/*",
   "api/external/user_settings/*",
   "api/interservice/authn/*",
@@ -233,6 +235,7 @@ paths = [
   "api/interservice/license_control/*",
   "api/interservice/local_user/*",
   "api/interservice/nodemanager/*",
+  "api/interservice/report_manager/*",
   "api/interservice/teams/*",
   "api/interservice/user_settings/*",
   "components/authz-service/*",
@@ -296,6 +299,7 @@ paths = [
   "api/interservice/es_sidecar/*",
   "api/interservice/event/*",
   "api/interservice/nodemanager/*",
+  "api/interservice/report_manager/*",
   "components/authz-service/*",
   "components/automate-grpc/*",
   "components/event-service/*",
@@ -400,6 +404,7 @@ paths = [
   "api/config/platform/*",
   "api/config/postgresql/*",
   "api/config/prometheus/*",
+  "api/config/report_manager/*",
   "api/config/sample_data/*",
   "api/config/secrets/*",
   "api/config/session/*",
@@ -490,6 +495,7 @@ paths = [
   "api/config/platform/*",
   "api/config/postgresql/*",
   "api/config/prometheus/*",
+  "api/config/report_manager/*",
   "api/config/sample_data/*",
   "api/config/secrets/*",
   "api/config/session/*",
@@ -1195,6 +1201,34 @@ paths = [
 plan_path = "components/automate-opensearch"
 paths = [
   "components/automate-opensearch/*"
+]
+
+[report-manager-service]
+plan_path = "components/report-manager-service"
+paths = [
+  "components/report-manager-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/annotations/*",
+  "api/external/iam/*",
+  "api/interservice/cereal/*",
+  "api/interservice/compliance/*",
+  "api/interservice/report_manager/*",
+  "components/automate-grpc/*",
+  "lib/cereal/*",
+  "lib/db/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/pcmp/*",
+  "lib/platform/config/*",
+  "lib/proxy/*",
+  "lib/secrets/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/user/*",
+  "lib/version/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

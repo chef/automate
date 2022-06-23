@@ -7,6 +7,8 @@ import * as moment from 'moment/moment';
 import { omitBy, isNil } from 'lodash';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 const CC_API_URL = environment.compliance_url;
 
@@ -32,7 +34,9 @@ export class ReportCollection {
 export class StatsService {
   constructor(
     private httpClient: HttpClient,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private appConfigService: AppConfigService,
+    private telemetryService: TelemetryService
   ) {}
 
   getFailures(types: Array<string>, reportQuery: ReportQuery): Observable<any> {
@@ -215,15 +219,21 @@ export class StatsService {
       map(({ reports, total }) => new ReportCollection(reports, total)));
   }
 
-  downloadReport(format: string, reportQuery: ReportQuery): Observable<ArrayBuffer> {
-    const url = `${CC_API_URL}/reporting/export`;
+  downloadReport(format: string, reportQuery: ReportQuery): Observable<Blob> {
+    let url = '';
+    if (this.appConfigService.isLargeReportingEnabled) {
+      url = `${CC_API_URL}/reporting/reportmanager/export`; // download Ack API
+      this.telemetryService.track('large_compliance_reports_enabled');
+    } else {
+      url = `${CC_API_URL}/reporting/export`; // direct download
+    }
 
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
     reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
 
     const body = { type: format, filters: this.formatFilters(reportQuery) };
-    return this.httpClient.post(url, body, { responseType: 'arraybuffer' });
+    return this.httpClient.post(url, body, { responseType: 'blob' });
   }
 
   downloadNodeReport(fileFormat: reportFormat, reportQuery: ReportQuery): Observable<string> {
@@ -249,6 +259,39 @@ export class StatsService {
             c.status = this.getControlStatus(c);
           });
         });
+        return omitBy(data, isNil);
+      }));
+  }
+
+  getNodeHeader(reportID: string, reportQuery: ReportQuery): Observable<any> {
+    const url = `${CC_API_URL}/reporting/nodeheader/id/${reportID}`;
+    const formatted = this.formatFilters(reportQuery);
+    const body = { filters: formatted };
+
+    return this.httpClient.post<any>(url, body).pipe(
+      map((data) => {
+        return omitBy(data, isNil);
+      }));
+  }
+
+  getControlsList(reportID: string, reportQuery: ReportQuery,
+     pageIndex: number, perPage: number, status: string): Observable<any> {
+    const url = `${CC_API_URL}/reporting/reportcontrols/id/${reportID}`;
+    const formatted = this.formatFilters(reportQuery);
+    const pagevalue = (pageIndex - 1) * perPage;
+    if (status === 'all') {
+      status = '';
+    }
+    const pageParam = [
+      ...formatted,
+      {'type': 'from', 'values': [`${pagevalue}`]},
+      {'type': 'size', 'values': [`${perPage}`]},
+      {'type': 'status', 'values': [`${status}`]}
+    ];
+    const body = { filters: pageParam };
+
+    return this.httpClient.post<any>(url, body).pipe(
+      map((data) => {
         return omitBy(data, isNil);
       }));
   }

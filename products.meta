@@ -56,6 +56,7 @@
     "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
     "chef/automate-elasticsearch",
+    "chef/report-manager-service",
     "core/rsync"
   ],
 
@@ -151,6 +152,7 @@
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
+        "chef/report-manager-service",
         "chef/event-gateway"
       ]
     },
@@ -162,6 +164,7 @@
       "services": [
         "chef/automate-cds",
         "chef/automate-opensearch",
+        "chef/report-manager-service",
         "chef/user-settings-service"
       ]
     },

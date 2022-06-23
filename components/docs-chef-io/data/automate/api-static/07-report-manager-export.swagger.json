@@ -1,0 +1,32 @@
+{
+  "paths": {
+    "api/v0/reportmanager/export/{id}": {
+      "get": {
+        "summary": "Export reports",
+        "description": "Get the generated report in JSON or CSV format when LCR enabled",
+        "tags": [
+          "ReportManagerService"
+        ],
+        "operationId": "Report Manager Export",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.common.ExportData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "produces": [
+          "application/json",
+          "text/csv"
+        ]
+      }
+    }
+  }
+}

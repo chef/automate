@@ -45,6 +45,47 @@
         ]
       }
     },
+    "/api/v0/compliance/reporting/nodeheader/id/{id}": {
+      "post": {
+        "summary": "Show Node Header Info From Report ID",
+        "description": "Show specific details about node, report and metadate provided the report ID.\nSupports filtering, but not pagination or sorting.\n\nAuthorization Action:\n```\ncompliance:nodeheader:get\n```",
+        "operationId": "ReportingService_ReadNodeHeader",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.NodeHeaderInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/nodes/id/{id}": {
       "get": {
         "summary": "Show Node by ID",
@@ -156,6 +197,80 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportIds"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/reportcontrols/id/{id}": {
+      "post": {
+        "summary": "List Control info\nLists controls from the last run, with optional filtering.\nSupports filtering and pagination. Maximum 100 search can be \nmade when specifying the pagination from and size. Sum of from+size\nshould be less that 100. By default 10 results will be returned.\nAuthorization Action:\n```\ncompliance:ControlElements:list\n```",
+        "operationId": "ReportingService_ListControlInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElements"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/reportmanager/export": {
+      "post": {
+        "summary": "Export reports",
+        "description": "Export multiple reports.\nSupports filtering by profile or control. API returns an acknowledgement ID.\n\nAuthorization Action:\n```\ncompliance:reports:list\n```",
+        "operationId": "ReportingService_ExportReportManager",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.CustomReportResponse"
             }
           },
           "default": {
@@ -413,6 +528,53 @@
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.ControlElement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The control's unique ID."
+        },
+        "title": {
+          "type": "string",
+          "description": "The control's compact description."
+        },
+        "profile": {
+          "type": "string",
+          "description": "Profile name."
+        },
+        "impact": {
+          "type": "number",
+          "format": "float",
+          "description": "The severity of the control."
+        },
+        "results": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The total number of results."
+        },
+        "status": {
+          "type": "string",
+          "title": "The control's status"
+        },
+        "profile_id": {
+          "type": "string",
+          "title": "Profile id"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ControlElements": {
+      "type": "object",
+      "properties": {
+        "control_elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElement"
+          },
+          "title": "List of control elements"
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.ControlItem": {
       "type": "object",
       "properties": {
@@ -519,6 +681,14 @@
         }
       },
       "description": "A minimal representation of the statuses of the controls in the report."
+    },
+    "chef.automate.api.compliance.reporting.v1.CustomReportResponse": {
+      "type": "object",
+      "properties": {
+        "acknowledgement_id": {
+          "type": "string"
+        }
+      }
     },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
@@ -711,6 +881,75 @@
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMeta"
           },
           "description": "A minimal representation of the compliance profiles run against the node."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.NodeHeaderInfo": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "description": "The reporting node's unique ID."
+        },
+        "node_name": {
+          "type": "string",
+          "description": "The reporting node name."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time that the report was completed."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the run the report was made from."
+        },
+        "environment": {
+          "type": "string",
+          "description": "The environment of the node making the report."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the report."
+        },
+        "platform": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Platform",
+          "description": "Intentionally blank."
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.NodeHeaderProfileInfo"
+          },
+          "description": "The profiles run as part of this report."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The Roles associated with the node."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "The status message of the report."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.NodeHeaderProfileInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the profile. Must be unique."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the profile in the generated report."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "A message to detail the reason why a profile is skipped or failed in the generated report."
         }
       }
     },
