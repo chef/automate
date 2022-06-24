@@ -857,34 +857,38 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	return map[string]interface{}{"projects": esProjectCollection}
 }
 
-func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid string, index string) (*relaxting.ESInSpecReport, error) {
+func (backend *ESClient) GetDocByReportUUId(ctx context.Context, data *relaxting.ESInSpecReport, index string) (*relaxting.ESInSpecReport, error) {
 	logrus.Debug("Fetching project by UUID")
-
 	var item relaxting.ESInSpecReport
-	boolQuery := elastic.NewBoolQuery()
 
-	idsQuery := elastic.NewIdsQuery()
-	idsQuery.Ids(reportUuid)
-	boolQuery = boolQuery.Must(idsQuery)
-	fsc := elastic.NewFetchSourceContext(true)
+	fsc := elastic.NewFetchSourceContext(false)
+	termQueryNotThisReport := elastic.NewTermsQuery("_id", data.ReportID)
+	boolQuery := elastic.NewBoolQuery()
+	boolQuery = boolQuery.Must(termQueryNotThisReport)
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
 		Query(boolQuery).
-		Size(1)
-
+		Size(1000)
 	searchResult, err := backend.client.Search().
 		SearchSource(searchSource).
 		Index(index).
-		FilterPath(
-			"took",
-			"hits.total",
-			"hits.hits._id",
-			"hits.hits._source",
-			"hits.hits.inner_hits").
-		Do(ctx)
+		Do(context.Background())
 
 	if err != nil {
-		return nil, err
+		switch {
+		case elastic.IsNotFound(err):
+			logrus.Errorf("Document not found: %v", err)
+			return nil, err
+		case elastic.IsTimeout(err):
+			logrus.Errorf("Timeout retrieving document: %v", err)
+			return nil, err
+		case elastic.IsConnErr(err):
+			logrus.Errorf("Connection problem: %v", err)
+			return nil, err
+		default:
+			logrus.Errorf("Received error: %v", err)
+			return nil, err
+		}
 	}
 
 	if searchResult.TotalHits() > 0 {
@@ -898,169 +902,9 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid stri
 				if err != nil {
 					logrus.Errorf("Received error while unmarshling %+v", err)
 				}
-
 			}
 
 		}
 	}
-
 	return &item, nil
-}
-
-func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday string) (bool, error) {
-	logrus.Debugf("Checking the control document exists for today with doc Id :%s", docId)
-	fsc := elastic.NewFetchSourceContext(false)
-	boolQuery := elastic.NewBoolQuery()
-	idsQuery := elastic.NewIdsQuery()
-	idsQuery.Ids(docId)
-	boolQuery = boolQuery.Must(idsQuery)
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(boolQuery).
-		Size(1)
-	searchResult, err := backend.client.Search().
-		SearchSource(searchSource).
-		Index(indexToday).
-		Do(context.Background())
-	if err != nil {
-		switch {
-		case elastic.IsTimeout(err):
-			logrus.Errorf("Timeout retrieving document: %v", err)
-			return false, err
-		default:
-			logrus.Errorf("Received error: %v", err)
-			return false, err
-		}
-	}
-
-	if searchResult.TotalHits() > 0 {
-		// Iterate through results
-		for _, hit := range searchResult.Hits.Hits {
-			// hit.Index contains the id of the index
-			if len(hit.Id) > 0 {
-				logrus.Debugf("Found the document with for control with doc Id %s", docId)
-				return true, nil
-			}
-
-		}
-	}
-	return false, nil
-
-}
-
-func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time) error {
-	mapping := mappings.ComplianceControlRepData
-	index := mapping.IndexTimeseriesFmt(endTime)
-
-	bulkRequest := backend.client.Bulk()
-	for _, control := range controls {
-		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err != nil {
-			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
-		}
-		err = backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err != nil {
-			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
-		}
-		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
-		if err != nil {
-			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
-		}
-		if found {
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])).Type("_doc"))
-			continue
-		}
-		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
-	}
-	approxBytes := bulkRequest.EstimatedSizeInBytes()
-	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
-	if err != nil {
-		logrus.Errorf("Unable to send the request in bulk for reportuuid :%s with error :%v", reportuuid, err)
-		return err
-	}
-	if bulkResponse == nil {
-		logrus.Errorf("Unable to fetch the response of bulk request reportuuid id:%s with error :%v", reportuuid, err)
-		return err
-	}
-
-	logrus.Debugf("Bulk insert %d summaries, ~size %dB, took %dms", len(controls), approxBytes, bulkResponse.Took)
-	return nil
-
-}
-
-func GetDocIdByControlIdAndProfileID(controlID string, profileID string) string {
-	return fmt.Sprintf("%s|%s", controlID, profileID)
-}
-
-func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
-	params := make(map[string]interface{})
-	params["node"] = node
-
-	return elastic.NewScript("if (!(ctx._source.nodes instanceof Collection)) {ctx._source.nodes = [ctx._source.nodes];} ctx._source.nodes.add(params.node)").Params(params)
-
-}
-
-// Sets the 'day_latest' field to 'false' for all control index
-// This way, the last 90 days is covered
-func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
-
-	boolQueryDayLatest := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
-
-	script := elastic.NewScript(`
-	def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
-	for(node in targets) { 
-		if(node.day_latest==true) {
-			node.day_latest = false
-		}
-	}
-	if (ctx._source.day_latest==true) {
-		ctx._source.day_latest = false;
-	}`).Param("node_uuid", nodeId)
-
-	// Getting the date before 90 days
-	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
-	// Getting all the indices for past 90 days
-	esIndexes, err := relaxting.IndexDates(relaxting.CompDailyControlIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Add(-24*time.Hour).Format(time.RFC3339))
-	if err != nil {
-		logrus.Errorf("Cannot get indexes: %+v", err)
-		return err
-	}
-	// Updating in all the Indices
-	_, err = elastic.NewUpdateByQueryService(backend.client).
-		Index(esIndexes).
-		Query(boolQueryDayLatest).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-	return errors.Wrap(err, "SetDayLatestsToFalseorControlIndex")
-}
-
-// Sets the 'daily_latest'  fields to 'false' for new control index
-// This targets only one ES UTC index
-func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
-
-	boolQueryDailyLatest := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
-
-	// Script to find the nodes and making daily_latest as false
-	script := elastic.NewScript(`
-		 def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
-		 for(node in targets) { 
-			 if(node.daily_latest==true) {
-				 node.daily_latest = false
-			 }
-		 }`).Param("node_uuid", nodeId)
-
-	// Updating in all the Indices
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(index).
-		Query(boolQueryDailyLatest).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }

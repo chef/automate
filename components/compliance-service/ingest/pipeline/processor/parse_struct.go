@@ -2,14 +2,43 @@ package processor
 
 import (
 	"context"
+	"time"
+
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/sirupsen/logrus"
 )
 
-func ParseReportCtrlStruct(ctx context.Context, client *ingestic.ESClient, reportUuid string, index string) ([]relaxting.Control, error) {
-	var controls []relaxting.Control
-	inspecReport, err := client.GetDocByReportUUId(context.Background(), reportUuid, index)
+type Control struct {
+	ControlID   string      `json:"control_id"`
+	Title       string      `json:"title"`
+	WaivedStr   string      `json:"waived_str"`
+	WaiverData  interface{} `json:"waiver_data"`
+	Impact      float64     `json:"impact"`
+	EndTime     time.Time   `json:"end_time"`
+	DailyLatest bool        `json:"daily_latest"`
+	DayLatest   bool        `json:"day_latest"`
+	Status      string      `json:"status"`
+	Nodes       Node        `json:"nodes"`
+	Profile     Profile     `json:"profile"`
+}
+
+type Node struct {
+	NodeUUID    string    `json:"node_uuid"`
+	NodeEndTime time.Time `json:"node_end_time"`
+	Status      string    `json:"status"`
+	DayLatest   bool      `json:"day_latest"`
+	DailyLatest bool      `json:"daily_latest"`
+	ReportUUID  string    `json:"report_uuid"`
+}
+
+type Profile struct {
+	ProfileID string `json:"profile_id"`
+}
+
+func ParseReportCtrlStruct(client *ingestic.ESClient, data *relaxting.ESInSpecReport, index string) ([]Control, error) {
+	var controls []Control
+	inspecReport, err := client.GetDocByReportUUId(context.Background(), data, index)
 	if err != nil {
 		logrus.Errorf("cannnot find inspec report: %v", err)
 		return nil, err
@@ -22,62 +51,34 @@ func ParseReportCtrlStruct(ctx context.Context, client *ingestic.ESClient, repor
 	return controls, err
 }
 
-func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) ([]relaxting.Control, error) {
-	var controls []relaxting.Control
+func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) ([]Control, error) {
+	var controls []Control
 
-	nodes := make([]relaxting.Node, 0)
 	// Get the nodes
-	node := relaxting.Node{NodeUUID: inspecReport.NodeID,
-		DailyLatest:      true,
-		DayLatest:        true,
-		NodeEndTime:      inspecReport.EndTime,
-		Status:           inspecReport.Status,
-		ReportUUID:       inspecReport.ReportID,
-		NodeName:         inspecReport.NodeName,
-		Environment:      inspecReport.Environment,
-		PolicyGroup:      inspecReport.PolicyGroup,
-		PolicyName:       inspecReport.PolicyName,
-		Platform:         inspecReport.Platform,
-		Recipes:          inspecReport.Recipes,
-		Roles:            inspecReport.Roles,
-		OrganizationName: inspecReport.OrganizationName,
-		SourceFQDN:       inspecReport.SourceFQDN,
-		ChefTags:         inspecReport.ChefTags,
-	}
-
-	nodes = append(nodes, node)
+	node := Node{}
+	node.NodeUUID = inspecReport.NodeID
+	node.DailyLatest = inspecReport.DailyLatest
+	node.DayLatest = inspecReport.DayLatest
+	node.NodeEndTime = inspecReport.EndTime
+	node.Status = inspecReport.Status
+	node.ReportUUID = inspecReport.ReportID
 
 	for _, value := range inspecReport.Profiles {
 		for _, value2 := range value.Controls {
-			ctrl := relaxting.Control{}
+			ctrl := Control{}
 			ctrl.ControlID = value2.ID
 			ctrl.Title = value2.Title
 			ctrl.WaivedStr = value2.WaivedStr
 			ctrl.WaiverData = value2.WaiverData
 			ctrl.Impact = float64(value2.Impact)
 			ctrl.EndTime = inspecReport.EndTime
-			ctrl.DailyLatest = true
-			ctrl.DayLatest = true
-			ctrl.StringTags = value2.StringTags
-
-			if checkIfControlWaivedStatus(value2.WaivedStr, value2.WaiverData) {
-				ctrl.Status = "waived"
-			} else {
-				ctrl.Status = value2.Status
-			}
-			ctrl.Nodes = nodes
-			ctrl.Profile = relaxting.Profile{ProfileID: value.Profile, Title: value.Title}
+			ctrl.DailyLatest = inspecReport.DailyLatest
+			ctrl.DayLatest = inspecReport.DailyLatest
+			ctrl.Status = value2.Status
+			ctrl.Nodes = node
+			ctrl.Profile = Profile{ProfileID: value.Profile}
 			controls = append(controls, ctrl)
 		}
 	}
 	return controls, nil
-}
-
-func checkIfControlWaivedStatus(waivedStr string, waivedData interface{}) bool {
-	if (waivedStr == "yes" || waivedStr == "yes_run") && waivedData != nil {
-		return true
-	}
-
-	return false
-
 }
