@@ -853,3 +853,56 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 
 	return map[string]interface{}{"projects": esProjectCollection}
 }
+
+func (backend *ESClient) GetDocByReportUUId(ctx context.Context, data *relaxting.ESInSpecReport, index string) (*relaxting.ESInSpecReport, error) {
+	logrus.Debug("Fetching project by UUID")
+	var item relaxting.ESInSpecReport
+
+	fsc := elastic.NewFetchSourceContext(false)
+	termQueryNotThisReport := elastic.NewTermsQuery("_id", data.ReportID)
+	boolQuery := elastic.NewBoolQuery()
+	boolQuery = boolQuery.Must(termQueryNotThisReport)
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(1000)
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(index).
+		Do(context.Background())
+
+	if err != nil {
+		switch {
+		case elastic.IsNotFound(err):
+			logrus.Errorf("Document not found: %v", err)
+			return nil, err
+		case elastic.IsTimeout(err):
+			logrus.Errorf("Timeout retrieving document: %v", err)
+			return nil, err
+		case elastic.IsConnErr(err):
+			logrus.Errorf("Connection problem: %v", err)
+			return nil, err
+		default:
+			logrus.Errorf("Received error: %v", err)
+			return nil, err
+		}
+	}
+
+	if searchResult.TotalHits() > 0 {
+		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
+
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			// hit.Index contains the name of the index
+			if hit.Source != nil {
+				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
+				err := json.Unmarshal(hit.Source, &item)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling %+v", err)
+				}
+			}
+
+		}
+	}
+	return &item, nil
+}
