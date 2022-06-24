@@ -3,6 +3,8 @@ package compliance
 import (
 	"context"
 	"fmt"
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"io"
 	"net"
 	"net/http"
@@ -41,7 +43,6 @@ import (
 	ingestserver "github.com/chef/automate/components/compliance-service/ingest/server"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -202,11 +203,16 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
+	err = processor.InitCerealManager(cerealManager, conf.CerealConfig.Workers, ingesticESClient)
+	if err != nil {
+		logrus.Fatalf("failed to initiate cereal manager: %v", err)
+	}
+
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServiceServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
 			reportmanagerClient, conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient,
-			conf.Service.MessageBufferSize, conf.Service.EnableLargeReporting))
+			conf.Service.MessageBufferSize, conf.Service.EnableLargeReporting,cerealManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
@@ -648,6 +654,7 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	if err != nil {
 		return err
 	}
+
 	defer func() {
 		err := cerealManager.Stop()
 		if err != nil {
