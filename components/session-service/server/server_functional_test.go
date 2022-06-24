@@ -149,7 +149,6 @@ func TestMain(t *testing.T) {
 		require.NoError(t, err, "parse new response")
 		if assert.NotEmpty(t, data.IDToken) {
 			idToken = data.IDToken
-
 		}
 	})
 
@@ -158,16 +157,16 @@ func TestMain(t *testing.T) {
 		require.NoError(t, err)
 		req.Header.Set("Authorization", fmt.Sprintf("bearer %s", idToken))
 		resp, err := c.Do(req)
-		require.NoError(t, err, "refresh request")
+		require.NoError(t, err, "session refresh request")
 		defer resp.Body.Close()
 
 		body, err := ioutil.ReadAll(resp.Body)
-		require.NoError(t, err, "read refresh response")
+		require.NoError(t, err, "read session refresh response")
 		data := struct {
 			IDToken string `json:"id_token"`
 		}{}
 		if err := json.Unmarshal(body, &data); err != nil {
-			t.Fatalf("parse refresh response: %s", err)
+			t.Fatalf("parse session refresh response: %s", err)
 		}
 
 		assert.Equal(t, idToken, data.IDToken,
@@ -358,7 +357,7 @@ func TestMain(t *testing.T) {
 					Sub string `json:"sub"`
 					PU  string `json:"preferred_username"`
 				}{}
-				_ = json.NewDecoder(resp.Body).Decode(&respMsg)
+				json.NewDecoder(resp.Body).Decode(&respMsg)
 				assert.Equal(t, "Cg0wLTM4NS0yODA4OS0wEgRtb2Nr", respMsg.Sub)
 				assert.Equal(t, "kilgore@kilgore.trout", respMsg.PU)
 			})
