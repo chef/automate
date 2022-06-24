@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const(
+const (
 	UUID = "efd46e48-5751-40a2-a705-1182356908c1"
 )
 
@@ -33,7 +33,7 @@ func TestMapStructs(t *testing.T) {
 			name: "Test with Value",
 			args: args{
 				inspecReport: &relaxting.ESInSpecReport{
-					NodeID:      "",
+					NodeID:      "ssdpweoru4etu5hgsklvldfknv",
 					ReportID:    UUID,
 					DailyLatest: true,
 					DayLatest:   true,
@@ -75,7 +75,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Nodes:       Node{NodeUUID: "", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
+					Nodes:       Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
 					Profile:     Profile{ProfileID: ""},
 				},
 				{
@@ -87,7 +87,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "failed",
-					Nodes:       Node{NodeUUID: "", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
+					Nodes:       Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
 					Profile:     Profile{ProfileID: ""},
 				},
 			},
