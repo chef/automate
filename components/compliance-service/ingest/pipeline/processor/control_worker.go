@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -45,20 +43,24 @@ type ControlWorkflow struct {
 type ControlWorkflowParameters struct {
 	ReportUuid string
 	Retries    int
-	EndTime    time.Time
 }
 
 type ControlWorkflowPayload struct {
 	ReportUuid  string
 	RetriesLeft int
 	Status      string
-	EndTime     time.Time
+	StartTime   *time.Time
 }
 
 func (s *ControlWorkflow) OnStart(w cereal.WorkflowInstance,
 	ev cereal.StartEvent) cereal.Decision {
 
 	logrus.Debug("In control-workflow start method")
+
+	startTime := time.Now()
+	workflowPayload := ControlWorkflowPayload{
+		StartTime: &startTime,
+	}
 
 	workflowParams := ControlWorkflowParameters{}
 	err := w.GetParameters(&workflowParams)
@@ -70,16 +72,12 @@ func (s *ControlWorkflow) OnStart(w cereal.WorkflowInstance,
 
 	logrus.Debugf("In On Start Method %s", workflowParams.ReportUuid)
 
-	workflowPayload := ControlWorkflowPayload{
-		ReportUuid:  workflowParams.ReportUuid,
-		EndTime:     workflowParams.EndTime,
-		RetriesLeft: workflowParams.Retries,
-		Status:      RunningStatus,
-	}
+	workflowPayload.ReportUuid = workflowParams.ReportUuid
+	workflowPayload.RetriesLeft = workflowParams.Retries
+	workflowPayload.Status = RunningStatus
 
 	err = w.EnqueueTask(ReportTaskName, GenerateControlParameters{
 		ReportUuid: workflowParams.ReportUuid,
-		EndTime:    workflowParams.EndTime,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "failed to enqueue the control-task")
@@ -149,12 +147,12 @@ func (s *ControlWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEv
 
 type GenerateControlTask struct {
 	ESClient *ingestic.ESClient
-	Esr      relaxting.ES2Backend
 }
 
 type GenerateControlParameters struct {
 	ReportUuid string
-	EndTime    time.Time
+	StartTime  *time.Time
+	EndTime    *time.Time
 }
 
 func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -168,22 +166,7 @@ func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interf
 
 	logrus.Infof("In TaskRun working on job %s", job.ReportUuid)
 
-	//time taking to commit to records to ES
-	time.Sleep(60 * time.Second)
-	mapping := mappings.ComplianceRepDate
-	index := mapping.IndexTimeseriesFmt(job.EndTime)
-	controls, err := ParseReportCtrlStruct(ctx, t.ESClient, job.ReportUuid, index)
-	if err != nil {
-		logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", job.ReportUuid)
-		return nil, err
-	}
-
-	logrus.Debugf("Parsed results got results")
-	err = t.ESClient.UploadDataToControlIndex(ctx, job.ReportUuid, controls, job.EndTime)
-	if err != nil {
-		logrus.Errorf("Unable to add data to index with reportuuid:%s", job.ReportUuid)
-		return nil, err
-	}
-
+	startTime := time.Now().UTC().Round(time.Second)
+	job.StartTime = &startTime
 	return &job, nil
 }

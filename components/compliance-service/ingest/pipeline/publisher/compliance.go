@@ -3,10 +3,11 @@ package publisher
 import (
 	"context"
 	"fmt"
-	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
-	"github.com/chef/automate/lib/cereal"
 	"sync"
 	"time"
+
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
+	"github.com/chef/automate/lib/cereal"
 
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
@@ -74,7 +75,16 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			message.Propagate(out, &msg)
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Published Compliance Report")
+		errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
+			fmt.Sprintf("%s-%s", "control-workflow", msg.Report.ReportUuid),
+			processor.ControlWorkflowParameters{
+				ReportUuid: msg.Report.ReportUuid,
+				Retries:    2,
+			})
 
+		if errWorkflow != nil {
+			fmt.Errorf("error in enqueuing the  workflow for request id %s: %w", msg.Report.ReportUuid, err)
+		}
 	}
 	close(out)
 }
