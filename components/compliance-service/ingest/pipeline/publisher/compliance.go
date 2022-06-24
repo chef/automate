@@ -74,7 +74,6 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			message.Propagate(out, &msg)
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Published Compliance Report")
-
 	}
 	close(out)
 }
