@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const endTime3 = "2022-06-24T00:00:00Z"
+
 func TestConvertControlProcessesTags(t *testing.T) {
 	profileControlsMap := make(map[string]*reportingapi.Control, 2)
 
@@ -460,7 +462,7 @@ func TestGetNodeInfoFromReportID_Failed(t *testing.T) {
 
 func TestFilterQueryChange(t *testing.T) {
 	endTime := "2022-06-24T12:00:00Z"
-	startTime := "2022-06-24T00:00:00Z"
+	startTime := endTime3
 	setFlag1, _ := filterQueryChange(endTime, startTime)
 	assert.Equal(t, "daily_latest", setFlag1[0])
 }
@@ -498,13 +500,13 @@ func TestValidateFiltersTimeRangeForErrorRange(t *testing.T) {
 }
 func TestValidateFiltersTimeRangeForErrorRangeTimes(t *testing.T) {
 	endTime2 := "2022-09-24T00:00:00Z"
-	startTime2 := "2022-06-24T00:00:00Z"
+	startTime2 := endTime3
 	err := validateFiltersTimeRange(endTime2, startTime2)
 	assert.EqualErrorf(t, err, "Range of start time and end time should not be greater than 90 days", "")
 }
 func TestValidateFiltersTimeRangeForErrorValid(t *testing.T) {
 	endTime2 := "2022-08-16T00:00:00Z"
-	startTime2 := "2022-06-24T00:00:00Z"
+	startTime2 := endTime3
 	err := validateFiltersTimeRange(endTime2, startTime2)
 	assert.Equal(t, nil, err)
 }
