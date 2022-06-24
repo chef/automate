@@ -815,7 +815,10 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
-
+	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		return nil, err
+	}
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
 	latestOnly := FetchLatestDataOrNot(filters)
@@ -1322,15 +1325,6 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
 		endTime := firstOrEmpty(filters["end_time"])
 		startTime := firstOrEmpty(filters["start_time"])
-		diff, _, _ := filterQuerychange(endTime, startTime)
-		if diff > 90 {
-			logrus.Error("Range should be less than 90 days")
-			return nil
-		}
-		if diff < 0 {
-			logrus.Error("Start date should not be greater than end date")
-			return nil
-		}
 		timeRangeQuery := elastic.NewRangeQuery("end_time")
 		if len(startTime) > 0 {
 			timeRangeQuery.Gte(startTime)
@@ -1370,29 +1364,16 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	if latestOnly {
 		// only if there is no job_id filter set, do we want the daily latest
-		_, setFlag, err := filterQuerychange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+		setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 		if err != nil {
 			errors.Errorf("cannot parse the time %v", err)
 			return nil
 		}
-		if len(filters["end_time"]) > 0 {
-			if setFlag == "daily_latest" {
-				// If we have an end_time filter, we use the daily_latest filter dedicated to the UTC timeseries indices
-				termQuery := elastic.NewTermsQuery(setFlag, true)
-				boolQuery = boolQuery.Must(termQuery)
-			}
-			if setFlag == "day_latest" {
-				for _, s_field := range []string{"day_latest", "daily_latest"} {
-					termQuery := elastic.NewTermsQuery(s_field, true)
-					boolQuery = boolQuery.Must(termQuery)
-				}
-
-			}
-		} else {
-			// If we don't have an end_time filter, we use the day_latest filter
-			termQuery := elastic.NewTermsQuery("day_latest", true)
+		for _, flag := range setFlags {
+			termQuery := elastic.NewTermsQuery(flag, true)
 			boolQuery = boolQuery.Must(termQuery)
 		}
+
 	}
 
 	if len(filters["end_time"]) == 0 {
@@ -2004,17 +1985,34 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 	return searchResult, queryInfo, nil
 }
 
-func filterQuerychange(endTime string, startTime string) (int, string, error) {
+func filterQueryChange(endTime string, startTime string) ([]string, error) {
 	eTime, err := time.Parse("2006-01-02T15:04:05Z", endTime)
 	sTime, err := time.Parse("2006-01-02T15:04:05Z", startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
-		return 0, "", errors.Errorf("cannot parse the time %v", err)
+		return nil, errors.Errorf("cannot parse the time")
+	}
+	if len(endTime) == 0 {
+		return []string{"day_latest"}, nil
 	}
 	if diff == 0 {
-		return diff, "daily_latest", nil
-	} else if diff > 0 && diff <= 90 {
-		return diff, "day_latest", nil
+		return []string{"daily_latest"}, nil
 	}
-	return 0, "", errors.Errorf("Give the correct range for start date and end date")
+	return []string{"day_latest", "daily_latest"}, nil
+
+}
+
+func validateFiltersTimeRange(endTime string, startTime string) error {
+	eTime, err := time.Parse("2006-01-02T15:04:05Z", endTime)
+	sTime, err := time.Parse("2006-01-02T15:04:05Z", startTime)
+	diff := int(eTime.Sub(sTime).Hours() / 24)
+	if err != nil {
+		return errors.Errorf("cannot parse the time")
+	}
+	if diff > 90 {
+		return errors.Errorf("Range of start time and end time should not be greater than 90 days")
+	} else if diff < 0 {
+		return errors.Errorf("Start time should not be greater than end time")
+	}
+	return nil
 }

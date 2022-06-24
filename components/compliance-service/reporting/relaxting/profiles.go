@@ -319,6 +319,10 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	for filterName, filterValue := range filters {
 		logrus.Debugf("filter: name=>%s value=>%s\n", filterName, filterValue)
 	}
+	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		return nil, err
+	}
 
 	client, err := backend.ES2Client()
 	if err != nil {

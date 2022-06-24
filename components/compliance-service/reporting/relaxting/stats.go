@@ -64,10 +64,11 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 //GetStatsSummaryNodes - Gets summary stats, node centric, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
-	// Only end_time matters for this call
-	filters["start_time"] = []string{}
 	latestOnly := FetchLatestDataOrNot(filters)
-
+	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		return nil, err
+	}
 	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))

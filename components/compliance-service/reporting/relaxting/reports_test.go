@@ -207,20 +207,47 @@ func TestDoesControlTagMatchFilter(t *testing.T) {
 	assert.Equal(t, true, doesControlTagMatchFilter(multFilters, tags2))
 }
 
-func TestFilterQuerychange(t *testing.T) {
-
+func TestFilterQueryChange(t *testing.T) {
 	endTime := "2022-06-21T00:00:00Z"
 	startTime := "2022-06-21T00:00:00Z"
-	_, setFlag1, _ := filterQuerychange(endTime, startTime)
-	assert.Equal(t, "daily_latest", setFlag1)
+	setFlag1, _ := filterQueryChange(endTime, startTime)
+	assert.Equal(t, "daily_latest", setFlag1[0])
+}
 
+func TestFilterQueryChangeForDifferentDates(t *testing.T) {
 	endTime1 := "2022-06-23T00:00:00Z"
 	startTime1 := "2022-06-22T00:00:00Z"
-	_, setFlag, _ := filterQuerychange(endTime1, startTime1)
-	assert.Equal(t, "day_latest", setFlag)
+	setFlag, _ := filterQueryChange(endTime1, startTime1)
+	assert.Equal(t, "day_latest", setFlag[0])
+}
 
+func TestFilterQueryChangeForError(t *testing.T) {
 	endTime2 := "2022-06-23T00:00:00Z"
+	startTime2 := "2022-06-24T00"
+	_, err := filterQueryChange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "cannot parse the time", "")
+}
+func TestFilterQueryChangeForEndTime(t *testing.T) {
+	endTime2 := ""
+	startTime2 := "2022-06-22T00:00:00Z"
+	setFlag, _ := filterQueryChange(endTime2, startTime2)
+	assert.Equal(t, "day_latest", setFlag[0])
+}
+func TestValidateFiltersTimeRangeForError(t *testing.T) {
+	endTime2 := "2022-06-23T00:00:00Z"
+	startTime2 := "2022-06-24T00"
+	err := validateFiltersTimeRange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "cannot parse the time", "")
+}
+func TestValidateFiltersTimeRangeForErrorRange(t *testing.T) {
+	endTime2 := "2022-06-24T00:00:00Z"
+	startTime2 := "2022-07-24T00:00:00Z"
+	err := validateFiltersTimeRange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "Start time should not be greater than end time", "")
+}
+func TestValidateFiltersTimeRangeForErrorRangeTimes(t *testing.T) {
+	endTime2 := "2022-09-24T00:00:00Z"
 	startTime2 := "2022-06-24T00:00:00Z"
-	_, _, err := filterQuerychange(endTime2, startTime2)
-	assert.EqualErrorf(t, err, "Give the correct range for start date and end date", "")
+	err := validateFiltersTimeRange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "Range of start time and end time should not be greater than 90 days", "")
 }
