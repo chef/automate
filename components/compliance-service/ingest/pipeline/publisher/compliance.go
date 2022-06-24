@@ -3,6 +3,8 @@ package publisher
 import (
 	"context"
 	"fmt"
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
+	"github.com/chef/automate/lib/cereal"
 	"sync"
 	"time"
 
@@ -15,20 +17,20 @@ import (
 )
 
 // StoreCompliance uses the publishers to save the data in ElasticSearch
-func StoreCompliance(client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
+func StoreCompliance(cerealService *cereal.Manager, client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
 	logrus.Debugf("StoreCompliance started with numberOfPublishers = %d", numberOfPublishers)
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
 		out := make(chan message.Compliance, 100)
 
 		for i := 0; i < numberOfPublishers; i++ {
-			go storeCompliance(in, out, client, i)
+			go storeCompliance(in, out, cerealService, client, i)
 		}
 
 		return out
 	}
 }
 
-func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance, client *ingestic.ESClient, number int) {
+func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance, cerealManager *cereal.Manager, client *ingestic.ESClient, number int) {
 	for msg := range in {
 		// Finish the ingestion if we have a DeadlineExceeded or Canceled context
 		err := msg.Ctx.Err()
@@ -72,6 +74,16 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			message.Propagate(out, &msg)
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Published Compliance Report")
+		errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
+			fmt.Sprintf("%s-%s", "control-workflow", msg.Report.ReportUuid),
+			processor.ControlWorkflowParameters{
+				ReportUuid: msg.Report.ReportUuid,
+				Retries:    2,
+			})
+
+		if errWorkflow != nil {
+			fmt.Errorf("error in enqueuing the  workflow for request id %s: %w", msg.Report.ReportUuid, err)
+		}
 	}
 	close(out)
 }
