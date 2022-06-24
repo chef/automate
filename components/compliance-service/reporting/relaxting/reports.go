@@ -26,6 +26,7 @@ import (
 )
 
 const MaxScrollRecordSize = 10000
+const layout = "2006-01-02T15:04:05Z"
 
 func (backend ES2Backend) getDocIdHits(esIndex string,
 	searchSource *elastic.SearchSource) ([]*elastic.SearchHit, time.Duration, error) {
@@ -1372,7 +1373,6 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		for _, flag := range setFlags {
 			termQuery := elastic.NewTermsQuery(flag, true)
 			boolQuery = boolQuery.Must(termQuery)
-			filterQuerychange(filters)
 		}
 
 	}
@@ -1987,8 +1987,8 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 }
 
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
-	eTime, err := time.Parse("2006-01-02T15:04:05Z", endTime)
-	sTime, err := time.Parse("2006-01-02T15:04:05Z", startTime)
+	eTime, err := time.Parse(layout, endTime)
+	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
 		return nil, errors.Errorf("cannot parse the time")
@@ -2004,8 +2004,8 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 }
 
 func validateFiltersTimeRange(endTime string, startTime string) error {
-	eTime, err := time.Parse("2006-01-02T15:04:05Z", endTime)
-	sTime, err := time.Parse("2006-01-02T15:04:05Z", startTime)
+	eTime, err := time.Parse(layout, endTime)
+	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
 		return errors.Errorf("cannot parse the time")
