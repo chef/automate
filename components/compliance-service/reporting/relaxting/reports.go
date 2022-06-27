@@ -815,21 +815,18 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
-
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
+<<<<<<< HEAD
 
 	controlIndex, err := getControlIndex(filters)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
-	}
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
 	latestOnly := FetchLatestDataOrNot(filters)
-
 	filtQuery := backend.getFiltersQuery(filters, latestOnly)
 
 	searchSource := elastic.NewSearchSource().
@@ -2031,6 +2028,7 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 	return searchResult, queryInfo, nil
 }
 
+<<<<<<< HEAD
 // getControlSummaryFromControlIndex is constructing query for getting control summary for various filters and returning the result in a map
 func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId []string, filters map[string][]string, esIndex string, size int32) (map[string]*reportingapi.ControlSummary, error) {
 	nodeStatus := "nodes.status"
@@ -2197,12 +2195,21 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 	if len(startTime) == 0 {
 		return []string{"daily_latest"}, nil
 	}
+=======
+func filterQueryChange(endTime string, startTime string) ([]string, error) {
+>>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
 		return nil, errors.Errorf("cannot parse the time")
 	}
+<<<<<<< HEAD
+=======
+	if len(endTime) == 0 {
+		return []string{"day_latest"}, nil
+	}
+>>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))
 	if diff == 0 {
 		return []string{"daily_latest"}, nil
 	}
@@ -2211,9 +2218,12 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 }
 
 func validateFiltersTimeRange(endTime string, startTime string) error {
+<<<<<<< HEAD
 	if len(endTime) == 0 || len(startTime) == 0 {
 		return nil
 	}
+=======
+>>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
@@ -2227,6 +2237,7 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 	}
 	return nil
 }
+<<<<<<< HEAD
 
 func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {
 	if len(endTime) == 0 {
@@ -2258,3 +2269,5 @@ func checkTodayIsEndTime(endTime time.Time) bool {
 	}
 	return false
 }
+=======
+>>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))

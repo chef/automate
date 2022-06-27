@@ -18,8 +18,6 @@ import (
 )
 
 const endTime3 = "2022-06-24T00:00:00Z"
-const startTimeErr = "2022-06-24T00"
-const errCannotParse = "cannot parse the time"
 
 func TestConvertControlProcessesTags(t *testing.T) {
 	profileControlsMap := make(map[string]*reportingapi.Control, 2)
@@ -464,7 +462,58 @@ func TestGetNodeInfoFromReportID_Failed(t *testing.T) {
 	}
 	_, err := esr.GetNodeInfoFromReportID("0d67b0ab-2709-49c7-81e4-efcc5700c5cf", filters)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "GetNodeInfoFromReportID unable to complete search")
+	assert.Contains(t, err.Error(), "GetNodeInfoFromReportID unable to get depth level for report")
+}
+
+func TestFilterQueryChange(t *testing.T) {
+	endTime := "2022-06-24T12:00:00Z"
+	startTime := endTime3
+	setFlag1, _ := filterQueryChange(endTime, startTime)
+	assert.Equal(t, "daily_latest", setFlag1[0])
+}
+
+func TestFilterQueryChangeForDifferentDates(t *testing.T) {
+	endTime1 := "2022-06-23T00:00:00Z"
+	startTime1 := "2022-06-21T00:00:00Z"
+	setFlag, _ := filterQueryChange(endTime1, startTime1)
+	assert.Equal(t, "day_latest", setFlag[0])
+}
+
+func TestFilterQueryChangeForError(t *testing.T) {
+	endTime2 := "2022-06-26T00:00:00Z"
+	startTime2 := "2022-06-24T00"
+	_, err := filterQueryChange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "cannot parse the time", "")
+}
+func TestFilterQueryChangeForEndTime(t *testing.T) {
+	endTime2 := ""
+	startTime2 := "2022-06-22T00:00:00Z"
+	setFlag, _ := filterQueryChange(endTime2, startTime2)
+	assert.Equal(t, "day_latest", setFlag[0])
+}
+func TestValidateFiltersTimeRangeForError(t *testing.T) {
+	endTime2 := "2022-06-23T00:00:00Z"
+	startTime2 := "2022-06-24T00"
+	err := validateFiltersTimeRange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "cannot parse the time", "")
+}
+func TestValidateFiltersTimeRangeForErrorRange(t *testing.T) {
+	endTime2 := "2022-05-24T00:00:00Z"
+	startTime2 := "2022-07-24T00:00:00Z"
+	err := validateFiltersTimeRange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "Start time should not be greater than end time", "")
+}
+func TestValidateFiltersTimeRangeForErrorRangeTimes(t *testing.T) {
+	endTime2 := "2022-09-24T00:00:00Z"
+	startTime2 := endTime3
+	err := validateFiltersTimeRange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "Range of start time and end time should not be greater than 90 days", "")
+}
+func TestValidateFiltersTimeRangeForErrorValid(t *testing.T) {
+	endTime2 := "2022-08-16T00:00:00Z"
+	startTime2 := endTime3
+	err := validateFiltersTimeRange(endTime2, startTime2)
+	assert.Equal(t, nil, err)
 }
 
 func TestFilterQueryChange(t *testing.T) {

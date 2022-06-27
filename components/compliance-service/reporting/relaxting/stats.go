@@ -70,7 +70,7 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	latestOnly := FetchLatestDataOrNot(filters)
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
 	}
@@ -128,9 +128,7 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 
 	latestOnly := FetchLatestDataOrNot(filters)
 
-	client, err := backend.ES2Client()
-
-	esIndex, err := getControlIndex(filters)
+	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to get the index for the control stats summary API")
 	}
@@ -361,67 +359,4 @@ func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelem
 		return 0, err
 	}
 	return count, nil
-}
-
-// getStatsSummaryControlsAggs() Gets the aggregations for the control summary for comp-1-control-*
-func (backend ES2Backend) getStatsSummaryControlsAggs() map[string]elastic.Aggregation {
-	status := "status"
-	aggs := make(map[string]elastic.Aggregation)
-	failed := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery(status, "failed"))
-	skipped := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery(status, "skipped"))
-	passed := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery(status, "passed"))
-	waived := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery(status, "waived"))
-	//For calculating passed failed and waived on impact
-	impact := elastic.NewTermsAggregation().Field("impact").Size(99999).
-		SubAggregation("failed", failed)
-
-	aggs["failed"] = failed
-	aggs["skipped"] = skipped
-	aggs["passed"] = passed
-	aggs["waived"] = waived
-	aggs["impact"] = impact
-
-	return aggs
-}
-
-//getStatsSummaryControlsResult get the aggregations result for the control summary query
-func (backend ES2Backend) getStatsSummaryControlsResult(aggRoot *elastic.SearchResult) *stats.ControlsSummary {
-	summary := &stats.ControlsSummary{}
-
-	if aggRoot.Aggregations != nil && len(aggRoot.Aggregations) > 0 {
-		passed, _ := aggRoot.Aggregations.Filter("passed")
-		summary.Passed = int32(passed.DocCount)
-
-		failed, _ := aggRoot.Aggregations.Filter("failed")
-		summary.Failures = int32(failed.DocCount)
-
-		skipped, _ := aggRoot.Aggregations.Filter("skipped")
-		summary.Skipped = int32(skipped.DocCount)
-
-		waived, _ := aggRoot.Aggregations.Filter("waived")
-		summary.Waived = int32(waived.DocCount)
-
-		//computing impacts from the buckets of impact in the result
-		impactMap := make(map[string]int32)
-		impactMap[inspec.ControlImpactCritical] = 0
-		impactMap[inspec.ControlImpactMajor] = 0
-		impactMap[inspec.ControlImpactMinor] = 0
-		if impactBuckets, found := aggRoot.Aggregations.Terms("impact"); found {
-			for _, bucket := range impactBuckets.Buckets {
-				impactName := impactName(bucket.Key.(float64))
-				failedCount, _ := bucket.Aggregations.Filter("failed")
-				if value, ok := impactMap[impactName]; ok {
-					impactMap[impactName] = value + int32(failedCount.DocCount)
-				}
-			}
-
-		}
-
-		summary.Criticals = impactMap[inspec.ControlImpactCritical]
-		summary.Majors = impactMap[inspec.ControlImpactMajor]
-		summary.Minors = impactMap[inspec.ControlImpactMinor]
-
-	}
-
-	return summary
 }
