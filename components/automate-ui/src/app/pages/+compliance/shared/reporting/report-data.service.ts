@@ -151,3 +151,4 @@ export class ReportDataService {
     return this.isEmpty(result);
   }
 }
+
