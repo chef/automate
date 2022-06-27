@@ -366,7 +366,7 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 	for _, ind := range indexes {
 		if ind != indexToday {
 			_, err = elastic.NewUpdateByQueryService(backend.client).
-				Index("comp-7-r-" + "*"). // Needs to be removed the hardcoded "comp-7-r-"
+				Index(ind + "*").
 				Query(boolQueryDayLatestThisNodeNotThisReport).
 				Script(script).
 				Refresh("false").
