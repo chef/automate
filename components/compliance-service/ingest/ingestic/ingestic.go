@@ -353,13 +353,6 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 		logrus.Errorf("Cannot get indexes: %+v", indexes)
 	}
 
-	for _, ind := range indexes {
-		if ind == indexToday {
-			logrus.Debug("setYesterdayLatestToFalse: day_latest not required when the report end_time is on yesterday's UTC day")
-			return nil
-		}
-	}
-
 	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
 	// Overlapping ES updates with Refresh(false) on same indices lead to inconsistent results
 	if index == indexOneDayAgo {
@@ -369,12 +362,17 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
 	}
 
-	_, err = elastic.NewUpdateByQueryService(backend.client).
-		Index("comp-7-r-" + "*"). // Needs to be removed the hardcoded "comp-7-r-"
-		Query(boolQueryDayLatestThisNodeNotThisReport).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
+	// If the date of index isn't the current date then update  the changes
+	for _, ind := range indexes {
+		if ind != indexToday {
+			_, err = elastic.NewUpdateByQueryService(backend.client).
+				Index("comp-7-r-" + "*"). // Needs to be removed the hardcoded "comp-7-r-"
+				Query(boolQueryDayLatestThisNodeNotThisReport).
+				Script(script).
+				Refresh("false").
+				Do(ctx)
+		}
+	}
 
 	return errors.Wrap(err, "setYesterdayLatestToFalse")
 }
