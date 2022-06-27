@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/golang/protobuf/ptypes"
 	elastic "github.com/olivere/elastic/v7"
@@ -27,6 +28,7 @@ import (
 )
 
 const MaxScrollRecordSize = 10000
+const layout = "2006-01-02T15:04:05Z"
 const layout = "2006-01-02T15:04:05Z"
 
 func (backend ES2Backend) getDocIdHits(esIndex string,
@@ -815,16 +817,13 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
-
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
-
-	controlIndex, err := getControlIndex(filters)
+	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
-		return nil, errors.Wrap(err, myName)
+		return nil, err
 	}
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
@@ -2031,177 +2030,15 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 	return searchResult, queryInfo, nil
 }
 
-// getControlSummaryFromControlIndex is constructing query for getting control summary for various filters and returning the result in a map
-func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId []string, filters map[string][]string, esIndex string, size int32) (map[string]*reportingapi.ControlSummary, error) {
-	nodeStatus := "nodes.status"
-	controlSummaryMap := make(map[string]*reportingapi.ControlSummary)
-	client, err := backend.ES2Client()
-	if err != nil {
-		return nil, err
-	}
-	boolQuery := getControlSummaryFilters(controlId, filters)
-
-	filterQuery := elastic.NewBoolQuery()
-
-	searchSource := elastic.NewSearchSource().
-		Query(boolQuery).
-		FetchSource(false).Size(1)
-
-	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery(nodeStatus, "passed")))
-
-	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery(nodeStatus, "failed")))
-
-	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery(nodeStatus, "skipped")))
-
-	setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
-	if err != nil {
-		logrus.Errorf("Unable to fetch details for flags %v", err)
-	}
-	for _, flag := range setFlags {
-		termQuery := elastic.NewTermsQuery("nodes."+flag, true)
-		filterQuery = filterQuery.Must(termQuery)
-	}
-
-	filterAggregationForLatestRecord := elastic.NewFilterAggregation().Filter(filterQuery).
-		SubAggregation("failed", failedFilter).
-		SubAggregation("passed", passedFilter).
-		SubAggregation("skipped", skippedFilter)
-
-	subAggregationNodes := elastic.NewNestedAggregation().Path("nodes").SubAggregation("status", filterAggregationForLatestRecord)
-
-	//waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
-
-	controlTermsAggregation := elastic.NewTermsAggregation().Field("control_id").SubAggregation("nodes", subAggregationNodes).Size(int(size))
-
-	searchSource.Aggregation("controls", controlTermsAggregation)
-
-	source, err := searchSource.Source()
-	if err != nil {
-		return nil, errors.Wrapf(err, "%s unable to get Source", "ControlSummary")
-	}
-	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", "ControlSummary"))
-
-	searchResult, err := client.Search().
-		SearchSource(searchSource).
-		Index(esIndex).
-		Do(ctx)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if controlBuckets, found := searchResult.Aggregations.Terms("controls"); found && len(controlBuckets.Buckets) > 0 {
-		for _, bucket := range controlBuckets.Buckets {
-			controlSummary := &reportingapi.ControlSummary{
-				Passed:  &reportingapi.Total{},
-				Skipped: &reportingapi.Total{},
-				Failed:  &reportingapi.Failed{},
-				Waived:  &reportingapi.Total{},
-			}
-			if nodesBuckets, found := bucket.Aggregations.Nested("nodes"); found {
-				controlSummary = getControlSummaryResult(nodesBuckets)
-			}
-
-			id, ok := bucket.Key.(string)
-			if !ok {
-				logrus.Errorf("Unable to find id for the control in new index structure %v", err)
-				continue
-			}
-			controlSummaryMap[id] = controlSummary
-		}
-	}
-	return controlSummaryMap, nil
-
-}
-
-// getControlSummaryResult gets the result from the summary query from index comp-1-control-*
-func getControlSummaryResult(nodesBucket *elastic.AggregationSingleBucket) (controlSummary *reportingapi.ControlSummary) {
-	controlSummary = &reportingapi.ControlSummary{
-		Passed:  &reportingapi.Total{},
-		Skipped: &reportingapi.Total{},
-		Failed:  &reportingapi.Failed{},
-		Waived:  &reportingapi.Total{},
-	}
-
-	if status, found := nodesBucket.Aggregations.Filter("status"); found {
-		if failed, found := status.Aggregations.Filter("failed"); found {
-			controlSummary.Failed.Total = int32(failed.DocCount)
-		}
-
-		if passed, found := status.Aggregations.Filter("passed"); found {
-			controlSummary.Passed.Total = int32(passed.DocCount)
-		}
-
-		if skipped, found := status.Aggregations.Filter("skipped"); found {
-			controlSummary.Skipped.Total = int32(skipped.DocCount)
-		}
-	}
-
-	return controlSummary
-
-}
-
-// getControlSummaryFilters is applying filters to the query for index comp-1-control-*
-func getControlSummaryFilters(controlId []string, filters map[string][]string) *elastic.BoolQuery {
-
-	boolQuery := elastic.NewBoolQuery()
-
-	controlTermsQuery := elastic.NewTermsQueryFromStrings("control_id", controlId...)
-
-	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
-		endTime := firstOrEmpty(filters["end_time"])
-		startTime := firstOrEmpty(filters["start_time"])
-		timeRangeQuery := elastic.NewRangeQuery("end_time")
-		if len(startTime) > 0 {
-			timeRangeQuery.Gte(startTime)
-		}
-		if len(endTime) > 0 {
-			timeRangeQuery.Lte(endTime)
-		}
-
-		boolQuery = boolQuery.Must(timeRangeQuery)
-	}
-
-	controlQuery := boolQuery.Must(controlTermsQuery)
-
-	return controlQuery
-
-}
-
-//getMultiControlString takes the list of strings and returns the query string used in search.
-func getMultiControlString(list []string) string {
-	controlList := []string{}
-	for _, control := range list {
-		controlList = append(controlList, handleSpecialChar(control))
-	}
-	return strings.Join(controlList, " ")
-}
-
-//handleSpecialChar takes the string, and add additional char in front of the reserved chars.
-func handleSpecialChar(term string) string {
-	//maintain `\` always first in the list to stop encoding the characters we are appending.
-	reservedChar := []string{`\`, `/`, `+`, `-`, `=`, `&&`, `||`, `>`, `<`, `!`, `(`, `)`, `{`, `}`, `[`, `]`, `^`, `"`, `~`, `*`, `?`, `:`}
-	for _, rChar := range reservedChar {
-		term = strings.ReplaceAll(term, rChar, fmt.Sprintf("\\%s", rChar))
-	}
-	return fmt.Sprintf("(%s)", term)
-}
-
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
-	if len(endTime) == 0 && len(startTime) == 0 {
-		return []string{"day_latest", "daily_latest"}, nil
-	}
-	if len(startTime) == 0 {
-		return []string{"daily_latest"}, nil
-	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
 		return nil, errors.Errorf("cannot parse the time")
+	}
+	if len(endTime) == 0 {
+		return []string{"day_latest"}, nil
 	}
 	if diff == 0 {
 		return []string{"daily_latest"}, nil
@@ -2211,9 +2048,6 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 }
 
 func validateFiltersTimeRange(endTime string, startTime string) error {
-	if len(endTime) == 0 || len(startTime) == 0 {
-		return nil
-	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
@@ -2226,35 +2060,4 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 		return errors.Errorf("Start time should not be greater than end time")
 	}
 	return nil
-}
-
-func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {
-	if len(endTime) == 0 {
-		return nil, nil
-	}
-
-	parsedEndTime, err := time.Parse(time.RFC3339, endTime)
-	if err != nil {
-		return []string{}, err
-	}
-
-	if checkTodayIsEndTime(parsedEndTime) {
-		if startTime == "" {
-			return []string{}, nil
-		}
-		return []string{startTime}, nil
-	}
-	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
-
-	return []string{newStartTime.Format(time.RFC3339)}, nil
-
-}
-
-func checkTodayIsEndTime(endTime time.Time) bool {
-	currentDay := time.Now()
-
-	if currentDay.Year() == endTime.Year() && currentDay.Month() == endTime.Month() && currentDay.Day() == endTime.Day() {
-		return true
-	}
-	return false
 }
