@@ -77,3 +77,4 @@
 - [`75_update_roles_pols.up.sql`](75_update_roles_pols.up.sql)
 - [`76_compliance_roles_pols.up.sql`](76_compliance_roles_pols.up.sql)
 - [`77_update_infra_service_policies.up.sql`](77_update_infra_service_policies.up.sql)
+- [`78_update_roles.up.sql`](78_update_roles.up.sql)

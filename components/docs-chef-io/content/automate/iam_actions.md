@@ -41,4 +41,5 @@ Specify the action to restrict user access to the specific action.
 | Manage Policies | Settings | iam:policies:* | /iam/v2/policies | https://{{< example_fqdn "automate" >}}/settings/policies |
 | Manage Roles | Settings | iam:roles:* | /iam/v2/roles | https://{{< example_fqdn "automate" >}}/settings/roles |
 | Manage Projects | Settings | iam:projects:* | /iam/v2/projects | https://{{< example_fqdn "automate" >}}/settings/projects |
+| List Download Report Requests | Compliance | reportmanager:requests:list | /reportmanager/requests | https://{{< example_fqdn "automate" >}}/reportmanager/requests |
 {{< /responsive-table >}}
