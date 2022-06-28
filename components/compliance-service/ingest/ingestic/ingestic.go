@@ -906,3 +906,35 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, data *relaxting
 	}
 	return &item, nil
 }
+
+func (backend *ESClient) SetDayLatestToFalse(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string) error {
+	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
+	termQueryThisControl := elastic.NewTermsQuery("control_id", controlId)
+	termQueryThisProfile := elastic.NewTermsQuery("profile", profileId)
+
+	boolQueryDayLatest := elastic.NewBoolQuery().
+		Must(termQueryDayLatestTrue).
+		Must(termQueryThisControl).
+		Must(termQueryThisProfile)
+
+	script := elastic.NewScript("ctx._source.day_latest = false")
+
+	oneDayAgo := time.Now().Add(-24 * time.Hour)
+	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
+	if index == indexOneDayAgo {
+		logrus.Debug("setYesterdayLatestToFalse: day_latest not required when the report end_time is on yesterday's UTC day")
+		return nil
+	}
+	for i := 0; i < 90; i++ {
+		oneDay := oneDayAgo.Add(-24 * time.Hour)
+		indexOneDay := mapping.IndexTimeseriesFmt(oneDay)
+		_, err := elastic.NewUpdateByQueryService(backend.client).
+			Index(indexOneDay + "*").
+			Query(boolQueryDayLatest).
+			Script(script).
+			Refresh("false").
+			Do(ctx)
+		return errors.Wrap(err, "setDayLatestToFalse")
+	}
+	return nil
+}
