@@ -1987,7 +1987,7 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 }
 
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
-	if len(endTime) == 0 {
+	if len(endTime) == 0 || len(startTime) == 0 {
 		return []string{"day_latest"}, nil
 	}
 	eTime, err := time.Parse(layout, endTime)

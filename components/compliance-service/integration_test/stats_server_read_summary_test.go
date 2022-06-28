@@ -130,6 +130,7 @@ func TestReadReportSummary(t *testing.T) {
 			octoberTwentyFifthQuery := &stats.Query{
 				Filters: []*stats.ListFilter{
 					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+					{Type: "start_time", Values: []string{"2018-10-25T00:00:00Z"}},
 				},
 			}
 			//passing in no type gets us a Summary type that contains a hydrated ReportSummary
@@ -237,6 +238,7 @@ func TestReadNodeSummary(t *testing.T) {
 			octoberTwentyFifthQuery := &stats.Query{
 				Filters: []*stats.ListFilter{
 					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+					{Type: "start_time", Values: []string{"2018-10-25T00:00:00Z"}},
 				},
 			}
 
@@ -336,6 +338,7 @@ func TestReadControlSummary(t *testing.T) {
 			octoberTwentyFifthQuery := &stats.Query{
 				Filters: []*stats.ListFilter{
 					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+					{Type: "start_time", Values: []string{"2018-10-25T00:00:00Z"}},
 				},
 			}
 			//passing in "controls" type gets us a Summary type that contains a hydrated ControlSummary
@@ -388,6 +391,7 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{
 			Filters: []*apiReporting.ListFilter{
 				{Type: "end_time", Values: []string{"2018-10-25T23:18:41Z"}},
+				{Type: "start_time", Values: []string{"2018-10-25T00:00:00Z"}},
 			},
 		})
 

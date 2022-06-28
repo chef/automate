@@ -854,14 +854,6 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	return map[string]interface{}{"projects": esProjectCollection}
 }
 
-func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
-	params := make(map[string]interface{})
-	params["node"] = node
-
-	return elastic.NewScript("if (!(ctx._source.nodes instanceof Collection)) {ctx._source.nodes = [ctx._source.nodes];} ctx._source.nodes.add(params.node)").Params(params)
-
-}
-
 func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid string, index string) (*relaxting.ESInSpecReport, error) {
 	logrus.Debug("Fetching project by UUID")
 
@@ -990,4 +982,12 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 
 func GetDocIdByControlIdAndProfileID(controlID string, profileID string) string {
 	return fmt.Sprintf("%s|%s", controlID, profileID)
+}
+
+func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
+	params := make(map[string]interface{})
+	params["node"] = node
+
+	return elastic.NewScript("if (!(ctx._source.nodes instanceof Collection)) {ctx._source.nodes = [ctx._source.nodes];} ctx._source.nodes.add(params.node)").Params(params)
+
 }
