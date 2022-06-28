@@ -995,23 +995,17 @@ func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
 }
 
 func (backend *ESClient) SetDayLatestToFalse(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string) error {
-	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
-	termQueryThisControl := elastic.NewTermsQuery("control_id", controlId)
-	termQueryThisProfile := elastic.NewTermsQuery("profile", profileId)
+	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
 	boolQueryDayLatest := elastic.NewBoolQuery().
-		Must(termQueryDayLatestTrue).
-		Must(termQueryThisControl).
-		Must(termQueryThisProfile)
+		Must(termQueryThisControl)
 
-	script := elastic.NewScript("ctx._source.day_latest = false")
+	script := elastic.NewScript("def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid); for(node in targets) { if(node.day_latest==true) {node.day_latest = false}} if (ctx._source.day_latest==true) {ctx._source.day_latest = false;}")
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
 	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
-	// Making a filter query to get all the indices from today to 90 days back
-	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
 	// Getting all the indices
-	esIndexs, err := relaxting.GetEsIndex(filters, true)
+	esIndexes, err := relaxting.IndexDates(relaxting.CompDailyControlIndexPrefix, time90daysAgo.Format(time.RFC3339), oneDayAgo.Format(time.RFC3339))
 	if err != nil {
 		logrus.Errorf("Cannot get indexes: %+v", err)
 	}
@@ -1021,10 +1015,14 @@ func (backend *ESClient) SetDayLatestToFalse(ctx context.Context, controlId stri
 	}
 	// Updating in all the Indices
 	_, err = elastic.NewUpdateByQueryService(backend.client).
-		Index(esIndexs).
+		Index(esIndexes).
 		Query(boolQueryDayLatest).
 		Script(script).
 		Refresh("false").
 		Do(ctx)
 	return errors.Wrap(err, "SetDayLatestsToFalse")
+}
+
+func GetDocIdByControlIdAndProfileID(controlID string, profileID string) string {
+	return fmt.Sprintf("%s|%s", controlID, profileID)
 }
