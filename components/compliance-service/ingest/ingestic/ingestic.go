@@ -342,7 +342,7 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 
 	script := elastic.NewScript("ctx._source.day_latest = false")
 
-	oneDayAgo := time.Now().Add(-90 * time.Hour)
+	oneDayAgo := time.Now().Add(-24 * time.Hour)
 	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 
 	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
