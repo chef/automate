@@ -13,6 +13,8 @@ import (
 )
 
 const endTime3 = "2022-06-24T00:00:00Z"
+const startTimeErr = "2022-06-24T00"
+const errCannotParse = "cannot parse the time"
 
 func TestConvertControlProcessesTags(t *testing.T) {
 	profileControlsMap := make(map[string]*reportingapi.Control, 2)
@@ -476,16 +478,14 @@ func TestFilterQueryChangeForDifferentDates(t *testing.T) {
 
 func TestFilterQueryChangeForError(t *testing.T) {
 	endTime2 := "2022-06-26T00:00:00Z"
-	startTime2 := "2022-06-24T00"
+	startTime2 := startTimeErr
 	_, err := filterQueryChange(endTime2, startTime2)
-	assert.EqualErrorf(t, err, "cannot parse the time", "")
+	assert.EqualErrorf(t, err, errCannotParse, "")
 }
 
 func TestFilterQueryChangeForErrorWithBlankStartTimeAndEndTime(t *testing.T) {
-	endTime2 := "2022-06-26T00:00:00Z"
-	startTime2 := "2022-06-24T00"
-	_, err := filterQueryChange(endTime2, startTime2)
-	assert.EqualErrorf(t, err, "cannot parse the time", "")
+	setFlag, _ := filterQueryChange("", "")
+	assert.Equal(t, "day_latest", setFlag[0])
 }
 
 func TestFilterQueryChangeForEndTime(t *testing.T) {
@@ -496,9 +496,9 @@ func TestFilterQueryChangeForEndTime(t *testing.T) {
 }
 func TestValidateFiltersTimeRangeForError(t *testing.T) {
 	endTime2 := "2022-06-23T00:00:00Z"
-	startTime2 := "2022-06-24T00"
+	startTime2 := startTimeErr
 	err := validateFiltersTimeRange(endTime2, startTime2)
-	assert.EqualErrorf(t, err, "cannot parse the time", "")
+	assert.EqualErrorf(t, err, errCannotParse, "")
 }
 func TestValidateFiltersTimeRangeForErrorRange(t *testing.T) {
 	endTime2 := "2022-05-24T00:00:00Z"

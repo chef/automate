@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	UUID = "efd46e48-5751-40a2-a705-1182356908c1"
+	UUID  = "efd46e48-5751-40a2-a705-1182356908c1"
+	ID    = "3q09ru4orbfer k vfksd "
+	Title = "some different tile"
 )
 
 func TestMapStructs(t *testing.T) {
@@ -52,9 +54,9 @@ func TestMapStructs(t *testing.T) {
 									WaivedStr:  "no",
 								},
 								{
-									ID:         "3q09ru4orbfer k vfksd ",
+									ID:         ID,
 									Impact:     0,
-									Title:      "some different tile",
+									Title:      Title,
 									Status:     "failed",
 									Results:    nil,
 									WaiverData: nil,
@@ -79,8 +81,8 @@ func TestMapStructs(t *testing.T) {
 					Profile:     relaxting.Profile{ProfileID: ""},
 				},
 				{
-					ControlID:   "3q09ru4orbfer k vfksd ",
-					Title:       "some different tile",
+					ControlID:   ID,
+					Title:       Title,
 					WaivedStr:   "no",
 					WaiverData:  (*relaxting.ESInSpecReportControlsWaiverData)(nil),
 					Impact:      0,
@@ -107,9 +109,9 @@ func TestMapStructs(t *testing.T) {
 							Name: "",
 							Controls: []relaxting.ESInSpecReportControl{
 								{
-									ID:         "3q09ru4orbfer k vfksd ",
+									ID:         ID,
 									Impact:     0,
-									Title:      "some different tile",
+									Title:      Title,
 									Status:     "failed",
 									Results:    nil,
 									WaiverData: &relaxting.ESInSpecReportControlsWaiverData{Run: true},
@@ -122,7 +124,7 @@ func TestMapStructs(t *testing.T) {
 			},
 			want: []relaxting.Control{
 				{
-					ControlID:   "3q09ru4orbfer k vfksd ",
+					ControlID:   ID,
 					Title:       "some different tile",
 					WaivedStr:   "yes",
 					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
