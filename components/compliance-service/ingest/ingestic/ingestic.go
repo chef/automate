@@ -17,12 +17,12 @@ import (
 )
 
 type ESClient struct {
-	client      *elastic.Client
+	*elastic.Client
 	initialized bool
 }
 
 func NewESClient(client *elastic.Client) *ESClient {
-	return &ESClient{client: client, initialized: false}
+	return &ESClient{Client: client, initialized: false}
 }
 
 // This method will support adding a document with a specified ID
@@ -33,8 +33,8 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 	data interface{}) error {
 
 	// Add a document on a particular index and a particular id
-	// This is not creating an index with a timestring at the end
-	_, err := backend.client.Index().
+	// This is not creating  an index with a timestring at the end
+	_, err := backend.Client.Index().
 		Index(mapping.Index).
 		Id(ID).
 		BodyJson(data).
@@ -48,7 +48,7 @@ func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping ma
 
 	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
 
-	_, err := backend.client.Update().
+	_, err := backend.Client.Update().
 		Index(mapping.Index).
 		Id(id).
 		Script(script).
@@ -80,7 +80,7 @@ func (backend *ESClient) InitializeStore(ctx context.Context) {
 
 func (backend *ESClient) createStoreAliasIfNotExists(ctx context.Context, alias string, index string) {
 	if len(alias) > 0 {
-		if exists, _ := relaxting.StoreExists(backend.client, alias); !exists {
+		if exists, _ := relaxting.StoreExists(backend.Client, alias); !exists {
 			indexError := backend.createAlias(ctx, alias, index)
 			if indexError != nil {
 				logrus.Errorf("Error creating alias %s with error: %s", alias, indexError.Error())
@@ -91,14 +91,14 @@ func (backend *ESClient) createStoreAliasIfNotExists(ctx context.Context, alias 
 
 func (backend *ESClient) CreateTemplate(ctx context.Context, templateName string, mapping string) {
 	// We don't care if it already exists because it will update the template
-	_, err := backend.client.IndexPutTemplate(templateName).BodyString(mapping).Do(ctx)
+	_, err := backend.Client.IndexPutTemplate(templateName).BodyString(mapping).Do(ctx)
 	if err != nil {
 		logrus.Errorf("Error creating index %s with error: %s", templateName, err.Error())
 	}
 }
 
 func (backend *ESClient) createStoreIfNotExists(ctx context.Context, indexName string, mapping string) {
-	exists, _ := relaxting.StoreExists(backend.client, indexName)
+	exists, _ := relaxting.StoreExists(backend.Client, indexName)
 	if !exists {
 		indexError := backend.createStore(ctx, indexName, mapping)
 		if indexError != nil {
@@ -108,14 +108,14 @@ func (backend *ESClient) createStoreIfNotExists(ctx context.Context, indexName s
 }
 
 func (backend *ESClient) createAlias(ctx context.Context, aliasName string, indexName string) error {
-	_, error := backend.client.Alias().Add(indexName, aliasName).Do(ctx)
+	_, error := backend.Client.Alias().Add(indexName, aliasName).Do(ctx)
 
 	return error
 }
 
 func (backend *ESClient) createStore(ctx context.Context, indexName string, mapping string) error {
 	// Create the actual index. The mapping is applied using the CreateTemplate method
-	_, error := backend.client.CreateIndex(indexName).Do(ctx)
+	_, error := backend.Client.CreateIndex(indexName).Do(ctx)
 
 	return error
 }
@@ -125,7 +125,7 @@ func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(hash)
 
-	searchResult, err := backend.client.Search().
+	searchResult, err := backend.Client.Search().
 		Index(relaxting.CompProfilesIndex).
 		Query(idsQuery).
 		Size(0).
@@ -167,7 +167,7 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 	}
 	relaxting.LogQueryPartMin(esIndex, source, "ProfilesMissing query searchSource")
 
-	searchResult, err := backend.client.Search().
+	searchResult, err := backend.Client.Search().
 		SearchSource(searchSource).
 		Index(esIndex).
 		Do(context.Background())
@@ -223,7 +223,7 @@ func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[st
 	}
 	relaxting.LogQueryPartMin(esIndex, source, "GetProfilesMissingMetadata query searchSource")
 
-	scroll := backend.client.Scroll().
+	scroll := backend.Client.Scroll().
 		Index(esIndex).
 		SearchSource(searchSource)
 
@@ -261,7 +261,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	data.DailyLatest = true
 	data.ReportID = id
 	// Add the summary document to the compliance timeseries index using the specified report id as document id
-	_, err := backend.client.Index().
+	_, err := backend.Client.Index().
 		Index(index).
 		Id(id).
 		BodyJson(*data).
@@ -291,7 +291,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	data.DailyLatest = true
 	data.ReportID = id
 	// Add the report document to the compliance timeseries index using the specified report id as document id
-	_, err := backend.client.Index().
+	_, err := backend.Client.Index().
 		Index(index).
 		Id(id).
 		BodyJson(*data).
@@ -342,7 +342,7 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 
 	script := elastic.NewScript("ctx._source.day_latest = false")
 
-	oneDayAgo := time.Now().Add(-24 * time.Hour)
+	oneDayAgo := time.Now().Add(-90 * time.Hour)
 	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 
 	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
@@ -354,7 +354,7 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
 	}
 
-	_, err := elastic.NewUpdateByQueryService(backend.client).
+	_, err := elastic.NewUpdateByQueryService(backend.Client).
 		Index(indexOneDayAgo + "*").
 		Query(boolQueryDayLatestThisNodeNotThisReport).
 		Script(script).
@@ -384,7 +384,7 @@ func (backend *ESClient) setLatestsToFalse(ctx context.Context, nodeId string, r
 	//source, _ := boolQueryDailyLatestThisNodeNotThisReport.Source()
 	//relaxting.LogQueryPartMin(index, source, "UPDATE")
 
-	_, err := elastic.NewUpdateByQueryService(backend.client).
+	_, err := elastic.NewUpdateByQueryService(backend.Client).
 		Index(index).
 		Query(boolQueryDailyLatestThisNodeNotThisReport).
 		Script(script).
@@ -542,7 +542,7 @@ func (backend *ESClient) UpdateReportProjectsTagsForIndex(ctx context.Context, i
 		ctx._source.projects = matchingProjects.toArray();
  `
 
-	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
+	startTaskResult, err := elastic.NewUpdateByQueryService(backend.Client).
 		Index(index).
 		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
@@ -684,7 +684,7 @@ func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, 
 		ctx._source.projects = matchingProjects.toArray();
  `
 
-	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
+	startTaskResult, err := elastic.NewUpdateByQueryService(backend.Client).
 		Index(index).
 		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
@@ -698,14 +698,14 @@ func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, 
 }
 
 func (backend *ESClient) JobCancel(ctx context.Context, jobID string) error {
-	_, err := elastic.NewTasksCancelService(backend.client).
+	_, err := elastic.NewTasksCancelService(backend.Client).
 		TaskId(jobID).
 		Do(ctx)
 	return err
 }
 
 func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
-	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(backend.client).
+	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(backend.Client).
 		TaskId(jobID).
 		WaitForCompletion(false).
 		Do(ctx)
@@ -852,57 +852,4 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	}
 
 	return map[string]interface{}{"projects": esProjectCollection}
-}
-
-func (backend *ESClient) GetDocByReportUUId(ctx context.Context, data *relaxting.ESInSpecReport, index string) (*relaxting.ESInSpecReport, error) {
-	logrus.Debug("Fetching project by UUID")
-	var item relaxting.ESInSpecReport
-
-	fsc := elastic.NewFetchSourceContext(false)
-	termQueryNotThisReport := elastic.NewTermsQuery("_id", data.ReportID)
-	boolQuery := elastic.NewBoolQuery()
-	boolQuery = boolQuery.Must(termQueryNotThisReport)
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(boolQuery).
-		Size(1000)
-	searchResult, err := backend.client.Search().
-		SearchSource(searchSource).
-		Index(index).
-		Do(context.Background())
-
-	if err != nil {
-		switch {
-		case elastic.IsNotFound(err):
-			logrus.Errorf("Document not found: %v", err)
-			return nil, err
-		case elastic.IsTimeout(err):
-			logrus.Errorf("Timeout retrieving document: %v", err)
-			return nil, err
-		case elastic.IsConnErr(err):
-			logrus.Errorf("Connection problem: %v", err)
-			return nil, err
-		default:
-			logrus.Errorf("Received error: %v", err)
-			return nil, err
-		}
-	}
-
-	if searchResult.TotalHits() > 0 {
-		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
-
-		// Iterate through results
-		for _, hit := range searchResult.Hits.Hits {
-			// hit.Index contains the name of the index
-			if hit.Source != nil {
-				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
-				err := json.Unmarshal(hit.Source, &item)
-				if err != nil {
-					logrus.Errorf("Received error while unmarshling %+v", err)
-				}
-			}
-
-		}
-	}
-	return &item, nil
 }
