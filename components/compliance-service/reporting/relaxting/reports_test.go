@@ -480,6 +480,14 @@ func TestFilterQueryChangeForError(t *testing.T) {
 	_, err := filterQueryChange(endTime2, startTime2)
 	assert.EqualErrorf(t, err, "cannot parse the time", "")
 }
+
+func TestFilterQueryChangeForErrorWithBlankStartTimeAndEndTime(t *testing.T) {
+	endTime2 := "2022-06-26T00:00:00Z"
+	startTime2 := "2022-06-24T00"
+	_, err := filterQueryChange(endTime2, startTime2)
+	assert.EqualErrorf(t, err, "cannot parse the time", "")
+}
+
 func TestFilterQueryChangeForEndTime(t *testing.T) {
 	endTime2 := ""
 	startTime2 := "2022-06-22T00:00:00Z"
