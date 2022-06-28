@@ -13,7 +13,7 @@ import (
 )
 
 func (backend *ESClient) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.SerializedProjectUpdateTask, error) {
-	indexNames, err := backend.Client.IndexNames()
+	indexNames, err := backend.client.IndexNames()
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (backend *ESClient) MonitorProjectUpdateTask(ctx context.Context,
 	projectUpdateID string, id project_update_lib.SerializedProjectUpdateTaskID) (
 	project_update_lib.SerializedProjectUpdateTaskStatus, error) {
 
-	res, err := elasticutil.GetUpdateByQueryTask(ctx, backend.Client, string(id))
+	res, err := elasticutil.GetUpdateByQueryTask(ctx, backend.client, string(id))
 
 	if err != nil {
 		logrus.WithError(err).Error("Could not query task")

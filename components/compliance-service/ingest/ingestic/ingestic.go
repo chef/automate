@@ -17,12 +17,12 @@ import (
 )
 
 type ESClient struct {
-	*elastic.Client
+	client      *elastic.Client
 	initialized bool
 }
 
 func NewESClient(client *elastic.Client) *ESClient {
-	return &ESClient{Client: client, initialized: false}
+	return &ESClient{client: client, initialized: false}
 }
 
 // This method will support adding a document with a specified ID
@@ -34,7 +34,7 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 
 	// Add a document on a particular index and a particular id
 	// This is not creating  an index with a timestring at the end
-	_, err := backend.Client.Index().
+	_, err := backend.client.Index().
 		Index(mapping.Index).
 		Id(ID).
 		BodyJson(data).
@@ -48,7 +48,7 @@ func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping ma
 
 	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
 
-	_, err := backend.Client.Update().
+	_, err := backend.client.Update().
 		Index(mapping.Index).
 		Id(id).
 		Script(script).
@@ -80,7 +80,7 @@ func (backend *ESClient) InitializeStore(ctx context.Context) {
 
 func (backend *ESClient) createStoreAliasIfNotExists(ctx context.Context, alias string, index string) {
 	if len(alias) > 0 {
-		if exists, _ := relaxting.StoreExists(backend.Client, alias); !exists {
+		if exists, _ := relaxting.StoreExists(backend.client, alias); !exists {
 			indexError := backend.createAlias(ctx, alias, index)
 			if indexError != nil {
 				logrus.Errorf("Error creating alias %s with error: %s", alias, indexError.Error())
@@ -91,14 +91,14 @@ func (backend *ESClient) createStoreAliasIfNotExists(ctx context.Context, alias 
 
 func (backend *ESClient) CreateTemplate(ctx context.Context, templateName string, mapping string) {
 	// We don't care if it already exists because it will update the template
-	_, err := backend.Client.IndexPutTemplate(templateName).BodyString(mapping).Do(ctx)
+	_, err := backend.client.IndexPutTemplate(templateName).BodyString(mapping).Do(ctx)
 	if err != nil {
 		logrus.Errorf("Error creating index %s with error: %s", templateName, err.Error())
 	}
 }
 
 func (backend *ESClient) createStoreIfNotExists(ctx context.Context, indexName string, mapping string) {
-	exists, _ := relaxting.StoreExists(backend.Client, indexName)
+	exists, _ := relaxting.StoreExists(backend.client, indexName)
 	if !exists {
 		indexError := backend.createStore(ctx, indexName, mapping)
 		if indexError != nil {
@@ -108,14 +108,14 @@ func (backend *ESClient) createStoreIfNotExists(ctx context.Context, indexName s
 }
 
 func (backend *ESClient) createAlias(ctx context.Context, aliasName string, indexName string) error {
-	_, error := backend.Client.Alias().Add(indexName, aliasName).Do(ctx)
+	_, error := backend.client.Alias().Add(indexName, aliasName).Do(ctx)
 
 	return error
 }
 
 func (backend *ESClient) createStore(ctx context.Context, indexName string, mapping string) error {
 	// Create the actual index. The mapping is applied using the CreateTemplate method
-	_, error := backend.Client.CreateIndex(indexName).Do(ctx)
+	_, error := backend.client.CreateIndex(indexName).Do(ctx)
 
 	return error
 }
@@ -125,7 +125,7 @@ func (backend *ESClient) ProfileExists(hash string) (bool, error) {
 	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(hash)
 
-	searchResult, err := backend.Client.Search().
+	searchResult, err := backend.client.Search().
 		Index(relaxting.CompProfilesIndex).
 		Query(idsQuery).
 		Size(0).
@@ -167,7 +167,7 @@ func (backend *ESClient) ProfilesMissing(allHashes []string) (missingHashes []st
 	}
 	relaxting.LogQueryPartMin(esIndex, source, "ProfilesMissing query searchSource")
 
-	searchResult, err := backend.Client.Search().
+	searchResult, err := backend.client.Search().
 		SearchSource(searchSource).
 		Index(esIndex).
 		Do(context.Background())
@@ -223,7 +223,7 @@ func (backend *ESClient) GetProfilesMissingMetadata(profileIDs []string) (map[st
 	}
 	relaxting.LogQueryPartMin(esIndex, source, "GetProfilesMissingMetadata query searchSource")
 
-	scroll := backend.Client.Scroll().
+	scroll := backend.client.Scroll().
 		Index(esIndex).
 		SearchSource(searchSource)
 
@@ -261,7 +261,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	data.DailyLatest = true
 	data.ReportID = id
 	// Add the summary document to the compliance timeseries index using the specified report id as document id
-	_, err := backend.Client.Index().
+	_, err := backend.client.Index().
 		Index(index).
 		Id(id).
 		BodyJson(*data).
@@ -291,7 +291,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	data.DailyLatest = true
 	data.ReportID = id
 	// Add the report document to the compliance timeseries index using the specified report id as document id
-	_, err := backend.Client.Index().
+	_, err := backend.client.Index().
 		Index(index).
 		Id(id).
 		BodyJson(*data).
@@ -354,7 +354,7 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
 	}
 
-	_, err := elastic.NewUpdateByQueryService(backend.Client).
+	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(indexOneDayAgo + "*").
 		Query(boolQueryDayLatestThisNodeNotThisReport).
 		Script(script).
@@ -384,7 +384,7 @@ func (backend *ESClient) setLatestsToFalse(ctx context.Context, nodeId string, r
 	//source, _ := boolQueryDailyLatestThisNodeNotThisReport.Source()
 	//relaxting.LogQueryPartMin(index, source, "UPDATE")
 
-	_, err := elastic.NewUpdateByQueryService(backend.Client).
+	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Query(boolQueryDailyLatestThisNodeNotThisReport).
 		Script(script).
@@ -542,7 +542,7 @@ func (backend *ESClient) UpdateReportProjectsTagsForIndex(ctx context.Context, i
 		ctx._source.projects = matchingProjects.toArray();
  `
 
-	startTaskResult, err := elastic.NewUpdateByQueryService(backend.Client).
+	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
@@ -684,7 +684,7 @@ func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, 
 		ctx._source.projects = matchingProjects.toArray();
  `
 
-	startTaskResult, err := elastic.NewUpdateByQueryService(backend.Client).
+	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
@@ -698,14 +698,14 @@ func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, 
 }
 
 func (backend *ESClient) JobCancel(ctx context.Context, jobID string) error {
-	_, err := elastic.NewTasksCancelService(backend.Client).
+	_, err := elastic.NewTasksCancelService(backend.client).
 		TaskId(jobID).
 		Do(ctx)
 	return err
 }
 
 func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
-	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(backend.Client).
+	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(backend.client).
 		TaskId(jobID).
 		WaitForCompletion(false).
 		Do(ctx)
@@ -852,4 +852,142 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	}
 
 	return map[string]interface{}{"projects": esProjectCollection}
+}
+
+func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
+	params := make(map[string]interface{})
+	params["node"] = node
+
+	return elastic.NewScript("if (!(ctx._source.nodes instanceof Collection)) {ctx._source.nodes = [ctx._source.nodes];} ctx._source.nodes.add(params.node)").Params(params)
+
+}
+
+func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid string, index string) (*relaxting.ESInSpecReport, error) {
+	logrus.Debug("Fetching project by UUID")
+
+	var item relaxting.ESInSpecReport
+	boolQuery := elastic.NewBoolQuery()
+
+	idsQuery := elastic.NewIdsQuery()
+	idsQuery.Ids(reportUuid)
+	boolQuery = boolQuery.Must(idsQuery)
+	fsc := elastic.NewFetchSourceContext(true)
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(1)
+
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(index).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._id",
+			"hits.hits._source",
+			"hits.hits.inner_hits").
+		Do(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if searchResult.TotalHits() > 0 {
+		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			// hit.Index contains the name of the index
+			if hit.Source != nil {
+				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
+				err := json.Unmarshal(hit.Source, &item)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling %+v", err)
+				}
+
+			}
+
+		}
+	}
+
+	return &item, nil
+}
+
+func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday string) (bool, error) {
+	logrus.Debugf("Checking the control document exists for today with doc Id :%s", docId)
+	fsc := elastic.NewFetchSourceContext(false)
+	boolQuery := elastic.NewBoolQuery()
+	idsQuery := elastic.NewIdsQuery()
+	idsQuery.Ids(docId)
+	boolQuery = boolQuery.Must(idsQuery)
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(1)
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(indexToday).
+		Do(context.Background())
+	if err != nil {
+		switch {
+		case elastic.IsTimeout(err):
+			logrus.Errorf("Timeout retrieving document: %v", err)
+			return false, err
+		default:
+			logrus.Errorf("Received error: %v", err)
+			return false, err
+		}
+	}
+
+	if searchResult.TotalHits() > 0 {
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			// hit.Index contains the id of the index
+			if len(hit.Id) > 0 {
+				logrus.Debugf("Found the document with for control with doc Id %s", docId)
+				return true, nil
+			}
+
+		}
+	}
+	return false, nil
+
+}
+
+func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time) error {
+	mapping := mappings.ComplianceControlRepData
+	index := mapping.IndexTimeseriesFmt(endTime)
+
+	bulkRequest := backend.client.Bulk()
+	for _, control := range controls {
+		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
+		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
+		if err != nil {
+			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
+		}
+		if found {
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])).Type("_doc"))
+		} else {
+			bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
+		}
+
+	}
+
+	approxBytes := bulkRequest.EstimatedSizeInBytes()
+	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
+	if err != nil {
+		logrus.Errorf("Unable to send the request in bulk for reportuuid :%s with error :%v", reportuuid, err)
+		return err
+	}
+	if bulkResponse == nil {
+		logrus.Errorf("Unable to fetch the response of bulk request reportuuid id:%s with error :%v", reportuuid, err)
+		return err
+	}
+
+	logrus.Debugf("Bulk insert %d summaries, ~size %dB, took %dms", len(controls), approxBytes, bulkResponse.Took)
+	return nil
+
+}
+
+func GetDocIdByControlIdAndProfileID(controlID string, profileID string) string {
+	return fmt.Sprintf("%s|%s", controlID, profileID)
 }
