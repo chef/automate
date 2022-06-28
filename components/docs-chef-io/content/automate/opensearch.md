@@ -84,6 +84,23 @@ If you wish to reset to the default configuration or to modify the configuration
 1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
 1. Run `chef-automate config set config.toml` to apply your changes.
 
+### Connect external OpenSearch using HTTP
+
+OpenSearch configuration in automate supports connection over HTTPS by default. To configure automate to connect over HTTP run the commands below:
+1. Run the commands below
+    ```
+    habrootcmd=$(HAB_LICENSE=accept-no-persist hab pkg path chef/automate-es-gateway)
+    ```
+    ```
+    sed -i 's/proxy_pass\ https:\/\/external-os;/proxy_pass http:\/\/external-os;/g' ${habrootcmd}/config/nginx.conf
+    ```
+
+2. After running the above commands, patch your opensearch configuration in automate (`sudo chef-automate config patch config.toml`). Please note that the `root_cert` field is not required anymore in the automate configuration.
+
+{{< note >}}
+The above configurations may get reverted back with automate upgrades resulting in the connection with opensearch to break. Post any automate upgrades these steps will have to be performed again.
+{{< /note >}}
+
 ## Backup External OpenSearch
 
 ### Backup External OpenSearch to a Local Filesystem
