@@ -344,7 +344,6 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 	script := elastic.NewScript("ctx._source.day_latest = false")
 
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
-	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 
 	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
 
@@ -355,15 +354,7 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 	esIndexs, err := relaxting.GetEsIndex(filters, false)
 	if err != nil {
 		logrus.Errorf("Cannot get indexes: %+v", err)
-	}
-
-	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
-	// Overlapping ES updates with Refresh(false) on same indices lead to inconsistent results
-	if index == indexOneDayAgo {
-		logrus.Debug("setYesterdayLatestToFalse: day_latest not required when the report end_time is on yesterday's UTC day")
-		return nil
-	} else {
-		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
+		return err
 	}
 
 	// Updating in all the Indices
