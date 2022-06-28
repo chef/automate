@@ -345,12 +345,15 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
 	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 
-	today := time.Now()
-	indexToday := mapping.IndexTimeseriesFmt(today)
+	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
 
-	indexes, err := backend.client.IndexNames()
+	// Making a filter query to get all the indices from today to 90 days back
+	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
+
+	// Getting all the indices
+	esIndexs, err := relaxting.GetEsIndex(filters, true)
 	if err != nil {
-		logrus.Errorf("Cannot get indexes: %+v", indexes)
+		logrus.Errorf("Cannot get indexes: %+v", err)
 	}
 
 	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
@@ -362,17 +365,13 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
 	}
 
-	// If the date of index isn't the current date then update  the changes
-	for _, ind := range indexes {
-		if ind != indexToday {
-			_, err = elastic.NewUpdateByQueryService(backend.client).
-				Index(ind + "*").
-				Query(boolQueryDayLatestThisNodeNotThisReport).
-				Script(script).
-				Refresh("false").
-				Do(ctx)
-		}
-	}
+	// Updating in all the Indices
+	_, err = elastic.NewUpdateByQueryService(backend.client).
+		Index(esIndexs).
+		Query(boolQueryDayLatestThisNodeNotThisReport).
+		Script(script).
+		Refresh("false").
+		Do(ctx)
 
 	return errors.Wrap(err, "setYesterdayLatestToFalse")
 }
