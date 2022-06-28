@@ -290,6 +290,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	}
 	data.DailyLatest = true
 	data.ReportID = id
+
 	// Add the report document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).
@@ -351,7 +352,7 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
 
 	// Getting all the indices
-	esIndexs, err := relaxting.GetEsIndex(filters, true)
+	esIndexs, err := relaxting.GetEsIndex(filters, false)
 	if err != nil {
 		logrus.Errorf("Cannot get indexes: %+v", err)
 	}
