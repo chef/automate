@@ -44,6 +44,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.profileFilterStatus = this.route.queryParams['_value'].status || 'all';
     this.user = this.chefSessionService.username;
     this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
