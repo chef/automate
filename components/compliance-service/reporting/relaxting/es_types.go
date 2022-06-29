@@ -304,3 +304,31 @@ type ESMigrationInfo struct {
 type EndTimeSource struct {
 	EndTime time.Time `json:"end_time"`
 }
+
+type Control struct {
+	ControlID   string                            `json:"control_id"`
+	Title       string                            `json:"title"`
+	WaivedStr   string                            `json:"waived_str"`
+	WaiverData  interface{}                       `json:"waiver_data"`
+	Impact      float64                           `json:"impact"`
+	EndTime     time.Time                         `json:"end_time"`
+	DailyLatest bool                              `json:"daily_latest"`
+	DayLatest   bool                              `json:"day_latest"`
+	Status      string                            `json:"status"`
+	Nodes       []Node                            `json:"nodes"`
+	StringTags  []ESInSpecReportControlStringTags `json:"string_tags"`
+	Profile     Profile                           `json:"profile"`
+}
+
+type Node struct {
+	NodeUUID    string    `json:"node_uuid"`
+	NodeEndTime time.Time `json:"node_end_time"`
+	Status      string    `json:"status"`
+	DayLatest   bool      `json:"day_latest"`
+	DailyLatest bool      `json:"daily_latest"`
+	ReportUUID  string    `json:"report_uuid"`
+}
+
+type Profile struct {
+	ProfileID string `json:"profile_id"`
+}
