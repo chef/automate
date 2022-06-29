@@ -1002,16 +1002,11 @@ func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context,
 
 	script := elastic.NewScript("def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid); for(node in targets) { if(node.day_latest==true) {node.day_latest = false}} if (ctx._source.day_latest==true) {ctx._source.day_latest = false;}").Param("node_uuid", node_uuid)
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
-	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
 	// Getting all the indices
 	esIndexes, err := relaxting.IndexDates(relaxting.CompDailyControlIndexPrefix, time90daysAgo.Format(time.RFC3339), oneDayAgo.Format(time.RFC3339))
 	if err != nil {
 		logrus.Errorf("Cannot get indexes: %+v", err)
-	}
-	if index == indexOneDayAgo {
-		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
-		return nil
 	}
 	// Updating in all the Indices
 	_, err = elastic.NewUpdateByQueryService(backend.client).
