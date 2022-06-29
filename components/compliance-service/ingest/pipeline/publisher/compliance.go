@@ -56,7 +56,7 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			}
 		}
 		errChannels = append(errChannels, insertInspecSummary(msg, client))
-		errChannels = append(errChannels, insertInspecReport(msg, client))
+		errChannels = append(errChannels, insertInspecReport(msg, client, cerealManager))
 		errChannels = append(errChannels, insertInspecReportRunInfo(msg, client))
 
 		for err := range merge(errChannels...) {
@@ -74,16 +74,7 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			message.Propagate(out, &msg)
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Published Compliance Report")
-		errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
-			fmt.Sprintf("%s-%s", "control-workflow", msg.Report.ReportUuid),
-			processor.ControlWorkflowParameters{
-				ReportUuid: msg.Report.ReportUuid,
-				Retries:    2,
-			})
 
-		if errWorkflow != nil {
-			fmt.Errorf("error in enqueuing the  workflow for request id %s: %w", msg.Report.ReportUuid, err)
-		}
 	}
 	close(out)
 }
@@ -106,7 +97,7 @@ func insertInspecSummary(msg message.Compliance, client *ingestic.ESClient) <-ch
 	return out
 }
 
-func insertInspecReport(msg message.Compliance, client *ingestic.ESClient) <-chan error {
+func insertInspecReport(msg message.Compliance, client *ingestic.ESClient, cerealManager *cereal.Manager) <-chan error {
 	out := make(chan error)
 	go func() {
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
@@ -119,6 +110,17 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient) <-cha
 			out <- nil
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
+		errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
+			fmt.Sprintf("%s-%s", "control-workflow", msg.Report.ReportUuid),
+			processor.ControlWorkflowParameters{
+				ReportUuid: msg.Report.ReportUuid,
+				Retries:    2,
+				EndTime:    msg.Shared.EndTime,
+			})
+
+		if errWorkflow != nil {
+			fmt.Errorf("error in enqueuing the  workflow for request id %s: %w", msg.Report.ReportUuid, err)
+		}
 		close(out)
 	}()
 	return out
