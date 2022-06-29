@@ -6,6 +6,7 @@ const haAwsConfigTemplate = `
 # successfully create a new Chef Automate HA instances with default settings.
 
 [architecture.aws]
+# ============== Access & Backup Config =================
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "aws"
@@ -22,7 +23,10 @@ backup_config = ""
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
+# ======================================================
 
+# ============== EC2 Nodes Config ======================
+# Please use the https://docs.chef.io/calculator/automate_ha_hardware_calculator.xlsx to calculate, No and type of instance needed.
 
 [automate.config]
 # admin_password = ""
@@ -42,8 +46,10 @@ instance_count = "3"
 
 [postgresql.config]
 instance_count = "3"
+# ======================================================
 
 [aws.config]
+# ============== AWS network Config ============================
 profile = "default"
 region = "us-east-1"
 # Provide vpcid and cidr block
@@ -55,6 +61,12 @@ private_custom_subnets = []
 public_custom_subnets = []
 # ssh key pair name in AWS to access instances
 ssh_key_pair_name = "A2HA"
+# ======================================================
+
+# ============== Managed Services ======================
+# in case your are trying to deploy with aws managed 
+# RDS, and openseach, then make setup_managed_services = true, 
+# and modify other managed services settings.
 setup_managed_services = false
 managed_opensearch_domain_name = ""
 managed_opensearch_domain_url = ""
@@ -70,6 +82,9 @@ managed_rds_superuser_password = ""
 managed_rds_dbuser_username = ""
 managed_rds_dbuser_password = ""
 managed_rds_certificate = ""
+# ======================================================
+
+# ============== EC2 Instance Config ===================
 ami_filter_name = ""
 ami_filter_virt_type = ""
 ami_filter_owner = ""
@@ -94,9 +109,15 @@ opensearch_ebs_volume_type = "gp3"
 postgresql_ebs_volume_iops = "100"
 postgresql_ebs_volume_size = "50"
 postgresql_ebs_volume_type = "gp3"
+# ======================================================
+
+# ============== EC2 Instance Tags =====================
 X-Contact = ""
 X-Dept = ""
 X-Project = ""
+# ======================================================
+
+# ============== Deprecated ============================
 #Deprecated Config - below config is not supported
 #aws_automate_route53_prefix = ""
 #aws_chef_server_route53_prefix = ""
@@ -109,6 +130,7 @@ X-Project = ""
 #use_existing_managed_infra = false
 #X-Production = "false"
 #X-Customer = ""
+# ======================================================
 `
 
 const haExistingNodesConfigTemplate = `
@@ -117,6 +139,7 @@ const haExistingNodesConfigTemplate = `
 # successfully create a new Chef Automate HA instances with default settings.
 
 [architecture.existing_infra]
+# ============== Access & Backup Config =================
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
@@ -128,7 +151,9 @@ sudo_password = ""
 
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
+# ======================================================
 
+# ============== EC2 Nodes Config ======================
 [automate.config]
 # admin_password = ""
 # automate load balancer fqdn IP or path
@@ -147,10 +172,14 @@ instance_count = "3"
 instance_count = "3"
 
 [existing_infra.config]
+# provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+# No of ip address should be same as No of instance_count count mentioned above in 
+# automate.config, chef_server.config, opensearch.config and postgresql.config
 automate_private_ips = []
 chef_server_private_ips = []
 opensearch_private_ips = []
 postgresql_private_ips = []
+# ======================================================
 `
 
 var UsageTemplate string = `
