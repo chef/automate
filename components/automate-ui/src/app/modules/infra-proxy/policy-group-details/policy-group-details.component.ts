@@ -82,7 +82,6 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(([_getOrgSt, orgState]) => {
       this.org = { ...orgState };
     });
-    
     // load policy Group details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),

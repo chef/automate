@@ -120,7 +120,6 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(([_getOrgSt, orgState]) => {
       this.org = { ...orgState };
     });
-
     // load policy file details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),

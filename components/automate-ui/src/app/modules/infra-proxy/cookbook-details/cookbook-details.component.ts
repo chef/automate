@@ -88,7 +88,6 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         const [, fragment] = url.split('#');
         this.tabValue = (fragment === 'details') ? 'details' : 'content';
       });
-
   
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
@@ -100,7 +99,6 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       this.serverId = server_id;
       this.orgId = org_id;
       this.cookbookName = cookbook_name;
-      
       this.store.dispatch(new GetCookbookVersions({
         server_id: server_id,
         org_id: org_id,

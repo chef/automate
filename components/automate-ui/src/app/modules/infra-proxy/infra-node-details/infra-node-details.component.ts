@@ -177,7 +177,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(([_getOrgSt, orgState]) => {
       this.org = { ...orgState };
     });
-
     // load node details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),

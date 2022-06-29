@@ -115,27 +115,27 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         this.tabValue = (fragment === 'attributes') ? 'attributes' : 'runList';
       });
 
-      combineLatest([
-        this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
-        this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
-      ]).pipe(
-        takeUntil(this.isDestroyed)
-      ).subscribe(([server_id, org_id]: string[]) => {
-        this.serverId = server_id;
-        this.orgId = org_id;
-        this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
-      });
-  
-      combineLatest([
-        this.store.select(gtStatus),
-        this.store.select(orgFromRoute)
-      ]).pipe(
-        filter(([getOrgSt, orgState]) => getOrgSt ===
-          EntityStatus.loadingSuccess && !isNil(orgState)),
-        takeUntil(this.isDestroyed)
-      ).subscribe(([_getOrgSt, orgState]) => {
-        this.org = { ...orgState };
-      });
+    combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([server_id, org_id]: string[]) => {
+      this.serverId = server_id;
+      this.orgId = org_id;
+      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
+    });
+
+    combineLatest([
+      this.store.select(gtStatus),
+      this.store.select(orgFromRoute)
+    ]).pipe(
+      filter(([getOrgSt, orgState]) => getOrgSt ===
+        EntityStatus.loadingSuccess && !isNil(orgState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getOrgSt, orgState]) => {
+      this.org = { ...orgState };
+    });
   
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
@@ -177,7 +177,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         this.idList[0] = this.env_id;
       }
     });
-
   }
 
   ngOnDestroy(): void {
