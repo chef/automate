@@ -88,7 +88,6 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         const [, fragment] = url.split('#');
         this.tabValue = (fragment === 'details') ? 'details' : 'content';
       });
-  
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),

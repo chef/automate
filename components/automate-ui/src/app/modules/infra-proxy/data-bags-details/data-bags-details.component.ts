@@ -157,7 +157,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
             }
           }
         }
-        this.dataBagsItemDetailsLoading = false; 
+        this.dataBagsItemDetailsLoading = false;
       });
   }
 

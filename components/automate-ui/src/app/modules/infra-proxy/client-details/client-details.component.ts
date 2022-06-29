@@ -56,7 +56,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
       this.name = name;
       this.store.dispatch(new GetClient({
         server_id: server_id, org_id: org_id, name: name
-      }));   
+      }));
     });
 
     this.store.select(clientFromRoute).pipe(
@@ -65,7 +65,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(client => {
       this.show = true;
       this.client = client;
-      this.clientDetailsLoading = false;  
+      this.clientDetailsLoading = false;
       this.clientTabLoading = false;
     });
   }
