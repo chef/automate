@@ -10,6 +10,7 @@ import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil, take } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import {
   infraNodeFromRoute
 } from 'app/entities/infra-nodes/infra-node-details.selectors';
@@ -47,6 +48,9 @@ import { AvailableType } from '../infra-roles/infra-roles.component';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { Org } from 'app/entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
+import { GetOrg } from 'app/entities/orgs/org.actions';
 
 export type InfraNodeTabName = 'details' | 'runList' | 'attributes';
 
@@ -57,6 +61,7 @@ export type InfraNodeTabName = 'details' | 'runList' | 'attributes';
 })
 
 export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
+  public org: Org;
   public conflictError = false;
   public InfraNode: InfraNode;
   public tabValue: InfraNodeTabName = 'details';
@@ -150,6 +155,29 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
           break;
       }
     });
+
+    combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([server_id, org_id]: string[]) => {
+      this.serverId = server_id;
+      this.orgId = org_id;
+      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
+    });
+
+    combineLatest([
+      this.store.select(gtStatus),
+      this.store.select(orgFromRoute)
+    ]).pipe(
+      filter(([getOrgSt, orgState]) => getOrgSt ===
+        EntityStatus.loadingSuccess && !isNil(orgState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getOrgSt, orgState]) => {
+      this.org = { ...orgState };
+    });
+
     // load node details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),

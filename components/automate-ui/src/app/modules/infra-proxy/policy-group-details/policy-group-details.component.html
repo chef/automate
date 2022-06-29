@@ -1,9 +1,12 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <!-- <chef-loading-spinner *ngIf="cookbookVersionsLoading" size="50" fixed></chef-loading-spinner> -->
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Server</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">{{org?.name}}
+        </chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Policy Groups
         </chef-breadcrumb>
         {{policyGroup?.name}}
@@ -41,12 +44,12 @@
           <chef-option value='nodes' data-cy="nodes-tab">Nodes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      
+
       <section class="page-body" *ngIf="tabValue === 'policyfiles'">
+        <div class="spinner">
+          <chef-loading-spinner *ngIf="policyGroupDetailsLoading" size="50" fixed></chef-loading-spinner>
+        </div>
         <div class="policyfiles-tab" *ngIf="!policyGroupDetailsLoading">
-          <div class="spinner">
-            <chef-loading-spinner *ngIf="policyGroupDetailsLoading" size="50" fixed></chef-loading-spinner>
-          </div>
           <div data-cy="empty-list" class="empty-section" *ngIf="!isPolicyfileAvailable">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p>No policyfiles available</p>
@@ -111,11 +114,7 @@
                 </chef-tr>
               </chef-tbody>
             </chef-table>
-            <app-page-picker
-              class="nodes-list-paging"
-              [total]="total"
-              [perPage]="per_page"
-              [page]="current_page"
+            <app-page-picker class="nodes-list-paging" [total]="total" [perPage]="per_page" [page]="current_page"
               (pageChanged)="onPageChange($event)">
             </app-page-picker>
           </div>

@@ -5,8 +5,11 @@
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Environments</chef-breadcrumb>
-         {{environment?.name}}
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">{{org?.name}}
+        </chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Environments
+        </chef-breadcrumb>
+        {{environment?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
         <chef-heading>{{environment?.name}}</chef-heading>
@@ -15,19 +18,10 @@
           <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      <app-edit-environment-attribute-modal
-        [jsonText]="jsonText"
-        [openEvent]="openEnvironmentModal"
-        [serverId]="serverId"
-        [orgId]="orgId"
-        [name]="name"
-        [environment]="environment"
-        [label]="label"
-        [cookbookConstraints]="cookbookConstraints"
-        [cookbookVersions]="cookbookVersions"
-        [constraintKeys]="constraintKeys"
-        [nameKeys]="nameKeys"
-        [name_id]="name_id">
+      <app-edit-environment-attribute-modal [jsonText]="jsonText" [openEvent]="openEnvironmentModal"
+        [serverId]="serverId" [orgId]="orgId" [name]="name" [environment]="environment" [label]="label"
+        [cookbookConstraints]="cookbookConstraints" [cookbookVersions]="cookbookVersions"
+        [constraintKeys]="constraintKeys" [nameKeys]="nameKeys" [name_id]="name_id">
       </app-edit-environment-attribute-modal>
       <section class="page-body" *ngIf="tabValue === 'cookbookConstraints'">
         <div *ngIf="show">
@@ -54,7 +48,7 @@
                     </chef-tr>
                   </chef-thead>
                   <chef-tbody>
-                    <chef-tr *ngFor= "let version of cookbookVersions" class="row-gap">
+                    <chef-tr *ngFor="let version of cookbookVersions" class="row-gap">
                       <chef-td class="no-border-th">{{ version.name }}</chef-td>
                       <chef-td class="no-border-th">{{ version.operator }}</chef-td>
                       <chef-td class="no-border-th">{{ version.versionNumber }}</chef-td>
@@ -76,21 +70,15 @@
         </label>
         <div class="attr">
           <div class="expand-collapse">
-            <chef-button tertiary class="action"
-              [disabled]= !hasDefaultJson
-              (click)="tree.expand()">
+            <chef-button tertiary class="action" [disabled]=!hasDefaultJson (click)="tree.expand()">
               <chef-icon>add_circle</chef-icon>
               <span>Expand All</span>
             </chef-button>
-            <chef-button tertiary class="action"
-              [disabled]= !hasDefaultJson
-              (click)="tree.collapse()">
+            <chef-button tertiary class="action" [disabled]=!hasDefaultJson (click)="tree.collapse()">
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
-            <chef-button
-              tertiary
-              class="right-button-box"
+            <chef-button tertiary class="right-button-box"
               (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
               <span class="material-icons edit-item">mode_edit</span>
               <span class="edit-text">Edit</span>
@@ -99,10 +87,7 @@
           <hr class="divider-constraints" />
           <div class="json-container">
             <div class="scroll">
-              <app-json-tree-table
-                class="json-tree-container"
-                [hidden]="hasDefaultJson? false : true"
-                #tree
+              <app-json-tree-table class="json-tree-container" [hidden]="hasDefaultJson? false : true" #tree
                 [json]="selectedAttrs?.default_attributes">
               </app-json-tree-table>
               <div *ngIf="!hasDefaultJson" class="img-section">
@@ -117,21 +102,15 @@
         </label>
         <div class="attr">
           <div class="expand-collapse">
-            <chef-button tertiary class="action"
-              [disabled]= !hasOverrideJson
-              (click)="override.expand()">
+            <chef-button tertiary class="action" [disabled]=!hasOverrideJson (click)="override.expand()">
               <chef-icon>add_circle</chef-icon>
               <span>Expand All</span>
             </chef-button>
-            <chef-button tertiary class="action"
-              [disabled]= !hasOverrideJson
-              (click)="override.collapse()">
+            <chef-button tertiary class="action" [disabled]=!hasOverrideJson (click)="override.collapse()">
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
-            <chef-button
-              tertiary
-              class="right-button-box"
+            <chef-button tertiary class="right-button-box"
               (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
               <span class="material-icons edit-item">mode_edit</span>
               <span class="edit-text">Edit</span>
@@ -140,10 +119,7 @@
           <hr class="divider-constraints" />
           <div class="json-container">
             <div class="scroll">
-              <app-json-tree-table
-                class="json-tree-container"
-                [hidden]="hasOverrideJson? false : true"
-                #override
+              <app-json-tree-table class="json-tree-container" [hidden]="hasOverrideJson? false : true" #override
                 [json]="selectedAttrs?.override_attributes">
               </app-json-tree-table>
               <div *ngIf="!hasOverrideJson" class="img-section">

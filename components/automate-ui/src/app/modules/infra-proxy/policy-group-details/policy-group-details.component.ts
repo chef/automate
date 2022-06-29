@@ -15,7 +15,9 @@ import { getAllNodesStatus, policyGroupNodeList } from 'app/entities/infra-nodes
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import { EntityStatus } from 'app/entities/entities';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
-
+import { Org } from 'app/entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
+import { GetOrg } from 'app/entities/orgs/org.actions';
 export type PolicyGroupTabName = 'policyfiles' | 'nodes';
 
 @Component({
@@ -24,6 +26,7 @@ export type PolicyGroupTabName = 'policyfiles' | 'nodes';
   styleUrls: ['./policy-group-details.component.scss']
 })
 export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
+  public org: Org;
   public policyGroup: PolicyGroup;
   public serverId: string;
   public orgId: string;
@@ -58,6 +61,28 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
       this.tabValue = (fragment === 'nodes') ? 'nodes' : 'policyfiles';
     });
 
+    combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([server_id, org_id]: string[]) => {
+      this.serverId = server_id;
+      this.orgId = org_id;
+      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
+    });
+
+    combineLatest([
+      this.store.select(gtStatus),
+      this.store.select(orgFromRoute)
+    ]).pipe(
+      filter(([getOrgSt, orgState]) => getOrgSt ===
+        EntityStatus.loadingSuccess && !isNil(orgState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getOrgSt, orgState]) => {
+      this.org = { ...orgState };
+    });
+    
     // load policy Group details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),

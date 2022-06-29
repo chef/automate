@@ -5,6 +5,8 @@
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">{{org?.name}}
+        </chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Cookbooks
         </chef-breadcrumb>
         {{ cookbookName }}
@@ -28,15 +30,14 @@
           <div class="item-column">
             <ul class="list" *ngIf="menuList.length">
               <li *ngFor="let item of menuList; let i = index;">
-                <span (click)="listClickEvent($event)" 
-                [ngClass]="{'extend-list': i === menuIndex}">
-                  {{ item.menu | titlecase  }} ({{ item.subMenu.length }})
+                <span (click)="listClickEvent($event)" [ngClass]="{'extend-list': i === menuIndex}">
+                  {{ item.menu | titlecase }} ({{ item.subMenu.length }})
                 </span>
                 <ul class="sub-list" [ngClass]="{'show': i === menuIndex}">
-                  <li *ngFor="let content of item.subMenu; let j = index;" 
-                  [ngClass]="{'active-sub-list': j === 0 && i === 0}" 
-                  (click)="subListClickEvent($event, content)">
-                    {{ content.name }}<chef-icon>fiber_manual_record</chef-icon></li>
+                  <li *ngFor="let content of item.subMenu; let j = index;"
+                    [ngClass]="{'active-sub-list': j === 0 && i === 0}" (click)="subListClickEvent($event, content)">
+                    {{ content.name }}<chef-icon>fiber_manual_record</chef-icon>
+                  </li>
                 </ul>
               </li>
             </ul>

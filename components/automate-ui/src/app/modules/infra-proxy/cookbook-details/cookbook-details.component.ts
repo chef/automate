@@ -14,6 +14,9 @@ import { routeURL, routeParams } from 'app/route.selectors';
 import { CookbookVersions } from 'app/entities/cookbooks/cookbook-versions.model';
 import { cookbookVersionsFromRoute, getStatus } from 'app/entities/cookbooks/cookbook-versions.selectors';
 import { GetCookbookVersions } from 'app/entities/cookbooks/cookbook-versions.actions';
+import { Org } from 'app/entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
+import { GetOrg } from 'app/entities/orgs/org.actions';
 import {
   CookbookDetails,
   RootFiles,
@@ -33,6 +36,7 @@ export type CookbookDetailsTab = 'content' | 'details';
   styleUrls: ['./cookbook-details.component.scss']
 })
 export class CookbookDetailsComponent implements OnInit, OnDestroy {
+  public org: Org;
   private isDestroyed = new Subject<boolean>();
   public cookbook: CookbookVersions;
   public url: string;
@@ -85,6 +89,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         this.tabValue = (fragment === 'details') ? 'details' : 'content';
       });
 
+  
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
@@ -95,11 +100,34 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       this.serverId = server_id;
       this.orgId = org_id;
       this.cookbookName = cookbook_name;
+      
       this.store.dispatch(new GetCookbookVersions({
         server_id: server_id,
         org_id: org_id,
         cookbook_name: cookbook_name
       }));
+    });
+
+    combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([server_id, org_id]: string[]) => {
+      this.serverId = server_id;
+      this.orgId = org_id;
+      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
+    });
+
+    combineLatest([
+      this.store.select(gtStatus),
+      this.store.select(orgFromRoute)
+    ]).pipe(
+      filter(([getOrgSt, orgState]) => getOrgSt ===
+        EntityStatus.loadingSuccess && !isNil(orgState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getOrgSt, orgState]) => {
+      this.org = { ...orgState };
     });
 
     combineLatest([
@@ -164,7 +192,6 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
             });
         }
       });
-
   }
 
   public handleCookbookVersionChange(event): void {

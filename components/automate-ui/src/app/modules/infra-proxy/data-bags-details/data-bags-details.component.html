@@ -1,18 +1,17 @@
 <div class="content-container dataBagItems">
   <div class="container">
     <main>
-      <app-delete-infra-object-modal
-        [visible]="deleteModalVisible"
-        objectNoun="data bag item"
-        [objectName]="dataBagItemToDelete?.name"
-        (close)="closeDeleteModal()"
-        (deleteClicked)="deleteDataBagItem()"
+      <chef-loading-spinner *ngIf="dataBagsTabLoading" size="50" fixed></chef-loading-spinner>
+      <app-delete-infra-object-modal [visible]="deleteModalVisible" objectNoun="data bag item"
+        [objectName]="dataBagItemToDelete?.name" (close)="closeDeleteModal()" (deleteClicked)="deleteDataBagItem()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
       <chef-loading-spinner class="spinner" *ngIf="dataBagsDetailsLoading" size="50" fixed></chef-loading-spinner>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">{{org?.name}}
+        </chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Data Bags
         </chef-breadcrumb>
         {{ dataBagName }}
@@ -35,36 +34,31 @@
         </chef-tab-selector>
       </chef-page-header>
 
-      <app-create-databag-item-modal
-          [openEvent]="openDataBagItemModal"
-          [server_Id]="serverId"
-          [org_Id]="orgId"
-          [name]="dataBagName"
-          [currentPage]="current_page">
+      <app-create-databag-item-modal [openEvent]="openDataBagItemModal" [server_Id]="serverId" [org_Id]="orgId"
+        [name]="dataBagName" [currentPage]="current_page">
       </app-create-databag-item-modal>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
         <div class="search-create-container">
-          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items by name...">
+          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)"
+            placeHolder="data bag items by name...">
           </app-infra-search-bar>
-          <app-paginator *ngIf="dataBagItems"
-            [length]= "total"
-            [pageSize]= "per_page"
-            [pageIndex]= "current_page"
-            (changePage)= "onUpdatePage($event)"
-          ></app-paginator>
+          <app-paginator *ngIf="dataBagItems" [length]="total" [pageSize]="per_page" [pageIndex]="current_page"
+            (changePage)="onUpdatePage($event)"></app-paginator>
           <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
         </div>
         <div class="section-container" *ngIf="dataBagItems">
-          <chef-loading-spinner *ngIf="loading || deleting" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
+          <chef-loading-spinner *ngIf="loading || deleting" size="50" fixed class="full-screen-spinner">
+          </chef-loading-spinner>
           <div class="empty-section" *ngIf="!loading && !dataBagItems.length">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p *ngIf="searchValue === ''">No data bag items available</p>
             <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
           </div>
           <div *ngIf="dataBagItems.length">
-            <ul id="accordion" class="accordion" >
-              <li *ngFor="let item of dataBagItems; let i = index" [class.active]="item.active" class="items" id="{{item.name}}">
+            <ul id="accordion" class="accordion">
+              <li *ngFor="let item of dataBagItems; let i = index" [class.active]="item.active" class="items"
+                id="{{item.name}}">
                 <div class="menu" (click)="handleItemSelected(item.name, i)">
                   <div class="data-bag-name">
                     {{ item.name }}
@@ -73,7 +67,8 @@
                 </div>
                 <div class="submenu" [ngClass]="item.active ? activeClassName : ''">
                   <div class="item-details">
-                    <chef-loading-spinner *ngIf="item.active && dataBagsItemDetailsLoading" size="50" fixed></chef-loading-spinner>
+                    <chef-loading-spinner *ngIf="item.active && dataBagsItemDetailsLoading" size="50" fixed>
+                    </chef-loading-spinner>
                     <div *ngIf="!dataBagsItemDetailsLoading && selectedItemDetails">
                       <div class="expand-collapse edited">
                         <chef-button tertiary class="action" (click)="tree.expand()">
@@ -88,39 +83,27 @@
                           <chef-icon class="material-icons">delete</chef-icon>
                           <span>Delete</span>
                         </chef-button>
-                        <chef-button
-                          tertiary
-                          class="action right-button-box"
-                          (click)="startUpdateDataBagItem(item, selectedItemDetails)"
-                          [disabled]="editDisable">
+                        <chef-button tertiary class="action right-button-box"
+                          (click)="startUpdateDataBagItem(item, selectedItemDetails)" [disabled]="editDisable">
                           <chef-icon class="material-icons">mode_edit</chef-icon>
                           <span>Edit</span>
                         </chef-button>
                       </div>
 
-                      <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
+                      <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails">
+                      </app-json-tree-table>
                     </div>
                   </div>
                 </div>
               </li>
             </ul>
           </div>
-          <app-edit-data-bag-item-modal
-            [openEvent]="openEditDataBagItemModal"
-            [serverId]="serverId"
-            [orgId]="orgId"
-            [dataBagName]="dataBagName"
-            [dataBagItemName]="dataBagItemName"
-            [itemDataJson]="itemDataJson"
+          <app-edit-data-bag-item-modal [openEvent]="openEditDataBagItemModal" [serverId]="serverId" [orgId]="orgId"
+            [dataBagName]="dataBagName" [dataBagItemName]="dataBagItemName" [itemDataJson]="itemDataJson"
             (refreshData)="refreshData($event)">
           </app-edit-data-bag-item-modal>
-          <app-page-picker
-            *ngIf="!loading"
-            class="item-list-paging"
-            [total]="total"
-            [perPage]="per_page"
-            [page]="current_page"
-            (pageChanged)="onPageChange($event)">
+          <app-page-picker *ngIf="!loading" class="item-list-paging" [total]="total" [perPage]="per_page"
+            [page]="current_page" (pageChanged)="onPageChange($event)">
           </app-page-picker>
         </div>
       </section>

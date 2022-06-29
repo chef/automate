@@ -18,7 +18,9 @@ import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-deta
 import { dataBagItemDetailsFromRoute, getStatus  } from 'app/entities/data-bags/data-bag-item-details.selector';
 import { Regex } from 'app/helpers/auth/regex';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-
+import { Org } from 'app/entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
+import { GetOrg } from 'app/entities/orgs/org.actions';
 export type DataBagsDetailsTab = 'details';
 
 @Component({
@@ -27,6 +29,7 @@ export type DataBagsDetailsTab = 'details';
   styleUrls: ['./data-bags-details.component.scss']
 })
 export class DataBagsDetailsComponent implements OnInit, OnDestroy {
+  public org: Org;
   private isDestroyed = new Subject<boolean>();
   public dataBagItems: DataBagItems[];
   public dataBagSearch: DataBagItems[];
@@ -38,6 +41,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public itemDataJson: string;
   public tabValue: DataBagsDetailsTab = 'details';
   public dataBagsDetailsLoading = true;
+  public dataBagsTabLoading = true;
   public selectedItem: string;
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
@@ -78,6 +82,28 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     });
 
     combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([server_id, org_id]: string[]) => {
+      this.serverId = server_id;
+      this.orgId = org_id;
+      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
+    });
+
+    combineLatest([
+      this.store.select(gtStatus),
+      this.store.select(orgFromRoute)
+    ]).pipe(
+      filter(([getOrgSt, orgState]) => getOrgSt ===
+        EntityStatus.loadingSuccess && !isNil(orgState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getOrgSt, orgState]) => {
+      this.org = { ...orgState };
+    });
+
+    combineLatest([
       this.store.select(getAllStatus),
       this.store.select(dataBagItemList)
     ]).pipe(
@@ -93,6 +119,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         this.dataBagsDetailsLoading = false;
         this.loading = false;
         this.deleting = false;
+        this.dataBagsTabLoading = false;
       });
 
     this.store.select(deleteStatus).pipe(
@@ -131,6 +158,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
           }
         }
         this.dataBagsItemDetailsLoading = false;
+        
       });
   }
 

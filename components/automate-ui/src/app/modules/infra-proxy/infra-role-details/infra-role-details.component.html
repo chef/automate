@@ -1,11 +1,15 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <chef-loading-spinner *ngIf="infraRoleLoading" size="50" fixed></chef-loading-spinner>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Roles</chef-breadcrumb>
-         {{role?.name}}
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">{{org?.name}}
+        </chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Roles
+        </chef-breadcrumb>
+        {{role?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
         <chef-heading>{{role?.name}}</chef-heading>
@@ -28,29 +32,20 @@
           <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      <app-edit-infra-role-modal
-        [jsonText]="jsonText"
-        [label]="label"
-        [openEvent]="openEnvironmentModal"
-        [orgId]="orgId"
-        [availableType]="availableType"
-        [role]="role"
-        [serverId]="serverId"
-        [selected]="selected"
+      <app-edit-infra-role-modal [jsonText]="jsonText" [label]="label" [openEvent]="openEnvironmentModal"
+        [orgId]="orgId" [availableType]="availableType" [role]="role" [serverId]="serverId" [selected]="selected"
         (runlistUpdated)="updateRunlist()">
       </app-edit-infra-role-modal>
       <section class="page-body" *ngIf="tabValue === 'runList'">
-        <chef-loading-spinner *ngIf="roleDetailsLoading" size="50"></chef-loading-spinner>
+        <chef-loading-spinner *ngIf="roleDetailsLoading && !infraRoleLoading" size="50"></chef-loading-spinner>
         <div *ngIf="show && !roleDetailsLoading">
           <div class="label-items">
             <label>
               <span class="label default">Run List</span>
             </label>
             <div class="version-dropdown">
-              <chef-select #li [value]="env_id" (change)="selectChangeHandler(li.value)" >
-                <chef-option
-                  *ngFor="let list of idList"
-                  [value]="list">
+              <chef-select #li [value]="env_id" (change)="selectChangeHandler(li.value)">
+                <chef-option *ngFor="let list of idList" [value]="list">
                   {{ list }}
                 </chef-option>
               </chef-select>
@@ -58,67 +53,44 @@
           </div>
           <div class="attr">
             <div class="expand-collapse" *ngIf="!hasRun_List">
-              <chef-button
-                tertiary
-                class="action"
-                (click)="''"
-                [disabled]="true">
+              <chef-button tertiary class="action" (click)="''" [disabled]="true">
                 <chef-icon>add_circle</chef-icon>
                 <span>Expand All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="action"
-                (click)="''"
-                [disabled]="true">
+              <chef-button tertiary class="action" (click)="''" [disabled]="true">
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="float-right action"
-                (click)="openEditModal(role?.default_attributes, 'Run List')"
-                [disabled]="editDisabled">
+              <chef-button tertiary class="float-right action"
+                (click)="openEditModal(role?.default_attributes, 'Run List')" [disabled]="editDisabled">
                 <span class="material-icons edit-item">mode_edit</span>
                 <span class="edit-text">Edit</span>
               </chef-button>
             </div>
             <div *ngIf="hasRun_List">
               <div class="expand-collapse">
-                <chef-button
-                  tertiary
-                  class="action"
-                  (click)="trees ? trees.expand() : ''"
-                  data-cy="expand-runlist">
+                <chef-button tertiary class="action" (click)="trees ? trees.expand() : ''" data-cy="expand-runlist">
                   <chef-icon>add_circle</chef-icon>
                   <span>Expand All</span>
                 </chef-button>
-                <chef-button
-                  tertiary
-                  class="action"
-                  (click)="trees ? trees.treeCollapsed() : ''"
+                <chef-button tertiary class="action" (click)="trees ? trees.treeCollapsed() : ''"
                   data-cy="collapse-runlist">
                   <chef-icon>remove_circle</chef-icon>
                   <span>Collapse All</span>
                 </chef-button>
-                <chef-button
-                  tertiary
-                  class="float-right action"
-                  (click)="openEditModal(role?.default_attributes, 'Run List')"
-                  data-cy="edit-runlist"
+                <chef-button tertiary class="float-right action"
+                  (click)="openEditModal(role?.default_attributes, 'Run List')" data-cy="edit-runlist"
                   [disabled]="editDisabled">
                   <span class="material-icons edit-item">mode_edit</span>
                   <span class="edit-text">Edit</span>
                 </chef-button>
               </div>
-              <app-tree-table
-                [hidden]="hasRun_List ? false : true"
-                [tree]="arrayOfNodesTree"
-                #trees
+              <app-tree-table [hidden]="hasRun_List ? false : true" [tree]="arrayOfNodesTree" #trees
                 [options]="treeOptions">
               </app-tree-table>
             </div>
-            <div data-cy="empty-runlist" *ngIf="!hasRun_List && !runListLoading && !conflictError" class="empty-section">
+            <div data-cy="empty-runlist" *ngIf="!hasRun_List && !runListLoading && !conflictError"
+              class="empty-section">
               <img alt="No preview" src="/assets/img/no_preview.gif" />
               <p>Run list details are not available for the <b>{{role?.name}}</b> role.</p>
             </div>
@@ -142,36 +114,23 @@
           </label>
           <div class="attr">
             <div class="expand-collapse">
-              <chef-button
-                tertiary
-                class="action"
-                (click)="tree ? tree.expand() : ''"
-                [disabled]="!hasDefaultJson"
+              <chef-button tertiary class="action" (click)="tree ? tree.expand() : ''" [disabled]="!hasDefaultJson"
                 data-cy="expand-default-attribute">
                 <chef-icon>add_circle</chef-icon>
                 <span>Expand All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="action"
-                (click)="tree ? tree.collapse() : ''"
-                [disabled]="!hasDefaultJson"
+              <chef-button tertiary class="action" (click)="tree ? tree.collapse() : ''" [disabled]="!hasDefaultJson"
                 data-cy="collapse-default-attribute">
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="float-right"
-                (click)="openEditModal(role?.default_attributes, 'Default')"
+              <chef-button tertiary class="float-right" (click)="openEditModal(role?.default_attributes, 'Default')"
                 data-cy="edit-default-attribute">
                 <span class="material-icons edit-item">mode_edit</span>
                 <span class="edit-text">Edit</span>
               </chef-button>
             </div>
-            <app-json-tree-table class="json-container"
-              [hidden]="hasDefaultJson ? false : true"
-              #tree
+            <app-json-tree-table class="json-container" [hidden]="hasDefaultJson ? false : true" #tree
               [json]="selectedAttrs?.default_attributes">
             </app-json-tree-table>
             <div data-cy="empty-default-attribute" *ngIf="!hasDefaultJson" class="img-section">
@@ -184,36 +143,23 @@
           </label>
           <div class="attr">
             <div class="expand-collapse">
-              <chef-button
-                tertiary
-                class="action"
-                (click)="override ? override.expand() : ''"
-                [disabled]="!hasOverrideJson"
-                data-cy="expand-override-attribute">
+              <chef-button tertiary class="action" (click)="override ? override.expand() : ''"
+                [disabled]="!hasOverrideJson" data-cy="expand-override-attribute">
                 <chef-icon>add_circle</chef-icon>
                 <span>Expand All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="action"
-                (click)="override ? override.collapse() : ''"
-                [disabled]="!hasOverrideJson"
-                data-cy="collapse-override-attribute">
+              <chef-button tertiary class="action" (click)="override ? override.collapse() : ''"
+                [disabled]="!hasOverrideJson" data-cy="collapse-override-attribute">
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="float-right action"
-                (click)="openEditModal(role?.override_attributes, 'Override')"
-                data-cy="edit-override-attribute">
+              <chef-button tertiary class="float-right action"
+                (click)="openEditModal(role?.override_attributes, 'Override')" data-cy="edit-override-attribute">
                 <span class="material-icons edit-item">mode_edit</span>
                 <span class="edit-text">Edit</span>
               </chef-button>
             </div>
-            <app-json-tree-table class="json-container"
-              [hidden]="hasOverrideJson ? false : true"
-              #override
+            <app-json-tree-table class="json-container" [hidden]="hasOverrideJson ? false : true" #override
               [json]="selectedAttrs?.override_attributes">
             </app-json-tree-table>
             <div data-cy="empty-override-attribute" *ngIf="!hasOverrideJson" class="img-section">

@@ -11,7 +11,11 @@ import { PolicyFile, CookbookLocks, IncludedPolicyLocks, SolutionDependencies } 
 import { GetPolicyFile } from 'app/entities/policy-files/policy-file.action';
 import { policyFileFromRoute } from 'app/entities/policy-files/policy-file-details.selectors';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
-
+import { Org } from 'app/entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
+import { GetOrg } from 'app/entities/orgs/org.actions';
+import { isNil } from 'lodash/fp';
+import { EntityStatus } from 'app/entities/entities';
 export type PolicyFileTabName = 'details' | 'runList' | 'attributes';
 export class CookbookList {
   name: string;
@@ -41,6 +45,7 @@ export class CookbookDependencyList {
 })
 
 export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
+  public org: Org;
   public conflictError = false;
   public PolicyFile: PolicyFile;
   public tabValue: PolicyFileTabName = 'details';
@@ -93,6 +98,29 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
           break;
       }
     });
+
+    combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([server_id, org_id]: string[]) => {
+      this.serverId = server_id;
+      this.orgId = org_id;
+      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
+    });
+
+    combineLatest([
+      this.store.select(gtStatus),
+      this.store.select(orgFromRoute)
+    ]).pipe(
+      filter(([getOrgSt, orgState]) => getOrgSt ===
+        EntityStatus.loadingSuccess && !isNil(orgState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getOrgSt, orgState]) => {
+      this.org = { ...orgState };
+    });
+
     // load policy file details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),

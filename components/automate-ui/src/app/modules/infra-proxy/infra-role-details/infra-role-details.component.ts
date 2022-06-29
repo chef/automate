@@ -12,6 +12,9 @@ import { GetRole } from 'app/entities/infra-roles/infra-role.action';
 import { GetRecipes } from 'app/entities/recipes/recipe.action';
 import { GetRoleEnvironments } from 'app/entities/role-environments/role-environments.action';
 import { GetRunlists } from 'app/entities/runlists/runlists.action';
+import { Org } from 'app/entities/orgs/org.model';
+import { getStatus as gtStatus, orgFromRoute } from 'app/entities/orgs/org.selectors';
+import { GetOrg } from 'app/entities/orgs/org.actions';
 import {
   allRecipes,
   getAllStatus as getAllRecipesForOrgStatus
@@ -44,6 +47,7 @@ export type InfraRoleTabName = 'runList' | 'attributes';
 })
 
 export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
+  public org: Org;
   public conflictError = false;
   public role: InfraRole;
   public tabValue: InfraRoleTabName = 'runList';
@@ -58,6 +62,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public hasDefaultJson = true;
   public roleDetailsLoading = true;
   public roleAttributeLoading = true;
+  public infraRoleLoading = true;
   public runListLoading = true;
   public openEdit = false;
   public editDisabled = false;
@@ -109,6 +114,29 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         const [, fragment] = url.split('#');
         this.tabValue = (fragment === 'attributes') ? 'attributes' : 'runList';
       });
+
+      combineLatest([
+        this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+        this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
+      ]).pipe(
+        takeUntil(this.isDestroyed)
+      ).subscribe(([server_id, org_id]: string[]) => {
+        this.serverId = server_id;
+        this.orgId = org_id;
+        this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
+      });
+  
+      combineLatest([
+        this.store.select(gtStatus),
+        this.store.select(orgFromRoute)
+      ]).pipe(
+        filter(([getOrgSt, orgState]) => getOrgSt ===
+          EntityStatus.loadingSuccess && !isNil(orgState)),
+        takeUntil(this.isDestroyed)
+      ).subscribe(([_getOrgSt, orgState]) => {
+        this.org = { ...orgState };
+      });
+  
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
@@ -134,6 +162,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.showAttribute = true;
       this.role = role;
       this.runList = this.role.run_list;
+      this.infraRoleLoading = false;
       this.attributes = new RoleAttributes(this.role);
       this.hasDefaultJson = Object.keys(
         JSON.parse(this.role.default_attributes)).length > 0 ? true : false;
@@ -148,6 +177,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         this.idList[0] = this.env_id;
       }
     });
+
   }
 
   ngOnDestroy(): void {

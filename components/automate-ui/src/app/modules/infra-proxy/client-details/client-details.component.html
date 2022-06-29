@@ -1,14 +1,20 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <chef-loading-spinner *ngIf="clientTabLoading" size="50" fixed></chef-loading-spinner>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Server</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Clients</chef-breadcrumb>
-         {{client?.name}}
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">{{orgId}}
+        </chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Clients
+        </chef-breadcrumb>
+        {{client?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
-        <chef-heading>{{client?.name}} <chef-badge no-data warning *ngIf="client?.validator">Validation Client</chef-badge></chef-heading>
+        <chef-heading>{{client?.name}} <chef-badge no-data warning *ngIf="client?.validator">Validation Client
+          </chef-badge>
+        </chef-heading>
         <table>
           <thead>
             <tr class="detail-row">
@@ -32,14 +38,11 @@
         </chef-tab-selector>
       </chef-page-header>
 
-      <app-reset-client-key
-        [openEvent]="openNotificationModal"
-        [serverId]="serverId"
-        [orgId]="orgId"
-        [name]="name"></app-reset-client-key>
+      <app-reset-client-key [openEvent]="openNotificationModal" [serverId]="serverId" [orgId]="orgId" [name]="name">
+      </app-reset-client-key>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <chef-loading-spinner *ngIf="clientDetailsLoading" size="50"></chef-loading-spinner>
+        <!-- <chef-loading-spinner *ngIf="clientDetailsLoading" size="50" fixed></chef-loading-spinner> -->
         <div *ngIf="!clientDetailsLoading" class="key-tab">
           <div class="empty-section" *ngIf="!client?.client_key.public_key">
             <img alt="No preview" src="/assets/img/no_preview.gif" />

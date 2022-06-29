@@ -4,8 +4,11 @@
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Policy files</chef-breadcrumb>
-          {{PolicyFile?.name}}
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">{{org?.name}}
+        </chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Policy files
+        </chef-breadcrumb>
+        {{PolicyFile?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
         <div class="header">
@@ -60,18 +63,17 @@
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <chef-loading-spinner class="top-spinner" *ngIf="policyFileDetailsLoading" size="50"></chef-loading-spinner>
+        <chef-loading-spinner *ngIf="policyFileDetailsLoading" size="50" fixed>
+        </chef-loading-spinner>
         <div class="cookbook-button" *ngIf="!policyFileDetailsLoading">
-          <chef-button
-            id="cookbook-dependencies"
-            primary
+          <chef-button id="cookbook-dependencies" primary
             (click)="cookbook.slidePanel(cookbookRuleList, cookbookDependencyList, cookbookList)"
             data-cy="cookbook-dependencies-button">
             Cookbook Dependencies
           </chef-button>
         </div>
         <div class="accordion-section" *ngIf="!policyFileDetailsLoading">
-          <ul id="included-policy-accordion" class="accordion" >
+          <ul id="included-policy-accordion" class="accordion">
             <li class="items" [class.active]="showIncludedPolicies">
               <div class="menu" (click)="handlePolicyFileSelected()">
                 <div class="data-bag-name" data-cy="included-policy">
@@ -85,7 +87,8 @@
                     <img alt="No preview" src="/assets/img/no_preview.gif" />
                     <p>No Included Policyfiles</p>
                   </div>
-                  <div id="included-policy-table-container" *ngIf="included_policy_locks.length" data-cy="included-policy-table-container">
+                  <div id="included-policy-table-container" *ngIf="included_policy_locks.length"
+                    data-cy="included-policy-table-container">
                     <chef-table>
                       <chef-thead>
                         <chef-tr class="no_border_tr">
@@ -98,8 +101,7 @@
                       <chef-tbody>
                         <chef-tr *ngFor="let included_policy_lock of included_policy_locks">
                           <chef-td>
-                            <a
-                              (click)="policyfile.slidePanel(included_policy_lock.name, included_policy_lock.revision_id)"
+                            <a (click)="policyfile.slidePanel(included_policy_lock.name, included_policy_lock.revision_id)"
                               class="details-link">
                               {{included_policy_lock.name}}
                             </a>
@@ -115,10 +117,10 @@
               </div>
             </li>
           </ul>
-          <ul id="run-list-accordion" class="accordion" >
+          <ul id="run-list-accordion" class="accordion">
             <li class="items" [class.active]="showRunList">
               <div class="menu" (click)="handleRunListSelected()">
-                <div class="data-bag-name"  data-cy="run-list">
+                <div class="data-bag-name" data-cy="run-list">
                   Run List
                 </div>
                 <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
@@ -142,10 +144,9 @@
                       <chef-tbody>
                         <chef-tr *ngFor="let cookbook_lock of cookbook_locks">
                           <chef-td>
-                            <a
-                            (click)="cookbooksDetails.slidePanel(cookbook_lock.name, cookbook_lock.version)"
-                            class="details-link">
-                            {{cookbook_lock.name}}
+                            <a (click)="cookbooksDetails.slidePanel(cookbook_lock.name, cookbook_lock.version)"
+                              class="details-link">
+                              {{cookbook_lock.name}}
                             </a>
                           </chef-td>
                           <chef-td>{{cookbook_lock.version}}</chef-td>
@@ -170,16 +171,12 @@
           </label>
           <div class="attr">
             <div class="expand-collapse">
-              <chef-button tertiary class="action"
-                [disabled]= !hasDefaultattributes
-                (click)="tree.expand()"
+              <chef-button tertiary class="action" [disabled]=!hasDefaultattributes (click)="tree.expand()"
                 data-cy="expand-default-attribute">
                 <chef-icon>add_circle</chef-icon>
                 <span>Expand All</span>
               </chef-button>
-              <chef-button tertiary class="action"
-                [disabled]= !hasDefaultattributes
-                (click)="tree.collapse()"
+              <chef-button tertiary class="action" [disabled]=!hasDefaultattributes (click)="tree.collapse()"
                 data-cy="collapse-default-attribute">
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
@@ -188,15 +185,10 @@
             <hr class="divider-constraints" />
             <div class="json-container">
               <div class="scroll">
-                <app-json-tree-table
-                  class="json-tree-container"
-                  [hidden]="hasDefaultattributes? false : true"
-                  #tree
+                <app-json-tree-table class="json-tree-container" [hidden]="hasDefaultattributes? false : true" #tree
                   [json]="defaultAttributes">
                 </app-json-tree-table>
-                <div
-                 *ngIf="!hasDefaultattributes"
-                  class="empty-section empty-default-attribute">
+                <div *ngIf="!hasDefaultattributes" class="empty-section empty-default-attribute">
                   <img alt="No preview" src="/assets/img/no_preview.gif" />
                   <p>There are no items to display.</p>
                 </div>
@@ -208,16 +200,12 @@
           </label>
           <div class="attr">
             <div class="expand-collapse">
-              <chef-button tertiary class="action"
-                [disabled]= !hasOverrideattributes
-                (click)="override.expand()"
+              <chef-button tertiary class="action" [disabled]=!hasOverrideattributes (click)="override.expand()"
                 data-cy="expand-override-attribute">
                 <chef-icon>add_circle</chef-icon>
                 <span>Expand All</span>
               </chef-button>
-              <chef-button tertiary class="action"
-                [disabled]= !hasOverrideattributes
-                (click)="override.collapse()"
+              <chef-button tertiary class="action" [disabled]=!hasOverrideattributes (click)="override.collapse()"
                 data-cy="collapse-override-attribute">
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
@@ -226,15 +214,10 @@
             <hr class="divider-constraints" />
             <div class="json-container">
               <div class="scroll">
-                <app-json-tree-table
-                  class="json-tree-container"
-                  [hidden]="hasOverrideattributes? false : true"
-                  #override
-                  [json]="overrideAttributes">
+                <app-json-tree-table class="json-tree-container" [hidden]="hasOverrideattributes? false : true"
+                  #override [json]="overrideAttributes">
                 </app-json-tree-table>
-                <div
-                 *ngIf="!hasOverrideattributes"
-                  class="empty-section empty-override-attribute">
+                <div *ngIf="!hasOverrideattributes" class="empty-section empty-override-attribute">
                   <img alt="No preview" src="/assets/img/no_preview.gif" />
                   <p>There are no items to display.</p>
                 </div>
@@ -243,25 +226,13 @@
           </div>
         </div>
       </section>
-      <app-revision-id
-        #slide
-        [serverId]="serverId"
-        [orgId]="orgId">
+      <app-revision-id #slide [serverId]="serverId" [orgId]="orgId">
       </app-revision-id>
-      <app-included-policies-details
-        #policyfile
-        [serverId]="serverId"
-        [orgId]="orgId">
+      <app-included-policies-details #policyfile [serverId]="serverId" [orgId]="orgId">
       </app-included-policies-details>
-      <app-cookbook-dependencies
-        #cookbook
-        [serverId]="serverId"
-        [orgId]="orgId">
+      <app-cookbook-dependencies #cookbook [serverId]="serverId" [orgId]="orgId">
       </app-cookbook-dependencies>
-      <app-cookbook-dependencies-details
-        #cookbooksDetails
-        [serverId]="serverId"
-        [orgId]="orgId">
+      <app-cookbook-dependencies-details #cookbooksDetails [serverId]="serverId" [orgId]="orgId">
       </app-cookbook-dependencies-details>
     </main>
   </div>
