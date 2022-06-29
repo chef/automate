@@ -86,19 +86,19 @@ In the above command, `--admin` will provide the admin privileges to the user.
 
 1. To set up the workstation on your machine, follow the steps given below:
 
-- Install the latest version of chef Workstation on the ubuntu system.
+-   Install the latest version of chef Workstation on the ubuntu system.
 
 ```bash
 wget https://packages.chef.io/files/stable/chef-workstation/21.7.524/ubuntu/20.04/chef-workstation_21.7.524-1_amd64.deb
 ```
 
-- To install the same:
+-   To install the same:
 
 ```bash
 dpkg -i chef-workstation_21.7.524-1_amd64.deb
 ```
 
-- Verify the installation using following command:
+-   Verify the installation using following command:
 
 ```bash
 chef -v
@@ -138,17 +138,17 @@ The above command will fetch certificate details, save them to the trusted_cert 
 
 `knife bootstrap <Public_ip> -i ~/<pem_file_of_node> -U ubuntu -N <name_of_node> --sudo`
 
-- **Public IP:** IP address of the node which we are bootstrapping.
+-   **Public IP:** IP address of the node which we are bootstrapping.
 
-- **pem_file_of_node:** `pem` file of node which we have saved at `/root/.ssh/<pem_file_of_node>`.
+-   **pem_file_of_node:** `pem` file of node which we have saved at `/root/.ssh/<pem_file_of_node>`.
 
-- **name_of_node:** You can provide any name to your node.
+-   **name_of_node:** You can provide any name to your node.
 
 For example: `knife bootstrap 3.124.**.** -i ~/.ssh/rsa.pem -U ubuntu -N johndoe`
 
 ## Troubleshoot
 
-If `knife bootstrap` throws permission denied or cannot create directory error, add the following configuration in `/root/.chef/credentials` and then run the bootstrap command as shown in *Step No. 8*.
+If `knife bootstrap` throws permission denied or cannot create directory error, add the following configuration in `/root/.chef/credentials` and then run the bootstrap command as shown in _Step No. 8_.
 
 ```bash
 [default.knife]
