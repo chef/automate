@@ -28,7 +28,6 @@ backup_mount = "/mnt/automate_backups"
 # ======================================================
 
 # ============== EC2 Nodes Config ======================
-# Please use the https://docs.chef.io/calculator/automate_ha_hardware_calculator.xlsx to calculate, No and type of instance needed.
 
 [automate.config]
 # admin_password = ""
