@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	UUID = "efd46e48-5751-40a2-a705-1182356908c1"
+	UUID  = "efd46e48-5751-40a2-a705-1182356908c1"
+	ID    = "3q09ru4orbfer k vfksd "
+	Title = "some different tile"
 )
 
 func TestMapStructs(t *testing.T) {
@@ -18,7 +20,7 @@ func TestMapStructs(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []Control
+		want    []relaxting.Control
 		wantErr bool
 	}{
 		{
@@ -26,7 +28,7 @@ func TestMapStructs(t *testing.T) {
 			args: args{
 				inspecReport: &relaxting.ESInSpecReport{},
 			},
-			want:    []Control{},
+			want:    []relaxting.Control{},
 			wantErr: false,
 		},
 		{
@@ -52,9 +54,9 @@ func TestMapStructs(t *testing.T) {
 									WaivedStr:  "no",
 								},
 								{
-									ID:         "3q09ru4orbfer k vfksd ",
+									ID:         ID,
 									Impact:     0,
-									Title:      "some different tile",
+									Title:      Title,
 									Status:     "failed",
 									Results:    nil,
 									WaiverData: nil,
@@ -65,7 +67,7 @@ func TestMapStructs(t *testing.T) {
 					},
 				},
 			},
-			want: []Control{
+			want: []relaxting.Control{
 				{
 					ControlID:   "adcksnjvfskhvbsfk",
 					Title:       "string",
@@ -75,20 +77,63 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Nodes:       Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
-					Profile:     Profile{ProfileID: ""},
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID}},
+					Profile:     relaxting.Profile{ProfileID: ""},
 				},
 				{
-					ControlID:   "3q09ru4orbfer k vfksd ",
-					Title:       "some different tile",
+					ControlID:   ID,
+					Title:       Title,
 					WaivedStr:   "no",
 					WaiverData:  (*relaxting.ESInSpecReportControlsWaiverData)(nil),
 					Impact:      0,
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "failed",
-					Nodes:       Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID},
-					Profile:     Profile{ProfileID: ""},
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID}},
+					Profile:     relaxting.Profile{ProfileID: ""},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Test for waived status",
+			args: args{
+				inspecReport: &relaxting.ESInSpecReport{
+					NodeID:      "ssdpweoru4etu5hgsklvldfknv",
+					ReportID:    UUID,
+					DailyLatest: true,
+					DayLatest:   true,
+					Status:      "on",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Name: "",
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									ID:         ID,
+									Impact:     0,
+									Title:      Title,
+									Status:     "failed",
+									Results:    nil,
+									WaiverData: &relaxting.ESInSpecReportControlsWaiverData{Run: true},
+									WaivedStr:  "yes",
+								},
+							},
+						},
+					},
+				},
+			},
+			want: []relaxting.Control{
+				{
+					ControlID:   ID,
+					Title:       "some different tile",
+					WaivedStr:   "yes",
+					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
+					Impact:      0,
+					DailyLatest: true,
+					DayLatest:   true,
+					Status:      "waived",
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID}},
+					Profile:     relaxting.Profile{ProfileID: ""},
 				},
 			},
 			wantErr: false,
@@ -103,6 +148,12 @@ func TestMapStructs(t *testing.T) {
 			}
 
 			if tt.name == "Test with Value" {
+				require.NoError(t, err)
+				require.NotEmpty(t, got)
+				require.Equal(t, got, tt.want)
+			}
+
+			if tt.name == "Test for waived status" {
 				require.NoError(t, err)
 				require.NotEmpty(t, got)
 				require.Equal(t, got, tt.want)
