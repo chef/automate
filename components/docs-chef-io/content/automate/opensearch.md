@@ -17,7 +17,7 @@ You can configure Chef Automate to use OpenSearch clusters that are not deployed
 
 ## Configure External OpenSearch
 
-These configuration directions are intended for in the initial deployment of Chef Automate.
+These configuration directions are intended for the initial deployment of Chef Automate.
 
 **Automate supports OpenSearch connection over HTTPS or HTTP**
 
