@@ -994,13 +994,13 @@ func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
 
 }
 
-func (backend *ESClient) SetDayLatestToFalse(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string) error {
+func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, node_uuid string) error {
 	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
 	boolQueryDayLatest := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
 
-	script := elastic.NewScript("def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid); for(node in targets) { if(node.day_latest==true) {node.day_latest = false}} if (ctx._source.day_latest==true) {ctx._source.day_latest = false;}")
+	script := elastic.NewScript("def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid); for(node in targets) { if(node.day_latest==true) {node.day_latest = false}} if (ctx._source.day_latest==true) {ctx._source.day_latest = false;}").Param("node_uuid", node_uuid)
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
 	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
@@ -1021,8 +1021,4 @@ func (backend *ESClient) SetDayLatestToFalse(ctx context.Context, controlId stri
 		Refresh("false").
 		Do(ctx)
 	return errors.Wrap(err, "SetDayLatestsToFalse")
-}
-
-func GetDocIdByControlIdAndProfileID(controlID string, profileID string) string {
-	return fmt.Sprintf("%s|%s", controlID, profileID)
 }
