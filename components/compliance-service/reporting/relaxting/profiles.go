@@ -660,7 +660,12 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 	filters["status"] = make([]string, 0)
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
+	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		return nil, nil, err
+	}
+
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)

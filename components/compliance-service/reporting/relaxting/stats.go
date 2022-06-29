@@ -19,7 +19,11 @@ import (
 func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.ReportSummary, error) {
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
+	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		return nil, err
+	}
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
