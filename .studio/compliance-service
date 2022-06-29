@@ -33,7 +33,7 @@ document "compliance_integration" <<DOC
 DOC
 function compliance_integration() {
   export PG_URL="postgresql://compliance@127.0.0.1:10145/chef_compliance_service?sslmode=verify-ca&sslcert=/hab/svc/compliance-service/config/service.crt&sslkey=/hab/svc/compliance-service/config/service.key&sslrootcert=/hab/svc/compliance-service/config/root_ca.crt"
-  # Go based integration tests
+   // Go based integration tests
   go_test -v "github.com/chef/automate/components/compliance-service/integration_test"
   go_test -v "github.com/chef/automate/components/compliance-service/integration_lcr_test"
 }
