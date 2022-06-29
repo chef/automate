@@ -13,7 +13,7 @@ grpc_port = 10108
 # issuer is constructed from external-fqdn config + "/dex"
 client_id = "automate-session"
 client_secret = "secretchangeme"
-redirect_url = "/session/callback"
+redirect_url = "/signin"
 
 [storage]
 database = "chef_session_service"

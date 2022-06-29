@@ -52,8 +52,9 @@ It's effective in the callback handler below.
 
 ### GET /callback
 
-OIDC callback handler; exchanges `code`, stores `refresh_token`, creates a session, redirects
-with `id_token` in URL fragment.
+Dex redirects to /signin route in browser which in turn calls the /callback endpoint.
+OIDC callback handler; exchanges `code`, stores `refresh_token`, creates a session, sends
+`id_token` as a json response.
 
 Diagram for /new -> /callback -> browser has session flow:
 
@@ -61,6 +62,7 @@ Diagram for /new -> /callback -> browser has session flow:
 
 #### `redirect_uri` provided
 
+Dex redirects to /signin route in browser which in turn calls the /callback endpoint.
 If the session data carries a `redirect_uri`, the callback handler slightly changes its
 behavior: it will generate a new `code`, associate the exchanged `id_token` with it, and
 redirect the browser to the Builder Signin URL as configured with session-service.

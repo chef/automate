@@ -430,20 +430,9 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := new(url.URL)
-
-	*u = *s.signInURL
-
-	cookie := &http.Cookie{
-		Name:  "id_token",
-		Value: rawIDToken,
-		Path:  "/",
-	}
-
-	http.SetCookie(w, cookie)
-
-	u.Fragment = fmt.Sprintf("state=%s", clientState)
-	http.Redirect(w, r, u.String(), http.StatusSeeOther)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"id_token": rawIDToken, "state": clientState})
 }
 
 func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
@@ -499,8 +488,8 @@ func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
 	// need to grab 'code' from the request body, exchange for token, return token
 	code := r.PostFormValue("code")
 	fmt.Printf("code:%s\n", code)
-	if "" == code {
-		http.Error(w, fmt.Sprint("no code in request"), http.StatusBadRequest)
+	if code == "" {
+		http.Error(w, "no code in request", http.StatusBadRequest)
 		return
 	}
 

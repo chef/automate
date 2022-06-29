@@ -1,57 +1,75 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { IDToken, Jwt } from 'app/helpers/jwt/jwt';
+import { ReplaySubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { SigninService } from 'app/services/signin/signin.service';
+
 
 @Component({
   selector: 'app-signin',
   templateUrl: './signin.component.html',
   styleUrls: ['./signin.component.scss']
 })
-export class SigninComponent implements OnInit {
+export class SigninComponent implements OnInit, OnDestroy {
   public error = false;
   public path: string; // from OIDC redirect, but sanitized
   private idToken: string;
   private id: IDToken;
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+  private searchParams: Params;
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
-    private session: ChefSessionService
-  ) { }
-
-  ngOnInit() {
-    // Reminder: URL fragment has to be treated as user-provided input, and can
-    //           NOT be trusted in any way. /!\
-    this.route.fragment.subscribe((fragment: string) => {
-      if (fragment === null) {
-        this.error = true;
-        return;
-      }
-      let state: string;
-      [this.idToken, state] = this.idTokenAndStateFromCookieAndFragment(fragment);
-      if (this.idToken === null) {
-        this.error = true;
-        return;
-      }
-      this.id = Jwt.parseIDToken(this.idToken);
-      if (this.id === null) {
-        this.error = true;
-        return;
-      }
-      this.path = this.pathFromState(state);
-
-      this.error = false;
-      this.setSession();
-      localStorage.setItem('manual-upgrade-banner', 'true');
-      this.deleteIdTokenFromCookie(this.idToken);
-      this.router.navigateByUrl(this.path);
+    private session: ChefSessionService,
+    private signinService: SigninService,
+    private route: ActivatedRoute
+  ) {
+    this.route.queryParams
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(params => {
+      this.searchParams = params;
     });
   }
 
-  deleteIdTokenFromCookie(token: string): void {
-    // Expire id_token cookie once it's set in localStorage
-    document.cookie = `id_token=${token}; Path=/; Expires=${new Date().toUTCString()};`;
+  ngOnInit() {
+    this.signinService.callback(this.searchParams)
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe((res) => {
+      this.error = this.setIdAndPath(res.id_token, res.state);
+      if (this.error) {
+        return;
+      }
+      this.setSession();
+      localStorage.setItem('manual-upgrade-banner', 'true');
+      this.router.navigateByUrl(this.path);
+    }, (err) => {
+      if (err.status === 200 && 'url' in err) {
+        window.location.href = err.url;
+        return;
+      }
+      this.error = true;
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+  }
+
+  setIdAndPath(idToken: string, state: string): boolean {
+    let error = false;
+    this.idToken = idToken;
+    this.path = this.pathFromState(state);
+    if (this.idToken === '') {
+      error = true;
+    }
+    this.id = Jwt.parseIDToken(this.idToken);
+    if (this.id === null) {
+      error = true;
+    }
+    return error;
   }
 
   setSession(): void {
@@ -81,14 +99,5 @@ export class SigninComponent implements OnInit {
       }
     }
     return path;
-  }
-
-  idTokenAndStateFromCookieAndFragment(fragment: string): [string | null, string | null] {
-    // Note: we only get an ID token and state now, so we match from ^ to $
-    const state_match = fragment.match('^state=([^&]*)$');
-    const id_token_match = `; ${document.cookie}`.match(';\\s*id_token=([^;]+)');
-    const id_token = id_token_match ? id_token_match[1] : null;
-    const state = state_match ? state_match[1] : null;
-    return [id_token, state];
   }
 }
