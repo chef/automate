@@ -2006,14 +2006,14 @@ func handleSpecialChar(term string) string {
 }
 
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
+	if len(endTime) == 0 || len(startTime) == 0 {
+		return []string{"day_latest"}, nil
+	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
 		return nil, errors.Errorf("cannot parse the time")
-	}
-	if len(endTime) == 0 {
-		return []string{"day_latest"}, nil
 	}
 	if diff == 0 {
 		return []string{"daily_latest"}, nil
@@ -2023,6 +2023,9 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 }
 
 func validateFiltersTimeRange(endTime string, startTime string) error {
+	if len(endTime) == 0 || len(startTime) == 0 {
+		return nil
+	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
