@@ -59,8 +59,6 @@ func (s *ControlWorkflow) OnStart(w cereal.WorkflowInstance,
 
 	logrus.Debug("In control-workflow start method")
 
-	workflowPayload := ControlWorkflowPayload{}
-
 	workflowParams := ControlWorkflowParameters{}
 	err := w.GetParameters(&workflowParams)
 	if err != nil {
@@ -71,10 +69,12 @@ func (s *ControlWorkflow) OnStart(w cereal.WorkflowInstance,
 
 	logrus.Debugf("In On Start Method %s", workflowParams.ReportUuid)
 
-	workflowPayload.ReportUuid = workflowParams.ReportUuid
-	workflowPayload.RetriesLeft = workflowParams.Retries
-	workflowPayload.EndTime = workflowParams.EndTime
-	workflowPayload.Status = RunningStatus
+	workflowPayload := ControlWorkflowPayload{
+		ReportUuid:  workflowParams.ReportUuid,
+		EndTime:     workflowParams.EndTime,
+		RetriesLeft: workflowParams.Retries,
+		Status:      RunningStatus,
+	}
 
 	err = w.EnqueueTask(ReportTaskName, GenerateControlParameters{
 		ReportUuid: workflowParams.ReportUuid,
