@@ -1008,6 +1008,7 @@ func TestReportingListSuggestionsUsersAccess(t *testing.T) {
 					Type: suggestionType,
 					Filters: []*reporting.ListFilter{
 						{Type: "end_time", Values: []string{"2018-10-25T18:18:41Z"}},
+						{Type: "start_time", Values: []string{"2018-10-25T00:00:00Z"}},
 					},
 				})
 
