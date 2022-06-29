@@ -19,25 +19,27 @@ You can configure Chef Automate to use OpenSearch clusters that are not deployed
 
 These configuration directions are intended for in the initial deployment of Chef Automate.
 
-Add the following to your config.toml:
+**Automate supports OpenSearch connection over HTTPS or HTTP**
+
+Add the following to your config.toml for HTTPS connection:
 
 ```toml
 [global.v1.external.opensearch]
   enable = true
-  nodes = ["http://opensearch1.example:9200", "http://opensearch2.example:9200", "..." ]
+  nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200", "..." ]
 
 # Uncomment and fill out if using external opensearch with SSL and/or basic auth
-# [global.v1.external.opensearch.auth]
-#   scheme = "basic_auth"
-# [global.v1.external.opensearch.auth.basic_auth]
+[global.v1.external.opensearch.auth]
+  scheme = "basic_auth"
+[global.v1.external.opensearch.auth.basic_auth]
 ## Create this opensearch user before starting the Chef Automate deployment;
 ## Chef Automate assumes it exists.
-#   username = "<admin username>"
-#   password = "<admin password>"
-# [global.v1.external.opensearch.ssl]
-#  Specify either a root_cert or a root_cert_file
-#  root_cert = """$(cat </path/to/cert_file.crt>)"""
-#  server_name = "<opensearch server name>"
+  username = "<admin username>"
+  password = "<admin password>"
+[global.v1.external.opensearch.ssl]
+# Specify either a root_cert or a root_cert_file
+  root_cert = """$(cat </path/to/cert_file.crt>)"""
+# server_name = "<opensearch server name>"
 
 # Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
 # [esgateway.v1.sys.ngx.http]
@@ -45,6 +47,22 @@ Add the following to your config.toml:
 
 # Uncomment and add to change the ssl_verify_depth for the root cert bundle
 #  ssl_verify_depth = "2"
+```
+
+Add the following to your config.toml for HTTP connection:
+```toml
+[global.v1.external.opensearch]
+  enable = true
+  nodes = ["http://opensearch1.example:9200", "http://opensearch2.example:9200", "..." ]
+
+# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+[global.v1.external.opensearch.auth]
+  scheme = "basic_auth"
+[global.v1.external.opensearch.auth.basic_auth]
+## Create this opensearch user before starting the Chef Automate deployment;
+## Chef Automate assumes it exists.
+  username = "<admin username>"
+  password = "<admin password>"
 ```
 
 Because externally-deployed OpenSearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure OpenSearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
@@ -83,23 +101,6 @@ If you wish to reset to the default configuration or to modify the configuration
 1. Run `chef-automate config show config.toml`.
 1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
 1. Run `chef-automate config set config.toml` to apply your changes.
-
-### Connect external OpenSearch using HTTP
-
-OpenSearch configuration in automate supports connection over HTTPS by default. To configure automate to connect over HTTP run the commands below:
-1. Run the commands below
-    ```
-    habrootcmd=$(HAB_LICENSE=accept-no-persist hab pkg path chef/automate-es-gateway)
-    ```
-    ```
-    sed -i 's/proxy_pass\ https:\/\/external-os;/proxy_pass http:\/\/external-os;/g' ${habrootcmd}/config/nginx.conf
-    ```
-
-2. After running the above commands, patch your opensearch configuration in automate (`sudo chef-automate config patch config.toml`). Please note that the `root_cert` field is not required anymore in the automate configuration.
-
-{{< note >}}
-The above configurations may get reverted back with automate upgrades resulting in the connection with opensearch to break. Post any automate upgrades these steps will have to be performed again.
-{{< /note >}}
 
 ## Backup External OpenSearch
 
