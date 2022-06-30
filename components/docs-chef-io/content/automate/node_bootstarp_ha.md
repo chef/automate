@@ -38,21 +38,7 @@ The Chef Infra Client installer puts everything into a unique directory (/opt/ch
 
 `sudo chef-automate status`
 
-4. Create an organization.
-
-Syntax:
-
-```bash
-sudo chef-server-ctl org-create <org name> '<org display name>' -f <path and file name to store org's pem file>
-```
-
-For Example:
-
-```bash
-sudo chef-server-ctl org-create new_org 'New Organization' -f ./new_org.pem
-```
-
-5. Create a User.
+4. Create a User.
 
 Syntax:
 
@@ -66,19 +52,23 @@ For Example:
 sudo chef-server-ctl user-create johndoe John Doe john.doe@example.com John@123 -f ./johndoe.pem
 ```
 
-6. Once you have created a user, add the user to the organization. Execute the below command for the same:
+Created users can be listed using `sudo chef-server-ctl user-list`
+
+5. Create an organization.
+
+Syntax:
 
 ```bash
-sudo knife opc org user add <org_name> <username> --admin
+sudo chef-server-ctl org-create <org name> '<org display name>' --association_user <username> -f <path and file name to store org's pem file>
 ```
 
 For Example:
 
 ```bash
-sudo knife opc org user add new_org johndoe --admin
+sudo chef-server-ctl org-create new_org 'New Organization' --association_user johndoe -f ./new_org.pem
 ```
 
-In the above command, `--admin` will provide the admin privileges to the user.
+Created organization can be listed using `sudo chef-server-ctl org-list`
 
 7. Copy the `pem` files and save them to a safe location.
 
