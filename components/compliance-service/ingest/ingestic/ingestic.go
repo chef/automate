@@ -272,7 +272,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	}
 
 	if data.DayLatest {
-		err = backend.setYesterdayLatestToFalse(ctx, data.NodeID, id, index, mapping)
+		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping)
 		if err != nil {
 			return err
 		}
@@ -290,6 +290,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	}
 	data.DailyLatest = true
 	data.ReportID = id
+
 	// Add the report document to the compliance timeseries index using the specified report id as document id
 	_, err := backend.client.Index().
 		Index(index).
@@ -302,7 +303,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	}
 
 	if data.DayLatest {
-		err = backend.setYesterdayLatestToFalse(ctx, data.NodeID, id, index, mapping)
+		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping)
 		if err != nil {
 			return err
 		}
@@ -328,9 +329,8 @@ func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, nodeId str
 	return err
 }
 
-// Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> in yesterday's UTC index.
-// This way, the last 24 hours is covered.
-func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId string, reportId string, index string, mapping mappings.Mapping) error {
+// Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> from yesterday upto 90 days UTC index.
+func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId string, reportId string, index string, mapping mappings.Mapping) error {
 	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
 	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeId)
 	termQueryNotThisReport := elastic.NewTermsQuery("_id", reportId)
@@ -343,19 +343,22 @@ func (backend *ESClient) setYesterdayLatestToFalse(ctx context.Context, nodeId s
 	script := elastic.NewScript("ctx._source.day_latest = false")
 
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
-	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 
-	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
-	// Overlapping ES updates with Refresh(false) on same indices lead to inconsistent results
-	if index == indexOneDayAgo {
-		logrus.Debug("setYesterdayLatestToFalse: day_latest not required when the report end_time is on yesterday's UTC day")
-		return nil
-	} else {
-		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
+	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
+
+	// Making a filter query to get all the indices from today to 90 days back
+	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
+
+	// Getting all the indices
+	esIndexs, err := relaxting.GetEsIndex(filters, false)
+	if err != nil {
+		logrus.Errorf("Cannot get indexes: %+v", err)
+		return err
 	}
 
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(indexOneDayAgo + "*").
+	// Updating in all the Indices
+	_, err = elastic.NewUpdateByQueryService(backend.client).
+		Index(esIndexs).
 		Query(boolQueryDayLatestThisNodeNotThisReport).
 		Script(script).
 		Refresh("false").
