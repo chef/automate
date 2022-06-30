@@ -342,12 +342,10 @@ func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId stri
 
 	script := elastic.NewScript("ctx._source.day_latest = false")
 
-	oneDayAgo := time.Now().Add(-24 * time.Hour)
-
 	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
 
 	// Making a filter query to get all the indices from today to 90 days back
-	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
+	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {time.Now().Format(time.RFC3339)}}
 
 	// Getting all the indices
 	esIndexs, err := relaxting.GetEsIndex(filters, false)
@@ -356,6 +354,8 @@ func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId stri
 		return err
 	}
 
+	logrus.Debugf("##################### Index need to be updated: %+v", esIndexs)
+
 	// Updating in all the Indices
 	_, err = elastic.NewUpdateByQueryService(backend.client).
 		Index(esIndexs).
@@ -363,8 +363,11 @@ func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId stri
 		Script(script).
 		Refresh("false").
 		Do(ctx)
-
-	return errors.Wrap(err, "setYesterdayLatestToFalse")
+	if err != nil {
+		logrus.Error("********************************* ERROR ***************************************")
+		logrus.Errorf("Error: %+v", err)
+	}
+	return errors.Wrap(err, "UpdateDayLatestToFalse")
 }
 
 // Sets the 'daily_latest' and 'day_latest' fields to 'false' for all reports (except <reportId>) of node <nodeId> in ES index <index>
