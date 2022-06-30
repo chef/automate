@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
-	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/postgres"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -22,6 +23,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	notifications "github.com/chef/automate/components/notifications-client/api"
+
 	"github.com/chef/automate/lib/grpc/auth_context"
 
 	"github.com/golang/mock/gomock"
@@ -46,6 +48,7 @@ type Suite struct {
 	NotifierMock            *NotifierMock
 	EventServiceClientMock  *event.MockEventServiceClient
 	ReportServiceClientMock *report_manager.MockReportManagerServiceClient
+	CerealManagerMock       *cereal.Manager
 }
 
 // Initialize the test suite
