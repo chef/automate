@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -84,8 +85,17 @@ type Opt func(c *HTTP)
 
 // NewHTTPClient returns a client with the given options applied.
 func NewHTTPClient(options ...Opt) *HTTP {
+
+	config := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+
 	c := &HTTP{
-		HTTPClient: &http.Client{},
+		HTTPClient: &http.Client{Transport: config},
 	}
 
 	for _, option := range options {
