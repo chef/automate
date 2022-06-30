@@ -441,6 +441,7 @@ func getAllVersions(ctx context.Context, url string) ([]string, error) {
 	req = req.WithContext(ctx)
 
 	config := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
 		TLSClientConfig: &tls.Config{
 			MinVersion:         tls.VersionTLS12,
 			InsecureSkipVerify: true,
