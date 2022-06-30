@@ -21,7 +21,7 @@ These configuration directions are intended for the initial deployment of Chef A
 
 **Automate supports OpenSearch connection over HTTPS or HTTP**
 
-Add the following to your config.toml for HTTPS connection:
+Add the following to your `config.toml` for HTTPS connection:
 
 ```toml
 [global.v1.external.opensearch]
@@ -49,7 +49,7 @@ Add the following to your config.toml for HTTPS connection:
 #  ssl_verify_depth = "2"
 ```
 
-Add the following to your config.toml for HTTP connection:
+Add the following to your `config.toml` for HTTP connection:
 ```toml
 [global.v1.external.opensearch]
   enable = true
