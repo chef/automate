@@ -142,25 +142,27 @@ The directions provided below are intended for use only during initial deploymen
 Chef Automate supports the official OpenSearch Service by Amazon Web Services. Chef Automate does not test or support alternative services, such as Amazon OpenSearch Service (Amazon OS).
 {{< /note >}}
 
-Add the following to your config.toml:
+**Automate supports OpenSearch connection over HTTPS or HTTP**
+
+Add the following to your `config.toml` for HTTPS connection:
 
 ```toml
 [global.v1.external.opensearch]
   enable = true
-  nodes = ["http://opensearch1.example:10168", "http://opensearch.example:10168", "..." ]
+  nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200", "..." ]
 
 # Uncomment and fill out if using external opensearch with SSL and/or basic auth
-# [global.v1.external.opensearch.auth]
-#   scheme = "basic_auth"
-# [global.v1.external.opensearch.auth.basic_auth]
-## Create this OpenSearch user before starting the Automate deployment;
+[global.v1.external.opensearch.auth]
+  scheme = "basic_auth"
+[global.v1.external.opensearch.auth.basic_auth]
+## Create this opensearch user before starting the Chef Automate deployment;
 ## Chef Automate assumes it exists.
-#   username = "<admin username>"
-#   password = "<admin password>"
-# [global.v1.external.opensearch.ssl]
-#  Specify either a root_cert or a root_cert_file
-#  root_cert = """$(cat </path/to/cert_file.crt>)"""
-#  server_name = "<opensearch server name>"
+  username = "<admin username>"
+  password = "<admin password>"
+[global.v1.external.opensearch.ssl]
+# Specify either a root_cert or a root_cert_file
+  root_cert = """$(cat </path/to/cert_file.crt>)"""
+# server_name = "<opensearch server name>"
 
 # Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
 # [esgateway.v1.sys.ngx.http]
@@ -168,6 +170,22 @@ Add the following to your config.toml:
 
 # Uncomment and add to change the ssl_verify_depth for the root cert bundle
 #  ssl_verify_depth = "2"
+```
+
+Add the following to your `config.toml` for HTTP connection:
+```toml
+[global.v1.external.opensearch]
+  enable = true
+  nodes = ["http://opensearch1.example:9200", "http://opensearch2.example:9200", "..." ]
+
+# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+[global.v1.external.opensearch.auth]
+  scheme = "basic_auth"
+[global.v1.external.opensearch.auth.basic_auth]
+## Create this opensearch user before starting the Chef Automate deployment;
+## Chef Automate assumes it exists.
+  username = "<admin username>"
+  password = "<admin password>"
 ```
 
 Because externally-deployed OpenSearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure OpenSearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
