@@ -122,7 +122,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(([_getOrgSt, orgState]) => {
       this.org = { ...orgState };
-    });  
+    });
 
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
