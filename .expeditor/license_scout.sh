@@ -37,7 +37,7 @@ gem uninstall license_scout -x
 log "Finished Uninstalling License Scout"
 
 log_section_start "Installing License Scout"
-gem install license_scout -v 2.5.1
+gem install license_scout
 log "Finished Installing License Scout"
 
 log_section_start "Installing Chef UI Library dependencies"
