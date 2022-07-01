@@ -42,7 +42,7 @@ log "Finished Installing License Scout"
 
 log_section_start "Installing Go 1.15"
 hab pkg install --binlink core/go/1.15 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
-"$GOPATH/bin/go" version
+ls /go/bin
 log "Finished Installing Go 1.15"
 
 log_section_start "Installing Chef UI Library dependencies"
