@@ -260,6 +260,7 @@ steps:
 
   - label: "[unit] deployment-service"
     command:
+      - git config --global --add safe.directory /go/src/github.com/chef/automate
       - scripts/install_golang.sh
       - cd components/automate-deployment
       - REAL_USERADD_TESTS=true make ci
