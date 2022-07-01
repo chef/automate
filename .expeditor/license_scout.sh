@@ -41,8 +41,7 @@ gem install license_scout -v 2.5.1
 log "Finished Installing License Scout"
 
 log_section_start "Installing Go 1.15"
-hab pkg install --binlink core/go/1.15 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
-ls /go/bin
+hab pkg install --force --binlink core/go/1.15 && rm -rf /hab/cache && mkdir -p "$GOPATH/src" "$GOPATH/bin"
 log "Finished Installing Go 1.15"
 
 log_section_start "Installing Chef UI Library dependencies"
