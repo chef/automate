@@ -955,6 +955,10 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
+		err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		if err != nil {
+			return err
+		}
 		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
@@ -992,4 +996,41 @@ func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
 
 	return elastic.NewScript("if (!(ctx._source.nodes instanceof Collection)) {ctx._source.nodes = [ctx._source.nodes];} ctx._source.nodes.add(params.node)").Params(params)
 
+}
+
+// Sets the 'day_latest' field to 'false' for all control index
+// This way, the last 90 days is covered
+func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
+	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
+
+	boolQueryDayLatest := elastic.NewBoolQuery().
+		Must(termQueryThisControl)
+
+	script := elastic.NewScript(`
+	def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
+	for(node in targets) { 
+		if(node.day_latest==true) {
+			node.day_latest = false
+		}
+	}
+	if (ctx._source.day_latest==true) {
+		ctx._source.day_latest = false;
+	}`).Param("node_uuid", nodeId)
+
+	// Getting the date before 90 days
+	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
+	// Getting all the indices for past 90 days
+	esIndexes, err := relaxting.IndexDates(relaxting.CompDailyControlIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Add(-24*time.Hour).Format(time.RFC3339))
+	if err != nil {
+		logrus.Errorf("Cannot get indexes: %+v", err)
+		return err
+	}
+	// Updating in all the Indices
+	_, err = elastic.NewUpdateByQueryService(backend.client).
+		Index(esIndexes).
+		Query(boolQueryDayLatest).
+		Script(script).
+		Refresh("false").
+		Do(ctx)
+	return errors.Wrap(err, "SetDayLatestsToFalseorControlIndex")
 }
