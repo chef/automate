@@ -993,3 +993,33 @@ func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
 	return elastic.NewScript("if (!(ctx._source.nodes instanceof Collection)) {ctx._source.nodes = [ctx._source.nodes];} ctx._source.nodes.add(params.node)").Params(params)
 
 }
+
+func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
+	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
+
+	boolQueryDayLatest := elastic.NewBoolQuery().
+		Must(termQueryThisControl)
+
+	script := elastic.NewScript(`
+		 def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
+		 for(node in targets) { 
+			 if(node.daily_latest==true) {
+				 node.daily_latest = false
+			 }
+		 }
+		 if (ctx._source.daily_latest==true) {
+			 ctx._source.daily_latest = false;
+		 }`).Param("node_uuid", nodeId)
+	esIndexes, err := relaxting.IndexDates(relaxting.CompDailyControlIndexPrefix, time.Now().Add(-24*time.Hour).Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	if err != nil {
+		logrus.Errorf("Cannot get indexes: %+v", err)
+		return err
+	}
+	_, err = elastic.NewUpdateByQueryService(backend.client).
+		Index(esIndexes).
+		Query(boolQueryDayLatest).
+		Script(script).
+		Refresh("false").
+		Do(ctx)
+	return errors.Wrap(err, "SetDayLatestsToFalseorControlIndex")
+}
