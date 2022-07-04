@@ -24,7 +24,7 @@ func TestIngestionPipelineControlIndex(t *testing.T) {
 	require.NoError(t, err)
 
 	logrus.Info("Parsing...")
-	time.Sleep(time.Second * 60)
+	time.Sleep(time.Second * 120)
 
 	// Get the indexes starting with `comp-1-control`
 	ifExists := suit.indexExists(index)

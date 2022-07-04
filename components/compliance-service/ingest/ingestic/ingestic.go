@@ -952,13 +952,13 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	mapping := mappings.ComplianceControlRepData
 	index := mapping.IndexTimeseriesFmt(endTime)
 
+	logrus.Infof("Inside Upload Data Control Index")
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
 		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
-			continue
 		}
 		if found {
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])).Type("_doc"))
@@ -966,7 +966,9 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
 	}
+	logrus.Infof("Inside Upload Data Bulk Request Data")
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
+	logrus.Infof("Inside Upload Data Bulk Request Data")
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
 	if err != nil {
 		logrus.Errorf("Unable to send the request in bulk for reportuuid :%s with error :%v", reportuuid, err)
