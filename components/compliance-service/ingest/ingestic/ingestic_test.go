@@ -2,6 +2,7 @@ package ingestic
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -41,6 +42,11 @@ func TestESClient_UpdateDayLatestToFalse(t *testing.T) {
 		handler(w, r)
 	}))
 	defer ts.Close()
+
+	handler = func(w http.ResponseWriter, r *http.Request) {
+		resp := `{}`
+		w.Write([]byte(resp))
+	}
 	esClient, err := ElasticClient(ts.URL)
 	require.NoError(t, err)
 	require.NotEmpty(t, esClient)
@@ -76,15 +82,17 @@ func TestESClient_UpdateDayLatestToFalse(t *testing.T) {
 				index:    "comp-7-s-2022.06.23",
 				mapping:  mappings.ComplianceRepDate,
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			backend := newEsClient
 			if err := backend.UpdateDayLatestToFalse(tt.args.ctx, tt.args.nodeId, tt.args.reportId, tt.args.index, tt.args.mapping); (err != nil) != tt.wantErr {
+
 				t.Errorf("ESClient.UpdateDayLatestToFalse() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			log.Printf("Error: %+v", err)
 		})
 	}
 }
