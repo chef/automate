@@ -111,7 +111,7 @@ export class ReportDataService {
     this.statsService.getProfiles(reportQuery, listParams)
       .subscribe(data => {
         this.profilesListLoading = false;
-        this.profilesListEmpty = this.isEmpty(data.items);
+        this.profilesListEmpty = this.isZero(data.total);
         let status: string;
         if (profileFilterStatus === 'all') {
           status = 'total';
