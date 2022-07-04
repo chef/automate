@@ -966,9 +966,8 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
 	}
-	logrus.Infof("Inside Upload Data Bulk Request Data")
+
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
-	logrus.Infof("Inside Upload Data Bulk Request Data")
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
 	if err != nil {
 		logrus.Errorf("Unable to send the request in bulk for reportuuid :%s with error :%v", reportuuid, err)

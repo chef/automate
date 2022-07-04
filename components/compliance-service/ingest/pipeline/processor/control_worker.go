@@ -2,13 +2,14 @@ package processor
 
 import (
 	"context"
+	"time"
+
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 var (
@@ -171,7 +172,6 @@ func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interf
 	time.Sleep(60 * time.Second)
 	mapping := mappings.ComplianceRepDate
 	index := mapping.IndexTimeseriesFmt(job.EndTime)
-	logrus.Infof("Parsed results parsing")
 	controls, err := ParseReportCtrlStruct(ctx, t.ESClient, job.ReportUuid, index)
 	if err != nil {
 		logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", job.ReportUuid)

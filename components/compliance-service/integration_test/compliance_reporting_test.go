@@ -24,7 +24,7 @@ func TestIngestionPipelineControlIndex(t *testing.T) {
 	require.NoError(t, err)
 
 	logrus.Info("Parsing...")
-	time.Sleep(time.Second * 120)
+	time.Sleep(time.Second * 60)
 
 	// Get the indexes starting with `comp-1-control`
 	ifExists := suit.indexExists(index)
@@ -33,11 +33,12 @@ func TestIngestionPipelineControlIndex(t *testing.T) {
 	// Check document's count
 	query := elastic.NewMatchAllQuery()
 	searchResult, err := suit.elasticClient.Search().
-		Query(query).
 		Index(index).
+		Query(query).
+		Pretty(true).
 		Do(context.Background())
-
+	logrus.Info("Total hits", searchResult.TotalHits())
 	require.NoError(t, err)
 	require.NotNil(t, searchResult)
-	require.Greater(t, searchResult.TotalHits(), 0, "Search result total hits shouldn't be 0")
+	require.NotEqual(t, 0, searchResult.TotalHits())
 }
