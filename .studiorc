@@ -291,3 +291,11 @@ cleanup() {
 
 # When exiting the studio save the bash history to a file
 trap cleanup EXIT
+printf "[0;31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>> TWO MORE STEPS NEEDED TO RUN A2 <<<
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<[0m
+"
+printf "1. Run this here:[1;32m start_all_services [0m
+"
+printf "2. Run the A2 UI:[1;34m $(cat /src/url.txt) [0m
+"

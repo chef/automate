@@ -6,7 +6,7 @@
   # The external fully qualified domain name.
   # When the application is deployed you should be able to access 'https://<fqdn>/'
   # to login.
-  fqdn = "a2-dev.test"
+  fqdn = 'ec2-18-117-194-225.us-east-2.compute.amazonaws.com'
 
   # TLS certs for all external-facing services
   [[global.v1.frontend_tls]]
@@ -65,7 +65,7 @@ OhLQB1XeN74ezxt5eHocIRrWow==
 
 [opensearch.v1.sys.runtime]
   #os_java_opts = "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=a2-dev.test"
-  heapsize = "2g"
+  heapsize = '3g'
 
 [opensearch.v1.sys.network]
 host = "0.0.0.0"
@@ -125,3 +125,9 @@ email_attr = "email"
 username_attr = "email"
 groups_attr = "groups"
 entity_issuer = "https://automate.chef.co/dex/callback"
+
+[compliance.v1.sys.logger]
+  level = "debug"
+
+[elasticsearch.v1.sys.path]
+data = "es_data"
