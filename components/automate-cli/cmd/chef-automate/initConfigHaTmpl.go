@@ -140,7 +140,7 @@ managed_opensearch_certificate = ""
 # eg: aws_os_snapshot_role_arn = "arn:aws:iam::1127583934333:role/managed-services"
 aws_os_snapshot_role_arn = ""
 
-# eg: os_snapshot_user_access_key_id = "AKIARUQXYZAVCPQS7Q7A"
+# eg: os_snapshot_user_access_key_id = "AKIA..........PQS7Q7A"
 os_snapshot_user_access_key_id = ""
 
 # eg: os_snapshot_user_access_key_secret = "skP4Mqihj....................anAXAX"
