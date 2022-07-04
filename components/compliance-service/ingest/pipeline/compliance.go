@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 	"errors"
+
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/sirupsen/logrus"
