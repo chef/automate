@@ -243,7 +243,7 @@ postgresql_ebs_volume_type = ""
 
 # Enabale/Disable load balancer logs
 # eg lb_access_logs = "false"
-lb_access_logs = ""
+lb_access_logs = "false"
 
 # ======================================================
 
