@@ -275,39 +275,73 @@ const haExistingNodesConfigTemplate = `
 # successfully create a new Chef Automate HA instances with default settings.
 
 [architecture.existing_infra]
-# ============== Access & Backup Config =================
+## === INPUT NEEDED ===
+# Eg.: ssh_user = "ubuntu"
+
+# private ssh key file path to access instances
+# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+ssh_key_file = ""
+# Provide Password if needed to run sudo commands.
+sudo_password = ""
+
+## === ===
+
+
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
 workspace_path = "/hab/a2_deploy_workspace"
-ssh_user = "centos"
-# private ssh key file path to access instances
-ssh_key_file = "~/.ssh/A2HA.pem"
-sudo_password = ""
-
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
-# ======================================================
+
 
 # ============== EC2 Nodes Config ======================
 [automate.config]
+## === INPUT NEEDED ===
+
+# Password for Automate UI for 'admin' user.
 # admin_password = ""
-# automate load balancer fqdn IP or path
+
+
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
 fqdn = ""
+
+# No. of Automate Frontend Machine or VM eg.: instance_count = "2"
 instance_count = "1"
+
+## === ===
+
+
 # teams_port = ""
 config_file = "configs/automate.toml"
 
 [chef_server.config]
-instance_count = "1"
+## === INPUT NEEDED ===
+
+# No. of Chef Server Frontend Machine or VM eg.: instance_count = "2"
+instance_count = ""
+
+## === ===
 
 [opensearch.config]
-instance_count = "3"
+## === INPUT NEEDED ===
+
+# No. of OpenSearch DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = ""
+
+## === ===
 
 [postgresql.config]
-instance_count = "3"
+## === INPUT NEEDED ===
+
+# No. of Postgresql DB Backend Machine or VM eg.: instance_count = "3"
+instance_count = ""
+
+## === ===
 
 [existing_infra.config]
+## === INPUT NEEDED ===
+
 # provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
 # No of ip address should be same as No of instance_count count mentioned above in 
 # automate.config, chef_server.config, opensearch.config and postgresql.config
@@ -315,7 +349,7 @@ automate_private_ips = []
 chef_server_private_ips = []
 opensearch_private_ips = []
 postgresql_private_ips = []
-# ======================================================
+## === ===
 `
 
 var UsageTemplate string = `
