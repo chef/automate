@@ -952,7 +952,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	mapping := mappings.ComplianceControlRepData
 	index := mapping.IndexTimeseriesFmt(endTime)
 
-	logrus.Infof("Inside Upload Data Control Index")
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
@@ -966,7 +965,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
 	}
-
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
 	if err != nil {
