@@ -12,7 +12,7 @@ s3_bucket_name="a2-backup-restore-test"
 s3_bucket_base_path="$(__bucket_base_path)"
 
 # deployment-service currently requires the regional endpoint
-s3_endpoint="https://s3.us-west-2.amazonaws.com"
+s3_endpoint="https://s3.amazonaws.com"
 
 do_create_config_s3_default() {
   #shellcheck disable=SC2154
