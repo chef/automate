@@ -277,13 +277,14 @@ const haExistingNodesConfigTemplate = `
 [architecture.existing_infra]
 ## === INPUT NEEDED ===
 # Eg.: ssh_user = "ubuntu"
+ssh_user = ""
 
 # private ssh key file path to access instances
 # Eg.: ssh_user = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
+
 # Provide Password if needed to run sudo commands.
 sudo_password = ""
-
 ## === ===
 
 
@@ -307,7 +308,7 @@ backup_mount = "/mnt/automate_backups"
 fqdn = ""
 
 # No. of Automate Frontend Machine or VM eg.: instance_count = "2"
-instance_count = "1"
+instance_count = ""
 
 ## === ===
 
