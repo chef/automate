@@ -26,6 +26,7 @@ Chef lets you choose your **upgrade journey** based on your current version of C
 | -------------------- | ---------- |
 | Any version before 20220329091442| 20220329091442|
 | 20220329091442| 3.0.x|
+| 3.0.49| 4.x|
 
 Click [here](/automate/major_upgrade/) to know more.
 
