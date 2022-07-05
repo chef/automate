@@ -2,6 +2,9 @@ package integration_test
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -17,6 +20,7 @@ func TestIngestionPipelineControlIndex(t *testing.T) {
 	require.NotNil(t, suit)
 
 	input := "../ingest/examples/compliance-success-tiny-report.json"
+	mapIndex := "../ingest/examples/mapping-comp-1-control-2018.10.25.json"
 	err := suit.ingestReport(input, func(r *compliance.Report) {
 		r.NodeUuid = newUUID()
 		r.ReportUuid = newUUID()
@@ -50,4 +54,16 @@ func TestIngestionPipelineControlIndex(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, mappings)
 	require.NotEmpty(t, mappings, "mappings cannot be empty")
+
+	file, err := os.Open(mapIndex)
+	require.NoError(t, err)
+
+	byteValue, err := ioutil.ReadAll(file)
+	require.NoError(t, err)
+
+	var result map[string]interface{}
+	err = json.Unmarshal(byteValue, &result)
+	require.NoError(t, err)
+
+	require.Equal(t, result, mappings, "result and mapping cannot be different")
 }
