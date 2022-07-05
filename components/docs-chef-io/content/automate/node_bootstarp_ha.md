@@ -122,6 +122,8 @@ knife ssh fetch
 knife ssl check
 ```
 
+{{< note >}} `knife ssl check` might throw certificate error in which case, configuration can be done using DNS attached to Chef Server URL {{< /note >}}
+
 The above command will fetch certificate details, save them to the trusted_cert folder in **/root/.chef/**, and verify the same.
 
 8. Run the bootstrap command.
