@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Node Bootstrapping"
-    identifier = "automate/configuring_automate/node_bootstarp_ha.md Node Bootstrapping"
-    parent = "automate/configuring_automate"
-    weight = 90
+    identifier = "automate/deploy_high_availability/node_bootstarp_ha.md Node Bootstrapping"
+    parent = "automate/deploy_high_availability"
+    weight = 95
 +++
 
 A node is any physical, virtual, or cloud device configured and maintained by an instance of Chef Infra Client. Bootstrapping installs Chef Infra Client on a target system so it can run as a client and sets the node up to communicate with a Chef Infra Server.
