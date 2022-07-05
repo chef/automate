@@ -98,9 +98,9 @@ Click [here](https://docs.chef.io/workstation/install_workstation/) for any addi
 
 2. Generate chef-repo using `chef generate repo chef-repo`. Click [here]https://docs.chef.io/workstation/getting_started/ to know more.
 
-3. Paste `pem` file of user inside `/root/.chef/<pem_file_of_user>`. For example: `Eg.: /root/.chef/johndoe.pem`
+3. Paste `pem` files of user and organization inside `/root/.chef/`. For example: `Eg.: /root/.chef/johndoe.pem , /root/.chef/new_org.pem`
 
-4. Paste `pem` file of node which you want to bootstrap inside `/root/.ssh/<pem_file_of_node>`.
+4. Paste ssh key of node which you want to bootstrap inside `/root/.ssh/<ssh_key_of_node>`.
 
 5. Edit Credentials file `vi /root/.chef/credentials` or run `knife configure` to configure the credentials.
 
