@@ -40,7 +40,7 @@ func TestIngestionPipelineControlIndex(t *testing.T) {
 
 	require.NoError(t, err)
 	require.NotNil(t, searchResult)
-	require.Greater(t, searchResult.TotalHits(), 0)
+	require.Greater(t, searchResult.TotalHits(), int64(0), "Total hits cannot be 0 or less")
 
 	// Check mapping
 	mappings, err := suit.elasticClient.GetMapping().
@@ -49,5 +49,5 @@ func TestIngestionPipelineControlIndex(t *testing.T) {
 		Do(context.Background())
 	require.NoError(t, err)
 	require.NotNil(t, mappings)
-	require.NotEmpty(t, mappings)
+	require.NotEmpty(t, mappings, "mappings cannot be empty")
 }
