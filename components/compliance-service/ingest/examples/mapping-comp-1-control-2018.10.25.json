@@ -1,0 +1,153 @@
+{
+    "comp-1-control-2018.10.25": {
+        "mappings": {
+            "properties": {
+                "control_id": {
+                    "type": "keyword"
+                },
+                "daily_latest": {
+                    "type": "boolean"
+                },
+                "day_latest": {
+                    "type": "boolean"
+                },
+                "end_time": {
+                    "type": "date"
+                },
+                "impact": {
+                    "type": "double"
+                },
+                "nodes": {
+                    "properties": {
+                        "daily_latest": {
+                            "type": "boolean"
+                        },
+                        "day_latest": {
+                            "type": "boolean"
+                        },
+                        "end_time": {
+                            "type": "date"
+                        },
+                        "node_end_time": {
+                            "type": "date"
+                        },
+                        "node_name": {
+                            "fields": {
+                                "engram": {
+                                    "analyzer": "autocomplete",
+                                    "type": "text"
+                                },
+                                "lower": {
+                                    "normalizer": "case_insensitive",
+                                    "type": "keyword"
+                                }
+                            },
+                            "type": "keyword"
+                        },
+                        "node_uuid": {
+                            "type": "keyword"
+                        },
+                        "report_uuid": {
+                            "type": "keyword"
+                        },
+                        "status": {
+                            "type": "keyword"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "profile": {
+                    "properties": {
+                        "profile": {
+                            "type": "keyword"
+                        },
+                        "profile_id": {
+                            "fields": {
+                                "keyword": {
+                                    "ignore_above": 256,
+                                    "type": "keyword"
+                                }
+                            },
+                            "type": "text"
+                        },
+                        "sha256": {
+                            "type": "keyword"
+                        }
+                    }
+                },
+                "report_uuid": {
+                    "type": "keyword"
+                },
+                "status": {
+                    "type": "keyword"
+                },
+                "string_tags": {
+                    "properties": {
+                        "key": {
+                            "fields": {
+                                "engram": {
+                                    "analyzer": "autocomplete",
+                                    "type": "text"
+                                },
+                                "lower": {
+                                    "normalizer": "case_insensitive",
+                                    "type": "keyword"
+                                }
+                            },
+                            "type": "keyword"
+                        },
+                        "values": {
+                            "fields": {
+                                "engram": {
+                                    "analyzer": "autocomplete",
+                                    "type": "text"
+                                },
+                                "lower": {
+                                    "normalizer": "case_insensitive",
+                                    "type": "keyword"
+                                }
+                            },
+                            "type": "keyword"
+                        }
+                    },
+                    "type": "nested"
+                },
+                "title": {
+                    "fields": {
+                        "engram": {
+                            "analyzer": "autocomplete",
+                            "type": "text"
+                        },
+                        "lower": {
+                            "normalizer": "case_insensitive",
+                            "type": "keyword"
+                        }
+                    },
+                    "type": "keyword"
+                },
+                "waived_str": {
+                    "type": "keyword"
+                },
+                "waiver_data": {
+                    "properties": {
+                        "expiration_date": {
+                            "type": "keyword"
+                        },
+                        "justification": {
+                            "type": "keyword"
+                        },
+                        "message": {
+                            "type": "keyword"
+                        },
+                        "run": {
+                            "type": "boolean"
+                        },
+                        "skipped_due_to_waiver": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
