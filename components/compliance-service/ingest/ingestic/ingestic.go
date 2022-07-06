@@ -959,7 +959,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		if err != nil {
 			return err
 		}
-		err1 := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err1 != nil {
 			return err1
 		}
