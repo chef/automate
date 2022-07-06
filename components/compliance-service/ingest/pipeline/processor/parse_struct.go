@@ -28,11 +28,22 @@ func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) 
 	nodes := make([]relaxting.Node, 0)
 	// Get the nodes
 	node := relaxting.Node{NodeUUID: inspecReport.NodeID,
-		DailyLatest: inspecReport.DailyLatest,
-		DayLatest:   inspecReport.DayLatest,
-		NodeEndTime: inspecReport.EndTime,
-		Status:      inspecReport.Status,
-		ReportUUID:  inspecReport.ReportID}
+		DailyLatest:      inspecReport.DailyLatest,
+		DayLatest:        inspecReport.DayLatest,
+		NodeEndTime:      inspecReport.EndTime,
+		Status:           inspecReport.Status,
+		ReportUUID:       inspecReport.ReportID,
+		NodeName:         inspecReport.NodeName,
+		Environment:      inspecReport.Environment,
+		PolicyGroup:      inspecReport.PolicyGroup,
+		PolicyName:       inspecReport.PolicyName,
+		Platform:         inspecReport.Platform,
+		Recipes:          inspecReport.Recipes,
+		Roles:            inspecReport.Roles,
+		OrganizationName: inspecReport.OrganizationName,
+		SourceFQDN:       inspecReport.SourceFQDN,
+		ChefTags:         inspecReport.ChefTags,
+	}
 
 	nodes = append(nodes, node)
 
