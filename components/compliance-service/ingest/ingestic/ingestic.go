@@ -955,14 +955,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err != nil {
-			return err
-		}
-		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err1 != nil {
-			return err1
-		}
+
 		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
@@ -972,6 +965,15 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
+		err = backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		if err != nil {
+			logrus.Error("Error: %+v", err)
+		}
+		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		if err1 != nil {
+			logrus.Error("Error: %+v", err1)
+			// return err1
+		}
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
