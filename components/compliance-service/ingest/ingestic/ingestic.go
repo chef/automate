@@ -961,7 +961,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		}
 		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err1 != nil {
-			return err
+			return err1
 		}
 		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
