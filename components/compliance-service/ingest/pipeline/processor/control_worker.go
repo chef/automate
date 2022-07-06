@@ -2,13 +2,14 @@ package processor
 
 import (
 	"context"
+	"time"
+
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 var (
@@ -178,6 +179,7 @@ func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interf
 		return nil, err
 	}
 
+	logrus.Debugf("Parsed results got results")
 	err = t.ESClient.UploadDataToControlIndex(ctx, job.ReportUuid, controls, job.EndTime)
 	if err != nil {
 		logrus.Errorf("Unable to add data to index with reportuuid:%s", job.ReportUuid)

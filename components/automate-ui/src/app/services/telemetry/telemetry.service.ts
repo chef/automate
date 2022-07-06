@@ -430,7 +430,7 @@ export class TelemetryService {
     const nodeUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: eventName,
-      properties: { node_cnt: nodeUsageStats.node_cnt }
+      properties: { node_cnt: nodeUsageStats.node_cnt, deployment_type: this.deploymentType }
     }, true).subscribe(() => {
       if (nodeUsageStatsSubscription) {
         nodeUsageStatsSubscription.unsubscribe();
@@ -453,7 +453,10 @@ export class TelemetryService {
     const applicationUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: 'servicesCountsGlobal',
-      properties: { total_services: applicationUsageStats.total_services }
+      properties: {
+        total_services: applicationUsageStats.total_services,
+        deployment_type: this.deploymentType
+      }
     }, true).subscribe(() => {
       if (applicationUsageStatsSubscription) {
         applicationUsageStatsSubscription.unsubscribe();

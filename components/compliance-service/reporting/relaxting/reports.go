@@ -812,9 +812,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
-
-	// Only end_time matters for this call
-	filters["start_time"] = []string{}
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
@@ -1329,7 +1326,6 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
 		endTime := firstOrEmpty(filters["end_time"])
 		startTime := firstOrEmpty(filters["start_time"])
-
 		timeRangeQuery := elastic.NewRangeQuery("end_time")
 		if len(startTime) > 0 {
 			timeRangeQuery.Gte(startTime)
@@ -1378,6 +1374,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 			termQuery := elastic.NewTermsQuery(flag, true)
 			boolQuery = boolQuery.Must(termQuery)
 		}
+
 	}
 
 	if len(filters["end_time"]) == 0 {
