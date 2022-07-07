@@ -532,7 +532,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     if (foundFilter === undefined) {
       return 0;
     } else {
-      const dateInterval = parseInt(foundFilter.text, 10);
+      const dateInterval = parseInt(foundFilter.text, 1);
       if ( !isNaN(dateInterval) && dateInterval >= 0 &&
         dateInterval < this.reportQuery.intervals.length ) {
         return dateInterval;
