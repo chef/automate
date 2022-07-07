@@ -955,11 +955,11 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err1 != nil {
-			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err1)
+		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		if err != nil {
+			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
 		}
-		err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		err = backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
 		}
