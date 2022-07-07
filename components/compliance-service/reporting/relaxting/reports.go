@@ -800,6 +800,8 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
 
+	controlListIds := make([]string, 0)
+
 	controlSummaryTotals := &reportingapi.ControlSummary{
 		Passed:  &reportingapi.Total{},
 		Skipped: &reportingapi.Total{},
@@ -1005,6 +1007,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 					if totalWaivedControls, found := filteredControls.Aggregations.Filter("waived_total"); found {
 						controlSummaryTotals.Waived.Total = int32(totalWaivedControls.DocCount)
 					}
+
 					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
 						start, end := paginate(int(pageNumber), int(size), len(controlBuckets.Buckets))
 						for _, controlBucket := range controlBuckets.Buckets[start:end] {
@@ -1016,15 +1019,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 							if err != nil {
 								return nil, err
 							}
-							controlSummary, err := backend.getControlSummaryFromControlIndex(ctx, id, filters, controlIndex)
-							if err != nil {
-								logrus.Errorf("Unable to fetch control summary from from control index %v", err)
-								return nil, err
-							}
-
-							logrus.Info("Got Control Summary", controlSummary)
-							contListItem.ControlSummary = controlSummary
-
+							controlListIds = append(controlListIds, id)
 							contListItems = append(contListItems, &contListItem)
 						}
 					}
@@ -1032,9 +1027,20 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 			}
 		}
 	}
-
+	logrus.Info("--------------- ControlListItems", len(contListItems))
+	controlSummaryMap, err := backend.getControlSummaryFromControlIndex(ctx, controlListIds, filters, controlIndex, size)
+	if err != nil {
+		logrus.Errorf("Unable to fetch the nodes status for controls with error %v", err)
+	}
+	setControlSummaryForControlItems(contListItems, controlSummaryMap)
 	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems, ControlSummaryTotals: controlSummaryTotals}
 	return contListItemList, nil
+}
+
+func setControlSummaryForControlItems(contListItems []*reportingapi.ControlItem, controlSummaryMap map[string]*reportingapi.ControlSummary) {
+	for _, controlItem := range contListItems {
+		controlItem.ControlSummary = controlSummaryMap[controlItem.Id]
+	}
 }
 
 // GetNodeControlListItems returns the paginated control list response.
@@ -2002,14 +2008,8 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 	return searchResult, queryInfo, nil
 }
 
-func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId string, filters map[string][]string, esIndex string) (*reportingapi.ControlSummary, error) {
-	controlSummary := &reportingapi.ControlSummary{
-		Passed:  &reportingapi.Total{},
-		Skipped: &reportingapi.Total{},
-		Failed:  &reportingapi.Failed{},
-		Waived:  &reportingapi.Total{},
-	}
-
+func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId []string, filters map[string][]string, esIndex string, size int32) (map[string]*reportingapi.ControlSummary, error) {
+	controlSummaryMap := make(map[string]*reportingapi.ControlSummary)
 	client, err := backend.ES2Client()
 	if err != nil {
 		return nil, err
@@ -2036,7 +2036,7 @@ func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context
 
 	//waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
-	controlTermsAggregation := elastic.NewTermsAggregation().Field("control_id").SubAggregation("nodes", subAggregation)
+	controlTermsAggregation := elastic.NewTermsAggregation().Field("control_id").SubAggregation("nodes", subAggregation).Size(int(size))
 
 	searchSource.Aggregation("controls", controlTermsAggregation)
 
@@ -2052,18 +2052,26 @@ func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context
 		Do(ctx)
 
 	if err != nil {
-		//logrus.Errorf("%s search failed", myName)
 		return nil, err
 	}
 
 	if controlBuckets, found := searchResult.Aggregations.Terms("controls"); found && len(controlBuckets.Buckets) > 0 {
-		if nodesBuckets, found := controlBuckets.Buckets[0].Aggregations.Nested("nodes"); found {
-			controlSummary = getControlSummaryResult(nodesBuckets)
-			logrus.Info("---------------- Inside both the if condisitions control summary", controlSummary)
+		for _, bucket := range controlBuckets.Buckets {
+			controlSummary := &reportingapi.ControlSummary{
+				Passed:  &reportingapi.Total{},
+				Skipped: &reportingapi.Total{},
+				Failed:  &reportingapi.Failed{},
+				Waived:  &reportingapi.Total{},
+			}
+			if nodesBuckets, found := bucket.Aggregations.Nested("nodes"); found {
+				controlSummary = getControlSummaryResult(nodesBuckets)
+			}
+
+			id, _ := bucket.Key.(string)
+			controlSummaryMap[id] = controlSummary
 		}
 	}
-
-	return controlSummary, nil
+	return controlSummaryMap, nil
 
 }
 
@@ -2091,9 +2099,9 @@ func getControlSummaryResult(nodesBucket *elastic.AggregationSingleBucket) (cont
 
 }
 
-func getControlSummaryFilters(controlId string, filters map[string][]string) *elastic.BoolQuery {
+func getControlSummaryFilters(controlId []string, filters map[string][]string) *elastic.BoolQuery {
 
-	controlTermsQuery := elastic.NewTermsQuery("control_id", controlId)
+	controlTermsQuery := elastic.NewTermsQueryFromStrings("control_id", controlId...)
 	boolQuery := elastic.NewBoolQuery()
 	setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
