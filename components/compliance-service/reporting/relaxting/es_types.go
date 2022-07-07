@@ -345,4 +345,6 @@ type Node struct {
 
 type Profile struct {
 	ProfileID string `json:"profile_id"`
+	Name      string `json:"name"`
+	Title     string `json:"title"`
 }

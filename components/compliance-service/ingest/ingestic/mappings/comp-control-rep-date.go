@@ -337,6 +337,22 @@ var ComplianceControlRepData = Mapping{
           },
           "sha256": {
             "type": "keyword"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "title": {
+            "type": "keyword",
+            "fields": {
+              "engram": {
+                "type": "text",
+                "analyzer": "autocomplete"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            }
           }
         }
       },
