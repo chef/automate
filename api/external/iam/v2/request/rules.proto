@@ -12,7 +12,7 @@ message CreateRuleReq {
     json_schema: {
       required: ["id", "project_id", "name", "type", "conditions"]
     },
-    example: { value: '{"id": "example-rule", "project-id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}]}'}
+    example: { value: '{"id": "example-rule", "project_id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}]}'}
   };
   // Unique ID. Cannot be changed.
   string id = 1;
@@ -32,7 +32,7 @@ message UpdateRuleReq {
     json_schema: {
       required: ["id", "project_id", "name", "type", "conditions"]
     },
-    example: { value: '{"id": "example-rule", "project-id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}]}'}
+    example: { value: '{"id": "example-rule", "project_id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}]}'}
   };
   // Unique ID. Cannot be changed.
   string id = 1;
