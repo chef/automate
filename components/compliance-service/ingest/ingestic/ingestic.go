@@ -955,13 +955,15 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-
-		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err1 != nil {
 			logrus.Error("Error: %+v", err1)
-			// return err1
 		}
+		err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		if err != nil {
+			logrus.Error("Error: %+v", err)
+		}
+		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
 		}
@@ -1048,7 +1050,6 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	boolQueryDailyLatest := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
 
-	logrus.Info("******************nodeID %v", nodeId)
 	// Script to find the nodes and making daily_latest as false
 	script := elastic.NewScript(`
 		 def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
