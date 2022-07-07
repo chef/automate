@@ -957,11 +957,11 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
 		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err1 != nil {
-			logrus.Error("Error: %+v", err1)
+			logrus.Error("Unable to SetDailyLatestToFalseForControlIndex %+v", err1)
 		}
 		err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
-			logrus.Error("Error: %+v", err)
+			logrus.Error("Unable to set Day Latest To false for control index %+v", err)
 		}
 		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
