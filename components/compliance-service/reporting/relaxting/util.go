@@ -200,7 +200,7 @@ func getControlIndex(filters map[string][]string) (esIndex string, err error) {
 	if err != nil {
 		return esIndex, err
 	}
-	logrus.Infof("GetEsIndex called with (filters=%+v), using startDateAsString=%s, endDateAsString=%s", filters, startDateAsString, endDateAsString)
+	logrus.Debugf("GetEsIndex called with (filters=%+v), using startDateAsString=%s, endDateAsString=%s", filters, startDateAsString, endDateAsString)
 	esIndex, err = IndexDates(CompDailyControlIndexPrefix, startDateAsString, endDateAsString)
 	return esIndex, err
 }
