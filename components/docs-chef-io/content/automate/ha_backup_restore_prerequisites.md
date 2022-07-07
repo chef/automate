@@ -167,7 +167,7 @@ repo = "/mnt/automate_backups/opensearch"
 To trigger the restart of the OpenSearch on each server, apply the updated `es_config.toml` config to OpenSearch once.
 
 ```sh
-hab config apply automate-ha-opensearch.default $(date '+%s') es\_config.toml
+hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
 
 hab svc status (check whether OpenSearch service is up or not)
 
@@ -254,7 +254,7 @@ repo = "/mnt/automate_backups/opensearch"
 To trigger the restart of the OpenSearch on each server, apply the updated `es_config.toml` config to OpenSearch once.
 
 ```sh
-hab config apply automate-ha-opensearch.default $(date '+%s') es\_config.toml
+hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
 
 hab svc status (check whether OpenSearch service is up or not)
 
