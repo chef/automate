@@ -957,7 +957,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
 
 		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
-		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[1].NodeUUID)
+		err1 := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err1 != nil {
 			logrus.Error("Error: %+v", err1)
 			// return err1
@@ -970,7 +970,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
-		err = backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[1].NodeUUID)
+		err = backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Error("Error: %+v", err)
 		}
