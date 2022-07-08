@@ -26,8 +26,8 @@ const (
 	//MigrationLabelFEEDS = "ElasticSearch_Feeds_1"
 )
 
-const maxMigrations = 9        // Total migrations should match the number of constants above
-const totalMigrationSteps = 41 // Max number of migration LogEntry items we can have across all migrations
+const maxMigrations = 10       // Total migrations should match the number of constants above
+const totalMigrationSteps = 46 // Max number of migration LogEntry items we can have across all migrations
 
 // Special message sent by the services to flag the end of a migration either failed or successful
 const MigrationFailedMsg = "FAILED"
@@ -126,13 +126,11 @@ func AddMigrationUpdate(migServer *Server, logLabel string, logText string) {
 		logrus.Errorf("AddMigrationUpdate encountered error while getting time: %s", err.Error())
 		return
 	}
-	logrus.Info("*********************************************")
-	logrus.Infof("timeNow: %+v, logLabel: %+v, logText: %+v", timeNow, logLabel, logText)
+
 	migServer.MigrationChannel <- status.LogEntry{
 		Label:     logLabel,
 		Text:      logText,
 		Timestamp: timeNow,
 	}
 
-	logrus.Infof("Channle is open still!")
 }
