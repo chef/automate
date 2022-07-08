@@ -27,13 +27,13 @@ This section includes the procedure to restore backed-up data of the Chef Automa
 
 ## Note
 
-Restore operation will restore all data until backup had been taken, after any data or operation will be lost
-- example
-  - We created automate user A and user B is created and we have generated a API token as tok1 
-  - We took backup with id 20220708044530
-  - Again we created users C and D, and alo generated a API token tok2,
-  - Now we are restored data in same automate cluster, then only user A and B will be restored similarly API token tok1 will be restored, 
-  - But user C and D along with API token tok2 will be lost because we had created these after backup it was not part of restore.
+Restore operation will restore all data until backup had been taken, any operation done after taking backup will not be restored.
+- Example:
+  - We created automate user A and we have generated an API token as tok1 for user A
+  - We took backup, generated backup id was 20220708044530
+  - Again we created users B, and alo generated an API token tok2 for user B,
+  - Now we are restored data in same automate cluster, then only user A and his API token tok1 will be restored from the backup bundle, as it contained user A and his token tok1.
+  - User B along with his API token tok2 will not be availble after restore, as it was not in backup bundle.
 
 
 ### Restoring the S3 Backed-up Data
