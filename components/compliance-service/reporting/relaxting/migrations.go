@@ -244,6 +244,17 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v6, statusserver.MigrationFailedMsg)
 		return errMsg
 	}
+
+	// Migrates A2 version 7 indices to the current version
+	a2V7Indices := A2V7ElasticSearchIndices{backend: &backend}
+	err = backend.migrate(a2V7Indices, statusSrv, statusserver.MigrationLabelESa2v7)
+	if err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v7))
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v7, errMsg.Error())
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v7, statusserver.MigrationFailedMsg)
+		return errMsg
+	}
+
 	return nil
 }
 

@@ -20,6 +20,7 @@ const (
 	MigrationLabelESa2v4 = "ElasticSearch_A2_v4"
 	MigrationLabelESa2v5 = "ElasticSearch_A2_v5"
 	MigrationLabelESa2v6 = "ElasticSearch_A2_v6"
+	MigrationLabelESa2v7 = "ElasticSearch_A2_v7"
 	MigrationLabelPG     = "PostgreSQL"
 	MigrationLabelPRO    = "Profiles"
 	//MigrationLabelFEEDS = "ElasticSearch_Feeds_1"
@@ -125,9 +126,13 @@ func AddMigrationUpdate(migServer *Server, logLabel string, logText string) {
 		logrus.Errorf("AddMigrationUpdate encountered error while getting time: %s", err.Error())
 		return
 	}
+	logrus.Info("*********************************************")
+	logrus.Infof("timeNow: %+v, logLabel: %+v, logText: %+v", timeNow, logLabel, logText)
 	migServer.MigrationChannel <- status.LogEntry{
 		Label:     logLabel,
 		Text:      logText,
 		Timestamp: timeNow,
 	}
+
+	logrus.Infof("Channle is open still!")
 }
