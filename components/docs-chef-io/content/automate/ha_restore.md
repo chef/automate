@@ -25,13 +25,26 @@ chef-automate backup create
 
 This section includes the procedure to restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS) and the Amazon Web Services (AWS) S3 bucket.
 
+## Note
+
+Restore operation will restore all data until backup had been taken, after any data or operation will be lost
+- example
+  - We created automate user A and user B is created and we have generated a API token as tok1 
+  - We took backup with id 20220708044530
+  - Again we created users C and D, and alo generated a API token tok2,
+  - Now we are restored data in same automate cluster, then only user A and B will be restored similarly API token tok1 will be restored, 
+  - But user C and D along with API token tok2 will be lost because we had created these after backup it was not part of restore.
+
+
 ### Restoring the S3 Backed-up Data
 
 To restore backed-up data of the Chef Automate High Availability (HA) using the Amazon Web Services (AWS) S3 bucket, follow the steps given below:
 
 - Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
-- Shutdown Chef Automate service on all front-end nodes by executing the `sudo systemctl stop chef-automate` command.
+- Shutdown Chef Automate service on all front-end nodes
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server 
 
 - Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
@@ -45,7 +58,9 @@ To restore backed-up data of the Chef Automate High Availability (HA) using Exte
 
 - Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 
-- Shutdown Chef Automate service on all front-end nodes by executing the `sudo systemctl stop chef-automate` command.
+- Shutdown Chef Automate service on all front-end nodes 
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Automate nodes
+  - Execute `sudo systemctl stop chef-automate` command in all Chef Infra Server 
 
 - Log in to the same instance of Chef Automate front-end node from which backup is taken.
 
