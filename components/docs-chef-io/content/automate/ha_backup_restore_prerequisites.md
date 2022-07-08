@@ -44,7 +44,10 @@ The permissions can either be directly added to the user or added via **IAM Grou
 
 Once done with the above steps, `.toml` file and patch the `.config`. In the file, modify the values listed below:
 
-1. **bucket name (bucket = "bucket-name" and name = "bucket-name")**
+1. bucket name
+
+    - bucket = "bucket-name"
+    - name = "bucket-name"
 
 2. `mkdir configs`
 
