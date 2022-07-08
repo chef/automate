@@ -25,16 +25,12 @@ chef-automate backup create
 
 This section includes the procedure to restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS) and the Amazon Web Services (AWS) S3 bucket.
 
-## Note
+Restore operation restores all the data while the backup is going on. The restore operation stops will the ongoing backup procedure. Let’s understand the whole process by a scenario:
 
-Restore operation will restore all data until backup had been taken, any operation done after taking backup will not be restored.
-- Example:
-  - We created automate user A and we have generated an API token as tok1 for user A
-  - We took backup, generated backup id was 20220708044530
-  - Again we created users B, and alo generated an API token tok2 for user B,
-  - Now we are restored data in same automate cluster, then only user A and his API token tok1 will be restored from the backup bundle, as it contained user A and his token tok1.
-  - User B along with his API token tok2 will not be availble after restore, as it was not in backup bundle.
-
+- Create a automate *UserA* and generate an API token named *Token1* for *UserA*.
+- Create a  backup, and let’s assume the back id to be *20220708044530*.
+- Create a new user *UserB* and a respective API token named *Token2*.
+- Now, suppose you want to restore data in the same automate cluster. In that case, the data will only be stored for *UserA* with its token as the backup bundle only contains the *UserA*, and the *UserB* is not available in the backup bundle.
 
 ### Restoring the S3 Backed-up Data
 
