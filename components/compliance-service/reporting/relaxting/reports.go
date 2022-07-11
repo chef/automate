@@ -972,7 +972,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s unable to get Source", myName)
+		return nil, errors.Wrapf(err, "%s Unable to get control items", myName)
 	}
 	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", myName))
 
@@ -2009,6 +2009,7 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 }
 
 func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId []string, filters map[string][]string, esIndex string, size int32) (map[string]*reportingapi.ControlSummary, error) {
+	nodeStatus := "nodes.status"
 	controlSummaryMap := make(map[string]*reportingapi.ControlSummary)
 	client, err := backend.ES2Client()
 	if err != nil {
@@ -2023,13 +2024,13 @@ func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context
 		FetchSource(false).Size(1)
 
 	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("nodes.status", "passed")))
+		Must(elastic.NewTermQuery(nodeStatus, "passed")))
 
 	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("nodes.status", "failed")))
+		Must(elastic.NewTermQuery(nodeStatus, "failed")))
 
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("nodes.status", "skipped")))
+		Must(elastic.NewTermQuery(nodeStatus, "skipped")))
 
 	setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
