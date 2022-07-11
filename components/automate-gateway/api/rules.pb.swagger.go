@@ -157,7 +157,7 @@ func init() {
         "x-code-samples": [
           {
             "lang": "JSON",
-            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Example Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"MEMBER_OF\", \"values\": [\"example.co\", \"example.io\"]}]}"
+            "source": "{\"id\": \"example-rule\", \"project_id\": \"example-project\", \"name\": \"My Example Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"MEMBER_OF\", \"values\": [\"example.co\", \"example.io\"]}]}"
           }
         ]
       }
@@ -287,7 +287,7 @@ func init() {
         "x-code-samples": [
           {
             "lang": "JSON",
-            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Updated Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}]}"
+            "source": "{\"id\": \"example-rule\", \"project_id\": \"example-project\", \"name\": \"My Updated Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}]}"
           }
         ]
       }
@@ -388,7 +388,7 @@ func init() {
       "type": "object",
       "example": {
         "id": "example-rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "name": "My Example Rule",
         "type": "NODE",
         "conditions": [
@@ -439,7 +439,7 @@ func init() {
       "type": "object",
       "example": {
         "id": "example-rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "name": "My Example Rule",
         "type": "NODE",
         "conditions": [
@@ -467,7 +467,7 @@ func init() {
       "type": "object",
       "example": {
         "id": "example-rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "name": "My Applied Rule",
         "type": "NODE",
         "conditions": [
@@ -493,7 +493,7 @@ func init() {
         "rules": [
           {
             "id": "example-rule",
-            "project-id": "example-project",
+            "project_id": "example-project",
             "name": "My Applied Rule",
             "type": "NODE",
             "conditions": [
@@ -509,7 +509,7 @@ func init() {
           },
           {
             "id": "example-rule-2",
-            "project-id": "example-project",
+            "project_id": "example-project",
             "name": "My 2nd Example Rule",
             "type": "EVENT",
             "conditions": [
@@ -603,7 +603,7 @@ func init() {
       "type": "object",
       "example": {
         "id": "example-rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "name": "My Updated Rule",
         "type": "NODE",
         "conditions": [
@@ -653,7 +653,7 @@ func init() {
       "type": "object",
       "example": {
         "id": "example-rule",
-        "project-id": "example-project",
+        "project_id": "example-project",
         "name": "My Updated Rule",
         "type": "NODE",
         "conditions": [
