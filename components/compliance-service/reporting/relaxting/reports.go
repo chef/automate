@@ -2016,6 +2016,8 @@ func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context
 	}
 	boolQuery := getControlSummaryFilters(controlId, filters)
 
+	filterQuery := elastic.NewBoolQuery()
+
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
 		FetchSource(false).Size(1)
@@ -2029,14 +2031,25 @@ func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
 		Must(elastic.NewTermQuery("nodes.status", "skipped")))
 
-	subAggregation := elastic.NewNestedAggregation().Path("nodes").
-		SubAggregation("passed", passedFilter).
+	setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		logrus.Errorf("Unable to fetch details for flags %v", err)
+	}
+	for _, flag := range setFlags {
+		termQuery := elastic.NewTermsQuery("nodes."+flag, true)
+		filterQuery = filterQuery.Must(termQuery)
+	}
+
+	filterAggregationForLatestRecord := elastic.NewFilterAggregation().Filter(filterQuery).
 		SubAggregation("failed", failedFilter).
+		SubAggregation("passed", passedFilter).
 		SubAggregation("skipped", skippedFilter)
+
+	subAggregationNodes := elastic.NewNestedAggregation().Path("nodes").SubAggregation("status", filterAggregationForLatestRecord)
 
 	//waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
-	controlTermsAggregation := elastic.NewTermsAggregation().Field("control_id").SubAggregation("nodes", subAggregation).Size(int(size))
+	controlTermsAggregation := elastic.NewTermsAggregation().Field("control_id").SubAggregation("nodes", subAggregationNodes).Size(int(size))
 
 	searchSource.Aggregation("controls", controlTermsAggregation)
 
@@ -2083,16 +2096,18 @@ func getControlSummaryResult(nodesBucket *elastic.AggregationSingleBucket) (cont
 		Waived:  &reportingapi.Total{},
 	}
 
-	if failed, found := nodesBucket.Aggregations.Filter("failed"); found {
-		controlSummary.Failed.Total = int32(failed.DocCount)
-	}
+	if status, found := nodesBucket.Aggregations.Filter("status"); found {
+		if failed, found := status.Aggregations.Filter("failed"); found {
+			controlSummary.Failed.Total = int32(failed.DocCount)
+		}
 
-	if passed, found := nodesBucket.Aggregations.Filter("passed"); found {
-		controlSummary.Passed.Total = int32(passed.DocCount)
-	}
+		if passed, found := status.Aggregations.Filter("passed"); found {
+			controlSummary.Passed.Total = int32(passed.DocCount)
+		}
 
-	if skipped, found := nodesBucket.Aggregations.Filter("skipped"); found {
-		controlSummary.Skipped.Total = int32(skipped.DocCount)
+		if skipped, found := status.Aggregations.Filter("skipped"); found {
+			controlSummary.Skipped.Total = int32(skipped.DocCount)
+		}
 	}
 
 	return controlSummary
@@ -2101,18 +2116,26 @@ func getControlSummaryResult(nodesBucket *elastic.AggregationSingleBucket) (cont
 
 func getControlSummaryFilters(controlId []string, filters map[string][]string) *elastic.BoolQuery {
 
-	controlTermsQuery := elastic.NewTermsQueryFromStrings("control_id", controlId...)
 	boolQuery := elastic.NewBoolQuery()
-	setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
-	if err != nil {
-		logrus.Errorf("Unable to fetch details for flags %v", err)
+
+	controlTermsQuery := elastic.NewTermsQueryFromStrings("control_id", controlId...)
+
+	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
+		endTime := firstOrEmpty(filters["end_time"])
+		startTime := firstOrEmpty(filters["start_time"])
+		timeRangeQuery := elastic.NewRangeQuery("end_time")
+		if len(startTime) > 0 {
+			timeRangeQuery.Gte(startTime)
+		}
+		if len(endTime) > 0 {
+			timeRangeQuery.Lte(endTime)
+		}
+
+		boolQuery = boolQuery.Must(timeRangeQuery)
 	}
-	for _, flag := range setFlags {
-		termQuery := elastic.NewTermsQuery("nodes."+flag, true)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-	boolNestedNodesQuery := elastic.NewNestedQuery("nodes", boolQuery)
-	controlQuery := elastic.NewBoolQuery().Must(controlTermsQuery).Must(boolNestedNodesQuery)
+
+	controlQuery := boolQuery.Must(controlTermsQuery)
+
 	return controlQuery
 
 }
