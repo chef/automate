@@ -64,7 +64,7 @@ habitat:
     - origin: chef
       channel: dev
     - origin: core
-      channel: sqlite_refresh
+      channel: refresh_sqlite
 allowed_licenses:
   - 0BSD
   - Apache-1.0
