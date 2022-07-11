@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 	"sort"
 	"strconv"
@@ -1027,7 +1028,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 			}
 		}
 	}
-	logrus.Info("--------------- ControlListItems", len(contListItems))
 	controlSummaryMap, err := backend.getControlSummaryFromControlIndex(ctx, controlListIds, filters, controlIndex, size)
 	if err != nil {
 		logrus.Errorf("Unable to fetch the nodes status for controls with error %v", err)
@@ -1147,15 +1147,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		Waived:  &reportingapi.Total{},
 	}*/
 
-	if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
-		//there can only be one
-		bucket := aggResult.Buckets[0]
-		title, ok := bucket.Key.(string)
-		if !ok {
-			logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
-		}
-		contListItem.Title = title
-	}
+	contListItem.Title = getTitleForControlItem(controlBucket)
 	if impactAggResult, found := controlBucket.Aggregations.Terms("impact"); found {
 		//there can only be one
 		impactBucket := impactAggResult.Buckets[0]
@@ -1167,40 +1159,14 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		//controlSummary.Total = int32(impactBucket.DocCount)
 	}
 	profileMin := &reportingapi.ProfileMin{}
-	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
-		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
-			sha := result.Buckets[0]
-			profileMin.Id = sha.Key.(string)
-		}
-		if result, found := profileResult.Terms("title"); found && len(result.Buckets) > 0 {
-			title := result.Buckets[0]
-			profileMin.Title = title.Key.(string)
-		}
-		if result, found := profileResult.Terms("version"); found && len(result.Buckets) > 0 {
-			version := result.Buckets[0]
-			profileMin.Version = version.Key.(string)
-		}
-	}
+	getProfileMinForControlItem(controlBucket, profileMin)
 	contListItem.Profile = profileMin
 
-	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
-		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
-			endTime := result.Buckets[0]
-			name := endTime.KeyAsString
-
-			endTimeAsTime, err := time.Parse(time.RFC3339, *name)
-			if err != nil {
-				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
-			}
-
-			timestamp, err := ptypes.TimestampProto(endTimeAsTime)
-			if err != nil {
-				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
-			} else {
-				contListItem.EndTime = timestamp
-			}
-		}
+	endTime, err := getEndTimeForControlItem(controlBucket)
+	if err != nil {
+		return reportingapi.ControlItem{}, errors.Wrapf(err, " time error:")
 	}
+	contListItem.EndTime = endTime
 	/*if waived, found := controlBucket.Aggregations.Filter("waived"); found {
 		controlSummary.Waived.Total = int32(waived.DocCount)
 	}
@@ -1233,6 +1199,60 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 
 	//contListItem.ControlSummary = controlSummary
 	return contListItem, nil
+}
+
+func getTitleForControlItem(controlBucket *elastic.AggregationBucketKeyItem) string {
+	var title string
+	var ok bool
+	if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
+		//there can only be one
+		bucket := aggResult.Buckets[0]
+		title, ok = bucket.Key.(string)
+		if !ok {
+			logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
+		}
+	}
+
+	return title
+
+}
+
+func getEndTimeForControlItem(controlBucket *elastic.AggregationBucketKeyItem) (*timestamppb.Timestamp, error) {
+	var timestamp *timestamppb.Timestamp
+
+	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
+		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
+			endTime := result.Buckets[0]
+			name := endTime.KeyAsString
+			endTimeAsTime, err := time.Parse(time.RFC3339, *name)
+			if err != nil {
+				return nil, errors.Wrapf(err, "%s time error: ", *name)
+			}
+			timestamp, err = ptypes.TimestampProto(endTimeAsTime)
+			if err != nil {
+				return nil, errors.Wrapf(err, "%s time error: ", *name)
+			}
+		}
+	}
+	return timestamp, nil
+}
+
+func getProfileMinForControlItem(controlBucket *elastic.AggregationBucketKeyItem, profileMin *reportingapi.ProfileMin) {
+	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
+		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
+			sha := result.Buckets[0]
+			profileMin.Id = sha.Key.(string)
+		}
+		if result, found := profileResult.Terms("title"); found && len(result.Buckets) > 0 {
+			title := result.Buckets[0]
+			profileMin.Title = title.Key.(string)
+		}
+		if result, found := profileResult.Terms("version"); found && len(result.Buckets) > 0 {
+			version := result.Buckets[0]
+			profileMin.Version = version.Key.(string)
+		}
+	}
+
 }
 
 func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationBucketKeyItems) ([]*reportingapi.WaiverData, error) {
