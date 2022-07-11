@@ -499,7 +499,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     reportQuery.interval = this.getDateInterval(urlFilters);
     reportQuery.endDate = this.getEndDate(urlFilters);
     reportQuery.startDate = this.reportQuery.findTimeIntervalStartDate(
-      reportQuery.interval, reportQuery.endDate);
+      0, reportQuery.endDate);
     reportQuery.last24h = this.isLast24h(urlFilters);
 
     this.reportQuery.setState(reportQuery);
@@ -532,7 +532,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     if (foundFilter === undefined) {
       return 0;
     } else {
-      const dateInterval = parseInt(foundFilter.text, 1);
+      const dateInterval = parseInt(foundFilter.text, 10);
       if ( !isNaN(dateInterval) && dateInterval >= 0 &&
         dateInterval < this.reportQuery.intervals.length ) {
         return dateInterval;
