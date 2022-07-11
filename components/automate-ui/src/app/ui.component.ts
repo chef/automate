@@ -88,7 +88,7 @@ export class UIComponent implements OnInit, AfterViewChecked {
     } else {
       this.upgradeBanner = this.stringToBoolean(bannerStorage);
     }
-    // this.upgradeBanner = this.stringToBoolean('false'); // uncomment this line to hide static Banner
+    this.upgradeBanner = this.stringToBoolean('false'); // uncomment this line to hide static Banner
   }
 
   closeBanner() {
