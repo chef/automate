@@ -54,7 +54,7 @@ export interface ReturnParams {
 export class ReportQueryService {
 
   intervals: TimeIntervals[] = [
-    { name: 'Last 0 days', findStartDate: (endDate: moment.Moment): moment.Moment =>
+    { name: 'Last 24 hrs', findStartDate: (endDate: moment.Moment): moment.Moment =>
       endDate.clone().subtract(0, 'days')},
     { name: 'Last 10 days', findStartDate: (endDate: moment.Moment): moment.Moment =>
       endDate.clone().subtract(10, 'days')},
