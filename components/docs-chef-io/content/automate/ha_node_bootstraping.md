@@ -7,7 +7,7 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Node Bootstrapping"
-    identifier = "automate/deploy_high_availability/node_bootstarp_ha.md Node Bootstrapping"
+    identifier = "automate/deploy_high_availability/ha_node_bootstraping.md Node Bootstrapping"
     parent = "automate/deploy_high_availability"
     weight = 95
 +++
