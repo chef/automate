@@ -113,3 +113,36 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
       sudo chef-automate start
     ``` 
 
+## Upgrading with S3 Backup
+
+Here we expect both the versions of Standalone Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version 4.x.
+
+### Pre Backup Configuration for S3 Backup
+
+Follow [Pre Backup COnfiguration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup)
+
+1. Create Backup of Chef Automate Standalone using command:
+    ```bash
+     chef-automate backup create
+    ```
+  - Once the backup is completed successfully, please save the backup Id. Example : `20210622065515`
+
+2. Follow the same [Pre Backup Configuration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup) inorder to restore in the new Automate HA cluster.
+
+3. Stop all the service's at frontend nodes in Automate HA Cluster.
+   Run the below command to all the Automate and Chef Infra Server nodes
+    ``` bash
+      sudo chef-automate stop
+    ``` 
+4. Run the command at Chef-Automate node of Automate HA cluster to get the applied config
+   ```bash
+     sudo chef-automate config show > current_config.toml 
+   ```  
+5. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster :
+    ```bash
+     chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key".
+    ```   
+6. Start the Service in All the Frontend Nodes with below command.
+    ``` bash
+      sudo chef-automate start
+    ```     
