@@ -19,6 +19,7 @@ import { isNull } from 'lodash';
 })
 export class UIComponent implements OnInit, AfterViewChecked {
   showBanner = false;
+  upgradeBanner = false;
   // Feature Flags
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
   experimentalFeatures: Array<Feature> = [
@@ -83,16 +84,16 @@ export class UIComponent implements OnInit, AfterViewChecked {
     const bannerStorage = localStorage.getItem('manual-upgrade-banner');
     if (isNull(bannerStorage)) {
       localStorage.setItem('manual-upgrade-banner', this.booleanToString(true));
-      this.showBanner = true;
+      this.upgradeBanner = true;
     } else {
-      this.showBanner = this.stringToBoolean(bannerStorage);
+      this.upgradeBanner = this.stringToBoolean(bannerStorage);
     }
-    this.showBanner = this.stringToBoolean('false'); // uncomment this line to hide static Banner
+    // this.upgradeBanner = this.stringToBoolean('false'); // uncomment this line to hide static Banner
   }
 
   closeBanner() {
     localStorage.setItem('manual-upgrade-banner', this.booleanToString(false));
-    this.showBanner = false;
+    this.upgradeBanner = false;
   }
 
   private booleanToString(bool: boolean): string {

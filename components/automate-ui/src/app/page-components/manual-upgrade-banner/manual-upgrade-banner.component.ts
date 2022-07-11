@@ -1,0 +1,18 @@
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-manual-upgrade-banner',
+  templateUrl: './manual-upgrade-banner.component.html',
+  styleUrls: ['./manual-upgrade-banner.component.scss']
+})
+export class ManualUpgradeBannerComponent implements OnInit {
+    showManualUpgradeContent = true;
+    @Output() close = new EventEmitter();
+    constructor() { }
+
+    ngOnInit(): void {
+    }
+    closeEvent() {
+        this.close.emit();
+    }
+}

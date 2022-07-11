@@ -52,9 +52,15 @@ export class AppConfigService {
   public loadAppConfig() {
     return new HttpClient(this.handler).get('/custom_settings.js')
       .toPromise()
-      .then((data: any) => this.appConfig = data)
+      .then((data: any) => {
+        console.log("Hello: ", data)
+        return this.appConfig = data
+      })
       // when there is no config, we can just reset the config to its initial empty values
-      .catch(_error => this.appConfig = initialConfig);
+      .catch(error => {
+        console.log("Error: ", error)
+        return this.appConfig = initialConfig
+      });
   }
 
   get showBanner(): boolean {
