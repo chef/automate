@@ -6,7 +6,6 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./manual-upgrade-banner.component.scss']
 })
 export class ManualUpgradeBannerComponent implements OnInit {
-    showManualUpgradeContent = true;
     @Output() close = new EventEmitter();
     constructor() { }
 
