@@ -765,3 +765,46 @@ func TestGetControlSummaryForControlList(t *testing.T) {
 	assert.Equal(t, controlSummary.Failed.Total, controlSummaryActual.Failed.Total)
 	assert.Equal(t, controlSummary.Skipped.Total, controlSummaryActual.Skipped.Total)
 }
+
+func TestSetControlSummaryIntoControlList(t *testing.T) {
+
+	controlListItems := make([]*reportingapi.ControlItem, 0)
+	contListItem := &reportingapi.ControlItem{
+		Id: "Control1",
+	}
+	controlListItems = append(controlListItems, contListItem)
+
+	controlSummaryMap := make(map[string]*reportingapi.ControlSummary)
+
+	controlSummaryMap["Control1"] = &reportingapi.ControlSummary{
+		Passed: &reportingapi.Total{Total: 8},
+	}
+	setControlSummaryForControlItems(controlListItems, controlSummaryMap)
+	assert.Equal(t, controlListItems[0].ControlSummary.Passed.Total, int32(8))
+}
+
+func TestBoolQueriesForControlItems(t *testing.T) {
+
+	tests := []struct {
+		name       string
+		wantErr    error
+		want       string
+		controlIds []string
+		filters    map[string][]string
+	}{{
+		name:       "TestWIllStartTimeAndEndTimeFilter",
+		wantErr:    nil,
+		want:       `{"bool":{"must":[{"range":{"end_time":{"from":"2022-07-11T00:00:00Z","include_lower":true,"include_upper":true,"to":"2022-07-11T23:59:59Z"}}},{"terms":{"control_id":["Test1","Test2"]}}]}}`,
+		controlIds: []string{"Test1", "Test2"},
+		filters:    map[string][]string{"end_time": []string{"2022-07-11T23:59:59Z"}, "start_time": []string{"2022-07-11T00:00:00Z"}},
+	},}
+
+	for _, tt := range tests {
+
+		boolQuery := getControlSummaryFilters(tt.controlIds, tt.filters)
+		src, _ := boolQuery.Source()
+		data, _ := json.Marshal(src)
+
+		assert.Equal(t, string(data), tt.want)
+	}
+}
