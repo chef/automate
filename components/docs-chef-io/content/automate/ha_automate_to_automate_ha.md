@@ -119,9 +119,9 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
 
 ### Backup Configuration for S3 Backup
 
-Follow [Backup COnfiguration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup)
+Follow [Backup Configuration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup)
 
-Taking Backup 
+### Taking Backup 
 
 1. Create Backup of Chef Automate Standalone using command:
     ```bash
