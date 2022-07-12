@@ -2107,7 +2107,11 @@ func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context
 				controlSummary = getControlSummaryResult(nodesBuckets)
 			}
 
-			id, _ := bucket.Key.(string)
+			id, ok := bucket.Key.(string)
+			if !ok {
+				logrus.Errorf("Unable to find id for the control in new index structure %v", err)
+				continue
+			}
 			controlSummaryMap[id] = controlSummary
 		}
 	}
