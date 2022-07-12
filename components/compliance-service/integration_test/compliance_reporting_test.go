@@ -9,10 +9,21 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	"github.com/chef/automate/components/compliance-service/migrations"
 	"github.com/olivere/elastic/v7"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
+
+func TestMarkDayLatestToFalse(t *testing.T) {
+	// index := "comp-1*"
+	suit := NewGlobalSuite()
+	require.NotNil(t, suit)
+	nodes, err := migrations.GetNodesDayLatestTrue(suit.elasticClient, context.Background())
+	require.NoError(t, err)
+	require.NotEmpty(t, nodes)
+	require.NotNil(t, nodes)
+}
 
 func TestIngestionPipelineControlIndex(t *testing.T) {
 	index := "comp-1-control*"
