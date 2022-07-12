@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Params} from '@angular/router';
+import { Params } from '@angular/router';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
@@ -94,7 +94,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
           this.policyGroupsTab = true;
         }
       });
-      if(this.redirect == 'cookbook') {
+      if (this.redirect === 'cookbook') {
         this.resetTabs();
         this.cookbooksTab = true;
       }
