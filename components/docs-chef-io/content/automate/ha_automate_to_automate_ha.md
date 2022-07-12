@@ -131,6 +131,8 @@ Follow [Backup Configuration for S3 Backup](https://docs.chef.io/automate/ha_bac
 
 2. Follow the same [Backup Configuration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup) inorder to restore in the new Automate HA cluster.
 
+{{< note >}} While Configuring S3 bucket, make sure to configure same S3 bucket which is used in Automate
+
 3. Stop all the service's at frontend nodes in Automate HA Cluster.
    Run the below command to all the Automate and Chef Infra Server nodes
     ``` bash
@@ -144,17 +146,26 @@ Follow [Backup Configuration for S3 Backup](https://docs.chef.io/automate/ha_bac
     ```bash
      chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key" --s3-secret-key "Secret_Key".
     ```   
+  In --airgap-bundle argument, replace  /var/tmp/frontend-4.x.y.aib with an appropriate bundle available inside /var/tmp folder. 
+
 6. Start the Service in All the Frontend Nodes with below command.
     ``` bash
       sudo chef-automate start
     ```     
 ## TroubleShooting with Backup and Restore
 
-Post Restore from S3 Backup, if any service like Ingest, Event-feed, Compliance service which communicates to OpenSearch fails, if getting 401 or 403 error, it means Base Path is given incorrect.
+In case of Restore Failure, grep the logs from the same automate machine where we triggered the restore command.
+  ``` bash
+    journalctl -f -u chef-automate | grep <SERVICE_NAME>
+  ```
+If error logs has a response code of 401(unauthorized), automate-es-gateway is not able to communicate with OpenSearch. We can add the credentials and patch in the config.
+ 
+If error logs shows Failed to locate snapshot for event-feed-service. We can use the same base_path in both automate and OpenSearch of Automate HA config.
 
-We need to use the same basepath in both Postgres and OpenSearch of Automate HA
 
-1. Login to One of Automate Front End Nodes
+1. From the Bastion Machine, apply the new config to all Nodes
+
+{{< note >}} Make sure to start all Front End Nodes before applying new config.
 
 2. Redirect the whole config into new file, using the following command
   ```bash
