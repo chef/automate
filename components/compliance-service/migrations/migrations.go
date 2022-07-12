@@ -3,7 +3,6 @@ package migrations
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"time"
 
 	"github.com/olivere/elastic/v7"
@@ -50,8 +49,7 @@ func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node,
 	if err != nil {
 		return nil, err
 	}
-	by, _ := json.Marshal(searchResult)
-	ioutil.WriteFile("abc.json", by, 0777)
+
 	if searchResult.TotalHits() > 0 {
 		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 		// Iterate through results
