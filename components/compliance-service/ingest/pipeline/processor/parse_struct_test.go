@@ -11,6 +11,7 @@ const (
 	UUID  = "efd46e48-5751-40a2-a705-1182356908c1"
 	ID    = "3q09ru4orbfer k vfksd "
 	Title = "some different tile"
+	Env   = "Test Env"
 )
 
 func TestMapStructs(t *testing.T) {
@@ -40,7 +41,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Environment: "Test Env",
+					Environment: Env,
 					Profiles: []relaxting.ESInSpecReportProfile{
 						{
 							Name: "",
@@ -105,7 +106,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Environment: "Test Env",
+					Environment: Env,
 					Profiles: []relaxting.ESInSpecReportProfile{
 						{
 							Name: "",
@@ -128,14 +129,14 @@ func TestMapStructs(t *testing.T) {
 			want: []relaxting.Control{
 				{
 					ControlID:   ID,
-					Title:       "some different tile",
+					Title:       Title,
 					WaivedStr:   "yes",
 					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
 					Impact:      0,
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "waived",
-					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID, Environment: "Test Env"}},
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID, Environment: Env}},
 					Profile:     relaxting.Profile{ProfileID: ""},
 				},
 			},
@@ -150,7 +151,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Environment: "Test Env",
+					Environment: Env,
 					Profiles: []relaxting.ESInSpecReportProfile{
 						{
 							Name: "",
@@ -173,14 +174,14 @@ func TestMapStructs(t *testing.T) {
 			want: []relaxting.Control{
 				{
 					ControlID:   ID,
-					Title:       "some different tile",
+					Title:       Title,
 					WaivedStr:   "yes",
 					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
 					Impact:      0,
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "waived",
-					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID, Environment: "Test Env"}},
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID, Environment: Env}},
 					Profile:     relaxting.Profile{ProfileID: ""},
 				},
 			},
@@ -217,7 +218,7 @@ func TestMapStructs(t *testing.T) {
 			want: []relaxting.Control{
 				{
 					ControlID:   ID,
-					Title:       "some different tile",
+					Title:       Title,
 					WaivedStr:   "yes",
 					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
 					Impact:      0,
