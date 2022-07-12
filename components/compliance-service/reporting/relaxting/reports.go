@@ -1037,6 +1037,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	return contListItemList, nil
 }
 
+// setControlSummaryForControlItems applying control summary to control list from the control summary map
 func setControlSummaryForControlItems(contListItems []*reportingapi.ControlItem, controlSummaryMap map[string]*reportingapi.ControlSummary) {
 	for _, controlItem := range contListItems {
 		controlItem.ControlSummary = controlSummaryMap[controlItem.Id]
