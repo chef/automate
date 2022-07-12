@@ -88,6 +88,7 @@ module "s3" {
   aws_s3_bucketName = var.aws_s3_bucketName
   random_id         = module.aws.random_id
   tags              = var.tag_name
+  destroy_bucket    = var.destroy_bucket
 }
 
 module "aws-output" {
