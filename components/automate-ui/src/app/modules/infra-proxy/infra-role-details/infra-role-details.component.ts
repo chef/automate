@@ -37,7 +37,6 @@ import { Node, Options } from '../tree-table/models';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { List, ExpandedChildList, Runlist } from 'app/entities/runlists/runlists.model';
 import { AvailableType } from '../infra-roles/infra-roles.component';
-
 export type InfraRoleTabName = 'runList' | 'attributes';
 
 @Component({
@@ -85,7 +84,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public label: string;
   public per_page = 9;
   public selectedAttrs: any;
-
   // precedence levels
   public default_attributes = 'default_attributes';
   public override_attributes = 'override_attributes';
@@ -114,7 +112,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         const [, fragment] = url.split('#');
         this.tabValue = (fragment === 'attributes') ? 'attributes' : 'runList';
       });
-
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
