@@ -3,6 +3,8 @@ package migrations
 import (
 	"context"
 	"encoding/json"
+	"io/ioutil"
+	"time"
 
 	"github.com/olivere/elastic/v7"
 	"github.com/sirupsen/logrus"
@@ -13,6 +15,8 @@ type Node struct {
 	EndTime   string `json:"end_time"`
 	DayLatest bool   `json:"day_latest"`
 }
+
+var setNodes map[string]Node
 
 func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node, error) {
 	var nodes []Node
@@ -46,7 +50,8 @@ func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node,
 	if err != nil {
 		return nil, err
 	}
-
+	by, _ := json.Marshal(searchResult)
+	ioutil.WriteFile("abc.json", by, 0777)
 	if searchResult.TotalHits() > 0 {
 		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 		// Iterate through results
@@ -66,6 +71,44 @@ func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node,
 }
 
 func SetNodesDayLatestFalse(client *elastic.Client, ctx context.Context) error {
+	today := time.Now()
+	nodes, err := GetNodesDayLatestTrue(client, ctx)
+	if err != nil {
+		return nil
+	}
+	for _, node := range nodes {
+		nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
+		if err != nil {
+			logrus.Error("cannot parse")
+		}
+		if nodeEndTime.Before(today) {
+			logrus.Info("Time: ", nodeEndTime)
+			if err = UpdateNodes(client, ctx, node.NodeUUID); err != nil {
+				logrus.Errorf("cannot update for: %+v", err)
+			}
+		}
 
+	}
 	return nil
+}
+
+func UpdateNodes(client *elastic.Client, ctx context.Context, nodeID string) error {
+	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
+	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeID)
+
+	boolQueryDayLatestThisNodeNotThisReport := elastic.NewBoolQuery().
+		Must(termQueryDayLatestTrue).
+		Must(termQueryThisNode)
+
+	script := elastic.NewScript("ctx._source.day_latest = false")
+
+	// Updating in all the Indices
+	_, err := elastic.NewUpdateByQueryService(client).
+		Index("comp-7*").
+		Query(boolQueryDayLatestThisNodeNotThisReport).
+		Script(script).
+		Refresh("false").
+		Do(ctx)
+
+	return err
 }

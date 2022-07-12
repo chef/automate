@@ -16,13 +16,16 @@ import (
 )
 
 func TestMarkDayLatestToFalse(t *testing.T) {
-	// index := "comp-1*"
 	suit := NewGlobalSuite()
 	require.NotNil(t, suit)
+
 	nodes, err := migrations.GetNodesDayLatestTrue(suit.elasticClient, context.Background())
 	require.NoError(t, err)
 	require.NotEmpty(t, nodes)
 	require.NotNil(t, nodes)
+
+	err = migrations.SetNodesDayLatestFalse(suit.elasticClient, context.Background())
+	require.NoError(t, err) 
 }
 
 func TestIngestionPipelineControlIndex(t *testing.T) {
