@@ -146,3 +146,26 @@ Follow [Pre Backup COnfiguration for S3 Backup](https://docs.chef.io/automate/ha
     ``` bash
       sudo chef-automate start
     ```     
+## TroubleShooting with Backup and Restore
+
+Post Restore from S3 Backup, if any service is failing
+
+We need to use the same basepath in both Postgres and OpenSearch of Automate HA
+
+1. Login to One of Automate Front End Nodes
+
+2. Redirect the whole config into new file, using the following command
+  ```bash
+    chef-automate config show > new_config.toml
+  ```
+3. Update New config file
+  ```bash
+    vim new_config.toml
+  ```
+   Modify the .toml file by changing both OpenSearch and Postgres base_path , which we gave in Automate
+
+4. To set the new config,Run the following command   
+  ```bash
+   chef-automate config set new_config.toml
+  ```
+Re-run the Restore Command  
