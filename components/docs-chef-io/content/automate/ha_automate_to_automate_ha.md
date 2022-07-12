@@ -117,9 +117,11 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
 
 Here we expect both the versions of Standalone Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version 4.x.
 
-### Pre Backup Configuration for S3 Backup
+### Backup Configuration for S3 Backup
 
-Follow [Pre Backup COnfiguration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup)
+Follow [Backup COnfiguration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup)
+
+Taking Backup 
 
 1. Create Backup of Chef Automate Standalone using command:
     ```bash
@@ -127,7 +129,7 @@ Follow [Pre Backup COnfiguration for S3 Backup](https://docs.chef.io/automate/ha
     ```
   - Once the backup is completed successfully, please save the backup Id. Example : `20210622065515`
 
-2. Follow the same [Pre Backup Configuration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup) inorder to restore in the new Automate HA cluster.
+2. Follow the same [Backup Configuration for S3 Backup](https://docs.chef.io/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-s3-backup) inorder to restore in the new Automate HA cluster.
 
 3. Stop all the service's at frontend nodes in Automate HA Cluster.
    Run the below command to all the Automate and Chef Infra Server nodes
@@ -148,7 +150,7 @@ Follow [Pre Backup COnfiguration for S3 Backup](https://docs.chef.io/automate/ha
     ```     
 ## TroubleShooting with Backup and Restore
 
-Post Restore from S3 Backup, if any service is failing
+Post Restore from S3 Backup, if any service like Ingest, Event-feed, Compliance service which communicates to OpenSearch fails, if getting 401 or 403 error, it means Base Path is given incorrect.
 
 We need to use the same basepath in both Postgres and OpenSearch of Automate HA
 
