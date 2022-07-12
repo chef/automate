@@ -1136,6 +1136,7 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 	return nil, errorutils.ProcessNotFound(nil, reportID)
 }
 
+// getControlItem returns one control from the control list results
 func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem, id string) (reportingapi.ControlItem, error) {
 	contListItem := reportingapi.ControlItem{}
 
@@ -1201,6 +1202,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 	return contListItem, nil
 }
 
+//getProfileMinForControlItem is parsing the  control title form the result of control list from comp-7-r-*
 func getTitleForControlItem(controlBucket *elastic.AggregationBucketKeyItem) string {
 	var title string
 	var ok bool
@@ -1217,6 +1219,7 @@ func getTitleForControlItem(controlBucket *elastic.AggregationBucketKeyItem) str
 
 }
 
+//getEndTimeForControlItem is parsing the end time form the result of control list from comp-7-r-*
 func getEndTimeForControlItem(controlBucket *elastic.AggregationBucketKeyItem) (*timestamppb.Timestamp, error) {
 	var timestamp *timestamppb.Timestamp
 
@@ -1237,6 +1240,7 @@ func getEndTimeForControlItem(controlBucket *elastic.AggregationBucketKeyItem) (
 	return timestamp, nil
 }
 
+//getProfileMinForControlItem is parsing the profile id,title and version form the result of control list from comp-7-r-*
 func getProfileMinForControlItem(controlBucket *elastic.AggregationBucketKeyItem, profileMin *reportingapi.ProfileMin) {
 	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
 		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
@@ -2028,6 +2032,7 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 	return searchResult, queryInfo, nil
 }
 
+// getControlSummaryFromControlIndex is constructing query for getting control summary for various filters and returning the result in a map
 func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId []string, filters map[string][]string, esIndex string, size int32) (map[string]*reportingapi.ControlSummary, error) {
 	nodeStatus := "nodes.status"
 	controlSummaryMap := make(map[string]*reportingapi.ControlSummary)
@@ -2109,6 +2114,7 @@ func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context
 
 }
 
+// getControlSummaryResult gets the result from the summary query from index comp-1-control-*
 func getControlSummaryResult(nodesBucket *elastic.AggregationSingleBucket) (controlSummary *reportingapi.ControlSummary) {
 	controlSummary = &reportingapi.ControlSummary{
 		Passed:  &reportingapi.Total{},
@@ -2135,6 +2141,7 @@ func getControlSummaryResult(nodesBucket *elastic.AggregationSingleBucket) (cont
 
 }
 
+// getControlSummaryFilters is applying filters to the query for index comp-1-control-*
 func getControlSummaryFilters(controlId []string, filters map[string][]string) *elastic.BoolQuery {
 
 	boolQuery := elastic.NewBoolQuery()
