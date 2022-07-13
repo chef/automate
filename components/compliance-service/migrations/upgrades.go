@@ -24,6 +24,7 @@ Select upgrade_value from upgrade_flags where upgrade_flag='day_latest'; `
 const UpdateQueryForDayLatest = `
 Update upgrade_flags set upgrade_value=true where upgrade_flag='day_latest';`
 
+//PollForUpgradeFlagDayLatest checks for the day latest flag value in upgrade flags
 func (u *Upgrades) PollForUpgradeFlagDayLatest() error {
 	var status bool
 	err := u.DB.QueryRow(getUpgradeValueForDayLatest).Scan(&status)
@@ -43,6 +44,7 @@ func (u *Upgrades) PollForUpgradeFlagDayLatest() error {
 	return nil
 }
 
+//UpdateDayLatestFlagToTrue updates the day latest flags to true
 func (u *Upgrades) UpdateDayLatestFlagToTrue() error {
 	_, err := u.DB.Exec(UpdateQueryForDayLatest)
 	if err != nil {
