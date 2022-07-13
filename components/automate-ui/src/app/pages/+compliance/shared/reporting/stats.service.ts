@@ -176,7 +176,7 @@ export class StatsService {
 
   getStatsProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/profiles`;
-
+    reportQuery.startDate = reportQuery.endDate.clone().subtract(0,'days');
     const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
 
