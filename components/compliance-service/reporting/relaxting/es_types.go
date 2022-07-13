@@ -332,3 +332,9 @@ type Node struct {
 type Profile struct {
 	ProfileID string `json:"profile_id"`
 }
+
+type NodesUpgradation struct {
+	NodeUUID  string `json:"node_uuid"`
+	EndTime   string `json:"end_time"`
+	DayLatest bool   `json:"day_latest"`
+}
