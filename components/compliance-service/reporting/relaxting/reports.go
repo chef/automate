@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 	"sort"
 	"strconv"
@@ -800,6 +801,8 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
 
+	controlListIds := make([]string, 0)
+
 	controlSummaryTotals := &reportingapi.ControlSummary{
 		Passed:  &reportingapi.Total{},
 		Skipped: &reportingapi.Total{},
@@ -813,6 +816,11 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		return nil, err
 	}
 	esIndex, err := GetEsIndex(filters, false)
+	if err != nil {
+		return nil, errors.Wrap(err, myName)
+	}
+
+	controlIndex, err := getControlIndex(filters)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
@@ -965,7 +973,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s unable to get Source", myName)
+		return nil, errors.Wrapf(err, "%s Unable to get control items", myName)
 	}
 	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", myName))
 
@@ -1000,13 +1008,19 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 					if totalWaivedControls, found := filteredControls.Aggregations.Filter("waived_total"); found {
 						controlSummaryTotals.Waived.Total = int32(totalWaivedControls.DocCount)
 					}
+
 					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
 						start, end := paginate(int(pageNumber), int(size), len(controlBuckets.Buckets))
 						for _, controlBucket := range controlBuckets.Buckets[start:end] {
-							contListItem, err := backend.getControlItem(controlBucket)
+							id, ok := controlBucket.Key.(string)
+							if !ok {
+								logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
+							}
+							contListItem, err := backend.getControlItem(controlBucket, id)
 							if err != nil {
 								return nil, err
 							}
+							controlListIds = append(controlListIds, id)
 							contListItems = append(contListItems, &contListItem)
 						}
 					}
@@ -1014,9 +1028,20 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 			}
 		}
 	}
-
+	controlSummaryMap, err := backend.getControlSummaryFromControlIndex(ctx, controlListIds, filters, controlIndex, size)
+	if err != nil {
+		logrus.Errorf("Unable to fetch the nodes status for controls with error %v", err)
+	}
+	setControlSummaryForControlItems(contListItems, controlSummaryMap)
 	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems, ControlSummaryTotals: controlSummaryTotals}
 	return contListItemList, nil
+}
+
+// setControlSummaryForControlItems applying control summary to control list from the control summary map
+func setControlSummaryForControlItems(contListItems []*reportingapi.ControlItem, controlSummaryMap map[string]*reportingapi.ControlSummary) {
+	for _, controlItem := range contListItems {
+		controlItem.ControlSummary = controlSummaryMap[controlItem.Id]
+	}
 }
 
 // GetNodeControlListItems returns the paginated control list response.
@@ -1112,28 +1137,19 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 	return nil, errorutils.ProcessNotFound(nil, reportID)
 }
 
-func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem) (reportingapi.ControlItem, error) {
+// getControlItem returns one control from the control list results
+func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem, id string) (reportingapi.ControlItem, error) {
 	contListItem := reportingapi.ControlItem{}
-	id, ok := controlBucket.Key.(string)
-	if !ok {
-		logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
-	}
+
 	contListItem.Id = id
-	controlSummary := &reportingapi.ControlSummary{
+	/*controlSummary := &reportingapi.ControlSummary{
 		Passed:  &reportingapi.Total{},
 		Skipped: &reportingapi.Total{},
 		Failed:  &reportingapi.Failed{},
 		Waived:  &reportingapi.Total{},
-	}
-	if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
-		//there can only be one
-		bucket := aggResult.Buckets[0]
-		title, ok := bucket.Key.(string)
-		if !ok {
-			logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
-		}
-		contListItem.Title = title
-	}
+	}*/
+
+	contListItem.Title = getTitleForControlItem(controlBucket)
 	if impactAggResult, found := controlBucket.Aggregations.Terms("impact"); found {
 		//there can only be one
 		impactBucket := impactAggResult.Buckets[0]
@@ -1142,9 +1158,91 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 			logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
 		}
 		contListItem.Impact = float32(impactAsNumber)
-		controlSummary.Total = int32(impactBucket.DocCount)
+		//controlSummary.Total = int32(impactBucket.DocCount)
 	}
 	profileMin := &reportingapi.ProfileMin{}
+	getProfileMinForControlItem(controlBucket, profileMin)
+	contListItem.Profile = profileMin
+
+	endTime, err := getEndTimeForControlItem(controlBucket)
+	if err != nil {
+		return reportingapi.ControlItem{}, errors.Wrapf(err, " time error:")
+	}
+	contListItem.EndTime = endTime
+	/*if waived, found := controlBucket.Aggregations.Filter("waived"); found {
+		controlSummary.Waived.Total = int32(waived.DocCount)
+	}
+	if passed, found := controlBucket.Aggregations.Filter("passed"); found {
+		controlSummary.Passed.Total = int32(passed.DocCount)
+	}
+	if skipped, found := controlBucket.Aggregations.Filter("skipped"); found {
+		controlSummary.Skipped.Total = int32(skipped.DocCount)
+	}*/
+	/*if failed, found := controlBucket.Aggregations.Filter("failed"); found {
+		total := int32(failed.DocCount)
+		controlSummary.Failed.Total = total
+		if contListItem.Impact < 0.4 {
+			controlSummary.Failed.Minor = total
+		} else if contListItem.Impact < 0.7 {
+			controlSummary.Failed.Major = total
+		} else {
+			controlSummary.Failed.Critical = total
+		}
+	}*/
+
+	if filteredWaivedStr, found := controlBucket.Aggregations.Filter("filtered_waived_str"); found {
+		if waivedStrBuckets, found := filteredWaivedStr.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
+			contListItem.Waivers, err = backend.getWaiverData(waivedStrBuckets)
+			if err != nil {
+				return contListItem, err
+			}
+		}
+	}
+
+	//contListItem.ControlSummary = controlSummary
+	return contListItem, nil
+}
+
+//getProfileMinForControlItem is parsing the  control title form the result of control list from comp-7-r-*
+func getTitleForControlItem(controlBucket *elastic.AggregationBucketKeyItem) string {
+	var title string
+	var ok bool
+	if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
+		//there can only be one
+		bucket := aggResult.Buckets[0]
+		title, ok = bucket.Key.(string)
+		if !ok {
+			logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
+		}
+	}
+
+	return title
+
+}
+
+//getEndTimeForControlItem is parsing the end time form the result of control list from comp-7-r-*
+func getEndTimeForControlItem(controlBucket *elastic.AggregationBucketKeyItem) (*timestamppb.Timestamp, error) {
+	var timestamp *timestamppb.Timestamp
+
+	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
+		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
+			endTime := result.Buckets[0]
+			name := endTime.KeyAsString
+			endTimeAsTime, err := time.Parse(time.RFC3339, *name)
+			if err != nil {
+				return nil, errors.Wrapf(err, "%s time error: ", *name)
+			}
+			timestamp, err = ptypes.TimestampProto(endTimeAsTime)
+			if err != nil {
+				return nil, errors.Wrapf(err, "%s time error: ", *name)
+			}
+		}
+	}
+	return timestamp, nil
+}
+
+//getProfileMinForControlItem is parsing the profile id,title and version form the result of control list from comp-7-r-*
+func getProfileMinForControlItem(controlBucket *elastic.AggregationBucketKeyItem, profileMin *reportingapi.ProfileMin) {
 	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
 		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
 			sha := result.Buckets[0]
@@ -1159,58 +1257,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 			profileMin.Version = version.Key.(string)
 		}
 	}
-	contListItem.Profile = profileMin
 
-	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
-		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
-			endTime := result.Buckets[0]
-			name := endTime.KeyAsString
-
-			endTimeAsTime, err := time.Parse(time.RFC3339, *name)
-			if err != nil {
-				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
-			}
-
-			timestamp, err := ptypes.TimestampProto(endTimeAsTime)
-			if err != nil {
-				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
-			} else {
-				contListItem.EndTime = timestamp
-			}
-		}
-	}
-	if waived, found := controlBucket.Aggregations.Filter("waived"); found {
-		controlSummary.Waived.Total = int32(waived.DocCount)
-	}
-	if passed, found := controlBucket.Aggregations.Filter("passed"); found {
-		controlSummary.Passed.Total = int32(passed.DocCount)
-	}
-	if skipped, found := controlBucket.Aggregations.Filter("skipped"); found {
-		controlSummary.Skipped.Total = int32(skipped.DocCount)
-	}
-	if failed, found := controlBucket.Aggregations.Filter("failed"); found {
-		total := int32(failed.DocCount)
-		controlSummary.Failed.Total = total
-		if contListItem.Impact < 0.4 {
-			controlSummary.Failed.Minor = total
-		} else if contListItem.Impact < 0.7 {
-			controlSummary.Failed.Major = total
-		} else {
-			controlSummary.Failed.Critical = total
-		}
-	}
-
-	if filteredWaivedStr, found := controlBucket.Aggregations.Filter("filtered_waived_str"); found {
-		if waivedStrBuckets, found := filteredWaivedStr.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
-			contListItem.Waivers, err = backend.getWaiverData(waivedStrBuckets)
-			if err != nil {
-				return contListItem, err
-			}
-		}
-	}
-
-	contListItem.ControlSummary = controlSummary
-	return contListItem, nil
 }
 
 func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationBucketKeyItems) ([]*reportingapi.WaiverData, error) {
@@ -1984,6 +2031,146 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 		searchResult.TookInMillis)
 
 	return searchResult, queryInfo, nil
+}
+
+// getControlSummaryFromControlIndex is constructing query for getting control summary for various filters and returning the result in a map
+func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId []string, filters map[string][]string, esIndex string, size int32) (map[string]*reportingapi.ControlSummary, error) {
+	nodeStatus := "nodes.status"
+	controlSummaryMap := make(map[string]*reportingapi.ControlSummary)
+	client, err := backend.ES2Client()
+	if err != nil {
+		return nil, err
+	}
+	boolQuery := getControlSummaryFilters(controlId, filters)
+
+	filterQuery := elastic.NewBoolQuery()
+
+	searchSource := elastic.NewSearchSource().
+		Query(boolQuery).
+		FetchSource(false).Size(1)
+
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery(nodeStatus, "passed")))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery(nodeStatus, "failed")))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery(nodeStatus, "skipped")))
+
+	setFlags, err := filterQueryChange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		logrus.Errorf("Unable to fetch details for flags %v", err)
+	}
+	for _, flag := range setFlags {
+		termQuery := elastic.NewTermsQuery("nodes."+flag, true)
+		filterQuery = filterQuery.Must(termQuery)
+	}
+
+	filterAggregationForLatestRecord := elastic.NewFilterAggregation().Filter(filterQuery).
+		SubAggregation("failed", failedFilter).
+		SubAggregation("passed", passedFilter).
+		SubAggregation("skipped", skippedFilter)
+
+	subAggregationNodes := elastic.NewNestedAggregation().Path("nodes").SubAggregation("status", filterAggregationForLatestRecord)
+
+	//waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+
+	controlTermsAggregation := elastic.NewTermsAggregation().Field("control_id").SubAggregation("nodes", subAggregationNodes).Size(int(size))
+
+	searchSource.Aggregation("controls", controlTermsAggregation)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrapf(err, "%s unable to get Source", "ControlSummary")
+	}
+	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", "ControlSummary"))
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if controlBuckets, found := searchResult.Aggregations.Terms("controls"); found && len(controlBuckets.Buckets) > 0 {
+		for _, bucket := range controlBuckets.Buckets {
+			controlSummary := &reportingapi.ControlSummary{
+				Passed:  &reportingapi.Total{},
+				Skipped: &reportingapi.Total{},
+				Failed:  &reportingapi.Failed{},
+				Waived:  &reportingapi.Total{},
+			}
+			if nodesBuckets, found := bucket.Aggregations.Nested("nodes"); found {
+				controlSummary = getControlSummaryResult(nodesBuckets)
+			}
+
+			id, ok := bucket.Key.(string)
+			if !ok {
+				logrus.Errorf("Unable to find id for the control in new index structure %v", err)
+				continue
+			}
+			controlSummaryMap[id] = controlSummary
+		}
+	}
+	return controlSummaryMap, nil
+
+}
+
+// getControlSummaryResult gets the result from the summary query from index comp-1-control-*
+func getControlSummaryResult(nodesBucket *elastic.AggregationSingleBucket) (controlSummary *reportingapi.ControlSummary) {
+	controlSummary = &reportingapi.ControlSummary{
+		Passed:  &reportingapi.Total{},
+		Skipped: &reportingapi.Total{},
+		Failed:  &reportingapi.Failed{},
+		Waived:  &reportingapi.Total{},
+	}
+
+	if status, found := nodesBucket.Aggregations.Filter("status"); found {
+		if failed, found := status.Aggregations.Filter("failed"); found {
+			controlSummary.Failed.Total = int32(failed.DocCount)
+		}
+
+		if passed, found := status.Aggregations.Filter("passed"); found {
+			controlSummary.Passed.Total = int32(passed.DocCount)
+		}
+
+		if skipped, found := status.Aggregations.Filter("skipped"); found {
+			controlSummary.Skipped.Total = int32(skipped.DocCount)
+		}
+	}
+
+	return controlSummary
+
+}
+
+// getControlSummaryFilters is applying filters to the query for index comp-1-control-*
+func getControlSummaryFilters(controlId []string, filters map[string][]string) *elastic.BoolQuery {
+
+	boolQuery := elastic.NewBoolQuery()
+
+	controlTermsQuery := elastic.NewTermsQueryFromStrings("control_id", controlId...)
+
+	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
+		endTime := firstOrEmpty(filters["end_time"])
+		startTime := firstOrEmpty(filters["start_time"])
+		timeRangeQuery := elastic.NewRangeQuery("end_time")
+		if len(startTime) > 0 {
+			timeRangeQuery.Gte(startTime)
+		}
+		if len(endTime) > 0 {
+			timeRangeQuery.Lte(endTime)
+		}
+
+		boolQuery = boolQuery.Must(timeRangeQuery)
+	}
+
+	controlQuery := boolQuery.Must(controlTermsQuery)
+
+	return controlQuery
+
 }
 
 func filterQueryChange(endTime string, startTime string) ([]string, error) {

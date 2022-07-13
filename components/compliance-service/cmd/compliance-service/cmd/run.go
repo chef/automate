@@ -64,7 +64,7 @@ var conf = config.Compliance{
 		Endpoint: "127.0.0.1:10152",
 	},
 	CerealConfig: config.CerealConfig{
-		Workers: 2,
+		Workers: 5,
 	},
 }
 
