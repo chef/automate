@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -1073,6 +1074,8 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context) ([]relaxting
 		return nil, err
 	}
 
+	indicesSlice := strings.Split(indices, ",")
+
 	boolQuery := elastic.NewBoolQuery().
 		Must(elastic.NewTermQuery("day_latest", true)).
 		Must(elastic.NewTermQuery("daily_latest", true))
@@ -1088,40 +1091,45 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context) ([]relaxting
 		Query(boolQuery).
 		Size(10000).Sort("end_time", false)
 
-	searchResult, err := backend.client.Search().
-		SearchSource(searchSource).
-		Index(indices).
-		FilterPath(
-			"took",
-			"hits.total",
-			"hits.hits._id",
-			"hits.hits._source",
-			"hits.hits.inner_hits").
-		Do(ctx)
+	for _, indx := range indicesSlice {
+		searchResult, err := backend.client.Search().
+			SearchSource(searchSource).
+			Index(indx).
+			FilterPath(
+				"took",
+				"hits.total",
+				"hits.hits._id",
+				"hits.hits._source",
+				"hits.hits.inner_hits").
+			Do(ctx)
 
-	if err != nil {
-		return nil, err
-	}
+		if err != nil {
+			return nil, err
+		}
 
-	if searchResult.TotalHits() > 0 {
-		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
-		// Iterate through results
-		for _, hit := range searchResult.Hits.Hits {
-			var node relaxting.NodesUpgradation
-			if hit.Source != nil {
-				err := json.Unmarshal(hit.Source, &node)
-				if err != nil {
-					logrus.Errorf("Received error while unmarshling %+v", err)
+		if searchResult.TotalHits() > 0 {
+			logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
+			// Iterate through results
+			for _, hit := range searchResult.Hits.Hits {
+				var node relaxting.NodesUpgradation
+				if hit.Source != nil {
+					err := json.Unmarshal(hit.Source, &node)
+					if err != nil {
+						logrus.Errorf("Received error while unmarshling %+v", err)
+					}
+
 				}
-
+				nodes = append(nodes, node)
 			}
-			nodes = append(nodes, node)
 		}
 	}
+
 	return nodes, nil
 }
 
 func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
+	bulkRequest := backend.client.Bulk()
+	script := elastic.NewScript("ctx._source.day_latest = false")
 	nodes, err := backend.GetNodesDayLatestTrue(ctx)
 	if err != nil {
 		return nil
@@ -1131,41 +1139,28 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 		if err != nil {
 			logrus.Error("cannot parse: ", err)
 		}
-		nodeStarttime := nodeEndTime.Add(-24 * time.Hour * 90)
+		nodeStarttime := time.Now().Add(-24 * time.Hour * 90)
 		indices, err := GetLast90DaysIndices(nodeStarttime, nodeEndTime.Add(-24*time.Hour))
 		if err != nil {
 			logrus.Error("cannot get indices:", err)
 		}
 
-		if err = backend.UpdateNodes(ctx, indices, node.NodeUUID); err != nil {
-			logrus.Error("cannot update the indices:", err)
-		}
-
+		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
+			Index(indices).
+			Script(script))
 	}
+	approxBytes := bulkRequest.EstimatedSizeInBytes()
+	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
+	if err != nil {
+		logrus.Errorf("Unable to send the request in bulk: %v", err)
+		return err
+	}
+	if bulkResponse == nil {
+		logrus.Errorf("Unable to fetch the response of bulk request: %v", err)
+		return err
+	}
+	logrus.Debugf("Bulk insert %d summaries, ~size %dB, took %dms", len(nodes), approxBytes, bulkResponse.Took)
 	return nil
-}
-
-func (backend *ESClient) UpdateNodes(ctx context.Context, indices, nodeID string) error {
-	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
-	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeID)
-	termQueryDailyLatest := elastic.NewTermQuery("daily_latest", true)
-
-	boolQueryDayLatestThisNodeNotThisReport := elastic.NewBoolQuery().
-		Must(termQueryDayLatestTrue).
-		Must(termQueryThisNode).
-		Must(termQueryDailyLatest)
-
-	script := elastic.NewScript("ctx._source.day_latest = false")
-
-	// Updating in all the Indices
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(indices).
-		Query(boolQueryDayLatestThisNodeNotThisReport).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-
-	return err
 }
 
 func GetLast90DaysIndices(startTime, endTime time.Time) (string, error) {
