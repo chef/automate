@@ -167,6 +167,7 @@ export class StatsService {
 
   getControls(reportQuery: ReportQuery): Observable<{total: any, items: any}> {
     const url = `${CC_API_URL}/reporting/controls`;
+    reportQuery.startDate = reportQuery.endDate.clone().subtract(0,'days');
     const filters = this.formatFilters(reportQuery);
     const body = { filters };
 
@@ -176,7 +177,6 @@ export class StatsService {
 
   getStatsProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/profiles`;
-    reportQuery.startDate = reportQuery.endDate.clone().subtract(0,'days');
     const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
 
