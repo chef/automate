@@ -152,8 +152,8 @@ export class StatsService {
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/profiles`;
     let formatted = this.formatFilters(reportQuery);
-    formatted = this.addStatusParam(formatted);
     formatted= this.addStartDate(reportQuery,formatted);
+    formatted = this.addStatusParam(formatted);
     let body = { filters: formatted };
 
     const {page, perPage} = listParams;
