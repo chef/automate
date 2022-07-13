@@ -1148,10 +1148,12 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 func (backend *ESClient) UpdateNodes(ctx context.Context, indices, nodeID string) error {
 	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
 	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeID)
+	termQueryDailyLatest := elastic.NewTermQuery("daily_latest", true)
 
 	boolQueryDayLatestThisNodeNotThisReport := elastic.NewBoolQuery().
 		Must(termQueryDayLatestTrue).
-		Must(termQueryThisNode)
+		Must(termQueryThisNode).
+		Must(termQueryDailyLatest)
 
 	script := elastic.NewScript("ctx._source.day_latest = false")
 
