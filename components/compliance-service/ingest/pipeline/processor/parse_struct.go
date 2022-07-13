@@ -28,11 +28,22 @@ func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) 
 	nodes := make([]relaxting.Node, 0)
 	// Get the nodes
 	node := relaxting.Node{NodeUUID: inspecReport.NodeID,
-		DailyLatest: inspecReport.DailyLatest,
-		DayLatest:   inspecReport.DayLatest,
-		NodeEndTime: inspecReport.EndTime,
-		Status:      inspecReport.Status,
-		ReportUUID:  inspecReport.ReportID}
+		DailyLatest:      true,
+		DayLatest:        true,
+		NodeEndTime:      inspecReport.EndTime,
+		Status:           inspecReport.Status,
+		ReportUUID:       inspecReport.ReportID,
+		NodeName:         inspecReport.NodeName,
+		Environment:      inspecReport.Environment,
+		PolicyGroup:      inspecReport.PolicyGroup,
+		PolicyName:       inspecReport.PolicyName,
+		Platform:         inspecReport.Platform,
+		Recipes:          inspecReport.Recipes,
+		Roles:            inspecReport.Roles,
+		OrganizationName: inspecReport.OrganizationName,
+		SourceFQDN:       inspecReport.SourceFQDN,
+		ChefTags:         inspecReport.ChefTags,
+	}
 
 	nodes = append(nodes, node)
 
@@ -45,8 +56,8 @@ func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) 
 			ctrl.WaiverData = value2.WaiverData
 			ctrl.Impact = float64(value2.Impact)
 			ctrl.EndTime = inspecReport.EndTime
-			ctrl.DailyLatest = inspecReport.DailyLatest
-			ctrl.DayLatest = inspecReport.DailyLatest
+			ctrl.DailyLatest = true
+			ctrl.DayLatest = true
 			ctrl.StringTags = value2.StringTags
 
 			if checkIfControlWaivedStatus(value2.WaivedStr, value2.WaiverData) {
@@ -55,7 +66,7 @@ func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) 
 				ctrl.Status = value2.Status
 			}
 			ctrl.Nodes = nodes
-			ctrl.Profile = relaxting.Profile{ProfileID: value.Profile}
+			ctrl.Profile = relaxting.Profile{ProfileID: value.Profile, Title: value.Title}
 			controls = append(controls, ctrl)
 		}
 	}
