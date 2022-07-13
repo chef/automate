@@ -1108,7 +1108,6 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context) ([]relaxting
 		}
 
 		if searchResult.TotalHits() > 0 {
-			logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 			// Iterate through results
 			for _, hit := range searchResult.Hits.Hits {
 				var node relaxting.NodesUpgradation
@@ -1147,6 +1146,7 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 
 		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
 			Index(indices).
+			Id(node.NodeUUID).
 			Script(script))
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
