@@ -167,7 +167,7 @@ export class StatsService {
 
   getControls(reportQuery: ReportQuery): Observable<{total: any, items: any}> {
     const url = `${CC_API_URL}/reporting/controls`;
-    reportQuery.startDate = reportQuery.endDate.clone().subtract(0,'days');
+    reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
     const filters = this.formatFilters(reportQuery);
     const body = { filters };
 
