@@ -165,9 +165,8 @@ var ComplianceControlRepData = Mapping{
             },
             "type": "keyword"
           },
-         "job_uuid": {
-            "type": "keyword"
-          },
+=======
+>>>>>>> 4f2904e2c (Adding node status from new control index in control List API (#7235))
           "node_name": {
             "type": "keyword",
             "fields": {
@@ -180,6 +179,152 @@ var ComplianceControlRepData = Mapping{
                 "normalizer": "case_insensitive"
               }
             }
+          },
+          "platform": {
+            "properties": {
+              "name": {
+                "fields": {
+                  "engram": {
+                    "analyzer": "autocomplete",
+                    "type": "text"
+                  },
+                  "lower": {
+                    "normalizer": "case_insensitive",
+                    "type": "keyword"
+                  }
+                },
+                "type": "keyword"
+              },
+              "release": {
+                "fields": {
+                  "engram": {
+                    "analyzer": "autocomplete",
+                    "type": "text"
+                  },
+                  "lower": {
+                    "normalizer": "case_insensitive",
+                    "type": "keyword"
+                  }
+                },
+                "type": "keyword"
+              },
+              "full": {
+                "fields": {
+                  "engram": {
+                    "analyzer": "autocomplete_version_numbers",
+                    "type": "text"
+                  },
+                  "lower": {
+                    "normalizer": "case_insensitive",
+                    "type": "keyword"
+                  }
+                },
+                "type": "keyword"
+              }
+            }
+          },
+          "recipes": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          },
+          "roles": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          },
+          "policy_name": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          },
+          "policy_group": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          },
+          "organization_name": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          },
+          "source_fqdn": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          },
+          "chef_tags": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          },
+          "end_time": {
+            "type": "date"
+          },
+          "status": {
+            "type": "keyword"
+          },
+          "daily_latest": {
+            "type": "boolean"
+          },
+          "day_latest": {
+            "type": "boolean"
           },
           "platform": {
             "properties": {
@@ -340,6 +485,22 @@ var ComplianceControlRepData = Mapping{
           },
           "sha256": {
             "type": "keyword"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "title": {
+            "type": "keyword",
+            "fields": {
+              "engram": {
+                "type": "text",
+                "analyzer": "autocomplete"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            }
           },
           "name": {
             "type": "keyword"
