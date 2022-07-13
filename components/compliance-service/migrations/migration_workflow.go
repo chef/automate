@@ -123,8 +123,12 @@ func (t *GenerateDayLatestMigrationTask) Run(ctx context.Context, task cereal.Ta
 
 	if !job.DayLatestFlag {
 		logrus.Info("Inside the daily Latest Flag")
-		//Todo add the function after calling the correct client
-		//err = SetNodesDayLatestFalse(t.ESClient,ctx)
+
+		err := t.ESClient.SetNodesDayLatestFalse(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not unmarshal GenerateReportParameters")
+		}
+
 		t.Upgrades.UpdateDayLatestFlagToTrue()
 	}
 

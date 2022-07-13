@@ -27,15 +27,14 @@ Update upgrade_flags set upgrade_value=true where upgrade_flag='day_latest';`
 //PollForUpgradeFlagDayLatest checks for the day latest flag value in upgrade flags
 func (u *Upgrades) PollForUpgradeFlagDayLatest() error {
 	var status bool
-	err := u.DB.QueryRow(getUpgradeValueForDayLatest).Scan(&status)
-	if err != nil {
-		return errors.Wrapf(err, "PollForUpgradeFlagDayLatest unable to get current job status")
-	}
-
+	var err error
+	status, err = u.GetDayLatestUpgradeFlagValue()
 	if !status {
-		err = u.cerealManager.EnqueueWorkflow(context.TODO(), MigrationWorkflowName, fmt.Sprintf("%s-%s", MigrationWorkflowName, DayLatestMigrationTaskName), MigrationWorkflowParameters{
-			DayLatestFlag: status,
-		})
+		err = u.cerealManager.EnqueueWorkflow(context.TODO(), MigrationWorkflowName,
+			fmt.Sprintf("%s-%s", MigrationWorkflowName, DayLatestMigrationTaskName),
+			MigrationWorkflowParameters{
+				DayLatestFlag: status,
+			})
 		if err != nil {
 			logrus.Debugf("Unable to Enqueue Workflow for Day Latest Task")
 			return errors.Wrapf(err, "Unable to Enqueue Workflow for Day Latest Task")
@@ -51,4 +50,13 @@ func (u *Upgrades) UpdateDayLatestFlagToTrue() error {
 		return errors.Wrapf(err, "Unable to UpdateDayLatestFlagToTrue")
 	}
 	return nil
+}
+
+func (u *Upgrades) GetDayLatestUpgradeFlagValue() (status bool, err error) {
+	logrus.Info("Inside the get day latest flag")
+	err = u.DB.QueryRow(getUpgradeValueForDayLatest).Scan(&status)
+	if err != nil {
+		return status, errors.Wrapf(err, "PollForUpgradeFlagDayLatest unable to get current job status")
+	}
+	return status, err
 }
