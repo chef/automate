@@ -121,16 +121,12 @@ func (t *GenerateDayLatestMigrationTask) Run(ctx context.Context, task cereal.Ta
 		return nil, err
 	}
 
-	if !job.DayLatestFlag {
-		logrus.Info("Inside the daily Latest Flag")
-
-		err := t.ESClient.SetNodesDayLatestFalse(ctx)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not unmarshal GenerateReportParameters")
-		}
-
-		t.Upgrades.UpdateDayLatestFlagToTrue()
+	logrus.Info("Inside the daily Latest Flag upgrades")
+	err := t.ESClient.SetNodesDayLatestFalse(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not unmarshal GenerateReportParameters")
 	}
+	t.Upgrades.UpdateDayLatestFlagToTrue()
 
 	return &job, nil
 }
