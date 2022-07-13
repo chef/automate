@@ -143,11 +143,17 @@ export class StatsService {
     }
     return filters;
   }
-
+  private addStartDate(reportQuery: ReportQuery,filters): any{
+    if(reportQuery.startDate)
+    {
+      filters.push({ type: 'start_time', values: [moment.utc(reportQuery.endDate).startOf('day')] })
+    }
+  }
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/profiles`;
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
+    formatted= this.addStartDate(reportQuery,formatted);
     let body = { filters: formatted };
 
     const {page, perPage} = listParams;
@@ -167,7 +173,6 @@ export class StatsService {
 
   getControls(reportQuery: ReportQuery): Observable<{total: any, items: any}> {
     const url = `${CC_API_URL}/reporting/controls`;
-    reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
     const filters = this.formatFilters(reportQuery);
     const body = { filters };
 
