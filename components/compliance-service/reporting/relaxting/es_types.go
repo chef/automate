@@ -343,21 +343,13 @@ type Node struct {
 	OrganizationName string   `json:"organization_name"`
 	SourceFQDN       string   `json:"source_fqdn"`
 	ChefTags         []string `json:"chef_tags"`
-	JobID            string   `json:"job_uuid"`
 }
 
 type Profile struct {
 	ProfileID string `json:"profile_id"`
 	Name      string `json:"name"`
 	Title     string `json:"title"`
+<<<<<<< HEAD
 }
 
 type NodesUpgradation struct {
-	NodeUUID  string `json:"node_uuid"`
-	EndTime   string `json:"end_time"`
-	DayLatest bool   `json:"day_latest"`
-}
-
-type Status struct {
-	Status string `json:"status"`
-}

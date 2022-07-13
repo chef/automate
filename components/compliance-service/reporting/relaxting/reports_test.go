@@ -584,7 +584,7 @@ func TestGetProfileFromControlList(t *testing.T) {
 	}{
 		{
 			name:    "TestGetTitleFromControListSuccess",
-			want:    &reportingapi.ProfileMin{Title: "My Demo Linux successful profile", Version: "1.8.9", Id: "doc_sha_value"},
+			want:    &reportingapi.ProfileMin{Title: "My Demo Linux successful profile", Version: "1.8.9", Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27"},
 			wantErr: false,
 			content: []byte(`{
                                         "doc_count": 5,
@@ -613,7 +613,7 @@ func TestGetProfileFromControlList(t *testing.T) {
                                             "sum_other_doc_count": 0,
                                             "buckets": [
                                                 {
-                                                    "key": "doc_sha_value",
+                                                    "key": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27",
                                                     "doc_count": 5
                                                 }
                                             ]
@@ -846,7 +846,7 @@ func TestBoolQueriesForControlItems(t *testing.T) {
 		want:       `{"bool":{"must":[{"range":{"end_time":{"from":"2022-07-11T00:00:00Z","include_lower":true,"include_upper":true,"to":"2022-07-11T23:59:59Z"}}},{"terms":{"control_id":["Test1","Test2"]}}]}}`,
 		controlIds: []string{"Test1", "Test2"},
 		filters:    map[string][]string{"end_time": []string{"2022-07-11T23:59:59Z"}, "start_time": []string{"2022-07-11T00:00:00Z"}},
-	}}
+	},}
 
 	for _, tt := range tests {
 
@@ -855,39 +855,5 @@ func TestBoolQueriesForControlItems(t *testing.T) {
 		data, _ := json.Marshal(src)
 
 		assert.Equal(t, string(data), tt.want)
-	}
-}
-
-func TestGetMultiControlString(t *testing.T) {
-	type test struct {
-		input        []string
-		expectedResp string
-	}
-	tests := []test{
-		{
-			input:        []string{`os-01`},
-			expectedResp: "(os\\-01)",
-		},
-		{
-			input:        []string{`os-01`, `os-02`},
-			expectedResp: "(os\\-01) (os\\-02)",
-		},
-		{
-			input:        []string{`ANZ Server - WAD-SEC-035 - Delegation of Access (SQL)`},
-			expectedResp: "(ANZ Server \\- WAD\\-SEC\\-035 \\- Delegation of Access \\(SQL\\))",
-		},
-		{
-			input:        []string{`({[W^E~L*C!O/M\E - H\E/L+L=O &&W||O>R<L"D!]})`},
-			expectedResp: "(\\(\\{\\[W\\^E\\~L\\*C\\!O\\/M\\\\E \\- H\\\\E\\/L\\+L\\=O \\&&W\\||O\\>R\\<L\\\"D\\!\\]\\}\\))",
-		},
-		{
-			input:        []string{`(generated from mysql_spec.rb:81 25e68d2c1d49a4ff4e27743084098a32)`},
-			expectedResp: "(\\(generated from mysql_spec.rb\\:81 25e68d2c1d49a4ff4e27743084098a32\\))",
-		},
-	}
-
-	for _, tc := range tests {
-		resp := getMultiControlString(tc.input)
-		assert.Equal(t, tc.expectedResp, resp)
 	}
 }
