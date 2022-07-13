@@ -1,11 +1,16 @@
 package relaxting
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/olivere/elastic/v7"
+	"github.com/pkg/errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
@@ -517,4 +522,289 @@ func TestValidateFiltersTimeRangeForErrorValid(t *testing.T) {
 	startTime2 := endTime3
 	err := validateFiltersTimeRange(endTime2, startTime2)
 	assert.Equal(t, nil, err)
+}
+
+func TestGetProfileFromControlList(t *testing.T) {
+	tests := []struct {
+		name       string
+		want       *reportingapi.ProfileMin
+		wantErr    bool
+		content    json.RawMessage
+		controlKey string
+		keyName    string
+	}{
+		{
+			name:    "TestGetTitleFromControListSuccess",
+			want:    &reportingapi.ProfileMin{Title: "My Demo Linux successful profile", Version: "1.8.9", Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27"},
+			wantErr: false,
+			content: []byte(`{
+                                        "doc_count": 5,
+                                        "title": {
+                                            "doc_count_error_upper_bound": 0,
+                                            "sum_other_doc_count": 0,
+                                            "buckets": [
+                                                {
+                                                    "key": "My Demo Linux successful profile",
+                                                    "doc_count": 5
+                                                }
+                                            ]
+                                        },
+                                        "version": {
+                                            "doc_count_error_upper_bound": 0,
+                                            "sum_other_doc_count": 0,
+                                            "buckets": [
+                                                {
+                                                    "key": "1.8.9",
+                                                    "doc_count": 5
+                                                }
+                                            ]
+                                        },
+                                        "sha": {
+                                            "doc_count_error_upper_bound": 0,
+                                            "sum_other_doc_count": 0,
+                                            "buckets": [
+                                                {
+                                                    "key": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27",
+                                                    "doc_count": 5
+                                                }
+                                            ]
+                                        }
+                                    }`),
+			controlKey: "testControl",
+			keyName:    "profile",
+		},
+	}
+
+	for _, tt := range tests {
+		profile := &reportingapi.ProfileMin{}
+		aggregations := make(map[string]json.RawMessage)
+		aggregations[tt.keyName] = tt.content
+		controlBucket := &elastic.AggregationBucketKeyItem{
+			Key:          tt.controlKey,
+			KeyAsString:  &tt.controlKey,
+			Aggregations: aggregations,
+		}
+		getProfileMinForControlItem(controlBucket, profile)
+		assert.Equal(t, tt.want, profile)
+	}
+}
+
+func TestGetTitleFromControlList(t *testing.T) {
+	tests := []struct {
+		name       string
+		want       string
+		wantErr    bool
+		content    json.RawMessage
+		controlKey string
+		keyName    string
+	}{
+		{
+			name:       "TestGetTitleFromControListSuccess",
+			want:       "My Demo Linux successful profile",
+			wantErr:    false,
+			content:    []byte(`{"doc_count_error_upper_bound": 0,"sum_other_doc_count": 0,"buckets": [{"key": "My Demo Linux successful profile","doc_count": 5}]}`),
+			controlKey: "testControl",
+			keyName:    "title",
+		},
+		{
+			name:       "TestGetTitleFromControListBlank",
+			want:       "",
+			wantErr:    false,
+			content:    []byte(`{"doc_count_error_upper_bound": 0,"sum_other_doc_count": 0,"buckets": [{"key": "My Demo Linux successful profile","doc_count": 5}]}`),
+			controlKey: "testControl",
+		},
+		{
+			name:       "TestGetTitleFromControListError",
+			want:       "",
+			wantErr:    false,
+			content:    []byte(`{"doc_count_error_upper_bound": 0,"sum_other_doc_count": 0,"buckets": [{"doc_count": 5}]}`),
+			controlKey: "testControl",
+		},
+	}
+
+	for _, tt := range tests {
+		aggregations := make(map[string]json.RawMessage)
+		aggregations[tt.keyName] = tt.content
+		controlBucket := &elastic.AggregationBucketKeyItem{
+			Key:          tt.controlKey,
+			KeyAsString:  &tt.controlKey,
+			Aggregations: aggregations,
+		}
+		title := getTitleForControlItem(controlBucket)
+		assert.Equal(t, title, tt.want)
+	}
+}
+
+func TestGetEndDateFromControlList(t *testing.T) {
+	endTime := "2022-07-12T04:21:22.000Z"
+
+	tests := []struct {
+		name       string
+		wantErr    error
+		content    json.RawMessage
+		controlKey string
+		keyName    string
+		endTime    string
+	}{
+		{
+			name:    "TestGetEndDateFromControlListSuccess",
+			endTime: endTime,
+			wantErr: nil,
+			content: []byte(`{ "doc_count": 5,
+                                        "most_recent_report": {
+                                            "doc_count_error_upper_bound": 0,
+                                            "sum_other_doc_count": 4,
+                                            "buckets": [
+                                                {
+                                                    "key": 1657599682000,
+                                                    "key_as_string": "2022-07-12T04:21:22.000Z",
+                                                    "doc_count": 1
+                                                }
+                                            ]
+                                        }
+                                    }`),
+			controlKey: "testControl",
+			keyName:    "end_time",
+		},
+		{
+			name:    "TestEndTimeWithParsingError",
+			endTime: endTime,
+			wantErr: errors.New(`2022-07-12T04:okhox time error: : parsing time "2022-07-12T04:okhox" as "2006-01-02T15:04:05Z07:00": cannot parse "okhox" as "04"`),
+			content: []byte(`{ "doc_count": 5,
+		                                        "most_recent_report": {
+		                                            "doc_count_error_upper_bound": 0,
+		                                            "sum_other_doc_count": 4,
+		                                            "buckets": [
+		                                                {
+		                                                    "key": 1657599682000,
+		                                                    "key_as_string": "2022-07-12T04:okhox",
+		                                                    "doc_count": 1
+		                                                }
+		                                            ]
+		                                        }
+		                                    }`),
+			controlKey: "testControl",
+			keyName:    "end_time",
+		},
+		{
+			name:    "TestEndTimeWithTimestampError",
+			endTime: "2022-07-12",
+			wantErr: errors.New(`2022-07-12 time error: : parsing time "2022-07-12" as "2006-01-02T15:04:05Z07:00": cannot parse "" as "T"`),
+			content: []byte(`{ "doc_count": 5,
+		                                        "most_recent_report": {
+		                                            "doc_count_error_upper_bound": 0,
+		                                            "sum_other_doc_count": 4,
+		                                            "buckets": [
+		                                                {
+		                                                    "key": 1657599682000,
+		                                                    "key_as_string": "2022-07-12",
+		                                                    "doc_count": 1
+		                                                }
+		                                            ]
+		                                        }
+		                                    }`),
+			controlKey: "testControl",
+			keyName:    "end_time",
+		},
+	}
+
+	for _, tt := range tests {
+		aggregations := make(map[string]json.RawMessage)
+		aggregations[tt.keyName] = tt.content
+		controlBucket := &elastic.AggregationBucketKeyItem{
+			Key:          tt.controlKey,
+			KeyAsString:  &tt.controlKey,
+			Aggregations: aggregations,
+		}
+		endTimeAsTime, _ := time.Parse(time.RFC3339, tt.endTime)
+		endTimeTest, _ := ptypes.TimestampProto(endTimeAsTime)
+		endTimeGot, err := getEndTimeForControlItem(controlBucket)
+
+		if err != nil {
+			assert.Equal(t, err.Error(), tt.wantErr.Error())
+			continue
+		}
+		assert.Equal(t, endTimeTest, endTimeGot)
+
+	}
+
+}
+
+func TestGetControlSummaryForControlList(t *testing.T) {
+
+	controlSummary := &reportingapi.ControlSummary{
+		Passed: &reportingapi.Total{Total: 6},
+		Failed: &reportingapi.Failed{
+			Total: 9,
+		},
+		Skipped: &reportingapi.Total{Total: 8},
+	}
+
+	content := []byte(`{ "doc_count": 6,
+                            "passed": {
+                                "doc_count": 6
+                            },
+                            "failed": {
+                                "doc_count": 9
+                            },
+                            "skipped": {
+                                "doc_count": 8
+                            }
+}`)
+
+	aggregations := make(map[string]json.RawMessage)
+	aggregations["status"] = content
+
+	nodeBucket := &elastic.AggregationSingleBucket{
+		Aggregations: aggregations,
+	}
+
+	controlSummaryActual := getControlSummaryResult(nodeBucket)
+
+	assert.Equal(t, controlSummary.Passed.Total, controlSummaryActual.Passed.Total)
+	assert.Equal(t, controlSummary.Failed.Total, controlSummaryActual.Failed.Total)
+	assert.Equal(t, controlSummary.Skipped.Total, controlSummaryActual.Skipped.Total)
+}
+
+func TestSetControlSummaryIntoControlList(t *testing.T) {
+
+	controlListItems := make([]*reportingapi.ControlItem, 0)
+	contListItem := &reportingapi.ControlItem{
+		Id: "Control1",
+	}
+	controlListItems = append(controlListItems, contListItem)
+
+	controlSummaryMap := make(map[string]*reportingapi.ControlSummary)
+
+	controlSummaryMap["Control1"] = &reportingapi.ControlSummary{
+		Passed: &reportingapi.Total{Total: 8},
+	}
+	setControlSummaryForControlItems(controlListItems, controlSummaryMap)
+	assert.Equal(t, controlListItems[0].ControlSummary.Passed.Total, int32(8))
+}
+
+func TestBoolQueriesForControlItems(t *testing.T) {
+
+	tests := []struct {
+		name       string
+		wantErr    error
+		want       string
+		controlIds []string
+		filters    map[string][]string
+	}{{
+		name:       "TestWIllStartTimeAndEndTimeFilter",
+		wantErr:    nil,
+		want:       `{"bool":{"must":[{"range":{"end_time":{"from":"2022-07-11T00:00:00Z","include_lower":true,"include_upper":true,"to":"2022-07-11T23:59:59Z"}}},{"terms":{"control_id":["Test1","Test2"]}}]}}`,
+		controlIds: []string{"Test1", "Test2"},
+		filters:    map[string][]string{"end_time": []string{"2022-07-11T23:59:59Z"}, "start_time": []string{"2022-07-11T00:00:00Z"}},
+	},}
+
+	for _, tt := range tests {
+
+		boolQuery := getControlSummaryFilters(tt.controlIds, tt.filters)
+		src, _ := boolQuery.Source()
+		data, _ := json.Marshal(src)
+
+		assert.Equal(t, string(data), tt.want)
+	}
 }
