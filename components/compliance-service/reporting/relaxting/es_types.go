@@ -327,8 +327,24 @@ type Node struct {
 	DayLatest   bool      `json:"day_latest"`
 	DailyLatest bool      `json:"daily_latest"`
 	ReportUUID  string    `json:"report_uuid"`
+	NodeName    string    `json:"node_name"`
+	Environment string    `json:"environment"`
+	Roles       []string  `json:"roles"`
+	Recipes     []string  `json:"recipes"`
+	Platform    struct {
+		Name    string `json:"name"`
+		Release string `json:"release"`
+		Full    string `json:"full"`
+	} `json:"platform"`
+	PolicyName       string   `json:"policy_name"`
+	PolicyGroup      string   `json:"policy_group"`
+	OrganizationName string   `json:"organization_name"`
+	SourceFQDN       string   `json:"source_fqdn"`
+	ChefTags         []string `json:"chef_tags"`
 }
 
 type Profile struct {
 	ProfileID string `json:"profile_id"`
+	Name      string `json:"name"`
+	Title     string `json:"title"`
 }
