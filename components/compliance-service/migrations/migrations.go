@@ -5,15 +5,13 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/olivere/elastic/v7"
 	"github.com/sirupsen/logrus"
 )
 
-type Node struct {
-	NodeUUID  string `json:"node_uuid"`
-	EndTime   string `json:"end_time"`
-	DayLatest bool   `json:"day_latest"`
-}
+func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]relaxting.NodesUpgradation, error) {
+	var nodes []relaxting.NodesUpgradation
 
 func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node, error) {
 	var nodes []Node
@@ -37,7 +35,7 @@ func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node,
 
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
-		Index("comp-7*").
+		Index(indices).
 		FilterPath(
 			"took",
 			"hits.total",
@@ -54,7 +52,7 @@ func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node,
 		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 		// Iterate through results
 		for _, hit := range searchResult.Hits.Hits {
-			var node Node
+			var node relaxting.NodesUpgradation
 			if hit.Source != nil {
 				err := json.Unmarshal(hit.Source, &node)
 				if err != nil {
@@ -69,23 +67,12 @@ func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node,
 }
 
 func SetNodesDayLatestFalse(client *elastic.Client, ctx context.Context) error {
-	today := time.Now()
 	nodes, err := GetNodesDayLatestTrue(client, ctx)
 	if err != nil {
 		return nil
 	}
 	for _, node := range nodes {
-		nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
-		if err != nil {
-			logrus.Error("cannot parse")
-		}
-		if nodeEndTime.Before(today) {
-			logrus.Info("Time: ", nodeEndTime)
-			if err = UpdateNodes(client, ctx, node.NodeUUID); err != nil {
-				logrus.Errorf("cannot update for: %+v", err)
-			}
-		}
-
+		logrus.Print(node)
 	}
 	return nil
 }
@@ -109,4 +96,20 @@ func UpdateNodes(client *elastic.Client, ctx context.Context, nodeID string) err
 		Do(ctx)
 
 	return err
+}
+
+func GetLast90DaysIndices() (string, error) {
+
+	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
+
+	// Making a filter query to get all the indices from today to 90 days back
+	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {time.Now().Format(time.RFC3339)}}
+
+	// Getting all the indices
+	esIndexs, err := relaxting.GetEsIndex(filters, false)
+	if err != nil {
+		logrus.Errorf("Cannot get indexes: %+v", err)
+		return "", err
+	}
+	return esIndexs, nil
 }
