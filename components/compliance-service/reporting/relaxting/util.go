@@ -179,12 +179,37 @@ func MapValues(m map[string]string) []string {
 // A good reason would be when you pass a job_id and you don't know when it ran so you want to search all indices
 func GetEsIndex(filters map[string][]string, useSummaryIndex bool) (esIndex string, err error) {
 	// Extract end_time from filters or set it to today's UTC day if not specified
-	endDateAsString, err := computeIndexDate(firstOrEmpty(filters["end_time"]))
+	startDateAsString, endDateAsString, err := getStartDateAndEndDateAsString(filters)
 	if err != nil {
 		return esIndex, err
 	}
 
-	var startDateAsString string
+	logrus.Debugf("GetEsIndex called with (filters=%+v), using startDateAsString=%s, endDateAsString=%s", filters, startDateAsString, endDateAsString)
+
+	if useSummaryIndex {
+		esIndex, err = IndexDates(CompDailySumIndexPrefix, startDateAsString, endDateAsString)
+	} else {
+		esIndex, err = IndexDates(CompDailyRepIndexPrefix, startDateAsString, endDateAsString)
+	}
+	logrus.Debugf("GetEsIndex, using indices: %s", esIndex)
+	return esIndex, err
+}
+
+func getControlIndex(filters map[string][]string) (esIndex string, err error) {
+	startDateAsString, endDateAsString, err := getStartDateAndEndDateAsString(filters)
+	if err != nil {
+		return esIndex, err
+	}
+	logrus.Debugf("GetEsIndex called with (filters=%+v), using startDateAsString=%s, endDateAsString=%s", filters, startDateAsString, endDateAsString)
+	esIndex, err = IndexDates(CompDailyControlIndexPrefix, startDateAsString, endDateAsString)
+	return esIndex, err
+}
+
+func getStartDateAndEndDateAsString(filters map[string][]string) (startDateAsString string, endDateAsString string, err error) {
+	endDateAsString, err = computeIndexDate(firstOrEmpty(filters["end_time"]))
+	if err != nil {
+		return "", "", err
+	}
 	if len(filters["start_time"]) == 0 && len(filters["end_time"]) == 0 {
 		// With `start_time` and `end_time` filters, we use start_date as yesterday's UTC date and `end_date` as today's UTC day.
 		// This way, we have the indices to query the last 24 hours worth of reports
@@ -196,20 +221,11 @@ func GetEsIndex(filters map[string][]string, useSummaryIndex bool) (esIndex stri
 		// Using the start_time specified in the filters
 		startDateAsString, err = computeIndexDate(filters["start_time"][0])
 		if err != nil {
-			return esIndex, err
+			return "", "", err
 		}
 	}
+	return startDateAsString, endDateAsString, nil
 
-	logrus.Debugf("GetEsIndex called with (filters=%+v), using startDateAsString=%s, endDateAsString=%s", filters, startDateAsString, endDateAsString)
-
-	if useSummaryIndex {
-		esIndex, err = IndexDates(CompDailySumIndexPrefix, startDateAsString, endDateAsString)
-	} else {
-		esIndex, err = IndexDates(CompDailyRepIndexPrefix, startDateAsString, endDateAsString)
-	}
-
-	logrus.Debugf("GetEsIndex, using indices: %s", esIndex)
-	return esIndex, err
 }
 
 func GetFilterDepth(filters map[string][]string) int {

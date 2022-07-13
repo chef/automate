@@ -11,6 +11,7 @@ const (
 	UUID  = "efd46e48-5751-40a2-a705-1182356908c1"
 	ID    = "3q09ru4orbfer k vfksd "
 	Title = "some different tile"
+	Env   = "Test Env"
 )
 
 func TestMapStructs(t *testing.T) {
@@ -40,6 +41,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
+					Environment: Env,
 					Profiles: []relaxting.ESInSpecReportProfile{
 						{
 							Name: "",
@@ -96,7 +98,7 @@ func TestMapStructs(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test for waived status",
+			name: "Test for Enviroment",
 			args: args{
 				inspecReport: &relaxting.ESInSpecReport{
 					NodeID:      "ssdpweoru4etu5hgsklvldfknv",
@@ -104,6 +106,97 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
+					Environment: Env,
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Name: "",
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									ID:         ID,
+									Impact:     0,
+									Title:      Title,
+									Status:     "failed",
+									Results:    nil,
+									WaiverData: &relaxting.ESInSpecReportControlsWaiverData{Run: true},
+									WaivedStr:  "yes",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			want: []relaxting.Control{
+				{
+					ControlID:   ID,
+					Title:       Title,
+					WaivedStr:   "yes",
+					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
+					Impact:      0,
+					DailyLatest: true,
+					DayLatest:   true,
+					Status:      "waived",
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID, Environment: Env}},
+					Profile:     relaxting.Profile{ProfileID: ""},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Test for Enviroment",
+			args: args{
+				inspecReport: &relaxting.ESInSpecReport{
+					NodeID:      "ssdpweoru4etu5hgsklvldfknv",
+					ReportID:    UUID,
+					DailyLatest: true,
+					DayLatest:   true,
+					Status:      "on",
+					Environment: Env,
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Name: "",
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									ID:         ID,
+									Impact:     0,
+									Title:      Title,
+									Status:     "failed",
+									Results:    nil,
+									WaiverData: &relaxting.ESInSpecReportControlsWaiverData{Run: true},
+									WaivedStr:  "yes",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			want: []relaxting.Control{
+				{
+					ControlID:   ID,
+					Title:       Title,
+					WaivedStr:   "yes",
+					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
+					Impact:      0,
+					DailyLatest: true,
+					DayLatest:   true,
+					Status:      "waived",
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID, Environment: Env}},
+					Profile:     relaxting.Profile{ProfileID: ""},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Test for Policy",
+			args: args{
+				inspecReport: &relaxting.ESInSpecReport{
+					NodeID:      "ssdpweoru4etu5hgsklvldfknv",
+					ReportID:    UUID,
+					DailyLatest: true,
+					DayLatest:   true,
+					Status:      "on",
+					PolicyName:  "Test Policy",
 					Profiles: []relaxting.ESInSpecReportProfile{
 						{
 							Name: "",
@@ -125,14 +218,14 @@ func TestMapStructs(t *testing.T) {
 			want: []relaxting.Control{
 				{
 					ControlID:   ID,
-					Title:       "some different tile",
+					Title:       Title,
 					WaivedStr:   "yes",
 					WaiverData:  &relaxting.ESInSpecReportControlsWaiverData{Run: true},
 					Impact:      0,
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "waived",
-					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID}},
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID, PolicyName: "Test Policy"}},
 					Profile:     relaxting.Profile{ProfileID: ""},
 				},
 			},
