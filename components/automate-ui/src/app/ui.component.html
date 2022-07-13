@@ -35,7 +35,6 @@
       </div>
       <app-manual-upgrade-banner *ngIf="upgradeBanner" (close)="closeBanner()"></app-manual-upgrade-banner>
       <chef-loading-spinner [hidden]="!(layoutFacade.showPageLoading$ | async)" size='50' fixed></chef-loading-spinner>
-      <app-warning-banner *ngIf="showBanner" (close)="closeBanner()"></app-warning-banner>
       <router-outlet></router-outlet>
     </div>
     <!-- App Sidebar -->
