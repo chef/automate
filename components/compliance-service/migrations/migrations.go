@@ -15,14 +15,14 @@ type Node struct {
 	DayLatest bool   `json:"day_latest"`
 }
 
-var setNodes map[string]Node
-
 func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node, error) {
 	var nodes []Node
 	termQueryDayLatest := elastic.NewTermQuery("day_latest", true)
+	termQueryDailyLatest := elastic.NewTermQuery("daily_latest", true)
 
 	boolQuery := elastic.NewBoolQuery().
-		Must(termQueryDayLatest)
+		Must(termQueryDayLatest).
+		Must(termQueryDailyLatest)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"node_uuid",
@@ -33,7 +33,7 @@ func GetNodesDayLatestTrue(client *elastic.Client, ctx context.Context) ([]Node,
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
 		Query(boolQuery).
-		Size(10000)
+		Size(100000)
 
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
