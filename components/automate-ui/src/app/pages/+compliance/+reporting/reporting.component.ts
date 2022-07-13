@@ -498,8 +498,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     reportQuery.interval = this.getDateInterval(urlFilters);
     reportQuery.endDate = this.getEndDate(urlFilters);
-    reportQuery.startDate = this.reportQuery.findTimeIntervalStartDate(
-      reportQuery.interval, reportQuery.endDate);
+    reportQuery.startDate =reportQuery.endDate.clone().subtract(0,'days')
     reportQuery.last24h = this.isLast24h(urlFilters);
 
     this.reportQuery.setState(reportQuery);
