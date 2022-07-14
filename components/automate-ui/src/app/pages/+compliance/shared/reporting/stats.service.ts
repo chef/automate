@@ -143,16 +143,14 @@ export class StatsService {
     }
     return filters;
   }
-  private addStartDate(reportQuery: ReportQuery,filters): any{
-    if(reportQuery.startDate)
-    {
-      filters.push({ type: 'start_time', values: [moment.utc(reportQuery.endDate).startOf('day')] })
-    }
+  getStartDate(reportQuery: ReportQuery): ReportQuery {
+    reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
+    return reportQuery
   }
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/profiles`;
+    reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
-    formatted= this.addStartDate(reportQuery,formatted);
     formatted = this.addStatusParam(formatted);
     let body = { filters: formatted };
 
