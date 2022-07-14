@@ -48,7 +48,7 @@ locals {
 
 resource "aws_s3_bucket" "createS3bucket" {
   bucket        = local.log_bucket
-  force_destroy = true
+  force_destroy = var.destroy_bucket
 }
 
 resource "aws_s3_bucket_acl" "elb_bucket_acl" {
