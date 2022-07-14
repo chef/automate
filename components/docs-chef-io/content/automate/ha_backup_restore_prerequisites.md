@@ -19,12 +19,12 @@ This page explains the prerequisites of the backup. If we choose the AWS Deploym
 
 ## AWS Backed Backup
 
-The two Backup configurations for AWS are:
+The two pre-backup configurations for AWS are:
 
 -   For S3 Backup
 -   For EFS Backup
 
-### Backup Configuration for S3 Backup
+### Pre Backup Configuration for S3 Backup
 
 To run the terraform scripts, the IAM users should have proper permissions. Going forward, we will also discuss the required permissions. You should have your `secret access key` and `key id`, or else you can regenerate a new access key.
 
@@ -208,12 +208,12 @@ path = "/mnt/automate_backups/backups"
 
 ## On-Premise Backed Backup
 
-The two Backup configurations for On-Premise are:
+The two pre-backup configurations for On-Premise are:
 
 -   For File System Backup
 -   For Object Storage
 
-### Backup Configuration for File System Backup
+### Pre Backup Configuration for File System Backup
 
 A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
 
@@ -293,9 +293,9 @@ path = "/mnt/automate_backups/backups"
 ./chef-automate config patch automate.toml
 ```
 
-### Backup Configuration for Object Storage
+### Pre-Backup Configuration for Object Storage
 
-This section provides the Backup configuration required to backup the data on Object Storage System (Other than AWS S3) like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
+This section provides the pre-backup configuration required to backup the data on Object Storage System (Other than AWS S3) like _Minio_, _Non-AWS S3_. The steps to set a secret key using commands are given below:
 
 1. Log in to all the opensearch nodes and follow the steps on all the opensearch nodes.
 
