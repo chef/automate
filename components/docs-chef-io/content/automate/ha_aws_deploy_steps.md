@@ -163,7 +163,7 @@ Below section will destroy the infrastructure
 
 #### To destroy AWS infra created with S3 Bucket
 
-If you have successfully done provision-infra and after that if you want to destroy infra then run below command in your bastion.
+To destroy infra after successfull provisioning, run below command in your bastion host in same order.
 
 1. This command will initialise the terraform packages
 
