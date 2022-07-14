@@ -949,6 +949,7 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday
 
 }
 
+//UploadDataToControlIndex Uploades the data to new control index with comp-1-control-*
 func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time) error {
 	mapping := mappings.ComplianceControlRepData
 	index := mapping.IndexTimeseriesFmt(endTime)
@@ -1066,9 +1067,10 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }
 
+//GetNodesDayLatestTrue Get the Nodes from past 90 days from now where day latest and daily latest are true
 func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAgo time.Time) ([]relaxting.NodesUpgradation, error) {
 	var nodes []relaxting.NodesUpgradation
-	indices, err := GetLast90DaysIndices(time90daysAgo, time.Now())
+	indices, err := GetIndexForARange(time90daysAgo, time.Now())
 	if err != nil {
 		return nil, err
 	}
@@ -1125,6 +1127,7 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAg
 	return nodes, nil
 }
 
+//SetNodesDayLatestFalse Sets the flag for the currently present data in os database
 func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 	bulkRequest := backend.client.Bulk()
 	script := elastic.NewScript("ctx._source.day_latest = false")
@@ -1138,7 +1141,7 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 		if err != nil {
 			logrus.Error("cannot parse: ", err)
 		}
-		indices, err := GetLast90DaysIndices(time90DaysAgo, nodeEndTime.Add(-24*time.Hour))
+		indices, err := GetIndexForARange(time90DaysAgo, nodeEndTime.Add(-24*time.Hour))
 		if err != nil {
 			logrus.Error("cannot get indices:", err)
 		}
@@ -1162,7 +1165,8 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 	return nil
 }
 
-func GetLast90DaysIndices(startTime, endTime time.Time) (string, error) {
+//GetIndexForARange Get the index for the entire range when the start date and end date are passed from os
+func GetIndexForARange(startTime, endTime time.Time) (string, error) {
 	filters := map[string][]string{"start_time": {startTime.Format(time.RFC3339)}, "end_time": {endTime.Format(time.RFC3339)}}
 
 	// Getting all the indices

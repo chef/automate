@@ -124,9 +124,11 @@ func (t *GenerateDayLatestMigrationTask) Run(ctx context.Context, task cereal.Ta
 	logrus.Info("Inside the daily Latest Flag upgrades")
 	err := t.ESClient.SetNodesDayLatestFalse(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not unmarshal GenerateReportParameters")
+		return nil, errors.Wrap(err, "could not update the day latest in rep data")
 	}
-	t.Upgrades.UpdateDayLatestFlagToTrue()
-
+	err = t.Upgrades.UpdateDayLatestFlagToTrue()
+	if err != nil {
+		return nil, errors.Wrap(err, "could not update flag the in upgrade database")
+	}
 	return &job, nil
 }
