@@ -57,7 +57,7 @@ func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
 		return w.Fail(err)
 	}
 
-	logrus.Debugf("In On Start Method %s", workflowParams.DayLatestFlag)
+	logrus.Debugf("In On Start Method %t", workflowParams.DayLatestFlag)
 
 	workflowPayload := MigrationWorkflowPayload{
 		DayLatestFlag: workflowParams.DayLatestFlag,
@@ -121,7 +121,7 @@ func (t *GenerateDayLatestMigrationTask) Run(ctx context.Context, task cereal.Ta
 		return nil, err
 	}
 
-	logrus.Info("Inside the daily Latest Flag upgrades")
+	logrus.Debug("Inside the daily Latest Flag upgrades")
 	err := t.ESClient.SetNodesDayLatestFalse(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not update the day latest in rep data")

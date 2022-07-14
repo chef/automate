@@ -1136,15 +1136,16 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 		return nil
 	}
 	for _, node := range nodesMap {
-		fmt.Println(node.NodeUUID)
 		nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
 		if err != nil {
 			logrus.Error("cannot parse: ", err)
+			continue
 		}
 
 		indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90DaysAgo.Format(time.RFC3339), nodeEndTime.Add(-24*time.Hour).Format(time.RFC3339))
 		if err != nil {
 			logrus.Error("cannot get indices:", err)
+			continue
 		}
 
 		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
