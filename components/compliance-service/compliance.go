@@ -204,10 +204,11 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
-	upgrades := migrations.New(db, cerealManager)
+	upgradeDB := migrations.NewDB(db)
+	upgradeService := migrations.NewService(upgradeDB, cerealManager)
 
 	// Initiating cereal Manager for upgrade jobs
-	err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgrades)
+	err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgradeDB)
 	if err != nil {
 		logrus.Fatalf("Failed to initiate cereal manager for upgrading jobs %v", err)
 	}
@@ -269,7 +270,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	}
 
 	// Running upgrade scenarios for DayLatest flag
-	go upgrades.PollForUpgradeFlagDayLatest()
+	go upgradeService.PollForUpgradeFlagDayLatest()
 
 	errc := make(chan error)
 	defer close(errc)

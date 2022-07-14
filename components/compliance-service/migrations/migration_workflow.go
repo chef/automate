@@ -14,7 +14,7 @@ var (
 	ControlIndexMigrationTaskName = cereal.NewTaskName("control-index-task")
 )
 
-func InitCerealManager(cerealManager *cereal.Manager, workerCount int, client *ingestic.ESClient, upgrades *Upgrades) error {
+func InitCerealManager(cerealManager *cereal.Manager, workerCount int, client *ingestic.ESClient, upgradesDB *UpgradesDB) error {
 	logrus.Info("Successfully starting control-workflow")
 	err := cerealManager.RegisterWorkflowExecutor(MigrationWorkflowName, &MigrationWorkflow{})
 	if err != nil {
@@ -25,8 +25,8 @@ func InitCerealManager(cerealManager *cereal.Manager, workerCount int, client *i
 
 	logrus.Info("Successfully registered migration-workflow")
 	return cerealManager.RegisterTaskExecutor(DayLatestMigrationTaskName, &GenerateDayLatestMigrationTask{
-		ESClient: client,
-		Upgrades: upgrades,
+		ESClient:   client,
+		UpgradesDB: upgradesDB,
 	}, cereal.TaskExecutorOpts{Workers: workerCount})
 
 }
@@ -104,8 +104,8 @@ func (s *MigrationWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.Cancel
 }
 
 type GenerateDayLatestMigrationTask struct {
-	ESClient *ingestic.ESClient
-	Upgrades *Upgrades
+	ESClient   *ingestic.ESClient
+	UpgradesDB *UpgradesDB
 }
 
 type GenerateDayLatestMigrationParameters struct {
@@ -126,7 +126,7 @@ func (t *GenerateDayLatestMigrationTask) Run(ctx context.Context, task cereal.Ta
 	if err != nil {
 		return nil, errors.Wrap(err, "could not update the day latest in rep data")
 	}
-	err = t.Upgrades.UpdateDayLatestFlagToTrue()
+	err = t.UpgradesDB.UpdateDayLatestFlagToTrue()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not update flag the in upgrade database")
 	}
