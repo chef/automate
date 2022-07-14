@@ -1066,9 +1066,8 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }
 
-func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context) ([]relaxting.NodesUpgradation, error) {
+func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAgo time.Time) ([]relaxting.NodesUpgradation, error) {
 	var nodes []relaxting.NodesUpgradation
-	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
 	indices, err := GetLast90DaysIndices(time90daysAgo, time.Now())
 	if err != nil {
 		return nil, err
@@ -1129,7 +1128,8 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context) ([]relaxting
 func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 	bulkRequest := backend.client.Bulk()
 	script := elastic.NewScript("ctx._source.day_latest = false")
-	nodes, err := backend.GetNodesDayLatestTrue(ctx)
+	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
+	nodes, err := backend.GetNodesDayLatestTrue(ctx, time90DaysAgo)
 	if err != nil {
 		return nil
 	}
@@ -1138,8 +1138,7 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 		if err != nil {
 			logrus.Error("cannot parse: ", err)
 		}
-		nodeStarttime := time.Now().Add(-24 * time.Hour * 90)
-		indices, err := GetLast90DaysIndices(nodeStarttime, nodeEndTime.Add(-24*time.Hour))
+		indices, err := GetLast90DaysIndices(time90DaysAgo, nodeEndTime.Add(-24*time.Hour))
 		if err != nil {
 			logrus.Error("cannot get indices:", err)
 		}

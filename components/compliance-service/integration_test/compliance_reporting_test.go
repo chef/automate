@@ -17,7 +17,8 @@ import (
 func TestMarkDayLatestToFalse(t *testing.T) {
 	suit := NewGlobalSuite()
 	require.NotNil(t, suit)
-	nodes, err := suit.ingesticESClient.GetNodesDayLatestTrue(context.Background())
+	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
+	nodes, err := suit.ingesticESClient.GetNodesDayLatestTrue(context.Background(), time90DaysAgo)
 	require.NoError(t, err)
 	require.NotEmpty(t, nodes)
 
