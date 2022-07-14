@@ -1068,9 +1068,9 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 }
 
 //GetNodesDayLatestTrue Get the Nodes from past 90 days from now where day latest and daily latest are true
-func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAgo time.Time) ([]relaxting.NodesUpgradation, error) {
-	var nodes []relaxting.NodesUpgradation
-	indices, err := GetIndexForARange(time90daysAgo, time.Now())
+func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]relaxting.NodesUpgradation, error) {
+	nodesMap := make(map[string]relaxting.NodesUpgradation)
+	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
 	if err != nil {
 		return nil, err
 	}
@@ -1119,12 +1119,11 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAg
 					}
 
 				}
-				nodes = append(nodes, node)
+				nodesMap[node.NodeUUID] = node
 			}
 		}
 	}
-
-	return nodes, nil
+	return nodesMap, nil
 }
 
 //SetNodesDayLatestFalse Sets the flag for the currently present data in os database
@@ -1132,16 +1131,18 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 	bulkRequest := backend.client.Bulk()
 	script := elastic.NewScript("ctx._source.day_latest = false")
 	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	nodes, err := backend.GetNodesDayLatestTrue(ctx, time90DaysAgo)
+	nodesMap, err := backend.GetNodesDayLatestTrue(ctx, time90DaysAgo)
 	if err != nil {
 		return nil
 	}
-	for _, node := range nodes {
+	for _, node := range nodesMap {
+		fmt.Println(node.NodeUUID)
 		nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
 		if err != nil {
 			logrus.Error("cannot parse: ", err)
 		}
-		indices, err := GetIndexForARange(time90DaysAgo, nodeEndTime.Add(-24*time.Hour))
+
+		indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90DaysAgo.Format(time.RFC3339), nodeEndTime.Add(-24*time.Hour).Format(time.RFC3339))
 		if err != nil {
 			logrus.Error("cannot get indices:", err)
 		}
@@ -1161,19 +1162,6 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 		logrus.Errorf("Unable to fetch the response of bulk request: %v", err)
 		return err
 	}
-	logrus.Debugf("Bulk insert %d summaries, ~size %dB, took %dms", len(nodes), approxBytes, bulkResponse.Took)
+	logrus.Debugf("Bulk insert day latest falgs, ~size %dB, took %dms", approxBytes, bulkResponse.Took)
 	return nil
-}
-
-//GetIndexForARange Get the index for the entire range when the start date and end date are passed from os
-func GetIndexForARange(startTime, endTime time.Time) (string, error) {
-	filters := map[string][]string{"start_time": {startTime.Format(time.RFC3339)}, "end_time": {endTime.Format(time.RFC3339)}}
-
-	// Getting all the indices
-	esIndexs, err := relaxting.GetEsIndex(filters, false)
-	if err != nil {
-		logrus.Errorf("Cannot get indexes: %+v", err)
-		return "", err
-	}
-	return esIndexs, nil
 }
