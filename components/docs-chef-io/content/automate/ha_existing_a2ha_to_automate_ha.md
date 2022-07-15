@@ -46,15 +46,11 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
      sudo chef-automate config show > current_config.toml 
    ``` 
   Note: In Automate 4.x.y version onwards, opensearch credentials are not stored in the config. Add the Opensearch password to the generated config above.
-  For example
+  For example : 
   ```
-  [global.v1.external.opensearch]
-    [global.v1.external.opensearch.backup]
-      [global.v1.external.opensearch.auth]
-        scheme = "basic_auth"
-          [global.v1.external.opensearch.auth.basic_auth]
-            username = "admin"
-            password = "admin"
+    [global.v1.external.opensearch.auth.basic_auth]
+      username = "admin"
+      password = "admin"
   ```
 
 
