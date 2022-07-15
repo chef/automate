@@ -9,7 +9,9 @@ export class ManualUpgradeBannerComponent implements OnInit {
     @Output() close = new EventEmitter();
     constructor() { }
 
+    forPipelinePass = false;
     ngOnInit(): void {
+      this.forPipelinePass = true;
     }
     closeEvent() {
         this.close.emit();
