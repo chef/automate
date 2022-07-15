@@ -956,6 +956,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
+		backend.SetControlIndexEndTime(control.Status, control.Nodes[0].Status, control.ControlID, control.Nodes[0].NodeUUID)
 		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
@@ -1070,32 +1071,7 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }
 
-func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
+func (backend *ESClient) SetControlIndexEndTime(controlStatus string, nodeStatus string, controlId string, nodeId string) {
 
-	boolQueryControlId := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
-	logrus.Info("controlId %s,%s", controlId, profileId)
-	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
-	ctx._source.end_time = latest;
-	def failed = ctx._source.nodes.findAll(node -> node.status == "failed");
-	def skipped = ctx._source.nodes.findAll(node -> node.status == "skipped"); 
-	def waived = ctx._source.nodes.findAll(node -> node.status == "waived"); 
-	def passed = ctx._source.nodes.findAll(node -> node.status == "passed"); 
-	if(failed.length > 0) { 
-		ctx._source.status="failed"; 
-	} else if (passed.length == 0 && skipped.length == 0 && waived.length > 0) {
-		ctx._source.status="waived";
-	} else if (passed.length > 0 || skipped.length == 0) {
-		ctx._source.status="passed";
-	} else if (passed.length == 0 && skipped.length > 0) { 
-		ctx._source.status="skipped";
-	}`)
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(index).
-		Query(boolQueryControlId).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-	return errors.Wrap(err, "SetControlIndexEndTime")
+	logrus.Infof("Control--%s,%s,%s,%s", controlStatus, nodeStatus)
 }
