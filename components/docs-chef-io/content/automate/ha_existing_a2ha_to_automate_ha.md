@@ -91,8 +91,9 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
   ``` 
     chef-automate config show > applied_config.toml
   ```
-  Modify the applied_config.toml, remove elastic serach config and set the config.
+  Modify the applied_config.toml, remove elastic search config and set the config.
   Need to set the applied_config.toml on all the frontend nodes manually. As removal of config is not supported from bastion. 
+  Use the below command to set the config manually.
   ```
    chef-automate config set applied_config.toml
   ```
