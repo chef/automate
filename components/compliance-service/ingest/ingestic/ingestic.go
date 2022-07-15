@@ -956,7 +956,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		backend.SetControlIndexEndTime(control.Status, control.Nodes[0].Status, control.ControlID, control.Nodes[0].NodeUUID)
+		backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index)
 		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
@@ -1071,7 +1071,20 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }
 
-func (backend *ESClient) SetControlIndexEndTime(controlStatus string, nodeStatus string, controlId string, nodeId string) {
+func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string) error {
+	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
-	logrus.Infof("Control--%s,%s,%s,%s", controlStatus, nodeStatus, controlId, nodeId)
+	boolQueryDailyLatest := elastic.NewBoolQuery().
+		Must(termQueryThisControl)
+
+	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
+	ctx._source.end_time = ctx._source.nodes[latest].node_end_time;
+	`)
+	_, err := elastic.NewUpdateByQueryService(backend.client).
+		Index(index).
+		Query(boolQueryDailyLatest).
+		Script(script).
+		Refresh("false").
+		Do(ctx)
+	return errors.Wrap(err, "SetControlIndexEndTime")
 }
