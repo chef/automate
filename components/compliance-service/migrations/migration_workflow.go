@@ -47,12 +47,12 @@ type MigrationWorkflowPayload struct {
 func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
 	ev cereal.StartEvent) cereal.Decision {
 
-	logrus.Debug("In control-workflow start method")
+	logrus.Debug("In migration-workflow start method")
 
 	workflowParams := MigrationWorkflowParameters{}
 	err := w.GetParameters(&workflowParams)
 	if err != nil {
-		err = errors.Wrap(err, "failed to unmarshal control-workflow parameters")
+		err = errors.Wrap(err, "failed to unmarshal migration-workflow parameters")
 		logrus.WithError(err).Error()
 		return w.Fail(err)
 	}
@@ -67,7 +67,7 @@ func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
 		DayLatestFlag: workflowParams.DayLatestFlag,
 	})
 	if err != nil {
-		err = errors.Wrap(err, "failed to enqueue the control-task")
+		err = errors.Wrap(err, "failed to enqueue the migration-task")
 		logrus.WithError(err).Error()
 		return w.Fail(err)
 	}
@@ -79,12 +79,12 @@ func (s *MigrationWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 
 	var payload MigrationWorkflowPayload
 	if err := w.GetPayload(&payload); err != nil {
-		err = errors.Wrap(err, "failed to unmarshal control-workflow payload")
+		err = errors.Wrap(err, "failed to unmarshal migration-workflow payload")
 		logrus.WithError(err).Error()
 		return w.Fail(err)
 	}
 
-	logrus.Debugf("Entered ControlWorkflow > OnTaskComplete with payload %+v", payload)
+	logrus.Debugf("Entered MigrationWorkflow > OnTaskComplete with payload %+v", payload)
 
 	//get the results returned by task run
 	var dayLatestParameters GenerateDayLatestMigrationParameters
