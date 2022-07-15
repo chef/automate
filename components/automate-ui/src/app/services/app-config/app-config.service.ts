@@ -53,13 +53,11 @@ export class AppConfigService {
     return new HttpClient(this.handler).get('/custom_settings.js')
       .toPromise()
       .then((data: any) => {
-        console.log("Hello: ", data)
-        return this.appConfig = data
+        return this.appConfig = data;
       })
       // when there is no config, we can just reset the config to its initial empty values
-      .catch(error => {
-        console.log("Error: ", error)
-        return this.appConfig = initialConfig
+      .catch(_error => {
+        return this.appConfig = initialConfig;
       });
   }
 
