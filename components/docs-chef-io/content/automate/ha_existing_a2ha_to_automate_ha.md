@@ -18,6 +18,7 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
 - Mount the file system to Automate HA, which was mount to A2HA Cluster.
 - Make sure that after mount, it should have the correct file permission. 
 
+
 ### Migration Steps 
 
 1. Run the below command from any one of automate instance, in A2HA Cluster.
@@ -44,6 +45,18 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
    ```bash
      sudo chef-automate config show > current_config.toml 
    ``` 
+  Note: In Automate 4.x.y version onwards, opensearch credentials are not stored in the config. Add the Opensearch password to the generated config above.
+  
+  ```
+  [global.v1.external.opensearch]
+    [global.v1.external.opensearch.backup]
+      [global.v1.external.opensearch.auth]
+        scheme = "basic_auth"
+          [global.v1.external.opensearch.auth.basic_auth]
+            username = "admin"
+            password = "admin"
+  ```
+
 
 7. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of Chef Automate HA cluster:
 
@@ -51,13 +64,36 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
   ```
 
-8. Copy the `bootstrap.abb` bundle to all the Frontend nodes of Chef Automate HA cluster. Unpack the bundle using below command on all the Frondend nodes.
+8.  - After the restore successfully excuted, you wil see the below message
+  
+  ```
+    Success: Restored backup 20210622065515
+  ```
+
+9. Copy the `bootstrap.abb` bundle to all the Frontend nodes of Chef Automate HA cluster. Unpack the bundle using below command on all the Frondend nodes.
  
   ```cmd
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
   ```
 
-9. Start the Service in all the frontend nodes with below command.
+10. Start the Service in all the frontend nodes with below command.
   ``` bash
     sudo chef-automate start
   ``` 
+
+{{< note >}}
+  - After the restore command successfully executed. If we run the `chef-automate config show`
+  we can see the both Elasticsearch and Opensearch config are the part of Automate Config. We can keep both the config, it wont' impact the functionality. After restore Automate HA talk to opensearch.
+
+    OR
+
+  -  We can remove the elaticsearch config from the automate, to do that redirect the applied config to the file and set the config again.
+  ``` 
+    chef-automate config show > applied_config.toml
+  ```
+  Modify the applied_config.toml, remove elastic serach config and set the config 
+  ```
+   chef-automate config set applied_config.toml
+  ```
+ 
+{{< /note >}}
