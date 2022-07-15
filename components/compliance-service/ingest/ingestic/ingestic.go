@@ -1073,5 +1073,5 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 
 func (backend *ESClient) SetControlIndexEndTime(controlStatus string, nodeStatus string, controlId string, nodeId string) {
 
-	logrus.Infof("Control--%s,%s,%s,%s", controlStatus, nodeStatus)
+	logrus.Infof("Control--%s,%s,%s,%s", controlStatus, nodeStatus, controlId, nodeId)
 }
