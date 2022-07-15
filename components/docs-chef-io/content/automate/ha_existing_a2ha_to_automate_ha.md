@@ -42,9 +42,9 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
 5. Please Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`
 
 6. Run the command at Chef-Automate node of Automate HA cluster to get the applied config
-   ```bash
+  ```bash
      sudo chef-automate config show > current_config.toml 
-   ``` 
+  ``` 
   Note: In Automate 4.x.y version onwards, opensearch credentials are not stored in the config. Add the Opensearch password to the generated config above.
   For example : 
   ```
@@ -52,7 +52,6 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
       username = "admin"
       password = "admin"
   ```
-
 
 7. To restore the A2HA backup on Chef Automate HA, run the following command from any Chef Automate instance of Chef Automate HA cluster:
 
@@ -78,17 +77,17 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
   ``` 
 
 {{< note >}}
-  - After the restore command successfully executed. If we run the `chef-automate config show`
+  - After the restore command successfully executed. If we run the `chef-automate config show` 
   we can see the both Elasticsearch and Opensearch config are the part of Automate Config. We can keep both the config, it wont' impact the functionality. After restore Automate HA talk to opensearch.
 
     OR
 
-  -  We can remove the elaticsearch config from the automate, to do that redirect the applied config to the file and set the config again.
+  -  We can remove the elaticsearch config from the automate. To do that, redirect the applied config to the file and set the config again.
   ``` 
     chef-automate config show > applied_config.toml
   ```
-  Modify the applied_config.toml, remove elastic search config and set the config.
-  Need to set the applied_config.toml on all the frontend nodes manually. As removal of config is not supported from bastion. 
+  Modify `applied_config.toml`, remove elastic search config and set the config.
+  Need to set `applied_config.toml` on all the frontend node's manually. As removal of config is not supported from bastion. 
   Use the below command to set the config manually.
   ```
    chef-automate config set applied_config.toml
