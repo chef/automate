@@ -46,7 +46,7 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
      sudo chef-automate config show > current_config.toml 
    ``` 
   Note: In Automate 4.x.y version onwards, opensearch credentials are not stored in the config. Add the Opensearch password to the generated config above.
-  
+  For example
   ```
   [global.v1.external.opensearch]
     [global.v1.external.opensearch.backup]
@@ -64,7 +64,7 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
     sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
   ```
 
-8.  - After the restore successfully excuted, you wil see the below message
+8.  - After the restore successfully executed, you wil see the below message
   
   ```
     Success: Restored backup 20210622065515
@@ -91,9 +91,10 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
   ``` 
     chef-automate config show > applied_config.toml
   ```
-  Modify the applied_config.toml, remove elastic serach config and set the config 
+  Modify the applied_config.toml, remove elastic serach config and set the config.
+  Need to set the applied_config.toml on all the frontend nodes manually. As removal of config is not supported from bastion. 
   ```
    chef-automate config set applied_config.toml
   ```
- 
+  
 {{< /note >}}
