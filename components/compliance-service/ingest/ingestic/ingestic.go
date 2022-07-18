@@ -956,8 +956,11 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index)
-		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		err := backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index)
+		if err != nil {
+			logrus.Errorf("Unable to SetControlIndexEndTime %v", err)
+		}
+		err = backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
 		}
@@ -1073,8 +1076,8 @@ func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId s
 	boolQueryControlId := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
 	logrus.Info("controlId %s,%s", controlId, profileId)
-	script := elastic.NewScript(`
-	ctx._source.end_time = ctx._source.nodes.length - 1;
+	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
+	ctx._source.end_time = ctx._source.nodes[latest].node_end_time;
 	def failed = ctx._source.nodes.findAll(node -> node.status == "failed");
 	def skipped = ctx._source.nodes.findAll(node -> node.status == "skipped"); 
 	def waived = ctx._source.nodes.findAll(node -> node.status == "waived"); 
