@@ -6,7 +6,7 @@ test_upgrades=true
 test_upgrade_strategy="at-once"
 test_loadbalancer_url="https://localhost:4443"
 
-CURRENT_OLDEST_VERSION=20180519154949
+CURRENT_OLDEST_VERSION=20180629132035
 OLD_MANIFEST_DIR=components/automate-deployment/testdata/old_manifests/
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 

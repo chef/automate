@@ -11,7 +11,7 @@
   "packages": [
     "chef/authn-service/0.1.0/20180517022200",
     "chef/authz-service/0.1.0/20180517021936",
-    "chef/automate-cli/0.1.0/20190501152621",
+    "chef/automate-cli/0.1.0/20180519154636",
     "chef/automate-debug/0.1.0/20180222235554",
     "chef/automate-dex/0.1.0/20180517195306",
     "chef/automate-elasticsearch/6.2.2/20180517095022",
