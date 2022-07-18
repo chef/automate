@@ -55,7 +55,7 @@ describe('WarningBannerComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WarningBannerComponent);
     component = fixture.componentInstance;
-    component.showManualUpgradeContent = false;
+    component.showBanner = false;
     fixture.detectChanges();
   });
 

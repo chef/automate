@@ -1,0 +1,48 @@
+@import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+
+:host {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  color: $chef-white;
+  background-color: $white;
+  height: 185px;
+  border-bottom: solid 1px $chef-grey;
+  overflow: hidden;
+  z-index: 10;
+
+  p {
+    margin: 0 auto;
+  }
+
+  .banner-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .logo-wrapper {
+      a.logo img {
+        display: block;
+        width: 419px;
+        @include carbon--breakpoint-down(lg) {
+          height: 184px;
+        }
+      }
+    }
+  }
+
+  .close-icon {
+    cursor: pointer;
+    color: $chef-black;
+    font-size: 22px;
+    position: relative;
+    right: 15px;
+    top: -62px;
+    @include carbon--breakpoint-down(lg) {
+      right: 5px;
+    }
+  }
+
+}

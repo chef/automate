@@ -9,21 +9,16 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
 export class WarningBannerComponent implements OnInit {
   bannerMessage: string;
   bannerTextColor: string;
-  showManualUpgradeContent = true;
+  showBanner = false;
   @Output() close = new EventEmitter();
   @HostBinding('style.backgroundColor') bannerBackgroundColor: string;
 
   constructor(private appConfigService: AppConfigService) { }
 
   ngOnInit() {
-    if (!this.showManualUpgradeContent) {
       this.bannerMessage = this.appConfigService.bannerMessage;
       this.bannerBackgroundColor = this.appConfigService.bannerBackgroundColor;
       this.bannerTextColor = this.appConfigService.bannerTextColor;
-    }
-  }
-
-  closeEvent() {
-    this.close.emit();
+      this.showBanner = this.appConfigService.showBanner;
   }
 }
