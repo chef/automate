@@ -535,7 +535,7 @@ func TestGetProfileFromControlList(t *testing.T) {
 	}{
 		{
 			name:    "TestGetTitleFromControListSuccess",
-			want:    &reportingapi.ProfileMin{Title: "My Demo Linux successful profile", Version: "1.8.9", Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27"},
+			want:    &reportingapi.ProfileMin{Title: "My Demo Linux successful profile", Version: "1.8.9", Id: "doc_sha_value"},
 			wantErr: false,
 			content: []byte(`{
                                         "doc_count": 5,
@@ -564,7 +564,7 @@ func TestGetProfileFromControlList(t *testing.T) {
                                             "sum_other_doc_count": 0,
                                             "buckets": [
                                                 {
-                                                    "key": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27",
+                                                    "key": "doc_sha_value",
                                                     "doc_count": 5
                                                 }
                                             ]
@@ -797,7 +797,7 @@ func TestBoolQueriesForControlItems(t *testing.T) {
 		want:       `{"bool":{"must":[{"range":{"end_time":{"from":"2022-07-11T00:00:00Z","include_lower":true,"include_upper":true,"to":"2022-07-11T23:59:59Z"}}},{"terms":{"control_id":["Test1","Test2"]}}]}}`,
 		controlIds: []string{"Test1", "Test2"},
 		filters:    map[string][]string{"end_time": []string{"2022-07-11T23:59:59Z"}, "start_time": []string{"2022-07-11T00:00:00Z"}},
-	},}
+	}}
 
 	for _, tt := range tests {
 
