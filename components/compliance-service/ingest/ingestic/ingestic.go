@@ -1076,7 +1076,7 @@ func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId s
 	boolQueryControlId := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
 	logrus.Info("controlId %s,%s", controlId, profileId)
-	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
+	script := elastic.NewScript(`def latest = ctx._source.nodes.length;
 	ctx._source.end_time = ctx._source.nodes[latest].node_end_time;
 	def failed = ctx._source.nodes.findAll(node -> node.status == "failed");
 	def skipped = ctx._source.nodes.findAll(node -> node.status == "skipped"); 
