@@ -10,7 +10,7 @@ import { identity } from 'lodash/fp';
 import { clientFromRoute } from 'app/entities/clients/client-details.selectors';
 import { GetClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
-
+import { Org } from 'app/entities/orgs/org.model';
 export type ClientTabName = 'details';
 
 @Component({
@@ -20,6 +20,7 @@ export type ClientTabName = 'details';
 })
 
 export class ClientDetailsComponent implements OnInit, OnDestroy {
+  public org: Org;
   public client: Client;
   public tabValue: ClientTabName = 'details';
   public url: string;
@@ -29,8 +30,9 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
   public orgId: string;
   public name: string;
   public show = false;
+  public clientTabLoading = true;
   private isDestroyed = new Subject<boolean>();
-  clientDetailsLoading = true;
+  public clientDetailsLoading = true;
   public openNotificationModal = new EventEmitter<void>();
 
   constructor(
@@ -64,6 +66,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
       this.show = true;
       this.client = client;
       this.clientDetailsLoading = false;
+      this.clientTabLoading = false;
     });
   }
 

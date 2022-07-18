@@ -11,6 +11,7 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { EntityStatus } from 'app/entities/entities';
 import { Org } from 'app/entities/orgs/org.model';
+import { ActivatedRoute } from '@angular/router';
 import {
   getStatus, orgFromRoute
 } from 'app/entities/orgs/org.selectors';
@@ -39,6 +40,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public clientsTab = false;
   public policyFilesTab = false;
   public policyGroupsTab = false;
+  public redirect = ' ';
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -49,6 +51,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
+    private activatedRoute: ActivatedRoute,
     private telemetryService: TelemetryService,
     private featureFlagsService: FeatureFlagsService
   ) {
@@ -57,10 +60,11 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
 
       this.previousRoute$ = this.store.select(previousRoute);
+      this.activatedRoute.queryParams.subscribe(data =>
+        this.redirect = data.redirect);
       // condition for breadcrumb to select specific tab
       this.previousRoute$.subscribe((params: Params) => {
         const path: string[] = params.path;
-
         if (path.includes('roles')) {
           this.resetTabs();
           this.rolesTab = true;
@@ -90,12 +94,14 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
           this.policyGroupsTab = true;
         }
       });
-
+      if (this.redirect === 'cookbook') {
+        this.resetTabs();
+        this.cookbooksTab = true;
+      }
     }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
