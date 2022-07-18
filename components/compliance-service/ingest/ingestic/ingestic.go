@@ -956,7 +956,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index)
 		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
@@ -974,6 +973,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
+		backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index)
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
@@ -1070,15 +1070,30 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string) error {
 	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
-	boolQueryDailyLatest := elastic.NewBoolQuery().
+	boolQueryControlId := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
 
 	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
 	ctx._source.end_time = ctx._source.nodes[latest].node_end_time;
-	`)
+	def failed = ctx._source.nodes.findAll(node -> node.status == 'failed');
+	def skipped = ctx._source.nodes.findAll(node -> node.status == 'skipped'); 
+	def waived = ctx._source.nodes.findAll(node -> node.status == 'waived'); 
+	def passed = ctx._source.nodes.findAll(node -> node.status == 'passed'); 
+	if(failed.length > 0) { 
+		ctx._source.status='failed' 
+	} 
+	else if (passed.length == 0 && skipped.length == 0 && waived.length > 0) {
+		ctx._source.status='waived'
+	} 
+	else if (passed.length > 0 || skipped.length == 0) {
+		ctx._source.status='passed'
+	} 
+	else if (passed.length == 0 && skipped.length > 0) { 
+		ctx._source.status='skipped'
+	}`)
 	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
-		Query(boolQueryDailyLatest).
+		Query(boolQueryControlId).
 		Script(script).
 		Refresh("false").
 		Do(ctx)
