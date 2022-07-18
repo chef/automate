@@ -22,11 +22,11 @@ const sampleManifest = `
 	"schema_version": "1",
 	"build": "20180611145755",
 	"hab": [
-	  "core/hab/0.55.0/20180321220925",
+	  "core/hab/1.6.521/20220603154827",
 	  "core/hab-sup/0.55.0/20180321222338",
 	  "core/hab-launcher/7241/20180321162126"
 	],
-	"hab_build": "core/hab/0.54.0/20180221022026",
+	"hab_build": "core/hab/1.6.521/20220603154827,
 	"git_sha": "c6e9e90b46b03ca9ea27cfd87125b26ea2cfafbb",
 	"packages": [
 	  "core/tar/1.29/20170513213607"
@@ -100,13 +100,13 @@ func TestRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 
 	downloaded := []string{
-		"core/hab/0.55.0/20180321220925",
+		"core/hab/1.6.521/20220603154827",
 		"core/acl/2.2.52/20170513213108",
 		"core/attr/2.4.47/20170513213059",
 		"core/glibc/2.22/20170513201042",
 		"core/linux-headers/4.3/20170513200956",
 		"core/tar/1.29/20170513213607",
-		"core/hab/0.55.0/20180321220925",
+		"core/hab/1.6.521/20220603154827",
 		"core/busybox-static/1.24.2/20170513215502",
 		"core/bzip2/1.0.6/20170513212938",
 		"core/cacerts/2017.09.20/20171014212239",
