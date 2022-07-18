@@ -26,7 +26,7 @@ const sampleManifest = `
 	  "core/hab-sup/0.55.0/20180321222338",
 	  "core/hab-launcher/7241/20180321162126"
 	],
-	"hab_build": "core/hab/0.54.0/20180221022026",
+	"hab_build": "core/hab/1.6.521/20220603154827",
 	"git_sha": "c6e9e90b46b03ca9ea27cfd87125b26ea2cfafbb",
 	"packages": [
 	  "core/tar/1.29/20170513213607"

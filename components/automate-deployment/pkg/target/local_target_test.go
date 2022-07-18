@@ -320,8 +320,8 @@ func TestInstallHabitat(t *testing.T) {
 	writer := cli.NewWriter(ioutil.Discard, ioutil.Discard, bytes.NewBuffer(nil))
 	manifest := mockManifest(habResponseFixture("manifest"))
 	hasHabCmd := expectCommand("bash", "-c", "command -v hab")
-	habHabInstall := expectHabCommand("hab", "pkg", "install", "core/hab/0.54.0/20180221022026")
-	habBinlink := expectHabCommand("hab", "pkg", "binlink", "--force", "core/hab/0.54.0/20180221022026", "hab")
+	habHabInstall := expectHabCommand("hab", "pkg", "install", "core/hab/1.6.521/20220603154827")
+	habBinlink := expectHabCommand("hab", "pkg", "binlink", "--force", "core/hab/1.6.521/20220603154827", "hab")
 
 	mockScriptInstall := func(t *testing.T, mockExec *command.MockExecutor, tempDir string, installError error) {
 		filename, err := testTempFileProvider.NextFileName()
