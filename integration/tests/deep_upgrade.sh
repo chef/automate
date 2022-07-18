@@ -22,7 +22,7 @@ test_detect_broken_cli=true
 test_detect_broken_packages=true
 
 CURRENT_OLDEST_VERSION=20180519154949
-OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/20180519154949.json"
+OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
 do_create_config() {
