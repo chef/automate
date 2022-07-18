@@ -76,6 +76,50 @@ This page explains the procedure to migrate the existing A2HA data to the newly 
     sudo chef-automate start
   ``` 
 
+## Troubleshooting 
+
+In case of Restore failure form Elastic search to Opensearch
+> error: Failed to restore snapshot
+
+Get the basepath location from the A2HA Clsuter by using the below curl request. 
+> REQUEST
+```
+ curl -XGET http://localhost:10144/_snapshot/_all?pretty -k 
+```
+> RESPONSE
+
+  Look for the `location` value in the response. 
+```
+    "settings" : {
+      "location" : "/mnt/automate_backups/automate-elasticsearch-data/chef-automate-es6-compliance-service",
+    }
+```
+`location` value should be match with the opensearch cluster. 
+In case of `location` value is different, then use the below script to create the snapshot repo
+```
+indices=(
+chef-automate-es5-automate-cs-oc-erchef
+chef-automate-es5-compliance-service
+chef-automate-es5-event-feed-service
+chef-automate-es5-ingest-service
+chef-automate-es6-automate-cs-oc-erchef
+chef-automate-es6-compliance-service
+chef-automate-es6-event-feed-service
+chef-automate-es6-ingest-service
+)
+
+for index in ${indices[@]}; do
+
+curl -XPUT -k -H 'Content-Type: application/json' http://localhost:10144/_snapshot/$index --data-binary @- << EOF
+{
+  "type": "fs",
+  "settings": {
+    "location" : "/mnt/automate_backups/automate-elasticsearch-data/$index"
+  }
+}
+EOF
+done
+```
 {{< note >}}
   - After the restore command successfully executed. If we run the `chef-automate config show` 
   we can see the both Elasticsearch and Opensearch config are the part of Automate Config. We can keep both the config, it wont' impact the functionality. After restore Automate HA talk to opensearch.
