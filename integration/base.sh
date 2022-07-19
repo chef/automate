@@ -210,8 +210,7 @@ do_deploy() {
 }
 
 do_deploy_default() {
-    log_info cat $test_manifest_path
-    log_info 'chef-automate deploy "$test_config_path" --hartifacts "$test_hartifacts_path" --override-origin "$HAB_ORIGIN" --manifest-dir "$test_manifest_path" --admin-password chefautomate --accept-terms-and-mlsa --debug'
+    
     chef-automate deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
@@ -455,7 +454,8 @@ __run_test() {
     source "$1"
 
     log_info "Running test $test_name on $test_container_name"
-
+    log_info cat $test_manifest_path
+    
     log_section_start "Step do_setup"
     do_setup
 
