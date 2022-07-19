@@ -956,11 +956,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		err := backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index)
-		if err != nil {
-			logrus.Errorf("Unable to SetControlIndexEndTime %v", err)
-		}
-		err = backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
 		}
@@ -977,6 +973,10 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
+		err = backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index)
+		if err != nil {
+			logrus.Errorf("Unable to SetControlIndexEndTime %v", err)
+		}
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
@@ -1071,7 +1071,7 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 }
 
 func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string) error {
-	termQueryThisControl := elastic.NewTermsQuery("control_id", controlId)
+	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
 	boolQueryControlId := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
