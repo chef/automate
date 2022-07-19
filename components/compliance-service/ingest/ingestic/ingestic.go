@@ -974,7 +974,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
-		err = backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, control.Nodes[0].NodeEndTime, index)
+		err = backend.SetControlIndexEndTime(ctx, control.ControlID, control.Profile.ProfileID, index, control.Status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)
 		if err != nil {
 			logrus.Errorf("Unable to SetControlIndexEndTime %v", err)
 		}
@@ -1171,14 +1171,24 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 	return nil
 }
 
-func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, nodeEndtime time.Time, index string) error {
+func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string, controlStatus string, nodeStatus string, nodeEndtime time.Time) error {
 	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
 	boolQueryControlId := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
 	logrus.Info("controlId %s,%s", controlId, profileId)
-
-	script := elastic.NewScript(`ctx._source.status=params.nodeEndtime`).Param("nodeEndtime", nodeEndtime)
+	params := make(map[string]interface{})
+	params["node_end_time"] = nodeEndtime
+	newStatus := controlStatus
+	if controlStatus != "failed" {
+		if nodeStatus == "failed" {
+			newStatus = "failed"
+		}
+	}
+	params["newStatus"] = newStatus
+	script := elastic.NewScript(`ctx._source.end_time=params.node_end_time;
+	ctx._source.status=newStatus;
+	`).Params(params)
 	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Query(boolQueryControlId).
