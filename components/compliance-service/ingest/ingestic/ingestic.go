@@ -1077,7 +1077,7 @@ func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId s
 		Must(termQueryThisControl)
 	logrus.Info("controlId %s,%s", controlId, profileId)
 	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
-	ctx._source.end_time = ctx._source.nodes[latest].node_end_time;
+	ctx._source.end_time = latest;
 	def failed = ctx._source.nodes.findAll(node -> node.status == "failed");
 	def skipped = ctx._source.nodes.findAll(node -> node.status == "skipped"); 
 	def waived = ctx._source.nodes.findAll(node -> node.status == "waived"); 
