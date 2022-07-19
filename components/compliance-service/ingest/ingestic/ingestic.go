@@ -1187,7 +1187,7 @@ func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId s
 	}
 	params["newStatus"] = newStatus
 	script := elastic.NewScript(`ctx._source.end_time=params.node_end_time;
-	ctx._source.status=newStatus;
+	ctx._source.status=params.newStatus;
 	`).Params(params)
 	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
