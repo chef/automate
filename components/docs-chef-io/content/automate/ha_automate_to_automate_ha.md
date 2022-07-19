@@ -48,6 +48,13 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
    ```bash
      sudo chef-automate config show > current_config.toml 
    ``` 
+ **Note:** In Automate 4.x.y version onwards, opensearch credentials are not stored in the config. Add the Opensearch password to the generated config above.
+  For example : 
+  ```
+    [global.v1.external.opensearch.auth.basic_auth]
+      username = "admin"
+      password = "admin"
+  ```
 
 8. Restore in Chef-Automate HA using this command:
     ```bash
@@ -95,6 +102,13 @@ Here we expect both the versions of Standalone Chef Automate and Chef Automate H
    ```bash
      sudo chef-automate config show > current_config.toml 
    ``` 
+ **Note:** In Automate 4.x.y version onwards, opensearch credentials are not stored in the config. Add the Opensearch password to the generated config above.
+  For example : 
+  ```
+    [global.v1.external.opensearch.auth.basic_auth]
+      username = "admin"
+      password = "admin"
+  ```
 
 6. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster :
     ```bash
