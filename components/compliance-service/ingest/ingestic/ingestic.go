@@ -1172,16 +1172,16 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 }
 
 func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
+	//termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
-	boolQueryControlId := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
+	//boolQueryControlId := elastic.NewBoolQuery().
+	//	Must(termQueryThisControl)
 	logrus.Info("controlId %s,%s", controlId, profileId)
 	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
 	ctx._source.end_time = latest;`)
 	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
-		Query(boolQueryControlId).
+		//Query(boolQueryControlId).
 		Script(script).
 		Refresh("false").
 		Do(ctx)
