@@ -124,9 +124,7 @@ sudo chef-automate stop
 sudo chef-automate config show > current_config.toml 
 ```
 
-{{< /note >}}
-
-From Automate `4.x.y` version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
+**Note:** From Automate `4.x.y` version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
 
 ```bash
 [global.v1.external.opensearch.auth.basic_auth]
