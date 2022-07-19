@@ -31,36 +31,12 @@ func (backend ES2Backend) getFiltersQueryForStatsSummaryControls(filters map[str
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
-	if len(filters["control"]) > 0 {
-		termQuery := elastic.NewTermsQueryFromStrings("control_id", filters["control"]...)
+	termQueries := getTermsQueryForProfileIdAndControlId(filters)
+	for _, termQuery := range termQueries {
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
-	if len(filters["profile_id"]) > 0 {
-		termQuery := elastic.NewTermsQueryFromStrings("profile.profile_id", filters["profile_id"]...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
-		endTime := firstOrEmpty(filters["end_time"])
-		startTime := firstOrEmpty(filters["start_time"])
-		timeRangeQuery := elastic.NewRangeQuery("end_time")
-		if len(startTime) > 0 {
-			timeRangeQuery.Gte(startTime)
-		}
-		if len(endTime) > 0 {
-			timeRangeQuery.Lte(endTime)
-		}
-
-		boolQuery = boolQuery.Must(timeRangeQuery)
-	}
-
-	if len(filters["end_time"]) == 0 && len(filters["start_time"]) == 0 {
-		// If we don't have an end_time filter, we limit to last 24 hours timeframe
-		timeRangeQuery := elastic.NewRangeQuery("end_time")
-		timeRangeQuery.Gt(time.Now().Add(-24 * time.Hour).UTC().Format(time.RFC3339))
-		boolQuery = boolQuery.Must(timeRangeQuery)
-	}
+	boolQuery = boolQuery.Must(getTimeRangeQueryForFilters(filters))
 
 	if latestOnly {
 		// only if there is no job_id filter set, do we want the daily latest
@@ -87,6 +63,48 @@ func (backend ES2Backend) getFiltersQueryForStatsSummaryControls(filters map[str
 
 	return boolQuery
 
+}
+
+func getTermsQueryForProfileIdAndControlId(filters map[string][]string) []*elastic.TermsQuery {
+
+	termQueries := make([]*elastic.TermsQuery, 0)
+	if len(filters["control"]) > 0 {
+		termQuery := elastic.NewTermsQueryFromStrings("control_id", filters["control"]...)
+		termQueries = append(termQueries, termQuery)
+
+	}
+
+	if len(filters["profile_id"]) > 0 {
+		termQuery := elastic.NewTermsQueryFromStrings("profile.profile_id", filters["profile_id"]...)
+		termQueries = append(termQueries, termQuery)
+	}
+
+	return termQueries
+}
+
+func getTimeRangeQueryForFilters(filters map[string][]string) *elastic.RangeQuery {
+
+	timeRangeQuery := elastic.NewRangeQuery("end_time")
+	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
+		endTime := firstOrEmpty(filters["end_time"])
+		startTime := firstOrEmpty(filters["start_time"])
+		if len(startTime) > 0 {
+			timeRangeQuery.Gte(startTime)
+		}
+		if len(endTime) > 0 {
+			timeRangeQuery.Lte(endTime)
+		}
+
+		return timeRangeQuery
+
+	}
+
+	if len(filters["end_time"]) == 0 && len(filters["start_time"]) == 0 {
+		// If we don't have an end_time filter, we limit to last 24 hours timeframe
+		timeRangeQuery.Gt(time.Now().Add(-24 * time.Hour).UTC().Format(time.RFC3339))
+	}
+
+	return timeRangeQuery
 }
 
 func getBoolQueryForNestedNodes(filters map[string][]string) *elastic.BoolQuery {

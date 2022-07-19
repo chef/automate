@@ -6,15 +6,17 @@ import (
 	"testing"
 )
 
-func TestFiltersForControlIndex(t *testing.T) {
-	esr := ES2Backend{
-		ESUrl:             "",
-		Enterprise:        "",
-		ChefDeliveryUser:  "",
-		ChefDeliveryToken: "",
-	}
+var esr = ES2Backend{
+	ESUrl:             "",
+	Enterprise:        "",
+	ChefDeliveryUser:  "",
+	ChefDeliveryToken: "",
+}
 
-	dummyTime := "2022-07-18T08:14:26Z"
+var dummyTime = "2022-07-18T08:14:26Z"
+
+func TestFiltersForControlIndex(t *testing.T) {
+
 	startTime := "2022-07-17T00:00:00Z"
 	endTime := "2022-07-18T23:59:59Z"
 	tests := []struct {
@@ -234,5 +236,20 @@ func TestFiltersForControlIndex(t *testing.T) {
 		})
 
 	}
+
+}
+
+func TestForControlIdAndProfileId(t *testing.T) {
+	filters := make(map[string][]string)
+	filters["profile_id"] = []string{"testProfile"}
+	filters["control"] = []string{"testControl"}
+	filters["start_time"] = []string{dummyTime}
+	filters["end_time"] = []string{dummyTime}
+	expectedQuery := `{"bool":{"must":[{"nested":{"path":"nodes","query":{"bool":{}}}},{"terms":{"control_id":["testControl"]}},{"terms":{"profile.profile_id":["testProfile"]}},{"range":{"end_time":{"from":"2022-07-18T08:14:26Z","include_lower":true,"include_upper":true,"to":"2022-07-18T08:14:26Z"}}}]}}`
+	got := esr.getFiltersQueryForStatsSummaryControls(filters, false)
+	query, _ := got.Source()
+	data, _ := json.Marshal(query)
+	actualQuery := string(data)
+	assert.Equal(t, expectedQuery, actualQuery)
 
 }
