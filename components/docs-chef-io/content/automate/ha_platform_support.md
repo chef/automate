@@ -61,5 +61,5 @@ Click [here](/calculator/automate_ha_hardware_calculator.xlsx) to calculate the 
 
 - For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
 - For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
-
+- Chef Automate bundle comes with chef-server version 14.15.10
 {{< /note >}}
