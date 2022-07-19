@@ -220,8 +220,6 @@ To run a GCP scan in Chef Automate:
 1. The service adds a node reference in the database for the project tied to the service account credential
 1. Execute a profile against the project reference with a scan job
 
-This information is required to detect all subscriptions available to your Azure account. Chef Automate creates a nodes reference for each subscription in your account.
-
 Note: The service account json credential requires the following fields:
 `type`, `project_id`, `client_id`, `private_key_id`, `private_key`, `client_email`, `auth_uri`, `token_uri`, `auth_provider_x509_cert_url`, `client_x509_cert_url`
 
