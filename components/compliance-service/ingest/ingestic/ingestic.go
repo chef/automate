@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -1070,6 +1071,106 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }
 
+//GetNodesDayLatestTrue Get the Nodes from past 90 days from now where day latest and daily latest are true
+func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]relaxting.NodesUpgradation, error) {
+	nodesMap := make(map[string]relaxting.NodesUpgradation)
+	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	if err != nil {
+		return nil, err
+	}
+
+	indicesSlice := strings.Split(indices, ",")
+
+	boolQuery := elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("day_latest", true)).
+		Must(elastic.NewTermQuery("daily_latest", true))
+
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"node_uuid",
+		"end_time",
+		"day_latest",
+	)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(10000).Sort("end_time", false)
+
+	for _, indx := range indicesSlice {
+		searchResult, err := backend.client.Search().
+			SearchSource(searchSource).
+			Index(indx).
+			FilterPath(
+				"took",
+				"hits.total",
+				"hits.hits._id",
+				"hits.hits._source",
+				"hits.hits.inner_hits").
+			Do(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if searchResult.TotalHits() > 0 {
+			// Iterate through results
+			for _, hit := range searchResult.Hits.Hits {
+				var node relaxting.NodesUpgradation
+				if hit.Source != nil {
+					err := json.Unmarshal(hit.Source, &node)
+					if err != nil {
+						logrus.Errorf("Received error while unmarshling %+v", err)
+					}
+
+				}
+				nodesMap[node.NodeUUID] = node
+			}
+		}
+	}
+	return nodesMap, nil
+}
+
+//SetNodesDayLatestFalse Sets the flag for the currently present data in os database
+func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
+	bulkRequest := backend.client.Bulk()
+	script := elastic.NewScript("ctx._source.day_latest = false")
+	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
+	nodesMap, err := backend.GetNodesDayLatestTrue(ctx, time90DaysAgo)
+	if err != nil {
+		return nil
+	}
+	for _, node := range nodesMap {
+		nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
+		if err != nil {
+			logrus.Error("cannot parse: ", err)
+			continue
+		}
+
+		indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90DaysAgo.Format(time.RFC3339), nodeEndTime.Add(-24*time.Hour).Format(time.RFC3339))
+		if err != nil {
+			logrus.Error("cannot get indices:", err)
+			continue
+		}
+
+		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
+			Index(indices).
+			Id(node.NodeUUID).
+			Script(script))
+	}
+	approxBytes := bulkRequest.EstimatedSizeInBytes()
+	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
+	if err != nil {
+		logrus.Errorf("Unable to send the request in bulk: %v", err)
+		return err
+	}
+	if bulkResponse == nil {
+		logrus.Errorf("Unable to fetch the response of bulk request: %v", err)
+		return err
+	}
+	logrus.Debugf("Bulk insert day latest falgs, ~size %dB, took %dms", approxBytes, bulkResponse.Took)
+	return nil
+}
+
 func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string) error {
 	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
@@ -1077,20 +1178,7 @@ func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId s
 		Must(termQueryThisControl)
 	logrus.Info("controlId %s,%s", controlId, profileId)
 	script := elastic.NewScript(`def latest = ctx._source.nodes.length -1;
-	ctx._source.end_time = latest;
-	def failed = ctx._source.nodes.findAll(node -> node.status == "failed");
-	def skipped = ctx._source.nodes.findAll(node -> node.status == "skipped"); 
-	def waived = ctx._source.nodes.findAll(node -> node.status == "waived"); 
-	def passed = ctx._source.nodes.findAll(node -> node.status == "passed"); 
-	if(failed.length > 0) { 
-		ctx._source.status="failed"; 
-	} else if (passed.length == 0 && skipped.length == 0 && waived.length > 0) {
-		ctx._source.status="waived";
-	} else if (passed.length > 0 || skipped.length == 0) {
-		ctx._source.status="passed";
-	} else if (passed.length == 0 && skipped.length > 0) { 
-		ctx._source.status="skipped";
-	}`)
+	ctx._source.end_time = latest;`)
 	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Query(boolQueryControlId).
