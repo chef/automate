@@ -1071,7 +1071,7 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 }
 
 func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId string, profileId string, index string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
+	termQueryThisControl := elastic.NewTermsQuery("control_id", controlId)
 
 	boolQueryControlId := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
@@ -1084,14 +1084,11 @@ func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId s
 	def passed = ctx._source.nodes.findAll(node -> node.status == "passed"); 
 	if(failed.length > 0) { 
 		ctx._source.status="failed"; 
-	} 
-	else if (passed.length == 0 && skipped.length == 0 && waived.length > 0) {
+	} else if (passed.length == 0 && skipped.length == 0 && waived.length > 0) {
 		ctx._source.status="waived";
-	} 
-	else if (passed.length > 0 || skipped.length == 0) {
+	} else if (passed.length > 0 || skipped.length == 0) {
 		ctx._source.status="passed";
-	} 
-	else if (passed.length == 0 && skipped.length > 0) { 
+	} else if (passed.length == 0 && skipped.length > 0) { 
 		ctx._source.status="skipped";
 	}`)
 	_, err := elastic.NewUpdateByQueryService(backend.client).
