@@ -30,7 +30,7 @@ do_deploy() {
     #   output="error: Found argument 'unload' which wasn't expected, or isn't valid in this context\n\nUSAGE:\n    hab sup [SUBCOMMAND]\n\nFor more information try --help\n"
     #   package=chef/deployment-service/0.1.0/20180519001804
     #
-    install_hab "1.6.521"
+    install_hab "0.54.0"
 
     #shellcheck disable=SC2154
     serve_manifest "$test_manifest_path"

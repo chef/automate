@@ -6,7 +6,7 @@
     "core/hab-sup/0.57.0/20180614232222",
     "core/hab-launcher/7611/20180521214042"
   ],
-  "hab_build": "core/hab/1.6.521/20220603154827",
+  "hab_build": "core/hab/0.54.0/20180221022026",
   "git_sha": "15f732db3098596fd7a8c7c0f4c9f90b39af4082",
   "packages": [
     "chef/authn-service/0.1.0/20180621233337",
