@@ -12,7 +12,8 @@ describe File.basename(__FILE__) do
   it "no filters gets them all filter" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
-            Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+         Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
+         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
         ]
     )
     control_item_array = actual_data['control_items']
@@ -22,7 +23,7 @@ describe File.basename(__FILE__) do
   it "suggests control tag keys matching 'scope'" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
-            Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
             Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
         ],
         size: 10
@@ -36,7 +37,7 @@ describe File.basename(__FILE__) do
   it "control list items with a size of 2" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
-            Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
             Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
         ],
         size: 2
@@ -184,7 +185,7 @@ describe File.basename(__FILE__) do
   it "control list items with a size of 2 but only care about skipped" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
-            Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
             Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
             Reporting::ListFilter.new(type: 'control_status', values: ['skipped']),
         ],
@@ -417,7 +418,7 @@ describe File.basename(__FILE__) do
   it "control list items with a size of 4 filtered by control_tag" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
-            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-04-01T00:00:00Z']),
             Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z']),
             Reporting::ListFilter.new(type: "control", values: ["pro1-con3"]),
 
@@ -466,7 +467,7 @@ describe File.basename(__FILE__) do
   it "control list items filtered by environment and platform" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
-            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
             Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
             Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod Zeta', 'missing']),
             Reporting::ListFilter.new(type: 'platform', values: ['windows', 'missing'])

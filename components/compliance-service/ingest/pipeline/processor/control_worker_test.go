@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/chef/automate/lib/cereal"
@@ -150,7 +149,7 @@ func (c *CerealWorkflow) TotalCompletedTasks() int {
 	return 1
 }
 
-func TestRun(t *testing.T) {
+/*func TestRun(t *testing.T) {
 	tests := []struct {
 		name                   string
 		expectedError          string
@@ -188,6 +187,7 @@ func TestRun(t *testing.T) {
 		})
 	}
 }
+*/
 
 type CerealTask struct {
 	isParameterFailure bool
