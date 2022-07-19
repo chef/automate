@@ -72,7 +72,7 @@ EOF
 
     #shellcheck disable=SC2154
     /bin/chef-automate deploy "$test_config_path" \
-        --hartifacts "results" \
+        --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
         --upgrade-strategy "$test_upgrade_strategy" \
         --accept-terms-and-mlsa \
