@@ -1177,14 +1177,11 @@ func (backend *ESClient) SetControlIndexEndTime(ctx context.Context, controlId s
 	boolQueryControlId := elastic.NewBoolQuery().
 		Must(termQueryThisControl)
 	logrus.Info("controlId %s,%s", controlId, profileId)
-	script := elastic.NewScript(`ctx._source.end_time=ctx._source.nodes[0].node_end_time;
+	script := elastic.NewScript(`ctx._source.end_time=ctx._source.nodes[ctx._source.nodes.length -1].node_end_time;
 	if(ctx._source.status != "failed" ) {
-		def failed = ctx._source.nodes.findAll(node -> node.status == 'failed');
-		for(node in targets){
-			if(node.status=="failed"){
-				ctx._source.status="failed";
-				break;
-			}
+		def failed = ctx._source.nodes.findAll(node -> node.status == "failed");
+		if(failed.length>0){
+			ctx._source.status="failed"
 		}
 		ctx._source.status=ctx._source.nodes[0].status;
 	}`)
