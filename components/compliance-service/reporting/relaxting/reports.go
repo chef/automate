@@ -830,10 +830,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
-	if err != nil {
-		return nil, err
-	}
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
 	latestOnly := FetchLatestDataOrNot(filters)
