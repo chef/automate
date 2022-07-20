@@ -169,4 +169,10 @@ https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_li
 ./chef-automate deploy config.toml <airgapped bundle name>
 ```
 
+{{< note >}}
+
+For more details on deployment follow [On-Premise Deployment](/automate/ha_onprim_deployment_procedure/)
+
+{{< /note >}}
+
 10. Clean up the old packages from chef-backend (like Elasticsearch and postgres)
