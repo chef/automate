@@ -2208,14 +2208,18 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 	return nil
 }
 
-/*func getStartTimeAsEndTime(endTime string) ([]string, error) {
+func getStartDateFromEndDate(endTime string) ([]string, error) {
 	if len(endTime) == 0 {
-		return []string{}, nil
+		return nil, nil
 	}
 
-	endDate, err := time.Parse(layout, endTime)
+	parsedEndTime, err := time.Parse(layout, endTime)
 	if err != nil {
 		return []string{}, err
 	}
+	startTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
+	fmt.Println("The time is", startTime)
 
-}*/
+	return []string{startTime.Format(layout)}, nil
+
+}
