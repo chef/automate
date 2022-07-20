@@ -815,6 +815,8 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
+
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["end_time"]))
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)

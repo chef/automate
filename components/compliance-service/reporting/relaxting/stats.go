@@ -21,7 +21,7 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
 	//filters["start_time"] = []string{}
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
 	}
