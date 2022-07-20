@@ -21,7 +21,7 @@ test_detect_broken_cli=true
 # tests.
 test_detect_broken_packages=true
 
-CURRENT_OLDEST_VERSION=20180519154949
+CURRENT_OLDEST_VERSION=20190501153509
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
@@ -56,7 +56,7 @@ do_deploy() {
     log_info "Generating Automate configuration"
     #shellcheck disable=SC2154
     /bin/chef-automate init-config \
-        --channel "current" \
+        --channel "$test_channel" \
         --file "$test_config_path" \
         --upgrade-strategy "$test_upgrade_strategy"
     cat <<EOF >>"$test_config_path"
