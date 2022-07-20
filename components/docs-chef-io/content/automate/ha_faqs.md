@@ -62,9 +62,9 @@ This page explains the frequently encountered issues in Chef Automate High Avail
   ``` bash
   chef-automate deploy config.toml --airgap-bundle <BUNDLE_NAME>
   ```
-{{< note >}}
+{{< warning >}}
   Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
-{{< /note >}}  
+{{< /warning >}}  
 
 ### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
  - No, Automate HA support https connection only with Managed services. 

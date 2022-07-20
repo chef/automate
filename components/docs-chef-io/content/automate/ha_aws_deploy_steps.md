@@ -81,10 +81,18 @@ vi config.toml
 -   Give `ssh_user` which has access to all the machines. Example: `ubuntu`
 -   Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
 -   Set `backup_config` to `"efs"` or `"s3"`
--   If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.
+-   If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value. By default, bucketname is `chef-automate-ha-<random_string>`
 -   Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
 -   Don't set `fqdn` for this AWS deployment.
 -   Set `instance_count` for Chef Automate, Chef Infra Server, Postgresql, OpenSearch.
+
+{{< note >}}
+
+- For **OpenSearch** and **PostgresSQL**, a minimum of three node clusters is required.
+- For production, OpenSearch volume size also depends on the number of nodes and frequency of Chef Infra Client runs and compliance scans.
+
+{{< /note >}}
+
 -   Set AWS Config Details:
     -   Set `profile`, by default `profile` is `"default"`
     -   Set `region`, by default `region` is `"us-east-1"`
