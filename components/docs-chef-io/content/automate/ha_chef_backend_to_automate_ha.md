@@ -161,48 +161,8 @@ https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_li
 - Update the `intance_count`  
 - fqdn : load balance url, which points to frondend node.
 - keys : ssh username and private keys
-- Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
-- Make sure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
-- Sample configuration, please modify according to your needs.
-
-```cmd
-[architecture.existing_infra]
-secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-architecture = "existing_nodes"
-workspace_path = "/hab/a2_deploy_workspace"
-ssh_user = "myusername"
-ssh_key_file = "~/.ssh/mykey.pem"
-sudo_password = ""
-
-# DON'T MODIFY THE BELOW LINE (backup_mount)
-backup_mount = "/mnt/automate_backups"
-
-[automate.config]
-# admin_password = ""
-# automate load balancer fqdn IP or path
-fqdn = "chef.example.com"
-instance_count = "2"
-# teams_port = ""
-config_file = "configs/automate.toml"
-
-[chef_server.config]
-instance_count = "2"
-
-[opensearch.config]
-instance_count = "3"
-
-[postgresql.config]
-instance_count = "3"
-
-[existing_infra.config]
-automate_private_ips = ["10.0.1.0","10.0.2.0"]
-chef_server_private_ips = ["10.0.1.0","10.0.2.0"]
-opensearch_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
-postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
-```
-
-9. Deploy using
+- Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate `Eg: automate_private_ips = ["10.0.1.0","10.0.2.0"]` and Chef Server `Eg: chef_server_private_ips = ["10.0.1.0","10.0.2.0"]`.
+- Make sure to provide Chef backend's backend server IPs for Automate HA Postgres `Eg: postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]` and OpenSearch machines `Eg: opensearch_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]`.
 
 ```cmd
 ./chef-automate deploy config.toml <airgapped bundle name>

@@ -66,7 +66,7 @@ Download the specific version of the bundle using the following command (`for ex
 curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
 ```
 
-4. Generate `init` config and generate it for existing infra structure using the following command:
+4. Generate `init` config and generate it for AWS infra structure using the following command:
 
 ```bash
 chef-automate init-config-ha aws
