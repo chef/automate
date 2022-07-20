@@ -181,7 +181,7 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 	}
 
 	// Only end_time matters for this call
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"] = []string{}
 
 	latestOnly := FetchLatestDataOrNot(filters)
 
@@ -236,8 +236,7 @@ func (backend ES2Backend) GetProfileListWithAggregatedComplianceSummaries(
 	myName := "GetProfileListWithAggregatedComplianceSummaries"
 
 	// Only end_time matters for this call
-	//filters["start_time"] = []string{}
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"] = []string{}
 	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -287,9 +286,8 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 	filters["profile_id"] = []string{profileID}
 
 	// Only end_time matters for this call
-	//filters["start_time"] = []string{}
+	filters["start_time"] = []string{}
 
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
