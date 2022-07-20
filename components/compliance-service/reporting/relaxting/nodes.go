@@ -43,10 +43,12 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 	sortField string, sortAsc bool) ([]*reportingapi.Node, TotalNodeCounts, error) {
 	emptyTotals := TotalNodeCounts{Total: 0, Passed: 0, Skipped: 0, Failed: 0, Waived: 0}
 	myName := "GetNodes"
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+
+	filters["start_time"] = []string{}
+	/*err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, emptyTotals, err
-	}
+	}*/
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
