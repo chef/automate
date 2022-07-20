@@ -454,7 +454,6 @@ __run_test() {
     source "$1"
 
     log_info "Running test $test_name on $test_container_name"
-    log_info cat $test_manifest_path
     
     log_section_start "Step do_setup"
     do_setup
