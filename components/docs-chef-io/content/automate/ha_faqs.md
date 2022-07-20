@@ -63,7 +63,7 @@ This page explains the frequently encountered issues in Chef Automate High Avail
   chef-automate deploy config.toml --airgap-bundle <BUNDLE_NAME>
   ```
 {{< warning >}}
-  Downgrading the number of **instance_count** for backend node will result in data loss. It is advised to not not downgrade the number of backend nodes. 
+  Downgrading the number of **instance_count** for backend node will result in data loss. It is advised to not downgrade the number of backend nodes. 
 {{< /warning >}}  
 
 ### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
