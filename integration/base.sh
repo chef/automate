@@ -210,7 +210,6 @@ do_deploy() {
 }
 
 do_deploy_default() {
-    
     chef-automate deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
@@ -454,7 +453,6 @@ __run_test() {
     source "$1"
 
     log_info "Running test $test_name on $test_container_name"
-    
     log_section_start "Step do_setup"
     do_setup
 
