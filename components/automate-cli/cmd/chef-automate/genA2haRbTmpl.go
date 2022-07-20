@@ -7,6 +7,7 @@ architecture "{{ .Architecture.ConfigInitials.Architecture }}"
 workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
+ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}"
 {{ if .Architecture.ConfigInitials.SudoPassword }} sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ else }} # sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ end }}
 
 # logging_monitoring_management "true"
@@ -72,6 +73,7 @@ architecture "{{ .Architecture.ConfigInitials.Architecture }}"
 workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
+ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}"
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
 {{ if  .Architecture.ConfigInitials.S3BucketName }} s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ else }} # s3_bucketName "{{ .Architecture.ConfigInitials.S3BucketName }}" {{ end }}
