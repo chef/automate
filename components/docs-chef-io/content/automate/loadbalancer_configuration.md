@@ -45,9 +45,9 @@ sudo yum install nginx
 
 ```bash
 upstream chef-automate-servers {
-   server 10.1.0.101:443;
-   server 10.1.0.102:443;
-   server 10.1.0.103:443;
+   server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
+   server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
+   server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
 }
 
 server {
@@ -74,9 +74,9 @@ server {
 
 ```bash
 upstream chef-infra-servers {
-   server 10.1.0.101:443;
-   server 10.1.0.102:443;
-   server 10.1.0.103:443;
+   server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
+   server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
+   server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
 }
 
 server {

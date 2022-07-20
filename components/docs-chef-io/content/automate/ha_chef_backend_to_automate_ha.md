@@ -13,7 +13,9 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-Customers who are using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
+- Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
+- Automate HA do not support the super market authentication with chef-server users credentials. 
+- Post Migration Customer can not login with chef-server users to Supermarket. 
 {{< /warning >}}
 
 This page explains the procedure to migrate the existing Chef Backend data to the newly deployed Chef Automate HA. This migration involves two steps:
@@ -34,10 +36,11 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
 
 ## Backup the Existing Chef Backend Data
 
-1.   Execute below command to install Habitat 
-  ```cmd
-        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-  ```
+1.   Execute below command to install Habitat:
+
+```cmd
+curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+```
  
 2.   Execute the below command to install the habitat package for `knife-ec-backup`
 
@@ -55,6 +58,7 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
     hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s <chef server URL> -u <pivotal> -k <path of pivotal>
 ```
 For Example:
+
 ```cmd
     hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
 ```
@@ -69,8 +73,10 @@ For Example:
 ```cmd
     hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s <chef server
 ```
-For example: 
-```cmd 
+
+For example:
+
+```cmd
     hab pkg exec chef/knife-ec-backup knife ec backup backup_$(date '+%Y%m%d%H%M%s') --webui-key /etc/opscode/webui_priv.pem -s https://chef.io`.
 ```
 
@@ -88,11 +94,13 @@ For example:
 ## Restore Backed Up Data to Chef Automate HA
 
 -   Execute the below command to install the habitat package for `knife-ec-backup`
+
 ```cmd
     hab pkg install chef/knife-ec-backup
 ```
 
 -   Execute the below command to restore the backup.
+
 ```cmd
     hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
 ```
@@ -114,34 +122,43 @@ This will require downtime, so plan accordingly. A reduced performance should be
 - Take the backup of the system to avoid the data loss.
 {{< /note >}}
 
-1. ssh to all the backend nodes of chef-backend and run 
+1. ssh to all the backend nodes of chef-backend and run
+
 ```cmd
     chef-backend-ctl stop
 ```
-2. ssh to all frontend nodes of chef-backend and run 
+
+2. ssh to all frontend nodes of chef-backend and run
+
 ```cmd
     chef-server-ctl stop
 ```
+
 3. Create one bastion machine under the same network space.
 
 4. ssh to bastion machine and download chef-automate cli
+
 ```cmd
 https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
 ```
+
 5. Extract downloaded zip file
 
-6. Create a airgap bundle using command 
-```cmd 
+6. Create a airgap bundle using command
+
+```cmd
     ./chef-automate airgap bundle create 
 ```
 
-7. Geneate `config.toml` file using command 
+7. Geneate `config.toml` file using command
+
 ```cmd 
     ./chef-automate init-config-ha existing_infra 
 ```
 
-8. Edit `config.toml` and add following things
-- update the intance_count  
+8. Edit `config.toml` and add the following:
+
+- Update the `intance_count`  
 - fqdn : load balance url, which points to frondend node.
 - keys : ssh username and private keys
 - Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
@@ -183,9 +200,10 @@ automate_private_ips = ["10.0.1.0","10.0.2.0"]
 chef_server_private_ips = ["10.0.1.0","10.0.2.0"]
 opensearch_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
 postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
-``` 
+```
 
-9. Deploy using 
+9. Deploy using
+
 ```cmd
 ./chef-automate deploy config.toml <airgapped bundle name>
 ```
