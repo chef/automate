@@ -2208,7 +2208,7 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 	return nil
 }
 
-func getStartDateFromEndDate(endTime string) ([]string, error) {
+func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {
 	if len(endTime) == 0 {
 		return nil, nil
 	}
@@ -2217,9 +2217,22 @@ func getStartDateFromEndDate(endTime string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	startTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
+
+	if checkTodayIsEndTime(parsedEndTime) {
+		return []string{startTime}, nil
+	}
+	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
 	fmt.Println("The time is", startTime)
 
-	return []string{startTime.Format(layout)}, nil
+	return []string{newStartTime.Format(layout)}, nil
 
+}
+
+func checkTodayIsEndTime(endTime time.Time) bool {
+	currentDay := time.Now()
+
+	if currentDay.Year() == endTime.Year() && currentDay.Month() == endTime.Month() && currentDay.Date() == endTime.Date() {
+		return true
+	}
+	return false
 }
