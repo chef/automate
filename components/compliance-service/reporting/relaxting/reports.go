@@ -2231,7 +2231,7 @@ func getStartDateFromEndDate(endTime string, startTime string) ([]string, error)
 func checkTodayIsEndTime(endTime time.Time) bool {
 	currentDay := time.Now()
 
-	if currentDay.Year() == endTime.Year() && currentDay.Month() == endTime.Month() && currentDay.Date() == endTime.Date() {
+	if currentDay.Year() == endTime.Year() && currentDay.Month() == endTime.Month() && currentDay.Day() == endTime.Day() {
 		return true
 	}
 	return false
