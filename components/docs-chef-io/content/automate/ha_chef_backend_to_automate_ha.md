@@ -165,6 +165,7 @@ https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_li
 - Make sure to provide Chef backend's backend server IPs for Automate HA Postgres `Eg: postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]` and OpenSearch machines `Eg: opensearch_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]`.
 
 9. Deploy using 
+
 ```cmd
 ./chef-automate deploy config.toml <airgapped bundle name>
 ```
