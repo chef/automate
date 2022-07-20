@@ -56,7 +56,7 @@ do_deploy() {
     log_info "Generating Automate configuration"
     #shellcheck disable=SC2154
     /bin/chef-automate init-config \
-        --channel "$test_channel" \
+        --channel "current" \
         --file "$test_config_path" \
         --upgrade-strategy "$test_upgrade_strategy"
     cat <<EOF >>"$test_config_path"
