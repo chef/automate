@@ -70,10 +70,11 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	latestOnly := FetchLatestDataOrNot(filters)
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	/*err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
-	}
+	}*/
 	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -180,7 +181,7 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 	}
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 
 	latestOnly := FetchLatestDataOrNot(filters)
 
@@ -235,7 +236,8 @@ func (backend ES2Backend) GetProfileListWithAggregatedComplianceSummaries(
 	myName := "GetProfileListWithAggregatedComplianceSummaries"
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	depth, err := backend.NewDepth(filters, true)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -285,7 +287,9 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 	filters["profile_id"] = []string{profileID}
 
 	// Only end_time matters for this call
-	filters["start_time"] = []string{}
+	//filters["start_time"] = []string{}
+
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)

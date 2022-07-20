@@ -74,6 +74,10 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	myName := "getNodeReportIdsFromTimeseries"
 	var repIds reportingapi.ReportIds
 
+	if len(filters["start_time"]) == 0 {
+		filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	}
+
 	//nodeReport := make(map[string]reportingapi.ReportData, 0)
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
