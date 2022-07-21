@@ -201,6 +201,10 @@ variable "ssh_user" {
   default = "centos"
 }
 
+variable "ssh_port" {
+  default = 22
+}
+
 variable "sudo_cmd" {
   default = "sudo"
 }

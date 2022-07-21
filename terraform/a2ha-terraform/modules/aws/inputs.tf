@@ -67,6 +67,10 @@ variable "aws_ssh_user" {
   default = "centos"
 }
 
+variable  "aws_ssh_port" {
+  default = 22
+}
+
 variable "aws_vpc_id" {
 }
 

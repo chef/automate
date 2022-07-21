@@ -123,6 +123,10 @@ variable "vsphere_linux_sshuser" {
   default = "vagrant"
 }
 
+variable "vsphere_linux_sshport" {
+  default = 22
+}
+
 variable "vsphere_linux_template" {
   description = "RHEL7 or CentOS7 template"
   default     = "centos76-template"

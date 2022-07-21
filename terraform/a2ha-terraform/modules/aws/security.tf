@@ -161,6 +161,16 @@ resource "aws_security_group_rule" "ingress_chef_automate_allow_proxy_tcp" {
   source_security_group_id = aws_security_group.chef_automate.id
 }
 
+# Allow custom SSH connections
+resource "aws_security_group_rule" "ingress_chef_automate_allow_custom_ssh" {
+  type                     = "ingress"
+  from_port                = var.aws_ssh_port
+  to_port                  = var.aws_ssh_port
+  protocol                 = "tcp"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = aws_security_group.chef_automate.id
+}
+
 //////////////////////////
 //  Load balancer security group Rules
 resource "aws_security_group_rule" "ingress_allow_80_tcp_all" {

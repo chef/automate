@@ -11,6 +11,7 @@ The following flags are available:
  -i IP            IP/hostname of the destination system
  -k PATH          Path to the ssh key pair file
  -u USER          SSH username on the destination system
+ -s PORT          SSH port on the destination system
  -p PATH          The path to airgap_bundle module (\${path.module})
  -l LIST          Comma delimited list of SRC1,DST1,SRC2,DST2.. file pairs
                   The SOURCE path is relative to terraform/transfer_files/ directory
@@ -34,10 +35,11 @@ fi
 export SSH_KEY_FILE=
 export SSH_IP=
 export SSH_USER=
+export SSH_PORT=
 export SSH_FILES=()
 export MODULE_DIR=
 
-while getopts ":i:k:u:p:l:h" opt; do
+while getopts ":i:k:u:s:p:l:h" opt; do
   case "${opt}" in
     i)
       export SSH_IP=${OPTARG}
@@ -47,6 +49,9 @@ while getopts ":i:k:u:p:l:h" opt; do
       ;;
     u)
       export SSH_USER=${OPTARG}
+      ;;
+    s)
+      export SSH_PORT=${OPTARG}
       ;;
     p)
       export MODULE_DIR=${OPTARG}
@@ -83,7 +88,7 @@ rsync_with_retry() {
   n=0
   until [ $n -ge $max ]; do
     rsync -aW --partial --inplace -e "ssh -o StrictHostKeyChecking=no\
-      -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE}" "${1}" \
+      -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE}" "${1}" "-p ${SSH_PORT}"  \
       "${SSH_USER}@${SSH_IP}:${2}" && break
     n=$((n+1))
     echo "Will re-attempt rsync of ${2} to ${SSH_IP} on next loop iteration.."

@@ -23,5 +23,8 @@ variable "ssh_key_file" {
 variable "ssh_user" {
 }
 
+variable "ssh_port" {
+}
+
 variable "tmp_path" {
 }

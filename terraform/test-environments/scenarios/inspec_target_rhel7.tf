@@ -38,6 +38,7 @@ module "inspec_target_rhel7_cd_base" {
   instance_id   = "${module.inspec_target_rhel7.instance_id}"
   instance_fqdn = "${module.inspec_target_rhel7.fqdn}"
   ssh_username  = "${module.inspec_target_rhel7.ssh_username}"
+  ssh_port  = "${module.inspec_target_rhel7.ssh_port}"
 
   enable_monitoring = "${var.enable_monitoring}"
   chef_environment  = "${var.chef_environment}"
@@ -65,6 +66,7 @@ resource "null_resource" "install_service_user" {
     type = "ssh"
     host = "${element(module.inspec_target_rhel7.fqdn, 0)}"
     user = "${module.inspec_target_rhel7.ssh_username}"
+    port = "${module.inspec_target_rhel7.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }

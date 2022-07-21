@@ -28,6 +28,7 @@ resource "null_resource" "mount_efs" {
     host        =  local.ip_list[count.index]
     type        = "ssh"
     user        = var.aws_ssh_user
+    port        = var.aws_ssh_port
     private_key = file(var.aws_ssh_key_file)
     script_path = "${var.tmp_path}/tf_inline_script_aws.sh"
   }

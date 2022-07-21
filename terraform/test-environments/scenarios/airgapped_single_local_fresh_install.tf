@@ -50,6 +50,7 @@ resource "null_resource" "airgapped_single_local_fresh_install_upload_airgap_bun
     type = "ssh"
     host = "${element(module.airgapped_single_local_fresh_install.fqdn, count.index)}"
     user = "${module.airgapped_single_local_fresh_install.ssh_username}"
+    port = "${module.airgapped_single_local_fresh_install.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }
@@ -78,6 +79,7 @@ module "airgapped_single_local_fresh_install_deploy" {
   instance_id   = "${module.airgapped_single_local_fresh_install.instance_id}"
   instance_fqdn = "${module.airgapped_single_local_fresh_install.fqdn}"
   ssh_username  = "${module.airgapped_single_local_fresh_install.ssh_username}"
+  ssh_port  = "${module.airgapped_single_local_fresh_install.ssh_port}"
 
   airgapped               = "${null_resource.airgapped_single_local_fresh_install_upload_airgap_bundle.id != "" ? true : false}"
   journald_system_max_use = "${var.channel == "acceptance" ? "20G" : "6G"}"

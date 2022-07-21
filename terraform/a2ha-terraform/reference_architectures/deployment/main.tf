@@ -11,6 +11,7 @@ module "system-tuning-automate" {
   private_ips                     = var.automate_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
 }
@@ -24,6 +25,7 @@ module "system-tuning-chef_server" {
   private_ips                     = var.chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
 }
@@ -38,6 +40,7 @@ module "system-tuning-opensearch" {
   private_ips                     = var.opensearch_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
 }
@@ -52,6 +55,7 @@ module "system-tuning-postgresql" {
   private_ips                     = var.postgresql_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
 }
@@ -68,6 +72,7 @@ module "airgap_bundle-opensearch" {
   }]
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
+  ssh_port     = var.ssh_port
   tmp_path     = var.tmp_path
   depends_on = [
     module.system-tuning-opensearch
@@ -86,6 +91,7 @@ module "airgap_bundle-postgresql" {
   }]
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
+  ssh_port     = var.ssh_port
   tmp_path     = var.tmp_path
   depends_on = [
     module.system-tuning-postgresql
@@ -106,6 +112,7 @@ module "airgap_bundle-automate" {
   }]
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
+  ssh_port     = var.ssh_port
   tmp_path     = var.tmp_path
   depends_on = [
     module.system-tuning-automate
@@ -126,6 +133,7 @@ module "airgap_bundle-chef_server" {
   }]
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
+  ssh_port     = var.ssh_port
   tmp_path     = var.tmp_path
   depends_on = [
     module.system-tuning-chef_server
@@ -153,6 +161,7 @@ module "habitat-opensearch" {
   )
   ssh_key_file           = var.ssh_key_file
   ssh_user               = var.ssh_user
+  ssh_port               = var.ssh_port
   ssh_user_sudo_password = local.be_sudo_password
   sudo_cmd               = var.sudo_cmd
   habitat_uid_gid        = var.habitat_uid_gid
@@ -182,6 +191,7 @@ module "habitat-postgresql" {
   )
   ssh_key_file           = var.ssh_key_file
   ssh_user               = var.ssh_user
+  ssh_port               = var.ssh_port
   ssh_user_sudo_password = local.be_sudo_password
   sudo_cmd               = var.sudo_cmd
   habitat_uid_gid        = var.habitat_uid_gid
@@ -207,6 +217,7 @@ module "habitat-automate" {
   peer_ips                        = var.automate_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
@@ -232,6 +243,7 @@ module "habitat-chef_server" {
   peer_ips                        = var.chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
@@ -260,6 +272,7 @@ module "opensearch" {
   private_ips                     = var.opensearch_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   backup_config_efs               = var.backup_config_efs
@@ -296,6 +309,7 @@ module "postgresql" {
   private_ips                     = var.postgresql_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   depends_on = [
@@ -344,6 +358,7 @@ module "bootstrap_automate" {
   setup_managed_services             = var.setup_managed_services
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
+  ssh_port                           = var.ssh_port
   ssh_user_sudo_password             = local.fe_sudo_password
   sudo_cmd                           = var.sudo_cmd
   teams_port                         = var.teams_port
@@ -401,6 +416,7 @@ module "automate" {
   setup_managed_services = var.setup_managed_services
   ssh_key_file           = var.ssh_key_file
   ssh_user               = var.ssh_user
+  ssh_port               = var.ssh_port
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
@@ -454,6 +470,7 @@ module "chef_server" {
   setup_managed_services             = var.setup_managed_services
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
+  ssh_port                           = var.ssh_port
   ssh_user_sudo_password             = local.fe_sudo_password
   sudo_cmd                           = var.sudo_cmd
   teams_port                         = var.teams_port

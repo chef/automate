@@ -198,6 +198,7 @@ resource "aws_instance" "chef_automate_postgresql" {
 
   connection {
     host        = coalesce(self.private_ip)
+    port        = var.aws_ssh_port
     type        = "ssh"
     user        = var.aws_ssh_user
     private_key = file(var.aws_ssh_key_file)

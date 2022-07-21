@@ -17,6 +17,10 @@ variable "aws_ssh_user" {
   default = "centos"
 }
 
+variable "aws_ssh_port" {
+  default = 22
+}
+
 variable "chef_server_private_ips" {
   default = []
 }

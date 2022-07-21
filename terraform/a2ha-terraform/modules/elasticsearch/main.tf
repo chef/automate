@@ -33,6 +33,7 @@ resource "null_resource" "elasticsearch" {
 
   connection {
     user        = var.ssh_user
+    port        = var.ssh_port
     private_key = file(var.ssh_key_file)
     host        = var.private_ips[count.index]
     script_path = "${var.tmp_path}/tf_inline_script_system_elasticsearch.sh"
@@ -70,6 +71,7 @@ resource "null_resource" "backup_configuration" {
 
   connection {
     user        = var.ssh_user
+    port        = var.ssh_port
     private_key = file(var.ssh_key_file)
     host        = var.private_ips[0]
     script_path = "${var.tmp_path}/tf_inline_script_system_elasticsearch.sh"

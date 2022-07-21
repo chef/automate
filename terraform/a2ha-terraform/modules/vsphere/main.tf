@@ -95,6 +95,7 @@ resource "vsphere_virtual_machine" "chef_automate_postgresql" {
     host        = self.default_ip_address
     type        = "ssh"
     user        = var.vsphere_linux_sshuser
+    port        = var.vsphere_linux_sshport
     private_key = file(var.vsphere_linux_sshkeyfile)
     script_path = "${var.tmp_path}/tf_inline_script_vsphere.sh"
   }
@@ -170,6 +171,7 @@ resource "vsphere_virtual_machine" "chef_automate_opensearch" {
     host        = self.default_ip_address
     type        = "ssh"
     user        = var.vsphere_linux_sshuser
+    port        = var.vsphere_linux_sshport
     private_key = file(var.vsphere_linux_sshkeyfile)
     script_path = "${var.tmp_path}/tf_inline_script_vsphere.sh"
   }
@@ -245,6 +247,7 @@ resource "vsphere_virtual_machine" "chef_automate" {
     host        = self.default_ip_address
     type        = "ssh"
     user        = var.vsphere_linux_sshuser
+    port        = var.vsphere_linux_sshport
     private_key = file(var.vsphere_linux_sshkeyfile)
     script_path = "${var.tmp_path}/tf_inline_script_vsphere.sh"
   }
@@ -320,6 +323,7 @@ resource "vsphere_virtual_machine" "chef_server" {
     host        = self.default_ip_address
     type        = "ssh"
     user        = var.vsphere_linux_sshuser
+    port        = var.vsphere_linux_sshport
     private_key = file(var.vsphere_linux_sshkeyfile)
     script_path = "${var.tmp_path}/tf_inline_script_vsphere.sh"
   }

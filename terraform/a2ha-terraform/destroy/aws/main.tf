@@ -29,6 +29,7 @@ module "aws" {
   aws_ssh_key_file                = var.ssh_key_file
   aws_ssh_key_pair_name           = var.aws_ssh_key_pair_name
   aws_ssh_user                    = var.ssh_user
+  aws_ssh_port                    = var.ssh_port
   chef_ebs_volume_iops            = var.automate_ebs_volume_iops
   chef_ebs_volume_size            = var.automate_ebs_volume_size
   chef_ebs_volume_type            = var.automate_ebs_volume_type
@@ -71,6 +72,7 @@ module "efs" {
   aws_ssh_key_file        = var.ssh_key_file
   aws_ssh_key_pair_name   = var.aws_ssh_key_pair_name
   aws_ssh_user            = var.ssh_user
+  aws_ssh_port            = var.ssh_port
   tag_name                = var.tag_name
   subnet_id               = module.aws.subnet_id
   mount_id                = module.aws.mount_id

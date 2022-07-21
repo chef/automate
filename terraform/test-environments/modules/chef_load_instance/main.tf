@@ -75,6 +75,7 @@ resource "null_resource" "habitat_install" {
     type = "ssh"
     host = "${element(var.instance_fqdn, count.index)}"
     user = "${var.ssh_username}"
+    port = "${var.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }
@@ -123,6 +124,7 @@ resource "null_resource" "chef_load_deploy" {
     type = "ssh"
     host = "${element(var.instance_fqdn, count.index)}"
     user = "${var.ssh_username}"
+    port = "${var.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }

@@ -18,6 +18,11 @@ variable "ssh_username" {
   description = "The SSH username for the instance. Typically an output of the cd_instance module."
 }
 
+variable "ssh_port" {
+  type        = "string"
+  description = "The SSH port for the instance. Typically an output of the cd_instance module."
+}
+
 variable "airgapped" {
   default     = "false"
   description = "Instance is airgapped."

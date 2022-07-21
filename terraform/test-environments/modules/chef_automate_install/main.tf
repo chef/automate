@@ -83,6 +83,7 @@ resource "null_resource" "soften_mounts" {
     type        = "ssh"
     host        = "${element(var.instance_fqdn, count.index)}"
     user        = "${var.ssh_username}"
+    port        = "${var.ssh_port}"
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
     script_path = "/home/${var.ssh_username}/run_soften_mounts.sh"
   }
@@ -121,6 +122,7 @@ resource "null_resource" "chef_automate_cli_deploy" {
     type = "ssh"
     host = "${element(var.instance_fqdn, count.index)}"
     user = "${var.ssh_username}"
+    port = "${var.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }
@@ -330,6 +332,7 @@ resource "null_resource" "chef_automate_metrics_prereqs" {
     type = "ssh"
     host = "${element(var.instance_fqdn, count.index)}"
     user = "${var.ssh_username}"
+    port = "${var.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }
@@ -362,6 +365,7 @@ resource "null_resource" "chef_automate_metrics" {
     type = "ssh"
     host = "${element(var.instance_fqdn, count.index)}"
     user = "${var.ssh_username}"
+    port = "${var.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }
