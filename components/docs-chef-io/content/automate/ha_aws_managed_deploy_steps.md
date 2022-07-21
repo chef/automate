@@ -69,7 +69,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    ```
 
 4. Generate init config
-   Then generate init config for existing infra structure:
+   Then generate init config for AWS infra structure:
 
    ```bash
    chef-automate init-config-ha aws
