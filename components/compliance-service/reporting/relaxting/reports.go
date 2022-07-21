@@ -2175,7 +2175,7 @@ func getControlSummaryFilters(controlId []string, filters map[string][]string) *
 
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
 	if len(endTime) == 0 || len(startTime) == 0 {
-		return []string{"day_latest"}, nil
+		return []string{"day_latest", "daily_latest"}, nil
 	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
