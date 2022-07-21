@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"net/http"
 	"strings"
 	"sync"
@@ -314,4 +315,14 @@ func FetchLatestDataOrNot(filters map[string][]string) bool {
 		latestOnly = false
 	}
 	return latestOnly
+}
+
+func impactName(impactValue float64) (impact string) {
+	impact = inspec.ControlImpactCritical
+	if impactValue < 0.4 {
+		impact = inspec.ControlImpactMinor
+	} else if impactValue < 0.7 {
+		impact = inspec.ControlImpactMajor
+	}
+	return impact
 }
