@@ -25,30 +25,29 @@ func ParseReportCtrlStruct(ctx context.Context, client *ingestic.ESClient, repor
 func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) ([]relaxting.Control, error) {
 	var controls []relaxting.Control
 
-	nodes := make([]relaxting.Node, 0)
-	// Get the nodes
-	node := relaxting.Node{NodeUUID: inspecReport.NodeID,
-		DailyLatest:      true,
-		DayLatest:        true,
-		NodeEndTime:      inspecReport.EndTime,
-		Status:           inspecReport.Status,
-		ReportUUID:       inspecReport.ReportID,
-		NodeName:         inspecReport.NodeName,
-		Environment:      inspecReport.Environment,
-		PolicyGroup:      inspecReport.PolicyGroup,
-		PolicyName:       inspecReport.PolicyName,
-		Platform:         inspecReport.Platform,
-		Recipes:          inspecReport.Recipes,
-		Roles:            inspecReport.Roles,
-		OrganizationName: inspecReport.OrganizationName,
-		SourceFQDN:       inspecReport.SourceFQDN,
-		ChefTags:         inspecReport.ChefTags,
-	}
-
-	nodes = append(nodes, node)
+	var nodeStatus string
 
 	for _, value := range inspecReport.Profiles {
 		for _, value2 := range value.Controls {
+			nodes := make([]relaxting.Node, 0)
+			// Get the nodes
+			node := &relaxting.Node{NodeUUID: inspecReport.NodeID,
+				DailyLatest:      true,
+				DayLatest:        true,
+				NodeEndTime:      inspecReport.EndTime,
+				ReportUUID:       inspecReport.ReportID,
+				NodeName:         inspecReport.NodeName,
+				Environment:      inspecReport.Environment,
+				PolicyGroup:      inspecReport.PolicyGroup,
+				PolicyName:       inspecReport.PolicyName,
+				Platform:         inspecReport.Platform,
+				Recipes:          inspecReport.Recipes,
+				Roles:            inspecReport.Roles,
+				OrganizationName: inspecReport.OrganizationName,
+				SourceFQDN:       inspecReport.SourceFQDN,
+				ChefTags:         inspecReport.ChefTags,
+				JobID:            inspecReport.JobID,
+			}
 			ctrl := relaxting.Control{}
 			ctrl.ControlID = value2.ID
 			ctrl.Title = value2.Title
@@ -59,14 +58,16 @@ func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) 
 			ctrl.DailyLatest = true
 			ctrl.DayLatest = true
 			ctrl.StringTags = value2.StringTags
-
 			if checkIfControlWaivedStatus(value2.WaivedStr, value2.WaiverData) {
-				ctrl.Status = "waived"
+				nodeStatus = "waived"
 			} else {
-				ctrl.Status = value2.Status
+				nodeStatus = value2.Status
 			}
+			ctrl.Status = nodeStatus
+			node.Status = nodeStatus
+			nodes = append(nodes, *node)
 			ctrl.Nodes = nodes
-			ctrl.Profile = relaxting.Profile{ProfileID: value.Profile, Title: value.Title}
+			ctrl.Profile = relaxting.Profile{ProfileID: value.SHA256, Title: value.Title}
 			controls = append(controls, ctrl)
 		}
 	}

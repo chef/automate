@@ -41,7 +41,6 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Environment: Env,
 					Profiles: []relaxting.ESInSpecReportProfile{
 						{
 							Name: "",
@@ -91,7 +90,7 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "failed",
-					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "on", DayLatest: true, DailyLatest: true, ReportUUID: UUID}},
+					Nodes:       []relaxting.Node{relaxting.Node{NodeUUID: "ssdpweoru4etu5hgsklvldfknv", Status: "failed", DayLatest: true, DailyLatest: true, ReportUUID: UUID}},
 					Profile:     relaxting.Profile{ProfileID: ""},
 				},
 			},

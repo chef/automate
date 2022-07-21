@@ -341,6 +341,7 @@ type Node struct {
 	OrganizationName string   `json:"organization_name"`
 	SourceFQDN       string   `json:"source_fqdn"`
 	ChefTags         []string `json:"chef_tags"`
+	JobID            string   `json:"job_uuid"`
 }
 
 type Profile struct {
