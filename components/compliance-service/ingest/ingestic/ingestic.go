@@ -970,9 +970,8 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
 		}
 		if found {
-			logrus.Infof("ControlId.. %s,%v ", docId, found)
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(control.ControlID).Script(setControlIndexEndTime(ctx, control.ControlID, control.Status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)).Type("_doc"))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])).Type("_doc"))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(control.ControlID).Script(scriptForUpdatingControlIndexStatusAndEndTime(control.Status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)).Type("_doc"))
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
@@ -1169,10 +1168,13 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 	return nil
 }
 
-func setControlIndexEndTime(ctx context.Context, controlId string, controlStatus string, nodeStatus string, nodeEndtime time.Time) *elastic.Script {
+//script for updating control index status and end time
+func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeStatus string, nodeEndtime time.Time) *elastic.Script {
+
 	params := make(map[string]interface{})
 	params["node_end_time"] = nodeEndtime
 	newStatus := controlStatus
+
 	if controlStatus != "failed" && nodeStatus == "failed" {
 		newStatus = "failed"
 	} else if controlStatus == "waived" && nodeStatus == "skipped" {
@@ -1180,10 +1182,11 @@ func setControlIndexEndTime(ctx context.Context, controlId string, controlStatus
 	} else if controlStatus == "passed" && nodeStatus == "waived" {
 		newStatus = "waived"
 	}
+
 	params["newStatus"] = newStatus
 	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
 	ctx._source.status = params.newStatus
 	`).Params(params)
-	logrus.Infof("controlId %s,%s,%s ", controlId, controlStatus, newStatus)
+
 	return script
 }
