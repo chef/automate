@@ -523,7 +523,6 @@ func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) tokenApiHandler(w http.ResponseWriter, r *http.Request) {
 	// need to grab 'code' from the query params, exchange for token, return token
 	code := r.URL.Query().Get("code")
-	fmt.Printf("code:%s\n", code)
 	if code == "" {
 		http.Error(w, "no code in request", http.StatusBadRequest)
 		return
