@@ -1,4 +1,4 @@
-import { map } from 'rxjs/operators';
+import { map  } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -9,6 +9,7 @@ import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+
 
 const CC_API_URL = environment.compliance_url;
 
@@ -29,16 +30,15 @@ export class ReportCollection {
     this.totalReports = totalReports;
   }
 }
-
 @Injectable()
 export class StatsService {
   constructor(
     private httpClient: HttpClient,
     private route: ActivatedRoute,
     private appConfigService: AppConfigService,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
   ) {}
-
+  
   getFailures(types: Array<string>, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/failures`;
     const formatted = this.formatFilters(reportQuery);
@@ -47,6 +47,7 @@ export class StatsService {
 
     return this.httpClient.post<any>(url, body);
   }
+
 
   getNodeSummary(reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/summary`;
@@ -65,14 +66,37 @@ export class StatsService {
     return this.httpClient.post<any>(url, body).pipe(
       map(({ controls_summary }) => controls_summary));
   }
-
   getNodeTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
-
+    let previous_url :string
+    let prev = localStorage.getItem(previous_url);
+    prev.toString();
+    const url_array = ["reporting/nodes" , "reporting/profiles" , "reporting/controls"];
+    var urlcheck = url_array.some(url_var => prev.includes(url_var));
+    if(urlcheck == true){
+      let time_interval = reportQuery.interval;
+      if (time_interval == 0 ){
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(10 , 'days');
+        localStorage.setItem(previous_url , url)
+      }
+      else if(time_interval == 1){
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'months');
+        localStorage.setItem(previous_url , url);
+      }
+      else if(time_interval == 2) {
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(3 , 'months');
+        localStorage.setItem(previous_url , url);
+      }
+      else if(time_interval == 3) {
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'years');
+        localStorage.setItem(previous_url , url);
+      }
+      localStorage.setItem(previous_url , url);
+    }
     const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'nodes', interval, filters: formatted};
-
+  
     return this.httpClient.post<any>(url, body).pipe(
       map(({ trends }) => trends));
   }
@@ -80,7 +104,32 @@ export class StatsService {
   getControlsTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
-
+    let testing : string;
+    let prev = localStorage.getItem(testing);
+    prev.toString();
+    const url_array = ["reporting/nodes" , "reporting/profiles" , "reporting/controls"];
+    var urlcheck = url_array.some(url_var => prev.includes(url_var));
+    if(urlcheck == true){
+      let time_interval = reportQuery.interval;
+      if (time_interval == 0 ){
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(10 , 'days');
+        localStorage.setItem(testing , url)
+      }
+      else if(time_interval == 1){
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'months');
+        localStorage.setItem(testing , url);
+      }
+      else if(time_interval == 2) {
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(3 , 'months');
+        localStorage.setItem(testing , url);
+      }
+      else if(time_interval == 3) {
+        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'years');
+        localStorage.setItem(testing , url);
+      }
+      localStorage.setItem(testing , url);
+    }
+    
     const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'controls', interval, filters: formatted};
 
@@ -116,6 +165,9 @@ export class StatsService {
 
   getNodes(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/nodes/search`;
+    let current_url : string
+    localStorage.setItem(current_url , url);
+    reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
 
@@ -149,6 +201,8 @@ export class StatsService {
   }
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/profiles`;
+    let current_url : string
+    localStorage.setItem(current_url , url); 
     reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
@@ -171,8 +225,12 @@ export class StatsService {
 
   getControls(reportQuery: ReportQuery): Observable<{total: any, items: any}> {
     const url = `${CC_API_URL}/reporting/controls`;
-    const filters = this.formatFilters(reportQuery);
-    const body = { filters };
+    let current_url : string
+    localStorage.setItem(current_url , url);
+    reportQuery = this.getStartDate(reportQuery);
+    let formatted = this.formatFilters(reportQuery);
+    formatted = this.addStatusParam(formatted);
+    let body = { filters: formatted };
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ control_items }) => ({ total: control_items.length, items: control_items })));
