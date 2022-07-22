@@ -218,6 +218,8 @@ func (s *Server) initHandlers() {
 		HeadersRegexp("Cookie", "session=.+")
 	r.HandleFunc("/logout", s.logoutHandler).
 		Methods("GET")
+	r.HandleFunc("/token_api", s.tokenApiHandler).
+		Methods("GET")
 
 	// these are only to be used if Builder is configured to authenticate with Automate
 	r.HandleFunc("/token", s.tokenHandler).
@@ -510,8 +512,46 @@ func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
 	returnData := struct {
 		AccessToken string `json:"access_token"`
 	}{rawIDToken}
+
 	if err := json.NewEncoder(w).Encode(returnData); err != nil {
 		http.Error(w, errors.Wrap(err, "failed to set access token").Error(),
+			http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) tokenApiHandler(w http.ResponseWriter, r *http.Request) {
+	// need to grab 'code' from the query params, exchange for token, return token
+	code := r.URL.Query().Get("code")
+	fmt.Printf("code:%s\n", code)
+	if code == "" {
+		http.Error(w, "no code in request", http.StatusBadRequest)
+		return
+	}
+
+	token, err := s.client.Exchange(r.Context(), code)
+	if err != nil {
+		s.log.Debugf("failed to get token: %v", err)
+		http.Error(w, fmt.Sprintf("failed to get token: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	rawIDToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		s.log.Debug("no id_token in token response")
+		http.Error(w, "no id_token in token response", http.StatusInternalServerError)
+		return
+	}
+
+	returnData := struct {
+		IdToken      string    `json:"id_token"`
+		TokenType    string    `json:"token_type"`
+		Expiry       time.Time `json:"expires_in"`
+		RefreshToken string    `json:"refresh_token"`
+	}{rawIDToken, token.TokenType, token.Expiry, token.RefreshToken}
+
+	if err := json.NewEncoder(w).Encode(returnData); err != nil {
+		http.Error(w, errors.Wrap(err, "failed to set token").Error(),
 			http.StatusInternalServerError)
 		return
 	}
