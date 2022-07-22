@@ -39,7 +39,7 @@ func (u *cerealService) EnqueueWorkflowDayLatest(status bool) error {
 //EnqueueWorkflowControl enqueue the message for control index flag
 func (u *cerealService) EnqueueWorkflowControl(status bool) error {
 	var err error
-	if !status {
+	if status {
 		err = u.cerealManger.EnqueueWorkflow(context.TODO(), MigrationWorkflowName,
 			fmt.Sprintf("%s-%s", MigrationWorkflowName, UpgradeTaskName),
 			MigrationWorkflowParameters{
