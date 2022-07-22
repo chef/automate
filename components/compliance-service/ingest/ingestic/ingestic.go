@@ -971,7 +971,7 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		}
 		if found {
 			logrus.Infof("controlId %s, %v", docId, found)
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(control.ControlID).Script(scriptForUpdatingControlIndexStatusAndEndTime(control.Status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)).Type("_doc"))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(control.Status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)).Type("_doc"))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])).Type("_doc"))
 			continue
 		}
@@ -1171,7 +1171,7 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 
 //script for updating control index status and end time
 func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeStatus string, nodeEndtime time.Time) *elastic.Script {
-
+	logrus.Infof("controlId %s", nodeEndtime)
 	params := make(map[string]interface{})
 	var newStatus string
 	if controlStatus != "failed" && nodeStatus == "failed" {

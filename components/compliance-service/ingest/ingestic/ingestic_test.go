@@ -8,7 +8,7 @@ import (
 	elastic "github.com/olivere/elastic/v7"
 )
 
-func Test_scriptForUpdatingControlIndexStatusAndEndTime(t *testing.T) {
+func TestScriptForUpdatingControlIndexStatusAndEndTime(t *testing.T) {
 	newStatus := ""
 	nodeEndTime := time.Now().UTC()
 	params := make(map[string]interface{})
@@ -48,7 +48,6 @@ func Test_scriptForUpdatingControlIndexStatusAndEndTime(t *testing.T) {
 		args args
 		want *elastic.Script
 	}{
-		// TODO: Add test cases.
 		{name: "test 1", args: args{controlStatus: "failed", nodeStatus: "passed", nodeEndtime: nodeEndTime}, want: script},
 		{name: "test 2", args: args{controlStatus: "passed", nodeStatus: "failed", nodeEndtime: nodeEndTime}, want: scriptNew},
 		{name: "test 3", args: args{controlStatus: "passed", nodeStatus: "skipped", nodeEndtime: nodeEndTime}, want: expectedScript},
