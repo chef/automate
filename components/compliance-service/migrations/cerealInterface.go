@@ -27,8 +27,8 @@ func (u *cerealService) EnqueueWorkflowDayLatest(status bool) error {
 				DayLatestFlag: status,
 			})
 		if err != nil {
-			logrus.Debugf("Unable to Enqueue Workflow for Control Task")
-			return errors.Wrapf(err, "Unable to Enqueue Workflow for Control Task")
+			logrus.Debugf("Unable to Enqueue Workflow for Daily Latest Task")
+			return errors.Wrapf(err, "Unable to Enqueue Workflow for Daily Latest Task")
 		}
 	}
 
@@ -46,8 +46,8 @@ func (u *cerealService) EnqueueWorkflowControl(status bool) error {
 				ControlIndexFlag: status,
 			})
 		if err != nil {
-			logrus.Debugf("Unable to Enqueue Workflow for Control Task")
-			return errors.Wrapf(err, "Unable to Enqueue Workflow for Control Task")
+			logrus.Debugf("Unable to Enqueue Workflow for Control Index Task")
+			return errors.Wrapf(err, "Unable to Enqueue Workflow for Control Index Task")
 		}
 	}
 

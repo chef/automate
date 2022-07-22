@@ -1240,8 +1240,7 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 				"took",
 				"hits.total",
 				"hits.hits._id",
-				"hits.hits._source",
-				"hits.hits.inner_hits").
+				"hits.hits._source").
 			Do(ctx)
 
 		if err != nil {
@@ -1255,7 +1254,7 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 				if hit.Source != nil {
 					err := json.Unmarshal(hit.Source, &report)
 					if err != nil {
-						logrus.Errorf("Received error while unmarshling %+v", err)
+						logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
 					}
 
 				}
