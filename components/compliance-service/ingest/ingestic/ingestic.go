@@ -1172,9 +1172,7 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeStatus string, nodeEndtime time.Time) *elastic.Script {
 
 	params := make(map[string]interface{})
-	params["node_end_time"] = nodeEndtime
-	newStatus := controlStatus
-
+	var newStatus string
 	if controlStatus != "failed" && nodeStatus == "failed" {
 		newStatus = "failed"
 	} else if controlStatus == "waived" && nodeStatus == "skipped" {
@@ -1182,10 +1180,12 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	} else if controlStatus == "passed" && nodeStatus == "waived" {
 		newStatus = "waived"
 	}
-
+	params["node_end_time"] = nodeEndtime
 	params["newStatus"] = newStatus
 	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	ctx._source.status = params.newStatus
+	if(params.newStatus){
+		ctx._source.status = params.newStatus
+	}
 	`).Params(params)
 
 	return script
