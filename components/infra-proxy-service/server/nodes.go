@@ -131,6 +131,11 @@ func (s *Server) DeleteNode(ctx context.Context, req *request.Node) (*response.D
 		return nil, err
 	}
 
+	err = c.client.Clients.Delete(req.Name)
+	if err != nil {
+		return nil, err
+	}
+
 	return &response.DeleteNode{
 		Name: req.Name,
 	}, nil
