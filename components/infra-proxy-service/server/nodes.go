@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -133,7 +134,7 @@ func (s *Server) DeleteNode(ctx context.Context, req *request.Node) (*response.D
 
 	err = c.client.Clients.Delete(req.Name)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Node is deleted but client deletion failed: %s", err)
 	}
 
 	return &response.DeleteNode{
