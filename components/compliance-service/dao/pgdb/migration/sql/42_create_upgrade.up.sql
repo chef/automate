@@ -5,4 +5,6 @@ CREATE TABLE IF NOT EXISTS upgrade_flags (
     upgrade_value              boolean NOT NULL
 );
 
-INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (1,'day_latest',false);
+INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (1,'day_latest',true);
+
+INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (2,'control_index',true);
