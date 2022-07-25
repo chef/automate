@@ -45,7 +45,7 @@ func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {
 		return status.Wrap(errors.New("Incorrect command usage"), 0, workspaceUpgradeHelpDocs)
 	}
 	if isA2HARBFileExist() {
-		err, upgraded := upgradeWorspace(args[0], false)
+		err, upgraded := upgradeWorspace(args[0], upgradeRunCmdFlags.saas)
 		if err != nil {
 			return status.Annotate(err, status.UpgradeError)
 		}
