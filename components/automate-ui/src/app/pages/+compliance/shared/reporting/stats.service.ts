@@ -69,6 +69,20 @@ export class StatsService {
   gettimeTrends(days: moment.DurationInputArg1 , intervals: moment.unitOfTime.DurationConstructor , reportQuery: ReportQuery){
     reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(days , intervals)
   }
+  checktime(time_interval: number , reportQuery : ReportQuery) {
+    if (time_interval == 0 ){
+      this.gettimeTrends(10 , 'days' , reportQuery)
+    }
+    else if(time_interval == 1){
+      this.gettimeTrends(1 , 'months' , reportQuery)
+    }
+    else if(time_interval == 2) {
+      this.gettimeTrends(3 , 'months' , reportQuery)
+    }
+    else if(time_interval == 3) {
+      this.gettimeTrends(1 , 'years' , reportQuery)
+    }
+  }
   getNodeTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
@@ -79,18 +93,7 @@ export class StatsService {
     var urlcheck = url_array.some(url_var => prev.includes(url_var));
     if(urlcheck == true){
       let time_interval = reportQuery.interval;
-      if (time_interval == 0 ){
-        this.gettimeTrends(10 , 'days' , reportQuery)
-      }
-      else if(time_interval == 1){
-        this.gettimeTrends(1 , 'months' , reportQuery)
-      }
-      else if(time_interval == 2) {
-        this.gettimeTrends(3 , 'months' , reportQuery)
-      }
-      else if(time_interval == 3) {
-        this.gettimeTrends(1 , 'years' , reportQuery)
-      }
+      this.checktime(time_interval , reportQuery)
       localStorage.setItem(previous_url , url);
     }
     const formatted = this.formatFilters(reportQuery, false);
@@ -110,18 +113,7 @@ export class StatsService {
     var urlcheck = url_array.some(url_var => prev.includes(url_var));
     if(urlcheck == true){
       let time_interval = reportQuery.interval;
-      if (time_interval == 0 ){
-        this.gettimeTrends(10 , 'days' , reportQuery)
-      }
-      else if(time_interval == 1){
-        this.gettimeTrends(1 , 'months' , reportQuery)
-      }
-      else if(time_interval == 2) {
-        this.gettimeTrends(3 , 'months' , reportQuery)
-      }
-      else if(time_interval == 3) {
-        this.gettimeTrends(1 , 'years' , reportQuery)
-      }
+      this.checktime(time_interval , reportQuery)
       localStorage.setItem(previous_url , url);
     }
     
