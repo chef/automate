@@ -355,3 +355,7 @@ type NodesUpgradation struct {
 	EndTime   string `json:"end_time"`
 	DayLatest bool   `json:"day_latest"`
 }
+
+type Status struct {
+	Status string `json:"status"`
+}

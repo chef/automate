@@ -939,7 +939,7 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday
 	}
 
 	relaxting.LogQueryPartMin(indexToday, searchResult, "Query for search result")
-	status := &Status{}
+	status := &relaxting.Status{}
 	if searchResult.TotalHits() > 0 {
 		// Iterate through results
 		for _, hit := range searchResult.Hits.Hits {
@@ -1189,7 +1189,7 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	params["node_end_time"] = nodeEndtime
 	params["newStatus"] = newStatus
 	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	if(params.newStatus){
+	if(len(params.newStatus)==0){
 		ctx._source.status = params.newStatus
 	}
 	`).Params(params)
@@ -1207,8 +1207,4 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 		newStatus = nodeStatus
 	}
 	return newStatus
-}
-
-type Status struct {
-	Status string `json:"status"`
 }
