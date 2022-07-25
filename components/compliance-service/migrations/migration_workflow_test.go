@@ -105,8 +105,8 @@ func (c CerealWorkflow) EnqueueTask(taskName cereal.TaskName, parameters interfa
 	if c.failEnqueueTask {
 		return fmt.Errorf("error in enqueuing")
 	}
-	assert.Equal(c.t, "day-latest-task", taskName.String())
-	params := parameters.(GenerateDayLatestMigrationParameters)
+	assert.Equal(c.t, "upgrade-task", taskName.String())
+	params := parameters.(UpgradeParameters)
 	assert.Equal(c.t, true, params.DayLatestFlag)
 	return nil
 }

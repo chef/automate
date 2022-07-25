@@ -289,7 +289,8 @@ type NodeListWithAggregatedComplianceSummary struct {
 }
 
 type ReportId struct {
-	ID string `json:"id"`
+	ReportUuid string `json:"report_uuid"`
+	EndTime    string `json:"end_time"`
 }
 
 type TimeBucketedReportIds struct {

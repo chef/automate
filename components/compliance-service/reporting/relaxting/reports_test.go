@@ -464,7 +464,7 @@ func TestGetNodeInfoFromReportID_Failed(t *testing.T) {
 	}
 	_, err := esr.GetNodeInfoFromReportID("0d67b0ab-2709-49c7-81e4-efcc5700c5cf", filters)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "GetNodeInfoFromReportID unable to get depth level for report")
+	assert.Contains(t, err.Error(), "GetNodeInfoFromReportID unable to complete search")
 }
 
 func TestFilterQueryChange(t *testing.T) {

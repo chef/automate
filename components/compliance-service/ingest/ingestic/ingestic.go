@@ -1208,3 +1208,59 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 	}
 	return newStatus
 }
+
+//GetReportsDailyLatestTrue Get the Nodes from past 90 days from current date for upgrading
+func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]string, error) {
+	reportsMap := make(map[string]string)
+	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	if err != nil {
+		return nil, err
+	}
+
+	indicesSlice := strings.Split(indices, ",")
+
+	boolQuery := elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("daily_latest", true))
+
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"report_uuid",
+		"end_time",
+	)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(10000).Sort("end_time", false)
+
+	for _, index := range indicesSlice {
+		searchResult, err := backend.client.Search().
+			SearchSource(searchSource).
+			Index(index).
+			FilterPath(
+				"took",
+				"hits.total",
+				"hits.hits._id",
+				"hits.hits._source").
+			Do(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if searchResult.TotalHits() > 0 {
+			// Iterate through results
+			for _, hit := range searchResult.Hits.Hits {
+				var report relaxting.ReportId
+				if hit.Source != nil {
+					err := json.Unmarshal(hit.Source, &report)
+					if err != nil {
+						logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
+					}
+
+				}
+				reportsMap[report.ReportUuid] = report.EndTime
+			}
+		}
+	}
+	return reportsMap, nil
+}
