@@ -661,17 +661,13 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(refreshToken, "refresh_old")
-	fmt.Println(idToken, "idToken_old")
 	// TODO 2017/12/11 (sr): should we kill the session on failure here?
-	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, s.connFactory.DisableDebugServer)
+	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, false)
 	if err != nil {
 		s.log.Debugf("failed to exchange token: %s", err)
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
-	fmt.Println(token.RefreshToken, "refresh_new")
-	fmt.Println(token.Extra("id_token"), "idToken_new")
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
 		http.Error(w, "no id_token in token response", http.StatusInternalServerError)
@@ -723,7 +719,6 @@ func JSONError(w http.ResponseWriter, err ErrorResponse, code int) {
 }
 
 func (s *Server) refreshNewHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Check Passed")
 	var data RefreshToken
 	// Try to decode the request body into the struct. If there is an error,
 	// respond to the client with the error message and a 400 status code.
