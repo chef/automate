@@ -1171,8 +1171,21 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 
 //script for updating control index status and end time
 func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeStatus string, nodeEndtime time.Time) *elastic.Script {
-	logrus.Infof("controlId %s", nodeEndtime)
 	params := make(map[string]interface{})
+	newStatus := getNewControlStatus(controlStatus, nodeStatus)
+	params["node_end_time"] = nodeEndtime
+	params["newStatus"] = newStatus
+	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
+	if(params.newStatus){
+		ctx._source.status = params.newStatus
+	}
+	`).Params(params)
+	logrus.Infof("controlId1 %s,%v ", nodeEndtime, script)
+	return script
+}
+
+//getting new control status
+func getNewControlStatus(controlStatus string, nodeStatus string) string {
 	var newStatus string
 	if controlStatus != "failed" && nodeStatus == "failed" {
 		newStatus = "failed"
@@ -1181,13 +1194,5 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	} else if controlStatus == "passed" && (nodeStatus == "waived" || nodeStatus == "skipped") {
 		newStatus = nodeStatus
 	}
-	params["node_end_time"] = nodeEndtime
-	params["newStatus"] = newStatus
-	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	if(params.newStatus){
-		ctx._source.status = params.newStatus
-	}
-	`).Params(params)
-
-	return script
+	return newStatus
 }
