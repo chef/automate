@@ -315,38 +315,38 @@ steps:
       executor:
         docker:
 
-#  - label: "[unit] automate-ui"
-#    command:
-#      - cd components/automate-ui
-#      - make install lint unit
-#    timeout_in_minutes: 20
-#    retry:
-#      automatic:
-#        limit: 1
-#    expeditor:
-#      executor:
-#        docker:
+  - label: "[unit] automate-ui"
+    command:
+      - cd components/automate-ui
+      - make install lint unit
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
 
-#  - label: "[unit] chef-ui-library"
-#    command:
-#      - cd components/chef-ui-library
-#      - npm install && npm run lint && npm run test
-#    timeout_in_minutes: 20
-#    retry:
-#      automatic:
-#        limit: 1
-#    expeditor:
-#      executor:
-#        docker:
-#
-#  - label: "[static] e2e"
-#    command:
-#      - cd e2e
-#      - npm install && npm run lint
-#    timeout_in_minutes: 5
-#    expeditor:
-#      executor:
-#        docker:
+  - label: "[unit] chef-ui-library"
+    command:
+      - cd components/chef-ui-library
+      - npm install && npm run lint && npm run test
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+
+  - label: "[static] e2e"
+    command:
+      - cd e2e
+      - npm install && npm run lint
+    timeout_in_minutes: 5
+    expeditor:
+      executor:
+        docker:
 
   - label: "[unit] compliance-service"
     command:

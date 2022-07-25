@@ -2179,7 +2179,7 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 	if len(endTime) == 0 && len(startTime) == 0 {
 		return []string{"day_latest", "daily_latest"}, nil
 	}
-		if len(startTime) == 0 {
+	if len(startTime) == 0 {
 		return []string{"daily_latest"}, nil
 	}
 	eTime, err := time.Parse(layout, endTime)
@@ -2218,7 +2218,7 @@ func getStartDateFromEndDate(endTime string, startTime string) ([]string, error)
 		return nil, nil
 	}
 
-	parsedEndTime, err := time.Parse(layout, endTime)
+	parsedEndTime, err := time.Parse(time.RFC3339, endTime)
 	if err != nil {
 		return []string{}, err
 	}
@@ -2227,9 +2227,8 @@ func getStartDateFromEndDate(endTime string, startTime string) ([]string, error)
 		return []string{startTime}, nil
 	}
 	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
-	fmt.Println("The time is", startTime)
 
-	return []string{newStartTime.Format(layout)}, nil
+	return []string{newStartTime.Format(time.RFC3339)}, nil
 
 }
 
