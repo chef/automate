@@ -1,37 +1,46 @@
 package migrations
 
 import (
-	"context"
-	"fmt"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type Upgrade struct {
-	UpgradesDB   *UpgradesDB
-	cerealManger *cereal.Manager
+	storage         pgdb.Storage
+	cerealInterface cerealInterface
 }
 
-func NewService(db *UpgradesDB, cerealManger *cereal.Manager) *Upgrade {
-	return &Upgrade{UpgradesDB: db, cerealManger: cerealManger}
+func NewService(pg *pgdb.UpgradesDB, cerealManger *cereal.Manager) *Upgrade {
+	return &Upgrade{storage: &pgdb.UpgradesDB{DB: pg.DB}, cerealInterface: &cerealService{
+		cerealManger: cerealManger,
+	}}
 }
 
 //PollForUpgradeFlagDayLatest checks for the day latest flag value in upgrade flags
 func (u *Upgrade) PollForUpgradeFlagDayLatest() error {
-	var status bool
-	var err error
-	status, err = u.UpgradesDB.GetDayLatestUpgradeFlagValue()
-	if !status {
-		err = u.cerealManger.EnqueueWorkflow(context.TODO(), MigrationWorkflowName,
-			fmt.Sprintf("%s-%s", MigrationWorkflowName, DayLatestMigrationTaskName),
-			MigrationWorkflowParameters{
-				DayLatestFlag: status,
-			})
-		if err != nil {
-			logrus.Debugf("Unable to Enqueue Workflow for Day Latest Task")
-			return errors.Wrapf(err, "Unable to Enqueue Workflow for Day Latest Task")
-		}
+
+	status, err := u.storage.GetDayLatestUpgradeFlagValue()
+	if err != nil {
+		logrus.Errorf("Unable to get the status of day latest flag")
+		return errors.Wrapf(err, "Unable to get the status of day latest flag")
 	}
+	err = u.cerealInterface.EnqueueWorkflowDayLatest(status)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to enqueue the message in the flow for daily latest flag")
+	}
+
+	status, err = u.storage.GetControlLatestUpgradeFlagValue()
+	if err != nil {
+		logrus.Errorf("Unable to get the status of Control index flag")
+		return errors.Wrapf(err, "Unable to get the status of control index flag")
+	}
+
+	err = u.cerealInterface.EnqueueWorkflowControl(status)
+	if err != nil {
+		return errors.Wrapf(err, "Unable to enqueue the message in the flow for control index flag")
+	}
+
 	return nil
 }
