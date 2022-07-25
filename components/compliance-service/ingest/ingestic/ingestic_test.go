@@ -12,24 +12,23 @@ func TestScriptForUpdatingControlIndexStatusAndEndTime(t *testing.T) {
 	nodeEndTime := time.Now().UTC()
 	params := make(map[string]interface{})
 	params["node_end_time"] = nodeEndTime
-	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	ctx._source.status = params.newStatus`).Params(params)
-	newStatus1 := "failed"
+	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time`).Params(params)
+	newStatus := "failed"
 	params1 := make(map[string]interface{})
 	params1["node_end_time"] = nodeEndTime
-	params1["newStatus"] = newStatus1
+	params1["newStatus"] = newStatus
 	scriptNew := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
 	ctx._source.status = params.newStatus`).Params(params1)
-	newStatus2 := "skipped"
+	newStatus1 := "skipped"
 	params2 := make(map[string]interface{})
 	params2["node_end_time"] = nodeEndTime
-	params2["newStatus"] = newStatus2
+	params2["newStatus"] = newStatus1
 	expectedScript := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
 	ctx._source.status = params.newStatus`).Params(params2)
-	newStatus3 := "skipped"
+	newStatus2 := "skipped"
 	params3 := make(map[string]interface{})
 	params3["node_end_time"] = nodeEndTime
-	params3["newStatus"] = newStatus3
+	params3["newStatus"] = newStatus2
 	newScript := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
 	ctx._source.status = params.newStatus`).Params(params3)
 

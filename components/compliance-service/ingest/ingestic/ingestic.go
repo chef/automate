@@ -1187,11 +1187,12 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	params := make(map[string]interface{})
 	newStatus := getNewControlStatus(controlStatus, nodeStatus)
 	params["node_end_time"] = nodeEndtime
+	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time`).Params(params)
 	if len(newStatus) > 0 {
 		params["newStatus"] = newStatus
-	}
-	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
+		script = elastic.NewScript(`ctx._source.end_time = params.node_end_time;
 	ctx._source.status = params.newStatus`).Params(params)
+	}
 	return script
 }
 
