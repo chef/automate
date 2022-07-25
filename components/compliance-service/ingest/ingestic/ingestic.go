@@ -1189,7 +1189,7 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	params["node_end_time"] = nodeEndtime
 	params["newStatus"] = newStatus
 	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	if(len(params.newStatus)==0){
+	if(params.newStatus!=""){
 		ctx._source.status = params.newStatus
 	}
 	`).Params(params)
@@ -1198,7 +1198,7 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 
 //getting new control status
 func getNewControlStatus(controlStatus string, nodeStatus string) string {
-	var newStatus string
+	newStatus := ""
 	if controlStatus != "failed" && nodeStatus == "failed" {
 		newStatus = "failed"
 	} else if controlStatus == "waived" && nodeStatus == "skipped" {
