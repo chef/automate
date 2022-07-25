@@ -515,15 +515,9 @@ func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	returnData := struct {
-<<<<<<< HEAD
 		AccessToken string `json:"access_token"`
 	}{rawIDToken}
 
-=======
-		AccessToken  string `json:"access_token"`
-		RefreshToken string `json:"refresh_token"`
-	}{rawIDToken, token.RefreshToken}
->>>>>>> 0aa9e078f (New Refresh API)
 	if err := json.NewEncoder(w).Encode(returnData); err != nil {
 		http.Error(w, errors.Wrap(err, "failed to set access token").Error(),
 			http.StatusInternalServerError)
