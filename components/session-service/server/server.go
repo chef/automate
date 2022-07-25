@@ -909,14 +909,12 @@ func (s *Server) maybeExchangeRefreshTokenForIDToken(ctx context.Context,
 	if err != nil {
 		return nil, errors.Wrap(err, "verify id_token")
 	}
-	fmt.Println(idToken.Expiry, "TOKEN EXPIRY")
-	fmt.Println(idToken.IssuedAt, "TOKEN ISSUED")
+
 	t, err := oidc.TokenFromIDToken(idToken, rawIDToken, refreshToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "build token from id_token")
 	}
-	fmt.Println(t.Expiry, "TIME")
-	fmt.Println(t.TokenType, "Token Type")
+
 	// This makes a refresh happen although it's not required "just yet" (but soon)
 	if newRefresh {
 		t.Expiry = time.Now()
@@ -925,8 +923,7 @@ func (s *Server) maybeExchangeRefreshTokenForIDToken(ctx context.Context,
 	}
 
 	token, err := s.client.TokenSource(ctx, t).Token()
-	fmt.Println(token.TokenType, "my Type")
-	fmt.Println(token.Expiry, "my Expiry")
+
 	if err != nil {
 		return nil, errors.Wrap(err, "exchange refresh token")
 	}
