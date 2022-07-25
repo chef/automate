@@ -15,7 +15,7 @@ func TestScriptForUpdatingControlIndexStatusAndEndTime(t *testing.T) {
 	params["node_end_time"] = nodeEndTime
 	params["newStatus"] = newStatus
 	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	if(len(params.newStatus)==0){
+	if(params.newStatus!=""){
 		ctx._source.status = params.newStatus
 	}
 	`).Params(params)
@@ -24,7 +24,7 @@ func TestScriptForUpdatingControlIndexStatusAndEndTime(t *testing.T) {
 	params1["node_end_time"] = nodeEndTime
 	params1["newStatus"] = newStatus1
 	scriptNew := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	if(len(params.newStatus)==0){
+	if(params.newStatus!=""){
 		ctx._source.status = params.newStatus
 	}
 	`).Params(params1)
@@ -33,7 +33,7 @@ func TestScriptForUpdatingControlIndexStatusAndEndTime(t *testing.T) {
 	params2["node_end_time"] = nodeEndTime
 	params2["newStatus"] = newStatus2
 	expectedScript := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	if(len(params.newStatus)==0){
+	if(params.newStatus!=""){
 		ctx._source.status = params.newStatus
 	}
 	`).Params(params2)
