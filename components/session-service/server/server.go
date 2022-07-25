@@ -222,7 +222,7 @@ func (s *Server) initHandlers() {
 	r.HandleFunc("/token_api", s.tokenApiHandler).
 		Methods("GET")
 
-	r.HandleFunc("/refreshNew", s.refreshNewHandler).
+	r.HandleFunc("/refresh_api", s.refreshApiHandler).
 		Methods("POST")
 
 	// these are only to be used if Builder is configured to authenticate with Automate
@@ -712,7 +712,7 @@ func JSONError(w http.ResponseWriter, err ErrorResponse, code int) {
 	json.NewEncoder(w).Encode(err)
 }
 
-func (s *Server) refreshNewHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	var data RefreshToken
 	// Try to decode the request body into the struct. If there is an error,
 	// respond to the client with the error message and a 400 status code.
@@ -752,6 +752,7 @@ func (s *Server) refreshNewHandler(w http.ResponseWriter, r *http.Request) {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
+	// Change the IP address with your automate IP.
 	resp, err := client.PostForm("https://ec2-18-117-216-177.us-east-2.compute.amazonaws.com/dex/tokenValid", formData)
 
 	if err != nil {
