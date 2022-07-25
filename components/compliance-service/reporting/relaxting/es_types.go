@@ -106,6 +106,7 @@ type ESInSpecReportControlsResult struct {
 	StartTime   string  `json:"start_time,omitempty"`
 	Message     string  `json:"message,omitempty"`
 	SkipMessage string  `json:"skip_message,omitempty"`
+	ResourceId  string  `json:"resource_id"`
 }
 
 type ESInSpecReportControlsWaiverData struct {
