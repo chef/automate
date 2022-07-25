@@ -350,6 +350,48 @@ automate_private_ips = []
 chef_server_private_ips = []
 opensearch_private_ips = []
 postgresql_private_ips = []
+
+# ============== Managed Services ======================
+
+## === INPUT NEEDED ===
+# in case your are trying to deploy with On-Premise managed 
+# RDS, and openseach, then make setup_managed_services = true, 
+# and modify other managed services settings.
+setup_managed_services = false
+
+# eg: managed_opensearch_domain_name = "managed-services-os"
+managed_opensearch_domain_name = ""
+
+# eg: managed_opensearch_domain_url = "search-managed-services-os-eckom3msrwqlmjlgbdu.us-east-1.es.amazonaws.com"
+managed_opensearch_domain_url = ""
+
+# eg: managed_opensearch_username = "admin"
+managed_opensearch_username = ""
+
+# eg: managed_opensearch_user_password = "Progress@123"
+managed_opensearch_user_password = ""
+
+# eg: managed_opensearch_certificate = "<cert content>"
+managed_opensearch_certificate = ""
+
+# eg: managed_rds_instance_url = "managed-rds-db.cww4poze5gkx.ap-northeast-1.rds.amazonaws.com:5432"
+managed_rds_instance_url = ""
+
+# eg: managed_rds_superuser_username = "postgres"
+managed_rds_superuser_username = ""
+
+# eg: managed_rds_superuser_password = "Progress123"
+managed_rds_superuser_password = ""
+
+# eg: managed_rds_dbuser_username = "postgres"
+managed_rds_dbuser_username = ""
+
+# eg: managed_rds_dbuser_password = "Progress123"
+managed_rds_dbuser_password = ""
+
+# eg: managed_rds_certificate =
+managed_rds_certificate = "<cert content>"
+
 ## === ===
 `
 
