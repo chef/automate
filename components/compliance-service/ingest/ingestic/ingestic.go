@@ -908,9 +908,9 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid stri
 	return &item, nil
 }
 
-func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday string) (bool, error) {
+func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday string) (bool, string, error) {
 	logrus.Debugf("Checking the control document exists for today with doc Id :%s", docId)
-	fsc := elastic.NewFetchSourceContext(false)
+	fsc := elastic.NewFetchSourceContext(true).Include("status")
 	boolQuery := elastic.NewBoolQuery()
 	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(docId)
@@ -919,6 +919,10 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday
 		FetchSourceContext(fsc).
 		Query(boolQuery).
 		Size(1)
+
+	source, _ := searchSource.Source()
+	relaxting.LogQueryPartMin(indexToday, source, "Query for search query")
+
 	searchResult, err := backend.client.Search().
 		SearchSource(searchSource).
 		Index(indexToday).
@@ -927,25 +931,35 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday
 		switch {
 		case elastic.IsTimeout(err):
 			logrus.Errorf("Timeout retrieving document: %v", err)
-			return false, err
+			return false, "", err
 		default:
 			logrus.Errorf("Received error: %v", err)
-			return false, err
+			return false, "", err
 		}
 	}
 
+	relaxting.LogQueryPartMin(indexToday, searchResult, "Query for search result")
+	status := &Status{}
 	if searchResult.TotalHits() > 0 {
 		// Iterate through results
 		for _, hit := range searchResult.Hits.Hits {
 			// hit.Index contains the id of the index
 			if len(hit.Id) > 0 {
+				if hit.Source != nil {
+					err := json.Unmarshal(hit.Source, status)
+					if err != nil {
+						return false, "", err
+					}
+
+					return true, status.Status, nil
+				}
 				logrus.Debugf("Found the document with for control with doc Id %s", docId)
-				return true, nil
+
 			}
 
 		}
 	}
-	return false, nil
+	return false, "", nil
 
 }
 
@@ -965,14 +979,14 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		if err != nil {
 			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
 		}
-		found, err := backend.CheckIfControlIdExistsForToday(docId, index)
+		found, controlStatus, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
 		}
 		if found {
 			logrus.Infof("controlId %s, %v", docId, found)
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])).Type("_doc"))
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(control.Status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)).Type("_doc"))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(controlStatus, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)))
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
@@ -1175,11 +1189,7 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	newStatus := getNewControlStatus(controlStatus, nodeStatus)
 	params["node_end_time"] = nodeEndtime
 	params["newStatus"] = newStatus
-	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
-	if(params.newStatus){
-		ctx._source.status = params.newStatus
-	}
-	`).Params(params)
+	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;ctx._source.status = params.newStatus`).Params(params)
 	logrus.Infof("controlId1 %s,%v ", nodeEndtime, script)
 	return script
 }
@@ -1195,4 +1205,8 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 		newStatus = nodeStatus
 	}
 	return newStatus
+}
+
+type Status struct {
+	Status string `json:"status"`
 }
