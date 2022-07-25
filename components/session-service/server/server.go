@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -221,6 +222,9 @@ func (s *Server) initHandlers() {
 	r.HandleFunc("/token_api", s.tokenApiHandler).
 		Methods("GET")
 
+	r.HandleFunc("/refreshNew", s.refreshNewHandler).
+		Methods("POST")
+
 	// these are only to be used if Builder is configured to authenticate with Automate
 	r.HandleFunc("/token", s.tokenHandler).
 		Methods("POST")
@@ -325,6 +329,7 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	sess := s.mgr.Load(r)
 
 	code := r.FormValue("code")
+	// code := ""
 	if code == "" {
 		s.log.Debugf("no code in request: %q", r.Form)
 		http.Error(w, fmt.Sprintf("no code in request: %q", r.Form), http.StatusBadRequest)
@@ -510,9 +515,15 @@ func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	returnData := struct {
+<<<<<<< HEAD
 		AccessToken string `json:"access_token"`
 	}{rawIDToken}
 
+=======
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}{rawIDToken, token.RefreshToken}
+>>>>>>> 0aa9e078f (New Refresh API)
 	if err := json.NewEncoder(w).Encode(returnData); err != nil {
 		http.Error(w, errors.Wrap(err, "failed to set access token").Error(),
 			http.StatusInternalServerError)
@@ -650,14 +661,17 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(refreshToken, "refresh_old")
+	fmt.Println(idToken, "idToken_old")
 	// TODO 2017/12/11 (sr): should we kill the session on failure here?
-	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken)
+	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, s.connFactory.DisableDebugServer)
 	if err != nil {
 		s.log.Debugf("failed to exchange token: %s", err)
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
-
+	fmt.Println(token.RefreshToken, "refresh_new")
+	fmt.Println(token.Extra("id_token"), "idToken_new")
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
 		http.Error(w, "no id_token in token response", http.StatusInternalServerError)
@@ -672,10 +686,127 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	returnData := struct {
-		IDToken string `json:"id_token"`
-	}{rawIDToken}
+		IDToken      string `json:"id_token"`
+		TokenType    string `json:"token_type"`
+		Expiry       string `json:"expires_in"`
+		RefreshToken string `json:"refresh_token"`
+	}{rawIDToken, token.Type(), token.Expiry.String(), token.RefreshToken}
 	if err := json.NewEncoder(w).Encode(returnData); err != nil {
+		// JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "failed to set marshal id_token").Error()), http.StatusInternalServerError)
 		http.Error(w, errors.Wrap(err, "failed to set marshal id_token").Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+type RefreshToken struct {
+	RefreshToken string `json:"refresh_token"`
+	GrantType    string `json:"grant_type"`
+}
+
+type ErrorResponse struct {
+	ErrorCode int    `json:"error_code"`
+	ErrorDesc string `json:"error"`
+}
+
+func prepareError(code int, errMsg string) ErrorResponse {
+	return ErrorResponse{
+		ErrorCode: code,
+		ErrorDesc: errMsg,
+	}
+}
+
+func JSONError(w http.ResponseWriter, err ErrorResponse, code int) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(err)
+}
+
+func (s *Server) refreshNewHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Check Passed")
+	var data RefreshToken
+	// Try to decode the request body into the struct. If there is an error,
+	// respond to the client with the error message and a 400 status code.
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		JSONError(w, prepareError(http.StatusBadRequest, err.Error()), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	refreshToken := data.RefreshToken
+
+	idToken, err := util.ExtractBearerToken(r)
+	if err != nil {
+		s.log.Debug("no bearer token")
+		JSONError(w, prepareError(http.StatusUnauthorized, err.Error()), http.StatusUnauthorized)
+		// httpError(w, http.StatusUnauthorized)
+		return
+	}
+
+	isBlacklisted, err := s.idTokenBlackLister.IsIdTokenBlacklisted(idToken)
+	if err != nil {
+		JSONError(w, prepareError(http.StatusInternalServerError, err.Error()), http.StatusInternalServerError)
+		// httpError(w, http.StatusInternalServerError)
+		return
+	}
+	if isBlacklisted {
+		s.log.Debug("bearer token blacklisted")
+		JSONError(w, prepareError(http.StatusUnauthorized, err.Error()), http.StatusUnauthorized)
+		// httpError(w, http.StatusUnauthorized)
+		return
+	}
+
+	formData := url.Values{}
+	formData.Add("refresh_token", refreshToken)
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	resp, err := client.PostForm("https://ec2-18-117-216-177.us-east-2.compute.amazonaws.com/dex/tokenValid", formData)
+
+	if err != nil {
+		JSONError(w, prepareError(http.StatusInternalServerError, err.Error()), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		content, _ := ioutil.ReadAll(resp.Body)
+		http.Error(w, string(content), resp.StatusCode)
+	}
+
+	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, true)
+	if err != nil {
+		s.log.Debugf("failed to exchange token: %s", err)
+		httpError(w, http.StatusUnauthorized)
+		return
+	}
+
+	rawIDToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "no id_token in token response").Error()), http.StatusInternalServerError)
+		// http.Error(w, "no id_token in token response", http.StatusInternalServerError)
+		return
+	}
+
+	// sess := s.mgr.Load(r)
+	// if token.RefreshToken != "" {
+	// 	if err := sess.PutString(w, refreshTokenKey, token.RefreshToken); err != nil {
+	// 		// http.Error(w, "failed to set refresh_token", http.StatusInternalServerError)
+	// 		JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "failed to set refresh_token").Error()), http.StatusInternalServerError)
+	// 		return
+	// 	}
+	// }
+
+	returnData := struct {
+		IDToken      string `json:"id_token"`
+		TokenType    string `json:"token_type"`
+		Expiry       string `json:"expires_in"`
+		RefreshToken string `json:"refresh_token"`
+	}{rawIDToken, token.Type(), token.Expiry.String(), token.RefreshToken}
+	if err := json.NewEncoder(w).Encode(returnData); err != nil {
+		JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "failed to set marshal id_token").Error()), http.StatusInternalServerError)
+		// http.Error(w, errors.Wrap(err, "failed to set marshal id_token").Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -715,6 +846,7 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	//
 	// Read more under "Authorization Request" here:
 	// https://www.oauth.com/oauth2-servers/redirect-uris/redirect-uri-validation/
+
 	if s.bldrClient != nil {
 		if r.FormValue("client_id") != "" && r.FormValue("client_id") != s.bldrClient.ClientID {
 			http.Error(w,
@@ -783,21 +915,29 @@ func httpError(w http.ResponseWriter, code int) {
 }
 
 func (s *Server) maybeExchangeRefreshTokenForIDToken(ctx context.Context,
-	refreshToken, rawIDToken string) (*oauth2.Token, error) {
+	refreshToken, rawIDToken string, newRefresh bool) (*oauth2.Token, error) {
 	idToken, err := s.client.Verify(ctx, rawIDToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "verify id_token")
 	}
-
+	fmt.Println(idToken.Expiry, "TOKEN EXPIRY")
+	fmt.Println(idToken.IssuedAt, "TOKEN ISSUED")
 	t, err := oidc.TokenFromIDToken(idToken, rawIDToken, refreshToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "build token from id_token")
 	}
-
+	fmt.Println(t.Expiry, "TIME")
+	fmt.Println(t.TokenType, "Token Type")
 	// This makes a refresh happen although it's not required "just yet" (but soon)
-	t.Expiry = t.Expiry.Add(-s.remainingDuration)
+	if newRefresh {
+		t.Expiry = time.Now()
+	} else {
+		t.Expiry = t.Expiry.Add(-s.remainingDuration)
+	}
 
 	token, err := s.client.TokenSource(ctx, t).Token()
+	fmt.Println(token.TokenType, "my Type")
+	fmt.Println(token.Expiry, "my Expiry")
 	if err != nil {
 		return nil, errors.Wrap(err, "exchange refresh token")
 	}
