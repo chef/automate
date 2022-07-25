@@ -654,8 +654,6 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(refreshToken, "refresh_old")
-	fmt.Println(idToken, "idToken_old")
 	// TODO 2017/12/11 (sr): should we kill the session on failure here?
 	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, false)
 	if err != nil {
