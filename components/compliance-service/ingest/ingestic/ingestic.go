@@ -984,7 +984,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
 		}
 		if found {
-			logrus.Infof("controlId %s, %v", docId, found)
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(controlStatus, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)))
 			continue
@@ -1189,8 +1188,11 @@ func scriptForUpdatingControlIndexStatusAndEndTime(controlStatus string, nodeSta
 	newStatus := getNewControlStatus(controlStatus, nodeStatus)
 	params["node_end_time"] = nodeEndtime
 	params["newStatus"] = newStatus
-	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;ctx._source.status = params.newStatus`).Params(params)
-	logrus.Infof("controlId1 %s,%v ", nodeEndtime, script)
+	script := elastic.NewScript(`ctx._source.end_time = params.node_end_time;
+	if(params.newStatus){
+		ctx._source.status = params.newStatus
+	}
+	`).Params(params)
 	return script
 }
 
