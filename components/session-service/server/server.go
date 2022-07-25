@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -653,6 +654,8 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(refreshToken, "refresh_old")
+	fmt.Println(idToken, "idToken_old")
 	// TODO 2017/12/11 (sr): should we kill the session on failure here?
 	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, false)
 	if err != nil {
@@ -750,17 +753,8 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		content := struct {
-			Error       string `json:"error"`
-			Description string `json:"error_description,omitempty"`
-		}{}
-		err := json.NewDecoder(resp.Body).Decode(&content)
-		if err != nil {
-			JSONError(w, prepareError(http.StatusInternalServerError, err.Error()), http.StatusInternalServerError)
-			return
-		}
-		JSONError(w, content, resp.StatusCode)
-		return
+		content, _ := ioutil.ReadAll(resp.Body)
+		http.Error(w, string(content), resp.StatusCode)
 	}
 
 	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, true)
@@ -897,12 +891,14 @@ func (s *Server) maybeExchangeRefreshTokenForIDToken(ctx context.Context,
 	if err != nil {
 		return nil, errors.Wrap(err, "verify id_token")
 	}
-
+	fmt.Println(idToken.Expiry, "TOKEN EXPIRY")
+	fmt.Println(idToken.IssuedAt, "TOKEN ISSUED")
 	t, err := oidc.TokenFromIDToken(idToken, rawIDToken, refreshToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "build token from id_token")
 	}
-
+	fmt.Println(t.Expiry, "TIME")
+	fmt.Println(t.TokenType, "Token Type")
 	// This makes a refresh happen although it's not required "just yet" (but soon)
 	if newRefresh {
 		t.Expiry = time.Now()
@@ -911,7 +907,6 @@ func (s *Server) maybeExchangeRefreshTokenForIDToken(ctx context.Context,
 	}
 
 	token, err := s.client.TokenSource(ctx, t).Token()
-
 	if err != nil {
 		return nil, errors.Wrap(err, "exchange refresh token")
 	}
