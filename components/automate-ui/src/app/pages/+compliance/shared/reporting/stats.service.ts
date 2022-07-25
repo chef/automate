@@ -66,6 +66,9 @@ export class StatsService {
     return this.httpClient.post<any>(url, body).pipe(
       map(({ controls_summary }) => controls_summary));
   }
+  gettimeTrends(days: moment.DurationInputArg1 , intervals: moment.unitOfTime.DurationConstructor , reportQuery: ReportQuery){
+    reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(days , intervals)
+  }
   getNodeTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
@@ -77,20 +80,16 @@ export class StatsService {
     if(urlcheck == true){
       let time_interval = reportQuery.interval;
       if (time_interval == 0 ){
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(10 , 'days');
-        localStorage.setItem(previous_url , url)
+        this.gettimeTrends(10 , 'days' , reportQuery)
       }
       else if(time_interval == 1){
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'months');
-        localStorage.setItem(previous_url , url);
+        this.gettimeTrends(1 , 'months' , reportQuery)
       }
       else if(time_interval == 2) {
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(3 , 'months');
-        localStorage.setItem(previous_url , url);
+        this.gettimeTrends(3 , 'months' , reportQuery)
       }
       else if(time_interval == 3) {
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'years');
-        localStorage.setItem(previous_url , url);
+        this.gettimeTrends(1 , 'years' , reportQuery)
       }
       localStorage.setItem(previous_url , url);
     }
@@ -104,30 +103,26 @@ export class StatsService {
   getControlsTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
-    let testing : string;
-    let prev = localStorage.getItem(testing);
+    let previous_url : string;
+    let prev = localStorage.getItem(previous_url);
     prev.toString();
     const url_array = ["reporting/nodes" , "reporting/profiles" , "reporting/controls"];
     var urlcheck = url_array.some(url_var => prev.includes(url_var));
     if(urlcheck == true){
       let time_interval = reportQuery.interval;
       if (time_interval == 0 ){
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(10 , 'days');
-        localStorage.setItem(testing , url)
+        this.gettimeTrends(10 , 'days' , reportQuery)
       }
       else if(time_interval == 1){
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'months');
-        localStorage.setItem(testing , url);
+        this.gettimeTrends(1 , 'months' , reportQuery)
       }
       else if(time_interval == 2) {
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(3 , 'months');
-        localStorage.setItem(testing , url);
+        this.gettimeTrends(3 , 'months' , reportQuery)
       }
       else if(time_interval == 3) {
-        reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(1 , 'years');
-        localStorage.setItem(testing , url);
+        this.gettimeTrends(1 , 'years' , reportQuery)
       }
-      localStorage.setItem(testing , url);
+      localStorage.setItem(previous_url , url);
     }
     
     const formatted = this.formatFilters(reportQuery, false);
