@@ -676,12 +676,16 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// returnData := struct {
+	// 	IDToken      string `json:"id_token"`
+	// 	TokenType    string `json:"token_type"`
+	// 	Expiry       string `json:"expires_in"`
+	// 	RefreshToken string `json:"refresh_token"`
+	// }{rawIDToken, token.Type(), token.Expiry.String(), token.RefreshToken}
+	fmt.Println(token.RefreshToken, "myRefreshToken")
 	returnData := struct {
-		IDToken      string `json:"id_token"`
-		TokenType    string `json:"token_type"`
-		Expiry       string `json:"expires_in"`
-		RefreshToken string `json:"refresh_token"`
-	}{rawIDToken, token.Type(), token.Expiry.String(), token.RefreshToken}
+		IDToken string `json:"id_token"`
+	}{rawIDToken}
 	if err := json.NewEncoder(w).Encode(returnData); err != nil {
 		JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "failed to set marshal id_token").Error()), http.StatusInternalServerError)
 		return
