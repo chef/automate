@@ -34,6 +34,7 @@ type client struct {
 	oauth2   *oauth2.Config
 	verifier *oidc.IDTokenVerifier
 	log      OIDCLogger
+	dexURL   *url.URL
 }
 
 // Config contains necessary elements for
@@ -95,15 +96,16 @@ func New(cfg Config, retrySec int, certs *certs.ServiceCerts, l OIDCLogger) (Cli
 		hc:       httpClient,
 		oauth2:   &oauth2cfg,
 		verifier: verifier,
-		log:      l}, nil
+		log:      l,
+		dexURL:   cfg.IssuerURL}, nil
 }
 
 func (c *client) RefreshTokenValidator(refreshToken string) (*http.Response, error) {
-	temp := myurl
-	temp += "/tokenValid"
+	tokenValidatorURL := c.dexURL.String()
+	tokenValidatorURL += "/tokenValid"
 	formData := url.Values{}
 	formData.Add("refresh_token", refreshToken)
-	return c.Client().PostForm(temp, formData)
+	return c.Client().PostForm(tokenValidatorURL, formData)
 }
 
 func (c *client) TokenSource(ctx context.Context, t *oauth2.Token) oauth2.TokenSource {
