@@ -48,10 +48,10 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		return nil, emptyTotals, err
 	}*/
 
-	/*filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, emptyTotals, err
-	}*/
+	}
 
 	latestOnly := FetchLatestDataOrNot(filters)
 
