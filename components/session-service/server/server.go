@@ -9,7 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -751,7 +751,7 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		content, _ := ioutil.ReadAll(resp.Body)
+		content, _ := io.ReadAll(resp.Body)
 		http.Error(w, string(content), resp.StatusCode)
 		return
 	}
