@@ -34,6 +34,7 @@ var upgradeRunCmdFlags = struct {
 	versionsPath         string
 	acceptMLSA           bool
 	upgradeHAWorkspace   string
+	saas                 bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -212,7 +213,7 @@ func runAutomateHAFlow(args []string, offlineMode bool) error {
 	}
 
 	if offlineMode {
-		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap)
+		uperr, upgraded := upgradeWorspace(upgradeRunCmdFlags.airgap, upgradeRunCmdFlags.saas)
 		if uperr != nil {
 			return status.Annotate(uperr, status.UpgradeError)
 		}
@@ -445,10 +446,24 @@ func init() {
 		"Path to versions.json",
 	)
 
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.saas,
+		"saas",
+		"",
+		false,
+		"Flag for saas setup")
+
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
 		"Path to versions.json",
 	)
+
+	upgradeRunCmd.SetHelpFunc(func(command *cobra.Command, strings []string) {
+		// Hide flag for this command
+		command.Flags().MarkHidden("saas")
+		// Call parent help func
+		command.Parent().HelpFunc()(command, strings)
+	})
 
 	if !isDevMode() {
 		err := upgradeStatusCmd.PersistentFlags().MarkHidden("versions-file")

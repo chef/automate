@@ -14,7 +14,9 @@ import (
 )
 
 const habpkgcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/automate-ha-deployment"
+const saashabpkgcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/chef-saas-deployment"
 const pkgName = "automate-ha-deployment"
+const saaspkgName = "chef-saas-deployment"
 
 const workspaceUpgradeHelpDocs = `
 This command will be used to upgrde Automate HA workspace version.
@@ -43,7 +45,7 @@ func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {
 		return status.Wrap(errors.New("Incorrect command usage"), 0, workspaceUpgradeHelpDocs)
 	}
 	if isA2HARBFileExist() {
-		err, upgraded := upgradeWorspace(args[0])
+		err, upgraded := upgradeWorspace(args[0], upgradeRunCmdFlags.saas)
 		if err != nil {
 			return status.Annotate(err, status.UpgradeError)
 		}
@@ -57,8 +59,8 @@ func worspaceUpgradeCmdExecute(cmd *cobra.Command, args []string) error {
 	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }
 
-func upgradeWorspace(bundle string) (error, bool) {
-	updateAvailabe, err := checkIfNewBundleHaveWorkspaceUpdate(bundle)
+func upgradeWorspace(bundle string, saas bool) (error, bool) {
+	updateAvailabe, err := checkIfNewBundleHaveWorkspaceUpdate(bundle, saas)
 	if err != nil {
 		writer.Println(err.Error())
 	}
@@ -84,7 +86,7 @@ func upgradeWorspace(bundle string) (error, bool) {
 		}
 		if upgradeAccepted {
 			writer.Println("Bootstraping for new version.")
-			err := doBootstrapEnv(bundle, false)
+			err := doBootstrapEnv(bundle, upgradeRunCmdFlags.saas)
 			if err != nil {
 				writer.Println(err.Error())
 				return nil, false
@@ -94,9 +96,9 @@ func upgradeWorspace(bundle string) (error, bool) {
 	}
 	return nil, false
 }
-func checkIfNewBundleHaveWorkspaceUpdate(bundle string) (bool, error) {
-	currVerAndRel := getCurrentInstalledWorsapceVersion()
-	newVersion, err := getWorkspaceVersionFromBundle(bundle)
+func checkIfNewBundleHaveWorkspaceUpdate(bundle string, saas bool) (bool, error) {
+	currVerAndRel := getCurrentInstalledWorsapceVersion(saas)
+	newVersion, err := getWorkspaceVersionFromBundle(bundle, saas)
 	if err != nil {
 		return false, err
 	}
@@ -114,8 +116,13 @@ func checkIfNewBundleHaveWorkspaceUpdate(bundle string) (bool, error) {
 	return false, nil
 }
 
-func getCurrentInstalledWorsapceVersion() []string {
-	out, err := exec.Command("/bin/sh", "-c", habpkgcmd).Output()
+func getCurrentInstalledWorsapceVersion(saas bool) []string {
+	pkgcmd := habpkgcmd
+	if saas {
+		pkgcmd = saashabpkgcmd
+	}
+
+	out, err := exec.Command("/bin/sh", "-c", pkgcmd).Output()
 	if err != nil {
 		writer.Fail(err.Error())
 		return nil
@@ -126,7 +133,7 @@ func getCurrentInstalledWorsapceVersion() []string {
 	return currVerAndRel
 }
 
-func getWorkspaceVersionFromBundle(bundle string) ([]string, error) {
+func getWorkspaceVersionFromBundle(bundle string, saas bool) ([]string, error) {
 	_, manifestBytes, err := airgap.GetMetadata(bundle)
 	if err != nil {
 		return nil, status.Annotate(err, status.AirgapUnpackInstallBundleError)
@@ -142,8 +149,12 @@ func getWorkspaceVersionFromBundle(bundle string) ([]string, error) {
 	writer.Printf(" Packages:\n")
 	workspacePkgVersion := make([]string, 2)
 	for _, pkg := range manifest.Packages {
+		habpkgname := pkgName
+		if saas {
+			habpkgname = saaspkgName
+		}
 		_pkgName := pkg.Name()
-		if strings.Contains(_pkgName, pkgName) {
+		if strings.Contains(_pkgName, habpkgname) {
 			pkg.Release()
 			workspacePkgVersion[0] = pkg.Version()
 			workspacePkgVersion[1] = pkg.Release()
