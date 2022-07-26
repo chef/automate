@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -751,8 +750,16 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		content, _ := io.ReadAll(resp.Body)
-		http.Error(w, string(content), resp.StatusCode)
+		content := struct {
+			Error       string `json:"error"`
+			Description string `json:"error_description,omitempty"`
+		}{}
+		err := json.NewDecoder(resp.Body).Decode(&content)
+		if err != nil {
+			JSONError(w, prepareError(http.StatusInternalServerError, err.Error()), http.StatusInternalServerError)
+			return
+		}
+		JSONError(w, content, resp.StatusCode)
 		return
 	}
 

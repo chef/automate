@@ -108,14 +108,6 @@ func (c *client) RefreshTokenValidator(refreshToken string) (*http.Response, err
 	return c.Client().PostForm(tokenValidatorURL, formData)
 }
 
-func (c *client) RefreshTokenValidator(refreshToken string) (*http.Response, error) {
-	temp := myurl
-	temp += "/tokenValid"
-	formData := url.Values{}
-	formData.Add("refresh_token", refreshToken)
-	return c.Client().PostForm(temp, formData)
-}
-
 func (c *client) TokenSource(ctx context.Context, t *oauth2.Token) oauth2.TokenSource {
 	return oauth2.ReuseTokenSource(t, c.oauth2.TokenSource(c.clientContext(ctx), t))
 }
