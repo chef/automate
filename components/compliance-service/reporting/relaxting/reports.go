@@ -2220,6 +2220,9 @@ func getStartDateFromEndDate(endTime string, startTime string) ([]string, error)
 	}
 
 	if checkTodayIsEndTime(parsedEndTime) {
+		if startTime == "" {
+			return []string{}, nil
+		}
 		return []string{startTime}, nil
 	}
 	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
