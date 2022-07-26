@@ -5,7 +5,7 @@ var ComplianceRunInfo = Mapping{
 	Index:      IndexNameComplianceRunInfo,
 	Timeseries: false,
 	Mapping: `
-    {
+  {
     "index_patterns": ["` + IndexNameComplianceRunInfo + `"],
     "settings": {
         "index": {
@@ -294,5 +294,110 @@ var ComplianceRunInfo = Mapping{
     }
 }
 
+        "properties": {
+            "node_uuid": {
+                "type": "keyword"
+            },
+            "resource_uuid": {
+                "type": "keyword"
+            },
+            "resource_type": {
+                "type": "keyword"
+            },
+            "status": {
+                "type": "keyword"
+            },
+            "first_run": {
+                "type": "date"
+            },
+            "last_run": {
+                "type": "date"
+            },
+            "platform_with_version": {
+                "type": "keyword"
+            },
+            "platform": {
+                "type": "keyword",
+                "fields": {
+                    "engram": {
+                        "type": "text",
+                        "analyzer": "autocomplete"
+                    }
+                }
+            },
+            "control_tag": {
+                "properties": {
+                    "key": {
+                        "fields": {
+                            "engram": {
+                                "analyzer": "autocomplete",
+                                "type": "text"
+                            },
+                            "lower": {
+                                "normalizer": "case_insensitive",
+                                "type": "keyword"
+                            }
+                        },
+                        "type": "keyword"
+                    },
+                    "values": {
+                        "fields": {
+                            "engram": {
+                                "analyzer": "autocomplete",
+                                "type": "text"
+                            },
+                            "lower": {
+                                "normalizer": "case_insensitive",
+                                "type": "keyword"
+                            }
+                        },
+                        "type": "keyword"
+                    }
+                },
+                "type": "nested"
+            },
+            "chef_server": {
+                "type": "keyword"
+            },
+            "organization": {
+                "type": "keyword"
+            },
+            "controls": {
+                "type": "keyword"
+            },
+            "inspec_version": {
+                "type": "keyword"
+            },
+            "node_id": {
+                "type": "keyword"
+            },
+            "policy_name": {
+                "type": "keyword"
+            },
+            "profile_id": {
+                "type": "keyword"
+            },
+            "recipe": {
+                "type": "keyword"
+            },
+            "role": {
+                "type": "keyword"
+            },
+            "chef_tags": {
+                "fields": {
+                    "engram": {
+                        "analyzer": "autocomplete",
+                        "type": "text"
+                    },
+                    "lower": {
+                        "normalizer": "case_insensitive",
+                        "type": "keyword"
+                    }
+                },
+                "type": "keyword"
+            }
+        }
+    }
+}
 	`,
 }
