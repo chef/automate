@@ -54,62 +54,62 @@ type BackendBundleCreator struct {
 	versionsPath string
 }
 
-// InstallBundleCreatorOpt are functional options for the InstallBundleCreator
-type InstallBundleCreatorOpt func(*BackendBundleCreator)
+// BundleCreatorOpt are functional options for the InstallBundleCreator
+type BundleCreatorOpt func(*BackendBundleCreator)
 
-// WithInstallBundleOutputPath tells the install bundle creator the exact file to use
-func WithInstallBundleOutputPath(outputPath string) InstallBundleCreatorOpt {
+// WithBundleOutputPath tells the install bundle creator the exact file to use
+func WithBundleOutputPath(outputPath string) BundleCreatorOpt {
 	return func(c *BackendBundleCreator) {
 		c.outputFile = outputPath
 	}
 }
 
-// WithInstallBundleHartifactsPath sets the path to search for override harts
-func WithInstallBundleHartifactsPath(hartifactsPath string, overrideOrigin string) InstallBundleCreatorOpt {
+// WithBundleHartifactsPath sets the path to search for override harts
+func WithBundleHartifactsPath(hartifactsPath string, overrideOrigin string) BundleCreatorOpt {
 	return func(c *BackendBundleCreator) {
 		c.overrideOrigin = overrideOrigin
 		c.hartifactsPath = hartifactsPath
 	}
 }
 
-// WithInstallBundleVersionsPath sets the path to search for override versions
-func WithInstallBundleVersionsPath(versionsPath string) InstallBundleCreatorOpt {
+// WithBundleVersionsPath sets the path to search for override versions
+func WithBundleVersionsPath(versionsPath string) BundleCreatorOpt {
 	return func(c *BackendBundleCreator) {
 		c.versionsPath = versionsPath
 	}
 }
 
-// WithInstallBundleManifestFile sets the path for manifest
-func WithInstallBundleManifestFile(path string) InstallBundleCreatorOpt {
+// WithBundleManifestFile sets the path for manifest
+func WithBundleManifestFile(path string) BundleCreatorOpt {
 	return func(c *BackendBundleCreator) {
 		c.manifestFile = path
 	}
 }
 
-// WithInstallBundleChannel sets the release channel from which to download
+// WithBundleChannel sets the release channel from which to download
 // the manifest.
-func WithInstallBundleChannel(channel string) InstallBundleCreatorOpt {
+func WithBundleChannel(channel string) BundleCreatorOpt {
 	return func(c *BackendBundleCreator) {
 		c.channel = channel
 	}
 }
 
-// WithInstallBundleVersion sets the version whose manifest should be used.
-func WithInstallBundleVersion(version string) InstallBundleCreatorOpt {
+// WithBundleVersion sets the version whose manifest should be used.
+func WithBundleVersion(version string) BundleCreatorOpt {
 	return func(c *BackendBundleCreator) {
 		c.version = version
 	}
 }
 
-// WithInstallBundleWorkspacePath sets the path for caching artifacts
-func WithInstallBundleWorkspacePath(path string) InstallBundleCreatorOpt {
+// WithBundleWorkspacePath sets the path for caching artifacts
+func WithBundleWorkspacePath(path string) BundleCreatorOpt {
 	return func(c *BackendBundleCreator) {
 		c.workspacePath = path
 	}
 }
 
 // NewBackendBundleCreatorinitializes a new artifact creator
-func NewInstallBundleCreator(opts ...InstallBundleCreatorOpt) *BackendBundleCreator {
+func NewBundleCreator(opts ...BundleCreatorOpt) *BackendBundleCreator {
 	creator := &BackendBundleCreator{
 		channel: "current",
 	}
@@ -145,7 +145,7 @@ func (creator *BackendBundleCreator) Create(requiredBackendPackages []string) (s
 		return "", err
 	}
 
-	if err := creator.createTar(requiredBackendPackages); err != nil {
+	if err := creator.createBackendBundleTar(requiredBackendPackages); err != nil {
 		return "", err
 	}
 
@@ -260,54 +260,54 @@ func (creator *BackendBundleCreator) loadManifest() (*manifest.A2, error) {
 	return m, nil
 }
 
-func (creator *BackendBundleCreator) createTar(requiredBackendPackages []string) error {
+func (creator *BackendBundleCreator) createBackendBundleTar(requiredBackendPackages []string) error {
 	err := fileutils.AtomicWriter(creator.outputFile, func(w io.Writer) error {
-	tarWriter := tar.NewWriter(w)
-	defer tarWriter.Close()
-	var airgapMetadata airgap.UnpackMetadata
-	requiredBackendPackages = backendBundles(airgapMetadata)
-	for _, path := range requiredBackendPackages{
-		var info os.FileInfo
-		header, err := tar.FileInfoHeader(info, info.Name())
-		if err != nil {
-			return status.Wrap(err, status.FileAccessError, "Failed to create archive file header")
+		tarWriter := tar.NewWriter(w)
+		defer tarWriter.Close()
+		var airgapMetadata airgap.UnpackMetadata
+		requiredBackendPackages = backendBundles(airgapMetadata)
+		for _, path := range requiredBackendPackages {
+			var info os.FileInfo
+			header, err := tar.FileInfoHeader(info, info.Name())
+			if err != nil {
+				return status.Wrap(err, status.FileAccessError, "Failed to create archive file header")
+			}
+			p, err := filepath.Rel(creator.workspacePath, path)
+			if err != nil {
+				return status.Wrap(err, status.FileAccessError, "Failed to get base archive path")
+			}
+
+			header.Name = p
+
+			// write the header
+			if err := tarWriter.WriteHeader(header); err != nil {
+				return status.Wrap(err, status.FileAccessError, "Failed to write archive file header")
+			}
+
+			if info.IsDir() {
+				return nil
+			}
+
+			file, err := os.Open(path)
+			if err != nil {
+				return status.Wrap(err, status.FileAccessError, "Failed to open archive file")
+			}
+			defer file.Close() // nolint errcheck
+
+			// copy file data into tar writer
+			if _, err := io.Copy(tarWriter, file); err != nil {
+				return status.Wrap(err, status.FileAccessError, "Failed to write archive file")
+			}
+
+			// manually close here after each file operation; defering would cause each file close
+			// to wait until all operations have completed.
+			file.Close()
 		}
-		p, err := filepath.Rel(creator.workspacePath, path)
-		if err != nil {
-			return status.Wrap(err, status.FileAccessError, "Failed to get base archive path")
+		if err := tarWriter.Close(); err != nil {
+			return status.Wrap(err, status.FileAccessError, "Failed to close archive")
 		}
 
-		header.Name = p
-
-		// write the header
-		if err := tarWriter.WriteHeader(header); err != nil {
-			return status.Wrap(err, status.FileAccessError, "Failed to write archive file header")
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		file, err := os.Open(path)
-		if err != nil {
-			return status.Wrap(err, status.FileAccessError, "Failed to open archive file")
-		}
-		defer file.Close() // nolint errcheck
-
-		// copy file data into tar writer
-		if _, err := io.Copy(tarWriter, file); err != nil {
-			return status.Wrap(err, status.FileAccessError, "Failed to write archive file")
-		}
-
-		// manually close here after each file operation; defering would cause each file close
-		// to wait until all operations have completed.
-		file.Close()
-	}
-	if err := tarWriter.Close(); err != nil {
-		return status.Wrap(err, status.FileAccessError, "Failed to close archive")
-	}
-
-	return nil
+		return nil
 	})
 	if err != nil {
 		return errors.Wrap(err, "Could not write archive")
