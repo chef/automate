@@ -753,12 +753,13 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	if resp.StatusCode != 200 {
 		content, _ := ioutil.ReadAll(resp.Body)
 		http.Error(w, string(content), resp.StatusCode)
+		return
 	}
 
 	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, true)
 	if err != nil {
 		s.log.Debugf("failed to exchange token: %s", err)
-		httpError(w, http.StatusUnauthorized)
+		JSONError(w, prepareError(http.StatusUnauthorized, err.Error()), http.StatusUnauthorized)
 		return
 	}
 
