@@ -46,6 +46,7 @@ module "single_hardened_local_fresh_install_deploy" {
   instance_id   = "${module.single_hardened_local_fresh_install.instance_id}"
   instance_fqdn = "${module.single_hardened_local_fresh_install.fqdn}"
   ssh_username  = "${module.single_hardened_local_fresh_install.ssh_username}"
+  ssh_port  = "${module.single_hardened_local_fresh_install.ssh_port}"
 
   journald_system_max_use = "${var.channel == "acceptance" ? "20G" : "6G"}"
 

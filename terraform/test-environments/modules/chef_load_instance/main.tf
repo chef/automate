@@ -57,6 +57,7 @@ module "chef_load_cd_base" {
   instance_id    = "${var.instance_id}"
   instance_fqdn  = "${var.instance_fqdn}"
   ssh_username   = "${var.ssh_username}"
+  ssh_port   = "${var.ssh_port}"
 
   enable_monitoring = "${var.enable_monitoring}"
   chef_environment  = "${var.chef_environment}"

@@ -28,7 +28,7 @@ usage() {
   exit 1
 }
 
-if [[ $# -ne 10 ]]; then
+if [[ $# -ne 12 ]]; then
   usage
 fi
 
@@ -87,8 +87,8 @@ rsync_with_retry() {
   max=40
   n=0
   until [ $n -ge $max ]; do
-    rsync -aW --partial --inplace -e "ssh -o StrictHostKeyChecking=no\
-      -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE}" "${1}" "-p ${SSH_PORT}"  \
+    rsync -aW --partial --inplace -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no\
+      -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE}" "${1}"  \
       "${SSH_USER}@${SSH_IP}:${2}" && break
     n=$((n+1))
     echo "Will re-attempt rsync of ${2} to ${SSH_IP} on next loop iteration.."

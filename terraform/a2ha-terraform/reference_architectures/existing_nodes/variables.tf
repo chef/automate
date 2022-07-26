@@ -36,6 +36,9 @@ variable "ssh_key_file" {
 variable "ssh_user" {
 }
 
+variable "ssh_port" {
+}
+
 variable "sudo_cmd" {
   default = "sudo"
 }

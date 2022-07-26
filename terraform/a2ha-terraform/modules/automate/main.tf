@@ -45,6 +45,7 @@ locals {
     frontend_aib_file               = var.frontend_aib_dest_file,
     hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token,
     ssh_user                        = var.ssh_user,
+    ssh_port                        = var.ssh_port,
     tmp_path                        = var.tmp_path
   })
 }
