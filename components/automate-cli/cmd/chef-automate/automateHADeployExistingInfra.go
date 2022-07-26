@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -42,6 +43,7 @@ func (e *existingInfra) generateConfig() error {
 	}
 	e.config = ExistingInfraConfigToml{}
 	err = ptoml.Unmarshal(templateBytes, &e.config)
+	fmt.Println("check", e.config.ExistingInfra.Config.SetupManagedServices)
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
 	}

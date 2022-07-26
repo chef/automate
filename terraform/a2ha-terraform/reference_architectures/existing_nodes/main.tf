@@ -39,7 +39,7 @@ module "system-tuning-backend" {
 module "airgap_bundle-backend" {
   source            = "./modules/airgap_bundle"
   count             = var.setup_managed_services ? 0 : 1
-  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-backend.archive_disk_info
+  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-backend[0].archive_disk_info
   instance_count    = local.backend_count
   private_ips       = local.backend_private_ips
   bundle_files = [{
@@ -75,7 +75,7 @@ module "airgap_bundle-frontend" {
 module "habitat-backend" {
   source                          = "./modules/habitat"
   count                           = var.setup_managed_services ? 0 : 1
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend.airgap_info
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key
@@ -125,7 +125,7 @@ module "habitat-frontend" {
 module "opensearch" {
   source                       = "./modules/opensearch"
   count                        = var.setup_managed_services ? 0 : 1
-  airgap_info                  = var.setup_managed_services ? "" : module.airgap_bundle-backend.airgap_info
+  airgap_info                  = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   backend_aib_dest_file        = var.backend_aib_dest_file
   backend_aib_local_file       = var.backend_aib_local_file
   curator_pkg_ident            = var.curator_pkg_ident
@@ -135,7 +135,7 @@ module "opensearch" {
   opensearch_svc_load_args        = var.elasticsearch_svc_load_args
   opensearchsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
   opensearchsidecar_svc_load_args = var.elasticsidecar_svc_load_args
-  habitat_info                 = var.setup_managed_services ? "" : module.habitat-backend.habitat_info
+  habitat_info                 = var.setup_managed_services ? "" : module.habitat-backend[0].habitat_info
   journalbeat_pkg_ident        = var.journalbeat_pkg_ident
   kibana_pkg_ident             = var.kibana_pkg_ident
   metricbeat_pkg_ident         = var.metricbeat_pkg_ident
@@ -150,12 +150,12 @@ module "opensearch" {
 module "postgresql" {
   source                          = "./modules/postgresql"
   count                           = var.setup_managed_services ? 0 : 1
-  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend.airgap_info
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   opensearch_listen_port          = var.opensearch_listen_port
   opensearch_private_ips       = var.setup_managed_services ? [] : var.existing_opensearch_private_ips
-  habitat_info                    = var.setup_managed_services ? "" : module.habitat-backend.habitat_info
+  habitat_info                    = var.setup_managed_services ? "" : module.habitat-backend[0].habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
