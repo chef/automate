@@ -193,7 +193,7 @@ To destroy infra after successfull provisioning, run below command in your basti
     for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform state rm "module.efs[0].aws_efs_file_system.backups";cd $i;done
     ```
 
-3. This command will destroy all resources created while provisioning (excluding S3).
+3. This command will destroy all resources created while provisioning (excluding EFS).
 
     ```bash
     for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done
