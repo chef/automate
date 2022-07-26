@@ -14,12 +14,15 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/id_token"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/lib/version"
 
 	"github.com/alexedwards/scs"
@@ -48,23 +51,31 @@ type BldrClient struct {
 	ClientSecret string
 }
 
+type userData struct {
+	Username    string `json:"username"`
+	UserId      string `json:"user_id"`
+	ConnectorID string `json:"connector_id"`
+}
+
 // Server holds the server state
 type Server struct {
-	mux                http.Handler
-	log                logger.Logger
-	pgDB               *sql.DB
-	mgr                *scs.Manager
-	client             oidc.Client
-	bldrClient         *BldrClient
-	signInURL          *url.URL
-	remainingDuration  time.Duration
-	serviceCerts       *certs.ServiceCerts
-	connFactory        *secureconn.Factory
-	grpcServer         *grpc.Server
-	httpServer         *http.Server
-	errC               chan error
-	sigC               chan os.Signal
-	idTokenBlackLister IdTokenBlackLister.IdTokenBlackLister
+	mux                 http.Handler
+	log                 logger.Logger
+	pgDB                *sql.DB
+	mgr                 *scs.Manager
+	client              oidc.Client
+	bldrClient          *BldrClient
+	signInURL           *url.URL
+	remainingDuration   time.Duration
+	serviceCerts        *certs.ServiceCerts
+	connFactory         *secureconn.Factory
+	grpcServer          *grpc.Server
+	httpServer          *http.Server
+	errC                chan error
+	sigC                chan os.Signal
+	idTokenBlackLister  IdTokenBlackLister.IdTokenBlackLister
+	authzPoliciesClient authz.PoliciesServiceClient
+	teamsServiceClient  teams.TeamsServiceClient
 }
 
 const (
@@ -101,6 +112,8 @@ func New(
 	l logger.Logger,
 	migrationConfig *migration.Config,
 	oidcCfg oidc.Config,
+	authzAddress string,
+	teamsAddress string,
 	bldrClient *BldrClient,
 	signInURL *url.URL,
 	serviceCerts *certs.ServiceCerts,
@@ -132,6 +145,18 @@ func New(
 
 	scsManager := createSCSManager(store, persistent)
 
+	authzConn, err := factory.Dial("authz-service", authzAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to dial authz-service at (%s)", authzAddress)
+	}
+	authzPoliciesClient := authz.NewPoliciesServiceClient(authzConn)
+
+	teamsConn, err := factory.Dial("teams-service", teamsAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to dial teams-service at (%s)", teamsAddress)
+	}
+	teamsServiceClient := teams.NewTeamsServiceClient(teamsConn)
+
 	s := Server{
 		log:               l,
 		client:            oidcClient,
@@ -140,12 +165,14 @@ func New(
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
-		mgr:                scsManager,
-		serviceCerts:       serviceCerts,
-		connFactory:        factory,
-		errC:               make(chan error, 5),
-		sigC:               make(chan os.Signal, 2),
-		idTokenBlackLister: IdTokenBlackLister.NewPgBlackLister(pgDB),
+		mgr:                 scsManager,
+		serviceCerts:        serviceCerts,
+		connFactory:         factory,
+		errC:                make(chan error, 5),
+		sigC:                make(chan os.Signal, 2),
+		idTokenBlackLister:  IdTokenBlackLister.NewPgBlackLister(pgDB),
+		authzPoliciesClient: authzPoliciesClient,
+		teamsServiceClient:  teamsServiceClient,
 	}
 	signal.Notify(s.sigC, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGINT, syscall.SIGUSR1)
 
@@ -224,7 +251,8 @@ func (s *Server) initHandlers() {
 		Methods("POST")
 	r.HandleFunc("/userinfo", s.userinfoHandler).
 		Methods("GET")
-
+	r.HandleFunc("/userpolicies", s.userPoliciesHandler).
+		Methods("POST")
 	r.PathPrefix("/").HandlerFunc(s.catchAllElseHandler)
 	// ^ if none of the above match, it's going to be a 401.
 	s.mux = r
@@ -295,6 +323,90 @@ func ClearExpiredTokens(pgDB *sql.DB) {
 		panic(err)
 	}
 	fmt.Println("Rows Deleted:", count)
+}
+
+func isMemberOfPolicy(member, username, connector string) bool {
+	memberArray := strings.Split(member, ":")
+	fmt.Println(memberArray, "memberArray")
+	if memberArray[0] == "user" && memberArray[1] == connector && memberArray[2] == username {
+		return true
+	}
+	return false
+}
+
+func isMemberOfTeams(member, user_id, connector string) bool {
+	memberArray := strings.Split(member, ":")
+	fmt.Println(memberArray, "memberArray")
+	if memberArray[0] == "user" && memberArray[1] == connector && memberArray[2] == user_id {
+		return true
+	}
+	return false
+}
+
+func (s *Server) getUserPolicies(ctx context.Context, username, connector_id string) []*authz.Policy {
+	listOfPolicies, err := s.authzPoliciesClient.ListPolicies(ctx, &authz.ListPoliciesReq{})
+	if err != nil {
+		fmt.Println(err, "userPoliciesHandler err")
+	}
+
+	var policies []*authz.Policy
+
+	for _, pol := range listOfPolicies.Policies {
+		for _, member := range pol.Members {
+			if isMemberOfPolicy(member, username, connector_id) {
+				policies = append(policies, pol)
+				fmt.Println(pol, "poll")
+			}
+		}
+	}
+	return policies
+}
+
+// func (s *Server) getTeamsPolicies(ctx context.Context, user_id, connector_id string) {
+// 	listOfTeams, err := s.teamsServiceClient.GetTeamsForMember(ctx, &teams.GetTeamsForMemberReq{UserId: user_id})
+// 	if err != nil {
+// 		fmt.Println(err, "getTeamsPolicies err")
+// 	}
+// 	fmt.Println(listOfTeams, "listOfTeamsAA")
+
+// 	teams := listOfTeams.GetTeams()
+
+// 	for _, team := range teams {
+// 		if isMemberOfTeams(member, user_id, connector_id) {
+// 			policies = append(policies, pol)
+// 		}
+// 	}
+
+// var policies []*authz.Policy
+
+// for _, pol := range listOfPolicies.Policies {
+// 	for _, member := range pol.Members {
+// 		if isMemberOfTeams(member, user_id, connector_id) {
+// 			policies = append(policies, pol)
+// 		}
+// 	}
+// }
+// return policies
+// }
+
+func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var data userData
+	err := decoder.Decode(&data)
+	if err != nil {
+		fmt.Println(err, "errororr")
+	}
+
+	fmt.Println(data, "dattt")
+
+	userPolicies := s.getUserPolicies(r.Context(), data.Username, data.ConnectorID)
+
+	// s.getTeamsPolicies(r.Context(), data.UserId, data.ConnectorID)
+
+	fmt.Println(userPolicies, "dataUSerP")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(userPolicies)
 }
 
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
