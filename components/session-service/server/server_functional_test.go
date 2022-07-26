@@ -348,18 +348,28 @@ func TestMain(t *testing.T) {
 			assert.NotZero(t, idToken)
 
 			t.Run("GET /session/userinfo, with ID token retrieved from /token endpoint", func(t *testing.T) {
+				fmt.Println("Till Here 1")
 				req, err := http.NewRequest("GET", userinfoEndpoint.String(), nil)
+				fmt.Println("Till Here 2")
 				require.NoError(t, err)
+				fmt.Println("Till Here 3")
 				req.Header.Add("Authorization", "bearer "+idToken)
+				fmt.Println("Till Here 4")
 				resp, err := c.Do(req)
+				fmt.Println("Till Here 5")
 				require.NoError(t, err)
+				fmt.Println("Till Here 6")
 				respMsg := struct {
 					Sub string `json:"sub"`
 					PU  string `json:"preferred_username"`
 				}{}
+				fmt.Println("Till Here 7")
 				json.NewDecoder(resp.Body).Decode(&respMsg)
+				fmt.Println("Till Here 8")
 				assert.Equal(t, "Cg0wLTM4NS0yODA4OS0wEgRtb2Nr", respMsg.Sub)
+				fmt.Println("Till Here 9")
 				assert.Equal(t, "kilgore@kilgore.trout", respMsg.PU)
+				fmt.Println("Till Here 10")
 			})
 		})
 	})
