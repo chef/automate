@@ -185,7 +185,7 @@ func GetEsIndex(filters map[string][]string, useSummaryIndex bool) (esIndex stri
 		return esIndex, err
 	}
 
-	logrus.Debugf("GetEsIndex called with (filters=%+v)", filters)
+	logrus.Debugf("GetEsIndex called with (filters=%+v), using startDateAsString=%s, endDateAsString=%s", filters, startDateAsString, endDateAsString)
 
 	if useSummaryIndex {
 		esIndex, err = IndexDates(CompDailySumIndexPrefix, startDateAsString, endDateAsString)
