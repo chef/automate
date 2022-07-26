@@ -107,7 +107,8 @@ module BackendUtils
     end
 
     def ssh_port
-      @ssh_port ||= / (\S+)@\S+/.match(frontend_ssh_connect_string)[1]
+      @ssh_port ||= / -p(\s\d+)/.match(frontend_ssh_connect_string)[1].delete(' ')
+    end
 
     def ssh_key_file
       @ssh_key_file ||= tf_output_value("ssh_key_file")

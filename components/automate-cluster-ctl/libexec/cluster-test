@@ -82,7 +82,7 @@ class AutomateClusterTest < AutomateCluster::Command
     cmd << "--input-file #{input_file}"
     cmd << "--sudo-password=#{sudo_password(service)}" if sudo_password(service)
     cmd << "--sudo-command=#{AutomateCluster.sudo_}" if sudo_command
-    cmd << "--target ssh://#{config.ssh_user}@#{server}"
+    cmd << "--target ssh://#{config.ssh_user}@#{server}:#{config.ssh_port}"
     cmd << File.join(profile_path, profile)
 
     cmd.join(' ')
