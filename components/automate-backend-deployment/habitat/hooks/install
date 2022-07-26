@@ -55,7 +55,13 @@ if [ -L /hab/a2_deploy_workspace ]; then
   # copy over tfvars from old workspace if any exist
   find $OLD_WORKSPACE/terraform -name \*.tfvars -exec cp {} $NEW_WORKSPACE/terraform \;
   # copy over tfstate from old workspace if any exist
-  find $OLD_WORKSPACE/terraform -name \*.tfstate -exec cp {} $NEW_WORKSPACE/terraform \;
+  # find $OLD_WORKSPACE/terraform -name \*.tfstate -exec cp {} $NEW_WORKSPACE/terraform \;
+  if [[ -f $OLD_WORKSPACE/terraform/terraform.tfstate ]]; then
+    cp $OLD_WORKSPACE/terraform/*.tfstate $NEW_WORKSPACE/terraform \;
+  fi
+  if [[ -f $OLD_WORKSPACE/terraform/destroy/aws/terraform.tfstate ]]; then
+    cp -r $OLD_WORKSPACE/terraform/destroy/aws/* $NEW_WORKSPACE/terraform/destroy/aws/ \;
+  fi
   # copy .abb files from old workspace if any exist
   find $OLD_WORKSPACE/terraform -name \*.abb -exec cp {} $NEW_WORKSPACE/terraform \;
   # copy over configs from old workspace if any exist
@@ -111,6 +117,7 @@ EOF
     echo "Copying previous 'automate-cluster-ctl' config and secrets to new workspace"
     cp $OLD_WORKSPACE/a2ha.rb $NEW_WORKSPACE/a2ha.rb
     cp $OLD_WORKSPACE/secrets.json $NEW_WORKSPACE/secrets.json
+    cp $OLD_WORKSPACE/secrets.key $NEW_WORKSPACE/secrets.key
   else
     display_upgrade_help $(cat $OLD_WORKSPACE/terraform/.tf_arch)
   fi
