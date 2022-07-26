@@ -1096,7 +1096,6 @@ func newTestServer(t *testing.T, store scs.Store, persistent bool) (*Server, htt
 	// in code & test, but it lets us assert that the helper is doing
 	// the right thing
 	scsManager := createSCSManager(store, persistent)
-
 	s := &Server{
 		log:                l,
 		mgr:                scsManager,
@@ -1146,6 +1145,10 @@ type testOAuth2Config struct {
 
 func (x *testOAuth2Config) TokenSource(context.Context, *oauth2.Token) oauth2.TokenSource {
 	return x
+}
+
+func (x *testOAuth2Config) RefreshTokenValidator(RefreshToken string) (*http.Response, error) {
+	return &http.Response{}, nil
 }
 
 func (x *testOAuth2Config) Exchange(ctx context.Context, code string) (*oauth2.Token, error) {
