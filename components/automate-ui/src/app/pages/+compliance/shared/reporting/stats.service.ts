@@ -36,9 +36,9 @@ export class StatsService {
     private httpClient: HttpClient,
     private route: ActivatedRoute,
     private appConfigService: AppConfigService,
-    private telemetryService: TelemetryService,
+    private telemetryService: TelemetryService
   ) {}
-  
+
   getFailures(types: Array<string>, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/failures`;
     const formatted = this.formatFilters(reportQuery);
@@ -66,57 +66,53 @@ export class StatsService {
     return this.httpClient.post<any>(url, body).pipe(
       map(({ controls_summary }) => controls_summary));
   }
-  gettimeTrends(days: moment.DurationInputArg1 , intervals: moment.unitOfTime.DurationConstructor , reportQuery: ReportQuery){
-    reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(days , intervals)
+  getTimeTrends(days: moment.DurationInputArg1, intervals: moment.unitOfTime.DurationConstructor, reportQuery: ReportQuery) {
+    reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(days, intervals);
   }
-  checktime(time_interval: number , reportQuery : ReportQuery) {
-    if (time_interval == 0 ){
-      this.gettimeTrends(10 , 'days' , reportQuery)
+  getTimeInterval(timeInterval: number, reportQuery: ReportQuery) {
+    if (timeInterval === 0 ) {
+      this.getTimeTrends(10, 'days', reportQuery);
     }
-    else if(time_interval == 1){
-      this.gettimeTrends(1 , 'months' , reportQuery)
+    else if (timeInterval === 1) {
+      this.getTimeTrends(1, 'months', reportQuery);
     }
-    else if(time_interval == 2) {
-      this.gettimeTrends(3 , 'months' , reportQuery)
+    else if (timeInterval === 2) {
+      this.getTimeTrends(3, 'months', reportQuery);
     }
-    else if(time_interval == 3) {
-      this.gettimeTrends(1 , 'years' , reportQuery)
+    else if (timeInterval === 3) {
+      this.getTimeTrends(1, 'years', reportQuery);
     }
   }
   getNodeTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
-    let previous_url :string
-    let prev = localStorage.getItem(previous_url);
-    prev.toString();
-    const url_array = ["reporting/nodes" , "reporting/profiles" , "reporting/controls"];
-    var urlcheck = url_array.some(url_var => prev.includes(url_var));
-    if(urlcheck == true){
-      let time_interval = reportQuery.interval;
-      this.checktime(time_interval , reportQuery)
-      localStorage.setItem(previous_url , url);
+    let previousUrl: string;
+    const prev = localStorage.getItem(previousUrl);
+    const url_array = ['reporting/nodes' , 'reporting/profiles' , 'reporting/controls'];
+    const urlcheck = url_array.some(urlVar => prev.includes(urlVar));
+    if (urlcheck) {
+      const timeInterval = reportQuery.interval;
+      this.getTimeInterval(timeInterval, reportQuery);
+      localStorage.setItem(previousUrl, url);
     }
     const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'nodes', interval, filters: formatted};
-  
     return this.httpClient.post<any>(url, body).pipe(
       map(({ trends }) => trends));
   }
-
+  
   getControlsTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
-    let previous_url : string;
-    let prev = localStorage.getItem(previous_url);
-    prev.toString();
-    const url_array = ["reporting/nodes" , "reporting/profiles" , "reporting/controls"];
-    var urlcheck = url_array.some(url_var => prev.includes(url_var));
-    if(urlcheck == true){
-      let time_interval = reportQuery.interval;
-      this.checktime(time_interval , reportQuery)
-      localStorage.setItem(previous_url , url);
+    let previousUrl: string;
+    const prev = localStorage.getItem(previousUrl);
+    const url_array = ['reporting/nodes', 'reporting/profiles', 'reporting/controls'];
+    const urlcheck = url_array.some(urlVar => prev.includes(urlVar));
+    if (urlcheck) {
+      const timeInterval = reportQuery.interval;
+      this.getTimeInterval(timeInterval, reportQuery);
+      localStorage.setItem(previousUrl, url);
     }
-    
     const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'controls', interval, filters: formatted};
 
@@ -152,8 +148,8 @@ export class StatsService {
 
   getNodes(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/nodes/search`;
-    let current_url : string
-    localStorage.setItem(current_url , url);
+    let currentUrl: string;
+    localStorage.setItem(currentUrl, url);
     reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
@@ -184,12 +180,12 @@ export class StatsService {
   }
   getStartDate(reportQuery: ReportQuery): ReportQuery {
     reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
-    return reportQuery
+    return reportQuery;
   }
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/profiles`;
-    let current_url : string
-    localStorage.setItem(current_url , url); 
+    let currentUrl: string;
+    localStorage.setItem(currentUrl, url); 
     reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
@@ -212,12 +208,12 @@ export class StatsService {
 
   getControls(reportQuery: ReportQuery): Observable<{total: any, items: any}> {
     const url = `${CC_API_URL}/reporting/controls`;
-    let current_url : string
-    localStorage.setItem(current_url , url);
+    let currentUrl: string;
+    localStorage.setItem(currentUrl, url);
     reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
-    let body = { filters: formatted };
+    const body = { filters: formatted };
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ control_items }) => ({ total: control_items.length, items: control_items })));
