@@ -81,7 +81,7 @@ func IndexDates(prefix string, startTimeAsStringRFC3339 string, endTimeAsStringR
 
 	//logrus.Debugf("startTime: %s endTime: %s", startTime, endTime)
 	if startTime.After(endTime) {
-		err = errors.New(StartDateGreaterThanEndDateErrMsg)
+		err = errors.New(fmt.Sprintf("%s--%s--%s", StartDateGreaterThanEndDateErrMsg, startTimeAsStringRFC3339, endTimeAsStringRFC3339))
 		return indices, err
 	}
 	indicesYears, straddleYears, _ := wholeCalendarYears(prefix, startTime, endTime)
