@@ -676,13 +676,6 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// returnData := struct {
-	// 	IDToken      string `json:"id_token"`
-	// 	TokenType    string `json:"token_type"`
-	// 	Expiry       string `json:"expires_in"`
-	// 	RefreshToken string `json:"refresh_token"`
-	// }{rawIDToken, token.Type(), token.Expiry.String(), token.RefreshToken}
-	fmt.Println(token.RefreshToken, "myRefreshToken")
 	returnData := struct {
 		IDToken string `json:"id_token"`
 	}{rawIDToken}
