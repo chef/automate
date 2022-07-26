@@ -753,6 +753,7 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	if resp.StatusCode != 200 {
 		content, _ := ioutil.ReadAll(resp.Body)
 		http.Error(w, string(content), resp.StatusCode)
+		return
 	}
 
 	token, err := s.maybeExchangeRefreshTokenForIDToken(r.Context(), refreshToken, idToken, true)
