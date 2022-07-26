@@ -1144,6 +1144,10 @@ type testOAuth2Config struct {
 	code    string
 }
 
+func (x *testOAuth2Config) RefreshTokenValidator(refreshToken string) (*http.Response, error) {
+	return &http.Response{}, nil
+}
+
 func (x *testOAuth2Config) TokenSource(context.Context, *oauth2.Token) oauth2.TokenSource {
 	return x
 }
