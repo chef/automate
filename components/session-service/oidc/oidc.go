@@ -25,6 +25,7 @@ type Client interface {
 	AuthCodeURL(string, ...oauth2.AuthCodeOption) string
 	Exchange(context.Context, string) (*oauth2.Token, error)
 	Verify(context.Context, string) (*oidc.IDToken, error)
+	RefreshTokenValidator(string) (*http.Response, error)
 	Client() *http.Client
 }
 
@@ -50,12 +51,14 @@ type OIDCLogger interface {
 	Warn(...interface{})
 }
 
+var myurl string
+
 // New initializes an OIDC client for our purposes
 func New(cfg Config, retrySec int, certs *certs.ServiceCerts, l OIDCLogger) (Client, error) {
 	httpClient := httpClientForIssuer("automate-dex", cfg.DexURL, certs)
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
-
 	var provider *oidc.Provider
+	myurl = cfg.IssuerURL.String()
 	var err error
 	retryTime := time.Duration(retrySec) * time.Second
 	for {
@@ -71,6 +74,7 @@ func New(cfg Config, retrySec int, certs *certs.ServiceCerts, l OIDCLogger) (Cli
 		l.Warn(fmt.Sprintf("attempting to connect to OIDC Issuer, retry in %d seconds (last error %v)", retrySec, err))
 		time.Sleep(retryTime)
 	}
+
 	oauth2cfg := oauth2.Config{
 		ClientID:     cfg.ClientID,
 		ClientSecret: cfg.ClientSecret,
@@ -92,6 +96,14 @@ func New(cfg Config, retrySec int, certs *certs.ServiceCerts, l OIDCLogger) (Cli
 		oauth2:   &oauth2cfg,
 		verifier: verifier,
 		log:      l}, nil
+}
+
+func (c *client) RefreshTokenValidator(refreshToken string) (*http.Response, error) {
+	temp := myurl
+	temp += "/tokenValid"
+	formData := url.Values{}
+	formData.Add("refresh_token", refreshToken)
+	return c.Client().PostForm(temp, formData)
 }
 
 func (c *client) TokenSource(ctx context.Context, t *oauth2.Token) oauth2.TokenSource {

@@ -111,7 +111,6 @@ func New(
 		version.Version,
 		version.GitSHA,
 	))
-
 	oidcClient, err := oidc.New(oidcCfg, 1, serviceCerts, l)
 	if err != nil {
 		return nil, errors.Wrap(err, "OIDC client")
@@ -719,7 +718,10 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		JSONError(w, prepareError(http.StatusBadRequest, err.Error()), http.StatusBadRequest)
-		// http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if data.RefreshToken == "" || data.GrantType == "" {
+		JSONError(w, prepareError(http.StatusBadRequest, "Send All Input Parameters"), http.StatusBadRequest)
 		return
 	}
 	refreshToken := data.RefreshToken
@@ -728,33 +730,21 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.log.Debug("no bearer token")
 		JSONError(w, prepareError(http.StatusUnauthorized, err.Error()), http.StatusUnauthorized)
-		// httpError(w, http.StatusUnauthorized)
 		return
 	}
 
 	isBlacklisted, err := s.idTokenBlackLister.IsIdTokenBlacklisted(idToken)
 	if err != nil {
 		JSONError(w, prepareError(http.StatusInternalServerError, err.Error()), http.StatusInternalServerError)
-		// httpError(w, http.StatusInternalServerError)
 		return
 	}
 	if isBlacklisted {
 		s.log.Debug("bearer token blacklisted")
 		JSONError(w, prepareError(http.StatusUnauthorized, err.Error()), http.StatusUnauthorized)
-		// httpError(w, http.StatusUnauthorized)
 		return
 	}
 
-	formData := url.Values{}
-	formData.Add("refresh_token", refreshToken)
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-	// Change the IP address with your automate IP.
-	resp, err := client.PostForm("https://ec2-18-117-216-177.us-east-2.compute.amazonaws.com/dex/tokenValid", formData)
-
+	resp, err := s.client.RefreshTokenValidator(refreshToken)
 	if err != nil {
 		JSONError(w, prepareError(http.StatusInternalServerError, err.Error()), http.StatusInternalServerError)
 		return
@@ -775,18 +765,8 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
 		JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "no id_token in token response").Error()), http.StatusInternalServerError)
-		// http.Error(w, "no id_token in token response", http.StatusInternalServerError)
 		return
 	}
-
-	// sess := s.mgr.Load(r)
-	// if token.RefreshToken != "" {
-	// 	if err := sess.PutString(w, refreshTokenKey, token.RefreshToken); err != nil {
-	// 		// http.Error(w, "failed to set refresh_token", http.StatusInternalServerError)
-	// 		JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "failed to set refresh_token").Error()), http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// }
 
 	returnData := struct {
 		IDToken      string `json:"id_token"`
@@ -796,7 +776,6 @@ func (s *Server) refreshApiHandler(w http.ResponseWriter, r *http.Request) {
 	}{rawIDToken, token.Type(), token.Expiry.String(), token.RefreshToken}
 	if err := json.NewEncoder(w).Encode(returnData); err != nil {
 		JSONError(w, prepareError(http.StatusInternalServerError, errors.Wrap(err, "failed to set marshal id_token").Error()), http.StatusInternalServerError)
-		// http.Error(w, errors.Wrap(err, "failed to set marshal id_token").Error(), http.StatusInternalServerError)
 		return
 	}
 }
