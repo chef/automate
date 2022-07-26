@@ -7,57 +7,10 @@ var ComplianceRunInfo = Mapping{
 	Mapping: `
     {
     "settings": {
-          "index": {
-                "refresh_interval": "1s",
-                "number_of_shards": "5"
+        "index": {
+            "refresh_interval": "1s",
+            "number_of_shards": "5"
         },
-        "analysis": {
-            "analyzer": {
-                "autocomplete": {
-                    "filter": [
-                        "lowercase"
-                    ],
-                    "tokenizer": "autocomplete_tokenizer"
-                },
-                "autocomplete_version_numbers": {
-                    "filter": [
-                        "lowercase"
-                    ],
-                    "tokenizer": "autocomplete_version_number_tokenizer"
-                }
-            },
-            "tokenizer": {
-                "autocomplete_tokenizer": {
-                    "max_gram": 20,
-                    "min_gram": 2,
-                    "token_chars": [
-                        "letter",
-                        "digit"
-                    ],
-                    "type": "edge_ngram"
-                },
-                "autocomplete_version_number_tokenizer": {
-                    "max_gram": 20,
-                    "min_gram": 2,
-                    "token_chars": [
-                        "letter",
-                        "digit",
-                        "punctuation"
-                    ],
-                    "type": "edge_ngram"
-                }
-            },
-            "normalizer": {
-                "case_insensitive": {
-                    "type": "custom",
-                    "char_filter": [],
-                    "filter": [
-                        "lowercase",
-                        "asciifolding"
-                    ]
-                }
-            }
-          },
         "analysis": {
             "analyzer": {
                 "autocomplete": {
@@ -126,202 +79,75 @@ var ComplianceRunInfo = Mapping{
             "last_run": {
                 "type": "date"
             },
-            "chef_server": {
+            "platform_with_version": {
+                "type": "keyword"
+            },
+            "platform": {
                 "type": "keyword",
                 "fields": {
                     "engram": {
                         "type": "text",
                         "analyzer": "autocomplete"
-                    },
-                    "lower": {
-                        "type": "keyword",
-                        "normalizer": "case_insensitive"
                     }
                 }
+            },
+            "control_tag": {
+                "properties": {
+                    "key": {
+                        "fields": {
+                            "engram": {
+                                "analyzer": "autocomplete",
+                                "type": "text"
+                            },
+                            "lower": {
+                                "normalizer": "case_insensitive",
+                                "type": "keyword"
+                            }
+                        },
+                        "type": "keyword"
+                    },
+                    "values": {
+                        "fields": {
+                            "engram": {
+                                "analyzer": "autocomplete",
+                                "type": "text"
+                            },
+                            "lower": {
+                                "normalizer": "case_insensitive",
+                                "type": "keyword"
+                            }
+                        },
+                        "type": "keyword"
+                    }
+                },
+                "type": "nested"
+            },
+            "chef_server": {
+                "type": "keyword"
             },
             "organization": {
-                "type": "keyword",
-                "fields": {
-                    "engram": {
-                        "type": "text",
-                        "analyzer": "autocomplete"
-                    },
-                    "lower": {
-                        "type": "keyword",
-                        "normalizer": "case_insensitive"
-                    }
-                }
+                "type": "keyword"
             },
-            "version": {
-                "type": "keyword",
-                "fields": {
-                    "engram": {
-                        "type": "text",
-                        "analyzer": "autocomplete_version_numbers"
-                    },
-                    "lower": {
-                        "type": "keyword",
-                        "normalizer": "case_insensitive"
-                    }
-                }
+            "controls": {
+                "type": "keyword"
+            },
+            "inspec_version": {
+                "type": "keyword"
+            },
+            "node_id": {
+                "type": "keyword"
             },
             "policy_name": {
-                "type": "keyword",
-                "fields": {
-                    "engram": {
-                        "type": "text",
-                        "analyzer": "autocomplete"
-                    },
-                    "lower": {
-                        "type": "keyword",
-                        "normalizer": "case_insensitive"
-                    }
-                }
+                "type": "keyword"
             },
-            "profiles": {
-                "type": "nested",
-                "properties": {
-                    "controls": {
-                        "type": "nested",
-                        "properties": {
-                            "id": {
-                                "type": "keyword"
-                            },
-                            "control_tags": {
-                                "type": "nested",
-                                "properties": {
-                                    "key": {
-                                        "type": "keyword",
-                                        "fields": {
-                                            "engram": {
-                                                "type": "text",
-                                                "analyzer": "autocomplete"
-                                            },
-                                            "lower": {
-                                                "type": "keyword",
-                                                "normalizer": "case_insensitive"
-                                            }
-                                        }
-                                    },
-                                    "values": {
-                                        "type": "keyword",
-                                        "fields": {
-                                            "engram": {
-                                                "type": "text",
-                                                "analyzer": "autocomplete"
-                                            },
-                                            "lower": {
-                                                "type": "keyword",
-                                                "normalizer": "case_insensitive"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "title": {
-                        "type": "keyword",
-                        "fields": {
-                            "engram": {
-                                "type": "text",
-                                "analyzer": "autocomplete"
-                            },
-                            "lower": {
-                                "type": "keyword",
-                                "normalizer": "case_insensitive"
-                            }
-                        }
-                    },
-                    "sha256": {
-                        "type": "keyword"
-                    },
-                    "name": {
-                        "type": "keyword"
-                    },
-                    "full": {
-                        "type": "keyword",
-                        "fields": {
-                            "engram": {
-                                "type": "text",
-                                "analyzer": "autocomplete_version_numbers"
-                            },
-                            "lower": {
-                                "type": "keyword",
-                                "normalizer": "case_insensitive"
-                            }
-                        }
-                    }
-                }
+            "profile_id": {
+                "type": "keyword"
             },
-            "recipes": {
-                "type": "keyword",
-                "fields": {
-                    "engram": {
-                        "type": "text",
-                        "analyzer": "autocomplete"
-                    },
-                    "lower": {
-                        "type": "keyword",
-                        "normalizer": "case_insensitive"
-                    }
-                }
+            "recipe": {
+                "type": "keyword"
             },
-            "roles": {
-                "type": "keyword",
-                "fields": {
-                    "engram": {
-                        "type": "text",
-                        "analyzer": "autocomplete"
-                    },
-                    "lower": {
-                        "type": "keyword",
-                        "normalizer": "case_insensitive"
-                    }
-                }
-            },
-            "platform_version": {
-                "properties": {
-                    "full": {
-                        "type": "keyword",
-                        "fields": {
-                            "engram": {
-                                "type": "text",
-                                "analyzer": "autocomplete_version_numbers"
-                            },
-                            "lower": {
-                                "type": "keyword",
-                                "normalizer": "case_insensitive"
-                            }
-                        }
-                    },
-                    "name": {
-                        "type": "keyword",
-                        "fields": {
-                            "engram": {
-                                "type": "text",
-                                "analyzer": "autocomplete"
-                            },
-                            "lower": {
-                                "type": "keyword",
-                                "normalizer": "case_insensitive"
-                            }
-                        }
-                    },
-                    "release": {
-                        "type": "keyword",
-                        "fields": {
-                            "engram": {
-                                "type": "text",
-                                "analyzer": "autocomplete"
-                            },
-                            "lower": {
-                                "type": "keyword",
-                                "normalizer": "case_insensitive"
-                            }
-                        }
-                    }
-                }
+            "role": {
+                "type": "keyword"
             },
             "chef_tags": {
                 "fields": {
@@ -339,6 +165,5 @@ var ComplianceRunInfo = Mapping{
         }
     }
 }
-
 	`,
 }
