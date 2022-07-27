@@ -21,6 +21,10 @@ variable "public_ips" {
 variable "ssh_key_file" {
 }
 
+variable "ssh_port" {
+  default = 22
+}
+
 variable "ssh_user" {
   default = "centos"
 }

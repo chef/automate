@@ -106,12 +106,16 @@ module BackendUtils
       @ssh_user ||= / (\S+)@\S+/.match(frontend_ssh_connect_string)[1]
     end
 
+    def ssh_port
+      @ssh_port ||= / -p(\s\d+)/.match(frontend_ssh_connect_string)[1].delete(' ')
+    end
+
     def ssh_key_file
       @ssh_key_file ||= tf_output_value("ssh_key_file")
     end
 
     def train(host_ip, options = {})
-      opts = { host: host_ip, port: 22, user: ssh_user,
+      opts = { host: host_ip, port: ssh_port, user: ssh_user,
                key_files: ssh_key_file, connection_timeout: 3, connection_retries: 5,
                connection_retry_sleep: 5, logger: backend_logger, verify_host_key: :never }
       Train.create('ssh', opts.merge(options))

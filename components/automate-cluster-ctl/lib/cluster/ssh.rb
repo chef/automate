@@ -57,7 +57,7 @@ module AutomateCluster
     def initialize(ip, opts = {})
       @ip = ip
       @options = opts.merge({
-        host: ip, port: 22, user: AutomateCluster::Config.ssh_user,
+        host: ip, port: AutomateCluster::Config.ssh_port, user: AutomateCluster::Config.ssh_user,
         key_files: AutomateCluster::Config.ssh_key_file, connection_timeout: 3, connection_retries: 5,
         connection_retry_sleep: 5, logger: AutomateCluster.logger, verify_host_key: :never
       })

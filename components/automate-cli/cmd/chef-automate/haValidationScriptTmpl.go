@@ -29,6 +29,9 @@ SSH_KEY=$(grep -E '(^|\s)ssh_key_file($|\s)' $CONFIG | cut -c13- | sed 's/"//g' 
 #Taking and filtering ssh_user from config.toml file
 SSH_USER=$(grep -E '(^|\s)ssh_user($|\s)' $CONFIG | cut -c10- | sed 's/"//g' | sed 's/=//g')
 
+#Taking and filtering ssh_port from config.toml file
+SSH_PORT=$(grep -E '(^|\s)ssh_port($|\s)' $CONFIG | cut -c10- | sed 's/"//g' | sed 's/=//g')
+
 #This will take ips from config.toml of server's and convert "[]" this array format to bash array formate like ().
 automate_server_private_ip=$(grep -E '(^|\s)automate_private_ips($|\s)' $CONFIG | cut -c24-)
 automate_server_private_ip=${automate_server_private_ip// /}

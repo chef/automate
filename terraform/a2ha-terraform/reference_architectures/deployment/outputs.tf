@@ -28,8 +28,9 @@ output "postgresql_private_ips" {
 
 output "automate_ssh" {
   value = formatlist(
-    "ssh -i %s %s@%s",
+    "ssh -i %s -p %s %s@%s",
     var.ssh_key_file,
+    var.ssh_port,
     var.ssh_user,
     var.automate_private_ips,
   )
@@ -37,8 +38,9 @@ output "automate_ssh" {
 
 output "chef_server_ssh" {
   value = formatlist(
-    "ssh -i %s %s@%s",
+    "ssh -i %s -p %s %s@%s",
     var.ssh_key_file,
+    var.ssh_port,
     var.ssh_user,
     var.chef_server_private_ips,
   )
@@ -46,8 +48,9 @@ output "chef_server_ssh" {
 
 output "postgresql_ssh" {
   value = formatlist(
-    "ssh -i %s %s@%s",
+    "ssh -i %s -p %s %s@%s",
     var.ssh_key_file,
+    var.ssh_port,
     var.ssh_user,
     var.postgresql_private_ips,
   )
@@ -55,8 +58,9 @@ output "postgresql_ssh" {
 
 output "opensearch_ssh" {
   value = formatlist(
-    "ssh -i %s %s@%s",
+    "ssh -i %s -p %s %s@%s",
     var.ssh_key_file,
+    var.ssh_port,
     var.ssh_user,
     var.opensearch_private_ips,
   )

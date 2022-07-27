@@ -26,6 +26,7 @@ type AwsConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
+			SSHPort						string	`toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`
@@ -139,6 +140,7 @@ type ExistingInfraConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
+			SSHPort						string	`toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`

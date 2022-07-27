@@ -24,7 +24,7 @@ module AutomateCluster
         utils.backend_logger.info ">>>> Running Automate Frontend inspec smoke tests against: #{utils.automate_private_ips}"
         utils.automate_private_ips.each do |ip|
           begin
-            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-frontend-smoke/"
+            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip}:#{utils.ssh_port} #{utils.top_level_dir}/inspec/automate-frontend-smoke/"
             utils.backend_logger.debug cmd
             result = utils.run_command cmd
             utils.backend_logger.info "STDOUT: #{result.stdout}" unless options[:live_stream]
@@ -36,7 +36,7 @@ module AutomateCluster
         utils.backend_logger.info ">>>> Running Automate Chef Server inspec smoke tests against: #{utils.chef_server_private_ips}"
         utils.chef_server_private_ips.each do |ip|
           begin
-            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-frontend-chef-server-smoke/"
+            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip}:#{utils.ssh_port} #{utils.top_level_dir}/inspec/automate-frontend-chef-server-smoke/"
             utils.backend_logger.debug cmd
             result = utils.run_command cmd
             utils.backend_logger.info "STDOUT: #{result.stdout}" unless options[:live_stream]
@@ -48,7 +48,7 @@ module AutomateCluster
         utils.backend_logger.info ">>>> Running Automate PostgreSQL inspec smoke tests against: #{utils.postgresql_private_ips}"
         utils.postgresql_private_ips.each do |ip|
           begin
-            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-backend-postgresql-smoke/"
+            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip}:#{utils.ssh_port} #{utils.top_level_dir}/inspec/automate-backend-postgresql-smoke/"
             utils.backend_logger.debug cmd
             result = utils.run_command cmd
             utils.backend_logger.info "STDOUT: #{result.stdout}" unless options[:live_stream]
@@ -60,7 +60,7 @@ module AutomateCluster
         utils.backend_logger.info ">>>> Running Automate Elasticsearch inspec smoke tests against: #{utils.opensearch_public_ips}"
         utils.opensearch_public_ips.each do |ip|
           begin
-            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-backend-opensearch-smoke/"
+            cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip}:#{utils.ssh_port} #{utils.top_level_dir}/inspec/automate-backend-opensearch-smoke/"
             utils.backend_logger.debug cmd
             result = utils.run_command cmd
             utils.backend_logger.info "STDOUT: #{result.stdout}" unless options[:live_stream]

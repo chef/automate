@@ -18,6 +18,7 @@ module "system-tuning-frontend" {
   private_ips                        = local.frontend_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
+  ssh_port                           = var.ssh_port
   ssh_user_sudo_password             = local.fe_sudo_password
   sudo_cmd                           = var.sudo_cmd
 }
@@ -31,6 +32,7 @@ module "system-tuning-backend" {
   private_ips                        = local.backend_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
+  ssh_port                           = var.ssh_port
   ssh_user_sudo_password             = local.be_sudo_password
   sudo_cmd                           = var.sudo_cmd
 }
@@ -46,6 +48,7 @@ module "airgap_bundle-backend" {
   }]
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
+  ssh_port     = var.ssh_port
   tmp_path     = var.tmp_path
   depends_on = [module.system-tuning-backend]
 }
@@ -64,6 +67,7 @@ module "airgap_bundle-frontend" {
   }]
   ssh_key_file = var.ssh_key_file
   ssh_user     = var.ssh_user
+  ssh_port     = var.ssh_port
   tmp_path     = var.tmp_path
   depends_on = [
     module.system-tuning-frontend
@@ -86,6 +90,7 @@ module "habitat-backend" {
   private_ips                     = local.backend_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
@@ -113,6 +118,7 @@ module "habitat-frontend" {
   peer_ips                        = local.frontend_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
@@ -138,6 +144,7 @@ module "opensearch" {
   private_ips                  = var.existing_opensearch_private_ips
   ssh_key_file                 = var.ssh_key_file
   ssh_user                     = var.ssh_user
+  ssh_port                     = var.ssh_port
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
   depends_on = [module.system-tuning-backend]
@@ -170,6 +177,7 @@ module "postgresql" {
   private_ips                     = var.existing_postgresql_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   depends_on = [module.system-tuning-backend]
@@ -201,6 +209,7 @@ module "bootstrap_automate" {
   private_ips                     = slice(var.existing_automate_private_ips, 0, 1)
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
@@ -237,6 +246,7 @@ module "automate" {
   )
   ssh_key_file           = var.ssh_key_file
   ssh_user               = var.ssh_user
+  ssh_port               = var.ssh_port
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
@@ -269,6 +279,7 @@ module "chef_server" {
   private_ips                     = var.existing_chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port

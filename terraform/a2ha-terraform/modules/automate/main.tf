@@ -45,6 +45,7 @@ locals {
     frontend_aib_file               = var.frontend_aib_dest_file,
     hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token,
     ssh_user                        = var.ssh_user,
+    ssh_port                        = var.ssh_port,
     tmp_path                        = var.tmp_path
   })
 }
@@ -60,6 +61,7 @@ resource "null_resource" "automate_pre" {
     user        = var.ssh_user
     private_key = file(var.ssh_key_file)
     host        = element(var.private_ips, count.index)
+    port        = var.ssh_port
     script_path = "${var.tmp_path}/tf_inline_script_system_automate.sh"
   }
 
@@ -87,6 +89,7 @@ resource "null_resource" "automate" {
     user        = var.ssh_user
     private_key = file(var.ssh_key_file)
     host        = element(var.private_ips, count.index)
+    port        = var.ssh_port
     script_path = "${var.tmp_path}/tf_inline_script_system_automate.sh"
   }
 
@@ -138,6 +141,7 @@ resource "null_resource" "automate_post" {
     user        = var.ssh_user
     private_key = file(var.ssh_key_file)
     host        = element(var.private_ips, count.index)
+    port        = var.ssh_port
     script_path = "${var.tmp_path}/tf_inline_script_system_automate.sh"
   }
 
@@ -149,7 +153,7 @@ resource "null_resource" "automate_post" {
   }
 
   provisioner "local-exec" {
-    command = "scp -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/bootstrap.abb bootstrap${var.cluster_id}.abb"
+    command = "scp -P ${var.ssh_port} -o StrictHostKeyChecking=no -i ${var.ssh_key_file} ${var.ssh_user}@${var.private_ips[0]}:${var.tmp_path}/bootstrap.abb bootstrap${var.cluster_id}.abb"
   }
 
   depends_on = [null_resource.automate]

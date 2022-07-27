@@ -10,6 +10,10 @@ const haAwsConfigTemplate = `
 # Eg.: ssh_user = "ubuntu"
 ssh_user = ""
 
+# custome ssh port no to connect instances, default will be 22
+# Eg.: ssh_port = "22"
+ssh_port = ""
+
 # Private SSH key file path, which has access to all the instances.
 # Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
@@ -282,6 +286,10 @@ ssh_user = ""
 # private ssh key file path to access instances
 # Eg.: ssh_user = "~/.ssh/A2HA.pem"
 ssh_key_file = ""
+
+# custome ssh port no to connect instances, default will be 22
+# Eg.: ssh_port = "22"
+ssh_port = ""
 
 # Provide Password if needed to run sudo commands.
 sudo_password = ""
