@@ -57,7 +57,6 @@ module "chef_load_cd_base" {
   instance_id    = "${var.instance_id}"
   instance_fqdn  = "${var.instance_fqdn}"
   ssh_username   = "${var.ssh_username}"
-  ssh_port   = "${var.ssh_port}"
 
   enable_monitoring = "${var.enable_monitoring}"
   chef_environment  = "${var.chef_environment}"
@@ -76,7 +75,6 @@ resource "null_resource" "habitat_install" {
     type = "ssh"
     host = "${element(var.instance_fqdn, count.index)}"
     user = "${var.ssh_username}"
-    port = "${var.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }
@@ -125,7 +123,6 @@ resource "null_resource" "chef_load_deploy" {
     type = "ssh"
     host = "${element(var.instance_fqdn, count.index)}"
     user = "${var.ssh_username}"
-    port = "${var.ssh_port}"
 
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
   }

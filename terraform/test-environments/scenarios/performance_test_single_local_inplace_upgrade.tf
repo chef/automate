@@ -72,7 +72,6 @@ module "attach_habitat_volume" {
   instance_fqdn      = "${module.performance_test_single_local_inplace_upgrade.fqdn}"
   ssh_private_key    = "${data.aws_s3_bucket_object.aws_private_key.body}"
   ssh_username       = "${module.performance_test_single_local_inplace_upgrade.ssh_username}"
-  ssh_port       = "${module.performance_test_single_local_inplace_upgrade.ssh_port}"
   volume_id          = "${aws_ebs_volume.habitat_volume.*.id}"
   volume_mount_point = "/hab"
 }
@@ -83,7 +82,6 @@ module "performance_test_single_local_inplace_upgrade_deploy" {
   instance_id   = "${module.attach_habitat_volume.instance_id}"
   instance_fqdn = "${module.performance_test_single_local_inplace_upgrade.fqdn}"
   ssh_username  = "${module.performance_test_single_local_inplace_upgrade.ssh_username}"
-  ssh_port  = "${module.performance_test_single_local_inplace_upgrade.ssh_port}"
 
   journald_system_max_use = "${var.channel == "acceptance" ? "20G" : "6G"}"
 
@@ -148,7 +146,6 @@ module "performance_test_chef_load_deploy" {
   instance_id    = "${module.performance_test_chef_load.instance_id}"
   instance_fqdn  = "${module.performance_test_chef_load.fqdn}"
   ssh_username   = "${module.performance_test_chef_load.ssh_username}"
-  ssh_port   = "${module.performance_test_chef_load.ssh_port}"
 
   # Chef Baseline
   enable_monitoring = "false"

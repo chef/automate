@@ -18,11 +18,6 @@ variable "ssh_username" {
   description = "The SSH username for the instance. Typically an output of the cd_instance module."
 }
 
-variable "ssh_port" {
-  default     = 22
-  description = "The SSH username for the instance. Typically an output of the cd_instance module."
-}
-
 #
 # Habitat
 #

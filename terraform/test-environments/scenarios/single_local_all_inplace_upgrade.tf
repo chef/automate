@@ -45,7 +45,6 @@ module "single_local_all_inplace_upgrade_deploy" {
   instance_id   = "${module.single_local_all_inplace_upgrade.instance_id}"
   instance_fqdn = "${module.single_local_all_inplace_upgrade.fqdn}"
   ssh_username  = "${module.single_local_all_inplace_upgrade.ssh_username}"
-  ssh_port  = "${module.single_local_all_inplace_upgrade.ssh_port}"
 
   journald_system_max_use = "${var.channel == "acceptance" ? "20G" : "6G"}"
 
