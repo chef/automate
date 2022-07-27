@@ -73,6 +73,7 @@ variable "managed_rds_superuser_username" {
 variable "setup_managed_services" {
   default = false
 }
+
 variable "ssh_key_file" {
 }
 

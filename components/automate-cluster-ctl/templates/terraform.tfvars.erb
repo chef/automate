@@ -138,6 +138,18 @@ existing_automate_private_ips = <%= config.existing_nodes.automate_private_ips %
 existing_chef_server_private_ips = <%= config.existing_nodes.chef_server_private_ips %>
 existing_opensearch_private_ips = <%= config.existing_nodes.opensearch_private_ips %>
 existing_postgresql_private_ips = <%= config.existing_nodes.postgresql_private_ips %>
+setup_managed_services = <%= config.existing_nodes.setup_managed_services %>
+managed_opensearch_domain_name = "<%= config.existing_nodes.managed_opensearch_domain_name %>"
+managed_opensearch_domain_url = "<%= config.existing_nodes.managed_opensearch_domain_url %>"
+managed_opensearch_username = "<%= config.existing_nodes.managed_opensearch_username %>"
+managed_opensearch_user_password = "<%= config.existing_nodes.managed_opensearch_user_password %>"
+managed_opensearch_certificate = "<%= config.existing_nodes.managed_opensearch_certificate %>"
+managed_rds_instance_url = "<%= config.existing_nodes.managed_rds_instance_url %>"
+managed_rds_superuser_username = "<%= config.existing_nodes.managed_rds_superuser_username %>"
+managed_rds_superuser_password = "<%= config.existing_nodes.managed_rds_superuser_password %>"
+managed_rds_dbuser_username = "<%= config.existing_nodes.managed_rds_dbuser_username %>"
+managed_rds_dbuser_password = "<%= config.existing_nodes.managed_rds_dbuser_password %>"
+managed_rds_certificate = "<%= config.existing_nodes.managed_rds_certificate %>"
 <% end %>
 
 # Common
