@@ -78,6 +78,18 @@ object_storage do
   endpoint "{{ .ObjectStorage.Config.Endpoint }}"
   region "{{ .ObjectStorage.Config.Region }}"
 end
+setup_managed_services {{ .ExistingInfra.Config.SetupManagedServices }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_opensearch_domain_name "{{ .ExistingInfra.Config.OpensearchDomainName }}" {{ else }}#managed_opensearch_domain_name "{{ .ExistingInfra.Config.OpensearchDomainName }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_opensearch_domain_url "{{ .ExistingInfra.Config.OpensearchDomainUrl }}" {{ else }}#managed_opensearch_domain_url "{{ .ExistingInfra.Config.OpensearchDomainUrl }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_opensearch_username "{{ .ExistingInfra.Config.OpensearchUsername }}" {{ else }}#managed_opensearch_username "{{ .ExistingInfra.Config.OpensearchUsername }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_opensearch_user_password "{{ .ExistingInfra.Config.OpensearchUserPassword }}" {{ else }}#managed_opensearch_user_password "{{ .ExistingInfra.Config.OpensearchUserPassword }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_opensearch_certificate "{{ .ExistingInfra.Config.OpensearchCertificate }}" {{ else }}#managed_opensearch_certificate "{{ .ExistingInfra.Config.OpensearchCertificate }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_rds_instance_url "{{ .ExistingInfra.Config.RDSInstanceUrl }}" {{ else }}#managed_rds_instance_url "{{ .ExistingInfra.Config.RDSInstanceUrl }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_rds_superuser_username "{{ .ExistingInfra.Config.RDSSuperUserName }}" {{ else }}#managed_rds_superuser_username "{{ .ExistingInfra.Config.RDSSuperUserName }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_rds_superuser_password "{{ .ExistingInfra.Config.RDSSuperUserPassword }}" {{ else }}#managed_rds_superuser_password "{{ .ExistingInfra.Config.RDSSuperUserPassword }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_rds_dbuser_username "{{ .ExistingInfra.Config.RDSDBUserName }}" {{ else }}#managed_rds_dbuser_username "{{ .ExistingInfra.Config.RDSDBUserName }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_rds_dbuser_password "{{ .ExistingInfra.Config.RDSDBUserPassword }}" {{ else }}#managed_rds_dbuser_password "{{ .ExistingInfra.Config.RDSDBUserPassword }}" {{ end }}
+{{ if .ExistingInfra.Config.SetupManagedServices }}managed_rds_certificate "{{ .ExistingInfra.Config.RDSCertificate }}" {{ else }}#managed_rds_certificate "{{ .ExistingInfra.Config.RDSCertificate }}" {{ end }}
 `
 
 const awsA2harbTemplate = `

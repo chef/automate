@@ -181,10 +181,22 @@ type ExistingInfraConfigToml struct {
 	} `toml:"postgresql"`
 	ExistingInfra struct {
 		Config struct {
-			AutomatePrivateIps   []string `toml:"automate_private_ips"`
-			ChefServerPrivateIps []string `toml:"chef_server_private_ips"`
-			OpensearchPrivateIps []string `toml:"opensearch_private_ips"`
-			PostgresqlPrivateIps []string `toml:"postgresql_private_ips"`
+			AutomatePrivateIps     []string `toml:"automate_private_ips"`
+			ChefServerPrivateIps   []string `toml:"chef_server_private_ips"`
+			OpensearchPrivateIps   []string `toml:"opensearch_private_ips"`
+			PostgresqlPrivateIps   []string `toml:"postgresql_private_ips"`
+			SetupManagedServices   bool     `toml:"setup_managed_services"`
+			OpensearchDomainName   string   `toml:"managed_opensearch_domain_name"`
+			OpensearchDomainUrl    string   `toml:"managed_opensearch_domain_url"`
+			OpensearchUsername     string   `toml:"managed_opensearch_username"`
+			OpensearchUserPassword string   `toml:"managed_opensearch_user_password"`
+			OpensearchCertificate  string   `toml:"managed_opensearch_certificate"`
+			RDSInstanceUrl         string   `toml:"managed_rds_instance_url"`
+			RDSSuperUserName       string   `toml:"managed_rds_superuser_username"`
+			RDSSuperUserPassword   string   `toml:"managed_rds_superuser_password"`
+			RDSDBUserName          string   `toml:"managed_rds_dbuser_username"`
+			RDSDBUserPassword      string   `toml:"managed_rds_dbuser_password"`
+			RDSCertificate         string   `toml:"managed_rds_certificate"`
 		} `toml:"config"`
 	} `toml:"existing_infra"`
 	ObjectStorage struct {

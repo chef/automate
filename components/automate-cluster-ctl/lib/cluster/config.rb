@@ -88,6 +88,18 @@ module AutomateCluster
       default :chef_server_private_ips, []
       default :opensearch_private_ips, []
       default :postgresql_private_ips, []
+      default :setup_managed_services, false
+      default :managed_opensearch_domain_name, ' '
+      default :managed_opensearch_domain_url, ' '
+      default :managed_opensearch_username, ' '
+      default :managed_opensearch_user_password, ' '
+      default :managed_opensearch_certificate, ' '
+      default :managed_rds_instance_url, ' '
+      default :managed_rds_superuser_username, ' '
+      default :managed_rds_superuser_password, ' '
+      default :managed_rds_dbuser_username, ' '
+      default :managed_rds_dbuser_password, ' '
+      default :managed_rds_certificate, ' '
     end
 
     # Only applies to Object storage

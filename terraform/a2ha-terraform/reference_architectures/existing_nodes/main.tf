@@ -39,7 +39,8 @@ module "system-tuning-backend" {
 
 module "airgap_bundle-backend" {
   source            = "./modules/airgap_bundle"
-  archive_disk_info = module.system-tuning-backend.archive_disk_info
+  count             = var.setup_managed_services ? 0 : 1
+  archive_disk_info = var.setup_managed_services ? "" : module.system-tuning-backend[0].archive_disk_info
   instance_count    = local.backend_count
   private_ips       = local.backend_private_ips
   bundle_files = [{
@@ -76,7 +77,8 @@ module "airgap_bundle-frontend" {
 
 module "habitat-backend" {
   source                          = "./modules/habitat"
-  airgap_info                     = module.airgap_bundle-backend.airgap_info
+  count                           = var.setup_managed_services ? 0 : 1
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   hab_sup_http_gateway_ca_cert    = var.hab_sup_http_gateway_ca_cert
   hab_sup_http_gateway_priv_key   = var.hab_sup_http_gateway_priv_key
@@ -160,7 +162,8 @@ module "opensearch" {
 
 module "postgresql" {
   source                          = "./modules/postgresql"
-  airgap_info                     = module.airgap_bundle-backend.airgap_info
+  count                           = var.setup_managed_services ? 0 : 1
+  airgap_info                     = var.setup_managed_services ? "" : module.airgap_bundle-backend[0].airgap_info
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   opensearch_listen_port          = var.opensearch_listen_port
@@ -171,7 +174,7 @@ module "postgresql" {
   pgleaderchk_listen_port         = var.pgleaderchk_listen_port
   pgleaderchk_pkg_ident           = var.pgleaderchk_pkg_ident
   pgleaderchk_svc_load_args       = var.pgleaderchk_svc_load_args
-  postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
+  postgresql_archive_disk_fs_path = var.setup_managed_services ? "" : var.postgresql_archive_disk_fs_path
   postgresql_instance_count       = var.postgresql_instance_count
   postgresql_listen_port          = var.postgresql_listen_port
   postgresql_pkg_ident            = var.postgresql_pkg_ident
@@ -214,7 +217,7 @@ module "bootstrap_automate" {
   opensearch_listen_port          = var.opensearch_listen_port
   opensearch_private_ips          = var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
-  postgresql_private_ips          = var.existing_postgresql_private_ips
+  postgresql_private_ips          = var.setup_managed_services ? [] :var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = slice(var.existing_automate_private_ips, 0, 1)
   ssh_key_file                    = var.ssh_key_file
@@ -256,7 +259,7 @@ module "automate" {
   opensearch_listen_port          = var.opensearch_listen_port
   opensearch_private_ips          = var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
-  postgresql_private_ips          = var.existing_postgresql_private_ips
+  postgresql_private_ips          = var.setup_managed_services ? [] : var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips = slice(
     var.existing_automate_private_ips,
@@ -302,7 +305,7 @@ module "chef_server" {
   opensearch_listen_port          = var.opensearch_listen_port
   opensearch_private_ips          = var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
-  postgresql_private_ips          = var.existing_postgresql_private_ips
+  postgresql_private_ips          = var.setup_managed_services ? [] : var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = var.existing_chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
