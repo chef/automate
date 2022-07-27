@@ -71,10 +71,9 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	myName := "GetStatsSummaryNodes"
 	latestOnly := FetchLatestDataOrNot(filters)
 	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
-	/*err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
-	}*/
+	}
 	depth, err := backend.NewDepth(filters, latestOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
@@ -122,8 +121,11 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
-	// Only end_time matters for this call
-	//filters["start_time"] = []string{}
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		return nil, err
+	}
+
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	client, err := backend.ES2Client()
