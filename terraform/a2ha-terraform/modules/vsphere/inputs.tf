@@ -119,12 +119,12 @@ variable "vsphere_linux_sshkeyfile" {
   description = "Path to the ssh private key file"
 }
 
-variable "vsphere_linux_sshuser" {
-  default = "vagrant"
-}
-
 variable "vsphere_linux_sshport" {
   default = 22
+}
+
+variable "vsphere_linux_sshuser" {
+  default = "vagrant"
 }
 
 variable "vsphere_linux_template" {

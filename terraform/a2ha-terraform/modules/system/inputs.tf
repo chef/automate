@@ -21,12 +21,12 @@ variable "public_ips" {
 variable "ssh_key_file" {
 }
 
-variable "ssh_user" {
-  default = "centos"
-}
-
 variable "ssh_port" {
   default = 22
+}
+
+variable "ssh_user" {
+  default = "centos"
 }
 
 variable "ssh_user_sudo_password" {

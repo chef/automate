@@ -13,12 +13,12 @@ variable "aws_ssh_key_file" {
 variable "aws_ssh_key_pair_name" {
 }
 
-variable "aws_ssh_user" {
-  default = "centos"
-}
-
 variable "aws_ssh_port" {
   default = 22
+}
+
+variable "aws_ssh_user" {
+  default = "centos"
 }
 
 variable "chef_server_private_ips" {

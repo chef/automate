@@ -62,12 +62,12 @@ variable "public_ips" {
 variable "ssh_key_file" {
 }
 
-variable "ssh_user" {
-  default = "ubuntu"
-}
-
 variable "ssh_port" {
   default = 22
+}
+
+variable "ssh_user" {
+  default = "ubuntu"
 }
 
 variable "ssh_user_sudo_password" {
