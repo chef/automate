@@ -98,8 +98,7 @@ func New(cfg Config, retrySec int, certs *certs.ServiceCerts, l OIDCLogger) (Cli
 }
 
 func (c *client) RefreshTokenValidator(refreshToken string) (*http.Response, error) {
-	tokenValidatorURL := c.dexURL.String()
-	tokenValidatorURL += "/refreshtokenvalid"
+	tokenValidatorURL := fmt.Sprintf("%s/%s", c.dexURL.String(), "refreshtokenvalid")
 	formData := url.Values{}
 	formData.Add("refresh_token", refreshToken)
 	return c.Client().PostForm(tokenValidatorURL, formData)
