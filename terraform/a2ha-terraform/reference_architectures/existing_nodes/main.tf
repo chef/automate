@@ -98,7 +98,7 @@ module "habitat-backend" {
     var.existing_opensearch_private_ips,
     var.existing_postgresql_private_ips
   )
-  depends_on = [module.system-tuning-backend]
+  depends_on = [module.airgap_bundle-backend]
 }
 
 module "habitat-frontend" {
@@ -122,7 +122,7 @@ module "habitat-frontend" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
-  depends_on = [module.system-tuning-frontend]
+  depends_on = [module.airgap_bundle-frontend]
 }
 
 module "opensearch" {
@@ -147,7 +147,7 @@ module "opensearch" {
   ssh_port                     = var.ssh_port
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
-  depends_on = [module.system-tuning-backend]
+  depends_on = [module.airgap_bundle-backend]
 }
 
 module "postgresql" {
@@ -180,7 +180,7 @@ module "postgresql" {
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
-  depends_on = [module.system-tuning-backend]
+  depends_on = [module.airgap_bundle-backend]
 }
 
 module "bootstrap_automate" {
@@ -213,7 +213,7 @@ module "bootstrap_automate" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
-  depends_on = [module.system-tuning-frontend]
+  depends_on = [module.airgap_bundle-frontend]
 }
 
 module "automate" {
@@ -250,7 +250,7 @@ module "automate" {
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
-  depends_on = [module.system-tuning-frontend]
+  depends_on = [module.bootstrap_automate]
 }
 
 module "chef_server" {
@@ -283,5 +283,5 @@ module "chef_server" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
-  depends_on = [module.system-tuning-frontend]
+  depends_on = [module.bootstrap_automate]
 }
