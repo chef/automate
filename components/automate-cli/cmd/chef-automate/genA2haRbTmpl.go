@@ -7,7 +7,7 @@ architecture "{{ .Architecture.ConfigInitials.Architecture }}"
 workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
 ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
 ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
-ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}"
+{{ if .Architecture.ConfigInitials.SSHPort }} ssh_port "{{ .Architecture.ConfigInitials.SSHPort }}" {{ else }} ssh_port "22" {{ end }}
 {{ if .Architecture.ConfigInitials.SudoPassword }} sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ else }} # sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}" {{ end }}
 
 # logging_monitoring_management "true"
