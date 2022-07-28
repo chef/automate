@@ -8,44 +8,23 @@ import (
 	"path/filepath"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 )
 
 func createBackendBundleTar(requiredBackendPackages []string) error {
 	log.Println("entry 1")
-
-	var airgapBundlePath string
-	var airgapMetadata airgap.UnpackMetadata
-
-	metadata, _ := airgap.Unpack(airgapBundlePath)
-	log.Printf("....---Metadata---..... : %s", metadata)
-
-	// if err != nil {
-	// 	return status.Annotate(err, status.AirgapUnpackInstallBundleError)
-	// }
-
-	airgapMetadata = metadata
-	log.Printf("...entry 2.....metadata: %s\n", airgapMetadata)
-
-	requiredBackendPackages = backendBundles(airgapMetadata)
-	log.Printf(".....----req packages---...: %s\n", requiredBackendPackages)
+	log.Printf("---Required Backend Packages----- : %s", requiredBackendPackages)
 
 	err := fileutils.AtomicWriter("automate-4.2.22.aib", func(w io.Writer) error {
 		log.Println("entry 3")
 		tarWriter := tar.NewWriter(w)
 		log.Println("entry 4")
 
-		// var airgapMetadata airgap.UnpackMetadata
-		// log.Printf("...entry 4.....metadata: %s\n", airgapMetadata)
-		// requiredBackendPackages = backendBundles(airgapMetadata)
-		// log.Printf(".....req packages...: %s\n", requiredBackendPackages)
-
 		if len(requiredBackendPackages) < 1 {
 			log.Println("Bundle list is empty")
 		}
-		
+
 		log.Println("entry 5")
 		for _, path := range requiredBackendPackages {
 			log.Println("entry 6")
