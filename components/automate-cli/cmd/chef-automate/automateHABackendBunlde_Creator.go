@@ -21,11 +21,6 @@ func createBackendBundleTar(requiredBackendPackages []string) error {
 		tarWriter := tar.NewWriter(w)
 		log.Println("entry 4")
 
-		if len(requiredBackendPackages) < 1 {
-			log.Println("Bundle list is empty")
-		}
-
-		log.Println("entry 5")
 		for _, path := range requiredBackendPackages {
 			log.Println("entry 6")
 			var info os.FileInfo
