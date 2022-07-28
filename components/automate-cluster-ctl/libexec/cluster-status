@@ -108,8 +108,8 @@ class AutomateClusterStatus < AutomateCluster::Command
     state_entered = data.dig('process', 'state_entered')
     elapsed = state_entered.nil? ? 0 : elasped_time(Time.now.utc.to_i - state_entered)
     [
-      service, ip, data.dig('health_check', 'status'),
-      "#{data.dig('process', 'state') || 'Unknown' } (pid: #{data.dig('process', 'pid')})",
+      service, ip, data.dig('health_check', 'status') || 'Unknown',
+      data.dig('process', 'state') ? "#{data.dig('process', 'state') } (pid: #{data.dig('process', 'pid')})" : "Unknown",
       elapsed, data['role']
     ]
   end

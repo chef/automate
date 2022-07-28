@@ -39,19 +39,26 @@ module AutomateCluster
         ssh = AutomateCluster::SSH.new
         ssh.connections(service: service) do |type, conn|
           service_name = "automate-ha-#{service}"
-          data = conn.curl_hab("/services/#{service_name}/default")
-          health = conn.curl_hab("/services/#{service_name}/default/health")
-          member_id = data.dig("sys", "member_id")
-          census = service_census_data(service_name, member_id, conn)
-          info = {
-            "member_id" => member_id,
-            "health_check" => health,
-            "process" => data["process"],
-            "role" => role(census),
-            "census" => census
-          }
-
-          yield conn.ip, info
+          if conn 
+            data = conn.curl_hab("/services/#{service_name}/default")
+            health = conn.curl_hab("/services/#{service_name}/default/health")
+            member_id = data.dig("sys", "member_id")
+            census = service_census_data(service_name, member_id, conn)
+            info = {
+              "member_id" => member_id,
+              "health_check" => health,
+              "process" => data["process"],
+              "role" => census ? role(census) : "Unknown",
+              "census" => census
+            }
+  
+            yield conn.ip, info
+           else 
+            yield conn.ip, {
+              "process" => data["process"],
+              "role" => "Unknown"
+            }
+          end
         end
       end
 
