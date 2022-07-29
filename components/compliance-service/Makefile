@@ -465,7 +465,7 @@ test-ingest-to-manager-conn:
 test-reporting: ingest-reports-into-es
 	@printf "\n===> ${blue}Running the reporting integration tests${reset}\n"
 	# the service sometimes isn't ready in travis if we don't sleep 15
-	sleep 15
+	sleep 120
 	TEST='[0-1]*_spec.rb' $(MAKE) test
 	cd api/tests && CGO_ENABLED=0 go test export_test.go -failfast
 	$(MAKE) test-ingest-to-manager-conn

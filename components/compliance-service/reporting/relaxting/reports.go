@@ -815,6 +815,8 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
+
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["end_time"]))
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
@@ -823,10 +825,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	controlIndex, err := getControlIndex(filters)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
-	}
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
-	if err != nil {
-		return nil, err
 	}
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
@@ -2193,8 +2191,11 @@ func handleSpecialChar(term string) string {
 }
 
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
-	if len(endTime) == 0 || len(startTime) == 0 {
+	if len(endTime) == 0 && len(startTime) == 0 {
 		return []string{"day_latest", "daily_latest"}, nil
+	}
+	if len(startTime) == 0 {
+		return []string{"daily_latest"}, nil
 	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
@@ -2225,4 +2226,35 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 		return errors.Errorf("Start time should not be greater than end time")
 	}
 	return nil
+}
+
+func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {
+	if len(endTime) == 0 {
+		return nil, nil
+	}
+
+	parsedEndTime, err := time.Parse(time.RFC3339, endTime)
+	if err != nil {
+		return []string{}, err
+	}
+
+	if checkTodayIsEndTime(parsedEndTime) {
+		if startTime == "" {
+			return []string{}, nil
+		}
+		return []string{startTime}, nil
+	}
+	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
+
+	return []string{newStartTime.Format(time.RFC3339)}, nil
+
+}
+
+func checkTodayIsEndTime(endTime time.Time) bool {
+	currentDay := time.Now()
+
+	if currentDay.Year() == endTime.Year() && currentDay.Month() == endTime.Month() && currentDay.Day() == endTime.Day() {
+		return true
+	}
+	return false
 }
