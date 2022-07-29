@@ -355,7 +355,7 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err, "error")
 	}
 
-	fmt.Println(data, "dataAZ_")
+	fmt.Println(data, "dataAZ")
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
