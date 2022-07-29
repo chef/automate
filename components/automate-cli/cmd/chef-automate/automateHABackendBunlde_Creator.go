@@ -25,7 +25,7 @@ func createBackendBundleTar(requiredBackendPackages []string) error {
 			log.Println("entry 6")
 			var info os.FileInfo
 			log.Println("entry 7")
-			header, err := tar.FileInfoHeader(info, info.Name())
+			header, err := tar.FileInfoHeader(info, path)
 			log.Println("entry 8")
 			if err != nil {
 				log.Println("entry 9")
