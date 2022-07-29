@@ -230,6 +230,9 @@ func (s *Server) initHandlers() {
 	r.HandleFunc("/userinfo", s.userinfoHandler).
 		Methods("GET")
 
+	r.HandleFunc("userpolicies", s.userPoliciesHandler).
+		Methods("POST")
+
 	r.PathPrefix("/").HandlerFunc(s.catchAllElseHandler)
 	// ^ if none of the above match, it's going to be a 401.
 	s.mux = r
@@ -316,6 +319,10 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
+
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
