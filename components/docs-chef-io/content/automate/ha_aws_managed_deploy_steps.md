@@ -82,6 +82,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    ```
 
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
+   - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
    - Set `backup_config` to `"efs"` or `"s3"`
    - If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.

@@ -172,6 +172,7 @@ secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
 workspace_path = "/hab/a2_deploy_workspace"
 ssh_user = "myusername"
+ssh_port = "22"
 ssh_key_file = "~/.ssh/mykey.pem"
 sudo_password = ""
 
