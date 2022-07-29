@@ -310,6 +310,7 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 // todo - deep filtering - this should be made depth aware as this still needs to be consumed by api users
 // todo - do we need to handle waiver info in here too?
 func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters map[string][]string) (*stats.ProfileSummary, error) {
+
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetProfileSummaryByProfileId, unable to get index")
@@ -318,11 +319,14 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	for filterName, filterValue := range filters {
 		logrus.Debugf("filter: name=>%s value=>%s\n", filterName, filterValue)
 	}
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+
+	filters["start_time"], _ = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+
+	/*err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
 	}
-
+	*/
 	client, err := backend.ES2Client()
 	if err != nil {
 		return nil, errors.Wrap(err, "GetProfileSummaryByProfileId, cannot connect to ElasticSearch")
@@ -660,8 +664,7 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 	filters["status"] = make([]string, 0)
 
 	// Only end_time matters for this call
-	//filters["start_time"] = []string{}
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, nil, err
 	}

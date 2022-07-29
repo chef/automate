@@ -21,7 +21,7 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	myName := "GetStatsSummary"
 	// Only end_time matters for this call
 	//filters["start_time"] = []string{}
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	latestOnly := FetchLatestDataOrNot(filters)
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +121,11 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
-	// Only end_time matters for this call
-	//filters["start_time"] = []string{}
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	if err != nil {
+		return nil, err
+	}
+
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	client, err := backend.ES2Client()
@@ -286,6 +289,7 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 
 	// Only end_time matters for this call
 	filters["start_time"] = []string{}
+
 	latestOnly := FetchLatestDataOrNot(filters)
 
 	depth, err := backend.NewDepth(filters, latestOnly)
