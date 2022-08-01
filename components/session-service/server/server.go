@@ -352,7 +352,7 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	var data userData
 	err := decoder.Decode(&data)
 	if err != nil {
-		fmt.Println(err, "errororr")
+		fmt.Println(err, "error")
 	}
 
 	fmt.Println(data, "data")
