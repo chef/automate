@@ -1643,10 +1643,10 @@ func getProfileAndControlQuery(filters map[string][]string, profileBaseFscInclud
 
 	//add in the control query if it exists
 	if numberOfControls > 0 {
-		controlIds := strings.Join(filters["control"], "|")
 		var nestedControlQuery *elastic.NestedQuery
 
-		controlQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.id:/(%s)/", controlIds))
+		controlQuery := elastic.NewQueryStringQuery(fmt.Sprintf("(%s)", getMultiControlString(filters["control"])))
+		controlQuery = controlQuery.Field("profiles.controls.id")
 		nestedControlQuery = elastic.NewNestedQuery("profiles.controls", controlQuery)
 
 		if numberOfProfiles == 1 && numberOfControls == 1 {
@@ -1983,4 +1983,23 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 		searchResult.TookInMillis)
 
 	return searchResult, queryInfo, nil
+}
+
+//getMultiControlString takes the list of strings and returns the query string used in search.
+func getMultiControlString(list []string) string {
+	controlList := []string{}
+	for _, control := range list {
+		controlList = append(controlList, handleSpecialChar(control))
+	}
+	return strings.Join(controlList, " ")
+}
+
+//handleSpecialChar takes the string, and add additional char in front of the reserved chars.
+func handleSpecialChar(term string) string {
+	//maintain `\` always first in the list to stop encoding the characters we are appending.
+	reservedChar := []string{`\`, `/`, `+`, `-`, `=`, `&&`, `||`, `>`, `<`, `!`, `(`, `)`, `{`, `}`, `[`, `]`, `^`, `"`, `~`, `*`, `?`, `:`}
+	for _, rChar := range reservedChar {
+		term = strings.ReplaceAll(term, rChar, fmt.Sprintf("\\%s", rChar))
+	}
+	return fmt.Sprintf("(%s)", term)
 }

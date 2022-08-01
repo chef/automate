@@ -457,3 +457,37 @@ func TestGetNodeInfoFromReportID_Failed(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "GetNodeInfoFromReportID unable to complete search")
 }
+
+func TestGetMultiControlString(t *testing.T) {
+	type test struct {
+		input        []string
+		expectedResp string
+	}
+	tests := []test{
+		{
+			input:        []string{`os-01`},
+			expectedResp: "(os\\-01)",
+		},
+		{
+			input:        []string{`os-01`, `os-02`},
+			expectedResp: "(os\\-01) (os\\-02)",
+		},
+		{
+			input:        []string{`ANZ Server - WAD-SEC-035 - Delegation of Access (SQL)`},
+			expectedResp: "(ANZ Server \\- WAD\\-SEC\\-035 \\- Delegation of Access \\(SQL\\))",
+		},
+		{
+			input:        []string{`({[W^E~L*C!O/M\E - H\E/L+L=O &&W||O>R<L"D!]})`},
+			expectedResp: "(\\(\\{\\[W\\^E\\~L\\*C\\!O\\/M\\\\E \\- H\\\\E\\/L\\+L\\=O \\&&W\\||O\\>R\\<L\\\"D\\!\\]\\}\\))",
+		},
+		{
+			input:        []string{`(generated from mysql_spec.rb:81 25e68d2c1d49a4ff4e27743084098a32)`},
+			expectedResp: "(\\(generated from mysql_spec.rb\\:81 25e68d2c1d49a4ff4e27743084098a32\\))",
+		},
+	}
+
+	for _, tc := range tests {
+		resp := getMultiControlString(tc.input)
+		assert.Equal(t, tc.expectedResp, resp)
+	}
+}
