@@ -161,6 +161,8 @@ func serve(_ *cobra.Command, args []string) {
 		l,
 		&migrationCfg,
 		oidcConfig,
+		authzAddress,
+		teamsAddress,
 		bldrClient,
 		authzAddress,
 		teamsAddress,
