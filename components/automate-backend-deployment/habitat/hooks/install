@@ -122,8 +122,5 @@ EOF
     display_upgrade_help $(cat $OLD_WORKSPACE/terraform/.tf_arch)
   fi
 fi
-
-cp -r $OLD_WORKSPACE/terraform/destroy/aws/* $NEW_WORKSPACE/terraform/destroy/aws;
-
 # shellcheck disable=SC1083
 ln -nsf $NEW_WORKSPACE /hab/a2_deploy_workspace
