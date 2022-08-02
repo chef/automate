@@ -308,6 +308,38 @@ func generateFrontendBundles(bundleName string, airgapPath string) error {
 	return nil
 }
 
+func generateMiniBackendBundles(airgapPath string) {
+
+}
+
+func getMiniBackendBundlePackages(airgapMetadata airgap.UnpackMetadata) []string {
+	var requiredPkgs []string
+	for _, pkgPath := range airgapMetadata.HartifactPaths {
+		if strings.Contains(pkgPath, AUTOMATE_HA_PKG_PG_LDR_CHK) {
+			requiredPkgs = append(requiredPkgs, pkgPath)
+		}
+		if strings.Contains(pkgPath, AUTOMATE_HA_DEPLOYMENT) {
+			requiredPkgs = append(requiredPkgs, pkgPath)
+		}
+		if strings.Contains(pkgPath, AUTOMATE_HA_CTL) {
+			requiredPkgs = append(requiredPkgs, pkgPath)
+		}
+		if strings.Contains(pkgPath, AUTOMATE_HA_ES_CAR) {
+			requiredPkgs = append(requiredPkgs, pkgPath)
+		}
+		if strings.Contains(pkgPath, AUTOMATE_HA_PKG_HA_PROXY) {
+			requiredPkgs = append(requiredPkgs, pkgPath)
+		}
+		if strings.Contains(pkgPath, AUTOMATE_HA_OS) {
+			requiredPkgs = append(requiredPkgs, pkgPath)
+		}
+		if strings.Contains(pkgPath, AUTOMATE_HA_PKG_PG) {
+			requiredPkgs = append(requiredPkgs, pkgPath)
+		}
+	}
+	return requiredPkgs
+}
+
 func generateBackendBundles(bundleName string, airgapPath string) error {
 	//generating backend bundle
 	backendBundleFile := AIRGAP_HA_TRANS_DIR_PATH + (strings.ReplaceAll(bundleName, "frontend", "backend"))
