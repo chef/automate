@@ -256,7 +256,7 @@ func (s *Server) initHandlers() {
 	r.HandleFunc("/userinfo", s.userinfoHandler).
 		Methods("GET")
 
-	r.HandleFunc("userpolicies", s.userPoliciesHandler).
+	r.HandleFunc("/userpolicies", s.userPoliciesHandler).
 		Methods("POST")
 
 	r.PathPrefix("/").HandlerFunc(s.catchAllElseHandler)
@@ -355,7 +355,7 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err, "error")
 	}
 
-	fmt.Println(data, "data")
+	fmt.Println(data, "dataAZ_")
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
