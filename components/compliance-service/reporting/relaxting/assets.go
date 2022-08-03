@@ -2,9 +2,12 @@ package relaxting
 
 import (
 	"context"
+	"fmt"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
+	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/olivere/elastic/v7"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
@@ -36,11 +39,8 @@ func (backend ES2Backend) getFiltersQueryForAssetFilters(filters map[string][]st
 	utils.DeDupFilters(filters)
 	boolQuery := elastic.NewBoolQuery()
 
-	// These are filter types where we use ElasticSearch Term Queries
-	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
-		"policy_group", "policy_name", "status", "node_name", "platform", "platform_with_version",
-		"role", "recipe", "inspec_version", "ipaddress", "control", "profile_id", "resource_type", "node_id"}
-
+	filterTypes := reporting.FilterType
+	filterTypes = append(filterTypes, []string{"control", "profile_id", "node_id"}...)
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {
 			ESFieldName := getESFieldNameAsset(filterType)
@@ -150,13 +150,7 @@ func getESFieldNameAsset(filterType string) string {
 }
 
 //getStartTimeAndEndTimeRangeForAsset gets the range query for date range and config as well
-func getStartTimeAndEndTimeRangeForAsset(filters map[string][]string, unreachableConfig int) *elastic.RangeQuery {
-
-	if unreachableConfig > 0 {
-		timeRangeQuery := elastic.NewRangeQuery("last_run")
-		timeRangeQuery.Gt(time.Now().Add(-24 * time.Hour * time.Duration(unreachableConfig)).UTC().Format(time.RFC3339))
-		return timeRangeQuery
-	}
+func getStartTimeAndEndTimeRangeForAsset(filters map[string][]string) *elastic.RangeQuery {
 
 	endTime := firstOrEmpty(filters["end_time"])
 	startTime := firstOrEmpty(filters["start_time"])
@@ -171,4 +165,110 @@ func getStartTimeAndEndTimeRangeForAsset(filters map[string][]string, unreachabl
 
 	return timeRangeQuery
 
+}
+
+//getReachableAssetTimeRangeQuery gets the range query for reachable assets
+func getReachableAssetTimeRangeQuery(unreachableConfig int) *elastic.RangeQuery {
+	if unreachableConfig > 0 {
+		timeRangeQuery := elastic.NewRangeQuery("last_run")
+		timeRangeQuery.Gt(time.Now().Add(-24 * time.Hour * time.Duration(unreachableConfig)).UTC().Format(time.RFC3339))
+		return timeRangeQuery
+	}
+	return nil
+}
+
+func (backend ES2Backend) getCollectedAssets(ctx context.Context, filtQuery *elastic.BoolQuery) (*AssetSummary, error) {
+
+	name := "AssetCollectedAssets"
+	myIndex := mappings.ComplianceRunInfo.Index
+
+	searchSource := elastic.NewSearchSource().
+		Query(filtQuery).
+		Size(0)
+
+	for aggName, agg := range getSummaryAssetAggregation() {
+		searchSource.Aggregation(aggName, agg)
+	}
+
+	client, err := backend.ES2Client()
+	if err != nil {
+		logrus.Errorf("Cannot connect to ElasticSearch: %v", err)
+		return nil, err
+	}
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get Source", name))
+	}
+
+	LogQueryPartMin(myIndex, source, fmt.Sprintf("%s query", name))
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(myIndex).
+		Size(0).
+		Do(context.Background())
+	if err != nil {
+		if searchResult != nil {
+			logrus.Error(searchResult.Error)
+		}
+		logrus.Info(err)
+		return nil, err
+	}
+	logrus.Info(searchResult)
+
+	LogQueryPartMin(myIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", name))
+
+	return getSummaryAssetAggResult(searchResult), nil
+}
+
+func getSummaryAssetAggregation() map[string]elastic.Aggregation {
+
+	status := "status"
+
+	passed := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery(status, "passed"))
+
+	skipped := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery(status, "skipped"))
+
+	failed := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery(status, "failed"))
+
+	waived := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery(status, "waived"))
+	aggs := make(map[string]elastic.Aggregation)
+	aggs["failed"] = failed
+	aggs["skipped"] = skipped
+	aggs["passed"] = passed
+	aggs["waived"] = waived
+
+	return aggs
+}
+
+func getSummaryAssetAggResult(aggRoot *elastic.SearchResult) *AssetSummary {
+
+	summary := &AssetSummary{}
+
+	singleBucket, found := aggRoot.Aggregations.Filter("failed")
+	if found {
+		summary.Failed = int32(singleBucket.DocCount)
+	}
+
+	singleBucket, found = aggRoot.Aggregations.Filter("passed")
+	if found {
+		summary.Passed = int32(singleBucket.DocCount)
+	}
+
+	singleBucket, found = aggRoot.Aggregations.Filter("skipped")
+	if found {
+		summary.Skipped = int32(singleBucket.DocCount)
+	}
+
+	singleBucket, found = aggRoot.Aggregations.Filter("waived")
+	if found {
+		summary.Waived = int32(singleBucket.DocCount)
+	}
+
+	return summary
 }
