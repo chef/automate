@@ -74,7 +74,7 @@ func writeManifest(workspacePath string, airgapMetadata airgap.UnpackMetadata) e
 }
 
 func createTar(pkgs []string, airgapMetadata airgap.UnpackMetadata, bundleName string) error {
-	workspacePath, err := ioutil.TempDir("/src", "aib-workspace")
+	workspacePath, err := ioutil.TempDir("", "aib-workspace")
 	if err != nil {
 		return err
 	}
