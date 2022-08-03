@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -50,7 +49,7 @@ func getHABackendManifestPkgs(manifest *manifest.A2) []habpkg.HabPkg {
 }
 
 func writeManifest(workspacePath string, airgapMetadata airgap.UnpackMetadata) error {
-	manifestData, err := ioutil.ReadFile(airgapMetadata.ManifestPath)
+	manifestData, err := os.ReadFile(airgapMetadata.ManifestPath)
 	if err != nil {
 		writer.FailWrap(err, "reading manifest data")
 		os.Exit(1)
@@ -74,7 +73,7 @@ func writeManifest(workspacePath string, airgapMetadata airgap.UnpackMetadata) e
 }
 
 func createTar(pkgs []string, airgapMetadata airgap.UnpackMetadata, bundleName string) error {
-	workspacePath, err := ioutil.TempDir("", "aib-workspace")
+	workspacePath, err := os.MkdirTemp("", "aib-workspace")
 	if err != nil {
 		return err
 	}
