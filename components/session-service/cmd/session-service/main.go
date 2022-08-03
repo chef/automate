@@ -43,6 +43,8 @@ func main() {
 	cmd.PersistentFlags().String("signin-url", "/signin", "signin URL")
 	cmd.PersistentFlags().String("postgres-url", "", "postgresql URL")
 	cmd.PersistentFlags().Bool("persistent", false, "Use persistent sessions")
+	cmd.PersistentFlags().Int("authz_port", 10130, "Authz service port")
+	cmd.PersistentFlags().Int("teams_port", 10128, "Teams service port")
 
 	// bind all flags to viper config
 	if err := viper.BindPFlags(cmd.PersistentFlags()); err != nil {
@@ -74,6 +76,8 @@ type config struct {
 	MigrationsPath   string `mapstructure:"migrations-path"`
 	Persistent       bool   `mapstructure:"persistent"`
 	certs.TLSConfig  `mapstructure:"tls"`
+	AuthzPort        uint `mapstructure:"authz_port"`
+	TeamsPort        uint `mapstructure:"teams_port"`
 }
 
 func serve(_ *cobra.Command, args []string) {
@@ -125,6 +129,9 @@ func serve(_ *cobra.Command, args []string) {
 	bind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.HTTPPort)
 	grpcBind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.GrpcPort)
 
+	authzAddress := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.AuthzPort)
+	teamsAddress := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.TeamsPort)
+
 	signInURL := mustParseURL(cfg.SignInURL)
 
 	redirectURL := mustParseURL(cfg.RedirectURL)
@@ -155,6 +162,8 @@ func serve(_ *cobra.Command, args []string) {
 		&migrationCfg,
 		oidcConfig,
 		bldrClient,
+		authzAddress,
+		teamsAddress,
 		signInURL,
 		serviceCerts,
 		cfg.Persistent)

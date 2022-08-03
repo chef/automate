@@ -20,7 +20,9 @@ import (
 
 	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 
+	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/id_token"
+	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/lib/version"
 
 	"github.com/alexedwards/scs"
@@ -49,23 +51,31 @@ type BldrClient struct {
 	ClientSecret string
 }
 
+type userData struct {
+	Username    string `json:"username"`
+	UserId      string `json:"user_id"`
+	ConnectorID string `json:"connector_id"`
+}
+
 // Server holds the server state
 type Server struct {
-	mux                http.Handler
-	log                logger.Logger
-	pgDB               *sql.DB
-	mgr                *scs.Manager
-	client             oidc.Client
-	bldrClient         *BldrClient
-	signInURL          *url.URL
-	remainingDuration  time.Duration
-	serviceCerts       *certs.ServiceCerts
-	connFactory        *secureconn.Factory
-	grpcServer         *grpc.Server
-	httpServer         *http.Server
-	errC               chan error
-	sigC               chan os.Signal
-	idTokenBlackLister IdTokenBlackLister.IdTokenBlackLister
+	mux                 http.Handler
+	log                 logger.Logger
+	pgDB                *sql.DB
+	mgr                 *scs.Manager
+	client              oidc.Client
+	bldrClient          *BldrClient
+	signInURL           *url.URL
+	remainingDuration   time.Duration
+	serviceCerts        *certs.ServiceCerts
+	connFactory         *secureconn.Factory
+	grpcServer          *grpc.Server
+	httpServer          *http.Server
+	errC                chan error
+	sigC                chan os.Signal
+	idTokenBlackLister  IdTokenBlackLister.IdTokenBlackLister
+	authzPoliciesClient authz.PoliciesServiceClient
+	teamsServiceClient  teams.TeamsServiceClient
 }
 
 const (
@@ -103,6 +113,8 @@ func New(
 	migrationConfig *migration.Config,
 	oidcCfg oidc.Config,
 	bldrClient *BldrClient,
+	authzAddress string,
+	teamsAddress string,
 	signInURL *url.URL,
 	serviceCerts *certs.ServiceCerts,
 	persistent bool) (*Server, error) {
@@ -133,6 +145,18 @@ func New(
 
 	scsManager := createSCSManager(store, persistent)
 
+	authzConn, err := factory.Dial("authz-service", authzAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to dial authz-service at (%s)", authzAddress)
+	}
+	authzPoliciesClient := authz.NewPoliciesServiceClient(authzConn)
+
+	teamsConn, err := factory.Dial("teams-service", teamsAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to dial teams-service at (%s)", teamsAddress)
+	}
+	teamsServiceClient := teams.NewTeamsServiceClient(teamsConn)
+
 	s := Server{
 		log:               l,
 		client:            oidcClient,
@@ -141,12 +165,14 @@ func New(
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
-		mgr:                scsManager,
-		serviceCerts:       serviceCerts,
-		connFactory:        factory,
-		errC:               make(chan error, 5),
-		sigC:               make(chan os.Signal, 2),
-		idTokenBlackLister: IdTokenBlackLister.NewPgBlackLister(pgDB),
+		mgr:                 scsManager,
+		serviceCerts:        serviceCerts,
+		connFactory:         factory,
+		errC:                make(chan error, 5),
+		sigC:                make(chan os.Signal, 2),
+		idTokenBlackLister:  IdTokenBlackLister.NewPgBlackLister(pgDB),
+		authzPoliciesClient: authzPoliciesClient,
+		teamsServiceClient:  teamsServiceClient,
 	}
 	signal.Notify(s.sigC, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGINT, syscall.SIGUSR1)
 
@@ -229,6 +255,9 @@ func (s *Server) initHandlers() {
 		Methods("POST")
 	r.HandleFunc("/userinfo", s.userinfoHandler).
 		Methods("GET")
+
+	r.HandleFunc("/userpolicies", s.userPoliciesHandler).
+		Methods("POST")
 
 	r.PathPrefix("/").HandlerFunc(s.catchAllElseHandler)
 	// ^ if none of the above match, it's going to be a 401.
@@ -316,6 +345,17 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var data userData
+	err := decoder.Decode(&data)
+	if err != nil {
+		fmt.Println(err, "error")
+	}
+
+	fmt.Println(data, "dataAZ_")
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
