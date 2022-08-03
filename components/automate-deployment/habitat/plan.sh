@@ -21,7 +21,7 @@ pkg_deps=(
   #core/hab/1.6.521/20220603154827
   #core/hab/1.6.543/20220721152654
   core/hab/1.6.181/20201030172917
-  core/hab-sup/1.6.181/20201030181202
+  #core/hab-sup/1.6.181/20201030181202
   core/net-tools
   core/procps-ng
   core/util-linux
