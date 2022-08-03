@@ -39,7 +39,7 @@ do_before() {
 do_unpack() {
   git clone "https://github.com/chef/dex-1" "$GOPATH/src/github.com/chef/dex-1"
   ( cd "$GOPATH/src/github.com/chef/dex-1" || exit
-    git checkout abdul/uum_1
+    git checkout abdul/uum_2
   )
 }
 

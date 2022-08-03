@@ -72,6 +72,15 @@ message ListPoliciesResp {
   repeated Policy policies = 1;
 }
 
+message GetUserPoliciesReq {
+    string username = 1;
+    string connector_id = 2; 
+}
+
+message GetUserPoliciesResp {
+    repeated Policy policies = 1;
+}
+
 message GetPolicyReq {
     string id = 1;
 }
@@ -244,6 +253,7 @@ service PoliciesService {
     rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {};
     rpc CreatePolicy (CreatePolicyReq) returns (Policy) {};
     rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {};
+    rpc GetUserPolicies (GetUserPoliciesReq) returns (GetUserPoliciesResp) {};
     rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {};
     rpc GetPolicy (GetPolicyReq) returns (Policy) {};
     rpc UpdatePolicy (UpdatePolicyReq) returns (Policy) {};

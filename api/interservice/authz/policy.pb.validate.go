@@ -750,6 +750,159 @@ var _ interface {
 	ErrorName() string
 } = ListPoliciesRespValidationError{}
 
+// Validate checks the field values on GetUserPoliciesReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetUserPoliciesReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Username
+
+	// no validation rules for ConnectorId
+
+	return nil
+}
+
+// GetUserPoliciesReqValidationError is the validation error returned by
+// GetUserPoliciesReq.Validate if the designated constraints aren't met.
+type GetUserPoliciesReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetUserPoliciesReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetUserPoliciesReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetUserPoliciesReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetUserPoliciesReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetUserPoliciesReqValidationError) ErrorName() string {
+	return "GetUserPoliciesReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetUserPoliciesReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetUserPoliciesReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetUserPoliciesReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetUserPoliciesReqValidationError{}
+
+// Validate checks the field values on GetUserPoliciesResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetUserPoliciesResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetPolicies() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetUserPoliciesRespValidationError{
+					field:  fmt.Sprintf("Policies[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// GetUserPoliciesRespValidationError is the validation error returned by
+// GetUserPoliciesResp.Validate if the designated constraints aren't met.
+type GetUserPoliciesRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetUserPoliciesRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetUserPoliciesRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetUserPoliciesRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetUserPoliciesRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetUserPoliciesRespValidationError) ErrorName() string {
+	return "GetUserPoliciesRespValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetUserPoliciesRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetUserPoliciesResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetUserPoliciesRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetUserPoliciesRespValidationError{}
+
 // Validate checks the field values on GetPolicyReq with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.

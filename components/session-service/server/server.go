@@ -352,10 +352,24 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	var data userData
 	err := decoder.Decode(&data)
 	if err != nil {
-		fmt.Println(err, "error")
+		fmt.Println(err, "decoder error")
 	}
 
-	fmt.Println(data, "dataAZ_")
+	resp, err := s.authzPoliciesClient.ListPolicies(r.Context(), &authz.ListPoliciesReq{})
+	if err != nil {
+		fmt.Println(err, "authzPoliciesClient err")
+	}
+
+	userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
+		Username:    data.Username,
+		ConnectorId: data.ConnectorID,
+	})
+	if err != nil {
+		fmt.Println(err, "authzPoliciesClient err")
+	}
+
+	fmt.Println(resp, "respAz__")
+	fmt.Println(userPolicies, "userPoliciesrespAz__")
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
