@@ -78,7 +78,7 @@ message GetUserPoliciesReq {
 }
 
 message GetUserPoliciesResp {
-    repeated Policy policies = 1;
+    repeated string policy_ids = 1;
 }
 
 message GetPolicyReq {

@@ -100,7 +100,7 @@ func (p *Server) ListPolicies(
 	}, nil
 }
 
-// GetUserPolicies returns the list of all policies.
+// GetUserPolicies returns the list of all user policyIds.
 func (p *Server) GetUserPolicies(
 	ctx context.Context, in *pb_req.GetUserPoliciesReq) (*pb_resp.GetUserPoliciesResp, error) {
 	resp, err := p.policies.GetUserPolicies(ctx, &authz.GetUserPoliciesReq{
@@ -111,17 +111,8 @@ func (p *Server) GetUserPolicies(
 		return nil, err
 	}
 
-	policies := make([]*pb_common.Policy, len(resp.Policies), len(resp.Policies))
-	for i, authzPol := range resp.Policies {
-		policy, err := convertDomainPolicyToAPIPolicy(authzPol)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-		policies[i] = policy
-	}
-
 	return &pb_resp.GetUserPoliciesResp{
-		Policies: policies,
+		PolicyIds: resp.PolicyIds,
 	}, nil
 }
 

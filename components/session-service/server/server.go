@@ -347,6 +347,32 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func filterUserPolicy(policyId string, policyIds []string) bool {
+	for _, _policyId := range policyIds {
+		if _policyId == policyId {
+			return true
+		}
+	}
+	return false
+}
+
+type projectRolePairs struct {
+	Role    string
+	Project []string
+}
+
+// func filterProjectRole(statements []*authz.Statement) []projectRolePairs {
+// 	var _projectRolePairs []projectRolePairs
+// 	for _, statement := range statements {
+// 		pr := projectRolePairs{
+// 			Role:    statement.Role,
+// 			Project: statement.Projects,
+// 		}
+// 		_projectRolePairs = append(_projectRolePairs, pr)
+// 	}
+// 	return _projectRolePairs
+// }
+
 func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var data userData
@@ -360,6 +386,11 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err, "authzPoliciesClient err")
 	}
 
+	teamsPolicies, err := s.teamsServiceClient.
+	if err != nil {
+		fmt.Println(err, "authzPoliciesClient err")
+	}
+
 	userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
 		Username:    data.Username,
 		ConnectorId: data.ConnectorID,
@@ -368,8 +399,21 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err, "authzPoliciesClient err")
 	}
 
-	fmt.Println(resp, "respAz__")
-	fmt.Println(userPolicies, "userPoliciesrespAz__")
+	// var projectRolePairs projectRolePairs
+	var prs []projectRolePairs
+	for _, policy := range resp.Policies {
+		if filterUserPolicy(policy.Id, userPolicies.PolicyIds) {
+			for _, statement := range policy.Statements {
+				pr := projectRolePairs{
+					Role:    statement.Role,
+					Project: statement.Projects,
+				}
+				prs = append(prs, pr)
+			}
+		}
+	}
+
+	fmt.Println(prs, "projectRolePairsAz__")
 }
 
 // Authorization redirect callback from OAuth2 auth flow.

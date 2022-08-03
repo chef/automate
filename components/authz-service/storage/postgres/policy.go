@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -141,11 +140,11 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*storage.Policy, error) {
 	return pols, nil
 }
 
-func (p *pg) GetUserPolicies(ctx context.Context, username, connector_id string) ([]*storage.Policy, error) {
+func (p *pg) GetUserPolicies(ctx context.Context, username, connectorId string) ([]string, error) {
 	rows, err := p.db.Query(`SELECT iam_policies.id FROM iam_members
 	JOIN iam_policy_members ON iam_members.db_id = iam_policy_members.member_id
 	JOIN iam_policies ON iam_policy_members.policy_id = iam_policies.db_id
-	WHERE iam_members.name=$1;`, "user:"+connector_id+":"+username)
+	WHERE iam_members.name=$1;`, "user:"+connectorId+":"+username)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -158,18 +157,7 @@ func (p *pg) GetUserPolicies(ctx context.Context, username, connector_id string)
 		policyIds = append(policyIds, policyId)
 	}
 
-	var userPolicies []*storage.Policy
-	for _, policyId := range policyIds {
-		policy, err := p.GetPolicy(ctx, policyId)
-		if err != nil {
-			return nil, p.processError(err)
-		}
-		userPolicies = append(userPolicies, policy)
-	}
-
-	fmt.Println(userPolicies, "policy_ids")
-
-	return userPolicies, nil
+	return policyIds, nil
 }
 
 func (p *pg) GetPolicy(ctx context.Context, id string) (*storage.Policy, error) {

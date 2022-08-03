@@ -26,9 +26,9 @@ message GetPolicyResp {
 
 message GetUserPoliciesResp {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    example: { value: '{"policies": [{"name": "My Viewer Policy 1","id": "custom-viewer-policy-1","members": ["user:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"}, {"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}, {"name": "My Custom Policy 2","id": "custom-policy-2","members": ["user:local:test"], "statements": [{"role": "auditor", "projects": ["project1"], "effect": "ALLOW"}],"projects": []}]}'}
+  example: { value: '{"policy_ids": ["viewer-access", "editor-access"]}'}
   };
-  repeated Policy policies = 1;
+  repeated string policy_ids = 1;
 }
 
 message ListPoliciesResp {

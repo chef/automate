@@ -164,7 +164,7 @@ func (s *policyServer) ListPolicies(ctx context.Context,
 	return &resp, nil
 }
 
-// ListPolicies fetches a list of all IAM policies.
+// GetUserPolicies fetches a list of all user policyIds.
 func (s *policyServer) GetUserPolicies(ctx context.Context,
 	req *api.GetUserPoliciesReq) (*api.GetUserPoliciesResp, error) {
 
@@ -172,15 +172,9 @@ func (s *policyServer) GetUserPolicies(ctx context.Context,
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error getting user policies: %s", err.Error())
 	}
-	resp := api.GetUserPoliciesResp{}
-	for _, polInternal := range pols {
-		pol, err := policyFromInternal(polInternal)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "error converting policy %q: %s", polInternal.Name, err.Error())
-		}
-		resp.Policies = append(resp.Policies, pol)
-	}
-	return &resp, nil
+	return &api.GetUserPoliciesResp{
+		PolicyIds: pols,
+	}, nil
 }
 
 // GetPolicy fetches an IAM policy.
