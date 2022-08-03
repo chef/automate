@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-//getTotalAssets Get Total Number of documents from the comp-*-run-info
+//getAssets Get Total Number of documents from the comp-*-run-info
 func (backend ES2Backend) getAssets(ctx context.Context, boolQuery *elastic.BoolQuery) (int32, error) {
 	myIndex := mappings.ComplianceRunInfo.Index
 
