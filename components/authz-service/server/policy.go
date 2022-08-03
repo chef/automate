@@ -168,7 +168,7 @@ func (s *policyServer) ListPolicies(ctx context.Context,
 func (s *policyServer) GetUserPolicies(ctx context.Context,
 	req *api.GetUserPoliciesReq) (*api.GetUserPoliciesResp, error) {
 
-	pols, err := s.store.GetUserPolicies(ctx, req.Username, req.ConnectorId)
+	pols, err := s.store.GetUserPolicies(ctx, req.MemberType, req.Username, req.ConnectorId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error getting user policies: %s", err.Error())
 	}

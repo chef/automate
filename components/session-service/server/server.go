@@ -386,12 +386,29 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err, "authzPoliciesClient err")
 	}
 
-	teamsPolicies, err := s.teamsServiceClient.
+	teamsForUser, err := s.teamsServiceClient.GetTeamsForMember(r.Context(), &teams.GetTeamsForMemberReq{
+		UserId: data.UserId,
+	})
 	if err != nil {
 		fmt.Println(err, "authzPoliciesClient err")
 	}
+	var teamsPolicyIds []string
+	for _, team := range teamsForUser.Teams {
+		userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
+			MemberType:  "team",
+			Username:    team.Id,
+			ConnectorId: data.ConnectorID,
+		})
+		if err != nil {
+			fmt.Println(err, "authzPoliciesClient err")
+		}
+		teamsPolicyIds = append(teamsPolicyIds, userPolicies.PolicyIds...)
+	}
+
+	fmt.Println(teamsPolicyIds, "teamsPolicyIdsAzz__")
 
 	userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
+		MemberType:  "user",
 		Username:    data.Username,
 		ConnectorId: data.ConnectorID,
 	})
@@ -399,10 +416,14 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err, "authzPoliciesClient err")
 	}
 
+	combinedPolicyIds := append(userPolicies.PolicyIds, teamsPolicyIds...)
+
+	fmt.Println(combinedPolicyIds, "combinedPolicyIdsAzz__")
+
 	// var projectRolePairs projectRolePairs
 	var prs []projectRolePairs
 	for _, policy := range resp.Policies {
-		if filterUserPolicy(policy.Id, userPolicies.PolicyIds) {
+		if filterUserPolicy(policy.Id, combinedPolicyIds) {
 			for _, statement := range policy.Statements {
 				pr := projectRolePairs{
 					Role:    statement.Role,

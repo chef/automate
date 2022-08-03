@@ -104,6 +104,7 @@ func (p *Server) ListPolicies(
 func (p *Server) GetUserPolicies(
 	ctx context.Context, in *pb_req.GetUserPoliciesReq) (*pb_resp.GetUserPoliciesResp, error) {
 	resp, err := p.policies.GetUserPolicies(ctx, &authz.GetUserPoliciesReq{
+		MemberType:  in.MemberType,
 		Username:    in.Username,
 		ConnectorId: in.ConnectorId,
 	})
