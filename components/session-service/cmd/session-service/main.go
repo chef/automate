@@ -164,12 +164,6 @@ func serve(_ *cobra.Command, args []string) {
 		bldrClient,
 		authzAddress,
 		teamsAddress,
-<<<<<<< HEAD
-		bldrClient,
-		authzAddress,
-		teamsAddress,
-=======
->>>>>>> authz and teams connection
 		signInURL,
 		serviceCerts,
 		cfg.Persistent)

@@ -357,8 +357,8 @@ func filterUserPolicy(policyId string, policyIds []string) bool {
 }
 
 type projectRolePairs struct {
-	Role    string
-	Project []string
+	Role     string
+	Projects []string
 }
 
 func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
@@ -410,8 +410,8 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		if filterUserPolicy(policy.Id, combinedPolicyIds) {
 			for _, statement := range policy.Statements {
 				pr := projectRolePairs{
-					Role:    statement.Role,
-					Project: statement.Projects,
+					Role:     statement.Role,
+					Projects: statement.Projects,
 				}
 				prs = append(prs, pr)
 			}
@@ -419,6 +419,12 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(prs, "projectRolePairsAz__")
+
+	if err := json.NewEncoder(w).Encode(prs); err != nil {
+		http.Error(w, errors.Wrap(err, "failed encode projectRolePairs").Error(),
+			http.StatusInternalServerError)
+		return
+	}
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
