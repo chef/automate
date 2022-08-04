@@ -3,10 +3,11 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/olivere/elastic/v7"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/olivere/elastic/v7"
+	"github.com/stretchr/testify/assert"
 )
 
 var esr = ES2Backend{
@@ -29,91 +30,91 @@ func TestFiltersForAssetIndex(t *testing.T) {
 			name:          "Test for Environment",
 			filtersKey:    "environment",
 			filtersValue:  []string{"Test ENV"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"environment.lower":["Test ENV"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"environment":["Test ENV"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Organisation",
 			filtersKey:    "organization",
 			filtersValue:  []string{"Test Org"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"organization.lower":["Test Org"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"organization":["Test Org"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for chef_server",
 			filtersKey:    "chef_server",
 			filtersValue:  []string{"fqdn"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"chef_server.lower":["fqdn"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"chef_server":["fqdn"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Policy group",
 			filtersKey:    "policy_group",
 			filtersValue:  []string{"Policy"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"policy_group.lower":["Policy"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"policy_group":["Policy"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Policy Name",
 			filtersKey:    "policy_name",
 			filtersValue:  []string{"name"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"policy_name.lower":["name"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"policy_name":["name"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Inspec Version",
 			filtersKey:    "inspec_version",
 			filtersValue:  []string{"1"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"inspec_version.lower":["1"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"inspec_version":["1"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for platform with version",
 			filtersKey:    "platform_with_version",
 			filtersValue:  []string{"1"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform.full.lower":["1"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform_with_version":["1"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for recipe",
 			filtersKey:    "recipe",
 			filtersValue:  []string{"testrecipe"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"recipe.lower":["testrecipe"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"recipe":["testrecipe"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Role",
 			filtersKey:    "role",
 			filtersValue:  []string{"testrole"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"role.lower":["testrole"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"role":["testrole"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Platform",
 			filtersKey:    "platform",
 			filtersValue:  []string{"Test Plat"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform.name.lower":["Test Plat"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform":["Test Plat"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Profile ID",
 			filtersKey:    "profile_id",
 			filtersValue:  []string{"Profile"},
-			expectedQuery: `{"bool":{"must":[{"bool":{"should":{"terms":{"profile_id":["Profile"]}}}},{"nested":{"inner_hits":{"_source":{"includes":["profiles.name","profiles.sha256"]}},"path":"profiles","query":{"bool":{"must":{"query_string":{"query":"profiles.sha256:/(Profile)/"}}}}}}]}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"profile_id":["Profile"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Control ID",
 			filtersKey:    "control",
 			filtersValue:  []string{"Control"},
-			expectedQuery: `{"bool":{"must":{"nested":{"path":"profiles","query":{"bool":{"must":[{"query_string":{"query":"profiles.sha256:/(.*)/"}},{"nested":{"path":"profiles.controls","query":{"query_string":{"query":"profiles.controls.id:/(Control)/"}}}}]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"control_id":["Control"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Node Id",
 			filtersKey:    "node_id",
-			filtersValue:  []string{"NodeUUId1", "NodeUUd2"},
-			expectedQuery: `{"bool":{"must":{"terms":{"node_uuid":["NodeUUId1","NodeUUd2"]}}}}`,
+			filtersValue:  []string{"NodeUUId"},
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"node_id":["NodeUUId"]}}}}}}`,
 			esr:           esr,
 		},
 		{
@@ -134,7 +135,7 @@ func TestFiltersForAssetIndex(t *testing.T) {
 			name:          "Test for chef tags",
 			filtersKey:    "chef_tags",
 			filtersValue:  []string{"tags"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"chef_tags.lower":["tags"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"chef_tags":["tags"]}}}}}}`,
 			esr:           esr,
 		},
 	}
@@ -166,23 +167,21 @@ func TestStartTimeAndEndTimeFilters(t *testing.T) {
 		unreachableConfig int
 		esr               ES2Backend
 	}{
-		{name: "Test for Starttime and endTime",
+		{name: "Test for 15 days unreachable config",
 			endTime:       endTime,
-			startTime:     startTime,
-			expectedQuery: `{"range":{"last_run":{"from":"2022-07-17T00:00:00Z","include_lower":true,"include_upper":true,"to":"2022-07-18T23:59:59Z"}}}`,
+			expectedQuery: fmt.Sprintf(`{"range":{"last_run":{"from":"%s","include_lower":false,"include_upper":true,"to":null}}}`, startTime),
 			esr:           esr,
-		},
-		{name: "Test for null end time and start time",
-			startTime:     startTime,
-			expectedQuery: `{"range":{"last_run":{"from":null,"include_lower":false,"include_upper":true,"to":"2022-07-17T00:00:00Z"}}}`,
-			esr:           esr,
-			endTime:       "",
 		},
 	}
 	for _, test := range tests {
 		filters := make(map[string][]string)
 		filters["start_time"] = []string{test.startTime}
 		filters["end_time"] = []string{test.endTime}
+
+		if test.unreachableConfig > 0 {
+			startTimeBefore := time.Now().Add(-24 * time.Hour * time.Duration(test.unreachableConfig)).UTC().Format(time.RFC3339)
+			test.expectedQuery = fmt.Sprintf(`{"range":{"last_run":{"from":"%s","include_lower":false,"include_upper":true,"to":null}}}`, startTimeBefore)
+		}
 
 		t.Run(test.name, func(t *testing.T) {
 			got := getStartTimeAndEndTimeRangeForAsset(filters)
@@ -211,7 +210,7 @@ func TestReachableAssetFilters(t *testing.T) {
 		{name: "Test for 15 days unreachable config",
 			endTime:           endTime,
 			unreachableConfig: 15,
-			expectedQuery:     fmt.Sprintf(`{"range":{"last_run":{"from":null,"include_lower":true,"include_upper":true,"to":"%s"}}}`, startTime),
+			expectedQuery:     fmt.Sprintf(`{"range":{"last_run":{"from":"%s","include_lower":false,"include_upper":true,"to":null}}}`, startTime),
 			esr:               esr,
 		},
 		{name: "Test for 0 days unreachable config",
@@ -228,11 +227,11 @@ func TestReachableAssetFilters(t *testing.T) {
 
 		if test.unreachableConfig > 0 {
 			startTimeBefore := time.Now().Add(-24 * time.Hour * time.Duration(test.unreachableConfig)).UTC().Format(time.RFC3339)
-			test.expectedQuery = fmt.Sprintf(`{"range":{"last_run":{"from":null,"include_lower":true,"include_upper":true,"to":"%s"}}}`, startTimeBefore)
+			test.expectedQuery = fmt.Sprintf(`{"range":{"last_run":{"from":"%s","include_lower":false,"include_upper":true,"to":null}}}`, startTimeBefore)
 		}
 
 		t.Run(test.name, func(t *testing.T) {
-			got := getUnReachableAssetTimeRangeQuery(test.unreachableConfig)
+			got := getReachableAssetTimeRangeQuery(test.unreachableConfig)
 			actualQuery := ""
 			if got != nil {
 				query, _ := got.Source()

@@ -2,18 +2,16 @@ package relaxting
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
-	constant "github.com/chef/automate/components/compliance-service/reporting"
+	"strings"
+	"time"
+
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"strings"
-	"time"
 )
 
 //getAssets Get Total Number of documents from the comp-*-run-info
@@ -28,8 +26,6 @@ func (backend ES2Backend) getAssets(ctx context.Context, boolQuery *elastic.Bool
 
 	countService := elastic.NewCountService(client)
 
-	scr, err := boolQuery.Source()
-	LogQueryPartMin(myIndex, scr, "getassests")
 	count, err := countService.Query(boolQuery).Index(myIndex).Do(ctx)
 	if err != nil {
 		logrus.Errorf("Cannot create client for count assets with error %v", err)
@@ -45,27 +41,13 @@ func (backend ES2Backend) getFiltersQueryForAssetFilters(filters map[string][]st
 	boolQuery := elastic.NewBoolQuery()
 
 	filterTypes := reporting.FilterType
+	filterTypes = append(filterTypes, []string{"control", "profile_id", "node_id"}...)
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {
 			ESFieldName := getESFieldNameAsset(filterType)
 			termQuery := newTermQueryFromFilter(ESFieldName, filters[filterType])
 			boolQuery = boolQuery.Must(termQuery)
 		}
-	}
-
-	if len(filters["node_id"]) > 0 {
-		termQuery := elastic.NewTermsQuery("node_uuid", stringArrayToInterfaceArray(filters["node_id"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	numberOfProfiles := len(filters["profile_id"])
-	numberOfControls := len(filters["control"])
-	if numberOfProfiles > 0 || numberOfControls > 0 {
-		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256"}
-		controlLevelFscIncludes := []string{"profiles.controls.id"}
-
-		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes, nil, controlLevelFscIncludes)
-		boolQuery = boolQuery.Must(profileAndControlQuery)
 	}
 
 	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
@@ -136,27 +118,33 @@ func getESFieldNameAsset(filterType string) string {
 	ESFieldName := filterType
 	switch filterType {
 	case "chef_server":
-		ESFieldName = "chef_server.lower"
+		ESFieldName = "chef_server"
 	case "inspec_version":
-		ESFieldName = "inspec_version.lower"
+		ESFieldName = "inspec_version"
 	case "organization":
-		ESFieldName = "organization.lower"
+		ESFieldName = "organization"
 	case "platform":
-		ESFieldName = "platform.name.lower"
+		ESFieldName = "platform"
 	case "platform_with_version":
-		ESFieldName = "platform.full.lower"
+		ESFieldName = "platform_with_version"
 	case "recipe":
-		ESFieldName = "recipe.lower"
+		ESFieldName = "recipe"
 	case "role":
-		ESFieldName = "role.lower"
+		ESFieldName = "role"
 	case "environment":
-		ESFieldName = "environment.lower"
+		ESFieldName = "environment"
 	case "chef_tags":
-		ESFieldName = "chef_tags.lower"
+		ESFieldName = "chef_tags"
+	case "node_id":
+		ESFieldName = "node_id"
 	case "policy_group":
-		ESFieldName = "policy_group.lower"
+		ESFieldName = "policy_group"
 	case "policy_name":
-		ESFieldName = "policy_name.lower"
+		ESFieldName = "policy_name"
+	case "control":
+		ESFieldName = "control_id"
+	case "profile_id":
+		ESFieldName = "profile_id"
 	}
 
 	return ESFieldName
@@ -165,18 +153,10 @@ func getESFieldNameAsset(filterType string) string {
 //getStartTimeAndEndTimeRangeForAsset gets the range query for date range and config as well
 func getStartTimeAndEndTimeRangeForAsset(filters map[string][]string) *elastic.RangeQuery {
 
-	endTime := firstOrEmpty(filters[reporting.EndTime])
-	startTime := firstOrEmpty(filters[reporting.StartTime])
+	endTime := firstOrEmpty(filters["end_time"])
+	startTime := firstOrEmpty(filters["start_time"])
 
 	timeRangeQuery := elastic.NewRangeQuery("last_run")
-
-	// For UnCollectedAssets we need all the records before the range start time
-	if len(endTime) == 0 && len(startTime) > 0 {
-		timeRangeQuery.Lte(startTime)
-		timeRangeQuery.IncludeLower(false)
-		return timeRangeQuery
-	}
-
 	if len(startTime) > 0 {
 		timeRangeQuery.Gte(startTime)
 	}
@@ -188,19 +168,19 @@ func getStartTimeAndEndTimeRangeForAsset(filters map[string][]string) *elastic.R
 
 }
 
-//getUnReachableAssetTimeRangeQuery gets the range query for reachable assets
-func getUnReachableAssetTimeRangeQuery(unreachableConfig int) *elastic.RangeQuery {
+//getReachableAssetTimeRangeQuery gets the range query for reachable assets
+func getReachableAssetTimeRangeQuery(unreachableConfig int) *elastic.RangeQuery {
 	if unreachableConfig > 0 {
 		timeRangeQuery := elastic.NewRangeQuery("last_run")
-		timeRangeQuery.Lte(time.Now().Add(-24 * time.Hour * time.Duration(unreachableConfig)).UTC().Format(time.RFC3339))
+		timeRangeQuery.Gt(time.Now().Add(-24 * time.Hour * time.Duration(unreachableConfig)).UTC().Format(time.RFC3339))
 		return timeRangeQuery
 	}
 	return nil
 }
 
-func (backend ES2Backend) getCollectedAssetsCount(ctx context.Context, filtQuery *elastic.BoolQuery) (*AssetSummary, error) {
+func (backend ES2Backend) getCollectedAssets(ctx context.Context, filtQuery *elastic.BoolQuery) (*AssetSummary, error) {
 
-	name := "AssetCollectedCount"
+	name := "AssetCollectedAssets"
 	myIndex := mappings.ComplianceRunInfo.Index
 
 	searchSource := elastic.NewSearchSource().
@@ -213,7 +193,7 @@ func (backend ES2Backend) getCollectedAssetsCount(ctx context.Context, filtQuery
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		logrus.Errorf("Cannot connect to ElasticSearch for assets count: %v", err)
+		logrus.Errorf("Cannot connect to ElasticSearch: %v", err)
 		return nil, err
 	}
 
@@ -241,72 +221,6 @@ func (backend ES2Backend) getCollectedAssetsCount(ctx context.Context, filtQuery
 	LogQueryPartMin(myIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", name))
 
 	return getSummaryAssetAggResult(searchResult), nil
-}
-
-func (backend ES2Backend) getAssetsList(ctx context.Context,
-	from int32, size int32,
-	filtQuery *elastic.BoolQuery) ([]*reportingapi.Assets, error) {
-	index := getRunInfoIndex()
-	name := "AssetCollected"
-	client, err := backend.ES2Client()
-	if err != nil {
-		logrus.Errorf("Cannot connect to ElasticSearch for assests list: %v", err)
-		return nil, err
-	}
-
-	fsc := elastic.NewFetchSourceContext(true).Include(
-		"node_uuid",
-		"status",
-		"first_run",
-		"last_run")
-
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(filtQuery).
-		Size(int(size)).
-		From(int(from)).
-		Sort("last_run", false)
-
-	source, err := searchSource.Source()
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get Source", name))
-	}
-
-	LogQueryPartMin(index, source, fmt.Sprintf("%s query", name))
-
-	searchResult, err := client.Search().
-		SearchSource(searchSource).
-		Index(index).
-		FilterPath(
-			"took",
-			"hits.total",
-			"hits.hits._id",
-			"hits.hits._source",
-			"hits.hits.inner_hits").
-		Do(ctx)
-
-	return getCollectedAssetsSearchResult(searchResult)
-}
-
-func getCollectedAssetsSearchResult(searchResult *elastic.SearchResult) ([]*reportingapi.Assets, error) {
-
-	assets := make([]*reportingapi.Assets, 0)
-	if searchResult.TotalHits() > 0 {
-		for _, hit := range searchResult.Hits.Hits {
-			var asset *reportingapi.Assets
-			if hit.Source != nil {
-				err := json.Unmarshal(hit.Source, &asset)
-				if err != nil {
-					return nil, errors.Wrap(err, "Unable to collect assets from database")
-				}
-				assets = append(assets, asset)
-			}
-
-		}
-	}
-
-	return assets, nil
-
 }
 
 func getSummaryAssetAggregation() map[string]elastic.Aggregation {
@@ -358,106 +272,4 @@ func getSummaryAssetAggResult(aggRoot *elastic.SearchResult) *AssetSummary {
 	}
 
 	return summary
-}
-func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string][]string) (*reportingapi.AssetSummary, error) {
-
-	// get the total number of assets without any date range filters i.e all the assets present
-	boolquery := backend.getFiltersQueryForAssetFilters(filters)
-	totalAssets, err := backend.getAssets(ctx, boolquery)
-	if err != nil {
-		logrus.Errorf("The error while getting the total assets %v", err)
-		return nil, err
-	}
-	// getting the un-reachable assets as per the unreachable config
-	// Todo hardcoding the value for Reachable assets
-	unreachableQuery := boolquery.Must(getUnReachableAssetTimeRangeQuery(10))
-	unreachableAsset, err :=backend.getAssets(ctx , unreachableQuery) 
-	if err != nil {
-		logrus.Errorf("The error while getting unreachable assets: %v" , err)
-		return nil , err
-	}
-	// get the un-reported assets as per the start time and end time present in filters
-	reportedQuery := boolquery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
-	reported, err := backend.getAssets(ctx, reportedQuery)
-	if err != nil {
-		logrus.Errorf("The error while getting the unreported assests %v", err)
-		return nil, err
-	}
-	unreportedAsset := totalAssets - (unreachableAsset + reported)
-
-	// getting the collected assets as per the filters present
-	collectedAsset, err := backend.getCollectedAssetsCount(ctx, reportedQuery)
-	if err != nil {
-		logrus.Errorf("The error while getting the collected assests %v", err)
-		return nil, err
-	}
-	notCollectedAsset := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)
-
-	collected := &reportingapi.Collected{
-		Passed:  collectedAsset.Passed,
-		Failed:  collectedAsset.Failed,
-		Skipped: collectedAsset.Skipped,
-		Weived:  collectedAsset.Waived,
-	}
-	summary := &reportingapi.AssetSummary{
-		TotalAssets:  totalAssets,
-		Collected:    collected,
-		NotCollected: notCollectedAsset,
-		Unreachable:  unreachableAsset,
-		Unreported:   unreportedAsset,
-	}
-
-	return summary, nil
-}
-
-func (backend ES2Backend) getCollectedAssets(ctx context.Context, from int32, size int32, filters map[string][]string, filtQuery *elastic.BoolQuery) ([]*reportingapi.Assets, error) {
-	//adding range query for date range
-	filtQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
-	return backend.getAssetsList(ctx, from, size, filtQuery)
-}
-
-func (backend ES2Backend) getUnReachableAssets(ctx context.Context, from int32, size int32, filtQuery *elastic.BoolQuery, unReachableConfig int) ([]*reportingapi.Assets, error) {
-	//adding range query as per unreachable config
-	filtQuery.Must(getUnReachableAssetTimeRangeQuery(unReachableConfig))
-	return backend.getAssetsList(ctx, from, size, filtQuery)
-
-}
-
-func (backend ES2Backend) getUnReportedAssets(ctx context.Context, from int32, size int32, filters map[string][]string, filtQuery *elastic.BoolQuery, unreachableConfig int) ([]*reportingapi.Assets, error) {
-	//unreported assets are records between the un-reachable config date till range start time
-	unReportedAssetsStartDate := time.Now().Add(-24 * time.Hour * time.Duration(unreachableConfig)).UTC().Format(time.RFC3339)
-	unReportedAssetsEndDate := firstOrEmpty(filters["start_time"])
-
-	filters[reporting.StartTime] = []string{unReportedAssetsStartDate}
-	filters[reporting.EndTime] = []string{unReportedAssetsEndDate}
-
-	filtQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
-
-	return backend.getAssetsList(ctx, from, size, filtQuery)
-}
-
-func (backend ES2Backend) getUnCollectedAssets(ctx context.Context, from int32, size int32, filters map[string][]string, filtQuery *elastic.BoolQuery) ([]*reportingapi.Assets, error) {
-	//adding unCollectedAssetsTimeRangeQuery := as we need all the records before start time only
-	filters[reporting.EndTime] = []string{}
-	filtQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
-	return backend.getAssetsList(ctx, from, size, filtQuery)
-}
-
-func (backend ES2Backend)GetAsset(ctx context.Context, filters map[string][]string , size int32 , from int32 , assetsType string) ([]*reportingapi.Assets, error) {
-
-	boolquery := backend.getFiltersQueryForAssetFilters(filters)
-	assets := make([]*reportingapi.Assets, 0)
-	if assetsType == constant.COLLECTED || len(assetsType)==0{
-		return backend.getCollectedAssets(ctx , from , size , filters , boolquery)
-	}
-	if assetsType == constant.UNREACHABLE{
-		return backend.getUnReachableAssets(ctx , from , size , boolquery , 10)	
-	}
-	if assetsType == constant.UNCOLLECTED {
-		return backend.getUnCollectedAssets(ctx, from , size , filters , boolquery)
-	} 
-	if assetsType == constant.UNREPORTED {
-		return backend.getUnReportedAssets(ctx , from , size , filters , boolquery , 10)
-	}
-	return assets, errors.New("Please provide the valid asset type")
 }
