@@ -361,3 +361,10 @@ type NodesUpgradation struct {
 type Status struct {
 	Status string `json:"status"`
 }
+
+type AssetSummary struct {
+	Passed  int32 `json:"passed"`
+	Skipped int32 `json:"skipped"`
+	Failed  int32 `json:"failed"`
+	Waived  int32 `json:"waived"`
+}
