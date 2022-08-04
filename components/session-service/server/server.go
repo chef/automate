@@ -361,18 +361,6 @@ type projectRolePairs struct {
 	Project []string
 }
 
-// func filterProjectRole(statements []*authz.Statement) []projectRolePairs {
-// 	var _projectRolePairs []projectRolePairs
-// 	for _, statement := range statements {
-// 		pr := projectRolePairs{
-// 			Role:    statement.Role,
-// 			Project: statement.Projects,
-// 		}
-// 		_projectRolePairs = append(_projectRolePairs, pr)
-// 	}
-// 	return _projectRolePairs
-// }
-
 func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var data userData
@@ -394,7 +382,7 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var teamsPolicyIds []string
 	for _, team := range teamsForUser.Teams {
-		userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
+		teamPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
 			MemberType:  "team",
 			Username:    team.Id,
 			ConnectorId: data.ConnectorID,
@@ -402,10 +390,8 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err, "authzPoliciesClient err")
 		}
-		teamsPolicyIds = append(teamsPolicyIds, userPolicies.PolicyIds...)
+		teamsPolicyIds = append(teamsPolicyIds, teamPolicies.PolicyIds...)
 	}
-
-	fmt.Println(teamsPolicyIds, "teamsPolicyIdsAzz__")
 
 	userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
 		MemberType:  "user",
@@ -417,8 +403,6 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	combinedPolicyIds := append(userPolicies.PolicyIds, teamsPolicyIds...)
-
-	fmt.Println(combinedPolicyIds, "combinedPolicyIdsAzz__")
 
 	// var projectRolePairs projectRolePairs
 	var prs []projectRolePairs
