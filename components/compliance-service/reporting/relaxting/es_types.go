@@ -305,3 +305,10 @@ type ESMigrationInfo struct {
 type EndTimeSource struct {
 	EndTime time.Time `json:"end_time"`
 }
+
+type AssetSummary struct {
+	Passed  int32 `json:"passed"`
+	Skipped int32 `json:"skipped"`
+	Failed  int32 `json:"failed"`
+	Waived  int32 `json:"waived"`
+}
