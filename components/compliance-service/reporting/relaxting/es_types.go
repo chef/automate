@@ -7,9 +7,28 @@ import (
 )
 
 type ESComplianceRunInfo struct {
-	NodeID   string    `json:"node_uuid"`
-	FirstRun time.Time `json:"first_run"`
-	LastRun  time.Time `json:"last_run"`
+	NodeID              string    `json:"node_uuid"`
+	ResourceId          string    `json:""`
+	ResourceType        string    `json:""`
+	Status              string    `json:"status"`
+	FirstRun            time.Time `json:"first_run"`
+	LastRun             time.Time `json:"last_run"`
+	PlatFormWithVersion string    `json:"platform_with_version"`
+	Platform            struct {
+		Name    string `json:"name"`
+		Release string `json:"release"`
+		Full    string `json:"full"`
+	} `json:"platform"`
+	ControlTags   []ESInSpecReportControlStringTags `json:"control_tag"`
+	ChefServer    string                            `json:"chef_server"`
+	Organization  string                            `json:"organization"`
+	Controls      []ESInSpecReportControl           `json:"controls"`
+	InspecVersion string                            `json:"inspec_version"`
+	PolicyName    string                            `json:"policy_name"`
+	Profiles      []ESInSpecReportProfile           `json:"profiles"`
+	Recipe        string                            `json:"recipe"`
+	Role          string                            `json:"role"`
+	ChefTags      []string                          `json:"chef_tags"`
 }
 
 // Used to unmarshal summary documents stored in comp-s-* ElasticSearch indices

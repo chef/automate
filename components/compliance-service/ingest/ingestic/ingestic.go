@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -43,19 +44,34 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 }
 
 // This method will support adding a document with a specified id
-func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
+func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, runInfo relaxting.ESComplianceRunInfo, runDateTime time.Time) error {
 	runDateTimeAsString := runDateTime.Format(time.RFC3339)
 
 	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
 
 	_, err := backend.client.Update().
 		Index(mapping.Index).
-		Id(id).
+		Id(runInfo.NodeID).
 		Script(script).
 		Upsert(map[string]interface{}{
-			"node_uuid": id,
-			"first_run": runDateTime,
-			"last_run":  runDateTime,
+			"node_uuid":             runInfo.NodeID,
+			"resource_uuid":         runInfo.ResourceId,
+			"resource_type":         runInfo.ResourceType,
+			"status":                runInfo.Status,
+			"first_run":             runInfo.FirstRun,
+			"last_run":              runInfo.LastRun,
+			"platform_with_version": runInfo.PlatFormWithVersion,
+			"platform":              runInfo.Platform,
+			"control_tag":           runInfo.ControlTags,
+			"chef_server":           runInfo.ChefServer,
+			"organization":          runInfo.Organization,
+			"controls":              runInfo.Controls,
+			"inspec_version":        runInfo.InspecVersion,
+			"policy_name":           runInfo.PolicyName,
+			"profiles":              runInfo.Profiles,
+			"recipe":                runInfo.Recipe,
+			"role":                  runInfo.Role,
+			"chef_tags":             runInfo.ChefTags,
 		}).
 		Do(ctx)
 
@@ -322,10 +338,50 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 	return err
 }
 
-func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, nodeId string, runDateTime time.Time) error {
+func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
+	runInfo := MapReportToRunInfo(report, runDateTime)
+
+	bs, err := json.MarshalIndent(runInfo, "", "    ")
+	if err != nil {
+		logrus.Errorf("Marshal######@#: %+v", err)
+	}
+
+	err = ioutil.WriteFile("demo.json", bs, 0777)
+	if err != nil {
+		logrus.Errorf("WriteFile######@#: %+v", err)
+	}
+
 	mapping := mappings.ComplianceRunInfo
-	err := backend.upsertComplianceRunInfo(ctx, mapping, nodeId, runDateTime)
+	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
 	return err
+
+	// Map structs
+
+	// // Insert into RunInfo index
+	// backend.BulkInsertRunInfo(ctx, runInfo)
+	// return nil
+}
+
+func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time) relaxting.ESComplianceRunInfo {
+	var rInfo relaxting.ESComplianceRunInfo
+	rInfo.NodeID = report.NodeID
+	rInfo.ResourceId = ""
+	rInfo.FirstRun = runDateTime
+	rInfo.LastRun = runDateTime
+	rInfo.PlatFormWithVersion = ""
+	rInfo.Platform = report.Platform
+	rInfo.ControlTags = []relaxting.ESInSpecReportControlStringTags{}
+	rInfo.ChefServer = "repo"
+	rInfo.Organization = report.OrganizationName
+	rInfo.Controls = report.Profiles[0].Controls
+	rInfo.InspecVersion = report.InSpecVersion
+	rInfo.PolicyName = report.PolicyName
+	rInfo.Profiles = report.Profiles
+	rInfo.Recipe = report.Recipes[0]
+	rInfo.Role = report.Roles[0]
+	rInfo.ChefTags = report.ChefTags
+
+	return rInfo
 }
 
 // Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> in yesterday's UTC index.
