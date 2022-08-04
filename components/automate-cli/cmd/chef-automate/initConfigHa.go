@@ -26,7 +26,7 @@ type AwsConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
-			SSHPort						string	`toml:"ssh_port"`
+			SSHPort                     string `toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`
@@ -75,6 +75,7 @@ type AwsConfigToml struct {
 			PrivateCustomSubnets         []string `toml:"private_custom_subnets"`
 			PublicCustomSubnets          []string `toml:"public_custom_subnets"`
 			SSHKeyPairName               string   `toml:"ssh_key_pair_name"`
+			IpAllowList                  string   `toml:"ip_allow_list"`
 			SetupManagedServices         bool     `toml:"setup_managed_services"`
 			OpensearchDomainName         string   `toml:"managed_opensearch_domain_name"`
 			OpensearchDomainUrl          string   `toml:"managed_opensearch_domain_url"`
@@ -140,7 +141,7 @@ type ExistingInfraConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
-			SSHPort						string	`toml:"ssh_port"`
+			SSHPort                     string `toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`

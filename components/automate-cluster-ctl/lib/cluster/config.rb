@@ -99,6 +99,7 @@ module AutomateCluster
       default :private_custom_subnets, []
       default :public_custom_subnets, []
       default :ssh_key_pair_name
+      default :ip_allow_list, []
       default :lb_access_logs, 'false'
       default :backup_config, ' '
       default :s3_bucketName, 'chef-automate-ha'

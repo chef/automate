@@ -116,6 +116,10 @@ public_custom_subnets = []
 # eg: ssh_key_pair_name = "A2HA"
 ssh_key_pair_name = ""
 
+# IP addresses in CIDR format that will be allowed access to UI
+# eg: ip_allow_list = ["192.168.64.1/32","192.168.65.0/24"]
+ip_allow_list = []
+
 ## === ===
 
 # ============== Managed Services ======================

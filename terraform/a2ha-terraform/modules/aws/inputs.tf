@@ -97,6 +97,10 @@ variable "chef_server_instance_type" {
 variable "chef_server_lb_certificate_arn" {
 }
 
+variable "ip_allow_list" {
+  default = []
+}
+
 variable "json_data" {
 }
 

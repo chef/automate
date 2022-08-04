@@ -26,6 +26,7 @@ module "aws" {
   automate_server_instance_type      = var.automate_server_instance_type
   aws_ami_id                         = var.aws_ami_id
   aws_ssh_key_file                   = var.ssh_key_file
+  ip_allow_list                      = var.ip_allow_list
   aws_ssh_key_pair_name              = var.aws_ssh_key_pair_name
   aws_ssh_user                       = var.ssh_user
   aws_ssh_port                       = var.ssh_port
