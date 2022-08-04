@@ -2,6 +2,7 @@ package relaxting
 
 import (
 	"context"
+	"fmt"
 	"encoding/json"
 	"fmt"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
@@ -370,7 +371,7 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 	// getting the un-reachable assets as per the unreachable config
 	// Todo hardcoding the value for Reachable assets
 	unreachableQuery := boolquery.Must(getUnReachableAssetTimeRangeQuery(10))
-	unreachableAsset, err :=backend.getAssets(ctx , unreachableQuery) 
+	unreachableAsset, err :=backend.getAssets(ctx , unreachableQuery)
 	if err != nil {
 		logrus.Errorf("The error while getting unreachable assets: %v" , err)
 		return nil , err
