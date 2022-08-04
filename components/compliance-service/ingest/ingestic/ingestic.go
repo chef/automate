@@ -359,17 +359,19 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time)
 	rInfo.InspecVersion = report.InSpecVersion
 	rInfo.PolicyName = report.PolicyName
 	rInfo.Profiles = report.Profiles
-	rInfo.Recipe = report.Recipes[0]
-	rInfo.Role = report.Roles[0]
+	rInfo.Recipe = append(rInfo.Recipe, report.Recipes[:]...)
+	rInfo.Role = append(rInfo.Role, report.Roles[:]...)
 	rInfo.ChefTags = report.ChefTags
 
 	return rInfo
 }
 
-func GetControls(profiles []relaxting.ESInSpecReportProfile) [][]relaxting.ESInSpecReportControl {
-	var ctrls [][]relaxting.ESInSpecReportControl
-	for _, v := range profiles {
-		ctrls = append(ctrls, v.Controls)
+func GetControls(profiles []relaxting.ESInSpecReportProfile) []string {
+	var ctrls []string
+	for _, profile := range profiles {
+		for _, control := range profile.Controls {
+			ctrls = append(ctrls, control.Title)
+		}
 	}
 	return ctrls
 }
