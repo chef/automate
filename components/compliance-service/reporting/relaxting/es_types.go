@@ -22,7 +22,7 @@ type ESComplianceRunInfo struct {
 	ControlTags   []ESInSpecReportControlStringTags `json:"control_tag"`
 	ChefServer    string                            `json:"chef_server"`
 	Organization  string                            `json:"organization"`
-	Controls      []ESInSpecReportControl           `json:"controls"`
+	Controls      [][]ESInSpecReportControl         `json:"controls"`
 	InspecVersion string                            `json:"inspec_version"`
 	PolicyName    string                            `json:"policy_name"`
 	Profiles      []ESInSpecReportProfile           `json:"profiles"`

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/chef/automate/api/interservice/authz"
@@ -341,25 +340,9 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
 	runInfo := MapReportToRunInfo(report, runDateTime)
 
-	bs, err := json.MarshalIndent(runInfo, "", "    ")
-	if err != nil {
-		logrus.Errorf("Marshal######@#: %+v", err)
-	}
-
-	err = ioutil.WriteFile("demo.json", bs, 0777)
-	if err != nil {
-		logrus.Errorf("WriteFile######@#: %+v", err)
-	}
-
 	mapping := mappings.ComplianceRunInfo
-	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
+	err := backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
 	return err
-
-	// Map structs
-
-	// // Insert into RunInfo index
-	// backend.BulkInsertRunInfo(ctx, runInfo)
-	// return nil
 }
 
 func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time) relaxting.ESComplianceRunInfo {
@@ -368,12 +351,11 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time)
 	rInfo.ResourceId = ""
 	rInfo.FirstRun = runDateTime
 	rInfo.LastRun = runDateTime
-	rInfo.PlatFormWithVersion = ""
+	rInfo.PlatFormWithVersion = PlatformWithVersion(*report)
 	rInfo.Platform = report.Platform
 	rInfo.ControlTags = []relaxting.ESInSpecReportControlStringTags{}
-	rInfo.ChefServer = "repo"
 	rInfo.Organization = report.OrganizationName
-	rInfo.Controls = report.Profiles[0].Controls
+	rInfo.Controls = GetControls(report.Profiles)
 	rInfo.InspecVersion = report.InSpecVersion
 	rInfo.PolicyName = report.PolicyName
 	rInfo.Profiles = report.Profiles
@@ -382,6 +364,18 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time)
 	rInfo.ChefTags = report.ChefTags
 
 	return rInfo
+}
+
+func GetControls(profiles []relaxting.ESInSpecReportProfile) [][]relaxting.ESInSpecReportControl {
+	var ctrls [][]relaxting.ESInSpecReportControl
+	for _, v := range profiles {
+		ctrls = append(ctrls, v.Controls)
+	}
+	return ctrls
+}
+
+func PlatformWithVersion(report relaxting.ESInSpecReport) string {
+	return fmt.Sprintf("%v %v", report.Platform.Name, report.Platform.Release)
 }
 
 // Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> in yesterday's UTC index.
