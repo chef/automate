@@ -329,20 +329,3 @@ type AssetSummary struct {
 	Failed  int32 `json:"failed"`
 	Waived  int32 `json:"waived"`
 }
-
-type ProfileRunInfo struct {
-	SHA256   string           `json:"sha256"`
-	Controls []ControlRunInfo `json:"controls"`
-	Name     string           `json:"name"`
-	Title    string           `json:"title"`
-	Full     string           `json:"full"`
-}
-
-type ControlRunInfo struct {
-	ID          string                            `json:"id"`
-	ControlTags []ESInSpecReportControlStringTags `json:"control_tags"`
-}
-
-type FirstRunInfo struct {
-	FirstRun string `json:"first_run""`
-}
