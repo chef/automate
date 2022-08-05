@@ -44,35 +44,29 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 
 // This method will support adding a document with a specified id
 func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, runInfo relaxting.ESComplianceRunInfo, runDateTime time.Time) error {
-	runDateTimeAsString := runDateTime.Format(time.RFC3339)
 
-	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
+	firstRunInfo, err := backend.getDocFromNodeRunInfoFromNodeId(ctx, runInfo.NodeID, mapping.Index)
+	if err != nil {
+		logrus.Errorf("Unable to fetch document with id %d and err %v", runInfo.NodeID, err)
+	}
 
-	_, err := backend.client.Update().
+	if len(firstRunInfo) != 0 {
+		runInfo.FirstRun, err = time.Parse(time.RFC3339, firstRunInfo)
+		if err != nil {
+			logrus.Errorf("Unable to parse time for node uuid %s with err %v", runInfo.NodeID, err)
+			return err
+		}
+
+	}
+	_, err = backend.client.Index().
 		Index(mapping.Index).
 		Id(runInfo.NodeID).
-		Script(script).
-		Upsert(map[string]interface{}{
-			"node_uuid":             runInfo.NodeID,
-			"resource_uuid":         runInfo.ResourceId,
-			"resource_type":         runInfo.ResourceType,
-			"status":                runInfo.Status,
-			"first_run":             runInfo.FirstRun,
-			"last_run":              runInfo.LastRun,
-			"platform_with_version": runInfo.PlatFormWithVersion,
-			"platform":              runInfo.Platform,
-			"control_tag":           runInfo.ControlTags,
-			"chef_server":           runInfo.ChefServer,
-			"organization":          runInfo.Organization,
-			"controls":              runInfo.Controls,
-			"inspec_version":        runInfo.InspecVersion,
-			"policy_name":           runInfo.PolicyName,
-			"profiles":              runInfo.Profiles,
-			"recipe":                runInfo.Recipe,
-			"role":                  runInfo.Role,
-			"chef_tags":             runInfo.ChefTags,
-		}).
+		BodyJson(runInfo).
+		Refresh("false").
 		Do(ctx)
+	if err != nil {
+		return errors.Wrap(err, "Insert Comp Node Run Info")
+	}
 
 	return err
 }
@@ -349,35 +343,42 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time)
 	var rInfo relaxting.ESComplianceRunInfo
 	rInfo.NodeID = report.NodeID
 	rInfo.ResourceId = ""
+	rInfo.ResourceType = "Node"
 	rInfo.FirstRun = runDateTime
 	rInfo.LastRun = runDateTime
-	rInfo.PlatFormWithVersion = PlatformWithVersion(*report)
+	rInfo.Status = report.Status
+	rInfo.ChefServer = report.SourceFQDN
 	rInfo.Platform = report.Platform
-	rInfo.ControlTags = []relaxting.ESInSpecReportControlStringTags{}
 	rInfo.Organization = report.OrganizationName
-	rInfo.Controls = GetControls(report.Profiles)
 	rInfo.InspecVersion = report.InSpecVersion
 	rInfo.PolicyName = report.PolicyName
-	rInfo.Profiles = report.Profiles
-	rInfo.Recipe = append(rInfo.Recipe, report.Recipes[:]...)
-	rInfo.Role = append(rInfo.Role, report.Roles[:]...)
+	rInfo.Profiles = GetProfiles(report.Profiles)
+	rInfo.Recipe = report.Recipes
+	rInfo.Role = report.Roles
 	rInfo.ChefTags = report.ChefTags
-
 	return rInfo
 }
 
-func GetControls(profiles []relaxting.ESInSpecReportProfile) []string {
-	var ctrls []string
-	for _, profile := range profiles {
+func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.ProfileRunInfo {
+	profiles := make([]relaxting.ProfileRunInfo, 0)
+	for _, profile := range profilesReport {
+		controlRunInfo := make([]relaxting.ControlRunInfo, 0)
 		for _, control := range profile.Controls {
-			ctrls = append(ctrls, control.Title)
+			controlRunInfo = append(controlRunInfo, relaxting.ControlRunInfo{
+				ID:          control.ID,
+				ControlTags: control.StringTags,
+			})
 		}
-	}
-	return ctrls
-}
 
-func PlatformWithVersion(report relaxting.ESInSpecReport) string {
-	return fmt.Sprintf("%v %v", report.Platform.Name, report.Platform.Release)
+		profiles = append(profiles, relaxting.ProfileRunInfo{
+			SHA256:   profile.SHA256,
+			Controls: controlRunInfo,
+			Title:    profile.Title,
+			Full:     profile.Full,
+			Name:     profile.Name,
+		})
+	}
+	return profiles
 }
 
 // Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> in yesterday's UTC index.
@@ -904,4 +905,54 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	}
 
 	return map[string]interface{}{"projects": esProjectCollection}
+}
+
+func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, nodeUuid string, index string) (string, error) {
+	logrus.Debug("Fetching document  by  nodeUUID")
+	var item relaxting.FirstRunInfo
+	boolQuery := elastic.NewBoolQuery()
+	idsQuery := elastic.NewIdsQuery()
+	idsQuery.Ids(nodeUuid)
+	boolQuery = boolQuery.Must(idsQuery)
+	fsc := elastic.NewFetchSourceContext(true)
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(1)
+
+	source, _ := searchSource.Source()
+	relaxting.LogQueryPartMin(index, source, "Doc Node run info")
+
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(index).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._id",
+			"hits.hits._source",
+			"hits.hits.inner_hits").
+		Do(ctx)
+
+	if err != nil {
+		return "", err
+	}
+
+	if searchResult.TotalHits() > 0 {
+		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			// hit.Index contains the name of the index
+			if hit.Source != nil {
+				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
+				err := json.Unmarshal(hit.Source, &item)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling %+v", err)
+				}
+
+			}
+
+		}
+	}
+	return item.FirstRun, nil
 }
