@@ -100,23 +100,6 @@ func (p *Server) ListPolicies(
 	}, nil
 }
 
-// GetUserPolicies returns the list of all user policyIds.
-func (p *Server) GetUserPolicies(
-	ctx context.Context, in *pb_req.GetUserPoliciesReq) (*pb_resp.GetUserPoliciesResp, error) {
-	resp, err := p.policies.GetUserPolicies(ctx, &authz.GetUserPoliciesReq{
-		MemberType:  in.MemberType,
-		Username:    in.Username,
-		ConnectorId: in.ConnectorId,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb_resp.GetUserPoliciesResp{
-		PolicyIds: resp.PolicyIds,
-	}, nil
-}
-
 // GetPolicy returns a specific policy.
 func (p *Server) GetPolicy(
 	ctx context.Context, in *pb_req.GetPolicyReq) (*pb_resp.GetPolicyResp, error) {
