@@ -186,15 +186,15 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return this.activeStatusFilter === status;
   }
 
-  isOpenControl({ id, profile_id }) {
-    const key = id + ' ' + profile_id;
+  isOpenControl(control: { id: string | number, profile_id: string; }) {
+    const key = this.toggleKey(control);
     return this.openControls[key] && this.openControls[key].open;
   }
 
   toggleControl(i: number, ctrl: any) {
     const control = ctrl;
     this.index = i;
-    const key = control.id + ' ' + control.profile_id;
+    const key = this.toggleKey(control);
     this.controlList.control_elements[this.index].controlDetailsLoading = true;
     const state = this.openControls[key];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
@@ -236,13 +236,18 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     }
   }
 
-  openControlPane(control: { id: string | number, profile_id: string; }) {
+  toggleKey(control: any) {
     const key = control.id + ' ' + control.profile_id;
+    return key;
+  }
+
+  openControlPane(control: { id: string | number, profile_id: string; }) {
+    const key = this.toggleKey(control);
     return this.openControls[key].pane;
   }
 
   showControlPane(control: { id: string | number, profile_id: string; }, pane: any ) {
-    const key = control.id + ' ' + control.profile_id;
+    const key = this.toggleKey(control);
     this.openControls[key].pane = pane;
   }
 
