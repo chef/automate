@@ -160,7 +160,7 @@ type GetUserPoliciesReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Username of the policy user.
+
 	MemberType  string `protobuf:"bytes,1,opt,name=member_type,json=memberType,proto3" json:"member_type,omitempty"`
 	Username    string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	ConnectorId string `protobuf:"bytes,3,opt,name=connector_id,json=connectorId,proto3" json:"connector_id,omitempty"`
