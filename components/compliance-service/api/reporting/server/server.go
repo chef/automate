@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"reflect"
 	sorter "sort"
 	"strings"
 	"time"
@@ -917,18 +918,37 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*reporting.AssetSummary , error) {
 	formatttedFilters := formatFilters(in.Filters)
 	var count reporting.AssetSummary
-	formatttedFilters, err := filterByProjects(ctx , formatttedFilters)
-	if err != nil {
-		return nil , errorutils.FormatErrorMsg(err , " ")
+	if len(formatttedFilters["start_time"]) <= 0 || len(formatttedFilters["end_time"]) <= 0 {
+		return nil , &errorutils.InvalidError{}
+	} else if reflect.DeepEqual(formatttedFilters["start_time"] , formatttedFilters["end_time"]) {
+		return nil , &errorutils.InvalidError{}
+	} else {
+		start_date := formatttedFilters["start_time"]
+		end_date := formatttedFilters["end_time"]
+		layout := "2006-01-02T15:04:05Z"
+		start_time, err := time.Parse(layout, start_date[0]) 
+		end_time,err := time.Parse(layout, end_date[0]) 
+		diff := int(end_time.Sub(start_time).Hours()/24)
+		if err != nil {
+			return nil , err
+		}else if diff > 90{
+			return nil , errors.Errorf("The Date Range should in range of 90 Days")
+		} else {
+			formatttedFilters, err := filterByProjects(ctx , formatttedFilters)
+			if err != nil {
+				return nil , errorutils.FormatErrorMsg(err , "")
+			}
+			assets, err := srv.es.GetSummary(ctx, formatttedFilters)
+			if err != nil {
+				return nil , errorutils.FormatErrorMsg(err , "")
+			}
+			count.TotalAssets = assets.TotalAssets
+			count.Collected = assets.Collected
+			count.NotCollected = assets.NotCollected
+			count.Unreported = assets.Unreported
+			count.Unreachable = assets.Unreachable
+			return &count , nil
+		}
+		
 	}
-	assets, err := srv.es.GetSummary(ctx, formatttedFilters)
-	if err != nil {
-		return nil , errorutils.FormatErrorMsg(err , "")
-	}
-	count.TotalAssets = assets.TotalAssets
-	count.Collected = assets.Collected
-	count.NotCollected = assets.NotCollected
-	count.Unreported = assets.Unreported
-	count.Unreachable = assets.Unreachable
-	return &count , nil
 }
