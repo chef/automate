@@ -914,3 +914,21 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 	}
 	return nil*/
 }
+func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*reporting.AssetSummary , error) {
+	formatttedFilters := formatFilters(in.Filters)
+	var count reporting.AssetSummary
+	formatttedFilters, err := filterByProjects(ctx , formatttedFilters)
+	if err != nil {
+		return nil , errorutils.FormatErrorMsg(err , " ")
+	}
+	assets, err := srv.es.GetSummary(ctx, formatttedFilters)
+	if err != nil {
+		return nil , errorutils.FormatErrorMsg(err , "")
+	}
+	count.TotalAssets = assets.TotalAssets
+	count.Collected = assets.Collected
+	count.NotCollected = assets.NotCollected
+	count.Unreported = assets.Unreported
+	count.Unreachable = assets.Unreachable
+	return &count , nil
+}

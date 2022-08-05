@@ -356,6 +356,46 @@ func getSummaryAssetAggResult(aggRoot *elastic.SearchResult) *AssetSummary {
 
 	return summary
 }
+func (backend ES2Backend)GetSummary(ctx context.Context ,filters  map[string][]string)(*reportingapi.AssetSummary , error){
+	boolquery := backend.getFiltersQueryForAssetFilters(filters)
+	totalAssets, err := backend.getAssets(ctx , boolquery)
+	if err != nil {
+		logrus.Errorf("The error while getting the Total Assests %v" , err)
+		return nil , err
+	}
+	// Todo hardcoding the value for Reachable assets
+	reachableQuery := boolquery.Must(getReachableAssetTimeRangeQuery(10))
+	reachableAsset, err := backend.getAssets(ctx , reachableQuery)
+	if err != nil {
+		logrus.Errorf("The error while getting the Reachable Assests %v" , err)
+		return nil , err
+	}
+	unreachableAsset := totalAssets - reachableAsset
+	reportedQuery := boolquery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
+	reported, err:= backend.getAssets(ctx ,reportedQuery)
+	if err != nil {
+		logrus.Errorf("The error while getting the unreported Assests %v" , err)
+		return nil , err
+	}
+	unreportedAsset := totalAssets - (unreachableAsset + reported)
+	collectedAsset, err:= backend.getCollectedAssets(ctx , reportedQuery)
+	if err != nil {
+		logrus.Errorf("The error while getting the unreported Assests %v" , err)
+		return nil , err
+	}
+	notCollectedAsset := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)
+	summary := &reportingapi.AssetSummary{}
+	summary.TotalAssets = totalAssets
+	fmt.Print(summary.Collected)
+	summary.Collected.Passed = collectedAsset.Passed
+	summary.Collected.Failed = collectedAsset.Failed
+	summary.Collected.Skipped = collectedAsset.Skipped
+	summary.Collected.Weived = collectedAsset.Waived
+	summary.NotCollected = notCollectedAsset
+	summary.Unreachable = unreachableAsset
+	summary.Unreported = unreportedAsset
+	return summary, nil
+}
 
 func (backend ES2Backend) getCollectedAssets(ctx context.Context, from int32, size int32, filters map[string][]string, filtQuery *elastic.BoolQuery) ([]*reportingapi.Assets, error) {
 	//adding range query for date range
