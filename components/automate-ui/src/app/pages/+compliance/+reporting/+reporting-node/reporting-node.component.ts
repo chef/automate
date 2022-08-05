@@ -186,15 +186,15 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return this.activeStatusFilter === status;
   }
 
-  isOpenControl({ id, profile }) {
-    let key = id + " " + profile
+  isOpenControl({ id, profile_id }) {
+    let key = id + " " + profile_id
     return this.openControls[key] && this.openControls[key].open;
   }
 
   toggleControl(i: number, ctrl: any) {
     const control = ctrl;
     this.index = i;
-    let key = control.id + " " + control.profile
+    let key = control.id + " " + control.profile_id
     this.controlList.control_elements[this.index].controlDetailsLoading = true;
     const state = this.openControls[key];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
@@ -216,8 +216,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
         this.allControlList.forEach((data) => {
           data.profiles.forEach(p => {
+            console.log(p, "test1")
             p.controls.forEach(c => {
-              if (c.id === control.id && p.name === control.profile) {
+              if (c.id === control.id && p.sha256 === control.profile_id) {
                 this.controlList.control_elements[this.index].controlDetailsLoading = false;
                 this.controlDetails = data;
                 const res = this.controlDetails['profiles'][0].controls[0].results;
@@ -226,6 +227,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
                 this.controlList.control_elements[this.index].result = res;
                 this.controlList.control_elements[this.index].code = code;
                 this.controlList.control_elements[this.index].desc = desc;
+                console.log("Sahiba")
               }
             });
           });
@@ -236,13 +238,13 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     }
   }
 
-  openControlPane(control: { id: string | number, profile: string; }) {
-    let key = control.id + " " + control.profile
+  openControlPane(control: { id: string | number, profile_id: string; }) {
+    let key = control.id + " " + control.profile_id
     return this.openControls[key].pane;
   }
 
-  showControlPane(control: { id: string | number, profile: string; }, pane: any,) {
-    let key = control.id + " " + control.profile
+  showControlPane(control: { id: string | number, profile_id: string; }, pane: any,) {
+    let key = control.id + " " + control.profile_id
     this.openControls[key].pane = pane;
   }
 
