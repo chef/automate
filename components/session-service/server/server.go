@@ -57,6 +57,11 @@ type userData struct {
 	ConnectorID string `json:"connector_id"`
 }
 
+type projectRolePairs struct {
+	Role     string
+	Projects []string
+}
+
 // Server holds the server state
 type Server struct {
 	mux                 http.Handler
@@ -356,41 +361,40 @@ func filterUserPolicy(policyId string, policyIds []string) bool {
 	return false
 }
 
-type projectRolePairs struct {
-	Role     string
-	Projects []string
-}
-
 func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var data userData
 	err := decoder.Decode(&data)
 	if err != nil {
-		fmt.Println(err, "decoder error")
-	}
-
-	resp, err := s.authzPoliciesClient.ListPolicies(r.Context(), &authz.ListPoliciesReq{})
-	if err != nil {
-		fmt.Println(err, "authzPoliciesClient err")
+		http.Error(w, errors.Wrap(err, "failed to decode").Error(),
+			http.StatusInternalServerError)
+		return
 	}
 
 	teamsForUser, err := s.teamsServiceClient.GetTeamsForMember(r.Context(), &teams.GetTeamsForMemberReq{
 		UserId: data.UserId,
 	})
 	if err != nil {
-		fmt.Println(err, "authzPoliciesClient err")
+		http.Error(w, errors.Wrap(err, "failed teamsServiceClient").Error(),
+			http.StatusInternalServerError)
+		return
 	}
+
 	var teamsPolicyIds []string
-	for _, team := range teamsForUser.Teams {
-		teamPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
-			MemberType:  "team",
-			Username:    team.Id,
-			ConnectorId: data.ConnectorID,
-		})
-		if err != nil {
-			fmt.Println(err, "authzPoliciesClient err")
+	if len(teamsForUser.Teams) > 0 {
+		for _, team := range teamsForUser.Teams {
+			teamPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
+				MemberType:  "team",
+				Username:    team.Id,
+				ConnectorId: data.ConnectorID,
+			})
+			if err != nil {
+				http.Error(w, errors.Wrap(err, "failed to GetUserPolicies").Error(),
+					http.StatusInternalServerError)
+				return
+			}
+			teamsPolicyIds = append(teamsPolicyIds, teamPolicies.PolicyIds...)
 		}
-		teamsPolicyIds = append(teamsPolicyIds, teamPolicies.PolicyIds...)
 	}
 
 	userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
@@ -399,28 +403,34 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		ConnectorId: data.ConnectorID,
 	})
 	if err != nil {
-		fmt.Println(err, "authzPoliciesClient err")
+		http.Error(w, errors.Wrap(err, "failed to GetUserPolicies").Error(),
+			http.StatusInternalServerError)
+		return
 	}
 
 	combinedPolicyIds := append(userPolicies.PolicyIds, teamsPolicyIds...)
 
-	// var projectRolePairs projectRolePairs
-	var prs []projectRolePairs
-	for _, policy := range resp.Policies {
+	listOfPolicies, err := s.authzPoliciesClient.ListPolicies(r.Context(), &authz.ListPoliciesReq{})
+	if err != nil {
+		http.Error(w, errors.Wrap(err, "failed to get listOfPolicies").Error(),
+			http.StatusInternalServerError)
+		return
+	}
+
+	var _projectRolePairs []projectRolePairs
+	for _, policy := range listOfPolicies.Policies {
 		if filterUserPolicy(policy.Id, combinedPolicyIds) {
 			for _, statement := range policy.Statements {
 				pr := projectRolePairs{
 					Role:     statement.Role,
 					Projects: statement.Projects,
 				}
-				prs = append(prs, pr)
+				_projectRolePairs = append(_projectRolePairs, pr)
 			}
 		}
 	}
 
-	fmt.Println(prs, "projectRolePairsAz__")
-
-	if err := json.NewEncoder(w).Encode(prs); err != nil {
+	if err := json.NewEncoder(w).Encode(_projectRolePairs); err != nil {
 		http.Error(w, errors.Wrap(err, "failed encode projectRolePairs").Error(),
 			http.StatusInternalServerError)
 		return
