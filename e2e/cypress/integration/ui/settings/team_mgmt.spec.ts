@@ -174,6 +174,7 @@ describe('team management', () => {
         if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
           cy.get('app-welcome-modal').invoke('hide');
         }
+        
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
         cy.get('[data-cy=create-name]').type(unassignedTeam1ID);
