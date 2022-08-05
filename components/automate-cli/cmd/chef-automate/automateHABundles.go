@@ -25,15 +25,19 @@ func moveFrontendBackendAirgapToTransferDir(airgapMetadata airgap.UnpackMetadata
 		if err != nil {
 			return err
 		}
-		backendBundleFilePath := path.Join(AIRGAP_HA_TRANS_DIR_PATH, "backend"+"-"+filepath.Base(airgapBundle))
+		backendBundleName, err := getBackendBundleName(airgapBundle)
+		if err != nil {
+			return err
+		}
+		backendBundleFilePath := path.Join(AIRGAP_HA_TRANS_DIR_PATH, backendBundleName)
 		err = generateMiniBackendBundles(airgapMetadata, backendBundleFilePath)
 		if err != nil {
 			return err
 		}
-		err = generateBackendBundles(bundleName, airgapBundle)
+		/* err = generateBackendBundles(bundleName, airgapBundle)
 		if err != nil {
 			return err
-		}
+		} */
 		//generate manifest auto tfvars
 		err = generateA2HAManifestTfvars(airgapMetadata)
 		if err != nil {
@@ -59,15 +63,19 @@ func moveAirgapFrontendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMeta
 
 func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetadata, airgapBundle string) error {
 	if len(airgapBundle) > 0 {
-		bundleName, err := getFrontendBundleName(airgapBundle)
+		/* bundleName, err := getFrontendBundleName(airgapBundle)
+		if err != nil {
+			return err
+		} */
+		/* err = generateBackendBundles(bundleName, airgapBundle)
+		if err != nil {
+			return err
+		} */
+		bundleName, err := getBackendBundleName(airgapBundle)
 		if err != nil {
 			return err
 		}
-		err = generateBackendBundles(bundleName, airgapBundle)
-		if err != nil {
-			return err
-		}
-		backendBundleFilePath := path.Join(AIRGAP_HA_TRANS_DIR_PATH, "backend"+filepath.Base(airgapBundle))
+		backendBundleFilePath := path.Join(AIRGAP_HA_TRANS_DIR_PATH, bundleName)
 		err = generateMiniBackendBundles(airgapMetadata, backendBundleFilePath)
 		if err != nil {
 			return err
@@ -80,12 +88,20 @@ func moveAirgapBackendBundlesOnlyToTransferDir(airgapMetadata airgap.UnpackMetad
 	}
 	return nil
 }
+
 func getFrontendBundleName(airgapPath string) (string, error) {
 	version, err := getVersion(airgapPath)
 	if err != nil {
 		return "", err
 	}
 	return "frontend-" + version + ".aib", nil
+}
+func getBackendBundleName(airgapPath string) (string, error) {
+	version, err := getVersion(airgapPath)
+	if err != nil {
+		return "", err
+	}
+	return "backend-" + version + ".aib", nil
 }
 func generateFrontendBundles(bundleName string, airgapPath string) error {
 	err := copyFileContents(airgapPath, (AIRGAP_HA_TRANS_DIR_PATH + bundleName))

@@ -166,5 +166,9 @@ func createTar(pkgs []string, airgapMetadata airgap.UnpackMetadata, bundleName s
 	if err != nil {
 		return errors.Wrap(err, "Could not write archive")
 	}
+	err = generateChecksumFile(bundleName, bundleName+".md5")
+	if err != nil {
+		return err
+	}
 	return nil
 }
