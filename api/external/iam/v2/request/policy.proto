@@ -38,18 +38,6 @@ message GetPolicyReq {
   string id = 1;
 }
 
-message GetUserPoliciesReq {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["member_type", "username", "connector_id"]
-    }
-  };
-  // Username of the policy user.
-  string member_type = 1;
-  string username = 2;
-  string connector_id = 3;
-}
-
 message ListPoliciesReq {}
 
 message DeletePolicyReq {
