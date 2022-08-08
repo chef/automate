@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"reflect"
 	sorter "sort"
 	"strings"
 	"time"
@@ -918,15 +917,7 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*reporting.AssetSummary , error) {
 	formattedFilters := formatFilters(in.Filters)
 	var assets *reporting.AssetSummary
-	if len(formattedFilters["start_time"]) <= 0 || len(formattedFilters["end_time"]) <=0 {
-		logrus.Errorf("The startTime or endTime cannot be null")
-		return nil , &errorutils.InvalidError{}
-	} 
-	if reflect.DeepEqual(formattedFilters["start_time"] , formattedFilters["end_time"]) {
-		logrus.Errorf("The startTime or endTime cannot be equal")
-		return nil , &errorutils.InvalidError{}
-	}
-	timeRange, err := Validate(formattedFilters["start_time"][0] , formattedFilters["end_time"][0])
+	timeRange, err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , formattedFilters["end_time"][0])
 	if err != nil {
 		logrus.Errorf("Error while getting the timerange diffrence")
 		return nil , err
@@ -943,20 +934,7 @@ func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*
 	if err != nil {
 		return nil , errorutils.FormatErrorMsg(err , "")
 	}
-	return assets , nil
+	return assets, nil
 	
-}
-
-func Validate(startTime string , endTime string) (bool , error) {
-	eTime, err := time.Parse(time.RFC3339, endTime)
-	sTime, err := time.Parse(time.RFC3339 , startTime)
-	diff := int(eTime.Sub(sTime).Hours()/24)
-	if err != nil {
-		return false , errors.Errorf("Error while getting time range")
-	}
-	if diff > 90 {
-		return false , errors.Errorf(" ")
-	} 
-	return true , nil
 }
 
