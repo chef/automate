@@ -171,7 +171,7 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 	if len(text) >= 2 {
 		if target == "node_name" {
 			text_string := "*" + lowerText + "*"
-			matchQuery := elastic.NewQueryStringQuery(text_string).Field(target)
+			matchQuery := elastic.NewQueryStringQuery(text_string).Field(fmt.Sprintf("%s.lower", target))
 			boolQuery = boolQuery.Must(matchQuery)
 		} else {
 			// Any(or) of the text words can match
