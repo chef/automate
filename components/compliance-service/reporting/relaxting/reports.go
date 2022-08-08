@@ -819,18 +819,14 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 	controlIndex, err := getControlIndex(filters)
-=======
 
 	controlIndex, err := getControlIndex(filters)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
 	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
->>>>>>> 4f2904e2c (Adding node status from new control index in control List API (#7235))
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
@@ -2037,10 +2033,7 @@ func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][
 	return searchResult, queryInfo, nil
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 4f2904e2c (Adding node status from new control index in control List API (#7235))
+
 // getControlSummaryFromControlIndex is constructing query for getting control summary for various filters and returning the result in a map
 func (backend *ES2Backend) getControlSummaryFromControlIndex(ctx context.Context, controlId []string, filters map[string][]string, esIndex string, size int32) (map[string]*reportingapi.ControlSummary, error) {
 	nodeStatus := "nodes.status"
@@ -2181,7 +2174,7 @@ func getControlSummaryFilters(controlId []string, filters map[string][]string) *
 
 }
 
-<<<<<<< HEAD
+
 //getMultiControlString takes the list of strings and returns the query string used in search.
 func getMultiControlString(list []string) string {
 	controlList := []string{}
@@ -2201,8 +2194,7 @@ func handleSpecialChar(term string) string {
 	return fmt.Sprintf("(%s)", term)
 }
 
-=======
->>>>>>> 4f2904e2c (Adding node status from new control index in control List API (#7235))
+
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
 	if len(endTime) == 0 && len(startTime) == 0 {
 		return []string{"day_latest", "daily_latest"}, nil
@@ -2210,21 +2202,20 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 	if len(startTime) == 0 {
 		return []string{"daily_latest"}, nil
 	}
-=======
+
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
->>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))
+
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
 		return nil, errors.Errorf("cannot parse the time")
 	}
-<<<<<<< HEAD
-=======
+
 	if len(endTime) == 0 {
 		return []string{"day_latest"}, nil
 	}
->>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))
+
 	if diff == 0 {
 		return []string{"daily_latest"}, nil
 	}
@@ -2233,12 +2224,11 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 }
 
 func validateFiltersTimeRange(endTime string, startTime string) error {
-<<<<<<< HEAD
+
 	if len(endTime) == 0 || len(startTime) == 0 {
 		return nil
 	}
-=======
->>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))
+
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
@@ -2252,7 +2242,7 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 	}
 	return nil
 }
-<<<<<<< HEAD
+
 
 func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {
 	if len(endTime) == 0 {
@@ -2284,5 +2274,4 @@ func checkTodayIsEndTime(endTime time.Time) bool {
 	}
 	return false
 }
-=======
->>>>>>> 3c484c471 (Sahithi/stalwart-162 (#7198))
+

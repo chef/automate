@@ -87,11 +87,7 @@ func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) 
 			node.Status = nodeStatus
 			nodes = append(nodes, *node)
 			ctrl.Nodes = nodes
-<<<<<<< HEAD
-			ctrl.Profile = relaxting.Profile{ProfileID: value.SHA256, Title: value.Title}
-=======
 			ctrl.Profile = relaxting.Profile{ProfileID: value.Profile, Title: value.Title}
->>>>>>> 4f2904e2c (Adding node status from new control index in control List API (#7235))
 			controls = append(controls, ctrl)
 		}
 	}

@@ -349,7 +349,7 @@ type Profile struct {
 	ProfileID string `json:"profile_id"`
 	Name      string `json:"name"`
 	Title     string `json:"title"`
-<<<<<<< HEAD
+
 }
 
-type NodesUpgradation struct {
+type NodesUpgradation struct {}
