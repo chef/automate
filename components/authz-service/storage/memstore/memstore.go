@@ -94,14 +94,23 @@ func (s *State) ListPolicies(context.Context) ([]*storage.Policy, error) {
 	return pols, nil
 }
 
-func (s *State) GetUserPolicies(_ context.Context, memberType, username, connectorId string) ([]string, error) {
+func filterMembers(memberName string, members []string) bool {
+	for _, member := range members {
+		if memberName == member {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *State) GetUserPolicies(_ context.Context, members []string) ([]string, error) {
 	items := s.policies.Items()
 	var policyIds []string
 
 	for _, item := range items {
 		if pol, ok := item.Object.(*storage.Policy); ok {
 			for _, member := range pol.Members {
-				if member.Name == memberType+":"+connectorId+":"+username {
+				if filterMembers(member.Name, members) {
 					policyIds = append(policyIds, pol.ID)
 				}
 			}

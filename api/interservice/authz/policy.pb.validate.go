@@ -758,12 +758,6 @@ func (m *GetUserPoliciesReq) Validate() error {
 		return nil
 	}
 
-	// no validation rules for MemberType
-
-	// no validation rules for Username
-
-	// no validation rules for ConnectorId
-
 	return nil
 }
 

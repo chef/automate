@@ -352,13 +352,12 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func filterUserPolicy(policyId string, policyIds []string) bool {
-	for _, _policyId := range policyIds {
-		if _policyId == policyId {
-			return true
-		}
+func convertPolicySliceToMap(list []*authz.Policy) map[string]*authz.Policy {
+	policyIdMap := make(map[string]*authz.Policy)
+	for i := 0; i < len(list); i++ {
+		policyIdMap[list[i].Id] = list[i]
 	}
-	return false
+	return policyIdMap
 }
 
 func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
@@ -380,35 +379,21 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var teamsPolicyIds []string
+	var members []string
 	if len(teamsForUser.Teams) > 0 {
 		for _, team := range teamsForUser.Teams {
-			teamPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
-				MemberType:  "team",
-				Username:    team.Id,
-				ConnectorId: data.ConnectorID,
-			})
-			if err != nil {
-				http.Error(w, errors.Wrap(err, "failed to GetUserPolicies").Error(),
-					http.StatusInternalServerError)
-				return
-			}
-			teamsPolicyIds = append(teamsPolicyIds, teamPolicies.PolicyIds...)
+			members = append(members, "team:"+data.ConnectorID+":"+team.Id)
 		}
 	}
-
-	userPolicies, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
-		MemberType:  "user",
-		Username:    data.Username,
-		ConnectorId: data.ConnectorID,
+	members = append(members, "user:"+data.ConnectorID+":"+data.Username)
+	combinedPolicyIds, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
+		Members: members,
 	})
 	if err != nil {
 		http.Error(w, errors.Wrap(err, "failed to GetUserPolicies").Error(),
 			http.StatusInternalServerError)
 		return
 	}
-
-	combinedPolicyIds := append(userPolicies.PolicyIds, teamsPolicyIds...)
 
 	listOfPolicies, err := s.authzPoliciesClient.ListPolicies(r.Context(), &authz.ListPoliciesReq{})
 	if err != nil {
@@ -417,16 +402,16 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	policiesIdMap := convertPolicySliceToMap(listOfPolicies.Policies)
+
 	var _projectRolePairs []projectRolePairs
-	for _, policy := range listOfPolicies.Policies {
-		if filterUserPolicy(policy.Id, combinedPolicyIds) {
-			for _, statement := range policy.Statements {
-				pr := projectRolePairs{
-					Role:     statement.Role,
-					Projects: statement.Projects,
-				}
-				_projectRolePairs = append(_projectRolePairs, pr)
+	for _, policyId := range combinedPolicyIds.PolicyIds {
+		for _, statement := range policiesIdMap[policyId].Statements {
+			pr := projectRolePairs{
+				Role:     statement.Role,
+				Projects: statement.Projects,
 			}
+			_projectRolePairs = append(_projectRolePairs, pr)
 		}
 	}
 

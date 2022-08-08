@@ -36,7 +36,7 @@ type policyStorage interface {
 	RemoveProjectFromGraveyard(context.Context, string) error
 	CreatePolicy(context.Context, *Policy, bool) (*Policy, error)
 	ListPolicies(context.Context) ([]*Policy, error)
-	GetUserPolicies(context.Context, string, string, string) ([]string, error)
+	GetUserPolicies(context.Context, []string) ([]string, error)
 	GetPolicy(context.Context, string) (*Policy, error)
 	UpdatePolicy(context.Context, *Policy) (*Policy, error)
 	ListPolicyMembers(context.Context, string) ([]Member, error)

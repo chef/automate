@@ -73,9 +73,7 @@ message ListPoliciesResp {
 }
 
 message GetUserPoliciesReq {
-    string member_type = 1;
-    string username = 2;
-    string connector_id = 3; 
+    repeated string members = 1;
 }
 
 message GetUserPoliciesResp {

@@ -140,11 +140,11 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*storage.Policy, error) {
 	return pols, nil
 }
 
-func (p *pg) GetUserPolicies(ctx context.Context, memberType, username, connectorId string) ([]string, error) {
+func (p *pg) GetUserPolicies(ctx context.Context, members []string) ([]string, error) {
 	rows, err := p.db.Query(`SELECT iam_policies.id FROM iam_members
 	JOIN iam_policy_members ON iam_members.db_id = iam_policy_members.member_id
 	JOIN iam_policies ON iam_policy_members.policy_id = iam_policies.db_id
-	WHERE iam_members.name=$1;`, memberType+":"+connectorId+":"+username)
+	WHERE iam_members.name = any($1);`, pq.Array(members))
 	if err != nil {
 		return nil, p.processError(err)
 	}
