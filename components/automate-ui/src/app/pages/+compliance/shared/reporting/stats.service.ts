@@ -153,6 +153,7 @@ export class StatsService {
     const url = `${CC_API_URL}/reporting/nodes/search`;
     let currentUrl: string;
     localStorage.setItem(currentUrl, url);
+
     reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
@@ -192,6 +193,7 @@ export class StatsService {
     let currentUrl: string;
     localStorage.setItem(currentUrl, url);
     reportQuery = this.getStartDate(reportQuery);
+
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
     let body = { filters: formatted };
@@ -217,6 +219,7 @@ export class StatsService {
     localStorage.setItem(currentUrl, url);
     reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
+    
     formatted = this.addStatusParam(formatted);
     const body = { filters: formatted };
 
