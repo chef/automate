@@ -29,4 +29,5 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     ReportingComponent
   ]
 })
+
 export class ReportingModule {}
