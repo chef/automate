@@ -65,11 +65,35 @@ export class StatsService {
     return this.httpClient.post<any>(url, body).pipe(
       map(({ controls_summary }) => controls_summary));
   }
-
+  getTimeTrends(days: moment.DurationInputArg1, intervals: moment.unitOfTime.DurationConstructor, reportQuery: ReportQuery) {
+    reportQuery.startDate = moment.utc(reportQuery.endDate).subtract(days, intervals);
+  }
+  getTimeInterval(timeInterval: number, reportQuery: ReportQuery) {
+    if (timeInterval === 0 ) {
+      this.getTimeTrends(10, 'days', reportQuery);
+    }
+    else if (timeInterval === 1) {
+      this.getTimeTrends(1, 'months', reportQuery);
+    }
+    else if (timeInterval === 2) {
+      this.getTimeTrends(3, 'months', reportQuery);
+    }
+    else if (timeInterval === 3) {
+      this.getTimeTrends(1, 'years', reportQuery);
+    }
+  }
   getNodeTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
-
+    let previousUrl: string;
+    const prev = localStorage.getItem(previousUrl);
+    const url_array = ['reporting/nodes' , 'reporting/profiles' , 'reporting/controls'];
+    const urlcheck = url_array.some(urlVar => prev.includes(urlVar));
+    if (urlcheck) {
+      const timeInterval = reportQuery.interval;
+      this.getTimeInterval(timeInterval, reportQuery);
+      localStorage.setItem(previousUrl, url);
+    }
     const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'nodes', interval, filters: formatted};
 
@@ -80,7 +104,15 @@ export class StatsService {
   getControlsTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
-
+    let previousUrl: string;
+    const prev = localStorage.getItem(previousUrl);
+    const url_array = ['reporting/nodes' , 'reporting/profiles' , 'reporting/controls'];
+    const urlcheck = url_array.some(urlVar => prev.includes(urlVar));
+    if (urlcheck) {
+      const timeInterval = reportQuery.interval;
+      this.getTimeInterval(timeInterval, reportQuery);
+      localStorage.setItem(previousUrl, url);
+    }
     const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'controls', interval, filters: formatted};
 
@@ -114,8 +146,16 @@ export class StatsService {
       })));
   }
 
+  getStartDate(reportQuery: ReportQuery): ReportQuery {
+    reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
+    return reportQuery;
+  }
+
   getNodes(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/nodes/search`;
+    let currentUrl: string;
+    localStorage.setItem(currentUrl, url);
+    reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
 
@@ -146,6 +186,9 @@ export class StatsService {
 
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/profiles`;
+    let currentUrl: string;
+    localStorage.setItem(currentUrl, url);
+    reportQuery = this.getStartDate(reportQuery);
     let formatted = this.formatFilters(reportQuery);
     formatted = this.addStatusParam(formatted);
     let body = { filters: formatted };
@@ -167,6 +210,9 @@ export class StatsService {
 
   getControls(reportQuery: ReportQuery): Observable<{total: any, items: any}> {
     const url = `${CC_API_URL}/reporting/controls`;
+    let currentUrl: string;
+    localStorage.setItem(currentUrl, url);
+    reportQuery = this.getStartDate(reportQuery);
     const filters = this.formatFilters(reportQuery);
     const body = { filters };
 
