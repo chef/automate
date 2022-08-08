@@ -917,22 +917,20 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*reporting.AssetSummary , error) {
 	formattedFilters := formatFilters(in.Filters)
 	var assets *reporting.AssetSummary
-	timeRange, err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , formattedFilters["end_time"][0])
+	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , formattedFilters["end_time"][0])
 	if err != nil {
-		logrus.Errorf("Error while getting the timerange diffrence")
+		logrus.Errorf("The startTime and endTime validation error %v" , err)
 		return nil , err
-	}
-	if !timeRange {
-		logrus.Errorf("The diffrence between startTima and endTime should not be greater than 90 Days")
-		return nil , &errorutils.InvalidError{}
 	}
 	formattedFilters, err = filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		return nil, errorutils.FormatErrorMsg(err, "")
+		logrus.Errorf("Unable to get filters by filterbyProject %v" , err)
+		return nil, err
 	}
 	assets, err = srv.es.GetSummary(ctx, formattedFilters)
 	if err != nil {
-		return nil , errorutils.FormatErrorMsg(err , "")
+		logrus.Errorf("Unable to get the asset summary %v" , err)
+		return nil , err
 	}
 	return assets, nil
 	

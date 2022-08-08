@@ -390,7 +390,7 @@ func (backend ES2Backend) GetSummary(ctx context.Context, filters map[string][]s
 	// getting the collected assets as per the filters present
 	collectedAsset, err := backend.getCollectedAssets(ctx, reportedQuery)
 	if err != nil {
-		logrus.Errorf("The error while getting the unreported Assests %v", err)
+		logrus.Errorf("The error while getting the collected Assests %v", err)
 		return nil, err
 	}
 	notCollectedAsset := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)

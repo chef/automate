@@ -305,21 +305,26 @@ func getRunInfoIndex() string {
 	return mappings.ComplianceRunInfo.Index
 }
 
-func ValidateTimeRangeForFilters(startTime string , endTime string) (bool , error) {
+func ValidateTimeRangeForFilters(startTime string , endTime string) (error) {
 	if len(startTime) <= 0 || len(endTime) <=0 {
-		return false , errors.Errorf("The startTime or endTime cannot be null")
+		logrus.Errorf("startTime or endTime cannot be null")
+		return errors.Errorf("startTime or endTime cannot be null")
 	}
+
 	eTime, err := time.Parse(time.RFC3339, endTime)
 	sTime, err := time.Parse(time.RFC3339 , startTime)
 	diff := int(eTime.Sub(sTime).Hours()/24)
 	if err != nil {
-		return false , errors.Errorf("Error while getting time range")
+		logrus.Errorf("error while getting the startTime and endTime diffrence %v" , err)
+		return err
 	}
 	if diff > 90 {
-		return false , errors.Errorf(" ")
+		logrus.Errorf("The diffrence between the startTime and endTime should not exceed 90 Days")
+		return errors.Errorf("TThe diffrence between the startTime and endTime should not exceed 90 Days")
 	}
 	if diff == 0 {
-		return false , errors.Errorf("Starttime and End time cannot be equal")
+		logrus.Errorf("The startTime and endTime should not be equal")
+		return errors.Errorf("The startTime and endTime should not be equal")
 	}
-	return true , nil
+	return nil
 }
