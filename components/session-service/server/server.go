@@ -404,18 +404,18 @@ func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 
 	policiesIdMap := convertPolicySliceToMap(listOfPolicies.Policies)
 
-	var _projectRolePairs []projectRolePairs
+	var projectRolePairList []projectRolePairs
 	for _, policyId := range combinedPolicyIds.PolicyIds {
 		for _, statement := range policiesIdMap[policyId].Statements {
 			pr := projectRolePairs{
 				Role:     statement.Role,
 				Projects: statement.Projects,
 			}
-			_projectRolePairs = append(_projectRolePairs, pr)
+			projectRolePairList = append(projectRolePairList, pr)
 		}
 	}
 
-	if err := json.NewEncoder(w).Encode(_projectRolePairs); err != nil {
+	if err := json.NewEncoder(w).Encode(projectRolePairList); err != nil {
 		http.Error(w, errors.Wrap(err, "failed encode projectRolePairs").Error(),
 			http.StatusInternalServerError)
 		return
