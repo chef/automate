@@ -47,7 +47,7 @@ func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping ma
 
 	firstRunInfo, err := backend.getDocFromNodeRunInfoFromNodeId(ctx, runInfo.NodeID, mapping.Index)
 	if err != nil {
-		logrus.Errorf("Unable to fetch document with id %d and err %v", runInfo.NodeID, err)
+		logrus.Errorf("Unable to fetch document with id %s and err %v", runInfo.NodeID, err)
 	}
 
 	if len(firstRunInfo) != 0 {
