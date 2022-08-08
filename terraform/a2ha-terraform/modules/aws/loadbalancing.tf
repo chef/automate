@@ -114,18 +114,19 @@ resource "aws_alb_listener" "chef_server_lb_listener_80" {
   }
 }
 
-resource "aws_waf_ipset" "allow_ipset" {
-  name = "WAF Allow IP Set"
-
-  ip_set_descriptors {
-    type  = "IPV4"
-    value = var.ip_allow_list
-  }
+resource "aws_wafv2_ip_set" "allow_ipset" {
+  name = "waf_allow_ipset"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = var.ip_allow_list
 }
 
 resource "aws_wafv2_web_acl" "lb_waf_rules" {
   name     = "waf_rules_lb"
   scope    = "REGIONAL"
+  default_action {
+    block {}
+  }
 
   rule {
     name     = "allowIPRule"
@@ -137,7 +138,7 @@ resource "aws_wafv2_web_acl" "lb_waf_rules" {
 
     statement {
       ip_set_reference_statement {
-          arn = aws_waf_ipset.allow_ipset.arn
+          arn = aws_wafv2_ip_set.allow_ipset.arn
       }
     }
 
@@ -147,28 +148,10 @@ resource "aws_wafv2_web_acl" "lb_waf_rules" {
       sampled_requests_enabled   = true
     }
   }
-
-  rule {
-    name     = "blockIPRule"
-    priority = 1
-
-    action {
-      block {}
-    }
-
-    statement {
-      not_statement {
-        ip_set_reference_statement {
-          arn = aws_waf_ipset.allow_ipset.arn
-        } 
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "blocked-requests-for-lb"
-      sampled_requests_enabled   = true
-    }
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "waf-acl-metrics"
+    sampled_requests_enabled   = true
   }
 }
 
