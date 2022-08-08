@@ -210,7 +210,7 @@ func (backend ES2Backend) getCollectedAssetsCount(ctx context.Context, filtQuery
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		logrus.Errorf("Cannot connect to ElasticSearch: %v", err)
+		logrus.Errorf("Cannot connect to ElasticSearch for assets count: %v", err)
 		return nil, err
 	}
 
@@ -247,7 +247,7 @@ func (backend ES2Backend) getAssetsList(ctx context.Context,
 	name := "AssetCollected"
 	client, err := backend.ES2Client()
 	if err != nil {
-		logrus.Errorf("Cannot connect to ElasticSearch: %v", err)
+		logrus.Errorf("Cannot connect to ElasticSearch for assests list: %v", err)
 		return nil, err
 	}
 

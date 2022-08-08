@@ -324,7 +324,3 @@ func TestGetAggsForAssets(t *testing.T) {
 	}
 
 }
-
-func TestGetAssetListFromSearchResult(t *testing.T) {
-
-}
