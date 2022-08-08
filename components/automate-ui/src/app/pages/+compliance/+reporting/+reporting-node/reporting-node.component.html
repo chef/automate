@@ -224,7 +224,7 @@
                 <chef-loading-spinner *ngIf="control.controlDetailsLoading" size="50"></chef-loading-spinner>
                 <div *ngIf="!control.controlDetailsLoading">
                   <p *ngIf="control.desc">{{ control.desc }}</p>
-                  <chef-toggle [value]="openControls[control.id]?.pane"
+                  <chef-toggle [value]='openControls[toggleKey(control)]?.pane'
                     (change)="showControlPane(control, $event.target.value)">
                     <chef-option value='results'>Results</chef-option>
                     <chef-option value='source'>Source</chef-option>
