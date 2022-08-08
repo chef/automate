@@ -952,7 +952,7 @@ func Validate(startTime string , endTime string) (bool , error) {
 	sTime, err := time.Parse(time.RFC3339 , startTime)
 	diff := int(eTime.Sub(sTime).Hours()/24)
 	if err != nil {
-		return false , errors.Errorf("Error while cal")
+		return false , errors.Errorf("Error while getting time range")
 	}
 	if diff > 90 {
 		return false , errors.Errorf(" ")
