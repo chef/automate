@@ -22,6 +22,7 @@ service ReportingService {
 	rpc ListControlInfo(Query) returns (ControlElements) {};
 	rpc GetReportContent(ReportContentRequest) returns (ReportContentResponse) {};
 	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
+	rpc AssetCount(ListFilters) returns (AssetSummary) {};
 }
 
 message ReportContentRequest {
@@ -393,6 +394,19 @@ message ReportResponse {
 message ProfileResponse {
 	string profile_id = 1;
 	repeated string controls = 2;
+}
+message AssetSummary {
+	int32 total_assets = 1;
+	Collected collected = 2;
+	int32 not_collected = 3;
+	int32 unreported = 4;
+	int32 unreachable = 5;
+}
+message Collected {
+	int32 passed = 1;
+	int32 failed = 2;
+	int32 skipped = 3;
+	int32 weived = 4;
 }
 
 message Assets {
