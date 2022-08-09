@@ -917,7 +917,9 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*reporting.AssetSummary , error) {
 	formattedFilters := formatFilters(in.Filters)
 	var assets *reporting.AssetSummary
-	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , formattedFilters["end_time"][0])
+	endTime := time.Now().Format(time.RFC3339)
+	formattedFilters["end_time"] = []string{endTime}
+	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , endTime)
 	if err != nil {
 		logrus.Errorf("The starttime and endtime validation error %v" , err)
 		return nil , err
