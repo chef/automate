@@ -293,5 +293,6 @@ var ComplianceRunInfo = Mapping{
         }
     }
 }
+
 	`,
 }
