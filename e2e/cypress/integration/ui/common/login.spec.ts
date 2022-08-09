@@ -13,7 +13,6 @@ if (Cypress.env('SKIP_SSO')) {
       it('greets with SSO page', () => {
         cy.url()
           .should('include', '/dex/auth?')
-          .should('include', '/dex/auth/local?')
           .should('include', 'client_id=automate-session')
           .should('include', 'redirect_uri');
         cy.contains('Sign in as a local user');
