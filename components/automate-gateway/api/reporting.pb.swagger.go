@@ -14,6 +14,38 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/compliance/reporting/assets/count": {
+      "post": {
+        "operationId": "ReportingService_AssetCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetSummary"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilters"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/controls": {
       "post": {
         "summary": "List Controls",
@@ -458,6 +490,35 @@ func init() {
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.AssetSummary": {
+      "type": "object",
+      "properties": {
+        "total_assets": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total number of total assets"
+        },
+        "collected": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Collected",
+          "title": "Accessing the collected from Collected Message"
+        },
+        "not_collected": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total number of not collected assests"
+        },
+        "unreported": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total number of unreported assets"
+        },
+        "unreachable": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total number of unreachable assests"
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.Attribute": {
       "type": "object",
       "properties": {
@@ -468,6 +529,31 @@ func init() {
         "options": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Option",
           "description": "The options defined for the attribute."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.Collected": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total collected and passsed in the assets"
+        },
+        "failed": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total collected and failed in the assets"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total collected and skipped in the assets"
+        },
+        "weived": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total collected and weived in the assets"
         }
       }
     },
@@ -845,6 +931,17 @@ func init() {
         "type": {
           "type": "string",
           "description": "The field to filter on."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ListFilters": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
+          }
         }
       }
     },
