@@ -319,6 +319,9 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 }
 
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
+	var runInfo relaxting.ESComplianceRunInfo
+	var firstRun string
+	var err error
 	mapping := mappings.ComplianceRunInfo
 	runInfoCh := make(chan relaxting.ESComplianceRunInfo)
 	cErr := make(chan error)
@@ -327,9 +330,15 @@ func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *re
 	go MapReportToRunInfo(report, runDateTime, runInfoCh)
 	go backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index, firstRunInfoCh, cErr)
 
-	runInfo := <-runInfoCh
-	firstRun := <-firstRunInfoCh
-	err := <-cErr
+	for i := 0; i < 2; i++ {
+		select {
+		case runInfo = <-runInfoCh:
+		case firstRun = <-firstRunInfoCh:
+		case err = <-cErr:
+
+		}
+	}
+
 	if err != nil {
 		logrus.Infof("Unable to fetch document with error  %v", err)
 		return err
@@ -364,7 +373,6 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time,
 	rInfo.Role = report.Roles
 	rInfo.ChefTags = report.ChefTags
 	runInfo <- rInfo
-	close(runInfo)
 }
 
 func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.ProfileRunInfo {
@@ -969,6 +977,4 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 
 	logrus.Infof("firsstttrunnnnn in document--------------- %s", item.FirstRun)
 	firstRun <- item.FirstRun
-	close(errorCh)
-	close(firstRun)
 }
