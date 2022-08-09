@@ -951,7 +951,6 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 		Do(ctx)
 
 	if err != nil {
-		logrus.Errorf("firsstttrunnnnn in document--------------- %v", err)
 		errorCh <- err
 		return
 	}
@@ -974,7 +973,5 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 
 		}
 	}
-
-	logrus.Infof("firsstttrunnnnn in document--------------- %s", item.FirstRun)
 	firstRun <- item.FirstRun
 }
