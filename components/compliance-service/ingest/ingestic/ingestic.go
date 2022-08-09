@@ -45,20 +45,7 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 // This method will support adding a document with a specified id
 func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, runInfo relaxting.ESComplianceRunInfo, runDateTime time.Time) error {
 
-	firstRunInfo, err := backend.getDocFromNodeRunInfoFromNodeId(ctx, runInfo.NodeID, mapping.Index)
-	if err != nil {
-		logrus.Errorf("Unable to fetch document with id %s and err %v", runInfo.NodeID, err)
-	}
-
-	if len(firstRunInfo) != 0 {
-		runInfo.FirstRun, err = time.Parse(time.RFC3339, firstRunInfo)
-		if err != nil {
-			logrus.Errorf("Unable to parse time for node uuid %s with err %v", runInfo.NodeID, err)
-			return err
-		}
-
-	}
-	_, err = backend.client.Index().
+	_, err := backend.client.Index().
 		Index(mapping.Index).
 		Id(runInfo.NodeID).
 		BodyJson(runInfo).
@@ -332,15 +319,35 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 }
 
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
-	runInfo := MapReportToRunInfo(report, runDateTime)
-
 	mapping := mappings.ComplianceRunInfo
-	err := backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
+	runInfoCh := make(chan relaxting.ESComplianceRunInfo)
+	cErr := make(chan error)
+	firstRunInfoCh := make(chan string)
+
+	go MapReportToRunInfo(report, runDateTime, runInfoCh)
+	go backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index, firstRunInfoCh, cErr)
+
+	runInfo := <-runInfoCh
+	firstRun := <-firstRunInfoCh
+	err := <-cErr
+	if err != nil {
+		logrus.Infof("Unable to fetch document with error  %v", err)
+		return err
+	}
+
+	if len(firstRun) > 0 {
+		runInfo.FirstRun, err = time.Parse(time.RFC3339, firstRun)
+		if err != nil {
+			logrus.Errorf("Unable to parse the first run info")
+		}
+	}
+
+	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
 	return err
 }
 
-func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time) relaxting.ESComplianceRunInfo {
-	var rInfo relaxting.ESComplianceRunInfo
+func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time, runInfo chan relaxting.ESComplianceRunInfo) {
+	rInfo := relaxting.ESComplianceRunInfo{}
 	rInfo.NodeID = report.NodeID
 	rInfo.ResourceId = ""
 	rInfo.ResourceType = "Node"
@@ -356,7 +363,8 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time)
 	rInfo.Recipe = report.Recipes
 	rInfo.Role = report.Roles
 	rInfo.ChefTags = report.ChefTags
-	return rInfo
+	runInfo <- rInfo
+	close(runInfo)
 }
 
 func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.ProfileRunInfo {
@@ -907,7 +915,7 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	return map[string]interface{}{"projects": esProjectCollection}
 }
 
-func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, nodeUuid string, index string) (string, error) {
+func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, nodeUuid string, index string, firstRun chan string, errorCh chan error) {
 	logrus.Debug("Fetching document  by  nodeUUID")
 	var item relaxting.FirstRunInfo
 	boolQuery := elastic.NewBoolQuery()
@@ -935,7 +943,9 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 		Do(ctx)
 
 	if err != nil {
-		return "", err
+		logrus.Errorf("firsstttrunnnnn in document--------------- %v", err)
+		errorCh <- err
+		return
 	}
 
 	if searchResult.TotalHits() > 0 {
@@ -948,11 +958,17 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 				err := json.Unmarshal(hit.Source, &item)
 				if err != nil {
 					logrus.Errorf("Received error while unmarshling %+v", err)
+					errorCh <- err
+					return
 				}
 
 			}
 
 		}
 	}
-	return item.FirstRun, nil
+
+	logrus.Infof("firsstttrunnnnn in document--------------- %s", item.FirstRun)
+	firstRun <- item.FirstRun
+	close(errorCh)
+	close(firstRun)
 }
