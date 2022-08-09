@@ -299,7 +299,7 @@ func (s *Suite) InsertComplianceRunInfos(reports []*relaxting.ESInSpecReport) ([
 		ids[i] = report.NodeID
 
 		for tries := 0; tries < 3; tries++ {
-			err = s.ingesticESClient.InsertComplianceRunInfo(context.Background(), report.NodeID, report.EndTime)
+			err = s.ingesticESClient.InsertComplianceRunInfo(context.Background(), report, report.EndTime)
 			if err == nil {
 				break
 			}
