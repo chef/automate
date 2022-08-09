@@ -927,7 +927,7 @@ func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*
 		logrus.Errorf("Unable to get filters by filterbyProject %v" , err)
 		return nil, err
 	}
-	assets, err = srv.es.GetSummary(ctx, formattedFilters)
+	assets, err = srv.es.GetAssetSummary(ctx, formattedFilters)
 	if err != nil {
 		logrus.Errorf("Unable to get the asset summary %v" , err)
 		return nil , err

@@ -358,7 +358,7 @@ func getSummaryAssetAggResult(aggRoot *elastic.SearchResult) *AssetSummary {
 
 	return summary
 }
-func (backend ES2Backend) GetSummary(ctx context.Context, filters map[string][]string) (*reportingapi.AssetSummary, error) {
+func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string][]string) (*reportingapi.AssetSummary, error) {
 
 	// get the total number of assets without any date range filters i.e all the assets present
 	boolquery := backend.getFiltersQueryForAssetFilters(filters)
