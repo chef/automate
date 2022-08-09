@@ -304,3 +304,26 @@ func FetchLatestDataOrNot(filters map[string][]string) bool {
 func getRunInfoIndex() string {
 	return mappings.ComplianceRunInfo.Index
 }
+
+func ValidateTimeRangeForFilters(startTime string , endTime string) (error) {
+	if len(startTime) <= 0 {
+		logrus.Errorf("Startime cannot be null")
+		return errors.Errorf("StartTime cannot be null")
+	}
+	eTime, err := time.Parse(time.RFC3339, endTime)
+	sTime, err := time.Parse(time.RFC3339 , startTime)
+	diff := int(eTime.Sub(sTime).Hours()/24)
+	if err != nil {
+		logrus.Errorf("Error while getting the start time and end time diffrence:  %v" , err)
+		return err
+	}
+	if diff > 90 {
+		logrus.Errorf("The diffrence between the startTime and endTime should not exceed 90 Days")
+		return errors.Errorf("The diffrence between the startTime and endTime should not exceed 90 Days")
+	}
+	if diff == 0 {
+		logrus.Errorf("The start time and end time should not be equal")
+		return errors.Errorf("The start time and end time should not be equal")
+	}
+	return nil
+}

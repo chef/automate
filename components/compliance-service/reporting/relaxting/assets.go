@@ -27,6 +27,8 @@ func (backend ES2Backend) getAssets(ctx context.Context, boolQuery *elastic.Bool
 
 	countService := elastic.NewCountService(client)
 
+	scr, err := boolQuery.Source()
+	LogQueryPartMin(myIndex, scr, "getassests")
 	count, err := countService.Query(boolQuery).Index(myIndex).Do(ctx)
 	if err != nil {
 		logrus.Errorf("Cannot create client for count assets with error %v", err)
@@ -355,6 +357,56 @@ func getSummaryAssetAggResult(aggRoot *elastic.SearchResult) *AssetSummary {
 	}
 
 	return summary
+}
+func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string][]string) (*reportingapi.AssetSummary, error) {
+
+	// get the total number of assets without any date range filters i.e all the assets present
+	boolquery := backend.getFiltersQueryForAssetFilters(filters)
+	totalAssets, err := backend.getAssets(ctx, boolquery)
+	if err != nil {
+		logrus.Errorf("The error while getting the total assets %v", err)
+		return nil, err
+	}
+	// getting the un-reachable assets as per the unreachable config
+	// Todo hardcoding the value for Reachable assets
+	unreachableQuery := boolquery.Must(getUnReachableAssetTimeRangeQuery(10))
+	unreachableAsset, err :=backend.getAssets(ctx , unreachableQuery) 
+	if err != nil {
+		logrus.Errorf("The error while getting unreachable assets: %v" , err)
+		return nil , err
+	}
+	// get the un-reported assets as per the start time and end time present in filters
+	reportedQuery := boolquery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
+	reported, err := backend.getAssets(ctx, reportedQuery)
+	if err != nil {
+		logrus.Errorf("The error while getting the unreported assests %v", err)
+		return nil, err
+	}
+	unreportedAsset := totalAssets - (unreachableAsset + reported)
+
+	// getting the collected assets as per the filters present
+	collectedAsset, err := backend.getCollectedAssetsCount(ctx, reportedQuery)
+	if err != nil {
+		logrus.Errorf("The error while getting the collected assests %v", err)
+		return nil, err
+	}
+	notCollectedAsset := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)
+
+	collected := &reportingapi.Collected{
+		Passed:  collectedAsset.Passed,
+		Failed:  collectedAsset.Failed,
+		Skipped: collectedAsset.Skipped,
+		Weived:  collectedAsset.Waived,
+	}
+	summary := &reportingapi.AssetSummary{
+		TotalAssets:  totalAssets,
+		Collected:    collected,
+		NotCollected: notCollectedAsset,
+		Unreachable:  unreachableAsset,
+		Unreported:   unreportedAsset,
+	}
+
+	return summary, nil
 }
 
 func (backend ES2Backend) getCollectedAssets(ctx context.Context, from int32, size int32, filters map[string][]string, filtQuery *elastic.BoolQuery) ([]*reportingapi.Assets, error) {

@@ -360,6 +360,17 @@ service ReportingService {
 			tags: "hidden";
 		};
 	};
+
+	rpc AssetCount(ListFilters) returns (AssetSummary) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/assets/count"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:reports"
+			action: "compliance:reports:list"
+		};
+	}
 }
 
 message ControlItemRequest {
@@ -949,4 +960,30 @@ message ControlElements {
 
 message CustomReportResponse {
 	string acknowledgement_id = 1;
+}
+
+message AssetSummary {
+	//Total number of total assets
+	int32 total_assets = 1;
+	//Accessing the collected from Collected Message
+	Collected collected = 2;
+	//Total number of not collected assests
+	int32 not_collected = 3;
+	//Total number of unreported assets
+	int32 unreported = 4;
+	//Total number of unreachable assests
+	int32 unreachable = 5;
+}
+message ListFilters {
+	repeated ListFilter filters = 1;
+}
+message Collected {
+	// Total collected and passsed in the assets
+	int32 passed = 1;
+	// Total collected and failed in the assets
+	int32 failed = 2;
+	// Total collected and skipped in the assets
+	int32 skipped = 3;
+	// Total collected and weived in the assets
+	int32 weived = 4;
 }
