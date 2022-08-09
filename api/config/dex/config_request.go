@@ -30,7 +30,7 @@ func NewConfigRequest() *ConfigRequest {
 				Disclosure:           &ConfigRequest_V1_Disclosure{},
 				Banner:               &ConfigRequest_V1_Banner{},
 				InvalidLoginAttempts: &ConfigRequest_V1_InvalidLoginAttempts{},
-				Redirection:          &ConfigRequest_V1_Redirection{},
+				RedirectionUris:      &ConfigRequest_V1_RedirectionURIs{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},

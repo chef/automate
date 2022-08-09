@@ -56,7 +56,7 @@ staticClients:
   - id: automate-session
     secret: secretchangeme # TODO
     redirectURIs:
-      {{- range cfg.redirection.redirection_url}}
+      {{- range cfg.redirection_uris.redirection_url}}
       - {{.}}
       {{- end}}
     name: Automate Session Service
