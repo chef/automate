@@ -63,7 +63,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.InvalidLoginAttempts.BlockedDurationInMinutes = w.Int32(30)
 	c.V1.Sys.InvalidLoginAttempts.MaxInvalidLoginAttemptsAllowed = w.Int32(5)
 
-	c.V1.Sys.RedirectionUris.RedirectionUrl = append(c.V1.Sys.RedirectionUris.RedirectionUrl, []string{"/signin"}...)
+	c.V1.Sys.RedirectionUris.RedirectionUrl = []string{"/signin"}
 	return c
 }
 
@@ -218,6 +218,7 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 	c.V1.Sys.InvalidLoginAttempts.MaxInvalidLoginAttemptsAllowed = c.V1.Sys.InvalidLoginAttempts.GetMaxInvalidLoginAttemptsAllowed()
 
 	c.V1.Sys.RedirectionUris.RedirectionUrl = c.V1.Sys.RedirectionUris.GetRedirectionUrl()
+
 	return c.V1.Sys, nil
 }
 
