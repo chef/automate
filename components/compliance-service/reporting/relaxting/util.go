@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"net/http"
 	"strings"
 	"sync"
