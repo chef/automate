@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"net/http"
 	"strings"
 	"sync"
@@ -298,4 +299,8 @@ func FetchLatestDataOrNot(filters map[string][]string) bool {
 		latestOnly = false
 	}
 	return latestOnly
+}
+
+func getRunInfoIndex() string {
+	return mappings.ComplianceRunInfo.Index
 }
