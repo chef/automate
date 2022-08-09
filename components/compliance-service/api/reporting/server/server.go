@@ -914,3 +914,27 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 	}
 	return nil*/
 }
+func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*reporting.AssetSummary , error) {
+	formattedFilters := formatFilters(in.Filters)
+	var assets *reporting.AssetSummary
+	endTime := time.Now().Format(time.RFC3339)
+	formattedFilters["end_time"] = []string{endTime}
+	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , endTime)
+	if err != nil {
+		logrus.Errorf("The starttime and endtime validation error %v" , err)
+		return nil , err
+	}
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		logrus.Errorf("Unable to get filters by filterbyProject %v" , err)
+		return nil, err
+	}
+	assets, err = srv.es.GetAssetSummary(ctx, formattedFilters)
+	if err != nil {
+		logrus.Errorf("Unable to get the asset summary %v" , err)
+		return nil , err
+	}
+	return assets, nil
+	
+}
+
