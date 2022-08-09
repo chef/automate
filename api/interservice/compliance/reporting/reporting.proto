@@ -394,3 +394,11 @@ message ProfileResponse {
 	string profile_id = 1;
 	repeated string controls = 2;
 }
+
+message Assets {
+	string node_uuid =1;
+	string status = 2;
+	string first_run = 3;
+	string last_run =4;
+}
+

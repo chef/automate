@@ -117,7 +117,8 @@ func insertInspecReportRunInfo(msg message.Compliance, client *ingestic.ESClient
 	go func() {
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
 		start := time.Now()
-		err := client.InsertComplianceRunInfo(msg.Ctx, msg.Report.NodeUuid, msg.Shared.EndTime)
+
+		err := client.InsertComplianceRunInfo(msg.Ctx, msg.InspecReport, msg.Shared.EndTime)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_report object")
 			out <- err

@@ -43,21 +43,17 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 }
 
 // This method will support adding a document with a specified id
-func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
-	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, runInfo relaxting.ESComplianceRunInfo, runDateTime time.Time) error {
 
-	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
-
-	_, err := backend.client.Update().
+	_, err := backend.client.Index().
 		Index(mapping.Index).
-		Id(id).
-		Script(script).
-		Upsert(map[string]interface{}{
-			"node_uuid": id,
-			"first_run": runDateTime,
-			"last_run":  runDateTime,
-		}).
+		Id(runInfo.NodeID).
+		BodyJson(runInfo).
+		Refresh("false").
 		Do(ctx)
+	if err != nil {
+		return errors.Wrap(err, "Insert Comp Node Run Info")
+	}
 
 	return err
 }
@@ -322,10 +318,83 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 	return err
 }
 
-func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, nodeId string, runDateTime time.Time) error {
+func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
+	var runInfo relaxting.ESComplianceRunInfo
+	var firstRun string
+	var err error
 	mapping := mappings.ComplianceRunInfo
-	err := backend.upsertComplianceRunInfo(ctx, mapping, nodeId, runDateTime)
+	runInfoCh := make(chan relaxting.ESComplianceRunInfo)
+	cErr := make(chan error)
+	firstRunInfoCh := make(chan string)
+
+	go MapReportToRunInfo(report, runDateTime, runInfoCh)
+	go backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index, firstRunInfoCh, cErr)
+
+	for i := 0; i < 2; i++ {
+		select {
+		case runInfo = <-runInfoCh:
+		case firstRun = <-firstRunInfoCh:
+		case err = <-cErr:
+
+		}
+	}
+
+	if err != nil {
+		logrus.Infof("Unable to fetch document with error  %v", err)
+		return err
+	}
+
+	if len(firstRun) > 0 {
+		runInfo.FirstRun, err = time.Parse(time.RFC3339, firstRun)
+		if err != nil {
+			logrus.Errorf("Unable to parse the first run info")
+		}
+	}
+
+	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
 	return err
+}
+
+func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time, runInfo chan relaxting.ESComplianceRunInfo) {
+	rInfo := relaxting.ESComplianceRunInfo{}
+	rInfo.NodeID = report.NodeID
+	rInfo.ResourceId = ""
+	rInfo.ResourceType = "Node"
+	rInfo.FirstRun = runDateTime
+	rInfo.LastRun = runDateTime
+	rInfo.Status = report.Status
+	rInfo.ChefServer = report.SourceFQDN
+	rInfo.Platform = report.Platform
+	rInfo.Organization = report.OrganizationName
+	rInfo.InspecVersion = report.InSpecVersion
+	rInfo.PolicyName = report.PolicyName
+	rInfo.Profiles = GetProfiles(report.Profiles)
+	rInfo.Recipe = report.Recipes
+	rInfo.Role = report.Roles
+	rInfo.ChefTags = report.ChefTags
+	runInfo <- rInfo
+}
+
+func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.ProfileRunInfo {
+	profiles := make([]relaxting.ProfileRunInfo, 0)
+	for _, profile := range profilesReport {
+		controlRunInfo := make([]relaxting.ControlRunInfo, 0)
+		for _, control := range profile.Controls {
+			controlRunInfo = append(controlRunInfo, relaxting.ControlRunInfo{
+				ID:          control.ID,
+				ControlTags: control.StringTags,
+			})
+		}
+
+		profiles = append(profiles, relaxting.ProfileRunInfo{
+			SHA256:   profile.SHA256,
+			Controls: controlRunInfo,
+			Title:    profile.Title,
+			Full:     profile.Full,
+			Name:     profile.Name,
+		})
+	}
+	return profiles
 }
 
 // Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> in yesterday's UTC index.
@@ -852,4 +921,57 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*authz.
 	}
 
 	return map[string]interface{}{"projects": esProjectCollection}
+}
+
+func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, nodeUuid string, index string, firstRun chan string, errorCh chan error) {
+	logrus.Debug("Fetching document  by  nodeUUID")
+	var item relaxting.FirstRunInfo
+	boolQuery := elastic.NewBoolQuery()
+	idsQuery := elastic.NewIdsQuery()
+	idsQuery.Ids(nodeUuid)
+	boolQuery = boolQuery.Must(idsQuery)
+	fsc := elastic.NewFetchSourceContext(true)
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(boolQuery).
+		Size(1)
+
+	source, _ := searchSource.Source()
+	relaxting.LogQueryPartMin(index, source, "Doc Node run info")
+
+	searchResult, err := backend.client.Search().
+		SearchSource(searchSource).
+		Index(index).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._id",
+			"hits.hits._source",
+			"hits.hits.inner_hits").
+		Do(ctx)
+
+	if err != nil {
+		errorCh <- err
+		return
+	}
+
+	if searchResult.TotalHits() > 0 {
+		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			// hit.Index contains the name of the index
+			if hit.Source != nil {
+				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
+				err := json.Unmarshal(hit.Source, &item)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling %+v", err)
+					errorCh <- err
+					return
+				}
+
+			}
+
+		}
+	}
+	firstRun <- item.FirstRun
 }
