@@ -94,6 +94,31 @@ func (s *State) ListPolicies(context.Context) ([]*storage.Policy, error) {
 	return pols, nil
 }
 
+func filterMembers(memberName string, members []string) bool {
+	for _, member := range members {
+		if memberName == member {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *State) GetUserPolicies(_ context.Context, members []string) ([]string, error) {
+	items := s.policies.Items()
+	var policyIds []string
+
+	for _, item := range items {
+		if pol, ok := item.Object.(*storage.Policy); ok {
+			for _, member := range pol.Members {
+				if filterMembers(member.Name, members) {
+					policyIds = append(policyIds, pol.ID)
+				}
+			}
+		}
+	}
+	return policyIds, nil
+}
+
 func (s *State) GetPolicy(_ context.Context, policyID string) (pol *storage.Policy, err error) {
 	item, exists := s.policies.Get(policyID)
 

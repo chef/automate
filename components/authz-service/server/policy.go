@@ -164,6 +164,19 @@ func (s *policyServer) ListPolicies(ctx context.Context,
 	return &resp, nil
 }
 
+// GetUserPolicies fetches a list of all user policyIds.
+func (s *policyServer) GetUserPolicies(ctx context.Context,
+	req *api.GetUserPoliciesReq) (*api.GetUserPoliciesResp, error) {
+
+	pols, err := s.store.GetUserPolicies(ctx, req.Members)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error getting user policies: %s", err.Error())
+	}
+	return &api.GetUserPoliciesResp{
+		PolicyIds: pols,
+	}, nil
+}
+
 // GetPolicy fetches an IAM policy.
 func (s *policyServer) GetPolicy(
 	ctx context.Context,

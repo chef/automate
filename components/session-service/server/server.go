@@ -57,6 +57,11 @@ type userData struct {
 	ConnectorID string `json:"connector_id"`
 }
 
+type projectRolePairs struct {
+	Role     string
+	Projects []string
+}
+
 // Server holds the server state
 type Server struct {
 	mux                 http.Handler
@@ -347,15 +352,74 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func convertPolicySliceToMap(list []*authz.Policy) map[string]*authz.Policy {
+	policyIdMap := make(map[string]*authz.Policy)
+	for i := 0; i < len(list); i++ {
+		policyIdMap[list[i].Id] = list[i]
+	}
+	return policyIdMap
+}
+
 func (s *Server) userPoliciesHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var data userData
 	err := decoder.Decode(&data)
 	if err != nil {
-		fmt.Println(err, "error")
+		http.Error(w, errors.Wrap(err, "failed to decode").Error(),
+			http.StatusInternalServerError)
+		return
 	}
 
-	fmt.Println(data, "dataAZ_")
+	teamsForUser, err := s.teamsServiceClient.GetTeamsForMember(r.Context(), &teams.GetTeamsForMemberReq{
+		UserId: data.UserId,
+	})
+	if err != nil {
+		http.Error(w, errors.Wrap(err, "failed teamsServiceClient").Error(),
+			http.StatusInternalServerError)
+		return
+	}
+
+	var members []string
+	if len(teamsForUser.Teams) > 0 {
+		for _, team := range teamsForUser.Teams {
+			members = append(members, "team:"+data.ConnectorID+":"+team.Id)
+		}
+	}
+	members = append(members, "user:"+data.ConnectorID+":"+data.Username)
+	combinedPolicyIds, err := s.authzPoliciesClient.GetUserPolicies(r.Context(), &authz.GetUserPoliciesReq{
+		Members: members,
+	})
+	if err != nil {
+		http.Error(w, errors.Wrap(err, "failed to GetUserPolicies").Error(),
+			http.StatusInternalServerError)
+		return
+	}
+
+	listOfPolicies, err := s.authzPoliciesClient.ListPolicies(r.Context(), &authz.ListPoliciesReq{})
+	if err != nil {
+		http.Error(w, errors.Wrap(err, "failed to get listOfPolicies").Error(),
+			http.StatusInternalServerError)
+		return
+	}
+
+	policiesIdMap := convertPolicySliceToMap(listOfPolicies.Policies)
+
+	var projectRolePairList []projectRolePairs
+	for _, policyId := range combinedPolicyIds.PolicyIds {
+		for _, statement := range policiesIdMap[policyId].Statements {
+			pr := projectRolePairs{
+				Role:     statement.Role,
+				Projects: statement.Projects,
+			}
+			projectRolePairList = append(projectRolePairList, pr)
+		}
+	}
+
+	if err := json.NewEncoder(w).Encode(projectRolePairList); err != nil {
+		http.Error(w, errors.Wrap(err, "failed encode projectRolePairs").Error(),
+			http.StatusInternalServerError)
+		return
+	}
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
