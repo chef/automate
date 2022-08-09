@@ -2,9 +2,9 @@ package relaxting
 
 import (
 	"context"
-	"fmt"
 	"encoding/json"
 	"fmt"
+
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting"
@@ -28,8 +28,6 @@ func (backend ES2Backend) getAssets(ctx context.Context, boolQuery *elastic.Bool
 
 	countService := elastic.NewCountService(client)
 
-	scr, err := boolQuery.Source()
-	LogQueryPartMin(myIndex, scr, "getassests")
 	count, err := countService.Query(boolQuery).Index(myIndex).Do(ctx)
 	if err != nil {
 		logrus.Errorf("Cannot create client for count assets with error %v", err)
@@ -241,72 +239,6 @@ func (backend ES2Backend) getCollectedAssetsCount(ctx context.Context, filtQuery
 	LogQueryPartMin(myIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", name))
 
 	return getSummaryAssetAggResult(searchResult), nil
-}
-
-func (backend ES2Backend) getAssetsList(ctx context.Context,
-	from int32, size int32,
-	filtQuery *elastic.BoolQuery) ([]*reportingapi.Assets, error) {
-	index := getRunInfoIndex()
-	name := "AssetCollected"
-	client, err := backend.ES2Client()
-	if err != nil {
-		logrus.Errorf("Cannot connect to ElasticSearch for assests list: %v", err)
-		return nil, err
-	}
-
-	fsc := elastic.NewFetchSourceContext(true).Include(
-		"node_uuid",
-		"status",
-		"first_run",
-		"last_run")
-
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(filtQuery).
-		Size(int(size)).
-		From(int(from)).
-		Sort("last_run", false)
-
-	source, err := searchSource.Source()
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get Source", name))
-	}
-
-	LogQueryPartMin(index, source, fmt.Sprintf("%s query", name))
-
-	searchResult, err := client.Search().
-		SearchSource(searchSource).
-		Index(index).
-		FilterPath(
-			"took",
-			"hits.total",
-			"hits.hits._id",
-			"hits.hits._source",
-			"hits.hits.inner_hits").
-		Do(ctx)
-
-	return getCollectedAssetsSearchResult(searchResult)
-}
-
-func getCollectedAssetsSearchResult(searchResult *elastic.SearchResult) ([]*reportingapi.Assets, error) {
-
-	assets := make([]*reportingapi.Assets, 0)
-	if searchResult.TotalHits() > 0 {
-		for _, hit := range searchResult.Hits.Hits {
-			var asset *reportingapi.Assets
-			if hit.Source != nil {
-				err := json.Unmarshal(hit.Source, &asset)
-				if err != nil {
-					return nil, errors.Wrap(err, "Unable to collect assets from database")
-				}
-				assets = append(assets, asset)
-			}
-
-		}
-	}
-
-	return assets, nil
-
 }
 
 func getSummaryAssetAggregation() map[string]elastic.Aggregation {
