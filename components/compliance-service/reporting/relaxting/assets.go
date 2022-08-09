@@ -364,7 +364,7 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 	boolquery := backend.getFiltersQueryForAssetFilters(filters)
 	totalAssets, err := backend.getAssets(ctx, boolquery)
 	if err != nil {
-		logrus.Errorf("The error while getting the Total Assests %v", err)
+		logrus.Errorf("The error while getting the total assets %v", err)
 		return nil, err
 	}
 	// getting the un-reachable assets as per the unreachable config
@@ -373,7 +373,7 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 	reachableQuery = reachableQuery.Must(getReachableAssetTimeRangeQuery(10))
 	reachableAsset, err := backend.getAssets(ctx, reachableQuery)
 	if err != nil {
-		logrus.Errorf("The error while getting the Reachable Assests %v", err)
+		logrus.Errorf("The error while getting the reachable assests %v", err)
 		return nil, err
 	}
 	unreachableAsset := totalAssets - reachableAsset
@@ -382,7 +382,7 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 	reportedQuery := boolquery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
 	reported, err := backend.getAssets(ctx, reportedQuery)
 	if err != nil {
-		logrus.Errorf("The error while getting the unreported Assests %v", err)
+		logrus.Errorf("The error while getting the unreported assests %v", err)
 		return nil, err
 	}
 	unreportedAsset := totalAssets - (unreachableAsset + reported)
@@ -390,7 +390,7 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 	// getting the collected assets as per the filters present
 	collectedAsset, err := backend.getCollectedAssets(ctx, reportedQuery)
 	if err != nil {
-		logrus.Errorf("The error while getting the collected Assests %v", err)
+		logrus.Errorf("The error while getting the collected assests %v", err)
 		return nil, err
 	}
 	notCollectedAsset := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)

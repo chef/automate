@@ -919,7 +919,7 @@ func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*
 	var assets *reporting.AssetSummary
 	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , formattedFilters["end_time"][0])
 	if err != nil {
-		logrus.Errorf("The startTime and endTime validation error %v" , err)
+		logrus.Errorf("The starttime and endtime validation error %v" , err)
 		return nil , err
 	}
 	formattedFilters, err = filterByProjects(ctx, formattedFilters)
