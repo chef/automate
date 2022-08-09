@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"net/http"
 	"strings"
 	"sync"
@@ -325,4 +326,8 @@ func impactName(impactValue float64) (impact string) {
 		impact = inspec.ControlImpactMajor
 	}
 	return impact
+}
+
+func getRunInfoIndex() string {
+	return mappings.ComplianceRunInfo.Index
 }
