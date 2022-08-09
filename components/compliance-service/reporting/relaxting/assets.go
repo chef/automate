@@ -369,15 +369,12 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 	}
 	// getting the un-reachable assets as per the unreachable config
 	// Todo hardcoding the value for Reachable assets
-	reachableQuery := boolquery
-	reachableQuery = reachableQuery.Must(getReachableAssetTimeRangeQuery(10))
-	reachableAsset, err := backend.getAssets(ctx, reachableQuery)
+	unreachableQuery := boolquery.Must(getUnReachableAssetTimeRangeQuery(10))
+	unreachableAsset, err :=backend.getAssets(ctx , unreachableQuery) 
 	if err != nil {
-		logrus.Errorf("The error while getting the reachable assests %v", err)
-		return nil, err
+		logrus.Errorf("The error while getting unreachable assets: %v" , err)
+		return nil , err
 	}
-	unreachableAsset := totalAssets - reachableAsset
-
 	// get the un-reported assets as per the start time and end time present in filters
 	reportedQuery := boolquery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
 	reported, err := backend.getAssets(ctx, reportedQuery)
@@ -388,7 +385,7 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 	unreportedAsset := totalAssets - (unreachableAsset + reported)
 
 	// getting the collected assets as per the filters present
-	collectedAsset, err := backend.getCollectedAssets(ctx, reportedQuery)
+	collectedAsset, err := backend.getCollectedAssetsCount(ctx, reportedQuery)
 	if err != nil {
 		logrus.Errorf("The error while getting the collected assests %v", err)
 		return nil, err
