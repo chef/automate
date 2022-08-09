@@ -309,3 +309,15 @@ func (a *Reporting) getAllNodes(ctx context.Context, jobId string, end_time stri
 	}
 	return nodesList, nil
 }
+func (a *Reporting) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary , error) {
+	inDomain := &reportingService.ListFilters{}
+	out := &reporting.AssetSummary{} 
+	f := func () (proto.Message ,error)  {
+		return a.client.AssetCount(ctx , inDomain)
+	}
+	err := protobuf.CallDomainService(in , inDomain , f , out)
+	if err != nil {
+		return nil , err
+	}
+	return out, nil
+}
