@@ -191,10 +191,7 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/LicenseUsageNodes", "compliance:reporting:licenseusage", "compliance:reportingLicenseUsage:list", "", "", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/AssetCount", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/assets/count", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListAsset", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/assets", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListAsset", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/assets/search", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*AssetListRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -208,5 +205,8 @@ func init() {
 			})
 		}
 		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/AssetCount", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/assets/count", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
 	})
 }

@@ -411,6 +411,7 @@ message Collected {
 }
 
 message Assets {
+
 	string node_uuid =1;
 	string status = 2;
 	string first_run = 3;
@@ -418,17 +419,11 @@ message Assets {
 }
 
 message AssetListRequest {
-	//Gives the filter of asset list
 	repeated ListFilter filters = 1;
-	//Give the size of the asset
 	int32 size = 2;
-	//Give the starting point of  the asset
 	int32 from = 3;
-	//Give the sort starting point
 	string sort = 4;
-	//Give the type of the asset
 	string assets_type = 5;
-
 }
 
 message AssetList {

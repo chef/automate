@@ -322,6 +322,7 @@ func (a *Reporting) AssetCount(ctx context.Context, in *reporting.ListFilters) (
 	return out, nil
 }
 func (a *Reporting) ListAsset(ctx context.Context, in *reporting.AssetListRequest) (*reporting.AssetList , error) {
+	logrus.Info("I am getting into Client!!!!!!!!!!!!!!!!!")
 	inDomain := &reportingService.AssetListRequest{}
 	out := &reporting.AssetList{} 
 	f := func () (proto.Message ,error)  {

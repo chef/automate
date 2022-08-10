@@ -14,38 +14,6 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/api/v0/compliance/reporting/assets": {
-      "post": {
-        "operationId": "ReportingService_ListAsset",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetListRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ReportingService"
-        ]
-      }
-    },
     "/api/v0/compliance/reporting/assets/count": {
       "post": {
         "operationId": "ReportingService_AssetCount",
@@ -70,6 +38,38 @@ func init() {
             "required": true,
             "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilters"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/assets/search": {
+      "post": {
+        "operationId": "ReportingService_ListAsset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetListRequest"
             }
           }
         ],

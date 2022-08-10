@@ -361,9 +361,9 @@ service ReportingService {
 		};
 	};
 
-	rpc AssetCount(ListFilters) returns (AssetSummary) {
+	rpc ListAsset(AssetListRequest) returns (AssetList) {
 		option (google.api.http) = {
-			post: "/api/v0/compliance/reporting/assets/count"
+			post: "/api/v0/compliance/reporting/assets/search"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -371,9 +371,9 @@ service ReportingService {
 			action: "compliance:reports:list"
 		};
 	}
-	rpc ListAsset(AssetListRequest) returns (AssetList) {
+	rpc AssetCount(ListFilters) returns (AssetSummary) {
 		option (google.api.http) = {
-			post: "/api/v0/compliance/reporting/assets"
+			post: "/api/v0/compliance/reporting/assets/count"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {

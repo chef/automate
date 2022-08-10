@@ -403,11 +403,13 @@ func (backend ES2Backend)GetAsset(ctx context.Context, filters map[string][]stri
         }
         assets = unreachable
     } else if asset_type == "collected" || len(asset_type)==0{
+		logrus.Info("Got into collected !!!!!!!!!!!!!!!!")
         collected, err := backend.getCollectedAssets(ctx , from , size , filters , boolquery) 
         if err != nil {
             logrus.Errorf("Unable to get the collected assets %v" , err)
             return nil , err
         }
+		logrus.Info(collected, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         assets = collected
     } else if asset_type == "uncollected" {
         uncollected, err := backend.getUnCollectedAssets(ctx, from , size , filters , boolquery)
