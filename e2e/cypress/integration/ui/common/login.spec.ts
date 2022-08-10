@@ -1,5 +1,4 @@
 describe('login and logout', () => {
-
   describe('presents SSO login capabilities', () => {
     before(() => {
       cy.visit('/');
