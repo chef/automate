@@ -14,6 +14,38 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/compliance/reporting/assets": {
+      "post": {
+        "operationId": "ReportingService_ListAsset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetListRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/assets/count": {
       "post": {
         "operationId": "ReportingService_AssetCount",
@@ -490,6 +522,47 @@ func init() {
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.AssetList": {
+      "type": "object",
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Assets"
+          }
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.AssetListRequest": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
+          },
+          "title": "Gives the filter of asset list"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Give the size of the asset"
+        },
+        "from": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Give the starting point of  the asset"
+        },
+        "sort": {
+          "type": "string",
+          "title": "Give the sort starting point"
+        },
+        "assets_type": {
+          "type": "string",
+          "title": "Give the type of the asset"
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.AssetSummary": {
       "type": "object",
       "properties": {
@@ -516,6 +589,27 @@ func init() {
           "type": "integer",
           "format": "int32",
           "title": "Total number of unreachable assests"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.Assets": {
+      "type": "object",
+      "properties": {
+        "node_uuid": {
+          "type": "string",
+          "title": "give the node unique id"
+        },
+        "status": {
+          "type": "string",
+          "title": "give the status of the asset"
+        },
+        "first_run": {
+          "type": "string",
+          "title": "Give the details of the first run"
+        },
+        "last_run": {
+          "type": "string",
+          "title": "Give the details of the last run"
         }
       }
     },

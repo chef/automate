@@ -392,3 +392,37 @@ func (backend ES2Backend) getUnCollectedAssets(ctx context.Context, from int32, 
 	filtQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
 	return backend.getAssetsList(ctx, from, size, filtQuery)
 }
+func (backend ES2Backend)GetAsset(ctx context.Context, filters map[string][]string , size int32 , from int32 , asset_type string) ([]*reportingapi.Assets, error) {
+    boolquery := backend.getFiltersQueryForAssetFilters(filters)
+    assets := make([]*reportingapi.Assets, 0)
+    if asset_type == "unreachable" {
+        unreachable,err := backend.getUnReachableAssets(ctx , from , size , boolquery , 10)
+        if err != nil {
+            logrus.Errorf("Unable to get the unreachable assets %v" , err)
+            return nil , err
+        }
+        assets = unreachable
+    } else if asset_type == "collected" || len(asset_type)==0{
+        collected, err := backend.getCollectedAssets(ctx , from , size , filters , boolquery) 
+        if err != nil {
+            logrus.Errorf("Unable to get the collected assets %v" , err)
+            return nil , err
+        }
+        assets = collected
+    } else if asset_type == "uncollected" {
+        uncollected, err := backend.getUnCollectedAssets(ctx, from , size , filters , boolquery)
+        if err != nil {
+            logrus.Errorf("Unable to get the uncollected assets %v" , err)
+            return nil , err
+        }
+        assets = uncollected
+    } else if asset_type == "unreported" {
+        unreported,err := backend.getUnReportedAssets(ctx , from , size , filters , boolquery , 10)
+        if err != nil {
+            logrus.Errorf("Unable to get the unreported assets %v" , err)
+            return nil , err
+        }
+        assets = unreported
+    }
+    return assets , nil
+}

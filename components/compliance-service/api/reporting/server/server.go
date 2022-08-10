@@ -937,4 +937,19 @@ func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*
 	return assets, nil
 	
 }
-
+func (srv *Server)ListAsset(ctx context.Context , in *reporting.AssetListRequest) (*reporting.AssetList , error) {
+	formattedFilters := formatFilters(in.Filters)
+	var asset []*reporting.Assets
+	formattedFilters, err := filterByProjects(ctx , formattedFilters)
+	if err != nil {
+		logrus.Errorf("Unable to get filters by filterbyProject %v" , err)
+		return nil, err
+	}
+	asset , err = srv.es.GetAsset(ctx , formattedFilters ,in.Size , in.From , in.AssetsType) 
+	if err != nil {
+		logrus.Errorf("Unable to get the assets list %v" , err)
+		return nil , err
+	}
+	return &reporting.AssetList{Assets: asset} , nil
+	
+}
