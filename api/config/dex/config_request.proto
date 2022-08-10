@@ -33,6 +33,7 @@ message ConfigRequest {
 			Disclosure disclosure = 10;
 			Banner banner = 11;
 			InvalidLoginAttempts invalid_login_attempts = 12;
+			RedirectionURIs redirection_uris = 13;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
@@ -146,6 +147,10 @@ message ConfigRequest {
 			google.protobuf.BoolValue enable_invalid_login_attempts = 1;
 			google.protobuf.Int32Value blocked_duration_in_minutes = 2;
 			google.protobuf.Int32Value max_invalid_login_attempts_allowed = 3;
+		}
+
+		message RedirectionURIs{
+			repeated string redirection_url = 1;
 		}
 	}
 }
