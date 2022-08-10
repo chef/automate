@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "cypress:open": "cypress open",
-    "cypress:local": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_RUN_FLAKY=no cypress open",
+    "cypress:local": "CYPRESS_BASE_URL=https://ec2-3-142-73-38.us-east-2.compute.amazonaws.com CYPRESS_RUN_FLAKY=no cypress open",
     "cypress:local:flaky": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_RUN_FLAKY=yes cypress open",
     "cypress:run": "cypress run",
     "cypress:record": "cypress run --record",
