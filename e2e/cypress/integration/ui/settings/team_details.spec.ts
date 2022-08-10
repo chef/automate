@@ -118,7 +118,7 @@ describe('team details', () => {
       beforeEach(() => {
         cy.applyProjectsFilter([unassigned]);
         if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
-          cy.get('[data-cy=close-x]').click();
+          cy.get('app-welcome-modal').invoke('hide');
         }
       });
 

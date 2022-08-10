@@ -482,7 +482,7 @@ function LoginHelper(username: string) {
   cy.get('[type=submit]').click().then(() => {
 
     // close welcome modal if present
-    cy.get('[data-cy=close-x]').click();
+    cy.get('app-welcome-modal').invoke('hide');
     cy.saveStorage();
 
     cy.wait(['@getAuthPopulateCache']);
