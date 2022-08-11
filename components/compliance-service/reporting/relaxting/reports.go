@@ -4,19 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/golang/protobuf/ptypes"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
@@ -29,7 +27,6 @@ import (
 )
 
 const MaxScrollRecordSize = 10000
-const layout = "2006-01-02T15:04:05Z"
 const layout = "2006-01-02T15:04:05Z"
 
 func (backend ES2Backend) getDocIdHits(esIndex string,
@@ -818,6 +815,8 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
 		return nil, err
 	}
+
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
@@ -826,10 +825,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	controlIndex, err := getControlIndex(filters)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
-	}
-	err = validateFiltersTimeRange(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
-	if err != nil {
-		return nil, err
 	}
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
@@ -2176,15 +2171,37 @@ func getControlSummaryFilters(controlId []string, filters map[string][]string) *
 
 }
 
+//getMultiControlString takes the list of strings and returns the query string used in search.
+func getMultiControlString(list []string) string {
+	controlList := []string{}
+	for _, control := range list {
+		controlList = append(controlList, handleSpecialChar(control))
+	}
+	return strings.Join(controlList, " ")
+}
+
+//handleSpecialChar takes the string, and add additional char in front of the reserved chars.
+func handleSpecialChar(term string) string {
+	//maintain `\` always first in the list to stop encoding the characters we are appending.
+	reservedChar := []string{`\`, `/`, `+`, `-`, `=`, `&&`, `||`, `>`, `<`, `!`, `(`, `)`, `{`, `}`, `[`, `]`, `^`, `"`, `~`, `*`, `?`, `:`}
+	for _, rChar := range reservedChar {
+		term = strings.ReplaceAll(term, rChar, fmt.Sprintf("\\%s", rChar))
+	}
+	return fmt.Sprintf("(%s)", term)
+}
+
 func filterQueryChange(endTime string, startTime string) ([]string, error) {
+	if len(endTime) == 0 && len(startTime) == 0 {
+		return []string{"day_latest", "daily_latest"}, nil
+	}
+	if len(startTime) == 0 {
+		return []string{"daily_latest"}, nil
+	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
 		return nil, errors.Errorf("cannot parse the time")
-	}
-	if len(endTime) == 0 {
-		return []string{"day_latest"}, nil
 	}
 	if diff == 0 {
 		return []string{"daily_latest"}, nil
@@ -2194,6 +2211,9 @@ func filterQueryChange(endTime string, startTime string) ([]string, error) {
 }
 
 func validateFiltersTimeRange(endTime string, startTime string) error {
+	if len(endTime) == 0 || len(startTime) == 0 {
+		return nil
+	}
 	eTime, err := time.Parse(layout, endTime)
 	sTime, err := time.Parse(layout, startTime)
 	diff := int(eTime.Sub(sTime).Hours() / 24)
@@ -2206,4 +2226,35 @@ func validateFiltersTimeRange(endTime string, startTime string) error {
 		return errors.Errorf("Start time should not be greater than end time")
 	}
 	return nil
+}
+
+func getStartDateFromEndDate(endTime string, startTime string) ([]string, error) {
+	if len(endTime) == 0 {
+		return nil, nil
+	}
+
+	parsedEndTime, err := time.Parse(time.RFC3339, endTime)
+	if err != nil {
+		return []string{}, err
+	}
+
+	if checkTodayIsEndTime(parsedEndTime) {
+		if startTime == "" {
+			return []string{}, nil
+		}
+		return []string{startTime}, nil
+	}
+	newStartTime := time.Date(parsedEndTime.Year(), parsedEndTime.Month(), parsedEndTime.Day(), 0, 0, 0, 0, time.Local)
+
+	return []string{newStartTime.Format(time.RFC3339)}, nil
+
+}
+
+func checkTodayIsEndTime(endTime time.Time) bool {
+	currentDay := time.Now()
+
+	if currentDay.Year() == endTime.Year() && currentDay.Month() == endTime.Month() && currentDay.Day() == endTime.Day() {
+		return true
+	}
+	return false
 }

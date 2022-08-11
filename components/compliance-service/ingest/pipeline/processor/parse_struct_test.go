@@ -41,7 +41,6 @@ func TestMapStructs(t *testing.T) {
 					DailyLatest: true,
 					DayLatest:   true,
 					Status:      "on",
-					Environment: Env,
 					Profiles: []relaxting.ESInSpecReportProfile{
 						{
 							Name: "",
