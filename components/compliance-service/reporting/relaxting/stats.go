@@ -4,9 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
-
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"time"
 
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"

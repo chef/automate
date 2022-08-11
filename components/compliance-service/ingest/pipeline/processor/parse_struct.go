@@ -2,7 +2,6 @@ package processor
 
 import (
 	"context"
-
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/sirupsen/logrus"

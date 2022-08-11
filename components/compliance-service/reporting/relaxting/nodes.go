@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/chef/automate/api/external/lib/errorutils"

@@ -3,15 +3,14 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/golang/protobuf/ptypes"
+        "github.com/olivere/elastic/v7"
+        "github.com/pkg/errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/golang/protobuf/ptypes"
-	"github.com/olivere/elastic/v7"
-	"github.com/pkg/errors"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
@@ -493,6 +492,7 @@ func TestFilterQueryChangeForErrorWithBlankStartTimeAndEndTime(t *testing.T) {
 	setFlag, _ := filterQueryChange("", "")
 	assert.Equal(t, "day_latest", setFlag[0])
 }
+
 func TestFilterQueryChangeForEndTime(t *testing.T) {
 	endTime2 := ""
 	startTime2 := "2022-06-22T00:00:00Z"
