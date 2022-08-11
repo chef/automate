@@ -38,9 +38,10 @@ describe('login the app', () => {
           }
         });
         cy.visit('/user-details/admin').then(() => {
-          cy.get('[data-cy=welcome-title]').should('exist').then(() => {
-            cy.get('[data-cy=close-x]').click();
-          });
+          cy.get('[data-cy=welcome-title]').should('exist');
+          cy.get('[data-cy=close-welcome]').click().then(() => {
+            cy.get('[data-cy=welcome-title]').should('not.exist');
+        });
         });
       });
       cy.restoreStorage();
