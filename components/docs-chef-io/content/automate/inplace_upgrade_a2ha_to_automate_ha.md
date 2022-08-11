@@ -12,18 +12,21 @@ gh_repo = "automate"
     weight = 200
 +++
 
+{< warning >}}
+Inplace migration have more downtime, so we suggest to go for normal migration process.
+{{< /warning >}}
+
 This page explains upgrading inplace A2HA to Automate HA. This migration involves the following steps:
 
 ## Prerequisites
 
-- Mount a file system A2HA Cluster.
-- Make sure that it has the correct file permission after mount.
+- Mount a efs/nfs file system A2HA Cluster to take backup.
+- Make sure that mount have the correct file permission after mount.
 
 ## Taking backup from old A2HA
 
-1. Run the floowing commands from any elsaticsearch instance in A2HA cluster
+1. Run the following commands from any elsaticsearch instance in A2HA cluster
 ```cmd
-mount /mnt/automate_backups
 sudo mkdir /mnt/automate_backups/elasticsearch
 sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 source /hab/sup/default/SystemdEnvironmentFile.sh
@@ -59,12 +62,12 @@ automate-backend-ctl applied --svc=automate-backend-elasticsearch | tail -n +2 >
    [global.v1.backups.filesystem]
    path = "/mnt/automate_backups/backups"
 ```
-5. Now from bastion machine run the following command
+5. Now from bastion node workspace directory (/hab/a2_deploy_workspace) run the following command
 ```cmd 
     automate-cluster-ctl deploy
 ```
 
-5. Run the following commands from any automate instance in A2HA Cluster.
+5. Run the following commands from any automate node of A2HA Cluster.
 
 ```cmd
 sudo chef-automate backup create
@@ -115,7 +118,7 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
     sudo kill -i <pid>
 ```
 
-5. From A2HA bashtion host node
+5. From A2HA bashtion host node run the following command from home directory or any directory other then /hab/*
 ```cmd
     cp /hab/a2-deploy-worksapce/a2ha.rb .
     wget https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
@@ -130,7 +133,12 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
     chef-automate init-config-ha existing_infra
 ```
 
-7. Edit config and provide No. of nodes & IP address, FQDN, ssh username, and ssh key paths 
+7. Edit config and provide following details same as a2ha.rb of A2HA cluster. 
+    provide No. of nodes
+    IP address
+    FQDN
+    ssh username
+    ssh key paths 
 
 ```cmd
     vi config.toml
