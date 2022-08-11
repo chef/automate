@@ -23,6 +23,7 @@ This section lists the recommended requirements for operating systems, virtual m
 | Ubuntu (64 Bit OS)                       | 16.04.x, 18.04.x, 20.04.x |
 | Centos (64 Bit OS)                       | 7                         |
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
+| SUSE Linux Enterprise Server 12 Service Pack 5               |  12         |
 
 ## Hardware Requirements
 
