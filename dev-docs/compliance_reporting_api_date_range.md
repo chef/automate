@@ -12,14 +12,14 @@ Perfomance Tetsing and benchmarking of the modified and new APIs.
 | Summary Node	|/api/v0/compliance/reporting/stats/trend	|"{start_time:""2022-07-24T00:00:00Z"",end_time:""2022-08-03T23:59:59Z""}"	|240ms	|251ms	|2	|10			
 | Failures Controls	|/api/v0/compliance/reporting/stats/failures	|"{start_time:""2022-07-24T00:00:00Z"",end_time:""2022-08-03T23:59:59Z""}"	|250ms	|245ms	|2	|10			
 | Trend Controls	|/api/v0/compliance/reporting/stats/summary	|"{start_time:""2022-07-24T00:00:00Z"",end_time:""2022-08-03T23:59:59Z""}"	|881ms	|893ms	|2	|10			
-| Summary Controls	|/api/v0/compliance/reporting/stats/trend	"{start_time:""2022-07-24T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|234ms	|244ms	|2	|10			
+| Summary Controls	|/api/v0/compliance/reporting/stats/trend	|"{start_time:""2022-07-24T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|234ms	|244ms	|2	|10			
 | Report Summary	|/api/v0/compliance/reporting/stats/summary	|"{start_time:""2022-07-24T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|280ms	|255ms	|2	|10			
 | Node search 	|/api/v0/compliance/reporting/nodes/search	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|267ms	|295ms	|2	|30			
 | Profile 	|/api/v0/compliance/reporting/profiles	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|259ms	|281ms	|2	|30			
 | Controls	|/api/v0/compliance/reporting/controls	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|889ms	|901ms	|2	|30			
 | Failures Node	|/api/v0/compliance/reporting/stats/failures	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|245ms	|240ms	|2	|30			
-| Trend Node	|/api/v0/compliance/reporting/stats/summary	"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|279ms	|284ms	|2	|30			
-| Summary Node	|/api/v0/compliance/reporting/stats/trend	"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|244ms	|256ms	|2	|30			
+| Trend Node	|/api/v0/compliance/reporting/stats/summary	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|279ms	|284ms	|2	|30			
+| Summary Node	|/api/v0/compliance/reporting/stats/trend	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|244ms	|256ms	|2	|30			
 | Failures Controls	|/api/v0/compliance/reporting/stats/failures	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|261ms	|267ms	|2	|30			
 | Trend Controls	|/api/v0/compliance/reporting/stats/summary	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|276ms	|321ms	|2	|30			
 | Summary Controls	|/api/v0/compliance/reporting/stats/trend	|"{start_time:""2022-07-03T00:00:00Z"",end_time: ""2022-08-03T23:59:59Z""}"	|251ms	|242ms	|2	|30			
