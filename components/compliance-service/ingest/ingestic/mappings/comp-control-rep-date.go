@@ -165,7 +165,7 @@ var ComplianceControlRepData = Mapping{
             },
             "type": "keyword"
           },
-        "job_uuid": {
+         "job_uuid": {
             "type": "keyword"
           },
           "node_name": {
