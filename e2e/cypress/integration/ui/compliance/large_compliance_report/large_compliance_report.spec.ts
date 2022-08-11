@@ -11,8 +11,9 @@ describe('login the app', () => {
         adminIdToken = admin.id_token;
         username = admin.username;
         connector = admin.connector;
-        cy.visit('/compliance/reports/nodes');
-        cy.get('app-welcome-modal').invoke('hide');
+        cy.visit('/compliance/reports/nodes').then(() => {
+          cy.get('app-welcome-modal').invoke('hide');
+        });
       });
       cy.restoreStorage();
     });
