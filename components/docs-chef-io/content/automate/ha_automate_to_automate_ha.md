@@ -12,9 +12,17 @@ gh_repo = "automate"
     weight = 220
 +++
  
+{{< warning >}}
+
+- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with  
+minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
+
+- Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA. 
+
+{{< /warning >}}
+
 ## Upgrade with FileSystem Backup Locally
 
-Here we expect both the versions of Standalone Chef Automate and Chef Automate HA are the same. Chef Automate HA is only available in version 4.x.
 
 1. Create Backup of Chef Automate Standalone using the following command:
 
@@ -70,7 +78,7 @@ In Automate **4.x.y** version onwards, OpenSearch credentials are not stored in 
 8. Restore in Chef-Automate HA using the following command:
 
 ```bash
-automate_version_number=4.0.91 ## please change this based on the version of Chef Automate running.
+automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
      
 chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
 ```
@@ -91,7 +99,6 @@ sudo chef-automate start
 
 ## Upgrade with FileSystem Backup via Volume Mount
 
-Here we expect both the versions of Standalone Chef Automate and Chef Automate HA are same. Chef Automate HA is only available in version **4.x**.
 
 1. Create *Backup* of Chef Automate Standalone using the following command:
 
@@ -135,7 +142,10 @@ password = "admin"
 7. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster:
     
 ```bash
-chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
+automate_version_number=4.x.y ## Please change this to the version of Chef Automate HA installed. Look for /var/tmp/frontend-4.x.y.aib file
+
+chef-automate backup restore /mnt/automate_backups/backups/<backup_id>/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-${automate_version_number}.aib --skip-preflight
+
 ```
 
 8. Copy the `bootstrap.abb` file to all the Chef Automate HA FrontEnd Nodes (both Chef Automate and Chef Infra Server).
