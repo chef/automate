@@ -395,7 +395,23 @@ After upgrading to version 4.x, Automate will have the configurations both for O
           total_limit = "95%"
 ```
 
-2. If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
+### Shard Failure 
+
+```
+[ERROR] Elasticsearch exception [type=validation_exception, reason=Validation Failed: 1: this action would add [5] total shards, but this cluster currently has [997]/[1000] maximum shards open;]
+```
+To address the issue of shard limit hitting 1000, we need to increase the `max_shards_per_node`
+Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>` 
+```
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+         max_shards_per_node = "<NUMBER_OF_SHARD>"
+```
+### Migration Fails
+
+ If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
 
 ```sh
 sudo chef-automate backup restore </path/to/backups/>BACKUP_ID
