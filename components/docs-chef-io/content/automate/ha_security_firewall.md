@@ -34,3 +34,10 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
 | TCP/UDP  | 9638        | Habitat gossip (UDP) |
 | TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
+
+
+
+{{< note >}}
+- Custom SSH port is supported, but same port should be used accross all the machines.
+  
+{{< /note >}}

@@ -99,7 +99,6 @@ sudo chef-automate start
 
 ## Upgrade with FileSystem Backup via Volume Mount
 
-Minimum supported version of Standalone Chef Automate Migration : [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246) to Chef Automate HA.
 
 1. Create *Backup* of Chef Automate Standalone using the following command:
 
