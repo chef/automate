@@ -49,7 +49,7 @@ function nodeSearchCSVHeader() {
 
 function nodeSearchCSVData() {
   local response=$1
-  echo "$response" | jq -r '.nodes[] | {id: .id, name: .nameact} | join(",")'
+  echo "$response" | jq -r '.nodes[] | {id: .id, name: .name} | join(",")'
 }
 
 function createCSV() {
@@ -105,9 +105,7 @@ printf '%s\n' 'Completed Controls Lists API'
 
 printf '%s\n' 'Calling Nodes Lists API'
 requestBody=$(nodeSearchAPIRequest "$startTime" "$endTime")
-echo "$requestBody"
 response=$(callingAPI "$hostname" "$nodeSearchUrl" "$header" "$requestBody")
-echo "$response"
 createCSV "$environment" "nodesearch" "$nodeSearchUrl" "$(nodeSearchCSVHeader)" "$(nodeSearchCSVData "$response")"
 printf '%s\n' 'Completed Nodes Lists API'
 
