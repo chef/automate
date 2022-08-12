@@ -143,7 +143,9 @@ Then add in OpenSearch configuration as:
 
 ```
 
-{{< warning >}} Configure the OpenSearch Heap size to **50%** of RAM.{{< /warning >}}
+{{< warning >}} 
+Configure the OpenSearch Heap size to **50%** of RAM, but not more than 32GB.
+{{< /warning >}}
 
 
 Apply this using the `config patch` command.
