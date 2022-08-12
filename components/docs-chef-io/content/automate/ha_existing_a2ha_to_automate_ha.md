@@ -12,7 +12,15 @@ gh_repo = "automate"
     weight = 200
 +++
 
+{{< warning >}}
+
+- A2HA user can be migrated to Automate HA with minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
+
+{{< /warning >}}
+
+
 This page explains migrating the existing A2HA data to the newly deployed Chef Automate HA. This migration involves the following steps:
+
 
 ## Prerequisites
 

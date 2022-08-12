@@ -12,9 +12,17 @@ gh_repo = "automate"
     weight = 220
 +++
  
+{{< warning >}}
+
+- Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with  
+minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
+
+- Chef Automate user running Chef Infra Server in external mode should not migrate to Automate HA. 
+
+{{< /warning >}}
+
 ## Upgrade with FileSystem Backup Locally
 
-Here we support migration from Chef Automate (version released after Jan 2021) to Chef Automate HA (version 4.x).
 
 1. Create Backup of Chef Automate Standalone using the following command:
 
@@ -91,7 +99,7 @@ sudo chef-automate start
 
 ## Upgrade with FileSystem Backup via Volume Mount
 
-Here we support migration from Chef Automate (version released after Jan 2021) to Chef Automate HA (version 4.x).
+Minimum supported version of Standalone Chef Automate Migration : [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246) to Chef Automate HA.
 
 1. Create *Backup* of Chef Automate Standalone using the following command:
 

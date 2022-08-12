@@ -377,7 +377,7 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 
 ## Troubleshooting
 
-If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
+- If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
 
 ```sh
 sudo chef-automate backup restore </path/to/backups/>BACKUP_ID
@@ -410,3 +410,21 @@ sudo chef-automate backup restore <backup_id>
 Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
+
+- Circuit Breaking Exception
+```
+{"error":{"root_cause":[{"type":"circuit_breaking_exception","reason":"[parent] Data too large, data for [<http_request>] would be [6126524880/5.7gb], which is larger than the limit of [5988548608/5.5gb], real usage: [6126524880/5.7gb], new bytes reserved: [0/0b], usages [request=0/0b, fielddata=74975/73.2kb, in_flight_requests=0/0b, accounting=89882860/85.7mb]","bytes_wanted":6126524880,"bytes_limit":5988548608,"durability":"PERMANENT"}]
+```
+
+- Update the Opensearch Config 
+```
+
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.runtime]
+         heapsize = "<HALF_OF_RAM>"
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+```
