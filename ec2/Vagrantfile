@@ -230,7 +230,7 @@ cd #{home_dir}
 git clone git@github.com:chef/automate.git
 cd automate
 echo "export GITHUB_TOKEN=\"#{ENV['GITHUB_TOKEN']}\"" > .secrets
-git checkout #{latest_head_commit}
+git checkout dave/fix_001
 
 if test "#{git_sha_from_manifest}" = "HEAD" ; then
   echo " * Not overwriting dev/config.toml as latest deb build is being installed"
