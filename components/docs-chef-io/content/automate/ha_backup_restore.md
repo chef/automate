@@ -157,6 +157,8 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
     name = "bucket-name"
 
+    # endpoint (required): The endpoint for the region the bucket lives in for Automate version 3.x.y
+    # endpoint  : For Automate version 4.x.y, use this https://s3.amazonaws.com
     
     endpoint = "https://s3.amazonaws.com"
 
