@@ -309,6 +309,9 @@ func ValidateTimeRangeForFilters(startTime string , endTime string) (error) {
 	if len(startTime) <= 0 {
 		logrus.Errorf("Startime cannot be null")
 		return errors.Errorf("StartTime cannot be null")
+	} else if startTime > endTime {
+		logrus.Errorf("Start time cannot be greater than end time")
+		return errors.Errorf("Start time cannot be greater than end time")
 	}
 	eTime, err := time.Parse(time.RFC3339, endTime)
 	sTime, err := time.Parse(time.RFC3339 , startTime)
