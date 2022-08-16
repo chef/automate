@@ -43,6 +43,38 @@
         ]
       }
     },
+    "/api/v0/compliance/reporting/assets/search": {
+      "post": {
+        "operationId": "ReportingService_ListAsset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetListRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/controls": {
       "post": {
         "summary": "List Controls",
@@ -487,6 +519,48 @@
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.AssetListRequest": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
+          },
+          "title": "List of the filters to be applied"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Size of the asset list"
+        },
+        "from": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results."
+        },
+        "sort": {
+          "type": "string",
+          "title": "Sort required from the which field"
+        },
+        "assets_type": {
+          "type": "string",
+          "title": "Asset Type as collected, unreported, unreachable, uncollected"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.AssetListResponse": {
+      "type": "object",
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Assets"
+          },
+          "title": "Assets list as per the filters applied"
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.AssetSummary": {
       "type": "object",
       "properties": {
@@ -513,6 +587,27 @@
           "type": "integer",
           "format": "int32",
           "title": "Total number of unreachable assests"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.Assets": {
+      "type": "object",
+      "properties": {
+        "node_uuid": {
+          "type": "string",
+          "title": "Node UUid for the asset"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status of the last run of the asset"
+        },
+        "first_run": {
+          "type": "string",
+          "title": "First Run details of asset"
+        },
+        "last_run": {
+          "type": "string",
+          "title": "Last run details of asset"
         }
       }
     },

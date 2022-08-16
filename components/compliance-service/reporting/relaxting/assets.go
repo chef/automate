@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
+	constant "github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/utils"
@@ -440,4 +441,23 @@ func (backend ES2Backend) getUnCollectedAssets(ctx context.Context, from int32, 
 	filters[reporting.EndTime] = []string{}
 	filtQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
 	return backend.getAssetsList(ctx, from, size, filtQuery)
+}
+
+func (backend ES2Backend)GetAsset(ctx context.Context, filters map[string][]string , size int32 , from int32 , assetsType string) ([]*reportingapi.Assets, error) {
+
+	boolquery := backend.getFiltersQueryForAssetFilters(filters)
+	assets := make([]*reportingapi.Assets, 0)
+	if assetsType == constant.COLLECTED || len(assetsType)==0{
+		return backend.getCollectedAssets(ctx , from , size , filters , boolquery)
+	}
+	if assetsType == constant.UNREACHABLE{
+		return backend.getUnReachableAssets(ctx , from , size , boolquery , 10)	
+	}
+	if assetsType == constant.UNCOLLECTED {
+		return backend.getUnCollectedAssets(ctx, from , size , filters , boolquery)
+	} 
+	if assetsType == constant.UNREPORTED {
+		return backend.getUnReportedAssets(ctx , from , size , filters , boolquery , 10)
+	}
+	return assets, errors.New("Please provide the valid asset type")
 }

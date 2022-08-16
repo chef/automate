@@ -371,6 +371,18 @@ service ReportingService {
 			action: "compliance:reports:list"
 		};
 	}
+	
+	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/assets/search"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:reports"
+			action: "compliance:reports:list"
+		};
+	}
+
 }
 
 message ControlItemRequest {
@@ -986,4 +998,30 @@ message Collected {
 	int32 skipped = 3;
 	// Total collected and weived in the assets
 	int32 weived = 4;
+}
+message AssetListRequest {
+	//List of the filters to be applied
+	repeated ListFilter filters = 1;
+	//Size of the asset list
+	int32 size = 2;
+	//The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
+	int32 from = 3;
+	//Sort required from the which field
+	string sort = 4;
+	//Asset Type as collected, unreported, unreachable, uncollected
+	string assets_type = 5;
+}
+message Assets {
+	//Node UUid for the asset
+	string node_uuid = 1;
+	//Status of the last run of the asset
+	string status = 2;
+	//First Run details of asset
+	string first_run = 3;
+	//Last run details of asset
+	string last_run = 4;
+}
+message AssetListResponse {
+	//Assets list as per the filters applied
+	repeated Assets assets = 1;
 }

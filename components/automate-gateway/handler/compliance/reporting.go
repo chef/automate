@@ -321,3 +321,15 @@ func (a *Reporting) AssetCount(ctx context.Context, in *reporting.ListFilters) (
 	}
 	return out, nil
 }
+func (a *Reporting) ListAsset(ctx context.Context, in *reporting.AssetListRequest) (*reporting.AssetListResponse , error) {
+	inDomain := &reportingService.AssetListRequest{}
+	out := &reporting.AssetListResponse{} 
+	f := func () (proto.Message ,error)  {
+		return a.client.ListAsset(ctx , inDomain)
+	}
+	err := protobuf.CallDomainService(in , inDomain , f , out)
+	if err != nil {
+		return nil , err
+	}
+	return out, nil
+} 
