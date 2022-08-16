@@ -104,7 +104,6 @@ Refer to the content for the `automate.toml` file below:
     # name (required): The name of the bucket
     name = "bucket-name"
 
-    # endpoint (required): The endpoint for the region the bucket lives in.
     endpoint = "https://s3.amazonaws.com"
 
     # base_path (optional):  The path within the bucket where backups should be stored

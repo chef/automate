@@ -75,7 +75,6 @@ To store backups in an existing AWS S3 bucket, use the supported S3-related sett
   # name (required): The name of the bucket
   name = "<bucket name>"
 
-  # endpoint (required): The endpoint for the region the bucket lives in.
   endpoint = "https://s3.amazonaws.com"
 
   # base_path (optional):  The path within the bucket where backups should be stored
