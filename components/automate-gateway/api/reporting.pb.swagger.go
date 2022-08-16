@@ -53,6 +53,38 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetListRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/assets/search": {
+      "post": {
+        "operationId": "ReportingService_ListAsset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
               "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.AssetList"
             }
           },
@@ -522,17 +554,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.compliance.reporting.v1.AssetList": {
-      "type": "object",
-      "properties": {
-        "assets": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Assets"
-          }
-        }
-      }
-    },
     "chef.automate.api.compliance.reporting.v1.AssetListRequest": {
       "type": "object",
       "properties": {
@@ -560,6 +581,17 @@ func init() {
         "assets_type": {
           "type": "string",
           "title": "Give the type of the asset"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.AssetListResponse": {
+      "type": "object",
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Assets"
+          }
         }
       }
     },

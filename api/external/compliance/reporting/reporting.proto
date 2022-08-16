@@ -361,7 +361,7 @@ service ReportingService {
 		};
 	};
 
-	rpc ListAsset(AssetListRequest) returns (AssetList) {
+	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {
 		option (google.api.http) = {
 			post: "/api/v0/compliance/reporting/assets/search"
 			body: "*"
@@ -1008,7 +1008,6 @@ message AssetListRequest {
 	string sort = 4;
 	//Give the type of the asset
 	string assets_type = 5;
-
 }
 
 message Assets {
@@ -1022,6 +1021,6 @@ message Assets {
 	string last_run = 4;
 }
 
-message AssetList {
+message AssetListResponse {
 	repeated Assets assets = 1;
 }
