@@ -2,6 +2,13 @@ package reporting
 
 const ESize = 999999
 
+const (
+	UNREPORTED = "unreported"
+	UNREACHABLE = "unreachable"
+	UNCOLLECTED = "uncollected"
+	COLLECTED = "collected"
+)
+
 // These are filter types where we use ElasticSearch Term Queries
 var FilterType = []string{"environment", "organization", "chef_server", "chef_tags",
 	"policy_group", "policy_name", "status", "node_name", "platform", "platform_with_version",

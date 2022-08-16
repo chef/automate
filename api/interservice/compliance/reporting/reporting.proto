@@ -23,6 +23,7 @@ service ReportingService {
 	rpc GetReportContent(ReportContentRequest) returns (ReportContentResponse) {};
 	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
 	rpc AssetCount(ListFilters) returns (AssetSummary) {};
+	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
 }
 
 message ReportContentRequest {
@@ -416,3 +417,14 @@ message Assets {
 	string last_run =4;
 }
 
+message AssetListRequest {
+	repeated ListFilter filters = 1;
+	int32 size = 2;
+	int32 from = 3;
+	string sort = 4;
+	string assets_type = 5;
+}
+
+message AssetListResponse {
+	repeated Assets assets = 1;
+}
