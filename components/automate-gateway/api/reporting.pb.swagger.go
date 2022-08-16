@@ -530,25 +530,25 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
-          "title": "Gives the filter of asset list"
+          "title": "List of the filters to be applied"
         },
         "size": {
           "type": "integer",
           "format": "int32",
-          "title": "Give the size of the asset"
+          "title": "Size of the asset list"
         },
         "from": {
           "type": "integer",
           "format": "int32",
-          "title": "Give the starting point of  the asset"
+          "description": "The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results."
         },
         "sort": {
           "type": "string",
-          "title": "Give the sort starting point"
+          "title": "Sort required from the which field"
         },
         "assets_type": {
           "type": "string",
-          "title": "Give the type of the asset"
+          "title": "Asset Type as collected, unreported, unreachable, uncollected"
         }
       }
     },
@@ -559,7 +559,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Assets"
-          }
+          },
+          "title": "Assets list as per the filters applied"
         }
       }
     },
@@ -597,19 +598,19 @@ func init() {
       "properties": {
         "node_uuid": {
           "type": "string",
-          "title": "give the node unique id"
+          "title": "Node UUid for the asset"
         },
         "status": {
           "type": "string",
-          "title": "give the status of the asset"
+          "title": "Status of the last run of the asset"
         },
         "first_run": {
           "type": "string",
-          "title": "Give the details of the first run"
+          "title": "First Run details of asset"
         },
         "last_run": {
           "type": "string",
-          "title": "Give the details of the last run"
+          "title": "Last run details of asset"
         }
       }
     },

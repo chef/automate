@@ -459,5 +459,5 @@ func (backend ES2Backend)GetAsset(ctx context.Context, filters map[string][]stri
 	if assetsType == constant.UNREPORTED {
 		return backend.getUnReportedAssets(ctx , from , size , filters , boolquery , 10)
 	}
-	return assets, nil
+	return assets, errors.New("Please provide the valid asset type")
 }

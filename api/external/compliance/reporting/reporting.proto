@@ -1000,29 +1000,28 @@ message Collected {
 	int32 weived = 4;
 }
 message AssetListRequest {
-	//Gives the filter of asset list
+	//List of the filters to be applied
 	repeated ListFilter filters = 1;
-	//Give the size of the asset
+	//Size of the asset list
 	int32 size = 2;
-	//Give the starting point of  the asset
+	//The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	int32 from = 3;
-	//Give the sort starting point
+	//Sort required from the which field
 	string sort = 4;
-	//Give the type of the asset
+	//Asset Type as collected, unreported, unreachable, uncollected
 	string assets_type = 5;
 }
-
 message Assets {
-	//give the node unique id
+	//Node UUid for the asset
 	string node_uuid = 1;
-	//give the status of the asset
+	//Status of the last run of the asset
 	string status = 2;
-	//Give the details of the first run 
+	//First Run details of asset
 	string first_run = 3;
-	//Give the details of the last run 
+	//Last run details of asset
 	string last_run = 4;
 }
-
 message AssetListResponse {
+	//Assets list as per the filters applied
 	repeated Assets assets = 1;
 }

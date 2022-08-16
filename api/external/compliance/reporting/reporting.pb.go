@@ -4105,15 +4105,15 @@ type AssetListRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//Gives the filter of asset list
+	//List of the filters to be applied
 	Filters []*ListFilter `protobuf:"bytes,1,rep,name=filters,proto3" json:"filters,omitempty"`
-	//Give the size of the asset
+	//Size of the asset list
 	Size int32 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	//Give the starting point of  the asset
+	//The offset for paginating requests. An offset defines a place in the results in order to show the next page of the results.
 	From int32 `protobuf:"varint,3,opt,name=from,proto3" json:"from,omitempty"`
-	//Give the sort starting point
+	//Sort required from the which field
 	Sort string `protobuf:"bytes,4,opt,name=sort,proto3" json:"sort,omitempty"`
-	//Give the type of the asset
+	//Asset Type as collected, unreported, unreachable, uncollected
 	AssetsType string `protobuf:"bytes,5,opt,name=assets_type,json=assetsType,proto3" json:"assets_type,omitempty"`
 }
 
@@ -4189,13 +4189,13 @@ type Assets struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//give the node unique id
+	//Node UUid for the asset
 	NodeUuid string `protobuf:"bytes,1,opt,name=node_uuid,json=nodeUuid,proto3" json:"node_uuid,omitempty"`
-	//give the status of the asset
+	//Status of the last run of the asset
 	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	//Give the details of the first run
+	//First Run details of asset
 	FirstRun string `protobuf:"bytes,3,opt,name=first_run,json=firstRun,proto3" json:"first_run,omitempty"`
-	//Give the details of the last run
+	//Last run details of asset
 	LastRun string `protobuf:"bytes,4,opt,name=last_run,json=lastRun,proto3" json:"last_run,omitempty"`
 }
 
@@ -4264,6 +4264,7 @@ type AssetListResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	//Assets list as per the filters applied
 	Assets []*Assets `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
 }
 
