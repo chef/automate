@@ -212,7 +212,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetControlDetail(payload));
       } else {
         this.store.select(controlsList).subscribe(data => {
-          this.allControlList = data; 
+          this.allControlList = data;
         });
 
         this.allControlList.forEach((data) => {
