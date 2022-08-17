@@ -385,7 +385,7 @@ service ReportingService {
 
 	rpc SetAssetConfig(ComplianceConfig) returns (ComplianceConfig) {
 		option (google.api.http) = {
-			put: "/api/v0/compliance/reporting/reporting/assets/config"
+			put: "/api/v0/compliance/reporting/assets/config"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
@@ -396,7 +396,7 @@ service ReportingService {
 
 	rpc GetAssetConfig(google.protobuf.Empty) returns (ComplianceConfig) {
 		option (google.api.http) = {
-			get: "/api/v0/compliance/reporting/reporting/assets/config/search"
+			get: "/api/v0/compliance/reporting/assets/config/search"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
