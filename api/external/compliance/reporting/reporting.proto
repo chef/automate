@@ -1025,3 +1025,10 @@ message AssetListResponse {
 	//Assets list as per the filters applied
 	repeated Assets assets = 1;
 }
+message ComplianceConfig {
+    string policy_name = 1;
+    int32 older_than_days = 2;
+}
+
+message GetAssetConfigRequest {
+}
