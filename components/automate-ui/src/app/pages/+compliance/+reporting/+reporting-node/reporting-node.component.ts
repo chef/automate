@@ -146,6 +146,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   onFilterControlStatusClick(_event: any, status: string) {
     this.pageIndex = 1;
     this.activeStatusFilter = status;
+    this.openControls = {};
     this.getControlData(this.activeReport);
   }
 
