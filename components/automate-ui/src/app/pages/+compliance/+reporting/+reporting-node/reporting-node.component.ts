@@ -194,7 +194,6 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   toggleControl(i: number, ctrl: any) {
     const control = ctrl;
-    console.log(control, "ctrl")
     this.index = i;
     const key = this.toggleKey(control);
     this.controlList.control_elements[this.index].controlDetailsLoading = true;
@@ -211,9 +210,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
             {'type': 'control', 'values': [`${control.id}`]}]
         };
         this.store.dispatch(new GetControlDetail(payload));
-        console.log("first")
       } else {
-        console.log("second")
         this.store.select(controlsList).subscribe(data => {
           this.allControlList = data; 
         });
