@@ -41,10 +41,10 @@ type Server struct {
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, lcr_open_search_requests int, db *pgdb.DB) *Server {
+func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, LRCOpenSearchRequest int, db *pgdb.DB) *Server {
 	server := Server{
 		es:                       es,
-		lcr_open_search_requests: lcr_open_search_requests,
+		lcr_open_search_requests: LRCOpenSearchRequest,
 		db:                       db,
 	}
 	if rm != nil {
@@ -974,7 +974,6 @@ func (srv *Server) GetConfigs(ctx context.Context, in *reporting.GetAssetConfigR
 	return result, nil
 }
 
-// TODO: Update based on the API call
 func (srv *Server) UpdateConfigs(ctx context.Context, in *reporting.ComplianceConfig) error {
 	err := srv.db.SetConfigs(ctx, in)
 	if err != nil {
