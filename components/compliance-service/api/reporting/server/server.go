@@ -967,14 +967,13 @@ func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceC
 	return res, nil
 }
 
-/*func (srv *Server) GetAssetConfig(ctx context.Context) (*reporting.ComplianceConfig, error) {
-	in := &reporting.ComplianceConfig{}
+func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfig, error) {
+	set := &reporting.ComplianceConfig{}
 	res := &reporting.ComplianceConfig{}
-	res, err := srv.SetAssetConfig(ctx, in)
+	res, err := srv.SetAssetConfig(ctx, set)
 	if err != nil {
 		logrus.Errorf("error GetAssetConfig: %v", err)
 		return nil, err
 	}
 	return res, nil
 }
-*/
