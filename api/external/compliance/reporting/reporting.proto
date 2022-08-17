@@ -389,19 +389,19 @@ service ReportingService {
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:reports"
-			action: "compliance:reports:list"
+			resource: "compliance:reporting:config"
+			action: "compliance:reports:update"
 		};
 	}
 
-	rpc GetAssetConfig(GetComplianceConfigRequest) returns (ComplianceConfig) {
+	rpc GetAssetConfig(google.protobuf.Empty) returns (ComplianceConfig) {
 		option (google.api.http) = {
-			get: "/api/v0/compliance/reporting/reporting/assets/config"
+			get: "/api/v0/compliance/reporting/reporting/assets/config/search"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:reports"
-			action: "compliance:reports:list"
+			resource: "compliance:reporting:config"
+			action: "compliance:reports:get"
 		};
 	}
 
@@ -1051,8 +1051,4 @@ message AssetListResponse {
 message ComplianceConfig {
 	string policy_name = 1;
 	int32 older_than_days = 2;
-}
-
-message GetComplianceConfigRequest {
-	
 }

@@ -25,7 +25,7 @@ service ReportingService {
 	rpc AssetCount(ListFilters) returns (AssetSummary) {};
 	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
 	rpc SetAssetConfig(ComplianceConfig) returns (ComplianceConfig) {};
-	rpc GetAssetConfig(GetComplianceConfigRequest) returns (ComplianceConfig) {};
+	rpc GetAssetConfig(google.protobuf.Empty) returns (ComplianceConfig) {};
 }
 
 message ReportContentRequest {
@@ -421,8 +421,4 @@ message AssetListResponse {
 message ComplianceConfig {
 	string policy_name = 1;
 	int32 older_than_days = 2;
-}
-
-message GetComplianceConfigRequest {
-	
 }
