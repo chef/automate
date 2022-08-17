@@ -12,9 +12,9 @@ describe('login the app', () => {
         username = admin.username;
         connector = admin.connector;
         cy.visit('/compliance/reports/nodes').then(() => {
-          cy.get('[data-cy=welcome-title]').should('exist').then(() => {
-              cy.get('[data-cy=close-x]').click();
-          });
+          if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+            cy.get('app-welcome-modal').invoke('hide');
+          }
         });
       });
       cy.restoreStorage();

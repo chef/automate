@@ -143,7 +143,9 @@ Then add in OpenSearch configuration as:
 
 ```
 
-{{< warning >}} Configure the OpenSearch Heap size to **50%** of RAM.{{< /warning >}}
+{{< warning >}} 
+Configure the OpenSearch Heap size to **50%** of RAM, but not more than 32GB.
+{{< /warning >}}
 
 
 Apply this using the `config patch` command.
@@ -377,7 +379,41 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 
 ## Troubleshooting
 
-If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
+### Circuit Breaking Exception
+
+```
+{"error":{"root_cause":[{"type":"circuit_breaking_exception","reason":"[parent] Data too large, data for [<http_request>] would be [6126524880/5.7gb], which is larger than the limit of [5988548608/5.5gb], real usage: [6126524880/5.7gb], new bytes reserved: [0/0b], usages [request=0/0b, fielddata=74975/73.2kb, in_flight_requests=0/0b, accounting=89882860/85.7mb]","bytes_wanted":6126524880,"bytes_limit":5988548608,"durability":"PERMANENT"}]
+```
+
+- Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>`
+```
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.runtime]
+         heapsize = "8g" # This should be Half of RAM
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+```
+
+### Shard Failure 
+
+```
+[ERROR] Elasticsearch exception [type=validation_exception, reason=Validation Failed: 1: this action would add [5] total shards, but this cluster currently has [997]/[1000] maximum shards open;]
+```
+To address the issue of shard limit hitting 1000, we need to increase the `max_shards_per_node`
+Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>` 
+```
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+         max_shards_per_node = "<NUMBER_OF_SHARD>"
+```
+### Migration Fails
+
+ If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
 
 ```sh
 sudo chef-automate backup restore </path/to/backups/>BACKUP_ID
@@ -410,3 +446,4 @@ sudo chef-automate backup restore <backup_id>
 Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
+

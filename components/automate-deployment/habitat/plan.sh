@@ -16,7 +16,7 @@ pkg_deps=(
   # runtime by Habitat.
   # 
   # IF YOU UPDATE THIS PIN YOU MUST ALSO UPDATE .expeditor/create-manifest.rb
-  core/hab/1.6.181/20201030172917
+  core/hab/1.6.521/20220603154827
   core/net-tools
   core/procps-ng
   core/util-linux
@@ -49,6 +49,7 @@ scaffolding_go_binary_list=(
 )
 
 do_strip() {
+  
   return 0
 }
 

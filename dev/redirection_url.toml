@@ -1,0 +1,3 @@
+[dex.v1.sys]
+    [dex.v1.sys.redirection_uris]
+        redirection_url = ["/signin", "/bye"]

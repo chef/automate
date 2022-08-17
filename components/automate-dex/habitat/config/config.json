@@ -24,5 +24,8 @@
 {{~#if cfg.invalid_login_attempts}}
 "invalid_login_attempts": {{ toJson cfg.invalid_login_attempts}},
 {{ ~/if }}
+{{~#if cfg.redirection_uris}}
+"redirection_uris": {{ toJson cfg.redirection_uris}},
+{{ ~/if }}
 "__placeholder": {}
 }

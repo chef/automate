@@ -7,19 +7,15 @@
     {
       "name": "mylinux-success",
       "version": "1.8.9",
-      "sha256": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27",
-      "title": "My Demo Linux successful profile",
+      "sha256": "0de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae21",
+      "title": "A Demo Linux success profile",
       "maintainer": "Chef Software, Inc.",
       "summary": "Demonstrates the use of InSpec Compliance Profile",
       "license": "Apache 2 license",
       "copyright": "Chef Software, Inc.",
       "copyright_email": "support@chef.io",
-      "supports": [
-
-      ],
-      "attributes": [
-
-      ],
+      "supports": [],
+      "attributes": [],
       "groups": [
         {
           "id": "controls/success.rb",
@@ -35,11 +31,8 @@
           "title": "Checking for /etc/passwd",
           "desc": "Checking for /etc/passwd desc",
           "impact": 0.6,
-          "refs": [
-
-          ],
-          "tags": {
-          },
+          "refs": [],
+          "tags": {},
           "code": "control '/etc/passwd must exist' do\n  title 'Checking for /etc/passwd'\n  desc 'Checking for /etc/passwd desc'\n  impact 0.6\n  describe file('/etc/passwd') do\n    it { should be_file }\n  end\nend\n",
           "source_location": {
             "line": 2,
@@ -59,11 +52,8 @@
           "title": "Checking for /etc/group",
           "desc": "Checking for /etc/group desc",
           "impact": 0.3,
-          "refs": [
-
-          ],
-          "tags": {
-          },
+          "refs": [],
+          "tags": {},
           "code": "control '/etc/group must exist' do\n  title 'Checking for /etc/group'\n  desc 'Checking for /etc/group desc'\n  impact 0.3\n  describe file('/etc/group') do\n    it { should be_file }\n  end\nend\n",
           "source_location": {
             "line": 11,
@@ -75,6 +65,268 @@
               "code_desc": "File /etc/group should be file",
               "run_time": 0.049345,
               "start_time": "2018-06-27T15:02:13+01:00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mylinux-failure-waived",
+      "version": "5.4.2",
+      "sha256": "0b7ecfb4f08d2ecdc8f08351d2e5ea93456c127aa751b2741b86f1e5f47614f2",
+      "title": "A Demo Linux failing profile waived",
+      "maintainer": "Chef Software, Inc.",
+      "summary": "Demonstrates the use of InSpec Compliance Profile",
+      "license": "Apache 2 license",
+      "copyright": "Chef Software, Inc.",
+      "copyright_email": "support@chef.io",
+      "supports": [
+        {
+          "os-family": "unix"
+        }
+      ],
+      "attributes": [],
+      "groups": [
+        {
+          "id": "controls/failure.rb",
+          "controls": [
+            "Checking /etc/missing5.rb"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "Checking /etc/missing5.rb",
+          "title": "Check /etc/missing5.rb",
+          "desc": "File test in failure.rb desc",
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'Checking /etc/missing5.rb' do\n  impact 0.5\n  title \"Check /etc/missing5.rb\"\n  desc \"File test in failure.rb desc\"\n  describe file('/etc/missing5.rb') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "line": 2,
+            "ref": "controls/failure.rb"
+          },
+          "waiver_data": {
+            "justification": "Sound reasoning",
+            "run": true,
+            "skipped_due_to_waiver": false,
+            "message": ""
+          },
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/missing5.rb should be file",
+              "run_time": 0.00557,
+              "start_time": "2018-06-27T15:02:21+01:00",
+              "message": "expected `File /etc/missing5.rb.file?` to return true, got false"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mylinux-failure",
+      "version": "5.4.4",
+      "sha256": "0b7ecfb4f08d2ecdc8f08351d2e5ea93456c127aa751b2741b86f1e5f47614f3",
+      "title": "A Demo Linux failing profile",
+      "maintainer": "Chef Software, Inc.",
+      "summary": "Demonstrates the use of InSpec Compliance Profile",
+      "license": "Apache 2 license",
+      "copyright": "Chef Software, Inc.",
+      "copyright_email": "support@chef.io",
+      "supports": [
+        {
+          "os-family": "unix"
+        }
+      ],
+      "attributes": [],
+      "groups": [
+        {
+          "id": "controls/failure.rb",
+          "controls": [
+            "Checking /etc/missing5.rb"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "failing control",
+          "title": "Log Suspicious Packets",
+          "desc": "When enabled, this feature logs packets with un-routable source addresses to the kernel log.\n\nRationale: Enabling this feature and logging these packets allows an administrator to investigate the possibility that an attacker is sending spoofed packets to their server.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control \"xccdf_org.cisecurity.benchmarks_rule_4.2.4_Log_Suspicious_Packets\" do\n  title \"Log Suspicious Packets\"\n  desc  \"\n    When enabled, this feature logs packets with un-routable source addresses to the kernel log.\n    \n    Rationale: Enabling this feature and logging these packets allows an administrator to investigate the possibility that an attacker is sending spoofed packets to their server.\n  \"\n  impact 1.0\n  describe kernel_parameter(\"net.ipv4.conf.all.log_martians\") do\n    its(\"value\") { should_not be_nil }\n  end\n  describe kernel_parameter(\"net.ipv4.conf.all.log_martians\") do\n    its(\"value\") { should eq 1 }\n  end\n  describe kernel_parameter(\"net.ipv4.conf.default.log_martians\") do\n    its(\"value\") { should_not be_nil }\n  end\n  describe kernel_parameter(\"net.ipv4.conf.default.log_martians\") do\n    its(\"value\") { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "line": 1010,
+            "ref": "controls/translated-controls.rb"
+          },
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.log_martians value should not be nil",
+              "run_time": 0.005221,
+              "start_time": "2018-06-27T15:02:16+01:00"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.log_martians value should eq 1",
+              "run_time": 0.005416,
+              "start_time": "2018-06-27T15:02:16+01:00",
+              "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.log_martians value should not be nil",
+              "run_time": 0.00562,
+              "start_time": "2018-06-27T15:02:16+01:00"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.log_martians value should eq 1",
+              "run_time": 0.00532,
+              "start_time": "2018-06-27T15:02:16+01:00",
+              "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "Checking /etc/missing5.rb",
+          "title": "Check /etc/missing5.rb",
+          "desc": "File test in failure.rb desc",
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'Checking /etc/missing5.rb' do\n  impact 0.5\n  title \"Check /etc/missing5.rb\"\n  desc \"File test in failure.rb desc\"\n  describe file('/etc/missing5.rb') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "line": 2,
+            "ref": "controls/failure.rb"
+          },
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/missing5.rb should be file",
+              "run_time": 0.00557,
+              "start_time": "2018-06-27T15:02:21+01:00",
+              "message": "expected `File /etc/missing5.rb.file?` to return true, got false"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mylinux-failure-pass-waived",
+      "version": "5.4.6",
+      "sha256": "0b7ecfb4f08d2ecdc8f08351d2e5ea93456c127aa751b2741b86f1e5f47614f4",
+      "title": "A Demo Linux with major failing one passing and one waived",
+      "maintainer": "Chef Software, Inc.",
+      "summary": "Demonstrates the use of InSpec Compliance Profile",
+      "license": "Apache 2 license",
+      "copyright": "Chef Software, Inc.",
+      "copyright_email": "support@chef.io",
+      "supports": [
+        {
+          "os-family": "unix"
+        }
+      ],
+      "attributes": [],
+      "groups": [
+        {
+          "id": "controls/failure.rb",
+          "controls": [
+            "Checking /etc/missing5.rb"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "failing control",
+          "title": "failing Log Suspicious Packets",
+          "desc": "When enabled, this feature logs packets with un-routable source addresses to the kernel log.\n\nRationale: Enabling this feature and logging these packets allows an administrator to investigate the possibility that an attacker is sending spoofed packets to their server.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control \"xccdf_org.cisecurity.benchmarks_rule_4.2.4_Log_Suspicious_Packets\" do\n  title \"Log Suspicious Packets\"\n  desc  \"\n    When enabled, this feature logs packets with un-routable source addresses to the kernel log.\n    \n    Rationale: Enabling this feature and logging these packets allows an administrator to investigate the possibility that an attacker is sending spoofed packets to their server.\n  \"\n  impact 1.0\n  describe kernel_parameter(\"net.ipv4.conf.all.log_martians\") do\n    its(\"value\") { should_not be_nil }\n  end\n  describe kernel_parameter(\"net.ipv4.conf.all.log_martians\") do\n    its(\"value\") { should eq 1 }\n  end\n  describe kernel_parameter(\"net.ipv4.conf.default.log_martians\") do\n    its(\"value\") { should_not be_nil }\n  end\n  describe kernel_parameter(\"net.ipv4.conf.default.log_martians\") do\n    its(\"value\") { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "line": 1010,
+            "ref": "controls/translated-controls.rb"
+          },
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.log_martians value should not be nil",
+              "run_time": 0.005221,
+              "start_time": "2018-06-27T15:02:16+01:00"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.log_martians value should eq 1",
+              "run_time": 0.005416,
+              "start_time": "2018-06-27T15:02:16+01:00",
+              "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.log_martians value should not be nil",
+              "run_time": 0.00562,
+              "start_time": "2018-06-27T15:02:16+01:00"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.log_martians value should eq 1",
+              "run_time": 0.00532,
+              "start_time": "2018-06-27T15:02:16+01:00",
+              "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "passing control",
+          "title": "passing Check /etc/missing5.rb",
+          "desc": "File test in failure.rb desc",
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'Checking /etc/missing5.rb' do\n  impact 0.5\n  title \"Check /etc/missing5.rb\"\n  desc \"File test in failure.rb desc\"\n  describe file('/etc/missing5.rb') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "line": 2,
+            "ref": "controls/failure.rb"
+          },
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/missing5.rb should be file",
+              "run_time": 0.00557,
+              "start_time": "2018-06-27T15:02:21+01:00"
+            }
+          ]
+        },
+        {
+          "id": "waived failing control",
+          "title": "waived Check /etc/missing5.rb",
+          "desc": "File test in failure.rb desc",
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'Checking /etc/missing5.rb' do\n  impact 0.5\n  title \"Check /etc/missing5.rb\"\n  desc \"File test in failure.rb desc\"\n  describe file('/etc/missing5.rb') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "line": 2,
+            "ref": "controls/failure.rb"
+          },
+          "waiver_data": {
+            "justification": "Sound reasoning",
+            "run": true,
+            "skipped_due_to_waiver": false,
+            "message": ""
+          },
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/missing5.rb should be file",
+              "run_time": 0.00557,
+              "start_time": "2018-06-27T15:02:21+01:00",
+              "message": "expected `File /etc/missing5.rb.file?` to return true, got false"
             }
           ]
         }
