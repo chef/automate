@@ -155,14 +155,16 @@ describe('ReportingComponent', () => {
       spyOn(router, 'navigate');
       const event = {detail: '2017-10-23'};
       component.onEndDateChanged(event);
-      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2017-10-23'}});
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { start_time: '2017-10-23',
+          end_time: '2017-10-23'}});
     });
 
     it('specific date object', () => {
       spyOn(router, 'navigate');
       const event = {detail: new Date('2017-10-23')};
       component.onEndDateChanged(event);
-      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2017-10-23'}});
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { start_time: '2017-10-23',
+          end_time: '2017-10-23'}});
     });
   });
 
@@ -479,6 +481,7 @@ describe('ReportingComponent', () => {
       // Add environment and end_time filters to the URL
       const queryParams = {...route.snapshot.queryParams};
       queryParams['environment'] = ['dev'];
+      queryParams['start_time'] = ['2019-09-05'];
       queryParams['end_time'] = ['2019-09-05'];
       route.snapshot.queryParams = queryParams;
 
@@ -488,7 +491,7 @@ describe('ReportingComponent', () => {
 
       // Ensure only the environment filter is removed and the end_time filter remains in the URL
       expect(router.navigate).toHaveBeenCalledWith([],
-        {queryParams: { end_time: [ '2019-09-05' ] }});
+        {queryParams: { start_time: [ '2019-09-05' ], end_time: [ '2019-09-05' ] }});
     });
   });
 });
