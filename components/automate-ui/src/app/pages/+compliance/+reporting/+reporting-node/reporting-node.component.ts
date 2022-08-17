@@ -95,7 +95,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       this.store.select(controlDetailList)
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([detailsStatusSt, detailsListState]) => {
-      if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)) {
+      if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)
+      && this.controlList && this.controlList.control_elements) {
         this.controlList.control_elements[this.index].controlDetailsLoading = false;
         this.isError = false;
         this.controlDetails = detailsListState;
@@ -145,6 +146,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   onFilterControlStatusClick(_event: any, status: string) {
     this.pageIndex = 1;
     this.activeStatusFilter = status;
+    this.openControls = {};
     this.getControlData(this.activeReport);
   }
 
