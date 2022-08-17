@@ -147,6 +147,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.pageIndex = 1;
     this.activeStatusFilter = status;
     this.getControlData(this.activeReport);
+    this.openControls = {};
   }
 
   onViewSourceClick(_event: any, control: { showMetaData: boolean; }) {
