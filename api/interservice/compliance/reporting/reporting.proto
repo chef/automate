@@ -25,7 +25,6 @@ service ReportingService {
 	rpc AssetCount(ListFilters) returns (AssetSummary) {};
 	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
 	rpc SetAssetConfig(ComplianceConfig) returns (ComplianceConfig) {};
-	rpc GetAssetConfig(google.protobuf.Empty) returns (ComplianceConfig) {};
 }
 
 message ReportContentRequest {
