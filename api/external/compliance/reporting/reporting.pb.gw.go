@@ -655,7 +655,7 @@ func local_request_ReportingService_SetAssetConfig_0(ctx context.Context, marsha
 }
 
 func request_ReportingService_GetAssetConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ReportingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
+	var protoReq GetAssetConfigRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.GetAssetConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -664,7 +664,7 @@ func request_ReportingService_GetAssetConfig_0(ctx context.Context, marshaler ru
 }
 
 func local_request_ReportingService_GetAssetConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ReportingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
+	var protoReq GetAssetConfigRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.GetAssetConfig(ctx, &protoReq)
