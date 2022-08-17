@@ -14,6 +14,60 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/compliance/reporting/assets/config": {
+      "put": {
+        "operationId": "ReportingService_SetAssetConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfig"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/assets/config/search": {
+      "get": {
+        "operationId": "ReportingService_GetAssetConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/assets/count": {
       "post": {
         "operationId": "ReportingService_AssetCount",
@@ -649,6 +703,18 @@ func init() {
           "type": "integer",
           "format": "int32",
           "title": "Total collected and weived in the assets"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ComplianceConfig": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string"
+        },
+        "older_than_days": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

@@ -209,4 +209,20 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/SetAssetConfig", "compliance:reporting:config", "compliance:reports:update", "PUT", "/api/v0/compliance/reporting/assets/config", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*ComplianceConfig); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "policy_name":
+					return m.PolicyName
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/GetAssetConfig", "compliance:reporting:config", "compliance:reports:get", "GET", "/api/v0/compliance/reporting/assets/config/search", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
