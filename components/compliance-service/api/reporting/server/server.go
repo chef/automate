@@ -961,3 +961,22 @@ func (srv *Server) ListAsset(ctx context.Context , in *reporting.AssetListReques
 	}
 	return &reporting.AssetListResponse{Assets: asset} , nil
 }
+
+func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfig) (*reporting.ComplianceConfig, error) {
+	res := &reporting.ComplianceConfig{}
+	res.PolicyName = "collection_percentage"
+	res.OlderThanDays = 60
+	return res, nil
+}
+
+func (srv *Server) GetAssetConfig(ctx context.Context) (*reporting.ComplianceConfig, error) {
+	in := &reporting.ComplianceConfig{}
+	res := &reporting.ComplianceConfig{}
+	res, err := srv.SetAssetConfig(ctx, in)
+	if err != nil {
+		logrus.Errorf("error GetAssetConfig: %v", err)
+		return nil, err
+	}
+	return res, nil
+}
+

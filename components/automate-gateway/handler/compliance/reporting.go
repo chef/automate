@@ -309,27 +309,53 @@ func (a *Reporting) getAllNodes(ctx context.Context, jobId string, end_time stri
 	}
 	return nodesList, nil
 }
-func (a *Reporting) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary , error) {
+func (a *Reporting) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary, error) {
 	inDomain := &reportingService.ListFilters{}
-	out := &reporting.AssetSummary{} 
-	f := func () (proto.Message ,error)  {
-		return a.client.AssetCount(ctx , inDomain)
+	out := &reporting.AssetSummary{}
+	f := func() (proto.Message, error) {
+		return a.client.AssetCount(ctx, inDomain)
 	}
-	err := protobuf.CallDomainService(in , inDomain , f , out)
+	err := protobuf.CallDomainService(in, inDomain, f, out)
 	if err != nil {
-		return nil , err
+		return nil, err
 	}
 	return out, nil
 }
-func (a *Reporting) ListAsset(ctx context.Context, in *reporting.AssetListRequest) (*reporting.AssetListResponse , error) {
+func (a *Reporting) ListAsset(ctx context.Context, in *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
 	inDomain := &reportingService.AssetListRequest{}
-	out := &reporting.AssetListResponse{} 
-	f := func () (proto.Message ,error)  {
-		return a.client.ListAsset(ctx , inDomain)
+	out := &reporting.AssetListResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.ListAsset(ctx, inDomain)
 	}
-	err := protobuf.CallDomainService(in , inDomain , f , out)
+	err := protobuf.CallDomainService(in, inDomain, f, out)
 	if err != nil {
-		return nil , err
+		return nil, err
 	}
 	return out, nil
-} 
+}
+
+func (a *Reporting) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfig) (*reporting.ComplianceConfig, error) {
+	inDomain := &reportingService.ComplianceConfig{}
+	out := &reporting.ComplianceConfig{}
+	f := func() (proto.Message, error) {
+		return a.client.SetAssetConfig(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (a *Reporting) GetAssetConfig(ctx context.Context, in *gp.Empty) (*reporting.ComplianceConfig, error) {
+	inDomain := &gp.Empty{}
+	out := &reporting.ComplianceConfig{}
+	f := func() (proto.Message, error) {
+		return a.client.GetAssetConfig(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
