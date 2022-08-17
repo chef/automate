@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment/moment';
-import { omitBy, isNil } from 'lodash';
+import { omitBy, isNil } from 'lodash'; 
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
