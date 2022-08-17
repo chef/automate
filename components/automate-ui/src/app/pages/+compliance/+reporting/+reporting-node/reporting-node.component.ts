@@ -95,7 +95,6 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       this.store.select(controlDetailList)
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([detailsStatusSt, detailsListState]) => {
-      console.log(this.controlList, 'test1');
       if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)
       && this.controlList && this.controlList.control_elements) {
         this.controlList.control_elements[this.index].controlDetailsLoading = false;
