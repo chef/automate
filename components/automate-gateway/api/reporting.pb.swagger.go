@@ -14,6 +14,63 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/compliance/reporting/assets/config": {
+      "put": {
+        "summary": "SetAssetConfig sets the compliance config with the parameters of no of days\nAnd API returns the policy name and no of the days which will set in the compliance data base",
+        "description": "Example\n{\n\"value\":60\n}\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ReportingService_SetAssetConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/assets/config/search": {
+      "get": {
+        "summary": "GetAssetConfig gets the config details from the compliance data base \nand API return the policy name and no of days\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:get\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ReportingService_GetAssetConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/assets/count": {
       "post": {
         "operationId": "ReportingService_AssetCount",
@@ -651,6 +708,32 @@ func init() {
           "title": "Total collected and weived in the assets"
         }
       }
+    },
+    "chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "format": "int32",
+          "title": "No of days for the config"
+        }
+      },
+      "title": "ComplianceConfigRequest to update no of days in the config"
+    },
+    "chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string",
+          "title": "Policy name to get from config"
+        },
+        "value": {
+          "type": "integer",
+          "format": "int32",
+          "title": "No of days to get for config"
+        }
+      },
+      "title": "ComplianceConfigResponse to get the policy name and no of days"
     },
     "chef.automate.api.compliance.reporting.v1.Control": {
       "type": "object",

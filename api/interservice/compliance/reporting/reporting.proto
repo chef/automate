@@ -24,6 +24,8 @@ service ReportingService {
 	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
 	rpc AssetCount(ListFilters) returns (AssetSummary) {};
 	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
+	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {};
+ 	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {};
 }
 
 message ReportContentRequest {
@@ -427,4 +429,22 @@ message AssetListRequest {
 
 message AssetListResponse {
 	repeated Assets assets = 1;
+}
+
+// ComplianceConfigRequest to update no of days in the config
+message ComplianceConfigRequest{
+	//No of days for the config
+    int32 value = 1;
+}
+
+// ComplianceConfigResponse to get the policy name and no of days
+message ComplianceConfigResponse {
+	//Policy name to get from config
+    string policy_name = 1;
+	//No of days to get for config
+    int32 value = 2;
+}
+
+// GetAssetConfigRequest to perform GET request
+message GetAssetConfigRequest {
 }
