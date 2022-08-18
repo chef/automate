@@ -1028,14 +1028,17 @@ message AssetListResponse {
 	repeated Assets assets = 1;
 }
 
+// ComplianceConfigRequest to update no of days in the config
 message ComplianceConfigRequest{
-    int32 older_than_days = 1;
+    int32 no_of_days = 1;
 }
 
+// ComplianceConfigResponse to get the policy name and no of days
 message ComplianceConfigResponse {
     string policy_name = 1;
-    int32 older_than_days = 2;
+    int32 no_of_days = 2;
 }
 
+// GetAssetConfigRequest to perform GET request
 message GetAssetConfigRequest {
 }
