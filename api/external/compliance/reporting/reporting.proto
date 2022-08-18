@@ -383,6 +383,27 @@ service ReportingService {
 		};
 	}
 
+	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {
+ 		option (google.api.http) = {
+ 			put: "/api/v0/compliance/reporting/assets/config"
+ 			body: "*"
+ 		};
+ 		option (chef.automate.api.iam.policy) = {
+ 			resource: "compliance:reporting:config"
+ 			action: "compliance:reports:update"
+ 		};
+ 	}
+
+ 	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {
+ 		option (google.api.http) = {
+ 			get: "/api/v0/compliance/reporting/assets/config/search"
+ 		};
+ 		option (chef.automate.api.iam.policy) = {
+ 			resource: "compliance:reporting:config"
+ 			action: "compliance:reports:get"
+ 		};
+ 	}
+
 }
 
 message ControlItemRequest {

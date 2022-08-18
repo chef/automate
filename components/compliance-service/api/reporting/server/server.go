@@ -982,3 +982,22 @@ func (srv *Server) UpdateConfigs(ctx context.Context, in *reporting.ComplianceCo
 	}
 	return nil
 }
+
+func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfigRequest) error {
+	err := srv.UpdateConfigs(ctx, in)
+	if err != nil {
+		logrus.Errorf("error SetAssetConfig: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	out := &reporting.ComplianceConfigResponse{}
+	out, err := srv.GetConfigs(ctx, in)
+	if err != nil {
+		logrus.Errorf("error GetAssetConfig: %v", err)
+		return nil, err
+	}
+	return out, nil
+}

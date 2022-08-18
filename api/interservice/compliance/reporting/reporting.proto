@@ -24,6 +24,8 @@ service ReportingService {
 	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
 	rpc AssetCount(ListFilters) returns (AssetSummary) {};
 	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
+	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {};
+ 	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {};
 }
 
 message ReportContentRequest {
