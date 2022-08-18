@@ -76,9 +76,9 @@ There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
 
 {{< warning >}} Your drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
 
-{{< warning >}} Disable the **sharding** for automate running embedded Elasticsearch.
+{{< warning >}} Upgrade will disable the **sharding** for automate running embedded Elasticsearch.
 
-Also, accept the checklist item asking permission to disable sharding. {{< /warning >}}
+So, accept the checklist item asking permission to disable sharding. {{< /warning >}}
 
 ### Chef Automate With Embedded Elasticsearch
 
@@ -91,7 +91,13 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.
 
 ```sh
-sudo chef-automate upgrade run --major
+sudo chef-automate upgrade run --airgap-bundle automate-${automate_version_number}.aib --major
+```
+
+**Note:** To upgrade from 3.0.49 to 4.0.x ,create a new Airgap Bundle of `4.x.y` version .For example:4.0.91
+
+```bash
+./chef-automate airgap bundle create --version VERSION
 ```
 
 Once you are done with the upgrade, follow the steps post upgrade which are:
