@@ -433,12 +433,15 @@ message AssetListResponse {
 
 // ComplianceConfigRequest to update no of days in the config
 message ComplianceConfigRequest{
+	//No of days for the config
     int32 no_of_days = 1;
 }
 
 // ComplianceConfigResponse to get the policy name and no of days
 message ComplianceConfigResponse {
+	//Policy name to get from config
     string policy_name = 1;
+	//No of days to get for config
     int32 no_of_days = 2;
 }
 

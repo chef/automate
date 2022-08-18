@@ -383,6 +383,20 @@ service ReportingService {
 		};
 	}
 
+	/*
+	SetAssetConfig sets the compliance config with the parameters of no of days
+	And API returns the policy name and no of the days which will set in the compliance data base
+
+	Example
+	{
+    	"no_of_days":60
+	}
+
+	Authorization Action:
+	```
+	compliance:reports:update
+	```
+	*/ 
 	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {
  		option (google.api.http) = {
  			put: "/api/v0/compliance/reporting/assets/config"
@@ -394,6 +408,14 @@ service ReportingService {
  		};
  	}
 
+	/*
+	GetAssetConfig gets the config details from the compliance data base 
+	and API return the policy name and no of days
+	Authorization Action:
+	```
+	compliance:reports:get
+	```
+	*/ 
  	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {
  		option (google.api.http) = {
  			get: "/api/v0/compliance/reporting/assets/config/search"
@@ -1051,12 +1073,15 @@ message AssetListResponse {
 
 // ComplianceConfigRequest to update no of days in the config
 message ComplianceConfigRequest{
+	//No of days for the config 
     int32 no_of_days = 1;
 }
 
 // ComplianceConfigResponse to get the policy name and no of days
 message ComplianceConfigResponse {
+	//Policy name to get from config
     string policy_name = 1;
+	//No of days to get for config
     int32 no_of_days = 2;
 }
 
