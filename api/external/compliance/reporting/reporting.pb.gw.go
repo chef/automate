@@ -621,7 +621,7 @@ func local_request_ReportingService_ListAsset_0(ctx context.Context, marshaler r
 }
 
 func request_ReportingService_SetAssetConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ReportingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ComplianceConfig
+	var protoReq ComplianceConfigRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -638,7 +638,7 @@ func request_ReportingService_SetAssetConfig_0(ctx context.Context, marshaler ru
 }
 
 func local_request_ReportingService_SetAssetConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ReportingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq ComplianceConfig
+	var protoReq ComplianceConfigRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

@@ -21,7 +21,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfig"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse"
             }
           },
           "default": {
@@ -37,7 +37,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfig"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest"
             }
           }
         ],
@@ -53,7 +53,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfig"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse"
             }
           },
           "default": {
@@ -706,7 +706,16 @@ func init() {
         }
       }
     },
-    "chef.automate.api.compliance.reporting.v1.ComplianceConfig": {
+    "chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest": {
+      "type": "object",
+      "properties": {
+        "older_than_days": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse": {
       "type": "object",
       "properties": {
         "policy_name": {
