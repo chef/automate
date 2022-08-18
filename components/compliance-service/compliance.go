@@ -3,6 +3,9 @@ package compliance
 import (
 	"context"
 	"fmt"
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
+	"github.com/chef/automate/components/compliance-service/migrations"
 	"io"
 	"net"
 	"net/http"
@@ -41,7 +44,6 @@ import (
 	ingestserver "github.com/chef/automate/components/compliance-service/ingest/server"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -202,11 +204,25 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		}
 	}
 
+	upgradeDB := pgdb.NewDB(db)
+	upgradeService := migrations.NewService(upgradeDB, cerealManager)
+
+	// Initiating cereal Manager for upgrade jobs
+	err = migrations.InitCerealManager(cerealManager, 1, ingesticESClient, upgradeDB)
+	if err != nil {
+		logrus.Fatalf("Failed to initiate cereal manager for upgrading jobs %v", err)
+	}
+
+	err = processor.InitCerealManager(cerealManager, conf.CerealConfig.Workers, ingesticESClient)
+	if err != nil {
+		logrus.Fatalf("failed to initiate cereal manager: %v", err)
+	}
+
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServiceServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
 			reportmanagerClient, conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient,
-			conf.Service.MessageBufferSize, conf.Service.EnableLargeReporting))
+			conf.Service.MessageBufferSize, conf.Service.EnableLargeReporting, cerealManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
@@ -252,6 +268,9 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	if err != nil {
 		logrus.Fatalf("serveGrpc aborting, unable to run migrations: %v", err)
 	}
+
+	// Running upgrade scenarios for DayLatest flag
+	go upgradeService.PollForUpgradeFlagDayLatest()
 
 	errc := make(chan error)
 	defer close(errc)
@@ -573,6 +592,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	// these are all inspec-agent packages
 	scanner := scanner.New(mgrClient, nodesClient, db)
 	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
+
 	err = runner.InitCerealManager(cerealManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize cereal manager")
@@ -648,6 +668,7 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	if err != nil {
 		return err
 	}
+
 	defer func() {
 		err := cerealManager.Stop()
 		if err != nil {

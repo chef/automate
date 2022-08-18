@@ -160,7 +160,7 @@ func TestListProfiles(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := contextWithProjects(test.allowedProjects)
 
-			query := reporting.Query{Filters: []*reporting.ListFilter{{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}}}}
+			query := reporting.Query{Filters: []*reporting.ListFilter{{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}}, {Type: "start_time", Values: []string{"2018-10-25T00:00:00Z"}}}}
 
 			response, err := server.ListProfiles(ctx, &query)
 
