@@ -914,15 +914,15 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 	}
 	return nil*/
 }
-func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*reporting.AssetSummary , error) {
+func (srv *Server) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary, error) {
 	formattedFilters := formatFilters(in.Filters)
 	var assets *reporting.AssetSummary
 	endTime := time.Now().Format(time.RFC3339)
 	formattedFilters["end_time"] = []string{endTime}
-	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , endTime)
+	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0], endTime)
 	if err != nil {
 		logrus.Errorf("The starttime and endtime validation error %v", err)
-		return nil , err
+		return nil, err
 	}
 	formattedFilters, err = filterByProjects(ctx, formattedFilters)
 	if err != nil {
@@ -932,45 +932,45 @@ func (srv *Server)AssetCount(ctx context.Context , in *reporting.ListFilters) (*
 	assets, err = srv.es.GetAssetSummary(ctx, formattedFilters)
 	if err != nil {
 		logrus.Errorf("Unable to get the asset summary %v ", err)
-		return nil , err
+		return nil, err
 	}
 	return assets, nil
 
 }
 
-func (srv *Server) ListAsset(ctx context.Context , in *reporting.AssetListRequest) (*reporting.AssetListResponse , error) {
+func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
 	formattedFilters := formatFilters(in.Filters)
 	var asset []*reporting.Assets
 	endTime := time.Now().Format(time.RFC3339)
 	formattedFilters["end_time"] = []string{endTime}
-	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0] , endTime)
+	err := relaxting.ValidateTimeRangeForFilters(formattedFilters["start_time"][0], endTime)
 	if err != nil {
 		logrus.Errorf("The starttime and endtime validation error: %v", err)
-		return nil , err
-	}
-	formattedFilters, err = filterByProjects(ctx , formattedFilters)
-	if err != nil {
-		logrus.Errorf("Unable to get filters by filterbyProject: %v" , err)
 		return nil, err
 	}
-	asset, err = srv.es.GetAsset(ctx , formattedFilters , in.Size , in.From , in.AssetsType)
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		logrus.Errorf("Unable to get %v from the assets list: %v" , in.AssetsType , err)
-		return nil , err
+		logrus.Errorf("Unable to get filters by filterbyProject: %v", err)
+		return nil, err
 	}
-	return &reporting.AssetListResponse{Assets: asset} , nil
+	asset, err = srv.es.GetAsset(ctx, formattedFilters, in.Size, in.From, in.AssetsType)
+	if err != nil {
+		logrus.Errorf("Unable to get %v from the assets list: %v", in.AssetsType, err)
+		return nil, err
+	}
+	return &reporting.AssetListResponse{Assets: asset}, nil
 }
 
 func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
 	res := &reporting.ComplianceConfigResponse{}
-	res.OlderThanDays = in.OlderThanDays
+	res.NoOfDays = in.NoOfDays
 	res.PolicyName = "collection_percentage"
 	return res, nil
 }
 
 func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
 	set := &reporting.ComplianceConfigRequest{}
-	set.OlderThanDays = 60
+	set.NoOfDays = 60
 	res := &reporting.ComplianceConfigResponse{}
 	res, err := srv.SetAssetConfig(ctx, set)
 	if err != nil {

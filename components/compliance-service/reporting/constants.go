@@ -3,10 +3,10 @@ package reporting
 const ESize = 999999
 
 const (
-	UNREPORTED  = "unreported"
+	UNREPORTED = "unreported"
 	UNREACHABLE = "unreachable"
 	UNCOLLECTED = "uncollected"
-	COLLECTED   = "collected"
+	COLLECTED = "collected"
 )
 
 // These are filter types where we use ElasticSearch Term Queries

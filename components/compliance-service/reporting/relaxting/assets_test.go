@@ -3,8 +3,8 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
-        "github.com/olivere/elastic/v7"
-        "github.com/stretchr/testify/assert"
+	"github.com/olivere/elastic/v7"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
