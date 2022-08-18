@@ -964,25 +964,6 @@ func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest
 	return &reporting.AssetListResponse{Assets: asset}, nil
 }
 
-// func (srv *Server) GetConfigs(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
-// 	result, err := srv.db.GetConfigs(ctx)
-// 	if err != nil {
-// 		logrus.Errorf("error while getting the conf: %+v", err)
-// 		return nil, err
-// 	}
-
-// 	return result, nil
-// }
-
-// func (srv *Server) UpdateConfigs(ctx context.Context, in *reporting.ComplianceConfigRequest) error {
-// 	err := srv.db.SetConfigs(ctx, in)
-// 	if err != nil {
-// 		logrus.Errorf("error while updating the conf: %+v", err)
-// 		return err
-// 	}
-// 	return nil
-// }
-
 func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
 	result, err := srv.db.GetConfigs(ctx)
 	if err != nil {
