@@ -4381,6 +4381,7 @@ type ComplianceConfigRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	//No of days for the config
 	NoOfDays int32 `protobuf:"varint,1,opt,name=no_of_days,json=noOfDays,proto3" json:"no_of_days,omitempty" toml:"no_of_days,omitempty" mapstructure:"no_of_days,omitempty"`
 }
 
@@ -4429,8 +4430,10 @@ type ComplianceConfigResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	//Policy name to get from config
 	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty" toml:"policy_name,omitempty" mapstructure:"policy_name,omitempty"`
-	NoOfDays   int32  `protobuf:"varint,2,opt,name=no_of_days,json=noOfDays,proto3" json:"no_of_days,omitempty" toml:"no_of_days,omitempty" mapstructure:"no_of_days,omitempty"`
+	//No of days to get for config
+	NoOfDays int32 `protobuf:"varint,2,opt,name=no_of_days,json=noOfDays,proto3" json:"no_of_days,omitempty" toml:"no_of_days,omitempty" mapstructure:"no_of_days,omitempty"`
 }
 
 func (x *ComplianceConfigResponse) Reset() {

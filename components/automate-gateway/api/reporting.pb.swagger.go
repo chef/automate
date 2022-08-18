@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/api/v0/compliance/reporting/assets/config": {
       "put": {
+        "summary": "SetAssetConfig sets the compliance config with the parameters of no of days\nAnd API returns the policy name and no of the days which will set in the compliance data base",
+        "description": "Example\n{\n\"no_of_days\":60\n}\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_SetAssetConfig",
         "responses": {
           "200": {
@@ -48,6 +50,7 @@ func init() {
     },
     "/api/v0/compliance/reporting/assets/config/search": {
       "get": {
+        "summary": "GetAssetConfig gets the config details from the compliance data base \nand API return the policy name and no of days\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_GetAssetConfig",
         "responses": {
           "200": {
@@ -711,7 +714,8 @@ func init() {
       "properties": {
         "no_of_days": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "No of days for the config"
         }
       },
       "title": "ComplianceConfigRequest to update no of days in the config"
@@ -720,11 +724,13 @@ func init() {
       "type": "object",
       "properties": {
         "policy_name": {
-          "type": "string"
+          "type": "string",
+          "title": "Policy name to get from config"
         },
         "no_of_days": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "No of days to get for config"
         }
       },
       "title": "ComplianceConfigResponse to get the policy name and no of days"

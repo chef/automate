@@ -4313,6 +4313,7 @@ type ComplianceConfigRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	//No of days for the config
 	NoOfDays int32 `protobuf:"varint,1,opt,name=no_of_days,json=noOfDays,proto3" json:"no_of_days,omitempty"`
 }
 
@@ -4361,8 +4362,10 @@ type ComplianceConfigResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	//Policy name to get from config
 	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
-	NoOfDays   int32  `protobuf:"varint,2,opt,name=no_of_days,json=noOfDays,proto3" json:"no_of_days,omitempty"`
+	//No of days to get for config
+	NoOfDays int32 `protobuf:"varint,2,opt,name=no_of_days,json=noOfDays,proto3" json:"no_of_days,omitempty"`
 }
 
 func (x *ComplianceConfigResponse) Reset() {
@@ -6494,7 +6497,27 @@ type ReportingServiceClient interface {
 	LicenseUsageNodes(ctx context.Context, in *TimeQuery, opts ...grpc.CallOption) (*Reports, error)
 	AssetCount(ctx context.Context, in *ListFilters, opts ...grpc.CallOption) (*AssetSummary, error)
 	ListAsset(ctx context.Context, in *AssetListRequest, opts ...grpc.CallOption) (*AssetListResponse, error)
+	//
+	//SetAssetConfig sets the compliance config with the parameters of no of days
+	//And API returns the policy name and no of the days which will set in the compliance data base
+	//
+	//Example
+	//{
+	//"no_of_days":60
+	//}
+	//
+	//Authorization Action:
+	//```
+	//compliance:reports:update
+	//```
 	SetAssetConfig(ctx context.Context, in *ComplianceConfigRequest, opts ...grpc.CallOption) (*ComplianceConfigResponse, error)
+	//
+	//GetAssetConfig gets the config details from the compliance data base
+	//and API return the policy name and no of days
+	//Authorization Action:
+	//```
+	//compliance:reports:get
+	//```
 	GetAssetConfig(ctx context.Context, in *GetAssetConfigRequest, opts ...grpc.CallOption) (*ComplianceConfigResponse, error)
 }
 
@@ -6931,7 +6954,27 @@ type ReportingServiceServer interface {
 	LicenseUsageNodes(context.Context, *TimeQuery) (*Reports, error)
 	AssetCount(context.Context, *ListFilters) (*AssetSummary, error)
 	ListAsset(context.Context, *AssetListRequest) (*AssetListResponse, error)
+	//
+	//SetAssetConfig sets the compliance config with the parameters of no of days
+	//And API returns the policy name and no of the days which will set in the compliance data base
+	//
+	//Example
+	//{
+	//"no_of_days":60
+	//}
+	//
+	//Authorization Action:
+	//```
+	//compliance:reports:update
+	//```
 	SetAssetConfig(context.Context, *ComplianceConfigRequest) (*ComplianceConfigResponse, error)
+	//
+	//GetAssetConfig gets the config details from the compliance data base
+	//and API return the policy name and no of days
+	//Authorization Action:
+	//```
+	//compliance:reports:get
+	//```
 	GetAssetConfig(context.Context, *GetAssetConfigRequest) (*ComplianceConfigResponse, error)
 }
 
