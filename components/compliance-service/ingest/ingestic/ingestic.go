@@ -56,7 +56,7 @@ func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping ma
 		return errors.Wrap(err, "Insert Comp Node Run Info")
 	}
 
-	return err
+	return nil
 }
 
 // InitializeStore runs the necessary initialization processes to make elasticsearch usable
