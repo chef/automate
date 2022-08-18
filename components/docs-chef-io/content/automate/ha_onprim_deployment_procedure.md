@@ -20,12 +20,10 @@ In this section, we'll discuss the steps to deploy Chef Automate HA on-premise m
 ### Prerequisites
 
 - All VM's or Machines are up and running.
-- OS Root Volume (/) must be at least 40 GB
-- TMP space (/var/tmp) must be at least 5GB
-- Separate Hab volume (/hab) provisioned at least 100 GB, for opensearch node `/hab` volume will be more based on the data retention policy.   
-- A Common user has access to all machines.
-- This common user should have sudo privileges.
-- This common user uses same SSH Private Key file to access all machines.
+- The Root Volume of the Operating System should not be less than **40 GB**.
+- The TMP space (/var/tmp) should not be less than **5GB**.
+- The Separate Hab's volume (/hab) provisioned should be at least 100 GB. For opensearch node, the `/hab` volume will be more based on the data retention policy.
+- A common user has access to all machines, should have **sudo privileges** and can use the same **SSH Private Key** file to access all machines.
 - Key-based SSH for the provisioning user for all the machine for HA-Deployment. 
 - LoadBalancers are setup according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)

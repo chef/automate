@@ -19,8 +19,8 @@ This guide details how to set up the load balancer configuration for Chef Automa
 
 Assuming you have DNS configured with domain names:
 
-- Chef Automate: chefautomate.example.com
-- Chef Infra Server: chefinfraserver.example.com
+- **Chef Automate:** `chefautomate.example.com`
+- **Chef Infra Server:** `chefinfraserver.example.com`
 
 ## Install Nginx
 

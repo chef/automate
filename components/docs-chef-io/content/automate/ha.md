@@ -18,7 +18,7 @@ Thus, HA is designed to avoid loss of service by reducing or managing failures a
 
 ## Chef Automate High Availability (HA)
 
-The Chef Automate HA equates to reliability, efficiency, and productivity, built on **Redundancy** and **Failover**. It aids in addressing significant issues like service failure and zone failure.
+The Chef Automate HA equates to the reliability, efficiency, and productivity, built on **Redundancy** and **Failover**. It aids in addressing significant issues like service failure and zone failure.
 
 ## Chef Automate HA Architecture
 
@@ -39,7 +39,7 @@ The Chef Automate HA Architecture involves the following clusters as part of the
 - **Backend Cluster** (Persistent Services)
   - **Postgres:** Database requires a minimum of three nodes. Postgres database uses the *Leader-Follower* strategy, where one becomes a leader, and the other two are the followers.
 
-  - **OpenSearch:** Database requires a minimum of three nodes. OpenSearch database manages the [cluster internally](https://opensearch.org/docs/latest/opensearch/cluster/).
+  - **OpenSearch:** Database requires a minimum of three nodes. OpenSearch database manages the [cluster](https://opensearch.org/docs/latest/opensearch/cluster/) internally.
 
 - **Frontend Cluster** (Application Services)
   - [Chef Automate](https://docs.chef.io/automate/)
@@ -54,9 +54,9 @@ Chef Automate High Availability (HA) supports two types of deployment:
 
 ### On-premise Deployment (Existing Node/Bare Infrastructure)
 
-In this, we expect VM (Virtual machine) or Bare Metal machines (Physical machine) that are already created and have initial Operating System (OS) setup done. Including Ports and Security policies changed according to requirements.
+In this, we expect VM (virtual machine) or Bare Metal Machines (physical machine) that are already created and have initial Operating System (OS) setup done. Including Ports and Security policies changed according to requirements.
 
-After this, installation steps will Deploy Chef Automate, Chef Infra Server, Postgresql DB, and OpenSearch DB to the relevant VMs or Physical Machines as provided in Config.
+After this, installation steps will deploy Chef Automate, Chef Infra Server, Postgresql DB, and OpenSearch DB to the relevant VMs or Physical Machines as provided in Config.
 
 ### Cloud Deployment using Amazon Web Services (AWS)
 
