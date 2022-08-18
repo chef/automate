@@ -11,6 +11,60 @@
     "application/json"
   ],
   "paths": {
+    "/api/v0/compliance/reporting/assets/config": {
+      "put": {
+        "operationId": "ReportingService_SetAssetConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/assets/config/search": {
+      "get": {
+        "operationId": "ReportingService_GetAssetConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/assets/count": {
       "post": {
         "operationId": "ReportingService_AssetCount",
@@ -646,6 +700,27 @@
           "type": "integer",
           "format": "int32",
           "title": "Total collected and weived in the assets"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest": {
+      "type": "object",
+      "properties": {
+        "no_of_days": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string"
+        },
+        "older_of_days": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
