@@ -14,7 +14,7 @@ import (
 )
 
 func TestReadNode(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5)
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil, 5, nil)
 
 	unassignedNodeId := newUUID()
 	assignedNodeId := newUUID()

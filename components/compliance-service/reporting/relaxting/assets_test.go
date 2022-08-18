@@ -3,18 +3,12 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/olivere/elastic/v7"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-)
 
-var esr = ES2Backend{
-	ESUrl:             "",
-	Enterprise:        "",
-	ChefDeliveryUser:  "",
-	ChefDeliveryToken: "",
-}
+	"github.com/olivere/elastic/v7"
+	"github.com/stretchr/testify/assert"
+)
 
 func TestFiltersForAssetIndex(t *testing.T) {
 
