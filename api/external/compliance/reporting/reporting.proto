@@ -389,7 +389,7 @@ service ReportingService {
 
 	Example
 	{
-    	"no_of_days":60
+    	"value":60
 	}
 
 	Authorization Action:
@@ -1074,7 +1074,7 @@ message AssetListResponse {
 // ComplianceConfigRequest to update no of days in the config
 message ComplianceConfigRequest{
 	//No of days for the config 
-    int32 no_of_days = 1;
+    int32 value = 1;
 }
 
 // ComplianceConfigResponse to get the policy name and no of days
@@ -1082,7 +1082,7 @@ message ComplianceConfigResponse {
 	//Policy name to get from config
     string policy_name = 1;
 	//No of days to get for config
-    int32 no_of_days = 2;
+    int32 value = 2;
 }
 
 // GetAssetConfigRequest to perform GET request

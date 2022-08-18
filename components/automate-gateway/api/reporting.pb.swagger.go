@@ -17,7 +17,7 @@ func init() {
     "/api/v0/compliance/reporting/assets/config": {
       "put": {
         "summary": "SetAssetConfig sets the compliance config with the parameters of no of days\nAnd API returns the policy name and no of the days which will set in the compliance data base",
-        "description": "Example\n{\n\"no_of_days\":60\n}\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Example\n{\n\"value\":60\n}\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_SetAssetConfig",
         "responses": {
           "200": {
@@ -712,7 +712,7 @@ func init() {
     "chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest": {
       "type": "object",
       "properties": {
-        "no_of_days": {
+        "value": {
           "type": "integer",
           "format": "int32",
           "title": "No of days for the config"
@@ -727,7 +727,7 @@ func init() {
           "type": "string",
           "title": "Policy name to get from config"
         },
-        "no_of_days": {
+        "value": {
           "type": "integer",
           "format": "int32",
           "title": "No of days to get for config"
