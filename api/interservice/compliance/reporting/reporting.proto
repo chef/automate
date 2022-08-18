@@ -25,8 +25,8 @@ service ReportingService {
 	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
 	rpc AssetCount(ListFilters) returns (AssetSummary) {};
 	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
-	rpc SetAssetConfig(ComplianceConfig) returns (ComplianceConfig) {};
-	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfig) {};
+	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {};
+	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {};
 }
 
 message ReportContentRequest {
@@ -419,7 +419,11 @@ message AssetListResponse {
 	repeated Assets assets = 1;
 }
 
-message ComplianceConfig {
+message ComplianceConfigRequest{
+	int32 older_than_days = 1;
+}
+
+message ComplianceConfigResponse {
 	string policy_name = 1;
 	int32 older_than_days = 2;
 }

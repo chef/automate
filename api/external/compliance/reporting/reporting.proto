@@ -383,7 +383,7 @@ service ReportingService {
 		};
 	}
 
-	rpc SetAssetConfig(ComplianceConfig) returns (ComplianceConfig) {
+	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {
 		option (google.api.http) = {
 			put: "/api/v0/compliance/reporting/assets/config"
 			body: "*"
@@ -394,7 +394,7 @@ service ReportingService {
 		};
 	}
 
-	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfig) {
+	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {
 		option (google.api.http) = {
 			get: "/api/v0/compliance/reporting/assets/config/search"
 		};
@@ -1047,7 +1047,11 @@ message AssetListResponse {
 	repeated Assets assets = 1;
 }
 
-message ComplianceConfig {
+message ComplianceConfigRequest{
+	int32 older_than_days = 1;
+}
+
+message ComplianceConfigResponse {
 	string policy_name = 1;
 	int32 older_than_days = 2;
 }
