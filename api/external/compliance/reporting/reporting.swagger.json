@@ -710,7 +710,8 @@
           "type": "integer",
           "format": "int32"
         }
-      }
+      },
+      "title": "ComplianceConfigRequest to update no of days in the config"
     },
     "chef.automate.api.compliance.reporting.v1.ComplianceConfigResponse": {
       "type": "object",
@@ -718,11 +719,12 @@
         "policy_name": {
           "type": "string"
         },
-        "older_of_days": {
+        "no_of_days": {
           "type": "integer",
           "format": "int32"
         }
-      }
+      },
+      "title": "ComplianceConfigResponse to get the policy name and no of days"
     },
     "chef.automate.api.compliance.reporting.v1.Control": {
       "type": "object",

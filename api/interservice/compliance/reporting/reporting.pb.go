@@ -4375,6 +4375,7 @@ func (x *AssetListResponse) GetAssets() []*Assets {
 	return nil
 }
 
+// ComplianceConfigRequest to update no of days in the config
 type ComplianceConfigRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4422,6 +4423,7 @@ func (x *ComplianceConfigRequest) GetNoOfDays() int32 {
 	return 0
 }
 
+// ComplianceConfigResponse to get the policy name and no of days
 type ComplianceConfigResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4477,6 +4479,7 @@ func (x *ComplianceConfigResponse) GetNoOfDays() int32 {
 	return 0
 }
 
+// GetAssetConfigRequest to perform GET request
 type GetAssetConfigRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

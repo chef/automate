@@ -15,7 +15,7 @@ const (
 func (db *DB) GetConfigs(ctx context.Context) (*reporting.ComplianceConfigResponse, error) {
 	resp := reporting.ComplianceConfigResponse{}
 
-	row := db.QueryRow("SELECT policy_name, older_than_days FROM compliance_lifecycle;")
+	row := db.QueryRow("SELECT policy_name, no_of_days FROM compliance_lifecycle;")
 	if err := row.Scan(&resp.PolicyName, &resp.NoOfDays); err != nil {
 		logrus.Errorf("error while scanning fields: %+v", err)
 		return nil, err
@@ -25,7 +25,7 @@ func (db *DB) GetConfigs(ctx context.Context) (*reporting.ComplianceConfigRespon
 
 func (db *DB) SetConfigs(ctx context.Context, in *reporting.ComplianceConfigRequest) error {
 
-	row, err := db.Exec("UPDATE compliance_lifecycle SET older_than_days=$1 WHERE policy_name=$2;", in.NoOfDays, PolicyNameUnreachable)
+	row, err := db.Exec("UPDATE compliance_lifecycle SET no_of_days=$1 WHERE policy_name=$2;", in.NoOfDays, PolicyNameUnreachable)
 	if err != nil {
 		logrus.Errorf("error while executing the conf UPDATE command: %+v", err)
 		return err
