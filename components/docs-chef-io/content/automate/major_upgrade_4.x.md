@@ -72,9 +72,9 @@ There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
 
 - [Chef Automate in Air-Gapped Environment With External Elasticsearch]({{< relref "#chef-automate-in-air-gapped-environment-with-external-elasticsearch" >}})
 
-{{< note >}} Confirm whether your installation is using an external Elasticsearch but running the `chef-automate config show` command. It `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
+{{< note >}} Confirm whether your installation is using an external Elasticsearch by running the `chef-automate config show` command. If `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
 
-{{< warning >}} You drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
+{{< warning >}} Your drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
 
 {{< warning >}} Disable the **sharding** for automate running embedded Elasticsearch.
 
@@ -88,7 +88,7 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
 1. Start a major version upgrade:
 
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Accept the actions before upgrade.
+Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.
 
 ```sh
 sudo chef-automate upgrade run --major
