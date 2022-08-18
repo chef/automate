@@ -323,6 +323,61 @@ type EndTimeSource struct {
 	EndTime time.Time `json:"end_time"`
 }
 
+type Control struct {
+	ControlID   string                            `json:"control_id"`
+	Title       string                            `json:"title"`
+	WaivedStr   string                            `json:"waived_str"`
+	WaiverData  interface{}                       `json:"waiver_data"`
+	Impact      float64                           `json:"impact"`
+	EndTime     time.Time                         `json:"end_time"`
+	DailyLatest bool                              `json:"daily_latest"`
+	DayLatest   bool                              `json:"day_latest"`
+	Status      string                            `json:"status"`
+	Nodes       []Node                            `json:"nodes"`
+	StringTags  []ESInSpecReportControlStringTags `json:"string_tags"`
+	Profile     Profile                           `json:"profile"`
+}
+
+type Node struct {
+	NodeUUID    string    `json:"node_uuid"`
+	NodeEndTime time.Time `json:"node_end_time"`
+	Status      string    `json:"status"`
+	DayLatest   bool      `json:"day_latest"`
+	DailyLatest bool      `json:"daily_latest"`
+	ReportUUID  string    `json:"report_uuid"`
+	NodeName    string    `json:"node_name"`
+	Environment string    `json:"environment"`
+	Roles       []string  `json:"roles"`
+	Recipes     []string  `json:"recipes"`
+	Platform    struct {
+		Name    string `json:"name"`
+		Release string `json:"release"`
+		Full    string `json:"full"`
+	} `json:"platform"`
+	PolicyName       string   `json:"policy_name"`
+	PolicyGroup      string   `json:"policy_group"`
+	OrganizationName string   `json:"organization_name"`
+	SourceFQDN       string   `json:"source_fqdn"`
+	ChefTags         []string `json:"chef_tags"`
+	JobID            string   `json:"job_uuid"`
+}
+
+type Profile struct {
+	ProfileID string `json:"profile_id"`
+	Name      string `json:"name"`
+	Title     string `json:"title"`
+}
+
+type NodesUpgradation struct {
+	NodeUUID  string `json:"node_uuid"`
+	EndTime   string `json:"end_time"`
+	DayLatest bool   `json:"day_latest"`
+}
+
+type Status struct {
+	Status string `json:"status"`
+}
+
 type AssetSummary struct {
 	Passed  int32 `json:"passed"`
 	Skipped int32 `json:"skipped"`

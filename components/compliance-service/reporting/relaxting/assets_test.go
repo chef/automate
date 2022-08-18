@@ -3,11 +3,10 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
+        "github.com/olivere/elastic/v7"
+        "github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-
-	"github.com/olivere/elastic/v7"
-	"github.com/stretchr/testify/assert"
 )
 
 var esr = ES2Backend{
