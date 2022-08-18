@@ -37,7 +37,8 @@ func (db *DB) SetConfigs(ctx context.Context, in *reporting.ComplianceConfigRequ
 		return err
 	}
 	if affected == 0 {
-		return errors.New("didn't update any row")
+		logrus.Warnf("the policy doesn't exists")
+		return errors.New("didn't update any row as the policy doesn't exists")
 	}
 
 	return nil
