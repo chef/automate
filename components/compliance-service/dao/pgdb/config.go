@@ -8,20 +8,24 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (db *DB) GetConfigs(ctx context.Context) (*reporting.ComplianceConfig, error) {
-	resp := reporting.ComplianceConfig{}
+const (
+	PolicyNameUnreachable = "unreachable_assets"
+)
+
+func (db *DB) GetConfigs(ctx context.Context) (*reporting.ComplianceConfigResponse, error) {
+	resp := reporting.ComplianceConfigResponse{}
 
 	row := db.QueryRow("SELECT policy_name, older_than_days FROM compliance_lifecycle;")
-	if err := row.Scan(&resp.PolicyName, &resp.OlderThanDays); err != nil {
+	if err := row.Scan(&resp.PolicyName, &resp.NoOfDays); err != nil {
 		logrus.Errorf("error while scanning fields: %+v", err)
 		return nil, err
 	}
 	return &resp, nil
 }
 
-func (db *DB) SetConfigs(ctx context.Context, in *reporting.ComplianceConfig) error {
+func (db *DB) SetConfigs(ctx context.Context, in *reporting.ComplianceConfigRequest) error {
 
-	row, err := db.Exec("UPDATE compliance_lifecycle SET older_than_days=$1 WHERE policy_name=$2;", in.OlderThanDays, in.PolicyName)
+	row, err := db.Exec("UPDATE compliance_lifecycle SET older_than_days=$1 WHERE policy_name=$2;", in.NoOfDays, PolicyNameUnreachable)
 	if err != nil {
 		logrus.Errorf("error while executing the conf UPDATE command: %+v", err)
 		return err

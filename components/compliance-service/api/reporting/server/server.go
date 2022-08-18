@@ -41,10 +41,10 @@ type Server struct {
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, LRCOpenSearchRequest int, db *pgdb.DB) *Server {
+func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, lcrOpenSearchRequest int, db *pgdb.DB) *Server {
 	server := Server{
 		es:                       es,
-		lcr_open_search_requests: LRCOpenSearchRequest,
+		lcr_open_search_requests: lcrOpenSearchRequest,
 		db:                       db,
 	}
 	if rm != nil {
@@ -964,7 +964,7 @@ func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest
 	return &reporting.AssetListResponse{Assets: asset}, nil
 }
 
-func (srv *Server) GetConfigs(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfig, error) {
+func (srv *Server) GetConfigs(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
 	result, err := srv.db.GetConfigs(ctx)
 	if err != nil {
 		logrus.Errorf("error whoile getting the conf: %+v", err)
@@ -974,7 +974,7 @@ func (srv *Server) GetConfigs(ctx context.Context, in *reporting.GetAssetConfigR
 	return result, nil
 }
 
-func (srv *Server) UpdateConfigs(ctx context.Context, in *reporting.ComplianceConfig) error {
+func (srv *Server) UpdateConfigs(ctx context.Context, in *reporting.ComplianceConfigRequest) error {
 	err := srv.db.SetConfigs(ctx, in)
 	if err != nil {
 		logrus.Errorf("error whoile updating the conf: %+v", err)
