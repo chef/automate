@@ -1217,35 +1217,38 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 	if err != nil {
 		return nil
 	}
-	for _, node := range nodesMap {
-		nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
-		if err != nil {
-			logrus.Error("cannot parse: ", err)
-			continue
-		}
 
-		indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90DaysAgo.Format(time.RFC3339), nodeEndTime.Add(-24*time.Hour).Format(time.RFC3339))
-		if err != nil {
-			logrus.Error("cannot get indices:", err)
-			continue
-		}
+	if len(nodesMap) > 0 {
+		for _, node := range nodesMap {
+			nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
+			if err != nil {
+				logrus.Error("cannot parse: ", err)
+				continue
+			}
 
-		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
-			Index(indices).
-			Id(node.NodeUUID).
-			Script(script))
+			indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90DaysAgo.Format(time.RFC3339), nodeEndTime.Add(-24*time.Hour).Format(time.RFC3339))
+			if err != nil {
+				logrus.Error("cannot get indices:", err)
+				continue
+			}
+
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
+				Index(indices).
+				Id(node.NodeUUID).
+				Script(script))
+		}
+		approxBytes := bulkRequest.EstimatedSizeInBytes()
+		bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
+		if err != nil {
+			logrus.Errorf("Unable to send the request in bulk: %v", err)
+			return err
+		}
+		if bulkResponse == nil {
+			logrus.Errorf("Unable to fetch the response of bulk request: %v", err)
+			return err
+		}
+		logrus.Debugf("Bulk insert day latest falgs, ~size %dB, took %dms", approxBytes, bulkResponse.Took)
 	}
-	approxBytes := bulkRequest.EstimatedSizeInBytes()
-	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
-	if err != nil {
-		logrus.Errorf("Unable to send the request in bulk: %v", err)
-		return err
-	}
-	if bulkResponse == nil {
-		logrus.Errorf("Unable to fetch the response of bulk request: %v", err)
-		return err
-	}
-	logrus.Debugf("Bulk insert day latest falgs, ~size %dB, took %dms", approxBytes, bulkResponse.Took)
 	return nil
 }
 

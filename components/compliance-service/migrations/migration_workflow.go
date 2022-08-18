@@ -187,21 +187,23 @@ func CreateControlIndexForUpgrade(ctx context.Context, esClient *ingestic.ESClie
 		return err
 	}
 
-	for report, endTime := range reportsMap {
-		parsedEndTime, _ := time.Parse(time.RFC3339, endTime)
-		index := mapping.IndexTimeseriesFmt(parsedEndTime)
-		controls, err := processor.ParseReportCtrlStruct(ctx, esClient, report, index)
-		if err != nil {
-			logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", report)
-			continue
-		}
+	if len(reportsMap) > 0 {
+		for report, endTime := range reportsMap {
+			parsedEndTime, _ := time.Parse(time.RFC3339, endTime)
+			index := mapping.IndexTimeseriesFmt(parsedEndTime)
+			controls, err := processor.ParseReportCtrlStruct(ctx, esClient, report, index)
+			if err != nil {
+				logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", report)
+				continue
+			}
 
-		logrus.Debugf("Parsed results got results")
-		err = esClient.UploadDataToControlIndex(ctx, report, controls, parsedEndTime)
-		if err != nil {
-			logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
-		}
+			logrus.Debugf("Parsed results got results")
+			err = esClient.UploadDataToControlIndex(ctx, report, controls, parsedEndTime)
+			if err != nil {
+				logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
+			}
 
+		}
 	}
 
 	logrus.Info("Successfully completed the upgrade for control index")
@@ -218,10 +220,12 @@ func UpgradeCompRunInfo(ctx context.Context, esClient *ingestic.ESClient) error 
 		logrus.Errorf("Unable to Get Report IDs where day latest true with err %v", err)
 		return err
 	}
-	for _, report := range reportList {
-		err = esClient.InsertComplianceRunInfo(ctx, &report, report.EndTime)
-		if err != nil {
-			logrus.Errorf("Unable to convert into compliance run info for report id %s with error %v", report.ReportID, err)
+	if len(reportList) > 0 {
+		for _, report := range reportList {
+			err = esClient.InsertComplianceRunInfo(ctx, &report, report.EndTime)
+			if err != nil {
+				logrus.Errorf("Unable to convert into compliance run info for report id %s with error %v", report.ReportID, err)
+			}
 		}
 	}
 
