@@ -147,7 +147,7 @@ module "opensearch" {
   ssh_port                     = var.ssh_port
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
-  depends_on = [module.airgap_bundle-backend]
+  depends_on = [module.airgap_bundle-backend,module.habitat-backend]
 }
 
 module "postgresql" {
@@ -180,7 +180,7 @@ module "postgresql" {
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
-  depends_on = [module.airgap_bundle-backend]
+  depends_on = [module.airgap_bundle-backend,module.habitat-backend]
 }
 
 module "bootstrap_automate" {
@@ -213,7 +213,7 @@ module "bootstrap_automate" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
-  depends_on = [module.airgap_bundle-frontend]
+  depends_on = [module.airgap_bundle-frontend,module.habitat-frontend]
 }
 
 module "automate" {
