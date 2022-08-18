@@ -41,11 +41,13 @@ type MigrationWorkflow struct {
 type MigrationWorkflowParameters struct {
 	DayLatestFlag    bool
 	ControlIndexFlag bool
+	CompRunInfoFlag  bool
 }
 
 type MigrationWorkflowPayload struct {
 	DayLatestFlag    bool
 	ControlIndexFlag bool
+	CompRunInfoFlag  bool
 }
 
 func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
@@ -66,11 +68,13 @@ func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
 	workflowPayload := MigrationWorkflowPayload{
 		DayLatestFlag:    workflowParams.DayLatestFlag,
 		ControlIndexFlag: workflowParams.ControlIndexFlag,
+		CompRunInfoFlag:  workflowParams.CompRunInfoFlag,
 	}
 
 	err = w.EnqueueTask(UpgradeTaskName, UpgradeParameters{
-		DayLatestFlag: workflowParams.DayLatestFlag,
-		ControlFlag:   workflowParams.ControlIndexFlag,
+		DayLatestFlag:   workflowParams.DayLatestFlag,
+		ControlFlag:     workflowParams.ControlIndexFlag,
+		CompRunInfoFlag: workflowParams.CompRunInfoFlag,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "failed to enqueue the migration-task")
@@ -115,12 +119,12 @@ type UpgradeTask struct {
 }
 
 type UpgradeParameters struct {
-	DayLatestFlag bool
-	ControlFlag   bool
+	DayLatestFlag   bool
+	ControlFlag     bool
+	CompRunInfoFlag bool
 }
 
 func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
-
 	var job UpgradeParameters
 	if err := task.GetParameters(&job); err != nil {
 		err = errors.Wrap(err, "could not unmarshal GenerateReportParameters")
@@ -133,20 +137,34 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 		err := t.ESClient.SetNodesDayLatestFalse(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not update the day latest in rep data")
-		}
-		err = t.UpgradesDB.UpdateDayLatestFlagToFalse()
-		if err != nil {
-			return nil, errors.Wrap(err, "could not update flag the in upgrade database")
+		} else {
+			err = t.UpgradesDB.UpdateDayLatestFlagToFalse()
+			if err != nil {
+				return nil, errors.Wrap(err, "could not update flag the in upgrade database")
+			}
 		}
 	}
 	if job.ControlFlag {
 		err := CreateControlIndexForUpgrade(ctx, t.ESClient)
 		if err != nil {
 			return nil, errors.Wrap(err, "Unable to Create control index structure")
+		} else {
+			err = t.UpgradesDB.UpdateControlFlagToFalse()
+			if err != nil {
+				return nil, errors.Wrap(err, "could not update flag the in upgrade database")
+			}
 		}
-		err = t.UpgradesDB.UpdateControlFlagToFalse()
+	}
+
+	if job.CompRunInfoFlag {
+		err := UpgradeCompRunInfo(ctx, t.ESClient)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not update flag the in upgrade database")
+			return nil, errors.Wrap(err, "Unable to upgrade Comp Run Info structure")
+		} else {
+			err = t.UpgradesDB.UpdateCompRunInfoFlagToTrue()
+			if err != nil {
+				return nil, errors.Wrap(err, "could not update comp run info flag the in upgrade database")
+			}
 		}
 
 	}
@@ -182,11 +200,32 @@ func CreateControlIndexForUpgrade(ctx context.Context, esClient *ingestic.ESClie
 		err = esClient.UploadDataToControlIndex(ctx, report, controls, parsedEndTime)
 		if err != nil {
 			logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
-			return err
 		}
 
 	}
 
+	logrus.Info("Successfully completed the upgrade for control index")
+
+	return nil
+
+}
+
+func UpgradeCompRunInfo(ctx context.Context, esClient *ingestic.ESClient) error {
+
+	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
+	reportList, err := esClient.GetReportsDayLatestTrue(ctx, time90DaysAgo)
+	if err != nil {
+		logrus.Errorf("Unable to Get Report IDs where day latest true with err %v", err)
+		return err
+	}
+	for _, report := range reportList {
+		err = esClient.InsertComplianceRunInfo(ctx, &report, report.EndTime)
+		if err != nil {
+			logrus.Errorf("Unable to convert into compliance run info for report id %s with error %v", report.ReportID, err)
+		}
+	}
+
+	logrus.Info("Successfully completed the upgrade for comp run info")
 	return nil
 
 }

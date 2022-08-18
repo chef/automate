@@ -35,16 +35,7 @@ func TestPollDataForFlags(t *testing.T) {
 				cerealInterface: &CerealInterfaceTest{NeedError: false},
 			}},
 			wantError: true,
-			error:     errors.New("Unable to get the status of day latest flag: Unable to fetch status from database"),
-		},
-		{
-			name: "Test error for control index flag from db",
-			args: args{upgrade: Upgrade{
-				storage:         &pgdb.UpgradeDbTest{ControlError: true},
-				cerealInterface: &CerealInterfaceTest{NeedError: false},
-			}},
-			wantError: true,
-			error:     errors.New("Unable to get the status of control index flag: Unable to fetch status from database"),
+			error:     errors.New("Unable to get the status of upgrade flags: Unable to fetch status from database"),
 		},
 		{
 			name: "Test true status from database",
@@ -63,18 +54,10 @@ func TestPollDataForFlags(t *testing.T) {
 			wantError: true,
 			error:     errors.New("Unable to enqueue the message in the flow for daily latest flag: Unable to enqueue workflow for day latest flag"),
 		},
-		{
-			name: "Test error from cereal manager for control index flag",
-			args: args{upgrade: Upgrade{
-				storage:         &pgdb.UpgradeDbTest{NeedStatus: true},
-				cerealInterface: &CerealInterfaceTest{NeedErrorForControl: true},
-			}},
-			wantError: true,
-			error:     errors.New("Unable to enqueue the message in the flow for control index flag: Unable to enqueue workflow for control index flag"),
-		},
 	}
 
 	for _, test := range tests {
+
 		got := test.args.upgrade.PollForUpgradeFlagDayLatest()
 
 		if test.wantError {

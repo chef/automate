@@ -8,6 +8,27 @@ type UpgradeDbTest struct {
 	NeedStatus   bool
 }
 
+func (u UpgradeDbTest) GetUpgradeFlags() (map[string]bool, error) {
+	if u.Error {
+		return nil, errors.New("Unable to fetch status from database")
+	}
+
+	flagsMap := make(map[string]bool)
+
+	if u.NeedStatus {
+		flagsMap[ControlIndexFlag] = true
+		flagsMap[CompRunInfoFlag] = true
+		flagsMap[DayLatestFlag] = true
+		return flagsMap, nil
+	}
+	return flagsMap, nil
+}
+
+func (u UpgradeDbTest) UpdateCompRunInfoFlagToTrue() error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (u UpgradeDbTest) GetDayLatestUpgradeFlagValue() (status bool, err error) {
 	if u.Error {
 		return false, errors.New("Unable to fetch status from database")

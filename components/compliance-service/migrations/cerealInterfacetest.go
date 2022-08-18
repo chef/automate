@@ -7,6 +7,15 @@ type CerealInterfaceTest struct {
 	NeedErrorForControl bool
 }
 
+func (c CerealInterfaceTest) EnqueueWorkflowUpgrade(dayLatest bool, controlIndex bool, compRunInfo bool) error {
+	if c.NeedError {
+		return errors.New("Unable to enqueue workflow for day latest flag")
+	}
+
+	return nil
+
+}
+
 func (c CerealInterfaceTest) EnqueueWorkflowDayLatest(status bool) error {
 	if c.NeedError {
 		return errors.New("Unable to enqueue workflow for day latest flag")

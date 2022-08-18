@@ -20,26 +20,14 @@ func NewService(pg *pgdb.UpgradesDB, cerealManger *cereal.Manager) *Upgrade {
 
 //PollForUpgradeFlagDayLatest checks for the day latest flag value in upgrade flags
 func (u *Upgrade) PollForUpgradeFlagDayLatest() error {
-
-	status, err := u.storage.GetDayLatestUpgradeFlagValue()
+	flagMap, err := u.storage.GetUpgradeFlags()
 	if err != nil {
-		logrus.Errorf("Unable to get the status of day latest flag")
-		return errors.Wrapf(err, "Unable to get the status of day latest flag")
+		logrus.Errorf("Unable to get the status of upgrade flags")
+		return errors.Wrapf(err, "Unable to get the status of upgrade flags")
 	}
-	err = u.cerealInterface.EnqueueWorkflowDayLatest(status)
+	err = u.cerealInterface.EnqueueWorkflowUpgrade(flagMap[pgdb.DayLatestFlag], flagMap[pgdb.ControlIndexFlag], flagMap[pgdb.CompRunInfoFlag])
 	if err != nil {
 		return errors.Wrapf(err, "Unable to enqueue the message in the flow for daily latest flag")
-	}
-
-	status, err = u.storage.GetControlLatestUpgradeFlagValue()
-	if err != nil {
-		logrus.Errorf("Unable to get the status of Control index flag")
-		return errors.Wrapf(err, "Unable to get the status of control index flag")
-	}
-
-	err = u.cerealInterface.EnqueueWorkflowControl(status)
-	if err != nil {
-		return errors.Wrapf(err, "Unable to enqueue the message in the flow for control index flag")
 	}
 
 	return nil

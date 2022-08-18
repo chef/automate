@@ -9,7 +9,7 @@ import (
 )
 
 type cerealInterface interface {
-	EnqueueWorkflowDayLatest(status bool) error
+	EnqueueWorkflowUpgrade(dayLatest bool, controlIndex bool, compRunInfo bool) error
 	EnqueueWorkflowControl(status bool) error
 }
 
@@ -18,13 +18,15 @@ type cerealService struct {
 }
 
 //EnqueueWorkflowDayLatest the message for Day latest flag
-func (u *cerealService) EnqueueWorkflowDayLatest(status bool) error {
+func (u *cerealService) EnqueueWorkflowUpgrade(dayLatest bool, controlIndex bool, compRunInfo bool) error {
 	var err error
-	if status {
+	if dayLatest {
 		err = u.cerealManger.EnqueueWorkflow(context.TODO(), MigrationWorkflowName,
 			fmt.Sprintf("%s-%s", MigrationWorkflowName, UpgradeTaskName),
 			MigrationWorkflowParameters{
-				DayLatestFlag: status,
+				DayLatestFlag:    dayLatest,
+				ControlIndexFlag: controlIndex,
+				CompRunInfoFlag:  compRunInfo,
 			})
 		if err != nil {
 			logrus.Debugf("Unable to Enqueue Workflow for Daily Latest Task")
