@@ -334,9 +334,9 @@ func (a *Reporting) ListAsset(ctx context.Context, in *reporting.AssetListReques
 	return out, nil
 }
 
-func (a *Reporting) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfig) (*reporting.ComplianceConfig, error) {
-	inDomain := &reportingService.ComplianceConfig{}
-	out := &reporting.ComplianceConfig{}
+func (a *Reporting) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	inDomain := &reportingService.ComplianceConfigRequest{}
+	out := &reporting.ComplianceConfigResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.SetAssetConfig(ctx, inDomain)
 	}
@@ -347,9 +347,9 @@ func (a *Reporting) SetAssetConfig(ctx context.Context, in *reporting.Compliance
 	return out, nil
 }
 
-func (a *Reporting) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfig, error) {
+func (a *Reporting) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
 	inDomain := &reportingService.GetAssetConfigRequest{}
-	out := &reporting.ComplianceConfig{}
+	out := &reporting.ComplianceConfigResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.GetAssetConfig(ctx, inDomain)
 	}

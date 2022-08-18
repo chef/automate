@@ -961,16 +961,17 @@ func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest
 	return &reporting.AssetListResponse{Assets: asset}, nil
 }
 
-func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfig) (*reporting.ComplianceConfig, error) {
-	res := &reporting.ComplianceConfig{}
-	res = in
-	logrus.Infof("setassetconfig*********************** %s", in.PolicyName)
+func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	res := &reporting.ComplianceConfigResponse{}
+	res.OlderThanDays = in.OlderThanDays
+	res.PolicyName = "collection_percentage"
 	return res, nil
 }
 
-func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfig, error) {
-	set := &reporting.ComplianceConfig{}
-	res := &reporting.ComplianceConfig{}
+func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	set := &reporting.ComplianceConfigRequest{}
+	set.OlderThanDays = 60
+	res := &reporting.ComplianceConfigResponse{}
 	res, err := srv.SetAssetConfig(ctx, set)
 	if err != nil {
 		logrus.Errorf("error GetAssetConfig: %v", err)
