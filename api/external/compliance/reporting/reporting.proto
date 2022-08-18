@@ -383,6 +383,49 @@ service ReportingService {
 		};
 	}
 
+	/*
+	SetAssetConfig sets the compliance config with the parameters of no of days
+	And API returns the policy name and no of the days which will set in the compliance data base
+
+	Example
+	{
+    	"value":60
+	}
+
+	Authorization Action:
+	```
+	compliance:reports:update
+	```
+	*/ 
+	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {
+ 		option (google.api.http) = {
+ 			put: "/api/v0/compliance/reporting/assets/config"
+ 			body: "*"
+ 		};
+ 		option (chef.automate.api.iam.policy) = {
+ 			resource: "compliance:reporting:config"
+ 			action: "compliance:reports:update"
+ 		};
+ 	}
+
+	/*
+	GetAssetConfig gets the config details from the compliance data base 
+	and API return the policy name and no of days
+	Authorization Action:
+	```
+	compliance:reports:get
+	```
+	*/ 
+ 	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {
+ 		option (google.api.http) = {
+ 			get: "/api/v0/compliance/reporting/assets/config/search"
+ 		};
+ 		option (chef.automate.api.iam.policy) = {
+ 			resource: "compliance:reporting:config"
+ 			action: "compliance:reports:get"
+ 		};
+ 	}
+
 }
 
 message ControlItemRequest {
@@ -1011,6 +1054,7 @@ message AssetListRequest {
 	//Asset Type as collected, unreported, unreachable, uncollected
 	string assets_type = 5;
 }
+
 message Assets {
 	//Node UUid for the asset
 	string node_uuid = 1;
@@ -1021,7 +1065,26 @@ message Assets {
 	//Last run details of asset
 	string last_run = 4;
 }
+
 message AssetListResponse {
 	//Assets list as per the filters applied
 	repeated Assets assets = 1;
+}
+
+// ComplianceConfigRequest to update no of days in the config
+message ComplianceConfigRequest{
+	//No of days for the config 
+    int32 value = 1;
+}
+
+// ComplianceConfigResponse to get the policy name and no of days
+message ComplianceConfigResponse {
+	//Policy name to get from config
+    string policy_name = 1;
+	//No of days to get for config
+    int32 value = 2;
+}
+
+// GetAssetConfigRequest to perform GET request
+message GetAssetConfigRequest {
 }

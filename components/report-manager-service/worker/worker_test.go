@@ -784,7 +784,7 @@ func dialer(t *testing.T) func(context.Context, string) (net.Conn, error) {
 
 	server := grpc.NewServer()
 
-	reporting.RegisterReportingServiceServer(server, &mockReportingServer{})
+	reporting.RegisterReportingServiceServer(server, &mockReportingServer{T: t})
 
 	go func() {
 		if err := server.Serve(listener); err != nil {
@@ -935,4 +935,11 @@ func (m *mockReportingServer) GetReportContent(context.Context, *reporting.Repor
 	return &reporting.ReportContentResponse{
 		Content: jsonBytes,
 	}, nil
+}
+
+func (m *mockReportingServer) AssetCount(context.Context, *reporting.ListFilters) (*reporting.AssetSummary, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ListAsset(context.Context, *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
+	return nil, nil
 }
