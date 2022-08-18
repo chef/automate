@@ -98,6 +98,7 @@ describe('StatsService', () => {
 
   describe('getProfiles()', () => {
     it('fetches profiles data', () => {
+
       const endDate = moment().utc().startOf('day').add(12, 'hours');
       const reportQuery: ReportQuery = {
         startDate: moment(endDate).subtract(10, 'days'),
@@ -493,6 +494,7 @@ describe('StatsService', () => {
         last24h: false
       };
 
+      localStorage.setItem('current-url', 'reporting/controls');
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
       const expectedResponse = [{
         'time': '2017-03-05T00:00:00+0000',
@@ -527,6 +529,7 @@ describe('StatsService', () => {
         filters: filters,
         last24h: false
       };
+      localStorage.setItem('current-url', 'test');
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
       const expectedResponse = [{
@@ -536,6 +539,7 @@ describe('StatsService', () => {
         'skipped': 6
       }];
       const mockResp = {trends: expectedResponse};
+
 
       service.getControlsTrend(reportQuery).subscribe(data => {
         expect(data).toEqual(expectedResponse);
