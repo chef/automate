@@ -709,7 +709,7 @@ func init() {
     "chef.automate.api.compliance.reporting.v1.ComplianceConfigRequest": {
       "type": "object",
       "properties": {
-        "older_than_days": {
+        "no_of_days": {
           "type": "integer",
           "format": "int32"
         }
@@ -721,7 +721,7 @@ func init() {
         "policy_name": {
           "type": "string"
         },
-        "older_than_days": {
+        "no_of_days": {
           "type": "integer",
           "format": "int32"
         }
