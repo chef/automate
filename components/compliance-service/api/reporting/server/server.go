@@ -963,7 +963,10 @@ func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest
 
 func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfig) (*reporting.ComplianceConfig, error) {
 	res := &reporting.ComplianceConfig{}
-	logrus.Infof("setassetconfig***********************", in.PolicyName)
+	in.PolicyName = "collection_percentage"
+	in.OlderThanDays = 60
+	res = in
+	logrus.Infof("setassetconfig*********************** %s", in.PolicyName)
 	return res, nil
 }
 
