@@ -452,7 +452,7 @@ Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 ```sh
 sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
 ```
-In some scenarios above command may throw the below error.
+In some scenarios, the above command may throw the below error.
 
 ```sh
 Installing airgap install bundle
