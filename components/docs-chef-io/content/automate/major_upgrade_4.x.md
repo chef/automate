@@ -452,23 +452,28 @@ Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 ```sh
 sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
 ```
-This error comes when you are running Automate with Proxy Settings and upgrading from Automate version before 4.2.22 to any version on or after 4.2.22.
+
+The above error occurs if you run Chef Automate with Proxy settings and upgrade it from the Automate version before 4.2.22 or after 4.2.22.
 
 ```sh
 Installing airgap install bundle
-DeploymentServiceCallError: A request to the deployment-service failed: Request to start upgrade failed: rpc error: code = FailedPrecondition desc = The minimum compatible version field is missing in the manifest, please create a bundle with the latest automate-cli
+DeploymentServiceCallError: A request to the deployment-service failed: Request to start to upgrade failed: RPC error: code = FailedPrecondition desc = The minimum compatible version field is missing in the manifest. Create a bundle with the latest automate-cli
 ```
-This error may occur if an user running non-airgapped version of chef automate tries to perform a minor upgrade using airgapped installation method. To fix this minor upgrade error, first run:
+
+This error may occur if a user running a non-airgapped version of Chef Automate tries to perform a minor upgrade using the airgapped installation method. To fix this minor upgrade error, run the following command:
 
 ```sh
 sudo chef-automate stop
 ```
-then run:
+
+Once done, run the following command:
+
 ```sh
 sudo chef-automate start
 ```
 
-Before trying the upgrade again make sure all the services are up by running:
+Before trying the upgrade again, confirm whether all the services are up by running the following command:
+
 ```sh
 sudo chef-automate status
 ```
