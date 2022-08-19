@@ -259,7 +259,7 @@ hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
 
 hab svc status (check whether OpenSearch service is up or not)
 
-curl -k -X GET "<https://localhost:9200/_cat/indices/*?v=true&s=index&pretty>" -u admin:admin (Another way to check is to check whether all the indices are green or not)
+curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u admin:admin (Another way to check is to check whether all the indices are green or not)
 
 # Watch for a message about OpenSearch going from RED to GREEN
 `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
