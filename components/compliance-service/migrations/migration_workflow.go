@@ -132,15 +132,15 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 		return nil, err
 	}
 
-	logrus.Debug("Inside the daily Latest Flag upgrades")
+	logrus.Debug("Inside the upgrades flag flow")
 
 	if err := performActionForControlIndexFlag(ctx, job.DayLatestFlag, t.ESClient, t.UpgradesDB); err != nil {
-		logrus.WithError(err).Error()
+		logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
 	}
 
 	if err2 := performActionForDayLatestFlag(ctx, job.DayLatestFlag, t.ESClient, t.UpgradesDB); err2 != nil {
-		logrus.WithError(err2).Error()
-		//return nil, err
+		logrus.WithError(err2).Error("Unable to upgrade day latest flag for latest record ")
+
 	}
 
 	if job.CompRunInfoFlag {

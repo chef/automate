@@ -1174,11 +1174,11 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, timeNDaysAgo
 
 	for _, indx := range indicesSlice {
 		from := 0
-		for i := 0; i < size; i++ {
+		for i := 0; i < 1000; i++ {
 			searchSource := elastic.NewSearchSource().
 				FetchSourceContext(fsc).
 				Query(boolQuery).
-				Size(size).Sort("end_time", false).From(from)
+				Size(size).From(from)
 			searchResult, err := backend.client.Search().
 				SearchSource(searchSource).
 				Index(indx).
@@ -1311,11 +1311,11 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 	size := 10000
 	for _, index := range indicesSlice {
 		from := 0
-		for i := 0; i < size; i++ {
+		for i := 0; i < 1000; i++ {
 			searchSource := elastic.NewSearchSource().
 				FetchSourceContext(fsc).
 				Query(boolQuery).
-				Size(size).Sort("end_time", false).From(from)
+				Size(size).From(from)
 			searchResult, err := backend.client.Search().
 				SearchSource(searchSource).
 				Index(index).
@@ -1347,6 +1347,8 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 			if len(searchResult.Hits.Hits) == 0 || len(searchResult.Hits.Hits) < size {
 				break
 			}
+
+			from = from + size
 		}
 	}
 	return reportsMap, nil
@@ -1423,11 +1425,11 @@ func (backend *ESClient) GetReportsDayLatestTrue(ctx context.Context, timeNDaysA
 	size := 10000
 	for _, index := range indicesSlice {
 		from := 0
-		for i := 0; i < size; i++ {
+		for i := 0; i < 100; i++ {
 			searchSource := elastic.NewSearchSource().
 				FetchSourceContext(fsc).
 				Query(boolQuery).
-				Size(size).Sort("end_time", false).From(from)
+				Size(size).From(from)
 			searchResult, err := backend.client.Search().
 				SearchSource(searchSource).
 				Index(index).
