@@ -14,18 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMarkDayLatestToFalse(t *testing.T) {
-	suit := NewGlobalSuite()
-	require.NotNil(t, suit)
-	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	nodes, err := suit.ingesticESClient.GetNodesDayLatestTrue(context.Background(), time90DaysAgo)
-	require.NoError(t, err)
-	require.NotEmpty(t, nodes)
-
-	err = suit.ingesticESClient.SetNodesDayLatestFalse(context.Background())
-	require.NoError(t, err)
-}
-
 func TestIngestionPipelineControlIndex(t *testing.T) {
 	index := "comp-1-control*"
 	suit := NewGlobalSuite()

@@ -133,27 +133,15 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 	}
 
 	logrus.Debug("Inside the upgrades flag flow")
-
-	if err := performActionForControlIndexFlag(ctx, job.DayLatestFlag, t.ESClient, t.UpgradesDB); err != nil {
-		logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
-	}
-
-	if err2 := performActionForDayLatestFlag(ctx, job.DayLatestFlag, t.ESClient, t.UpgradesDB); err2 != nil {
-		logrus.WithError(err2).Error("Unable to upgrade day latest flag for latest record ")
-
-	}
-
-	if job.CompRunInfoFlag {
-		err := UpgradeCompRunInfo(ctx, t.ESClient)
-		if err != nil {
-			return nil, errors.Wrap(err, "Unable to upgrade Comp Run Info structure")
-		} else {
-			err = t.UpgradesDB.UpdateCompRunInfoFlagToFalse()
-			if err != nil {
-				logrus.Warnf("Unable to set Comp Run Info flag in upgrades database")
-			}
+	if job.ControlFlag {
+		if err := performActionForUpgrade(ctx, t.ESClient); err != nil {
+			logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
 		}
 
+		err := t.UpgradesDB.UpdateCompRunInfoFlagToFalse()
+		if err != nil {
+			logrus.Warnf("Unable to set upgrades flag in database")
+		}
 	}
 
 	return &job, nil
@@ -164,43 +152,10 @@ type ControlIndexUpgradeTask struct {
 	UpgradesDB *pgdb.UpgradesDB
 }
 
-func performActionForDayLatestFlag(ctx context.Context, dayLatestFlag bool, esClient *ingestic.ESClient, upgradesDB *pgdb.UpgradesDB) error {
-	if dayLatestFlag {
-		err := esClient.SetNodesDayLatestFalse(ctx)
-		if err != nil {
-			return errors.Wrap(err, "could not update the day latest in rep data")
-		}
-		err = upgradesDB.UpdateDayLatestFlagToFalse()
-		if err != nil {
-			logrus.Warnf("Unable to set Daily Latest flag in upgrades database")
-		}
-
-	}
-
-	return nil
-}
-
-func performActionForControlIndexFlag(ctx context.Context, controlIndexFlag bool, esClient *ingestic.ESClient, upgradesDB *pgdb.UpgradesDB) error {
-	if controlIndexFlag {
-		err := CreateControlIndexForUpgrade(ctx, esClient)
-		if err != nil {
-			return errors.Wrap(err, "Unable to Create control index structure")
-		}
-		err = upgradesDB.UpdateControlFlagToFalse()
-		if err != nil {
-			logrus.Warnf("Unable to set Control Index flag in upgrades database")
-		}
-
-	}
-
-	return nil
-}
-
-func CreateControlIndexForUpgrade(ctx context.Context, esClient *ingestic.ESClient) error {
+func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) error {
 	mapping := mappings.ComplianceRepDate
 	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	reportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, time90DaysAgo)
-
+	reportsMap, nodesMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, time90DaysAgo)
 	if err != nil {
 		logrus.Errorf("Unable to Get Report IDs where daily latest true with err %v", err)
 		return err
@@ -208,9 +163,31 @@ func CreateControlIndexForUpgrade(ctx context.Context, esClient *ingestic.ESClie
 
 	if len(reportsMap) > 0 {
 		for report, endTime := range reportsMap {
+
 			parsedEndTime, _ := time.Parse(time.RFC3339, endTime)
 			index := mapping.IndexTimeseriesFmt(parsedEndTime)
-			controls, err := processor.ParseReportCtrlStruct(ctx, esClient, report, index)
+
+			inspecReport, err := esClient.GetDocByReportUUId(context.Background(), report, index)
+			if err != nil {
+				logrus.Errorf("Unable to fetch report for the reportuuid %s", report)
+			}
+
+			if _, found := latestReportsMap[report]; found {
+				//Updating the comp run info Flag
+				err := esClient.InsertComplianceRunInfo(ctx, inspecReport, inspecReport.EndTime)
+				if err != nil {
+					logrus.Errorf("Unable to perform action compliance run info for node %s with error %v", inspecReport.NodeID, err)
+				}
+
+				//Updating Day Latest Flag
+				err = esClient.SetNodesDayLatestFalseForUpgrade(ctx, nodesMap[inspecReport.NodeID])
+				if err != nil {
+					logrus.Errorf("Unable to perform action for day latest flag for node %s with error %v", inspecReport.NodeID, err)
+				}
+
+			}
+			//Updating controls Index structure
+			controls, err := processor.MapStructsESInSpecReportToControls(inspecReport)
 			if err != nil {
 				logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", report)
 				continue
@@ -225,30 +202,8 @@ func CreateControlIndexForUpgrade(ctx context.Context, esClient *ingestic.ESClie
 		}
 	}
 
-	logrus.Info("Successfully completed the upgrade for control index")
+	logrus.Info("Successfully completed the upgrade all the indexes")
 
-	return nil
-
-}
-
-func UpgradeCompRunInfo(ctx context.Context, esClient *ingestic.ESClient) error {
-
-	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	reportList, err := esClient.GetReportsDayLatestTrue(ctx, time90DaysAgo)
-	if err != nil {
-		logrus.Errorf("Unable to Get Report IDs where day latest true with err %v", err)
-		return err
-	}
-	if len(reportList) > 0 {
-		for _, report := range reportList {
-			err = esClient.InsertComplianceRunInfo(ctx, &report, report.EndTime)
-			if err != nil {
-				logrus.Errorf("Unable to convert into compliance run info for report id %s with error %v", report.ReportID, err)
-			}
-		}
-	}
-
-	logrus.Info("Successfully completed the upgrade for comp run info")
 	return nil
 
 }
