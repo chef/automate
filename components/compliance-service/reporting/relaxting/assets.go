@@ -205,8 +205,7 @@ func (backend ES2Backend) getCollectedAssetsCount(ctx context.Context, filtQuery
 
 	searchSource := elastic.NewSearchSource().
 		Query(filtQuery).
-		Size(0)
-
+		Size(10000)
 	for aggName, agg := range getSummaryAssetAggregation() {
 		searchSource.Aggregation(aggName, agg)
 	}
@@ -391,7 +390,7 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 		logrus.Errorf("The error while getting the collected assests %v", err)
 		return nil, err
 	}
-	notCollectedAsset := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)
+	// uncollected := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)
 
 	collected := &reportingapi.Collected{
 		Passed:  collectedAsset.Passed,
@@ -399,12 +398,16 @@ func (backend ES2Backend)GetAssetSummary(ctx context.Context, filters map[string
 		Skipped: collectedAsset.Skipped,
 		Weived:  collectedAsset.Waived,
 	}
+	uncollected := &reportingapi.Uncollected{
+		Unreachable: unreachableAsset,
+		Unreported:  unreportedAsset,
+	}
+	logrus.Info("*************************")
+	logrus.Info(collectedAsset)
 	summary := &reportingapi.AssetSummary{
 		TotalAssets:  totalAssets,
 		Collected:    collected,
-		NotCollected: notCollectedAsset,
-		Unreachable:  unreachableAsset,
-		Unreported:   unreportedAsset,
+		Uncollected:  uncollected,
 	}
 
 	return summary, nil

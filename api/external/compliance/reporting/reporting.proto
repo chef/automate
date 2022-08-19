@@ -1078,11 +1078,8 @@ message AssetSummary {
 	//Accessing the collected from Collected Message
 	Collected collected = 2;
 	//Total number of not collected assests
-	int32 not_collected = 3;
+	Uncollected uncollected = 3;
 	//Total number of unreported assets
-	int32 unreported = 4;
-	//Total number of unreachable assests
-	int32 unreachable = 5;
 }
 message ListFilters {
 	repeated ListFilter filters = 1;
@@ -1096,6 +1093,13 @@ message Collected {
 	int32 skipped = 3;
 	// Total collected and weived in the assets
 	int32 weived = 4;
+}
+
+message Uncollected {
+	//Total count of unreachable assets
+	int32 unreachable = 1;
+	//Total count of unreported assets
+	int32 unreported = 2;
 }
 message AssetListRequest {
 	//List of the filters to be applied
