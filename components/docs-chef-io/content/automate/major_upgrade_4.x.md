@@ -452,7 +452,7 @@ Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 ```sh
 sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
 ```
-This error comes when you are running Automate with Proxy Settings. And upgrading from Automate version before 4.2.22 to any version on or after 4.2.22.
+This error comes when you are running Automate with Proxy Settings and upgrading from Automate version before 4.2.22 to any version on or after 4.2.22.
 
 ```sh
 Installing airgap install bundle
