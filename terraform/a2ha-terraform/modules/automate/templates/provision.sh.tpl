@@ -41,6 +41,14 @@ wait_for_install() {
     n=$((n+1))
     echo "Waiting for $1 cli to be installed.."
     sleep 30
+    pkg_count=$(ls -Art /hab/cache/artifacts/chef-automate-ha-ctl* | tail -n 1 | wc -l )
+    pkg_name=$(ls -Art /hab/cache/artifacts/chef-automate-ha-ctl* | tail -n 1)
+    echo "pkg_count:$pkg_count"
+    echo "pkg_name:$pkg_name"
+    if [ $pkg_count -eq 1 ]
+      then
+        hab pkg install $pkg_name -bf 
+    fi    
   done
   if [[ $n -ge $max ]]; then
     failure "Timed out waiting for $1 to be installed within $max iterations!"
