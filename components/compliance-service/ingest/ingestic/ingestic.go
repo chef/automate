@@ -1149,10 +1149,11 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }
 
-//GetNodesDayLatestTrue Get the Nodes from past 90 days from now where day latest and daily latest are true
-func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]relaxting.NodesUpgradation, error) {
+//GetNodesDayLatestTrue Get the Nodes from past N days from now where day latest and daily latest are true.
+// timeNDaysAgo Pass the n days before time to extract the records
+func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, timeNDaysAgo time.Time) (map[string]relaxting.NodesUpgradation, error) {
 	nodesMap := make(map[string]relaxting.NodesUpgradation)
-	indicesSlice, err := get90DaysIndex(time90daysAgo)
+	indicesSlice, err := getNDaysIndex(timeNDaysAgo)
 	if err != nil {
 		logrus.Errorf("Unable to get the indexe for last 90 days %v", err)
 		return nil, err
@@ -1163,6 +1164,7 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAg
 		Must(elastic.NewTermQuery("daily_latest", true))
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
+		"node_uuid",
 		"node_uuid",
 		"end_time",
 		"day_latest",
@@ -1402,11 +1404,12 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 	firstRun <- item.FirstRun
 }
 
-//GetReportsDayLatestTrue Get the Nodes from past 90 days from current date for upgrading
-func (backend *ESClient) GetReportsDayLatestTrue(ctx context.Context, time90daysAgo time.Time) ([]relaxting.ESInSpecReport, error) {
+//GetReportsDayLatestTrue Get the reports from past N days from current date where day latest flag is true
+// Pass the N day before time as timeNDaysAgo
+func (backend *ESClient) GetReportsDayLatestTrue(ctx context.Context, timeNDaysAgo time.Time) ([]relaxting.ESInSpecReport, error) {
 	reportList := make([]relaxting.ESInSpecReport, 0)
 
-	indicesSlice, err := get90DaysIndex(time90daysAgo)
+	indicesSlice, err := getNDaysIndex(timeNDaysAgo)
 	if err != nil {
 		logrus.Errorf("Unable to get the indexe for last 90 days %v", err)
 		return nil, err
@@ -1464,9 +1467,9 @@ func (backend *ESClient) GetReportsDayLatestTrue(ctx context.Context, time90days
 }
 
 // get90DaysIndex give 90days indexs from current date
-func get90DaysIndex(time90daysAgo time.Time) ([]string, error) {
+func getNDaysIndex(timedaysAgo time.Time) ([]string, error) {
 
-	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, timedaysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
 	if err != nil {
 		return nil, err
 	}
