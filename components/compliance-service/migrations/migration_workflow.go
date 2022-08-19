@@ -155,7 +155,7 @@ type ControlIndexUpgradeTask struct {
 func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) error {
 	mapping := mappings.ComplianceRepDate
 	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	reportsMap, nodesMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, time90DaysAgo)
+	reportsMap, latestReportsMap, err := esClient.GetReportsDailyLatestTrue(ctx, time90DaysAgo)
 	if err != nil {
 		logrus.Errorf("Unable to Get Report IDs where daily latest true with err %v", err)
 		return err
@@ -180,7 +180,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 				}
 
 				//Updating Day Latest Flag
-				err = esClient.SetNodesDayLatestFalseForUpgrade(ctx, nodesMap[inspecReport.NodeID])
+				err = esClient.SetNodesDayLatestFalseForUpgrade(ctx, inspecReport.NodeID, inspecReport.EndTime)
 				if err != nil {
 					logrus.Errorf("Unable to perform action for day latest flag for node %s with error %v", inspecReport.NodeID, err)
 				}
