@@ -449,7 +449,8 @@ func (backend *ESClient) setLatestsToFalse(ctx context.Context, nodeId string, r
 		Must(termQueryThisNode).
 		MustNot(termQueryNotThisReport)
 
-	script := elastic.NewScript(`ctx._source.daily_latest = false;
+	script := elastic.NewScript(`
+        ctx._source.daily_latest = false;
 		ctx._source.day_latest = false
 	`)
 
