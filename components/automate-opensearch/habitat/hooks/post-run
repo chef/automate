@@ -83,7 +83,7 @@ echo -e "list of templates\n$templates"
 # Looping over each template individually and patching "number_of_replica" from config (toml)
 for template in ${templates[@]};do
 echo -e " snapshot status for $template\n"
-export current_index = $(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/$template/?pretty -u 'admin:admin' --insecure)
+export current_index=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/$template/?pretty -u 'admin:admin' --insecure)
 curl --location --request PUT "https://${HOST}:{{cfg.network.port}}/_template/$template" --header 'Content-Type: application/json' -k -u admin:admin --data-raw '{
     "index_patterns" : [
        '"\"$template\""'
