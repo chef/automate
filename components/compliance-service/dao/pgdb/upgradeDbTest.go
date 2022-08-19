@@ -25,29 +25,7 @@ func (u UpgradeDbTest) GetUpgradeFlags() (map[string]bool, error) {
 }
 
 func (u UpgradeDbTest) UpdateCompRunInfoFlagToTrue() error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u UpgradeDbTest) GetDayLatestUpgradeFlagValue() (status bool, err error) {
-	if u.Error {
-		return false, errors.New("Unable to fetch status from database")
-	}
-	if u.NeedStatus {
-		return true, nil
-	}
-	return false, nil
-}
-
-func (u UpgradeDbTest) GetControlLatestUpgradeFlagValue() (status bool, err error) {
-	if u.ControlError {
-		return false, errors.New("Unable to fetch status from database")
-	}
-	if u.NeedStatus {
-		return true, nil
-	}
-
-	return true, nil
+	return nil
 }
 
 func (u UpgradeDbTest) UpdateDayLatestFlagToFalse() error {

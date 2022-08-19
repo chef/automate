@@ -449,8 +449,7 @@ func (backend *ESClient) setLatestsToFalse(ctx context.Context, nodeId string, r
 		Must(termQueryThisNode).
 		MustNot(termQueryNotThisReport)
 
-	script := elastic.NewScript(`
-		ctx._source.daily_latest = false;
+	script := elastic.NewScript(`ctx._source.daily_latest = false;
 		ctx._source.day_latest = false
 	`)
 
@@ -1169,40 +1168,49 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAg
 		"day_latest",
 	)
 
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(boolQuery).
-		Size(10000).Sort("end_time", false)
+	size := 10000
 
 	for _, indx := range indicesSlice {
-		searchResult, err := backend.client.Search().
-			SearchSource(searchSource).
-			Index(indx).
-			FilterPath(
-				"took",
-				"hits.total",
-				"hits.hits._id",
-				"hits.hits._source",
-				"hits.hits.inner_hits").
-			Do(ctx)
+		from := 0
+		for i := 0; i < size; i++ {
+			searchSource := elastic.NewSearchSource().
+				FetchSourceContext(fsc).
+				Query(boolQuery).
+				Size(size).Sort("end_time", false).From(from)
+			searchResult, err := backend.client.Search().
+				SearchSource(searchSource).
+				Index(indx).
+				FilterPath(
+					"took",
+					"hits.total",
+					"hits.hits._id",
+					"hits.hits._source",
+					"hits.hits.inner_hits").
+				Do(ctx)
 
-		if err != nil {
-			return nil, err
-		}
-
-		if searchResult.TotalHits() > 0 {
-			// Iterate through results
-			for _, hit := range searchResult.Hits.Hits {
-				var node relaxting.NodesUpgradation
-				if hit.Source != nil {
-					err := json.Unmarshal(hit.Source, &node)
-					if err != nil {
-						logrus.Errorf("Received error while unmarshling %+v", err)
-					}
-
-				}
-				nodesMap[node.NodeUUID] = node
+			if err != nil {
+				return nil, err
 			}
+
+			if searchResult.TotalHits() > 0 {
+				// Iterate through results
+				for _, hit := range searchResult.Hits.Hits {
+					var node relaxting.NodesUpgradation
+					if hit.Source != nil {
+						err := json.Unmarshal(hit.Source, &node)
+						if err != nil {
+							logrus.Errorf("Received error while unmarshling %+v", err)
+						}
+
+					}
+					nodesMap[node.NodeUUID] = node
+				}
+			}
+
+			if len(searchResult.Hits.Hits) == 0 || len(searchResult.Hits.Hits) < size {
+				break
+			}
+			from = from + size
 		}
 	}
 	return nodesMap, nil
@@ -1210,7 +1218,6 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAg
 
 //SetNodesDayLatestFalse Sets the flag for the currently present data in os database
 func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
-	bulkRequest := backend.client.Bulk()
 	script := elastic.NewScript("ctx._source.day_latest = false")
 	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
 	nodesMap, err := backend.GetNodesDayLatestTrue(ctx, time90DaysAgo)
@@ -1220,6 +1227,8 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 
 	if len(nodesMap) > 0 {
 		for _, node := range nodesMap {
+			termQueryThisNode := elastic.NewTermsQuery("node_uuid", node.NodeUUID)
+			boolQuery := elastic.NewBoolQuery().Must(termQueryThisNode)
 			nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
 			if err != nil {
 				logrus.Error("cannot parse: ", err)
@@ -1232,23 +1241,23 @@ func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
 				continue
 			}
 
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
+			_, err = elastic.NewUpdateByQueryService(backend.client).
 				Index(indices).
-				Id(node.NodeUUID).
-				Script(script))
+				Query(boolQuery).
+				Script(script).
+				Refresh("false").
+				Do(ctx)
+
+			if err != nil {
+				logrus.Errorf("Unable to update node uuid %s with error %v", node.NodeUUID, err)
+				continue
+			}
+
 		}
-		approxBytes := bulkRequest.EstimatedSizeInBytes()
-		bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
-		if err != nil {
-			logrus.Errorf("Unable to send the request in bulk: %v", err)
-			return err
-		}
-		if bulkResponse == nil {
-			logrus.Errorf("Unable to fetch the response of bulk request: %v", err)
-			return err
-		}
-		logrus.Debugf("Bulk insert day latest falgs, ~size %dB, took %dms", approxBytes, bulkResponse.Took)
+
 	}
+
+	logrus.Infof("Successfully update the day latest flag in upgrade")
 	return nil
 }
 
@@ -1297,38 +1306,44 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 		"end_time",
 	)
 
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(boolQuery).
-		Size(10000).Sort("end_time", false)
-
+	size := 10000
 	for _, index := range indicesSlice {
-		searchResult, err := backend.client.Search().
-			SearchSource(searchSource).
-			Index(index).
-			FilterPath(
-				"took",
-				"hits.total",
-				"hits.hits._id",
-				"hits.hits._source").
-			Do(ctx)
+		from := 0
+		for i := 0; i < size; i++ {
+			searchSource := elastic.NewSearchSource().
+				FetchSourceContext(fsc).
+				Query(boolQuery).
+				Size(size).Sort("end_time", false).From(from)
+			searchResult, err := backend.client.Search().
+				SearchSource(searchSource).
+				Index(index).
+				FilterPath(
+					"took",
+					"hits.total",
+					"hits.hits._id",
+					"hits.hits._source").
+				Do(ctx)
 
-		if err != nil {
-			return nil, err
-		}
+			if err != nil {
+				return nil, err
+			}
 
-		if searchResult.TotalHits() > 0 {
-			// Iterate through results
-			for _, hit := range searchResult.Hits.Hits {
-				var report relaxting.ReportId
-				if hit.Source != nil {
-					err := json.Unmarshal(hit.Source, &report)
-					if err != nil {
-						logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
+			if searchResult.TotalHits() > 0 {
+				// Iterate through results
+				for _, hit := range searchResult.Hits.Hits {
+					var report relaxting.ReportId
+					if hit.Source != nil {
+						err := json.Unmarshal(hit.Source, &report)
+						if err != nil {
+							logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
+						}
+
 					}
-
+					reportsMap[report.ReportUuid] = report.EndTime
 				}
-				reportsMap[report.ReportUuid] = report.EndTime
+			}
+			if len(searchResult.Hits.Hits) == 0 || len(searchResult.Hits.Hits) < size {
+				break
 			}
 		}
 	}
@@ -1402,40 +1417,48 @@ func (backend *ESClient) GetReportsDayLatestTrue(ctx context.Context, time90days
 
 	fsc := elastic.NewFetchSourceContext(true)
 
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(boolQuery).
-		Size(10000).Sort("end_time", false)
-
+	size := 10000
 	for _, index := range indicesSlice {
-		searchResult, err := backend.client.Search().
-			SearchSource(searchSource).
-			Index(index).
-			FilterPath(
-				"took",
-				"hits.total",
-				"hits.hits._id",
-				"hits.hits._source").
-			Do(ctx)
+		from := 0
+		for i := 0; i < size; i++ {
+			searchSource := elastic.NewSearchSource().
+				FetchSourceContext(fsc).
+				Query(boolQuery).
+				Size(size).Sort("end_time", false).From(from)
+			searchResult, err := backend.client.Search().
+				SearchSource(searchSource).
+				Index(index).
+				FilterPath(
+					"took",
+					"hits.total",
+					"hits.hits._id",
+					"hits.hits._source").
+				Do(ctx)
 
-		if err != nil {
-			return nil, err
-		}
-
-		if searchResult.TotalHits() > 0 {
-			// Iterate through results
-			for _, hit := range searchResult.Hits.Hits {
-				var report relaxting.ESInSpecReport
-				if hit.Source != nil {
-					err := json.Unmarshal(hit.Source, &report)
-					if err != nil {
-						logrus.Errorf("Received error while unmarshling for reports in upgrade for comp run info %+v", err)
-					}
-
-				}
-				reportList = append(reportList, report)
+			if err != nil {
+				return nil, err
 			}
+
+			if searchResult.TotalHits() > 0 {
+				// Iterate through results
+				for _, hit := range searchResult.Hits.Hits {
+					var report relaxting.ESInSpecReport
+					if hit.Source != nil {
+						err := json.Unmarshal(hit.Source, &report)
+						if err != nil {
+							logrus.Errorf("Received error while unmarshling for reports in upgrade for comp run info %+v", err)
+						}
+
+					}
+					reportList = append(reportList, report)
+				}
+			}
+			if len(searchResult.Hits.Hits) == 0 || len(searchResult.Hits.Hits) < size {
+				break
+			}
+			from = from + size
 		}
+
 	}
 	return reportList, nil
 }

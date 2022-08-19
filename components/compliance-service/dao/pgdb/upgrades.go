@@ -15,46 +15,34 @@ func NewDB(db *DB) *UpgradesDB {
 	return &UpgradesDB{db}
 }
 
-//UpdateDayLatestFlagToTrue updates the day latest flags to true
+//UpdateDayLatestFlagToFalse updates the day latest flags to true
 func (u *UpgradesDB) UpdateDayLatestFlagToFalse() error {
 	_, err := u.DB.Exec(getUpdateQuery(DayLatestFlag))
 	if err != nil {
-		return errors.Wrapf(err, "Unable to UpdateDayLatestFlagToTrue")
+		return errors.Wrapf(err, "Unable to day latest flag to database")
 	}
 	return nil
 }
 
-//UpdateControlIndexFlagToTrue updates the day latest flags to true
+//UpdateControlFlagToFalse updates the control index flags to false
 func (u *UpgradesDB) UpdateControlFlagToFalse() error {
 	_, err := u.DB.Exec(getUpdateQuery(ControlIndexFlag))
 	if err != nil {
-		return errors.Wrapf(err, "Unable to UpdateDayLatestFlagToTrue")
+		return errors.Wrapf(err, "Unable to Control Index flag to db")
 	}
 	return nil
 }
 
-//UpdateCompRunInfoFlagToTrue updates the day latest flags to true
-func (u *UpgradesDB) UpdateCompRunInfoFlagToTrue() error {
+//UpdateCompRunInfoFlagToFalse updates the comp run info to true
+func (u *UpgradesDB) UpdateCompRunInfoFlagToFalse() error {
 	_, err := u.DB.Exec(getUpdateQuery(CompRunInfoFlag))
 	if err != nil {
-		return errors.Wrapf(err, "Unable to UpdateDayLatestFlagToTrue")
+		return errors.Wrapf(err, "Unable to update comp run info flag to db")
 	}
 	return nil
 }
 
-//GetControlLatestUpgradeFlag Gets the day latest flag status from the pg database
-func (u *UpgradesDB) GetControlLatestUpgradeFlagValue() (status bool, err error) {
-	logrus.Info("Inside the get control index flag")
-	return status, err
-}
-
-//GetDayLatestUpgradeFlagValue Gets the day latest flag status from the pg database
-func (u *UpgradesDB) GetDayLatestUpgradeFlagValue() (status bool, err error) {
-	logrus.Info("Inside the day latest flag")
-	return status, err
-}
-
-//GetDayLatestUpgradeFlagValue Gets the day latest flag status from the pg database
+//GetUpgradeFlags Gets the all the upgrade flags and status from the pg database
 func (u *UpgradesDB) GetUpgradeFlags() (map[string]bool, error) {
 	flagMap := make(map[string]bool)
 

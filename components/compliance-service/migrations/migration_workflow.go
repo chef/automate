@@ -133,27 +133,14 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 	}
 
 	logrus.Debug("Inside the daily Latest Flag upgrades")
-	if job.DayLatestFlag {
-		err := t.ESClient.SetNodesDayLatestFalse(ctx)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not update the day latest in rep data")
-		} else {
-			err = t.UpgradesDB.UpdateDayLatestFlagToFalse()
-			if err != nil {
-				return nil, errors.Wrap(err, "could not update flag the in upgrade database")
-			}
-		}
+
+	if err := performActionForControlIndexFlag(ctx, job.DayLatestFlag, t.ESClient, t.UpgradesDB); err != nil {
+		logrus.WithError(err).Error()
 	}
-	if job.ControlFlag {
-		err := CreateControlIndexForUpgrade(ctx, t.ESClient)
-		if err != nil {
-			return nil, errors.Wrap(err, "Unable to Create control index structure")
-		} else {
-			err = t.UpgradesDB.UpdateControlFlagToFalse()
-			if err != nil {
-				return nil, errors.Wrap(err, "could not update flag the in upgrade database")
-			}
-		}
+
+	if err2 := performActionForDayLatestFlag(ctx, job.DayLatestFlag, t.ESClient, t.UpgradesDB); err2 != nil {
+		logrus.WithError(err2).Error()
+		//return nil, err
 	}
 
 	if job.CompRunInfoFlag {
@@ -161,9 +148,9 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 		if err != nil {
 			return nil, errors.Wrap(err, "Unable to upgrade Comp Run Info structure")
 		} else {
-			err = t.UpgradesDB.UpdateCompRunInfoFlagToTrue()
+			err = t.UpgradesDB.UpdateCompRunInfoFlagToFalse()
 			if err != nil {
-				return nil, errors.Wrap(err, "could not update comp run info flag the in upgrade database")
+				logrus.Warnf("Unable to set Comp Run Info flag in upgrades database")
 			}
 		}
 
@@ -175,6 +162,38 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 type ControlIndexUpgradeTask struct {
 	ESClient   *ingestic.ESClient
 	UpgradesDB *pgdb.UpgradesDB
+}
+
+func performActionForDayLatestFlag(ctx context.Context, dayLatestFlag bool, esClient *ingestic.ESClient, upgradesDB *pgdb.UpgradesDB) error {
+	if dayLatestFlag {
+		err := esClient.SetNodesDayLatestFalse(ctx)
+		if err != nil {
+			return errors.Wrap(err, "could not update the day latest in rep data")
+		}
+		err = upgradesDB.UpdateDayLatestFlagToFalse()
+		if err != nil {
+			logrus.Warnf("Unable to set Daily Latest flag in upgrades database")
+		}
+
+	}
+
+	return nil
+}
+
+func performActionForControlIndexFlag(ctx context.Context, controlIndexFlag bool, esClient *ingestic.ESClient, upgradesDB *pgdb.UpgradesDB) error {
+	if controlIndexFlag {
+		err := CreateControlIndexForUpgrade(ctx, esClient)
+		if err != nil {
+			return errors.Wrap(err, "Unable to Create control index structure")
+		}
+		err = upgradesDB.UpdateControlFlagToFalse()
+		if err != nil {
+			logrus.Warnf("Unable to set Control Index flag in upgrades database")
+		}
+
+	}
+
+	return nil
 }
 
 func CreateControlIndexForUpgrade(ctx context.Context, esClient *ingestic.ESClient) error {
