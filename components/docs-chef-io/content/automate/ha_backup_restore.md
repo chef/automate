@@ -13,20 +13,20 @@ gh_repo = "automate"
     weight = 200
 +++
 
-Computer security safeguards the computer system and data against theft, unlawful access, or any disaster. It's guarding against and detecting unlawful access to your computer system. Data security refers to securing data from unlawful access or any disaster. This process includes the following terms:
+Computer security safeguards the computer system and data against theft, illegal access, or disaster. It's guarding against and detecting illegal access to your computer system. Data security refers to securing data from unlawful access or any disaster. This process includes the following terms:
 
 - Data Backup
 - Data Restore
 
 ## Data Backup
 
-Backup refers to making copies of data or data files to use in the event the original data or data files are lost or destroyed.
+Backup refers to making copies of data or files to use if the original data or files are lost or destroyed.
 
 In information technology, a data backup is a copy of computer data taken and stored elsewhere to restore the original after a data loss event. A backup system contains at least one copy of all data considered worth saving. The data storage requirements can be extensive. An information repository model may be used to provide structure to this storage. Typically, backup data includes all the data such as documents, media files, configuration and registry files, and machine images.
 
 ## Data Restore
 
-Data restore is the process of copying backup data from secondary storage and restoring it to its original location or a new location. A restoring process is carried out to return lost, stolen, or damaged data to its original condition or move it to a new location.
+Data restortion is copying backup data from secondary storage and restoring it to its original location or a new location. A restoring process is carried out to return lost, stolen, or damaged data to its original condition or move it to a new location.
 
 ## Chef Automate High Availability (HA) Backups
 
@@ -34,55 +34,50 @@ You can manually back up the OpenSearch, Postgres, and Chef Automate Server data
 
 ## Backup Types
 
-You can backup the Chef Automate HA data either using an External file-system (EFS) or Amazon's S3 bucket.
+You can backup the Chef Automate HA data using an External file system (EFS) or Amazon's S3 bucket.
 
-### What is EFS System?
+### EFS System
 
 External file system refers to any non-volatile storage device external to the computer. It can be any storage device that serves as an addition to the computer's primary storage, RAM, and cache memory. EFS aids in backing up the data used for future restores or disaster recovery, long-term archiving of data that is not frequently accessed, and storage of non-critical data in lower-performing, less expensive drives. These systems do not directly interact with the computer's CPU (Central Processing Unit).
 
-External file systems include devices such as Solid-state drives (SSDs), Hard disk drives (HDDs), Cloud storage, CD-ROM drives, DVD drives, Blu-ray drives, USB flash drives, SD cards, Tape drives.
+External file systems include devices such as Solid-state drives (SSDs), Hard disk drives (HDDs), Cloud storage, CD-ROM drives, DVD drives, Blu-ray drives, USB flash drives, SD cards, and Tape drives.
 
-### What is Amazon's S3 Bucket?
+### Amazon's S3 Bucket
 
 An Amazon S3 bucket is a public cloud storage resource available in Amazon Web Services (AWS) Simple Storage Service (S3), an object storage offering. Amazon S3 buckets, similar to file folders, store objects consisting of data and its descriptive metadata. Amazon S3 is a program built to store, protect, and retrieve data from *buckets* at any time from anywhere on any device such as websites, mobile apps, archiving, data backups and restorations, IoT devices, enterprise application storage, and providing the underlying storage layer for your data lake.
 
 With the AWS Free Usage Tier*, you can get started with Amazon S3 for free in all regions except the AWS GovCloud Regions. [See](https://aws.amazon.com/s3/) for more information.
 
-## Taking Backup with Amazon S3 Bucket
+## Backup with Amazon S3 Bucket
 
-This section explains how to take backup for External Elastic Search (ES) and Postgres-Sql to the Amazon S3 bucket.
+This section explains how to take backup for External Elastic Search (ES) and PostgreSQL to the Amazon S3 bucket.
 
-{{< note >}}
-
-Ensure you perform the backup configuration before deploying the Chef Automate High Availability (HA) cluster.
-
-{{< /note >}}
+{{< note >}} Ensure you perform the backup configuration before deploying the Chef Automate High Availability (HA) cluster. {{< /note >}}
 
 ### Pre-Backup Configurations
 
 - Configure an [Amazon S3 storage bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html).
 - Configure [External Elasticsearch](https://docs.chef.io/automate/install/#configuring-external-elasticsearch).
-- Configure AWS credentials and generate access key ID and secret access key.
+- Configure AWS credentials and generate **access key ID** and **secret access key**.
 - Create an IAM user in your AWS account to access the S3 bucket.
-- Provide `AdministratorAccess`, `APIGatewayAdministrator` (for AWS, AmazonAPIGatewayAdministrator), `S3FullAccess` (for AWS, AmazonS3FullAccess)permissions to IAM user.
+- Provide `AdministratorAccess`, `APIGatewayAdministrator` (for AWS, AmazonAPIGatewayAdministrator), `S3FullAccess` (for AWS, AmazonS3FullAccess) permissions to IAM user.
 - Add the IAM role to the IAM user.
 - Create an IAM policy to be associated with an IAM role. On Elasticsearch Access Policy, associate the ARN to the resource section of your bucket.
 - Ensure the Chef Automate has basic [permissions](https://docs.chef.io/automate/backup/#aws-s3-permissions) to run backup operation.
-- Ensure the statuses of Chef Automate services are up and running. You can check the status by typing the command, `sudo chef-automate status`.
+- Ensure the statuses of Chef Automate services are up and running. You can check the status by running the command, `sudo chef-automate status`.
 - Create `.toml` file.
 
 ### Backup Procedure
 
 1. Navigate to your deploy workspace. For example, `cd /hab/a2_deploy_workspace`.
-2. Create directory `configs` by typing the command, `mkdir configs`.
-3. Create *.toml* file by typing command, `vi /configs/automate.toml`.
-4. Copy the following Ruby code into this file by altering the value of *bucket* with `bucket-name` and *name* with `bucket-name`.
+2. Create directory `configs` by running the command `mkdir configs`.
+3. Create *.toml* file by running the command, `vi /configs/automate.toml`.
+4. Copy the following Ruby code into the above-created file by altering the value of *bucket* with `bucket-name` and *name* with `bucket-name`.
 
 ``` ruby
 [global.v1.external.elasticsearch.backup]
 
     enable = true
-
     location = "s3"
 
 [global.v1.external.elasticsearch.backup.s3]
@@ -101,7 +96,7 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
   # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
 
-  # for full documentation on how to configure client settings on your
+  # for complete documentation on how to configure client settings on your
 
   # Elasticsearch nodes
 
@@ -114,7 +109,6 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
     ## documentation. See the following links:
 
     ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
-
 
 
     ## Backup repo settings
@@ -170,7 +164,7 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
 [global.v1.backups.s3.credentials]
 
-    # Optionally, AWS credentials may be provided. If these are not provided, IAM instance
+    # Optionally, AWS credentials may be provided. If these are not provided, the IAM instance
 
     # credentials will be used. It's also possible for these to be read through the standard
 
@@ -187,13 +181,13 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
 1. Execute command, `./chef-automate patch configs/automate.toml`. This command triggers the deployment.
 
-1. Assign the created IAM role to all the Elasticsearch instances.
+1. Assign the created IAM role to all the ElasticSearch instances.
 
 1. SSH into the Chef Automate instance by typing the command, `sudo automate-cluster-ctl ssh automate`.
 
 1. Execute command, `./chef-automate backup create`, from the Chef Automate front-end node. The backup gets created.
 
-### Restoring the S3 Backed-up Data
+### Restore the S3 Backed-up Data
 
 This section includes the procedure to restore backed-up data of the Chef Automate High Availability [HA] using EFS [External File System].
 
@@ -209,17 +203,13 @@ This section includes the procedure to restore backed-up data of the Chef Automa
 
 ## Backup with EFS System
 
-This section explains how to take backup and restore for External Elastic Search (ES) and Postgres-Sql on External File-System (EFS). You can take the backup and restore on EFS system through DNS or IP.
+This section explains how to take backup and restore for External Elastic Search (ES) and PostgreSQL it on External File-System (EFS). You can take the backup and restore on the EFS system through DNS or IP.
 
-A shared file system requires you to create Elasticsearch snapshots. To mount the same shared filesystem to the same location on all master and data nodes, register these snapshot repositories with Elasticsearch.
+A shared file system requires you to create ElasticSearch snapshots. To mount the same shared filesystem to the exact location on all master and data nodes, register these snapshot repositories with ElasticSearch.
 
 You must register this location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
 
-{{< note >}}
-
-Ensure you perform the backup configuration before deploying the Chef Automate High Availability (HA) cluster.
-
-{{< /note >}}
+{{< note >}} Ensure you perform the backup configuration before deploying the Chef Automate High Availability (HA) cluster. {{< /note >}}
 
 ### Pre-Backup Configurations
 
@@ -228,22 +218,18 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
 ### Backup Procedure
 
-Let us assume that the shared filesystem is mounted to `/mnt/automate_backups`. Now, follow these steps to configure the Chef Automate High Availability (HA) to register the snapshot locations with Elasticsearch:
+Let us assume that the shared filesystem is mounted to `/mnt/automate_backups`. Now, follow these steps to configure the Chef Automate High Availability (HA) to register the snapshot locations with ElasticSearch:
 
-1. Enter the `mount /mnt/automate_backups` command to ensure the shared file system exists on all Elasticsearch servers.
+1. Enter the `mount /mnt/automate_backups` command to ensure the shared file system exists on all ElasticSearch servers.
 
-1. Create Elasticsearch sub-directory and set permissions by executing the following commands:
+1. Create ElasticSearch sub-directory and set permissions by executing the following commands:
 
 ```bash
 sudo mkdir /mnt/automate_backups/elasticsearch
 sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 ```
 
-{{< note >}}
-
-If the network is mounted correctly, you need to perform this step on a single OpenSearch server.
-
-{{< /note >}}
+{{< note >} If the network is mounted correctly, you need to perform this step on a single OpenSearch server. {{< /note >}}
 
 1. Export the current OpenSearch configuration from the Habitat supervisor.
 
@@ -264,13 +250,9 @@ automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_conf
    repo = "/mnt/automate_backups/elasticsearch"
 ```
 
-{{< note >}}
+{{< note >}} This file may be empty if credentials are never rotated. {{< /note >}}
 
-This file may be empty if credentials are never rotated.
-
-{{< /note >}}
-
-1. Apply updated `es_config.toml` configuration to Elasticsearch by executing the following commands:
+1. Apply the updated `es_config.toml` configuration to ElasticSearch by executing the following commands:
 
 ```bash
 hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
@@ -280,9 +262,9 @@ curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u 
 `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
 ```
 
-You can perform this application only once, which triggers a restart of the Elasticsearch services on each server.
+You can perform the above application only once, which triggers a restart of the ElasticSearch services on each server.
 
-1. Configure Chef Automate HA to handle external Elasticsearch backups by adding the following configuration to `/hab/a2_deploy_workspace/config/automate.toml` on the provisioning host or from the bastion host:
+1. Configure Chef Automate HA to handle external ElasticSearch backups by adding the following configuration to `/hab/a2_deploy_workspace/config/automate.toml` on the provisioning host or from the bastion host:
 
 ```ruby
 [global.v1.external.elasticsearch.backup]
