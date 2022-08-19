@@ -943,3 +943,10 @@ func (m *mockReportingServer) AssetCount(context.Context, *reporting.ListFilters
 func (m *mockReportingServer) ListAsset(context.Context, *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
 	return nil, nil
 }
+
+func (m *mockReportingServer) SetAssetConfig(context.Context, *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) GetAssetConfig(context.Context, *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	return nil, nil
+}
