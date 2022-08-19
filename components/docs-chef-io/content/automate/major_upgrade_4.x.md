@@ -447,3 +447,28 @@ Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
 
+### Minor upgrade errors
+
+```sh
+sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
+```
+In some scenarios above command may throw the below error.
+
+```sh
+Installing airgap install bundle
+DeploymentServiceCallError: A request to the deployment-service failed: Request to start upgrade failed: rpc error: code = FailedPrecondition desc = The minimum compatible version field is missing in the manifest, please create a bundle with the latest automate-cli
+```
+This error may occur if an user running non-airgapped version of chef automate tries to perform a minor upgrade using airgapped installation method. To fix this minor upgrade error, first run:
+
+```sh
+sudo chef-automate stop
+```
+then run:
+```sh
+sudo chef-automate start
+```
+
+Before trying the upgrade again make sure all the services are up by running:
+```sh
+sudo chef-automate status
+```
