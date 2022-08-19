@@ -1195,20 +1195,7 @@ func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, timeNDaysAgo
 				return nil, err
 			}
 
-			if searchResult.TotalHits() > 0 {
-				// Iterate through results
-				for _, hit := range searchResult.Hits.Hits {
-					var node relaxting.NodesUpgradation
-					if hit.Source != nil {
-						err := json.Unmarshal(hit.Source, &node)
-						if err != nil {
-							logrus.Errorf("Received error while unmarshling %+v", err)
-						}
-
-					}
-					nodesMap[node.NodeUUID] = node
-				}
-			}
+			getNodesDayLatestTrueResult(searchResult, nodesMap)
 
 			if len(searchResult.Hits.Hits) == 0 || len(searchResult.Hits.Hits) < size {
 				break
@@ -1331,20 +1318,8 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 				return nil, err
 			}
 
-			if searchResult.TotalHits() > 0 {
-				// Iterate through results
-				for _, hit := range searchResult.Hits.Hits {
-					var report relaxting.ReportId
-					if hit.Source != nil {
-						err := json.Unmarshal(hit.Source, &report)
-						if err != nil {
-							logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
-						}
+			getReportsDailyLatestTrueResult(searchResult, reportsMap)
 
-					}
-					reportsMap[report.ReportUuid] = report.EndTime
-				}
-			}
 			if len(searchResult.Hits.Hits) == 0 || len(searchResult.Hits.Hits) < size {
 				break
 			}
@@ -1481,4 +1456,38 @@ func getNDaysIndex(timedaysAgo time.Time) ([]string, error) {
 
 	return indicesSlice, nil
 
+}
+
+func getNodesDayLatestTrueResult(searchResult *elastic.SearchResult, nodesMap map[string]relaxting.NodesUpgradation) {
+	if searchResult.TotalHits() > 0 {
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			var node relaxting.NodesUpgradation
+			if hit.Source != nil {
+				err := json.Unmarshal(hit.Source, &node)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling %+v", err)
+				}
+
+			}
+			nodesMap[node.NodeUUID] = node
+		}
+	}
+}
+
+func getReportsDailyLatestTrueResult(searchResult *elastic.SearchResult, reportsMap map[string]string) {
+	if searchResult.TotalHits() > 0 {
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			var report relaxting.ReportId
+			if hit.Source != nil {
+				err := json.Unmarshal(hit.Source, &report)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
+				}
+
+			}
+			reportsMap[report.ReportUuid] = report.EndTime
+		}
+	}
 }
