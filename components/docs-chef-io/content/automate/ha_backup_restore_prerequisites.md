@@ -127,19 +127,19 @@ Take a [back-up](/automate/ha_restore/) of the configurations once the cluster h
 
 {{< note >}} **IAM Role:** Assign the IAM Role to all the OpenSearch instances in the cluster created above. {{< /note >}}
 
-### Elastic File System(EFS) Configuration for backup
+### Elastic File System(EFS) Configuration for Backup
 
 To backup on the shared file system for AWS, follow the steps given below:
 
 - Create the **EFS** over AWS. (Make sure to enable network access to all the available AZs in that VPC)
 - Open the **Port(2049) Proto(NFS)** for EFS Security Group.
-- Mount the created EFS using **DNS** or **IP** in exact same path (mount point) in all OpenSearch node. `Eg: /mnt/automate_backups. For this example, make sure directory /mnt/automate_backups is present`
+- Mount the created EFS using **DNS** or **IP** in the same path (mount point) in all OpenSearch nodes. `Eg: /mnt/automate_backups. For this example, make sure directory /mnt/automate_backups is present`
 
 {{< note >}} Refer [here](https://docs.aws.amazon.com/efs/latest/ug/wt1-test.html) to mount EFS to instances. {{< /note >}}
 
 Once the shared EFS filesystem is mounted to the mount point (`/mnt/automate_backups`),
 
-- Create an OpenSearch sub-directory and set permissions to one of the OpenSearch server (only if the network mount is correctly mounted).
+- Create an OpenSearch sub-directory and set permissions to one of the OpenSearch servers (only if the network mount is correctly mounted).
 
 ```sh
 sudo mkdir /mnt/automate_backups/opensearch
