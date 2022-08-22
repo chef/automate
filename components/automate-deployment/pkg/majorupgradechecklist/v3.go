@@ -591,6 +591,9 @@ func getElasticSearchCusterSetting() {
 }
 
 func getElasticSearchRuntimeSettings() (string, error) {
+	var result = make(map[string]string)
+
+    var lines = data.Split(result,"\n")
 	pid, err := ioutil.ReadFile("/hab/svc/automate-elasticsearch/PID")
 	if err != nil {
 		return "", err
@@ -605,5 +608,15 @@ func getElasticSearchRuntimeSettings() (string, error) {
 		return "", err
 	}
 	json.Unmarshal(data, ESClusterSetting{})
+    
+	for i:= 1 ; i < len(lines); i++ {
+		s := strings.Split(lines[i], "\t")
+		if s[0]= "Max open files" || "Max locked memory" {
+		result[s[0]] = s[1]
+		}
+    	
+	}
+	
+
 	return string(data), nil
 }
