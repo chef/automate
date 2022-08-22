@@ -426,6 +426,17 @@ service ReportingService {
  		};
  	}
 
+	rpc ListControlItemsRange(ControlItemRequest) returns (ControlItems) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/controls/search"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:control"
+			action: "compliance:controlItems:list"
+		};
+	};
+
 }
 
 message ControlItemRequest {
