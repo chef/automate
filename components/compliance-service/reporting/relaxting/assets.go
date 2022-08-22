@@ -18,7 +18,7 @@ import (
 )
 
 //getAssets Get Total Number of documents from the comp-*-run-info
-func (backend ES2Backend) getAssets(ctx context.Context, boolQuery *elastic.BoolQuery) (int32, error) {
+func (backend ES2Backend) getAssets(ctx context.Context, boolQuery *elastic.BoolQuery, msg string) (int32, error) {
 	myIndex := mappings.ComplianceRunInfo.Index
 
 	client, err := backend.ES2Client()
@@ -30,7 +30,7 @@ func (backend ES2Backend) getAssets(ctx context.Context, boolQuery *elastic.Bool
 	countService := elastic.NewCountService(client)
 
 	scr, err := boolQuery.Source()
-	LogQueryPartMin(myIndex, scr, "getassests")
+	LogQueryPartMin(myIndex, scr, msg)
 	count, err := countService.Query(boolQuery).Index(myIndex).Do(ctx)
 	if err != nil {
 		logrus.Errorf("Cannot create client for count assets with error %v", err)
@@ -206,7 +206,7 @@ func (backend ES2Backend) getCollectedAssetsCount(ctx context.Context, filtQuery
 
 	searchSource := elastic.NewSearchSource().
 		Query(filtQuery).
-		Size(10000)
+		Size(0)
 	for aggName, agg := range getSummaryAssetAggregation() {
 		searchSource.Aggregation(aggName, agg)
 	}
@@ -363,22 +363,25 @@ func (backend ES2Backend) GetAssetSummary(ctx context.Context, filters map[strin
 
 	// get the total number of assets without any date range filters i.e all the assets present
 	boolquery := backend.getFiltersQueryForAssetFilters(filters)
-	totalAssets, err := backend.getAssets(ctx, boolquery)
+	repQuery := boolquery
+
+	totalAssets, err := backend.getAssets(ctx, boolquery, "total_assets")
 	if err != nil {
 		logrus.Errorf("The error while getting the total assets %v", err)
 		return nil, err
 	}
+
 	// getting the un-reachable assets as per the unreachable config
 	// Todo hardcoding the value for Reachable assets
-	unreachableQuery := boolquery.Must(getUnReachableAssetTimeRangeQuery(10))
-	unreachableAsset, err := backend.getAssets(ctx, unreachableQuery)
+	unreachableAsset, err := backend.GetUnreachable(ctx, filters)
 	if err != nil {
 		logrus.Errorf("The error while getting unreachable assets: %v", err)
 		return nil, err
 	}
+
 	// get the un-reported assets as per the start time and end time present in filters
-	reportedQuery := boolquery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
-	reported, err := backend.getAssets(ctx, reportedQuery)
+	reportedQuery := repQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
+	reported, err := backend.getAssets(ctx, reportedQuery, "reported_assets")
 	if err != nil {
 		logrus.Errorf("The error while getting the unreported assests %v", err)
 		return nil, err
@@ -403,8 +406,7 @@ func (backend ES2Backend) GetAssetSummary(ctx context.Context, filters map[strin
 		Unreachable: unreachableAsset,
 		Unreported:  unreportedAsset,
 	}
-	logrus.Info("*************************")
-	logrus.Info(collectedAsset)
+
 	summary := &reportingapi.AssetSummary{
 		TotalAssets: totalAssets,
 		Collected:   collected,
@@ -464,4 +466,15 @@ func (backend ES2Backend) GetAsset(ctx context.Context, filters map[string][]str
 		return backend.getUnReportedAssets(ctx, from, size, filters, boolquery, 10)
 	}
 	return assets, errors.New("Please provide the valid asset type")
+}
+
+func (backend ES2Backend) GetUnreachable(ctx context.Context, filters map[string][]string) (int32, error) {
+	boolquery := backend.getFiltersQueryForAssetFilters(filters)
+	unreachableQuery := boolquery
+	unreachableQuery = unreachableQuery.Must(getUnReachableAssetTimeRangeQuery(10))
+	unreachableAsset, err := backend.getAssets(ctx, unreachableQuery, "unreachable_assets")
+	if err != nil {
+		return 0, err
+	}
+	return unreachableAsset, nil
 }
