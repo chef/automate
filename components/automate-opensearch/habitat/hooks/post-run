@@ -1,4 +1,5 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
+#shellcheck disable=SC2086
 
 exec 2>&1
 
