@@ -55,8 +55,9 @@ if [[ $(wait_until_healthy 5) -ne 0 ]]; then
   exit 1 # always exit 0 in post-run or it'll retry the hook
 fi
 
-# Getting all indices
+echo "Configuring index settings"
 
+# Getting all indices 
 indices=$(curl -k -XGET https://${HOST}:{{cfg.network.port}}/_cat/indices -u "admin:admin" | awk '{print $3}' | awk '!/^(\.)/' | awk '!/security/')
 echo -e "list of indices\n$indices"
 
@@ -82,7 +83,8 @@ echo -e "list of templates\n$templates"
 # Looping over each template individually and patching "number_of_replica" from config (toml)
 for template in $templates;do
 echo -e " snapshot status for $template\n"
-index_patterns=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/"$template"?pretty -u 'admin:admin' --insecure | jq  ".[\"${template}\"].index_patterns") 
+index_patterns=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/"$template"?pretty -u 'admin:admin' --insecure | jq  ".[\"${template}\"].index_patterns")
+echo -e echo -e " Index pattern: $index_patterns\n"
 
 
 done
