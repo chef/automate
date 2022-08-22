@@ -62,14 +62,12 @@ fi
 echo "Configuring index settings"
 
 # Getting all indices 
-export indices
-indices=$(curl -k -XGET https://${HOST}:{{cfg.network.port}}/_cat/indices -u "admin:admin" | awk '{print $3}' | awk '!/^(\.)/' | awk '!/security/')
+export indices=$(curl -k -XGET https://${HOST}:{{cfg.network.port}}/_cat/indices -u "admin:admin" | awk '{print $3}' | awk '!/^(\.)/' | awk '!/security/')
 echo -e "list of indices\n$indices"
 
 # Looping over each index individually and patching "number_of_replica" from config (toml)
 for index in $indices;do
 echo -e " snapshot status for $index\n"
-" snapshot status for $index\n" >> logs.txt
 curl -X PUT \
   "https://${HOST}:{{cfg.network.port}}/$index/_settings?pretty=" \
   -k -u admin:admin \
@@ -83,8 +81,7 @@ curl -X PUT \
 done
 
 # Getting all templates
-export templates
-templates=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_cat/templates -k -u 'admin:admin'| awk '{print $1}')
+export templates=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_cat/templates -k -u 'admin:admin'| awk '{print $1}')
 echo -e "list of templates\n$templates"
 
 # Looping over each template individually and patching "number_of_replica" from config (toml)
