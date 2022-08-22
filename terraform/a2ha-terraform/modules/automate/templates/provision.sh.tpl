@@ -43,6 +43,7 @@ wait_for_install() {
     sleep 30
     pkg_count=$(ls -Art /hab/cache/artifacts/chef-automate-ha-ctl* | tail -n 1 | wc -l )
     pkg_name=$(ls -Art /hab/cache/artifacts/chef-automate-ha-ctl* | tail -n 1)
+    echo "Installing the package $pkg_name"
     echo "pkg_count:$pkg_count"
     echo "pkg_name:$pkg_name"
     if [ $pkg_count -eq 1 ]
