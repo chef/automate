@@ -62,7 +62,7 @@ export indices=$(curl -k -XGET https://${HOST}:{{cfg.network.port}}/_cat/indices
 echo -e "list of indices\n$indices"
 
 # Looping over each index individually and patching "number_of_replica" from config (toml)
-for index in ${indices[@]};do
+for index in $indices;do
 echo -e " snapshot status for $index\n"
 curl -X PUT \
   "https://${HOST}:{{cfg.network.port}}/$index/_settings?pretty=" \
@@ -81,7 +81,7 @@ export templates=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_cat/template
 echo -e "list of templates\n$templates"
 
 # Looping over each template individually and patching "number_of_replica" from config (toml)
-for template in ${templates[@]};do
+for template in $templates;do
 echo -e " snapshot status for $template\n"
 export index_patterns=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/$template?pretty -u 'admin:admin' --insecure | jq  ".[\"${template}\"].index_patterns") # []
 curl --location --request PUT "https://${HOST}:{{cfg.network.port}}/_template/$template" --header 'Content-Type: application/json' -k -u admin:admin --data-raw "{
