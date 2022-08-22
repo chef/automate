@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/pkg/errors"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
 
 type indexVersion struct {
@@ -34,6 +35,24 @@ type V4ChecklistManager struct {
 	writer       cli.FormatWriter
 	version      string
 	isExternalES bool
+}
+
+func isUpdated(){
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return err
+	}
+	resp, err := connection.UpgradeStatus(context.Background(), &api.UpgradeStatusRequest{
+		VersionsPath: upgradeStatusCmdFlags.versionsPath,
+	})
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to get upgrade status failed",
+		)
+	}
+	return resp.IsAirgapped
 }
 
 const (
@@ -104,6 +123,15 @@ var postChecklistV4Embedded = []PostCheckListItem{
 	},
 }
 
+if isUpdated(){
+	postChecklistV4Embedded = append(postChecklistV4Embedded, {
+		Id:         "",
+		Msg:        ,
+		Cmd:        ,
+		Optional:   true,
+		IsExecuted: false,
+	})
+}
 var postChecklistV4External = []PostCheckListItem{
 	{
 		Id:         "upgrade_status",
