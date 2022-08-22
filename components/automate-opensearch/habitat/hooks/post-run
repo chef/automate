@@ -1,6 +1,7 @@
 #shellcheck disable=SC2155
 #shellcheck disable=SC2086
 #shellcheck disable=SC1128
+#shellcheck disable=all
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
 exec 2>&1
