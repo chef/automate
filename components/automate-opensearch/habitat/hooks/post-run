@@ -83,13 +83,11 @@ echo -e "list of templates\n$templates"
 # Looping over each template individually and patching "number_of_replica" from config (toml)
 for template in $templates;do
 echo -e " snapshot status for $template\n"
-index_patterns=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/"$template"?pretty -u 'admin:admin' --insecure | jq  ".[\"${template}\"].index_patterns")
+index_patterns=$(curl -XGET https://${HOST}:{{cfg.network.port}}/_template/"$template"?pretty -u 'admin:admin' --insecure | jq  ".[\"${template}\"].index_patterns[]")
 echo -e "Index Pattern: $index_patterns"
 echo -e " snapshot status for $template"
-JSON_STRING=$( jq -n \
-                  --arg ip "$index_patterns" \
-                  '{
-                    "index_patterns" : $ip,
+JSON_STRING=$( jq -n --arg ip ${index_patterns} '{
+                    "index_patterns" : ["$ip"],
                     "settings" : {
                       "index" : {
                         "number_of_replicas" : "{{cfg.index.number_of_replicas}}",
