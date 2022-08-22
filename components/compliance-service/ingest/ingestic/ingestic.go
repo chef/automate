@@ -1232,7 +1232,7 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 	for i := len(indicesSlice) - 1; i >= 0; i-- {
 		index := indicesSlice[i]
 		from := 0
-		for i := 0; i < 10000; i++ {
+		for {
 			searchSource := elastic.NewSearchSource().
 				FetchSourceContext(fsc).
 				Query(boolQuery).
@@ -1248,7 +1248,7 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 				Do(ctx)
 
 			if err != nil {
-				return nil, nil, err
+				logrus.Errorf("Unable to fetch result for upgrade with error %v", err)
 			}
 
 			getReportsDailyLatestTrueResult(searchResult, reportsMap, nodesMap, latestReportMap)

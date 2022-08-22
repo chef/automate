@@ -8,6 +8,10 @@ type UpgradeDbTest struct {
 	NeedStatus   bool
 }
 
+func (u UpgradeDbTest) UpdateCompRunInfoFlagToFalse() error {
+	return nil
+}
+
 func (u UpgradeDbTest) GetUpgradeFlags() (map[string]bool, error) {
 	if u.Error {
 		return nil, errors.New("Unable to fetch status from database")
