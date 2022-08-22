@@ -989,3 +989,26 @@ func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceC
 
 	return res, nil
 }
+
+// ListControlItemsRange returns a list of controlListItems based on query
+func (srv *Server) ListControlItemsRange(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+	var controlListItems *reporting.ControlItems
+	if in.Size == 0 {
+		in.Size = 100
+	}
+	if in.PageNumber == 0 {
+		in.PageNumber = 1
+	}
+
+	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+
+	controlListItems, err = srv.es.GetControlListItemsRange(ctx, formattedFilters, in.Size, in.PageNumber)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	return controlListItems, nil
+}
