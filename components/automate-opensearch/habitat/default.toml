@@ -227,7 +227,7 @@
   #security.ssl.http.enabled = false
 # ======================== Runtime Configuration =========================
 [runtime]
-  max_open_files = ""
+  max_open_files = "65536"
   max_locked_memory = "unlimited"
   os_startup_sleep_time = ""
   os_java_opts = ""

@@ -7,6 +7,23 @@ export GODEBUG=x509ignoreCN=0
 
 export OPENSEARCH_PATH_CONF={{pkg.svc_config_path}}
 
+half_mem=$(echo $(( $(free -m | grep Mem | awk '{print $2}') / 2 )))
+if [ $half_mem -lt 26624 ]; then heapsize=$half_mem; heapsize+=m;else heapsize=26624m; fi
+export OS_JAVA_HEAP="-Xms$heapsize -Xmx$heapsize"
+
+{{#if cfg.runtime.max_locked_memory ~}}
+ulimit -l {{cfg.runtime.max_locked_memory}}
+{{/if ~}}
+{{#if cfg.runtime.max_open_files ~}}
+ulimit -n {{cfg.runtime.max_open_files}}
+{{/if ~}}
+# https://opensearch.org/docs/latest/opensearch/install/important-settings/
+{{#if cfg.runtime.es_java_opts ~}}
+export OPENSEARCH_JAVA_OPTS="{{cfg.runtime.os_java_opts}}"
+{{else ~}}
+export OPENSEARCH_JAVA_OPTS="${OS_JAVA_HEAP}"
+{{/if ~}}
+
 {{#if cfg.disable ~}}
 while true
 do
