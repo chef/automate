@@ -55,6 +55,8 @@ if [[ $(wait_until_healthy 5) -ne 0 ]]; then
   exit 1 # always exit 0 in post-run or it'll retry the hook
 fi
 
+# Getting all indices
+
 echo "Configuring index settings"
 curl \
   -s \
