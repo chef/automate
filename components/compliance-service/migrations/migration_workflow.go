@@ -160,9 +160,11 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 	//Adding new mapping for the comp run info Index
 	esClient.CreateTemplate(ctx, mappings.ComplianceRunInfo.Index, mappings.ComplianceRunInfo.Mapping)
 
+	count := 0
 	if len(reportsMap) > 0 {
 		logrus.Infof("Inside upgrade reports Map with length %d", len(reportsMap))
 		for report, endTime := range reportsMap {
+			logrus.Infof("Currently at the index of map : %d", count)
 
 			parsedEndTime, _ := time.Parse(time.RFC3339, endTime)
 			index := mapping.IndexTimeseriesFmt(parsedEndTime)
@@ -199,6 +201,8 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 			if err != nil {
 				logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
 			}
+
+			count++;
 
 		}
 	}
