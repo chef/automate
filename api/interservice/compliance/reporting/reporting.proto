@@ -26,6 +26,7 @@ service ReportingService {
 	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {};
 	rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {};
  	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {};
+	rpc ListControlItemsRange(ControlItemRequest) returns (ControlItems) {};
 }
 
 message ReportContentRequest {
