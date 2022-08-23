@@ -967,7 +967,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s unable to get Source", myName)
+		return nil, errors.Wrapf(err, "%s unable to get Source ", myName)
 	}
 	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", myName))
 
@@ -1183,7 +1183,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 
 			timestamp, err := ptypes.TimestampProto(endTimeAsTime)
 			if err != nil {
-				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
+				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error : ", *name)
 			} else {
 				contListItem.EndTime = timestamp
 			}
@@ -2460,7 +2460,7 @@ func (backend *ES2Backend) GetControlListItemsRange(ctx context.Context, filters
 	if err != nil {
 		return nil, errors.Wrapf(err, "%s Unable to get control items", myName)
 	}
-	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", myName))
+	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query ", myName))
 
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
@@ -2472,7 +2472,7 @@ func (backend *ES2Backend) GetControlListItemsRange(ctx context.Context, filters
 		return nil, err
 	}
 
-	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
+	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s Search Result aggs", myName))
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
 
