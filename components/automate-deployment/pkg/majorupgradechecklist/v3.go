@@ -2,10 +2,12 @@ package majorupgradechecklist
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/platform/sys"
 	"github.com/pkg/errors"
 )
 
@@ -27,6 +29,9 @@ const (
 	backupError = "Please take a backup and restart the upgrade process."
 
 	diskSpaceError = `Please ensure to have 60% free disk space`
+
+	diskSpaceCheckError = `You do not have minimum space available to continue with this upgrade. 
+Please ensure you have 60% free disk space`
 
 	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
 
@@ -130,17 +135,6 @@ func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3Checklist
 	}
 }
 
-type checkFunc func() Checklist
-
-func preChecklist(check checkFunc) []Checklist {
-	return []Checklist{
-		downTimeCheck(),
-		backupCheck(),
-		check(),
-		postChecklistIntimationCheck(),
-	}
-}
-
 func IsExternalPG() bool {
 	config, err := platform_config.ConfigFromParams("pg-sidecar-service", "/hab/svc/pg-sidecar-service", "")
 	if err != nil {
@@ -160,7 +154,7 @@ func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V3ChecklistManager) RunChecklist(timeout int64) error {
+func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgradeFlags) error {
 
 	var dbType string
 	checklists := []Checklist{}
@@ -169,11 +163,13 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64) error {
 	if ci.isExternalPG {
 		dbType = "External"
 		postcheck = postChecklistExternal
-		checklists = append(checklists, preChecklist(externalPGUpgradeCheck)...)
+		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), externalPGUpgradeCheck(), postChecklistIntimationCheck()}...)
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistEmbedded
-		checklists = append(checklists, preChecklist(diskSpaceCheck)...)
+		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
+		log.Println("---ci.version-----------", ci.version)
+		log.Println("-----checklists embedded-----", checklists)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
 
@@ -182,6 +178,7 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64) error {
 	}
 
 	ci.writer.Println(fmt.Sprintf(initMsg, dbType, ci.version)) //display the init message
+	log.Println("-----ci.version in v3------", ci.version)
 
 	for _, item := range checklists {
 		if item.TestFunc == nil {
@@ -253,15 +250,73 @@ func backupCheck() Checklist {
 	}
 }
 
-func diskSpaceCheck() Checklist {
+func calDiskSizeAndDirSize(data, oldData string) (bool, error) {
+	v, err := sys.SpaceAvailForPath(data)
+	if err != nil {
+		return false, err
+	}
+	diskSpaceInMb := v / 1024
+	log.Println("-------diskspace in MB------", diskSpaceInMb)
+
+	size, err := sys.DirSize(oldData)
+	if err != nil {
+		return false, err
+	}
+
+	dirSizeInMb := size / (1024 * 1024)
+	log.Println("-----dirspace in MB------", dirSizeInMb)
+
+	msg := fmt.Sprintf("Insufficient disk space for migration.\n%s: %5d MB\n%s: %5d MB\n%s",
+		"Space Required", (dirSizeInMb + (dirSizeInMb / 10)),
+		"Space Available", diskSpaceInMb,
+		"To continue with less memory Please use --skip-storage-check")
+	// NewData > olddata + 10%of oldData
+	if diskSpaceInMb > (uint64(dirSizeInMb) + uint64(dirSizeInMb/10)) {
+		return true, nil
+	} else {
+		return false, errors.New(msg)
+	}
+}
+
+var SpaceAvailable bool
+
+func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir string) Checklist {
 	return Checklist{
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
 			resp, err := h.Writer.Confirm("Ensure you have more than 60 percent free disk space")
+			// h.Writer.Printf("-------skip disk space check---- %t", skipDiskSpaceCheck)
+			// h.Writer.Printf("------os destination data dir----- %s", osDestDataDir)
+			// h.Writer.Printf("-----version----- %s", version)
+			// h.Writer.Printf("----resp----- %t", resp)
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+			}
+			if !skipDiskSpaceCheck {
+				os_path := getHabRootPath(habrootcmd)
+				version, _ = GetMajorVersion(version)
+				// h.Writer.Printf("------os_path------- %s", os_path)
+				// h.Writer.Printf("------version-----......... %s", version)
+				switch version {
+				case "3":
+					SpaceAvailable, err = calDiskSizeAndDirSize(os_path+"svc/automate-postgresql/data", os_path+"svc/automate-postgresql/data/pgdata")
+					// h.Writer.Printf("------space available----- %t", SpaceAvailable)
+				case "4":
+					destDir := os_path
+					// h.Writer.Printf("------dest dir------ %s", destDir)
+					if osDestDataDir != "" {
+						destDir = osDestDataDir
+					}
+					// h.Writer.Printf("------dest dir 2------ %s", destDir)
+					SpaceAvailable, err = calDiskSizeAndDirSize(destDir, os_path+"svc/automate-elasticsearch")
+					// h.Writer.Printf("------space available----- %t", SpaceAvailable)
+				}
+				if err != nil {
+					h.Writer.Error(diskSpaceCheckError + "\n")
+					return status.New(status.InvalidCommandArgsError, diskSpaceCheckError)
+				}
 			}
 			if !resp {
 				h.Writer.Error(diskSpaceError)
