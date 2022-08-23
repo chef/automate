@@ -20,12 +20,13 @@ type ESComplianceRunInfo struct {
 	} `json:"platform_version"`
 	ChefServer    string           `json:"chef_server"`
 	Organization  string           `json:"organization"`
-	InspecVersion string           `json:"inspec_version"`
+	InspecVersion string           `json:"version"`
 	PolicyName    string           `json:"policy_name"`
 	Profiles      []ProfileRunInfo `json:"profiles"`
-	Recipe        []string         `json:"recipe"`
-	Role          []string         `json:"role"`
+	Recipe        []string         `json:"recipes"`
+	Role          []string         `json:"roles"`
 	ChefTags      []string         `json:"chef_tags"`
+	Environment   []string         `json:"environment"`
 }
 
 // Used to unmarshal summary documents stored in comp-s-* ElasticSearch indices

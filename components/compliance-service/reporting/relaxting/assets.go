@@ -139,7 +139,7 @@ func getESFieldNameAsset(filterType string) string {
 	case "chef_server":
 		ESFieldName = "chef_server.lower"
 	case "inspec_version":
-		ESFieldName = "inspec_version.lower"
+		ESFieldName = "version.lower"
 	case "organization":
 		ESFieldName = "organization.lower"
 	case "platform":
@@ -147,9 +147,9 @@ func getESFieldNameAsset(filterType string) string {
 	case "platform_with_version":
 		ESFieldName = "platform.full.lower"
 	case "recipe":
-		ESFieldName = "recipe.lower"
+		ESFieldName = "recipes.lower"
 	case "role":
-		ESFieldName = "role.lower"
+		ESFieldName = "roles.lower"
 	case "environment":
 		ESFieldName = "environment.lower"
 	case "chef_tags":
