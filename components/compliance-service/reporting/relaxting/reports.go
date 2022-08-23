@@ -29,6 +29,9 @@ import (
 
 const MaxScrollRecordSize = 10000
 const layout = "2006-01-02T15:04:05Z"
+const impact = "profiles.controls.impact"
+const lower = "profiles.controls.title.lower"
+const profile = "profiles.title.lower"
 
 func (backend ES2Backend) getDocIdHits(esIndex string,
 	searchSource *elastic.SearchSource) ([]*elastic.SearchHit, time.Duration, error) {
@@ -838,7 +841,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		Order("_key", true)
 
 	controlTermsAgg.SubAggregation("impact",
-		elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1))
+		elastic.NewTermsAggregation().Field(impact).Size(1))
 
 	controlTermsAgg.SubAggregation("title",
 		elastic.NewTermsAggregation().Field("profiles.controls.title").Size(1))
@@ -927,7 +930,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Infof("controls status query %v", controlStatusQuery)
 	}
 	if len(filters["control_name"]) > 0 {
-		controlTitlesQuery := newTermQueryFromFilter("profiles.controls.title.lower", filters["control_name"])
+		controlTitlesQuery := newTermQueryFromFilter(lower, filters["control_name"])
 		controlsQuery = controlsQuery.Should(controlTitlesQuery)
 		logrus.Infof("controls name query %v", controlTitlesQuery)
 	}
@@ -948,7 +951,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	profilesQuery := &elastic.BoolQuery{}
 	if len(filters["profile_name"]) > 0 {
-		profileTitlesQuery := newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
+		profileTitlesQuery := newTermQueryFromFilter(profile, filters["profile_name"])
 		profilesQuery = profilesQuery.Should(profileTitlesQuery)
 		logrus.Infof("profiles name query %v", profileTitlesQuery)
 	}
@@ -1178,7 +1181,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 
 			endTimeAsTime, err := time.Parse(time.RFC3339, *name)
 			if err != nil {
-				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
+				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error : ", *name)
 			}
 
 			timestamp, err := ptypes.TimestampProto(endTimeAsTime)
@@ -1358,13 +1361,13 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	if len(filters["control_name"]) > 0 {
-		termQuery := newNestedTermQueryFromFilter("profiles.controls.title.lower", "profiles.controls",
+		termQuery := newNestedTermQueryFromFilter(lower, "profiles.controls",
 			filters["control_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["profile_name"]) > 0 {
-		termQuery := newNestedTermQueryFromFilter("profiles.title.lower", "profiles", filters["profile_name"])
+		termQuery := newNestedTermQueryFromFilter(profile, "profiles", filters["profile_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -1384,7 +1387,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
 		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
 		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status",
-			"profiles.controls.impact", "profiles.controls.waived_str"}
+			impact, "profiles.controls.waived_str"}
 
 		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes,
 			profileLevelFscIncludes, controlLevelFscIncludes)
@@ -2329,7 +2332,7 @@ func (backend *ES2Backend) GetControlListItemsRange(ctx context.Context, filters
 		Order("_key", true)
 
 	controlTermsAgg.SubAggregation("impact",
-		elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1))
+		elastic.NewTermsAggregation().Field(impact).Size(1))
 
 	controlTermsAgg.SubAggregation("title",
 		elastic.NewTermsAggregation().Field("profiles.controls.title").Size(1))
@@ -2418,7 +2421,7 @@ func (backend *ES2Backend) GetControlListItemsRange(ctx context.Context, filters
 		logrus.Infof("controls status query %v", controlStatusQuery)
 	}
 	if len(filters["control_name"]) > 0 {
-		controlTitlesQuery := newTermQueryFromFilter("profiles.controls.title.lower", filters["control_name"])
+		controlTitlesQuery := newTermQueryFromFilter(lower, filters["control_name"])
 		controlsQuery = controlsQuery.Should(controlTitlesQuery)
 		logrus.Infof("controls name query %v", controlTitlesQuery)
 	}
@@ -2439,7 +2442,7 @@ func (backend *ES2Backend) GetControlListItemsRange(ctx context.Context, filters
 
 	profilesQuery := &elastic.BoolQuery{}
 	if len(filters["profile_name"]) > 0 {
-		profileTitlesQuery := newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
+		profileTitlesQuery := newTermQueryFromFilter(profile, filters["profile_name"])
 		profilesQuery = profilesQuery.Should(profileTitlesQuery)
 		logrus.Infof("profiles name query %v", profileTitlesQuery)
 	}
