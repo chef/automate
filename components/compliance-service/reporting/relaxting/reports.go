@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/golang/protobuf/ptypes"
 	elastic "github.com/olivere/elastic/v7"
@@ -28,6 +29,9 @@ import (
 
 const MaxScrollRecordSize = 10000
 const layout = "2006-01-02T15:04:05Z"
+const impact = "profiles.controls.impact"
+const lower = "profiles.controls.title.lower"
+const profile = "profiles.title.lower"
 
 func (backend ES2Backend) getDocIdHits(esIndex string,
 	searchSource *elastic.SearchSource) ([]*elastic.SearchHit, time.Duration, error) {
@@ -801,8 +805,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
 
-	controlListIds := make([]string, 0)
-
 	controlSummaryTotals := &reportingapi.ControlSummary{
 		Passed:  &reportingapi.Total{},
 		Skipped: &reportingapi.Total{},
@@ -816,16 +818,13 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		return nil, err
 	}
 
-	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	// Only end_time matters for this call
+	filters["start_time"] = []string{}
 	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, myName)
 	}
 
-	controlIndex, err := getControlIndex(filters)
-	if err != nil {
-		return nil, errors.Wrap(err, myName)
-	}
 	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
 	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
 	latestOnly := FetchLatestDataOrNot(filters)
@@ -842,7 +841,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		Order("_key", true)
 
 	controlTermsAgg.SubAggregation("impact",
-		elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1))
+		elastic.NewTermsAggregation().Field(impact).Size(1))
 
 	controlTermsAgg.SubAggregation("title",
 		elastic.NewTermsAggregation().Field("profiles.controls.title").Size(1))
@@ -931,7 +930,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Infof("controls status query %v", controlStatusQuery)
 	}
 	if len(filters["control_name"]) > 0 {
-		controlTitlesQuery := newTermQueryFromFilter("profiles.controls.title.lower", filters["control_name"])
+		controlTitlesQuery := newTermQueryFromFilter(lower, filters["control_name"])
 		controlsQuery = controlsQuery.Should(controlTitlesQuery)
 		logrus.Infof("controls name query %v", controlTitlesQuery)
 	}
@@ -952,7 +951,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	profilesQuery := &elastic.BoolQuery{}
 	if len(filters["profile_name"]) > 0 {
-		profileTitlesQuery := newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
+		profileTitlesQuery := newTermQueryFromFilter(profile, filters["profile_name"])
 		profilesQuery = profilesQuery.Should(profileTitlesQuery)
 		logrus.Infof("profiles name query %v", profileTitlesQuery)
 	}
@@ -971,7 +970,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s Unable to get control items", myName)
+		return nil, errors.Wrapf(err, "%s unable to get Source ", myName)
 	}
 	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", myName))
 
@@ -1006,19 +1005,13 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 					if totalWaivedControls, found := filteredControls.Aggregations.Filter("waived_total"); found {
 						controlSummaryTotals.Waived.Total = int32(totalWaivedControls.DocCount)
 					}
-
 					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
 						start, end := paginate(int(pageNumber), int(size), len(controlBuckets.Buckets))
 						for _, controlBucket := range controlBuckets.Buckets[start:end] {
-							id, ok := controlBucket.Key.(string)
-							if !ok {
-								logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
-							}
-							contListItem, err := backend.getControlItem(controlBucket, id)
+							contListItem, err := backend.getControlItem(controlBucket)
 							if err != nil {
 								return nil, err
 							}
-							controlListIds = append(controlListIds, id)
 							contListItems = append(contListItems, &contListItem)
 						}
 					}
@@ -1026,11 +1019,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 			}
 		}
 	}
-	controlSummaryMap, err := backend.getControlSummaryFromControlIndex(ctx, controlListIds, filters, controlIndex, size)
-	if err != nil {
-		logrus.Errorf("Unable to fetch the nodes status for controls with error %v", err)
-	}
-	setControlSummaryForControlItems(contListItems, controlSummaryMap)
+
 	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems, ControlSummaryTotals: controlSummaryTotals}
 	return contListItemList, nil
 }
@@ -1136,18 +1125,28 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 }
 
 // getControlItem returns one control from the control list results
-func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem, id string) (reportingapi.ControlItem, error) {
+func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem) (reportingapi.ControlItem, error) {
 	contListItem := reportingapi.ControlItem{}
-
+	id, ok := controlBucket.Key.(string)
+	if !ok {
+		logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
+	}
 	contListItem.Id = id
-	/*controlSummary := &reportingapi.ControlSummary{
+	controlSummary := &reportingapi.ControlSummary{
 		Passed:  &reportingapi.Total{},
 		Skipped: &reportingapi.Total{},
 		Failed:  &reportingapi.Failed{},
 		Waived:  &reportingapi.Total{},
-	}*/
-
-	contListItem.Title = getTitleForControlItem(controlBucket)
+	}
+	if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
+		//there can only be one
+		bucket := aggResult.Buckets[0]
+		title, ok := bucket.Key.(string)
+		if !ok {
+			logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
+		}
+		contListItem.Title = title
+	}
 	if impactAggResult, found := controlBucket.Aggregations.Terms("impact"); found {
 		//there can only be one
 		impactBucket := impactAggResult.Buckets[0]
@@ -1156,18 +1155,44 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 			logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
 		}
 		contListItem.Impact = float32(impactAsNumber)
-		//controlSummary.Total = int32(impactBucket.DocCount)
+		controlSummary.Total = int32(impactBucket.DocCount)
 	}
 	profileMin := &reportingapi.ProfileMin{}
-	getProfileMinForControlItem(controlBucket, profileMin)
+	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
+		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
+			sha := result.Buckets[0]
+			profileMin.Id = sha.Key.(string)
+		}
+		if result, found := profileResult.Terms("title"); found && len(result.Buckets) > 0 {
+			title := result.Buckets[0]
+			profileMin.Title = title.Key.(string)
+		}
+		if result, found := profileResult.Terms("version"); found && len(result.Buckets) > 0 {
+			version := result.Buckets[0]
+			profileMin.Version = version.Key.(string)
+		}
+	}
 	contListItem.Profile = profileMin
 
-	endTime, err := getEndTimeForControlItem(controlBucket)
-	if err != nil {
-		return reportingapi.ControlItem{}, errors.Wrapf(err, " time error:")
+	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
+		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
+			endTime := result.Buckets[0]
+			name := endTime.KeyAsString
+
+			endTimeAsTime, err := time.Parse(time.RFC3339, *name)
+			if err != nil {
+				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error : ", *name)
+			}
+
+			timestamp, err := ptypes.TimestampProto(endTimeAsTime)
+			if err != nil {
+				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error : ", *name)
+			} else {
+				contListItem.EndTime = timestamp
+			}
+		}
 	}
-	contListItem.EndTime = endTime
-	/*if waived, found := controlBucket.Aggregations.Filter("waived"); found {
+	if waived, found := controlBucket.Aggregations.Filter("waived"); found {
 		controlSummary.Waived.Total = int32(waived.DocCount)
 	}
 	if passed, found := controlBucket.Aggregations.Filter("passed"); found {
@@ -1175,8 +1200,8 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 	}
 	if skipped, found := controlBucket.Aggregations.Filter("skipped"); found {
 		controlSummary.Skipped.Total = int32(skipped.DocCount)
-	}*/
-	/*if failed, found := controlBucket.Aggregations.Filter("failed"); found {
+	}
+	if failed, found := controlBucket.Aggregations.Filter("failed"); found {
 		total := int32(failed.DocCount)
 		controlSummary.Failed.Total = total
 		if contListItem.Impact < 0.4 {
@@ -1186,7 +1211,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		} else {
 			controlSummary.Failed.Critical = total
 		}
-	}*/
+	}
 
 	if filteredWaivedStr, found := controlBucket.Aggregations.Filter("filtered_waived_str"); found {
 		if waivedStrBuckets, found := filteredWaivedStr.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
@@ -1197,8 +1222,9 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		}
 	}
 
-	//contListItem.ControlSummary = controlSummary
+	contListItem.ControlSummary = controlSummary
 	return contListItem, nil
+
 }
 
 //getProfileMinForControlItem is parsing the  control title form the result of control list from comp-7-r-*
@@ -1335,13 +1361,13 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	if len(filters["control_name"]) > 0 {
-		termQuery := newNestedTermQueryFromFilter("profiles.controls.title.lower", "profiles.controls",
+		termQuery := newNestedTermQueryFromFilter(lower, "profiles.controls",
 			filters["control_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["profile_name"]) > 0 {
-		termQuery := newNestedTermQueryFromFilter("profiles.title.lower", "profiles", filters["profile_name"])
+		termQuery := newNestedTermQueryFromFilter(profile, "profiles", filters["profile_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -1361,7 +1387,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
 		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
 		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status",
-			"profiles.controls.impact", "profiles.controls.waived_str"}
+			impact, "profiles.controls.waived_str"}
 
 		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes,
 			profileLevelFscIncludes, controlLevelFscIncludes)
@@ -2257,4 +2283,283 @@ func checkTodayIsEndTime(endTime time.Time) bool {
 		return true
 	}
 	return false
+}
+
+func (backend *ES2Backend) GetControlListItemsRange(ctx context.Context, filters map[string][]string,
+	size int32, pageNumber int32) (*reportingapi.ControlItems, error) {
+	myName := "GetControlListItemsRange"
+
+	contListItems := make([]*reportingapi.ControlItem, 0)
+
+	controlListIds := make([]string, 0)
+
+	controlSummaryTotals := &reportingapi.ControlSummary{
+		Passed:  &reportingapi.Total{},
+		Skipped: &reportingapi.Total{},
+		Failed:  &reportingapi.Failed{},
+		Waived:  &reportingapi.Total{},
+	}
+
+	client, err := backend.ES2Client()
+	if err != nil {
+		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
+		return nil, err
+	}
+
+	filters["start_time"], err = getStartDateFromEndDate(firstOrEmpty(filters["end_time"]), firstOrEmpty(filters["start_time"]))
+	esIndex, err := GetEsIndex(filters, false)
+	if err != nil {
+		return nil, errors.Wrap(err, myName)
+	}
+
+	controlIndex, err := getControlIndex(filters)
+	if err != nil {
+		return nil, errors.Wrap(err, myName)
+	}
+	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
+	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
+	latestOnly := FetchLatestDataOrNot(filters)
+
+	filtQuery := backend.getFiltersQuery(filters, latestOnly)
+
+	searchSource := elastic.NewSearchSource().
+		Query(filtQuery).
+		FetchSource(false).
+		Size(1)
+
+	controlTermsAgg := elastic.NewTermsAggregation().Field("profiles.controls.id").
+		Size(int(size*pageNumber)).
+		Order("_key", true)
+
+	controlTermsAgg.SubAggregation("impact",
+		elastic.NewTermsAggregation().Field(impact).Size(1))
+
+	controlTermsAgg.SubAggregation("title",
+		elastic.NewTermsAggregation().Field("profiles.controls.title").Size(1))
+
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
+
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+
+	controlTermsAgg.SubAggregation("skipped", skippedFilter)
+	controlTermsAgg.SubAggregation("failed", failedFilter)
+	controlTermsAgg.SubAggregation("passed", passedFilter)
+	controlTermsAgg.SubAggregation("waived", waivedFilter)
+
+	waivedStrAgg := elastic.NewTermsAggregation().Field("profiles.controls.waived_str").Size(4) //there are 4 different waived_str states
+	waivedButNotRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes")
+	waivedAndRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes_run")
+	waiverDataPassedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		Must(waivedAndRunQuery))
+
+	waiverDataFailedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		Must(waivedAndRunQuery))
+
+	waiverDataSkippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Should(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		Should(waivedButNotRunQuery))
+
+	waiverDataWaivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+
+	waiverDataJustificationAgg := elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.justification").Size(reporting.ESize)
+	waiverDataJustificationAgg.SubAggregation("skipped", waiverDataSkippedFilter)
+	waiverDataJustificationAgg.SubAggregation("failed", waiverDataFailedFilter)
+	waiverDataJustificationAgg.SubAggregation("passed", waiverDataPassedFilter)
+	waiverDataJustificationAgg.SubAggregation("waived", waiverDataWaivedFilter)
+
+	waiverDataExpirationDateAgg := elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.expiration_date").Size(reporting.ESize)
+	waiverDataExpirationDateAgg.SubAggregation("justification", waiverDataJustificationAgg)
+	waivedStrAgg.SubAggregation("expiration_date", waiverDataExpirationDateAgg)
+
+	waivedStrFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+	waivedStrFilter.SubAggregation("waived_str", waivedStrAgg)
+
+	controlTermsAgg.SubAggregation("filtered_waived_str", waivedStrFilter)
+
+	controlTermsAgg.SubAggregation("end_time", elastic.NewReverseNestedAggregation().SubAggregation("most_recent_report",
+		elastic.NewTermsAggregation().Field("end_time").Size(1)))
+
+	profileInfoAgg := elastic.NewReverseNestedAggregation().Path("profiles").SubAggregation("version",
+		elastic.NewTermsAggregation().Field("profiles.name"))
+
+	profileInfoAgg.SubAggregation("sha",
+		elastic.NewTermsAggregation().Field("profiles.sha256"))
+
+	profileInfoAgg.SubAggregation("title",
+		elastic.NewTermsAggregation().Field("profiles.title"))
+
+	profileInfoAgg.SubAggregation("version",
+		elastic.NewTermsAggregation().Field("profiles.version"))
+
+	controlTermsAgg.SubAggregation("profile", profileInfoAgg)
+
+	controlsQuery := &elastic.BoolQuery{}
+	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			_, tagKey := leftSplit(filterType, ":")
+			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+			controlsQuery = controlsQuery.Must(termQuery)
+		}
+	}
+	if len(filters["control_status"]) > 0 {
+		controlStatusQuery := newTermQueryFromFilter("profiles.controls.status", filters["control_status"])
+		controlsQuery = controlsQuery.Must(controlStatusQuery)
+		logrus.Infof("controls status query %v", controlStatusQuery)
+	}
+	if len(filters["control_name"]) > 0 {
+		controlTitlesQuery := newTermQueryFromFilter(lower, filters["control_name"])
+		controlsQuery = controlsQuery.Should(controlTitlesQuery)
+		logrus.Infof("controls name query %v", controlTitlesQuery)
+	}
+	if len(filters["control"]) > 0 {
+		controlIdsQuery := newTermQueryFromFilter("profiles.controls.id", filters["control"])
+		controlsQuery = controlsQuery.Should(controlIdsQuery)
+		logrus.Infof("controls ids query %v", controlIdsQuery)
+	}
+
+	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
+	filteredControls.SubAggregation("control", controlTermsAgg)
+	filteredControls.SubAggregation("skipped_total", skippedFilter)
+	filteredControls.SubAggregation("failed_total", failedFilter)
+	filteredControls.SubAggregation("passed_total", passedFilter)
+	filteredControls.SubAggregation("waived_total", waivedFilter)
+	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
+	controlsAgg.SubAggregation("filtered_controls", filteredControls)
+
+	profilesQuery := &elastic.BoolQuery{}
+	if len(filters["profile_name"]) > 0 {
+		profileTitlesQuery := newTermQueryFromFilter(profile, filters["profile_name"])
+		profilesQuery = profilesQuery.Should(profileTitlesQuery)
+		logrus.Infof("profiles name query %v", profileTitlesQuery)
+	}
+
+	if len(filters["profile_id"]) > 0 {
+		profilesShaQuery := newTermQueryFromFilter("profiles.sha256", filters["profile_id"])
+		profilesQuery = profilesQuery.Should(profilesShaQuery)
+	}
+
+	filteredProfiles := elastic.NewFilterAggregation().Filter(profilesQuery)
+	filteredProfiles.SubAggregation("controls", controlsAgg)
+	outterMostProfilesAgg := elastic.NewNestedAggregation().Path("profiles")
+	outterMostProfilesAgg.SubAggregation("filtered_profiles", filteredProfiles)
+
+	searchSource.Aggregation("profiles", outterMostProfilesAgg)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrapf(err, "%s Unable to get control items", myName)
+	}
+	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query ", myName))
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(ctx)
+
+	if err != nil {
+		logrus.Errorf("%s search failed", myName)
+		return nil, err
+	}
+
+	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s Search Result aggs", myName))
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredProfiles, found := outerProfilesAggResult.Aggregations.Filter("filtered_profiles"); found {
+			if outerControlsAggResult, found := outerFilteredProfiles.Aggregations.Nested("controls"); found {
+				if filteredControls, found := outerControlsAggResult.Aggregations.Filter("filtered_controls"); found {
+					controlSummaryTotals.Total = int32(filteredControls.DocCount)
+					if totalPassedControls, found := filteredControls.Aggregations.Filter("passed_total"); found {
+						controlSummaryTotals.Passed.Total = int32(totalPassedControls.DocCount)
+					}
+					if totalFailedControls, found := filteredControls.Aggregations.Filter("failed_total"); found {
+						controlSummaryTotals.Failed.Total = int32(totalFailedControls.DocCount)
+					}
+					if totalSkippedControls, found := filteredControls.Aggregations.Filter("skipped_total"); found {
+						controlSummaryTotals.Skipped.Total = int32(totalSkippedControls.DocCount)
+					}
+					if totalWaivedControls, found := filteredControls.Aggregations.Filter("waived_total"); found {
+						controlSummaryTotals.Waived.Total = int32(totalWaivedControls.DocCount)
+					}
+
+					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
+						start, end := paginate(int(pageNumber), int(size), len(controlBuckets.Buckets))
+						for _, controlBucket := range controlBuckets.Buckets[start:end] {
+							id, ok := controlBucket.Key.(string)
+							if !ok {
+								logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
+							}
+							contListItem, err := backend.getControlItemRange(controlBucket, id)
+							if err != nil {
+								return nil, err
+							}
+							controlListIds = append(controlListIds, id)
+							contListItems = append(contListItems, &contListItem)
+						}
+					}
+				}
+			}
+		}
+	}
+	controlSummaryMap, err := backend.getControlSummaryFromControlIndex(ctx, controlListIds, filters, controlIndex, size)
+	if err != nil {
+		logrus.Errorf("Unable to fetch the nodes status for controls with error %v", err)
+	}
+	setControlSummaryForControlItems(contListItems, controlSummaryMap)
+	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems, ControlSummaryTotals: controlSummaryTotals}
+	return contListItemList, nil
+
+}
+
+func (backend *ES2Backend) getControlItemRange(controlBucket *elastic.AggregationBucketKeyItem, id string) (reportingapi.ControlItem, error) {
+	contListItem := reportingapi.ControlItem{}
+
+	contListItem.Id = id
+
+	contListItem.Title = getTitleForControlItem(controlBucket)
+	if impactAggResult, found := controlBucket.Aggregations.Terms("impact"); found {
+		//there can only be one
+		impactBucket := impactAggResult.Buckets[0]
+		impactAsNumber, ok := impactBucket.Key.(float64)
+		if !ok {
+			logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
+		}
+		contListItem.Impact = float32(impactAsNumber)
+	}
+	profileMin := &reportingapi.ProfileMin{}
+	getProfileMinForControlItem(controlBucket, profileMin)
+	contListItem.Profile = profileMin
+
+	endTime, err := getEndTimeForControlItem(controlBucket)
+	if err != nil {
+		return reportingapi.ControlItem{}, errors.Wrapf(err, " time error:")
+	}
+	contListItem.EndTime = endTime
+
+	if filteredWaivedStr, found := controlBucket.Aggregations.Filter("filtered_waived_str"); found {
+		if waivedStrBuckets, found := filteredWaivedStr.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
+			contListItem.Waivers, err = backend.getWaiverData(waivedStrBuckets)
+			if err != nil {
+				return contListItem, err
+			}
+		}
+	}
+
+	return contListItem, nil
+
 }

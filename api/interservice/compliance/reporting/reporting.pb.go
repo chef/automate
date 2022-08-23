@@ -5219,7 +5219,7 @@ var file_interservice_compliance_reporting_reporting_proto_rawDesc = []byte{
 	0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x17, 0x0a, 0x15, 0x47,
 	0x65, 0x74, 0x41, 0x73, 0x73, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x32, 0x85, 0x14, 0x0a, 0x10, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69,
+	0x75, 0x65, 0x73, 0x74, 0x32, 0x99, 0x15, 0x0a, 0x10, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69,
 	0x6e, 0x67, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x84, 0x01, 0x0a, 0x0b, 0x4c, 0x69,
 	0x73, 0x74, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x30, 0x2e, 0x63, 0x68, 0x65, 0x66,
 	0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e,
@@ -5379,12 +5379,21 @@ var file_interservice_compliance_reporting_reporting_proto_rawDesc = []byte{
 	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x63, 0x6f, 0x6d,
 	0x70, 0x6c, 0x69, 0x61, 0x6e, 0x63, 0x65, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69, 0x6e,
 	0x67, 0x2e, 0x43, 0x6f, 0x6d, 0x70, 0x6c, 0x69, 0x61, 0x6e, 0x63, 0x65, 0x43, 0x6f, 0x6e, 0x66,
-	0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x40, 0x5a, 0x3e,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f,
-	0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74,
-	0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x69,
-	0x61, 0x6e, 0x63, 0x65, 0x2f, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69, 0x6e, 0x67, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x91, 0x01, 0x0a,
+	0x15, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x49, 0x74, 0x65, 0x6d,
+	0x73, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x12, 0x3d, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x63, 0x6f,
+	0x6d, 0x70, 0x6c, 0x69, 0x61, 0x6e, 0x63, 0x65, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69,
+	0x6e, 0x67, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x37, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74,
+	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x63, 0x6f, 0x6d,
+	0x70, 0x6c, 0x69, 0x61, 0x6e, 0x63, 0x65, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69, 0x6e,
+	0x67, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x49, 0x74, 0x65, 0x6d, 0x73, 0x22, 0x00,
+	0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63,
+	0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63, 0x6f,
+	0x6d, 0x70, 0x6c, 0x69, 0x61, 0x6e, 0x63, 0x65, 0x2f, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x69,
+	0x6e, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -5548,27 +5557,29 @@ var file_interservice_compliance_reporting_reporting_proto_depIdxs = []int32{
 	58, // 76: chef.automate.domain.compliance.reporting.ReportingService.ListAsset:input_type -> chef.automate.domain.compliance.reporting.AssetListRequest
 	60, // 77: chef.automate.domain.compliance.reporting.ReportingService.SetAssetConfig:input_type -> chef.automate.domain.compliance.reporting.ComplianceConfigRequest
 	62, // 78: chef.automate.domain.compliance.reporting.ReportingService.GetAssetConfig:input_type -> chef.automate.domain.compliance.reporting.GetAssetConfigRequest
-	15, // 79: chef.automate.domain.compliance.reporting.ReportingService.ListReports:output_type -> chef.automate.domain.compliance.reporting.ReportsSummaryLevelOne
-	20, // 80: chef.automate.domain.compliance.reporting.ReportingService.ListReportIds:output_type -> chef.automate.domain.compliance.reporting.ReportIds
-	18, // 81: chef.automate.domain.compliance.reporting.ReportingService.ReadReport:output_type -> chef.automate.domain.compliance.reporting.Report
-	40, // 82: chef.automate.domain.compliance.reporting.ReportingService.ListSuggestions:output_type -> chef.automate.domain.compliance.reporting.Suggestions
-	41, // 83: chef.automate.domain.compliance.reporting.ReportingService.ListProfiles:output_type -> chef.automate.domain.compliance.reporting.ProfileMins
-	3,  // 84: chef.automate.domain.compliance.reporting.ReportingService.Export:output_type -> chef.automate.domain.compliance.reporting.ExportData
-	3,  // 85: chef.automate.domain.compliance.reporting.ReportingService.ExportNode:output_type -> chef.automate.domain.compliance.reporting.ExportData
-	51, // 86: chef.automate.domain.compliance.reporting.ReportingService.ExportReportManager:output_type -> chef.automate.domain.compliance.reporting.CustomReportResponse
-	44, // 87: chef.automate.domain.compliance.reporting.ReportingService.ReadNode:output_type -> chef.automate.domain.compliance.reporting.Node
-	45, // 88: chef.automate.domain.compliance.reporting.ReportingService.ListNodes:output_type -> chef.automate.domain.compliance.reporting.Nodes
-	14, // 89: chef.automate.domain.compliance.reporting.ReportingService.ListControlItems:output_type -> chef.automate.domain.compliance.reporting.ControlItems
-	19, // 90: chef.automate.domain.compliance.reporting.ReportingService.ReadNodeHeader:output_type -> chef.automate.domain.compliance.reporting.NodeHeaderInfo
-	50, // 91: chef.automate.domain.compliance.reporting.ReportingService.ListControlInfo:output_type -> chef.automate.domain.compliance.reporting.ControlElements
-	2,  // 92: chef.automate.domain.compliance.reporting.ReportingService.GetReportContent:output_type -> chef.automate.domain.compliance.reporting.ReportContentResponse
-	2,  // 93: chef.automate.domain.compliance.reporting.ReportingService.GetReportListForReportManager:output_type -> chef.automate.domain.compliance.reporting.ReportContentResponse
-	55, // 94: chef.automate.domain.compliance.reporting.ReportingService.AssetCount:output_type -> chef.automate.domain.compliance.reporting.AssetSummary
-	59, // 95: chef.automate.domain.compliance.reporting.ReportingService.ListAsset:output_type -> chef.automate.domain.compliance.reporting.AssetListResponse
-	61, // 96: chef.automate.domain.compliance.reporting.ReportingService.SetAssetConfig:output_type -> chef.automate.domain.compliance.reporting.ComplianceConfigResponse
-	61, // 97: chef.automate.domain.compliance.reporting.ReportingService.GetAssetConfig:output_type -> chef.automate.domain.compliance.reporting.ComplianceConfigResponse
-	79, // [79:98] is the sub-list for method output_type
-	60, // [60:79] is the sub-list for method input_type
+	11, // 79: chef.automate.domain.compliance.reporting.ReportingService.ListControlItemsRange:input_type -> chef.automate.domain.compliance.reporting.ControlItemRequest
+	15, // 80: chef.automate.domain.compliance.reporting.ReportingService.ListReports:output_type -> chef.automate.domain.compliance.reporting.ReportsSummaryLevelOne
+	20, // 81: chef.automate.domain.compliance.reporting.ReportingService.ListReportIds:output_type -> chef.automate.domain.compliance.reporting.ReportIds
+	18, // 82: chef.automate.domain.compliance.reporting.ReportingService.ReadReport:output_type -> chef.automate.domain.compliance.reporting.Report
+	40, // 83: chef.automate.domain.compliance.reporting.ReportingService.ListSuggestions:output_type -> chef.automate.domain.compliance.reporting.Suggestions
+	41, // 84: chef.automate.domain.compliance.reporting.ReportingService.ListProfiles:output_type -> chef.automate.domain.compliance.reporting.ProfileMins
+	3,  // 85: chef.automate.domain.compliance.reporting.ReportingService.Export:output_type -> chef.automate.domain.compliance.reporting.ExportData
+	3,  // 86: chef.automate.domain.compliance.reporting.ReportingService.ExportNode:output_type -> chef.automate.domain.compliance.reporting.ExportData
+	51, // 87: chef.automate.domain.compliance.reporting.ReportingService.ExportReportManager:output_type -> chef.automate.domain.compliance.reporting.CustomReportResponse
+	44, // 88: chef.automate.domain.compliance.reporting.ReportingService.ReadNode:output_type -> chef.automate.domain.compliance.reporting.Node
+	45, // 89: chef.automate.domain.compliance.reporting.ReportingService.ListNodes:output_type -> chef.automate.domain.compliance.reporting.Nodes
+	14, // 90: chef.automate.domain.compliance.reporting.ReportingService.ListControlItems:output_type -> chef.automate.domain.compliance.reporting.ControlItems
+	19, // 91: chef.automate.domain.compliance.reporting.ReportingService.ReadNodeHeader:output_type -> chef.automate.domain.compliance.reporting.NodeHeaderInfo
+	50, // 92: chef.automate.domain.compliance.reporting.ReportingService.ListControlInfo:output_type -> chef.automate.domain.compliance.reporting.ControlElements
+	2,  // 93: chef.automate.domain.compliance.reporting.ReportingService.GetReportContent:output_type -> chef.automate.domain.compliance.reporting.ReportContentResponse
+	2,  // 94: chef.automate.domain.compliance.reporting.ReportingService.GetReportListForReportManager:output_type -> chef.automate.domain.compliance.reporting.ReportContentResponse
+	55, // 95: chef.automate.domain.compliance.reporting.ReportingService.AssetCount:output_type -> chef.automate.domain.compliance.reporting.AssetSummary
+	59, // 96: chef.automate.domain.compliance.reporting.ReportingService.ListAsset:output_type -> chef.automate.domain.compliance.reporting.AssetListResponse
+	61, // 97: chef.automate.domain.compliance.reporting.ReportingService.SetAssetConfig:output_type -> chef.automate.domain.compliance.reporting.ComplianceConfigResponse
+	61, // 98: chef.automate.domain.compliance.reporting.ReportingService.GetAssetConfig:output_type -> chef.automate.domain.compliance.reporting.ComplianceConfigResponse
+	14, // 99: chef.automate.domain.compliance.reporting.ReportingService.ListControlItemsRange:output_type -> chef.automate.domain.compliance.reporting.ControlItems
+	80, // [80:100] is the sub-list for method output_type
+	60, // [60:80] is the sub-list for method input_type
 	60, // [60:60] is the sub-list for extension type_name
 	60, // [60:60] is the sub-list for extension extendee
 	0,  // [0:60] is the sub-list for field type_name
@@ -6377,6 +6388,7 @@ type ReportingServiceClient interface {
 	ListAsset(ctx context.Context, in *AssetListRequest, opts ...grpc.CallOption) (*AssetListResponse, error)
 	SetAssetConfig(ctx context.Context, in *ComplianceConfigRequest, opts ...grpc.CallOption) (*ComplianceConfigResponse, error)
 	GetAssetConfig(ctx context.Context, in *GetAssetConfigRequest, opts ...grpc.CallOption) (*ComplianceConfigResponse, error)
+	ListControlItemsRange(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 }
 
 type reportingServiceClient struct {
@@ -6627,6 +6639,15 @@ func (c *reportingServiceClient) GetAssetConfig(ctx context.Context, in *GetAsse
 	return out, nil
 }
 
+func (c *reportingServiceClient) ListControlItemsRange(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error) {
+	out := new(ControlItems)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.compliance.reporting.ReportingService/ListControlItemsRange", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportingServiceServer is the server API for ReportingService service.
 type ReportingServiceServer interface {
 	ListReports(context.Context, *Query) (*ReportsSummaryLevelOne, error)
@@ -6648,6 +6669,7 @@ type ReportingServiceServer interface {
 	ListAsset(context.Context, *AssetListRequest) (*AssetListResponse, error)
 	SetAssetConfig(context.Context, *ComplianceConfigRequest) (*ComplianceConfigResponse, error)
 	GetAssetConfig(context.Context, *GetAssetConfigRequest) (*ComplianceConfigResponse, error)
+	ListControlItemsRange(context.Context, *ControlItemRequest) (*ControlItems, error)
 }
 
 // UnimplementedReportingServiceServer can be embedded to have forward compatible implementations.
@@ -6710,6 +6732,9 @@ func (*UnimplementedReportingServiceServer) SetAssetConfig(context.Context, *Com
 }
 func (*UnimplementedReportingServiceServer) GetAssetConfig(context.Context, *GetAssetConfigRequest) (*ComplianceConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAssetConfig not implemented")
+}
+func (*UnimplementedReportingServiceServer) ListControlItemsRange(context.Context, *ControlItemRequest) (*ControlItems, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListControlItemsRange not implemented")
 }
 
 func RegisterReportingServiceServer(s *grpc.Server, srv ReportingServiceServer) {
@@ -7067,6 +7092,24 @@ func _ReportingService_GetAssetConfig_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportingService_ListControlItemsRange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ControlItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportingServiceServer).ListControlItemsRange(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.compliance.reporting.ReportingService/ListControlItemsRange",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportingServiceServer).ListControlItemsRange(ctx, req.(*ControlItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ReportingService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.compliance.reporting.ReportingService",
 	HandlerType: (*ReportingServiceServer)(nil),
@@ -7134,6 +7177,10 @@ var _ReportingService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAssetConfig",
 			Handler:    _ReportingService_GetAssetConfig_Handler,
+		},
+		{
+			MethodName: "ListControlItemsRange",
+			Handler:    _ReportingService_ListControlItemsRange_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

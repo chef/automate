@@ -457,6 +457,30 @@ service ReportingService {
  		};
  	}
 
+	/*
+	List Controls
+
+	Lists controls from the last run, with optional filtering.
+	Supports filtering,pagination but not sorting.
+	Limited to 100 results by default.
+	Gets the summary of each control.
+
+	Authorization Action:
+	```
+	compliance:controlItems:list
+	```
+	*/
+	rpc ListControlItemsRange(ControlItemRequest) returns (ControlItems) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/controls/search"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:control"
+			action: "compliance:controlItems:list"
+		};
+	};
+
 }
 
 message ControlItemRequest {
