@@ -27,6 +27,7 @@ type ESComplianceRunInfo struct {
 	Role          []string         `json:"roles"`
 	ChefTags      []string         `json:"chef_tags"`
 	Environment   []string         `json:"environment"`
+	PolicyGroup   string           `json:"policy_group"`
 }
 
 // Used to unmarshal summary documents stored in comp-s-* ElasticSearch indices
