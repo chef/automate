@@ -950,3 +950,7 @@ func (m *mockReportingServer) SetAssetConfig(context.Context, *reporting.Complia
 func (m *mockReportingServer) GetAssetConfig(context.Context, *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
 	return nil, nil
 }
+
+func (m *mockReportingServer) ListControlItemsRange(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+	return nil, nil
+}
