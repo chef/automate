@@ -157,6 +157,9 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 		return err
 	}
 
+	//Adding new mapping for the comp run info Index
+	esClient.CreateTemplate(ctx, mappings.ComplianceRunInfo.Index, mappings.ComplianceRunInfo.Mapping)
+
 	if len(reportsMap) > 0 {
 		logrus.Infof("Inside upgrade reports Map with length %d", len(reportsMap))
 		for report, endTime := range reportsMap {

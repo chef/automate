@@ -1,1 +1,0 @@
-DELETE from UPGRADE_FLAGS where id=3;

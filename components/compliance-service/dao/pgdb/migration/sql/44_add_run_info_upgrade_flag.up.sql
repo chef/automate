@@ -1,1 +1,0 @@
-INSERT INTO UPGRADE_FLAGS (id,upgrade_flag,upgrade_value) VALUES (3,'comp_run_info',true);
