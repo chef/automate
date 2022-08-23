@@ -359,3 +359,16 @@ func (a *Reporting) GetAssetConfig(ctx context.Context, in *reporting.GetAssetCo
 	}
 	return out, nil
 }
+
+func (a *Reporting) ListControlItemsRange(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+	inDomain := &reportingService.ControlItemRequest{}
+	out := &reporting.ControlItems{}
+	f := func() (proto.Message, error) {
+		return a.client.ListControlItemsRange(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
