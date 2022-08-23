@@ -143,9 +143,9 @@ func getESFieldNameAsset(filterType string) string {
 	case "organization":
 		ESFieldName = "organization.lower"
 	case "platform":
-		ESFieldName = "platform.name.lower"
+		ESFieldName = "platform_version.name.lower"
 	case "platform_with_version":
-		ESFieldName = "platform.full.lower"
+		ESFieldName = "platform_version.full.lower"
 	case "recipe":
 		ESFieldName = "recipes.lower"
 	case "role":
