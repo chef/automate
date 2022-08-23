@@ -26,7 +26,7 @@ type ESComplianceRunInfo struct {
 	Recipe        []string         `json:"recipes"`
 	Role          []string         `json:"roles"`
 	ChefTags      []string         `json:"chef_tags"`
-	Environment   []string         `json:"environment"`
+	Environment   string           `json:"environment"`
 	PolicyGroup   string           `json:"policy_group"`
 }
 
