@@ -2,9 +2,7 @@ package pgdb
 
 type Storage interface {
 	GetUpgradeFlags() (map[string]bool, error)
-	UpdateDayLatestFlagToFalse() error
 	UpdateControlFlagToFalse() error
-	UpdateCompRunInfoFlagToFalse() error
 }
 
 const DayLatestFlag = "day_latest"

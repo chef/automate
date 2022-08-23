@@ -1207,7 +1207,7 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 	return newStatus
 }
 
-//GetReportsDailyLatestTrue Get the Nodes from past 90 days from current date for upgrading
+//GetReportsDailyLatestTrue Get the Nodes where daily latest flag is true from past 90 days from current date for upgrading
 func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]string, map[string]bool, error) {
 	reportsMap := make(map[string]string)
 	nodesMap := make(map[string]relaxting.ReportId)
@@ -1232,21 +1232,11 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 	for i := len(indicesSlice) - 1; i >= 0; i-- {
 		index := indicesSlice[i]
 		from := 0
-		for {
-			searchSource := elastic.NewSearchSource().
-				FetchSourceContext(fsc).
-				Query(boolQuery).
-				Size(size).From(from).Sort("end_time", false)
-			searchResult, err := backend.client.Search().
-				SearchSource(searchSource).
-				Index(index).
-				FilterPath(
-					"took",
-					"hits.total",
-					"hits.hits._id",
-					"hits.hits._source").
-				Do(ctx)
+		svc := backend.client.Scroll(index).Query(boolQuery).Size(size).FetchSourceContext(fsc)
 
+		logrus.Debugf("Reading the data for index : %s", index)
+		for {
+			searchResult, err := svc.Do(context.TODO())
 			if err != nil {
 				logrus.Errorf("Unable to fetch result for upgrade with error %v", err)
 			}
@@ -1260,6 +1250,8 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 			from = from + size
 		}
 	}
+
+	logrus.Debugf("Got All the reports for all the indexes with report map length as %d", len(reportsMap))
 	return reportsMap, latestReportMap, nil
 }
 

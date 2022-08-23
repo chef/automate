@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -23,7 +22,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test False status from db",
 			args: args{upgrade: Upgrade{
-				storage:         &pgdb.UpgradeDbTest{},
+				storage:         UpgradeDBTest{},
 				cerealInterface: &CerealInterfaceTest{NeedError: false},
 			}},
 			wantError: false,
@@ -31,7 +30,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test error for day latest flag from db",
 			args: args{upgrade: Upgrade{
-				storage:         &pgdb.UpgradeDbTest{Error: true},
+				storage:         &UpgradeDBTest{Error: true},
 				cerealInterface: &CerealInterfaceTest{NeedError: false},
 			}},
 			wantError: true,
@@ -40,7 +39,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test true status from database",
 			args: args{upgrade: Upgrade{
-				storage:         &pgdb.UpgradeDbTest{NeedStatus: true},
+				storage:         &UpgradeDBTest{NeedStatus: true},
 				cerealInterface: &CerealInterfaceTest{NeedError: false},
 			}},
 			wantError: false,
@@ -48,7 +47,7 @@ func TestPollDataForFlags(t *testing.T) {
 		{
 			name: "Test error from cereal manager for daily latest flag",
 			args: args{upgrade: Upgrade{
-				storage:         &pgdb.UpgradeDbTest{NeedStatus: true},
+				storage:         &UpgradeDBTest{NeedStatus: true},
 				cerealInterface: &CerealInterfaceTest{NeedError: true},
 			}},
 			wantError: true,

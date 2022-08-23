@@ -39,15 +39,11 @@ type MigrationWorkflow struct {
 }
 
 type MigrationWorkflowParameters struct {
-	DayLatestFlag    bool
 	ControlIndexFlag bool
-	CompRunInfoFlag  bool
 }
 
 type MigrationWorkflowPayload struct {
-	DayLatestFlag    bool
 	ControlIndexFlag bool
-	CompRunInfoFlag  bool
 }
 
 func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
@@ -63,18 +59,14 @@ func (s *MigrationWorkflow) OnStart(w cereal.WorkflowInstance,
 		return w.Fail(err)
 	}
 
-	logrus.Debugf("In On Start Method %t", workflowParams.DayLatestFlag)
+	logrus.Debugf("In On Start Method %t", workflowParams.ControlIndexFlag)
 
 	workflowPayload := MigrationWorkflowPayload{
-		DayLatestFlag:    workflowParams.DayLatestFlag,
 		ControlIndexFlag: workflowParams.ControlIndexFlag,
-		CompRunInfoFlag:  workflowParams.CompRunInfoFlag,
 	}
 
 	err = w.EnqueueTask(UpgradeTaskName, UpgradeParameters{
-		DayLatestFlag:   workflowParams.DayLatestFlag,
-		ControlFlag:     workflowParams.ControlIndexFlag,
-		CompRunInfoFlag: workflowParams.CompRunInfoFlag,
+		ControlFlag: workflowParams.ControlIndexFlag,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "failed to enqueue the migration-task")
@@ -132,14 +124,15 @@ func (t *UpgradeTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 		return nil, err
 	}
 
-	logrus.Debug("Inside the upgrades flag flow")
+	logrus.Info("Inside the upgrades flag flow")
 	logrus.Infof("Upgrade started at time %v", time.Now())
 	if job.ControlFlag {
+		logrus.Info("Inside the control flag")
 		if err := performActionForUpgrade(ctx, t.ESClient); err != nil {
 			logrus.WithError(err).Error("Unable to upgrade control index flag for latest record ")
 		}
 
-		err := t.UpgradesDB.UpdateCompRunInfoFlagToFalse()
+		err := t.UpgradesDB.UpdateControlFlagToFalse()
 		if err != nil {
 			logrus.Warnf("Unable to set upgrades flag in database")
 		}
@@ -165,6 +158,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 	}
 
 	if len(reportsMap) > 0 {
+		logrus.Infof("Inside upgrade reports Map with length %d", len(reportsMap))
 		for report, endTime := range reportsMap {
 
 			parsedEndTime, _ := time.Parse(time.RFC3339, endTime)
@@ -176,16 +170,17 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 			}
 
 			if _, found := latestReportsMap[report]; found {
+
 				//Updating the comp run info Flag
 				err := esClient.InsertComplianceRunInfo(ctx, inspecReport, inspecReport.EndTime)
 				if err != nil {
-					logrus.Errorf("Unable to perform action compliance run info for node %s with error %v", inspecReport.NodeID, err)
+					logrus.Errorf("Unable to perform action compliance run info for node %s and report %s with error %v", inspecReport.NodeID, report, err)
 				}
 
 				//Updating Day Latest Flag
 				err = esClient.SetNodesDayLatestFalseForUpgrade(ctx, inspecReport.NodeID, inspecReport.EndTime)
 				if err != nil {
-					logrus.Errorf("Unable to perform action for day latest flag for node %s with error %v", inspecReport.NodeID, err)
+					logrus.Errorf("Unable to perform action for day latest flag for node %s  report %s  with error %v", inspecReport.NodeID, report, err)
 				}
 
 			}

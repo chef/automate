@@ -25,7 +25,7 @@ func (u *Upgrade) PollForUpgradeFlagDayLatest() error {
 		logrus.Errorf("Unable to get the status of upgrade flags")
 		return errors.Wrapf(err, "Unable to get the status of upgrade flags")
 	}
-	err = u.cerealInterface.EnqueueWorkflowUpgrade(flagMap[pgdb.DayLatestFlag], flagMap[pgdb.ControlIndexFlag], flagMap[pgdb.CompRunInfoFlag])
+	err = u.cerealInterface.EnqueueWorkflowUpgrade(flagMap[pgdb.ControlIndexFlag])
 	if err != nil {
 		return errors.Wrapf(err, "Unable to enqueue the message in the flow for daily latest flag")
 	}

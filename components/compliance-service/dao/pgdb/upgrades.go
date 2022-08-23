@@ -15,15 +15,6 @@ func NewDB(db *DB) *UpgradesDB {
 	return &UpgradesDB{db}
 }
 
-//UpdateDayLatestFlagToFalse updates the day latest flags to true
-func (u *UpgradesDB) UpdateDayLatestFlagToFalse() error {
-	_, err := u.DB.Exec(getUpdateQuery(DayLatestFlag))
-	if err != nil {
-		return errors.Wrapf(err, "Unable to day latest flag to database")
-	}
-	return nil
-}
-
 //UpdateControlFlagToFalse updates the control index flags to false
 func (u *UpgradesDB) UpdateControlFlagToFalse() error {
 	_, err := u.DB.Exec(getUpdateQuery(ControlIndexFlag))
@@ -33,21 +24,12 @@ func (u *UpgradesDB) UpdateControlFlagToFalse() error {
 	return nil
 }
 
-//UpdateCompRunInfoFlagToFalse updates the comp run info to true
-func (u *UpgradesDB) UpdateCompRunInfoFlagToFalse() error {
-	_, err := u.DB.Exec(getUpdateQuery(CompRunInfoFlag))
-	if err != nil {
-		return errors.Wrapf(err, "Unable to update comp run info flag to db")
-	}
-	return nil
-}
-
 //GetUpgradeFlags Gets the all the upgrade flags and status from the pg database
 func (u *UpgradesDB) GetUpgradeFlags() (map[string]bool, error) {
 	flagMap := make(map[string]bool)
 
 	logrus.Info("Inside the comp run info flag")
-	flags := []string{CompRunInfoFlag, ControlIndexFlag, DayLatestFlag}
+	flags := []string{ControlIndexFlag}
 	rows, err := u.DB.Query(getQueryForFlag(flags))
 	if err != nil {
 		return flagMap, err
