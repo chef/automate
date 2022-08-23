@@ -14,13 +14,11 @@ gh_repo = "automate"
 
 {{< warning >}}
 
-- A2HA user can be migrated to Automate HA with minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
+- A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
 {{< /warning >}}
 
-
 This page explains migrating the existing A2HA data to the newly deployed Chef Automate HA. This migration involves the following steps:
-
 
 ## Prerequisites
 
@@ -37,8 +35,8 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
 ```
 
 - The first command will take the backup at the mount file system. You can get the mount path from the file `/hab/a2_deploy_workspace/a2ha.rb`
-- The second command will create the bootstrap bundle, which we need to copy all the frontend nodes of Automate HA cluster.
-- Once the backup is completed successfully, please save the backup Id. For example: `20210622065515`.
+- The second command will create the bootstrap bundle, which needed to copy all the frontend nodes of Automate HA cluster.
+- Once the backup is completed successfully, save the backup Id. For example: `20210622065515`.
 
 2. Detach the File system from the old A2HA cluster.
 
@@ -52,13 +50,13 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
 sudo chef-automate stop
 ```
 
-5. Please Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`.
+5. Get the Automate HA version number from the location `/var/tmp/` in Automate instance. Example : `frontend-4.x.y.aib`.
 
-6. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config
+6. Run the command at the Chef-Automate node of Automate HA cluster to get the applied config:
 
 ```bash
 sudo chef-automate config show > current_config.toml 
-``` 
+```
 
 {{< note >}}
 
@@ -90,7 +88,7 @@ Success: Restored backup 20210622065515
 sudo chef-automate bootstrap bundle unpack bootstrap.abb
 ```
 
-10. Start the Service in all the frontend nodes with the below command.
+10. Start the Service in all the frontend nodes with the below command:
 
 ``` bash
 sudo chef-automate start
@@ -149,11 +147,11 @@ done
 
 {{< note >}}
 
-- After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. We can keep both the config; it won't impact the functionality. After restoring Automate HA talk to OpenSearch.
+- After the restore command is successfully executed. If we run the `chef-automate config show`, we can see that both ElasticSearch and OpenSearch config are part of Automate Config. We can keep both the config; it won't impact the functionality. After restoring Automate HA, talk to OpenSearch.
 
 OR
 
--  We can remove the elaticsearch config from the automate. To do that, redirect the applied config to the file and set the config again.
+- We can remove the ElasticSearch config from the automate. To do that, redirect the applied config to the file and set the config again.
 
 ```bash
 chef-automate config show > applied_config.toml

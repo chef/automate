@@ -21,17 +21,17 @@ To run the terraform scripts, you need an IAM user with the following permission
 - AmazonAPIGatewayAdministrator
 - AmazonS3FullAccess
 
-These permissions can be directly added to the user or via IAM Group.
+Add the permissions directly to the user or via IAM Group.
 
 {{< note >}}
 
-Keep access key ID and secret access key handy. Refer [access key](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) page for detailed information on regenerating access key ID and secret access key.
+Keep access key ID and secret access key handy. Refer to [access key](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) page for detailed information on regenerating access key ID and private access key.
 
 {{< /note >}}
 
 Once we have an AWS account, we'll need to create an IAM user to programmatically interact with it and configure the AWS CLI (command-line interface). Amazon IAM enables you to manage users and user permissions in AWS. You can create one or more IAM users in your AWS account. You might create an IAM user for someone who needs access to your AWS console or when you have a new application that needs to make API calls to AWS. This is to add an extra layer of security to your AWS account.
 
-## Creating an IAM User
+## Create an IAM User
 
 1. Navigate to your AWS account.
 1. Select **IAM** from the list of services from the AWS console. The **IAM dashboard** screen appears.
@@ -48,9 +48,9 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 
 {{< figure src="/images/automate/ha_aws_iam_paccess.png" alt="AWS IAM User - Programmetic Access">}}
 
-  This is the sign-in name for AWS. If you want to add multiple users, choose to Add another user for each additional user and specify their user names. You can add up to 10 users at one time.
+The above image shows the sign-in name for AWS. If you want to add multiple users, choose to Add another user for each additional user and specify their user names. You can add up to 10 users at one time.
 
-  This account will be used by your AWS CLI and will be connecting to the AWS API directly by not using the Management Console.
+This account will be used by your AWS CLI and will connect to the AWS API directly by not using the Management Console.
 
 1. Select **Next: Permissions**.
 1. Select **Attach existing policies directly**.
@@ -61,19 +61,19 @@ Once we have an AWS account, we'll need to create an IAM user to programmaticall
 1. Set the user permissions.
 1. Search for **AdministratorAccess** and select the policy.
 1. Select **Next: Tags**.
-1. Provide key name and value as tagging for the user been created.
+1. Provide key names and values as tagging for the created user.
 1. Select **Next: Review**.
 
 {{< figure src="/images/automate/ha_aws_iam_user_review.png" alt="AWS IAM User Review with permissions">}}
 
 1. Select **Create user**.
 1. Select **show** to reveal the secret access key.
-1. Download and save the **Secret access key**.
+1. Download and Save the **Secret Access Key**.
 
 {{< figure src="/images/automate/ha_aws_iam_user_created.png" alt="AWS IAM User Created with Access Key">}}
 
 1. Take a note of the Access key ID and Secret access key.
 
-  Now, let's configure the AWS CLI to deploy our applications from the command line.
+Now, configure the AWS CLI to deploy the applications from the command line.
 
-  Refer [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating an IAM user through CLI and API methods.
+Refer to [Creating an IAM User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) page for creating an IAM user through CLI and API methods.

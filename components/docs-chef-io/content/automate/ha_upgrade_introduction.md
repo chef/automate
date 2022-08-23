@@ -14,45 +14,52 @@ gh_repo = "automate"
 
 Steps to upgrade the Chef Automate HA are as shown below:
 
-- Download the latest cli 
+- Download the latest CLI using:
+
   ```bash
    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
    ```
 
-- Download Airgapped Bundle, download latest Bundle with this:
+- Download the latest airgapped Bundle by running the following command:
 
   ```bash
   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
   ```
-  Download specific version bundle with this, example version: 4.0.91:
+
+  Download a specific version bundle with this, example version: 4.0.91:
+
   ```bash
   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
   ```
 
-- If we want to only upgrade FrontEnd Services i.e. Chef Automate and Chef Infra Server.
+- If you only want to upgrade FrontEnd Services, i.e., Chef Automate and Chef Infra Server, run the following command:
+
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends
   ```
 
-- If we want to only upgrade BackEnd Services i.e. Postgresql and OpenSearch.
+- If you only want to upgrade BackEnd Services i.e., Postgresql and OpenSearch, run the following command:
+
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends
   ```
 
-- To upgrade full Chef Automate HA System run this command from Bation Host: 
+- To upgrade the entire Chef Automate HA System, run the following command from Bastion Host:
+
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib
   ```
 
-
 {{< note >}}
 
-  - BackEnd upgrades will restart the backend service, which take time for cluster to be in health state.
-  - Upgrade command, currently only supports minor upgrade.  
+- BackEnd upgrades will restart the backend service, which takes time for the cluster to be healthy.
+- Upgrade command currently only supports minor upgrades.
+
 {{< /note >}}
 
-- To skip user confirmation prompt in upgrade, you can pass a flag
-  ```bash 
+- To skip the user confirmation prompt for an upgrade, you can pass a flag using the following command:
+
+  ```bash
     chef-automate upgrade run --airgap-bundle latest.aib --auto-approve
     OR 
     chef-automate upgrade run --airgap-bundle latest.aib --upgrade-backends --auto-approve
@@ -60,15 +67,12 @@ Steps to upgrade the Chef Automate HA are as shown below:
     chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends --auto-approve
   ```
 
-Upgrade will also check for new version of bastion workspace, if new version is available, it will promt for a confirmation for workspace upgrade before upgrading the Frontend or backend nodes, 
+Upgrade will also check for the new version of the bastion workspace. If a new version is available, it will prompt confirmation for workspace upgrade before upgrading the Frontend or backend nodes.
 
-In case of yes, it will do workspace upgrade and no will skip this.
-We can also pass a flag in upgade command to avoid prompt for workspace upgrade. 
+If you select **Yes**, it will upgrade the workspace; else, skip this step. We can also pass a flag in the upgrade command to avoid a prompt for a workspace upgrade.
 
   ```bash
    chef-automate upgrade run --airgap-bundle latest.aib --auto-approve --workspace-upgrade yes
       OR  
    chef-automate upgrade run --airgap-bundle latest.aib --auto-approve --workspace-upgrade no
   ```
-
-

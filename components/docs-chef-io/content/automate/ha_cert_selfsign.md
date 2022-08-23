@@ -21,7 +21,7 @@ To ensure optimal security, rotate the certificates periodically.
 
 ## What are Self Signed Certificates?
 
-A self-signed certificate is a digital certificate that is not signed by a publicly trusted certificate authority (CA). They are created, issued, and signed by the company or developer responsible for the website or software. The third party in such certificates does not validate the private keys. It is used in low-risk internal networks or the software development phase. So, you cannot revoke the CA-issues and the self-signed certificates.
+A self-signed certificate is a digital certificate not signed by a publicly trusted certificate authority (CA). They are created, issued, and signed by the company or developer responsible for the website or software. The third party in such certificates does not validate the private keys. It is used in low-risk internal networks or the software development phase. So, you cannot revoke the CA-issues and the self-signed certificates.
 
 ## Certificate Creation
 
@@ -29,7 +29,7 @@ You can create a self-signed key and certificate pair with the **OpenSSL** utili
 
 ### Prerequisites
 
--   Install an OpenSSL utility.
+- Install an OpenSSL utility.
 
 ### Creating a Certificate
 
@@ -72,11 +72,11 @@ cp oser_ssl_public.pem /hab/a2_deploy_workspace/certs/pg_ssl_public.pem
 
 6. To apply the generated certificates, execute the following command:
 
--   `./scripts/credentials set ssl --oser-ssl`
--   `./scripts/credentials set ssl --pg-ssl`
+- `./scripts/credentials set ssl --oser-ssl`
+- `./scripts/credentials set ssl --pg-ssl`
 
 A confirmation message appears once the certificates are applied successfully, as shown below:
 
 {{< figure src="/images/automate/ha_self_sign_certificate.png" alt="Certification Creation using openssl utility">}}
 
-7. Navigate to the Chef Automate and Chef Server instances and check the Chef Service health status. If the service is down or critical, wait for three to four minutes for the instances to be up.
+7. Navigate to the Chef Automate and Chef Server instances and check the Chef Service health status. If the service is down or critical, wait three to four minutes for the instances to be up.

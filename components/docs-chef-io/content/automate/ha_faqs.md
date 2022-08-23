@@ -16,84 +16,110 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ## Frequently Asked Questions
 
-### How to check logs For automate nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
-`./chef-automate ssh --hostname a2`
+### How to check logs for Automate Nodes?
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit chef-automate` 
+- To view the logs, do `ssh` to the respective node by running the command from the bastion node.
 
-### How to check logs For Chef Infra Server nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
-`./chef-automate ssh --hostname cs`
+```bash
+./chef-automate ssh --hostname a2
+```
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit chef-automate` 
+- Choose the instance based on the output. To view the logs, run the following command:
+
+```bash
+journalctl --follow --unit chef-automate
+```
+
+### How to check logs For Chef Infra Server Nodes?
+
+- To view the logs please do ssh to the respective node by running the following command from the bastion node:
+
+```bash
+./chef-automate ssh --hostname cs
+```
+
+- choose the Instace based on the output. To view the logs, run the following command:
+
+```bash
+journalctl --follow --unit chef-automate
+```
 
 ### How to check logs For Postgres nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
-`./chef-automate ssh --hostname pg`
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit hab-sup` 
+- To view the logs, do `ssh` to the respective node by running the command from the bastion node:
 
-### How to check logs For Opensearch nodes?
-- To view the logs please do ssh to the respective node by runnig the command from bastion node 
-`./chef-automate ssh --hostname os`
+```bash
+./chef-automate ssh --hostname pg
+```
 
-- choose the Instace based on the output. To view the logs run the command 
-`journalctl --follow --unit hab-sup` 
+- Choose the instance based on the output. To view the logs, run the following command:
 
-### How to Pass the custom config for the Frontend node (Automate / ChefInfraServer)?
-- Create a file with say `customconfig.toml`, pass the absolute path `config_file=/ABSOLUTE_PATH/customconfig.toml`
+```bash
+journalctl --follow --unit hab-sup
+```
 
+### How to check logs For OpenSearch nodes?
 
+- To view the logs, do `ssh` to the respective node by running the following command from the bastion node:
 
-### How to Add more nodes In AWS Deployment, post deployment. 
-- Move `/hab/a2_deploy_workspace/terraform/aws.auto.tfvars` to `/hab/a2_deploy_workspace/terraform/destroy/aws/`
-- Modify `/hab/a2_deploy_workspace/terraform/.tf_arch` from `deployment` to `aws`
-- Modify the `instance_count` in config.toml
+```bash
+./chef-automate ssh --hostname os
+```
+
+- Choose the instance based on the output. To view the logs, run the following command:
+
+```bash
+journalctl --follow --unit hab-sup
+```
+
+### How to Pass the custom `config` for the Frontend Node (Automate/Chef Infra Server)?
+
+- Create a file with say `customconfig.toml`, pass the absolute path `config_file=/ABSOLUTE_PATH/customconfig.toml`.
+
+### How to add more nodes in AWS Deployment, post deployment
+
+- Move `/hab/a2_deploy_workspace/terraform/aws.auto.tfvars` to `/hab/a2_deploy_workspace/terraform/destroy/aws/`.
+- Modify `/hab/a2_deploy_workspace/terraform/.tf_arch` from `deployment` to `aws`.
+- Modify the `instance_count` in **config.toml**.
 - Run the Provision command (This will create or destroy the resources):
-  ``` bash 
+  
+  ```bash
   chef-automate provision-infra config.toml --airgap-bundle <BUNDLE_NAME>
   ```
   
-- Redeploy the cluster
-  ``` bash
+- Redeploy the Cluster
+
+  ```bash
   chef-automate deploy config.toml --airgap-bundle <BUNDLE_NAME>
   ```
-{{< note >}}
-  Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend node. 
-{{< /note >}}  
 
-### Is Automate HA supports unencrypted traffic with managed service like AWS-Opensearch / RDS ?
- - No, Automate HA support https connection only with Managed services. 
+{{< note >}} Downgrade the number of instance_count for backend node will be data loss. We can not downgrade the backend nodes. {{< /note >}}
 
+### Does Automate HA support Unencrypted traffic with Managed Services like AWS-OpenSearch/RDS?
+
+- No! Automate HA supports `HTTPS` connection only with managed services.
 
 ### How to check logs while doing backup or restore?
 
 Set *log-level* debug using the command `chef-automate debug set-log-level deployment-service debug` and execute *journalctl* command, `journalctl --follow --unit chef-automate`.
 
-
-### How to perform infrastructure cleanup for on-premises nodes
+### How to perform infrastructure cleanup for on-premises nodes?
 
 Execute the following commands to perform cleanup on the instances and nodes of the deployed Chef Automate HA infrastructure (Chef Automate, Chef Infra Server, three instances of Postgres, three instances of Elasticsearch)
 
 ```bash
-
 rm -rf /hab
 cd /var/tmp && rm -f frontend-* && rm -f backend-*
 sudo kill -9 $(sudo ps -ef | awk '/[h]ab-sup/{print $2}')
-
 ```
 
-Then, Run `rm -rf /hab` on Bastion node.
+Once done, Run `rm -rf /hab` on Bastion node.
 
 ## Issues and Resolution
 
 ### Issue: Database Accessed by Other Users
 
-Restore command fails when the databases of the nodes are accessed by other users or services. This issue happens while the restore service is trying to drop the database when some services are still in a running state and are referring to the database.
+The restore command fails when other users or services access the nodes' databases. This issue happens while the restore service tries to drop the database when some services are still running and referring to the database.
 
 ![Database Access Error](/images/automate/ha_faq_access.png)
 
@@ -103,8 +129,8 @@ Restore command fails when the databases of the nodes are accessed by other user
 
 - Perform the following steps on all frontend and backend nodes:
 
-  - SSH into frontend node and execute the command, `chef-automate status`.
-  - SSH into backend node and execute the command, `hab svc status`.
+  - SSH into the frontend node and execute the command, `chef-automate status`.
+  - SSH into the backend node and execute the command, `hab svc status`.
 
 ### Issue: Cached Artifact not found in Offline Mode
 
@@ -114,7 +140,7 @@ The cached artifact does not exist in offline mode. This issue occurs in an airg
 
 #### Resolution
 
-Use `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, airgap bundle file name, *frontend-20210908093242.aib*.
+Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-20210908093242.aib*.
 
 ##### Command Example
 
@@ -126,7 +152,7 @@ chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --patc
 
 ### Issue: Existing Architecture does not Match with the Requested
 
-The existing architecture does not match the requested one issue occurs when you have made AWS provisioning and again you are trying to run `automate-cluster-ctl provision` command.
+The existing architecture does not match the requested issue when you have made AWS provisioning and are trying to run the `automate-cluster-ctl provision` command.
 
 #### Resolution
 
@@ -138,7 +164,7 @@ Execute the following command from the bastion host from any location:
 
 ### Issue: Unable to Determine the Bucket Region
 
-When Chef Automate instances could not locate S3 bucket, the following error is displayed, *Unable to restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"*
+When Chef Automate instances could not locate the S3 bucket, the following error is displayed, *Unable to the restore backup: Listing backups failed: RequestError: send request failed caused by: Get "https://s3.amazonaws.com/a2backup"*
 
 ![Bucket Region Error](/images/automate/ha_faq_bucket_region.png)
 
@@ -146,7 +172,7 @@ When Chef Automate instances could not locate S3 bucket, the following error is 
 
 Make sure that the access key, secret key, and endpoints are correct.
 
-If you are using on-premises S3 for backup and your are facing issues with restore, attach `s3-endpoint` with `s3 restore` command.
+If you are using on-premises S3 for backup and facing issues with restore, attach the `s3-endpoint` with the `s3 restore` command.
 
 For example:
 
@@ -170,7 +196,7 @@ sudo chef-automate backup fix-repo-permissions <path>
 
 ### Issue: Longer Time in Executing Command ./scripts/credentials set ssl
 
-The `./scripts/credentials set ssl` command gets stuck and could not locate the HAB license.
+The `./scripts/credentials set ssl` command got stuck and could not locate the HAB license.
 
 #### Resolution
 
@@ -188,38 +214,32 @@ Do the following steps when you face this issue:
 
 - SSH into all frontends (Chef Automate HA and chef Server)
 
-- Remove */hab* directory from all frontends nodes.
+- Remove the */hab* directory from all frontend nodes.
 
 - Remove all the files from the */var/tmp* folder of all frontend nodes.
 
 ```bash
-
 rm -rf /hab && cd /var/tmp && rm -rf
-
 sudo kill -9 $(sudo lsof -t -i:9631)
-
 sudo kill -9 $(sudo lsof -t -i:9638)
-
 ```
 
-- Execute *terraform destroy* command to remove the deployment.
+- Execute the *terraform destroy* command to remove the deployment.
 
 ```bash
-
 for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/;terraform destroy;cd $i;done
-
 ```
 
 - Re-run the deployment command, `./chef-automate deploy config.toml`.
 
 ### Issue: bootstrap.abb scp Error
 
-While trying to deploy Chef Automate HA multiple times on the same infrastructure, the *bootstrap.abb* file is not created again as there is a state entry from past deployment that blocks the creation.
+While trying to deploy Chef Automate HA multiple times on the same infrastructure, the *bootstrap.abb* file is not created again as a state entry from past deployment blocks the creation.
 
 The possible error looks like as shown below:
 
 ```bash
-    Error running command 'scp -o StrictHostKeyChecking=no -i /root/.ssh/a2ha-hub cloud-user@<ip>5:/var/tmp/bootstrap.abb bootstrap8e143d7d.abb': exit status 1. Output: scp: /var/tmp/bootstrap.abb: No such file or directory
+Error running command 'scp -o StrictHostKeyChecking=no -i /root/.ssh/a2ha-hub cloud-user@<ip>5:/var/tmp/bootstrap.abb bootstrap8e143d7d.abb': exit status 1. Output: scp: /var/tmp/bootstrap.abb: No such file or directory
 ```
 
 #### Resolution
@@ -231,23 +251,21 @@ The possible error looks like as shown below:
 1. Execute the following commands:
 
 ```bash
-
-	terraform taint module.bootstrap_automate.null_resource.automate_pre[0]
-	terraform taint module.bootstrap_automate.null_resource.automate_pre[1]
-	terraform taint module.bootstrap_automate.null_resource.automate_pre[2]
-	terraform taint module.bootstrap_automate.null_resource.automate_post[0]
-	terraform taint module.bootstrap_automate.null_resource.automate_post[1]
-	terraform taint module.bootstrap_automate.null_resource.automate_post[2]
-
+terraform taint module.bootstrap_automate.null_resource.automate_pre[0]
+terraform taint module.bootstrap_automate.null_resource.automate_pre[1]
+terraform taint module.bootstrap_automate.null_resource.automate_pre[2]
+terraform taint module.bootstrap_automate.null_resource.automate_post[0]
+terraform taint module.bootstrap_automate.null_resource.automate_post[1]
+terraform taint module.bootstrap_automate.null_resource.automate_post[2]
 ```
 
 ## HA Health Check Commands
 
-This section includes commands that you can execute for the Chef Automate cluster part of the Chef Automate High Availability (HA) system. These commands aid you in assessing the health and status of the components part of the HA cluster. It is highly recommended to run these commands on a test cluster before using them in a production environment.
+This section includes commands you can execute for the Chef Automate cluster part of the Chef Automate High Availability (HA) system. These commands aid you in assessing the health and status of the components part of the HA cluster. Run these commands on a test cluster before using them in a production environment.
 
 ### Log Check Commands
 
-The Chef Automate frontend and backend nodes service logs are available via `journalctl` from each node. You can identify the service by the name in the generated output preceding with the logline.
+The Chef Automate frontend and backend nodes service logs are available via `journalctl` from each node. You can identify the service by the name in the generated output preceding the logline.
 
 - Execute the following command, `journalctl --follow --unit hab-sup`, to view the backend logs related to all hab services.
 

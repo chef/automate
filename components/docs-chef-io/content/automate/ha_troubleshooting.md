@@ -16,13 +16,9 @@ This page explains the frequently encountered issues in Chef Automate High Avail
 
 ## Issues and Solutions
 
-### Post Automate HA deployment, if chef-server service is in critical state.
-- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate`
-  if gettign an 500 internal server error with data-collector endpoint, it means that
-  Chef Infra Server not able to communicate to the Chef Automate data-collector endpoint
-  
-  ssh to the Automate HA Chef Infra Server, and get token and automate-lb-url from the config.
-  run `chef-automate config show` go get the config.
+### Post Automate HA deployment if `chef-server` Service is in a Critical State
+
+- Run the command on Automate HA chef-server node `journalctl --follow --unit chef-automate` if getting a 500 internal server error with the data-collector endpoint, it means that Chef Infra Server is not able to communicate to the Chef Automate data-collector endpoint `ssh` to the Automate HA Chef Infra Server, and get token and `automate-lb-url` from the config. Run `chef-automate config show` to get the config.
   
 ```cmd
   export endpoint="AUTOMATE LB URL"
@@ -30,15 +26,15 @@ This page explains the frequently encountered issues in Chef Automate High Avail
   curl -H "api-token:$token" https://$endpoint/api/v0/events/data-collector -k
 ```
 
-To make the service health, make sure that chef server able to curl the data collector endpoint from chef server node.
+To make the service healthy, ensure that the chef server can curl the data collector endpoint from the chef server node.
 
-### Deployment doesn't exit Gracefully
-- There are some cases in which deployment doesn't exited successfully.
+### Deployment doesn't Exit Gracefully
 
+- There are some cases in which deployment doesn't exit successfully.
 
 ### Issue: Database Accessed by Other Users
 
-The restore command fails when other users or services access the nodes' databases. This happens when restore service tries to drop the database when some services are still running and are referring to database.
+The restore command fails when other users or services access the nodes' databases. This happens when the restore service tries to drop the database when some services are still running and are referring to the database.
 
 ![Database Access Error](/images/automate/ha_faq_access.png)
 
@@ -61,17 +57,15 @@ The cached artifact does not exist in offline mode. This issue occurs in an air 
 
 Use the `--airgap-bundle` option and the `restore` command. Locate the name of the airgap bundle from the path `/var/tmp`. For example, the airgap bundle file name, *frontend-4.x.y.aib*.
 
-##### Command Example
+For Example:
 
 ```bash
-
 chef-automate backup restore s3://bucket\_name/path/to/backups/BACKUP\_ID --patch-config </path/to/patch.toml> --skip-preflight --s3-access-key "Access\_Key" --s3-secret-key "Secret\_Key" --airgap-bundle /var/tmp/<airgap-bundle>
-
 ```
 
 ### Issue: Existing Architecture does not Match with the Requested
 
-The existing architecture does not match the requested one issue occurs when you have made AWS provisioning, and again you are trying to run the `automate-cluster-ctl provision` command.
+The existing architecture does not match the requested one issue when you have made AWS provisioning, and you are trying to run the `automate-cluster-ctl provision` command again.
 
 #### Solution
 
@@ -91,7 +85,7 @@ When Chef Automate instances could not locate the S3 bucket, the following error
 
 Ensure that the access key, secret key, and endpoints are correct.
 
-If you are using on-premises S3 for backup and facing issues with restore, attach the `s3-endpoint` with  the `s3 restore` command.
+If you are using on-premises S3 for backup and facing issues with restore, attach the `s3-endpoint` with the `s3 restore` command.
 
 For example:
 
