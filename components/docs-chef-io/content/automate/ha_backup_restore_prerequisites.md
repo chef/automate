@@ -300,11 +300,19 @@ This section provides the pre-backup configuration required to backup the data o
 
 1. Log in to all the opensearch nodes and follow the steps on all the opensearch nodes.
 
+<<<<<<< HEAD
 - Export `ES_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
 - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
 - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
 - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
 - `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+=======
+-   Export `OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
+-   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
+-   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
+-   `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
+-   `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
+>>>>>>> main
 
 The final output after running the command 1.5 on the third node is given below:
 

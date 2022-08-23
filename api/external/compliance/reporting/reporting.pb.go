@@ -5521,6 +5521,20 @@ type ReportingServiceClient interface {
 	//Supports filtering,pagination but not sorting.
 	//Limited to 100 results by default.
 	//
+	//The API supports date range filters when `end_time` is the current time
+	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	//date other than the current date, the API would return data only for the `end_time`.
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page_number":1, "size": 3,
+	//}
+	//```
 	//Authorization Action:
 	//```
 	//compliance:controlItems:list
@@ -5611,6 +5625,20 @@ type ReportingServiceClient interface {
 	//Supports pagination, filtering, and sorting.
 	//Valid sort fields: name, title
 	//
+	//The API supports date range filters when `end_time` is the current time
+	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	//date other than the current date, the API would return data only for the `end_time`.
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page":1, "per_page": 3,
+	//}
+	//```
 	//Authorization Action:
 	//```
 	//compliance:reportProfiles:list
@@ -5646,7 +5674,6 @@ type ReportingServiceClient interface {
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
 	//Max return payload size is 4MB, use pagination to fetch remaining data.
-	//
 	//| Sort parameter | Sort value |
 	//| --- | --- |
 	//| environment | environment.lower |
@@ -5657,6 +5684,10 @@ type ReportingServiceClient interface {
 	//| name | node_name.lower |
 	//| platform | platform.full |
 	//| status | status |
+	//
+	//The API supports date range filters when `end_time` is the current time
+	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	//date other than the current date, the API would return data only for the `end_time`.
 	//
 	//Example:
 	//```
@@ -5918,6 +5949,20 @@ type ReportingServiceServer interface {
 	//Supports filtering,pagination but not sorting.
 	//Limited to 100 results by default.
 	//
+	//The API supports date range filters when `end_time` is the current time
+	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	//date other than the current date, the API would return data only for the `end_time`.
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page_number":1, "size": 3,
+	//}
+	//```
 	//Authorization Action:
 	//```
 	//compliance:controlItems:list
@@ -6008,6 +6053,20 @@ type ReportingServiceServer interface {
 	//Supports pagination, filtering, and sorting.
 	//Valid sort fields: name, title
 	//
+	//The API supports date range filters when `end_time` is the current time
+	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	//date other than the current date, the API would return data only for the `end_time`.
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page":1, "per_page": 3,
+	//}
+	//```
 	//Authorization Action:
 	//```
 	//compliance:reportProfiles:list
@@ -6043,7 +6102,6 @@ type ReportingServiceServer interface {
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
 	//Max return payload size is 4MB, use pagination to fetch remaining data.
-	//
 	//| Sort parameter | Sort value |
 	//| --- | --- |
 	//| environment | environment.lower |
@@ -6054,6 +6112,10 @@ type ReportingServiceServer interface {
 	//| name | node_name.lower |
 	//| platform | platform.full |
 	//| status | status |
+	//
+	//The API supports date range filters when `end_time` is the current time
+	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	//date other than the current date, the API would return data only for the `end_time`.
 	//
 	//Example:
 	//```
