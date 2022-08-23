@@ -172,6 +172,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 			inspecReport, err := esClient.GetDocByReportUUId(context.Background(), report, index)
 			if err != nil {
 				logrus.Errorf("Unable to fetch report for the reportuuid %s", report)
+				continue
 			}
 
 			if _, found := latestReportsMap[report]; found {
@@ -202,7 +203,7 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 				logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
 			}
 
-			count++;
+			count++
 
 		}
 	}
