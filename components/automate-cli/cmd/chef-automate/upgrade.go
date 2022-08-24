@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	os "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
@@ -15,6 +17,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -24,7 +27,7 @@ var upgradeCmd = &cobra.Command{
 }
 
 var upgradeRunCmdFlags = struct {
-	airgapsss            string
+	airgap               string
 	version              string
 	upgradefrontends     bool
 	upgradebackends      bool
@@ -328,6 +331,8 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			for index, msg := range pendingPostChecklist {
 				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
 			}
+			writer.Body("\n")
+			GetopenSearchConfig()
 		}
 
 	case api.UpgradeStatusResponse_UPGRADING:
@@ -496,4 +501,36 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil
+}
+
+func GetopenSearchConfig() error {
+	res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+	if err != nil {
+		return nil
+	}
+
+	con := res.Config.GetOpensearch()
+	opensearch_v1 := &OpenSearch_v1{
+		V1: con.V1,
+	}
+	opensearch_model := &OpenSearchModel{
+		Opensearch: opensearch_v1,
+	}
+	t, err := toml.Marshal(opensearch_model)
+	if err != nil {
+		return nil
+	}
+
+	fmt.Println("This is your OpenSearch Config")
+	fmt.Println(string(t))
+
+	return nil
+}
+
+type OpenSearchModel struct {
+	Opensearch *OpenSearch_v1 `json:"opensearch,omitempty" toml:"opensearch,omitempty" mapstructure:"opensearch,omitempty"`
+}
+
+type OpenSearch_v1 struct {
+	V1 *os.ConfigRequest_V1 `json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
 }
