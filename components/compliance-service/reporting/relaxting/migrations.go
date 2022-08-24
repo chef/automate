@@ -29,6 +29,7 @@ type esMigratable interface {
 	postFeedsMigration() error
 	postMigration() error
 	removeOldIndices(dateToMigrate time.Time) error
+	migrateCompRunInfo() error
 }
 
 const noScript = "NO_SCRIPT"
@@ -239,17 +240,29 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 	a2V6Indices := A2V6ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V6Indices, statusSrv, statusserver.MigrationLabelESa2v6)
 	if err != nil {
-		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v5))
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", statusserver.MigrationLabelESa2v5))
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v6, errMsg.Error())
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v6, statusserver.MigrationFailedMsg)
 		return errMsg
 	}
+
+	// Migrates A2 version 3 for comp-run-info indices to the current version
+	a2V7Indices := A2V7ElasticSearchIndices{backend: &backend}
+	logrus.Infof("A2v7 indexes %v", a2V7Indices)
+	err = backend.migrate(a2V7Indices, statusSrv, statusserver.MigrationLabelCompRun)
+	if err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelCompRun))
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelCompRun, errMsg.Error())
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelCompRun, statusserver.MigrationFailedMsg)
+		return errMsg
+	}
+
 	return nil
 }
 
 func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserver.Server, migrationLabel string) error {
 	myName := fmt.Sprintf("migrate (%s)", migrationLabel)
-	logrus.Debugf(myName)
+	logrus.Infof(myName)
 	defer util.TimeTrack(time.Now(), fmt.Sprintf(" %s reindex indices", myName))
 
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Post feeds migration cleanup...")
@@ -272,6 +285,16 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 		logrus.Error(err)
 		return err
 	}
+
+	logrus.Infof("Ran post profles migration script %s", migrationLabel)
+	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the comp run info index...")
+	err = migratable.migrateCompRunInfo()
+	if err != nil {
+		logrus.Error(err)
+		return err
+	}
+
+	logrus.Infof("Ran  comp run info migration  script %s", migrationLabel)
 
 	//migrate the compliance time-series indices
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Calculating TimeSeries migration range...")

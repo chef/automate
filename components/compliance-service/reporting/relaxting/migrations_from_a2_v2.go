@@ -27,6 +27,10 @@ type A2V2ElasticSearchIndices struct {
 	backend *ES2Backend
 }
 
+func (migratable A2V2ElasticSearchIndices) migrateCompRunInfo() error {
+	return nil
+}
+
 type missingControlMeta struct {
 	Title  string
 	Impact float32
