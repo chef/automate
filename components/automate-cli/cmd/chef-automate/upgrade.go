@@ -503,28 +503,31 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 	return []string{}, nil
 }
 
-func GetopenSearchConfig() error {
+func GetopenSearchConfig() {
 	res, err := client.GetAutomateConfig(configCmdFlags.timeout)
 	if err != nil {
-		return nil
+		return
 	}
 
 	con := res.Config.GetOpensearch()
-	opensearchV1 := &OpenSearch_v1{
-		V1: con.V1,
-	}
-	opensearchModel := &OpenSearchModel{
-		Opensearch: opensearchV1,
-	}
-	t, err := toml.Marshal(opensearchModel)
-	if err != nil {
-		return nil
+	if con != nil {
+		opensearchV1 := &OpenSearch_v1{
+			V1: con.V1,
+		}
+		opensearchModel := &OpenSearchModel{
+			Opensearch: opensearchV1,
+		}
+		t, err := toml.Marshal(opensearchModel)
+		if err != nil {
+			return
+		}
+
+		fmt.Println("This is your OpenSearch Config")
+		fmt.Println(string(t))
+
 	}
 
-	fmt.Println("This is your OpenSearch Config")
-	fmt.Println(string(t))
-
-	return nil
+	return
 }
 
 type OpenSearchModel struct {
