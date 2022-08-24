@@ -2,6 +2,7 @@ package majorupgradechecklist
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -31,7 +32,7 @@ const (
 
 	diskSpaceCheckError = `You do not have minimum space available to continue with this upgrade. 
 Please ensure you have 60% free disk space.
-To skip this free disk space check please use --skip-storage-check flag`
+To skip this free disk space check please use --skip-disk-space-check flag`
 
 	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
 
@@ -64,6 +65,7 @@ Now, upgrade will start, Please confirm to continue...`
 Post Upgrade Steps:
 ===================
 `
+	minDirSizeInGB = 5
 )
 
 var postChecklistEmbedded = []PostCheckListItem{
@@ -254,27 +256,52 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Ensure you have more than 60 percent free disk space")
+			os_path := getHabRootPath(habrootcmd)
+			habDirSize, err := cm.CalDirSizeInGB(os_path)
+			fmt.Printf("------habDirSize----: %v", habDirSize)
+
+			if err != nil {
+				h.Writer.Error(err.Error())
+				return status.Errorf(status.UnknownError, err.Error())
+			}
+			version, _ = GetMajorVersion(version)
+			var dbDataPath string
+			switch version {
+			case "3":
+				dbDataPath = os_path + "svc/automate-postgresql/data/pgdata"
+			case "4":
+				dbDataPath = os_path + "svc/automate-elasticsearch/data"
+			}
+
+			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
+			fmt.Printf("------dbDataSize-----: %v", dbDataSize)
+			if err != nil {
+				h.Writer.Error(err.Error())
+				return status.Errorf(status.UnknownError, err.Error())
+			}
+
+			minReqDiskSpace := math.Max(minDirSizeInGB, math.Max(habDirSize, dbDataSize)) * 11 / 10
+			fmt.Printf("-----min req disk space-----: %v", minReqDiskSpace)
+
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure you have more than %v GB of free disk space", minReqDiskSpace))
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !skipDiskSpaceCheck {
-				os_path := getHabRootPath(habrootcmd)
-				version, _ = GetMajorVersion(version)
-				switch version {
-				case "3":
-					SpaceAvailable, err = cm.CalDiskSizeAndDirSize(os_path+"svc/automate-postgresql/data", os_path+"svc/automate-postgresql/data/pgdata")
-				case "4":
-					destDir := os_path
-					if osDestDataDir != "" {
-						destDir = osDestDataDir
-					}
-					h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
-					h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
-					SpaceAvailable, err = cm.CalDiskSizeAndDirSize(destDir, os_path+"svc/automate-elasticsearch")
+				destDir := os_path
+				if osDestDataDir != "" {
+					destDir = osDestDataDir
 				}
+				h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
+				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
+				SpaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
+				fmt.Printf("---space available--- %t", SpaceAvailable)
 				if err != nil {
+					h.Writer.Error("Failed to check available space")
+					return status.Errorf(status.UnknownError, err.Error())
+				}
+				if !SpaceAvailable {
 					h.Writer.Error(diskSpaceCheckError + "\n")
 					return status.New(status.InvalidCommandArgsError, diskSpaceCheckError)
 				}

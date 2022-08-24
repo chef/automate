@@ -70,3 +70,23 @@ func CalDiskSizeAndDirSize(data, oldData string) (bool, error) {
 		return false, errors.New(msg)
 	}
 }
+
+func CalDirSizeInGB(path string) (float64, error) {
+	size, err := sys.DirSize(path)
+	if err != nil {
+		return -1, err
+	}
+	return float64(size / (1024 * 1024 * 1024)), nil
+}
+
+func CheckSpaceAvailability(dir string, minSpace float64) (bool, error) {
+	v, err := sys.SpaceAvailForPath(dir)
+	if err != nil {
+		return false, err
+	}
+	dirSpaceInGB := float64(v) / (1024 * 1024)
+	if minSpace <= dirSpaceInGB {
+		return true, nil
+	}
+	return false, nil
+}

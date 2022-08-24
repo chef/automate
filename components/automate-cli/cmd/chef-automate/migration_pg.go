@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"os/exec"
 	"strconv"
@@ -62,6 +63,12 @@ const (
 	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"
 	OPENSEARCH_DIR              = "/hab/svc/automate-opensearch"
 	ELASTICSEARCH_DIR           = "/hab/svc/automate-elasticsearch"
+	minDirSizeInGB              = 5
+	diskSpaceError              = `Please ensure to have 60% free disk space`
+
+	diskSpaceCheckError = `You do not have minimum space available to continue with this upgrade. 
+Please ensure you have 60% free disk space.
+To skip this free disk space check please use --skip-storage-check flag`
 )
 
 func init() {
@@ -201,6 +208,27 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func checkSpaceAvailable(dataDir string) error {
+	os_path := getHabRootPath(habrootcmd)
+	habDirSize, err := cm.CalDirSizeInGB(os_path)
+	if err != nil {
+		return status.Errorf(status.UnknownError, err.Error())
+	}
+	dbDataSize, err := cm.CalDirSizeInGB(ELASTICSEARCH_DIR)
+	if err != nil {
+		return status.Errorf(status.UnknownError, err.Error())
+	}
+	minReqDiskSpace := math.Max(minDirSizeInGB, math.Max(habDirSize, dbDataSize)) * 11 / 10
+	SpaceAvailable, err := cm.CheckSpaceAvailability(os_path, minReqDiskSpace)
+	if err != nil {
+		return status.Errorf(status.UnknownError, err.Error())
+	}
+	if !SpaceAvailable {
+		return status.New(status.InvalidCommandArgsError, diskSpaceCheckError)
+	}
+	return nil
+}
+
 func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 
 	if migrateDataCmdFlags.data == "" {
@@ -270,7 +298,10 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			isAvailableSpace = true
 			err = nil
 		} else {
-			isAvailableSpace, err = cm.CalDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
+			err = checkSpaceAvailable(ELASTICSEARCH_DIR)
+			if err != nil {
+				return err
+			}
 		}
 
 		if err != nil {
@@ -729,16 +760,14 @@ func executePgdata13ShellScript() error {
 
 func checkUpdateMigration(check bool) error {
 	var isAvailableSpace bool
-	var err error
-
 	if migrateDataCmdFlags.skipStorageCheck {
 		isAvailableSpace = true
 	} else {
-		isAvailableSpace, err = cm.CalDiskSizeAndDirSize(PG_DATA_DIR, OLD_PG_DATA_DIR)
-
+		err := checkSpaceAvailable(OLD_PG_DATA_DIR)
 		if err != nil {
 			return err
 		}
+
 	}
 
 	if isAvailableSpace {
@@ -908,4 +937,3 @@ func pgVersion(path string) (string, error) {
 	getOldPgVersion := string(bytes.Trim(data, ""))
 	return getOldPgVersion, nil
 }
-
