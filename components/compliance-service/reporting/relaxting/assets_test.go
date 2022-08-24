@@ -17,7 +17,7 @@ func TestFiltersForAssetIndex(t *testing.T) {
 		filtersKey    string
 		filtersValue  []string
 		expectedQuery string
-		esr           ES2Backend
+		esr           ES2Backend 
 	}{
 		{
 			name:          "Test for Environment",
