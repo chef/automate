@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -483,16 +484,22 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
 	re := regexp.MustCompile(s3regex)
 	if re.MatchString(endpoint.String()) {
-		err = ioutil.WriteFile(filename, []byte(s3EndpointConf), 0644) // nosemgrep
+		file, err := ioutil.TempFile("", filename)
 		if err != nil {
+			h.Writer.Errorln("could not create temp file" + err.Error())
+			return nil
+		}
+		defer os.Remove(file.Name())
+		if _, err := file.Write([]byte(s3EndpointConf)); err != nil {
 			h.Writer.Errorln("could not write toml file" + err.Error())
 			return nil
 		}
-		out, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(automatePatchCmd, filename)).Output()
-		if !strings.Contains(string(out), "Success: Configuration patched") || err != nil {
+		out, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(automatePatchCmd, file.Name())).Output()
+		if !strings.Contains(string(out), "Configuration patched") || err != nil {
 			h.Writer.Errorln("error in running automate patch command")
 			return nil
 		}
+		h.Writer.Println("Your S3 url in backup config is changed to https://s3.amazonaws.com. This is because automate version 4 now only supports this format due to AWS SDK upgrade.")
 	}
 
 	return nil
