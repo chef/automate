@@ -728,7 +728,7 @@ func init() {
         "waived": {
           "type": "integer",
           "format": "int32",
-          "title": "Total collected and weived in the assets"
+          "title": "Total collected and waived in the assets"
         }
       }
     },

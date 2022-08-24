@@ -4018,7 +4018,7 @@ type Collected struct {
 	Failed int32 `protobuf:"varint,2,opt,name=failed,proto3" json:"failed,omitempty"`
 	// Total collected and skipped in the assets
 	Skipped int32 `protobuf:"varint,3,opt,name=skipped,proto3" json:"skipped,omitempty"`
-	// Total collected and weived in the assets
+	// Total collected and waived in the assets
 	Waived int32 `protobuf:"varint,4,opt,name=waived,proto3" json:"waived,omitempty"`
 }
 
