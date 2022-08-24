@@ -1,0 +1,17 @@
+grammar TomlRB::Helper
+  rule comment
+    (space? "#" (~line_break)* line_break?) { nil }
+  end
+
+  rule space
+    [ \t]*
+  end
+
+  rule indent
+    [ \t\r\n]*
+  end
+
+  rule line_break
+    (space "\n" space | space "\r\n" space) { nil }
+  end
+end

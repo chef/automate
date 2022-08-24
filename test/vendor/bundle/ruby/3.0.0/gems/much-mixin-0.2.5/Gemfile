@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+ruby ">= 2.5"
+
+gemspec
+
+gem "pry"
+
+# to release, uncomment this and run `bundle exec ggem r -f`
+gem "ggem"
+
+gem "assert", path: "/Users/kellyredding/projects/tmp/assert"
+gem "much-style-guide", path: "/Users/kellyredding/projects/tmp/much-style-guide"
+gem "much-factory", path: "/Users/kellyredding/projects/tmp/much-factory"
+gem "much-not-given", path: "/Users/kellyredding/projects/tmp/much-not-given"
+gem "much-stub", path: "/Users/kellyredding/projects/tmp/much-stub"

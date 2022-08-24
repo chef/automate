@@ -1,0 +1,16 @@
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/unf_ext-0.0.8.2/ext/unf_ext
+/hab/pkgs/core/ruby30/3.0.3/20220312100602/bin/ruby -I /hab/pkgs/core/ruby30/3.0.3/20220312100602/lib/ruby/site_ruby/3.0.0 extconf.rb
+checking for -lstdc++... yes
+creating Makefile
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/unf_ext-0.0.8.2/ext/unf_ext
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-2gn45x sitelibdir\=./.gem.20220803-99955-2gn45x clean
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/unf_ext-0.0.8.2/ext/unf_ext
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-2gn45x sitelibdir\=./.gem.20220803-99955-2gn45x
+compiling unf.cc
+linking shared-object unf_ext.so
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/unf_ext-0.0.8.2/ext/unf_ext
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-2gn45x sitelibdir\=./.gem.20220803-99955-2gn45x install
+/hab/pkgs/core/coreutils/8.32/20220311101609/bin/install -c -m 0755 unf_ext.so ./.gem.20220803-99955-2gn45x

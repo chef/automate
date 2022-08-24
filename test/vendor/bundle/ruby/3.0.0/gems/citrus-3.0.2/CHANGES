@@ -1,0 +1,132 @@
+= 3.0.1 / 2014-03-14
+
+  * Fixed bad 3.0.0 release.
+
+= 3.0.0 / 2014-03-14
+
+  * Moved Object#grammar to citrus/core_ext.rb. Citrus no longer installs core
+    extensions by default. Use "require 'citrus/core_ext.rb'" instead of
+    "require 'citrus'" to keep the previous behavior.
+
+  * Removed Match#method_missing, added #capture(name) and #captures(name)
+
+    Match#method_missing is unsafe as illustrated in Github issue #41. In
+    particular, it makes composing a grammar with aribitrary gems unsafe (e.g.
+    when the latter make core extensions), leads to unexpected results with
+    labels match existing Kernel methods (e.g. `p`), and prevents Match from
+    getting new methods in a backward compatible way. This commit therefore
+    removes it.
+
+    In Citrus 2.x, method_missing allowed rule productions to denote captured
+    matches by label name:
+
+        rule pair
+          (foo ':' bar) {
+            [foo.value, bar.value]
+          }
+        end
+
+    Also, it allowed invoking String operators on the Match's text:
+
+        rule int
+          [0-9]+ { to_i }
+        end
+
+    Those two scenarios no longer work out of the box in Citrus 3.0. You must
+    use capture(label) for the former, and to_str for the latter:
+
+        rule pair
+          (foo ':' bar) {
+            [capture(:foo).value, capture(:bar).value]
+          }
+        end
+
+        rule int
+          [0-9]+ { to_str.to_i }
+        end
+
+    Match#captures now accepts an optional label name as first argument and
+    returns the corresponding array of matches for that label (useful in case
+    the label belongs to a repetition).
+
+= 2.5.0 / 2014-03-13
+
+  * Inputs may be generated from many different sources, including Pathname and
+    IO objects (thanks blambeau).
+
+  * Matches keep track of their offset in the original source  (thanks
+    blambeau).
+
+  * Citrus.load no longer raises Citrus::LoadError for files that can't be found
+    or are not readable. Users must rescue Errno::ENOENT instead, for example.
+
+  * Removed a few ruby warnings (thanks tbuehlmann)
+
+= 2.4.1 / 2011-11-04
+
+  * Fixed a bug that prevented rule names from starting with "super".
+
+  * Several minor bug fixes.
+
+= 2.4.0 / 2011-05-11
+
+  * Fixed a bug that prevented parsing nested blocks correctly (issue #21).
+
+  * Added URI example.
+
+  * Moved example grammars inside lib/citrus/grammars and added
+    lib/citrus/grammars.rb for easily requiring Citrus example grammars.
+
+= 2.3.7 / 2011-02-20
+
+  * Fixed a bug that prevented forward slashes from being used inside character
+    class literals.
+
+  * Added email address example.
+
+= 2.3.6 / 2011-02-19
+
+  * Fixed a bug that prevented memoization from advancing the input's pointer
+    properly (thanks joachimm).
+
+  * Several additions to the TextMate bundle (thanks joachimm).
+
+= 2.3.5 / 2011-02-07
+
+  * Fixed a bug that prevented Match objects from being printed properly using
+    Kernel#puts (thanks joachimm).
+
+  * Fixed a bug that prevented using rules with names that begin with "end"
+    (thanks Mark Wilden).
+
+  * Citrus#require accepts relative file paths, in addition to absolute ones.
+
+  * Simplified/cleaned up some example files.
+
+= 2.3.4 / 2011-01-17
+
+  * Added CHANGES file.
+
+= 2.3.3 / 2011-01-17
+
+  * Added self to Match#captures hash. This means that a Match may retrieve a
+    reference to itself by using its own label, proxy name, or index 0 in the
+    hash.
+
+  * Match#captures returns an empty array for unknown Symbol keys, coerces
+    String keys to Symbols, and returns nil for unknown Numeric keys.
+
+  * Moved Citrus::VERSION to its own file.
+
+  * Citrus::LoadError is raised when Citrus is unable to load a file from the
+    file system because it cannot be found or it is not readable.
+
+  * Citrus::SyntaxError is raised when Citrus::File is unable to parse some
+    Citrus syntax.
+
+  * Added Citrus.require for requiring .citrus grammar files in a similar way
+    to Ruby's Kernel.require. Also, overloaded the require operator in Citrus
+    grammar files to failover to Citrus.require when Kernel.require raises a
+    LoadError.
+
+  * Improved UTF-8 support.
