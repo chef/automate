@@ -753,6 +753,7 @@ func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, 
 				}
 			}
 		}
+
 		ctx._source.projects = matchingProjects.toArray();
  `
 
