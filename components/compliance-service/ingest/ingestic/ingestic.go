@@ -374,6 +374,8 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time,
 	rInfo.Recipe = report.Recipes
 	rInfo.Role = report.Roles
 	rInfo.ChefTags = report.ChefTags
+	rInfo.Environment = report.Environment
+	rInfo.PolicyGroup = report.PolicyGroup
 	runInfo <- rInfo
 }
 
