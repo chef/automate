@@ -30,6 +30,7 @@ const (
 	ComplianceDailySumTwenty          string = CompDailySumIndexPrefix + "20*"
 	ComplianceDailyRepTwenty          string = CompDailyRepIndexPrefix + "20*"
 	CompProfilesIndex                 string = mappings.IndexNameProf
+	CompRunInfoIndex                  string = mappings.IndexNameComplianceRunInfo
 )
 
 type nowFuncT func() time.Time
