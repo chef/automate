@@ -1091,8 +1091,8 @@ message Collected {
 	int32 failed = 2;
 	// Total collected and skipped in the assets
 	int32 skipped = 3;
-	// Total collected and weived in the assets
-	int32 weived = 4;
+	// Total collected and waived in the assets
+	int32 waived = 4;
 }
 
 message Uncollected {

@@ -725,7 +725,7 @@ func init() {
           "format": "int32",
           "title": "Total collected and skipped in the assets"
         },
-        "weived": {
+        "waived": {
           "type": "integer",
           "format": "int32",
           "title": "Total collected and weived in the assets"

@@ -394,13 +394,12 @@ func (backend ES2Backend) GetAssetSummary(ctx context.Context, filters map[strin
 		logrus.Errorf("The error while getting the collected assests %v", err)
 		return nil, err
 	}
-	// uncollected := totalAssets - (collectedAsset.Passed + collectedAsset.Failed + collectedAsset.Skipped + collectedAsset.Waived)
 
 	collected := &reportingapi.Collected{
 		Passed:  collectedAsset.Passed,
 		Failed:  collectedAsset.Failed,
 		Skipped: collectedAsset.Skipped,
-		Weived:  collectedAsset.Waived,
+		Waived:  collectedAsset.Waived,
 	}
 	uncollected := &reportingapi.Uncollected{
 		Unreachable: unreachableAsset,
