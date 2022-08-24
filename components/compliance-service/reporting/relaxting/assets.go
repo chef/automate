@@ -363,7 +363,7 @@ func (backend ES2Backend) GetAssetSummary(ctx context.Context, filters map[strin
 
 	// get the total number of assets without any date range filters i.e all the assets present
 	boolquery := backend.getFiltersQueryForAssetFilters(filters)
-	repQuery := boolquery
+	reportedBoolQuery := boolquery
 
 	totalAssets, err := backend.getAssets(ctx, boolquery, "total_assets")
 	if err != nil {
@@ -380,7 +380,7 @@ func (backend ES2Backend) GetAssetSummary(ctx context.Context, filters map[strin
 	}
 
 	// get the un-reported assets as per the start time and end time present in filters
-	reportedQuery := repQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
+	reportedQuery := reportedBoolQuery.Must(getStartTimeAndEndTimeRangeForAsset(filters))
 	reported, err := backend.getAssets(ctx, reportedQuery, "reported_assets")
 	if err != nil {
 		logrus.Errorf("The error while getting the unreported assests %v", err)
