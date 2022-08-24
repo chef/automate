@@ -74,6 +74,11 @@ const (
 	filename                     = "/tmp/s3.toml"
 	automatePatchCmd             = "chef-automate config patch %s"
 	habrootcmd                   = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+	s3regex                      = "https?://s3.(.*).amazonaws.com"
+	s3EndpointConf               = `
+		[global.v1.backups.s3.bucket]
+			endpoint = "https://s3.amazonaws.com"
+	`
 )
 
 var postChecklistV4Embedded = []PostCheckListItem{
@@ -499,12 +504,9 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 		return nil
 	}
 	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
-	re := regexp.MustCompile("https?://s3.(.*).amazonaws.com")
+	re := regexp.MustCompile(s3regex)
 	if re.MatchString(endpoint.String()) {
-		err = ioutil.WriteFile(filename, []byte(`
-			[global.v1.backups.s3.bucket]
-				endpoint = "https://s3.amazonaws.com"
-		`), 0644) // nosemgrep
+		err = ioutil.WriteFile(filename, []byte(s3EndpointConf), 0644) // nosemgrep
 		if err != nil {
 			h.Writer.Errorln("could not write toml file" + err.Error())
 			return nil
