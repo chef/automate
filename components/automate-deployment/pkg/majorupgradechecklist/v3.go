@@ -5,8 +5,8 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	platform_config "github.com/chef/automate/lib/platform/config"
 	cm "github.com/chef/automate/lib/io/fileutils"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/pkg/errors"
 )
 
