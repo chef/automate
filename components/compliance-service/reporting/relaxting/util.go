@@ -5,12 +5,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	elastic "github.com/olivere/elastic/v7"
@@ -332,7 +333,7 @@ func getRunInfoIndex() string {
 	return mappings.ComplianceRunInfo.Index
 }
 
-func ValidateTimeRangeForFilters(startTime string , endTime string) (error) {
+func ValidateTimeRangeForFilters(startTime string, endTime string) error {
 	if len(startTime) <= 0 {
 		logrus.Errorf("Startime cannot be null")
 		return errors.Errorf("StartTime cannot be null")
@@ -341,10 +342,10 @@ func ValidateTimeRangeForFilters(startTime string , endTime string) (error) {
 		return errors.Errorf("Start time cannot be greater than end time")
 	}
 	eTime, err := time.Parse(time.RFC3339, endTime)
-	sTime, err := time.Parse(time.RFC3339 , startTime)
-	diff := int(eTime.Sub(sTime).Hours()/24)
+	sTime, err := time.Parse(time.RFC3339, startTime)
+	diff := int(eTime.Sub(sTime).Hours() / 24)
 	if err != nil {
-		logrus.Errorf("Error while getting the start time and end time diffrence:  %v" , err)
+		logrus.Errorf("Error while getting the start time and end time diffrence:  %v", err)
 		return err
 	}
 	if diff > 90 {

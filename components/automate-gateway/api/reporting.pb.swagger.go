@@ -171,6 +171,8 @@ func init() {
     },
     "/api/v0/compliance/reporting/controls/search": {
       "post": {
+        "summary": "List Controls",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\nGets the summary of each control.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_ListControlItemsRange",
         "responses": {
           "200": {
@@ -665,20 +667,9 @@ func init() {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Collected",
           "title": "Accessing the collected from Collected Message"
         },
-        "not_collected": {
-          "type": "integer",
-          "format": "int32",
+        "uncollected": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Uncollected",
           "title": "Total number of not collected assests"
-        },
-        "unreported": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Total number of unreported assets"
-        },
-        "unreachable": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Total number of unreachable assests"
         }
       }
     },
@@ -734,10 +725,10 @@ func init() {
           "format": "int32",
           "title": "Total collected and skipped in the assets"
         },
-        "weived": {
+        "waived": {
           "type": "integer",
           "format": "int32",
-          "title": "Total collected and weived in the assets"
+          "title": "Total collected and waived in the assets"
         }
       }
     },
@@ -1984,6 +1975,21 @@ func init() {
         }
       },
       "description": "A subtotal of controls."
+    },
+    "chef.automate.api.compliance.reporting.v1.Uncollected": {
+      "type": "object",
+      "properties": {
+        "unreachable": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total count of unreachable assets"
+        },
+        "unreported": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total count of unreported assets"
+        }
+      }
     },
     "chef.automate.api.compliance.reporting.v1.WaiverData": {
       "type": "object",

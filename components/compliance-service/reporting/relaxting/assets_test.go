@@ -17,7 +17,7 @@ func TestFiltersForAssetIndex(t *testing.T) {
 		filtersKey    string
 		filtersValue  []string
 		expectedQuery string
-		esr           ES2Backend
+		esr           ES2Backend 
 	}{
 		{
 			name:          "Test for Environment",
@@ -58,49 +58,49 @@ func TestFiltersForAssetIndex(t *testing.T) {
 			name:          "Test for Inspec Version",
 			filtersKey:    "inspec_version",
 			filtersValue:  []string{"1"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"inspec_version.lower":["1"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"version.lower":["1"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for platform with version",
 			filtersKey:    "platform_with_version",
 			filtersValue:  []string{"1"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform.full.lower":["1"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform_version.full.lower":["1"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for recipe",
 			filtersKey:    "recipe",
 			filtersValue:  []string{"testrecipe"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"recipe.lower":["testrecipe"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"recipes.lower":["testrecipe"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Role",
 			filtersKey:    "role",
 			filtersValue:  []string{"testrole"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"role.lower":["testrole"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"roles.lower":["testrole"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Platform",
 			filtersKey:    "platform",
 			filtersValue:  []string{"Test Plat"},
-			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform.name.lower":["Test Plat"]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"bool":{"should":{"terms":{"platform_version.name.lower":["Test Plat"]}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Profile ID",
 			filtersKey:    "profile_id",
 			filtersValue:  []string{"Profile"},
-			expectedQuery: `{"bool":{"must":[{"bool":{"should":{"terms":{"profile_id":["Profile"]}}}},{"nested":{"inner_hits":{"_source":{"includes":["profiles.name","profiles.sha256"]}},"path":"profiles","query":{"bool":{"must":{"query_string":{"query":"profiles.sha256:/(Profile)/"}}}}}}]}}`,
+			expectedQuery: `{"bool":{"must":{"nested":{"inner_hits":{"_source":{"includes":["profiles.name","profiles.sha256"]}},"path":"profiles","query":{"bool":{"must":{"query_string":{"query":"profiles.sha256:/(Profile)/"}}}}}}}}`,
 			esr:           esr,
 		},
 		{
 			name:          "Test for Control ID",
 			filtersKey:    "control",
 			filtersValue:  []string{"Control"},
-			expectedQuery: `{"bool":{"must":{"nested":{"path":"profiles","query":{"bool":{"must":[{"query_string":{"query":"profiles.sha256:/(.*)/"}},{"nested":{"path":"profiles.controls","query":{"query_string":{"query":"profiles.controls.id:/(Control)/"}}}}]}}}}}}`,
+			expectedQuery: `{"bool":{"must":{"nested":{"path":"profiles","query":{"bool":{"must":[{"query_string":{"query":"profiles.sha256:/(.*)/"}},{"nested":{"path":"profiles.controls","query":{"query_string":{"fields":["profiles.controls.id"],"query":"((Control))"}}}}]}}}}}}`,
 			esr:           esr,
 		},
 		{
