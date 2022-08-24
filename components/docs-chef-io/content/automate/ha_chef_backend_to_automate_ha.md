@@ -13,9 +13,11 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+
 - Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
 - Automate HA does not support supermarket authentication with chef-server users' credentials.
 - Post Migration Customer can not log in with chef-server users to Supermarket.
+
 {{< /warning >}}
 
 This page explains migrating the existing Chef Backend data to the newly deployed Chef Automate HA. This migration involves two steps:
@@ -42,13 +44,13 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
     curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
     ```
 
-2. Execute the below command to install the habitat package for `knife-ec-backup`
+1. Execute the below command to install the habitat package for `knife-ec-backup`
 
     ```cmd
     hab pkg install chef/knife-ec-backup
     ```
 
-3. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc.  In this command:
+1. Execute the below command to generate a knife tidy server report to examine the stale node, data, etc.  In this command:
 
     - `pivotal` is the name of the user
     - `path of pivotal` is where the user's pem file is stored.
@@ -64,7 +66,7 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
     hab pkg exec chef/knife-ec-backup knife tidy server report --node-threshold 60 -s https://chef.io -u pivotal -k /etc/opscode/pivotal.pem
     ```
 
-4. Execute the below command to initiate a backup of your Chef Server data. In this command:
+1. Execute the below command to initiate a backup of your Chef Server data. In this command:
 
     - `with-user-sql` is required to handle user passwords and ensure user-specific association groups are not duplicate.
     - `--with-key-sql` is to handle cases where customers have users with multiple pem keys associated with their user or clients. The current chef-server API only dumps the default key. Sometimes, users will generate and assign additional keys to give additional users access to an account but still be able to lock them out later without removing everyone's access.
@@ -85,7 +87,7 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
     hab pkg exec chef/knife-ec-backup knife tidy server clean --backup-path /path/to/an-ec-backup
     ```
 
-5. Execute the below command to copy the backup directory to the Automate HA Chef Server.
+1. Execute the below command to copy the backup directory to the Automate HA Chef Server.
 
     ```cmd
     scp -i /path/to/key backup\_$(date '+%Y%m%d%H%M%s') user@host:/home/user
@@ -95,15 +97,15 @@ Take backup using the `knife-ec-backup` utility and move the backup folder to th
 
 - Execute the below command to install the habitat package for `knife-ec-backup`
 
-```cmd
-hab pkg install chef/knife-ec-backup
-```
+    ```cmd
+    hab pkg install chef/knife-ec-backup
+    ```
 
 - Execute the below command to restore the backup.
 
-```cmd
-hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
-```
+    ```cmd
+    hab pkg exec chef/knife-ec-backup knife ec restore /home/centos/backup\_2021061013191623331154 -yes --concurrency 1 --webui-key /hab/svc/automate-cs-oc-erchef/data/webui\_priv.pem --purge -c /hab/pkgs/chef/chef-server-ctl/*/*/omnibus-ctl/spec/fixtures/pivotal.rb
+    ```
 
 ## In place Migration (Chef Backend to Automate HA)
 
@@ -129,35 +131,35 @@ The above migration will require downtime, so plan accordingly. A reduced perfor
     chef-backend-ctl stop
     ```
 
-2. SSH to all frontend nodes of chef-backend and run:
+1. SSH to all frontend nodes of chef-backend and run:
 
     ```cmd
     chef-server-ctl stop
     ```
 
-3. Create one bastion machine under the same network space.
+1. Create one bastion machine under the same network space.
 
-4. SSH to bastion machine and download chef-automate cli
+1. SSH to bastion machine and download chef-automate cli
 
     ```cmd
     https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip
     ```
 
-5. Extract the downloaded zip file.
+1. Extract the downloaded zip file.
 
-6. Create an airgap bundle using the command:
+1. Create an airgap bundle using the command:
 
     ```cmd
     ./chef-automate airgap bundle create 
     ```
 
-7. Generate `config.toml` file using command:
+1. Generate `config.toml` file using command:
 
     ```cmd
     ./chef-automate init-config-ha existing_infra 
     ```
 
-8. Edit `config.toml` and add the following:
+1. Edit `config.toml` and add the following:
 
     - Update the `instance_count`  
     - **fqdn:** load balance URL, which points to the frontend node.
@@ -204,10 +206,10 @@ The above migration will require downtime, so plan accordingly. A reduced perfor
     postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
     ```
 
-9. Deploy using
+1. Deploy using
 
     ```cmd
     ./chef-automate deploy config.toml <airgapped bundle name>
     ```
 
-10. Clean up the old packages from the chef-backend (like ElasticSearch and Postgres).
+1. Clean up the old packages from the chef-backend (like ElasticSearch and Postgres).
