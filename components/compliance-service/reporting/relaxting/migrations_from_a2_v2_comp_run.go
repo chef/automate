@@ -8,17 +8,17 @@ import (
 )
 
 const (
-	a2V7CompRunInfoIndexPrefix = "comp-2-"
-	olderIndexCompRunInfo      = a2V7CompRunInfoIndexPrefix + "run-info"
+	a2V2CompRunInfoIndexPrefix = "comp-2-"
+	olderIndexCompRunInfo      = a2V2CompRunInfoIndexPrefix + "run-info"
 )
 
-type A2V7ElasticSearchIndices struct {
+type A2V2CompRunIndices struct {
 	backend *ES2Backend
 }
 
 //migrateCompRunInfo migrates the comp run info table
-func (migratable A2V7ElasticSearchIndices) migrateCompRunInfo() error {
-	myName := "A2V1ElasticSearchIndices::migrateCompRunInfo"
+func (migratable A2V2CompRunIndices) migrateCompRunInfo() error {
+	myName := "A2V2CompRunIndices::migrateCompRunInfo"
 	defer util.TimeTrack(time.Now(), myName)
 
 	src := olderIndexCompRunInfo
@@ -32,32 +32,32 @@ func (migratable A2V7ElasticSearchIndices) migrateCompRunInfo() error {
 
 }
 
-func (a A2V7ElasticSearchIndices) getSourceSummaryIndexPrefix() string {
-	return a2V7CompRunInfoIndexPrefix
+func (a A2V2CompRunIndices) getSourceSummaryIndexPrefix() string {
+	return a2V2CompRunInfoIndexPrefix
 }
 
-func (a A2V7ElasticSearchIndices) migrateProfiles() error {
+func (a A2V2CompRunIndices) migrateProfiles() error {
 	return nil
 }
 
-func (a A2V7ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.Time) error {
+func (a A2V2CompRunIndices) migrateTimeSeries(dateToMigrate time.Time) error {
 	return nil
 }
 
-func (a A2V7ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate time.Time) error {
+func (a A2V2CompRunIndices) postTimeSeriesMigration(dateToMigrate time.Time) error {
 	return nil
 }
 
-func (a A2V7ElasticSearchIndices) postProfilesMigration() error {
+func (a A2V2CompRunIndices) postProfilesMigration() error {
 	return nil
 }
 
-func (a A2V7ElasticSearchIndices) postFeedsMigration() error {
+func (a A2V2CompRunIndices) postFeedsMigration() error {
 	return nil
 }
 
 //removes the older index thats not needed
-func (migratable A2V7ElasticSearchIndices) postMigration() error {
+func (migratable A2V2CompRunIndices) postMigration() error {
 	myName := "A2V7ElasticSearchIndices::postMigration"
 	defer util.TimeTrack(time.Now(), myName)
 
@@ -75,6 +75,6 @@ func (migratable A2V7ElasticSearchIndices) postMigration() error {
 	return nil
 }
 
-func (a A2V7ElasticSearchIndices) removeOldIndices(dateToMigrate time.Time) error {
+func (a A2V2CompRunIndices) removeOldIndices(dateToMigrate time.Time) error {
 	return nil
 }
