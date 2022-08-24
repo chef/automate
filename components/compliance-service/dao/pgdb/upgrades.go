@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"strings"
 )
 
 type UpgradesDB struct {
@@ -14,47 +15,49 @@ func NewDB(db *DB) *UpgradesDB {
 	return &UpgradesDB{db}
 }
 
-//UpdateDayLatestFlagToTrue updates the day latest flags to true
-func (u *UpgradesDB) UpdateDayLatestFlagToFalse() error {
-	_, err := u.DB.Exec(getUpdateQuery(DayLatestFlag))
-	if err != nil {
-		return errors.Wrapf(err, "Unable to UpdateDayLatestFlagToTrue")
-	}
-	return nil
-}
-
-//UpdateControlIndexFlagToTrue updates the day latest flags to true
+//UpdateControlFlagToFalse updates the control index flags to false
 func (u *UpgradesDB) UpdateControlFlagToFalse() error {
 	_, err := u.DB.Exec(getUpdateQuery(ControlIndexFlag))
 	if err != nil {
-		return errors.Wrapf(err, "Unable to UpdateDayLatestFlagToTrue")
+		return errors.Wrapf(err, "Unable to Control Index flag to db")
 	}
 	return nil
 }
 
-//GetControlLatestUpgradeFlag Gets the day latest flag status from the pg database
-func (u *UpgradesDB) GetControlLatestUpgradeFlagValue() (status bool, err error) {
-	logrus.Info("Inside the get day latest flag")
-	err = u.DB.QueryRow(getQueryForFlag(ControlIndexFlag)).Scan(&status)
-	if err != nil {
-		return status, errors.Wrapf(err, "PollForUpgradeFlagDayLatest unable to get current job status")
-	}
-	return status, err
-}
+//GetUpgradeFlags Gets the all the upgrade flags and status from the pg database
+func (u *UpgradesDB) GetUpgradeFlags() (map[string]bool, error) {
+	flagMap := make(map[string]bool)
 
-//GetDayLatestUpgradeFlagValue Gets the day latest flag status from the pg database
-func (u *UpgradesDB) GetDayLatestUpgradeFlagValue() (status bool, err error) {
-	logrus.Info("Inside the get day latest flag")
-	err = u.DB.QueryRow(getQueryForFlag(DayLatestFlag)).Scan(&status)
+	logrus.Info("Inside the comp run info flag")
+	flags := []string{ControlIndexFlag}
+	rows, err := u.DB.Query(getQueryForFlag(flags))
 	if err != nil {
-		return status, errors.Wrapf(err, "PollForUpgradeFlagDayLatest unable to get current job status")
+		return flagMap, err
 	}
-	return status, err
+	defer func() {
+		if err := rows.Close(); err != nil {
+			logrus.Errorf("failed to close db rows: %s", err.Error())
+		}
+	}()
+
+	for rows.Next() {
+		flag := Flag{}
+		if err := rows.Scan(&flag.flag, &flag.status); err != nil {
+			logrus.Errorf("Unable to get the flags with error %v", err)
+			return nil, err
+		}
+		flagMap[flag.flag] = flag.status
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
+	return flagMap, err
 }
 
 //getQueryForFlag gets the query for flag
-func getQueryForFlag(flag string) string {
-	return fmt.Sprintf("Select upgrade_value from upgrade_flags where upgrade_flag='%s'", flag)
+func getQueryForFlag(flag []string) string {
+	flags := `'` + strings.Join(flag, `','`) + `'`
+	return fmt.Sprintf("Select upgrade_flag,upgrade_value from upgrade_flags where upgrade_flag in (%s)", flags)
 }
 
 //getUpdateQuery gets the update query for flag
