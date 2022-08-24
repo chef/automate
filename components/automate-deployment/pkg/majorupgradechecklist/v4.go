@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -483,7 +484,7 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
 	re := regexp.MustCompile("https?://s3.(.*).amazonaws.com")
 	if re.MatchString(endpoint.String()) {
-		err = ioutil.WriteFile(filename, []byte(`
+		err = os.WriteFile(filename, []byte(`
 			[global.v1.backups.s3.bucket]
 				endpoint = "https://s3.amazonaws.com"
 		`), 0644)
