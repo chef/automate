@@ -228,7 +228,7 @@ sudo mkdir /mnt/automate_backups/elasticsearch
 sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 ```
 
-{{< note >} If the network is mounted correctly, you need to perform this step on a single OpenSearch server. {{< /note >}}
+{{< note >}} If the network is mounted correctly, you need to perform this step on a single OpenSearch server. {{< /note >}}
 
 1. Export the current OpenSearch configuration from the Habitat supervisor.
 
