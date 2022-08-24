@@ -24,7 +24,7 @@ var upgradeCmd = &cobra.Command{
 }
 
 var upgradeRunCmdFlags = struct {
-	airgap               string
+	airgapsss            string
 	version              string
 	upgradefrontends     bool
 	upgradebackends      bool
