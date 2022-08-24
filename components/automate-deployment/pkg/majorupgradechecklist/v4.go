@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -484,10 +483,10 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
 	re := regexp.MustCompile("https?://s3.(.*).amazonaws.com")
 	if re.MatchString(endpoint.String()) {
-		err = os.WriteFile(filename, []byte(`
+		err = ioutil.WriteFile(filename, []byte(`
 			[global.v1.backups.s3.bucket]
 				endpoint = "https://s3.amazonaws.com"
-		`), 0644)
+		`), 0644) // nosemgrep
 		if err != nil {
 			h.Writer.Errorln("could not write toml file" + err.Error())
 			return nil
