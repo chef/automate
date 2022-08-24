@@ -58,7 +58,7 @@ func (a A2V2CompRunIndices) postFeedsMigration() error {
 
 //removes the older index thats not needed
 func (migratable A2V2CompRunIndices) postMigration() error {
-	myName := "A2V7ElasticSearchIndices::postMigration"
+	myName := "A2V2CompRunIndices::postMigration"
 	defer util.TimeTrack(time.Now(), myName)
 
 	client, err := migratable.backend.ES2Client()
