@@ -2,12 +2,11 @@ package majorupgradechecklist
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	platform_config "github.com/chef/automate/lib/platform/config"
-	"github.com/chef/automate/lib/platform/sys"
+	cm "github.com/chef/automate/lib/io/fileutils"
 	"github.com/pkg/errors"
 )
 
@@ -168,8 +167,6 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 		dbType = "Embedded"
 		postcheck = postChecklistEmbedded
 		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
-		log.Println("---ci.version-----------", ci.version)
-		log.Println("-----checklists embedded-----", checklists)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
 
@@ -178,7 +175,6 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	}
 
 	ci.writer.Println(fmt.Sprintf(initMsg, dbType, ci.version)) //display the init message
-	log.Println("-----ci.version in v3------", ci.version)
 
 	for _, item := range checklists {
 		if item.TestFunc == nil {
@@ -250,34 +246,6 @@ func backupCheck() Checklist {
 	}
 }
 
-func calDiskSizeAndDirSize(data, oldData string) (bool, error) {
-	v, err := sys.SpaceAvailForPath(data)
-	if err != nil {
-		return false, err
-	}
-	diskSpaceInMb := v / 1024
-	log.Println("-------diskspace in MB------", diskSpaceInMb)
-
-	size, err := sys.DirSize(oldData)
-	if err != nil {
-		return false, err
-	}
-
-	dirSizeInMb := size / (1024 * 1024)
-	log.Println("-----dirspace in MB------", dirSizeInMb)
-
-	msg := fmt.Sprintf("Insufficient disk space for migration.\n%s: %5d MB\n%s: %5d MB\n%s",
-		"Space Required", (dirSizeInMb + (dirSizeInMb / 10)),
-		"Space Available", diskSpaceInMb,
-		"To continue with less memory Please use --skip-storage-check")
-	// NewData > olddata + 10%of oldData
-	if diskSpaceInMb > (uint64(dirSizeInMb) + uint64(dirSizeInMb/10)) {
-		return true, nil
-	} else {
-		return false, errors.New(msg)
-	}
-}
-
 var SpaceAvailable bool
 
 func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir string) Checklist {
@@ -286,10 +254,6 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
 			resp, err := h.Writer.Confirm("Ensure you have more than 60 percent free disk space")
-			// h.Writer.Printf("-------skip disk space check---- %t", skipDiskSpaceCheck)
-			// h.Writer.Printf("------os destination data dir----- %s", osDestDataDir)
-			// h.Writer.Printf("-----version----- %s", version)
-			// h.Writer.Printf("----resp----- %t", resp)
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
@@ -297,21 +261,16 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 			if !skipDiskSpaceCheck {
 				os_path := getHabRootPath(habrootcmd)
 				version, _ = GetMajorVersion(version)
-				// h.Writer.Printf("------os_path------- %s", os_path)
-				// h.Writer.Printf("------version-----......... %s", version)
 				switch version {
 				case "3":
-					SpaceAvailable, err = calDiskSizeAndDirSize(os_path+"svc/automate-postgresql/data", os_path+"svc/automate-postgresql/data/pgdata")
-					// h.Writer.Printf("------space available----- %t", SpaceAvailable)
+					SpaceAvailable, err = cm.CalDiskSizeAndDirSize(os_path+"svc/automate-postgresql/data", os_path+"svc/automate-postgresql/data/pgdata")
 				case "4":
 					destDir := os_path
-					// h.Writer.Printf("------dest dir------ %s", destDir)
 					if osDestDataDir != "" {
 						destDir = osDestDataDir
 					}
-					// h.Writer.Printf("------dest dir 2------ %s", destDir)
-					SpaceAvailable, err = calDiskSizeAndDirSize(destDir, os_path+"svc/automate-elasticsearch")
-					// h.Writer.Printf("------space available----- %t", SpaceAvailable)
+					h.Writer.Printf("Picked dest dir %s", destDir)
+					SpaceAvailable, err = cm.CalDiskSizeAndDirSize(destDir, os_path+"svc/automate-elasticsearch")
 				}
 				if err != nil {
 					h.Writer.Error(diskSpaceCheckError + "\n")

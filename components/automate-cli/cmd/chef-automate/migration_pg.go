@@ -15,7 +15,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
-	"github.com/chef/automate/lib/platform/sys"
+	cm "github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
@@ -270,7 +270,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			isAvailableSpace = true
 			err = nil
 		} else {
-			isAvailableSpace, err = calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
+			isAvailableSpace, err = cm.CalDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
 		}
 
 		if err != nil {
@@ -734,7 +734,7 @@ func checkUpdateMigration(check bool) error {
 	if migrateDataCmdFlags.skipStorageCheck {
 		isAvailableSpace = true
 	} else {
-		isAvailableSpace, err = calDiskSizeAndDirSize(PG_DATA_DIR, OLD_PG_DATA_DIR)
+		isAvailableSpace, err = cm.CalDiskSizeAndDirSize(PG_DATA_DIR, OLD_PG_DATA_DIR)
 
 		if err != nil {
 			return err
@@ -909,28 +909,3 @@ func pgVersion(path string) (string, error) {
 	return getOldPgVersion, nil
 }
 
-func calDiskSizeAndDirSize(data, oldData string) (bool, error) {
-	v, err := sys.SpaceAvailForPath(data)
-	if err != nil {
-		return false, err
-	}
-	diskSpaceInMb := v / 1024
-
-	size, err := sys.DirSize(oldData)
-	if err != nil {
-		return false, err
-	}
-
-	dirSizeInMb := size / (1024 * 1024)
-
-	msg := fmt.Sprintf("Insufficient disk space for migration.\n%s: %5d MB\n%s: %5d MB\n%s",
-		"Space Required", (dirSizeInMb + (dirSizeInMb / 10)),
-		"Space Available", diskSpaceInMb,
-		"To continue with less memory Please use --skip-storage-check")
-	// NewData > olddata + 10%of oldData
-	if diskSpaceInMb > (uint64(dirSizeInMb) + uint64(dirSizeInMb/10)) {
-		return true, nil
-	} else {
-		return false, errors.New(msg)
-	}
-}
