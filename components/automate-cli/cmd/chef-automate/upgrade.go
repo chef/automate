@@ -510,13 +510,13 @@ func GetopenSearchConfig() error {
 	}
 
 	con := res.Config.GetOpensearch()
-	opensearch_v1 := &OpenSearch_v1{
+	opensearchV1 := &OpenSearch_v1{
 		V1: con.V1,
 	}
-	opensearch_model := &OpenSearchModel{
-		Opensearch: opensearch_v1,
+	opensearchModel := &OpenSearchModel{
+		Opensearch: opensearchV1,
 	}
-	t, err := toml.Marshal(opensearch_model)
+	t, err := toml.Marshal(opensearchModel)
 	if err != nil {
 		return nil
 	}
