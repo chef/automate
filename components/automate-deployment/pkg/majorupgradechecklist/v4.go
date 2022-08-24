@@ -6,11 +6,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/pkg/errors"
 )
 
@@ -69,6 +71,9 @@ const (
 	$ ` + disable_maintenance_mode_cmd
 
 	disable_maintenance_mode_cmd = `chef-automate maintenance off`
+	filename                     = "/tmp/s3.toml"
+	automatePatchCmd             = "chef-automate config patch %s"
+	habrootcmd                   = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
 )
 
 var postChecklistV4Embedded = []PostCheckListItem{
@@ -166,7 +171,7 @@ func (ci *V4ChecklistManager) RunChecklist() error {
 		checklists = append(checklists, []Checklist{runIndexCheck(), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
+	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES), replaceurl())
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
@@ -473,8 +478,6 @@ func getDataFromUrl(url string) ([]byte, error) {
 	return body, nil
 }
 
-const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
-
 func getHabRootPath(habrootcmd string) string {
 	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
 	if err != nil {
@@ -487,6 +490,41 @@ func getHabRootPath(habrootcmd string) string {
 		rootHab = "/hab/"
 	}
 	return rootHab
+}
+
+func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
+	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
+	if err != nil {
+		h.Writer.Errorln("failed to get backup s3 url configuration: " + err.Error())
+		return nil
+	}
+	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
+	re := regexp.MustCompile("https?://s3.(.*).amazonaws.com")
+	if re.MatchString(endpoint.String()) {
+		err = ioutil.WriteFile(filename, []byte(`
+			[global.v1.backups.s3.bucket]
+				endpoint = "https://s3.amazonaws.com"
+		`), 0644)
+		if err != nil {
+			h.Writer.Errorln("could not write toml file" + err.Error())
+			return nil
+		}
+		out, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(automatePatchCmd, filename)).Output()
+		if !strings.Contains(string(out), "Success: Configuration patched") || err != nil {
+			h.Writer.Errorln("error in running automate patch command")
+			return nil
+		}
+	}
+
+	return nil
+}
+
+func replaceurl() Checklist {
+	return Checklist{
+		Name:        "post_checklist",
+		Description: "display post checklist and ask for final confirmation",
+		TestFunc:    replaceAndPatchS3backupUrl,
+	}
 }
 
 func checkIndexVersion() error {
