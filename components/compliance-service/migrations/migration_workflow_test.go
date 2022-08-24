@@ -85,7 +85,7 @@ func (c CerealWorkflow) GetPayload(obj interface{}) error {
 		return fmt.Errorf("Error in fetching payload")
 	}
 
-	jsonString := `{"DayLatestFlag":true}`
+	jsonString := `{"ControlIndexFlag":true}`
 	jsonBytes := []byte(jsonString)
 	err := json.Unmarshal(jsonBytes, obj)
 	return err
@@ -95,7 +95,7 @@ func (c CerealWorkflow) GetParameters(obj interface{}) error {
 	if c.failGetParameters {
 		return fmt.Errorf("error in fetching parameters")
 	}
-	jsonString := `{"DayLatestFlag":true}`
+	jsonString := `{"ControlIndexFlag":true}`
 	jsonBytes := []byte(jsonString)
 	err := json.Unmarshal(jsonBytes, obj)
 	return err
@@ -107,7 +107,7 @@ func (c CerealWorkflow) EnqueueTask(taskName cereal.TaskName, parameters interfa
 	}
 	assert.Equal(c.t, "upgrade-task", taskName.String())
 	params := parameters.(UpgradeParameters)
-	assert.Equal(c.t, true, params.DayLatestFlag)
+	assert.Equal(c.t, true, params.ControlFlag)
 	return nil
 }
 
