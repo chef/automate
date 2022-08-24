@@ -31,7 +31,7 @@ const (
 
 	diskSpaceCheckError = `You do not have minimum space available to continue with this upgrade. 
 Please ensure you have 60% free disk space.
-To skip this free disk space check please use --skip-storage-check`
+To skip this free disk space check please use --skip-storage-check flag`
 
 	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
 
@@ -271,7 +271,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 						destDir = osDestDataDir
 					}
 					h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
-					h.Writer.Println("To change destination directory please use --os-dest-data-dir")
+					h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
 					SpaceAvailable, err = cm.CalDiskSizeAndDirSize(destDir, os_path+"svc/automate-elasticsearch")
 				}
 				if err != nil {
