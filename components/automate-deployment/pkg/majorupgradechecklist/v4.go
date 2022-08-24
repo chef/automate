@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -152,7 +151,7 @@ func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4Checklist
 	return &V4ChecklistManager{
 		writer:       writer,
 		version:      version,
-		isExternalES: IsExternalElasticSearch(),
+		isExternalES: IsExternalElasticSearch(writer),
 	}
 }
 
@@ -481,25 +480,22 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 		h.Writer.Errorln("failed to get backup s3 url configuration: " + err.Error())
 		return nil
 	}
-	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint().GetValue()
-	re := regexp.MustCompile(s3regex)
-	if re.MatchString(endpoint) {
-		file, err := ioutil.TempFile("", filename) // nosemgrep
+	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
+	re := regexp.MustCompile("https?://s3.(.*).amazonaws.com")
+	if re.MatchString(endpoint.String()) {
+		err = ioutil.WriteFile(filename, []byte(`
+			[global.v1.backups.s3.bucket]
+				endpoint = "https://s3.amazonaws.com"
+		`), 0644)
 		if err != nil {
-			h.Writer.Errorln("could not create temp file" + err.Error())
-			return nil
-		}
-		defer os.Remove(file.Name())
-		if _, err := file.Write([]byte(s3EndpointConf)); err != nil {
 			h.Writer.Errorln("could not write toml file" + err.Error())
 			return nil
 		}
-		out, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(automatePatchCmd, file.Name())).Output()
-		if !strings.Contains(string(out), "Configuration patched") || err != nil {
+		out, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(automatePatchCmd, filename)).Output()
+		if !strings.Contains(string(out), "Success: Configuration patched") || err != nil {
 			h.Writer.Errorln("error in running automate patch command")
 			return nil
 		}
-		h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
 	}
 
 	return nil
@@ -507,13 +503,13 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 
 func replaceurl() Checklist {
 	return Checklist{
-		Name:        "Change s3 url",
-		Description: "Changes backup s3 url during upgrade.",
+		Name:        "post_checklist",
+		Description: "display post checklist and ask for final confirmation",
 		TestFunc:    replaceAndPatchS3backupUrl,
 	}
 }
 
-func checkIndexVersion(timeout int64) error {
+func checkIndexVersion() error {
 	var basePath = "http://localhost:10144/"
 	cfg := dc.DefaultAutomateConfig()
 	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
