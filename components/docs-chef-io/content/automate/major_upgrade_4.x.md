@@ -84,14 +84,8 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
 1. Start a major version upgrade:
 
-**Note:** To upgrade from 3.0.49 to 4.0.x ,create a new Airgap Bundle of `4.x.y` version .For example:4.0.91
-
-```bash
-./chef-automate airgap bundle create --version VERSION
-```
-
 ```sh
-sudo chef-automate upgrade run --airgap-bundle automate-${automate_version_number}.aib --major
+sudo chef-automate upgrade run --major
 ```
 Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
 
@@ -118,6 +112,40 @@ Once you are done with the upgrade, follow the steps post upgrade which are:
 sudo chef-automate upgrade status
 ```
 This should return: Automate is up-to-date with airgap bundle `4.x.y` version
+
+```shell
+Post Upgrade Steps:
+===================
+
+  
+1) Check the status of your upgrade using:  
+     $ chef-automate upgrade status
+   This should return: Automate is up-to-date
+  
+2) Disable the maintenance mode if you enabled previously using:
+	$ chef-automate maintenance off
+  
+3) Migrate Data from Elastic Search to Open Search using this command:
+     $ chef-automate post-major-upgrade migrate --data=es
+  
+4) Check Automate UI everything is running and all data is visible
+  
+5) If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
+     $ chef-automate post-major-upgrade clear-data --data=es
+```
+{{< note >}} If your backup location is S3 and endpoint is configured as regional then change your settings as below:
+```shell
+[global.v1.backups]
+  location = "s3"
+[global.v1.backups.s3.bucket]
+  # name (required): The name of the bucket
+  name = "<bucket name>"
+
+  # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
+  # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
+  endpoint = "https://s3.amazonaws.com"
+```
+ {{< /note >}}
 
 3. Turn off maintenance mode:
 
