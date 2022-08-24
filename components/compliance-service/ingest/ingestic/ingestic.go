@@ -1232,7 +1232,7 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 	for i := len(indicesSlice) - 1; i >= 0; i-- {
 		index := indicesSlice[i]
 		from := 0
-		svc := backend.client.Scroll(index).Query(boolQuery).Size(size).FetchSourceContext(fsc)
+		svc := backend.client.Scroll(index).Query(boolQuery).Size(size).FetchSourceContext(fsc).Sort("end_time", false)
 
 		logrus.Debugf("Reading the data for index : %s", index)
 		for {
