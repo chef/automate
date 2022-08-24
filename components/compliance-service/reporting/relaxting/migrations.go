@@ -246,7 +246,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		return errMsg
 	}
 
-	// Migrates A2 version 3 for comp-run-info indices to the current version
+	// Migrates A2 version 2 for comp-run-info indices to the current version
 	a2V7Indices := A2V7ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V7Indices, statusSrv, statusserver.MigrationLabelCompRun)
 	if err != nil {
@@ -285,6 +285,7 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 		return err
 	}
 
+	//migrating the comp run info index
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the comp run info index...")
 	err = migratable.migrateCompRunInfo()
 	if err != nil {
