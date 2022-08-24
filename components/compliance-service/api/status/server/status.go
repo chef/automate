@@ -27,7 +27,7 @@ const (
 )
 
 const maxMigrations = 10       // Total migrations should match the number of constants above
-const totalMigrationSteps = 47 // Max number of migration LogEntry items we can have across all migrations
+const totalMigrationSteps = 53 // Max number of migration LogEntry items we can have across all migrations
 
 // Special message sent by the services to flag the end of a migration either failed or successful
 const MigrationFailedMsg = "FAILED"
