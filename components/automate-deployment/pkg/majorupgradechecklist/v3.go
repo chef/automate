@@ -269,7 +269,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 					if osDestDataDir != "" {
 						destDir = osDestDataDir
 					}
-					h.Writer.Printf("Picked dest dir %s", destDir)
+					h.Writer.Printf("Picked dest dir %s\n", destDir)
 					SpaceAvailable, err = cm.CalDiskSizeAndDirSize(destDir, os_path+"svc/automate-elasticsearch")
 				}
 				if err != nil {
