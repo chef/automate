@@ -117,7 +117,7 @@ func (c CerealWorkflow) Complete(opt ...cereal.CompleteOpt) cereal.Decision {
 
 func (c CerealWorkflow) Continue(payload interface{}) cereal.Decision {
 	workflowPayload := payload.(*MigrationWorkflowPayload)
-	assert.Equal(c.t, true, workflowPayload.DayLatestFlag)
+	assert.Equal(c.t, true, workflowPayload.ControlIndexFlag)
 	return cereal.NewContinueDecision(payload)
 }
 
@@ -214,7 +214,7 @@ func (t TaskResult) GetParameters(obj interface{}) error {
 	if t.failGet {
 		return fmt.Errorf("Error in fetching job results")
 	}
-	jsonString := `{"DayLatestFlag":true}`
+	jsonString := `{"ControlIndexFlag":true}`
 	jsonBytes := []byte(jsonString)
 	err := json.Unmarshal(jsonBytes, obj)
 	return err

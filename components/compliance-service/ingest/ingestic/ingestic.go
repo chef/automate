@@ -269,7 +269,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	}
 
 	if data.DayLatest {
-		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping)
+		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, true)
 		if err != nil {
 			return err
 		}
@@ -300,7 +300,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	}
 
 	if data.DayLatest {
-		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping)
+		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, false)
 		if err != nil {
 			return err
 		}
@@ -400,7 +400,7 @@ func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.P
 }
 
 // Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> from yesterday upto 90 days UTC index.
-func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId string, reportId string, index string, mapping mappings.Mapping) error {
+func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId string, reportId string, index string, mapping mappings.Mapping, useSummaryIndex bool) error {
 	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
 	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeId)
 	termQueryNotThisReport := elastic.NewTermsQuery("_id", reportId)
@@ -420,7 +420,7 @@ func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId stri
 	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
 
 	// Getting all the indices
-	esIndexs, err := relaxting.GetEsIndex(filters, false)
+	esIndexs, err := relaxting.GetEsIndex(filters, useSummaryIndex)
 	if err != nil {
 		logrus.Errorf("Cannot get indexes: %+v", err)
 		return err
@@ -450,7 +450,7 @@ func (backend *ESClient) setLatestsToFalse(ctx context.Context, nodeId string, r
 		MustNot(termQueryNotThisReport)
 
 	script := elastic.NewScript(`
-		ctx._source.daily_latest = false;
+        ctx._source.daily_latest = false;
 		ctx._source.day_latest = false
 	`)
 
@@ -958,7 +958,6 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid stri
 	}
 
 	if searchResult.TotalHits() > 0 {
-		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 		// Iterate through results
 		for _, hit := range searchResult.Hits.Hits {
 			// hit.Index contains the name of the index
@@ -966,7 +965,7 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid stri
 				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
 				err := json.Unmarshal(hit.Source, &item)
 				if err != nil {
-					logrus.Errorf("Received error while unmarshling %+v", err)
+					logrus.Errorf("Received error while unmarshling for getting report %+v", err)
 				}
 
 			}
@@ -1151,103 +1150,33 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
 }
 
-//GetNodesDayLatestTrue Get the Nodes from past 90 days from now where day latest and daily latest are true
-func (backend *ESClient) GetNodesDayLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]relaxting.NodesUpgradation, error) {
-	nodesMap := make(map[string]relaxting.NodesUpgradation)
-	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
-	if err != nil {
-		return nil, err
-	}
-
-	indicesSlice := strings.Split(indices, ",")
-
-	boolQuery := elastic.NewBoolQuery().
-		Must(elastic.NewTermQuery("day_latest", true)).
-		Must(elastic.NewTermQuery("daily_latest", true))
-
-	fsc := elastic.NewFetchSourceContext(true).Include(
-		"node_uuid",
-		"end_time",
-		"day_latest",
-	)
-
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(boolQuery).
-		Size(10000).Sort("end_time", false)
-
-	for _, indx := range indicesSlice {
-		searchResult, err := backend.client.Search().
-			SearchSource(searchSource).
-			Index(indx).
-			FilterPath(
-				"took",
-				"hits.total",
-				"hits.hits._id",
-				"hits.hits._source",
-				"hits.hits.inner_hits").
-			Do(ctx)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if searchResult.TotalHits() > 0 {
-			// Iterate through results
-			for _, hit := range searchResult.Hits.Hits {
-				var node relaxting.NodesUpgradation
-				if hit.Source != nil {
-					err := json.Unmarshal(hit.Source, &node)
-					if err != nil {
-						logrus.Errorf("Received error while unmarshling %+v", err)
-					}
-
-				}
-				nodesMap[node.NodeUUID] = node
-			}
-		}
-	}
-	return nodesMap, nil
-}
-
 //SetNodesDayLatestFalse Sets the flag for the currently present data in os database
-func (backend *ESClient) SetNodesDayLatestFalse(ctx context.Context) error {
-	bulkRequest := backend.client.Bulk()
+func (backend *ESClient) SetNodesDayLatestFalseForUpgrade(ctx context.Context, nodeUuid string, endTime time.Time) error {
 	script := elastic.NewScript("ctx._source.day_latest = false")
 	time90DaysAgo := time.Now().Add(-24 * time.Hour * 90)
-	nodesMap, err := backend.GetNodesDayLatestTrue(ctx, time90DaysAgo)
-	if err != nil {
-		return nil
-	}
-	for _, node := range nodesMap {
-		nodeEndTime, err := time.Parse(time.RFC3339, node.EndTime)
-		if err != nil {
-			logrus.Error("cannot parse: ", err)
-			continue
-		}
 
-		indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90DaysAgo.Format(time.RFC3339), nodeEndTime.Add(-24*time.Hour).Format(time.RFC3339))
-		if err != nil {
-			logrus.Error("cannot get indices:", err)
-			continue
-		}
+	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeUuid)
+	boolQuery := elastic.NewBoolQuery().Must(termQueryThisNode)
 
-		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().
-			Index(indices).
-			Id(node.NodeUUID).
-			Script(script))
-	}
-	approxBytes := bulkRequest.EstimatedSizeInBytes()
-	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
+	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90DaysAgo.Format(time.RFC3339), endTime.Add(-24*time.Hour).Format(time.RFC3339))
 	if err != nil {
-		logrus.Errorf("Unable to send the request in bulk: %v", err)
-		return err
+		logrus.Error("cannot get indices:", err)
+
 	}
-	if bulkResponse == nil {
-		logrus.Errorf("Unable to fetch the response of bulk request: %v", err)
-		return err
+
+	_, err = elastic.NewUpdateByQueryService(backend.client).
+		Index(indices).
+		Query(boolQuery).
+		Script(script).
+		Refresh("false").
+		Do(ctx)
+
+	if err != nil {
+		logrus.Errorf("Unable to update node uuid %s with error %v", nodeUuid, err)
+
 	}
-	logrus.Debugf("Bulk insert day latest falgs, ~size %dB, took %dms", approxBytes, bulkResponse.Took)
+
+	logrus.Infof("Successfully update the day latest flag in upgrade")
 	return nil
 }
 
@@ -1278,12 +1207,14 @@ func getNewControlStatus(controlStatus string, nodeStatus string) string {
 	return newStatus
 }
 
-//GetReportsDailyLatestTrue Get the Nodes from past 90 days from current date for upgrading
-func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]string, error) {
+//GetReportsDailyLatestTrue Get the Nodes where daily latest flag is true from past 90 days from current date for upgrading
+func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90daysAgo time.Time) (map[string]string, map[string]bool, error) {
 	reportsMap := make(map[string]string)
+	nodesMap := make(map[string]relaxting.ReportId)
+	latestReportMap := make(map[string]bool)
 	indices, err := relaxting.IndexDates(relaxting.CompDailyRepIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Format(time.RFC3339))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	indicesSlice := strings.Split(indices, ",")
@@ -1293,45 +1224,35 @@ func (backend *ESClient) GetReportsDailyLatestTrue(ctx context.Context, time90da
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"report_uuid",
+		"node_uuid",
 		"end_time",
 	)
 
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(boolQuery).
-		Size(10000).Sort("end_time", false)
+	size := 1000
+	for i := len(indicesSlice) - 1; i >= 0; i-- {
+		index := indicesSlice[i]
+		from := 0
+		svc := backend.client.Scroll(index).Query(boolQuery).Size(size).FetchSourceContext(fsc).Sort("end_time", false)
 
-	for _, index := range indicesSlice {
-		searchResult, err := backend.client.Search().
-			SearchSource(searchSource).
-			Index(index).
-			FilterPath(
-				"took",
-				"hits.total",
-				"hits.hits._id",
-				"hits.hits._source").
-			Do(ctx)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if searchResult.TotalHits() > 0 {
-			// Iterate through results
-			for _, hit := range searchResult.Hits.Hits {
-				var report relaxting.ReportId
-				if hit.Source != nil {
-					err := json.Unmarshal(hit.Source, &report)
-					if err != nil {
-						logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
-					}
-
-				}
-				reportsMap[report.ReportUuid] = report.EndTime
+		logrus.Debugf("Reading the data for index : %s", index)
+		for {
+			searchResult, err := svc.Do(context.TODO())
+			if err != nil {
+				logrus.Errorf("Unable to fetch result for upgrade with error %v", err)
 			}
+
+			getReportsDailyLatestTrueResult(searchResult, reportsMap, nodesMap, latestReportMap)
+
+			if len(searchResult.Hits.Hits) == 0 || len(searchResult.Hits.Hits) < size {
+				break
+			}
+
+			from = from + size
 		}
 	}
-	return reportsMap, nil
+
+	logrus.Debugf("Got All the reports for all the indexes with report map length as %d", len(reportsMap))
+	return reportsMap, latestReportMap, nil
 }
 
 func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, nodeUuid string, index string, firstRun chan string, errorCh chan error) {
@@ -1367,7 +1288,6 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 	}
 
 	if searchResult.TotalHits() > 0 {
-		logrus.Printf("Found a total of %d ESInSpecReport\n", searchResult.TotalHits())
 		// Iterate through results
 		for _, hit := range searchResult.Hits.Hits {
 			// hit.Index contains the name of the index
@@ -1375,7 +1295,7 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 				// Deserialize hit.Source into a ESInSpecReport (could also be just a map[string]interface{}).
 				err := json.Unmarshal(hit.Source, &item)
 				if err != nil {
-					logrus.Errorf("Received error while unmarshling %+v", err)
+					logrus.Errorf("Received error while unmarshling from getting first run info %+v", err)
 					errorCh <- err
 					return
 				}
@@ -1385,4 +1305,25 @@ func (backend *ESClient) getDocFromNodeRunInfoFromNodeId(ctx context.Context, no
 		}
 	}
 	firstRun <- item.FirstRun
+}
+
+func getReportsDailyLatestTrueResult(searchResult *elastic.SearchResult, reportsMap map[string]string, nodesMap map[string]relaxting.ReportId, latestReports map[string]bool) {
+	if searchResult.TotalHits() > 0 {
+		// Iterate through results
+		for _, hit := range searchResult.Hits.Hits {
+			var report relaxting.ReportId
+			if hit.Source != nil {
+				err := json.Unmarshal(hit.Source, &report)
+				if err != nil {
+					logrus.Errorf("Received error while unmarshling for reports in upgrade%+v", err)
+				}
+
+			}
+			reportsMap[report.ReportUuid] = report.EndTime
+			if _, found := nodesMap[report.NodeUuid]; !found {
+				nodesMap[report.NodeUuid] = report
+				latestReports[report.ReportUuid] = true
+			}
+		}
+	}
 }
