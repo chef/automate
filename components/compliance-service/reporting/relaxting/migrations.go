@@ -248,7 +248,6 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 
 	// Migrates A2 version 3 for comp-run-info indices to the current version
 	a2V7Indices := A2V7ElasticSearchIndices{backend: &backend}
-	logrus.Infof("A2v7 indexes %v", a2V7Indices)
 	err = backend.migrate(a2V7Indices, statusSrv, statusserver.MigrationLabelCompRun)
 	if err != nil {
 		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelCompRun))
@@ -262,7 +261,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 
 func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserver.Server, migrationLabel string) error {
 	myName := fmt.Sprintf("migrate (%s)", migrationLabel)
-	logrus.Infof(myName)
+	logrus.Debugf(myName)
 	defer util.TimeTrack(time.Now(), fmt.Sprintf(" %s reindex indices", myName))
 
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Post feeds migration cleanup...")
@@ -286,15 +285,12 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 		return err
 	}
 
-	logrus.Infof("Ran post profles migration script %s", migrationLabel)
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the comp run info index...")
 	err = migratable.migrateCompRunInfo()
 	if err != nil {
 		logrus.Error(err)
 		return err
 	}
-
-	logrus.Infof("Ran  comp run info migration  script %s", migrationLabel)
 
 	//migrate the compliance time-series indices
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Calculating TimeSeries migration range...")
