@@ -70,46 +70,45 @@ This section explains how to take backup for External Elastic Search (ES) and Po
 ### Backup Procedure
 
 1. Navigate to your deploy workspace. For example, `cd /hab/a2_deploy_workspace`.
-2. Create directory `configs` by running the command `mkdir configs`.
-3. Create *.toml* file by running the command, `vi /configs/automate.toml`.
-4. Copy the following Ruby code into the above-created file by altering the value of *bucket* with `bucket-name` and *name* with `bucket-name`.
+1. Create directory `configs` by running the command `mkdir configs`.
+1. Create *.toml* file by running the command, `vi /configs/automate.toml`.
+1. Copy the following Ruby code into the above-created file by altering the value of *bucket* with `bucket-name` and *name* with `bucket-name`.
 
-``` ruby
-[global.v1.external.elasticsearch.backup]
+    ``` ruby
+    [global.v1.external.elasticsearch.backup]
 
-    enable = true
-    location = "s3"
+        enable = true
+        location = "s3"
 
-[global.v1.external.elasticsearch.backup.s3]
+    [global.v1.external.elasticsearch.backup.s3]
 
-  # bucket (required): The name of the bucket
+    # bucket (required): The name of the bucket
 
-  bucket = "bucket-name"
+    bucket = "bucket-name"
 
-  # base_path (optional):  The path within the bucket where backups should be stored
+    # base_path (optional):  The path within the bucket where backups should be stored
 
-  # If base_path is not set, backups will be stored at the root of the bucket.
+    # If base_path is not set, backups will be stored at the root of the bucket.
 
-  base_path = "elasticsearch"
+        base_path = "elasticsearch"
 
-  # name of an s3 client configuration you create in your elasticsearch.yml
+    # name of an s3 client configuration you create in your elasticsearch.yml
 
-  # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
+    # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
 
-  # for complete documentation on how to configure client settings on your
+    # for complete documentation on how to configure client settings on your
 
-  # Elasticsearch nodes
+    # Elasticsearch nodes
 
-  client = "default"
+        client = "default"
 
-[global.v1.external.elasticsearch.backup.s3.settings]
+    [global.v1.external.elasticsearch.backup.s3.settings]
 
     ## The meaning of these settings is documented in the S3 Repository Plugin
 
     ## documentation. See the following links:
 
     ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
-
 
     ## Backup repo settings
 
@@ -141,28 +140,28 @@ This section explains how to take backup for External Elastic Search (ES) and Po
 
     # protocol = "https"
 
-[global.v1.backups]
+    [global.v1.backups]
 
-    location = "s3"
+        location = "s3"
 
-[global.v1.backups.s3.bucket]
+    [global.v1.backups.s3.bucket]
 
     # name (required): The name of the bucket
 
-    name = "bucket-name"
+        name = "bucket-name"
 
     # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
     # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
     
-    endpoint = "https://s3.amazonaws.com"
+        endpoint = "https://s3.amazonaws.com"
 
     # base_path (optional):  The path within the bucket where backups should be stored
 
     # If base_path is not set, backups will be stored at the root of the bucket.
 
-    base_path = "automate"
+        base_path = "automate"
 
-[global.v1.backups.s3.credentials]
+    [global.v1.backups.s3.credentials]
 
     # Optionally, AWS credentials may be provided. If these are not provided, the IAM instance
 
@@ -172,10 +171,10 @@ This section explains how to take backup for External Elastic Search (ES) and Po
 
     # Use the credentials obtained from here [AWS-Credential](https://github.com/chef/automate-as-saas/wiki/Bastion-Setup#aws-credentials)
 
-    access_key = "AKIARUQHMSKHGYTUJ&UI"
+        access_key = "AKIARUQHMSKHGYTUJ&UI"
 
-    secret_key = "s3kQ4Idyf9WjAgRXyv9tLYCQgYTRESDFRFV"
-```
+        secret_key = "s3kQ4Idyf9WjAgRXyv9tLYCQgYTRESDFRFV"
+    ```
 
 1. Save `.toml file` and exit *VI editor*.
 
@@ -237,55 +236,55 @@ sudo chown hab:hab /mnt/automate_backups/elasticsearch/
 
 1. SSH to a single OpenSearch server and configure OpenSearch `path.repo` setting by executing the following commands:
 
-```bash
-source /hab/sup/default/SystemdEnvironmentFile.sh
-automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
-```
+    ```bash
+    source /hab/sup/default/SystemdEnvironmentFile.sh
+    automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
+    ```
 
 1. Edit `es_config.toml` to add the following settings at the end of the file:
 
-```ruby
-[path]
-   # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
-   repo = "/mnt/automate_backups/elasticsearch"
-```
+    ```ruby
+    [path]
+    # Replace /mnt/automate_backups with the backup_mount config found on the provisioning host in /hab/a2_deploy_workspace/a2ha.rb
+    repo = "/mnt/automate_backups/elasticsearch"
+    ```
 
-{{< note >}} This file may be empty if credentials are never rotated. {{< /note >}}
+    {{< note >}} This file may be empty if credentials are never rotated. {{< /note >}}
 
 1. Apply the updated `es_config.toml` configuration to ElasticSearch by executing the following commands:
 
-```bash
-hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
-hab svc status (check opensearch service is up or not)
-curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u admin:admin
-   # Watch for a message about Elasticsearch going from RED to GREEN
-`journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
-```
+    ```bash
+    hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
+    hab svc status (check opensearch service is up or not)
+    curl -k -X GET "https://localhost:9200/_cat/indices/*?v=true&s=index&pretty" -u admin:admin
+    # Watch for a message about Elasticsearch going from RED to GREEN
+    `journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
+    ```
 
-You can perform the above application only once, which triggers a restart of the ElasticSearch services on each server.
+    You can perform the above application only once, which triggers a restart of the ElasticSearch services on each server.
 
 1. Configure Chef Automate HA to handle external ElasticSearch backups by adding the following configuration to `/hab/a2_deploy_workspace/config/automate.toml` on the provisioning host or from the bastion host:
 
-```ruby
-[global.v1.external.elasticsearch.backup]
-   enable = true
-   location = "fs"
+    ```ruby
+    [global.v1.external.elasticsearch.backup]
+        enable = true
+        location = "fs"
 
-   [global.v1.external.elasticsearch.backup.fs]
-   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
-   # a parent directory of the setting you configure here:
-   path = "/mnt/automate_backups/elasticsearch"
+    [global.v1.external.elasticsearch.backup.fs]
+    # The `path.repo` setting you've configured on your Elasticsearch nodes must be
+    # a parent directory of the setting you configure here:
+        path = "/mnt/automate_backups/elasticsearch"
 
-   [global.v1.backups.filesystem]
-   path = "/mnt/automate_backups/backups"
-```
+    [global.v1.backups.filesystem]
+        path = "/mnt/automate_backups/backups"
+    ```
 
 1. Enter the `./chef-automate config patch automate.toml` command to apply the patch configuration to the Chef Automate HA servers. This command also triggers the deployment.
 
 1. Enter the `chef-automate backup create` command from a Chef Automate front-end node to create a backup.
 
-- External File-System (EFS) OR
-- Amazon's S3 Bucket
+    - External File-System (EFS) OR
+    - Amazon's S3 Bucket
 
 ### EFS System
 

@@ -300,75 +300,67 @@ This section provides the pre-backup configuration required to backup the data o
 
 1. Log in to all the opensearch nodes and follow the steps on all the opensearch nodes.
 
-<<<<<<< HEAD
-- Export `ES_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
-- `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
-- `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
-- `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
-- `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
-=======
--   Export `OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
--   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
--   `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
--   `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
--   `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
->>>>>>> main
+    - Export `ES_PATH_CONF="/hab/svc/automate-ha-opensearch/config"`
+    - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.access_key` (When asked, Enter your key)
+    - `hab pkg exec chef/automate-ha-opensearch opensearch-keystore add s3.client.default.secret_key` (When asked, Enter your key/secret)
+    - `chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore` (Setting hab:hab permission)
+    - `curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin` (Command to load the above setting)
 
-The final output after running the command 1.5 on the third node is given below:
+    The final output after running the command 1.5 on the third node is given below:
 
-```json
-{
-	"_nodes": {
-		"total": 3,
-		"successful": 3,
-		"failed": 0
-	},
-	"cluster_name": "chef-insights",
-	"nodes": {
-		"lenRTrZ1QS2uv_vJIwL-kQ": {
-			"name": "lenRTrZ"
-		},
-		"Us5iBo4_RoaeojySjWpr9A": {
-			"name": "Us5iBo4"
-		},
-		"qtz7KseqSlGm2lEm0BiUEg": {
-			"name": "qtz7Kse"
-		}
-	}
-}
-```
+    ```json
+    {
+	      "_nodes": {
+		        "total": 3,
+		        "successful": 3,
+		        "failed": 0
+	      },
+	      "cluster_name": "chef-insights",
+	      "nodes": {
+		        "lenRTrZ1QS2uv_vJIwL-kQ": {
+			          "name": "lenRTrZ"
+		        },
+		        "Us5iBo4_RoaeojySjWpr9A": {
+			          "name": "Us5iBo4"
+		        },
+		        "qtz7KseqSlGm2lEm0BiUEg": {
+			          "name": "qtz7Kse"
+		        }
+	      }
+    }
+    ```
 
 2. To override the existing default endpoint:
 
-- Login to one of the open search instances and run the following command (You need root access to run the command):
+    - Login to one of the open search instances and run the following command (You need root access to run the command):
 
-```sh
-source /hab/sup/default/SystemdEnvironmentFile.sh
-automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
-```
+    ```sh
+    source /hab/sup/default/SystemdEnvironmentFile.sh
+    automate-backend-ctl applied --svc=automate-ha-opensearch | tail -n +2 > es_config.toml
+    ```
 
-- Edit the created `es_config.toml` file and add the following settings at the end of the file. (_The file will be empty if the credentials have not been rotated_)
+    - Edit the created `es_config.toml` file and add the following settings at the end of the file. (_The file will be empty if the credentials have not been rotated_)
 
-```sh
-[s3]
-  [s3.client.default]
-    protocol = "https"
-    read_timeout = "60s"
-    max_retries = "3"
-    use_throttle_retries = true
-    endpoint = "s3.amazonaws.com"
-```
+    ```sh
+    [s3]
+    [s3.client.default]
+        protocol = "https"
+        read_timeout = "60s"
+        max_retries = "3"
+        use_throttle_retries = true
+        endpoint = "s3.amazonaws.com"
+    ```
 
-- Run the following command to apply the updated `es_config.toml` changes. Run this command only once. (_This will trigger a restart of the OpenSearch services on each server_)
+    - Run the following command to apply the updated `es_config.toml` changes. Run this command only once. (_This will trigger a restart of the OpenSearch services on each server_)
 
-```sh
-hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
-```
+    ```sh
+    hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
+    ```
 
-- Once done with the above steps, run the following command:
+    - Once done with the above steps, run the following command:
 
-```sh
-journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
-```
+    ```sh
+    journalctl -u hab-sup -f | grep 'automate-ha-opensearch'
+    ```
 
-The screen will display a message of OpenSearch going from **RED/YELLOW** to **GREEN**.
+    The screen will display a message of OpenSearch going from **RED/YELLOW** to **GREEN**.
