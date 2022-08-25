@@ -481,9 +481,9 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 		h.Writer.Errorln("failed to get backup s3 url configuration: " + err.Error())
 		return nil
 	}
-	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
+	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint().GetValue()
 	re := regexp.MustCompile(s3regex)
-	if re.MatchString(endpoint.String()) {
+	if re.MatchString(endpoint) {
 		file, err := ioutil.TempFile("", filename) // nosemgrep
 		if err != nil {
 			h.Writer.Errorln("could not create temp file" + err.Error())
@@ -499,7 +499,7 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 			h.Writer.Errorln("error in running automate patch command")
 			return nil
 		}
-		h.Writer.Println("Your S3 url in backup config is changed to https://s3.amazonaws.com. This is because automate version 4 now only supports this format due to AWS SDK upgrade.")
+		h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
 	}
 
 	return nil
