@@ -530,8 +530,8 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 
 func replaceurl() Checklist {
 	return Checklist{
-		Name:        "post_checklist",
-		Description: "display post checklist and ask for final confirmation",
+		Name:        "Change s3 url",
+		Description: "Changes backup s3 url during upgrade.",
 		TestFunc:    replaceAndPatchS3backupUrl,
 	}
 }
