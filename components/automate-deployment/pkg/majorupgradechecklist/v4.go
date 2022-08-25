@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -538,16 +539,27 @@ func replaceurl() Checklist {
 
 func checkIndexVersion() error {
 	var basePath = "http://localhost:10144/"
+	cfg := dc.DefaultAutomateConfig()
+	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+	defaultPort := cfg.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
 
-	habpath := getHabRootPath(habrootcmd)
-
-	input, err := ioutil.ReadFile(habpath + "svc/automate-es-gateway/config/URL") // nosemgrep
-	if err != nil {
-		fmt.Printf("Failed to read URL file\n")
+	if defaultHost != "" || defaultPort > 0 {
+		basePath = fmt.Sprintf(`http://%s:%d/`, defaultHost, defaultPort)
 	}
-	url := strings.TrimSuffix(string(input), "\n")
-	if url != "" {
-		basePath = "http://" + url + "/"
+
+	res, err := client.GetAutomateConfig(10)
+	if err != nil {
+		return err
+	}
+
+	host := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+	port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
+
+	if host != "" || port > 0 {
+		url := fmt.Sprintf(`%s:%d`, host, port)
+		if url != "" {
+			basePath = "http://" + url + "/"
+		}
 	}
 
 	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
