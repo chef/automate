@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -547,7 +548,7 @@ func checkIndexVersion(timeout int64) error {
 	defaultPort := cfg.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
 
 	if defaultHost != "" || defaultPort > 0 {
-		basePath = fmt.Sprintf(`http://%s:%d/`, defaultHost, defaultPort)
+		basePath = fmt.Sprintf(`http://%s/`, net.JoinHostPort(defaultHost, string(defaultPort)))
 	}
 
 	res, err := client.GetAutomateConfig(timeout)
@@ -559,9 +560,9 @@ func checkIndexVersion(timeout int64) error {
 	port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
 
 	if host != "" || port > 0 {
-		url := fmt.Sprintf(`%s:%d`, host, port)
+		url := net.JoinHostPort(host, string(port))
 		if url != "" {
-			basePath = "http://" + url + "/"
+			basePath = fmt.Sprintf(`http://%s/`, url)
 		}
 	}
 
