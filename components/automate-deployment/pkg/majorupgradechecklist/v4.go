@@ -507,7 +507,7 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint()
 	re := regexp.MustCompile(s3regex)
 	if re.MatchString(endpoint.String()) {
-		file, err := ioutil.TempFile("", filename)
+		file, err := ioutil.TempFile("", filename) // nosemgrep
 		if err != nil {
 			h.Writer.Errorln("could not create temp file" + err.Error())
 			return nil
