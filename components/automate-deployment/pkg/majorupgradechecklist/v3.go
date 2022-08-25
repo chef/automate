@@ -28,10 +28,10 @@ const (
 
 	backupError = "Please take a backup and restart the upgrade process."
 
-	diskSpaceError = `Please ensure to have 60% free disk space`
+	diskSpaceError = `Please ensure to have %.2f GB free disk space`
 
 	diskSpaceCheckError = `You do not have minimum space available to continue with this upgrade. 
-Please ensure you have 60% free disk space.
+Please ensure you have %.2f GB free disk space.
 To skip this free disk space check please use --skip-disk-space-check flag`
 
 	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
@@ -65,7 +65,7 @@ Now, upgrade will start, Please confirm to continue...`
 Post Upgrade Steps:
 ===================
 `
-	minDirSizeInGB = 5
+	minDirSizeInGB float64 = 5
 )
 
 var postChecklistEmbedded = []PostCheckListItem{
@@ -258,7 +258,6 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 		TestFunc: func(h ChecklistHelper) error {
 			os_path := getHabRootPath(habrootcmd)
 			habDirSize, err := cm.CalDirSizeInGB(os_path)
-			fmt.Printf("------habDirSize----: %v", habDirSize)
 
 			if err != nil {
 				h.Writer.Error(err.Error())
@@ -274,16 +273,14 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 			}
 
 			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
-			fmt.Printf("------dbDataSize-----: %v", dbDataSize)
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.UnknownError, err.Error())
 			}
 
 			minReqDiskSpace := math.Max(minDirSizeInGB, math.Max(habDirSize, dbDataSize)) * 11 / 10
-			fmt.Printf("-----min req disk space-----: %v", minReqDiskSpace)
 
-			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure you have more than %v GB of free disk space", minReqDiskSpace))
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure you have more than %.2f GB of free disk space", minReqDiskSpace))
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
@@ -296,19 +293,16 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 				h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
 				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
 				SpaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
-				fmt.Printf("---space available--- %t", SpaceAvailable)
 				if err != nil {
 					h.Writer.Error("Failed to check available space \n")
 					return status.Errorf(status.UnknownError, err.Error())
 				}
 				if !SpaceAvailable {
-					h.Writer.Error(diskSpaceCheckError + "\n")
-					return status.New(status.InvalidCommandArgsError, diskSpaceCheckError)
+					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceCheckError, minReqDiskSpace))
 				}
 			}
 			if !resp {
-				h.Writer.Error(diskSpaceError)
-				return status.New(status.InvalidCommandArgsError, diskSpaceError)
+				return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
 			}
 			return nil
 		},
