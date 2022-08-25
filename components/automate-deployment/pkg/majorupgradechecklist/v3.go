@@ -294,8 +294,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
 				SpaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
 				if err != nil {
-					h.Writer.Error("Failed to check available space \n")
-					return status.Errorf(status.UnknownError, err.Error())
+					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceCheckError, minReqDiskSpace))
 				}
 				if !SpaceAvailable {
 					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceCheckError, minReqDiskSpace))
