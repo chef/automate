@@ -360,7 +360,14 @@ func getSummaryAssetAggResult(aggRoot *elastic.SearchResult) *AssetSummary {
 	return summary
 }
 func (backend ES2Backend) GetAssetSummary(ctx context.Context, filters map[string][]string) (*reportingapi.AssetSummary, error) {
+	endTime := time.Now().Format(time.RFC3339)
+	filters["end_time"] = []string{endTime}
 
+	err := ValidateTimeRangeForFilters(firstOrEmpty(filters["start_time"]), endTime)
+	if err != nil {
+		logrus.Errorf("The starttime and endtime validation error: %v", err)
+		return nil, err
+	}
 	// get the total number of assets without any date range filters i.e all the assets present
 	boolquery := backend.getFiltersQueryForAssetFilters(filters)
 	reportedBoolQuery := boolquery
@@ -448,6 +455,15 @@ func (backend ES2Backend) getUnCollectedAssets(ctx context.Context, from int32, 
 }
 
 func (backend ES2Backend) GetAsset(ctx context.Context, filters map[string][]string, size int32, from int32, assetsType string) ([]*reportingapi.Assets, error) {
+	endTime := time.Now().Format(time.RFC3339)
+	filters["end_time"] = []string{endTime}
+
+	err := ValidateTimeRangeForFilters(firstOrEmpty(filters["start_time"]), endTime)
+	if err != nil {
+		logrus.Errorf("The starttime and endtime validation error: %v", err)
+		return nil, err
+	}
+
 	config, err := backend.GetConfigs(ctx)
 	if err != nil {
 		logrus.Errorf("cannot get the configuration: %+v", err)
