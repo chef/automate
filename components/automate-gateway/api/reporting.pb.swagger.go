@@ -16,8 +16,8 @@ func init() {
   "paths": {
     "/api/v0/compliance/reporting/assets/config": {
       "put": {
-        "summary": "SetAssetConfig sets the compliance config with the parameters of no of days\nAnd API returns the policy name and no of the days which will set in the compliance data base",
-        "description": "Example\n{\n\"value\":60\n}\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Set Unreachable Assets Config",
+        "description": "SetAssetConfig sets the compliance config with the parameters of no of days\nAnd API returns the policy name and no of the days which will set in the compliance data base\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_SetAssetConfig",
         "responses": {
           "200": {
@@ -44,13 +44,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Comp_Assets"
         ]
       }
     },
     "/api/v0/compliance/reporting/assets/config/search": {
       "get": {
-        "summary": "GetAssetConfig gets the config details from the compliance data base \nand API return the policy name and no of days\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:get\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Get Assets Config",
+        "description": "GetAssetConfig gets the config details from the compliance data base \nand API return the policy name and no of days\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_GetAssetConfig",
         "responses": {
           "200": {
@@ -67,12 +68,14 @@ func init() {
           }
         },
         "tags": [
-          "ReportingService"
+          "Comp_Assets"
         ]
       }
     },
     "/api/v0/compliance/reporting/assets/count": {
       "post": {
+        "summary": "Assets Count",
+        "description": "Count the compliance assets based on different filter options.\nThe API returns the response based on reported and unreported assets\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_AssetCount",
         "responses": {
           "200": {
@@ -99,12 +102,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Comp_Assets"
         ]
       }
     },
     "/api/v0/compliance/reporting/assets/search": {
       "post": {
+        "summary": "List Assets",
+        "description": "Lists the compliance assets based on different filter options.\nThe API works with filtering assets based on collected, uncollected, unreported and unreachable assets\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_ListAsset",
         "responses": {
           "200": {
@@ -131,14 +136,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Comp_Assets"
         ]
       }
     },
     "/api/v0/compliance/reporting/controls": {
       "post": {
         "summary": "List Controls",
-        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\n\nThe API supports date range filters when ` + "`" + `end_time` + "`" + ` is the current time\nand ` + "`" + `start_time` + "`" + ` is any time in last 90 days. In case, the ` + "`" + `end_time` + "`" + ` is any\ndate other than the current date, the API would return data only for the ` + "`" + `end_time` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n],\n\"page_number\":1, \"size\": 3,\n}\n` + "`" + `` + "`" + `` + "`" + `\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_ListControlItems",
         "responses": {
           "200": {
@@ -171,8 +176,8 @@ func init() {
     },
     "/api/v0/compliance/reporting/controls/search": {
       "post": {
-        "summary": "List Controls",
-        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\nGets the summary of each control.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "List Controls Search",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering,pagination but not sorting.\nLimited to 100 results by default.\nGets the summary of each control.\n\nThe API supports date range filters when ` + "`" + `end_time` + "`" + ` is the current time\nand ` + "`" + `start_time` + "`" + ` is any time in last 90 days. In case, the ` + "`" + `end_time` + "`" + ` is any\ndate other than the current date, the API would return data only for the ` + "`" + `end_time` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n],\n\"page_number\":1, \"size\": 3,\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_ListControlItemsRange",
         "responses": {
           "200": {
@@ -381,7 +386,8 @@ func init() {
     },
     "/api/v0/compliance/reporting/reportcontrols/id/{id}": {
       "post": {
-        "summary": "List Control info\nLists controls from the last run, with optional filtering.\nSupports filtering and pagination. Maximum 100 search can be \nmade when specifying the pagination from and size. Sum of from+size\nshould be less that 100. By default 10 results will be returned.\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:ControlElements:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "List Control Info",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering and pagination. Maximum 100 search can be \nmade when specifying the pagination from and size. Sum of from+size\nshould be less that 100. By default 10 results will be returned.\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:ControlElements:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReportingService_ListControlInfo",
         "responses": {
           "200": {

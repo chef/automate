@@ -83,20 +83,6 @@ service ReportingService {
 	Supports filtering,pagination but not sorting.
 	Limited to 100 results by default.
 
-	The API supports date range filters when `end_time` is the current time
-	and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	date other than the current date, the API would return data only for the `end_time`.
-
-	Example:
-	```
-	{"filters":
-		[
-			{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-			{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-		],
-		"page_number":1, "size": 3,
-	}
-	```
 	Authorization Action:
 	```
 	compliance:controlItems:list
@@ -114,7 +100,8 @@ service ReportingService {
 	};
 
 	/*
-	List Control info
+	List Control Info
+
 	Lists controls from the last run, with optional filtering.
 	Supports filtering and pagination. Maximum 100 search can be 
 	made when specifying the pagination from and size. Sum of from+size
@@ -392,6 +379,17 @@ service ReportingService {
 		};
 	};
 
+	/*
+	Assets Count
+
+	Count the compliance assets based on different filter options.
+	The API returns the response based on reported and unreported assets
+
+	Authorization Action:
+	```
+	compliance:reports:list
+	```
+	*/
 	rpc AssetCount(ListFilters) returns (AssetSummary) {
 		option (google.api.http) = {
 			post: "/api/v0/compliance/reporting/assets/count"
@@ -401,8 +399,22 @@ service ReportingService {
 			resource: "compliance:reporting:reports"
 			action: "compliance:reports:list"
 		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
 	}
-	
+
+	/*
+	List Assets
+
+	Lists the compliance assets based on different filter options.
+	The API works with filtering assets based on collected, uncollected, unreported and unreachable assets
+
+	Authorization Action:
+	```
+	compliance:reports:list
+	```
+	*/
 	rpc ListAsset(AssetListRequest) returns (AssetListResponse) {
 		option (google.api.http) = {
 			post: "/api/v0/compliance/reporting/assets/search"
@@ -412,16 +424,16 @@ service ReportingService {
 			resource: "compliance:reporting:reports"
 			action: "compliance:reports:list"
 		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
 	}
 
 	/*
+	Set Unreachable Assets Config
+
 	SetAssetConfig sets the compliance config with the parameters of no of days
 	And API returns the policy name and no of the days which will set in the compliance data base
-
-	Example
-	{
-    	"value":60
-	}
 
 	Authorization Action:
 	```
@@ -437,9 +449,14 @@ service ReportingService {
  			resource: "compliance:reporting:config"
  			action: "compliance:reports:update"
  		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
  	}
 
 	/*
+	Get Assets Config
+
 	GetAssetConfig gets the config details from the compliance data base 
 	and API return the policy name and no of days
 	Authorization Action:
@@ -455,15 +472,33 @@ service ReportingService {
  			resource: "compliance:reporting:config"
  			action: "compliance:reports:get"
  		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "Comp_Assets";
+		};
  	}
 
 	/*
-	List Controls
+	List Controls Search
 
 	Lists controls from the last run, with optional filtering.
 	Supports filtering,pagination but not sorting.
 	Limited to 100 results by default.
 	Gets the summary of each control.
+
+  The API supports date range filters when `end_time` is the current time
+	and `start_time` is any time in last 90 days. In case, the `end_time` is any
+	date other than the current date, the API would return data only for the `end_time`.
+
+	Example:
+	```
+	{"filters":
+		[
+			{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+			{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+		],
+		"page_number":1, "size": 3,
+	}
+	```
 
 	Authorization Action:
 	```
