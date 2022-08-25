@@ -266,6 +266,16 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 			logrus.Debug(fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch), err.Error())
 		}
 		logrus.Debug(fmt.Sprintf("Config written %s to \n", AutomateOpensearchConfigPatch))
+		defer func() {
+			err := os.Remove(AutomateOpensearchConfigPatch)
+			if err != nil {
+				logrus.Debug(fmt.Sprintf("error in removing file %s", AutomateOpensearchConfigPatch), err.Error())
+			}
+			err = os.Remove(V3ESSettingFile)
+			if err != nil {
+				logrus.Debug(fmt.Sprintf("error in removing file %s", V3ESSettingFile), err.Error())
+			}
+		}()
 		cmd := exec.Command("chef-automate", "config", "patch", AutomateOpensearchConfigPatch)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = io.MultiWriter(os.Stdout)
