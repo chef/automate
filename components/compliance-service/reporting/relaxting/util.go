@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -26,6 +27,7 @@ type ES2Backend struct {
 	Enterprise        string
 	ChefDeliveryUser  string
 	ChefDeliveryToken string
+	PGdb              *pgdb.DB
 }
 
 // ReportingTransport structure for Automate login
