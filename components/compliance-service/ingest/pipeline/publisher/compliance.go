@@ -3,7 +3,6 @@ package publisher
 import (
 	"context"
 	"fmt"
-	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/lib/cereal"
 	"sync"
 	"time"
@@ -110,17 +109,17 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient, cerea
 			out <- nil
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
-		errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
+		/*errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
 			fmt.Sprintf("%s-%s", "control-workflow", msg.Report.ReportUuid),
 			processor.ControlWorkflowParameters{
 				ReportUuid: msg.Report.ReportUuid,
-				Retries:    2,
+				Retries:    0,
 				EndTime:    msg.Shared.EndTime,
 			})
 
 		if errWorkflow != nil {
 			fmt.Errorf("error in enqueuing the  workflow for request id %s: %w", msg.Report.ReportUuid, err)
-		}
+		}*/
 		close(out)
 	}()
 	return out

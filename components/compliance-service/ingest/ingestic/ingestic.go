@@ -322,15 +322,15 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
 	var runInfo relaxting.ESComplianceRunInfo
-	var firstRun string
+	//var firstRun string
 	var err error
 	mapping := mappings.ComplianceRunInfo
-	runInfoCh := make(chan relaxting.ESComplianceRunInfo)
-	cErr := make(chan error)
-	firstRunInfoCh := make(chan string)
+	//runInfoCh := make(chan relaxting.ESComplianceRunInfo)
+	//cErr := make(chan error)
+	//firstRunInfoCh := make(chan string)
 
-	go MapReportToRunInfo(report, runDateTime, runInfoCh)
-	go backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index, firstRunInfoCh, cErr)
+	runInfo = MapReportToRunInfo(report, runDateTime)
+	/*go backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index, firstRunInfoCh, cErr)
 
 	for i := 0; i < 2; i++ {
 		select {
@@ -351,13 +351,13 @@ func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *re
 		if err != nil {
 			logrus.Errorf("Unable to parse the first run info")
 		}
-	}
+	}*/
 
 	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
 	return err
 }
 
-func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time, runInfo chan relaxting.ESComplianceRunInfo) {
+func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time) relaxting.ESComplianceRunInfo {
 	rInfo := relaxting.ESComplianceRunInfo{}
 	rInfo.NodeID = report.NodeID
 	rInfo.ResourceId = ""
@@ -376,7 +376,7 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time,
 	rInfo.ChefTags = report.ChefTags
 	rInfo.Environment = report.Environment
 	rInfo.PolicyGroup = report.PolicyGroup
-	runInfo <- rInfo
+	return rInfo
 }
 
 func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.ProfileRunInfo {
