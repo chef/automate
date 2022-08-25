@@ -449,6 +449,11 @@ func (backend ES2Backend) getUnCollectedAssets(ctx context.Context, from int32, 
 }
 
 func (backend ES2Backend) GetAsset(ctx context.Context, filters map[string][]string, size int32, from int32, assetsType string) ([]*reportingapi.Assets, error) {
+	config, err := backend.GetConfigs(ctx)
+	if err != nil {
+		logrus.Errorf("cannot get the configuration: %+v", err)
+		return nil, err
+	}
 
 	boolquery := backend.getFiltersQueryForAssetFilters(filters)
 	assets := make([]*reportingapi.Assets, 0)
@@ -456,24 +461,40 @@ func (backend ES2Backend) GetAsset(ctx context.Context, filters map[string][]str
 		return backend.getCollectedAssets(ctx, from, size, filters, boolquery)
 	}
 	if assetsType == constant.UNREACHABLE {
-		return backend.getUnReachableAssets(ctx, from, size, boolquery, 10)
+		return backend.getUnReachableAssets(ctx, from, size, boolquery, config)
 	}
 	if assetsType == constant.UNCOLLECTED {
 		return backend.getUnCollectedAssets(ctx, from, size, filters, boolquery)
 	}
 	if assetsType == constant.UNREPORTED {
-		return backend.getUnReportedAssets(ctx, from, size, filters, boolquery, 10)
+		return backend.getUnReportedAssets(ctx, from, size, filters, boolquery, config)
 	}
 	return assets, errors.New("Please provide the valid asset type")
 }
 
 func (backend ES2Backend) GetUnreachable(ctx context.Context, filters map[string][]string) (int32, error) {
+	config, err := backend.GetConfigs(ctx)
+	if err != nil {
+		logrus.Errorf("cannot get the configuration: %+v", err)
+		return 0, err
+	}
+
 	boolquery := backend.getFiltersQueryForAssetFilters(filters)
 	unreachableQuery := boolquery
-	unreachableQuery = unreachableQuery.Must(getUnReachableAssetTimeRangeQuery(10))
+	unreachableQuery = unreachableQuery.Must(getUnReachableAssetTimeRangeQuery(config))
 	unreachableAsset, err := backend.getAssets(ctx, unreachableQuery, "unreachable_assets")
 	if err != nil {
 		return 0, err
 	}
 	return unreachableAsset, nil
+}
+
+func (backend ES2Backend) GetConfigs(ctx context.Context) (int, error) {
+	var value int
+	row := backend.PGdb.QueryRow("SELECT value FROM compliance_lifecycle WHERE policy_name='unreachable_assets';")
+	if err := row.Scan(&value); err != nil {
+		logrus.Errorf("error while scanning the value: %+v", err)
+		return 0, err
+	}
+	return value, nil
 }
