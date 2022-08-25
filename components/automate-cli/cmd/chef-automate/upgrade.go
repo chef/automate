@@ -521,7 +521,7 @@ func GetopenSearchConfig() {
 			return
 		}
 
-		writer.Println("This is your current OpenSearch Config")
+		writer.Println("This is your OpenSearch Config")
 		writer.Println(string(t))
 
 	}
