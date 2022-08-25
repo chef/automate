@@ -270,7 +270,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 			case "3":
 				dbDataPath = os_path + "svc/automate-postgresql/data/pgdata"
 			case "4":
-				dbDataPath = os_path + "svc/automate-elasticsearch/data"
+				dbDataPath = os_path + "svc/automate-elasticsearch"
 			}
 
 			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
