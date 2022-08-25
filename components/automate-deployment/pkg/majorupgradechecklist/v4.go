@@ -1,12 +1,9 @@
 package majorupgradechecklist
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"math"
 	"net"
 	"net/http"
 	"os"
@@ -14,7 +11,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"text/template"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -156,7 +152,7 @@ func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4Checklist
 	return &V4ChecklistManager{
 		writer:       writer,
 		version:      version,
-		isExternalES: IsExternalElasticSearch(writer),
+		isExternalES: IsExternalElasticSearch(),
 	}
 }
 
@@ -271,156 +267,6 @@ func enableSharding(h ChecklistHelper, isEmbedded bool) error {
 		return reEnableShardAllocation()
 	}
 	return nil
-}
-
-func PatchBestOpenSearchSettings(isEmbedded bool) error {
-	if isEmbedded {
-		bestSettings, err := GetBestSettings()
-		if err != nil {
-			return err
-		}
-		fmt.Println(bestSettings)
-		temp := template.Must(template.New("init").
-			Funcs(template.FuncMap{"StringsJoin": strings.Join}).
-			Parse(patchOpensearchSettingsTemplate))
-
-		var buf bytes.Buffer
-		err = temp.Execute(&buf, bestSettings)
-		if err != nil {
-			fmt.Printf("some error occurred while rendering template \n %s", err)
-		}
-		finalTemplate := buf.String()
-		err = ioutil.WriteFile(AutomateOpensearchConfigPatch, []byte(finalTemplate), 0600)
-		if err != nil {
-			fmt.Printf("Writing into %s file failed\n", AutomateOpensearchConfigPatch)
-		}
-		fmt.Printf("Config written to %s\n", AutomateOpensearchConfigPatch)
-		cmd := exec.Command("chef-automate", "config", "patch", AutomateOpensearchConfigPatch)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = io.MultiWriter(os.Stdout)
-		cmd.Stderr = io.MultiWriter(os.Stderr)
-		err = cmd.Run()
-		if err != nil {
-			fmt.Println("Error in patching opensearch configuration")
-			fmt.Println(err)
-		}
-		fmt.Printf("config patch execution done, exiting\n")
-	}
-	return nil
-}
-
-func GetBestSettings() (*ESSettings, error) {
-	esSetting, err := getOldElasticSearchSettings()
-	if err != nil {
-		fmt.Println(err)
-	}
-	ossSetting := GetDefaultOSSettings()
-	bestSetting := &ESSettings{}
-
-	esHeapSize, err := extractNumericFromText(esSetting.HeapMemory, 0)
-	if err != nil {
-		fmt.Println("Not able to parse heapsize from elasticsearch settings")
-	} else {
-		ossHeapSize, err := extractNumericFromText(ossSetting.HeapMemory, 0)
-		if err != nil {
-			fmt.Println("Not able to parse heapsize from opensearch settings")
-		} else {
-			if esHeapSize >= 32 || ossHeapSize >= 32 {
-				bestSetting.HeapMemory = "32g"
-			}
-			if esHeapSize > ossHeapSize {
-				bestSetting.HeapMemory = fmt.Sprintf("%d", int64(math.Round(esHeapSize)))
-			} else {
-				bestSetting.HeapMemory = fmt.Sprintf("%d", int64(math.Round(ossHeapSize)))
-			}
-		}
-	}
-
-	esIndicesBreakerTotalLimit, err := extractNumericFromText(esSetting.IndicesBreakerTotalLimit, 0)
-	if err != nil {
-		fmt.Println("Not able to parse indicesBreakerTotalLimit from opensearch settings")
-	} else {
-		ossIndicesBreakerTotalLimit, err := extractNumericFromText(ossSetting.IndicesBreakerTotalLimit, 0)
-		if err != nil {
-			fmt.Println("Not able to parse indicesBreakerTotalLimit from opensearch settings")
-		} else {
-			if esIndicesBreakerTotalLimit > ossIndicesBreakerTotalLimit {
-				bestSetting.IndicesBreakerTotalLimit = fmt.Sprintf("%d", int64(math.Round(esIndicesBreakerTotalLimit)))
-			} else {
-				bestSetting.IndicesBreakerTotalLimit = fmt.Sprintf("%d", int64(math.Round(ossIndicesBreakerTotalLimit)))
-			}
-		}
-	}
-
-	esRunTimeMaxOpenFile, err := extractNumericFromText(esSetting.RuntimeMaxOpenFile, 0)
-	if err != nil {
-		fmt.Println("Not able to parse esRunTimeMaxOpenFile from opensearch settings")
-	} else {
-		ossRunTimeMaxOpenFile, err := extractNumericFromText(ossSetting.RuntimeMaxOpenFile, 0)
-		if err != nil {
-			fmt.Println("Not able to parse ossRunTimeMaxOpenFile from opensearch settings")
-		} else {
-			if esRunTimeMaxOpenFile > ossRunTimeMaxOpenFile {
-				bestSetting.RuntimeMaxOpenFile = fmt.Sprintf("%d", int64(esRunTimeMaxOpenFile))
-			} else {
-				bestSetting.RuntimeMaxOpenFile = fmt.Sprintf("%d", int64(ossRunTimeMaxOpenFile))
-			}
-		}
-	}
-
-	if esSetting.TotalShardSettings > ossSetting.TotalShardSettings {
-		bestSetting.TotalShardSettings = esSetting.TotalShardSettings
-	} else {
-		bestSetting.TotalShardSettings = ossSetting.TotalShardSettings
-	}
-
-	if esSetting.RuntimeMaxLockedMem == "unlimited" || ossSetting.RuntimeMaxLockedMem == "unlimited" {
-		bestSetting.RuntimeMaxLockedMem = "unlimited"
-	} else {
-		esRunTimeMaxLockedMem, err := extractNumericFromText(esSetting.RuntimeMaxLockedMem, 0)
-		if err != nil {
-			fmt.Println("Not able to parse esRunTimeMaxLockedMem from opensearch settings")
-		} else {
-			ossRunTimeMaxLockedMem, err := extractNumericFromText(ossSetting.RuntimeMaxLockedMem, 0)
-			if err != nil {
-				fmt.Println("Not able to parse ossRunTimeMaxLockedMem from opensearch settings")
-			} else {
-				if esRunTimeMaxLockedMem > ossRunTimeMaxLockedMem {
-					bestSetting.RuntimeMaxLockedMem = fmt.Sprintf("%d", int64(math.Round(esRunTimeMaxLockedMem)))
-				} else {
-					bestSetting.RuntimeMaxLockedMem = fmt.Sprintf("%d", int64(math.Round(ossRunTimeMaxLockedMem)))
-				}
-			}
-		}
-	}
-	return bestSetting, nil
-}
-
-func extractNumericFromText(text string, index int) (float64, error) {
-	re := regexp.MustCompile(`[-]?\d[\d,]*[\.]?[\d{2}]*`)
-	submatchall := re.FindAllString(text, -1)
-	if len(submatchall) < 1 {
-		return 0, errors.New("No match found")
-	}
-	//fmt.Println(submatchall)
-	numeric, err := strconv.ParseFloat(submatchall[index], 64)
-	if err != nil {
-		return 0, err
-	}
-	return numeric, nil
-}
-
-func getOldElasticSearchSettings() (*ESSettings, error) {
-	esSetting := &ESSettings{}
-	jsonData, err := ioutil.ReadFile(V3ESSettingFile)
-	if err != nil {
-		return esSetting, err
-	}
-	err = json.Unmarshal(jsonData, esSetting)
-	if err != nil {
-		return esSetting, err
-	}
-	return esSetting, nil
 }
 
 func GetDefaultOSSettings() *ESSettings {
@@ -770,27 +616,12 @@ func runIndexCheck(timeout int64) Checklist {
 	}
 }
 
-func StoreESSettings() error {
-	pid, err := getElasticsearchPID()
-	if err != nil {
-		fmt.Println("No process id found for running elasticsearch")
-	}
-	esSettings, err := getAllSearchEngineSettings(pid)
-	if err != nil {
-		fmt.Println(err)
-	}
-	esSettingsJson, err := json.Marshal(esSettings)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(string(esSettingsJson))
-	err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775)
-	if err != nil {
-		fmt.Println(err)
+func (ci *V4ChecklistManager) StoreSearchEngineSettings() error {
+	isEmbeded := !IsExternalElasticSearch()
+	if !isEmbeded {
+		fmt.Println("Automate is running on external elastic search, not taking configuration backup")
+	} else {
+		return StoreESSettings(isEmbeded)
 	}
 	return nil
-}
-
-func (ci *V4ChecklistManager) StoreSearchEngineSettings() error {
-	return StoreESSettings()
 }

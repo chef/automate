@@ -260,7 +260,8 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
-		patchError := majorupgradechecklist.PatchBestOpenSearchSettings(true)
+		isEmbeded := !majorupgradechecklist.IsExternalElasticSearch()
+		patchError := majorupgradechecklist.PatchBestOpenSearchSettings(isEmbeded)
 		if patchError != nil {
 			writer.Title("Tuning search engine settings")
 		}

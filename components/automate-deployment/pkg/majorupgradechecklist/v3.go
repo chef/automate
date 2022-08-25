@@ -122,22 +122,6 @@ type V3ChecklistManager struct {
 	isExternalPG bool
 }
 
-type ESClusterSetting struct {
-	Persistent struct {
-	} `json:"persistent"`
-	Transient struct {
-	} `json:"transient"`
-	Defaults struct {
-		Indices struct {
-			Breaker struct {
-				Total struct {
-					Limit string `json:"limit"`
-				} `json:"total"`
-			} `json:"breaker"`
-		} `json:"indices"`
-	} `json:"defaults"`
-}
-
 func NewV3ChecklistManager(writer cli.FormatWriter, version string) *V3ChecklistManager {
 	return &V3ChecklistManager{
 		writer:       writer,
