@@ -1,11 +1,7 @@
 package majorupgradechecklist
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"strconv"
-	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -118,19 +114,6 @@ var postChecklistExternal = []PostCheckListItem{
 		Optional:   true,
 		IsExecuted: false,
 	},
-}
-
-type esIndicesShardTotal struct {
-	indices struct {
-		shards struct {
-			total int `json:"total"`
-		}
-	}
-}
-
-type esClusterSetting struct {
-	persistent struct{}
-	transient  struct{}
 }
 
 type V3ChecklistManager struct {
@@ -362,61 +345,7 @@ func promptUpgradeContinue() Checklist {
 	}
 }
 
-func getELasticSearchBasePath() string {
-	var basePath = "http://localhost:10144/"
-
-	habpath := getHabRootPath(habrootcmd)
-
-	input, err := ioutil.ReadFile(habpath + "svc/automate-es-gateway/config/URL") // nosemgrep
-	if err != nil {
-		fmt.Printf("Failed to read URL file")
-	}
-	url := strings.TrimSuffix(string(input), "\n")
-	if url != "" {
-		basePath = "http://" + url + "/"
-	}
-	return basePath
-}
-
-func getElasticSearchClusterStas() (string, error) {
-	basePath := getELasticSearchBasePath()
-	indicesTotalShard, err := getDataFromUrl(basePath + "_cluster/stats?filter_path=indices.shards.total")
-	if err != nil {
-		return "", err
-	}
-	return string(indicesTotalShard), nil
-}
-
-func getElasticSearchCusterSetting() (*ESClusterSetting, error) {
-	basePath := getELasticSearchBasePath()
-	allClusterSettings, err := getDataFromUrl(basePath + "_cluster/settings?include_defaults=true")
-	if err != nil {
-		return nil, err
-	}
-	clusterSetting := &ESClusterSetting{}
-	err = json.Unmarshal(allClusterSettings, clusterSetting)
-	if err != nil {
-		return nil, err
-	}
-	return clusterSetting, nil
-}
-
-func getElasticSearchRuntimeSettings() (string, error) {
-	var result = make(map[string]string)
-
-	var lines = data.Split(result, "\n")
-	pid, err := ioutil.ReadFile("/hab/svc/automate-elasticsearch/PID")
-	if err != nil {
-		return "", err
-	}
-	pidInt64, err := strconv.ParseInt(string(pid), 10, 64)
-	if err != nil {
-		return "", err
-	}
-	processProcFile := `/proc/` + strconv.FormatInt(pidInt64, 10) + `/stat`
-	data, err := ioutil.ReadFile(processProcFile)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
+func (ci *V3ChecklistManager) StoreSearchEngineSettings() error {
+	fmt.Printf("Not needed for now")
+	return nil
 }
