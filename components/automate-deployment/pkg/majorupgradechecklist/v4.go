@@ -162,7 +162,7 @@ func (ci *V4ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V4ChecklistManager) RunChecklist() error {
+func (ci *V4ChecklistManager) RunChecklist(timeout int64) error {
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
@@ -175,7 +175,7 @@ func (ci *V4ChecklistManager) RunChecklist() error {
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{runIndexCheck(), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
+		checklists = append(checklists, []Checklist{runIndexCheck(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES), replaceurl())
@@ -537,7 +537,7 @@ func replaceurl() Checklist {
 	}
 }
 
-func checkIndexVersion() error {
+func checkIndexVersion(timeout int64) error {
 	var basePath = "http://localhost:10144/"
 	cfg := dc.DefaultAutomateConfig()
 	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
@@ -547,7 +547,7 @@ func checkIndexVersion() error {
 		basePath = fmt.Sprintf(`http://%s:%d/`, defaultHost, defaultPort)
 	}
 
-	res, err := client.GetAutomateConfig(10)
+	res, err := client.GetAutomateConfig(timeout)
 	if err != nil {
 		return err
 	}
@@ -618,12 +618,12 @@ func getMajorVersion(versionData []byte, index string) (int64, string, error) {
 	return i, dataIdx.Settings.Index.Version.CreatedString, nil
 }
 
-func runIndexCheck() Checklist {
+func runIndexCheck(timeout int64) Checklist {
 	return Checklist{
 		Name:        "check index version",
 		Description: "confirmation check index version",
 		TestFunc: func(h ChecklistHelper) error {
-			err := checkIndexVersion()
+			err := checkIndexVersion(timeout)
 			if err != nil {
 				return err
 			}
