@@ -513,7 +513,7 @@ func replaceurl() Checklist {
 	}
 }
 
-func checkIndexVersion() error {
+func checkIndexVersion(timeout int64) error {
 	var basePath = "http://localhost:10144/"
 	cfg := dc.DefaultAutomateConfig()
 	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
