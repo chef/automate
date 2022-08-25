@@ -372,7 +372,6 @@ func (backend ES2Backend) GetAssetSummary(ctx context.Context, filters map[strin
 	}
 
 	// getting the un-reachable assets as per the unreachable config
-	// Todo hardcoding the value for Reachable assets
 	unreachableAsset, err := backend.GetUnreachable(ctx, filters)
 	if err != nil {
 		logrus.Errorf("The error while getting unreachable assets: %v", err)
