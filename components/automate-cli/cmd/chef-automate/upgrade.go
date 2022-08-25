@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -522,8 +521,8 @@ func GetopenSearchConfig() {
 			return
 		}
 
-		fmt.Println("This is your OpenSearch Config")
-		fmt.Println(string(t))
+		writer.Println("This is your OpenSearch Config")
+		writer.Println(string(t))
 
 	}
 
