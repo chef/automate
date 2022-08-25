@@ -270,7 +270,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 			case "3":
 				dbDataPath = os_path + "svc/automate-postgresql/data/pgdata"
 			case "4":
-				dbDataPath = os_path + "svc/automate-elasticsearch"
+				dbDataPath = os_path + "svc/automate-elasticsearch/data"
 			}
 
 			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
@@ -298,7 +298,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 				SpaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
 				fmt.Printf("---space available--- %t", SpaceAvailable)
 				if err != nil {
-					h.Writer.Error("Failed to check available space")
+					h.Writer.Error("Failed to check available space \n")
 					return status.Errorf(status.UnknownError, err.Error())
 				}
 				if !SpaceAvailable {
