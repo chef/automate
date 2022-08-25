@@ -481,6 +481,9 @@ func getDataFromUrl(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.New("Automate ES gateway unreachable.")
+	}
 
 	body, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
@@ -548,7 +551,7 @@ func checkIndexVersion(timeout int64) error {
 	defaultPort := cfg.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
 
 	if defaultHost != "" || defaultPort > 0 {
-		basePath = fmt.Sprintf(`http://%s/`, net.JoinHostPort(defaultHost, string(defaultPort)))
+		basePath = fmt.Sprintf(`http://%s/`, net.JoinHostPort(defaultHost, fmt.Sprintf("%d", defaultPort)))
 	}
 
 	res, err := client.GetAutomateConfig(timeout)
@@ -560,7 +563,7 @@ func checkIndexVersion(timeout int64) error {
 	port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
 
 	if host != "" || port > 0 {
-		url := net.JoinHostPort(host, string(port))
+		url := net.JoinHostPort(host, fmt.Sprintf("%d", port))
 		if url != "" {
 			basePath = fmt.Sprintf(`http://%s/`, url)
 		}
