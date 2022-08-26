@@ -191,14 +191,14 @@ func performActionForUpgrade(ctx context.Context, esClient *ingestic.ESClient) e
 
 			}
 			//Updating controls Index structure
-			controls, err := processor.MapStructsESInSpecReportToControls(inspecReport)
+			controls, docIds, err := processor.MapStructsESInSpecReportToControls(inspecReport)
 			if err != nil {
 				logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", report)
 				continue
 			}
 
 			logrus.Debugf("Parsed results got results")
-			err = esClient.UploadDataToControlIndex(ctx, report, controls, parsedEndTime)
+			err = esClient.UploadDataToControlIndex(ctx, report, controls, parsedEndTime, docIds)
 			if err != nil {
 				logrus.Errorf("Unable to add data to index with reportuuid:%s", report)
 			}

@@ -7,24 +7,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ParseReportCtrlStruct(ctx context.Context, client *ingestic.ESClient, reportUuid string, index string) ([]relaxting.Control, error) {
+func ParseReportCtrlStruct(ctx context.Context, client *ingestic.ESClient, reportUuid string, index string) ([]relaxting.Control, []string, error) {
 	var controls []relaxting.Control
+	var docIds []string
 	logrus.Infof("Getting the report for report uuid %s", reportUuid)
 	inspecReport, err := client.GetDocByReportUUId(ctx, reportUuid, index)
 	if err != nil {
 		logrus.Errorf("cannnot find inspec report: %v", err)
-		return nil, err
+		return nil, nil, err
 	}
 
-	controls, err = MapStructsESInSpecReportToControls(inspecReport)
+	controls, docIds, err = MapStructsESInSpecReportToControls(inspecReport)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return controls, err
+	return controls, docIds, err
 }
 
-func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) ([]relaxting.Control, error) {
+func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) ([]relaxting.Control, []string, error) {
 	var controls []relaxting.Control
+	var docIds []string
 
 	var nodeStatus string
 
@@ -70,9 +72,10 @@ func MapStructsESInSpecReportToControls(inspecReport *relaxting.ESInSpecReport) 
 			ctrl.Nodes = nodes
 			ctrl.Profile = relaxting.Profile{ProfileID: value.SHA256, Title: value.Title}
 			controls = append(controls, ctrl)
+			docIds = append(docIds, ingestic.GetDocIdByControlIdAndProfileID(ctrl.ControlID, ctrl.Profile.ProfileID))
 		}
 	}
-	return controls, nil
+	return controls, docIds, nil
 }
 
 func checkIfControlWaivedStatus(waivedStr string, waivedData interface{}) bool {

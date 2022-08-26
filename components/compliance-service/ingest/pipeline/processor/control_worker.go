@@ -170,10 +170,10 @@ func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interf
 	logrus.Infof("In TaskRun working on job %s", job.ReportUuid)
 
 	//time taking to commit to records to ES
-	//time.Sleep(60 * time.Second)
+	time.Sleep(60 * time.Second)
 	mapping := mappings.ComplianceRepDate
 	index := mapping.IndexTimeseriesFmt(job.EndTime)
-	controls, err := ParseReportCtrlStruct(ctx, t.ESClient, job.ReportUuid, index)
+	controls, docIds, err := ParseReportCtrlStruct(ctx, t.ESClient, job.ReportUuid, index)
 	if err != nil {
 		logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", job.ReportUuid)
 		return nil, err
@@ -181,7 +181,7 @@ func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interf
 
 	logrus.Infof("Parsed results for report uuid %s with controls number %d", job.ReportUuid, len(controls))
 	if len(controls) > 0 {
-		err = t.ESClient.UploadDataToControlIndex(ctx, job.ReportUuid, controls, job.EndTime)
+		err = t.ESClient.UploadDataToControlIndex(ctx, job.ReportUuid, controls, job.EndTime, docIds)
 		if err != nil {
 			logrus.Errorf("Unable to add data to index with reportuuid:%s", job.ReportUuid)
 			return nil, err
