@@ -555,17 +555,14 @@ func checkIndexVersion(timeout int64) error {
 	}
 
 	res, err := client.GetAutomateConfig(timeout)
-	if err != nil {
-		return err
-	}
-
-	host := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
-	port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
-
-	if host != "" || port > 0 {
-		url := net.JoinHostPort(host, fmt.Sprintf("%d", port))
-		if url != "" {
-			basePath = fmt.Sprintf(`http://%s/`, url)
+	if err == nil {
+		host := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+		port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
+		if host != "" || port > 0 {
+			url := net.JoinHostPort(host, fmt.Sprintf("%d", port))
+			if url != "" {
+				basePath = fmt.Sprintf(`http://%s/`, url)
+			}
 		}
 	}
 
