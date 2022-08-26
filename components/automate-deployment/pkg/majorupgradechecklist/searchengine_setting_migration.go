@@ -87,6 +87,9 @@ func getDataFromUrl(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("url: %s not reachable,url")
+	}
 	body, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		return nil, err
