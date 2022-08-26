@@ -268,12 +268,12 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 		return errors.Wrap(err, "InsertInspecSummary")
 	}
 
-	/*if data.DayLatest {
+	if data.DayLatest {
 		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, true)
 		if err != nil {
 			return err
 		}
-	}*/
+	}
 	return backend.setLatestsToFalse(ctx, data.NodeID, id, index)
 }
 
@@ -299,12 +299,12 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 		return errors.Wrap(err, "InsertInspecReport")
 	}
 
-	/*if data.DayLatest {
+	if data.DayLatest {
 		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, false)
 		if err != nil {
 			return err
 		}
-	}*/
+	}
 	return backend.setLatestsToFalse(ctx, data.NodeID, id, index)
 }
 
@@ -1022,23 +1022,32 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		logrus.Errorf("Unable to fetch document for controls fo report uuid %s", reportuuid)
 	}
 
+	bulkBatch := 25
 	bulkRequest := backend.client.Bulk()
-	for _, control := range controls {
+	for ind, control := range controls {
+		if ind > 0 && ind%bulkBatch == 0 {
+			if bulkRequest.NumberOfActions() > 0 {
+				e := backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
+				if e != nil {
+					return e
+				}
+			}
+		}
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		/*scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
 		}
 		//Updating the day latest in bulk update
-		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))*/
+		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
 		status, found := statusMap[docId]
 		if found {
-			/*scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+			scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 			if err != nil {
 				logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
 			}
 			//Updating the day latest in bulk update
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))*/
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
 			//Adding the request for daily latest in bulk update only
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(backend.SetDailyLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
@@ -1047,6 +1056,14 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
 	}
+	if bulkRequest.NumberOfActions() > 0 {
+		err = backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
+	}
+	return err
+
+}
+
+func (backend *ESClient) bulkCommit(ctx context.Context, reportuuid string, controls []relaxting.Control, bulkRequest *elastic.BulkService, err error) error {
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
 	if err != nil {
@@ -1060,7 +1077,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 
 	logrus.Debugf("Bulk insert %d summaries, ~size %dB, took %dms", len(controls), approxBytes, bulkResponse.Took)
 	return nil
-
 }
 
 func GetDocIdByControlIdAndProfileID(controlID string, profileID string) string {
