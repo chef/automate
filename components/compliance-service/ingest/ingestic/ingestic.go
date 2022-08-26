@@ -1042,12 +1042,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
 		status, found := statusMap[docId]
 		if found {
-			scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-			if err != nil {
-				logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
-			}
-			//Updating the day latest in bulk update
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
 			//Adding the request for daily latest in bulk update only
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(backend.SetDailyLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
