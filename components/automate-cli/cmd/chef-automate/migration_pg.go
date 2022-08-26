@@ -39,36 +39,30 @@ var ClearDataCmdFlags = struct {
 var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220311204618/bin"
 
 const (
-	AUTOMATE_VERSION                    = "3"
-	NEXT_AUTOMATE_VERSION               = "4"
-	AUTOMATE_PG_MIGRATE_LOG_DIR         = "/tmp"
-	OLD_PG_VERSION                      = "9.6"
-	OLD_PG_DATA_DIR                     = "/hab/svc/automate-postgresql/data/pgdata"
-	NEW_PG_DATA_DIR                     = "/hab/svc/automate-postgresql/data/pgdata13"
-	PG_DATA_DIR                         = "/hab/svc/automate-postgresql/data"
-	PGPORT                              = "5432"
-	PGHOST                              = "0.0.0.0"
-	PGUSER                              = "automate"
-	PGDATABASE                          = "postgres"
-	PGSSLMODE                           = "verify-ca"
-	PGSSLCERT                           = "/hab/svc/automate-postgresql/config/server.crt"
-	PGSSLKEY                            = "/hab/svc/automate-postgresql/config/server.key"
-	PGSSLROOTCERT                       = "/hab/svc/automate-postgresql/config/root.crt"
-	OLD_BIN_DIR                         = "/hab/pkgs/core/postgresql/9.6.24/20220218015755/bin"
-	CLEANUP_ID                          = "clean_up"
-	MIGRATE_PG_ID                       = "migrate_pg"
-	MIGRATE_ES_ID                       = "migrate_es"
-	NEW_PG_VERSION                      = "13.5"
-	ELASTICSEARCH_DATA_DIR              = "/hab/svc/automate-elasticsearch/data"
-	ELASTICSEARCH_VAR_DIR               = "/hab/svc/automate-elasticsearch/var"
-	OPENSEARCH_DIR                      = "/hab/svc/automate-opensearch"
-	ELASTICSEARCH_DIR                   = "/hab/svc/automate-elasticsearch"
-	minDirSizeInGB              float64 = 5
-	diskSpaceError                      = `Please ensure to have %.2f free disk space`
-
-	diskSpaceCheckError = `You do not have minimum space available to continue with this migration. 
-Please ensure you have %.2f GB free disk space.
-To skip this free disk space check please use --skip-storage-check flag`
+	AUTOMATE_VERSION            = "3"
+	NEXT_AUTOMATE_VERSION       = "4"
+	AUTOMATE_PG_MIGRATE_LOG_DIR = "/tmp"
+	OLD_PG_VERSION              = "9.6"
+	OLD_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata"
+	NEW_PG_DATA_DIR             = "/hab/svc/automate-postgresql/data/pgdata13"
+	PG_DATA_DIR                 = "/hab/svc/automate-postgresql/data"
+	PGPORT                      = "5432"
+	PGHOST                      = "0.0.0.0"
+	PGUSER                      = "automate"
+	PGDATABASE                  = "postgres"
+	PGSSLMODE                   = "verify-ca"
+	PGSSLCERT                   = "/hab/svc/automate-postgresql/config/server.crt"
+	PGSSLKEY                    = "/hab/svc/automate-postgresql/config/server.key"
+	PGSSLROOTCERT               = "/hab/svc/automate-postgresql/config/root.crt"
+	OLD_BIN_DIR                 = "/hab/pkgs/core/postgresql/9.6.24/20220218015755/bin"
+	CLEANUP_ID                  = "clean_up"
+	MIGRATE_PG_ID               = "migrate_pg"
+	MIGRATE_ES_ID               = "migrate_es"
+	NEW_PG_VERSION              = "13.5"
+	ELASTICSEARCH_DATA_DIR      = "/hab/svc/automate-elasticsearch/data"
+	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"
+	OPENSEARCH_DIR              = "/hab/svc/automate-opensearch"
+	ELASTICSEARCH_DIR           = "/hab/svc/automate-elasticsearch"
 )
 
 func init() {
@@ -209,8 +203,8 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 }
 
 func checkSpaceAvailable(dataDir string) (bool, error) {
-	os_path := getHabRootPath(habrootcmd)
-	habDirSize, err := cm.CalDirSizeInGB(os_path)
+	osPath := getHabRootPath(habrootcmd)
+	habDirSize, err := cm.CalDirSizeInGB(osPath)
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
@@ -218,13 +212,13 @@ func checkSpaceAvailable(dataDir string) (bool, error) {
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
-	minReqDiskSpace := math.Max(minDirSizeInGB, math.Max(habDirSize, dbDataSize)) * 11 / 10
-	SpaceAvailable, err := cm.CheckSpaceAvailability(os_path, minReqDiskSpace)
+	minReqDiskSpace := math.Max(majorupgradechecklist.MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
+	SpaceAvailable, err := cm.CheckSpaceAvailability(osPath, minReqDiskSpace)
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
 	if !SpaceAvailable {
-		return false, status.New(status.UnknownError, fmt.Sprintf(diskSpaceCheckError, minReqDiskSpace))
+		return false, status.New(status.UnknownError, fmt.Sprintf(majorupgradechecklist.DISKSPACE_CHECK_ERROR, "migration", minReqDiskSpace, "--skip-storage-check"))
 	}
 	return true, nil
 }

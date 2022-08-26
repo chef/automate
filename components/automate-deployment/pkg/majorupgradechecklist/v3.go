@@ -30,10 +30,6 @@ const (
 
 	diskSpaceError = `Please ensure to have %.2f GB free disk space`
 
-	diskSpaceCheckError = `You do not have minimum space available to continue with this upgrade. 
-Please ensure you have %.2f GB free disk space.
-To skip this free disk space check please use --skip-disk-space-check flag`
-
 	postChecklistIntimationError = "Post upgrade steps need to be run, after this upgrade completed."
 
 	run_chef_automate_upgrade_status_cmd = `chef-automate upgrade status`
@@ -65,7 +61,11 @@ Now, upgrade will start, Please confirm to continue...`
 Post Upgrade Steps:
 ===================
 `
-	minDirSizeInGB float64 = 5
+	MIN_DIRSIZE_GB float64 = 5
+
+	DISKSPACE_CHECK_ERROR = `You do not have minimum space available to continue with this %s. 
+Please ensure you have %.2f GB free disk space.
+To skip this free disk space check please use %s flag`
 )
 
 var postChecklistEmbedded = []PostCheckListItem{
@@ -249,27 +249,26 @@ func backupCheck() Checklist {
 	}
 }
 
-var SpaceAvailable bool
-
 func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir string) Checklist {
 	return Checklist{
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			os_path := getHabRootPath(habrootcmd)
-			habDirSize, err := cm.CalDirSizeInGB(os_path)
+			osPath := getHabRootPath(habrootcmd)
+			habDirSize, err := cm.CalDirSizeInGB(osPath)
 
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.UnknownError, err.Error())
 			}
+			var spaceAvailable bool
 			version, _ = GetMajorVersion(version)
 			var dbDataPath string
 			switch version {
 			case "3":
-				dbDataPath = os_path + "svc/automate-postgresql/data/pgdata"
+				dbDataPath = osPath + "svc/automate-postgresql/data/pgdata"
 			case "4":
-				dbDataPath = os_path + "svc/automate-elasticsearch/data"
+				dbDataPath = osPath + "svc/automate-elasticsearch/data"
 			}
 
 			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
@@ -278,7 +277,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 				return status.Errorf(status.UnknownError, err.Error())
 			}
 
-			minReqDiskSpace := math.Max(minDirSizeInGB, math.Max(habDirSize, dbDataSize)) * 11 / 10
+			minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
 
 			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure you have more than %.2f GB of free disk space", minReqDiskSpace))
 			if err != nil {
@@ -286,18 +285,18 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !skipDiskSpaceCheck {
-				destDir := os_path
+				destDir := osPath
 				if osDestDataDir != "" {
 					destDir = osDestDataDir
 				}
 				h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
 				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
-				SpaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
+				spaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
 				if err != nil {
-					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceCheckError, minReqDiskSpace))
+					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, "upgrade", minReqDiskSpace, "--skip-disk-space-check"))
 				}
-				if !SpaceAvailable {
-					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceCheckError, minReqDiskSpace))
+				if !spaceAvailable {
+					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, "upgrade", minReqDiskSpace, "--skip-disk-space-check"))
 				}
 			}
 			if !resp {
