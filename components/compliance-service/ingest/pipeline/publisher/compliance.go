@@ -20,7 +20,7 @@ import (
 func StoreCompliance(cerealService *cereal.Manager, client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
 	logrus.Debugf("StoreCompliance started with numberOfPublishers = %d", numberOfPublishers)
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
-		out := make(chan message.Compliance, 100)
+		out := make(chan message.Compliance, 50)
 
 		for i := 0; i < numberOfPublishers; i++ {
 			go storeCompliance(in, out, cerealService, client, i)

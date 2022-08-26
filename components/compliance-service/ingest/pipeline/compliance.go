@@ -36,7 +36,7 @@ func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.Projects
 		processor.ComplianceReport(notifierClient, automateURL, enableLargeReporting),
 		processor.BundleReportProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
-		publisher.StoreCompliance(cerealService, client, 100),
+		publisher.StoreCompliance(cerealService, client, 50),
 	}
 	if enableLargeReporting {
 		pipes = append(pipes, publisher.ReportManagerPublisher(reportMgrClient))
@@ -48,7 +48,7 @@ func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.Projects
 func (s *Compliance) Run(report *compliance.Report) error {
 	done := make(chan error)
 	defer close(done)
-	ctx, cancel := context.WithTimeout(context.Background(), 35*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	msg := message.Compliance{
 		QueueTime: time.Now(),
