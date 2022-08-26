@@ -213,11 +213,11 @@ func checkSpaceAvailable(dataDir string) (bool, error) {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
 	minReqDiskSpace := math.Max(majorupgradechecklist.MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
-	SpaceAvailable, err := cm.CheckSpaceAvailability(osPath, minReqDiskSpace)
+	spaceAvailable, err := cm.CheckSpaceAvailability(osPath, minReqDiskSpace)
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
-	if !SpaceAvailable {
+	if !spaceAvailable {
 		return false, status.New(status.UnknownError, fmt.Sprintf(majorupgradechecklist.DISKSPACE_CHECK_ERROR, "migration", minReqDiskSpace, "--skip-storage-check"))
 	}
 	return true, nil

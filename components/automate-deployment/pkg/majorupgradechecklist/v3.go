@@ -292,10 +292,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 				h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
 				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
 				spaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
-				if err != nil {
-					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, "upgrade", minReqDiskSpace, "--skip-disk-space-check"))
-				}
-				if !spaceAvailable {
+				if err != nil || !spaceAvailable {
 					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, "upgrade", minReqDiskSpace, "--skip-disk-space-check"))
 				}
 			}
