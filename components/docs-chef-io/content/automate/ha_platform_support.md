@@ -27,8 +27,7 @@ This section lists the recommended requirements for operating systems, virtual m
 
 {{< note >}}
 
-Click [here](/calculator/automate_ha_hardware_calculator.xlsx) to calculate the actual estimate of the configuration using the sample calculator.
-
+[Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) use this to check how much hardware you will need for your use-case.
 {{< /note >}}
 
 ## Hardware Requirements
