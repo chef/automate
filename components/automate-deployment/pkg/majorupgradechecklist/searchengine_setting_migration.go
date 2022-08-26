@@ -134,7 +134,7 @@ func getCusterSetting() (*ESClusterSetting, error) {
 	return clusterSetting, nil
 }
 func getElasticsearchPID() (string, error) {
-	pid, err := ioutil.ReadFile("/hab/svc/automate-elasticsearch/PID")
+	pid, err := ioutil.ReadFile("/hab/svc/automate-elasticsearch/PID") // nosemgrep
 	if err != nil {
 		return "", err
 	}
@@ -148,7 +148,7 @@ func getProcessRuntimeSettings(pid string) (map[string]string, error) {
 			return result, err
 		}
 		processProcFile := filepath.Join("/proc/", strconv.FormatInt(pidInt64, 10), "/limits")
-		data, err := ioutil.ReadFile(processProcFile)
+		data, err := ioutil.ReadFile(processProcFile) // nosemgrep
 		if err != nil {
 			return result, err
 		}
@@ -240,7 +240,7 @@ func StoreESSettings(isEmbeded bool) error {
 			logrus.Debug("error in mapping elastic search settings to json.", err.Error())
 		}
 		logrus.Debug("writing json in file.")
-		err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775)
+		err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775) // nosemgrep
 		if err != nil {
 			logrus.Debug("error in writing json in file.", err.Error())
 		}
@@ -261,7 +261,7 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 			logrus.Debug("some error occurred while rendering template", err.Error())
 		}
 		finalTemplate := buf.String()
-		err = ioutil.WriteFile(AutomateOpensearchConfigPatch, []byte(finalTemplate), 0600)
+		err = ioutil.WriteFile(AutomateOpensearchConfigPatch, []byte(finalTemplate), 0600) // nosemgrep
 		if err != nil {
 			logrus.Debug(fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch), err.Error())
 		}
@@ -399,7 +399,7 @@ func extractNumericFromText(text string, index int) (float64, error) {
 
 func getOldElasticSearchSettings() (*ESSettings, error) {
 	esSetting := &ESSettings{}
-	jsonData, err := ioutil.ReadFile(V3ESSettingFile)
+	jsonData, err := ioutil.ReadFile(V3ESSettingFile) // nosemgrep
 	if err != nil {
 		return esSetting, err
 	}
