@@ -322,36 +322,9 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
 	var runInfo relaxting.ESComplianceRunInfo
-	//var firstRun string
 	var err error
 	mapping := mappings.ComplianceRunInfo
-	//runInfoCh := make(chan relaxting.ESComplianceRunInfo)
-	//cErr := make(chan error)
-	//firstRunInfoCh := make(chan string)
-
 	runInfo = MapReportToRunInfo(report, runDateTime)
-	/*go backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index, firstRunInfoCh, cErr)
-
-	for i := 0; i < 2; i++ {
-		select {
-		case runInfo = <-runInfoCh:
-		case firstRun = <-firstRunInfoCh:
-		case err = <-cErr:
-
-		}
-	}
-
-	if err != nil {
-		logrus.Infof("Unable to fetch document with error  %v", err)
-		return err
-	}
-
-	if len(firstRun) > 0 {
-		runInfo.FirstRun, err = time.Parse(time.RFC3339, firstRun)
-		if err != nil {
-			logrus.Errorf("Unable to parse the first run info")
-		}
-	}*/
 
 	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
 	return err
@@ -953,7 +926,7 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid stri
 			"hits.hits._id",
 			"hits.hits._source",
 			"hits.hits.inner_hits").
-		Do(context.TODO())
+		Do(ctx)
 
 	if err != nil {
 		return nil, err
