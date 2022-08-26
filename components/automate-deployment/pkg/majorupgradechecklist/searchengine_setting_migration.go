@@ -94,7 +94,7 @@ func getDataFromUrl(url string) ([]byte, error) {
 	return body, nil
 }
 
-func getSearchEngineBasePath() (string, error) {
+func getSearchEngineBasePath() string {
 
 	var basePath = "http://localhost:10144/"
 	cfg := dc.DefaultAutomateConfig()
@@ -107,7 +107,7 @@ func getSearchEngineBasePath() (string, error) {
 
 	res, err := client.GetAutomateConfig(10)
 	if err != nil {
-		return "", err
+		return basePath
 	}
 
 	host := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
@@ -119,15 +119,12 @@ func getSearchEngineBasePath() (string, error) {
 			basePath = fmt.Sprintf(`http://%s/`, url)
 		}
 	}
-	return basePath, nil
+	return basePath
 }
 
 func getClusterStats() (*IndicesShardTotal, error) {
 	indicesShardTotal := &IndicesShardTotal{}
-	basePath, err := getSearchEngineBasePath()
-	if err != nil {
-		return indicesShardTotal, err
-	}
+	basePath := getSearchEngineBasePath()
 	totalShard, err := getDataFromUrl(basePath + "_cluster/stats?filter_path=indices.shards.total")
 	if err != nil {
 		return indicesShardTotal, err
@@ -141,10 +138,7 @@ func getClusterStats() (*IndicesShardTotal, error) {
 
 func getCusterSetting() (*ESClusterSetting, error) {
 	clusterSetting := &ESClusterSetting{}
-	basePath, err := getSearchEngineBasePath()
-	if err != nil {
-		return clusterSetting, err
-	}
+	basePath := getSearchEngineBasePath()
 	allClusterSettings, err := getDataFromUrl(basePath + "_cluster/settings?include_defaults=true")
 	if err != nil {
 		return clusterSetting, err
@@ -196,10 +190,7 @@ func getProcessRuntimeSettings(pid string) (map[string]string, error) {
 }
 
 func getHeapMemorySettings() (string, error) {
-	basePath, err := getSearchEngineBasePath()
-	if err != nil {
-		return "", err
-	}
+	basePath := getSearchEngineBasePath()
 	heapMemorySettings, err := getDataFromUrl(basePath + "_cat/nodes?h=heap*&v")
 	if err != nil {
 		return "", err
