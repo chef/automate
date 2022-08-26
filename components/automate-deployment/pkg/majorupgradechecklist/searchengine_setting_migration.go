@@ -315,13 +315,14 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 }
 
 func GetBestSettings() *ESSettings {
+	ossSetting := GetDefaultOSSettings()
 	esSetting, err := getOldElasticSearchSettings()
 	if err != nil {
-		fmt.Println(err)
+		logrus.Debug("error in reading old es settigs\n", err)
+		return ossSetting
 	}
-	ossSetting := GetDefaultOSSettings()
-	bestSetting := &ESSettings{}
 
+	bestSetting := &ESSettings{}
 	esHeapSize, err := extractNumericFromText(esSetting.HeapMemory, 0)
 	if err != nil {
 		logrus.Debug("Not able to parse heapsize from elasticsearch settings", err.Error())
