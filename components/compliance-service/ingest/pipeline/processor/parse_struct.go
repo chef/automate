@@ -9,7 +9,8 @@ import (
 
 func ParseReportCtrlStruct(ctx context.Context, client *ingestic.ESClient, reportUuid string, index string) ([]relaxting.Control, error) {
 	var controls []relaxting.Control
-	inspecReport, err := client.GetDocByReportUUId(context.Background(), reportUuid, index)
+	logrus.Infof("Getting the report for report uuid %s", reportUuid)
+	inspecReport, err := client.GetDocByReportUUId(ctx, reportUuid, index)
 	if err != nil {
 		logrus.Errorf("cannnot find inspec report: %v", err)
 		return nil, err

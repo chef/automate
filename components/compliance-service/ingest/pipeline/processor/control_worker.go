@@ -169,7 +169,7 @@ func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interf
 	logrus.Infof("In TaskRun working on job %s", job.ReportUuid)
 
 	//time taking to commit to records to ES
-	time.Sleep(60 * time.Second)
+	//time.Sleep(60 * time.Second)
 	mapping := mappings.ComplianceRepDate
 	index := mapping.IndexTimeseriesFmt(job.EndTime)
 	controls, err := ParseReportCtrlStruct(ctx, t.ESClient, job.ReportUuid, index)
