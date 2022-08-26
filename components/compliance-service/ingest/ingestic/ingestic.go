@@ -268,12 +268,12 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 		return errors.Wrap(err, "InsertInspecSummary")
 	}
 
-	if data.DayLatest {
+	/*if data.DayLatest {
 		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, true)
 		if err != nil {
 			return err
 		}
-	}
+	}*/
 	return backend.setLatestsToFalse(ctx, data.NodeID, id, index)
 }
 
@@ -299,12 +299,12 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 		return errors.Wrap(err, "InsertInspecReport")
 	}
 
-	if data.DayLatest {
+	/*if data.DayLatest {
 		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, false)
 		if err != nil {
 			return err
 		}
-	}
+	}*/
 	return backend.setLatestsToFalse(ctx, data.NodeID, id, index)
 }
 
@@ -1025,18 +1025,23 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-
+		/*scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		if err != nil {
+			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
+		}
+		//Updating the day latest in bulk update
+		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))*/
 		status, found := statusMap[docId]
 		if found {
-			scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+			/*scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 			if err != nil {
 				logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
 			}
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
 			//Updating the day latest in bulk update
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))*/
 			//Adding the request for daily latest in bulk update only
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(backend.SetDailyLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)))
 			continue
 		}
