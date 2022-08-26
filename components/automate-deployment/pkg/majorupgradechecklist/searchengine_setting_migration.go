@@ -3,12 +3,12 @@ package majorupgradechecklist
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
 	"math"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -17,7 +17,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
+
+	dc "github.com/chef/automate/api/config/deployment"
 	oss "github.com/chef/automate/api/config/opensearch"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/lib/platform/sys"
 	"github.com/sirupsen/logrus"
 )
@@ -90,25 +94,40 @@ func getDataFromUrl(url string) ([]byte, error) {
 	return body, nil
 }
 
-func getSearchEngineBasePath() string {
+func getSearchEngineBasePath() (string, error) {
+
 	var basePath = "http://localhost:10144/"
+	cfg := dc.DefaultAutomateConfig()
+	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+	defaultPort := cfg.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
 
-	habpath := getHabRootPath(habrootcmd)
+	if defaultHost != "" || defaultPort > 0 {
+		basePath = fmt.Sprintf(`http://%s/`, net.JoinHostPort(defaultHost, fmt.Sprintf("%d", defaultPort)))
+	}
 
-	input, err := ioutil.ReadFile(habpath + "svc/automate-es-gateway/config/URL") // nosemgrep
+	res, err := client.GetAutomateConfig(10)
 	if err != nil {
-		fmt.Printf("Failed to read URL file")
+		return "", err
 	}
-	url := strings.TrimSuffix(string(input), "\n")
-	if url != "" {
-		basePath = "http://" + url + "/"
+
+	host := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+	port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
+
+	if host != "" || port > 0 {
+		url := net.JoinHostPort(host, fmt.Sprintf("%d", port))
+		if url != "" {
+			basePath = fmt.Sprintf(`http://%s/`, url)
+		}
 	}
-	return basePath
+	return basePath, nil
 }
 
-func getClusterStas() (*IndicesShardTotal, error) {
+func getClusterStats() (*IndicesShardTotal, error) {
 	indicesShardTotal := &IndicesShardTotal{}
-	basePath := getSearchEngineBasePath()
+	basePath, err := getSearchEngineBasePath()
+	if err != nil {
+		return indicesShardTotal, err
+	}
 	totalShard, err := getDataFromUrl(basePath + "_cluster/stats?filter_path=indices.shards.total")
 	if err != nil {
 		return indicesShardTotal, err
@@ -122,7 +141,10 @@ func getClusterStas() (*IndicesShardTotal, error) {
 
 func getCusterSetting() (*ESClusterSetting, error) {
 	clusterSetting := &ESClusterSetting{}
-	basePath := getSearchEngineBasePath()
+	basePath, err := getSearchEngineBasePath()
+	if err != nil {
+		return clusterSetting, err
+	}
 	allClusterSettings, err := getDataFromUrl(basePath + "_cluster/settings?include_defaults=true")
 	if err != nil {
 		return clusterSetting, err
@@ -174,7 +196,10 @@ func getProcessRuntimeSettings(pid string) (map[string]string, error) {
 }
 
 func getHeapMemorySettings() (string, error) {
-	basePath := getSearchEngineBasePath()
+	basePath, err := getSearchEngineBasePath()
+	if err != nil {
+		return "", err
+	}
 	heapMemorySettings, err := getDataFromUrl(basePath + "_cat/nodes?h=heap*&v")
 	if err != nil {
 		return "", err
@@ -186,7 +211,7 @@ func getHeapMemorySettings() (string, error) {
 
 // Supported search engines are Elastic Search and Open Search only as of now
 func getAllSearchEngineSettings(searchEnginePid string) (*ESSettings, error) {
-	clusterStats, err := getClusterStas()
+	clusterStats, err := getClusterStats()
 	if err != nil {
 		logrus.Debug("not able to fetch total shard values, moving to default", err.Error())
 		clusterStats.Indices.Shards.Total = INDICES_TOTAL_SHARD_DEFAULT
@@ -233,16 +258,16 @@ func StoreESSettings(isEmbeded bool) error {
 		logrus.Debug("fetching elastic search settings.")
 		esSettings, err := getAllSearchEngineSettings(pid)
 		if err != nil {
-			logrus.Debug("error in fetching elastic search settings.", err.Error())
+			return errors.Wrap(err, "error in fetching elastic search settings.")
 		}
 		esSettingsJson, err := json.Marshal(esSettings)
 		if err != nil {
-			logrus.Debug("error in mapping elastic search settings to json.", err.Error())
+			return errors.Wrap(err, "error in mapping elastic search settings to json.")
 		}
 		logrus.Debug("writing json in file.")
 		err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775) // nosemgrep
 		if err != nil {
-			logrus.Debug("error in writing json in file.", err.Error())
+			return errors.Wrap(err, "error in writing json in file.")
 		}
 	}
 	return nil
@@ -258,13 +283,12 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 		var buf bytes.Buffer
 		err := temp.Execute(&buf, bestSettings)
 		if err != nil {
-			logrus.Debug("some error occurred while rendering template", err.Error())
+			return errors.Wrap(err, "some error occurred while rendering template")
 		}
 		finalTemplate := buf.String()
 		err = ioutil.WriteFile(AutomateOpensearchConfigPatch, []byte(finalTemplate), 0600) // nosemgrep
 		if err != nil {
-			logrus.Debug(fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch), err.Error())
-			return err
+			return errors.Wrap(err, fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch))
 		}
 		logrus.Debug(fmt.Sprintf("Config written %s to \n", AutomateOpensearchConfigPatch))
 		defer func() {
@@ -283,7 +307,7 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 		cmd.Stderr = io.MultiWriter(os.Stderr)
 		err = cmd.Run()
 		if err != nil {
-			logrus.Debug("Error in patching opensearch configuration", err.Error())
+			return errors.Wrap(err, "Error in patching opensearch configuration")
 		}
 		logrus.Debug("config patch execution done, exiting\n")
 	}
