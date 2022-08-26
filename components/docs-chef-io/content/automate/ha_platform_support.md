@@ -24,6 +24,12 @@ This section lists the recommended requirements for operating systems, virtual m
 | Centos (64 Bit OS)                       | 7                         |
 | Amazon Linux 2 (64 Bit OS)               | 2 (kernel 5.10)           |
 | SUSE Linux Enterprise Server 12 SP5      | 12                        |
+
+{{< note >}}
+
+[Hardware Calculator](/calculator/automate_ha_hardware_calculator.xlsx) use this to check how much hardware you will need for your use-case.
+{{< /note >}}
+
 ## Hardware Requirements
 
 The hardware configuration is according to the performance benchmarking tests based on the assumptions listed below:
@@ -50,12 +56,6 @@ The machine requirements based on the above assumptions are listed below:
 | Opensearch DB     | 3     | 2    | 8   | 58.9 GB            | m5.large         |/tmp=5%  /root=20%|
 | Bastion Machine   | 1     | 2    | 8   | 150 GB             | m5.large         |/tmp=5%  /root=20%|
 
-
-{{< note >}}
-
-Click [here](/calculator/automate_ha_hardware_calculator.xlsx) to calculate the actual estimate of the configuration using the sample calculator.
-
-{{< /note >}}
 
 {{< note >}}
 
