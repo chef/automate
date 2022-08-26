@@ -48,7 +48,7 @@ func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.Projects
 func (s *Compliance) Run(report *compliance.Report) error {
 	done := make(chan error)
 	defer close(done)
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 35*time.Second)
 	defer cancel()
 	msg := message.Compliance{
 		QueueTime: time.Now(),
