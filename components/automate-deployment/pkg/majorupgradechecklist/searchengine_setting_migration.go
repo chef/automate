@@ -308,6 +308,100 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 	return nil
 }
 
+func getBestHeapSetting(esSetting *ESSettings, ossSetting *ESSettings) string {
+	esHeapSize, err := extractNumericFromText(esSetting.HeapMemory, 0)
+	if err != nil {
+		logrus.Debug("Not able to parse heapsize from elasticsearch settings", err.Error())
+		return ossSetting.HeapMemory
+	} else {
+		ossHeapSize, err := extractNumericFromText(ossSetting.HeapMemory, 0)
+		if err != nil {
+			logrus.Debug("Not able to parse heapsize from opensearch settings", err.Error())
+			return ossSetting.HeapMemory
+		} else {
+			if esHeapSize >= 32 || ossHeapSize >= 32 {
+				return "32"
+			} else if esHeapSize > ossHeapSize {
+				return fmt.Sprintf("%d", int64(math.Round(esHeapSize)))
+			} else {
+				return fmt.Sprintf("%d", int64(math.Round(ossHeapSize)))
+			}
+		}
+	}
+}
+
+func getIndicesBreakerTotalLimitSetting(esSetting *ESSettings, ossSetting *ESSettings) string {
+	esIndicesBreakerTotalLimit, err := extractNumericFromText(esSetting.IndicesBreakerTotalLimit, 0)
+	if err != nil {
+		logrus.Debug("Not able to parse indicesBreakerTotalLimit from opensearch settings", err.Error())
+		return ossSetting.IndicesBreakerTotalLimit
+	} else {
+		ossIndicesBreakerTotalLimit, err := extractNumericFromText(ossSetting.IndicesBreakerTotalLimit, 0)
+		if err != nil {
+			logrus.Debug("Not able to parse indicesBreakerTotalLimit from opensearch settings", err.Error())
+			return ossSetting.IndicesBreakerTotalLimit
+		} else {
+			if esIndicesBreakerTotalLimit > ossIndicesBreakerTotalLimit {
+				return fmt.Sprintf("%d", int64(math.Round(esIndicesBreakerTotalLimit)))
+			} else {
+				return fmt.Sprintf("%d", int64(math.Round(ossIndicesBreakerTotalLimit)))
+			}
+		}
+	}
+}
+
+func getRuntimeMaxOpenFile(esSetting *ESSettings, ossSetting *ESSettings) string {
+	esRunTimeMaxOpenFile, err := extractNumericFromText(esSetting.RuntimeMaxOpenFile, 0)
+	if err != nil {
+		logrus.Debug("Not able to parse esRunTimeMaxOpenFile from opensearch settings", err.Error())
+		return ossSetting.RuntimeMaxOpenFile
+	} else {
+		ossRunTimeMaxOpenFile, err := extractNumericFromText(ossSetting.RuntimeMaxOpenFile, 0)
+		if err != nil {
+			logrus.Debug("Not able to parse ossRunTimeMaxOpenFile from opensearch settings", err.Error())
+			return ossSetting.RuntimeMaxOpenFile
+		} else {
+			if esRunTimeMaxOpenFile > ossRunTimeMaxOpenFile {
+				return fmt.Sprintf("%d", int64(esRunTimeMaxOpenFile))
+			} else {
+				return fmt.Sprintf("%d", int64(ossRunTimeMaxOpenFile))
+			}
+		}
+	}
+}
+
+func getMaxLockedMemorySetting(esSetting *ESSettings, ossSetting *ESSettings) string {
+	if esSetting.RuntimeMaxLockedMem == "unlimited" || ossSetting.RuntimeMaxLockedMem == "unlimited" {
+		return "unlimited"
+	} else {
+		esRunTimeMaxLockedMem, err := extractNumericFromText(esSetting.RuntimeMaxLockedMem, 0)
+		if err != nil {
+			logrus.Debug("Not able to parse esRunTimeMaxLockedMem from opensearch settings", err.Error())
+			return ossSetting.RuntimeMaxLockedMem
+		} else {
+			ossRunTimeMaxLockedMem, err := extractNumericFromText(ossSetting.RuntimeMaxLockedMem, 0)
+			if err != nil {
+				logrus.Debug("Not able to parse ossRunTimeMaxLockedMem from opensearch settings", err.Error())
+				return ossSetting.RuntimeMaxLockedMem
+			} else {
+				if esRunTimeMaxLockedMem > ossRunTimeMaxLockedMem {
+					return fmt.Sprintf("%d", int64(math.Round(esRunTimeMaxLockedMem)))
+				} else {
+					return fmt.Sprintf("%d", int64(math.Round(ossRunTimeMaxLockedMem)))
+				}
+			}
+		}
+	}
+}
+
+func getTotalShardsSetting(esSetting *ESSettings, ossSetting *ESSettings) int64 {
+	if esSetting.TotalShardSettings > ossSetting.TotalShardSettings {
+		return esSetting.TotalShardSettings
+	} else {
+		return ossSetting.TotalShardSettings
+	}
+}
+
 func GetBestSettings() *ESSettings {
 	ossSetting := GetDefaultOSSettings()
 	esSetting, err := getOldElasticSearchSettings()
@@ -315,91 +409,12 @@ func GetBestSettings() *ESSettings {
 		logrus.Debug("error in reading old es settigs\n", err)
 		return ossSetting
 	}
-
 	bestSetting := &ESSettings{}
-	esHeapSize, err := extractNumericFromText(esSetting.HeapMemory, 0)
-	if err != nil {
-		logrus.Debug("Not able to parse heapsize from elasticsearch settings", err.Error())
-		bestSetting.HeapMemory = ossSetting.HeapMemory
-	} else {
-		ossHeapSize, err := extractNumericFromText(ossSetting.HeapMemory, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse heapsize from opensearch settings", err.Error())
-			bestSetting.HeapMemory = ossSetting.HeapMemory
-		} else {
-			if esHeapSize >= 32 || ossHeapSize >= 32 {
-				bestSetting.HeapMemory = "32"
-			} else if esHeapSize > ossHeapSize {
-				bestSetting.HeapMemory = fmt.Sprintf("%d", int64(math.Round(esHeapSize)))
-			} else {
-				bestSetting.HeapMemory = fmt.Sprintf("%d", int64(math.Round(ossHeapSize)))
-			}
-		}
-	}
-
-	esIndicesBreakerTotalLimit, err := extractNumericFromText(esSetting.IndicesBreakerTotalLimit, 0)
-	if err != nil {
-		logrus.Debug("Not able to parse indicesBreakerTotalLimit from opensearch settings", err.Error())
-		bestSetting.IndicesBreakerTotalLimit = ossSetting.IndicesBreakerTotalLimit
-	} else {
-		ossIndicesBreakerTotalLimit, err := extractNumericFromText(ossSetting.IndicesBreakerTotalLimit, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse indicesBreakerTotalLimit from opensearch settings", err.Error())
-			bestSetting.IndicesBreakerTotalLimit = ossSetting.IndicesBreakerTotalLimit
-		} else {
-			if esIndicesBreakerTotalLimit > ossIndicesBreakerTotalLimit {
-				bestSetting.IndicesBreakerTotalLimit = fmt.Sprintf("%d", int64(math.Round(esIndicesBreakerTotalLimit)))
-			} else {
-				bestSetting.IndicesBreakerTotalLimit = fmt.Sprintf("%d", int64(math.Round(ossIndicesBreakerTotalLimit)))
-			}
-		}
-	}
-
-	esRunTimeMaxOpenFile, err := extractNumericFromText(esSetting.RuntimeMaxOpenFile, 0)
-	if err != nil {
-		logrus.Debug("Not able to parse esRunTimeMaxOpenFile from opensearch settings", err.Error())
-		bestSetting.RuntimeMaxOpenFile = ossSetting.RuntimeMaxOpenFile
-	} else {
-		ossRunTimeMaxOpenFile, err := extractNumericFromText(ossSetting.RuntimeMaxOpenFile, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse ossRunTimeMaxOpenFile from opensearch settings", err.Error())
-			bestSetting.RuntimeMaxOpenFile = ossSetting.RuntimeMaxOpenFile
-		} else {
-			if esRunTimeMaxOpenFile > ossRunTimeMaxOpenFile {
-				bestSetting.RuntimeMaxOpenFile = fmt.Sprintf("%d", int64(esRunTimeMaxOpenFile))
-			} else {
-				bestSetting.RuntimeMaxOpenFile = fmt.Sprintf("%d", int64(ossRunTimeMaxOpenFile))
-			}
-		}
-	}
-
-	if esSetting.TotalShardSettings > ossSetting.TotalShardSettings {
-		bestSetting.TotalShardSettings = esSetting.TotalShardSettings
-	} else {
-		bestSetting.TotalShardSettings = ossSetting.TotalShardSettings
-	}
-
-	if esSetting.RuntimeMaxLockedMem == "unlimited" || ossSetting.RuntimeMaxLockedMem == "unlimited" {
-		bestSetting.RuntimeMaxLockedMem = "unlimited"
-	} else {
-		esRunTimeMaxLockedMem, err := extractNumericFromText(esSetting.RuntimeMaxLockedMem, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse esRunTimeMaxLockedMem from opensearch settings", err.Error())
-			bestSetting.RuntimeMaxLockedMem = ossSetting.RuntimeMaxLockedMem
-		} else {
-			ossRunTimeMaxLockedMem, err := extractNumericFromText(ossSetting.RuntimeMaxLockedMem, 0)
-			if err != nil {
-				logrus.Debug("Not able to parse ossRunTimeMaxLockedMem from opensearch settings", err.Error())
-				bestSetting.RuntimeMaxLockedMem = ossSetting.RuntimeMaxLockedMem
-			} else {
-				if esRunTimeMaxLockedMem > ossRunTimeMaxLockedMem {
-					bestSetting.RuntimeMaxLockedMem = fmt.Sprintf("%d", int64(math.Round(esRunTimeMaxLockedMem)))
-				} else {
-					bestSetting.RuntimeMaxLockedMem = fmt.Sprintf("%d", int64(math.Round(ossRunTimeMaxLockedMem)))
-				}
-			}
-		}
-	}
+	bestSetting.HeapMemory = getBestHeapSetting(esSetting, ossSetting)
+	bestSetting.IndicesBreakerTotalLimit = getIndicesBreakerTotalLimitSetting(esSetting, ossSetting)
+	bestSetting.RuntimeMaxOpenFile = getRuntimeMaxOpenFile(esSetting, ossSetting)
+	bestSetting.RuntimeMaxLockedMem = getMaxLockedMemorySetting(esSetting, ossSetting)
+	bestSetting.TotalShardSettings = getTotalShardsSetting(esSetting, ossSetting)
 	return bestSetting
 }
 
