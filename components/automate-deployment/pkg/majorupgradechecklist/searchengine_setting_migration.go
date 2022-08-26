@@ -264,6 +264,7 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 		err = ioutil.WriteFile(AutomateOpensearchConfigPatch, []byte(finalTemplate), 0600) // nosemgrep
 		if err != nil {
 			logrus.Debug(fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch), err.Error())
+			return err
 		}
 		logrus.Debug(fmt.Sprintf("Config written %s to \n", AutomateOpensearchConfigPatch))
 		defer func() {

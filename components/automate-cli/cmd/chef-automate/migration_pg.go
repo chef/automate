@@ -260,11 +260,6 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
-		isEmbeded := !majorupgradechecklist.IsExternalElasticSearch()
-		patchError := majorupgradechecklist.PatchBestOpenSearchSettings(isEmbeded)
-		if patchError != nil {
-			writer.Title("Tuning search engine settings")
-		}
 		var isAvailableSpace bool
 		var err error
 		if migrateDataCmdFlags.check {
@@ -317,6 +312,12 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 					)
 					if err != nil {
 						return err
+					}
+					isEmbeded := !majorupgradechecklist.IsExternalElasticSearch()
+					patchError := majorupgradechecklist.PatchBestOpenSearchSettings(isEmbeded)
+					if patchError != nil {
+						writer.Errorln("Error in patching default settings for opensearch")
+						writer.Errorln(patchError.Error())
 					}
 					err = esMigrateExecutor(ci)
 					if err != nil {
