@@ -269,16 +269,6 @@ func enableSharding(h ChecklistHelper, isEmbedded bool) error {
 	return nil
 }
 
-func GetDefaultOSSettings() *ESSettings {
-	defaultSettings := &ESSettings{}
-	defaultSettings.HeapMemory = defaultHeapSize()
-	defaultSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
-	defaultSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
-	defaultSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT
-	defaultSettings.TotalShardSettings = INDICES_TOTAL_SHARD_DEFAULT
-	return defaultSettings
-}
-
 func downTimeCheckV4() Checklist {
 	return Checklist{
 		Name:        "down_time_acceptance",

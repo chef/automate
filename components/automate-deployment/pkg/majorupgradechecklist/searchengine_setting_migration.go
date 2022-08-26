@@ -33,7 +33,7 @@ const MAX_OPEN_FILE_KEY = "Max open files"
 const MAX_LOCKED_MEM_KEY = "Max locked memory"
 
 const INDICES_TOTAL_SHARD_DEFAULT = 6000
-const INDICES_BREAKER_TOTAL_LIMIT_DEFAULT = "95%"
+const INDICES_BREAKER_TOTAL_LIMIT_DEFAULT = "95"
 
 var V3ESSettingFile string = "/hab/svc/deployment-service/old_es_v3_settings.json"
 var AutomateOpensearchConfigPatch string = "/hab/svc/deployment-service/oss-config.toml"
@@ -240,7 +240,7 @@ func defaultHeapSize() string {
 	if err != nil {
 		sysMem = 0
 	}
-	return fmt.Sprintf("%dg", oss.RecommendedHeapSizeGB(sysMem))
+	return fmt.Sprintf("%d", oss.RecommendedHeapSizeGB(sysMem))
 }
 
 func StoreESSettings(isEmbeded bool) error {
@@ -314,18 +314,13 @@ func getBestHeapSetting(esSetting *ESSettings, ossSetting *ESSettings) string {
 		logrus.Debug("Not able to parse heapsize from elasticsearch settings", err.Error())
 		return ossSetting.HeapMemory
 	} else {
-		ossHeapSize, err := extractNumericFromText(ossSetting.HeapMemory, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse heapsize from opensearch settings", err.Error())
-			return ossSetting.HeapMemory
+		ossHeap, _ := strconv.ParseFloat(ossSetting.HeapMemory, 64)
+		if esHeapSize >= 32 || ossHeap >= 32 {
+			return "32"
+		} else if esHeapSize > ossHeap {
+			return fmt.Sprintf("%d", int64(math.Round(esHeapSize)))
 		} else {
-			if esHeapSize >= 32 || ossHeapSize >= 32 {
-				return "32"
-			} else if esHeapSize > ossHeapSize {
-				return fmt.Sprintf("%d", int64(math.Round(esHeapSize)))
-			} else {
-				return fmt.Sprintf("%d", int64(math.Round(ossHeapSize)))
-			}
+			return fmt.Sprintf("%d", int64(math.Round(ossHeap)))
 		}
 	}
 }
@@ -336,16 +331,11 @@ func getIndicesBreakerTotalLimitSetting(esSetting *ESSettings, ossSetting *ESSet
 		logrus.Debug("Not able to parse indicesBreakerTotalLimit from opensearch settings", err.Error())
 		return ossSetting.IndicesBreakerTotalLimit
 	} else {
-		ossIndicesBreakerTotalLimit, err := extractNumericFromText(ossSetting.IndicesBreakerTotalLimit, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse indicesBreakerTotalLimit from opensearch settings", err.Error())
-			return ossSetting.IndicesBreakerTotalLimit
+		ossIndicesBreakerTotalLimit, _ := strconv.ParseFloat(ossSetting.IndicesBreakerTotalLimit, 64)
+		if esIndicesBreakerTotalLimit > ossIndicesBreakerTotalLimit {
+			return fmt.Sprintf("%d", int64(math.Round(esIndicesBreakerTotalLimit)))
 		} else {
-			if esIndicesBreakerTotalLimit > ossIndicesBreakerTotalLimit {
-				return fmt.Sprintf("%d", int64(math.Round(esIndicesBreakerTotalLimit)))
-			} else {
-				return fmt.Sprintf("%d", int64(math.Round(ossIndicesBreakerTotalLimit)))
-			}
+			return fmt.Sprintf("%d", int64(math.Round(ossIndicesBreakerTotalLimit)))
 		}
 	}
 }
@@ -356,42 +346,17 @@ func getRuntimeMaxOpenFile(esSetting *ESSettings, ossSetting *ESSettings) string
 		logrus.Debug("Not able to parse esRunTimeMaxOpenFile from opensearch settings", err.Error())
 		return ossSetting.RuntimeMaxOpenFile
 	} else {
-		ossRunTimeMaxOpenFile, err := extractNumericFromText(ossSetting.RuntimeMaxOpenFile, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse ossRunTimeMaxOpenFile from opensearch settings", err.Error())
-			return ossSetting.RuntimeMaxOpenFile
+		ossRunTimeMaxOpenFile, _ := strconv.ParseFloat(ossSetting.RuntimeMaxOpenFile, 64)
+		if esRunTimeMaxOpenFile > ossRunTimeMaxOpenFile {
+			return fmt.Sprintf("%d", int64(esRunTimeMaxOpenFile))
 		} else {
-			if esRunTimeMaxOpenFile > ossRunTimeMaxOpenFile {
-				return fmt.Sprintf("%d", int64(esRunTimeMaxOpenFile))
-			} else {
-				return fmt.Sprintf("%d", int64(ossRunTimeMaxOpenFile))
-			}
+			return fmt.Sprintf("%d", int64(ossRunTimeMaxOpenFile))
 		}
 	}
 }
 
-func getMaxLockedMemorySetting(esSetting *ESSettings, ossSetting *ESSettings) string {
-	if esSetting.RuntimeMaxLockedMem == "unlimited" || ossSetting.RuntimeMaxLockedMem == "unlimited" {
-		return "unlimited"
-	} else {
-		esRunTimeMaxLockedMem, err := extractNumericFromText(esSetting.RuntimeMaxLockedMem, 0)
-		if err != nil {
-			logrus.Debug("Not able to parse esRunTimeMaxLockedMem from opensearch settings", err.Error())
-			return ossSetting.RuntimeMaxLockedMem
-		} else {
-			ossRunTimeMaxLockedMem, err := extractNumericFromText(ossSetting.RuntimeMaxLockedMem, 0)
-			if err != nil {
-				logrus.Debug("Not able to parse ossRunTimeMaxLockedMem from opensearch settings", err.Error())
-				return ossSetting.RuntimeMaxLockedMem
-			} else {
-				if esRunTimeMaxLockedMem > ossRunTimeMaxLockedMem {
-					return fmt.Sprintf("%d", int64(math.Round(esRunTimeMaxLockedMem)))
-				} else {
-					return fmt.Sprintf("%d", int64(math.Round(ossRunTimeMaxLockedMem)))
-				}
-			}
-		}
-	}
+func getMaxLockedMemorySetting() string {
+	return "unlimited"
 }
 
 func getTotalShardsSetting(esSetting *ESSettings, ossSetting *ESSettings) int64 {
@@ -413,7 +378,7 @@ func GetBestSettings() *ESSettings {
 	bestSetting.HeapMemory = getBestHeapSetting(esSetting, ossSetting)
 	bestSetting.IndicesBreakerTotalLimit = getIndicesBreakerTotalLimitSetting(esSetting, ossSetting)
 	bestSetting.RuntimeMaxOpenFile = getRuntimeMaxOpenFile(esSetting, ossSetting)
-	bestSetting.RuntimeMaxLockedMem = getMaxLockedMemorySetting(esSetting, ossSetting)
+	bestSetting.RuntimeMaxLockedMem = getMaxLockedMemorySetting()
 	bestSetting.TotalShardSettings = getTotalShardsSetting(esSetting, ossSetting)
 	return bestSetting
 }
@@ -443,4 +408,14 @@ func getOldElasticSearchSettings() (*ESSettings, error) {
 		return esSetting, err
 	}
 	return esSetting, nil
+}
+
+func GetDefaultOSSettings() *ESSettings {
+	defaultSettings := &ESSettings{}
+	defaultSettings.HeapMemory = defaultHeapSize()
+	defaultSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
+	defaultSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
+	defaultSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT
+	defaultSettings.TotalShardSettings = INDICES_TOTAL_SHARD_DEFAULT
+	return defaultSettings
 }
