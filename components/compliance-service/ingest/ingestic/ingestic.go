@@ -1041,20 +1041,20 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 	bulkRequest := backend.client.Bulk()
 	for _, control := range controls {
 		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err != nil {
-			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
-		}
-		err = backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err != nil {
-			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
-		}
 		found, controlStatus, err := backend.CheckIfControlIdExistsForToday(docId, index)
 		if err != nil {
 			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
 		}
 		if found {
+			scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+			if err != nil {
+				logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
+			}
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
+			//Updating the day latest in bulk update
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
+			//Adding the request for daily latest in bulk update only
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(backend.SetDailyLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(controlStatus, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)))
 			continue
 		}
@@ -1090,11 +1090,7 @@ func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
 
 // Sets the 'day_latest' field to 'false' for all control index
 // This way, the last 90 days is covered
-func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
-
-	boolQueryDayLatest := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
+func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) (*elastic.Script, string, error) {
 
 	script := elastic.NewScript(`
 	def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
@@ -1113,25 +1109,21 @@ func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context,
 	esIndexes, err := relaxting.IndexDates(relaxting.CompDailyControlIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Add(-24*time.Hour).Format(time.RFC3339))
 	if err != nil {
 		logrus.Errorf("Cannot get indexes: %+v", err)
-		return err
+		return nil, "", err
 	}
 	// Updating in all the Indices
-	_, err = elastic.NewUpdateByQueryService(backend.client).
-		Index(esIndexes).
-		Query(boolQueryDayLatest).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-	return errors.Wrap(err, "SetDayLatestsToFalseorControlIndex")
+
+	return script, esIndexes, nil
+
 }
 
 // Sets the 'daily_latest'  fields to 'false' for new control index
 // This targets only one ES UTC index
-func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
+func (backend *ESClient) SetDailyLatestToFalseForControlIndex(nodeId string) *elastic.Script {
+	/*termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
 	boolQueryDailyLatest := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
+		Must(termQueryThisControl)*/
 
 	// Script to find the nodes and making daily_latest as false
 	script := elastic.NewScript(`
@@ -1143,13 +1135,15 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 		 }`).Param("node_uuid", nodeId)
 
 	// Updating in all the Indices
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(index).
-		Query(boolQueryDailyLatest).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
+	/*_, err := elastic.NewUpdateByQueryService(backend.client).
+	Index(index).
+	Query(boolQueryDailyLatest).
+	Script(script).
+	Refresh("false").
+	Do(ctx)*/
+	//return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
+
+	return script
 }
 
 //SetNodesDayLatestFalse Sets the flag for the currently present data in os database
