@@ -1003,10 +1003,9 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId []string, indexTod
 					}
 					statusMap[hit.Id] = status.Status
 				}
-				logrus.Debugf("Found the document with for control with doc Id %s", docId)
+				//logrus.Debugf("Found the document with for control with doc Id %s", docId)
 
 			}
-
 		}
 	}
 	return statusMap, nil
