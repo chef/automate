@@ -20,7 +20,7 @@ import (
 func StoreCompliance(cerealService *cereal.Manager, client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
 	logrus.Debugf("StoreCompliance started with numberOfPublishers = %d", numberOfPublishers)
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
-		out := make(chan message.Compliance, 100)
+		out := make(chan message.Compliance, 50)
 
 		for i := 0; i < numberOfPublishers; i++ {
 			go storeCompliance(in, out, cerealService, client, i)
@@ -110,6 +110,7 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient, cerea
 			out <- nil
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
+		logrus.Infof("Enqueue workflow started at %v", time.Now())
 		errWorkflow := cerealManager.EnqueueWorkflow(context.TODO(), processor.ReportWorkflowName,
 			fmt.Sprintf("%s-%s", "control-workflow", msg.Report.ReportUuid),
 			processor.ControlWorkflowParameters{
@@ -117,6 +118,8 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient, cerea
 				Retries:    2,
 				EndTime:    msg.Shared.EndTime,
 			})
+
+		logrus.Infof("Enqueue completed at %v", time.Now())
 
 		if errWorkflow != nil {
 			fmt.Errorf("error in enqueuing the  workflow for request id %s: %w", msg.Report.ReportUuid, err)

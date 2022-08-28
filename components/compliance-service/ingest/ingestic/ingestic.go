@@ -321,43 +321,23 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 }
 
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
+	t := time.Now()
 	var runInfo relaxting.ESComplianceRunInfo
-	var firstRun string
 	var err error
 	mapping := mappings.ComplianceRunInfo
-	runInfoCh := make(chan relaxting.ESComplianceRunInfo)
-	cErr := make(chan error)
-	firstRunInfoCh := make(chan string)
+	t1 := time.Now()
+	runInfo = MapReportToRunInfo(report, runDateTime)
+	logrus.Info("Completed mapping report to runinfo in ", time.Since(t1).Seconds())
 
-	go MapReportToRunInfo(report, runDateTime, runInfoCh)
-	go backend.getDocFromNodeRunInfoFromNodeId(ctx, report.NodeID, mappings.ComplianceRunInfo.Index, firstRunInfoCh, cErr)
-
-	for i := 0; i < 2; i++ {
-		select {
-		case runInfo = <-runInfoCh:
-		case firstRun = <-firstRunInfoCh:
-		case err = <-cErr:
-
-		}
-	}
-
-	if err != nil {
-		logrus.Infof("Unable to fetch document with error  %v", err)
-		return err
-	}
-
-	if len(firstRun) > 0 {
-		runInfo.FirstRun, err = time.Parse(time.RFC3339, firstRun)
-		if err != nil {
-			logrus.Errorf("Unable to parse the first run info")
-		}
-	}
-
+	t1 = time.Now()
 	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
+	logrus.Info("Completed upsert report to runinfo in ", time.Since(t1).Seconds())
+
+	logrus.Info("Completed InsertComplianceRunInfo in ", time.Since(t).Seconds())
 	return err
 }
 
-func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time, runInfo chan relaxting.ESComplianceRunInfo) {
+func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time) relaxting.ESComplianceRunInfo {
 	rInfo := relaxting.ESComplianceRunInfo{}
 	rInfo.NodeID = report.NodeID
 	rInfo.ResourceId = ""
@@ -376,7 +356,7 @@ func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time,
 	rInfo.ChefTags = report.ChefTags
 	rInfo.Environment = report.Environment
 	rInfo.PolicyGroup = report.PolicyGroup
-	runInfo <- rInfo
+	return rInfo
 }
 
 func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.ProfileRunInfo {
@@ -978,17 +958,18 @@ func (backend *ESClient) GetDocByReportUUId(ctx context.Context, reportUuid stri
 	return &item, nil
 }
 
-func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday string) (bool, string, error) {
+func (backend *ESClient) CheckIfControlIdExistsForToday(docId []string, indexToday string) (map[string]string, error) {
 	logrus.Debugf("Checking the control document exists for today with doc Id :%s", docId)
-	fsc := elastic.NewFetchSourceContext(true).Include("status")
+	statusMap := make(map[string]string)
+	fsc := elastic.NewFetchSourceContext(true).Include("_id", "status")
 	boolQuery := elastic.NewBoolQuery()
 	idsQuery := elastic.NewIdsQuery()
-	idsQuery.Ids(docId)
+	idsQuery.Ids(docId...)
 	boolQuery = boolQuery.Must(idsQuery)
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
 		Query(boolQuery).
-		Size(1)
+		Size(len(docId))
 
 	source, _ := searchSource.Source()
 	relaxting.LogQueryPartMin(indexToday, source, "Query for search query")
@@ -1001,10 +982,10 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday
 		switch {
 		case elastic.IsTimeout(err):
 			logrus.Errorf("Timeout retrieving document: %v", err)
-			return false, "", err
+			return nil, err
 		default:
 			logrus.Errorf("Received error: %v", err)
-			return false, "", err
+			return nil, err
 		}
 	}
 
@@ -1018,48 +999,64 @@ func (backend *ESClient) CheckIfControlIdExistsForToday(docId string, indexToday
 				if hit.Source != nil {
 					err := json.Unmarshal(hit.Source, status)
 					if err != nil {
-						return false, "", err
+						return nil, err
 					}
-
-					return true, status.Status, nil
+					statusMap[hit.Id] = status.Status
 				}
-				logrus.Debugf("Found the document with for control with doc Id %s", docId)
+				//logrus.Debugf("Found the document with for control with doc Id %s", docId)
 
 			}
-
 		}
 	}
-	return false, "", nil
+	return statusMap, nil
 
 }
 
 //UploadDataToControlIndex Uploades the data to new control index with comp-1-control-*
-func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time) error {
+func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuuid string, controls []relaxting.Control, endTime time.Time, docIds []string) error {
 	mapping := mappings.ComplianceControlRepData
 	index := mapping.IndexTimeseriesFmt(endTime)
+	statusMap, err := backend.CheckIfControlIdExistsForToday(docIds, index)
+	if err != nil {
+		logrus.Errorf("Unable to fetch document for controls fo report uuid %s", reportuuid)
+	}
 
+	bulkBatch := 25
 	bulkRequest := backend.client.Bulk()
-	for _, control := range controls {
-		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
-		err := backend.SetDailyLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
-		if err != nil {
-			logrus.Errorf("Unable to SetDailyLatestToFalseForControlIndex %v", err)
+	for ind, control := range controls {
+		if ind > 0 && ind%bulkBatch == 0 {
+			if bulkRequest.NumberOfActions() > 0 {
+				e := backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
+				if e != nil {
+					return e
+				}
+			}
 		}
-		err = backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
+		docId := GetDocIdByControlIdAndProfileID(control.ControlID, control.Profile.ProfileID)
+		scriptDayLatest, indexes, err := backend.SetDayLatestToFalseForControlIndex(ctx, control.ControlID, control.Profile.ProfileID, mapping, index, control.Nodes[0].NodeUUID)
 		if err != nil {
 			logrus.Errorf("Unable to set Day Latest To false for control index %v", err)
 		}
-		found, controlStatus, err := backend.CheckIfControlIdExistsForToday(docId, index)
-		if err != nil {
-			logrus.Errorf("Unable to fetch document for control id %s|%s", control.ControlID, control.Profile.ProfileID)
-		}
+		//Updating the day latest in bulk update
+		bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(indexes).Id(docId).Script(scriptDayLatest))
+		status, found := statusMap[docId]
 		if found {
+			//Adding the request for daily latest in bulk update only
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(backend.SetDailyLatestToFalseForControlIndex(control.Nodes[0].NodeUUID)))
 			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(createScriptForAddingNode(control.Nodes[0])))
-			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(controlStatus, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)))
+			bulkRequest = bulkRequest.Add(elastic.NewBulkUpdateRequest().Index(index).Id(docId).Script(scriptForUpdatingControlIndexStatusAndEndTime(status, control.Nodes[0].Status, control.Nodes[0].NodeEndTime)))
 			continue
 		}
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(docId).Doc(control).Type("_doc"))
 	}
+	if bulkRequest.NumberOfActions() > 0 {
+		err = backend.bulkCommit(ctx, reportuuid, controls, bulkRequest, err)
+	}
+	return err
+
+}
+
+func (backend *ESClient) bulkCommit(ctx context.Context, reportuuid string, controls []relaxting.Control, bulkRequest *elastic.BulkService, err error) error {
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
 	if err != nil {
@@ -1073,7 +1070,6 @@ func (backend *ESClient) UploadDataToControlIndex(ctx context.Context, reportuui
 
 	logrus.Debugf("Bulk insert %d summaries, ~size %dB, took %dms", len(controls), approxBytes, bulkResponse.Took)
 	return nil
-
 }
 
 func GetDocIdByControlIdAndProfileID(controlID string, profileID string) string {
@@ -1090,11 +1086,7 @@ func createScriptForAddingNode(node relaxting.Node) *elastic.Script {
 
 // Sets the 'day_latest' field to 'false' for all control index
 // This way, the last 90 days is covered
-func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
-
-	boolQueryDayLatest := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
+func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) (*elastic.Script, string, error) {
 
 	script := elastic.NewScript(`
 	def targets = ctx._source.nodes.findAll(node -> node.node_uuid == params.node_uuid);
@@ -1113,25 +1105,21 @@ func (backend *ESClient) SetDayLatestToFalseForControlIndex(ctx context.Context,
 	esIndexes, err := relaxting.IndexDates(relaxting.CompDailyControlIndexPrefix, time90daysAgo.Format(time.RFC3339), time.Now().Add(-24*time.Hour).Format(time.RFC3339))
 	if err != nil {
 		logrus.Errorf("Cannot get indexes: %+v", err)
-		return err
+		return nil, "", err
 	}
 	// Updating in all the Indices
-	_, err = elastic.NewUpdateByQueryService(backend.client).
-		Index(esIndexes).
-		Query(boolQueryDayLatest).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-	return errors.Wrap(err, "SetDayLatestsToFalseorControlIndex")
+
+	return script, esIndexes, nil
+
 }
 
 // Sets the 'daily_latest'  fields to 'false' for new control index
 // This targets only one ES UTC index
-func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Context, controlId string, profileId string, mapping mappings.Mapping, index string, nodeId string) error {
-	termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
+func (backend *ESClient) SetDailyLatestToFalseForControlIndex(nodeId string) *elastic.Script {
+	/*termQueryThisControl := elastic.NewTermsQuery("_id", GetDocIdByControlIdAndProfileID(controlId, profileId))
 
 	boolQueryDailyLatest := elastic.NewBoolQuery().
-		Must(termQueryThisControl)
+		Must(termQueryThisControl)*/
 
 	// Script to find the nodes and making daily_latest as false
 	script := elastic.NewScript(`
@@ -1143,13 +1131,15 @@ func (backend *ESClient) SetDailyLatestToFalseForControlIndex(ctx context.Contex
 		 }`).Param("node_uuid", nodeId)
 
 	// Updating in all the Indices
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(index).
-		Query(boolQueryDailyLatest).
-		Script(script).
-		Refresh("false").
-		Do(ctx)
-	return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
+	/*_, err := elastic.NewUpdateByQueryService(backend.client).
+	Index(index).
+	Query(boolQueryDailyLatest).
+	Script(script).
+	Refresh("false").
+	Do(ctx)*/
+	//return errors.Wrap(err, "SetDailyLatestToFalseForControlIndex")
+
+	return script
 }
 
 //SetNodesDayLatestFalse Sets the flag for the currently present data in os database
