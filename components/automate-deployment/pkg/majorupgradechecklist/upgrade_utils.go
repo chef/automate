@@ -58,7 +58,7 @@ func GetMajorVersion(version string) (string, bool) {
 	return version, false
 }
 
-func IsExternalElasticSearch(writer cli.FormatWriter) bool {
+func IsExternalElasticSearch() bool {
 	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
 	if err != nil {
 		logrus.Error("failed to get elastic search configuration: ", err.Error())
