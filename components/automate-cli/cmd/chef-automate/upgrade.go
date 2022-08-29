@@ -3,13 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	os "github.com/chef/automate/api/config/opensearch"
+	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
@@ -118,6 +120,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 		}
+		// Restart Deployment service to update the manifest.json
+		err = restartDeploymentService()
+		if err != nil {
+			return status.Annotate(err, status.RestartDeploymentServiceError)
+		}
 	}
 
 	connection, err := client.Connection(client.DefaultClientTimeout)
@@ -210,6 +217,49 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	// stuff breaks when deployment-service is restarted. Until that's fixed,
 	// it would be pointless to try to stream the events.
 	return nil
+}
+
+// restartDeploymentService will kill the Pid of Deployment Service and then Hab will restart this service
+func restartDeploymentService() error {
+	writer.Println("Trying to restart Deployment Service...")
+	res, err := getStatus()
+	if err != nil {
+		return err
+	}
+	isDeploymentServiceKilled := false
+	for _, s := range res.ServiceStatus.Services {
+		if s.Name == "deployment-service" {
+			deploymentServiceProcess := os.Process{Pid: int(s.Pid)}
+			err := deploymentServiceProcess.Kill()
+			if err != nil {
+				return err
+			}
+			isDeploymentServiceKilled = true
+			writer.Println("Deployment service is stopped")
+		}
+	}
+	if !isDeploymentServiceKilled {
+		return errors.New("Failed to stop Deployment Service")
+	}
+	time.Sleep(10 * time.Second)
+	retryLimit := 30
+	for i := 0; i < retryLimit; i++ {
+		res, err := getStatus()
+		if err != nil {
+			return err
+		}
+		for _, s := range res.ServiceStatus.Services {
+			if s.Name == "deployment-service" {
+				if s.State == api.ServiceState_OK {
+					writer.Println("Deployment Service is healty now")
+					return nil
+				}
+				writer.Println("Waiting for Deployment Service to be healthy")
+				time.Sleep(10 * time.Second)
+			}
+		}
+	}
+	return errors.New("Deployment service is not healthy after restarting.")
 }
 
 func runAutomateHAFlow(args []string, offlineMode bool) error {
@@ -564,5 +614,5 @@ type OpenSearchModel struct {
 }
 
 type OpenSearch_v1 struct {
-	V1 *os.ConfigRequest_V1 `json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
+	V1 *opensearch.ConfigRequest_V1 `json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
 }

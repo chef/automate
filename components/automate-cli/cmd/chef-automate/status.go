@@ -53,6 +53,24 @@ var (
 	statusErrUnhealthy  = status.New(status.UnhealthyStatusError, "One or more services are unhealthy")
 )
 
+func getStatus() (*api.StatusResponse, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := connection.Status(context.Background(), &api.StatusRequest{})
+	if err != nil {
+		return nil, status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to obtain Chef Automate status information failed",
+		)
+	}
+
+	return res, nil
+}
+
 func runStatusCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		return executeAutomateClusterCtlCommand("status", args, statusHAHelpDocs)
@@ -67,24 +85,6 @@ func runStatusCmd(cmd *cobra.Command, args []string) error {
 		status.GlobalResult = statusResult{
 			Services: res.ServiceStatus.FormattedServices(),
 		}
-	}
-
-	getStatus := func() (*api.StatusResponse, error) {
-		connection, err := client.Connection(client.DefaultClientTimeout)
-		if err != nil {
-			return nil, err
-		}
-
-		res, err := connection.Status(context.Background(), &api.StatusRequest{})
-		if err != nil {
-			return nil, status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to obtain Chef Automate status information failed",
-			)
-		}
-
-		return res, nil
 	}
 
 	handleBadStatus := func(res *api.StatusResponse, err error) error {
