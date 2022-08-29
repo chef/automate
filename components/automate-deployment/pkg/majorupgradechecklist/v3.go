@@ -328,3 +328,8 @@ func promptUpgradeContinue() Checklist {
 		},
 	}
 }
+
+func (ci *V3ChecklistManager) StoreSearchEngineSettings() error {
+	fmt.Printf("Not needed for now")
+	return nil
+}

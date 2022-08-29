@@ -2,7 +2,6 @@ package majorupgradechecklist
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 )
 
 const (
@@ -31,7 +30,6 @@ type PostChecklist struct {
 }
 
 func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
-	var writer cli.FormatWriter
 	externalDB := false
 
 	majorVersion, _ := GetMajorVersion(version)
@@ -39,7 +37,7 @@ func NewPostChecklistManager(version string) (*PostChecklistManager, error) {
 	case "3":
 		externalDB = IsExternalPG()
 	case "4":
-		externalDB = IsExternalElasticSearch(writer)
+		externalDB = IsExternalElasticSearch()
 	}
 
 	ci, err := NewChecklistManager(nil, version)
