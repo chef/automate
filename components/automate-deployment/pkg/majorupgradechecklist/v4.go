@@ -1,4 +1,4 @@
-package majorupgradechecklist
+git adpackage majorupgradechecklist
 
 import (
 	"encoding/json"
@@ -166,7 +166,7 @@ func (ci *V4ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V4ChecklistManager) RunChecklist(timeout int64) error {
+func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgradeFlags) error {
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
@@ -179,7 +179,7 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64) error {
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{runIndexCheck(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
+		checklists = append(checklists, []Checklist{runIndexCheck(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES), replaceurl())
@@ -189,7 +189,6 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64) error {
 	}
 
 	ci.writer.Println(fmt.Sprintf(initMsgV4, dbType, ci.version)) //display the init message
-
 	for _, item := range checklists {
 		if item.TestFunc == nil {
 			continue
