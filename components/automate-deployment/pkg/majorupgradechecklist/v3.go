@@ -279,7 +279,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 
 			minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
 
-			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure you have more than %.2f GB of free disk space", minReqDiskSpace))
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure destination directory is having min. %.2f GB free space ?", minReqDiskSpace))
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
