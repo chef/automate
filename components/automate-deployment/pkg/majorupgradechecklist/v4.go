@@ -33,12 +33,31 @@ type indexVersion struct {
 type indexDetails struct {
 	Name    string
 	Version string
+	Error   string
 }
 
 type V4ChecklistManager struct {
 	writer       cli.FormatWriter
 	version      string
 	isExternalES bool
+}
+
+type IndexInfo struct {
+	Settings struct {
+		Index struct {
+			Version struct {
+				CreatedString string `json:"created_string"`
+				Created       string `json:"created"`
+			} `json:"version"`
+		} `json:"index"`
+	} `json:"settings"`
+}
+
+type indexData struct {
+	Name          string
+	MajorVersion  int64
+	CreatedString string
+	IsDeleted     bool
 }
 
 const (
@@ -85,6 +104,8 @@ const (
 	urlChangeMessage = `Your S3 url in backup config is changed from %s to https://s3.amazonaws.com. 
 This is because automate version 4 now only supports this format due to AWS SDK upgrade.
 `
+	msg           = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
+	oldIndexError = "The index %s is from an older version of elasticsearch version %s.\nPlease reindex in elasticsearch 6. %s\n%s"
 )
 
 var postChecklistV4Embedded = []PostCheckListItem{
@@ -179,7 +200,7 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{runIndexCheck(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
+		checklists = append(checklists, []Checklist{deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES), replaceurl())
@@ -513,7 +534,7 @@ func replaceurl() Checklist {
 	}
 }
 
-func checkIndexVersion(timeout int64) error {
+func getESBasePath(timeout int64) string {
 	var basePath = "http://localhost:10144/"
 	cfg := dc.DefaultAutomateConfig()
 	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
@@ -534,69 +555,89 @@ func checkIndexVersion(timeout int64) error {
 			}
 		}
 	}
+	return basePath
+}
 
-	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
+func getAllIndices(timeout int64) ([]byte, error) {
+	return execRequest(getESBasePath(timeout)+"_cat/indices?h=index", "GET", nil)
+}
+
+func doDeleteStaleIndices(timeout int64, h ChecklistHelper) error {
+	basePath := getESBasePath(timeout)
+	allIndexList, err := getAllIndices(timeout)
 	if err != nil {
 		return err
 	}
 
-	indexDetailsArray := []indexDetails{}
-	for _, index := range strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n") {
-		versionData, err := getDataFromUrl(basePath + index + "/_settings/index.version.created*?&human")
-		if err != nil {
-			return err
-		}
-		i, createdString, err := getMajorVersion(versionData, index)
-		if err != nil {
-			return err
-		}
-		if i < 6 {
-			indexDetailsArray = append(indexDetailsArray, indexDetails{Name: index, Version: createdString})
-		}
+	indexList := strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n")
+	indexCSL := strings.Join(indexList, ",")
+	versionData, err := execRequest(basePath+indexCSL+"/_settings/index.version.created*?&human", "GET", nil)
+	if err != nil {
+		return err
 	}
-	if len(indexDetailsArray) > 0 {
-		return formErrorMsg(indexDetailsArray)
+
+	indexInfo, err := getOldIndexInfo(versionData)
+
+	for i, index := range indexInfo {
+		h.Writer.Println(fmt.Sprintf("Automate is unable to upgrade because an index with name: %s is created using an older version of elasticsearch %s", index.Name, index.CreatedString))
+		resp, err := h.Writer.Confirm("Do you wish to delete the index to continue?")
+		if err != nil {
+			h.Writer.Error(err.Error())
+			return status.Errorf(status.InvalidCommandArgsError, err.Error())
+		}
+		errMsg := formErrorMsg(indexInfo)
+		if !resp {
+			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+		}
+
+		_, err = execRequest(fmt.Sprintf("%s%s?pretty", basePath, index.Name), "DELETE", nil)
+		if err != nil {
+			h.Writer.Error(err.Error())
+			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+		}
+		indexInfo[i].IsDeleted = true //mark the deleted indices, so that those wont show in the list to end user
 	}
 	return nil
 }
 
-func formErrorMsg(IndexDetailsArray []indexDetails) error {
+func formErrorMsg(IndexDetailsArray []indexData) error {
 	msg := "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n"
-	for _, version := range IndexDetailsArray {
-		msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", version.Name, version.Version)
+	for _, index := range IndexDetailsArray {
+		if !index.IsDeleted {
+			msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", index.Name, index.CreatedString)
+		}
 	}
 	msg += "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
 	return fmt.Errorf(msg)
 }
 
-func getMajorVersion(versionData []byte, index string) (int64, string, error) {
-	data := map[string]interface{}{}
-	json.Unmarshal(versionData, &data)
-	dataIdx := indexVersion{}
-	b, err := json.Marshal(data[index])
+func getOldIndexInfo(allIndexData []byte) ([]indexData, error) {
+	var indexDataArray []indexData
+	var parsed map[string]IndexInfo
+	err := json.Unmarshal(allIndexData, &parsed)
 	if err != nil {
-		return -1, "", errors.Wrap(err, "failed to marshal index data")
+		return nil, errors.Wrap(err, "error in unmarshalling the index data")
 	}
-	err = json.Unmarshal(b, &dataIdx)
-	if err != nil {
-		return -1, "", errors.Wrap(err, "failed to unmarshal index data")
+	for key, data := range parsed {
+		i, err := strconv.ParseInt(data.Settings.Index.Version.CreatedString[0:1], 10, 64)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse index version")
+		}
+		if i < 6 && key != ".watches" {
+			indexDataArray = append(indexDataArray,
+				indexData{Name: key, MajorVersion: i,
+					CreatedString: data.Settings.Index.Version.CreatedString})
+		}
 	}
-	if dataIdx.Settings.Index.Version.CreatedString == "" {
-		return -1, "", errors.New("version not found for index")
-	}
-	i, err := strconv.ParseInt(dataIdx.Settings.Index.Version.CreatedString[0:1], 10, 64)
-	if err != nil {
-		return -1, "", errors.Wrap(err, "failed to parse index version")
-	}
-	return i, dataIdx.Settings.Index.Version.CreatedString, nil
+	return indexDataArray, nil
 }
 
-func runIndexCheck(timeout int64) Checklist {
+func deleteStaleIndices(timeout int64) Checklist {
 	return Checklist{
 		Name:        "check index version",
-		Description: "confirmation check index version",
+		Description: "confirmation check to delete stale indices",
 		TestFunc: func(h ChecklistHelper) error {
-			err := checkIndexVersion(timeout)
+			err := doDeleteStaleIndices(timeout, h)
 			if err != nil {
 				return err
 			}
@@ -613,4 +654,77 @@ func (ci *V4ChecklistManager) StoreSearchEngineSettings() error {
 		return StoreESSettings(isEmbeded)
 	}
 	return nil
+}
+
+func deleteA1Indexes(timeout int64) Checklist {
+	allIndexList, err := getAllIndices(timeout)
+	if err != nil {
+		return Checklist{
+			Name:        "delete A1 indexes",
+			Description: "confirmation check to delete A1 indexes",
+			TestFunc: func(h ChecklistHelper) error {
+				return fmt.Errorf("Error while feteching the list of indices: %w", err)
+			},
+		}
+	}
+	targetList := []string{}
+	for _, index := range strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n") {
+		targetList = append(targetList, index)
+	}
+	sourceList := []string{".automate", ".locky", "saved-searches", ".tasks"}
+
+	existingIndexes := findMatch(sourceList, targetList)
+
+	if len(existingIndexes) == 0 {
+		return Checklist{
+			Name:        "delete A1 indexes",
+			Description: "confirmation check index version",
+			TestFunc:    nil,
+		}
+	}
+
+	return Checklist{
+		Name:        "delete A1 indexes",
+		Description: "confirmation check to delete A1 indexes",
+		TestFunc: func(h ChecklistHelper) error {
+			indexes := strings.Join(existingIndexes, ",")
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Following Indexes are of Automate 1 and are no longer use in automate, thus we will delete these indices:%s", indexes))
+			if err != nil {
+				h.Writer.Error(err.Error())
+				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+			}
+			if !resp {
+				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.")
+			}
+			err = deleteIndexFromA1(timeout, indexes)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+}
+
+func deleteIndexFromA1(timeout int64, indexes string) error {
+	basePath := getESBasePath(timeout)
+	_, err := execRequest(fmt.Sprintf("%s%s", basePath, indexes)+"?pretty", "DELETE", nil)
+	return err
+}
+
+//findMatch returns the list of items available in targetList from sourceList
+func findMatch(sourceList, targetList []string) []string {
+	matchedList := make(map[string]interface{})
+	for _, item := range targetList {
+		for _, sourceItem := range sourceList {
+			if strings.Contains(item, sourceItem) {
+				matchedList[item] = ""
+				break
+			}
+		}
+	}
+	list := []string{}
+	for key := range matchedList {
+		list = append(list, key)
+	}
+	return list
 }
