@@ -21,22 +21,38 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	oss "github.com/chef/automate/api/config/opensearch"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/lib/platform/sys"
-	"github.com/sirupsen/logrus"
 )
 
-const MAX_OPEN_FILE_DEFAULT = "65535"
-const MAX_LOCKED_MEM_DEFAULT = "unlimited"
+const (
+	MAX_OPEN_FILE_DEFAULT  = "65535"
+	MAX_LOCKED_MEM_DEFAULT = "unlimited"
+	MAX_OPEN_FILE_KEY      = "Max open files"
+	MAX_LOCKED_MEM_KEY     = "Max locked memory"
 
-const MAX_OPEN_FILE_KEY = "Max open files"
-const MAX_LOCKED_MEM_KEY = "Max locked memory"
+	INDICES_TOTAL_SHARD_DEFAULT         = 2000
+	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT = "95"
 
-const INDICES_TOTAL_SHARD_DEFAULT = 6000
-const INDICES_BREAKER_TOTAL_LIMIT_DEFAULT = "95"
+	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 500
 
-var V3ESSettingFile string = "/hab/svc/deployment-service/old_es_v3_settings.json"
-var AutomateOpensearchConfigPatch string = "/hab/svc/deployment-service/oss-config.toml"
+	MAX_POSSIBLE_HEAP_SIZE = 32
+
+	V3ESSettingFile               = "/hab/svc/deployment-service/old_es_v3_settings.json"
+	AutomateOpensearchConfigPatch = "/hab/svc/deployment-service/oss-config.toml"
+
+	maxHeapSizeExceeded = `
+heap size : %s, max allowed is 50%% of ram %dgb here but not exceeding %dgb,
+max shards per node : %d, max allowed is %d,
+indices breaker total limit : %s, max allowed is %s%%
+max open file : %s, max allowed is %s
+max locked memory : %s, max allowed is %s
+we recommend you to move to external/managed opensearch cluster for better performance.
+but if you still want to continue with the upgrade
+`
+	upgradeFailed = "due to pre-condition check failed"
+)
 
 type ESSettings struct {
 	TotalShardSettings       int64  `json:"totalShardSettings" toml:"totalShardSettings"`
@@ -54,19 +70,10 @@ type IndicesShardTotal struct {
 	} `json:"indices"`
 }
 
-type ESClusterSetting struct {
-	Persistent struct {
-	} `json:"persistent"`
-	Transient struct {
-	} `json:"transient"`
+type MaxShardPerNodeAndIndicesTotalLimit struct {
 	Defaults struct {
-		Indices struct {
-			Breaker struct {
-				Total struct {
-					Limit string `json:"limit"`
-				} `json:"total"`
-			} `json:"breaker"`
-		} `json:"indices"`
+		ClusterMaxShardsPerNode  string `json:"cluster.max_shards_per_node"`
+		IndicesBreakerTotalLimit string `json:"indices.breaker.total.limit"`
 	} `json:"defaults"`
 }
 
@@ -126,7 +133,7 @@ func getSearchEngineBasePath() string {
 	return basePath
 }
 
-func getClusterStats() (*IndicesShardTotal, error) {
+func getTotalShards() (*IndicesShardTotal, error) {
 	indicesShardTotal := &IndicesShardTotal{}
 	basePath := getSearchEngineBasePath()
 	totalShard, err := execRequest(basePath+"_cluster/stats?filter_path=indices.shards.total", "GET", nil)
@@ -160,6 +167,21 @@ func getElasticsearchPID() (string, error) {
 	}
 	return string(pid), nil
 }
+
+func getIndicesBreakerLimit() (*MaxShardPerNodeAndIndicesTotalLimit, error) {
+	maxShardPerNodeAndIndicesTotalLimit := &MaxShardPerNodeAndIndicesTotalLimit{}
+	basePath := getSearchEngineBasePath()
+	data, err := getDataFromUrl(basePath + "_cluster/settings?include_defaults=true&flat_settings=true&pretty")
+	if err != nil {
+		return maxShardPerNodeAndIndicesTotalLimit, err
+	}
+	err = json.Unmarshal(data, maxShardPerNodeAndIndicesTotalLimit)
+	if err != nil {
+		return maxShardPerNodeAndIndicesTotalLimit, err
+	}
+	return maxShardPerNodeAndIndicesTotalLimit, nil
+}
+
 func getProcessRuntimeSettings(pid string) (map[string]string, error) {
 	var result = make(map[string]string)
 	if pid != "" {
@@ -205,72 +227,78 @@ func getHeapMemorySettings() (string, error) {
 }
 
 // Supported search engines are Elastic Search and Open Search only as of now
-func getAllSearchEngineSettings(searchEnginePid string) (*ESSettings, error) {
-	clusterStats, err := getClusterStats()
+func getAllSearchEngineSettings(writer cli.FormatWriter, searchEnginePid string) (*ESSettings, error) {
+	esSettings := &ESSettings{}
+	totalShard, err := getTotalShards()
 	if err != nil {
-		logrus.Debug("not able to fetch total shard values, moving to default", err.Error())
-		clusterStats.Indices.Shards.Total = INDICES_TOTAL_SHARD_DEFAULT
+		writer.Warnf("not able to fetch total shard values, moving to default %s \n", err.Error())
+		esSettings.TotalShardSettings = INDICES_TOTAL_SHARD_DEFAULT
+	} else {
+		esSettings.TotalShardSettings = totalShard.Indices.Shards.Total
 	}
-	clusterSettings, err := getCusterSetting()
+	maxShardPerNodeAndIndicesTotalLimit, err := getIndicesBreakerLimit()
 	if err != nil {
-		logrus.Debug("not able to fetch indices breaker total limit, moving to default", err.Error())
-		clusterSettings.Defaults.Indices.Breaker.Total.Limit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
+		writer.Warnf("not able to fetch indices breaker total limit, moving to default \n %s \n", err.Error())
+		esSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
+	} else {
+		esSettings.IndicesBreakerTotalLimit = maxShardPerNodeAndIndicesTotalLimit.Defaults.IndicesBreakerTotalLimit
 	}
 	runtimeSettings, err := getProcessRuntimeSettings(searchEnginePid)
 	if err != nil {
-		logrus.Debug("not able to fetch max open file and max locked memory, moving to default", err.Error())
-		runtimeSettings[MAX_OPEN_FILE_KEY] = MAX_OPEN_FILE_DEFAULT
-		runtimeSettings[MAX_LOCKED_MEM_KEY] = MAX_LOCKED_MEM_DEFAULT
+		writer.Warnf("not able to fetch max open file and max locked memory, moving to default \n %s \n ", err.Error())
+		esSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT
+		esSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
+	} else {
+		esSettings.RuntimeMaxOpenFile = runtimeSettings["Max open files"]
+		esSettings.RuntimeMaxLockedMem = runtimeSettings["Max locked memory"]
 	}
-	heapmemSettings, err := getHeapMemorySettings()
+	heapMemSettings, err := getHeapMemorySettings()
 	if err != nil {
-		logrus.Debug("not able to fetch heap memory, moving to default", err.Error())
-		heapmemSettings = defaultHeapSize()
+		writer.Warnf("not able to fetch heap memory, moving to default \n %s \n", err.Error())
+		esSettings.HeapMemory = fmt.Sprintf("%d", defaultHeapSizeInGB())
+	} else {
+		esSettings.HeapMemory = heapMemSettings
 	}
-	esSettings := &ESSettings{}
-	esSettings.HeapMemory = heapmemSettings
-	esSettings.IndicesBreakerTotalLimit = clusterSettings.Defaults.Indices.Breaker.Total.Limit
-	esSettings.TotalShardSettings = clusterStats.Indices.Shards.Total
-	esSettings.RuntimeMaxOpenFile = runtimeSettings["Max open files"]
-	esSettings.RuntimeMaxLockedMem = runtimeSettings["Max locked memory"]
 	return esSettings, err
 }
 
-func defaultHeapSize() string {
+func defaultHeapSizeInGB() int {
 	sysMem, err := sys.SystemMemoryKB()
 	if err != nil {
 		sysMem = 0
 	}
-	return fmt.Sprintf("%d", oss.RecommendedHeapSizeGB(sysMem))
+	return oss.RecommendedHeapSizeGB(sysMem)
 }
 
-func StoreESSettings(isEmbeded bool) error {
-	if isEmbeded {
-		pid, err := getElasticsearchPID()
-		if err != nil {
-			logrus.Debug("No process id found for running elasticsearch", err.Error())
-		}
-		logrus.Debug("fetching elastic search settings.")
-		esSettings, err := getAllSearchEngineSettings(pid)
-		if err != nil {
-			return errors.Wrap(err, "error in fetching elastic search settings.")
-		}
-		esSettingsJson, err := json.Marshal(esSettings)
-		if err != nil {
-			return errors.Wrap(err, "error in mapping elastic search settings to json.")
-		}
-		logrus.Debug("writing json in file.")
-		err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775) // nosemgrep
-		if err != nil {
-			return errors.Wrap(err, "error in writing json in file.")
-		}
+func GetESSettings(writer cli.FormatWriter) (*ESSettings, error) {
+	pid, err := getElasticsearchPID()
+	if err != nil {
+		writer.Warnf("No process id found for running elasticsearch, %s \n", err.Error())
+	}
+	writer.Println("fetching elastic search settings.")
+	esSettings, err := getAllSearchEngineSettings(writer, pid)
+	if err != nil {
+		return esSettings, err
+	}
+	return esSettings, nil
+}
+
+func StoreESSettings(writer cli.FormatWriter, esSettings *ESSettings) error {
+	esSettingsJson, err := json.Marshal(esSettings)
+	if err != nil {
+		return errors.Wrap(err, "error in mapping elasticsearch settings to json.")
+	}
+	writer.Println("writing elasticsearch settings in file.")
+	err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775) // nosemgrep
+	if err != nil {
+		return errors.Wrap(err, "error in elasticsearch settings in file.")
 	}
 	return nil
 }
 
-func PatchBestOpenSearchSettings(isEmbedded bool) error {
+func PatchBestOpenSearchSettings(writer cli.FormatWriter, isEmbedded bool) error {
 	if isEmbedded {
-		bestSettings := GetBestSettings()
+		bestSettings := GetBestSettings(writer)
 		temp := template.Must(template.New("init").
 			Funcs(template.FuncMap{"StringsJoin": strings.Join}).
 			Parse(patchOpensearchSettingsTemplate))
@@ -285,15 +313,15 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch))
 		}
-		logrus.Debug(fmt.Sprintf("Config written %s to \n", AutomateOpensearchConfigPatch))
+		writer.Printf(fmt.Sprintf("Config written %s to \n", AutomateOpensearchConfigPatch))
 		defer func() {
 			err := os.Remove(AutomateOpensearchConfigPatch)
 			if err != nil {
-				logrus.Debug(fmt.Sprintf("error in removing file %s", AutomateOpensearchConfigPatch), err.Error())
+				writer.Warnf(fmt.Sprintf("error in removing file %s \n", AutomateOpensearchConfigPatch), err.Error())
 			}
 			err = os.Remove(V3ESSettingFile)
 			if err != nil {
-				logrus.Debug(fmt.Sprintf("error in removing file %s", V3ESSettingFile), err.Error())
+				writer.Warnf(fmt.Sprintf("error in removing file %s \n", V3ESSettingFile), err.Error())
 			}
 		}()
 		cmd := exec.Command("chef-automate", "config", "patch", AutomateOpensearchConfigPatch)
@@ -304,15 +332,16 @@ func PatchBestOpenSearchSettings(isEmbedded bool) error {
 		if err != nil {
 			return errors.Wrap(err, "Error in patching opensearch configuration")
 		}
-		logrus.Debug("config patch execution done, exiting\n")
+		writer.Success("config patch execution done, exiting\n")
 	}
 	return nil
 }
 
-func getBestHeapSetting(esSetting *ESSettings, ossSetting *ESSettings) string {
+func getBestHeapSetting(writer cli.FormatWriter, esSetting *ESSettings, ossSetting *ESSettings) string {
 	esHeapSize, err := extractNumericFromText(esSetting.HeapMemory, 0)
 	if err != nil {
-		logrus.Debug("Not able to parse heapsize from elasticsearch settings", err.Error())
+		writer.Warnf("Not able to parse heapsize from elasticsearch settings %s \n", err.Error())
+		writer.Warnf("applying default heap size %s \n", ossSetting.HeapMemory)
 		return ossSetting.HeapMemory
 	} else {
 		ossHeap, _ := strconv.ParseFloat(ossSetting.HeapMemory, 64)
@@ -326,10 +355,11 @@ func getBestHeapSetting(esSetting *ESSettings, ossSetting *ESSettings) string {
 	}
 }
 
-func getIndicesBreakerTotalLimitSetting(esSetting *ESSettings, ossSetting *ESSettings) string {
+func getIndicesBreakerTotalLimitSetting(writer cli.FormatWriter, esSetting *ESSettings, ossSetting *ESSettings) string {
 	esIndicesBreakerTotalLimit, err := extractNumericFromText(esSetting.IndicesBreakerTotalLimit, 0)
 	if err != nil {
-		logrus.Debug("Not able to parse indicesBreakerTotalLimit from opensearch settings", err.Error())
+		writer.Warnf("Not able to parse indicesBreakerTotalLimit from opensearch settings %s \n", err.Error())
+		writer.Warnf("applying default indices breaker total limit %s \n", ossSetting.IndicesBreakerTotalLimit)
 		return ossSetting.IndicesBreakerTotalLimit
 	} else {
 		ossIndicesBreakerTotalLimit, _ := strconv.ParseFloat(ossSetting.IndicesBreakerTotalLimit, 64)
@@ -341,10 +371,11 @@ func getIndicesBreakerTotalLimitSetting(esSetting *ESSettings, ossSetting *ESSet
 	}
 }
 
-func getRuntimeMaxOpenFile(esSetting *ESSettings, ossSetting *ESSettings) string {
+func getRuntimeMaxOpenFile(writer cli.FormatWriter, esSetting *ESSettings, ossSetting *ESSettings) string {
 	esRunTimeMaxOpenFile, err := extractNumericFromText(esSetting.RuntimeMaxOpenFile, 0)
 	if err != nil {
-		logrus.Debug("Not able to parse esRunTimeMaxOpenFile from opensearch settings", err.Error())
+		writer.Warnf("Not able to parse esRunTimeMaxOpenFile from opensearch settings %s \n", err.Error())
+		writer.Warnf("applying default max open file %s \n", ossSetting.RuntimeMaxOpenFile)
 		return ossSetting.RuntimeMaxOpenFile
 	} else {
 		ossRunTimeMaxOpenFile, _ := strconv.ParseFloat(ossSetting.RuntimeMaxOpenFile, 64)
@@ -368,17 +399,17 @@ func getTotalShardsSetting(esSetting *ESSettings, ossSetting *ESSettings) int64 
 	}
 }
 
-func GetBestSettings() *ESSettings {
+func GetBestSettings(writer cli.FormatWriter) *ESSettings {
 	ossSetting := GetDefaultOSSettings()
 	esSetting, err := getOldElasticSearchSettings()
 	if err != nil {
-		logrus.Debug("error in reading old es settigs\n", err)
+		writer.Warnf("error in reading old es settigs %s \n", err)
 		return ossSetting
 	}
 	bestSetting := &ESSettings{}
-	bestSetting.HeapMemory = getBestHeapSetting(esSetting, ossSetting)
-	bestSetting.IndicesBreakerTotalLimit = getIndicesBreakerTotalLimitSetting(esSetting, ossSetting)
-	bestSetting.RuntimeMaxOpenFile = getRuntimeMaxOpenFile(esSetting, ossSetting)
+	bestSetting.HeapMemory = getBestHeapSetting(writer, esSetting, ossSetting)
+	bestSetting.IndicesBreakerTotalLimit = getIndicesBreakerTotalLimitSetting(writer, esSetting, ossSetting)
+	bestSetting.RuntimeMaxOpenFile = getRuntimeMaxOpenFile(writer, esSetting, ossSetting)
 	bestSetting.RuntimeMaxLockedMem = getMaxLockedMemorySetting()
 	bestSetting.TotalShardSettings = getTotalShardsSetting(esSetting, ossSetting)
 	return bestSetting
@@ -413,7 +444,7 @@ func getOldElasticSearchSettings() (*ESSettings, error) {
 
 func GetDefaultOSSettings() *ESSettings {
 	defaultSettings := &ESSettings{}
-	defaultSettings.HeapMemory = defaultHeapSize()
+	defaultSettings.HeapMemory = fmt.Sprintf("%d", defaultHeapSizeInGB())
 	defaultSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
 	defaultSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
 	defaultSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT

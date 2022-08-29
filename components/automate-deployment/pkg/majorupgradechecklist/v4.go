@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -646,14 +647,43 @@ func deleteStaleIndices(timeout int64) Checklist {
 	}
 }
 
-func (ci *V4ChecklistManager) StoreSearchEngineSettings() error {
+func (ci *V4ChecklistManager) StoreSearchEngineSettings(writer cli.FormatWriter) (bool, error) {
 	isEmbeded := !IsExternalElasticSearch()
 	if !isEmbeded {
-		fmt.Println("Automate is running on external elastic search, not taking configuration backup")
+		writer.Warnf("Automate is running on external elastic search, not taking configuration backup")
+		return true, nil
 	} else {
-		return StoreESSettings(isEmbeded)
+		esSettings, _ := GetESSettings(writer)
+		esHeapSize, _ := extractNumericFromText(esSettings.HeapMemory, 0)
+		fiftyPercentOfMemory := defaultHeapSizeInGB()
+		isOkSettings := true
+		if esHeapSize > MAX_POSSIBLE_HEAP_SIZE || int(math.Round(esHeapSize)) > fiftyPercentOfMemory {
+			isOkSettings = false
+		}
+		requiredShards := (esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
+		if requiredShards > INDICES_TOTAL_SHARD_DEFAULT {
+			isOkSettings = false
+		}
+		if !isOkSettings {
+			msg := fmt.Sprintf(
+				maxHeapSizeExceeded,
+				esSettings.HeapMemory, fiftyPercentOfMemory, MAX_POSSIBLE_HEAP_SIZE,
+				(esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT), INDICES_TOTAL_SHARD_DEFAULT,
+				esSettings.IndicesBreakerTotalLimit, INDICES_BREAKER_TOTAL_LIMIT_DEFAULT,
+				esSettings.RuntimeMaxOpenFile, MAX_OPEN_FILE_DEFAULT,
+				esSettings.RuntimeMaxLockedMem, MAX_LOCKED_MEM_DEFAULT)
+			resp, err := writer.Confirm(msg)
+			if err != nil {
+				writer.Error(err.Error())
+				return false, status.Errorf(status.InappropriateSettingError, err.Error())
+			}
+			if !resp {
+				return false, status.New(status.InappropriateSettingError, upgradeFailed)
+			}
+		}
+		StoreESSettings(writer, esSettings)
+		return true, nil
 	}
-	return nil
 }
 
 func deleteA1Indexes(timeout int64) Checklist {
