@@ -1111,14 +1111,12 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 		}
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
-
-		ctx = context.WithValue(ctx, "requestorid", authnResp.Requestor)
-
 		if err != nil {
 			log.Errorf("User not authenticated to perform the action: %s", err.Error())
 			return nil, errors.Wrap(err, "authn-service error")
 		}
 
+		ctx = context.WithValue(ctx, "requestorid", authnResp.Requestor)
 		log.Info("User authenticated to perform the action", action)
 		ctx = context.WithValue(ctx, "requestorID", authnResp.Requestor)
 

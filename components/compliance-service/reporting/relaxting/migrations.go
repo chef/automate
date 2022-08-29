@@ -29,6 +29,7 @@ type esMigratable interface {
 	postFeedsMigration() error
 	postMigration() error
 	removeOldIndices(dateToMigrate time.Time) error
+	migrateCompRunInfo() error
 }
 
 const noScript = "NO_SCRIPT"
@@ -244,6 +245,17 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v6, statusserver.MigrationFailedMsg)
 		return errMsg
 	}
+
+	// Migrates A2 version 2 for comp-run-info indices to the current version
+	a2V2CompRunIndices := A2V2CompRunIndices{backend: &backend}
+	err = backend.migrate(a2V2CompRunIndices, statusSrv, statusserver.MigrationLabelCompRun)
+	if err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelCompRun))
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelCompRun, errMsg.Error())
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelCompRun, statusserver.MigrationFailedMsg)
+		return errMsg
+	}
+
 	return nil
 }
 
@@ -268,6 +280,14 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Post profiles migration cleanup...")
 	err = migratable.postProfilesMigration()
+	if err != nil {
+		logrus.Error(err)
+		return err
+	}
+
+	//migrating the comp run info index
+	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the comp run info index...")
+	err = migratable.migrateCompRunInfo()
 	if err != nil {
 		logrus.Error(err)
 		return err
