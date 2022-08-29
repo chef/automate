@@ -80,6 +80,8 @@ const (
 
 	shardingError = "sharding has to be disabled before upgrade"
 
+	s3UrlError = "Upgrade terminated as automate version 4 will only support https://s3.amazonaws.com pattern"
+
 	run_os_data_migrate = `Migrate Data from Elastic Search to Open Search using this command:
      $ ` + run_os_data_migrate_cmd
 
@@ -204,7 +206,7 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 		checklists = append(checklists, []Checklist{deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES), replaceurl())
+	checklists = append(checklists, showPostChecklist(&postcheck), replaceS3Url(), promptUpgradeContinueV4(!ci.isExternalES))
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
@@ -505,6 +507,17 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	}
 	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint().GetValue()
 	re := regexp.MustCompile(s3regex)
+	resp, err := h.Writer.Confirm("If the endpoint value of s3 backup is having s3.<region>.amazonaws.com pattern then it will be replaced with s3.amazonaws.com")
+	if err != nil {
+		h.Writer.Error(err.Error())
+		return status.Errorf(status.InvalidCommandArgsError, err.Error())
+	}
+
+	if !resp {
+		h.Writer.Error(s3UrlError)
+		return status.New(status.InvalidCommandArgsError, s3UrlError)
+	}
+
 	if re.MatchString(endpoint) {
 		file, err := ioutil.TempFile("", filename) // nosemgrep
 		if err != nil {
@@ -527,7 +540,7 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	return nil
 }
 
-func replaceurl() Checklist {
+func replaceS3Url() Checklist {
 	return Checklist{
 		Name:        "Change s3 url",
 		Description: "Changes backup s3 url during upgrade.",
