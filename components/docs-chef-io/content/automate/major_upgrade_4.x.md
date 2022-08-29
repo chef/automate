@@ -72,13 +72,13 @@ There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
 
 - [Chef Automate in Air-Gapped Environment With External Elasticsearch]({{< relref "#chef-automate-in-air-gapped-environment-with-external-elasticsearch" >}})
 
-{{< note >}} Confirm whether your installation is using an external Elasticsearch but running the `chef-automate config show` command. It `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
+{{< note >}} Confirm whether your installation is using an external Elasticsearch by running the `chef-automate config show` command. If `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
 
-{{< warning >}} You drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
+{{< warning >}} Your drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
 
-{{< warning >}} Disable the **sharding** for automate running embedded Elasticsearch.
+{{< warning >}} Upgrade will disable the **sharding** for automate running embedded Elasticsearch.
 
-Also, accept the checklist item asking permission to disable sharding. {{< /warning >}}
+So, accept the checklist item asking permission to disable sharding. {{< /warning >}}
 
 ### Chef Automate With Embedded Elasticsearch
 
@@ -88,12 +88,26 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
 1. Start a major version upgrade:
 
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Accept the actions before upgrade.
-
 ```sh
 sudo chef-automate upgrade run --major
 ```
+Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
 
+```shell
+You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+y
+You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+y
+Ensure you have more than 60 percent free disk space (y/n)
+y
+This will disable Sharding on your elastic search (y/n)
+y
+{"acknowledged":true,"persistent":{"cluster":{"routing":{"allocation":{"enable":"primaries"}}}},"transient":{}}
+{"_shards":{"total":60,"successful":30,"failed":0}}
+After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+y
+```
+It starts upgrading 
 Once you are done with the upgrade, follow the steps post upgrade which are:
 
 2. Check the upgrade status of Chef Automate:
@@ -101,12 +115,50 @@ Once you are done with the upgrade, follow the steps post upgrade which are:
 ```sh
 sudo chef-automate upgrade status
 ```
+This should return: Automate is up-to-date with airgap bundle `4.x.y` version
+
+```shell
+Post Upgrade Steps:
+===================
+
+  
+1) Check the status of your upgrade using:  
+     $ chef-automate upgrade status
+   This should return: Automate is up-to-date
+  
+2) Disable the maintenance mode if you enabled previously using:
+	$ chef-automate maintenance off
+  
+3) Migrate Data from Elastic Search to Open Search using this command:
+     $ chef-automate post-major-upgrade migrate --data=es
+  
+4) Check Automate UI everything is running and all data is visible
+  
+5) If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
+     $ chef-automate post-major-upgrade clear-data --data=es
+```
+{{< note >}} If your backup location is S3 and endpoint is configured as regional then change your settings as below:
+```shell
+[global.v1.backups]
+  location = "s3"
+[global.v1.backups.s3.bucket]
+  # name (required): The name of the bucket
+  name = "<bucket name>"
+
+  # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
+  # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
+  endpoint = "https://s3.amazonaws.com"
+```
+ {{< /note >}}
 
 3. Turn off maintenance mode:
 
 ```sh
 sudo chef-automate maintenance off
 ```
+This should return:
+`Updating deployment configuration`
+`Applying deployment configuration`
 
 4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
@@ -158,6 +210,38 @@ Apply this using the `config patch` command.
 
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
+```
+```shell
+It will start the migration immediately after check.
+Press y to agree, n to disagree? [y/n]: y
+
+HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
+
+
+----------------------------------------------
+Chef-automate stop 
+----------------------------------------------
+
+Chef Automate Stopped
+
+----------------------------------------------
+migration from es to os 
+----------------------------------------------
+
+Checking for es_upgrade
+
+Done with Migration 
+ Please wait for some time to reindex the data
+
+----------------------------------------------
+Chef-automate start 
+----------------------------------------------
+
+Starting Chef Automate
+
+----------------------------------------------
+Chef-automate status 
+----------------------------------------------
 ```
 
 6. Verify whether all services are running:
@@ -243,6 +327,24 @@ sudo ./chef-automate config show
 ```sh
 sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```
+Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
+
+```shell
+You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+y
+You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+y
+Ensure you have more than 60 percent free disk space (y/n)
+y
+This will disable Sharding on your elastic search (y/n)
+y
+{"acknowledged":true,"persistent":{"cluster":{"routing":{"allocation":{"enable":"primaries"}}}},"transient":{}}
+{"_shards":{"total":60,"successful":30,"failed":0}}
+After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+y
+```
+It starts upgrading 
+Once you are done with the upgrade, follow the steps post upgrade which are:
 
 **Post Upgrade**
 
@@ -251,12 +353,16 @@ sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```sh
 sudo chef-automate upgrade status
 ```
+This should return: Automate is up-to-date with airgap bundle `4.x.y` version
 
 2. Turn off the maintenance mode.
 
 ```sh
 sudo chef-automate maintenance off
 ```
+This should return:
+`Updating deployment configuration`
+`Applying deployment configuration`
 
 3. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
@@ -303,6 +409,38 @@ Apply this using `config patch` command.
 
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
+```
+```shell
+It will start the migration immediately after check.
+Press y to agree, n to disagree? [y/n]: y
+
+HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
+
+
+----------------------------------------------
+Chef-automate stop 
+----------------------------------------------
+
+Chef Automate Stopped
+
+----------------------------------------------
+migration from es to os 
+----------------------------------------------
+
+Checking for es_upgrade
+
+Done with Migration 
+ Please wait for some time to reindex the data
+
+----------------------------------------------
+Chef-automate start 
+----------------------------------------------
+
+Starting Chef Automate
+
+----------------------------------------------
+Chef-automate status 
+----------------------------------------------
 ```
 
 5. Verify whether all services are running:
