@@ -221,6 +221,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 // restartDeploymentService will kill the Pid of Deployment Service and then Hab will restart this service
 func restartDeploymentService() error {
+	writer.Println("Trying to restart Deployment Service...")
 	res, err := getStatus()
 	if err != nil {
 		return err
@@ -234,10 +235,11 @@ func restartDeploymentService() error {
 				return err
 			}
 			isDeploymentServiceKilled = true
+			writer.Println("Deployment service is stopped")
 		}
 	}
 	if !isDeploymentServiceKilled {
-		return errors.New("Failed to kill Deployment Service")
+		return errors.New("Failed to stop Deployment Service")
 	}
 	time.Sleep(10 * time.Second)
 	retryLimit := 30
@@ -249,8 +251,10 @@ func restartDeploymentService() error {
 		for _, s := range res.ServiceStatus.Services {
 			if s.Name == "deployment-service" {
 				if s.State == api.ServiceState_OK {
+					writer.Println("Deployment Service is healty now")
 					return nil
 				}
+				writer.Println("Waiting for Deployment Service to be healthy")
 				time.Sleep(10 * time.Second)
 			}
 		}
