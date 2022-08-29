@@ -34,6 +34,8 @@ var upgradeRunCmdFlags = struct {
 	upgradeairgapbundles bool
 	skipDeploy           bool
 	isMajorUpgrade       bool
+	skipDiskSpaceCheck   bool
+	osDestDataDir        string
 	versionsPath         string
 	acceptMLSA           bool
 	upgradeHAWorkspace   string
@@ -168,7 +170,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				writer.Printf("Failed to read or store search-engine settings\n %w \n", err)
 			}
-			err = ci.RunChecklist(configCmdFlags.timeout)
+			flags := majorupgradechecklist.ChecklistUpgradeFlags{
+				SkipDiskSpaceCheck: upgradeRunCmdFlags.skipDiskSpaceCheck,
+				OsDestDataDir:      upgradeRunCmdFlags.osDestDataDir,
+			}
+			err = ci.RunChecklist(configCmdFlags.timeout, flags)
 			if err != nil {
 				return status.Wrap(
 					err,
@@ -467,6 +473,19 @@ func init() {
 		"",
 		false,
 		"Flag for saas setup")
+
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.skipDiskSpaceCheck,
+		"skip-disk-space-check",
+		"",
+		false,
+		"Flag for skipping disk space check during upgrade")
+
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.osDestDataDir,
+		"os-dest-data-dir",
+		"",
+		"Flag for providing custom os destination data directory")
 
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
