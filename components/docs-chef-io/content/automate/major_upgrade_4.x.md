@@ -550,7 +550,7 @@ Update the Opensearch Config, using `chef-automate config patch <config_patch.to
          max_shards_per_node = "<NUMBER_OF_SHARD>"
 ```
 ### Proxy Setting issue
-If you are using Proxy Settings and have upgraded to a version between 4.0.27 and 4.2.10, they you might get this error:
+If you are using Proxy Settings and have upgraded to a version between 4.0.27 and 4.2.10, then you might get this error when you upgrade:
 ```
 DeploymentServiceCallError: A request to the deployment-service failed: Request to get upgrade status failed: rpc error: code = Unknown desc = error in getting the versions from current channel: error in invoking the endpoint https://packages.chef.io/manifests/current/automate/versions.json: Get "https://packages.chef.io/manifests/current/automate/versions.json": dial tcp: lookup packages.chef.io on 10.2.72.20:53: read udp 10.1.97.98:59620->10.2.72.20:53: i/o timeout
 ```
@@ -558,12 +558,24 @@ To move ahead with upgrade you can download latest CLI and Airgapped bundle usin
 ```sh
 curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 
-curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/airgap_bundle/current/automate/4.2.22.aib -o automate-4.2.22.aib
+curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-latest.aib
 ```
 
 After downloading, run the upgrade command with airgapped bundle option:
 ```sh
-./chef-automate upgrade run --airgap-bundle automate-4.2.22.aib
+./chef-automate upgrade run --airgap-bundle automate-latest.aib
+```
+Output will look like this:
+```sh
+Installing airgap install bundle
+Trying to restart Deployment Service...
+Deployment service is stopped
+Waiting for Deployment Service to be healthy
+Waiting for Deployment Service to be healthy
+Waiting for Deployment Service to be healthy
+Deployment Service is healty now
+current_version:"4.2.10" target_version:"4.2.59" target_major:"4"
+Upgrading Chef Automate
 ```
 
 ### Minor upgrade errors
