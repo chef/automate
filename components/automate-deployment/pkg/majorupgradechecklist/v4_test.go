@@ -7,38 +7,31 @@ import (
 )
 
 func TestGetMajorVersion(t *testing.T) {
-	versionData := []byte(`{"comp-2-run-info":{"settings":{"index":{"creation_date_string":"2022-06-06T10:50:55.477Z","refresh_interval":"1s","number_of_shards":"5","provided_name":"comp-2-run-info","creation_date":"1654512655477","number_of_replicas":"1","uuid":"cYlQeyHNRn2mnsvIRZ1-rg","version":{"created_string":"1.2.4","created":"135238227"}}}}}`)
-	majorVersion, version, err := getMajorVersion(versionData, "comp-2-run-info")
+	data := `{"automate-2":{"settings":{"index":{"version":{"created_string":"5.6.2","created":"5060299"}}}},".watches":{"settings":{"index":{"version":{"created_string":"5.6.2","created":"5060299"}}}},"node-attribute":{"settings":{"index":{"version":{"created_string":"6.8.23","created":"6082399"}}}}}`
+
+	indexInfo, err := getOldIndexInfo([]byte(data))
 	assert.NoError(t, err)
-	assert.Equal(t, int64(1), majorVersion)
-	assert.Equal(t, "1.2.4", version)
-
-	versionData = []byte(`{"comp-2-run-info":{"settings":{"index":{"creation_date_string":"2022-06-06T10:50:55.477Z","refresh_interval":"1s","number_of_shards":"5","provided_name":"comp-2-run-info","creation_date":"1654512655477","number_of_replicas":"1","uuid":"cYlQeyHNRn2mnsvIRZ1-rg","version":{"created_string":"7.2.4","created":"135238227"}}}}}`)
-	majorVersion, version, err = getMajorVersion(versionData, "comp-2-run-info")
-	assert.NoError(t, err)
-	assert.Equal(t, int64(7), majorVersion)
-	assert.Equal(t, "7.2.4", version)
-
-	versionData = []byte(`{"comp-2-run-info":{"settings":{"index":{"creation_date_string":"2022-06-06T10:50:55.477Z","refresh_interval":"1s","number_of_shards":"5","provided_name":"comp-2-run-info","creation_date":"1654512655477","number_of_replicas":"1","uuid":"cYlQeyHNRn2mnsvIRZ1-rg","version":{"created":"135238227"}}}}}`)
-	majorVersion, version, err = getMajorVersion(versionData, "comp-2-run-info")
-	assert.Error(t, err)
-	assert.Equal(t, int64(-1), majorVersion)
-	assert.Equal(t, "", version)
-
-	versionData = []byte(`{"comp-2-run-info":{"settings":{"index":{"creation_date_string":"2022-06-06T10:50:55.477Z","refresh_interval":"1s","number_of_shards":"5","provided_name":"comp-2-run-info","creation_date":"1654512655477","number_of_replicas":"1","uuid":"cYlQeyHNRn2mnsvIRZ1-rg"}}}}`)
-	majorVersion, version, err = getMajorVersion(versionData, "comp-2-run-info")
-	assert.Error(t, err)
-	assert.Equal(t, int64(-1), majorVersion)
-	assert.Equal(t, "", version)
+	assert.Equal(t, 1, len(indexInfo))
+	assert.Equal(t, "automate-2", indexInfo[0].Name)
+	assert.Equal(t, int64(5), indexInfo[0].MajorVersion)
+	assert.Equal(t, "5.6.2", indexInfo[0].CreatedString)
 }
 
 func TestFormErrorMsg(t *testing.T) {
-	IndexDetailsArray := []indexDetails{
-		{Name: "abc", Version: "5.6.4"},
-		{Name: "def", Version: "4.3.1"},
-		{Name: "abc", Version: "5.6.2"},
+	IndexDetailsArray := []indexData{
+		{Name: "abc", MajorVersion: 5, CreatedString: "5.6.4"},
+		{Name: "def", MajorVersion: 4, CreatedString: "4.3.1"},
+		{Name: "abc", MajorVersion: 5, CreatedString: "5.6.2"},
+		{Name: "def", MajorVersion: 5, CreatedString: "5.6.4", IsDeleted: true},
 	}
 	errMsg := formErrorMsg(IndexDetailsArray)
 	assert.Error(t, errMsg)
 	assert.Equal(t, "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n- Index Name: abc, Version: 5.6.4 \n- Index Name: def, Version: 4.3.1 \n- Index Name: abc, Version: 5.6.2 \n\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html", errMsg.Error())
+}
+
+func TestFindMatch(t *testing.T) {
+	sourceList := []string{".automate", ".locky", "saved-searches", ".tasks"}
+	targetList := []string{".automate-23423274", "automate-saved-searches", "temp.tasks", "test.locky", "comp_info.automate"}
+	resp := findMatch(sourceList, targetList)
+	assert.Equal(t, 5, len(resp))
 }
