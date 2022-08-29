@@ -254,21 +254,29 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			osPath := getHabRootPath(habrootcmd)
-			habDirSize, err := cm.CalDirSizeInGB(osPath)
+			habRootPath := getHabRootPath(habrootcmd)
+			habDirSize, err := cm.CalDirSizeInGB(habRootPath)
 
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.UnknownError, err.Error())
 			}
+
+			// If (/hab) dir size is less than 5GB, then throw error
+			habSpaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, MIN_DIRSIZE_GB)
+			if err != nil || !habSpaceAvailable {
+				h.Writer.Errorln(fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space", habRootPath, MIN_DIRSIZE_GB))
+				return status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, MIN_DIRSIZE_GB))
+			}
+
 			var spaceAvailable bool
 			version, _ = GetMajorVersion(version)
 			var dbDataPath string
 			switch version {
 			case "3":
-				dbDataPath = osPath + "svc/automate-postgresql/data/pgdata"
+				dbDataPath = habRootPath + "svc/automate-postgresql/data/pgdata"
 			case "4":
-				dbDataPath = osPath + "svc/automate-elasticsearch/data"
+				dbDataPath = habRootPath + "svc/automate-elasticsearch/data"
 			}
 
 			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
@@ -279,16 +287,17 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 
 			minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
 
-			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure you have more than %.2f GB of free disk space", minReqDiskSpace))
+			destDir := habRootPath
+			if osDestDataDir != "" {
+				destDir = osDestDataDir
+			}
+
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure destination directory (%s) is having min. %.2f GB free space ?", destDir, minReqDiskSpace))
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !skipDiskSpaceCheck {
-				destDir := osPath
-				if osDestDataDir != "" {
-					destDir = osDestDataDir
-				}
 				h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
 				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
 				spaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
