@@ -263,7 +263,8 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 			}
 
 			// If (/hab) dir size is less than 5GB, then throw error
-			if habDirSize < MIN_DIRSIZE_GB {
+			habSpaceAvailable, err := cm.CheckSpaceAvailability(osPath, MIN_DIRSIZE_GB)
+			if err != nil || !habSpaceAvailable {
 				h.Writer.Error(fmt.Sprintf("Hab root directory size is less than %.2f GB", MIN_DIRSIZE_GB))
 				return status.Errorf(status.UnknownError, fmt.Sprintf("Hab root directory size is less than %.2f GB", MIN_DIRSIZE_GB))
 			}

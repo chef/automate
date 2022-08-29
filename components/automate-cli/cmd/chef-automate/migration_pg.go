@@ -209,7 +209,8 @@ func checkSpaceAvailable(dataDir string) (bool, error) {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
 	// If (/hab) dir size is less than 5GB, then give error
-	if habDirSize < majorupgradechecklist.MIN_DIRSIZE_GB {
+	habSpaceAvailable, err := cm.CheckSpaceAvailability(osPath, majorupgradechecklist.MIN_DIRSIZE_GB)
+	if err != nil || !habSpaceAvailable {
 		return false, status.Errorf(status.UnknownError, fmt.Sprintf("Hab root directory size is less than %.2f GB", majorupgradechecklist.MIN_DIRSIZE_GB))
 	}
 	dbDataSize, err := cm.CalDirSizeInGB(dataDir)
