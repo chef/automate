@@ -133,6 +133,33 @@ func getSearchEngineBasePath() string {
 	return basePath
 }
 
+func getDataFromUrl(url string) ([]byte, error) {
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil) // nosemgrep
+
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("url: %s not reachable", url)
+	}
+	body, err := ioutil.ReadAll(res.Body) // nosemgrep
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
 func getTotalShards() (*IndicesShardTotal, error) {
 	indicesShardTotal := &IndicesShardTotal{}
 	basePath := getSearchEngineBasePath()
@@ -147,19 +174,6 @@ func getTotalShards() (*IndicesShardTotal, error) {
 	return indicesShardTotal, nil
 }
 
-func getCusterSetting() (*ESClusterSetting, error) {
-	clusterSetting := &ESClusterSetting{}
-	basePath := getSearchEngineBasePath()
-	allClusterSettings, err := execRequest(basePath+"_cluster/settings?include_defaults=true", "GET", nil)
-	if err != nil {
-		return clusterSetting, err
-	}
-	err = json.Unmarshal(allClusterSettings, clusterSetting)
-	if err != nil {
-		return clusterSetting, err
-	}
-	return clusterSetting, nil
-}
 func getElasticsearchPID() (string, error) {
 	pid, err := ioutil.ReadFile("/hab/svc/automate-elasticsearch/PID") // nosemgrep
 	if err != nil {
