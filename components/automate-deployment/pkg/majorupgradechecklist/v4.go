@@ -1,4 +1,4 @@
-git adpackage majorupgradechecklist
+package majorupgradechecklist
 
 import (
 	"encoding/json"
