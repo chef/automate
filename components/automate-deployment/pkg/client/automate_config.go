@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/pkg/errors"
@@ -77,7 +78,16 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 
 func validateS3Url(config *dc.AutomateConfig) bool {
 	endpoint := config.Global.V1.Backups.S3.Bucket.Endpoint.Value
-	return endpoint == "https://s3.amazonaws.com"
+	s3regex := "https?://s3.(.*).amazonaws.com"
+	res1, err := regexp.MatchString(s3regex, endpoint)
+	fmt.Println("Something: ", res1, err)
+	if err != nil {
+		return false
+	}
+	if res1 {
+		return endpoint == "https://s3.amazonaws.com"
+	}
+	return true
 }
 
 // SetAutomateConfig makes a gRPC request to the server with a given
