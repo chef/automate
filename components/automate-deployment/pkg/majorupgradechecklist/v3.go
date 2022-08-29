@@ -279,16 +279,17 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 
 			minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
 
-			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure destination directory is having min. %.2f GB free space ?", minReqDiskSpace))
+			destDir := osPath
+			if osDestDataDir != "" {
+				destDir = osDestDataDir
+			}
+
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure destination directory (%s) is having min. %.2f GB free space ?", destDir, minReqDiskSpace))
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !skipDiskSpaceCheck {
-				destDir := osPath
-				if osDestDataDir != "" {
-					destDir = osDestDataDir
-				}
 				h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
 				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
 				spaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
