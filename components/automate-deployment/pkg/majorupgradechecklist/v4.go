@@ -206,7 +206,7 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 		checklists = append(checklists, []Checklist{deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), replaceurl(), promptUpgradeContinueV4(!ci.isExternalES))
+	checklists = append(checklists, showPostChecklist(&postcheck), replaceS3Url(), promptUpgradeContinueV4(!ci.isExternalES))
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
@@ -540,7 +540,7 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	return nil
 }
 
-func replaceurl() Checklist {
+func replaceS3Url() Checklist {
 	return Checklist{
 		Name:        "Change s3 url",
 		Description: "Changes backup s3 url during upgrade.",

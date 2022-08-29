@@ -171,7 +171,7 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 		postcheck = postChecklistEmbedded
 		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), replaceurl(), promptUpgradeContinue())
+	checklists = append(checklists, showPostChecklist(&postcheck), replaceS3Url(), promptUpgradeContinue())
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
