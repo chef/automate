@@ -70,11 +70,11 @@ type ESClusterSetting struct {
 	} `json:"defaults"`
 }
 
-func getDataFromUrl(url string) ([]byte, error) {
-	method := "GET"
+func execRequest(url, methodType string, requestBody io.Reader) ([]byte, error) {
+	method := methodType
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil) // nosemgrep
+	req, err := http.NewRequest(method, url, requestBody) // nosemgrep
 
 	if err != nil {
 		return nil, err
@@ -87,12 +87,13 @@ func getDataFromUrl(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("url: %s not reachable", url)
-	}
 	body, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("Request failed with status %d\n%s\n", res.StatusCode, string(body))
 	}
 	return body, nil
 }
@@ -128,7 +129,7 @@ func getSearchEngineBasePath() string {
 func getClusterStats() (*IndicesShardTotal, error) {
 	indicesShardTotal := &IndicesShardTotal{}
 	basePath := getSearchEngineBasePath()
-	totalShard, err := getDataFromUrl(basePath + "_cluster/stats?filter_path=indices.shards.total")
+	totalShard, err := execRequest(basePath+"_cluster/stats?filter_path=indices.shards.total", "GET", nil)
 	if err != nil {
 		return indicesShardTotal, err
 	}
@@ -142,7 +143,7 @@ func getClusterStats() (*IndicesShardTotal, error) {
 func getCusterSetting() (*ESClusterSetting, error) {
 	clusterSetting := &ESClusterSetting{}
 	basePath := getSearchEngineBasePath()
-	allClusterSettings, err := getDataFromUrl(basePath + "_cluster/settings?include_defaults=true")
+	allClusterSettings, err := execRequest(basePath+"_cluster/settings?include_defaults=true", "GET", nil)
 	if err != nil {
 		return clusterSetting, err
 	}
@@ -194,7 +195,7 @@ func getProcessRuntimeSettings(pid string) (map[string]string, error) {
 
 func getHeapMemorySettings() (string, error) {
 	basePath := getSearchEngineBasePath()
-	heapMemorySettings, err := getDataFromUrl(basePath + "_cat/nodes?h=heap*&v")
+	heapMemorySettings, err := execRequest(basePath+"_cat/nodes?h=heap*&v", "GET", nil)
 	if err != nil {
 		return "", err
 	}
