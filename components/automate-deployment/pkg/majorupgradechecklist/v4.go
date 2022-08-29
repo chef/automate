@@ -152,7 +152,7 @@ func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4Checklist
 	return &V4ChecklistManager{
 		writer:       writer,
 		version:      version,
-		isExternalES: IsExternalElasticSearch(writer),
+		isExternalES: IsExternalElasticSearch(),
 	}
 }
 
@@ -250,12 +250,10 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 			}
 			if !resp {
 				h.Writer.Error("end user not ready to upgrade")
-
 				shardError := enableSharding(h, isEmbedded)
 				if shardError != nil {
 					h.Writer.Error(shardError.Error())
 				}
-
 				return status.New(status.InvalidCommandArgsError, "end user not ready to upgrade")
 			}
 			return nil
@@ -464,34 +462,6 @@ func disableSharding() Checklist {
 	}
 }
 
-func getDataFromUrl(url string) ([]byte, error) {
-	method := "GET"
-
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil) // nosemgrep
-
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return nil, errors.New("Automate ES gateway unreachable.")
-	}
-
-	body, err := ioutil.ReadAll(res.Body) // nosemgrep
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-
 func getHabRootPath(habrootcmd string) string {
 	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
 	if err != nil {
@@ -634,4 +604,14 @@ func runIndexCheck(timeout int64) Checklist {
 			return nil
 		},
 	}
+}
+
+func (ci *V4ChecklistManager) StoreSearchEngineSettings() error {
+	isEmbeded := !IsExternalElasticSearch()
+	if !isEmbeded {
+		fmt.Println("Automate is running on external elastic search, not taking configuration backup")
+	} else {
+		return StoreESSettings(isEmbeded)
+	}
+	return nil
 }
