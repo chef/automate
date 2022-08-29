@@ -203,22 +203,22 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 }
 
 func checkSpaceAvailable(dataDir string) (bool, error) {
-	osPath := getHabRootPath(habrootcmd)
-	habDirSize, err := cm.CalDirSizeInGB(osPath)
+	habRootPath := getHabRootPath(habrootcmd)
+	habDirSize, err := cm.CalDirSizeInGB(habRootPath)
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
 	// If (/hab) dir size is less than 5GB, then give error
-	habSpaceAvailable, err := cm.CheckSpaceAvailability(osPath, majorupgradechecklist.MIN_DIRSIZE_GB)
+	habSpaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, majorupgradechecklist.MIN_DIRSIZE_GB)
 	if err != nil || !habSpaceAvailable {
-		return false, status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", osPath, majorupgradechecklist.MIN_DIRSIZE_GB))
+		return false, status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, majorupgradechecklist.MIN_DIRSIZE_GB))
 	}
 	dbDataSize, err := cm.CalDirSizeInGB(dataDir)
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
 	minReqDiskSpace := math.Max(majorupgradechecklist.MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
-	spaceAvailable, err := cm.CheckSpaceAvailability(osPath, minReqDiskSpace)
+	spaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, minReqDiskSpace)
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}

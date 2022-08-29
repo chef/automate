@@ -254,8 +254,8 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			osPath := getHabRootPath(habrootcmd)
-			habDirSize, err := cm.CalDirSizeInGB(osPath)
+			habRootPath := getHabRootPath(habrootcmd)
+			habDirSize, err := cm.CalDirSizeInGB(habRootPath)
 
 			if err != nil {
 				h.Writer.Error(err.Error())
@@ -263,10 +263,10 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 			}
 
 			// If (/hab) dir size is less than 5GB, then throw error
-			habSpaceAvailable, err := cm.CheckSpaceAvailability(osPath, MIN_DIRSIZE_GB)
+			habSpaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, MIN_DIRSIZE_GB)
 			if err != nil || !habSpaceAvailable {
-				h.Writer.Errorln(fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space", osPath, MIN_DIRSIZE_GB))
-				return status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", osPath, MIN_DIRSIZE_GB))
+				h.Writer.Errorln(fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space", habRootPath, MIN_DIRSIZE_GB))
+				return status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, MIN_DIRSIZE_GB))
 			}
 
 			var spaceAvailable bool
@@ -274,9 +274,9 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 			var dbDataPath string
 			switch version {
 			case "3":
-				dbDataPath = osPath + "svc/automate-postgresql/data/pgdata"
+				dbDataPath = habRootPath + "svc/automate-postgresql/data/pgdata"
 			case "4":
-				dbDataPath = osPath + "svc/automate-elasticsearch/data"
+				dbDataPath = habRootPath + "svc/automate-elasticsearch/data"
 			}
 
 			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
@@ -287,7 +287,7 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 
 			minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
 
-			destDir := osPath
+			destDir := habRootPath
 			if osDestDataDir != "" {
 				destDir = osDestDataDir
 			}
