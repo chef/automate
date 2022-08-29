@@ -4,13 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/pkg/errors"
 )
 
@@ -69,6 +74,17 @@ const (
 	$ ` + disable_maintenance_mode_cmd
 
 	disable_maintenance_mode_cmd = `chef-automate maintenance off`
+	filename                     = "s3.toml"
+	automatePatchCmd             = "chef-automate config patch %s"
+	habrootcmd                   = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+	s3regex                      = "https?://s3.(.*).amazonaws.com"
+	s3EndpointConf               = `
+		[global.v1.backups.s3.bucket]
+			endpoint = "https://s3.amazonaws.com"
+	`
+	urlChangeMessage = `Your S3 url in backup config is changed from %s to https://s3.amazonaws.com. 
+This is because automate version 4 now only supports this format due to AWS SDK upgrade.
+`
 )
 
 var postChecklistV4Embedded = []PostCheckListItem{
@@ -150,7 +166,7 @@ func (ci *V4ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V4ChecklistManager) RunChecklist() error {
+func (ci *V4ChecklistManager) RunChecklist(timeout int64) error {
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
@@ -163,10 +179,10 @@ func (ci *V4ChecklistManager) RunChecklist() error {
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{runIndexCheck(), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
+		checklists = append(checklists, []Checklist{runIndexCheck(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
+	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES), replaceurl())
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
@@ -465,6 +481,9 @@ func getDataFromUrl(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.New("Automate ES gateway unreachable.")
+	}
 
 	body, err := ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
@@ -472,8 +491,6 @@ func getDataFromUrl(url string) ([]byte, error) {
 	}
 	return body, nil
 }
-
-const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
 
 func getHabRootPath(habrootcmd string) string {
 	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
@@ -489,18 +506,64 @@ func getHabRootPath(habrootcmd string) string {
 	return rootHab
 }
 
-func checkIndexVersion() error {
-	var basePath = "http://localhost:10144/"
-
-	habpath := getHabRootPath(habrootcmd)
-
-	input, err := ioutil.ReadFile(habpath + "svc/automate-es-gateway/config/URL") // nosemgrep
+func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
+	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
 	if err != nil {
-		fmt.Printf("Failed to read URL file")
+		h.Writer.Errorln("failed to get backup s3 url configuration: " + err.Error())
+		return nil
 	}
-	url := strings.TrimSuffix(string(input), "\n")
-	if url != "" {
-		basePath = "http://" + url + "/"
+	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint().GetValue()
+	re := regexp.MustCompile(s3regex)
+	if re.MatchString(endpoint) {
+		file, err := ioutil.TempFile("", filename) // nosemgrep
+		if err != nil {
+			h.Writer.Errorln("could not create temp file" + err.Error())
+			return nil
+		}
+		defer os.Remove(file.Name())
+		if _, err := file.Write([]byte(s3EndpointConf)); err != nil {
+			h.Writer.Errorln("could not write toml file" + err.Error())
+			return nil
+		}
+		out, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(automatePatchCmd, file.Name())).Output()
+		if !strings.Contains(string(out), "Configuration patched") || err != nil {
+			h.Writer.Errorln("error in running automate patch command")
+			return nil
+		}
+		h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
+	}
+
+	return nil
+}
+
+func replaceurl() Checklist {
+	return Checklist{
+		Name:        "Change s3 url",
+		Description: "Changes backup s3 url during upgrade.",
+		TestFunc:    replaceAndPatchS3backupUrl,
+	}
+}
+
+func checkIndexVersion(timeout int64) error {
+	var basePath = "http://localhost:10144/"
+	cfg := dc.DefaultAutomateConfig()
+	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+	defaultPort := cfg.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
+
+	if defaultHost != "" || defaultPort > 0 {
+		basePath = fmt.Sprintf(`http://%s/`, net.JoinHostPort(defaultHost, fmt.Sprintf("%d", defaultPort)))
+	}
+
+	res, err := client.GetAutomateConfig(timeout)
+	if err == nil {
+		host := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+		port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
+		if host != "" || port > 0 {
+			url := net.JoinHostPort(host, fmt.Sprintf("%d", port))
+			if url != "" {
+				basePath = fmt.Sprintf(`http://%s/`, url)
+			}
+		}
 	}
 
 	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
@@ -559,12 +622,12 @@ func getMajorVersion(versionData []byte, index string) (int64, string, error) {
 	return i, dataIdx.Settings.Index.Version.CreatedString, nil
 }
 
-func runIndexCheck() Checklist {
+func runIndexCheck(timeout int64) Checklist {
 	return Checklist{
 		Name:        "check index version",
 		Description: "confirmation check index version",
 		TestFunc: func(h ChecklistHelper) error {
-			err := checkIndexVersion()
+			err := checkIndexVersion(timeout)
 			if err != nil {
 				return err
 			}
