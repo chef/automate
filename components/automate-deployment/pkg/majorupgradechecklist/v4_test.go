@@ -9,7 +9,7 @@ import (
 func TestGetMajorVersion(t *testing.T) {
 	data := `{"automate-2":{"settings":{"index":{"version":{"created_string":"5.6.2","created":"5060299"}}}},".watches":{"settings":{"index":{"version":{"created_string":"5.6.2","created":"5060299"}}}},"node-attribute":{"settings":{"index":{"version":{"created_string":"6.8.23","created":"6082399"}}}}}`
 
-	indexInfo, err := getOldIndexInfo([]byte(data))
+	indexInfo, err := getDataForOldIndices([]byte(data))
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(indexInfo))
 	assert.Equal(t, "automate-2", indexInfo[0].Name)
@@ -31,7 +31,7 @@ func TestFormErrorMsg(t *testing.T) {
 
 func TestFindMatch(t *testing.T) {
 	sourceList := []string{".automate", ".locky", "saved-searches", ".tasks"}
-	targetList := []string{".automate-23423274", "automate-saved-searches", "temp.tasks", "test.locky", "comp_info.automate"}
+	targetList := []indexData{{Name: ".automate-23423274"}, {Name: "automate-saved-searches"}, {Name: "temp.tasks"}, {Name: "test.locky"}, {Name: "comp_info.automate"}}
 	resp := findMatch(sourceList, targetList)
 	assert.Equal(t, 5, len(resp))
 }
