@@ -233,7 +233,7 @@ func TestMapStructs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MapStructsESInSpecReportToControls(tt.args.inspecReport)
+			got, _, err := MapStructsESInSpecReportToControls(tt.args.inspecReport)
 			if tt.name == "Test 1" {
 				require.NoError(t, err)
 				require.Empty(t, got)
