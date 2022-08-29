@@ -6,7 +6,7 @@ import (
 )
 
 type ChecklistManager interface {
-	RunChecklist() error
+	RunChecklist(int64) error
 	GetPostChecklist() []PostCheckListItem
 }
 

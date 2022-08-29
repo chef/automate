@@ -155,7 +155,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 					"Request to start upgrade failed",
 				)
 			}
-			err = ci.RunChecklist()
+			err = ci.RunChecklist(configCmdFlags.timeout)
 			if err != nil {
 				return status.Wrap(
 					err,
