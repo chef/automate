@@ -160,7 +160,7 @@ func (ci *V3ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V3ChecklistManager) RunChecklist() error {
+func (ci *V3ChecklistManager) RunChecklist(timeout int64) error {
 
 	var dbType string
 	checklists := []Checklist{}
