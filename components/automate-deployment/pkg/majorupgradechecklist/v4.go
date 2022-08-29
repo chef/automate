@@ -619,13 +619,13 @@ func getOldIndexInfo(allIndexData []byte) ([]indexData, error) {
 		return nil, errors.Wrap(err, "error in unmarshalling the index data")
 	}
 	for key, data := range parsed {
-		i, err := strconv.ParseInt(data.Settings.Index.Version.CreatedString[0:1], 10, 64)
+		index, err := strconv.ParseInt(data.Settings.Index.Version.CreatedString[0:1], 10, 64)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse index version")
 		}
-		if i < 6 && key != ".watches" {
+		if index < 6 && key != ".watches" {
 			indexDataArray = append(indexDataArray,
-				indexData{Name: key, MajorVersion: i,
+				indexData{Name: key, MajorVersion: index,
 					CreatedString: data.Settings.Index.Version.CreatedString})
 		}
 	}
