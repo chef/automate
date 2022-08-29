@@ -173,7 +173,14 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				)
 			}
 
-			err = ci.StoreSearchEngineSettings()
+			isSettingOk, err := ci.StoreSearchEngineSettings(writer)
+			if err != nil && !isSettingOk {
+				return status.Wrap(
+					err,
+					status.InappropriateSettingError,
+					"Request to start upgrade failed",
+				)
+			}
 			if err != nil {
 				writer.Printf("Failed to read or store search-engine settings\n %w \n", err)
 			}
