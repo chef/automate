@@ -43,7 +43,7 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to get Chef Automate configuration from the deployment-service")
 	}
 
-	if config.Global.V1.Backups.Location.Value == "s3" {
+	if len(config.Global.String()) > 0 && config.Global.V1.Backups.Location.Value == "s3" {
 		// writer.Title(config.Global.V1.Backups.S3.Bucket.Endpoint.Value)
 		isValid := validateS3Url(config)
 		if !isValid {
