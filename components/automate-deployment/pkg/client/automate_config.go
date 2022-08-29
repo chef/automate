@@ -43,13 +43,12 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to get Chef Automate configuration from the deployment-service")
 	}
 
-	if len(config.Global.String()) > 0 {
-		if config.Global.V1.Backups.Location.Value == "s3" {
-			// writer.Title(config.Global.V1.Backups.S3.Bucket.Endpoint.Value)
-			isValid := validateS3Url(config)
-			if !isValid {
-				return status.Wrap(nil, status.DeploymentServiceCallError, "The endpoint value of s3 backup in provided patch configuration is having https://s3.<region>.amazonaws.com pattern. Please ensure to replace it with https://s3.amazonaws.com")
-			}
+	if config.Global.V1.Backups.Location.Value == "s3" {
+		// writer.Title(config.Global.V1.Backups.S3.Bucket.Endpoint.Value)
+		isValid := validateS3Url(config)
+		if !isValid {
+			errMessage := "The endpoint value of s3 backup in provided patch configuration is having invalid pattern " + config.Global.V1.Backups.S3.Bucket.Endpoint.Value + ". Please ensure to replace it with https://s3.amazonaws.com"
+			return status.Wrap(nil, status.DeploymentServiceCallError, errMessage)
 		}
 	}
 
