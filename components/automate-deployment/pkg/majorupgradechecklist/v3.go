@@ -261,6 +261,13 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.UnknownError, err.Error())
 			}
+
+			// If (/hab) dir size is less than 5GB, then throw error
+			if habDirSize < MIN_DIRSIZE_GB {
+				h.Writer.Error(fmt.Sprintf("Hab root directory size is less than %.2f GB", MIN_DIRSIZE_GB))
+				return status.Errorf(status.UnknownError, fmt.Sprintf("Hab root directory size is less than %.2f GB", MIN_DIRSIZE_GB))
+			}
+
 			var spaceAvailable bool
 			version, _ = GetMajorVersion(version)
 			var dbDataPath string

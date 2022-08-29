@@ -35,7 +35,7 @@ var ClearDataCmdFlags = struct {
 	forceExecute bool
 }{}
 
-//changes with postgresql13 version pinned in components/automate-postgresql/habitat/plan.sh
+// changes with postgresql13 version pinned in components/automate-postgresql/habitat/plan.sh
 var NEW_BIN_DIR = "/hab/pkgs/core/postgresql13/13.5/20220311204618/bin"
 
 const (
@@ -207,6 +207,10 @@ func checkSpaceAvailable(dataDir string) (bool, error) {
 	habDirSize, err := cm.CalDirSizeInGB(osPath)
 	if err != nil {
 		return false, status.Errorf(status.UnknownError, err.Error())
+	}
+	// If (/hab) dir size is less than 5GB, then give error
+	if habDirSize < majorupgradechecklist.MIN_DIRSIZE_GB {
+		return false, status.Errorf(status.UnknownError, fmt.Sprintf("Hab root directory size is less than %.2f GB", majorupgradechecklist.MIN_DIRSIZE_GB))
 	}
 	dbDataSize, err := cm.CalDirSizeInGB(dataDir)
 	if err != nil {
