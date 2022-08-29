@@ -43,6 +43,16 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 		return status.Wrap(err, status.DeploymentServiceCallError, "Failed attempting to get Chef Automate configuration from the deployment-service")
 	}
 
+	if len(config.Global.String()) > 0 {
+		if config.Global.V1.Backups.Location.Value == "s3" {
+			// writer.Title(config.Global.V1.Backups.S3.Bucket.Endpoint.Value)
+			isValid := validateS3Url(config)
+			if !isValid {
+				return status.Wrap(nil, status.DeploymentServiceCallError, "The endpoint value of s3 backup in provided patch configuration is having https://s3.<region>.amazonaws.com pattern. Please ensure to replace it with https://s3.amazonaws.com")
+			}
+		}
+	}
+
 	// TODO: Create merge configuration together, show it to the user and
 	// confirm that they wish to proceed with the patched merged config.
 
@@ -64,6 +74,11 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 	}
 
 	return nil
+}
+
+func validateS3Url(config *dc.AutomateConfig) bool {
+	endpoint := config.Global.V1.Backups.S3.Bucket.Endpoint.Value
+	return endpoint == "https://s3.amazonaws.com"
 }
 
 // SetAutomateConfig makes a gRPC request to the server with a given
