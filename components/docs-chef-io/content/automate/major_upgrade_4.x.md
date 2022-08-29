@@ -549,6 +549,53 @@ Update the Opensearch Config, using `chef-automate config patch <config_patch.to
       [opensearch.v1.sys.cluster]
          max_shards_per_node = "<NUMBER_OF_SHARD>"
 ```
+### Proxy Setting issue
+If you are using Proxy Settings and have upgraded to a version between 4.0.27 and 4.2.10, they you might get this error:
+```
+DeploymentServiceCallError: A request to the deployment-service failed: Request to get upgrade status failed: rpc error: code = Unknown desc = error in getting the versions from current channel: error in invoking the endpoint https://packages.chef.io/manifests/current/automate/versions.json: Get "https://packages.chef.io/manifests/current/automate/versions.json": dial tcp: lookup packages.chef.io on 10.2.72.20:53: read udp 10.1.97.98:59620->10.2.72.20:53: i/o timeout
+```
+To move ahead with upgrade you can download latest CLI and Airgapped bundle using curl command with proxy settings:
+```sh
+curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+
+curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/airgap_bundle/current/automate/4.2.22.aib -o automate-4.2.22.aib
+```
+
+After downloading, run the upgrade command with airgapped bundle option:
+```sh
+./chef-automate upgrade run --airgap-bundle automate-4.2.22.aib
+```
+
+### Minor upgrade errors
+
+```sh
+sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
+```
+
+The above error occurs if you run Chef Automate with Proxy settings and upgrade it from the Automate version before 4.2.22 to after 4.2.22.
+
+```sh
+Installing airgap install bundle
+DeploymentServiceCallError: A request to the deployment-service failed: Request to start to upgrade failed: RPC error: code = FailedPrecondition desc = The minimum compatible version field is missing in the manifest. Create a bundle with the latest automate-cli
+```
+
+This error may occur if a user running a non-airgapped version of Chef Automate tries to perform a minor upgrade using the airgapped installation method. To fix this minor upgrade error, run the following command:
+
+```sh
+sudo chef-automate stop
+```
+
+Once done, run the following command:
+
+```sh
+sudo chef-automate start
+```
+
+Before trying the upgrade again, confirm whether all the services are up by running the following command:
+
+```sh
+sudo chef-automate status
+```
 ### Migration Fails
 
  If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
@@ -585,33 +632,4 @@ Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
 
-### Minor upgrade errors
 
-```sh
-sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
-```
-
-The above error occurs if you run Chef Automate with Proxy settings and upgrade it from the Automate version before 4.2.22 or after 4.2.22.
-
-```sh
-Installing airgap install bundle
-DeploymentServiceCallError: A request to the deployment-service failed: Request to start to upgrade failed: RPC error: code = FailedPrecondition desc = The minimum compatible version field is missing in the manifest. Create a bundle with the latest automate-cli
-```
-
-This error may occur if a user running a non-airgapped version of Chef Automate tries to perform a minor upgrade using the airgapped installation method. To fix this minor upgrade error, run the following command:
-
-```sh
-sudo chef-automate stop
-```
-
-Once done, run the following command:
-
-```sh
-sudo chef-automate start
-```
-
-Before trying the upgrade again, confirm whether all the services are up by running the following command:
-
-```sh
-sudo chef-automate status
-```
