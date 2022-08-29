@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -43,11 +42,11 @@ const (
 	AutomateOpensearchConfigPatch = "/hab/svc/deployment-service/oss-config.toml"
 
 	maxHeapSizeExceeded = `
-heap size : %s, max allowed is 50%% of ram %dgb here but not exceeding %dgb,
-max shards per node : %d, max allowed is %d,
-indices breaker total limit : %s, max allowed is %s%%
-max open file : %s, max allowed is %s
-max locked memory : %s, max allowed is %s
+heap size : %s, max allowed is (50%% of ram = %dgb) but not exceeding %dgb,
+total shards per node : %d, max allowed is %d, 
+	having this more than %d decreases perfomance to avoid breaching this limit, 
+	you can reduce data retention policy
+indices breaker total limit : %s, recommend limit is %s%%
 we recommend you to move to external/managed opensearch cluster for better performance.
 but if you still want to continue with the upgrade
 `
@@ -70,7 +69,7 @@ type IndicesShardTotal struct {
 	} `json:"indices"`
 }
 
-type MaxShardPerNodeAndIndicesTotalLimit struct {
+type IndicesTotalLimit struct {
 	Defaults struct {
 		ClusterMaxShardsPerNode  string `json:"cluster.max_shards_per_node"`
 		IndicesBreakerTotalLimit string `json:"indices.breaker.total.limit"`
@@ -182,51 +181,18 @@ func getElasticsearchPID() (string, error) {
 	return string(pid), nil
 }
 
-func getIndicesBreakerLimit() (*MaxShardPerNodeAndIndicesTotalLimit, error) {
-	maxShardPerNodeAndIndicesTotalLimit := &MaxShardPerNodeAndIndicesTotalLimit{}
+func getIndicesBreakerLimit() (*IndicesTotalLimit, error) {
+	indicesTotalLimit := &IndicesTotalLimit{}
 	basePath := getSearchEngineBasePath()
 	data, err := getDataFromUrl(basePath + "_cluster/settings?include_defaults=true&flat_settings=true&pretty")
 	if err != nil {
-		return maxShardPerNodeAndIndicesTotalLimit, err
+		return indicesTotalLimit, err
 	}
-	err = json.Unmarshal(data, maxShardPerNodeAndIndicesTotalLimit)
+	err = json.Unmarshal(data, indicesTotalLimit)
 	if err != nil {
-		return maxShardPerNodeAndIndicesTotalLimit, err
+		return indicesTotalLimit, err
 	}
-	return maxShardPerNodeAndIndicesTotalLimit, nil
-}
-
-func getProcessRuntimeSettings(pid string) (map[string]string, error) {
-	var result = make(map[string]string)
-	if pid != "" {
-		pidInt64, err := strconv.ParseInt(strings.TrimSpace(string(pid)), 10, 64)
-		if err != nil {
-			return result, err
-		}
-		processProcFile := filepath.Join("/proc/", strconv.FormatInt(pidInt64, 10), "/limits")
-		data, err := ioutil.ReadFile(processProcFile) // nosemgrep
-		if err != nil {
-			return result, err
-		}
-		var lines = strings.Split(string(data), "\n")
-		for i := 1; i < len(lines); i++ {
-			r := regexp.MustCompile("[^\\s]+")
-			r.FindAllString(lines[i], -1)
-			s := strings.Fields(lines[i])
-			if len(s) >= 4 {
-				if strings.TrimSpace(s[0]) == "Max" && strings.TrimSpace(s[1]) == "open" && strings.TrimSpace(s[2]) == "files" {
-					result[MAX_OPEN_FILE_KEY] = s[3]
-				}
-				if strings.TrimSpace(s[0]) == "Max" && strings.TrimSpace(s[1]) == "locked" && strings.TrimSpace(s[2]) == "memory" {
-					result[MAX_LOCKED_MEM_KEY] = s[3]
-				}
-			}
-		}
-	} else {
-		return result, errors.New("Process id is empty")
-	}
-
-	return result, nil
+	return indicesTotalLimit, nil
 }
 
 func getHeapMemorySettings() (string, error) {
@@ -256,15 +222,6 @@ func getAllSearchEngineSettings(writer cli.FormatWriter, searchEnginePid string)
 		esSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
 	} else {
 		esSettings.IndicesBreakerTotalLimit = maxShardPerNodeAndIndicesTotalLimit.Defaults.IndicesBreakerTotalLimit
-	}
-	runtimeSettings, err := getProcessRuntimeSettings(searchEnginePid)
-	if err != nil {
-		writer.Warnf("not able to fetch max open file and max locked memory, moving to default \n %s \n ", err.Error())
-		esSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT
-		esSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
-	} else {
-		esSettings.RuntimeMaxOpenFile = runtimeSettings["Max open files"]
-		esSettings.RuntimeMaxLockedMem = runtimeSettings["Max locked memory"]
 	}
 	heapMemSettings, err := getHeapMemorySettings()
 	if err != nil {
@@ -385,26 +342,6 @@ func getIndicesBreakerTotalLimitSetting(writer cli.FormatWriter, esSetting *ESSe
 	}
 }
 
-func getRuntimeMaxOpenFile(writer cli.FormatWriter, esSetting *ESSettings, ossSetting *ESSettings) string {
-	esRunTimeMaxOpenFile, err := extractNumericFromText(esSetting.RuntimeMaxOpenFile, 0)
-	if err != nil {
-		writer.Warnf("Not able to parse esRunTimeMaxOpenFile from opensearch settings %s \n", err.Error())
-		writer.Warnf("applying default max open file %s \n", ossSetting.RuntimeMaxOpenFile)
-		return ossSetting.RuntimeMaxOpenFile
-	} else {
-		ossRunTimeMaxOpenFile, _ := strconv.ParseFloat(ossSetting.RuntimeMaxOpenFile, 64)
-		if esRunTimeMaxOpenFile > ossRunTimeMaxOpenFile {
-			return fmt.Sprintf("%d", int64(esRunTimeMaxOpenFile))
-		} else {
-			return fmt.Sprintf("%d", int64(ossRunTimeMaxOpenFile))
-		}
-	}
-}
-
-func getMaxLockedMemorySetting() string {
-	return "unlimited"
-}
-
 func getTotalShardsSetting(esSetting *ESSettings, ossSetting *ESSettings) int64 {
 	if esSetting.TotalShardSettings > ossSetting.TotalShardSettings {
 		return esSetting.TotalShardSettings
@@ -423,8 +360,8 @@ func GetBestSettings(writer cli.FormatWriter) *ESSettings {
 	bestSetting := &ESSettings{}
 	bestSetting.HeapMemory = getBestHeapSetting(writer, esSetting, ossSetting)
 	bestSetting.IndicesBreakerTotalLimit = getIndicesBreakerTotalLimitSetting(writer, esSetting, ossSetting)
-	bestSetting.RuntimeMaxOpenFile = getRuntimeMaxOpenFile(writer, esSetting, ossSetting)
-	bestSetting.RuntimeMaxLockedMem = getMaxLockedMemorySetting()
+	bestSetting.RuntimeMaxOpenFile = ossSetting.RuntimeMaxOpenFile
+	bestSetting.RuntimeMaxLockedMem = ossSetting.RuntimeMaxLockedMem
 	bestSetting.TotalShardSettings = getTotalShardsSetting(esSetting, ossSetting)
 	return bestSetting
 }

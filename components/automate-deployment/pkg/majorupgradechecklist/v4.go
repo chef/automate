@@ -668,10 +668,8 @@ func (ci *V4ChecklistManager) StoreSearchEngineSettings(writer cli.FormatWriter)
 			msg := fmt.Sprintf(
 				maxHeapSizeExceeded,
 				esSettings.HeapMemory, fiftyPercentOfMemory, MAX_POSSIBLE_HEAP_SIZE,
-				(esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT), INDICES_TOTAL_SHARD_DEFAULT,
-				esSettings.IndicesBreakerTotalLimit, INDICES_BREAKER_TOTAL_LIMIT_DEFAULT,
-				esSettings.RuntimeMaxOpenFile, MAX_OPEN_FILE_DEFAULT,
-				esSettings.RuntimeMaxLockedMem, MAX_LOCKED_MEM_DEFAULT)
+				requiredShards, INDICES_TOTAL_SHARD_DEFAULT, requiredShards,
+				esSettings.IndicesBreakerTotalLimit, INDICES_BREAKER_TOTAL_LIMIT_DEFAULT)
 			resp, err := writer.Confirm(msg)
 			if err != nil {
 				writer.Error(err.Error())
