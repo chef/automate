@@ -11,6 +11,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 )
 
 // GetAutomateConfig makes a gRPC request to the server and returns the
@@ -37,6 +38,8 @@ func PatchAutomateConfig(timeout int64, config *dc.AutomateConfig, writer cli.Fo
 	if err != nil {
 		return err
 	}
+
+	majorupgradechecklist.NewPostChecklistManager("NEXT_AUTOMATE_VERSION")
 
 	getRes, err := GetAutomateConfig(timeout)
 	if err != nil {
