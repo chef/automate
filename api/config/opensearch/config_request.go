@@ -70,7 +70,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	// indices
 	sys.Indices.Recovery.MaxBytesPerSec = w.String("20mb")
-	sys.Indices.Breaker.TotalLimit = w.String("70%")
+	sys.Indices.Breaker.TotalLimit = w.String("95%")
 	sys.Indices.Breaker.FielddataLimit = w.String("60%")
 	sys.Indices.Breaker.FielddataOverhead = w.String("1.03")
 	sys.Indices.Breaker.RequestLimit = w.String("40%")
