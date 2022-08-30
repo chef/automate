@@ -317,7 +317,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 					isEmbeded := !majorupgradechecklist.IsExternalElasticSearch()
 					patchError := majorupgradechecklist.PatchBestOpenSearchSettings(writer, isEmbeded)
 					if patchError != nil {
-						writer.Errorf("Error in patching default settings for opensearch\n %w \n", err)
+						writer.Errorf("Error in patching default settings for opensearch\n %s \n", err.Error())
 					}
 					err = esMigrateExecutor(ci)
 					if err != nil {
