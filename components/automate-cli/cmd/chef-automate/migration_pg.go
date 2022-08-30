@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"math"
 	"os"
 	"os/exec"
 	"strconv"
@@ -16,7 +15,6 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
-	cm "github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
@@ -203,29 +201,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 }
 
 func checkSpaceAvailable(dataDir string) (bool, error) {
-	habRootPath := getHabRootPath(habrootcmd)
-	habDirSize, err := cm.CalDirSizeInGB(habRootPath)
-	if err != nil {
-		return false, status.Errorf(status.UnknownError, err.Error())
-	}
-	// If (/hab) dir size is less than 5GB, then give error
-	habSpaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, majorupgradechecklist.MIN_DIRSIZE_GB)
-	if err != nil || !habSpaceAvailable {
-		return false, status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, majorupgradechecklist.MIN_DIRSIZE_GB))
-	}
-	dbDataSize, err := cm.CalDirSizeInGB(dataDir)
-	if err != nil {
-		return false, status.Errorf(status.UnknownError, err.Error())
-	}
-	minReqDiskSpace := math.Max(majorupgradechecklist.MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
-	spaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, minReqDiskSpace)
-	if err != nil {
-		return false, status.Errorf(status.UnknownError, err.Error())
-	}
-	if !spaceAvailable {
-		return false, status.New(status.UnknownError, fmt.Sprintf(majorupgradechecklist.DISKSPACE_CHECK_ERROR, "migration", minReqDiskSpace, "--skip-storage-check"))
-	}
-	return true, nil
+	return majorupgradechecklist.CheckSpaceAvailable(true, dataDir, nil, "", false, "")
 }
 
 func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
