@@ -71,7 +71,7 @@ func IsExternalElasticSearch() bool {
 	return res.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
 }
 
-func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatWriter, version string, skipDiskSpaceCheck bool, osDestDataDir string) (bool, error) {
+func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatWriter, version string, skipStorageCheck bool, osDestDataDir string) (bool, error) {
 	habRootPath := getHabRootPath(habrootcmd)
 	habDirSize, err := cm.CalDirSizeInGB(habRootPath)
 
@@ -111,8 +111,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 
 	minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
 
-	diskSpaceErrorType := "upgrade"
-	diskSpaceErrorFlag := "--skip-disk-space-check"
+	diskSpaceErrorType := "migration"
 	destDir := habRootPath
 
 	if !isMigration {
@@ -129,18 +128,17 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 				return false, status.New(status.UnknownError, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
 			}
 		}
-		diskSpaceErrorType = "migration"
-		diskSpaceErrorFlag = "--skip-storage-check"
+		diskSpaceErrorType = "upgrade"
 	}
 
-	if !skipDiskSpaceCheck {
+	if !skipStorageCheck {
 		if !isMigration && writer != nil {
 			writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
 			writer.Println("To change destination directory please use --os-dest-data-dir flag")
 		}
 		spaceAvailable, err := cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
 		if err != nil || !spaceAvailable {
-			return false, status.New(status.UnknownError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, diskSpaceErrorType, minReqDiskSpace, diskSpaceErrorFlag))
+			return false, status.New(status.UnknownError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, diskSpaceErrorType, minReqDiskSpace))
 		}
 	}
 	return true, nil

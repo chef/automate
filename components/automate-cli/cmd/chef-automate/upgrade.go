@@ -36,7 +36,7 @@ var upgradeRunCmdFlags = struct {
 	upgradeairgapbundles bool
 	skipDeploy           bool
 	isMajorUpgrade       bool
-	skipDiskSpaceCheck   bool
+	skipStorageCheck     bool
 	osDestDataDir        string
 	versionsPath         string
 	acceptMLSA           bool
@@ -174,8 +174,8 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			}
 
 			flags := majorupgradechecklist.ChecklistUpgradeFlags{
-				SkipDiskSpaceCheck: upgradeRunCmdFlags.skipDiskSpaceCheck,
-				OsDestDataDir:      upgradeRunCmdFlags.osDestDataDir,
+				SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
+				OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
 			}
 			err = ci.RunChecklist(configCmdFlags.timeout, flags)
 			if err != nil {
@@ -521,8 +521,8 @@ func init() {
 		"Flag for saas setup")
 
 	upgradeRunCmd.PersistentFlags().BoolVarP(
-		&upgradeRunCmdFlags.skipDiskSpaceCheck,
-		"skip-disk-space-check",
+		&upgradeRunCmdFlags.skipStorageCheck,
+		"skip-storage-check",
 		"",
 		false,
 		"Flag for skipping disk space check during upgrade")
