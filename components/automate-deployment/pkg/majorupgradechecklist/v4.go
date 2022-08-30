@@ -697,20 +697,23 @@ func (ci *V4ChecklistManager) StoreSearchEngineSettings(writer cli.FormatWriter)
 		esHeapSize, _ := extractNumericFromText(esSettings.HeapMemory, 0)
 		fiftyPercentOfMemory := defaultHeapSizeInGB()
 		isOkSettings := true
+		inAppropriateSettings := []string{}
 		if esHeapSize > MAX_POSSIBLE_HEAP_SIZE || int(math.Round(esHeapSize)) > fiftyPercentOfMemory {
+			msg := fmt.Sprintf(heapSizeExceededError, esSettings.HeapMemory, fiftyPercentOfMemory, MAX_POSSIBLE_HEAP_SIZE)
+			inAppropriateSettings = append(inAppropriateSettings, msg)
 			isOkSettings = false
 		}
 		requiredShards := (esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
 		if requiredShards > INDICES_TOTAL_SHARD_DEFAULT {
+			msg := fmt.Sprintf(shardCountExceededError, requiredShards, INDICES_TOTAL_SHARD_DEFAULT, requiredShards)
+			inAppropriateSettings = append(inAppropriateSettings, msg)
 			isOkSettings = false
 		}
 		if !isOkSettings {
-			msg := fmt.Sprintf(
-				maxHeapSizeExceeded,
-				esSettings.HeapMemory, fiftyPercentOfMemory, MAX_POSSIBLE_HEAP_SIZE,
-				requiredShards, INDICES_TOTAL_SHARD_DEFAULT, requiredShards,
-				esSettings.IndicesBreakerTotalLimit, INDICES_BREAKER_TOTAL_LIMIT_DEFAULT)
-			resp, err := writer.Confirm(msg)
+			for _, errMsg := range inAppropriateSettings {
+				writer.Fail(errMsg)
+			}
+			resp, err := writer.Confirm(errorUserConcent)
 			if err != nil {
 				writer.Error(err.Error())
 				return false, status.Errorf(status.InappropriateSettingError, err.Error())
