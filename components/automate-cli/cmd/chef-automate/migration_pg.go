@@ -275,7 +275,6 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		} else {
 			isAvailableSpace, err = checkSpaceAvailable(ELASTICSEARCH_DIR)
 			if err != nil {
-				writer.Error("Error while calDiskSizeAndDirSize : " + err.Error())
 				return err
 			}
 		}
