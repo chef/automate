@@ -1,6 +1,9 @@
 package majorupgradechecklist
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,4 +37,21 @@ func TestFindMatch(t *testing.T) {
 	targetList := []indexData{{Name: ".automate-23423274"}, {Name: "automate-saved-searches"}, {Name: "temp.tasks"}, {Name: "test.locky"}, {Name: "comp_info.automate"}}
 	resp := findMatch(sourceList, targetList)
 	assert.Equal(t, 5, len(resp))
+}
+
+func TestBatchDelete(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.Method, "DELETE")
+		if strings.Contains(r.URL.Path, "2,3,4") {
+			assert.Equal(t, r.URL.Path, "/2,3,4,5,6,7,8,9,10,11")
+		} else {
+			assert.Equal(t, r.URL.Path, "/12,13,14")
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"SUCCESS","data":null}`))
+	}))
+	defer server.Close()
+	err := batchDeleteIndexFromA1(10, []string{"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"}, server.URL+"/")
+	assert.NoError(t, err)
+
 }

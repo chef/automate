@@ -575,12 +575,12 @@ func getESBasePath(timeout int64) string {
 	return basePath
 }
 
-func getAllIndices(timeout int64) ([]byte, error) {
-	return execRequest(getESBasePath(timeout)+"_cat/indices?h=index", "GET", nil)
+func getAllIndices(basePath string) ([]byte, error) {
+	return execRequest(basePath+"_cat/indices?h=index", "GET", nil)
 }
 
-func fetchOldIndexInfo(timeout int64, basePath string) ([]indexData, error) {
-	allIndexList, err := getAllIndices(timeout)
+func fetchOldIndexInfo(basePath string) ([]indexData, error) {
+	allIndexList, err := getAllIndices(basePath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error while getting list of indices.")
 	}
@@ -612,7 +612,7 @@ func fetchOldIndexInfo(timeout int64, basePath string) ([]indexData, error) {
 
 func doDeleteStaleIndices(timeout int64, h ChecklistHelper) error {
 	basePath := getESBasePath(timeout)
-	indexInfo, err := fetchOldIndexInfo(timeout, basePath)
+	indexInfo, err := fetchOldIndexInfo(basePath)
 	if err != nil {
 		return err
 	}
@@ -723,7 +723,7 @@ func (ci *V4ChecklistManager) StoreSearchEngineSettings(writer cli.FormatWriter)
 
 func deleteA1Indexes(timeout int64) Checklist {
 	basePath := getESBasePath(timeout)
-	indexInfo, err := fetchOldIndexInfo(timeout, basePath)
+	indexInfo, err := fetchOldIndexInfo(basePath)
 	if err != nil {
 		return Checklist{
 			Name:        "delete A1 indexes",
@@ -757,7 +757,8 @@ func deleteA1Indexes(timeout int64) Checklist {
 			if !resp {
 				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.")
 			}
-			err = batchDeleteIndexFromA1(timeout, existingIndexes)
+			basePath := getESBasePath(timeout)
+			err = batchDeleteIndexFromA1(timeout, existingIndexes, basePath)
 			if err != nil {
 				return err
 			}
@@ -766,8 +767,7 @@ func deleteA1Indexes(timeout int64) Checklist {
 	}
 }
 
-func batchDeleteIndexFromA1(timeout int64, indexList []string) error {
-	basePath := getESBasePath(timeout)
+func batchDeleteIndexFromA1(timeout int64, indexList []string, basePath string) error {
 	additionalBatch := 0
 	if len(indexList)%indexBatchSize > 0 {
 		additionalBatch = 1
