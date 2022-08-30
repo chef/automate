@@ -165,13 +165,13 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	if ci.isExternalPG {
 		dbType = "External"
 		postcheck = postChecklistExternal
-		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), externalPGUpgradeCheck(), postChecklistIntimationCheck()}...)
+		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), externalPGUpgradeCheck(), postChecklistIntimationCheck()}...)
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistEmbedded
-		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
+		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), replaceS3Url(), promptUpgradeContinue())
+	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
