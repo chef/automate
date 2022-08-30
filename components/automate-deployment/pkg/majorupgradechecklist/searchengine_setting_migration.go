@@ -45,8 +45,7 @@ const (
 	shardCountExceededError = `total shards per node : %d, max allowed is %d, 
 having this more than %d decreases perfomance to avoid breaching this limit, 
 you can reduce data retention policy`
-	indicesBreakedLimitExceededError = `indices breaker total limit : %s, recommend limit is %s%%`
-	errorUserConcent                 = `we recommend you to move to external/managed opensearch cluster for better performance.
+	errorUserConcent = `we recommend you to move to external/managed opensearch cluster for better performance.
 but if you still want to continue with the upgrade`
 
 	upgradeFailed = "due to pre-condition check failed"
@@ -253,7 +252,7 @@ func GetESSettings(writer cli.FormatWriter) (*ESSettings, error) {
 	return esSettings, nil
 }
 
-func StoreESSettings(writer cli.FormatWriter, esSettings *ESSettings) error {
+func storeESSettings(writer cli.FormatWriter, esSettings *ESSettings) error {
 	esSettingsJson, err := json.Marshal(esSettings)
 	if err != nil {
 		return errors.Wrap(err, "error in mapping elasticsearch settings to json.")
@@ -283,7 +282,9 @@ func PatchBestOpenSearchSettings(writer cli.FormatWriter, isEmbedded bool) error
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch))
 		}
-		writer.Printf(fmt.Sprintf("Config written %s to \n", AutomateOpensearchConfigPatch))
+		writer.Println("below config will pached to automate opensearch")
+		writer.Println(finalTemplate)
+		writer.Printf(fmt.Sprintf("patch config written %s to \n", AutomateOpensearchConfigPatch))
 		defer func() {
 			err := os.Remove(AutomateOpensearchConfigPatch)
 			if err != nil {

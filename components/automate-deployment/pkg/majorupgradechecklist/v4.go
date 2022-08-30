@@ -206,7 +206,11 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
+<<<<<<< HEAD
 		checklists = append(checklists, []Checklist{deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
+=======
+		checklists = append(checklists, []Checklist{storeSearchEngineSettings(), deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
+>>>>>>> using checklist for errors, and showing config before patch
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
@@ -687,43 +691,49 @@ func deleteStaleIndices(timeout int64) Checklist {
 	}
 }
 
-func (ci *V4ChecklistManager) StoreSearchEngineSettings(writer cli.FormatWriter) (bool, error) {
-	isEmbedded := !IsExternalElasticSearch()
-	if !isEmbedded {
-		writer.Warnf("Automate is running on external elastic search, not taking configuration backup")
-		return true, nil
-	} else {
-		esSettings, _ := GetESSettings(writer)
-		esHeapSize, _ := extractNumericFromText(esSettings.HeapMemory, 0)
-		fiftyPercentOfMemory := defaultHeapSizeInGB()
-		isOkSettings := true
-		inAppropriateSettings := []string{}
-		if esHeapSize > MAX_POSSIBLE_HEAP_SIZE || int(math.Round(esHeapSize)) > fiftyPercentOfMemory {
-			msg := fmt.Sprintf(heapSizeExceededError, esSettings.HeapMemory, fiftyPercentOfMemory, MAX_POSSIBLE_HEAP_SIZE)
-			inAppropriateSettings = append(inAppropriateSettings, msg)
-			isOkSettings = false
-		}
-		requiredShards := (esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
-		if requiredShards > INDICES_TOTAL_SHARD_DEFAULT {
-			msg := fmt.Sprintf(shardCountExceededError, requiredShards, INDICES_TOTAL_SHARD_DEFAULT, requiredShards)
-			inAppropriateSettings = append(inAppropriateSettings, msg)
-			isOkSettings = false
-		}
-		if !isOkSettings {
-			for _, errMsg := range inAppropriateSettings {
-				writer.Fail(errMsg)
+func storeSearchEngineSettings() Checklist {
+	return Checklist{
+		Name:        "post_checklist_intimation_acceptance",
+		Description: "confirmation check for post checklist intimation",
+		TestFunc: func(h ChecklistHelper) error {
+			isEmbeded := !IsExternalElasticSearch()
+			if !isEmbeded {
+				h.Writer.Warnf("Automate is running on external elastic search, not taking configuration backup")
+				return nil
+			} else {
+				esSettings, _ := GetESSettings(h.Writer)
+				esHeapSize, _ := extractNumericFromText(esSettings.HeapMemory, 0)
+				fiftyPercentOfMemory := defaultHeapSizeInGB()
+				isOkSettings := true
+				inAppropriateSettings := []string{}
+				if esHeapSize > MAX_POSSIBLE_HEAP_SIZE || int(math.Round(esHeapSize)) > fiftyPercentOfMemory {
+					msg := fmt.Sprintf(heapSizeExceededError, esSettings.HeapMemory, fiftyPercentOfMemory, MAX_POSSIBLE_HEAP_SIZE)
+					inAppropriateSettings = append(inAppropriateSettings, msg)
+					isOkSettings = false
+				}
+				requiredShards := (esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
+				if requiredShards > INDICES_TOTAL_SHARD_DEFAULT {
+					msg := fmt.Sprintf(shardCountExceededError, requiredShards, INDICES_TOTAL_SHARD_DEFAULT, requiredShards)
+					inAppropriateSettings = append(inAppropriateSettings, msg)
+					isOkSettings = false
+				}
+				if !isOkSettings {
+					for _, errMsg := range inAppropriateSettings {
+						h.Writer.Warn(errMsg)
+					}
+					resp, err := h.Writer.Confirm(errorUserConcent)
+					if err != nil {
+						h.Writer.Error(err.Error())
+						return status.Errorf(status.InappropriateSettingError, err.Error())
+					}
+					if !resp {
+						return status.New(status.InappropriateSettingError, upgradeFailed)
+					}
+				}
+				storeESSettings(h.Writer, esSettings)
+				return nil
 			}
-			resp, err := writer.Confirm(errorUserConcent)
-			if err != nil {
-				writer.Error(err.Error())
-				return false, status.Errorf(status.InappropriateSettingError, err.Error())
-			}
-			if !resp {
-				return false, status.New(status.InappropriateSettingError, upgradeFailed)
-			}
-		}
-		StoreESSettings(writer, esSettings)
-		return true, nil
+		},
 	}
 }
 
