@@ -63,7 +63,7 @@ Post Upgrade Steps:
 
 	DISKSPACE_CHECK_ERROR = `You do not have minimum space available to continue with this %s. 
 Please ensure you have %.2f GB free disk space.
-To skip this free disk space check please use %s flag`
+To skip this free disk space check please use --skip-storage-check flag`
 )
 
 var postChecklistEmbedded = []PostCheckListItem{
@@ -167,7 +167,7 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistEmbedded
-		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
+		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
 
@@ -247,12 +247,12 @@ func backupCheck() Checklist {
 	}
 }
 
-func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir string) Checklist {
+func diskSpaceCheck(version string, skipStorageCheck bool, osDestDataDir string) Checklist {
 	return Checklist{
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			_, err := CheckSpaceAvailable(false, "", h.Writer, version, skipDiskSpaceCheck, osDestDataDir)
+			_, err := CheckSpaceAvailable(false, "", h.Writer, version, skipStorageCheck, osDestDataDir)
 			return err
 		},
 	}
