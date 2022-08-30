@@ -757,13 +757,32 @@ func deleteA1Indexes(timeout int64) Checklist {
 			if !resp {
 				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.")
 			}
-			err = deleteIndexFromA1(timeout, indexes)
+			err = batchDeleteIndexFromA1(timeout, existingIndexes)
 			if err != nil {
 				return err
 			}
 			return nil
 		},
 	}
+}
+
+func batchDeleteIndexFromA1(timeout int64, indexList []string) error {
+	basePath := getESBasePath(timeout)
+	additionalBatch := 0
+	if len(indexList)%indexBatchSize > 0 {
+		additionalBatch = 1
+	}
+	numOfBatches := len(indexList)/indexBatchSize + additionalBatch
+	for i := 0; i < numOfBatches; i++ {
+		upper := i*indexBatchSize + indexBatchSize
+		if upper > len(indexList)-1 {
+			upper = len(indexList)
+		}
+		indexCSL := strings.Join(indexList[i*indexBatchSize:upper], ",")
+		_, err := execRequest(fmt.Sprintf("%s%s", basePath, indexCSL)+"?pretty", "DELETE", nil)
+		return err
+	}
+	return nil
 }
 
 func deleteIndexFromA1(timeout int64, indexes string) error {
