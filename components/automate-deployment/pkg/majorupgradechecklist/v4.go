@@ -374,11 +374,10 @@ func disableShardAllocation() error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body) // nosemgrep
+	_, err = ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(body))
 	return nil
 }
 
@@ -409,12 +408,11 @@ func flushRequest() error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body) // nosemgrep
+	_, err = ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	fmt.Println(string(body))
 	return nil
 }
 
@@ -469,6 +467,7 @@ func disableSharding() Checklist {
 				h.Writer.Error(shardingError)
 				return status.New(status.InvalidCommandArgsError, shardingError)
 			}
+			h.Writer.Println("Calling elasticsearch api to disable shard allocation...")
 			err = disableShardAllocation()
 			if err != nil {
 				h.Writer.Error(err.Error())
@@ -480,6 +479,7 @@ func disableSharding() Checklist {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.DatabaseError, err.Error())
 			}
+			h.Writer.Println("Finished disabling shard allocation successfully.")
 			return nil
 		},
 	}
