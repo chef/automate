@@ -2,11 +2,9 @@ package majorupgradechecklist
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	cm "github.com/chef/automate/lib/io/fileutils"
 	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/pkg/errors"
 )
@@ -254,61 +252,8 @@ func diskSpaceCheck(version string, skipDiskSpaceCheck bool, osDestDataDir strin
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			habRootPath := getHabRootPath(habrootcmd)
-			habDirSize, err := cm.CalDirSizeInGB(habRootPath)
-
-			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.UnknownError, err.Error())
-			}
-
-			// If (/hab) dir size is less than 5GB, then throw error
-			habSpaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, MIN_DIRSIZE_GB)
-			if err != nil || !habSpaceAvailable {
-				h.Writer.Errorln(fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space", habRootPath, MIN_DIRSIZE_GB))
-				return status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, MIN_DIRSIZE_GB))
-			}
-
-			var spaceAvailable bool
-			version, _ = GetMajorVersion(version)
-			var dbDataPath string
-			switch version {
-			case "3":
-				dbDataPath = habRootPath + "svc/automate-postgresql/data/pgdata"
-			case "4":
-				dbDataPath = habRootPath + "svc/automate-elasticsearch/data"
-			}
-
-			dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
-			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.UnknownError, err.Error())
-			}
-
-			minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
-
-			destDir := habRootPath
-			if osDestDataDir != "" {
-				destDir = osDestDataDir
-			}
-
-			resp, err := h.Writer.Confirm(fmt.Sprintf("Ensure destination directory (%s) is having min. %.2f GB free space ?", destDir, minReqDiskSpace))
-			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
-			}
-			if !skipDiskSpaceCheck {
-				h.Writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
-				h.Writer.Println("To change destination directory please use --os-dest-data-dir flag")
-				spaceAvailable, err = cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
-				if err != nil || !spaceAvailable {
-					return status.New(status.InvalidCommandArgsError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, "upgrade", minReqDiskSpace, "--skip-disk-space-check"))
-				}
-			}
-			if !resp {
-				return status.New(status.InvalidCommandArgsError, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
-			}
-			return nil
+			_, err := CheckSpaceAvailable(false, "", h.Writer, version, skipDiskSpaceCheck, osDestDataDir)
+			return err
 		},
 	}
 }
