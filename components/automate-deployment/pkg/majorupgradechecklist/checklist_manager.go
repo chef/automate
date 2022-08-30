@@ -13,7 +13,6 @@ type ChecklistUpgradeFlags struct {
 type ChecklistManager interface {
 	RunChecklist(int64, ChecklistUpgradeFlags) error
 	GetPostChecklist() []PostCheckListItem
-	StoreSearchEngineSettings(writer cli.FormatWriter) (bool, error)
 }
 
 func NewChecklistManager(writer cli.FormatWriter, version string) (ChecklistManager, error) {
