@@ -49,15 +49,6 @@ const (
 	errorUserConcent                 = `we recommend you to move to external/managed opensearch cluster for better performance.
 	but if you still want to continue with the upgrade`
 
-	maxHeapSizeExceeded = `
-heap size : %s, max allowed is (50%% of ram = %dgb) but not exceeding %dgb,
-total shards per node : %d, max allowed is %d, 
-	having this more than %d decreases perfomance to avoid breaching this limit, 
-	you can reduce data retention policy
-indices breaker total limit : %s, recommend limit is %s%%
-we recommend you to move to external/managed opensearch cluster for better performance.
-but if you still want to continue with the upgrade
-`
 	upgradeFailed = "due to pre-condition check failed"
 )
 
