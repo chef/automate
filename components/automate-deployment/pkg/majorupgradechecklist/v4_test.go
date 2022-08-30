@@ -1,6 +1,9 @@
 package majorupgradechecklist
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,7 +12,7 @@ import (
 func TestGetMajorVersion(t *testing.T) {
 	data := `{"automate-2":{"settings":{"index":{"version":{"created_string":"5.6.2","created":"5060299"}}}},".watches":{"settings":{"index":{"version":{"created_string":"5.6.2","created":"5060299"}}}},"node-attribute":{"settings":{"index":{"version":{"created_string":"6.8.23","created":"6082399"}}}}}`
 
-	indexInfo, err := getOldIndexInfo([]byte(data))
+	indexInfo, err := getDataForOldIndices([]byte(data))
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(indexInfo))
 	assert.Equal(t, "automate-2", indexInfo[0].Name)
@@ -31,7 +34,24 @@ func TestFormErrorMsg(t *testing.T) {
 
 func TestFindMatch(t *testing.T) {
 	sourceList := []string{".automate", ".locky", "saved-searches", ".tasks"}
-	targetList := []string{".automate-23423274", "automate-saved-searches", "temp.tasks", "test.locky", "comp_info.automate"}
+	targetList := []indexData{{Name: ".automate-23423274"}, {Name: "automate-saved-searches"}, {Name: "temp.tasks"}, {Name: "test.locky"}, {Name: "comp_info.automate"}}
 	resp := findMatch(sourceList, targetList)
 	assert.Equal(t, 5, len(resp))
+}
+
+func TestBatchDelete(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.Method, "DELETE")
+		if strings.Contains(r.URL.Path, "2,3,4") {
+			assert.Equal(t, r.URL.Path, "/2,3,4,5,6,7,8,9,10,11")
+		} else {
+			assert.Equal(t, r.URL.Path, "/12,13,14")
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"SUCCESS","data":null}`))
+	}))
+	defer server.Close()
+	err := batchDeleteIndexFromA1(10, []string{"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"}, server.URL+"/")
+	assert.NoError(t, err)
+
 }
