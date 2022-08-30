@@ -314,8 +314,3 @@ func promptUpgradeContinue() Checklist {
 		},
 	}
 }
-
-func (ci *V3ChecklistManager) StoreSearchEngineSettings(writer cli.FormatWriter) (bool, error) {
-	writer.Printf("Not needed for now")
-	return true, nil
-}
