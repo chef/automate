@@ -6,8 +6,8 @@ import (
 )
 
 type ChecklistUpgradeFlags struct {
-	SkipDiskSpaceCheck bool
-	OsDestDataDir      string
+	SkipStorageCheck bool
+	OsDestDataDir    string
 }
 
 type ChecklistManager interface {
