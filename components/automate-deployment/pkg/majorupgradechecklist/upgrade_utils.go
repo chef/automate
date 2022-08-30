@@ -111,8 +111,8 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 
 	minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
 
-	diskSpaceErrorType := "upgrade"
-	diskSpaceErrorFlag := "--skip-disk-space-check"
+	diskSpaceErrorType := "migration"
+	diskSpaceErrorFlag := "--skip-storage-check"
 	destDir := habRootPath
 
 	if !isMigration {
@@ -129,8 +129,8 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 				return false, status.New(status.UnknownError, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
 			}
 		}
-		diskSpaceErrorType = "migration"
-		diskSpaceErrorFlag = "--skip-storage-check"
+		diskSpaceErrorType = "upgrade"
+		diskSpaceErrorFlag = "--skip-disk-space-check"
 	}
 
 	if !skipDiskSpaceCheck {
