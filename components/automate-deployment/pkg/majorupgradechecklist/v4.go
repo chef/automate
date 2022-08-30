@@ -277,6 +277,7 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 				if shardError != nil {
 					h.Writer.Error(shardError.Error())
 				}
+				h.Writer.Println("Finished enabling sharding.")
 				return status.New(status.InvalidCommandArgsError, "end user not ready to upgrade")
 			}
 			return nil
@@ -286,7 +287,7 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 
 func enableSharding(h ChecklistHelper, isEmbedded bool) error {
 	if isEmbedded {
-		h.Writer.Println("enabling sharding")
+		h.Writer.Println("\nenabling sharding...")
 		return reEnableShardAllocation()
 	}
 	return nil
@@ -445,11 +446,10 @@ func reEnableShardAllocation() error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body) // nosemgrep
+	_, err = ioutil.ReadAll(res.Body) // nosemgrep
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(body))
 	return nil
 }
 
