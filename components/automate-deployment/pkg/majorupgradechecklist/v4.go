@@ -107,9 +107,12 @@ const (
 	urlChangeMessage = `Your S3 url in backup config is changed from %s to https://s3.amazonaws.com. 
 This is because automate version 4 now only supports this format due to AWS SDK upgrade.
 `
-	msg           = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
-	oldIndexError = "The index %s is from an older version of elasticsearch version %s.\nPlease reindex in elasticsearch 6. %s\n%s"
+	msg            = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
+	oldIndexError  = "The index %s is from an older version of elasticsearch version %s.\nPlease reindex in elasticsearch 6. %s\n%s"
+	indexBatchSize = 10
 )
+
+var sourceList = []string{".automate", ".locky", "saved-searches", ".tasks"}
 
 var postChecklistV4Embedded = []PostCheckListItem{
 	{
@@ -582,12 +585,29 @@ func fetchOldIndexInfo(timeout int64, basePath string) ([]indexData, error) {
 		return nil, errors.Wrap(err, "error while getting list of indices.")
 	}
 	indexList := strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n")
-	indexCSL := strings.Join(indexList, ",")
-	versionData, err := execRequest(basePath+indexCSL+"/_settings/index.version.created*?&human", "GET", nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "error while getting indices details.")
+	additionalBatch := 0
+	if len(indexList)%indexBatchSize > 0 {
+		additionalBatch = 1
 	}
-	return getDataForOldIndices(versionData)
+	numOfBatches := len(indexList)/indexBatchSize + additionalBatch
+	var indexDataArr []indexData
+	for i := 0; i < numOfBatches; i++ {
+		upper := i*indexBatchSize + indexBatchSize
+		if upper > len(indexList)-1 {
+			upper = len(indexList)
+		}
+		indexCSL := strings.Join(indexList[i*indexBatchSize:upper], ",")
+		versionData, err := execRequest(basePath+indexCSL+"/_settings/index.version.created*?&human", "GET", nil)
+		if err != nil {
+			return nil, errors.Wrap(err, "error while getting indices details.")
+		}
+		data, err := getDataForOldIndices(versionData)
+		if err != nil {
+			return nil, errors.Wrap(err, "error while parsing indices details.")
+		}
+		indexDataArr = append(indexDataArr, data...)
+	}
+	return indexDataArr, nil
 }
 
 func doDeleteStaleIndices(timeout int64, h ChecklistHelper) error {
@@ -713,7 +733,6 @@ func deleteA1Indexes(timeout int64) Checklist {
 			},
 		}
 	}
-	sourceList := []string{".automate", ".locky", "saved-searches", ".tasks"}
 
 	existingIndexes := findMatch(sourceList, indexInfo)
 
