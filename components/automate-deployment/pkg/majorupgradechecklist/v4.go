@@ -780,15 +780,11 @@ func batchDeleteIndexFromA1(timeout int64, indexList []string) error {
 		}
 		indexCSL := strings.Join(indexList[i*indexBatchSize:upper], ",")
 		_, err := execRequest(fmt.Sprintf("%s%s", basePath, indexCSL)+"?pretty", "DELETE", nil)
-		return err
+		if err != nil {
+			return err
+		}
 	}
 	return nil
-}
-
-func deleteIndexFromA1(timeout int64, indexes string) error {
-	basePath := getESBasePath(timeout)
-	_, err := execRequest(fmt.Sprintf("%s%s", basePath, indexes)+"?pretty", "DELETE", nil)
-	return err
 }
 
 //findMatch returns the list of items available in targetList from sourceList
