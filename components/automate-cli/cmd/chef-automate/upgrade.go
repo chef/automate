@@ -8,9 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-
+	"github.com/chef/automate/api/config/deployment"
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -21,6 +19,8 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
 var upgradeCmd = &cobra.Command{
@@ -579,12 +579,9 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 }
 
 func GetopenSearchConfig() {
-	res, err := client.GetAutomateConfig(configCmdFlags.timeout)
-	if err != nil {
-		return
-	}
+	res := deployment.DefaultAutomateConfig()
 
-	con := res.Config.GetOpensearch()
+	con := res.GetOpensearch()
 	if con != nil {
 		opensearchV1 := &OpenSearch_v1{
 			V1: con.V1,
@@ -597,7 +594,7 @@ func GetopenSearchConfig() {
 			return
 		}
 
-		writer.Println("This is your OpenSearch Config")
+		writer.Println("This is your Default OpenSearch Config")
 		writer.Println(string(t))
 
 	}
