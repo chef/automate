@@ -287,7 +287,7 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 
 func enableSharding(h ChecklistHelper, isEmbedded bool) error {
 	if isEmbedded {
-		h.Writer.Println("\nenabling sharding...")
+		h.Writer.Println("\nEnabling sharding...")
 		return reEnableShardAllocation()
 	}
 	return nil
