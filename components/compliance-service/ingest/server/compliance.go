@@ -3,9 +3,10 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
-	"time"
+	"regexp"
 
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/lib/cereal"
@@ -24,7 +25,6 @@ import (
 	ingest_api "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
-	"github.com/chef/automate/components/automate-gateway/gateway"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
 	"github.com/chef/automate/components/notifications-client/notifier"
@@ -137,40 +137,21 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(stream ingest_api.Compl
 		logrus.Error(err)
 		return err
 	}
-
-	start1 := time.Now()
-	in := gateway.ParseBytesToComplianceReport(jsonBytes)
-	fmt.Println("::::::: old approach time taken", time.Since(start1))
-
-	// in := &compliance.Report{}
-	// start2 := time.Now()
-	// str := r(string(jsonBytes), 0)
-	// err = json.Unmarshal([]byte(str), &in)
-	// if err != nil {
-	// 	return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
-	// }
-	// fmt.Println("received report ::::::::::::: 22222222222", in.GetProfiles()[0].GetAttributes()[0].Options.Fields["filesystem"], time.Since(start2))
-
-	// in := &compliance.Report{}
-	// re := regexp.MustCompile(`""\s*:`)
-	// bb := bytes.Buffer{}
-
-	// t := time.Now()
-	// split := re.Split(string(jsonBytes), -1)
-
-	// for i := range split {
-	// 	if i < len(split)-1 {
-	// 		bb.WriteString(split[i] + fmt.Sprintf(`"unknown-%d":`, i))
-	// 	} else {
-	// 		bb.WriteString(split[i])
-	// 	}
-	// }
-	// err = json.Unmarshal(bb.Bytes(), &in)
-	// if err != nil {
-	// 	return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
-	// }
-	// fmt.Println("::::::: new approach time taken", time.Since(t))
-
+	in := &compliance.Report{}
+	re := regexp.MustCompile(`""\s*:`)
+	bb := bytes.Buffer{}
+	split := re.Split(string(jsonBytes), -1)
+	for i := range split {
+		if i < len(split)-1 {
+			bb.WriteString(split[i] + fmt.Sprintf(`"unknown-%d":`, i))
+		} else {
+			bb.WriteString(split[i])
+		}
+	}
+	err = json.Unmarshal(bb.Bytes(), &in)
+	if err != nil {
+		return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
+	}
 	err = SendComplianceReport(context.Background(), in, s)
 	if err != nil {
 		return err
