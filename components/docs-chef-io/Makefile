@@ -25,8 +25,10 @@ chef_web_docs:
 		git clone https://github.com/chef/chef-web-docs.git; \
 	fi
 
-clean_all: clean_swagger_files
-	pushd chef-web-docs && make clean_all && popd
+clean:
+	rm -rf chef-web-docs
+
+clean_all: clean_swagger_files clean
 
 clean_swagger_files:
 	rm -rf ./$(SWAGGER_DIR)/*
