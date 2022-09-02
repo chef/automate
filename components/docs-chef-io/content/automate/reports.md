@@ -119,9 +119,7 @@ Use Chef InSpec to configure [waivers](https://docs.chef.io/inspec/waivers/).
 The download button to the right of the search bar allows users to download a JSON or CSV format of the reports. The downloaded contents result from all the applied filters--including the end time selected in the calendar.
 
 {{< warning >}}
-
-- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
-
+{{< readfile file="content/automate/4x-warn.md" >}}
 {{< /warning >}}
 
 ## Download Report Results (With Large Compliance Report Configuration)  

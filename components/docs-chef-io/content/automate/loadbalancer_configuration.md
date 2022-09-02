@@ -14,9 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-
-- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
-
+{{< readfile file="content/automate/4x-warn.md" >}}
 {{< /warning >}}
 
 This guide details how to set up the load balancer configuration for Chef Automate and Chef Infra Server.
