@@ -13,7 +13,6 @@ gh_repo = "automate"
     weight = 200
 +++
 
-{{ os.ReadFile "banner.md" }}
 {{< readfile file="content/automate/banner.md" >}}
 
 This section lists the recommended requirements for operating systems, virtual machine instances, and VPC for implementing the Chef Automate High Availability (HA) in your network infrastructure.
