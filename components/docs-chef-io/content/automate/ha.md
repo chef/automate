@@ -1,6 +1,12 @@
 +++
 title = "High Availability Overview"
 
+{{< warning >}}
+
+A2HA user can be migrated to Automate HA with minimum Chef Automate version 20201230192246
+
+{{< /warning >}}
+
 draft = false
 
 gh_repo = "automate"
