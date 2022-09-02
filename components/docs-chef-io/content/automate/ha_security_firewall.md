@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 210
 +++
 
-{{ $file := .Get "banner" | readFile }}
+{{% $file := .Get "banner" | readFile }}
 
 The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
 
