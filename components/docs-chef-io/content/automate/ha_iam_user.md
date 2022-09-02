@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{< readfile file="content/automate/4x-warn.md" >}}
+{{% automate/4x-warn %}}
 {{< /warning >}}
 
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You can use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.

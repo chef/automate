@@ -13,7 +13,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{< readfile file="content/automate/4x-warn.md" >}}
+{{% automate/4x-warn %}}
 {{< /warning >}}
 
 {{< warning >}} *Elasticsearch support has been removed from this version (4.0.27) of Chef Automate.* {{< /warning >}}

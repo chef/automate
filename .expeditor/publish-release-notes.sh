@@ -19,10 +19,6 @@ pushd ./automate.wiki
   # Reset "Pending Release Notes" wiki page
   cat >./Pending-Release-Notes.md <<EOH
 
-{{< warning >}}
-{{< readfile file="content/automate/4x-warn.md" >}}
-{{< /warning >}}
-
 ## Upgrade Journey
 
 Chef lets you choose your **upgrade journey** based on your current version of Chef Automate. You can do all the version upgrades manually.

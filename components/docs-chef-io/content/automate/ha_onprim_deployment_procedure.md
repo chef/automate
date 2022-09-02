@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{< readfile file="content/automate/4x-warn.md" >}}
+{{% automate/4x-warn %}}
 {{< /warning >}}
 
 In this section, we'll discuss the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:

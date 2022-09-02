@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{< readfile file="content/automate/4x-warn.md" >}}
+{{% automate/4x-warn %}}
 {{< /warning >}}
 
 This page explains the prerequisites of the backup. If we choose the AWS Deployment procedure to deploy Automate-HA, we can choose either the `efs` or `s3` backup option. In the config it will be: **`backup_config = "efs"` OR `backup_config = "s3"` in `config.toml`, the below steps are not required.** The below steps are taken care of by the deployment. If we have kept the `backup_config` blank, we need to perform the below steps.

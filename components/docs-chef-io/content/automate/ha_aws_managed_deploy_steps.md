@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
- {{< readfile file="content/automate/4x-warn.md" >}}
+ {{% automate/4x-warn %}}
 {{< /warning >}}
 
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services.

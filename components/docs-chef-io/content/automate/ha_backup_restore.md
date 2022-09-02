@@ -14,7 +14,7 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
-{{< readfile file="content/automate/4x-warn.md" >}}
+{{% automate/4x-warn %}}
 {{< /warning >}}
 
 Computer security safeguards the computer system and data against theft, unlawful access, or any disaster. It's guarding against and detecting unlawful access to your computer system. Data security refers to securing data from unlawful access or any disaster. This process includes the following terms:
