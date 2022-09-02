@@ -61,9 +61,9 @@ spellcheck:
 	@pushd ../.. > /dev/null; \
 		cspell \
 			"api/external/**/*.proto" \
-			"components/docs-chef-io/**/*.md" \
+			--exclude "components/docs-chef-io/chef-web-docs/**/*" "components/docs-chef-io/**/*.md" \
 			"components/docs-chef-io/data/automate/api-static/**/*" \
-			"components/docs-chef-io/layouts/**/*.html" \
+			"components/docs-chef-io/layouts/**/*.{html,md}" \
 			"components/automate-gateway/**/*.proto" \
 		; EXIT_CODE=$$?; \
 		popd > /dev/null; \
