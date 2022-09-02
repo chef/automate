@@ -14,9 +14,7 @@ gh_repo = "automate"
 
 
 {{< warning >}}
-
-4.X version will be Temporarily down, plese use 3.X version until we will release new version.
-
+{{< readfile file="content/automate/4x-warn.md" >}}
 {{< /warning >}}
 
 **High availability (HA)** refers to a system or application that offers a high level of operational availability. This means that the entire site or application will not be down if one server goes down due to traffic overload or other issues. HA represents the application remains available with no interruption. We achieve high availability when an application continues to operate even when one or more underlying components fail.
