@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 220
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 Certificate rotation is the replacement of existing certificates with new ones when any certificate expires or is based on your organization's policy. A new CA authority is substituted for the old, requiring a replacement of the root certificate for the cluster.
 
 The certificate rotation is also required when the key for a node, client, or CA is compromised. If compromised, you need to change the contents of a certificate. For example, to add another DNS name or the IP address of a load balancer to reach a node, you have to rotate only the node certificates.

@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 200
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 In this section, we'll discuss the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:
 
 ## Install Chef Automate HA

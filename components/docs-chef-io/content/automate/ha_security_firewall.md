@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 210
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
 
 ## Ports required for all Machines

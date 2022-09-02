@@ -14,6 +14,12 @@ gh_repo = "automate"
 
 {{< warning >}}
 
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
+{{< warning >}}
+
 - A2HA user can be migrated to Automate HA with minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
 {{< /warning >}}

@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 230
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 ## Backup
 
 Chef Automate let's you create a new backup. You can create it by running the backup command from a Chef Automate front-end node. The backup command is as shown below:

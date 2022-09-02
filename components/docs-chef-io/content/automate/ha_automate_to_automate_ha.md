@@ -11,7 +11,13 @@ gh_repo = "automate"
     identifier = "automate/deploy_high_availability/migration/ha_automate_to_automate_ha.md Automate to Automate HA"
     weight = 220
 +++
- 
+
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 {{< warning >}}
 
 - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with  

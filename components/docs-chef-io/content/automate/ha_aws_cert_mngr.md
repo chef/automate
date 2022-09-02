@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 230
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 This page explains how to use the **AWS Certificate Manager (ACM)** console to generate a public ACM certificate for your domain.
 
 You can either generate a new public certificate or copy an existing Amazon Resource Name (ARN) value of the certificate of your selected region in the AWS console.

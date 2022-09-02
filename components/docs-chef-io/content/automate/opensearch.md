@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 You can configure Chef Automate to use OpenSearch clusters that are not deployed via Chef Automate itself.
 
 ## Configure External OpenSearch

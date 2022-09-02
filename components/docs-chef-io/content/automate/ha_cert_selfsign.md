@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 210
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 ## What are Certificates?
 
 A security certificate is a small data file used as an Internet security technique through which the identity, authenticity, and reliability of a website or web application are established.

@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 210
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 This page explains the prerequisites of the backup. If we choose the AWS Deployment procedure to deploy Automate-HA, we can choose either the `efs` or `s3` backup option. In the config it will be: **`backup_config = "efs"` OR `backup_config = "s3"` in `config.toml`, the below steps are not required.** The below steps are taken care of by the deployment. If we have kept the `backup_config` blank, we need to perform the below steps.
 
 {{< note >}} You can take backup on EFS system through DNS or IP. {{< /note >}}

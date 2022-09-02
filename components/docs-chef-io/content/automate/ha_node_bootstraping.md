@@ -12,6 +12,12 @@ gh_repo = "automate"
     weight = 95
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 A node is any physical, virtual, or cloud device configured and maintained by an instance of Chef Infra Client. Bootstrapping installs Chef Infra Client on a target system so it can run as a client and sets the node up to communicate with a Chef Infra Server.
 
 To bootstrap a node, run `knife bootstrap` in the workstation.

@@ -12,6 +12,12 @@ gh_repo = "automate"
     weight = 80
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 ## Prerequisites
 
 ### PostgreSQL Setup

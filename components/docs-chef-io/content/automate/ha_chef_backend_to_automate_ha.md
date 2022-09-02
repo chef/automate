@@ -13,6 +13,12 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
+{{< warning >}}
 - Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
 - Automate HA do not support the super market authentication with chef-server users credentials. 
 - Post Migration Customer can not login with chef-server users to Supermarket. 

@@ -13,6 +13,12 @@ gh_repo = "automate"
     weight = 220
 +++
 
+{{< warning >}}
+
+- Automate 4.x will not be available for download before the end of September 2022. We are working on making the upgrade process a seamless experience. Until then, you can download Automate 3.0.49. Please get in touch with support for more information. 
+
+{{< /warning >}}
+
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You can use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
 
 To run the terraform scripts, you need an IAM user with the following permissions:
