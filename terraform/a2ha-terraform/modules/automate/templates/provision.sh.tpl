@@ -43,6 +43,7 @@ wait_for_install() {
     sleep 30
     if [ $cmd == "automate-backend-ctl"]
       then
+        echo "bin-linking automate-backend-ctl"
         pkg_count=$(ls -Art /hab/cache/artifacts/chef-automate-ha-ctl* | tail -n 1 | wc -l )
         pkg_name=$(ls -Art /hab/cache/artifacts/chef-automate-ha-ctl* | tail -n 1)
         echo "Installing the package $pkg_name"
