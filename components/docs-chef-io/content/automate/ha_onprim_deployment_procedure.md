@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "On-Premise Deployment"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_onprim_deployment_procedure.md On-Premise Deployment"
-    weight = 200
+    weight = 210
 +++
 
 {{< warning >}}
