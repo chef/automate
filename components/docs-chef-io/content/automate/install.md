@@ -35,6 +35,14 @@ sudo ./chef-automate init-config
 
 You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor.
 
+add elasticsearch heapsize setting at end of config as shown below, 
+recomended heap size is 50% of total memory, but cannot exceed more than 32 gb.
+
+```toml
+[elasticsearch.v1.sys.runtime]
+  heapsize = "...g" # ... must be replaced with number in gb example 4g mean (4 gb)
+```
+
 If you have requirements around data size and/or redundancy, see [Configuring External
 Data Stores]({{< relref "#configuring-external-data-stores" >}}) for information on
 configuring Chef Automate to use an externally-deployed PostgreSQL database cluster
@@ -62,29 +70,6 @@ Deploy complete
 ```
 
 The deployment process writes login credentials to the `automate-credentials.toml` in your current working directory.
-
-Create a new patch configuration toml as `patch-config.toml` and update the products
-  to include both `builder` and `automate`:
-
-    ```toml
-    [elasticsearch.v1.sys.runtime]
-      heapsize = "8g"
-    ```
-
-Patch the configuration to deploy the rest of the Chef Automate services:
-
-    ```shell
-    ./chef-automate config patch patch-config.toml
-    ```
-
-    You should see output similar to:
-
-    ```output
-    Updating deployment configuration
-
-    Applying deployment configuration
-    Success: Configuration patched
-    ```
 
 ## Open Chef Automate
 
