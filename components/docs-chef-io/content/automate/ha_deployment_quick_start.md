@@ -99,6 +99,9 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    #Print data in the config
    cat config.toml
 
+   #Run provision command to deploy `automate.aib` with set `config.toml`
+   chef-automate provision-infra config.toml --airgap-bundle automate.aib
+
    #Run deploy command to deploy `automate.aib` with set `config.toml`
    chef-automate deploy config.toml --airgap-bundle automate.aib
 
