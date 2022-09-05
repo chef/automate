@@ -101,7 +101,6 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 **Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 1. Start a major version upgrade:
-
 ```sh
 sudo chef-automate upgrade run --major
 ```
@@ -147,14 +146,12 @@ It starts upgrading
 Once you are done with the upgrade, follow the steps post upgrade which are:
 
 2. Check the upgrade status of Chef Automate:
-
 ```sh
 sudo chef-automate upgrade status
 ```
 This should return: Automate is up-to-date with airgap bundle `4.x.y` version
 
 3. Turn off maintenance mode:
-
 ```sh
 sudo chef-automate maintenance off
 ```
@@ -209,7 +206,6 @@ Configure the OpenSearch Heap size to **50%** of RAM, but not more than 32GB.
 Apply this using the `config patch` command.
 
 5. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
-
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
@@ -248,13 +244,11 @@ Chef-automate status
 When migration is successful the default config will be shown
 
 6. Verify whether all services are running:
-
 ```sh
 sudo chef-automate status
 ```
 
 7. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
-
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
 ```
@@ -266,7 +260,6 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
 **Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 1. Start major version upgrade:
-
 ```sh
 sudo chef-automate upgrade run --major
 ```
@@ -290,12 +283,12 @@ Once you are done with the upgrade, follow the steps post upgrade which are:
 Post Upgrade Steps:
 ===================
 
-  
 1) Check the status of your upgrade using:  
      $ chef-automate upgrade status
   
 2) Disable the maintenance mode if you enabled previously using:
 	$ chef-automate maintenance off
+```
 
 2. Check upgrade status is up-to-date
 
@@ -312,7 +305,6 @@ This should return: Automate is up-to-date
     Add the releavent configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
 
 5. Turn off maintenance mode:
-
 ```sh
 sudo chef-automate maintenance off
 ```
@@ -386,14 +378,12 @@ Once you are done with the upgrade, follow the steps post upgrade which are:
 **Post Upgrade**
 
 1. Check the upgrade status of Chef Automate, run the following command:
-
 ```sh
 sudo chef-automate upgrade status
 ```
 This should return: Automate is up-to-date with airgap bundle `4.x.y` version
 
 2. Turn off the maintenance mode.
-
 ```sh
 sudo chef-automate maintenance off
 ```
@@ -443,7 +433,6 @@ Then add in OpenSearch configuration as:
 Apply this using `config patch` command.
 
 4. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
-
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
@@ -482,13 +471,11 @@ Chef-automate status
 When migration is successful the default config will be shown
 
 5. Verify whether all services are running:
-
 ```sh
 sudo chef-automate status
 ```
 
 6. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
-
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
 ```
@@ -553,7 +540,6 @@ Once you are done with the upgrade, follow the steps post upgrade which are:
 Post Upgrade Steps:
 ===================
 
-  
 1) Check the status of your upgrade using:  
      $ chef-automate upgrade status
    This should return: Automate is up-to-date
@@ -562,7 +548,6 @@ Post Upgrade Steps:
 	$ chef-automate maintenance off
 
 3. Check whether upgrade status is up-to-date
-
 ```sh
 sudo chef-automate upgrade status
 ```
@@ -575,7 +560,6 @@ sudo chef-automate upgrade status
     Add the releavent configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
 
 6. Turn off maintenance mode using following command:
-
 ```sh
 sudo chef-automate maintenance off
 ```
@@ -604,8 +588,8 @@ You need to clear the space in /hab for having atleast 5GB free space.
 ```
 UnknownError: An unknown issue occurred during execution: Request to start upgrade failed: one of the checklist was not accepted/satisfied for upgrade: You do not have minimum space available to continue with this upgrade. 
 ```
-To skip this free disk space check please use --skip-storage-check flag (or)
-To change destination directory please use --os-dest-data-dir flag
+To skip this free disk space check please use ```--skip-storage-check``` flag (or)
+To change destination directory please use ```--os-dest-data-dir``` flag
 
 ### Circuit Breaking Exception
 
@@ -646,7 +630,7 @@ Update the Opensearch Config, using `chef-automate config patch <config_patch.to
 ```
 Error while calDiskSizeAndDirSize : You do not have minimum space available to continue with this
 ```
-To skip this free disk space check please use --skip-storage-check flag
+To skip this free disk space check please use ```--skip-storage-check``` flag
 
 2) If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
 
