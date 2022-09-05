@@ -50,8 +50,8 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
-   #Switch to sudo.
-   sudo su -
+   #Run commands as sudo.
+   sudo -- sh -c "
 
    #Download Chef Automate CLI.
    curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
@@ -62,20 +62,15 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
 
-   #If Airgapped Bastion machine is different, then transfer Bundle file `latest.aib` and Chef Automate CLI binary `chef-automate` to the Airgapped Bastion Machine using scp command.
-   #After transfering, in Airgapped Bastion, switch to sudo.
-   
-   #Move the Chef Automate CLI to `/usr/bin`.
-   cp -f chef-automate /usr/bin/chef-automate
-
    #Generate init config and then generate init config for existing infra structure
    chef-automate init-config-ha existing_infra
+   "
    ```
 
 2. Update Config with relevant data:
 
    ```bash
-   vi config.toml
+   sudo vi config.toml
    ```
 
    - Add No. of machines for each Service: Chef Automate, Chef Infra Server, Postgresql, OpenSearch
@@ -92,6 +87,8 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 3. Continue with the deployment after updating config:
 
    ```bash
+   #Run commands as sudo.
+   sudo -- sh -c "
    #Print data in the config
    cat config.toml
 
@@ -100,6 +97,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
+   "
    ```
 
 Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
