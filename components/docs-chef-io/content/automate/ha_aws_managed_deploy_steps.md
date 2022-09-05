@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "AWS Managed Services Deployment"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_aws_managed_deploy_steps.md AWS Managed Services"
-    weight = 220
+    weight = 230
 +++
 
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services.
