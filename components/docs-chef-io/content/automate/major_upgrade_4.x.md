@@ -159,45 +159,6 @@ This should return:
 `Updating deployment configuration`
 `Applying deployment configuration`
 
-4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
-
-For Example:
-
-If Elasticsearch configuration was:
-
-```bash
-[elasticsearch]
-  [elasticsearch.v1]
-    [elasticsearch.v1.sys]
-      [elasticsearch.v1.sys.cluster]
-        max_shards_per_node = 6000
-      [elasticsearch.v1.sys.indices]
-        [elasticsearch.v1.sys.indices.breaker]
-          total_limit = "95%"
-      [elasticsearch.v1.sys.runtime]
-        max_open_files = "65536"
-        max_locked_memory = "unlimited"
-        heapsize = "8g" # This should be the 50% of RAM```
-```
-
-Then add in OpenSearch configuration as:
-
-```bash
-[opensearch]
-  [opensearch.v1]
-    [opensearch.v1.sys]
-      [opensearch.v1.sys.cluster]
-        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch.
-      [opensearch.v1.sys.indices]
-        [opensearch.v1.sys.indices.breaker]
-          total_limit = "95%"
-      [opensearch.v1.sys.runtime]
-        max_open_files = "65536"
-        max_locked_memory = "unlimited"
-        heapsize = "8g" # This should be the 50% of RAM
-
-```
-
 {{< warning >}} 
 Configure the OpenSearch Heap size to **50%** of RAM, but not more than 32GB.
 {{< /warning >}}
@@ -205,7 +166,7 @@ Configure the OpenSearch Heap size to **50%** of RAM, but not more than 32GB.
 
 Apply this using the `config patch` command.
 
-5. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+4. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
@@ -299,12 +260,7 @@ This should return: Automate is up-to-date
 
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-4. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
-
-    Please refer to the `elasticsearch.yml` file to get the applied configuration on your external Elasticsearch.
-    Add the releavent configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
-
-5. Turn off maintenance mode:
+4. Turn off maintenance mode:
 ```sh
 sudo chef-automate maintenance off
 ```
@@ -391,48 +347,7 @@ This should return:
 `Updating deployment configuration`
 `Applying deployment configuration`
 
-3. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
-
-For Example:
-
-If Elasticsearch configuration was:
-
-```bash
-[elasticsearch]
-  [elasticsearch.v1]
-    [elasticsearch.v1.sys]
-      [elasticsearch.v1.sys.cluster]
-        max_shards_per_node = 6000
-      [elasticsearch.v1.sys.indices]
-        [elasticsearch.v1.sys.indices.breaker]
-          total_limit = "95%"
-      [elasticsearch.v1.sys.runtime]
-        max_open_files = "65536"
-        max_locked_memory = "unlimited"
-        heapsize = "8g" # This should be the 50% of RAM```
-```
-
-Then add in OpenSearch configuration as:
-
-```bash
-[opensearch]
-  [opensearch.v1]
-    [opensearch.v1.sys]
-      [opensearch.v1.sys.cluster]
-        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch.
-      [opensearch.v1.sys.indices]
-        [opensearch.v1.sys.indices.breaker]
-          total_limit = "95%"
-      [opensearch.v1.sys.runtime]
-        max_open_files = "65536"
-        max_locked_memory = "unlimited"
-        heapsize = "8g" # This should be the 50% of RAM
-
-```
-
-Apply this using `config patch` command.
-
-4. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+3. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
@@ -470,12 +385,12 @@ Chef-automate status
 ```
 When migration is successful the default config will be shown
 
-5. Verify whether all services are running:
+4. Verify whether all services are running:
 ```sh
 sudo chef-automate status
 ```
 
-6. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+5. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
 ```
@@ -554,12 +469,7 @@ sudo chef-automate upgrade status
 
 4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-5. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
-
-    Please refer to the `elasticsearch.yml` file to get the applied configuration on your external Elasticsearch.
-    Add the releavent configuration from external Elasticsearch (`elasticsearch.yml`) to the `opensearch.yml` on your external OpenSearch.
-
-6. Turn off maintenance mode using following command:
+5. Turn off maintenance mode using following command:
 ```sh
 sudo chef-automate maintenance off
 ```
