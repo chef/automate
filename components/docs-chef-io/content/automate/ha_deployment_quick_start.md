@@ -54,13 +54,16 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    sudo su -
 
    #Download Chef Automate CLI.
-   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
+   | gunzip - > chef-automate && chmod +x chef-automate \
+   | cp -f chef-automate /usr/bin/chef-automate
    
    #Download latest Airgapped Bundle.
    #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
 
-   #If Airgapped Bastion machine is different, then transfer Bundle file `latest.aib` and Chef Automate CLI binary `chef-automate` to the Airgapped Bastion Machine using scp command. \ After transfering, in Airgapped Bastion, switch to sudo.
+   #If Airgapped Bastion machine is different, then transfer Bundle file `latest.aib` and Chef Automate CLI binary `chef-automate` to the Airgapped Bastion Machine using scp command.
+   #After transfering, in Airgapped Bastion, switch to sudo.
    
    #Move the Chef Automate CLI to `/usr/bin`.
    cp -f chef-automate /usr/bin/chef-automate
