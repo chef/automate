@@ -63,6 +63,29 @@ Deploy complete
 
 The deployment process writes login credentials to the `automate-credentials.toml` in your current working directory.
 
+Create a new patch configuration toml as `patch-config.toml` and update the products
+  to include both `builder` and `automate`:
+
+    ```toml
+    [elasticsearch.v1.sys.runtime]
+      heapsize = "8g"
+    ```
+
+Patch the configuration to deploy the rest of the Chef Automate services:
+
+    ```shell
+    ./chef-automate config patch patch-config.toml
+    ```
+
+    You should see output similar to:
+
+    ```output
+    Updating deployment configuration
+
+    Applying deployment configuration
+    Success: Configuration patched
+    ```
+
 ## Open Chef Automate
 
 Navigate to `https://{{< example_fqdn "automate" >}}` in a browser and log in to Chef Automate with
