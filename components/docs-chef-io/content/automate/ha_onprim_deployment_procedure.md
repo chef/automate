@@ -66,10 +66,10 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
    ```
 
-   Download specific version bundle with this, example version: 4.2.59:
+   Download specific version bundle with this, example version: 4.0.91:
 
    ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/4.2.59.aib -o automate-4.2.59.aib
+   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
    ```
 
 4. If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command. \
