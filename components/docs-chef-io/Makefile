@@ -25,8 +25,10 @@ chef_web_docs:
 		git clone https://github.com/chef/chef-web-docs.git; \
 	fi
 
-clean_all: clean_swagger_files
-	pushd chef-web-docs && make clean_all && popd
+clean:
+	rm -rf chef-web-docs
+
+clean_all: clean_swagger_files clean
 
 clean_swagger_files:
 	rm -rf ./$(SWAGGER_DIR)/*
@@ -61,9 +63,9 @@ spellcheck:
 	@pushd ../.. > /dev/null; \
 		cspell \
 			"api/external/**/*.proto" \
-			"components/docs-chef-io/**/*.md" \
+			--exclude "components/docs-chef-io/chef-web-docs/**/*" "components/docs-chef-io/**/*.md" \
 			"components/docs-chef-io/data/automate/api-static/**/*" \
-			"components/docs-chef-io/layouts/**/*.html" \
+			"components/docs-chef-io/layouts/**/*.{html,md}" \
 			"components/automate-gateway/**/*.proto" \
 		; EXIT_CODE=$$?; \
 		popd > /dev/null; \

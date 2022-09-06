@@ -6,7 +6,8 @@
         "ReportingService",
         "StatsService",
         "JobsService",
-        "ProfilesService"
+        "ProfilesService",
+        "Comp_Assets"
       ]
     },
     {
@@ -81,6 +82,10 @@
     {
       "name": "StatsService",
       "x-displayName": "Stats"
+    },
+    {
+      "name": "Comp_Assets",
+      "x-displayName": "Assets Management"
     },
     {
       "name": "ConfigMgmt",

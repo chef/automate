@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	reportmanager "github.com/chef/automate/api/interservice/report_manager"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
@@ -36,13 +37,15 @@ type Server struct {
 	es                       *relaxting.ES2Backend
 	reportMgr                reportmanager.ReportManagerServiceClient
 	lcr_open_search_requests int
+	db                       *pgdb.DB
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, lcr_open_search_requests int) *Server {
+func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient, lcrOpenSearchRequest int, db *pgdb.DB) *Server {
 	server := Server{
 		es:                       es,
-		lcr_open_search_requests: lcr_open_search_requests,
+		lcr_open_search_requests: lcrOpenSearchRequest,
+		db:                       db,
 	}
 	if rm != nil {
 		server.reportMgr = rm
@@ -913,4 +916,89 @@ func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportCon
 		}
 	}
 	return nil*/
+}
+func (srv *Server) AssetCount(ctx context.Context, in *reporting.ListFilters) (*reporting.AssetSummary, error) {
+	var assets *reporting.AssetSummary
+
+	formattedFilters := formatFilters(in.Filters)
+
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		logrus.Errorf("Unable to get filters by filterbyProject: %v", err)
+		return nil, err
+	}
+
+	assets, err = srv.es.GetAssetSummary(ctx, formattedFilters)
+	if err != nil {
+		logrus.Errorf("Unable to get the asset summary: %v", err)
+		return nil, err
+	}
+
+	return assets, nil
+}
+
+func (srv *Server) ListAsset(ctx context.Context, in *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
+	formattedFilters := formatFilters(in.Filters)
+	var asset []*reporting.Assets
+
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		logrus.Errorf("Unable to get filters by filterbyProject: %v", err)
+		return nil, err
+	}
+	asset, err = srv.es.GetAsset(ctx, formattedFilters, in.Size, in.From, in.AssetsType)
+	if err != nil {
+		logrus.Errorf("Unable to get %v from the assets list: %v", in.AssetsType, err)
+		return nil, err
+	}
+	return &reporting.AssetListResponse{Assets: asset}, nil
+}
+
+func (srv *Server) GetAssetConfig(ctx context.Context, in *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	result, err := srv.db.GetConfigs(ctx)
+	if err != nil {
+		logrus.Errorf("error while getting the conf: %+v", err)
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (srv *Server) SetAssetConfig(ctx context.Context, in *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+	err := srv.db.SetConfigs(ctx, in)
+	if err != nil {
+		logrus.Errorf("error while updating the conf: %+v", err)
+		return nil, err
+	}
+
+	res, err := srv.GetAssetConfig(ctx, &reporting.GetAssetConfigRequest{})
+	if err != nil {
+		logrus.Errorf("error while getting the conf: %+v", err)
+		return nil, err
+	}
+
+	return res, nil
+}
+
+// ListControlItemsRange returns a list of controlListItems based on query
+func (srv *Server) ListControlItemsRange(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+	var controlListItems *reporting.ControlItems
+	if in.Size == 0 {
+		in.Size = 100
+	}
+	if in.PageNumber == 0 {
+		in.PageNumber = 1
+	}
+
+	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+
+	controlListItems, err = srv.es.GetControlListItemsRange(ctx, formattedFilters, in.Size, in.PageNumber)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	return controlListItems, nil
 }

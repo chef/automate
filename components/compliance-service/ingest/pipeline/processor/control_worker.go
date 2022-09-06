@@ -117,6 +117,7 @@ func (s *ControlWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 
 			err = w.EnqueueTask(ReportTaskName, GenerateControlParameters{
 				ReportUuid: payload.ReportUuid,
+				EndTime:    payload.EndTime,
 			})
 			if err != nil {
 				err = errors.Wrap(err, "failed to enqueue the control-task")
@@ -172,18 +173,21 @@ func (t *GenerateControlTask) Run(ctx context.Context, task cereal.Task) (interf
 	time.Sleep(60 * time.Second)
 	mapping := mappings.ComplianceRepDate
 	index := mapping.IndexTimeseriesFmt(job.EndTime)
-	controls, err := ParseReportCtrlStruct(ctx, t.ESClient, job.ReportUuid, index)
+	controls, docIds, err := ParseReportCtrlStruct(ctx, t.ESClient, job.ReportUuid, index)
 	if err != nil {
 		logrus.Errorf("Unable to parse the structure from reportuuid to controls with reportuuid:%s", job.ReportUuid)
 		return nil, err
 	}
 
-	logrus.Debugf("Parsed results got results")
-	err = t.ESClient.UploadDataToControlIndex(ctx, job.ReportUuid, controls, job.EndTime)
-	if err != nil {
-		logrus.Errorf("Unable to add data to index with reportuuid:%s", job.ReportUuid)
-		return nil, err
-	}
+	logrus.Infof("Parsed results for report uuid %s with controls number %d", job.ReportUuid, len(controls))
+	if len(controls) > 0 {
+		err = t.ESClient.UploadDataToControlIndex(ctx, job.ReportUuid, controls, job.EndTime, docIds)
+		if err != nil {
+			logrus.Errorf("Unable to add data to index with reportuuid:%s", job.ReportUuid)
+			return nil, err
+		}
 
+	}
+	logrus.Infof("In TaskRun completed on job %s", job.ReportUuid)
 	return &job, nil
 }
