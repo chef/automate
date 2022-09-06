@@ -166,9 +166,9 @@ postgresql_private_ips = []
 
 ##### Minimum changes to be made
 
--   `ssh_user` Eg: ubuntu, centos, ec2-user
--   `ssh_key_file` Eg: ~/.ssh/id_rsa, /home/ubuntu/key.pem
--   `fqdn` Eg: chef-automate.domain.com
+-   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
+-   Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
+-   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM’s. Eg: `chefautomate.example.com`
 -   `automate_private_ips` Eg: ["192.0.0.1"]
 -   `chef_server_private_ips` Eg: ["192.0.1.1"]
 -   `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
