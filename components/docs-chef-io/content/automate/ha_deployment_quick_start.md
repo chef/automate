@@ -181,7 +181,13 @@ postgresql_private_ips = []
 {{< note >}}
 
 -   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+
+{{< /note >}}
+
+{{< note >}}
+
 -   User only needs to create/setup **the bastion node** with IAM role of Admin acess, API gateway access and s3 bucket access attached to it.
+-   It is adviceble to create bastion server (EC2 instance) in a new VPC.
 -   Following config will create s3 bucket for backup.
 
 {{< /note >}}
