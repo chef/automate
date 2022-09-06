@@ -181,6 +181,7 @@ postgresql_private_ips = []
 {{< note >}}
 
 -   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+-   User only needs to create/setup **the bastion node** with IAM role of Admin acess, API gateway access and s3 bucket access attached to it.
 -   Following config will create s3 bucket for backup.
 
 {{< /note >}}
@@ -297,7 +298,7 @@ X-Project = "Test_Project"
 
 ```
 
-##### Minimum changes to be made
+##### Changes to be made
 
 -   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 -   Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
