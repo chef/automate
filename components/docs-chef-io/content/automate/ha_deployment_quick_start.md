@@ -114,6 +114,7 @@ Check if Chef Automate UI is accessible by going to (Domain used for Chef Automa
 {{< /note >}}
 
 ```config
+
 # This is a Chef Automate AWS HA mode configuration file. You can run
 # 'chef-automate deploy' with this config file and it should
 # successfully create a new Chef Automate HA instances with default settings.
@@ -173,4 +174,141 @@ postgresql_private_ips = []
 -   `chef_server_private_ips` Eg: ["192.0.1.1"]
 -   `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 -   `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
+
+
+##### AWS Deployment
+
+{{< note >}}
+
+-   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+-   Following config will create s3 bucket for backup.
+
+{{< /note >}}
+
+```config
+
+[architecture.aws]
+
+ssh_port = "22"
+
+ssh_user = ""
+
+# Private SSH key file path, which has access to all the instances.
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
+ssh_key_file = ""
+
+# Eg.: backup_config = "efs" or "s3"
+backup_config = "s3"
+
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "aws"
+workspace_path = "/hab/a2_deploy_workspace"
+
+# DON'T MODIFY THE BELOW LINE (backup_mount)
+backup_mount = "/mnt/automate_backups"
+
+
+[automate.config]
+admin_password = ""
+
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+fqdn = ""
+instance_count = "1"
+
+config_file = "configs/automate.toml"
+
+[chef_server.config]
+instance_count = "1"
+
+[opensearch.config]
+instance_count = "3"
+
+[postgresql.config]
+instance_count = "3"
+
+[aws.config]
+profile = "default"
+
+# Eg.: region = "us-east-1"
+region = ""
+
+aws_vpc_id  = ""
+
+aws_cidr_block_addr  = ""
+
+private_custom_subnets = []
+public_custom_subnets = []
+
+# ssh key pair name in AWS to access instances
+# eg: ssh_key_pair_name = "A2HA"
+ssh_key_pair_name = ""
+
+
+# ============== EC2 Instance Config ===================
+
+# eg: ami_filter_name = ""
+ami_filter_name = ""
+
+# Only if we have filter criteria. Best give 'ami_id' below.
+ami_filter_virt_type = ""
+
+# Filter ami based on owner.
+ami_filter_owner = ""
+
+## === INPUT NEEDED ===
+
+# This AMI should be from the Same Region which we selected above.
+# eg: ami_id = "ami-08d4ac5b634553e16" # This ami is of Ubuntu 20.04 in us-east-1
+
+ami_id = ""
+
+automate_server_instance_type = "t3.medium"
+chef_server_instance_type = "t3.medium"
+opensearch_server_instance_type = "m5.large"
+postgresql_server_instance_type = "t3.medium"
+
+automate_lb_certificate_arn = ""
+
+chef_server_lb_certificate_arn = ""
+
+automate_ebs_volume_iops = "100"
+automate_ebs_volume_size = "50"
+automate_ebs_volume_type = "gp3"
+chef_ebs_volume_iops = "100"
+chef_ebs_volume_size = "50"
+chef_ebs_volume_type = "gp3"
+opensearch_ebs_volume_iops = "100"
+opensearch_ebs_volume_size = "50"
+opensearch_ebs_volume_type = "gp3"
+postgresql_ebs_volume_iops = "100"
+postgresql_ebs_volume_size = "50"
+postgresql_ebs_volume_type = "gp3"
+
+lb_access_logs = "false"
+
+# ======================================================
+
+# ============== EC2 Instance Tags =====================
+X-Contact = ""
+X-Dept = ""
+X-Project = "Test_Project"
+# ======================================================
+
+```
+
+##### Minimum changes to be made
+
+-   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
+-   Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
+-   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM’s. (optional for above configuration) Eg: `chefautomate.example.com`
+-   Provide `region` Eg: `us-east-1`, `ap-northeast-1`.
+-   Provide `aws_vpc_id` Eg: `vpc-0a12*****`
+-   Provide `aws_cidr_block_addr` Eg: `10.0.192.0`
+-   Provide `ssh_key_pair_name` Eg: `user-key`
+-   Provide `ami_filter_name` Eg: `ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*`
+-   Provide `ami_filter_virt_type` Eg: `hvm`
+-   Provide `ami_filter_owner` Eg: `112758395563`
+-   Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
+-   Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectivelly.
 
