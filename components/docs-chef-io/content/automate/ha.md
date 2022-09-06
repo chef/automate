@@ -32,6 +32,10 @@ HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *Pos
 
 ![High Availability Architecture](/images/automate/ha_arch_aws_managed.png)
 
+### Chef Automate HA Architecture for AWS OnPremise / AWS Non-Managed Minimum Node Cluster
+
+![High Availability Architecture](/images/automate/ha_arch_minnode_cluster.png)
+
 ## Chef Automate HA Topology
 
 The Chef Automate HA Architecture involves the following clusters as part of the main cluster:
