@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 220
 +++
 
+{{< warning >}}
+ {{% automate/4x-warn %}}
+{{< /warning >}}
+
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services.
 
 ## Steps to install Chef Automate HA on AWS with Managed AWS Services

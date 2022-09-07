@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 220
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 AWS Identity and Access Management (IAM) is a web service that helps you securely control access to AWS resources. You can use IAM to control who is authenticated (signed in) and authorized (has permissions) to use resources.
 
 To run the terraform scripts, you need an IAM user with the following permissions:

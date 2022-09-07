@@ -35,6 +35,14 @@ sudo ./chef-automate init-config
 
 You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor.
 
+add elasticsearch heapsize setting at end of config as shown below, 
+recomended heap size is 50% of total memory, but cannot exceed more than 32 gb.
+
+```toml
+[elasticsearch.v1.sys.runtime]
+  heapsize = "...g" # ... must be replaced with number in gb example 4g mean (4 gb)
+```
+
 If you have requirements around data size and/or redundancy, see [Configuring External
 Data Stores]({{< relref "#configuring-external-data-stores" >}}) for information on
 configuring Chef Automate to use an externally-deployed PostgreSQL database cluster

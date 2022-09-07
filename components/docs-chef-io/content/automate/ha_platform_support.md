@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 200
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 This section lists the recommended requirements for operating systems, virtual machine instances, and VPC for implementing the Chef Automate High Availability (HA) in your network infrastructure.
 
 ## Software Requirements

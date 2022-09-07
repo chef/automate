@@ -13,6 +13,10 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
+{{< warning >}}
 - Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
 - Automate HA do not support the super market authentication with chef-server users credentials. 
 - Post Migration Customer can not login with chef-server users to Supermarket. 

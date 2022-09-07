@@ -13,6 +13,10 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
+{{< warning >}}
 
 - A2HA user can be migrated to Automate HA with minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 

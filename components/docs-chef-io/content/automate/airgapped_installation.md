@@ -84,8 +84,17 @@ sudo ./chef-automate init-config --upgrade-strategy none
 creates a `config.toml` file with default values. Setting an upgrade strategy of `none`
 prevents Chef Automate from checking its release channel for updates via the internet.
 
-Edit `config.toml` to make changes to FQDN and other configuration settings. See
+Edit `config.toml` to make changes to FQDN and other configuration settings. 
+add elasticsearch heapsize setting at end of config as shown below, 
+recomended heap size is 50% of total memory, but cannot exceed more than 32 gb.
+
+```toml
+[elasticsearch.v1.sys.runtime]
+  heapsize = "...g" # ... must be replaced with number in gb example 4g mean (4 gb)
+```
+See
 [Configuring Chef Automate]({{< relref "configuration.md" >}}) for more information on configuration settings.
+
 
 ### Deploy Chef Automate
 

@@ -11,7 +11,11 @@ gh_repo = "automate"
     identifier = "automate/deploy_high_availability/migration/ha_automate_to_automate_ha.md Automate to Automate HA"
     weight = 220
 +++
- 
+
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 {{< warning >}}
 
 - Standalone Chef Automate or Chef Automate with embedded Chef Infra Server can migrate to Automate HA, with  
