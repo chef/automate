@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 200
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 In this section, we'll discuss the steps to quick start Chef Automate HA on-premise deployment.
 
 ## Install Chef Automate HA
