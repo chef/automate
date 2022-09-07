@@ -145,7 +145,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 Run the following steps on Bastion Host Machine:
 
-1. Switch to `sudo` using the following command:
+1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
    #Run commands as sudo.
@@ -200,7 +200,7 @@ Run the following steps on Bastion Host Machine:
      - Set `postgresql_ebs_volume_iops`, `postgresql_ebs_volume_size` based on your load needs.
      - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`, `opensearch_ebs_volume_type`, `postgresql_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-3. Confirm all the data in the config is correct using the following command:
+3. Continue with the deployment after updating config:
 
    ```bash
    #Run commands as sudo.
