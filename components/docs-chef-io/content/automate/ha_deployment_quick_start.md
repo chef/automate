@@ -17,7 +17,7 @@ gh_repo = "automate"
 {{% automate/4x-warn %}}
 {{< /warning >}}
 
-In this section, we'll discuss the steps to quick start Chef Automate HA on-premise deployment.
+In this section, we'll discuss the steps to quick start Chef Automate HA deployment.
 
 ## Install Chef Automate HA
 
