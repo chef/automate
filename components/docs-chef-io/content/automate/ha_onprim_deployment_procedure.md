@@ -71,6 +71,10 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    "
    ```
 
+   {{< note >}} 
+   Chef Automate bundles are available for 60 days from the release of a version. However, the milestone release bundles are available for download forever.
+   {{< /note >}}
+
    Note: If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command. \
    After transfering, in Airgapped Bastion, run below commands:
 
