@@ -162,8 +162,8 @@ sudo chef-automate maintenance off
 ```
 This should return: 
 
-``Updating deployment configuration``
-``Applying deployment configuration``
+``Updating deployment configuration
+  Applying deployment configuration``
 
 4. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
 ```sh
@@ -388,7 +388,7 @@ sudo chef-automate maintenance off
 ```
 This should return:
 
-``Updating deployment configuration \
+``Updating deployment configuration 
    Applying deployment configuration``
 
 3. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
