@@ -184,7 +184,7 @@ sudo yum install haproxy
          | sudo tee /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
       ```
 
-2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate.
+2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate and chef infra server.
 
 ```bash
 # The below section is used for http call
