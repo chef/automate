@@ -214,3 +214,78 @@ postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
 ```
 
 10. Clean up the old packages from chef-backend (like Elasticsearch and postgres)
+
+11. [Doc: Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
+
+
+## Using Autoamte HA for Chef-Backend user
+
+1. Download and Install chef-workstation 
+    From Bashtion machine or local machine install chef-workstation
+    https://www.chef.io/downloads/tools/workstation
+    
+2. Set up workstation
+    ```bash 
+    chef generate repo chef-repo 
+    ```
+    ```bash 
+    cd  chef-repo 
+    ```
+    ```bash 
+    knife configure 
+    ```
+
+    provide chef-server FQDN of Automate HA Chef-Server
+    
+    Example :-
+    https://demo-chef-server.com/organizations/demo-org
+
+    ```bash 
+        knife configure
+        Please enter the chef server URL: [https://ip-10-1-0-52.ap-southeast-1.compute.internal/organizations/myorg] https://demo-chef-server.com/organizations/demo-org
+        Please enter an existing username or clientname for the API: [ubuntu] org-user
+        *****
+
+        You must place your client key in:
+            /root/.chef/org-user.pem
+        Before running commands with Knife
+
+        *****
+        Knife configuration file written to /root/.chef/credentials
+    ```
+
+3. Ssl fetch command
+    ```bash 
+    knife ssl fetch 
+    ```
+4. Ssl check command
+    ```bash 
+    knife ssl check 
+    ```
+
+5. Create role command 
+    ```bash 
+    knife role create abc --disable-editing 
+    ```
+
+6. Download cookbook 
+    ```bash 
+    knife supermarket download line 
+    knife supermarket download apache2
+    ```
+
+
+7. Upload cookbook
+    ```bash 
+    knife cookbook upload line --cookbook-path cookbooks 
+    ```
+
+8. Bootstrap as node
+    ```bash 
+        knife bootstrap <public_ip_node>  -i <key_to_connect_node> -U ubuntu -N test1 --sudo 
+    ```
+    Example :- 
+    ```bash 
+        knife bootstrap 15.207.98.155 -i  ~/.ssh/ssh-key.pem -U ubuntu -N node1 --sudo 
+        knife bootstrap 3.110.103.65 -i ~/.ssh/ssh-key.pem -U ubuntu -N node2 --sudo
+    ```
