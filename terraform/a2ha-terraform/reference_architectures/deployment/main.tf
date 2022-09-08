@@ -166,7 +166,7 @@ module "habitat-opensearch" {
   sudo_cmd               = var.sudo_cmd
   habitat_uid_gid        = var.habitat_uid_gid
   depends_on = [
-    module.system-tuning-opensearch
+    module.airgap_bundle-opensearch
   ]
 }
 
@@ -196,7 +196,7 @@ module "habitat-postgresql" {
   sudo_cmd               = var.sudo_cmd
   habitat_uid_gid        = var.habitat_uid_gid
   depends_on = [
-    module.system-tuning-postgresql
+    module.airgap_bundle-postgresql
   ]
 }
 
@@ -222,7 +222,7 @@ module "habitat-automate" {
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
   depends_on = [
-    module.system-tuning-automate
+    module.airgap_bundle-automate
   ]
 }
 
@@ -248,7 +248,7 @@ module "habitat-chef_server" {
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
   depends_on = [
-    module.system-tuning-chef_server
+    module.airgap_bundle-chef_server
   ]
 }
 
@@ -277,7 +277,7 @@ module "opensearch" {
   sudo_cmd                        = var.sudo_cmd
   backup_config_efs               = var.backup_config_efs
   depends_on = [
-    module.system-tuning-opensearch
+    module.habitat-opensearch
   ]
 }
 
@@ -313,7 +313,7 @@ module "postgresql" {
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   depends_on = [
-    module.system-tuning-postgresql
+    module.habitat-postgresql
   ]
 }
 
@@ -367,7 +367,7 @@ module "bootstrap_automate" {
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
   depends_on = [
-    module.system-tuning-automate
+    module.airgap_bundle-automate
   ]
 }
 
@@ -425,7 +425,7 @@ module "automate" {
   s3_endpoint            = var.s3_endpoint
   bucket_name            = var.bucket_name
   depends_on = [
-    module.system-tuning-automate
+    module.bootstrap_automate
   ]
 }
 
@@ -479,6 +479,6 @@ module "chef_server" {
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
   depends_on = [
-    module.system-tuning-chef_server
+    module.bootstrap_automate
   ]
 }
