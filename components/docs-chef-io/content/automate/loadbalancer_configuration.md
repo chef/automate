@@ -19,6 +19,10 @@ gh_repo = "automate"
 
 This guide details how to set up the load balancer configuration for Chef Automate and Chef Infra Server.
 
+## Listed below are some ways for setting up load balancer.
+- Using NGINX
+- Using HA Proxy
+
 ## Load Balancer
 
 Assuming you have DNS configured with domain names:
@@ -26,7 +30,8 @@ Assuming you have DNS configured with domain names:
 - Chef Automate: chefautomate.example.com
 - Chef Infra Server: chefinfraserver.example.com
 
-## Install Nginx
+## Load Balancer setup using NGINX
+### Install Nginx
 
 For Debian / Ubuntu :
 
@@ -43,7 +48,7 @@ sudo yum update
 sudo yum install nginx
 ```
 
-## Configure
+### Configure
 
 1. Create new file `/etc/nginx/sites-available/chef-automate-lb.conf`
 
@@ -136,4 +141,63 @@ sudo nginx -t
 
 ```bash
 sudo systemctl restart nginx
+```
+
+## Load Balancer setup using HA Proxy
+
+For Debian / Ubuntu :
+
+```bash
+sudo apt-get update
+sudo apt install haproxy
+```
+
+For Centos or Redhat :
+
+```bash
+sudo yum install epel-release
+sudo yum update
+sudo yum install haproxy
+```
+
+### Configure
+
+1. HAProxy needs an ssl-certificate to be one file, in a certain format. To do that, we create a new directory where the SSL certificate that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+
+```bash
+sudo mkdir -p /etc/ssl/chefautomate.example.com
+
+sudo cat /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem \
+    /etc/letsencrypt/live/chefautomate.example.com/privkey.pem \
+    | sudo tee /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
+```
+
+2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate.
+
+```bash
+frontend fe_automate
+   bind chefautomate.example.com:80
+   bind chefautomate.example.com:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
+   default_backend automate_server
+
+backend automate_server
+   balance roundrobin
+   server automate1 10.1.0.101:443 check
+   server automate2 10.1.0.102:443 check
+   server automate2 10.1.0.103:443 check
+```
+
+2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef infra server.
+
+```bash
+frontend fe_infra
+   bind chefinfraserver.example.com:80
+   bind chefinfraserver.example.com:443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
+   default_backend chef_infra_server
+
+backend chef_infra_server
+   balance roundrobin
+   server infra1 10.1.0.101:443 check
+   server infra2 10.1.0.102:443 check
+   server infra3 10.1.0.103:443 check
 ```
