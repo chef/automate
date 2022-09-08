@@ -212,12 +212,14 @@ backend chef_infra_server
    server infra3 10.1.0.103:443 check
 ```
 
-4. Restart HAProxy
-Now you have made all necessary changes in your HAProxy server. Now verify configuration file before restarting service using the following command.
+4. Test Nginx Config
+
 ```bash
-haproxy -c -f /etc/haproxy/haproxy.cfg
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
 ```
-If above command returned output as configuration file is valid then restart HAProxy service
+
+5. Restart Nginx
+
 ```bash
 sudo service haproxy restart
 ```
