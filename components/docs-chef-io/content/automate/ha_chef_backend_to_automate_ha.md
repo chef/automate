@@ -215,7 +215,7 @@ postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
 
 10. Clean up the old packages from chef-backend (like Elasticsearch and postgres)
 
-11. [Doc: Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up data-to-chef-automate-ha)
+11. [Doc: Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha)
 
 
 ## Using Autoamte HA for Chef-Backend user
@@ -242,7 +242,7 @@ postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
 
     ```bash 
         knife configure
-        Please enter the chef server URL: [https://ip-10-1-0-52.ap-southeast-1.compute.internal/organizations/myorg] https://A2-c57f69cb-chef-server-lb-980686949.ap-southeast-1.elb.amazonaws.com/organizations/a2ha
+        Please enter the chef server URL: [https://ip-10-1-0-52.ap-southeast-1.compute.internal/organizations/myorg] https://A2-c57f69cb-chef-server-lb-980686949.ap-southeast-1.elb.amazonaws.com/organizations/demo-org
         Please enter an existing username or clientname for the API: [ubuntu] org-user
         *****
 
