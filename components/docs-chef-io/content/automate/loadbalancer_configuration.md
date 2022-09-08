@@ -162,63 +162,71 @@ sudo yum install haproxy
 
 ### Configure
 
-1. HAProxy needs an ssl-certificate to be one file, in a certain format. To do that, we create a new directory where the SSL certificate that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
+1. HAProxy needs an ssl-certificate to be one file, in a certain format. To do that, we create a new directory where the SSL certificate for automate and infra server that HAProxy reads will live. Then we output the "live" (latest) certificates from LetsEncrypt and dump that output into the certificate file for HAProxy to use:
 
-```bash
-sudo mkdir -p /etc/ssl/chefautomate.example.com
+   - For Chef Automate:
 
-sudo cat /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem \
-    /etc/letsencrypt/live/chefautomate.example.com/privkey.pem \
-    | sudo tee /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
-```
+      ```bash
+      sudo mkdir -p /etc/ssl/chefautomate.example.com
+
+      sudo cat /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem \
+         /etc/letsencrypt/live/chefautomate.example.com/privkey.pem \
+         | sudo tee /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
+      ```
+
+   - For Chef Infra server:
+
+      ```bash
+      sudo mkdir -p /etc/ssl/chefinfraserver.example.com
+
+      sudo cat /etc/letsencrypt/live/chefinfraserver.example.com/fullchain.pem \
+         /etc/letsencrypt/live/chefinfraserver.example.com/privkey.pem \
+         | sudo tee /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
+      ```
 
 2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate.
 
 ```bash
-frontend fe_automate_http
+# The below section is used for http call
+frontend fe_a2ha_http
     mode http
-    bind :80
+    bind *:80
     redirect scheme https code 301 if !{ ssl_fc }
 
-frontend fe_automate
+# The below section is used for https call
+frontend fe_a2ha
    mode tcp
-   bind :443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
-   default_backend automate_server
+   # You need to get your own automate DNS,
+   # here we have taken example DNS: chefautomate.example.com and chefinfraserver.example.com
+   # Here ssl certificate is added,
+   # we have created certificate using certBot, below url is an example for ubuntu machine
+   # reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
+   bind *:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
+   use_backend automate_server if { ssl_fc_sni chefautomate.example.com }
+   use_backend chef_infra_server if { ssl_fc_sni chefinfraserver.example.com }
 
 backend automate_server
    balance roundrobin
-   server automate1 10.1.0.101:443 check
-   server automate2 10.1.0.102:443 check
-   server automate2 10.1.0.103:443 check
-```
-
-3. Add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef infra server.
-
-```bash
-frontend fe_infra_http
-    mode http
-    bind :80
-    redirect scheme https code 301 if !{ ssl_fc }
-
-frontend fe_infra
-   mode tcp
-   bind :443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
-   default_backend chef_infra_server
+   # Add a list of automate machine ip addresses.
+   server automate1 10.1.0.101:443 check ssl verify none
+   server automate2 10.1.0.102:443 check ssl verify none
+   server automate3 10.1.0.103:443 check ssl verify none
 
 backend chef_infra_server
    balance roundrobin
-   server infra1 10.1.0.101:443 check
-   server infra2 10.1.0.102:443 check
-   server infra3 10.1.0.103:443 check
+   # Add a list of infra server machine ip addresses.
+   server infra1 10.1.0.101:443 check ssl verify none
+   server infra2 10.1.0.102:443 check ssl verify none
+   server infra3 10.1.0.103:443 check ssl verify none
 ```
 
-4. Test Nginx Config
+3. Test Nginx Config
 
 ```bash
 sudo haproxy -c -f /etc/haproxy/haproxy.cfg
 ```
 
-5. Restart Nginx
+4. Restart Nginx
 
 ```bash
 sudo service haproxy restart
