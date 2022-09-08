@@ -149,7 +149,7 @@ y
 {{< note >}} The 'X' GB is the minimum free space required in /hab which is calculated with the formula => [ ((/hab size or /hab/svc/automate-elasticsearch/data) + 10%) or 5GB ] . {{< /note >}}
 
 It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+Once the upgrade is completed, follow the post upgrade steps which are:
 
 2. Check the upgrade status of Chef Automate:
 ```sh
@@ -175,36 +175,38 @@ sudo chef-automate post-major-upgrade migrate --data=es
 ```shell
 It will start the migration immediately after check.
 Press y to agree, n to disagree? [y/n]: y
+It will start the migration immediately after check.
 
-HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
+below config will pached to automate opensearch
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+        max_shards_per_node = 2000
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [opensearch.v1.sys.runtime]
+        max_open_files = "65535"
+        max_locked_memory = "unlimited"
+        heapsize = "8g"
 
+patch config written /hab/svc/deployment-service/oss-config.toml to
+Updating deployment configuration
+Applying deployment configuration
+ Started automate-opensearch
+ Started automate-es-gateway
+ Started es-sidecar-service
+ Started event-feed-service
+ Started compliance-service
+ Started config-mgmt-service
+ Started ingest-service
+Success: Configuration patched
+Success: config patch execution done, exiting
 
-----------------------------------------------
-Chef-automate stop 
-----------------------------------------------
-
-Chef Automate Stopped
-
-----------------------------------------------
-migration from es to os 
-----------------------------------------------
-
-Checking for es_upgrade
-
-Done with Migration 
- Please wait for some time to reindex the data
-
-----------------------------------------------
-Chef-automate start 
-----------------------------------------------
-
-Starting Chef Automate
-
-----------------------------------------------
-Chef-automate status 
-----------------------------------------------
+HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/*
 ```
-When migration is successful the default config will be shown
+{{< note >}} The above displayed config is the sample config shown in the migration. {{< /note >}}
 
 6. Verify whether all services are running:
 ```sh
@@ -215,6 +217,8 @@ sudo chef-automate status
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
 ```
+To clear the old ElasticSearch data accept the checklist it has prompted.
+
 
 ### Chef Automate with External ElasticSearch
 
@@ -263,23 +267,27 @@ y
 It starts upgrading 
 Once you are done with the upgrade, follow the steps post upgrade which are:
 
-```shell
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
-     $ chef-automate upgrade status
-  
-2) Disable the maintenance mode if you enabled previously using:
-	$ chef-automate maintenance off
-```
-
-2. Check upgrade status is up-to-date
+1) Check the status of your upgrade using:
 
 ```sh
-sudo chef-automate upgrade status
+chef-automate upgrade status
 ```
-This should return: Automate is up-to-date
+   This should return: Automate is up-to-date
+  
+2) Check all services are running using:
+
+```sh
+chef-automate upgrade status
+```
+
+3). Disable the maintenance mode if you enabled previously using:
+
+```sh
+chef-automate maintenance off
+```
 
 3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
@@ -377,7 +385,7 @@ y
 {{< note >}} The 'X' GB is the minimum free space required in /hab which is calculated with the formula => [ ((/hab size or /hab/svc/automate-elasticsearch/data) + 10%) or 5GB ] . {{< /note >}}
 
 It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+Once the upgrade is completed, follow the post upgrade steps which are:
 
 **Post Upgrade**
 
@@ -402,39 +410,42 @@ This should return:
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
-```shell
+
 It will start the migration immediately after check.
+
+```shell
 Press y to agree, n to disagree? [y/n]: y
 
-HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
+below config will pached to automate opensearch
+[opensearch]
+  [opensearch.v1]
+    [opensearch.v1.sys]
+      [opensearch.v1.sys.cluster]
+        max_shards_per_node = 2000
+      [opensearch.v1.sys.indices]
+        [opensearch.v1.sys.indices.breaker]
+          total_limit = "95%"
+      [opensearch.v1.sys.runtime]
+        max_open_files = "65535"
+        max_locked_memory = "unlimited"
+        heapsize = "8g"
 
+patch config written /hab/svc/deployment-service/oss-config.toml to
+Updating deployment configuration
+Applying deployment configuration
+ Started automate-opensearch
+ Started automate-es-gateway
+ Started es-sidecar-service
+ Started event-feed-service
+ Started compliance-service
+ Started config-mgmt-service
+ Started ingest-service
+Success: Configuration patched
+Success: config patch execution done, exiting
 
-----------------------------------------------
-Chef-automate stop 
-----------------------------------------------
-
-Chef Automate Stopped
-
-----------------------------------------------
-migration from es to os 
-----------------------------------------------
-
-Checking for es_upgrade
-
-Done with Migration 
- Please wait for some time to reindex the data
-
-----------------------------------------------
-Chef-automate start 
-----------------------------------------------
-
-Starting Chef Automate
-
-----------------------------------------------
-Chef-automate status 
-----------------------------------------------
+HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/*
 ```
-When migration is successful the default config will be shown
+{{< note >}} The above displayed config is the sample config shown in the migration. {{< /note >}}
 
 4. Verify whether all services are running:
 ```sh
@@ -445,6 +456,8 @@ sudo chef-automate status
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
 ```
+To clear the old ElasticSearch data accept the checklist it has prompted.
+
 
 ### Chef Automate in Air-Gapped Environment With External ElasticSearch
 
@@ -527,16 +540,23 @@ Once you are done with the upgrade, follow the steps post upgrade which are:
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
-     $ chef-automate upgrade status
+1) Check the status of your upgrade using:
+
+```sh
+chef-automate upgrade status
+```
    This should return: Automate is up-to-date
   
-2) Disable the maintenance mode if you enabled previously using:
-	$ chef-automate maintenance off
+2) Check all services are running using:
 
-3. Check whether upgrade status is up-to-date
 ```sh
-sudo chef-automate upgrade status
+chef-automate upgrade status
+```
+
+3). Disable the maintenance mode if you enabled previously using:
+
+```sh
+chef-automate maintenance off
 ```
 
 4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
