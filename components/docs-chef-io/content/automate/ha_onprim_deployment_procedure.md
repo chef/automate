@@ -27,6 +27,7 @@ In this section, we'll discuss the steps to deploy Chef Automate HA on-premise m
 - This common user should have sudo privileges.
 - This common user uses same SSH Private Key file to access all machines.
 - Key-based SSH for the provisioning user for all the machine for HA-Deployment. 
+- We do not support passphrase for Private Key authentication.
 - LoadBalancers are setup according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
 - DNS is configured to redirect `chefautomate.example.com` to Primary Load Balancer.
@@ -106,6 +107,8 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give `ssh_key_file` path, this key should have access to all the Machines or VM's
+   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
+   - We support only private key authentication.
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
