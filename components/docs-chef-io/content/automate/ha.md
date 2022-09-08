@@ -30,11 +30,18 @@ HA architecture includes the cluster of the *Chef Automate*, *Chef Server*, *Pos
 
 ### Chef Automate HA Architecture for OnPremise / AWS Non-Managed
 
-![High Availability Architecture](/images/automate/ha_arch_onpremise.png)
+![High Availability Architecture](/images/automate/ha_arch_onprem.png)
 
 ### Chef Automate HA Architecture for AWS Managed
 
-![High Availability Architecture](/images/automate/ha_arch_aws_managed.png)
+![High Availability Architecture](/images/automate/ha_arch_aws_managedservices.png)
+
+{{< note >}}
+Chef Automate HA for Managed Services has default port 7392 for Managed Postgresql and 9200 for Managed Opensearch. You can also change to your custom port.
+{{< /note >}}
+### Chef Automate HA Architecture for AWS OnPremise / AWS Non-Managed Minimum Node Cluster
+
+![High Availability Architecture](/images/automate/ha_arch_minnode_cluster.png)
 
 ## Chef Automate HA Topology
 
