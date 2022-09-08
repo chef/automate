@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "AWS Managed Services Deployment"
     parent = "automate/deploy_high_availability/deployment"
     identifier = "automate/deploy_high_availability/deployment/ha_aws_managed_deploy_steps.md AWS Managed Services"
-    weight = 230
+    weight = 220
 +++
 
 {{< warning >}}
@@ -47,39 +47,26 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
 
 ### Run these steps on Bastion Host Machine
 
-1. Before starting, switch to sudo:
+1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
-   sudo su -
-   ```
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Download Chef Automate CLI.
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
+   | gunzip - > chef-automate && chmod +x chef-automate \
+   | cp -f chef-automate /usr/bin/chef-automate
 
-2. Download Chef Automate CLI
+   #Download latest Airgapped Bundle.
+   #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
+   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
 
-   ```bash
-   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
-   ```
-
-3. Download Airgapped Bundle
-   Download latest Bundle with this:
-
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
-   ```
-
-   Download specific version bundle with this, example version: 4.0.91:
-
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
-   ```
-
-4. Generate init config
-   Then generate init config for AWS infra structure:
-
-   ```bash
+   #Generate init config and then generate init config for AWS infra structure
    chef-automate init-config-ha aws
+   "
    ```
 
-5. Update Config with relevant data
+2. Update Config with relevant data
 
    ```bash
    vi config.toml
@@ -103,8 +90,8 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
       - Set `setup_managed_services` as `true`, As these deployment steps are for Managed Services AWS Deployment. Default value is `false` which should be changed.
         - Set `managed_opensearch_domain_name`, `managed_opensearch_domain_url`, `managed_opensearch_username`, `managed_opensearch_user_password` from the Managed AWS OpenSearch which you created in the Prerequsite steps.
         - Set `managed_opensearch_domain_url` as the URL without Port No. Example: `["vpc-automate-ha-cbyqy5q.eu-north-1.es.amazonaws.com"]`
-        - For backup and restore configuration Set `managed_opensearch_certificate`, 
-        `aws_os_snapshot_role_arn`, 
+        - For backup and restore configuration Set `managed_opensearch_certificate`,
+        `aws_os_snapshot_role_arn`,
         `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret` ([Ref link](/automate/managed_services/#prerequisites)).
         - Set `managed_rds_instance_url` as the URL with Port No. Example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
         - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the Managed AWS RDS Postgresql which you created in the Prerequsite steps.
@@ -120,52 +107,27 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
       - Set `chef_ebs_volume_iops`, `chef_ebs_volume_size` based on your load needs.
       - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-6. Confirm all the data in the config is correct:
+3. Continue with the deployment after updating config:
 
    ```bash
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Print data in the config
    cat config.toml
-   ```
 
-7. Run Provision Command
+   #Run provision command to deploy `automate.aib` with set `config.toml`
+   chef-automate provision-infra config.toml --airgap-bundle automate.aib
 
-   ```bash
-   chef-automate provision-infra config.toml --airgap-bundle latest.aib
-   ```
+   #Run deploy command to deploy `automate.aib` with set `config.toml`
+   chef-automate deploy config.toml --airgap-bundle automate.aib
 
-   Using specific version of Chef Automate, example: `automate-4.0.91.aib` 
-
-   ```bash
-   chef-automate provision-infra config.toml --airgap-bundle automate-4.0.91.aib
-   ```
-
-8. Run Deploy Command
-
-   Deploy `latest.aib` with set `config.toml`
-
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle latest.aib
-   ```
-
-   If deploying specific version of Chef Automate, example: Deploy `automate-4.0.91.aib` with set `config.toml`
-
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
-   ```
-
-9. After Deployment is done successfully.
-   Check status of Chef Automate HA services:
-
-   ```bash
+   #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
-   ```
-
-10. Check Chef Automate HA deployment info, using the command below:
-
-   ```bash
+   
+   #Check Chef Automate HA deployment information, using the following command
    chef-automate info
    ```
 
-11. Set DNS entries:
-   DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
+Note: DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
 
-12. Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
