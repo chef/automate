@@ -187,7 +187,7 @@ backend automate_server
    server automate2 10.1.0.103:443 check
 ```
 
-2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef infra server.
+2. Add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef infra server.
 
 ```bash
 frontend fe_infra
