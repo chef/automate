@@ -42,7 +42,7 @@ For example, if today you are on version *2021201164433*, your upgrade journey s
 
 - **Plan your downtime:** This upgrade requires downtime. Before upgrading, set the environment to handle the downtime. Run `sudo chef-automate maintenance on` to turn on maintenance mode.
 - **Backup Chef Automate database:** This Chef Automate version upgrades ElasticSearch. [Backup](/automate/backup/) your data before upgrading.
-- **Current version should be 3.0.49:** If you are not on *3.0.49* version, do regular upgrades according to your topology.
+- **Current version should be 3.0.49:** If you are not on the *3.0.49* version, do regular upgrades according to your topology.
 
 ## Upgrade to Version 3.0.49
 
@@ -52,9 +52,9 @@ Check your current version:
 sudo chef-automate version
 ```
 
-{{< note >}} If your server Version is less than *20220329091442*, refer to [Upgrade to 3.0.49]({{< relref "major_upgrade.md" >}}) page. {{< /note >}}
+{{< note >}} If your server version is less than *20220329091442*, refer to [Upgrade to 3.0.49]({{< relref "major_upgrade.md" >}}) page. {{< /note >}}
 
-{{< note >}} If your server sersion is less than *3.0.49*, upgrade to latest minor version in 3 series. {{< /note >}}
+{{< note >}} If your server version is less than *3.0.49*, upgrade to the latest minor version in the 3 series. {{< /note >}}
 
 ### Normal and airgapped upgrade to 3.0.49
 
@@ -62,7 +62,7 @@ To upgrade to automate 3.0.49 follow the link: [upgrading to 3.0.49]({{< relref 
 
 ## Upgrade Path from 3.0.49 to 4.0.x
 
-There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
+There are four possible scenarios to upgrade from the 3.0.49 to 4.0.x version.
 
 - [Chef Automate with Embedded Elasticsearch]({{< relref "#chef-automate-with-embedded-elasticsearch" >}})
 
@@ -80,7 +80,8 @@ There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
 
 So, accept the checklist item asking permission to disable sharding. {{< /warning >}}
 
-{{< note >}} If your backup location is S3 and endpoint is configured as regional then change your settings as below:
+{{< note >}} If your backup location is S3 and the endpoint is configured as regional, then change your settings as below:
+
 ```shell
 [global.v1.backups]
   location = "s3"
@@ -92,7 +93,8 @@ So, accept the checklist item asking permission to disable sharding. {{< /warnin
   # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
   endpoint = "https://s3.amazonaws.com"
 ```
- {{< /note >}}
+
+{{< /note >}}
 
 ### Chef Automate With Embedded Elasticsearch
 
@@ -101,14 +103,16 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 **Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 1. Start a major version upgrade:
+
 ```sh
 sudo chef-automate upgrade run --major
 ```
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before confirming for upgrade, otherwise it will prompt you the error.
-The checklist will be as following:
+
+Here, you will be prompted to accept multiple Pre Upgrade checklists. Ensure you have performed all those actions before confirming an upgrade. Otherwise, it will prompt you with an error. The checklist will be as follows:
+
 
 ```shell
-You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+You had planned for a downtime by running the command(chef-automate maintenance on)?: (y/n)
 y
 You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
 y
@@ -124,60 +128,63 @@ y
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
+1. Check the status of your upgrade using:  
      $ chef-automate upgrade status
   
-2) Disable the maintenance mode if you enabled previously using:
+2. Disable the maintenance mode if you enabled it previously using:
 	$ chef-automate maintenance off
   
-3) Migrate Data from Elastic Search to Open Search using this command:
+3. Migrate Data from Elastic Search to Open Search using this command:
      $ chef-automate post-major-upgrade migrate --data=es
   
-4) Check Automate UI everything is running and all data is visible
+4. Check Automate UI everything is running, and all data is visible
   
-5) If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
+5. If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
      $ chef-automate post-major-upgrade clear-data --data=es
 **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-Now, upgrade will start, Please confirm to continue... (y/n)
+Now, the upgrade will start. Please confirm to continue... (y/n)
 y
-
 ```
 
-{{< note >}} To continue with the upgradation the /hab must and should contain atleast 5GB free space. {{< /note >}}
+{{< note >}} To continue with the upgradation, the /hab must and should contain at least 5GB of free space. {{< /note >}}
 
 {{< note >}} The 'X' GB is the minimum free space required in /hab which is calculated with the formula => [ ((/hab size or /hab/svc/automate-elasticsearch/data) + 10%) or 5GB ] . {{< /note >}}
 
-It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+Once you are done with the upgrade. Follow the steps post upgrade, which are:
 
 2. Check the upgrade status of Chef Automate:
+
 ```sh
 sudo chef-automate upgrade status
 ```
-This should return: Automate is up-to-date with airgap bundle `4.x.y` version
+
+The above command should return: Automate is up-to-date with airgap bundle `4.x.y` version
 
 3. Turn off maintenance mode:
+
 ```sh
 sudo chef-automate maintenance off
 ```
-This should return: 
 
-  ```result
-  Updating deployment configuration
-  Applying deployment configuration
-  ```
+The above command should return:
+
+```result
+Updating deployment configuration
+Applying deployment configuration
+```
 
 4. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
+
 ```shell
-It will start the migration immediately after check.
+It will start the migration immediately after checking.
 Press y to agree, n to disagree? [y/n]: y
 
 HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
-
 
 ----------------------------------------------
 Chef-automate stop 
@@ -191,8 +198,7 @@ migration from es to os
 
 Checking for es_upgrade
 
-Done with Migration 
- Please wait for some time to reindex the data
+Once done with the migration, please wait for some time to reindex the data
 
 ----------------------------------------------
 Chef-automate start 
@@ -204,14 +210,17 @@ Starting Chef Automate
 Chef-automate status 
 ----------------------------------------------
 ```
-When migration is successful the default config will be shown
+
+The default config will be shown once the migration is successful.
 
 6. Verify whether all services are running:
+
 ```sh
 sudo chef-automate status
 ```
 
 7. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
 ```
@@ -223,10 +232,12 @@ To upgrade Chef Automate with external Elasticsearch, follow the steps given bel
 **Upgrade Chef Automate from version 3.0.49 to 4.0.x**
 
 1. Start major version upgrade:
+
 ```sh
 sudo chef-automate upgrade run --major
 ```
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
+
+Here, you will be prompted to accept multiple Pre Upgrade checklists. Ensure you have performed all those actions before the upgrade, then mark yes. Otherwise, it will prompt you with an error. The checklist will be as follows:
 
 ```shell
 You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
@@ -241,36 +252,34 @@ y
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
+1. Check the status of your upgrade using:  
      $ chef-automate upgrade status
    This should return: Automate is up-to-date
 
-2) Check all services are running using: 
+2. Check all services are running using: 
      $ chef-automate status
 
-3) Disable the maintenance mode if you enabled previously using:
+3. Disable the maintenance mode if you enabled it previously using:
 	$ chef-automate maintenance off
 
-4) Check Automate UI everything is running and all data is visible
+4. Check Automate UI everything is running, and all data is visible
 
 **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-Now, upgrade will start, Please confirm to continue... (y/n)
+Now, the upgrade will start. Please confirm to continue... (y/n)
 y
-
 ```
 
-It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+Once you are done with the upgrade. Follow the steps post upgrade, which is:
 
 ```shell
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
+1. Check the status of your upgrade using:  
      $ chef-automate upgrade status
   
-2) Disable the maintenance mode if you enabled previously using:
+2. Disable the maintenance mode if you enabled it previously using:
 	$ chef-automate maintenance off
 ```
 
@@ -279,20 +288,23 @@ Post Upgrade Steps:
 ```sh
 sudo chef-automate upgrade status
 ```
-This should return: Automate is up-to-date
 
-3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
+The above commabd should return: Automate is up-to-date.
+
+3. manually upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4*. If you have configured *Host*, *Port*, *Username*, or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
 4. Turn off maintenance mode:
+
 ```sh
 sudo chef-automate maintenance off
 ```
-This should return:
+
+Thr above command should return:
   
-  ```result
-  Updating deployment configuration
-  Applying deployment configuration
-  ```
+```result
+Updating deployment configuration
+Applying deployment configuration
+```
 
 ### Chef Automate in Air-Gapped Environment With Embedded ElasticSearch
 
@@ -302,7 +314,7 @@ To upgrade to 4.0.x, follow the steps below:
 
 #### On Internet connected machine
 
-1. Download latest CLI of Chef Automate.
+1. Download the latest CLI of Chef Automate.
 
 ```sh
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
@@ -313,7 +325,8 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 ```sh
 sudo ./chef-automate airgap bundle create 
 ```
-OR we can directly download via curl request
+
+OR we can directly download via a curl request
 
 ```sh
 curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-4.x.y.aib
@@ -323,7 +336,7 @@ curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o autom
 
 #### On Air-Gapped machine running Chef Automate
 
-1. Set your upgrade strategy to none in Chef Automate config. Confirm by the following code:
+1. Set your upgrade strategy to none in the Chef Automate config. Confirm by the following code:
 
 ```sh
 sudo ./chef-automate config show
@@ -334,10 +347,11 @@ sudo ./chef-automate config show
 ```sh
 sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
+
+Here, you will be prompted to accept multiple Pre Upgrade checklists. Ensure you have performed all those actions before the upgrade, then mark yes. Otherwise, it will prompt you with an error. The checklist will be as follows:
 
 ```shell
-You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+You had planned for a downtime by running the command(chef-automate maintenance on)?: (y/n)
 y
 You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
 y
@@ -353,45 +367,48 @@ y
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
+1. Check the status of your upgrade using:  
      $ chef-automate upgrade status
   
-2) Disable the maintenance mode if you enabled previously using:
+2. Disable the maintenance mode if you enabled it previously using:
   $ chef-automate maintenance off
   
-3) Migrate Data from Elastic Search to Open Search using this command:
+3. Migrate Data from Elastic Search to Open Search using this command:
      $ chef-automate post-major-upgrade migrate --data=es
   
-4) Check Automate UI everything is running and all data is visible
+4. Check Automate UI everything is running, and all data is visible
   
-5) If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
+5. If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
      $ chef-automate post-major-upgrade clear-data --data=es
 **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-Now, upgrade will start, Please confirm to continue... (y/n)
+Now, the upgrade will start. Please confirm to continue... (y/n)
 y
-
 ```
-{{< note >}} To continue with the upgradation the /hab must and should contain atleast 5GB free space. {{< /note >}}
+
+{{< note >}} To continue with the upgradation, the /hab must and should contain at least 5GB free space. {{< /note >}}
 
 {{< note >}} The 'X' GB is the minimum free space required in /hab which is calculated with the formula => [ ((/hab size or /hab/svc/automate-elasticsearch/data) + 10%) or 5GB ] . {{< /note >}}
 
-It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+Once you are done with the upgrade. Follow the steps post upgrade, which are:
 
 **Post Upgrade**
 
 1. Check the upgrade status of Chef Automate, run the following command:
+
 ```sh
 sudo chef-automate upgrade status
 ```
-This should return: Automate is up-to-date with airgap bundle `4.x.y` version
+
+The above command should return: Automate is up-to-date with airgap bundle `4.x.y` version
 
 2. Turn off the maintenance mode.
+
 ```sh
 sudo chef-automate maintenance off
 ```
-This should return:
+
+The above command should return:
   
   ```result
   Updating deployment configuration 
@@ -399,15 +416,16 @@ This should return:
   ```
 
 3. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
+
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
 ```
+
 ```shell
 It will start the migration immediately after check.
 Press y to agree, n to disagree? [y/n]: y
 
 HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
-
 
 ----------------------------------------------
 Chef-automate stop 
@@ -434,14 +452,17 @@ Starting Chef Automate
 Chef-automate status 
 ----------------------------------------------
 ```
+
 When migration is successful the default config will be shown
 
 4. Verify whether all services are running:
+
 ```sh
 sudo chef-automate status
 ```
 
 5. Clear the old ElasticSearch 6.8 data if all the data is present in your upgraded Chef Automate.
+
 ```sh
 sudo chef-automate post-major-upgrade clear-data --data=es
 ```
@@ -465,6 +486,7 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 ```sh
 sudo ./chef-automate airgap bundle create
 ```
+
 OR we can directly download via curl request
 
 ```sh
@@ -486,6 +508,7 @@ sudo ./chef-automate config show
 ```sh
 sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```
+
 Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
 
 ```shell
@@ -501,40 +524,40 @@ y
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
+1. Check the status of your upgrade using:  
      $ chef-automate upgrade status
    This should return: Automate is up-to-date
 
-2) Check all services are running using: 
+2. Check all services are running using: 
      $ chef-automate status
 
-3) Disable the maintenance mode if you enabled previously using:
+3. Disable the maintenance mode if you enabled previously using:
 	$ chef-automate maintenance off
 
-4) Check Automate UI everything is running and all data is visible
+4. Check Automate UI everything is running and all data is visible
 
 **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
 Now, upgrade will start, Please confirm to continue... (y/n)
 y
-
 ```
 
-It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+It starts upgrading once you are done with the upgrade, follow the steps post upgrade which are:
 
 ```shell
 Post Upgrade Steps:
 ===================
 
-1) Check the status of your upgrade using:  
+1. Check the status of your upgrade using:  
      $ chef-automate upgrade status
    This should return: Automate is up-to-date
   
-2) Disable the maintenance mode if you enabled previously using:
+2. Disable the maintenance mode if you enabled previously using:
 	$ chef-automate maintenance off
 
 3. Check whether upgrade status is up-to-date
+```
+
 ```sh
 sudo chef-automate upgrade status
 ```
@@ -542,15 +565,18 @@ sudo chef-automate upgrade status
 4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
 5. Turn off maintenance mode using following command:
+
 ```sh
 sudo chef-automate maintenance off
 ```
+
 This should return:
   
   ```result
   Updating deployment configuration
   Applying deployment configuration
   ```
+
 {{< note >}}
 After upgrading to version 4.x, Automate will have the configurations both for OpenSearch and Elasticsearch. It is recommended to remove the Elasticsearch configuration after upgrading to External OpenSearch.
 {{< /note >}}
@@ -559,30 +585,33 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 
 ### Disc Space Validation
 
-1) When /hab is less than 5gb the upgrade will fail with the below error:
+1. When /hab is less than 5gb the upgrade will fail with the below error:
 
-```
+```sh
 Hab (/hab/) directory should have more than 5.00GB free space
 UnknownError: An unknown issue occurred during execution: Request to start upgrade failed: one of the checklist was not accepted/satisfied for upgrade: Hab (/hab/) directory should have more than 5.00GB free space.
 ```
+
 You need to clear the space in /hab for having atleast 5GB free space.
 
-2) When the disk free space is less than the minimum required, the upgrade will fail with the below error:
+2. When the disk free space is less than the minimum required, the upgrade will fail with the below error:
 
-```
+```sh
 UnknownError: An unknown issue occurred during execution: Request to start upgrade failed: one of the checklist was not accepted/satisfied for upgrade: You do not have minimum space available to continue with this upgrade. 
 ```
+
 To skip this free disk space check please use ```--skip-storage-check``` flag (or)
 To change destination directory please use ```--os-dest-data-dir``` flag
 
 ### Circuit Breaking Exception
 
-```
+```sh
 {"error":{"root_cause":[{"type":"circuit_breaking_exception","reason":"[parent] Data too large, data for [<http_request>] would be [6126524880/5.7gb], which is larger than the limit of [5988548608/5.5gb], real usage: [6126524880/5.7gb], new bytes reserved: [0/0b], usages [request=0/0b, fielddata=74975/73.2kb, in_flight_requests=0/0b, accounting=89882860/85.7mb]","bytes_wanted":6126524880,"bytes_limit":5988548608,"durability":"PERMANENT"}]
 ```
 
 - Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>`
-```
+
+```sh
 [opensearch]
   [opensearch.v1]
     [opensearch.v1.sys]
@@ -593,30 +622,34 @@ To change destination directory please use ```--os-dest-data-dir``` flag
           total_limit = "95%"
 ```
 
-### Shard Failure 
+### Shard Failure
 
-```
+```sh
 [ERROR] Elasticsearch exception [type=validation_exception, reason=Validation Failed: 1: this action would add [5] total shards, but this cluster currently has [997]/[1000] maximum shards open;]
 ```
+
 To address the issue of shard limit hitting 1000, we need to increase the `max_shards_per_node`
-Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>` 
-```
+Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>`
+
+```sh
 [opensearch]
   [opensearch.v1]
     [opensearch.v1.sys]
       [opensearch.v1.sys.cluster]
          max_shards_per_node = "<NUMBER_OF_SHARD>"
 ```
+
 ### Migration Fails
 
-1)When migration fails due to no minimum space available, the upgrade will fail with error:
+1. When migration fails due to no minimum space available, the upgrade will fail with error:
 
-```
+```sh
 Error while calDiskSizeAndDirSize : You do not have minimum space available to continue with this
 ```
+
 To skip this free disk space check please use ```--skip-storage-check``` flag
 
-2) If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
+2. If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
 
 ```sh
 sudo chef-automate backup restore </path/to/backups/>BACKUP_ID
