@@ -104,7 +104,8 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 ```sh
 sudo chef-automate upgrade run --major
 ```
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
+Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before confirming for upgrade, otherwise it will prompt you the error.
+The checklist will be as following:
 
 ```shell
 You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
@@ -558,7 +559,7 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 
 ### Disc Space Validation
 
-1)When /hab is less than 5gb
+1) When /hab is less than 5gb the upgrade will fail with the below error:
 
 ```
 Hab (/hab/) directory should have more than 5.00GB free space
@@ -566,7 +567,7 @@ UnknownError: An unknown issue occurred during execution: Request to start upgra
 ```
 You need to clear the space in /hab for having atleast 5GB free space.
 
-2)When the disk free space is less than it required
+2) When the disk free space is less than the minimum required, the upgrade will fail with the below error:
 
 ```
 UnknownError: An unknown issue occurred during execution: Request to start upgrade failed: one of the checklist was not accepted/satisfied for upgrade: You do not have minimum space available to continue with this upgrade. 
@@ -608,7 +609,7 @@ Update the Opensearch Config, using `chef-automate config patch <config_patch.to
 ```
 ### Migration Fails
 
-1)When migration fails due to no minimum space available
+1)When migration fails due to no minimum space available, the upgrade will fail with error:
 
 ```
 Error while calDiskSizeAndDirSize : You do not have minimum space available to continue with this
