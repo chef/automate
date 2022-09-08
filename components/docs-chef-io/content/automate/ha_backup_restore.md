@@ -83,13 +83,13 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 4. Copy the following Ruby code into this file by altering the value of *bucket* with `bucket-name` and *name* with `bucket-name`.
 
 ``` ruby
-[global.v1.external.elasticsearch.backup]
+[global.v1.external.opensearch.backup]
 
     enable = true
 
     location = "s3"
 
-[global.v1.external.elasticsearch.backup.s3]
+[global.v1.external.opensearch.backup.s3]
 
   # bucket (required): The name of the bucket
 
@@ -99,25 +99,25 @@ Ensure you perform the backup configuration before deploying the Chef Automate H
 
   # If base_path is not set, backups will be stored at the root of the bucket.
 
-  base_path = "elasticsearch"
+  base_path = "opensearch"
 
-  # name of an s3 client configuration you create in your elasticsearch.yml
+  # name of an s3 client configuration you create in your opensearch.yml
 
-  # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
+  # see https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-client.html
 
   # for full documentation on how to configure client settings on your
 
-  # Elasticsearch nodes
+  # Opensearch nodes
 
   client = "default"
 
-[global.v1.external.elasticsearch.backup.s3.settings]
+[global.v1.external.opensearch.backup.s3.settings]
 
     ## The meaning of these settings is documented in the S3 Repository Plugin
 
     ## documentation. See the following links:
 
-    ## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
+    ## https://www.open.co/guide/en/opensearch/plugins/current/repository-s3-repository.html
 
 
 
