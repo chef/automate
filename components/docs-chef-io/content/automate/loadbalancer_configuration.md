@@ -46,7 +46,6 @@ sudo yum install nginx
 ```bash
 upstream chef-automate-servers {
    # Add a list of automate machine ip addresses.
-   # Minimum automate machine is 2
    server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
@@ -84,7 +83,6 @@ server {
 ```bash
 upstream chef-infra-servers {
    # Add a list of infra server machine api addresses.
-   # Minimum infra server machine is 2
    server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
