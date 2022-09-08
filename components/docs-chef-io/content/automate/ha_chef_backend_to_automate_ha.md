@@ -238,11 +238,11 @@ postgresql_private_ips = ["10.0.3.0","10.0.4.0","10.0.5.0"]
     provide chef-server FQDN of Automate HA Chef-Server
     
     Example :-
-    https://demo-chef-server.com/organizations/a2ha
+    https://demo-chef-server.com/organizations/demo-org
 
     ```bash 
         knife configure
-        Please enter the chef server URL: [https://ip-10-1-0-52.ap-southeast-1.compute.internal/organizations/myorg] https://A2-c57f69cb-chef-server-lb-980686949.ap-southeast-1.elb.amazonaws.com/organizations/demo-org
+        Please enter the chef server URL: [https://ip-10-1-0-52.ap-southeast-1.compute.internal/organizations/myorg] https://demo-chef-server.com/organizations/demo-org
         Please enter an existing username or clientname for the API: [ubuntu] org-user
         *****
 
