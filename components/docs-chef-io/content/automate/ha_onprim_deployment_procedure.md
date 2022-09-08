@@ -84,7 +84,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    "
    ```
 
-2. Update Config with relevant data
+2. Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config) sample config
 
    ```bash
    vi config.toml
