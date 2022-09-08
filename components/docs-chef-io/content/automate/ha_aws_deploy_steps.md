@@ -65,7 +65,7 @@ Run the following steps on Bastion Host Machine:
    "
    ```
 
-2. Update Config with relevant data. Click [here](/automate/ha_aws_deploy_steps/#sample-config) sample config
+2. Update Config with relevant data. Click [here](/automate/ha_aws_deploy_steps/#sample-config) for sample config
 
    ```bash
    vi config.toml
