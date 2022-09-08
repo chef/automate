@@ -265,7 +265,7 @@ y
 ```
 
 It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+Once the upgrade is completed, follow the post upgrade steps which are:
 
 Post Upgrade Steps:
 ===================
@@ -275,7 +275,7 @@ Post Upgrade Steps:
 ```sh
 chef-automate upgrade status
 ```
-   This should return: Automate is up-to-date
+  This should return: Automate is up-to-date
   
 2) Check all services are running using:
 
@@ -283,24 +283,19 @@ chef-automate upgrade status
 chef-automate upgrade status
 ```
 
-3). Disable the maintenance mode if you enabled previously using:
+3) Disable the maintenance mode if you enabled previously using:
 
 ```sh
 chef-automate maintenance off
 ```
-
-3. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
-
-4. Turn off maintenance mode:
-```sh
-sudo chef-automate maintenance off
-```
 This should return:
-  
   ```result
   Updating deployment configuration
   Applying deployment configuration
   ```
+
+4) Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
+
 
 ### Chef Automate in Air-Gapped Environment With Embedded ElasticSearch
 
@@ -534,9 +529,8 @@ y
 ```
 
 It starts upgrading 
-Once you are done with the upgrade, follow the steps post upgrade which are:
+Once the upgrade is completed, follow the post upgrade steps which are:
 
-```shell
 Post Upgrade Steps:
 ===================
 
@@ -553,15 +547,15 @@ chef-automate upgrade status
 chef-automate upgrade status
 ```
 
-3). Disable the maintenance mode if you enabled previously using:
+3) Disable the maintenance mode if you enabled previously using:
 
 ```sh
 chef-automate maintenance off
 ```
 
-4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
+4) Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-5. Turn off maintenance mode using following command:
+5) Turn off maintenance mode using following command:
 ```sh
 sudo chef-automate maintenance off
 ```
