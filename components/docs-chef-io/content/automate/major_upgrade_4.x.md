@@ -160,9 +160,7 @@ This should return: Automate is up-to-date with airgap bundle `4.x.y` version
 ```sh
 sudo chef-automate maintenance off
 ```
-This should return:
-```Updating deployment configuration```
-```Applying deployment configuration```
+This should return: ```Updating deployment configuration``` ```Applying deployment configuration```
 
 4. Migrate your data from *ElasticSearch 6.8* to *OpenSearch 1.2.4*:
 ```sh
