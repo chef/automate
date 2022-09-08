@@ -174,7 +174,7 @@ sudo yum install haproxy
          | sudo tee /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
       ```
 
-   - For Chef Infra server:
+   - For Chef Infra Server:
 
       ```bash
       sudo mkdir -p /etc/ssl/chefinfraserver.example.com
@@ -220,14 +220,14 @@ backend chef_infra_server
    server infra3 10.1.0.103:443 check ssl verify none
 ```
 
-3. Test Nginx Config
+3. Test HA Proxy Config
 
 ```bash
 sudo haproxy -c -f /etc/haproxy/haproxy.cfg
 ```
 
-4. Restart Nginx
+4. Restart HA Proxy
 
 ```bash
-sudo service haproxy restart
+sudo systemctl restart haproxy
 ```
