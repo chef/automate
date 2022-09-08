@@ -181,7 +181,7 @@ To destroy infra after successfull provisioning, run below command in your basti
 
 {{< note >}}
 
--   User only needs to create/setup **the bastion node** with IAM role of Admin acess, API gateway access and s3 bucket access attached to it.
+-   User only needs to create/setup **the bastion node** with IAM role of Admin access, and s3 bucket access attached to it.
 -   It is adviceble to create bastion server (EC2 instance) in a new VPC.
 -   Following config will create s3 bucket for backup.
 
