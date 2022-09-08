@@ -155,6 +155,20 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
 {{< /warning >}}
 
+## Equivalent Commands
+In Automate HA there are equivalent command which had been used in A2HA
+
+| Commands                   	| A2HA                                                          	|  Automate HA                                                                                                                  	|
+|----------------------------	|---------------------------------------------------------------	|-------------------------------------------------------------------------------------------------------------------------------	|
+| init config existing infra 	| ```bash automate-cluster-ctl config init -a existing_nodes``` 	| ```bash chef-automate init-config-ha existing_infra ```                                                                       	|
+| deploy                     	| ```bash automate-cluster-ctl deploy ```                       	| ```bash chef-automate deploy config.toml ```                                                                                  	|
+| info                       	| ```bash automate-cluster-ctl info ```                         	| ```bash chef-automate info ```                                                                                                	|
+| status                     	| ```bash chef-automate status ```                              	| ```bash chef-automate status ```                                                                                              	|
+| ssh                        	| ```bash automate-cluster-ctl ssh <name> ```                   	| ```bash chef-automate ssh --hostname <name> ```                                                                               	|
+| test                       	| ```bash automate-cluster-ctl test ```                         	| ```bash chef-automate test ```                                                                                                	|
+| gather logs                	| ```bash automate-cluster-clt gather-logs ```                  	| ```bash chef-automate gather-logs ```                                                                                         	|
+| workspace                  	| ```bash automate-cluster-clt workspace ```                    	| ```bash chef-automate workspace [OPTIONS] SUBCOMMAND [ARG] ... ```                                                            	|
+
 
 ## Troubleshooting
 
