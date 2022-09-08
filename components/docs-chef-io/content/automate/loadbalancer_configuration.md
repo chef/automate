@@ -175,9 +175,14 @@ sudo cat /etc/letsencrypt/live/chefautomate.example.com/fullchain.pem \
 2. Once HA Proxy is installed, add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef automate.
 
 ```bash
+frontend fe_automate_http
+    mode http
+    bind :80
+    redirect scheme https code 301 if !{ ssl_fc }
+
 frontend fe_automate
-   bind chefautomate.example.com:80
-   bind chefautomate.example.com:443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
+   mode tcp
+   bind :443 ssl crt /etc/ssl/chefautomate.example.com/chefautomate.example.com.pem
    default_backend automate_server
 
 backend automate_server
@@ -187,12 +192,17 @@ backend automate_server
    server automate2 10.1.0.103:443 check
 ```
 
-2. Add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef infra server.
+3. Add the following to the configuration file present at `/etc/haproxy/haproxy.cfg`. This will set the load balancer config for chef infra server.
 
 ```bash
+frontend fe_infra_http
+    mode http
+    bind :80
+    redirect scheme https code 301 if !{ ssl_fc }
+
 frontend fe_infra
-   bind chefinfraserver.example.com:80
-   bind chefinfraserver.example.com:443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
+   mode tcp
+   bind :443 ssl crt /etc/ssl/chefinfraserver.example.com/chefinfraserver.example.com.pem
    default_backend chef_infra_server
 
 backend chef_infra_server
@@ -200,4 +210,14 @@ backend chef_infra_server
    server infra1 10.1.0.101:443 check
    server infra2 10.1.0.102:443 check
    server infra3 10.1.0.103:443 check
+```
+
+4. Restart HAProxy
+Now you have made all necessary changes in your HAProxy server. Now verify configuration file before restarting service using the following command.
+```bash
+haproxy -c -f /etc/haproxy/haproxy.cfg
+```
+If above command returned output as configuration file is valid then restart HAProxy service
+```bash
+sudo service haproxy restart
 ```
