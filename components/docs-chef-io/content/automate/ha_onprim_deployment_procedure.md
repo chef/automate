@@ -26,11 +26,11 @@ In this section, we'll discuss the steps to deploy Chef Automate HA on-premise m
 - All VM's or Machines are up and running.
 - OS Root Volume (/) must be at least 40 GB
 - TMP space (/var/tmp) must be at least 5GB
-- Separate Hab volume (/hab) provisioned at least 100 GB, for opensearch node `/hab` volume will be more based on the data retention policy.
+- Separate Hab volume (/hab) provisioned at least 100 GB, for opensearch node `/hab` volume will be more based on the data retention policy.   
 - A Common user has access to all machines.
 - This common user should have sudo privileges.
 - This common user uses same SSH Private Key file to access all machines.
-- Key-based SSH for the provisioning user for all the machine for HA-Deployment.
+- Key-based SSH for the provisioning user for all the machine for HA-Deployment. 
 - LoadBalancers are setup according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
 - DNS is configured to redirect `chefautomate.example.com` to Primary Load Balancer.
@@ -51,40 +51,52 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 ### Run these steps on Bastion Host Machine
 
-1. Run below commands to download latest Automate CLI and Airgapped Bundle:
+1. Before starting, switch to sudo:
 
    ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Download Chef Automate CLI.
-   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
-   | gunzip - > chef-automate && chmod +x chef-automate \
-   | cp -f chef-automate /usr/bin/chef-automate
-   
-   #Download latest Airgapped Bundle.
-   #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
-   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
-
-   #Generate init config and then generate init config for existing infra structure
-   chef-automate init-config-ha existing_infra
-   "
+   sudo su -
    ```
 
-   Note: If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command. \
-   After transfering, in Airgapped Bastion, run below commands:
+2. Download Chef Automate CLI
 
    ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Move the Chef Automate CLI to `/usr/bin`.
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
+   ```
+
+3. Download Airgapped Bundle \
+   Download latest Bundle with this:
+
+   ```bash
+   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
+   ```
+
+   Download specific version bundle with this, example version: 4.0.91:
+
+   ```bash
+   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
+   ```
+
+4. If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command. \
+   After transfering, in Airgapped Bastion, swtich to sudo:
+
+   ```bash
+   sudo su -
+   ```
+
+   Move the Chef Automate CLI to `/usr/bin` by running below command:
+
+   ```bash
    cp -f chef-automate /usr/bin/chef-automate
-
-   #Generate init config and then generate init config for existing infra structure
-   chef-automate init-config-ha existing_infra
-   "
    ```
 
-2. Update Config with relevant data
+5. Generate init config \
+   Then generate init config for existing infra structure:
+
+   ```bash
+   chef-automate init-config-ha existing_infra
+   ```
+
+6. Update Config with relevant data
 
    ```bash
    vi config.toml
@@ -101,93 +113,30 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
-3. Continue with the deployment after updating config:
+7. Confirm all the data in the config is correct:
 
    ```bash
-   #Run commands as sudo.
-   sudo -- sh -c "
-   #Print data in the config
    cat config.toml
+   ```
 
-   #Run deploy command to deploy `automate.aib` with set `config.toml`
-   chef-automate deploy config.toml --airgap-bundle automate.aib
+8. Run Deploy Command \
+   Deploy `latest.aib` with set `config.toml`
 
-   #After Deployment is done successfully. Check status of Chef Automate HA services
+   ```bash
+   chef-automate deploy config.toml --airgap-bundle latest.aib
+   ```
+
+   If deploying specific version of Chef Automate, example: Deploy `automate-4.0.91.aib` with set `config.toml`
+
+   ```bash
+   chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
+   ```
+
+9. After Deployment is done successfully. \
+   Check status of Chef Automate HA services:
+
+   ```bash
    chef-automate status
    ```
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
-
-
-
-#### Sample config
-
-
-{{< note >}}
-
--   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
-
-{{< /note >}}
-
-```config
-
-# This is a Chef Automate AWS HA mode configuration file. You can run
-# 'chef-automate deploy' with this config file and it should
-# successfully create a new Chef Automate HA instances with default settings.
-
-[architecture.existing_infra]
-
-ssh_user = ""
-
-# private ssh key file path to access instances
-# Eg.: ssh_user = "~/.ssh/A2HA.pem"
-ssh_key_file = ""
-
-ssh_port = "22"
-secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
-secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
-architecture = "existing_nodes"
-workspace_path = "/hab/a2_deploy_workspace"
-# DON'T MODIFY THE BELOW LINE (backup_mount)
-backup_mount = "/mnt/automate_backups"
-
-
-# ============== EC2 Nodes Config ======================
-[automate.config]
-# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
-fqdn = ""
-
-instance_count = "1"
-config_file = "configs/automate.toml"
-
-[chef_server.config]
-instance_count = "1"
-
-[opensearch.config]
-instance_count = "3"
-
-[postgresql.config]
-instance_count = "3"
-
-[existing_infra.config]
-## === INPUT NEEDED ===
-
-# provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
-# No of ip address should be same as No of instance_count count mentioned above in
-# automate.config, chef_server.config, opensearch.config and postgresql.config
-automate_private_ips = []
-chef_server_private_ips = []
-opensearch_private_ips = []
-postgresql_private_ips = []
-```
-
-##### Minimum changes to be made
-
--   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
--   Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
--   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM’s. Eg: `chefautomate.example.com`
--   `automate_private_ips` Eg: ["192.0.0.1"]
--   `chef_server_private_ips` Eg: ["192.0.1.1"]
--   `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
--   `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
-
