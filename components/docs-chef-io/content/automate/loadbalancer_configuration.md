@@ -49,14 +49,21 @@ sudo yum install nginx
 
 ```bash
 upstream chef-automate-servers {
+   # Add a list of automate machine ip addresses.
    server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
 }
 
+# The below section is used for https call
 server {
    listen 443 ssl;
+   # You need to get your own automate DNS,
+   # here we have taken example DNS: chefautomate.example.com
    server_name chefautomate.example.com;
+   # Here ssl certificate is added,
+   # we have created certificate using certBot, below url is an example for ubuntu machine
+   # reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
    ssl_certificate /etc/letsencrypt/live/chefautomate.example.com/cert.pem;
    ssl_certificate_key /etc/letsencrypt/live/chefautomate.example.com/privkey.pem;
    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -67,6 +74,7 @@ server {
    }
 }
 
+# The below section is used for http call
 server {
    listen 80;
    server_name chefautomate.example.com;
@@ -78,14 +86,21 @@ server {
 
 ```bash
 upstream chef-infra-servers {
+   # Add a list of infra server machine api addresses.
    server 10.1.0.101:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.102:443 max_fails=2 fail_timeout=30s;
    server 10.1.0.103:443 max_fails=2 fail_timeout=30s;
 }
 
+# The below section is used for https call
 server {
    listen 443 ssl;
+   # You need to get your own infra server DNS,
+   # here we have taken example DNS: chefinfraserver.example.com
    server_name chefinfraserver.example.com;
+   # Here ssl certificate is added,
+   # we have created certificate using certBot, below url is an example for ubuntu machine
+   # reference: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
    ssl_certificate /etc/letsencrypt/live/chefinfraserver.example.com/cert.pem;
    ssl_certificate_key /etc/letsencrypt/live/chefinfraserver.example.com/privkey.pem;
    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
@@ -96,6 +111,7 @@ server {
    }
 }
 
+# The below section is used for http call
 server {
    listen 80;
    server_name chefinfraserver.example.com;
