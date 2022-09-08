@@ -28,10 +28,14 @@ Steps to upgrade the Chef Automate HA are as shown below:
   ```bash
   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
   ```
-  Download specific version bundle with this, example version: 4.0.91:
+  Download specific version bundle with this:
   ```bash
-  curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
+  curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o automate-<version>.aib
   ```
+
+  {{< note >}} 
+  Chef Automate bundles are available for 60 days from the release of a version. However, the milestone release bundles are available for download forever.
+  {{< /note >}}
 
 - If we want to only upgrade FrontEnd Services i.e. Chef Automate and Chef Infra Server.
   ```bash

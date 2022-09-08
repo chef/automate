@@ -65,6 +65,10 @@ Run the following steps on Bastion Host Machine:
    "
    ```
 
+   {{< note >}} 
+   Chef Automate bundles are available for 60 days from the release of a version. However, the milestone release bundles are available for download forever.
+   {{< /note >}}
+
 2. Update Config with relevant data. Click [here](/automate/ha_aws_deploy_steps/#sample-config) for sample config
 
    ```bash
