@@ -156,16 +156,12 @@ In Automate HA there are equivalent command which had been used in A2HA
 
 | Commands                   	| A2HA                                                          	|  Automate HA                                                                                                                  	|
 |----------------------------	|---------------------------------------------------------------	|-------------------------------------------------------------------------------------------------------------------------------	|
-| init config aws            	| ```bash automate-cluster-ctl config init -a aws ```           	| ```bash chef-automate init-config-ha aws ```                                                                                  	|
 | init config existing infra 	| ```bash automate-cluster-ctl config init -a existing_nodes``` 	| ```bash chef-automate init-config-ha existing_infra ```                                                                       	|
-| provision                  	| ```bash automate-cluster-ctl provision ```                    	| ```bash chef-automate provision config.toml ```                                                                               	|
 | deploy                     	| ```bash automate-cluster-ctl deploy ```                       	| ```bash chef-automate deploy config.toml ```                                                                                  	|
 | info                       	| ```bash automate-cluster-ctl info ```                         	| ```bash chef-automate info ```                                                                                                	|
 | status                     	| ```bash chef-automate status ```                              	| ```bash chef-automate status ```                                                                                              	|
 | ssh                        	| ```bash automate-cluster-ctl ssh <name> ```                   	| ```bash chef-automate ssh --hostname <name> ```                                                                               	|
 | test                       	| ```bash automate-cluster-ctl test ```                         	| ```bash chef-automate test ```                                                                                                	|
-| patch                      	|                                                               	| To patch config in Automate HA, create a patch config.toml file, and run command  ```bash chef-automate patch config.toml ``` 	|
-| secret                     	| ```bash automate-cluster-clt secret init ```                  	| ```bash chef-automate secrets init ```                                                                                        	|
 | gather logs                	| ```bash automate-cluster-clt gather-logs ```                  	| ```bash chef-automate gather-logs ```                                                                                         	|
 | workspace                  	| ```bash automate-cluster-clt workspace ```                    	| ```bash chef-automate workspace [OPTIONS] SUBCOMMAND [ARG] ... ```                                                            	|
 
