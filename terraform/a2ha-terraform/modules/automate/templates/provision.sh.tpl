@@ -41,7 +41,7 @@ wait_for_install() {
     n=$((n+1))
     echo "Waiting for $1 cli to be installed.."
     sleep 30
-    if [ $cmd == "automate-backend-ctl"]
+    if [ $cmd == "automate-backend-ctl" ]
       then
         echo "bin-linking automate-backend-ctl"
         pkg_count=$(ls -Art /hab/cache/artifacts/chef-automate-ha-ctl* | tail -n 1 | wc -l )
