@@ -247,7 +247,6 @@ Post Upgrade Steps:
 
 1) Check the status of your upgrade using:  
      $ chef-automate upgrade status
-   This should return: Automate is up-to-date
 
 2) Check all services are running using: 
      $ chef-automate status
@@ -511,7 +510,6 @@ Post Upgrade Steps:
 
 1) Check the status of your upgrade using:  
      $ chef-automate upgrade status
-   This should return: Automate is up-to-date
 
 2) Check all services are running using: 
      $ chef-automate status
