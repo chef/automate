@@ -44,7 +44,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
   Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
 - Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
   Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-
+- We do not support passphrase for Private Key authentication.
 ### Run these steps on Bastion Host Machine
 
 1. Run below commands to download latest Automate CLI and Airgapped Bundle:
@@ -75,6 +75,8 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
+   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
+   - We support only private key authentication.
    - Set `backup_config` to `"efs"` or `"s3"`
    - If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.
    - Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
