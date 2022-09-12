@@ -176,3 +176,19 @@ postgresql_private_ips = []
 -   `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 -   `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
+
+### How To Add Nodes to the Existing Deploment 
+- Open the `config.toml`, change the `instance_count` 
+For example :
+
+  | #Old Config                           | #New Config                                   |
+
+  | :---:                                 | :---:                                         |
+
+  | [automate.config]                     | [automate.config]                             |
+
+  | instance_count = "1"                  | instance_count = "1"                          |
+
+  | [existing_infra.config]               | [existing_infra.config]                       |
+  
+  | automate_private_ips = ["X.Y.Z.Q"]    | automate_private_ips = ["X.Y.Z.Q","A.B.C.D"]  |
