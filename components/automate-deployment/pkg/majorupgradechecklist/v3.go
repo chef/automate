@@ -167,7 +167,7 @@ func (ci *V3ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistEmbedded
-		checklists = append(checklists, []Checklist{downTimeCheck(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir), postChecklistIntimationCheck()}...)
+		checklists = append(checklists, []Checklist{diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir), downTimeCheck(), backupCheck(), replaceS3Url(), postChecklistIntimationCheck()}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinue())
 
