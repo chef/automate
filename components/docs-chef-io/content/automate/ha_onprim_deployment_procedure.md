@@ -180,15 +180,9 @@ postgresql_private_ips = []
 ### How To Add Nodes to the Existing Deploment 
 - Open the `config.toml`, change the `instance_count` 
 For example :
-
-  | #Old Config                           | #New Config                                   |
-
-  | :---:                                 | :---:                                         |
-
-  | [automate.config]                     | [automate.config]                             |
-
-  | instance_count = "1"                  | instance_count = "1"                          |
-
-  | [existing_infra.config]               | [existing_infra.config]                       |
-  
-  | automate_private_ips = ["X.Y.Z.Q"]    | automate_private_ips = ["X.Y.Z.Q","A.B.C.D"]  |
+  | Old Config | => | New Config |
+  | :---: | :---: | :---: |
+  | [automate.config] | => |[automate.config] |
+  | instance_count = "1" | => | instance_count = "2" |
+  | [existing_infra.config] | => | [existing_infra.config] |
+  | automate_private_ips = ["X.Y.Z.Q"] | => | automate_private_ips = ["X.Y.Z.Q","A.B.C.D"] |
