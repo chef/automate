@@ -15,6 +15,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	MIN_DIRSIZE_GB float64 = 5
+
+	DISKSPACE_CHECK_ERROR = `You do not have minimum space available to continue with this %s. 
+Please ensure you have %.2f GB free disk space.
+To skip this free disk space check please use --skip-storage-check flag.`
+)
+
 type Checklist struct {
 	Name        string
 	Description string
