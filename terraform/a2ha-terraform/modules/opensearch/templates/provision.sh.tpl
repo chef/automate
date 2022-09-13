@@ -89,3 +89,16 @@ if [ -e /hab/sup/default/specs/"$OPENSEARCHSIDECAR_PKG_NAME".spec ]; then
 else
   bash -c 'eval hab svc load ${opensearchsidecar_pkg_ident} ${opensearchsidecar_svc_load_args} --bind opensearch:"$OS_PKG_NAME".default --binding-mode=strict "$LOGCMD"'
 fi
+
+# 
+if [["$backup_config_s3" == "true"]]; then
+  echo yes | hab svc status
+  export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
+  echo $OPENSEARCH_PATH_CONF
+  echo "$access_key" | hab pkg exec chef/automate-ha-opensearch opensearch-keystore add --stdin --force s3.client.default.access_key
+  echo "$secret_key" | hab pkg exec chef/automate-ha-opensearch opensearch-keystore add --stdin --force s3.client.default.secret_key
+  hab pkg exec chef/automate-ha-opensearch opensearch-keystore list
+  sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
+  hab pkg exec chef/automate-ha-opensearch opensearch-keystore list
+  curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin
+fi
