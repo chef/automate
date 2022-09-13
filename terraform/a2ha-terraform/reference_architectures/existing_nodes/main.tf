@@ -148,6 +148,9 @@ module "opensearch" {
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
   depends_on = [module.airgap_bundle-backend,module.habitat-backend]
+  backup_config_s3             = var.backup_config_s3
+  access_key                   = var.access_key
+  secret_key                   = var.secret_key
 }
 
 module "postgresql" {
@@ -213,6 +216,10 @@ module "bootstrap_automate" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
+  backup_config_s3                   = var.backup_config_s3
+  backup_config_efs                  = var.backup_config_efs
+  s3_endpoint                        = var.s3_endpoint
+  bucket_name                        = var.bucket_name
   depends_on = [module.airgap_bundle-frontend,module.habitat-frontend]
 }
 
@@ -250,6 +257,10 @@ module "automate" {
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
+  backup_config_s3                   = var.backup_config_s3
+  backup_config_efs                  = var.backup_config_efs
+  s3_endpoint                        = var.s3_endpoint
+  bucket_name                        = var.bucket_name
   depends_on = [module.bootstrap_automate]
 }
 
@@ -283,5 +294,9 @@ module "chef_server" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
+  backup_config_s3                   = var.backup_config_s3
+  backup_config_efs                  = var.backup_config_efs
+  s3_endpoint                        = var.s3_endpoint
+  bucket_name                        = var.bucket_name
   depends_on = [module.bootstrap_automate]
 }

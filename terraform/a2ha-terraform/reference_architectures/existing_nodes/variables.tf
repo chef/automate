@@ -1,3 +1,19 @@
+variable "backup_config_s3" {
+  default = "false"
+}
+
+variable "backup_config_efs" {
+  default = "false"
+}
+
+variable "s3_endpoint" {
+  default = "https://s3.amazonaws.com"
+}
+
+variable "bucket_name" {
+  default = "chef-automate-ha"
+}
+
 variable "existing_automate_ips" {
   default = []
 }

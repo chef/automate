@@ -22,6 +22,9 @@ locals {
     opensearchsidecar_pkg_ident     = var.opensearchsidecar_pkg_ident,
     opensearchsidecar_svc_load_args = var.opensearchsidecar_svc_load_args,
     tmp_path                        = var.tmp_path
+    backup_config_s3                = var.backup_config_s3
+    access_key                      = var.access_key
+    secret_key                      = var.secret_key
   })
 }
 
