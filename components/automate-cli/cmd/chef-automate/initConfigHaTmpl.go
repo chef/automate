@@ -174,15 +174,6 @@ managed_rds_certificate = "<cert content>"
 
 # ============== EC2 Instance Config ===================
 
-# eg: ami_filter_name = ""
-ami_filter_name = ""
-
-# Only if we have filter criteria. Best give 'ami_id' below.
-ami_filter_virt_type = ""
-
-# Filter ami based on owner.
-ami_filter_owner = ""
-
 ## === INPUT NEEDED ===
 
 # This AMI should be from the Same Region which we selected above.
