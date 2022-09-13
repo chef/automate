@@ -22,7 +22,7 @@ const (
   before continuing with the Upgrade to version %s:
 `
 
-	downTimeError = "There will be a downtime while upgrading. Please prepare for down time and run the upgrade"
+	downTimeError = "There will be a downtime while upgrading. Please prepare for downtime and run the upgrade."
 
 	backupError = "Please take a backup and restart the upgrade process."
 

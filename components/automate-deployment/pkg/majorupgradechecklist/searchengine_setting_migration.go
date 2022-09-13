@@ -42,11 +42,12 @@ const (
 	AutomateOpensearchConfigPatch = "/hab/svc/deployment-service/oss-config.toml"
 
 	heapSizeExceededError   = `heap size : %s, max allowed is (50%% of ram = %dgb) but not exceeding %dgb`
-	shardCountExceededError = `total shards per node : %d, max allowed is %d, 
-having this more than %d decreases perfomance to avoid breaching this limit, 
-you can reduce data retention policy`
-	errorUserConcent = `we recommend you to move to external/managed opensearch cluster for better performance.
-but if you still want to continue with the upgrade`
+	shardCountExceededError = `Having more than %d shards will lead to performance problems with Automate. 
+To decrease the number of shards, 
+reduce number of days of data retained in the "Data Lifecycle" settings. 
+https://docs.chef.io/automate/data_lifecycle/`
+	errorUserConcent = `We recommend you to move to external/managed OpenSearch cluster for better performance. 
+Do you still want to continue with the upgrade?`
 
 	upgradeFailed = "due to pre-condition check failed"
 )
@@ -244,7 +245,7 @@ func GetESSettings(writer cli.FormatWriter) (*ESSettings, error) {
 	if err != nil {
 		writer.Warnf("No process id found for running elasticsearch, %s \n", err.Error())
 	}
-	writer.Println("fetching elastic search settings.")
+	writer.Println("Fetching Elasticsearch settings.")
 	esSettings, err := getAllSearchEngineSettings(writer, pid)
 	if err != nil {
 		return esSettings, err

@@ -100,7 +100,7 @@ You have taken backup of your data and kept it safe, preferred on other disk or 
 y
 Ensure you have more than 60 percent free disk space (y/n)
 y
-This will disable Sharding on your elastic search (y/n)
+This will disable Sharding on your Elasticsearch (y/n)
 y
 {"acknowledged":true,"persistent":{"cluster":{"routing":{"allocation":{"enable":"primaries"}}}},"transient":{}}
 {"_shards":{"total":60,"successful":30,"failed":0}}
@@ -129,12 +129,12 @@ Post Upgrade Steps:
 2) Disable the maintenance mode if you enabled previously using:
 	$ chef-automate maintenance off
   
-3) Migrate Data from Elastic Search to Open Search using this command:
+3) Migrate Data from Elasticsearch to OpenSearch using this command:
      $ chef-automate post-major-upgrade migrate --data=es
   
 4) Check Automate UI everything is running and all data is visible
   
-5) If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
+5) If you are sure all data is available in Upgraded Automate, then we can free up old Elasticsearch Data by running: 
      $ chef-automate post-major-upgrade clear-data --data=es
 ```
 {{< note >}} If your backup location is S3 and endpoint is configured as regional then change your settings as below:
@@ -188,7 +188,7 @@ Then add in OpenSearch configuration as:
   [opensearch.v1]
     [opensearch.v1.sys]
       [opensearch.v1.sys.cluster]
-        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch.
+        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in Elasticsearch config, then do not patch in openseaarch.
       [opensearch.v1.sys.indices]
         [opensearch.v1.sys.indices.breaker]
           total_limit = "95%"
@@ -336,7 +336,7 @@ You have taken backup of your data and kept it safe, preferred on other disk or 
 y
 Ensure you have more than 60 percent free disk space (y/n)
 y
-This will disable Sharding on your elastic search (y/n)
+This will disable Sharding on your Elasticsearch (y/n)
 y
 {"acknowledged":true,"persistent":{"cluster":{"routing":{"allocation":{"enable":"primaries"}}}},"transient":{}}
 {"_shards":{"total":60,"successful":30,"failed":0}}
@@ -392,7 +392,7 @@ Then add in OpenSearch configuration as:
   [opensearch.v1]
     [opensearch.v1.sys]
       [opensearch.v1.sys.cluster]
-        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in elastic search config, then do not patch in openseaarch.
+        max_shards_per_node = 6000 # Refer the value from ElasticSearch Config, If this value is not there in Elasticsearch config, then do not patch in openseaarch.
       [opensearch.v1.sys.indices]
         [opensearch.v1.sys.indices.breaker]
           total_limit = "95%"

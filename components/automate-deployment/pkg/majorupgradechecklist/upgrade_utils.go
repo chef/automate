@@ -65,7 +65,7 @@ func GetMajorVersion(version string) (string, bool) {
 func IsExternalElasticSearch() bool {
 	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
 	if err != nil {
-		logrus.Error("failed to get elastic search configuration: ", err.Error())
+		logrus.Error("failed to get Elasticsearch configuration: ", err.Error())
 		return false
 	}
 	return res.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()

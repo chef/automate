@@ -336,7 +336,7 @@ The final output after running the command 1.5 on the third node is given below:
 
 2. To override the existing default endpoint:
 
--   Login to one of the open search instances and run the following command (You need root access to run the command):
+-   Login to one of the OpenSearch instances and run the following command (You need root access to run the command):
 
 ```sh
 source /hab/sup/default/SystemdEnvironmentFile.sh

@@ -65,29 +65,29 @@ const (
 	initMsgV4 = `This is a Major upgrade. 
 ========================
 
-  1) In this release Elastic Search is migrated to Open Search
+  1) In this release Elasticsearch is migrated to OpenSearch
   2) This upgrade will require special care. 
 
-===== Your installation is using %s Elastic Search =====
+===== Your installation is using %s Elasticsearch =====
 
   Please confirm this checklist that you have taken care of these steps 
   before continuing with the Upgrade to version %s:
 `
 
-	externalESUpgradeMsg = "You are ready with your external open search with migrated data from elastic search, this should be done with the help of your Administrator"
+	externalESUpgradeMsg = "You are ready with your external OpenSearch with migrated data from Elasticsearch, this should be done with the help of your Administrator"
 
-	externalESUpgradeError = "As you are using external elastic search, migrations of data to open search is required before the upgrade"
+	externalESUpgradeError = "As you are using external Elasticsearch, migrations of data to OpenSearch is required before the upgrade"
 
 	shardingError = "sharding has to be disabled before upgrade"
 
 	s3UrlError = "Upgrade terminated as automate version 4 will only support https://s3.amazonaws.com pattern"
 
-	run_os_data_migrate = `Migrate Data from Elastic Search to Open Search using this command:
+	run_os_data_migrate = `Migrate Data from Elasticsearch to OpenSearch using this command:
      $ ` + run_os_data_migrate_cmd
 
 	run_os_data_migrate_cmd = `chef-automate post-major-upgrade migrate --data=es`
 
-	run_os_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
+	run_os_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old Elasticsearch Data by running: 
      $ ` + run_os_data_cleanup_cmd
 
 	run_os_data_cleanup_cmd = `chef-automate post-major-upgrade clear-data --data=es`
@@ -301,7 +301,7 @@ func downTimeCheckV4() Checklist {
 		Name:        "down_time_acceptance",
 		Description: "confirmation for downtime",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("You had planned for a downtime, by running the command(chef-automate maintenance on)?:")
+			resp, err := h.Writer.Confirm("You had planned for a downtime, by running the command(chef-automate maintenance on)?:(y/n)")
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
@@ -461,7 +461,7 @@ func disableSharding() Checklist {
 		Name:        "disable sharding",
 		Description: "confirmation check to disable sharding",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("This will disable Sharding on your elastic search")
+			resp, err := h.Writer.Confirm("This will disable Sharding on your Elasticsearch")
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
@@ -694,7 +694,7 @@ func storeSearchEngineSettings() Checklist {
 		TestFunc: func(h ChecklistHelper) error {
 			isEmbeded := !IsExternalElasticSearch()
 			if !isEmbeded {
-				h.Writer.Warnf("Automate is running on external elastic search, not taking configuration backup")
+				h.Writer.Warnf("Automate is running on external Elasticsearch, not taking configuration backup")
 				return nil
 			} else {
 				esSettings, _ := GetESSettings(h.Writer)
@@ -709,7 +709,7 @@ func storeSearchEngineSettings() Checklist {
 				}
 				requiredShards := (esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
 				if requiredShards > INDICES_TOTAL_SHARD_DEFAULT {
-					msg := fmt.Sprintf(shardCountExceededError, requiredShards, INDICES_TOTAL_SHARD_DEFAULT, requiredShards)
+					msg := fmt.Sprintf(shardCountExceededError, INDICES_TOTAL_SHARD_DEFAULT)
 					inAppropriateSettings = append(inAppropriateSettings, msg)
 					isOkSettings = false
 				}
