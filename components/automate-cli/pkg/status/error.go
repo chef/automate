@@ -49,6 +49,10 @@ const (
 // When an invocation of the chef-automate CLI results in a Failure it exits with
 // one of the following codes that identifies the error types.
 const (
+	ESDeleteError                     = 122
+	ESIndexDetailsFetchError          = 121
+	ESIndexFetchError                 = 120
+	ESClusterUnhealthy                = 119
 	InappropriateSettingError         = 118
 	RestartDeploymentServiceError     = 117
 	IAMResetV1DatabaseError           = 116
@@ -96,6 +100,10 @@ const (
 // an error code and its type and a description, but also as a way to generate
 // documentation.
 var ErrorMetadata = map[int][]string{
+	ESDeleteError:                     {"122", "ESDeleteError", "Unable to reach Elasticsearch delete api"},
+	ESIndexDetailsFetchError:          {"121", "ESIndexDetailsFetchError", "Unable to fetch Elasticsearch indices details"},
+	ESIndexFetchError:                 {"120", "ESIndexFetchError", "Unable to fetch Elasticsearch indices"},
+	ESClusterUnhealthy:                {"119", "ESClusterUnhealthy", "Elasticsearch cluster unhealthy"},
 	InappropriateSettingError:         {"118", "InappropriateSettingError", "Settings are not appropriate"},
 	RestartDeploymentServiceError:     {"117", "DeploymentServiceError", "Failed to restart Deployment Service"},
 	IAMResetV1DatabaseError:           {"116", "UnknownError", "Failed to reset IAM state to v1"},

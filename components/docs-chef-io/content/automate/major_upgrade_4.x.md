@@ -577,7 +577,7 @@ Deployment service is stopped
 Waiting for Deployment Service to be healthy
 Waiting for Deployment Service to be healthy
 Waiting for Deployment Service to be healthy
-Deployment Service is healty now
+Deployment Service is healthy now
 current_version:"4.2.10" target_version:"4.2.59" target_major:"4"
 Upgrading Chef Automate
 ```

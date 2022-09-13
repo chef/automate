@@ -70,8 +70,7 @@ const (
 
 ===== Your installation is using %s Elasticsearch =====
 
-  Please confirm this checklist that you have taken care of these steps 
-  before continuing with the Upgrade to version %s:
+  Please confirm that you have taken care of the check list below before continuing with the upgrade to version %s:
 `
 
 	externalESUpgradeMsg = "You are ready with your external OpenSearch with migrated data from Elasticsearch, this should be done with the help of your Administrator"
@@ -108,7 +107,7 @@ const (
 This is because automate version 4 now only supports this format due to AWS SDK upgrade.
 `
 	msg            = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
-	oldIndexError  = "The index %s is from an older version of elasticsearch version %s.\nPlease reindex in elasticsearch 6. %s\n%s"
+	oldIndexError  = "The index %s is from an older version of Elasticsearch version %s.\nPlease reindex in Elasticsearch 6. %s\n%s"
 	indexBatchSize = 10
 )
 
@@ -221,7 +220,7 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 			continue
 		}
 		if err := item.TestFunc(helper); err != nil {
-			return errors.Wrap(err, "one of the checklist was not accepted/satisfied for upgrade")
+			return err
 		}
 	}
 	return nil
@@ -301,7 +300,7 @@ func downTimeCheckV4() Checklist {
 		Name:        "down_time_acceptance",
 		Description: "confirmation for downtime",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Have you planned for a downtime ? You can do this by running ( chef-automate maintenance on )?:(y/n)")
+			resp, err := h.Writer.Confirm("Have you planned for a downtime ? You can do this by running ( chef-automate maintenance on )?")
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
@@ -470,7 +469,7 @@ func disableSharding() Checklist {
 				h.Writer.Error(shardingError)
 				return status.New(status.InvalidCommandArgsError, shardingError)
 			}
-			h.Writer.Println("Calling elasticsearch api to disable shard allocation...")
+			h.Writer.Println("Calling Elasticsearch api to disable shard allocation...")
 			err = disableShardAllocation()
 			if err != nil {
 				h.Writer.Error(err.Error())
@@ -585,7 +584,7 @@ func getAllIndices(basePath string) ([]byte, error) {
 func fetchOldIndexInfo(basePath string) ([]indexData, error) {
 	allIndexList, err := getAllIndices(basePath)
 	if err != nil {
-		return nil, errors.Wrap(err, "error while getting list of indices.")
+		return nil, status.New(status.ESIndexFetchError, "Please make sure your that the Elasticsearch cluster is healthy before upgrade.")
 	}
 	indexList := strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n")
 	additionalBatch := 0
@@ -602,11 +601,11 @@ func fetchOldIndexInfo(basePath string) ([]indexData, error) {
 		indexCSL := strings.Join(indexList[i*indexBatchSize:upper], ",")
 		versionData, err := execRequest(basePath+indexCSL+"/_settings/index.version.created*?&human", "GET", nil)
 		if err != nil {
-			return nil, errors.Wrap(err, "error while getting indices details.")
+			return nil, status.New(status.ESIndexDetailsFetchError, "Please make sure your that the Elasticsearch cluster is healthy before upgrade.")
 		}
 		data, err := getDataForOldIndices(versionData)
 		if err != nil {
-			return nil, errors.Wrap(err, "error while parsing indices details.")
+			return nil, errors.Wrap(err, "Error while parsing indices details.")
 		}
 		indexDataArr = append(indexDataArr, data...)
 	}
@@ -620,21 +619,20 @@ func doDeleteStaleIndices(timeout int64, h ChecklistHelper) error {
 		return err
 	}
 	for i, index := range indexInfo {
-		h.Writer.Println(fmt.Sprintf("Automate is unable to upgrade because an index with name: %s is created using an older version of elasticsearch %s", index.Name, index.CreatedString))
-		resp, err := h.Writer.Confirm("Do you wish to delete the index to continue?")
+		h.Writer.Println(fmt.Sprintf("Automate is unable to upgrade because an index with name: %s is created using an older version of Elasticsearch %s", index.Name, index.CreatedString))
+		h.Writer.Println("You can either reindex this index or delete it to continue with the upgrade.")
+		resp, err := h.Writer.Confirm("Do you wish to delete the index?")
 		if err != nil {
-			h.Writer.Error(err.Error())
 			return status.Errorf(status.InvalidCommandArgsError, err.Error())
 		}
 		errMsg := formErrorMsg(indexInfo)
 		if !resp {
-			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+			return status.Errorf(status.InvalidCommandArgsError, errMsg.Error())
 		}
 
 		_, err = execRequest(fmt.Sprintf("%s%s?pretty", basePath, index.Name), "DELETE", nil)
 		if err != nil {
-			h.Writer.Error(err.Error())
-			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+			return status.Errorf(status.ESDeleteError, errMsg.Error())
 		}
 		indexInfo[i].IsDeleted = true //mark the deleted indices, so that those wont show in the list to end user
 	}
@@ -657,12 +655,12 @@ func getDataForOldIndices(allIndexData []byte) ([]indexData, error) {
 	var parsed map[string]IndexInfo
 	err := json.Unmarshal(allIndexData, &parsed)
 	if err != nil {
-		return nil, errors.Wrap(err, "error in unmarshalling the index data")
+		return nil, err
 	}
 	for key, data := range parsed {
 		index, err := strconv.ParseInt(data.Settings.Index.Version.CreatedString[0:1], 10, 64)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to parse index version")
+			return nil, err
 		}
 		if index < 6 && key != ".watches" {
 			indexDataArray = append(indexDataArray,
@@ -697,6 +695,10 @@ func storeSearchEngineSettings() Checklist {
 				h.Writer.Warnf("Automate is running on external Elasticsearch, not taking configuration backup")
 				return nil
 			} else {
+				health, err := getClusterHealth()
+				if err != nil || health.Status == "red" {
+					return status.New(status.ESClusterUnhealthy, "Please make sure your that the Elasticsearch cluster is healthy before upgrade.")
+				}
 				esSettings, _ := GetESSettings(h.Writer)
 				esHeapSize, _ := extractNumericFromText(esSettings.HeapMemory, 0)
 				fiftyPercentOfMemory := defaultHeapSizeInGB()
@@ -761,19 +763,19 @@ func deleteA1Indexes(timeout int64) Checklist {
 		Description: "confirmation check to delete A1 indexes",
 		TestFunc: func(h ChecklistHelper) error {
 			indexes := strings.Join(existingIndexes, ",")
-			resp, err := h.Writer.Confirm(fmt.Sprintf("Following Indexes are of Automate 1 and are no longer use in automate, thus we will delete these indices:%s", indexes))
+			resp, err := h.Writer.Confirm(fmt.Sprintf("The following indices are of Automate 1 and are no longer used in Automate, hence we will delete these indices:%s", indexes))
 			if err != nil {
-				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.")
+				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.\nPlease refer https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-delete-index.html to manually delete Automate 1 indices.")
 			}
 			basePath := getESBasePath(timeout)
 			err = batchDeleteIndexFromA1(timeout, existingIndexes, basePath)
 			if err != nil {
 				return err
 			}
+			h.Writer.Println("Automate 1 indices deleted successfully.")
 			return nil
 		},
 	}

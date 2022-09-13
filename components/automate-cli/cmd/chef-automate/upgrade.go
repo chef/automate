@@ -141,14 +141,10 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") &&
 			!strings.Contains(err.Error(), "Unimplemented desc = unknown service chef.automate.domain.deployment.Deployment") {
-			return status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to start upgrade failed",
-			)
+			return err
 		}
 	} else {
-		fmt.Println(validatedResp)
+		fmt.Println(validatedResp.CurrentVersion, validatedResp.TargetVersion)
 		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
 			writer.Println("Chef Automate up-to-date")
 			return nil
@@ -179,11 +175,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			}
 			err = ci.RunChecklist(configCmdFlags.timeout, flags)
 			if err != nil {
-				return status.Wrap(
-					err,
-					status.DeploymentServiceCallError,
-					"Request to start upgrade failed",
-				)
+				return err
 			}
 		}
 	}
@@ -194,11 +186,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		VersionsPath:   upgradeRunCmdFlags.versionsPath,
 	})
 	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to start upgrade failed",
-		)
+		return err
 	}
 	if resp.NextVersion != resp.PreviousVersion {
 		writer.Println("Upgrading Chef Automate")
@@ -247,7 +235,7 @@ func restartDeploymentService() error {
 		for _, s := range res.ServiceStatus.Services {
 			if s.Name == "deployment-service" {
 				if s.State == api.ServiceState_OK {
-					writer.Println("Deployment Service is healty now")
+					writer.Println("Deployment Service is healthy now")
 					return nil
 				}
 				writer.Println("Waiting for Deployment Service to be healthy")

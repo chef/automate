@@ -172,6 +172,24 @@ func getTotalShards() (*IndicesShardTotal, error) {
 	return indicesShardTotal, nil
 }
 
+type ClusterHealth struct {
+	Status string `json:"status"`
+}
+
+func getClusterHealth() (*ClusterHealth, error) {
+	health := &ClusterHealth{}
+	basePath := getSearchEngineBasePath()
+	resp, err := execRequest(basePath+"_cluster/health", "GET", nil)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, health)
+	if err != nil {
+		return nil, err
+	}
+	return health, nil
+}
+
 func getElasticsearchPID() (string, error) {
 	pid, err := ioutil.ReadFile("/hab/svc/automate-elasticsearch/PID") // nosemgrep
 	if err != nil {
@@ -210,22 +228,23 @@ func getAllSearchEngineSettings(writer cli.FormatWriter, searchEnginePid string)
 	esSettings := &ESSettings{}
 	totalShard, err := getTotalShards()
 	if err != nil {
-		writer.Warnf("not able to fetch total shard values, moving to default %s \n", err.Error())
+		writer.Warnf("Not able to fetch total shard values, setting default value %d\n", INDICES_TOTAL_SHARD_DEFAULT)
 		esSettings.TotalShardSettings = INDICES_TOTAL_SHARD_DEFAULT
 	} else {
 		esSettings.TotalShardSettings = totalShard.Indices.Shards.Total
 	}
 	maxShardPerNodeAndIndicesTotalLimit, err := getIndicesBreakerLimit()
 	if err != nil {
-		writer.Warnf("not able to fetch indices breaker total limit, moving to default \n %s \n", err.Error())
+		writer.Warnf("Not able to fetch indices breaker total limit, setting default value %d\n", INDICES_BREAKER_TOTAL_LIMIT_DEFAULT)
 		esSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
 	} else {
 		esSettings.IndicesBreakerTotalLimit = maxShardPerNodeAndIndicesTotalLimit.Defaults.IndicesBreakerTotalLimit
 	}
 	heapMemSettings, err := getHeapMemorySettings()
 	if err != nil {
-		writer.Warnf("not able to fetch heap memory, moving to default \n %s \n", err.Error())
-		esSettings.HeapMemory = fmt.Sprintf("%d", defaultHeapSizeInGB())
+		defaultHeapSize := defaultHeapSizeInGB()
+		writer.Warnf("not able to fetch heap memory, setting default value %d\n", defaultHeapSize)
+		esSettings.HeapMemory = fmt.Sprintf("%d", defaultHeapSize)
 	} else {
 		esSettings.HeapMemory = heapMemSettings
 	}
@@ -245,7 +264,6 @@ func GetESSettings(writer cli.FormatWriter) (*ESSettings, error) {
 	if err != nil {
 		writer.Warnf("No process id found for running elasticsearch, %s \n", err.Error())
 	}
-	writer.Println("Fetching Elasticsearch settings.")
 	esSettings, err := getAllSearchEngineSettings(writer, pid)
 	if err != nil {
 		return esSettings, err
@@ -258,11 +276,13 @@ func storeESSettings(writer cli.FormatWriter, esSettings *ESSettings) error {
 	if err != nil {
 		return errors.Wrap(err, "error in mapping elasticsearch settings to json.")
 	}
-	writer.Println("writing elasticsearch settings in file.")
+	writer.Println(fmt.Sprintf("Elasticsearch settings to be used: \n%s", esSettingsJson))
+	writer.Println(fmt.Sprintf("Writing Elasticsearch settings to %s.", V3ESSettingFile))
 	err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775) // nosemgrep
 	if err != nil {
-		return errors.Wrap(err, "error in elasticsearch settings in file.")
+		return errors.Wrap(err, "Error while writing Elasticsearch settings to file.")
 	}
+	writer.Println(fmt.Sprintf("If you want to modify the above Elasticsearch settings please edit %s before running the post-major-upgrade migrate command\n", V3ESSettingFile))
 	return nil
 }
 

@@ -33,6 +33,7 @@ import (
 	config "github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	lc "github.com/chef/automate/api/interservice/license_control"
+	cli_status "github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
@@ -1931,7 +1932,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 			if isMinorAvailable {
 				nextManifestVersion = compVersion
 			} else if isMajorAvailable {
-				return nil, status.Errorf(codes.FailedPrecondition, "This is a Major upgrade. Please use `--major` flag in the above command")
+				return nil, cli_status.New(cli_status.InvalidCommandArgsError, "This is a Major upgrade. Please use `--major` flag in the above command")
 			}
 		} else { //major upgrade
 			if isMinorAvailable {
@@ -1969,7 +1970,7 @@ func (s *server) IsValidUpgrade(ctx context.Context, req *api.UpgradeRequest) (*
 
 		//check the upgrade is major or not, and if the upgrade is major user should provide --major flag.
 		if isActualMajorUpgrade && !req.IsMajorUpgrade {
-			return nil, status.Errorf(codes.FailedPrecondition, "This is a Major upgrade. Please use `--major` flag in the above command")
+			return nil, cli_status.New(cli_status.InvalidCommandArgsError, "This is a Major upgrade. Please use `--major` flag in the above command")
 		}
 
 	}
