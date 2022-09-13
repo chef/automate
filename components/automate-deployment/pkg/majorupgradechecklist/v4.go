@@ -542,7 +542,7 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 			return nil
 		}
 
-		// h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
+		h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
 	}
 
 	return nil
