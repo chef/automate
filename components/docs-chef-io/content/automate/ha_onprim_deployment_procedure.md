@@ -177,12 +177,19 @@ postgresql_private_ips = []
 -   `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
 
-### How To Add Nodes to the Existing Deploment 
-- Open the `config.toml`, change the `instance_count` 
-For example :
+### How To Add More Nodes to the Onprem Deployment 
+- Open the `config.toml` at bastion node
+- change the `instance_count` value 
+- Add the `Ip address` as the end.
+- Make sure that all the necesssary port and fire wall setting are allign in the new node.
+
+For example : Add new Automate node to the existing cluster.
   | Old Config | => | New Config |
   | :---: | :---: | :---: |
   | [automate.config] | => |[automate.config] |
   | instance_count = "1" | => | instance_count = "2" |
   | [existing_infra.config] | => | [existing_infra.config] |
   | automate_private_ips = ["X.Y.Z.Q"] | => | automate_private_ips = ["X.Y.Z.Q","A.B.C.D"] |
+
+- Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
+- Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well.
