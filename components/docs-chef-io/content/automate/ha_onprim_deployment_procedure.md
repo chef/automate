@@ -125,7 +125,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
-#### Sample config
+### Sample config
 {{< note >}}
 -   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
 {{< /note >}}
@@ -167,7 +167,7 @@ chef_server_private_ips = []
 opensearch_private_ips = []
 postgresql_private_ips = []
 ```
-##### Minimum changes to be made
+### Minimum changes to be made
 -   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
 -   Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
 -   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Eg: `chefautomate.example.com`
@@ -178,12 +178,12 @@ postgresql_private_ips = []
 
 
 ### How To Add More Nodes to the Onprem Deployment 
-- Open the `config.toml` at bastion node
-- change the `instance_count` value 
-- Add the `Ip address` as the end.
+- Open the `config.toml` at bastion node.
+- change the `instance_count` value, as explain in below example.
+- Add the `Ip address` for the respetive node at the end, as expain in the example.
 - Make sure that all the necesssary port and fire wall setting are allign in the new node.
 
-For example : Add new Automate node to the existing cluster.
+For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :---: | :---: | :---: |
   | [automate.config] | => |[automate.config] |
@@ -192,4 +192,33 @@ For example : Add new Automate node to the existing cluster.
   | automate_private_ips = ["X.Y.Z.Q"] | => | automate_private_ips = ["X.Y.Z.Q","A.B.C.D"] |
 
 - Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
+- Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
+
+### How To Remove Any Nodes to the Onprem Deployment 
+- Open the `config.toml` at bastion node.
+- change the `instance_count` value, as explain in below example.
+- Remove the `Ip address` for the respetive node, as explain in the example.
+- Make sure that in case of deleting the node from the backend maintain the minimum count to 3.
+
+
+For example : Remove Automate node to the existing deployed cluster.
+  | Old Config | => | New Config |
+  | :---: | :---: | :---: |
+  | [automate.config] | => |[automate.config] |
+  | instance_count = "3" | => | instance_count = "2" |
+  | [existing_infra.config] | => | [existing_infra.config] |
+  | automate_private_ips = ["X.Y.Z.Q","A.B.C.D","E.F.G.H"] | => | automate_private_ips = ["X.Y.Z.Q","E.F.G.H"] |
+
+- Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well.
+
+
+{{< note >}}
+- In case of any node is down, in that case we first add the new node and do the deployment. 
+- After that we remove the node and change the `instance_count` and redo the depoyment. 
+{{< /note >}}
+### Troubleshooting
+
+```
+Error: Upload failed: scp: /var/automate-ha: Permission denied
+```
