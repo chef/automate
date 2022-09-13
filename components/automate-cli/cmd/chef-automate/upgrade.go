@@ -72,6 +72,27 @@ Otherwise, you may need to run "chef-automate dev start-converge".
 `
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
+	ci, err := majorupgradechecklist.NewChecklistManager(writer, "4")
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to start upgrade failed",
+		)
+	}
+
+	flags := majorupgradechecklist.ChecklistUpgradeFlags{
+		SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
+		OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
+	}
+	err = ci.RunChecklist(configCmdFlags.timeout, flags)
+	if err != nil {
+		return status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to start upgrade failed",
+		)
+	}
 	a1IsRunning, err := isA1Running()
 	if err != nil {
 		return status.Annotate(err, status.FileAccessError)
