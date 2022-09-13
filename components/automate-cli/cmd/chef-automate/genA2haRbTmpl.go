@@ -64,6 +64,16 @@ existing_nodes do
   opensearch_private_ips [{{ range $index, $element := .ExistingInfra.Config.OpensearchPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   postgresql_private_ips [{{ range $index, $element := .ExistingInfra.Config.PostgresqlPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
 end
+
+###################################################################################
+### Only applies when using an existing node architecture with object storage   ###
+###################################################################################
+object_storage do
+  BucketName {{ .ObjectStorage.Config.BucketName }}
+  AccessKey {{ .ObjectStorage.Config.AccessKey }}
+  SecretKey {{ .ObjectStorage.Config.SecretKey }}
+  Endpoint {{ .ObjectStorage.Config.Endpoint }}
+end
 `
 
 const awsA2harbTemplate = `

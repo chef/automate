@@ -109,6 +109,30 @@ func (e *existingInfra) validateConfigFields() *list.List {
 	if len(e.config.ExistingInfra.Config.PostgresqlPrivateIps) < 1 {
 		errorList.PushBack("Invalid or empty postgresql_private_ips")
 	}
+
+	if len(e.config.Architecture.ConfigInitials.BackupConfig) > 0 {
+		if e.config.Architecture.ConfigInitials.BackupConfig == "object_storage" {
+			if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
+				errorList.PushBack("Invalid or empty access_key")
+			}
+			if len(e.config.ObjectStorage.Config.SecretKey) < 1 {
+				errorList.PushBack("Invalid or empty secret_key")
+			}
+			if len(e.config.ObjectStorage.Config.BucketName) < 1 {
+				errorList.PushBack("Invalid or empty bucket_name")
+			}
+			if len(e.config.ObjectStorage.Config.Endpoint) < 1 {
+				errorList.PushBack("Invalid or empty endpoint")
+			}
+		} else if e.config.Architecture.ConfigInitials.BackupConfig == "file_system" {
+			// if len(e.config.ObjectStorage.Config.AccessKey) < 1 {
+			// 	errorList.PushBack("Invalid or empty access_key")
+			// }
+		} else {
+			errorList.PushBack("Invalid or empty backup_config")
+		}
+	}
+
 	errorList.PushBackList(e.validateIPs())
 	return errorList
 }

@@ -26,7 +26,7 @@ type AwsConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
-			SSHPort						string	`toml:"ssh_port"`
+			SSHPort                     string `toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`
@@ -140,7 +140,7 @@ type ExistingInfraConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
-			SSHPort						string	`toml:"ssh_port"`
+			SSHPort                     string `toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`
@@ -151,6 +151,7 @@ type ExistingInfraConfigToml struct {
 			ExistingElkPassword         string `toml:"existing_elk_password"`
 			BackupMount                 string `toml:"backup_mount"`
 			HabitatUIDGid               string `toml:"habitat_uid_gid"`
+			BackupConfig                string `toml:"backup_config"`
 		} `toml:"existing_infra"`
 	} `toml:"architecture"`
 	Automate struct {
@@ -185,6 +186,19 @@ type ExistingInfraConfigToml struct {
 			PostgresqlPrivateIps []string `toml:"postgresql_private_ips"`
 		} `toml:"config"`
 	} `toml:"existing_infra"`
+	ObjectStorage struct {
+		Config struct {
+			BucketName string `toml:"bucket_name"`
+			AccessKey  string `toml:"access_key"`
+			SecretKey  string `toml:"secret_key"`
+			Endpoint   string `toml:"endpoint"`
+		} `toml:"config"`
+	} `toml:"object_storage"`
+	// FileSystem struct {
+	// 	Config struct {
+	// 		BucketName []string `toml:"automate_private_ips"`
+	// 	} `toml:"config"`
+	// } `toml:"file_system"`
 }
 
 func init() {
