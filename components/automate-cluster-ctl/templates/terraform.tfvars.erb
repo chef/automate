@@ -15,11 +15,11 @@ aws_tags    = {
 aws_ssh_key_pair_name = "<%= config.aws.ssh_key_pair_name %>"
 <% end %>
 
-<% if config.backup_config == 'efs' %>
+<% if config.backup_config == 'efs' or config.backup_config == 'file_system' %>
  backup_config_efs = "true"
 <% end %>
 
-<% if config.backup_config == 's3' %>
+<% if config.backup_config == 's3' or config.backup_config == 'object_storage' %>
  backup_config_s3 = "true"
 <% end %>
 
@@ -168,4 +168,13 @@ tag_<%= tag.to_s %> = "<%= config.aws[tag] %>"
 
 <% if config.automate.teams_port %>
 teams_port = <%= config.automate.teams_port.to_i %>
+<% end %>
+
+<% if config.architecture == 'existing_nodes' and config.backup_config == 'object_storage' %>
+# ObjectStorage
+################################################################################
+bucket_name = <%= config.object_storage.bucket_name %>
+access_key = <%= config.object_storage.access_key %>
+secret_key = <%= config.object_storage.secret_key %>
+endpoint = <%= config.object_storage.endpoint %>
 <% end %>
