@@ -233,7 +233,7 @@ func backupCheck() Checklist {
 		Name:        "backup_acceptance",
 		Description: "confirmation check for creating a backup",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Have you taken backup of your data and kept it safe, preferably on another disk or location ?:(y/n)")
+			resp, err := h.Writer.Confirm("Have you taken backup of your data and kept it safe, preferably on another disk or location ?:")
 			if err != nil {
 				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())

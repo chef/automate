@@ -258,7 +258,7 @@ func storeESSettings(writer cli.FormatWriter, esSettings *ESSettings) error {
 	if err != nil {
 		return errors.Wrap(err, "error in mapping elasticsearch settings to json.")
 	}
-	writer.Println("writing elasticsearch settings in file.")
+	writer.Println("Writing elasticsearch settings in file.")
 	err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775) // nosemgrep
 	if err != nil {
 		return errors.Wrap(err, "error in elasticsearch settings in file.")
