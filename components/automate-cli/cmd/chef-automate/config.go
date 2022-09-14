@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -128,6 +129,35 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		then automate cluster ctl deploy will patch the config to automate
 	*/
 	if isA2HARBFileExist() {
+		const fscript = `
+		export timestamp
+		export new_config
+		timestamp=$(date +"%Y%m%d%H%M%S")
+        sudo chef-automate config show %[1]v> config.backup.$timestamp.toml;
+		$new_config=$(cat chef-automate config show);
+		echo $new_config > %[1]vnew_config.toml;
+		scp -o %[1]vStrictHostKeyChecking=no -i %[1]v$SSH_KEY $HAB_PATH $SSH_USER@$i:/tmp/new_config.toml;
+		scp -o %[1]vStrictHostKeyChecking=no -i %[1]v$SSH_KEY $NC_PKG $SSH_USER@$i:/tmp/;
+		ssh -i %[1]v$SSH_KEY $SSH_USER@$i /bin/bash << EOF;
+        sudo su;
+		sudo chef-automate config patch %[1]v$new_config;
+		ERROR=$(sudo chef-automate config patch) || true;
+        if echo "$ERROR" | grep 'Success'; then;
+        echo "Success: Configuration patched";
+        rm -rf /config.backup.$timestamp.tom
+		else sudo chef-automate config patch config.backup.$timestamp.toml
+		fi;
+		`
+
+    script := fmt.Sprintf(fscript, habRoot)
+	command := exec.Command("/bin/sh", "-c", script)
+	err := command.Run()
+	if err != nil {
+		writer.Fail(err.Error())
+		return err
+	}
+	
+
 		if !configCmdFlags.acceptMLSA {
 			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
 			this command will deploy that new airgap bundle with patching of configuration. 
