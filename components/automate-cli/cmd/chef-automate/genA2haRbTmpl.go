@@ -69,10 +69,10 @@ end
 ### Only applies when using an existing node architecture with object storage   ###
 ###################################################################################
 object_storage do
-  BucketName {{ .ObjectStorage.Config.BucketName }}
-  AccessKey {{ .ObjectStorage.Config.AccessKey }}
-  SecretKey {{ .ObjectStorage.Config.SecretKey }}
-  Endpoint {{ .ObjectStorage.Config.Endpoint }}
+  bucket_name "{{ .ObjectStorage.Config.BucketName }}"
+  access_key "{{ .ObjectStorage.Config.AccessKey }}"
+  secret_key "{{ .ObjectStorage.Config.SecretKey }}"
+  endpoint "{{ .ObjectStorage.Config.Endpoint }}"
 end
 `
 

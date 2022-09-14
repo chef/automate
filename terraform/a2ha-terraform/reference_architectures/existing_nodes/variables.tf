@@ -6,6 +6,14 @@ variable "backup_config_efs" {
   default = "false"
 }
 
+variable "access_key" {
+  default = ""
+}
+
+variable "secret_key" {
+  default = ""
+}
+
 variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
 }

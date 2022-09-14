@@ -147,10 +147,10 @@ module "opensearch" {
   ssh_port                     = var.ssh_port
   ssh_user_sudo_password       = local.be_sudo_password
   sudo_cmd                     = var.sudo_cmd
-  depends_on = [module.airgap_bundle-backend,module.habitat-backend]
   backup_config_s3             = var.backup_config_s3
   access_key                   = var.access_key
   secret_key                   = var.secret_key
+  depends_on = [module.airgap_bundle-backend,module.habitat-backend]
 }
 
 module "postgresql" {

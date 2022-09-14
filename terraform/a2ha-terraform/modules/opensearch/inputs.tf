@@ -2,6 +2,10 @@ variable "access_key" {
   default = ""
 }
 
+variable "backup_config_s3" {
+  default = ""
+}
+
 variable "secret_key" {
   default = ""
 }
