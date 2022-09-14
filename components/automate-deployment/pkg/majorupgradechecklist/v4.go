@@ -18,7 +18,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type indexVersion struct {
@@ -207,9 +206,8 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		//checklists = append(checklists, []Checklist{storeSearchEngineSettings(), deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir),
-		//	disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
-		checklists = append(checklists, []Checklist{replaceS3Url()}...)
+		checklists = append(checklists, []Checklist{storeSearchEngineSettings(), deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir),
+			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
 
@@ -505,7 +503,6 @@ func getHabRootPath(habrootcmd string) string {
 }
 
 func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
-	logrus.Infof("started replacing ...........")
 	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
 	if err != nil {
 		h.Writer.Errorln("failed to get backup s3 url configuration: " + err.Error())
@@ -542,7 +539,7 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 			return nil
 		}
 
-		h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
+		//h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
 	}
 
 	return nil
