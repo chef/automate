@@ -266,7 +266,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		var isAvailableSpace bool
 		var err error
 
-		//Disabling  of the maintenance mode when staring for migration
+		//Disabling  of the maintenance mode when starting for migration post-upgrade
 		writer.Println("Disabling the Maintenance mode")
 		out, err := exec.Command("/bin/sh", "-c", "chef-automate maintenance off").Output()
 		if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
