@@ -96,6 +96,7 @@ const (
 	$ ` + disable_maintenance_mode_cmd
 
 	disable_maintenance_mode_cmd = `chef-automate maintenance off`
+	enable_maintenance_mode_cmd  = `chef-automate maintenance on`
 	filename                     = "s3.toml"
 	automatePatchCmd             = "chef-automate config patch %s"
 	habrootcmd                   = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
@@ -110,6 +111,8 @@ This is because automate version 4 now only supports this format due to AWS SDK 
 	msg            = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
 	oldIndexError  = "The index %s is from an older version of elasticsearch version %s.\nPlease reindex in elasticsearch 6. %s\n%s"
 	indexBatchSize = 10
+
+	maintenanceModeMsg = "To Upgrade to version 4.x we will have to put the system in maintenance mode. While the system is in maintenance mode 'ON' no new ingestion of data can happen. \nAt the end of successful upgrade, the maintenance mode will be switched off automatically and at end of un-successful upgrade, you have to set it ‘Off’ manually.\nAre you ready to proceed? "
 )
 
 var sourceList = []string{".automate", ".locky", "saved-searches", ".tasks"}
@@ -121,13 +124,13 @@ var postChecklistV4Embedded = []PostCheckListItem{
 		Cmd:        run_chef_automate_upgrade_status_cmd,
 		Optional:   true,
 		IsExecuted: false,
-	}, {
+	}, /*{
 		Id:         "disable_maintenance_mode",
 		Msg:        disable_maintenance_mode,
 		Cmd:        disable_maintenance_mode_cmd,
 		Optional:   true,
 		IsExecuted: false,
-	}, {
+	},*/{
 		Id:         "migrate_es",
 		Msg:        run_os_data_migrate,
 		Cmd:        run_os_data_migrate_cmd,
@@ -206,8 +209,9 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{storeSearchEngineSettings(), deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir),
-			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
+		/*checklists = append(checklists, []Checklist{storeSearchEngineSettings(), deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir),
+		disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)*/
+		checklists = append(checklists, []Checklist{downTimeCheckV4()}...)
 	}
 	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
 
@@ -301,14 +305,29 @@ func downTimeCheckV4() Checklist {
 		Name:        "down_time_acceptance",
 		Description: "confirmation for downtime",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("You had planned for a downtime, by running the command(chef-automate maintenance on)?:")
+			config, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
 			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				h.Writer.Errorln("failed to get  maintenance mode config " + err.Error())
+				return nil
 			}
-			if !resp {
-				h.Writer.Error(downTimeError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+			maintenanceFlag := config.GetConfig().GetLoadBalancer().GetV1().GetSys().GetService().GetMaintenanceMode().GetValue()
+			if !maintenanceFlag {
+				resp, err := h.Writer.Confirm(maintenanceModeMsg)
+				if err != nil {
+					h.Writer.Error(err.Error())
+					return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				}
+				if !resp {
+					h.Writer.Error(downTimeError)
+					return status.New(status.InvalidCommandArgsError, downTimeError)
+				}
+
+				out, err := exec.Command("/bin/sh", "-c", enable_maintenance_mode_cmd).Output()
+				if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
+					h.Writer.Errorln("error in enabling the maintenance mode")
+					return nil
+				}
+
 			}
 			return nil
 		},

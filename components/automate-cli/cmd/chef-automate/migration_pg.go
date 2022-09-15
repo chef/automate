@@ -265,6 +265,15 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 	} else if strings.ToLower(migrateDataCmdFlags.data) == "es" {
 		var isAvailableSpace bool
 		var err error
+
+		//Disabling  of the maintenance mode when staring for migration
+		writer.Println("Disabling the Maintenance mode")
+		out, err := exec.Command("/bin/sh", "-c", "chef-automate maintenance off").Output()
+		if !strings.Contains(string(out), "Updating deployment configuration") || err != nil {
+			writer.Error("Failed to disable the maintenance mode : " + err.Error() +
+				"/n/n Please disable it manually post migration using chef-automate maintenance off")
+		}
+
 		if migrateDataCmdFlags.check {
 			writer.Title("--check flag is not required for es-migation. \nPlease run the command without --check flag")
 			return nil
