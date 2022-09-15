@@ -75,6 +75,7 @@ variable "sudo_cmd" {
   default = "sudo"
 }
 
+
 variable "tag_contact" {
   default = ""
 }
