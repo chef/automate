@@ -94,17 +94,20 @@ fi
 echo "${backup_config_s3}"
 
 SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
-echo $SERVICE_UP_TIME
-until [ $SERVICE_UP_TIME -gt 0 ]
+
+# Following loop will hold adding credentials in keystore until
+# services are up and ran for 30 seconds and gives enough
+# time to remove temp keystore file 'opensearch.keystore'
+until [ "$SERVICE_UP_TIME" -gt 30 ]
 do
   sleep 5
+  SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
   echo "No services are loaded"
   echo "Sleeping for 5 seconds"
 done
 
 if [ "${backup_config_s3}" == "true" ]; then
-  echo "Arvinth! Here you go..."
-  echo "$OS_ORIGIN_NAME/$OS_PKG_NAME  ${listen_port}"
+  echo "Setting up keystore"
   echo yes | hab svc status
   export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
   echo $OPENSEARCH_PATH_CONF
@@ -113,5 +116,5 @@ if [ "${backup_config_s3}" == "true" ]; then
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
   sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
-  curl -k -X POST "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty" -u admin:admin 
+  curl -k -X POST "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty" -u admin:admin
 fi

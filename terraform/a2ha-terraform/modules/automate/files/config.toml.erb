@@ -149,7 +149,6 @@
   # Elasticsearch nodes
   client = "default"
 
-<% if overrides[:infra] != "existing_infra" -%>
 [global.v1.external.opensearch.backup.s3.settings]
   region = "<%= overrides[:aws_region] %>"
   role_arn = "<%= services[:opensearch][:aws_os_snapshot_role_arn] %>"
@@ -172,7 +171,6 @@
   # max_retries = 3
   # use_throttle_retries = true
   # protocol = "https"
-<% end %>
 
 [global.v1.backups]
   location = "s3"
