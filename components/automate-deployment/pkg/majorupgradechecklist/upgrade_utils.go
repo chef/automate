@@ -117,16 +117,6 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 		if osDestDataDir != "" {
 			destDir = osDestDataDir
 		}
-		if writer != nil {
-			resp, err := writer.Confirm(fmt.Sprintf("Ensure destination directory (%s) is having min. %.2f GB free space ?", destDir, minReqDiskSpace))
-			if err != nil {
-				writer.Error(err.Error())
-				return false, status.Errorf(status.UnknownError, err.Error())
-			}
-			if !resp {
-				return false, status.New(status.UnknownError, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
-			}
-		}
 		diskSpaceErrorType = "upgrade"
 	}
 
