@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -128,6 +129,60 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		then automate cluster ctl deploy will patch the config to automate
 	*/
 	if isA2HARBFileExist() {
+
+		infra, err := getAutomateHAInfraDetails()
+        if err != nil {
+        return err
+        }
+        sshStrings1, err := getIPOfRequestedServers("automate", infra)
+        
+		if err != nil {
+        return err
+	    }
+        sshStrings2, err := getIPOfRequestedServers("chef server", infra)
+
+       if err != nil {
+       return err
+       }
+	   //scp -i <> fileNAmepassedInArgs username@A.B.C.D:/home/<USER-DIR>/config.345r34r.toml
+	   //ssh -o StrictHostKeyChecking=no  -i $SSH_KEY $SSH_USER@$ip
+
+	   var sshKey AutomteHAInfraDetails
+	   sshKeyFile := sshKey.Outputs.SSHKeyFile.Value
+
+	   var sshUser AutomteHAInfraDetails
+	   sshUsername := sshUser.Outputs.SSHUser.Value
+       
+	   var sshPort AutomteHAInfraDetails
+	   sshPortnumber := sshPort.Outputs.SSHUser.Value
+       
+	   var automateIp AutomteHAInfraDetails
+	   automateIps := automateIp.Outputs.AutomatePublicIps.Value
+
+    script := fmt.Sprintf(`
+	ssh -o StrictHostKeyChecking=no  -i %s %s@%s;
+    for ip: automate do;
+	scp -i %s %s@%s:/home/%s/%s
+    sudo chef-automate config patch $new_config;
+    done
+    for ip: chef-server do
+	scp -i %s %s@%s:/home/%s/%s
+    sudo chef-automate config patch $new_config;
+    done
+    rm -rf /config.backup.$timestamp.toml;
+    fi;`,sshKeyFile,sshUsername,automateIps[],sshPortnumber,sshStrings1[0],sshStrings2[1])
+
+    command := exec.Command("/bin/sh", "-c", script)
+
+    err = command.Run()
+
+    if err != nil {
+
+        writer.Fail(err.Error())
+
+        return err
+
+    }
 		if !configCmdFlags.acceptMLSA {
 			response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
 			this command will deploy that new airgap bundle with patching of configuration. 
