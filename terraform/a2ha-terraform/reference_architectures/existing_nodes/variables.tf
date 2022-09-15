@@ -10,6 +10,9 @@ variable "access_key" {
   default = ""
 }
 
+variable "region" {
+}
+
 variable "secret_key" {
   default = ""
 }

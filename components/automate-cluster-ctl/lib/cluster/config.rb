@@ -96,6 +96,7 @@ module AutomateCluster
       default :access_key, ""
       default :secret_key, ""
       default :endpoint, ""
+      default :region, ""
     end
 
     # AWS Related

@@ -3,7 +3,7 @@ variable "automate_private_ips" {
 }
 
 variable "aws_region" {
-  default     = "us-west-2"
+  default     = ""
   description = "The name of the selected AWS region / datacenter."
 }
 

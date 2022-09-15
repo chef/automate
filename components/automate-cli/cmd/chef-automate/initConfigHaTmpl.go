@@ -353,11 +353,17 @@ opensearch_private_ips = []
 postgresql_private_ips = []
 ## === ===
 
+
+## Object storage similar to AWS S3 Bucket
 [object_storage.config]
 bucket_name = ""
 access_key = ""
 secret_key = ""
 endpoint = ""
+
+# [Optional] Mention object_storage region Eg: region = "us-west-1"
+region = ""
+
 `
 
 var UsageTemplate string = `

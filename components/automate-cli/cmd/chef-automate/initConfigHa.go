@@ -192,6 +192,7 @@ type ExistingInfraConfigToml struct {
 			AccessKey  string `toml:"access_key"`
 			SecretKey  string `toml:"secret_key"`
 			Endpoint   string `toml:"endpoint"`
+			Region     string `toml:"region"`
 		} `toml:"config"`
 	} `toml:"object_storage"`
 	// FileSystem struct {

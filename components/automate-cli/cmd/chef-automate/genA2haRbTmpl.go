@@ -76,6 +76,7 @@ object_storage do
   access_key "{{ .ObjectStorage.Config.AccessKey }}"
   secret_key "{{ .ObjectStorage.Config.SecretKey }}"
   endpoint "{{ .ObjectStorage.Config.Endpoint }}"
+  region "{{ .ObjectStorage.Config.Region }}"
 end
 `
 
