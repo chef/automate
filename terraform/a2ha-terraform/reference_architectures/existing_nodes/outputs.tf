@@ -6,8 +6,8 @@ output "ssh_key_file" {
   value = var.ssh_key_file
 }
 
-output "ssh_user_name" {
-  value = var.ssh_user_name
+output "ssh_user" {
+  value = var.ssh_user
 }
 
 output "ssh_port" {
