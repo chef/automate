@@ -263,8 +263,8 @@ X-Project = "Test_Project"
 ```
 ##### Changes to be made
 -   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
--   Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
--   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM’s. (optional for above configuration) Eg: `chefautomate.example.com`
+-   Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
+-   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. (optional for above configuration) Eg: `chefautomate.example.com`
 -   Provide `region` Eg: `us-east-1`, `ap-northeast-1`.
 -   Provide `aws_vpc_id` Eg: `vpc-0a12*****`
 -   Provide `aws_cidr_block_addr` Eg: `10.0.192.0`
