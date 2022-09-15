@@ -75,6 +75,10 @@ variable "hab_sup_http_gateway_auth_token" {
 variable "habitat_info" {
 }
 
+variable "infra" {
+  default = ""
+}
+
 variable "managed_opensearch_certificate" {
   default = ""
 }

@@ -54,6 +54,10 @@ variable "existing_postgresql_private_ips" {
   default = []
 }
 
+variable "infra" {
+  default = "existing_infra"
+}
+
 variable "ssh_key_file" {
 }
 

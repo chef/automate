@@ -35,6 +35,9 @@ locals {
     backup_config_efs                   = var.backup_config_efs,
     s3_endpoint                         = var.s3_endpoint,
     bucket_name                         = var.bucket_name,
+    access_key                        = var.access_key
+    secret_key                        = var.secret_key
+    infra                        = var.infra
   })          
 
   provision = templatefile("${path.module}/templates/provision.sh.tpl", {

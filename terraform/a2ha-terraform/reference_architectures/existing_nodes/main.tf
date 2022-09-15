@@ -220,6 +220,9 @@ module "bootstrap_automate" {
   backup_config_efs                  = var.backup_config_efs
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
+  access_key                   = var.access_key
+  secret_key                   = var.secret_key
+  infra                   = var.secret_key
   depends_on = [module.airgap_bundle-frontend,module.habitat-frontend]
 }
 
@@ -261,6 +264,9 @@ module "automate" {
   backup_config_efs                  = var.backup_config_efs
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
+  access_key                   = var.access_key
+  secret_key                   = var.secret_key
+  infra                   = var.secret_key
   depends_on = [module.bootstrap_automate]
 }
 
@@ -298,5 +304,8 @@ module "chef_server" {
   backup_config_efs                  = var.backup_config_efs
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
+  access_key                   = var.access_key
+  secret_key                   = var.secret_key
+  infra                   = var.infra
   depends_on = [module.bootstrap_automate]
 }

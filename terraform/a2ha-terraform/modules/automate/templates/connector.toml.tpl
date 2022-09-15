@@ -15,6 +15,9 @@
   backup_config_efs = "${backup_config_efs}"
   bucket_name = "${bucket_name}"
   s3_endpoint = "${s3_endpoint}"
+  access_key = "${access_key}"
+  secret_key = "${secret_key}"
+  infra = "${infra}"
 
 [services]
   [services.opensearch]

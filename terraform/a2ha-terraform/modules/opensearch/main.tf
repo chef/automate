@@ -25,6 +25,7 @@ locals {
     backup_config_s3                = var.backup_config_s3
     access_key                      = var.access_key
     secret_key                      = var.secret_key
+    listen_port                     = var.opensearch_listen_port,
   })
 }
 

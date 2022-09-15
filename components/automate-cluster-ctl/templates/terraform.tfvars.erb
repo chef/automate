@@ -15,11 +15,11 @@ aws_tags    = {
 aws_ssh_key_pair_name = "<%= config.aws.ssh_key_pair_name %>"
 <% end %>
 
-<% if config.backup_config == 'efs' or config.backup_config == 'file_system' %>
+<% if config.backup_config == 'efs' %>
  backup_config_efs = "true"
 <% end %>
 
-<% if config.backup_config == 's3' or config.backup_config == 'object_storage' %>
+<% if config.backup_config == 's3' %>
  backup_config_s3 = "true"
 <% end %>
 
@@ -132,6 +132,15 @@ vsphere_linux_template = "<%= config.vsphere.linux_template %>"
 <% end %>
 
 <% if config.architecture == 'existing_nodes' %>
+
+<% if config.backup_config == 'file_system' %>
+ backup_config_efs = "true"
+<% end %>
+
+<% if config.backup_config == 'object_storage' %>
+ backup_config_s3 = "true"
+<% end %>
+
 # Existing nodes
 ################################################################################
 existing_automate_private_ips = <%= config.existing_nodes.automate_private_ips %>
@@ -173,8 +182,8 @@ teams_port = <%= config.automate.teams_port.to_i %>
 <% if config.architecture == 'existing_nodes' and config.backup_config == 'object_storage' %>
 # ObjectStorage
 ################################################################################
-bucket_name = <%= config.object_storage.bucket_name %>
-access_key = <%= config.object_storage.access_key %>
-secret_key = <%= config.object_storage.secret_key %>
-endpoint = <%= config.object_storage.endpoint %>
+bucket_name = "<%= config.object_storage.bucket_name %>"
+access_key = "<%= config.object_storage.access_key %>"
+secret_key = "<%= config.object_storage.secret_key %>"
+endpoint = "<%= config.object_storage.endpoint %>"
 <% end %>

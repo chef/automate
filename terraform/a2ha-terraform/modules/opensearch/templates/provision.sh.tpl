@@ -91,14 +91,27 @@ else
 fi
 
 # 
-if [["$backup_config_s3" == "true"]]; then
+echo "${backup_config_s3}"
+
+SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
+echo $SERVICE_UP_TIME
+until [ $SERVICE_UP_TIME -gt 0 ]
+do
+  sleep 5
+  echo "No services are loaded"
+  echo "Sleeping for 5 seconds"
+done
+
+if [ "${backup_config_s3}" == "true" ]; then
+  echo "Arvinth! Here you go..."
+  echo "$OS_ORIGIN_NAME/$OS_PKG_NAME  ${listen_port}"
   echo yes | hab svc status
   export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
   echo $OPENSEARCH_PATH_CONF
-  echo "$access_key" | hab pkg exec chef/automate-ha-opensearch opensearch-keystore add --stdin --force s3.client.default.access_key
-  echo "$secret_key" | hab pkg exec chef/automate-ha-opensearch opensearch-keystore add --stdin --force s3.client.default.secret_key
-  hab pkg exec chef/automate-ha-opensearch opensearch-keystore list
+  echo "${access_key}" | hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force s3.client.default.access_key
+  echo "${secret_key}" | hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force s3.client.default.secret_key
+  hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
   sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
-  hab pkg exec chef/automate-ha-opensearch opensearch-keystore list
-  curl -k -X POST "https://127.0.0.1:9200/_nodes/reload_secure_settings?pretty" -u admin:admin
+  hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
+  curl -k -X POST "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty" -u admin:admin 
 fi

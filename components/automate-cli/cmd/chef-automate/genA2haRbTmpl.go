@@ -18,6 +18,9 @@ ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
+
+backup_config "{{ .Architecture.ConfigInitials.BackupConfig }}"
+
 backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 {{ if .Architecture.ConfigInitials.HabitatUIDGid }} habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ else }} # habitat_uid_gid "{{ .Architecture.ConfigInitials.HabitatUIDGid }}" {{ end }}
 ###############################################################
