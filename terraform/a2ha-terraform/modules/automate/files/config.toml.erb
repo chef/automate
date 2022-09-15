@@ -149,6 +149,7 @@
   # Elasticsearch nodes
   client = "default"
 
+<% if overrides[:infra] != "existing_infra" -%>
 [global.v1.external.opensearch.backup.s3.settings]
   region = "<%= overrides[:aws_region] %>"
   role_arn = "<%= services[:opensearch][:aws_os_snapshot_role_arn] %>"
