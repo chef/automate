@@ -512,16 +512,6 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 	re := regexp.MustCompile(s3regex)
 
 	if re.MatchString(endpoint) {
-		resp, err := h.Writer.Confirm("Your Backup AWS S3 Endpoint will be changed from \"" + endpoint + "\" to \"https://s3.amazonaws.com\". This is changed due to changes from AWS side.For more details check the the blog url https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/. Do you want to Upgrade?")
-
-		if err != nil {
-			h.Writer.Error(err.Error())
-			return status.Errorf(status.InvalidCommandArgsError, err.Error())
-		}
-
-		if !resp {
-			return nil
-		}
 
 		file, err := ioutil.TempFile("", filename) // nosemgrep
 		if err != nil {
@@ -538,8 +528,6 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 			h.Writer.Errorln("error in running automate patch command")
 			return nil
 		}
-
-		//h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
 	}
 
 	return nil
