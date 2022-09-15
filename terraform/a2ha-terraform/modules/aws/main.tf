@@ -3,22 +3,6 @@ resource "random_id" "random" {
   byte_length = 4
 }
 
-data "aws_ami" "image" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = [var.ami_filter_name]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = [var.ami_filter_virt_type]
-  }
-
-  owners = [var.ami_filter_owner]
-}
-
 data "aws_availability_zones" "available" {
 }
 
@@ -182,7 +166,7 @@ resource "aws_route_table_association" "nat3" {
 }
 
 locals {
-  ami = length(var.aws_ami_id) > 0 ? var.aws_ami_id : data.aws_ami.image.id
+  ami = var.aws_ami_id
 }
 
 resource "aws_instance" "chef_automate_postgresql" {
