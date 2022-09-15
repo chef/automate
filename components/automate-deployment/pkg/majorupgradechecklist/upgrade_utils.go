@@ -90,15 +90,6 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 		return false, status.Errorf(status.UnknownError, err.Error())
 	}
 
-	// If (/hab) dir size is less than 5GB, then throw error
-	// habSpaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, MIN_DIRSIZE_GB)
-	// if err != nil || !habSpaceAvailable {
-	// 	if writer != nil {
-	// 		writer.Errorln(fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space", habRootPath, MIN_DIRSIZE_GB))
-	// 	}
-	// 	return false, status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, MIN_DIRSIZE_GB))
-	// }
-
 	if !isMigration {
 		version, _ = GetMajorVersion(version)
 		switch version {
