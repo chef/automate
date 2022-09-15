@@ -63,7 +63,7 @@ variable "aws_ssh_key_file" {
 variable "aws_ssh_key_pair_name" {
 }
 
-variable  "aws_ssh_port" {
+variable "aws_ssh_port" {
   default = 22
 }
 

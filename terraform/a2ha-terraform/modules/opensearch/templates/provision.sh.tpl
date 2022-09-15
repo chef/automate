@@ -98,6 +98,9 @@ SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
 # Following loop will hold adding credentials in keystore until
 # services are up and ran for 30 seconds and gives enough
 # time to remove temp keystore file 'opensearch.keystore'
+
+# If you get following error, ===> `[: : integer expression expected`
+# try `until [[ "$SERVICE_UP_TIME" -gt 30 ]]` instead of `until [ "$SERVICE_UP_TIME" -gt 30 ]`
 until [ "$SERVICE_UP_TIME" -gt 30 ]
 do
   sleep 5
@@ -106,6 +109,8 @@ do
   echo "Sleeping for 5 seconds"
 done
 
+
+# Adding aws access and secret keys once all services are up
 if [ "${backup_config_s3}" == "true" ]; then
   echo "Setting up keystore"
   echo yes | hab svc status

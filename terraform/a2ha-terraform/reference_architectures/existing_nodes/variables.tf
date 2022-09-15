@@ -1,28 +1,17 @@
-variable "backup_config_s3" {
-  default = "false"
+variable "access_key" {
+  default = ""
 }
 
 variable "backup_config_efs" {
   default = "false"
 }
 
-variable "access_key" {
-  default = ""
-}
-
-variable "region" {
-}
-
-variable "secret_key" {
-  default = ""
-}
-
-variable "s3_endpoint" {
-  default = "https://s3.amazonaws.com"
+variable "backup_config_s3" {
+  default = "false"
 }
 
 variable "bucket_name" {
-  default = "chef-automate-ha"
+  default = ""
 }
 
 variable "existing_automate_ips" {
@@ -61,6 +50,16 @@ variable "infra" {
   default = "existing_infra"
 }
 
+variable "region" {
+}
+
+variable "s3_endpoint" {
+  default = "https://s3.amazonaws.com"
+}
+
+variable "secret_key" {
+  default = ""
+}
 variable "ssh_key_file" {
 }
 
@@ -73,6 +72,7 @@ variable "ssh_user" {
 variable "sudo_cmd" {
   default = "sudo"
 }
+
 
 variable "tag_contact" {
   default = ""

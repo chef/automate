@@ -3,38 +3,38 @@ resource "random_id" "cluster_id" {
 }
 
 locals {
-backend_private_ips = tolist(setunion(var.existing_opensearch_private_ips,var.existing_postgresql_private_ips))
-backend_count = length(local.backend_private_ips)
-frontend_private_ips = tolist(setunion(var.existing_automate_private_ips,var.existing_chef_server_private_ips))
-frontend_count = length(local.frontend_private_ips)
+  backend_private_ips  = tolist(setunion(var.existing_opensearch_private_ips, var.existing_postgresql_private_ips))
+  backend_count        = length(local.backend_private_ips)
+  frontend_private_ips = tolist(setunion(var.existing_automate_private_ips, var.existing_chef_server_private_ips))
+  frontend_count       = length(local.frontend_private_ips)
 }
 
 module "system-tuning-frontend" {
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
+  source                          = "./modules/system"
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
   opensearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = local.frontend_count
-  postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  private_ips                        = local.frontend_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_port                           = var.ssh_port
-  ssh_user_sudo_password             = local.fe_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  instance_count                  = local.frontend_count
+  postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
+  private_ips                     = local.frontend_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
+  ssh_user_sudo_password          = local.fe_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
 module "system-tuning-backend" {
-  source                             = "./modules/system"
-  automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
+  source                          = "./modules/system"
+  automate_archive_disk_fs_path   = var.automate_archive_disk_fs_path
   opensearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = local.backend_count
-  postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  private_ips                        = local.backend_private_ips
-  ssh_key_file                       = var.ssh_key_file
-  ssh_user                           = var.ssh_user
-  ssh_port                           = var.ssh_port
-  ssh_user_sudo_password             = local.be_sudo_password
-  sudo_cmd                           = var.sudo_cmd
+  instance_count                  = local.backend_count
+  postgresql_archive_disk_fs_path = var.postgresql_archive_disk_fs_path
+  private_ips                     = local.backend_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
+  ssh_user_sudo_password          = local.be_sudo_password
+  sudo_cmd                        = var.sudo_cmd
 }
 
 module "airgap_bundle-backend" {
@@ -50,7 +50,7 @@ module "airgap_bundle-backend" {
   ssh_user     = var.ssh_user
   ssh_port     = var.ssh_port
   tmp_path     = var.tmp_path
-  depends_on = [module.system-tuning-backend]
+  depends_on   = [module.system-tuning-backend]
 }
 
 module "airgap_bundle-frontend" {
@@ -122,35 +122,35 @@ module "habitat-frontend" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   habitat_uid_gid                 = var.habitat_uid_gid
-  depends_on = [module.airgap_bundle-frontend]
+  depends_on                      = [module.airgap_bundle-frontend]
 }
 
 module "opensearch" {
-  source                       = "./modules/opensearch"
-  airgap_info                  = module.airgap_bundle-backend.airgap_info
-  backend_aib_dest_file        = var.backend_aib_dest_file
-  backend_aib_local_file       = var.backend_aib_local_file
-  curator_pkg_ident            = var.curator_pkg_ident
-  opensearch_instance_count = var.opensearch_instance_count
-  opensearch_listen_port       = var.opensearch_listen_port
+  source                          = "./modules/opensearch"
+  airgap_info                     = module.airgap_bundle-backend.airgap_info
+  backend_aib_dest_file           = var.backend_aib_dest_file
+  backend_aib_local_file          = var.backend_aib_local_file
+  curator_pkg_ident               = var.curator_pkg_ident
+  opensearch_instance_count       = var.opensearch_instance_count
+  opensearch_listen_port          = var.opensearch_listen_port
   opensearch_pkg_ident            = var.opensearch_pkg_ident
   opensearch_svc_load_args        = var.elasticsearch_svc_load_args
   opensearchsidecar_pkg_ident     = var.elasticsidecar_pkg_ident
   opensearchsidecar_svc_load_args = var.elasticsidecar_svc_load_args
-  habitat_info                 = module.habitat-backend.habitat_info
-  journalbeat_pkg_ident        = var.journalbeat_pkg_ident
-  kibana_pkg_ident             = var.kibana_pkg_ident
-  metricbeat_pkg_ident         = var.metricbeat_pkg_ident
-  private_ips                  = var.existing_opensearch_private_ips
-  ssh_key_file                 = var.ssh_key_file
-  ssh_user                     = var.ssh_user
-  ssh_port                     = var.ssh_port
-  ssh_user_sudo_password       = local.be_sudo_password
-  sudo_cmd                     = var.sudo_cmd
-  backup_config_s3             = var.backup_config_s3
-  access_key                   = var.access_key
-  secret_key                   = var.secret_key
-  depends_on = [module.airgap_bundle-backend,module.habitat-backend]
+  habitat_info                    = module.habitat-backend.habitat_info
+  journalbeat_pkg_ident           = var.journalbeat_pkg_ident
+  kibana_pkg_ident                = var.kibana_pkg_ident
+  metricbeat_pkg_ident            = var.metricbeat_pkg_ident
+  private_ips                     = var.existing_opensearch_private_ips
+  ssh_key_file                    = var.ssh_key_file
+  ssh_user                        = var.ssh_user
+  ssh_port                        = var.ssh_port
+  ssh_user_sudo_password          = local.be_sudo_password
+  sudo_cmd                        = var.sudo_cmd
+  backup_config_s3                = var.backup_config_s3
+  access_key                      = var.access_key
+  secret_key                      = var.secret_key
+  depends_on                      = [module.airgap_bundle-backend, module.habitat-backend]
 }
 
 module "postgresql" {
@@ -159,7 +159,7 @@ module "postgresql" {
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips       = var.existing_opensearch_private_ips
+  opensearch_private_ips          = var.existing_opensearch_private_ips
   habitat_info                    = module.habitat-backend.habitat_info
   journalbeat_pkg_ident           = var.journalbeat_pkg_ident
   metricbeat_pkg_ident            = var.metricbeat_pkg_ident
@@ -183,7 +183,7 @@ module "postgresql" {
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
-  depends_on = [module.airgap_bundle-backend,module.habitat-backend]
+  depends_on                      = [module.airgap_bundle-backend, module.habitat-backend]
 }
 
 module "bootstrap_automate" {
@@ -205,7 +205,7 @@ module "bootstrap_automate" {
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips       = var.existing_opensearch_private_ips
+  opensearch_private_ips          = var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
   postgresql_private_ips          = var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
@@ -216,15 +216,15 @@ module "bootstrap_automate" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
-  backup_config_s3                   = var.backup_config_s3
-  backup_config_efs                  = var.backup_config_efs
-  s3_endpoint                        = var.s3_endpoint
-  bucket_name                        = var.bucket_name
-  access_key                   = var.access_key
-  secret_key                   = var.secret_key
-  aws_region                   = var.region
-  infra                   = var.infra
-  depends_on = [module.airgap_bundle-frontend,module.habitat-frontend]
+  backup_config_s3                = var.backup_config_s3
+  backup_config_efs               = var.backup_config_efs
+  s3_endpoint                     = var.s3_endpoint
+  bucket_name                     = var.bucket_name
+  access_key                      = var.access_key
+  secret_key                      = var.secret_key
+  aws_region                      = var.region
+  infra                           = var.infra
+  depends_on                      = [module.airgap_bundle-frontend, module.habitat-frontend]
 }
 
 module "automate" {
@@ -246,7 +246,7 @@ module "automate" {
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips       = var.existing_opensearch_private_ips
+  opensearch_private_ips          = var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
   postgresql_private_ips          = var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
@@ -261,15 +261,15 @@ module "automate" {
   ssh_user_sudo_password = local.fe_sudo_password
   sudo_cmd               = var.sudo_cmd
   teams_port             = var.teams_port
-  backup_config_s3                   = var.backup_config_s3
-  backup_config_efs                  = var.backup_config_efs
-  s3_endpoint                        = var.s3_endpoint
-  bucket_name                        = var.bucket_name
-  access_key                   = var.access_key
-  secret_key                   = var.secret_key
-  aws_region                   = var.region
-  infra                   = var.infra
-  depends_on = [module.bootstrap_automate]
+  backup_config_s3       = var.backup_config_s3
+  backup_config_efs      = var.backup_config_efs
+  s3_endpoint            = var.s3_endpoint
+  bucket_name            = var.bucket_name
+  access_key             = var.access_key
+  secret_key             = var.secret_key
+  aws_region             = var.region
+  infra                  = var.infra
+  depends_on             = [module.bootstrap_automate]
 }
 
 module "chef_server" {
@@ -281,7 +281,7 @@ module "chef_server" {
   automate_config                 = file(var.automate_config_file)
   automate_dc_token               = var.automate_dc_token
   automate_fqdn                   = var.automate_fqdn
-  automate_instance_count         = length(setsubtract(var.existing_chef_server_private_ips,var.existing_automate_private_ips))
+  automate_instance_count         = length(setsubtract(var.existing_chef_server_private_ips, var.existing_automate_private_ips))
   automate_role                   = "chef_api"
   cluster_id                      = random_id.cluster_id.hex
   backend_aib_dest_file           = var.backend_aib_dest_file
@@ -291,7 +291,7 @@ module "chef_server" {
   habitat_info                    = module.habitat-frontend.habitat_info
   hab_sup_http_gateway_auth_token = var.hab_sup_http_gateway_auth_token
   opensearch_listen_port          = var.opensearch_listen_port
-  opensearch_private_ips       = var.existing_opensearch_private_ips
+  opensearch_private_ips          = var.existing_opensearch_private_ips
   proxy_listen_port               = var.proxy_listen_port
   postgresql_private_ips          = var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
@@ -302,13 +302,13 @@ module "chef_server" {
   ssh_user_sudo_password          = local.fe_sudo_password
   sudo_cmd                        = var.sudo_cmd
   teams_port                      = var.teams_port
-  backup_config_s3                   = var.backup_config_s3
-  backup_config_efs                  = var.backup_config_efs
-  s3_endpoint                        = var.s3_endpoint
-  bucket_name                        = var.bucket_name
-  access_key                   = var.access_key
-  secret_key                   = var.secret_key
-  aws_region                   = var.region
-  infra                   = var.infra
-  depends_on = [module.bootstrap_automate]
+  backup_config_s3                = var.backup_config_s3
+  backup_config_efs               = var.backup_config_efs
+  s3_endpoint                     = var.s3_endpoint
+  bucket_name                     = var.bucket_name
+  access_key                      = var.access_key
+  secret_key                      = var.secret_key
+  aws_region                      = var.region
+  infra                           = var.infra
+  depends_on                      = [module.bootstrap_automate]
 }

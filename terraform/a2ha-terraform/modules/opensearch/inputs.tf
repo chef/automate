@@ -2,14 +2,6 @@ variable "access_key" {
   default = ""
 }
 
-variable "backup_config_s3" {
-  default = ""
-}
-
-variable "secret_key" {
-  default = ""
-}
-
 variable "airgap_info" {
 }
 
@@ -21,6 +13,10 @@ variable "backend_aib_local_file" {
 
 variable "backup_config_efs" {
   default = "false"
+}
+
+variable "backup_config_s3" {
+  default = ""
 }
 
 variable "curator_pkg_ident" {
@@ -69,6 +65,10 @@ variable "private_ips" {
 
 variable "public_ips" {
   default = []
+}
+
+variable "secret_key" {
+  default = ""
 }
 
 variable "ssh_key_file" {

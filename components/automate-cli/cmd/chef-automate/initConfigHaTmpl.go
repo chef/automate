@@ -361,7 +361,8 @@ access_key = ""
 secret_key = ""
 endpoint = ""
 
-# [Optional] Mention object_storage region Eg: region = "us-west-1"
+# [Optional] Mention object_storage region 
+# Eg: region = "us-west-1"
 region = ""
 
 `
