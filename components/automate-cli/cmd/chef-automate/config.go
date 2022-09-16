@@ -152,26 +152,25 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 
 	   var sshUser AutomteHAInfraDetails
 	   sshUsername := sshUser.Outputs.SSHUser.Value
-       
-	   var sshPort AutomteHAInfraDetails
-	   sshPortnumber := sshPort.Outputs.SSHUser.Value
-       
+
 	   var automateIp AutomteHAInfraDetails
-	   automateIps := automateIp.Outputs.AutomatePublicIps.Value
+	   automateIps := automateIp.Outputs.AutomatePrivateIps.Value
+
+	   var chefserverIp AutomteHAInfraDetails
+	   chefserverIps := chefserverIp.Outputs.ChefServerPrivateIps
 
     script := fmt.Sprintf(`
-	ssh -o StrictHostKeyChecking=no  -i %s %s@%s;
+	ssh -o StrictHostKeyChecking=no  -i %[1]s %[2]s@%[3]s;
     for ip: automate do;
-	scp -i %s %s@%s:/home/%s/%s
-    sudo chef-automate config patch $new_config;
+	scp -i %[1]s %[4]s %[2]s @%[3]s/etc;
+    sudo chef-automate config patch %[4]s;
     done
     for ip: chef-server do
-	scp -i %s %s@%s:/home/%s/%s
-    sudo chef-automate config patch $new_config;
+	scp -i %[1]s %[4]s %[2]s @%[5]s/etc;
+    sudo chef-automate config patch %[4]s;
     done
-    rm -rf /config.backup.$timestamp.toml;
-    fi;`,sshKeyFile,sshUsername,automateIps[],sshPortnumber,sshStrings1[0],sshStrings2[1])
-
+    rm -rf /config.backup.$timestamp.toml;`,sshKeyFile,sshUsername,automateIps,args[0],chefserverIps)
+ 
     command := exec.Command("/bin/sh", "-c", script)
 
     err = command.Run()
