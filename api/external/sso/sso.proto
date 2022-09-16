@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package chef.automate.api.sso;
+option go_package = "github.com/chef/automate/api/external/sso";
+
+import "google/api/annotations.proto";
+import "external/annotations/iam/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+
+service SsoConfigService {
+    rpc GetSsoConfig (GetSsoConfigRequest) returns (GetSsoConfigResponse) {
+		option (google.api.http) = {
+			get: "/api/sso"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "sso:config"
+			action: "sso:config:getConfig"
+		};
+	};
+}
+
+message GetSsoConfigRequest {}
+
+message GetSsoConfigResponse {
+    string ca_contents = 1;
+    string sso_url = 2;
+    string email_attr = 3;
+    string username_attr = 4;
+    string groups_attr = 5;
+    repeated string allowed_groups = 6;
+    string entity_issuer = 7;
+    string name_id_policy_format = 8;
+}
+  
