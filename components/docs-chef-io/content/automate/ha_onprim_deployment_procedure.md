@@ -186,39 +186,52 @@ postgresql_private_ips = []
 For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :---: | :---: | :---: |
-  | [automate.config] | => |[automate.config] |
-  | instance_count = "1" | => | instance_count = "2" |
-  | [existing_infra.config] | => | [existing_infra.config] |
-  | automate_private_ips = ["X.Y.Z.Q"] | => | automate_private_ips = ["X.Y.Z.Q","A.B.C.D"] |
+  | [automate.config] <br> instance_count = "1" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D"] | => | [automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","P.Q.R.S"] |
 
 - Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
 
-### How To Remove Any Nodes to the Onprem Deployment 
+### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment). 
 - Open the `config.toml` at bastion node.
 - change the `instance_count` value, as explain in below example.
 - Remove the `Ip address` for the respetive node, as explain in the example.
 - Make sure that in case of deleting the node from the backend maintain the minimum count to 3.
 
-
 For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :---: | :---: | :---: |
-  | [automate.config] | => |[automate.config] |
-  | instance_count = "3" | => | instance_count = "2" |
-  | [existing_infra.config] | => | [existing_infra.config] |
-  | automate_private_ips = ["X.Y.Z.Q","A.B.C.D","E.F.G.H"] | => | automate_private_ips = ["X.Y.Z.Q","E.F.G.H"] |
-
+  | [automate.config] <br> instance_count = "3" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","E.F.G.H","X.Y.Z.Q"] |  |[automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","X.Y.Z.Q"] |
+  
 - Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
-- Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well.
+- Above process can be done for `chef-server` and `automate`.
 
-
-{{< note >}}
-- In case of any node is down, in that case we first add the new node and do the deployment. 
-- After that we remove the node and change the `instance_count` and redo the depoyment. 
-{{< /note >}}
+### How to Replace Node in Automate HA Cluster
+- Open the `config.toml` at bastion node.
+- Remove the `Ip Address` of unhealth node as explain in below example.
+- Add the new `Ip address` value, as explain in below example.
+- Make sure that all the necesssary port and fire wall setting are allign in the new node.
+For example : Remove node to the existing deployed Postgres cluster.
+change the node `E.F.G.H` -> `P.Q.R.S` 
+  | Old Config | => | New Config |
+  | :---: | :---: | :---: |
+  | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","E.F.G.H","W.X.Y.Z"] |  | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","P.Q.R.S","W.X.Y.Z"] |
+  
+- Run the below command from the bastion node.
+```
+cd /hab/a2_deploy_workspace/terraform
+for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
+cd -
+``` 
+ - Run the `deploy` command to update the new node into the cluster `chef-automate deploy config.toml --airgap-bundle latest.aib`
 ### Troubleshooting
-
+- while adding new node into the cluster if we get an below error
 ```
 Error: Upload failed: scp: /var/automate-ha: Permission denied
 ```
+Resolution : Execute the below command. 
+```
+cd /hab/a2_deploy_workspace/terraform
+for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
+cd -
+``` 
+Once the module's tainted, run the `deploy` command again `chef-automate deploy config.toml --airgap-bundle latest.aib`
