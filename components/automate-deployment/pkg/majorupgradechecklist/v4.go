@@ -112,7 +112,7 @@ This is because automate version 4 now only supports this format due to AWS SDK 
 	oldIndexError  = "The index %s is from an older version of elasticsearch version %s.\nPlease reindex in elasticsearch 6. %s\n%s"
 	indexBatchSize = 10
 
-	maintenanceModeMsg = "To Upgrade to version 4.x we will have to put the system in maintenance mode. While the system is in maintenance mode 'ON' no new ingestion of data can happen. \nAt the end of successful upgrade, the maintenance mode will be switched off automatically and at end of un-successful upgrade, you have to set it ‘Off’ manually.\nAre you ready to proceed? "
+	maintenanceModeMsg = "This upgrade put the system in maintenance mode. During that period no new ingestion of data can happen. \n The maintenance mode will be switched off automatically at the end of a successful upgrade. But in case of an unsuccessful upgrade, you have to set it ‘Off’ manually.\nAre you ready to proceed?"
 )
 
 var sourceList = []string{".automate", ".locky", "saved-searches", ".tasks"}
@@ -124,13 +124,7 @@ var postChecklistV4Embedded = []PostCheckListItem{
 		Cmd:        run_chef_automate_upgrade_status_cmd,
 		Optional:   true,
 		IsExecuted: false,
-	}, /*{
-		Id:         "disable_maintenance_mode",
-		Msg:        disable_maintenance_mode,
-		Cmd:        disable_maintenance_mode_cmd,
-		Optional:   true,
-		IsExecuted: false,
-	},*/{
+	}, {
 		Id:         "migrate_es",
 		Msg:        run_os_data_migrate,
 		Cmd:        run_os_data_migrate_cmd,

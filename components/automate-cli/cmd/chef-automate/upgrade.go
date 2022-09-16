@@ -251,7 +251,7 @@ func restartDeploymentService() error {
 		for _, s := range res.ServiceStatus.Services {
 			if s.Name == "deployment-service" {
 				if s.State == api.ServiceState_OK {
-					writer.Println("Deployment Service is healty now")
+					writer.Println("Deployment Service is healthy now")
 					return nil
 				}
 				writer.Println("Waiting for Deployment Service to be healthy")
@@ -351,7 +351,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(
 			err,
 			status.DeploymentServiceCallError,
-			fmt.Sprintf("Request to get upgrade status failed"),
+			"Request to get upgrade status failed",
 		)
 	}
 
