@@ -151,11 +151,11 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	scp -i %[1]s %[4]s %[2]s @%[3]s/etc;
     sudo chef-automate config patch %[4]s;
     done
+	ssh -o StrictHostKeyChecking=no  -i %[1]s %[2]s@%[5]s;
     for ip: chef-server do
 	scp -i %[1]s %[4]s %[2]s @%[5]s/etc;
     sudo chef-automate config patch %[4]s;
-    done
-    rm -rf /config.backup.$timestamp.toml;`,sshKeyFile,sshUsername,automateIps,args[0],chefserverIps)
+    done`,sshKeyFile,sshUsername,automateIps,args[0],chefserverIps)
  
     command := exec.Command("/bin/sh", "-c", script)
 
