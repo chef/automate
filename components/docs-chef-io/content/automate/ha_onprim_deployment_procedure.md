@@ -185,7 +185,7 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 
 For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
-  | :---: | :---: | :---: |
+  | :--- | :---: | :--- |
   | [automate.config] <br> instance_count = "1" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D"] | => | [automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","P.Q.R.S"] |
 
 - Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
@@ -198,7 +198,7 @@ For example : Add new Automate node to the existing deployed cluster.
 
 For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
-  | :---: | :---: | :---: |
+  | :--- | :---: | :--- |
   | [automate.config] <br> instance_count = "3" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","E.F.G.H","X.Y.Z.Q"] |  |[automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","X.Y.Z.Q"] |
   
 - Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
@@ -214,7 +214,7 @@ For example : Remove Automate node to the existing deployed cluster.
  In the example we are replacing the node `E.F.G.H` with `P.Q.R.S`.
 
   | Old Config | => | New Config |
-  | :---: | :---: | :---: |
+  | :--- | :---: | :--- |
   | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","E.F.G.H","W.X.Y.Z"] |  | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","P.Q.R.S","W.X.Y.Z"] |
   
 - Run the below command from the bastion node.
@@ -229,13 +229,13 @@ For example : Remove Automate node to the existing deployed cluster.
 
 ### Troubleshooting
 - while adding new node into the cluster if we get an below error
-```
-Error: Upload failed: scp: /var/automate-ha: Permission denied
-```
-Resolution : Execute the below command. 
-```
-cd /hab/a2_deploy_workspace/terraform
-for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
-cd -
-``` 
+  ```
+  Error: Upload failed: scp: /var/automate-ha: Permission denied
+  ```
+Resolution : Execute the below command.
+  ```
+  cd /hab/a2_deploy_workspace/terraform
+  for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
+  cd -
+   ``` 
 Once the module's tainted, run the `deploy` command again `chef-automate deploy config.toml --airgap-bundle latest.aib`
