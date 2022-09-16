@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -64,6 +65,8 @@ var upgradeStatusCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(0),
 }
 
+const disableMaintenanceModeCmd = `chef-automate maintenance off`
+const disableMaintenanceModeMsg = `Please disable the maintenance mode to allow ingestion by using ` + disableMaintenanceModeCmd
 const a1RunningMsg = "You have a running Chef Automate v1 installation. Did you mean to type `chef-automate upgrade-from-v1` (alias for: `chef-automate migrate-from-v1`)?"
 const convergeDisabledWarning = `Converge is disabled. This will prevent Automate from upgrading.
 
@@ -179,6 +182,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			}
 			err = ci.RunChecklist(configCmdFlags.timeout, flags)
 			if err != nil {
+				exec.Command("/bin/sh", "-c", disableMaintenanceModeCmd).Output()
 				return status.Wrap(
 					err,
 					status.DeploymentServiceCallError,
@@ -247,7 +251,7 @@ func restartDeploymentService() error {
 		for _, s := range res.ServiceStatus.Services {
 			if s.Name == "deployment-service" {
 				if s.State == api.ServiceState_OK {
-					writer.Println("Deployment Service is healty now")
+					writer.Println("Deployment Service is healthy now")
 					return nil
 				}
 				writer.Println("Waiting for Deployment Service to be healthy")
@@ -343,6 +347,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		VersionsPath: upgradeStatusCmdFlags.versionsPath,
 	})
 	if err != nil {
+		writer.Warn(disableMaintenanceModeMsg)
 		return status.Wrap(
 			err,
 			status.DeploymentServiceCallError,
@@ -428,7 +433,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(
 			err,
 			status.DeploymentServiceCallError,
-			"Upgrade state could not be determined!",
+			fmt.Sprintf("Upgrade state could not be determined! /n/n %s", disableMaintenanceModeMsg),
 		)
 	}
 
