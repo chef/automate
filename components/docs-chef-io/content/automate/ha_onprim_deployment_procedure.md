@@ -127,7 +127,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 ### Sample config
 {{< note >}}
--   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+-   Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
 {{< /note >}}
 ```config
 # This is a Chef Automate AWS HA mode configuration file. You can run
@@ -149,10 +149,10 @@ backup_mount = "/mnt/automate_backups"
 [automate.config]
 # Automate Load Balancer FQDN eg.: "chefautomate.example.com"
 fqdn = ""
-instance_count = "1"
+instance_count = "2"
 config_file = "configs/automate.toml"
 [chef_server.config]
-instance_count = "1"
+instance_count = "2"
 [opensearch.config]
 instance_count = "3"
 [postgresql.config]
@@ -162,10 +162,10 @@ instance_count = "3"
 # provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
 # No of ip address should be same as No of instance_count count mentioned above in
 # automate.config, chef_server.config, opensearch.config and postgresql.config
-automate_private_ips = []
-chef_server_private_ips = []
-opensearch_private_ips = []
-postgresql_private_ips = []
+automate_private_ips = ["A.B.C.D","D.E.F.G"]
+chef_server_private_ips = ["I.J.K.L","M.N.O.P"]
+opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
+postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 ```
 ### Minimum changes to be made
 -   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
@@ -195,7 +195,6 @@ For example : Add new Automate node to the existing deployed cluster.
 - Open the `config.toml` at bastion node.
 - change the `instance_count` value, as explain in below example.
 - Remove the `Ip address` for the respetive node, as explain in the example.
-- Make sure that in case of deleting the node from the backend maintain the minimum count to 3.
 
 For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
@@ -210,19 +209,24 @@ For example : Remove Automate node to the existing deployed cluster.
 - Remove the `Ip Address` of unhealth node as explain in below example.
 - Add the new `Ip address` value, as explain in below example.
 - Make sure that all the necesssary port and fire wall setting are allign in the new node.
-For example : Remove node to the existing deployed Postgres cluster.
-change the node `E.F.G.H` -> `P.Q.R.S` 
+
+ For example : Remove node to the existing deployed Postgres cluster.
+ In the example we are replacing the node `E.F.G.H` with `P.Q.R.S`.
+
   | Old Config | => | New Config |
   | :---: | :---: | :---: |
   | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","E.F.G.H","W.X.Y.Z"] |  | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","P.Q.R.S","W.X.Y.Z"] |
   
 - Run the below command from the bastion node.
-```
-cd /hab/a2_deploy_workspace/terraform
-for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
-cd -
-``` 
- - Run the `deploy` command to update the new node into the cluster `chef-automate deploy config.toml --airgap-bundle latest.aib`
+
+  ```
+  cd /hab/a2_deploy_workspace/terraform
+  for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
+  cd -
+  ``` 
+
+- Run the `deploy` command to Add new node into the cluster `chef-automate deploy config.toml --airgap-bundle latest.aib`
+
 ### Troubleshooting
 - while adding new node into the cluster if we get an below error
 ```
