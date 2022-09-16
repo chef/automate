@@ -130,20 +130,6 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	*/
 	if isA2HARBFileExist() {
 
-		infra, err := getAutomateHAInfraDetails()
-        if err != nil {
-        return err
-        }
-        sshStrings1, err := getIPOfRequestedServers("automate", infra)
-        
-		if err != nil {
-        return err
-	    }
-        sshStrings2, err := getIPOfRequestedServers("chef server", infra)
-
-       if err != nil {
-       return err
-       }
 	   //scp -i <> fileNAmepassedInArgs username@A.B.C.D:/home/<USER-DIR>/config.345r34r.toml
 	   //ssh -o StrictHostKeyChecking=no  -i $SSH_KEY $SSH_USER@$ip
 
