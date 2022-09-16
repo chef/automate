@@ -237,7 +237,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 		if !isExecuted {
 			if !migrateDataCmdFlags.check && !migrateDataCmdFlags.autoAccept {
 				err := promptCheckList(
-					"It will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
+					"Do you want to start the migration process?",
 				)
 				if err != nil {
 					return err
@@ -309,7 +309,7 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			if !isExecuted {
 				if !migrateDataCmdFlags.autoAccept {
 					err := promptCheckList(
-						"It will start the migration immediately after check.\nPress y to agree, n to disagree? [y/n]",
+						"Do you want to start the migration ?",
 					)
 					if err != nil {
 						return err
@@ -434,7 +434,7 @@ func esMigrateExecutor(ci *majorupgradechecklist.PostChecklistManager) error {
 func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot string) error {
 	writer.Title(
 		"----------------------------------------------\n" +
-			"migration from es to os \n" +
+			"Migration from Elasticsearch to OpenSearch \n" +
 			"----------------------------------------------",
 	)
 	writer.Title("Checking for es_upgrade")
@@ -461,7 +461,7 @@ func executeMigrate(ci *majorupgradechecklist.PostChecklistManager, habRoot stri
 	if err != nil {
 		writer.Fail("UpdatePostChecklistFile : " + err.Error())
 	}
-	writer.Title("Done with Migration \n Please wait for some time to reindex the data")
+	writer.Title("Done with Migration \n Please wait for sometime to reindex the data")
 	return nil
 }
 
@@ -575,9 +575,8 @@ func cleanUpes() error {
 
 	if !migrateDataCmdFlags.autoAccept {
 		err := promptCheckList(
-			"Are you sure do you want to delete old elastic-search-data\n" +
-				"This will delete all the data (elasticsearch) and will not be able to recover it.\n" +
-				"Press y to agree, n to disagree? [y/n]")
+			"This will delete all the data (Elasticsearch) and you will not be able to recover it.\n" +
+				"Do you want to continue?")
 		if err != nil {
 			return err
 		}
@@ -610,11 +609,7 @@ func cleanUpes() error {
 }
 
 func chefAutomateStop() error {
-	writer.Title(
-		"----------------------------------------------\n" +
-			"Chef-automate stop \n" +
-			"----------------------------------------------",
-	)
+
 	args := []string{
 		"stop",
 	}
@@ -624,9 +619,9 @@ func chefAutomateStop() error {
 	if err != nil {
 
 		if err.Error() == "exit status 99" { // exit status 99 means already stopped
-			writer.Warn("chef-automate already stopped")
+			writer.Warn("Chef Automate is not running")
 		} else {
-			writer.Fail("chef-automate stop failed")
+			writer.Fail("Failed to stop Chef Automate")
 			return err
 		}
 
@@ -670,11 +665,6 @@ func removeAndReplacePgdata13() error {
 }
 
 func chefAutomateStart() error {
-	writer.Title(
-		"----------------------------------------------\n" +
-			"Chef-automate start \n" +
-			"----------------------------------------------",
-	)
 
 	args := []string{
 		"start",
@@ -745,8 +735,6 @@ func checkUpdateMigration(check bool) error {
 		)
 
 		os.Unsetenv("PGHOST")
-
-		writer.Title("Checking for pg_upgrade")
 
 		args := []string{
 			"--old-datadir=" + OLD_PG_DATA_DIR,
@@ -884,12 +872,12 @@ func dirExists(path string) (bool, error) {
 
 // prompt checklist
 func promptCheckList(message string) error {
-	response, err := writer.Prompt(message)
+	response, err := writer.Confirm(message)
 	if err != nil {
 		return err
 	}
-	if !strings.Contains(strings.ToUpper(response), "Y") {
-		return errors.New("cancelled")
+	if !response {
+		return status.New(status.UserCancelledMigration, "Its necessary to run this command to migrate your data.")
 	}
 	return nil
 }

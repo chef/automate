@@ -276,13 +276,10 @@ func storeESSettings(writer cli.FormatWriter, esSettings *ESSettings) error {
 	if err != nil {
 		return errors.Wrap(err, "error in mapping elasticsearch settings to json.")
 	}
-	writer.Println(fmt.Sprintf("Elasticsearch settings to be used: \n%s", esSettingsJson))
-	writer.Println(fmt.Sprintf("Writing Elasticsearch settings to %s.", V3ESSettingFile))
 	err = ioutil.WriteFile(V3ESSettingFile, esSettingsJson, 775) // nosemgrep
 	if err != nil {
 		return errors.Wrap(err, "Error while writing Elasticsearch settings to file.")
 	}
-	writer.Println(fmt.Sprintf("If you want to modify the above Elasticsearch settings please edit %s before running the post-major-upgrade migrate command\n", V3ESSettingFile))
 	return nil
 }
 
@@ -303,9 +300,9 @@ func PatchBestOpenSearchSettings(writer cli.FormatWriter, isEmbedded bool) error
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("Writing into file %s failed\n", AutomateOpensearchConfigPatch))
 		}
-		writer.Println("below config will pached to automate opensearch")
+		writer.Println("Below config will be patched to Automate OpenSearch.")
 		writer.Println(finalTemplate)
-		writer.Printf(fmt.Sprintf("patch config written %s to \n", AutomateOpensearchConfigPatch))
+		writer.Printf(fmt.Sprintf("Patch config written to %s\n", AutomateOpensearchConfigPatch))
 		defer func() {
 			err := os.Remove(AutomateOpensearchConfigPatch)
 			if err != nil {

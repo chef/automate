@@ -62,22 +62,21 @@ type indexData struct {
 }
 
 const (
-	initMsgV4 = `This is a Major upgrade. 
-========================
+	initMsgV4 = `========================
 
   1) In this release Elasticsearch is migrated to OpenSearch
   2) This upgrade will require special care. 
 
 ===== Your installation is using %s Elasticsearch =====
 
-  Please confirm that you have taken care of the check list below before continuing with the upgrade to version %s:
+  Please take care of the checklist below before continuing with the upgrade:
 `
 
-	externalESUpgradeMsg = "You are ready with your external OpenSearch with migrated data from Elasticsearch, this should be done with the help of your Administrator"
+	externalESUpgradeMsg = "Have you installed external OpenSearch and migrated the Elasticsearch data?"
 
-	externalESUpgradeError = "As you are using external Elasticsearch, migrations of data to OpenSearch is required before the upgrade"
+	externalESUpgradeError = "As you are using external Elasticsearch, migration of data to OpenSearch is required before the upgrade."
 
-	shardingError = "sharding has to be disabled before upgrade"
+	shardingError = "Sharding has to be disabled before upgrade."
 
 	s3UrlError = "Upgrade terminated as automate version 4 will only support https://s3.amazonaws.com pattern"
 
@@ -106,9 +105,10 @@ const (
 	urlChangeMessage = `Your S3 url in backup config is changed from %s to https://s3.amazonaws.com. 
 This is because automate version 4 now only supports this format due to AWS SDK upgrade.
 `
-	msg            = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
-	oldIndexError  = "The index %s is from an older version of Elasticsearch version %s.\nPlease reindex in Elasticsearch 6. %s\n%s"
-	indexBatchSize = 10
+	msg                            = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
+	oldIndexError                  = "The index %s is from an older version of Elasticsearch version %s.\nPlease reindex in Elasticsearch 6. %s\n%s"
+	v4_post_checklist_confirmation = `**** In case of any errors, please refer to https://docs.chef.io/automate/major_upgrade_4.x/#troubleshooting and release notes for this version. ****`
+	indexBatchSize                 = 10
 )
 
 var sourceList = []string{".automate", ".locky", "saved-searches", ".tasks"}
@@ -118,12 +118,6 @@ var postChecklistV4Embedded = []PostCheckListItem{
 		Id:         "upgrade_status",
 		Msg:        run_chef_automate_upgrade_status,
 		Cmd:        run_chef_automate_upgrade_status_cmd,
-		Optional:   true,
-		IsExecuted: false,
-	}, {
-		Id:         "disable_maintenance_mode",
-		Msg:        disable_maintenance_mode,
-		Cmd:        disable_maintenance_mode_cmd,
 		Optional:   true,
 		IsExecuted: false,
 	}, {
@@ -200,21 +194,20 @@ func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgrade
 	if ci.isExternalES {
 		dbType = "External"
 		postcheck = postChecklistV4External
-		checklists = append(checklists, []Checklist{downTimeCheckV4(), backupCheck(), replaceS3Url(), externalESUpgradeCheck(),
-			postChecklistIntimationCheckV4(!ci.isExternalES)}...)
+		checklists = append(checklists, []Checklist{downTimeCheckV4(), backupCheck(), replaceS3Url(), externalESUpgradeCheck()}...)
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
 		checklists = append(checklists, []Checklist{storeSearchEngineSettings(), deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), replaceS3Url(), diskSpaceCheck(ci.version, flags.SkipStorageCheck, flags.OsDestDataDir),
-			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
+			disableSharding()}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
+	checklists = append(checklists, showPostChecklist(&postcheck), postChecklistIntimationCheckV4(!ci.isExternalES))
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
 	}
 
-	ci.writer.Println(fmt.Sprintf(initMsgV4, dbType, ci.version)) //display the init message
+	ci.writer.Println(fmt.Sprintf(initMsgV4, dbType)) //display the init message
 	for _, item := range checklists {
 		if item.TestFunc == nil {
 			continue
@@ -231,26 +224,20 @@ func postChecklistIntimationCheckV4(isEmbedded bool) Checklist {
 		Name:        "post_checklist_intimation_acceptance",
 		Description: "confirmation check for post checklist intimation",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use")
+			resp, err := h.Writer.Confirm("After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use. Do you wish to continue upgrade?")
 			if err != nil {
-				h.Writer.Error(err.Error())
-
 				shardError := enableSharding(h, isEmbedded)
 				if shardError != nil {
 					h.Writer.Error(shardError.Error())
 				}
-
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(postChecklistIntimationError)
-
 				shardError := enableSharding(h, isEmbedded)
 				if shardError != nil {
 					h.Writer.Error(shardError.Error())
 				}
-
-				return status.New(status.InvalidCommandArgsError, postChecklistIntimationError)
+				return status.New(status.UserCancelledUpgrade, postChecklistIntimationError)
 			}
 			return nil
 		},
@@ -262,15 +249,12 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 		Name:        "post_checklist",
 		Description: "display post checklist and ask for final confirmation",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm(v3_post_checklist_confirmation)
+			resp, err := h.Writer.Confirm(v4_post_checklist_confirmation)
 			if err != nil {
-				h.Writer.Error(err.Error())
-
 				shardError := enableSharding(h, isEmbedded)
 				if shardError != nil {
 					h.Writer.Error(shardError.Error())
 				}
-
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
@@ -280,7 +264,7 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 					h.Writer.Error(shardError.Error())
 				}
 				h.Writer.Println("Finished enabling sharding.")
-				return status.New(status.InvalidCommandArgsError, "end user not ready to upgrade")
+				return status.New(status.UserCancelledUpgrade, "end user not ready to upgrade")
 			}
 			return nil
 		},
@@ -289,7 +273,6 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 
 func enableSharding(h ChecklistHelper, isEmbedded bool) error {
 	if isEmbedded {
-		h.Writer.Println("\nEnabling sharding...")
 		return reEnableShardAllocation()
 	}
 	return nil
@@ -300,14 +283,12 @@ func downTimeCheckV4() Checklist {
 		Name:        "down_time_acceptance",
 		Description: "confirmation for downtime",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Have you planned for a downtime ? You can do this by running ( chef-automate maintenance on )?")
+			resp, err := h.Writer.Confirm("Have you planned for a downtime? You can do this by running chef-automate maintenance on?")
 			if err != nil {
-				h.Writer.Error(err.Error())
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(downTimeError)
-				return status.New(status.InvalidCommandArgsError, downTimeError)
+				return status.New(status.UserCancelledUpgrade, downTimeError)
 			}
 			return nil
 		},
@@ -321,12 +302,10 @@ func externalESUpgradeCheck() Checklist {
 		TestFunc: func(h ChecklistHelper) error {
 			resp, err := h.Writer.Confirm(externalESUpgradeMsg)
 			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.Errorf(status.InvalidCommandArgsError, externalESUpgradeError)
 			}
 			if !resp {
-				h.Writer.Error(externalESUpgradeError)
-				return status.New(status.InvalidCommandArgsError, externalESUpgradeError)
+				return status.New(status.UserCancelledUpgrade, externalESUpgradeError)
 			}
 			return nil
 		},
@@ -460,26 +439,22 @@ func disableSharding() Checklist {
 		Name:        "disable sharding",
 		Description: "confirmation check to disable sharding",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("This will disable Sharding on your Elasticsearch")
+			resp, err := h.Writer.Confirm("It is mandatory to disable sharding on your Elasticsearch before upgrading. Do you want to continue?")
 			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.Errorf(status.InvalidCommandArgsError, shardingError)
 			}
 			if !resp {
-				h.Writer.Error(shardingError)
-				return status.New(status.InvalidCommandArgsError, shardingError)
+				return status.New(status.UserCancelledUpgrade, shardingError)
 			}
 			h.Writer.Println("Calling Elasticsearch api to disable shard allocation...")
 			err = disableShardAllocation()
 			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.DatabaseError, err.Error())
+				return status.Errorf(status.ESShardDisableError, shardingError)
 			}
 
 			err = flushRequest()
 			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.DatabaseError, err.Error())
+				return status.Errorf(status.ESFlushRequest, shardingError)
 			}
 			h.Writer.Println("Finished disabling shard allocation successfully.")
 			return nil
@@ -530,13 +505,11 @@ func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
 		resp, err := h.Writer.Confirm("Your Backup AWS S3 Endpoint will be changed from \"" + endpoint + "\" to \"https://s3.amazonaws.com\". This is changed due to changes from AWS side. Do you want to continue?")
 
 		if err != nil {
-			h.Writer.Error(err.Error())
 			return status.Errorf(status.InvalidCommandArgsError, err.Error())
 		}
 
 		if !resp {
-			h.Writer.Error(s3UrlError)
-			return status.New(status.InvalidCommandArgsError, s3UrlError)
+			return status.New(status.UserCancelledUpgrade, s3UrlError)
 		}
 
 		// h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
@@ -584,7 +557,7 @@ func getAllIndices(basePath string) ([]byte, error) {
 func fetchOldIndexInfo(basePath string) ([]indexData, error) {
 	allIndexList, err := getAllIndices(basePath)
 	if err != nil {
-		return nil, status.New(status.ESIndexFetchError, "Please make sure your that the Elasticsearch cluster is healthy before upgrade.")
+		return nil, status.New(status.ESIndexFetchError, "Please make sure that the Elasticsearch cluster is healthy before upgrade.")
 	}
 	indexList := strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n")
 	additionalBatch := 0
@@ -601,7 +574,7 @@ func fetchOldIndexInfo(basePath string) ([]indexData, error) {
 		indexCSL := strings.Join(indexList[i*indexBatchSize:upper], ",")
 		versionData, err := execRequest(basePath+indexCSL+"/_settings/index.version.created*?&human", "GET", nil)
 		if err != nil {
-			return nil, status.New(status.ESIndexDetailsFetchError, "Please make sure your that the Elasticsearch cluster is healthy before upgrade.")
+			return nil, status.New(status.ESIndexDetailsFetchError, "Please make sure that the Elasticsearch cluster is healthy before upgrade.")
 		}
 		data, err := getDataForOldIndices(versionData)
 		if err != nil {
@@ -627,7 +600,7 @@ func doDeleteStaleIndices(timeout int64, h ChecklistHelper) error {
 		}
 		errMsg := formErrorMsg(indexInfo)
 		if !resp {
-			return status.Errorf(status.InvalidCommandArgsError, errMsg.Error())
+			return status.Errorf(status.UserCancelledUpgrade, errMsg.Error())
 		}
 
 		_, err = execRequest(fmt.Sprintf("%s%s?pretty", basePath, index.Name), "DELETE", nil)
@@ -697,7 +670,7 @@ func storeSearchEngineSettings() Checklist {
 			} else {
 				health, err := getClusterHealth()
 				if err != nil || health.Status == "red" {
-					return status.New(status.ESClusterUnhealthy, "Please make sure your that the Elasticsearch cluster is healthy before upgrade.")
+					return status.New(status.ESClusterUnhealthy, "Please make sure that the Elasticsearch cluster is healthy before upgrade.")
 				}
 				esSettings, _ := GetESSettings(h.Writer)
 				esHeapSize, _ := extractNumericFromText(esSettings.HeapMemory, 0)
@@ -763,12 +736,12 @@ func deleteA1Indexes(timeout int64) Checklist {
 		Description: "confirmation check to delete A1 indexes",
 		TestFunc: func(h ChecklistHelper) error {
 			indexes := strings.Join(existingIndexes, ",")
-			resp, err := h.Writer.Confirm(fmt.Sprintf("The following indices are of Automate 1 and are no longer used in Automate, hence we will delete these indices:%s", indexes))
+			resp, err := h.Writer.Confirm(fmt.Sprintf("The following indices are of Automate 1 and are no longer used in Automate:\n%s\nDo you want to delete these indices?", indexes))
 			if err != nil {
 				return status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.\nPlease refer https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-delete-index.html to manually delete Automate 1 indices.")
+				return status.New(status.UserCancelledUpgrade, "The Automate 1 stale indices needs to be deleted before upgrading.\nPlease refer https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-delete-index.html to manually delete Automate 1 indices.")
 			}
 			basePath := getESBasePath(timeout)
 			err = batchDeleteIndexFromA1(timeout, existingIndexes, basePath)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -141,10 +140,12 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		if !strings.Contains(err.Error(), "unknown method IsValidUpgrade") &&
 			!strings.Contains(err.Error(), "Unimplemented desc = unknown service chef.automate.domain.deployment.Deployment") {
-			return err
+			return status.New(
+				status.DeploymentServiceCallError,
+				err.Error(),
+			)
 		}
 	} else {
-		fmt.Println(validatedResp.CurrentVersion, validatedResp.TargetVersion)
 		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
 			writer.Println("Chef Automate up-to-date")
 			return nil
@@ -173,6 +174,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
 				OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
 			}
+			writer.Printf("This is a Major upgrade from your current version %s to major version %s\n", validatedResp.GetCurrentVersion(), validatedResp.GetTargetVersion())
 			err = ci.RunChecklist(configCmdFlags.timeout, flags)
 			if err != nil {
 				return err

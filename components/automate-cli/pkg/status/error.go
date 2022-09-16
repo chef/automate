@@ -49,6 +49,14 @@ const (
 // When an invocation of the chef-automate CLI results in a Failure it exits with
 // one of the following codes that identifies the error types.
 const (
+	UserCancelledMigration            = 130
+	CalcDestDirAvailableSpaceError    = 129
+	CalcHabDirAvailableSpaceError     = 128
+	CalcHabDirSizeError               = 127
+	CalcDbDirSizeError                = 126
+	UserCancelledUpgrade              = 125
+	ESShardDisableError               = 124
+	ESFlushRequest                    = 123
 	ESDeleteError                     = 122
 	ESIndexDetailsFetchError          = 121
 	ESIndexFetchError                 = 120
@@ -100,6 +108,14 @@ const (
 // an error code and its type and a description, but also as a way to generate
 // documentation.
 var ErrorMetadata = map[int][]string{
+	UserCancelledMigration:            {"130", "UserCancelledMigration", "User cancelled/stopped the migration process"},
+	CalcDestDirAvailableSpaceError:    {"129", "CalcDestDirAvailableSpaceError", "Error calculating destination directory available space"},
+	CalcHabDirAvailableSpaceError:     {"128", "CalcHabDirAvailableSpace", "Error calculating hab directory available space"},
+	CalcHabDirSizeError:               {"127", "CalcHabDirSizeError", "Error calculating hab directory size"},
+	CalcDbDirSizeError:                {"126", "CalcDbDirSizeError", "Error calculating DB directory size"},
+	UserCancelledUpgrade:              {"125", "UserCancelledUpgrade", "User cancelled/stopped the upgrade process"},
+	ESShardDisableError:               {"124", "ESShardDisableError", "Unable to disable sharding using Elasticsearch api"},
+	ESFlushRequest:                    {"123", "ESFlushRequest", "Unable to reach Elasticsearch flush api"},
 	ESDeleteError:                     {"122", "ESDeleteError", "Unable to reach Elasticsearch delete api"},
 	ESIndexDetailsFetchError:          {"121", "ESIndexDetailsFetchError", "Unable to fetch Elasticsearch indices details"},
 	ESIndexFetchError:                 {"120", "ESIndexFetchError", "Unable to fetch Elasticsearch indices"},

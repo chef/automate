@@ -79,7 +79,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 		if writer != nil {
 			writer.Error(err.Error())
 		}
-		return false, status.Errorf(status.UnknownError, err.Error())
+		return false, status.Errorf(status.CalcHabDirSizeError, err.Error())
 	}
 
 	// If (/hab) dir size is less than 5GB, then throw error
@@ -88,7 +88,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 		if writer != nil {
 			writer.Errorln(fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space", habRootPath, MIN_DIRSIZE_GB))
 		}
-		return false, status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, MIN_DIRSIZE_GB))
+		return false, status.New(status.CalcHabDirAvailableSpaceError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, MIN_DIRSIZE_GB))
 	}
 
 	if !isMigration {
@@ -106,7 +106,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 		if writer != nil {
 			writer.Error(err.Error())
 		}
-		return false, status.Errorf(status.UnknownError, err.Error())
+		return false, status.Errorf(status.CalcDbDirSizeError, err.Error())
 	}
 
 	minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
@@ -119,13 +119,13 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 			destDir = osDestDataDir
 		}
 		if writer != nil {
-			resp, err := writer.Confirm(fmt.Sprintf("Ensure destination directory (%s) is having min. %.2f GB free space ?", destDir, minReqDiskSpace))
+			resp, err := writer.Confirm(fmt.Sprintf("Ensure destination directory (%s) is having minimum %.2f GB free space ?", destDir, minReqDiskSpace))
 			if err != nil {
 				writer.Error(err.Error())
-				return false, status.Errorf(status.UnknownError, err.Error())
+				return false, status.Errorf(status.InvalidCommandArgsError, err.Error())
 			}
 			if !resp {
-				return false, status.New(status.UnknownError, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
+				return false, status.New(status.UserCancelledUpgrade, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
 			}
 		}
 		diskSpaceErrorType = "upgrade"
@@ -138,7 +138,7 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 		}
 		spaceAvailable, err := cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
 		if err != nil || !spaceAvailable {
-			return false, status.New(status.UnknownError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, diskSpaceErrorType, minReqDiskSpace))
+			return false, status.New(status.CalcDestDirAvailableSpaceError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, diskSpaceErrorType, minReqDiskSpace))
 		}
 	}
 	return true, nil

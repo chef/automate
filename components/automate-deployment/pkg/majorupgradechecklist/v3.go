@@ -44,14 +44,14 @@ const (
 	run_chef_automate_status     = `Check all services are running using: 
      $ chef-automate status`
 
-	run_pg_data_cleanup = `If you are sure all data is available in Upgraded Automate, then we can free up old PostgreSQL 9.6 Data by running: 
+	run_pg_data_cleanup = `If you are sure that all data is available in upgraded Automate, we can free up the old Elasticsearch data by running: 
      $ ` + run_pg_data_cleanup_cmd
 
 	run_pg_data_cleanup_cmd        = `chef-automate post-major-upgrade clear-data --data=PG`
-	v3_post_checklist_confirmation = `**** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
+	v3_post_checklist_confirmation = `**** In case of any errors, please refer to https://docs.chef.io/automate/major_upgrade/#troubleshooting and release notes for this version. ****
 
 Now, upgrade will start, Please confirm to continue...`
-	ui_check           = `Check Automate UI everything is running and all data is visible`
+	ui_check           = `Check if everything in Automate UI is working properly and all the data is visible.`
 	patch_new_conf_cmd = `chef-automate config patch config.toml`
 	patch_new_conf     = `If your PostgreSQL Connection URL and Credential are changed then update them by putting them in config.toml and patching it in using:
      $ chef-automate config patch config.toml`
@@ -233,14 +233,12 @@ func backupCheck() Checklist {
 		Name:        "backup_acceptance",
 		Description: "confirmation check for creating a backup",
 		TestFunc: func(h ChecklistHelper) error {
-			resp, err := h.Writer.Confirm("Have you taken backup of your data and kept it safe, preferably on another disk or location ?:(y/n)")
+			resp, err := h.Writer.Confirm("Have you taken backup of Automate data to your preferred location?")
 			if err != nil {
-				h.Writer.Error(err.Error())
-				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+				return status.Errorf(status.UserCancelledUpgrade, err.Error())
 			}
 			if !resp {
-				h.Writer.Error(backupError)
-				return status.New(status.InvalidCommandArgsError, backupError)
+				return status.New(status.UserCancelledUpgrade, backupError)
 			}
 			return nil
 		},
