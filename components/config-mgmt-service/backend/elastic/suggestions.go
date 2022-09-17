@@ -120,7 +120,7 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 	if len(text) >= 2 {
 		if term == "node_name" {
 			text_string := "*" + lowerText + "*"
-			matchQuery := elastic.NewQueryStringQuery(text_string).Field(term)
+			matchQuery := elastic.NewQueryStringQuery(text_string).Field(fmt.Sprintf("%s.lower", term))
 			boolQuery = boolQuery.Must(matchQuery)
 		} else {
 			// Any(or) of the text words can match
