@@ -8,3 +8,16 @@
 
 [transport]
   port = 9300
+
+
+# "backup_config_efs: ${backup_config_efs}"
+# "backup_config_s3: ${backup_config_s3}"
+
+${ "${backup_config_s3}" == "true" ? <<EOT
+[s3]
+  [s3.client.default]
+    endpoint = "${endpoint}"
+
+EOT 
+: "" }
+

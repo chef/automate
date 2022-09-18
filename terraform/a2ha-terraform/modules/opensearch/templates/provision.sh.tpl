@@ -23,6 +23,10 @@ cp -f ${tmp_path}/opensearch-user.toml /hab/user/"$OS_PKG_NAME"/config/user.toml
 mkdir -p /hab/user/"$OPENSEARCHSIDECAR_PKG_NAME"/config
 cp -f ${tmp_path}/opensearchsidecar.toml /hab/user/"$OPENSEARCHSIDECAR_PKG_NAME"/config/user.toml
 
+# Creating mount path for elasticsearch backup 
+sudo mkdir -p ${nfs_mount_path}/opensearch
+sudo chown hab:hab ${nfs_mount_path}/opensearch/
+
 wait_for_aib_extraction() {
   max=20
   n=0
@@ -101,17 +105,21 @@ SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
 
 # If you get following error, ===> `[: : integer expression expected`
 # try `until [[ "$SERVICE_UP_TIME" -gt 30 ]]` instead of `until [ "$SERVICE_UP_TIME" -gt 30 ]`
-until [ "$SERVICE_UP_TIME" -gt 30 ]
+if [ "${backup_config_s3}" == "true" ]; then
+
+max=15
+n=0
+until [ "$SERVICE_UP_TIME" -gt 30 and  $n -ge $max ]
 do
   sleep 5
   SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
   echo "No services are loaded"
   echo "Sleeping for 5 seconds"
+  n=$((n+1))
 done
 
-
 # Adding aws access and secret keys once all services are up
-if [ "${backup_config_s3}" == "true" ]; then
+
   echo "Setting up keystore"
   echo yes | hab svc status
   export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"

@@ -51,6 +51,7 @@ variable "infra" {
 }
 
 variable "region" {
+  default = ""
 }
 
 variable "s3_endpoint" {

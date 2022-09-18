@@ -1,13 +1,16 @@
 locals {
   opensearch_user_toml = [
     for n in range(var.opensearch_instance_count) : templatefile("${path.module}/templates/opensearch_user.toml.tpl", {
-      listen_port     = var.opensearch_listen_port,
-      minimum_masters = floor(var.opensearch_instance_count / 2 + 1),
-      node_name       = var.private_ips[n],
-      private_ip      = var.private_ips[n],
-      private_ips     = join(", ", formatlist("\"%s\"", var.private_ips)),
-      nodes_list      = join(", ", formatlist("\"%s\"", var.private_ips))
-      tmp_path        = var.tmp_path
+      listen_port       = var.opensearch_listen_port,
+      minimum_masters   = floor(var.opensearch_instance_count / 2 + 1),
+      node_name         = var.private_ips[n],
+      private_ip        = var.private_ips[n],
+      private_ips       = join(", ", formatlist("\"%s\"", var.private_ips)),
+      nodes_list        = join(", ", formatlist("\"%s\"", var.private_ips))
+      tmp_path          = var.tmp_path
+      backup_config_s3  = var.backup_config_s3
+      backup_config_efs = var.backup_config_efs
+      endpoint          = var.s3_endpoint
     })
   ]
   opensearchsidecar_user_toml = [
@@ -25,7 +28,8 @@ locals {
     backup_config_s3                = var.backup_config_s3
     access_key                      = var.access_key
     secret_key                      = var.secret_key
-    listen_port                     = var.opensearch_listen_port,
+    listen_port                     = var.opensearch_listen_port
+    nfs_mount_path                  = var.nfs_mount_path
   })
 }
 

@@ -289,6 +289,8 @@ sudo_password = ""
 # Eg.: backup_config = "object_storage" or "file_system"
 backup_config = ""
 
+# If backup_config = "object_storage" fill out [object_storage.config] as well
+
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
@@ -355,13 +357,14 @@ postgresql_private_ips = []
 
 
 ## Object storage similar to AWS S3 Bucket
+## 
 [object_storage.config]
 bucket_name = ""
 access_key = ""
 secret_key = ""
 endpoint = ""
 
-# [Optional] Mention object_storage region 
+# [Optional] Mention object_storage region if applicable
 # Eg: region = "us-west-1"
 region = ""
 

@@ -16,10 +16,14 @@ variable "backup_config_efs" {
 }
 
 variable "backup_config_s3" {
-  default = ""
+  default = "false"
 }
 
 variable "curator_pkg_ident" {
+}
+
+variable "s3_endpoint" {
+  default = ""
 }
 
 variable "habitat_info" {
@@ -35,6 +39,10 @@ variable "kibana_pkg_ident" {
 
 variable "metricbeat_pkg_ident" {
   default = "chef/automate-ha-metricbeat"
+}
+
+variable "nfs_mount_path" {
+  default = "/mnt/automate_backups"
 }
 
 variable "opensearch_instance_count" {

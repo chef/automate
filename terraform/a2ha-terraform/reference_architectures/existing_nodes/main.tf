@@ -148,6 +148,9 @@ module "opensearch" {
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   backup_config_s3                = var.backup_config_s3
+  backup_config_efs                = var.backup_config_efs
+  s3_endpoint                     = var.s3_endpoint
+  nfs_mount_path                  = var.nfs_mount_path
   access_key                      = var.access_key
   secret_key                      = var.secret_key
   depends_on                      = [module.airgap_bundle-backend, module.habitat-backend]
