@@ -23,7 +23,7 @@ pkg_deps=(
   core/rsync
   core/terraform/0.14.8/20210826165930
   core/busybox-static
-  chef/automate-ha-cluster-ctl
+  arvinth/automate-ha-cluster-ctl
 )
 
 pkg_build_deps=(
