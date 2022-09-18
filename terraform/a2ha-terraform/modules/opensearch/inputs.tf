@@ -22,6 +22,10 @@ variable "backup_config_s3" {
 variable "curator_pkg_ident" {
 }
 
+variable "s3_endpoint" {
+  default = ""
+}
+
 variable "habitat_info" {
 }
 
