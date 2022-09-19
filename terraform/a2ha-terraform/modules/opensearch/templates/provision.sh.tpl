@@ -109,7 +109,7 @@ if [ "${backup_config_s3}" == "true" ]; then
 
 max=15
 n=0
-until [ "$SERVICE_UP_TIME" -gt 30 and  $n -ge $max ]
+until [ "$SERVICE_UP_TIME" -gt 30 -a $n -lt $max ]
 do
   sleep 5
   SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
