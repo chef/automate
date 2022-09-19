@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-UPSTREAM_PKG_IDENT="chef/knife-ec-backup"
+UPSTREAM_PKG_IDENT="chef/knife-ec-backup/3.0.0"
 pkg_name="automate-knife-ec-backup"
 pkg_description="Wrapper package for chef/knife-ec-backup"
 pkg_origin="chef"
