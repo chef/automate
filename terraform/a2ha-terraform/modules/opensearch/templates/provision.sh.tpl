@@ -97,7 +97,8 @@ fi
 # 
 echo "${backup_config_s3}"
 
-SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
+export HAB_LICENSE=accept-no-persist
+SERVICE_UP_TIME=$(hab svc status  | awk  '{print $5}' | tail -1)
 
 # Following loop will hold adding credentials in keystore until
 # services are up and ran for 30 seconds and gives enough
@@ -112,7 +113,7 @@ n=0
 until [ "$SERVICE_UP_TIME" -gt 30 -a $n -lt $max ]
 do
   sleep 5
-  SERVICE_UP_TIME=$(echo yes | hab svc status  | awk  '{print $5}' | tail -1)
+  SERVICE_UP_TIME=$(hab svc status  | awk  '{print $5}' | tail -1)
   echo "No services are loaded"
   echo "Sleeping for 5 seconds"
   n=$((n+1))
@@ -121,7 +122,7 @@ done
 # Adding aws access and secret keys once all services are up
 
   echo "Setting up keystore"
-  echo yes | hab svc status
+  hab svc status
   export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
   echo $OPENSEARCH_PATH_CONF
   echo "${access_key}" | hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force s3.client.default.access_key
