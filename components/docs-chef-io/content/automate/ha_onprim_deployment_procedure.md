@@ -222,8 +222,7 @@ For example : Remove Automate node to the existing deployed cluster.
   ```
 
 - Above process can be done for `chef-server` and `automate`.
-- We can not remove the node from backend cluster, but we can replace the node. 
-For replace a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
+- We can not remove the node from backend cluster, but we can replace the node. For replace a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How to Replace Node in Automate HA Cluster
