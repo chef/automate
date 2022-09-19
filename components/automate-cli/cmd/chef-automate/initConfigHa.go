@@ -195,11 +195,6 @@ type ExistingInfraConfigToml struct {
 			Region     string `toml:"region"`
 		} `toml:"config"`
 	} `toml:"object_storage"`
-	// FileSystem struct {
-	// 	Config struct {
-	// 		BucketName []string `toml:"automate_private_ips"`
-	// 	} `toml:"config"`
-	// } `toml:"file_system"`
 }
 
 func init() {

@@ -286,11 +286,6 @@ ssh_port = ""
 sudo_password = ""
 ## === ===
 
-# Eg.: backup_config = "object_storage" or "file_system"
-backup_config = ""
-
-# If backup_config = "object_storage" fill out [object_storage.config] as well
-
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
 architecture = "existing_nodes"
@@ -298,6 +293,21 @@ workspace_path = "/hab/a2_deploy_workspace"
 # DON'T MODIFY THE BELOW LINE (backup_mount)
 backup_mount = "/mnt/automate_backups"
 
+# Eg.: backup_config = "object_storage" or "file_system"
+backup_config = ""
+
+# If backup_config = "object_storage" fill out [object_storage.config] as well 
+## Object storage similar to AWS S3 Bucket
+[object_storage.config]
+bucket_name = ""
+access_key = ""
+secret_key = ""
+endpoint = ""
+
+# [Optional] Mention object_storage region if applicable
+# Eg: region = "us-west-1"
+region = ""
+## === ===
 
 # ============== EC2 Nodes Config ======================
 [automate.config]
@@ -354,19 +364,6 @@ chef_server_private_ips = []
 opensearch_private_ips = []
 postgresql_private_ips = []
 ## === ===
-
-
-## Object storage similar to AWS S3 Bucket
-## 
-[object_storage.config]
-bucket_name = ""
-access_key = ""
-secret_key = ""
-endpoint = ""
-
-# [Optional] Mention object_storage region if applicable
-# Eg: region = "us-west-1"
-region = ""
 
 `
 
