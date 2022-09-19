@@ -190,11 +190,11 @@ For example : Add new Automate node to the existing deployed cluster.
 
 - Trigger the deployment command again from the bastion node. 
 
-{{< note >}}
-  latest.aib will replace with your airgap bundle name which was install in the cluster.
-{{< /note >}}
+  {{< note >}}
+    In below deploy command,latest.aib will replace with your airgap bundle name which was install in the cluster.
+  {{< /note >}}
   ```
-  chef-automate deploy config.toml --airgap-bundle latest.aib
+    chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
 
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
@@ -212,11 +212,11 @@ For example : Remove Automate node to the existing deployed cluster.
   
 - Trigger the deployment command again from the bastion node 
 {{< note >}}
-  latest.aib will replace with your airgap bundle name which was install in the cluster.
+  In below deploy command, latest.aib will replace with your airgap bundle name which was install in the cluster.
 {{< /note >}}
 
   ```
-  chef-automate deploy config.toml --airgap-bundle latest.aib
+    chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
 
 - Above process can be done for `chef-server` and `automate`.
@@ -245,11 +245,11 @@ For example : Remove Automate node to the existing deployed cluster.
 
 - Run the `deploy` command to Add new node into the cluster 
 {{< note >}}
-  latest.aib will replace with your airgap bundle name which was install in the cluster.
+  In below deploy command, latest.aib will replace with your airgap bundle name which was install in the cluster.
 {{< /note >}}
 
   ```
-  chef-automate deploy config.toml --airgap-bundle latest.aib
+    chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
 
 ### Troubleshooting
