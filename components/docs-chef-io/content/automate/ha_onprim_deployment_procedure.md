@@ -197,6 +197,7 @@ For example : Add new Automate node to the existing deployed cluster.
   ```
 
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
+- In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment). 
 - Open the `config.toml` at bastion node.
@@ -218,6 +219,7 @@ For example : Remove Automate node to the existing deployed cluster.
   ```
 
 - Above process can be done for `chef-server` and `automate`.
+- In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How to Replace Node in Automate HA Cluster
 - Open the `config.toml` at bastion node.
