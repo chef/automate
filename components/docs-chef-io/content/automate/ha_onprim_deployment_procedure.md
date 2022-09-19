@@ -244,7 +244,7 @@ For example : Remove Automate node to the existing deployed cluster.
   ```
 
 ### Troubleshooting
-- while adding new node into the cluster if we get an below error
+#### Failure in adding nodes
   ```
   Error: Upload failed: scp: /var/automate-ha: Permission denied
   ```
