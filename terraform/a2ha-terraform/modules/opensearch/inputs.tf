@@ -61,6 +61,14 @@ variable "opensearch_svc_load_args" {
   default = "--topology standalone --strategy none"
 }
 
+variable "opensearch_username" {
+  default = ""
+}
+
+variable "opensearch_user_password" {
+  default = ""
+}
+
 variable "opensearchsidecar_pkg_ident" {
 }
 

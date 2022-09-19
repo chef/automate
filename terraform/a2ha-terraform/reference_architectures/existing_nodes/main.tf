@@ -153,6 +153,8 @@ module "opensearch" {
   nfs_mount_path                  = var.nfs_mount_path
   access_key                      = var.access_key
   secret_key                      = var.secret_key
+  opensearch_username             = var.opensearch_username
+  opensearch_user_password        = var.opensearch_user_password
   depends_on                      = [module.airgap_bundle-backend, module.habitat-backend]
 }
 

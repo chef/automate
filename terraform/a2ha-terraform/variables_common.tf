@@ -85,6 +85,14 @@ variable "opensearch_listen_port" {
   default = 9200
 }
 
+variable "opensearch_username" {
+  default = "admin"
+}
+
+variable "opensearch_user_password" {
+  default = "admin"
+}
+
 variable "elasticsearch_pkg_ident" {
   default = "chef/automate-ha-elasticsearch"
 }

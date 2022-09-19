@@ -13,7 +13,7 @@
 # "backup_config_efs: ${backup_config_efs}"
 # "backup_config_s3: ${backup_config_s3}"
 
-${ "${backup_config_s3}" == "true" ? <<EOT
+${ "${backup_config}" == "s3" ? <<EOT
 [s3]
   [s3.client.default]
     endpoint = "${endpoint}"

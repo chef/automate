@@ -8,8 +8,7 @@ locals {
       private_ips       = join(", ", formatlist("\"%s\"", var.private_ips)),
       nodes_list        = join(", ", formatlist("\"%s\"", var.private_ips))
       tmp_path          = var.tmp_path
-      backup_config_s3  = var.backup_config_s3
-      backup_config_efs = var.backup_config_efs
+      backup_config     = var.backup_config_s3 == "true" ? "s3" : var.backup_config_efs == "true" ? "efs" : ""
       endpoint          = var.s3_endpoint
     })
   ]
@@ -30,6 +29,8 @@ locals {
     secret_key                      = var.secret_key
     listen_port                     = var.opensearch_listen_port
     nfs_mount_path                  = var.nfs_mount_path
+    opensearch_username             = var.opensearch_username
+    opensearch_user_password        = var.opensearch_user_password
   })
 }
 
