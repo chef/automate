@@ -189,10 +189,7 @@ For example : Add new Automate node to the existing deployed cluster.
   | [automate.config] <br> instance_count = "1" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
 
 - Trigger the deployment command again from the bastion node.
-
-  {{< note >}}
-    In below deploy command,latest.aib will replace with your airgap bundle name which was install in the cluster.
-  {{< /note >}}
+- In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
 
   ```
     chef-automate deploy config.toml --airgap-bundle latest.aib
@@ -202,6 +199,10 @@ For example : Add new Automate node to the existing deployed cluster.
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment). 
+{{< warning >}}
+ We can not remove the node from backend cluster, but we can replace the node. For replace a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
+{{< /warning >}}
+
 - Open the `config.toml` at bastion node.
 - change the `instance_count` value, as explain in below example.
 - Remove the `Ip address` for the respetive node, as explain in the example.
@@ -212,17 +213,13 @@ For example : Remove Automate node to the existing deployed cluster.
   | [automate.config] <br> instance_count = "3" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
   
 - Trigger the deployment command again from the bastion node.
-
-{{< note >}}
-  In below deploy command, latest.aib will replace with your airgap bundle name which was install in the cluster.
-{{< /note >}}
+- In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
 
   ```
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
 
 - Above process can be done for `chef-server` and `automate`.
-- We can not remove the node from backend cluster, but we can replace the node. For replace a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How to Replace Node in Automate HA Cluster
@@ -247,10 +244,7 @@ For example : Remove Automate node to the existing deployed cluster.
   ``` 
 
 - Run the `deploy` command to Add new node into the cluster.
-
-{{< note >}}
-  In below deploy command, latest.aib will replace with your airgap bundle name which was install in the cluster.
-{{< /note >}}
+- In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
 
   ```
     chef-automate deploy config.toml --airgap-bundle latest.aib
@@ -267,4 +261,5 @@ Resolution : Execute the below command.
   for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
   cd -
    ``` 
-Once the module's tainted, run the `deploy` command again `chef-automate deploy config.toml --airgap-bundle latest.aib`
+- Once the module's tainted, run the `deploy` command again `chef-automate deploy config.toml --airgap-bundle latest.aib`
+- In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
