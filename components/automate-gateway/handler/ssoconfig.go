@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 
 	deployment "github.com/chef/automate/api/interservice/deployment"
 
@@ -22,7 +21,6 @@ func NewServer(client deployment.DeploymentClient) *Server {
 }
 
 func (a *Server) GetSsoConfig(ctx context.Context, _ *sso.GetSsoConfigRequest) (*sso.GetSsoConfigResponse, error) {
-	fmt.Println("================================================================== Test SSO CONFIG DURGA ==================================================================")
 
 	req := &deployment.GetAutomateConfigRequest{}
 
@@ -32,15 +30,24 @@ func (a *Server) GetSsoConfig(ctx context.Context, _ *sso.GetSsoConfigRequest) (
 	}
 
 	new := res.Config.Dex.V1.Sys.Connectors.Saml
-	fmt.Println(new)
+
+	ca_contents := new.CaContents.GetValue()
+	sso_url := new.SsoUrl.GetValue()
+	email_attr := new.EmailAttr.GetValue()
+	username_attr := new.UsernameAttr.GetValue()
+	entity_issuer := new.EntityIssuer.GetValue()
+	group_attr := new.GroupsAttr.GetValue()
+	allowed_group := new.AllowedGroups
+	name_id_policy_format := new.NameIdPolicyFormat.GetValue()
+
 	return &sso.GetSsoConfigResponse{
-		CaContents:         new.CaContents.Value,
-		SsoUrl:             new.SsoUrl.Value,
-		EmailAttr:          new.EmailAttr.Value,
-		UsernameAttr:       new.UsernameAttr.Value,
-		GroupsAttr:         new.GroupsAttr.Value,
-		AllowedGroups:      new.AllowedGroups,
-		EntityIssuer:       new.EntityIssuer.Value,
-		NameIdPolicyFormat: new.NameIdPolicyFormat.Value,
+		CaContents:         ca_contents,
+		SsoUrl:             sso_url,
+		EmailAttr:          email_attr,
+		UsernameAttr:       username_attr,
+		GroupsAttr:         group_attr,
+		AllowedGroups:      allowed_group,
+		EntityIssuer:       entity_issuer,
+		NameIdPolicyFormat: name_id_policy_format,
 	}, nil
 }
