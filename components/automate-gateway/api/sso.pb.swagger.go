@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/api/sso": {
+    "/api/v0/sso/config": {
       "get": {
         "operationId": "SsoConfigService_GetSsoConfig",
         "responses": {

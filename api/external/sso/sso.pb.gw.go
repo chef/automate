@@ -139,7 +139,7 @@ func RegisterSsoConfigServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_SsoConfigService_GetSsoConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api", "sso"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_SsoConfigService_GetSsoConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "sso", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

@@ -11,11 +11,11 @@ import "protoc-gen-swagger/options/annotations.proto";
 service SsoConfigService {
     rpc GetSsoConfig (GetSsoConfigRequest) returns (GetSsoConfigResponse) {
 		option (google.api.http) = {
-			get: "/api/sso"
+			get: "/api/v0/sso/config"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "sso:config"
-			action: "sso:config:getConfig"
+			action: "sso:config:get"
 		};
 	};
 }

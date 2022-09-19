@@ -31,5 +31,14 @@ func (a *Server) GetSsoConfig(ctx context.Context, _ *sso.GetSsoConfigRequest) (
 
 	new := res.Config.Dex.V1.Sys.Connectors.Saml
 	fmt.Println(new)
-	return &sso.GetSsoConfigResponse{}, nil
+	return &sso.GetSsoConfigResponse{
+		CaContents:         new.CaContents.Value,
+		SsoUrl:             new.SsoUrl.Value,
+		EmailAttr:          new.EmailAttr.Value,
+		UsernameAttr:       new.UsernameAttr.Value,
+		GroupsAttr:         new.GroupsAttr.Value,
+		AllowedGroups:      new.AllowedGroups,
+		EntityIssuer:       new.EntityIssuer.Value,
+		NameIdPolicyFormat: new.NameIdPolicyFormat.Value,
+	}, nil
 }

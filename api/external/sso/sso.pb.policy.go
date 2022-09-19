@@ -6,7 +6,7 @@ package sso
 import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.sso.SsoConfigService/GetSsoConfig", "sso:config", "sso:config:getConfig", "GET", "/api/sso", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.sso.SsoConfigService/GetSsoConfig", "sso:config", "sso:config:get", "GET", "/api/v0/sso/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 }
