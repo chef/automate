@@ -22,6 +22,8 @@ func NewServer(client deployment.DeploymentClient) *Server {
 }
 
 func (a *Server) GetSsoConfig(ctx context.Context, _ *sso.GetSsoConfigRequest) (*sso.GetSsoConfigResponse, error) {
+	fmt.Println("================================================================== Test SSO CONFIG DURGA ==================================================================")
+
 	req := &deployment.GetAutomateConfigRequest{}
 
 	res, err := a.client.GetAutomateConfig(ctx, req)

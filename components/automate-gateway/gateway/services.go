@@ -43,6 +43,7 @@ import (
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
 	pb_report_manager "github.com/chef/automate/api/external/report_manager"
 	pb_secrets "github.com/chef/automate/api/external/secrets"
+	pb_sso "github.com/chef/automate/api/external/sso"
 	pb_user_settings "github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/api/interservice/authn"
 	cfgmgmt_request "github.com/chef/automate/api/interservice/cfgmgmt/request"
@@ -100,6 +101,8 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_deployment.RegisterDeploymentServer(grpcServer,
 		handler.NewDeploymentServer(deploymentClient))
+
+	pb_sso.RegisterSsoConfigServiceServer(grpcServer, handler.NewServer(deploymentClient))
 
 	licenseClient, err := clients.LicenseControlClient()
 	if err != nil {
@@ -384,6 +387,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
 		"user-settings":            pb_user_settings.RegisterUserSettingsServiceHandlerFromEndpoint,
 		"report-manager":           pb_report_manager.RegisterReportManagerServiceHandlerFromEndpoint,
+		"sso_config":               pb_sso.RegisterSsoConfigServiceHandlerFromEndpoint,
 	})
 }
 
