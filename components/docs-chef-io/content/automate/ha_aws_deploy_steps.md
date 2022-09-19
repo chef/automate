@@ -225,12 +225,6 @@ public_custom_subnets = []
 # eg: ssh_key_pair_name = "A2HA"
 ssh_key_pair_name = ""
 # ============== EC2 Instance Config ===================
-# eg: ami_filter_name = ""
-ami_filter_name = ""
-# Only if we have filter criteria. Best give 'ami_id' below.
-ami_filter_virt_type = ""
-# Filter ami based on owner.
-ami_filter_owner = ""
 ## === INPUT NEEDED ===
 # This AMI should be from the Same Region which we selected above.
 # eg: ami_id = "ami-08d4ac5b634553e16" # This ami is of Ubuntu 20.04 in us-east-1
