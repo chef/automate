@@ -501,6 +501,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-knife-ec-backup",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }

@@ -1259,3 +1259,10 @@ paths = [
   "components/automate-platform-tools/*",
   "components/notifications-service/*"
 ]
+
+
+[automate-knife-ec-backup]
+plan_path = "components/automate-knife-ec-backup"
+paths = [
+  "components/automate-knife-ec-backup/*"
+]
