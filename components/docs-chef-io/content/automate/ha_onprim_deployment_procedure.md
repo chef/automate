@@ -192,7 +192,7 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [automate.config] <br> instance_count = "1" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
+  | [automate.config] <br/ > instance_count = "1" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br/ > instance_count = "2" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0","10.0.2.0"] |
 
 - Trigger the deployment command again from the bastion node.
 - In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
@@ -217,7 +217,7 @@ For example : Add new Automate node to the existing deployed cluster.
 For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [automate.config] <br> instance_count = "3" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
+  | [automate.config] <br/ > instance_count = "3" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br/ > instance_count = "2" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0","10.0.3.0"] |
   
 - Trigger the deployment command again from the bastion node.
 - In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
@@ -241,7 +241,7 @@ For example : Remove Automate node to the existing deployed cluster.
 
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
+  | [existing_infra.config] <br/ > postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br/ > postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
   
 - Run the below command from the bastion node.
 
@@ -276,6 +276,6 @@ For example : Remove Automate node to the existing deployed cluster.
 
 - Once the module's tainted, run the `deploy` command again.`latest.aib` should be replaced with your airgap bundle name which is running on the current cluster
    
-   ```sh
+  ```sh
      chef-automate deploy config.toml --airgap-bundle latest.aib
-   ```
+  ```
