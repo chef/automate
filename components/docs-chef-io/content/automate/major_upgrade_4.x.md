@@ -62,7 +62,7 @@ To upgrade to automate 3.0.49 follow the link: [upgrading to 3.0.49]({{< relref 
 
 ## Upgrade Path from 3.0.49 to 4.0.x
 
-There are four possible scenarios to upgrade from the 3.0.49 to 4.0.x version.
+There are four possible scenarios to upgrade from the 3.0.49 to the 4.0.x version.
 
 - [Chef Automate with Embedded Elasticsearch]({{< relref "#chef-automate-with-embedded-elasticsearch" >}})
 
@@ -110,13 +110,12 @@ sudo chef-automate upgrade run --major
 
 Here, you will be prompted to accept multiple Pre Upgrade checklists. Ensure you have performed all those actions before confirming an upgrade. Otherwise, it will prompt you with an error. The checklist will be as follows:
 
-
 ```shell
-You had planned for a downtime by running the command(chef-automate maintenance on)?: (y/n)
+You had planned for downtime by running the command(chef-automate maintenance on)?: (y/n)
 y
-You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+Have you taken a backup of your data and kept it safe, preferably on another disk or location? (y/n)
 y
-Ensure destination directory (/hab/) is having min. 'X' GB free space ? (y/n)
+Ensure destination directory (/hab/) has min. 'X' GB free space? (y/n)
 y
 This will disable Sharding on your elastic search (y/n)
 y
@@ -151,7 +150,7 @@ y
 
 {{< note >}} The 'X' GB is the minimum free space required in /hab which is calculated with the formula => [ ((/hab size or /hab/svc/automate-elasticsearch/data) + 10%) or 5GB ] . {{< /note >}}
 
-Once you are done with the upgrade. Follow the steps post upgrade, which are:
+Once you are done with the upgrade. Follow the steps post upgrade, which is:
 
 2. Check the upgrade status of Chef Automate:
 
@@ -159,7 +158,7 @@ Once you are done with the upgrade. Follow the steps post upgrade, which are:
 sudo chef-automate upgrade status
 ```
 
-The above command should return: Automate is up-to-date with airgap bundle `4.x.y` version
+The above command should return: Automate is up-to-date with the airgap bundle `4.x.y` version.
 
 3. Turn off maintenance mode:
 
@@ -198,7 +197,7 @@ migration from es to os
 
 Checking for es_upgrade
 
-Once done with the migration, please wait for some time to reindex the data
+Once done with the migration, please wait for some time to reindex the data.
 
 ----------------------------------------------
 Chef-automate start 
@@ -240,11 +239,11 @@ sudo chef-automate upgrade run --major
 Here, you will be prompted to accept multiple Pre Upgrade checklists. Ensure you have performed all those actions before the upgrade, then mark yes. Otherwise, it will prompt you with an error. The checklist will be as follows:
 
 ```shell
-You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+You had planned for downtime by running the command(chef-automate maintenance on)?: (y/n)
 y
-You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+Have you taken a backup of your data and kept it safe, preferably on another disk or location? (y/n)
 y
-You are ready with your external open search with migrated data from elastic search, this should be done with the help of your Administrator (y/n)
+You are ready with your external open search with migrated data from elastic search; this should be done with the help of your Administrator (y/n)
 y
 After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
 y
@@ -289,7 +288,7 @@ Post Upgrade Steps:
 sudo chef-automate upgrade status
 ```
 
-The above commabd should return: Automate is up-to-date.
+The above command should return: Automate is up-to-date.
 
 3. manually upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4*. If you have configured *Host*, *Port*, *Username*, or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
@@ -299,7 +298,7 @@ The above commabd should return: Automate is up-to-date.
 sudo chef-automate maintenance off
 ```
 
-Thr above command should return:
+The above command should return:
   
 ```result
 Updating deployment configuration
@@ -326,7 +325,7 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 sudo ./chef-automate airgap bundle create 
 ```
 
-OR we can directly download via a curl request
+OR we can directly download via a curl request.
 
 ```sh
 curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-4.x.y.aib
@@ -351,9 +350,9 @@ sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 Here, you will be prompted to accept multiple Pre Upgrade checklists. Ensure you have performed all those actions before the upgrade, then mark yes. Otherwise, it will prompt you with an error. The checklist will be as follows:
 
 ```shell
-You had planned for a downtime by running the command(chef-automate maintenance on)?: (y/n)
+You had planned for downtime by running the command(chef-automate maintenance on)?: (y/n)
 y
-You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+Have you taken a backup of your data and kept it safe, preferably on another disk or location? (y/n)
 y
 Ensure you have more than 'X' GB percent free disk space (y/n)
 y
@@ -386,11 +385,11 @@ Now, the upgrade will start. Please confirm to continue... (y/n)
 y
 ```
 
-{{< note >}} To continue with the upgradation, the /hab must and should contain at least 5GB free space. {{< /note >}}
+{{< note >}} To continue with the upgradation, the /hab must and should contain at least 5GB of free space. {{< /note >}}
 
 {{< note >}} The 'X' GB is the minimum free space required in /hab which is calculated with the formula => [ ((/hab size or /hab/svc/automate-elasticsearch/data) + 10%) or 5GB ] . {{< /note >}}
 
-Once you are done with the upgrade. Follow the steps post upgrade, which are:
+Once the upgrade is done, follow the following post upgrade steps:
 
 **Post Upgrade**
 
@@ -400,7 +399,7 @@ Once you are done with the upgrade. Follow the steps post upgrade, which are:
 sudo chef-automate upgrade status
 ```
 
-The above command should return: Automate is up-to-date with airgap bundle `4.x.y` version
+The above command should return: Automate is up-to-date with the airgap bundle `4.x.y` version
 
 2. Turn off the maintenance mode.
 
@@ -422,7 +421,7 @@ sudo chef-automate post-major-upgrade migrate --data=es
 ```
 
 ```shell
-It will start the migration immediately after check.
+It will start the migration immediately after checking.
 Press y to agree, n to disagree? [y/n]: y
 
 HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
@@ -439,8 +438,7 @@ migration from es to os
 
 Checking for es_upgrade
 
-Done with Migration 
- Please wait for some time to reindex the data
+Once you are done with migration, wait for some time to reindex the data.
 
 ----------------------------------------------
 Chef-automate start 
@@ -453,7 +451,7 @@ Chef-automate status
 ----------------------------------------------
 ```
 
-When migration is successful the default config will be shown
+The default config will show up once the migration takes place successfully.
 
 4. Verify whether all services are running:
 
@@ -473,9 +471,9 @@ sudo chef-automate post-major-upgrade clear-data --data=es
 
 To upgrade to 4.0.x, follow the steps below:
 
-#### On Internet connected machine
+#### On Internet Connected Machine
 
-1. Download latest CLI of Chef Automate
+1. Download the latest CLI of Chef Automate
 
 ```sh
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
@@ -487,7 +485,7 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 sudo ./chef-automate airgap bundle create
 ```
 
-OR we can directly download via curl request
+OR we can directly download via a curl request.
 
 ```sh
 curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-4.x.y.aib
@@ -497,7 +495,7 @@ curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o autom
 
 #### On Air-Gapped machine running Chef Automate
 
-1. Set your upgrade strategy to none in Chef Automate config. Confirm by the following code:
+1. Set your upgrade strategy to none in the Chef Automate config. Confirm by the following code:
 
 ```sh
 sudo ./chef-automate config show
@@ -509,14 +507,14 @@ sudo ./chef-automate config show
 sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```
 
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
+Here, you will be prompted to accept multiple Pre Upgrade checklists. Ensure you have performed all those actions before the upgrade, then mark yes; otherwise, it will prompt the error. The checklist will be as follows:
 
 ```shell
-You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+You had planned for downtime by running the command(chef-automate maintenance on)?: (y/n)
 y
-You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+Have you taken a backup of your data and kept it safe, preferably on another disk or location? (y/n)
 y
-You are ready with your external open search with migrated data from elastic search, this should be done with the help of your Administrator (y/n)
+You are ready with your external open search with migrated data from elastic search; this should be done with the help of your Administrator (y/n)
 y
 After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
 y
@@ -531,18 +529,18 @@ Post Upgrade Steps:
 2. Check all services are running using: 
      $ chef-automate status
 
-3. Disable the maintenance mode if you enabled previously using:
+3. Disable the maintenance mode if you enabled it previously using:
 	$ chef-automate maintenance off
 
-4. Check Automate UI everything is running and all data is visible
+4. Check Automate UI everything is running, and all data is visible
 
 **** In case of any errors, please refer to docs.chef.io and release notes for this version. ****
 
-Now, upgrade will start, Please confirm to continue... (y/n)
+Now, the upgrade will start; please confirm to continue... (y/n)
 y
 ```
 
-It starts upgrading once you are done with the upgrade, follow the steps post upgrade which are:
+It starts upgrading once you are done with the upgrade; follow the steps post upgrade, which is:
 
 ```shell
 Post Upgrade Steps:
@@ -552,7 +550,7 @@ Post Upgrade Steps:
      $ chef-automate upgrade status
    This should return: Automate is up-to-date
   
-2. Disable the maintenance mode if you enabled previously using:
+2. Disable the maintenance mode if you enabled it previously using:
 	$ chef-automate maintenance off
 
 3. Check whether upgrade status is up-to-date
@@ -562,15 +560,15 @@ Post Upgrade Steps:
 sudo chef-automate upgrade status
 ```
 
-4. Upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4* manually. If you have configured *Host*, *Port*, *Username* or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
+4. Manually upgrade your external *ElasticSearch 6.8* to *OpenSearch 1.2.4*. If you have configured *Host*, *Port*, *Username*, or *Password* of ElasticSearch, patch the new configuration to use Chef Automate.
 
-5. Turn off maintenance mode using following command:
+5. Turn off maintenance mode using the following command:
 
 ```sh
 sudo chef-automate maintenance off
 ```
 
-This should return:
+The above command should return:
   
   ```result
   Updating deployment configuration
@@ -585,23 +583,23 @@ After upgrading to version 4.x, Automate will have the configurations both for O
 
 ### Disc Space Validation
 
-1. When /hab is less than 5gb the upgrade will fail with the below error:
+1. When /hab is less than 5 GB, the upgrade will fail with the below error:
 
 ```sh
-Hab (/hab/) directory should have more than 5.00GB free space
-UnknownError: An unknown issue occurred during execution: Request to start upgrade failed: one of the checklist was not accepted/satisfied for upgrade: Hab (/hab/) directory should have more than 5.00GB free space.
+Hab (/hab/) directory should have more than 5.00GB of free space
+UnknownError: An unknown issue occurred during execution: Request to start to upgrade failed: one of the checklists was not accepted/satisfied for upgrade: Hab (/hab/) directory should have more than 5.00GB free space.
 ```
 
-You need to clear the space in /hab for having atleast 5GB free space.
+You need to clear the space in /hab for having at least 5GB free space.
 
 2. When the disk free space is less than the minimum required, the upgrade will fail with the below error:
 
 ```sh
-UnknownError: An unknown issue occurred during execution: Request to start upgrade failed: one of the checklist was not accepted/satisfied for upgrade: You do not have minimum space available to continue with this upgrade. 
+UnknownError: An unknown issue occurred during execution: Request to start to upgrade failed: one of the checklists was not accepted/satisfied for upgrade: You do not have minimum space available to continue. 
 ```
 
-To skip this free disk space check please use ```--skip-storage-check``` flag (or)
-To change destination directory please use ```--os-dest-data-dir``` flag
+To skip this free disk space check, use the ```--skip-storage-check``` flag (or)
+To change the destination directory, use the ```--os-dest-data-dir``` flag.
 
 ### Circuit Breaking Exception
 
@@ -616,7 +614,7 @@ To change destination directory please use ```--os-dest-data-dir``` flag
   [opensearch.v1]
     [opensearch.v1.sys]
       [opensearch.v1.sys.runtime]
-         heapsize = "8g" # This should be Half of RAM
+         heapsize = "8g" # This should be Half of the RAM
       [opensearch.v1.sys.indices]
         [opensearch.v1.sys.indices.breaker]
           total_limit = "95%"
@@ -628,7 +626,7 @@ To change destination directory please use ```--os-dest-data-dir``` flag
 [ERROR] Elasticsearch exception [type=validation_exception, reason=Validation Failed: 1: this action would add [5] total shards, but this cluster currently has [997]/[1000] maximum shards open;]
 ```
 
-To address the issue of shard limit hitting 1000, we need to increase the `max_shards_per_node`
+To address the issue of the shard limit hitting 1000, we need to increase the `max_shards_per_node`
 Update the Opensearch Config, using `chef-automate config patch <config_patch.toml>`
 
 ```sh
@@ -647,7 +645,7 @@ Update the Opensearch Config, using `chef-automate config patch <config_patch.to
 Error while calDiskSizeAndDirSize : You do not have minimum space available to continue with this
 ```
 
-To skip this free disk space check please use ```--skip-storage-check``` flag
+To skip this free disk space check, use the ```--skip-storage-check``` flag.
 
 2. If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
 
