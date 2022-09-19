@@ -126,9 +126,13 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
 
 ### Sample config
+
 {{< note >}}
--   Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+
+- Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+
 {{< /note >}}
+
 ```config
 # This is a Chef Automate AWS HA mode configuration file. You can run
 # 'chef-automate deploy' with this config file and it should
@@ -167,17 +171,19 @@ chef_server_private_ips = ["I.J.K.L","M.N.O.P"]
 opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
 postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 ```
-### Minimum changes to be made
--   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
--   Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
--   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Eg: `chefautomate.example.com`
--   `automate_private_ips` Eg: ["192.0.0.1"]
--   `chef_server_private_ips` Eg: ["192.0.1.1"]
--   `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
--   `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
+### Minimum changes to be made
+
+- Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
+- Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
+- Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM’s. Eg: `chefautomate.example.com`
+- `automate_private_ips` Eg: ["192.0.0.1"]
+- `chef_server_private_ips` Eg: ["192.0.1.1"]
+- `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
+- `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
 ### How To Add More Nodes to the On-Prem Deployment 
+
 - Open the `config.toml` at bastion node
 - change the `instance_count` value, as explained in below example.
 - Add the `Ip address` for the respetive node at the end, as explained in the example.
@@ -190,13 +196,16 @@ For example : Add new Automate node to the existing deployed cluster.
 
 - Trigger the deployment command again from the bastion node.
 - In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
-  ```
+  
+  ```sh
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
+
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
-### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment). 
+### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment)
+
 {{< warning >}}
  We do not recommend removal of any node from backend cluster, but replacement of node is recommended. For replacement of a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
 {{< /warning >}}
@@ -212,13 +221,16 @@ For example : Remove Automate node to the existing deployed cluster.
   
 - Trigger the deployment command again from the bastion node.
 - In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
-  ```
+  
+  ```sh
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
+
 - Above process can be done for `chef-server` and `automate`.
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
 ### How to Replace Node in Automate HA Cluster
+
 - Open the `config.toml` at bastion node.
 - Remove the `Ip Address` of unhealth node as explained in below example.
 - Add the new `Ip address` value, as explained in below example.
@@ -232,29 +244,38 @@ For example : Remove Automate node to the existing deployed cluster.
   | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
   
 - Run the below command from the bastion node.
-  ```
+
+  ```sh
   cd /hab/a2_deploy_workspace/terraform
   for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
   cd -
-  ``` 
+  ```
+
 - Run the `deploy` command to Add new node into the cluster.
 - In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
-  ```
+  
+  ```sh
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
 
 ### Troubleshooting
+
 #### Failure in adding nodes
-  ```
+
+  ```bash
   Error: Upload failed: scp: /var/automate-ha: Permission denied
   ```
+
 - **Resolution** : Execute the below command.
-  ```
+  
+  ```sh
   cd /hab/a2_deploy_workspace/terraform
   for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
   cd -
-   ``` 
-- Once the module's tainted, run the `deploy` command again.`latest.aib` should be replaced with your airgap bundle name which is running on the current cluster
    ```
+
+- Once the module's tainted, run the `deploy` command again.`latest.aib` should be replaced with your airgap bundle name which is running on the current cluster
+   
+   ```sh
      chef-automate deploy config.toml --airgap-bundle latest.aib
    ```
