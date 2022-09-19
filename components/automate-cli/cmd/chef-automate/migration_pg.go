@@ -201,7 +201,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 }
 
 func checkSpaceAvailable(dataDir string) (bool, error) {
-	return majorupgradechecklist.CheckSpaceAvailable(true, dataDir, nil, "", false, "")
+	return majorupgradechecklist.CheckSpaceAvailable(true, dataDir, "", false, "")
 }
 
 func runMigrateDataCmd(cmd *cobra.Command, args []string) error {

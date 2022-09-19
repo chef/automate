@@ -247,7 +247,7 @@ func diskSpaceCheck(version string, skipStorageCheck bool, osDestDataDir string)
 		Name:        "disk_space_acceptance",
 		Description: "confirmation check for disk space",
 		TestFunc: func(h ChecklistHelper) error {
-			_, err := CheckSpaceAvailable(false, "", h.Writer, version, skipStorageCheck, osDestDataDir)
+			_, err := CheckSpaceAvailable(false, "", version, skipStorageCheck, osDestDataDir)
 			return err
 		},
 	}
