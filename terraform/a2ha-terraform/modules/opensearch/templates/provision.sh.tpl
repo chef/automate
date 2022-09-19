@@ -129,5 +129,5 @@ done
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
   sudo chown -RL hab:hab /hab/svc/automate-ha-opensearch/config/opensearch.keystore
   hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore list
-  curl -k -X POST "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty" -u admin:admin
+  curl -k -X POST "https://127.0.0.1:${listen_port}/_nodes/reload_secure_settings?pretty" -u $opensearch_username:$opensearch_user_password
 fi
