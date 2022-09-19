@@ -32,6 +32,10 @@ locals {
     opensearch_username             = var.opensearch_username
     opensearch_user_password        = var.opensearch_user_password
   })
+
+  efs_backup = templatefile("${path.module}/templates/efs_backup.sh.tpl", {
+    nfs_mount_path        = var.nfs_mount_path
+  })
 }
 
 resource "null_resource" "opensearch" {
@@ -90,7 +94,7 @@ resource "null_resource" "backup_configuration" {
 
   provisioner "file" {
     destination = "${var.tmp_path}/efs_backup.sh"
-    source      = "${path.module}/templates/efs_backup.sh"
+    content      = local.efs_backup
   }
 
   provisioner "remote-exec" {

@@ -1,8 +1,9 @@
 #!/bin/bash
 
 source /hab/sup/default/SystemdEnvironmentFile.sh
-echo  '
+<<EOT > es_config.toml
 [path]      
-  repo = "/mnt/automate_backups/opensearch" ' > es_config.toml
+  repo = "${nfs_mount_path}/opensearch" ' 
+EOT
 
 hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml

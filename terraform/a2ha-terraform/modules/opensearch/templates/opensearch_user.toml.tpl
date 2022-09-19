@@ -9,10 +9,6 @@
 [transport]
   port = 9300
 
-
-# "backup_config_efs: ${backup_config_efs}"
-# "backup_config_s3: ${backup_config_s3}"
-
 ${ "${backup_config}" == "s3" ? <<EOT
 [s3]
   [s3.client.default]
