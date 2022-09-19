@@ -186,9 +186,16 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [automate.config] <br> instance_count = "1" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D"] |  | [automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","P.Q.R.S"] |
+  | [automate.config] <br> instance_count = "1" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
 
-- Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
+- Trigger the deployment command again from the bastion node. 
+
+  ```
+  chef-automate deploy config.toml --airgap-bundle latest.aib
+
+  # Note: latest.aib will replace with your airgap bundle name which was install in the cluster
+  ```
+
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
 
 ### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment). 
@@ -199,9 +206,17 @@ For example : Add new Automate node to the existing deployed cluster.
 For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [automate.config] <br> instance_count = "3" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","E.F.G.H","X.Y.Z.Q"] |  |[automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["A.B.C.D","X.Y.Z.Q"] |
+  | [automate.config] <br> instance_count = "3" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
   
-- Trigger the deployment command again from the bastion node `chef-automate deploy config.toml --airgap-bundle latest.aib`.
+- Trigger the deployment command again from the bastion node 
+
+  ```
+  chef-automate deploy config.toml --airgap-bundle latest.aib
+
+  # Note: latest.aib will replace with your airgap bundle name which was install in the cluster.
+  
+  ```
+
 - Above process can be done for `chef-server` and `automate`.
 
 ### How to Replace Node in Automate HA Cluster
@@ -211,11 +226,11 @@ For example : Remove Automate node to the existing deployed cluster.
 - Make sure that all the necesssary port and fire wall setting are allign in the new node.
 
  For example : Remove node to the existing deployed Postgres cluster.
- In the example we are replacing the node `E.F.G.H` with `P.Q.R.S`.
+ In the example we are replacing the node `10.0.7.0` with `10.0.9.0`.
 
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","E.F.G.H","W.X.Y.Z"] |  | [existing_infra.config] <br> postgresql_private_ips = ["A.B.C.D","P.Q.R.S","W.X.Y.Z"] |
+  | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
   
 - Run the below command from the bastion node.
 
@@ -225,7 +240,13 @@ For example : Remove Automate node to the existing deployed cluster.
   cd -
   ``` 
 
-- Run the `deploy` command to Add new node into the cluster `chef-automate deploy config.toml --airgap-bundle latest.aib`
+- Run the `deploy` command to Add new node into the cluster 
+
+  ```
+  chef-automate deploy config.toml --airgap-bundle latest.aib
+
+  # Note: latest.aib will replace with your airgap bundle name which was install in the cluster
+  ```
 
 ### Troubleshooting
 - while adding new node into the cluster if we get an below error
