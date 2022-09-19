@@ -188,11 +188,12 @@ For example : Add new Automate node to the existing deployed cluster.
   | :--- | :--- | :--- |
   | [automate.config] <br> instance_count = "1" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
 
-- Trigger the deployment command again from the bastion node. 
+- Trigger the deployment command again from the bastion node.
 
   {{< note >}}
     In below deploy command,latest.aib will replace with your airgap bundle name which was install in the cluster.
   {{< /note >}}
+
   ```
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
@@ -210,7 +211,8 @@ For example : Remove Automate node to the existing deployed cluster.
   | :--- | :--- | :--- |
   | [automate.config] <br> instance_count = "3" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br> instance_count = "2" <br> [existing_infra.config] <br> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
   
-- Trigger the deployment command again from the bastion node 
+- Trigger the deployment command again from the bastion node.
+
 {{< note >}}
   In below deploy command, latest.aib will replace with your airgap bundle name which was install in the cluster.
 {{< /note >}}
@@ -243,7 +245,8 @@ For example : Remove Automate node to the existing deployed cluster.
   cd -
   ``` 
 
-- Run the `deploy` command to Add new node into the cluster 
+- Run the `deploy` command to Add new node into the cluster.
+
 {{< note >}}
   In below deploy command, latest.aib will replace with your airgap bundle name which was install in the cluster.
 {{< /note >}}
