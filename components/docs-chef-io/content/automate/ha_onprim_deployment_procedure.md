@@ -31,6 +31,7 @@ In this section, we'll discuss the steps to deploy Chef Automate HA on-premise m
 - This common user should have sudo privileges.
 - This common user uses same SSH Private Key file to access all machines.
 - Key-based SSH for the provisioning user for all the machine for HA-Deployment.
+- We do not support passphrase for Private Key authentication.
 - LoadBalancers are setup according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
 - DNS is configured to redirect `chefautomate.example.com` to Primary Load Balancer.
@@ -70,6 +71,10 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    "
    ```
 
+   {{< note >}} 
+   Chef Automate bundles are available for 60 days from the release of a version. However, the milestone release bundles are available for download forever.
+   {{< /note >}}
+
    Note: If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command. \
    After transfering, in Airgapped Bastion, run below commands:
 
@@ -84,7 +89,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    "
    ```
 
-2. Update Config with relevant data
+2. Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config) for sample config
 
    ```bash
    vi config.toml
@@ -97,7 +102,9 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
       - Thus, overall minimum machines needed will be 5.
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
-   - Give `ssh_key_file` path, this key should have access to all the Machines or VM's
+   - Give `ssh_key_file` path, this key should have access to all the Machines or VM's.
+   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
+   - We support only private key authentication.
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
@@ -117,3 +124,55 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    ```
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+
+#### Sample config
+{{< note >}}
+-   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+{{< /note >}}
+```config
+# This is a Chef Automate AWS HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
+[architecture.existing_infra]
+ssh_user = ""
+# private ssh key file path to access instances
+# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+ssh_key_file = ""
+ssh_port = "22"
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "existing_nodes"
+workspace_path = "/hab/a2_deploy_workspace"
+# DON'T MODIFY THE BELOW LINE (backup_mount)
+backup_mount = "/mnt/automate_backups"
+# ============== EC2 Nodes Config ======================
+[automate.config]
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+fqdn = ""
+instance_count = "1"
+config_file = "configs/automate.toml"
+[chef_server.config]
+instance_count = "1"
+[opensearch.config]
+instance_count = "3"
+[postgresql.config]
+instance_count = "3"
+[existing_infra.config]
+## === INPUT NEEDED ===
+# provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+# No of ip address should be same as No of instance_count count mentioned above in
+# automate.config, chef_server.config, opensearch.config and postgresql.config
+automate_private_ips = []
+chef_server_private_ips = []
+opensearch_private_ips = []
+postgresql_private_ips = []
+```
+##### Minimum changes to be made
+-   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
+-   Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
+-   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM’s. Eg: `chefautomate.example.com`
+-   `automate_private_ips` Eg: ["192.0.0.1"]
+-   `chef_server_private_ips` Eg: ["192.0.1.1"]
+-   `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
+-   `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
+

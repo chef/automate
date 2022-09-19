@@ -41,7 +41,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
     Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
 - Have SSH Key Pair ready in AWS, so new VM's are created using that pair.
     Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
-
+- We do not support passphrase for Private Key authentication.
 ### Deployment
 
 Run the following steps on Bastion Host Machine:
@@ -65,7 +65,11 @@ Run the following steps on Bastion Host Machine:
    "
    ```
 
-2. Update Config with relevant data.
+   {{< note >}} 
+   Chef Automate bundles are available for 60 days from the release of a version. However, the milestone release bundles are available for download forever.
+   {{< /note >}}
+
+2. Update Config with relevant data. Click [here](/automate/ha_aws_deploy_steps/#sample-config) for sample config
 
    ```bash
    vi config.toml
@@ -74,6 +78,8 @@ Run the following steps on Bastion Host Machine:
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`
    - Give `ssh_port` in case your AMI is running on custom ssh port, default will be 22.
    - Give `ssh_key_file` path, this should have been download from AWS SSH Key Pair which we want to use to create all the VM's. Thus, we will be able to access all VM's using this.
+   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
+   - We support only private key authentication.
    - Set `backup_config` to `"efs"` or `"s3"`
    - If `backup_config` is `s3` then set `s3_bucketName` to a Unique Value.
    - Set `admin_password` which you can use to access Chef Automate UI for user `admin`.
@@ -170,3 +176,102 @@ To destroy infra after successfull provisioning, run below command in your basti
     ```bash
     for i in 1;do i=$PWD;cd /hab/a2_deploy_workspace/terraform/destroy/aws/;terraform destroy;cd $i;done
     ```
+
+#### Sample config
+{{< note >}}
+-   Assuming 8+1 nodes (1 bastion, 1 for automate UI, 1 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+{{< /note >}}
+{{< note >}}
+-   User only needs to create/setup **the bastion node** with IAM role of Admin access, and s3 bucket access attached to it.
+-   It is adviceble to create bastion server (EC2 instance) in a new VPC.
+-   Following config will create s3 bucket for backup.
+{{< /note >}}
+```config
+[architecture.aws]
+ssh_port = "22"
+ssh_user = ""
+# Private SSH key file path, which has access to all the instances.
+# Eg.: ssh_key_file = "~/.ssh/A2HA.pem"
+ssh_key_file = ""
+# Eg.: backup_config = "efs" or "s3"
+backup_config = "s3"
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "aws"
+workspace_path = "/hab/a2_deploy_workspace"
+# DON'T MODIFY THE BELOW LINE (backup_mount)
+backup_mount = "/mnt/automate_backups"
+[automate.config]
+admin_password = ""
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+fqdn = ""
+instance_count = "1"
+config_file = "configs/automate.toml"
+[chef_server.config]
+instance_count = "1"
+[opensearch.config]
+instance_count = "3"
+[postgresql.config]
+instance_count = "3"
+[aws.config]
+profile = "default"
+# Eg.: region = "us-east-1"
+region = ""
+aws_vpc_id  = ""
+aws_cidr_block_addr  = ""
+private_custom_subnets = []
+public_custom_subnets = []
+# ssh key pair name in AWS to access instances
+# eg: ssh_key_pair_name = "A2HA"
+ssh_key_pair_name = ""
+# ============== EC2 Instance Config ===================
+# eg: ami_filter_name = ""
+ami_filter_name = ""
+# Only if we have filter criteria. Best give 'ami_id' below.
+ami_filter_virt_type = ""
+# Filter ami based on owner.
+ami_filter_owner = ""
+## === INPUT NEEDED ===
+# This AMI should be from the Same Region which we selected above.
+# eg: ami_id = "ami-08d4ac5b634553e16" # This ami is of Ubuntu 20.04 in us-east-1
+ami_id = ""
+automate_server_instance_type = "t3.medium"
+chef_server_instance_type = "t3.medium"
+opensearch_server_instance_type = "m5.large"
+postgresql_server_instance_type = "t3.medium"
+automate_lb_certificate_arn = ""
+chef_server_lb_certificate_arn = ""
+automate_ebs_volume_iops = "100"
+automate_ebs_volume_size = "50"
+automate_ebs_volume_type = "gp3"
+chef_ebs_volume_iops = "100"
+chef_ebs_volume_size = "50"
+chef_ebs_volume_type = "gp3"
+opensearch_ebs_volume_iops = "100"
+opensearch_ebs_volume_size = "50"
+opensearch_ebs_volume_type = "gp3"
+postgresql_ebs_volume_iops = "100"
+postgresql_ebs_volume_size = "50"
+postgresql_ebs_volume_type = "gp3"
+lb_access_logs = "false"
+# ======================================================
+# ============== EC2 Instance Tags =====================
+X-Contact = ""
+X-Dept = ""
+X-Project = "Test_Project"
+# ======================================================
+```
+##### Changes to be made
+-   Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
+-   Give `ssh_key_file` path, this key should have access to all the Machines or VM’s. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
+-   Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM’s. (optional for above configuration) Eg: `chefautomate.example.com`
+-   Provide `region` Eg: `us-east-1`, `ap-northeast-1`.
+-   Provide `aws_vpc_id` Eg: `vpc-0a12*****`
+-   Provide `aws_cidr_block_addr` Eg: `10.0.192.0`
+-   Provide `ssh_key_pair_name` Eg: `user-key`
+-   Provide `ami_filter_name` Eg: `ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*`
+-   Provide `ami_filter_virt_type` Eg: `hvm`
+-   Provide `ami_filter_owner` Eg: `112758395563`
+-   Give `ami_id` for the respective region where the infra is been created. Eg: `ami-0bb66b6ba59664870`
+-   Provide `certificate ARN` for both automate and Chef server in `automate_lb_certificate_arn` and `chef_server_lb_certificate_arn` respectivelly.
+
