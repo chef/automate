@@ -2,8 +2,10 @@ package usagegenerator
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -32,7 +34,7 @@ type ConvergeInfo struct {
 
 type ComplianceInfo interface{}
 
-var url = "http://%s:%s"
+var url = "https://%s:%s"
 var errorcsv = "Error while writing csv: "
 var timeFormat = "2006-01-02"
 var dateFormat = "yyyy-MM-dd"
@@ -41,16 +43,25 @@ var datetimesecFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
 var errorQuery = "Error in query: "
 
 func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
 	elasticSearchURL := fmt.Sprintf(url, esHostName, esPort)
-	client, err := elastic.NewClient(
+	esclient, err := elastic.NewClient(
+		elastic.SetHttpClient(client),
 		elastic.SetURL(elasticSearchURL),
 		elastic.SetSniff(false),
+		elastic.SetBasicAuth("admin", "admin"),
 	)
 	if err != nil {
 		fmt.Println("Elastic error : ", err)
 		os.Exit(1)
 	}
-	return client
+	return esclient
 }
 
 func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
