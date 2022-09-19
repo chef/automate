@@ -190,11 +190,9 @@ For example : Add new Automate node to the existing deployed cluster.
 
 - Trigger the deployment command again from the bastion node.
 - In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
-
   ```
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
-
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
@@ -214,11 +212,9 @@ For example : Remove Automate node to the existing deployed cluster.
   
 - Trigger the deployment command again from the bastion node.
 - In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
-
   ```
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
-
 - Above process can be done for `chef-server` and `automate`.
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
@@ -236,16 +232,13 @@ For example : Remove Automate node to the existing deployed cluster.
   | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
   
 - Run the below command from the bastion node.
-
   ```
   cd /hab/a2_deploy_workspace/terraform
   for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
   cd -
   ``` 
-
 - Run the `deploy` command to Add new node into the cluster.
 - In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
-
   ```
     chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
@@ -255,11 +248,11 @@ For example : Remove Automate node to the existing deployed cluster.
   ```
   Error: Upload failed: scp: /var/automate-ha: Permission denied
   ```
-Resolution : Execute the below command.
+- Resolution : Execute the below command.
   ```
   cd /hab/a2_deploy_workspace/terraform
   for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
   cd -
    ``` 
 - Once the module's tainted, run the `deploy` command again `chef-automate deploy config.toml --airgap-bundle latest.aib`
-- In below deploy command,latest.aib will replace with your airgap bundle name which is running on the current cluster.
+ (latest.aib will replace with your airgap bundle name which is running on the current cluster).
