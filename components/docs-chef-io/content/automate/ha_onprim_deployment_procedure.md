@@ -182,7 +182,7 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 - `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
 - `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
-### How To Add More Nodes to the On-Prem Deployment 
+### How To Add More Nodes to the On-Prem Deployment
 
 - Open the `config.toml` at bastion node
 - change the `instance_count` value, as explained in below example.
@@ -204,7 +204,7 @@ For example : Add new Automate node to the existing deployed cluster.
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
 - In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
 
-### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment)
+### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
 
 {{< warning >}}
  We do not recommend removal of any node from backend cluster, but replacement of node is recommended. For replacement of a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
@@ -279,4 +279,3 @@ For example : Remove Automate node to the existing deployed cluster.
   ```sh
      chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
-  
