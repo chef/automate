@@ -20,7 +20,8 @@ export class SettingsLandingComponent {
     { allOfCheck: [['/apis/iam/v2/tokens', 'get']], route: '/settings/tokens' },
     { allOfCheck: [['/apis/iam/v2/policies', 'get']], route: '/settings/policies' },
     { allOfCheck: [['/apis/iam/v2/roles', 'get']], route: '/settings/roles' },
-    { allOfCheck: [['/apis/iam/v2/projects', 'get']], route: '/settings/projects' }
+    { allOfCheck: [['/apis/iam/v2/projects', 'get']], route: '/settings/projects' },
+    { allOfCheck: [['/apis/iam/v2/sso', 'get']], route: '/settings/sso' }
   ];
 
 }

@@ -219,6 +219,7 @@ import {
 } from './page-components/data-feed-table/data-feed-table.component';
 import { SigninService } from './services/signin/signin.service';
 import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-banner/manual-upgrade-banner.component';
+import { ConfigureComponent } from './modules/configure/configure.component';
 
 
 @NgModule({
@@ -282,7 +283,8 @@ import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-b
     WarningBannerComponent,
     DataFeedConfigDetailsComponent,
     DataFeedTableComponent,
-    ManualUpgradeBannerComponent
+    ManualUpgradeBannerComponent,
+    ConfigureComponent
   ],
   imports: [
     ApiTokenModule,
