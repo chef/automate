@@ -177,11 +177,11 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 -   `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
 
 
-### How To Add More Nodes to the Onprem Deployment 
-- Open the `config.toml` at bastion node.
-- change the `instance_count` value, as explain in below example.
-- Add the `Ip address` for the respetive node at the end, as expain in the example.
-- Make sure that all the necesssary port and fire wall setting are allign in the new node.
+### How To Add More Nodes to the On-Prem Deployment 
+- Open the `config.toml` at bastion node
+- change the `instance_count` value, as explained in below example.
+- Add the `Ip address` for the respetive node at the end, as explained in the example.
+- Make sure that all the necesssary port and fire wall setting are align in the new node.
 
 For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
@@ -198,12 +198,12 @@ For example : Add new Automate node to the existing deployed cluster.
 
 ### How To Remove Any Nodes From Frontend Cluster (Onprem Deployment). 
 {{< warning >}}
- We can not remove the node from backend cluster, but we can replace the node. For replace a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
+ We do not recommend removal of any node from backend cluster, but replacement of node is recommended. For replacement of a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
 {{< /warning >}}
 
 - Open the `config.toml` at bastion node.
-- change the `instance_count` value, as explain in below example.
-- Remove the `Ip address` for the respetive node, as explain in the example.
+- change the `instance_count` value, as explained in below example.
+- Remove the `Ip address` for the respective node, as explained in the example.
 
 For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
@@ -220,9 +220,9 @@ For example : Remove Automate node to the existing deployed cluster.
 
 ### How to Replace Node in Automate HA Cluster
 - Open the `config.toml` at bastion node.
-- Remove the `Ip Address` of unhealth node as explain in below example.
-- Add the new `Ip address` value, as explain in below example.
-- Make sure that all the necesssary port and fire wall setting are allign in the new node.
+- Remove the `Ip Address` of unhealth node as explained in below example.
+- Add the new `Ip address` value, as explained in below example.
+- Make sure that all the necessary  port and fire wall setting are align in the new node.
 
  For example : Remove node to the existing deployed Postgres cluster.
  In the example we are replacing the node `10.0.7.0` with `10.0.9.0`.
@@ -248,11 +248,13 @@ For example : Remove Automate node to the existing deployed cluster.
   ```
   Error: Upload failed: scp: /var/automate-ha: Permission denied
   ```
-- Resolution : Execute the below command.
+- **Resolution** : Execute the below command.
   ```
   cd /hab/a2_deploy_workspace/terraform
   for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
   cd -
    ``` 
-- Once the module's tainted, run the `deploy` command again `chef-automate deploy config.toml --airgap-bundle latest.aib`
- (`latest.aib` will replace with your airgap bundle name which is running on the current cluster).
+- Once the module's tainted, run the `deploy` command again.`latest.aib` should be replaced with your airgap bundle name which is running on the current cluster
+   ```
+     chef-automate deploy config.toml --airgap-bundle latest.aib
+   ```
