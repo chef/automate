@@ -72,7 +72,7 @@ There are four possible scenarios to upgrade from the 3.0.49 to the 4.0.x versio
 
 - [Chef Automate in Air-Gapped Environment with External Elasticsearch]({{< relref "#chef-automate-in-air-gapped-environment-with-external-elasticsearch" >}})
 
-{{< note >}} Confirm whether your installation is using an external Elasticsearch by running the `chef-automate config show` command. If `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
+{{< note >}} Confirm whether your installation is using an external Elasticsearch by running the `chef-automate config show` command. If `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using an external Elasticsearch. {{< /note >}}
 
 {{< warning >}} Your drive should have a minimum of 60% of free space to start the major version upgrade. {{< /warning >}}
 
@@ -133,7 +133,7 @@ Post Upgrade Steps:
 2. Disable the maintenance mode if you enabled it previously using:
 	$ chef-automate maintenance off
   
-3. Migrate Data from Elastic Search to Open Search using this command:
+3. Migrate Data from ElasticSearch to Open Search using this command:
      $ chef-automate post-major-upgrade migrate --data=es
   
 4. Check Automate UI; everything is running, and all data is visible.
@@ -147,7 +147,7 @@ y
 
 ```
 
-{{< note >}} To continue with the upgradation, the /hab should contain at least 5GB of free space. {{< /note >}}
+{{< note >}} To continue with the upgrade, the /hab should contain at least 5GB of free space. {{< /note >}}
 
 {{< note >}}
 
@@ -380,7 +380,7 @@ Post Upgrade Steps:
 2. Disable the maintenance mode if you enabled it previously using:
   $ chef-automate maintenance off
   
-3. Migrate Data from Elastic Search to Open Search using this command:
+3. Migrate Data from ElasticSearch to Open Search using this command:
      $ chef-automate post-major-upgrade migrate --data=es
   
 4. Check Automate UI; everything is running, and all data is visible
@@ -394,7 +394,7 @@ y
 
 ```
 
-{{< note >}} To continue with the upgradation, the /hab should contain at least 5GB of free space. {{< /note >}}
+{{< note >}} To continue with the upgrade, the /hab should contain at least 5GB of free space. {{< /note >}}
 
 {{< note >}}
 
