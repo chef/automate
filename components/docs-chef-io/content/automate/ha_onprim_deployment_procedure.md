@@ -275,7 +275,8 @@ For example : Remove Automate node to the existing deployed cluster.
    ```
 
 - Once the module's tainted, run the `deploy` command again.`latest.aib` should be replaced with your airgap bundle name which is running on the current cluster
-   
+
   ```sh
      chef-automate deploy config.toml --airgap-bundle latest.aib
   ```
+  
