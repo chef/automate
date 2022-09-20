@@ -24,6 +24,41 @@ gh_repo = "automate"
 
 - To connect to the DB instance, the DB instance should be associated with a security group that provides access to it. Ensure External RDS is accessible from Automate instances.
 
+### Adding Resolvers for PostgreSQL Database
+
+In case you want to resolve the PostgreSQL cluster node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
+
+Name Servers can be added in two ways:
+
+1. **Add nameserver IPs:** If you are aware of the nameservers which should resolve the PostgreSQL nodes, the nameservers can be added to your `config.toml` file.
+
+    ```toml
+    [pg_gateway.v1.sys.resolvers]
+      # Multiple resolvers can be specified by adding the resolvers in the list.
+      nameservers = ["127.0.0.53:53"]
+    ```
+
+1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
+
+    ```toml
+    [pg_gateway.v1.sys.resolvers]
+      enable_system_nameservers = true
+    ```
+
+If both options are set, nameserver IPs takes precedence over the system nameserver entries.
+
+Apply the changes:
+
+```bash
+sudo chef-automate config patch config.toml
+````
+
+If you wish to reset to the default configuration or to modify the configuration:
+
+1. Run `chef-automate config show config.toml`.
+2. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
+3. Run `chef-automate config set config.toml` to apply your changes.
+
 ### OpenSearch Setup
 
 - Create an Opensearch domain. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
@@ -108,6 +143,40 @@ The command provides no feedback and runs indefinitely. Select *Ctrl + C* to sto
 Navigate to `https://localhost:9200/\_dashboards/` in your web browser. To navigate, acknowledge a security exception.
 
 Alternately, you can send requests to `https://localhost:9200` using curl, Postman, or any programming language. {{< /note >}}
+
+### Add Resolvers for OpenSearch
+
+In case you want to resolve the OpenSearch node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
+
+Name Servers can be added in two ways:
+
+1. **Add nameserver IPs:** Add the nameservers to your `config.toml` file to resolve the OpenSearch nodes.
+
+    ```toml
+    [esgateway.v1.sys.ngx.main.resolvers]
+      # Multiple resolvers can be specified by adding the resolvers in the list.
+      nameservers = ["192.0.2.0:24", "198.51.100.0:24"]
+    ```
+
+1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
+
+    ```toml
+    [esgateway.v1.sys.ngx.main.resolvers]
+      enable_system_nameservers = true
+    ```
+
+If both options are set, nameserver IPs takes precedence over the system nameserver entries.
+
+Apply the changes:
+
+```bash
+sudo chef-automate config patch config.toml
+````
+If you wish to reset to the default configuration or to modify the configuration:
+
+1. Run `chef-automate config show config.toml`.
+1. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
+1. Run `chef-automate config set config.toml` to apply your changes.
 
 ## Chef Automate Backup from Embedded PostgreSQL/OpenSearch and restore to External AWS PostgreSQL/OpenSearch
 
