@@ -1230,6 +1230,12 @@ paths = [
   "lib/user/*",
   "lib/version/*"
 ]
+
+[automate-knife-ec-backup]
+plan_path = "components/automate-knife-ec-backup"
+paths = [
+  "components/automate-knife-ec-backup/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
@@ -1259,3 +1265,5 @@ paths = [
   "components/automate-platform-tools/*",
   "components/notifications-service/*"
 ]
+
+
