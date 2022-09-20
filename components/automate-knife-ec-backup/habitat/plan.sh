@@ -30,9 +30,10 @@ do_build() {
 }
 
 do_install() {
+  hab install "chef/knife-ec-backup" -bf
   return 0
 }
 
 do_end() {
-  return 0
+ return 0
 }
