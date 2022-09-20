@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
@@ -151,7 +152,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			)
 		}
 	} else {
-		fmt.Println(validatedResp)
+		PrintVersions(writer, validatedResp.CurrentVersion, validatedResp.TargetVersion)
 		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
 			writer.Println("Chef Automate up-to-date")
 			return nil
@@ -217,6 +218,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	// stuff breaks when deployment-service is restarted. Until that's fixed,
 	// it would be pointless to try to stream the events.
 	return nil
+}
+
+func PrintVersions(writer *cli.Writer, currentVersion, targetVersion string) {
+	writer.Println("Current version: " + currentVersion)
+	writer.Println("Target version: " + targetVersion)
 }
 
 // restartDeploymentService will kill the Pid of Deployment Service and then Hab will restart this service
@@ -373,11 +379,13 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			if resp.IsAirgapped {
 				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
 			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
-				writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
-					resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
-				if !resp.IsConvergeCompatable {
-					writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
-				}
+				isMajor := !resp.IsConvergeCompatable
+				PrintAutomateOutOfDate(writer, resp.CurrentVersion, resp.LatestAvailableVersion, isMajor)
+				// writer.Printf("Automate is out-of-date (current version: %s; next available version: %s; is Airgapped: %v)\n",
+				// 	resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
+				// if !resp.IsConvergeCompatable {
+				// 	writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
+				// }
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
 			}
@@ -613,4 +621,22 @@ type OpenSearchModel struct {
 
 type OpenSearch_v1 struct {
 	V1 *opensearch.ConfigRequest_V1 `json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
+}
+
+const (
+	msgAutomateOutOfDate = `Automate is out-of-date !!`
+	msgInfoMajor         = `
+Please ensure you are using latest CLI version and then run the command:
+  $ chef-automate upgrade run --major command to upgrade to latest version
+
+Visit https://docs.chef.io/automate/major_upgrade_4.x for more information`
+)
+
+func PrintAutomateOutOfDate(writer *cli.Writer, currentVersion, latestVersion string, isMajor bool) {
+	writer.Println(msgAutomateOutOfDate)
+	writer.Println("Current version: " + currentVersion)
+	writer.Println("Latest upgradable version: " + latestVersion)
+	if isMajor {
+		writer.Println(msgInfoMajor)
+	}
 }
