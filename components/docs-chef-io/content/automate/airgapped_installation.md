@@ -45,8 +45,7 @@ Download the bundle of a specific version using:
 curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o </path/to/airgap-install-bundle>
 ```
 
-{{< note >}} Chef Automate bundles are available for 60 days from the release of a version.  
-However, the milestone release bundles are available for download forever.{{< /note >}}
+{{< note >}} Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.{{< /note >}}
 
 ## Create an Airgap Installation Bundle
 
