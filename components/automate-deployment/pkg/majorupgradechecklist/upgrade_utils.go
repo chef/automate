@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math"
+	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -13,6 +13,18 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	cm "github.com/chef/automate/lib/io/fileutils"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	MIN_DIRSIZE_GB float64 = 5
+
+	DISKSPACE_CHECK_ERROR = `You do not have minimum space available to continue with this %s. 
+Please ensure you have %.2f GB free disk space.
+To skip this free disk space check please use --skip-storage-check flag.`
+	HAB_DIR                  = "/hab"
+	HAB_5GB_FREE_SPACE_ERROR = "\n  - /hab/ directory should have more than 5GB free space"
+	DIR_FREE_SPACE_ERROR     = "\n  - %s directory should have more than %.2fGB free space"
+	DEST_FLAG_INFO           = "%s\nDestination directory chosen to check free disk space: %s\nTo change destination directory please use --os-dest-data-dir flag"
 )
 
 type Checklist struct {
@@ -71,26 +83,12 @@ func IsExternalElasticSearch() bool {
 	return res.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
 }
 
-func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatWriter, version string, skipStorageCheck bool, osDestDataDir string) (bool, error) {
+func CheckSpaceAvailable(isMigration bool, dbDataPath string, version string, skipStorageCheck bool, osDestDataDir string) (bool, error) {
+
+	if skipStorageCheck {
+		return true, nil
+	}
 	habRootPath := getHabRootPath(habrootcmd)
-	habDirSize, err := cm.CalDirSizeInGB(habRootPath)
-
-	if err != nil {
-		if writer != nil {
-			writer.Error(err.Error())
-		}
-		return false, status.Errorf(status.UnknownError, err.Error())
-	}
-
-	// If (/hab) dir size is less than 5GB, then throw error
-	habSpaceAvailable, err := cm.CheckSpaceAvailability(habRootPath, MIN_DIRSIZE_GB)
-	if err != nil || !habSpaceAvailable {
-		if writer != nil {
-			writer.Errorln(fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space", habRootPath, MIN_DIRSIZE_GB))
-		}
-		return false, status.New(status.UnknownError, fmt.Sprintf("Hab (%s) directory should have more than %.2fGB free space.", habRootPath, MIN_DIRSIZE_GB))
-	}
-
 	if !isMigration {
 		version, _ = GetMajorVersion(version)
 		switch version {
@@ -100,46 +98,41 @@ func CheckSpaceAvailable(isMigration bool, dbDataPath string, writer cli.FormatW
 			dbDataPath = habRootPath + "svc/automate-elasticsearch/data"
 		}
 	}
-
-	dbDataSize, err := cm.CalDirSizeInGB(dbDataPath)
+	habFreeSpace, err := cm.GetFreeSpaceinGB(habRootPath)
 	if err != nil {
-		if writer != nil {
-			writer.Error(err.Error())
-		}
-		return false, status.Errorf(status.UnknownError, err.Error())
+		return false, status.Errorf(status.AvailableSpaceError, err.Error())
 	}
-
-	minReqDiskSpace := math.Max(MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
-
-	diskSpaceErrorType := "migration"
+	sizeESDir, err := cm.CalDirSizeInGB(dbDataPath)
+	if err != nil {
+		return false, status.Errorf(status.CalESDirSizeError, err.Error())
+	}
 	destDir := habRootPath
+	eSDirSizeWithBuffer := sizeESDir * 11 / 10
+	message := ""
+	isDestDirFlag := len(strings.TrimSpace(osDestDataDir)) > 0
 
-	if !isMigration {
-		if osDestDataDir != "" {
-			destDir = osDestDataDir
+	if isDestDirFlag && osDestDataDir != HAB_DIR {
+		destDir = osDestDataDir
+		sizeDestDir, err := cm.GetFreeSpaceinGB(osDestDataDir)
+		if err != nil {
+			return false, status.Errorf(status.CalDestDirSizeError, err.Error())
 		}
-		if writer != nil {
-			resp, err := writer.Confirm(fmt.Sprintf("Ensure destination directory (%s) is having min. %.2f GB free space ?", destDir, minReqDiskSpace))
-			if err != nil {
-				writer.Error(err.Error())
-				return false, status.Errorf(status.UnknownError, err.Error())
-			}
-			if !resp {
-				return false, status.New(status.UnknownError, fmt.Sprintf(diskSpaceError, minReqDiskSpace))
-			}
+		if habFreeSpace < MIN_DIRSIZE_GB {
+			message = HAB_5GB_FREE_SPACE_ERROR
 		}
-		diskSpaceErrorType = "upgrade"
+		if sizeDestDir < eSDirSizeWithBuffer {
+			message += fmt.Sprintf(DIR_FREE_SPACE_ERROR, osDestDataDir, eSDirSizeWithBuffer)
+		}
+	} else {
+		if habFreeSpace < MIN_DIRSIZE_GB+eSDirSizeWithBuffer {
+			message = fmt.Sprintf(DIR_FREE_SPACE_ERROR, habRootPath, MIN_DIRSIZE_GB+eSDirSizeWithBuffer)
+		}
 	}
-
-	if !skipStorageCheck {
-		if !isMigration && writer != nil {
-			writer.Printf("Destination directory chosen to check free disk space: %s\n", destDir)
-			writer.Println("To change destination directory please use --os-dest-data-dir flag")
+	if message != "" {
+		if !isMigration && isDestDirFlag {
+			message = fmt.Sprintf(DEST_FLAG_INFO, message, destDir)
 		}
-		spaceAvailable, err := cm.CheckSpaceAvailability(destDir, minReqDiskSpace)
-		if err != nil || !spaceAvailable {
-			return false, status.New(status.UnknownError, fmt.Sprintf(DISKSPACE_CHECK_ERROR, diskSpaceErrorType, minReqDiskSpace))
-		}
+		return false, status.Errorf(status.InsufficientSpaceError, message)
 	}
 	return true, nil
 }
