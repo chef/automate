@@ -102,7 +102,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	pb_deployment.RegisterDeploymentServer(grpcServer,
 		handler.NewDeploymentServer(deploymentClient))
 
-	pb_sso.RegisterSsoConfigServiceServer(grpcServer, handler.NewServer(deploymentClient))
+	pb_sso.RegisterSsoConfigServiceServer(grpcServer, handler.NewSsoConfigHandler(deploymentClient))
 
 	licenseClient, err := clients.LicenseControlClient()
 	if err != nil {
