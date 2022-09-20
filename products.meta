@@ -57,6 +57,7 @@
     "chef/automate-opensearch",
     "chef/automate-elasticsearch",
     "chef/report-manager-service",
+    "chef/automate-knife-ec-backup",
     "core/rsync"
   ],
 
