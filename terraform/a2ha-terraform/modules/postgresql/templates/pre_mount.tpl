@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
-sudo mkdir -p /mnt/automate_backups/postgresql/pg_dump/
+sudo mkdir -p ${nfs_mount_path}/postgresql/pg_dump/
 
-sudo mkdir -p /mnt/automate_backups/postgresql/archive/
+sudo mkdir -p ${nfs_mount_path}/postgresql/archive/
 
-sudo chown -R hab:hab /mnt/automate_backups/
+sudo chown -R hab:hab ${nfs_mount_path}/

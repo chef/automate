@@ -188,6 +188,8 @@ module "postgresql" {
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
+  backup_config_efs                = var.backup_config_efs
+  nfs_mount_path                  = var.nfs_mount_path
   depends_on                      = [module.airgap_bundle-backend, module.habitat-backend]
 }
 

@@ -13,6 +13,7 @@
   teams_port = ${teams_port}
   backup_config_s3 = "${backup_config_s3}"
   backup_config_efs = "${backup_config_efs}"
+  nfs_mount_path = "${nfs_mount_path}"
   bucket_name = "${bucket_name}"
   s3_endpoint = "${s3_endpoint}"
   access_key = "${access_key}"

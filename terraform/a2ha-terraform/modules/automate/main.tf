@@ -33,6 +33,7 @@ locals {
     tmp_path                           = var.tmp_path,
     backup_config_s3                   = var.backup_config_s3,
     backup_config_efs                  = var.backup_config_efs,
+    nfs_mount_path                     = var.nfs_mount_path,
     s3_endpoint                        = var.s3_endpoint,
     bucket_name                        = var.bucket_name,
     access_key                         = var.access_key

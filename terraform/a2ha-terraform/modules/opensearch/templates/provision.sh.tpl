@@ -122,7 +122,6 @@ done
 # Adding aws access and secret keys once all services are up
 
   echo "Setting up keystore"
-  hab svc status
   export OPENSEARCH_PATH_CONF="/hab/svc/automate-ha-opensearch/config"
   echo $OPENSEARCH_PATH_CONF
   echo "${access_key}" | hab pkg exec "$OS_ORIGIN_NAME/$OS_PKG_NAME" opensearch-keystore add --stdin --force s3.client.default.access_key

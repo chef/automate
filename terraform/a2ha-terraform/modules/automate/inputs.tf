@@ -125,6 +125,10 @@ variable "managed_rds_superuser_username" {
   default = ""
 }
 
+variable "nfs_mount_path" {
+  default = "/mnt/automate_backups"
+}
+
 variable "opensearch_listen_port" {
   default = 9200
 }

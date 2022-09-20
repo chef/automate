@@ -10,6 +10,7 @@ locals {
       tmp_path          = var.tmp_path
       backup_config     = var.backup_config_s3 == "true" ? "s3" : var.backup_config_efs == "true" ? "efs" : ""
       endpoint          = var.s3_endpoint
+    nfs_mount_path                  = var.nfs_mount_path
     })
   ]
   opensearchsidecar_user_toml = [
@@ -82,7 +83,7 @@ resource "null_resource" "opensearch" {
 }
 
 resource "null_resource" "backup_configuration" {
-  count = var.backup_config_efs == "true" ? 1 : 0
+  count = 0
 
   connection {
     user        = var.ssh_user
