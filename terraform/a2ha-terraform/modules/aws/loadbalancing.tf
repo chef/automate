@@ -113,3 +113,54 @@ resource "aws_alb_listener" "chef_server_lb_listener_80" {
     }
   }
 }
+
+resource "aws_wafv2_ip_set" "allow_ipset" {
+  name = "waf_allow_ipset"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = var.ip_allow_list
+}
+
+resource "aws_wafv2_web_acl" "lb_waf_rules" {
+  name     = "waf_rules_lb"
+  scope    = "REGIONAL"
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "allowIPRule"
+    priority = 0
+
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+          arn = aws_wafv2_ip_set.allow_ipset.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allowed-requests-for-lb"
+      sampled_requests_enabled   = true
+    }
+  }
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "waf-acl-metrics"
+    sampled_requests_enabled   = true
+  }
+}
+
+resource "aws_wafv2_web_acl_association" "automate_lb_association" {
+  resource_arn = aws_alb.automate_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.lb_waf_rules.arn
+}
+
+resource "aws_wafv2_web_acl_association" "server_lb_association" {
+  resource_arn = aws_alb.chef_server_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.lb_waf_rules.arn
+}

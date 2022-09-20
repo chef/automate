@@ -136,6 +136,7 @@ aws do
   private_custom_subnets [{{ range $index, $element := .Aws.Config.PrivateCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   public_custom_subnets [{{ range $index, $element := .Aws.Config.PublicCustomSubnets}}{{if $index}},{{end}}"{{$element}}"{{end}}]
   ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
+  ip_allow_list [{{ range $index, $element := .Aws.Config.IpAllowList }}{{if $index}},{{end}}"{{$element}}"{{end}}]
   aws_automate_route53_prefix "{{ .Aws.Config.AwsAutomateRoute53Prefix }}"
   aws_chef_server_route53_prefix "{{ .Aws.Config.AwsChefServerRoute53Prefix }}"
   aws_route53_hosted_zone "{{ .Aws.Config.AwsRoute53HostedZone }}"

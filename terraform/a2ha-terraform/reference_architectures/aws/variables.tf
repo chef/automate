@@ -101,6 +101,10 @@ variable "destroy_bucket" {
   default = false
 }
 
+variable "ip_allow_list" {
+  default = []
+}
+
 variable "managed_opensearch_certificate" {
   default = ""
 }
