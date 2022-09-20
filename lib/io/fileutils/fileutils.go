@@ -3,9 +3,16 @@ package fileutils
 import (
 	"io"
 	"os"
+	"os/exec"
+	"strings"
 
 	"github.com/chef/automate/lib/platform/sys"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	HAB_ROOT_CMD string = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+	HAB_DIR      string = "/hab"
 )
 
 // LogCLose closes the given io.Closer, logging any error.
@@ -68,4 +75,48 @@ func GetFreeSpaceinGB(dir string) (float64, error) {
 		return -1, err
 	}
 	return float64(v) / (1024 * 1024), nil
+}
+
+type FileUtils interface {
+	PathExists(path string) (bool, error)
+	IsSymlink(path string) (bool, error)
+	CalDirSizeInGB(path string) (float64, error)
+	CheckSpaceAvailability(dir string, minSpace float64) (bool, error)
+	GetFreeSpaceinGB(dir string) (float64, error)
+	GetHabRootPath() string
+}
+
+func GetHabRootPath() string {
+	out, err := exec.Command("/bin/sh", "-c", HAB_ROOT_CMD).Output()
+	if err != nil {
+		return HAB_DIR
+	}
+	pkgPath := string(out)
+	habIndex := strings.Index(string(pkgPath), "hab")
+	rootHab := pkgPath[0 : habIndex+4]
+	if rootHab == "" {
+		rootHab = HAB_DIR
+	}
+	return rootHab
+}
+
+type FileSystemUtils struct{}
+
+func (fsu *FileSystemUtils) PathExists(path string) (bool, error) {
+	return PathExists(path)
+}
+func (fsu *FileSystemUtils) IsSymlink(path string) (bool, error) {
+	return IsSymlink(path)
+}
+func (fsu *FileSystemUtils) CalDirSizeInGB(path string) (float64, error) {
+	return CalDirSizeInGB(path)
+}
+func (fsu *FileSystemUtils) CheckSpaceAvailability(dir string, minSpace float64) (bool, error) {
+	return CheckSpaceAvailability(dir, minSpace)
+}
+func (fsu *FileSystemUtils) GetFreeSpaceinGB(dir string) (float64, error) {
+	return GetFreeSpaceinGB(dir)
+}
+func (fsu *FileSystemUtils) GetHabRootPath() string {
+	return GetHabRootPath()
 }
