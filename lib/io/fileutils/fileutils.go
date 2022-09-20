@@ -52,13 +52,20 @@ func CalDirSizeInGB(path string) (float64, error) {
 }
 
 func CheckSpaceAvailability(dir string, minSpace float64) (bool, error) {
-	v, err := sys.SpaceAvailForPath(dir)
+	dirSpaceInGB, err := GetFreeSpaceinGB(dir)
 	if err != nil {
 		return false, err
 	}
-	dirSpaceInGB := float64(v) / (1024 * 1024)
 	if minSpace <= dirSpaceInGB {
 		return true, nil
 	}
 	return false, nil
+}
+
+func GetFreeSpaceinGB(dir string) (float64, error) {
+	v, err := sys.SpaceAvailForPath(dir)
+	if err != nil {
+		return -1, err
+	}
+	return float64(v) / (1024 * 1024), nil
 }
