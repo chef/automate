@@ -153,10 +153,9 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 }
 
 func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
-	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-	rangeQuery.Gte(startTime)
-	rangeQuery.Lte(endTime)
+	rangeQuery := elastic.NewRangeQuery("end_time")
+	rangeQuery.Gte(startTime.Format(time.RFC3339))
+	rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 	aggr := elastic.NewCardinalityAggregation().Field("entity_uuid")
 	searchService := client.Search().
@@ -214,10 +213,9 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 	}
 
 	for {
-		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-		rangeQuery.Gte(t)
-		rangeQuery.Lte(endTime)
+		rangeQuery := elastic.NewRangeQuery("end_time")
+		rangeQuery.Gte(t.Format(time.RFC3339))
+		rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 		fetchSource := elastic.NewFetchSourceContext(true).Include(sourceFields...)
 		searchService := client.Search().
@@ -338,10 +336,9 @@ func queryElasticSearchComplianceResourceCount(client *elastic.Client, startTime
 }
 
 func getUniqueComplianceCounts(client *elastic.Client, startTime time.Time, endTime time.Time) (*elastic.AggregationValueMetric, bool) {
-	rangeQuery := elastic.NewRangeQuery("end_time").
-		Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-	rangeQuery.Gte(startTime)
-	rangeQuery.Lte(endTime)
+	rangeQuery := elastic.NewRangeQuery("end_time")
+	rangeQuery.Gte(startTime.Format(time.RFC3339))
+	rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 	aggr := elastic.NewCardinalityAggregation().Field("node_uuid")
 	searchService := client.Search().
@@ -388,10 +385,9 @@ func queryElasticSearchComplianceResourceRunReport(client *elastic.Client, start
 	}
 	header := true
 	for {
-		rangeQuery := elastic.NewRangeQuery("end_time").
-			Format(dateFormat + "||" + datetimeFormat + "||" + datetimesecFormat)
-		rangeQuery.Gte(t)
-		rangeQuery.Lte(endTime)
+		rangeQuery := elastic.NewRangeQuery("end_time")
+		rangeQuery.Gte(t.Format(time.RFC3339))
+		rangeQuery.Lte(endTime.Format(time.RFC3339))
 
 		fetchSource := elastic.NewFetchSourceContext(true).Include(sourceField...)
 
