@@ -34,7 +34,7 @@ Steps to upgrade the Chef Automate HA are as shown below:
   ```
 
   {{< note >}} 
-  Chef Automate bundles are available for 60 days from the release of a version. However, the milestone release bundles are available for download forever.
+  Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
   {{< /note >}}
 
 - If we want to only upgrade FrontEnd Services i.e. Chef Automate and Chef Infra Server.
