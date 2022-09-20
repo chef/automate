@@ -8,7 +8,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "Disaster Recovery"
     parent = "automate/deploy_high_availability"
-    identifier = "automate/deploy_high_availability/ha.md High Availability Overview"
+    identifier = "automate/deploy_high_availability/dr.md Disaster Recovery"
     weight = 10
 +++
 
