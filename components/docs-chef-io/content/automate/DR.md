@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Disaster Recovery"
     parent = "automate/deploy_high_availability"
     identifier = "automate/deploy_high_availability/dr.md Disaster Recovery"
-    weight = 10
+    weight = 200 +++
 +++
 
 ## How To SetUp Disaster Recovery Cluster For OnPrem Deployment
