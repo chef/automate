@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "Disaster Recovery"
     parent = "automate/deploy_high_availability/DR SetUp"
     identifier = "automate/deploy_high_availability/dr.md Disaster Recovery"
-    weight = 220 +++
+    weight = 220
 +++
 
 ## How To SetUp Disaster Recovery Cluster For OnPrem Deployment
@@ -28,17 +28,13 @@ In this approach we have a cluster running, which perform the `chef-automate bac
 
 {{< note >}}
 
-- After the Deployment on Primary cluster, create bootstrap bundle and save it. Use below command to create the bundle. Run the below command to one of the Automate node.
+- After the Deployment on Primary cluster, create bootstrap bundle and save it. Use below command to create the bootstrap bundle. Run the below command to one of the Automate node.
 
 ```sh
 chef-automate bootstrap bundle create bootstrap.abb
 ```
 
 - After Installation DR Cluster, copy the bootstrap bundle to all the Frontend node and install with below command
-
-```sh
-chef-automate bootstrap bundle unpack bootstrap.abb
-```
 
 {{< /note >}}
 
