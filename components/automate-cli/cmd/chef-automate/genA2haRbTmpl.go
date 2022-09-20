@@ -170,6 +170,8 @@ aws do
   {{ if .Aws.Config.AmiFilterOwner }} ami_filter_owner "{{ .Aws.Config.AmiFilterOwner }}" {{ else }} # ami_filter_owner "{{ .Aws.Config.AmiFilterOwner }}" {{ end }}
   ### Overrides ami filter search features
   {{ if .Aws.Config.AmiID }} ami_id "{{ .Aws.Config.AmiID }}" {{ else }} # ami_id "{{ .Aws.Config.AmiID }}" {{ end }}
+  ### Delete on Termination is used for saving the instances volumes
+  delete_on_termination "{{ .Aws.Config.DeleteOnTermination }}"
   ### EC2 instance type to use for Automate frontends, minimum >2G of RAM for test, 8G for prod
   automate_server_instance_type "{{ .Aws.Config.AutomateServerInstanceType }}"
   ### EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod

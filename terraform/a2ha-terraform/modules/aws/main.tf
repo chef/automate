@@ -190,7 +190,7 @@ resource "aws_instance" "chef_automate_postgresql" {
   }
 
   root_block_device {
-    delete_on_termination = true
+    delete_on_termination = var.delete_on_termination
     iops                  = var.postgresql_ebs_volume_type == "io1" ? var.postgresql_ebs_volume_iops : 0
     volume_size           = var.postgresql_ebs_volume_size
     volume_type           = var.postgresql_ebs_volume_type
@@ -221,7 +221,7 @@ resource "aws_instance" "chef_automate_opensearch" {
   iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
-    delete_on_termination = true
+    delete_on_termination = var.delete_on_termination
     iops                  = var.opensearch_ebs_volume_type == "io1" ? var.opensearch_ebs_volume_iops : 0
     volume_size           = var.opensearch_ebs_volume_size
     volume_type           = var.opensearch_ebs_volume_type
@@ -251,7 +251,7 @@ resource "aws_instance" "chef_automate" {
   iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
-    delete_on_termination = true
+    delete_on_termination = var.delete_on_termination
     iops                  = var.automate_ebs_volume_type == "io1" ? var.automate_ebs_volume_iops : 0
     volume_size           = var.automate_ebs_volume_size
     volume_type           = var.automate_ebs_volume_type
@@ -282,7 +282,7 @@ resource "aws_instance" "chef_server" {
   iam_instance_profile        = var.aws_instance_profile_name
 
   root_block_device {
-    delete_on_termination = true
+    delete_on_termination = var.delete_on_termination
     iops                  = var.chef_ebs_volume_type == "io1" ? var.chef_ebs_volume_iops : 0
     volume_size           = var.chef_ebs_volume_size
     volume_type           = var.chef_ebs_volume_type

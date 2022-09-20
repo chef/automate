@@ -30,6 +30,10 @@ variable "automate_private_ips" {
   default = []
 }
 
+variable "delete_on_termination" {
+  default = true
+}
+
 variable "automate_server_instance_type" {
   default = "t3a.medium"
 }

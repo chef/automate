@@ -121,6 +121,7 @@ module AutomateCluster
       default :ami_filter_virt_type
       default :ami_filter_owner
       default :ami_id
+      default :delete_on_termination, true
       default :automate_server_instance_type, 't3a.medium'
       default :chef_server_instance_type, 't3a.medium'
       default :opensearch_server_instance_type, 'm5a.large'

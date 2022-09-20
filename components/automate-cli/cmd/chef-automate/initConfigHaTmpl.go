@@ -180,6 +180,9 @@ managed_rds_certificate = "<cert content>"
 # eg: ami_id = "ami-08d4ac5b634553e16" # This ami is of Ubuntu 20.04 in us-east-1
 ami_id = ""
 
+# eg: delete_on_termination = true or false
+delete_on_termination = true
+
 # eg: automate_server_instance_type = "t3.medium"
 automate_server_instance_type = ""
 
