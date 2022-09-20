@@ -3,7 +3,7 @@
 
 [global.v1]
   fqdn = "<%= overrides[:automate_fqdn] %>"
-
+  
   [global.v1.external.opensearch]
 <% if overrides[:setup_managed_services] == true -%>
   enable = true
@@ -90,6 +90,9 @@
 <% else %>
   [auth_n.v1.sys.service]
     a1_data_collector_token = "<%= overrides[:automate_dc_token] %>"
+  [global.v1.external.automate.ssl]
+    server_name = "<%= overrides[:automate_fqdn] %>"
+    root_cert = """<%= tls_cert %>"""
 <% end %>
 
 # Deployment service configuration.
@@ -123,6 +126,9 @@
       # The TLS private key for the load balancer frontend.
       key = """<%= tls_key %>"""
 <% end %>
+
+[cs_nginx.v1.sys.ngx.http]
+  ssl_verify_depth = 5 
 
 <% if overrides[:teams_port] != 10128 %>
 [teams.v1.sys.service]
