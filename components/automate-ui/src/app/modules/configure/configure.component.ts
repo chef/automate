@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LayoutFacadeService , Sidebar} from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ConfigService } from 'app/services/config/config.service';
 @Component({
   selector: 'app-configure',
@@ -8,8 +8,7 @@ import { ConfigService } from 'app/services/config/config.service';
 })
 export class ConfigureComponent implements OnInit {
 
-  notificationVisible = false;
-  deploymentType: string
+  isNotificationVisible = false;
 
   constructor(
     private layoutFacade: LayoutFacadeService,
@@ -18,29 +17,21 @@ export class ConfigureComponent implements OnInit {
 
   ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
-    this.notificationVisible = false;
-    this.getConfigdetails();
+    this.isNotificationVisible = false;
+    this.getConfigDetails();
   }
-  
 
-  getConfigdetails() {
+  getConfigDetails() {
     this.configService.getConfig().subscribe(
       config => {
-        if(config.deploymentType != 'SAAS') {
-          this.showNotification();
-        } else {
-          this.hideNotification();
+        if (config.deploymentType !== 'SAAS') {
+          this.isNotificationVisible = true;
         }
       }
-    )
+    );
   }
 
-  
   hideNotification() {
-    this.notificationVisible = false;
-  }
-
-  showNotification() {
-    this.notificationVisible = true;
+    this.isNotificationVisible = false;
   }
 }

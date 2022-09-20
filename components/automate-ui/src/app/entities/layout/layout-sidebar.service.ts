@@ -228,7 +228,7 @@ export class LayoutSidebarService {
                 name: 'Configure',
                 icon: 'security',
                 route: '/settings/sso',
-                authorized: { // until the sso api is not there for the UI till we are using /policies as if the dummy URL is used it wont authorise the menu group an menuItem and it wont be visible on the UI.
+                authorized: { // using /policies until /sso is there as if dunmmy url is used it shows the menugroup in sidebar.
                   allOf: ['/apis/iam/v2/policies', 'get']
                 }
               }

@@ -5,7 +5,7 @@
             <div class="sticky-notifications">
                 <div class="sticky-inner">
                     <app-notification
-                    *ngIf="notificationVisible"
+                    *ngIf="isNotificationVisible"
                     type="error"
                     timeout="5"
                     (dismissed)="hideNotification()">

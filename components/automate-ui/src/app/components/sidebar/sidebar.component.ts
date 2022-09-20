@@ -15,7 +15,7 @@ export class SidebarComponent {
 
   constructor(
     @Inject(LayoutFacadeService) public layoutFacade: LayoutFacadeService,
-    private TelemetryService: TelemetryService
+    private telemetryService: TelemetryService
   ) {
     this.menuGroups$ = layoutFacade.sidebar$;
     this.updateMenuGroupVisibility();
@@ -23,12 +23,13 @@ export class SidebarComponent {
 
   public isAuthorized($event, menuItem, menuGroup) {
     menuItem.authorized.isAuthorized = $event;
-    this.checkDeploymentType(menuItem , menuGroup)
+    this.checkDeploymentType(menuItem , menuGroup);
     this.setGroupVisibility(menuGroup);
   }
 
   public checkDeploymentType(menuItem: any , menuGroup: any) {
-    if(menuGroup.name == 'Single Sign-On' && menuItem.route == '/settings/sso' && this.TelemetryService.getDeploymenType() != 'SAAS') {
+    if (menuGroup.name === 'Single Sign-On' && menuItem.route === '/settings/sso' &&
+    this.telemetryService.getDeploymenType() !== 'SAAS') {
       menuGroup.visible$ = false;
       menuItem.visible$ = false;
     }
