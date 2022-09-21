@@ -84,6 +84,12 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
             password = "admin"
         ```
     - If using AWS Managed services, then add the below config into `current_config.toml` (change this with your actual credentials)
+
+    > **_NOTE:_**  The following special characters are not allowed in password.  
+    ```
+        ‘ ` " ' \ ;
+    ```
+
         ```
         [global.v1.external.opensearch.auth]
             scheme = "aws_os"

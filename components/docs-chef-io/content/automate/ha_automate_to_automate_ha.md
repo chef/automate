@@ -71,6 +71,11 @@ sudo chef-automate config show > current_config.toml
 
 In Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
 
+> **_NOTE:_**  The following special characters are not allowed in password.  
+```
+    ‘ ` " ' \ ;
+```
+
 ```bash
 [global.v1.external.opensearch.auth.basic_auth]
   username = "admin"
@@ -136,6 +141,11 @@ sudo chef-automate config show > current_config.toml
 ```
 
 **Note:** From Automate `4.x.y` version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
+
+> **_NOTE:_**  The following special characters are not allowed in password.  
+```
+    ‘ ` " ' \ ;
+```
 
 ```bash
 [global.v1.external.opensearch.auth.basic_auth]

@@ -22,6 +22,11 @@ These configuration directions are intended for in the initial deployment of Che
 
 Add the following settings to your `config.toml`:
 
+> **_NOTE:_**  The following special characters are not allowed in password.  
+```
+    ‘ ` " ' \ ;
+```
+
 ```toml
 [global.v1.external.postgresql]
 enable = true

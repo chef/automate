@@ -154,7 +154,7 @@ Chef Automate supports the official OpenSearch Service by Amazon Web Services. C
 
 Add the following to your `config.toml` for HTTPS connection:
 
-> **_NOTE:_**  The following special characters are not allowed in a password.  
+> **_NOTE:_**  The following special characters are not allowed in password.  
 ```
     ‘ ` " ' \ ;
 ```
