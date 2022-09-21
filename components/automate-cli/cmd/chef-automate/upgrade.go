@@ -17,6 +17,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/inspector/upgradeinspectorv4"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
@@ -76,6 +77,19 @@ Otherwise, you may need to run "chef-automate dev start-converge".
 `
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
+	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, &fileutils.FileSystemUtils{})
+	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetOSDestDir(upgradeRunCmdFlags.osDestDataDir)
+	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
+	err := upgradeInspector.ShowInfo()
+	if err != nil {
+		return err
+	}
+	err = upgradeInspector.Inspect()
+	if err != nil {
+		return err
+	}
+	return nil
+
 	a1IsRunning, err := isA1Running()
 	if err != nil {
 		return status.Annotate(err, status.FileAccessError)

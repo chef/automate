@@ -20,7 +20,7 @@ https://docs.chef.io/automate/major_upgrade 4.x/
 
 Would you like to proceed with the upgrade? (y/n)
 `
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
 	assert.NoError(t, err)
@@ -39,7 +39,7 @@ https://docs.chef.io/automate/major_upgrade 4.x/
 
 Would you like to proceed with the upgrade? (y/n)
 `
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/hab")
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -56,7 +56,7 @@ https://docs.chef.io/automate/major_upgrade 4.x/
 
 Would you like to proceed with the upgrade? (y/n)
 `
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -65,7 +65,7 @@ Would you like to proceed with the upgrade? (y/n)
 
 func TestUpgradeInspectorV4ShowInfoWithNoInput(t *testing.T) {
 	tw := NewTestWriterWithInputs("n")
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -103,7 +103,7 @@ https://docs.chef.io/automate/major_upgrade 4.x/
 
 Would you like to proceed with the upgrade? (y/n)
 `
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	ui.AddInspection(NewDiskSpaceInspection(tw.CliWriter, false, "", &MockFileSystemUtils{values: map[string][]interface{}{"CalDirSizeInGB": {3.0}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}}}))
@@ -122,7 +122,7 @@ Please make sure following things are taken care of
 1. You have planned downtime
 2. You have taken backup by running command: chef automate backup create
 `
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	ui.AddInspection(NewDiskSpaceInspection(tw.CliWriter, false, "", &MockFileSystemUtils{values: map[string][]interface{}{"CalDirSizeInGB": {3.0, errors.New("failed to check filesystem")}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}}}))
@@ -147,7 +147,7 @@ Would you like to proceed with the upgrade? (y/n)
 I don't understand 't'. Please type 'y' or 'n'.
 Would you like to proceed with the upgrade? (y/n)
 `
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -158,7 +158,7 @@ Would you like to proceed with the upgrade? (y/n)
 
 func TestUpgradeInspectorV4Inspect(t *testing.T) {
 	tw := NewTestWriter()
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", &MockFileSystemUtils{values: map[string][]interface{}{"CalDirSizeInGB": {3.0}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}}})
@@ -171,10 +171,10 @@ func TestUpgradeInspectorV4Inspect(t *testing.T) {
 	diskSpaceInspection.requiredOSDestSpace = 3.3
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]     /hab directory should have 5.5GB of free space"
-	expectedBeginOSDestChecking := "┤  [Checking]     /home/ubuntu directory should have 3.3GB of free space"
-	expectedPassHabChecking := "✔ [Passed]        /hab directory should have 5.5GB of free space"
-	expectedPassOSDestChecking := "✔ [Passed]        /home/ubuntu directory should have 3.3GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 5.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have 3.3GB of free space"
+	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have 5.5GB of free space"
+	expectedPassOSDestChecking := "✔  [Passed]\t/home/ubuntu directory should have 3.3GB of free space"
 
 	err := ui.Inspect()
 	assert.Contains(t, tw.Output(), expectedChecks)
@@ -187,7 +187,7 @@ func TestUpgradeInspectorV4Inspect(t *testing.T) {
 
 func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 	tw := NewTestWriter()
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", &MockFileSystemUtils{values: map[string][]interface{}{"CalDirSizeInGB": {3.0}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}}})
@@ -200,10 +200,10 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 	diskSpaceInspection.requiredOSDestSpace = 3.3
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]     /hab directory should have 10.5GB of free space"
-	expectedBeginOSDestChecking := "┤  [Checking]     /home/ubuntu directory should have 3.3GB of free space"
-	expectedPassHabChecking := "✖ [Failed]        /hab directory should have 10.5GB of free space"
-	expectedPassOSDestChecking := "∅ [Skipped]        /home/ubuntu directory should have 3.3GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 10.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have 3.3GB of free space"
+	expectedPassHabChecking := "✖  [Failed]\t/hab directory should have 10.5GB of free space"
+	expectedPassOSDestChecking := "⊖  [Skipped]\t/home/ubuntu directory should have 3.3GB of free space"
 
 	err := ui.Inspect()
 	assert.Contains(t, tw.Output(), expectedChecks)
@@ -218,7 +218,7 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 
 func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	tw := NewTestWriter()
-	ui := NewUpgradeInspectorV4(tw.CliWriter)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", &MockFileSystemUtils{values: map[string][]interface{}{"CalDirSizeInGB": {3.0}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}}})
@@ -231,10 +231,10 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	diskSpaceInspection.requiredOSDestSpace = 10.5
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]     /hab directory should have 5.5GB of free space"
-	expectedBeginOSDestChecking := "┤  [Checking]     /home/ubuntu directory should have 10.5GB of free space"
-	expectedPassHabChecking := "✔ [Passed]        /hab directory should have 5.5GB of free space"
-	expectedPassOSDestChecking := "✖ [Failed]        /home/ubuntu directory should have 10.5GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 5.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have 10.5GB of free space"
+	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have 5.5GB of free space"
+	expectedPassOSDestChecking := "✖  [Failed]\t/home/ubuntu directory should have 10.5GB of free space"
 
 	err := ui.Inspect()
 	assert.Contains(t, tw.Output(), expectedChecks)
@@ -245,4 +245,27 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	if assert.Error(t, err) {
 		assert.EqualError(t, err, "Upgrade process terminated.: failed in OS Dest Check")
 	}
+}
+
+func TestUpgradeInspectorV4InspectShowInspectionList(t *testing.T) {
+	tw := NewTestWriter()
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, &MockFileSystemUtils{})
+	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
+	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
+	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", &MockFileSystemUtils{values: map[string][]interface{}{"CalDirSizeInGB": {3.0}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}}})
+	ui.AddInspection(diskSpaceInspection)
+	diskSpaceInspection.habDir = "/hab"
+	diskSpaceInspection.osDestDir = "/home/ubuntu"
+	diskSpaceInspection.currentHabSpace = 8.5
+	diskSpaceInspection.requiredHabSpace = 5.5
+	diskSpaceInspection.currentSpaceInOSDir = 8.5
+	diskSpaceInspection.requiredOSDestSpace = 3.3
+
+	expected := `Following Pre-flight checks will be conducted
+1. /hab directory should have 5.5GB of free space
+2. /home/ubuntu directory should have 3.3GB of free space
+`
+
+	ui.ShowInspectionList()
+	assert.Contains(t, tw.Output(), expected)
 }

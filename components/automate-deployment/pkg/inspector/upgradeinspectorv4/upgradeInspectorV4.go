@@ -7,12 +7,15 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
+	"github.com/chef/automate/lib/io/fileutils"
 )
 
 type UpgradeInspectorV4 struct {
-	writer      *cli.Writer
-	inspections []inspector.Inspection
-	osDestDir   string
+	writer       *cli.Writer
+	inspections  []inspector.Inspection
+	osDestDir    string
+	upgradeUtils UpgradeV4Utils
+	fileUtils    fileutils.FileUtils
 }
 
 const (
@@ -37,7 +40,8 @@ In this release, Elasticsearch will be migrated to OpenSearch.
 	if len(ui.inspections) > 0 {
 		ui.writer.Println("")
 	}
-	if len(ui.osDestDir) == 0 || ui.osDestDir == HAB_DIR {
+
+	if len(ui.osDestDir) == 0 || ui.osDestDir == HAB_DIR || ui.upgradeUtils.IsExternalElasticSearch() {
 		ui.showOSDestDirFlagMsg()
 	}
 	ui.writer.Println(`For more information, visit 
@@ -77,9 +81,11 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 	return nil
 }
 
-func NewUpgradeInspectorV4(w *cli.Writer) inspector.Inspector {
+func NewUpgradeInspectorV4(w *cli.Writer, upgradeUtils UpgradeV4Utils, fileUtils fileutils.FileUtils) inspector.Inspector {
 	return &UpgradeInspectorV4{
-		writer: w,
+		writer:       w,
+		upgradeUtils: upgradeUtils,
+		fileUtils:    fileUtils,
 	}
 }
 
@@ -92,5 +98,30 @@ func (ui *UpgradeInspectorV4) SetOSDestDir(path string) {
 func (ui *UpgradeInspectorV4) AddInspection(inspection inspector.Inspection) {
 	if inspection != nil {
 		ui.inspections = append(ui.inspections, inspection)
+	}
+}
+
+func (ui *UpgradeInspectorV4) AddDefaultInspections() {
+	ui.AddInspection(NewPlannedDownTimeInspection(ui.writer))
+	ui.AddInspection(NewTakeBackupInspection(ui.writer))
+	diskSpaceInspection := NewDiskSpaceInspection(ui.writer, ui.upgradeUtils.IsExternalElasticSearch(), ui.osDestDir, ui.fileUtils)
+	ui.AddInspection(diskSpaceInspection)
+}
+
+func (ui *UpgradeInspectorV4) ShowInspectionList() {
+	ui.writer.Println("Following Pre-flight checks will be conducted")
+	index := 1
+	for _, inspection := range ui.inspections {
+		var i interface{} = inspection
+		_, ok := i.(inspector.SystemInspection)
+		if ok {
+			msgs := inspection.(inspector.SystemInspection).GetShortInfo()
+			for _, msg := range msgs {
+				if msg != "" {
+					ui.writer.Printf("%d. %s\n", index, msg)
+					index++
+				}
+			}
+		}
 	}
 }
