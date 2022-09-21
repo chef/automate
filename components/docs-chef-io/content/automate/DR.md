@@ -89,7 +89,7 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
                     password = "admin"
                 ```
 
-        - To restore backup on Chef Automate HA, below is the restore command, which can be from any Chef Automate instance of DR cluster:
+        - To restore backup on Chef Automate HA, below is the restore command, which can be from any Chef Automate instance of DR cluster. Below restore command is an example command for the file system as a backup options.
 
             ```cmd
             sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
