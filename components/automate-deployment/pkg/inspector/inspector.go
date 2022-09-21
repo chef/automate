@@ -4,6 +4,7 @@ type Inspector interface {
 	ShowInfo() error
 	Inspect() error
 	AddInspection(inspection Inspection)
+	ShowInspectionList()
 }
 
 type Inspection interface {
@@ -13,4 +14,5 @@ type Inspection interface {
 type SystemInspection interface {
 	Inspection
 	Inspect() error
+	GetShortInfo() []string
 }

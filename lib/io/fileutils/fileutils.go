@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/chef/automate/lib/platform/sys"
 	"github.com/sirupsen/logrus"
 )
@@ -72,7 +74,7 @@ func CheckSpaceAvailability(dir string, minSpace float64) (bool, error) {
 func GetFreeSpaceinGB(dir string) (float64, error) {
 	v, err := sys.SpaceAvailForPath(dir)
 	if err != nil {
-		return -1, err
+		return -1, errors.Wrap(err, "failed in checking "+dir)
 	}
 	return float64(v) / (1024 * 1024), nil
 }
