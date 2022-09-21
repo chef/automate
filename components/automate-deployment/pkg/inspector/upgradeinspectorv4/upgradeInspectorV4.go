@@ -72,11 +72,16 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 		var i interface{} = inspection
 		_, ok := i.(inspector.SystemInspection)
 		if ok {
-			err = inspection.(inspector.SystemInspection).Inspect()
 			if err != nil {
-				return errors.Wrap(err, "Upgrade process terminated.")
+				err = inspection.(inspector.SystemInspection).Inspect()
+			} else {
+				err = inspection.(inspector.SystemInspection).Inspect()
 			}
+
 		}
+	}
+	if err != nil {
+		return errors.Wrap(err, "Upgrade process terminated.")
 	}
 	return nil
 }
@@ -109,7 +114,7 @@ func (ui *UpgradeInspectorV4) AddDefaultInspections() {
 }
 
 func (ui *UpgradeInspectorV4) ShowInspectionList() {
-	ui.writer.Println("Following Pre-flight checks will be conducted")
+	ui.writer.Println("\nFollowing Pre-flight checks will be conducted")
 	index := 1
 	for _, inspection := range ui.inspections {
 		var i interface{} = inspection
@@ -124,4 +129,5 @@ func (ui *UpgradeInspectorV4) ShowInspectionList() {
 			}
 		}
 	}
+	ui.writer.Println("")
 }

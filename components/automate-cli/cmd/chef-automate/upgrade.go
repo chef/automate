@@ -77,16 +77,29 @@ Otherwise, you may need to run "chef-automate dev start-converge".
 `
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
-	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, &fileutils.FileSystemUtils{})
+	mfs := &fileutils.MockFileSystemUtils{
+		GetFreeSpaceinGBFunc: func(dir string) (float64, error) {
+			if dir == "/hab" {
+				return 15, nil
+			}
+			return 5, nil
+		},
+		CalDirSizeInGBFunc: func(path string) (float64, error) {
+			return 2, nil
+		},
+		GetHabRootPathFunc: func() string { return "/hab" },
+	}
+	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, mfs)
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetOSDestDir(upgradeRunCmdFlags.osDestDataDir)
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
 	err := upgradeInspector.ShowInfo()
 	if err != nil {
 		return err
 	}
+	upgradeInspector.ShowInspectionList()
 	err = upgradeInspector.Inspect()
 	if err != nil {
-		return err
+		return nil
 	}
 	return nil
 
