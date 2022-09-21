@@ -228,7 +228,7 @@ export class LayoutSidebarService {
                 name: 'Configure',
                 icon: 'security',
                 route: '/settings/sso',
-                authorized: { // using /policies until /sso is there as if dunmmy url is used it shows the menugroup in sidebar.
+                authorized: { // using /policies until /sso is there or else it wont show.
                   allOf: ['/apis/iam/v2/policies', 'get']
                 }
               }

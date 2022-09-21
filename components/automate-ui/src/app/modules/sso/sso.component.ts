@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ConfigService } from 'app/services/config/config.service';
+
 @Component({
-  selector: 'app-configure',
-  templateUrl: './configure.component.html',
+  selector: 'app-sso',
+  templateUrl: './sso.component.html'
 })
-export class ConfigureComponent implements OnInit {
+export class SsoComponent implements OnInit {
 
   isNotificationVisible = false;
 
@@ -33,4 +34,6 @@ export class ConfigureComponent implements OnInit {
   hideNotification() {
     this.isNotificationVisible = false;
   }
+
+
 }

@@ -53,7 +53,7 @@ import { RoleDetailsComponent } from './modules/roles/details/role-details.compo
 import { UIComponent } from 'app/ui.component';
 import { UserDetailsComponent } from './modules/user/user-details/user-details.component';
 import { UserDetailsNonAdminResolve } from './modules/user/user-details/user-details.resolver';
-import { ConfigureComponent } from './modules/configure/configure.component';
+import { SsoComponent } from './modules/sso/sso.component';
 
 // Services
 import { ChefSessionService } from './services/chef-session/chef-session.service';
@@ -105,7 +105,7 @@ const routes: Routes = [
         },
         {
           path: 'sso',
-          component: ConfigureComponent
+          component: SsoComponent
         },
         {
           path: 'users',
