@@ -14,5 +14,6 @@ type Inspection interface {
 type SystemInspection interface {
 	Inspection
 	Inspect() error
+	Skip()
 	GetShortInfo() []string
 }
