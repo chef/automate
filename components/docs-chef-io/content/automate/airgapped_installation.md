@@ -58,7 +58,7 @@ you can create airgap bundle using
 ```shell
 ./chef-automate airgap bundle create --version 3.0.49
 ```
-or, you can download the airgap bundle directly using
+or, you can download the airgap bundle using
 ```shell
 curl https://packages.chef.io/airgap_bundle/current/automate/3.0.49.aib -o </path/to/airgap-install-bundle>
 ```
