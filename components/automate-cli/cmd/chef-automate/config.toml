@@ -48,6 +48,7 @@ region = "us-east-1"
 ssh_key_pair_name = "A2HA"
 ami_id = ""
 lb_access_logs = "false"
+delete_on_termination = true
 automate_server_instance_type = "t3.medium"
 chef_server_instance_type = "t3.medium"
 opensearch_server_instance_type = "m5.large"
