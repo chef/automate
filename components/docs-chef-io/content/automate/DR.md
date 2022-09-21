@@ -14,8 +14,7 @@ gh_repo = "automate"
 
 ## How To SetUp Disaster Recovery Cluster For OnPrem Deployment
 
-If the Frequency of Data Sync between the Live System(Production cluster) and DR could be in the range of 6 to 24 hrs, then we have 2 option's which utilize the regular backup and restore cadence, that syncs data from the Production cluster to the DR cluster. Typically these two clusters are located in different data centres or cloud provider regions.
-
+If the Frequency of Data Sync between the Live System(Production cluster) and DR could be in the range of 6 to 24 hrs, then we have a option's which utilize the regular backup and restore cadence, that syncs data from the Production cluster to the DR cluster. Typically these two clusters are located in different data centres or cloud provider regions.
 
 ### Setup DR With Acceptable Down Time will be few minutes
 
