@@ -18,6 +18,7 @@ const (
 	MSG_ES_CHECKING  string = "Elasticsearch indices are in version 6"
 )
 
+// remove .saved-searches
 var automateOldIndicesPattern []string = []string{".automate", ".locky", "saved-searches", ".tasks"}
 
 type ESIndexInspection struct {
@@ -52,11 +53,15 @@ func (es *ESIndexInspection) Inspect() (err error) {
 	}
 	es.showError()
 	es.showErrorList()
-
+	shouldDelete := es.promptForDeletion()
+	if !shouldDelete {
+		return nil
+	}
+	err = es.deleteOldIndices()
 	return
 }
 
-func (es *ESIndexInspection) promptForDeletion() {
+func (es *ESIndexInspection) promptForDeletion() bool {
 	msg := `Please choose from options below:
 1. Delete these indices and proceed with upgrade.
 2. Exit the upgrade process, manually re-index the indices and upgrade Chef Automate later on.
@@ -65,16 +70,34 @@ For more information on reindexing, visit: https://www. elastic.co/guide/en/elas
 
 `
 	es.writer.Println(msg)
-	choseDelete := es.shouldDelete()
-	if choseDelete {
-
-	} else {
-
-	}
+	return es.shouldDelete()
 }
 
-func (es *ESIndexInspection) deleteOldIndices() {
+func (es *ESIndexInspection) deleteOldIndices() error {
+	allIndices := []string{}
+	allIndices = append(allIndices, es.automateOldIndices...)
+	allIndices = append(allIndices, es.otherOldIndices...)
+	return es.batchDeleteOldIndices(allIndices, es.esBasePath)
+}
 
+func (es *ESIndexInspection) batchDeleteOldIndices(indexList []string, basePath string) error {
+	additionalBatch := 0
+	if len(indexList)%INDEX_BATCH_SIZE > 0 {
+		additionalBatch = 1
+	}
+	numOfBatches := len(indexList)/INDEX_BATCH_SIZE + additionalBatch
+	for i := 0; i < numOfBatches; i++ {
+		upper := i*INDEX_BATCH_SIZE + INDEX_BATCH_SIZE
+		if upper > len(indexList)-1 {
+			upper = len(indexList)
+		}
+		indexCSL := strings.Join(indexList[i*INDEX_BATCH_SIZE:upper], ",")
+		_, err := es.upgradeUtils.ExecRequest(fmt.Sprintf("%s%s", basePath, indexCSL)+"?pretty", "DELETE", nil)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (es *ESIndexInspection) deletedSuccessfully() {
