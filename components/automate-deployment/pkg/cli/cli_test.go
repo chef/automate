@@ -173,5 +173,4 @@ func TestConfirmationDialog(t *testing.T) {
 		assert.Equal(t, expected, output())
 		assert.Nil(t, err)
 	}
-
 }
