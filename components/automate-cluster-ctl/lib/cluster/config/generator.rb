@@ -27,6 +27,7 @@ module AutomateCluster
         project: "DEPRECATED: AWS Tag: Project name to apply to AWS insfrastructure tags",
         automate_lb_certificate_arn: "AWS Certificate is specific to the region and AWS account this is being deployed to.",
         chef_server_lb_certificate_arn: "AWS Certificate is specific to the region and AWS account this is being deployed to.",
+        delete_on_termination: "delete on termination value can be true or false only",
         automate_server_instance_type: "EC2 instance type to use for Automate frontends, minimum >2G of RAM for test, 8G for prod",
         chef_server_instance_type: "EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod",
         opensearch_server_instance_type: "EC2 instance type to use for Opensearch backends, minimum 8G of RAM for test, 16G for prod",

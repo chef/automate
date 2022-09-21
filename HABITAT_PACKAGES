@@ -88,3 +88,4 @@ automate-ha-cluster-ctl components/automate-cluster-ctl
 automate-netcat components/automate-netcat
 automate-opensearch components/automate-opensearch
 report-manager-service components/report-manager-service
+automate-knife-ec-backup components/automate-knife-ec-backup

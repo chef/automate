@@ -13,7 +13,11 @@ gh_repo = "automate"
     weight = 200
 +++
 
-This section will discuss the steps to deploy Chef Automate HA on-premise machines or on existing VMs. The steps are as follows:
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
+In this section, we'll discuss the steps to deploy Chef Automate HA on-premise machines or on existing VM's. The steps are as follows:
 
 ## Install Chef Automate HA
 
@@ -23,8 +27,11 @@ This section will discuss the steps to deploy Chef Automate HA on-premise machin
 - The Root Volume of the Operating System should not be less than **40 GB**.
 - The TMP space (/var/tmp) should not be less than **5GB**.
 - The Separate Hab's volume (/hab) provisioned should be at least 100 GB. The `/hab` volume depends on the data retention policy for the OpenSearch node.
-- A typical user has access to all machines, should have **sudo privileges**, and can use the same **SSH Private Key** file to access all devices.
-- Key-based SSH for the provisioning user for all the machines for HA-Deployment.
+- A Common user has access to all machines.
+- This common user should have sudo privileges.
+- This common user uses same SSH Private Key file to access all machines.
+- Key-based SSH for the provisioning user for all the machine for HA-Deployment.
+- We do not support passphrase for Private Key authentication.
 - LoadBalancers are setup according to [Chef Automate HA Architecture](/automate/ha/) needs as explained in [Load Balancer Configuration page](/automate/loadbalancer_configuration/).
 - Network ports are opened as per [Chef Automate Architecture](/automate/ha/) needs as explained in [Security and Firewall page](/automate/ha_security_firewall/)
 - DNS is configured to redirect `chefautomate.example.com`, and `chefinfraserver.example.com` to Primary Load Balancer.
@@ -43,49 +50,44 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
 ### Steps for Bastion Host Machine
 
-1. Before you start, switch to sudo:
+1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
-   sudo su -
-   ```
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Download Chef Automate CLI.
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
+   | gunzip - > chef-automate && chmod +x chef-automate \
+   | cp -f chef-automate /usr/bin/chef-automate
+   
+   #Download latest Airgapped Bundle.
+   #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
+   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
 
-2. Download Chef Automate CLI:
-
-   ```bash
-   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
-   ```
-
-3. Download the latest Airgapped Bundle using the following command:
-
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
-   ```
-
-   Download a specific version bundle using the comman below. For example: `4.0.91`:
-
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
-   ```
-
-4. If the Airgapped Bastion machine is different, transfer the Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using the `scp` command. After transferring, in Airgapped Bastion, switch to sudo:
-
-   ```bash
-   sudo su -
-   ```
-
-   Move the Chef Automate CLI to `/usr/bin` by running the below command:
-
-   ```bash
-   cp -f chef-automate /usr/bin/chef-automate
-   ```
-
-5. Generate the `init` config for existing infrastructure:
-
-   ```bash
+   #Generate init config and then generate init config for existing infra structure
    chef-automate init-config-ha existing_infra
+   "
    ```
 
-6. Update Config with relevant data:
+   {{< note >}}
+   Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
+   {{< /note >}}
+
+   Note: If Airgapped Bastion machine is different, then transfer Bundle file (`latest.aib`) and Chef Automate CLI binary (`chef-automate`) to the Airgapped Bastion Machine using `scp` command.
+   After transfering, in Airgapped Bastion, run below commands:
+
+   ```bash
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Move the Chef Automate CLI to `/usr/bin`.
+   cp -f chef-automate /usr/bin/chef-automate
+
+   #Generate init config and then generate init config for existing infra structure
+   chef-automate init-config-ha existing_infra
+   "
+   ```
+
+2. Update Config with relevant data. Click [here](/automate/ha_onprim_deployment_procedure/#sample-config) for sample config
 
    ```bash
    vi config.toml
@@ -99,31 +101,250 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `ssh_user`, which has access to all the machines. Example: `ubuntu`.
    - Give `ssh_port` if your AMI runs on a custom ssh port. The default will be 22.
    - Give `ssh_key_file` path. This key should have access to all the Machines or VMs.
+   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
+   - We support only private key authentication.
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VMs. Example: `chefautomate.example.com`.
    - Set the `admin_password` to what you want to use to login to Chef Automate when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
 
-7. Confirm all the data in the config is correct:
+3. Continue with the deployment after updating config:
 
    ```bash
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Print data in the config
    cat config.toml
-   ```
 
-8. Run deploy command `latest.aib` with set `config.toml`:
+   #Run deploy command to deploy `automate.aib` with set `config.toml`
+   chef-automate deploy config.toml --airgap-bundle automate.aib
 
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle latest.aib
-   ```
-
-   If deploying a specific version of Chef Automate, for example: Deploy `automate-4.0.91.aib` with set `config.toml`
-
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
-   ```
-
-9. After Deployment is done successfully. Check the status of Chef Automate HA services:
-
-   ```bash
+   #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
    ```
 
    Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).
+
+### Sample config
+
+{{< note >}}
+
+- Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+
+{{< /note >}}
+
+```config
+# This is a Chef Automate AWS HA mode configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate HA instances with default settings.
+[architecture.existing_infra]
+ssh_user = ""
+# private ssh key file path to access instances
+# Eg.: ssh_user = "~/.ssh/A2HA.pem"
+ssh_key_file = ""
+ssh_port = "22"
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.json"
+architecture = "existing_nodes"
+workspace_path = "/hab/a2_deploy_workspace"
+# DON'T MODIFY THE BELOW LINE (backup_mount)
+backup_mount = "/mnt/automate_backups"
+# ============== EC2 Nodes Config ======================
+[automate.config]
+# Automate Load Balancer FQDN eg.: "chefautomate.example.com"
+fqdn = ""
+instance_count = "2"
+config_file = "configs/automate.toml"
+[chef_server.config]
+instance_count = "2"
+[opensearch.config]
+instance_count = "3"
+[postgresql.config]
+instance_count = "3"
+[existing_infra.config]
+## === INPUT NEEDED ===
+# provide comma seperated ip address of nodes, like ["192.0.0.1", "192.0.0.2", "192.0.0.2"]
+# No of ip address should be same as No of instance_count count mentioned above in
+# automate.config, chef_server.config, opensearch.config and postgresql.config
+automate_private_ips = ["A.B.C.D","D.E.F.G"]
+chef_server_private_ips = ["I.J.K.L","M.N.O.P"]
+opensearch_private_ips = ["A1.A2.A3.A4","B1.B2.B3.B4","C1.C2.C3.C4"]
+postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
+```
+
+### Minimum changes to be made
+
+- Give `ssh_user` which has access to all the machines. Eg: `ubuntu`, `centos`, `ec2-user`
+- Give `ssh_key_file` path, this key should have access to all the Machines or VM's. Eg: `~/.ssh/id_rsa`, `/home/ubuntu/key.pem`
+- Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Eg: `chefautomate.example.com`
+- `automate_private_ips` Eg: ["192.0.0.1"]
+- `chef_server_private_ips` Eg: ["192.0.1.1"]
+- `opensearch_private_ips` Eg: ["192.0.2.1", "192.0.2.2", "192.0.2.2"]
+- `postgresql_private_ips` Eg: ["192.0.3.1", "192.0.3.2", "192.0.3.2"]
+
+### How To Add More Nodes to the On-Prem Deployment
+
+- Open the `config.toml` at bastion node
+- change the `instance_count` value, as explained in below example.
+- Add the `Ip address` for the respetive node at the end, as explained in the example.
+- Make sure that all the necesssary port and fire wall setting are align in the new node.
+
+For example : Add new Automate node to the existing deployed cluster.
+  | Old Config | => | New Config |
+  | :--- | :--- | :--- |
+  | [automate.config] <br/> instance_count = "1" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
+
+- Trigger the deployment command again from the bastion node.
+- To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
+  - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
+
+    ```sh
+    sudo chef-automate version
+    ```
+
+  - Output
+
+    ```sh
+    Version: 2
+    CLI Build: 20220920122615
+    Server Build: 4.X.Y
+    ```
+
+  - To download the airgap bundle, please run the command from the machine where we have internet access.
+
+    ```sh
+    chef-automate create airgap bundle --version 4.X.Y  
+    ```
+
+  - Copy the airgap bundle to the bastion host.  
+
+- Run the `deploy` command to add the new node.  
+  
+  ```sh
+    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
+  ```
+
+- Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
+- In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
+
+### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
+
+{{< warning >}}
+
+- We do not recommend removal of any node from backend cluster, but replacement of node is recommended. For replacement of a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
+- Below process can be done for `chef-server` and `automate`.
+
+{{< /warning >}}
+
+- Open the `config.toml` at bastion node.
+- change the `instance_count` value, as explained in below example.
+- Remove the `Ip address` for the respective node, as explained in the example.
+
+For example : Remove Automate node to the existing deployed cluster.
+  | Old Config | => | New Config |
+  | :--- | :--- | :--- |
+  | [automate.config] <br/> instance_count = "3" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
+  
+- Trigger the deployment command again from the bastion node.
+- To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
+  - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
+
+    ```sh
+    sudo chef-automate version
+    ```
+
+  - Output
+
+    ```sh
+    Version: 2
+    CLI Build: 20220920122615
+    Server Build: 4.X.Y
+    ```
+
+  - To download the airgap bundle, please run the command from the machine where we have internet access.
+
+    ```sh
+    chef-automate create airgap bundle --version 4.X.Y  
+    ```
+
+  - Copy the airgap bundle to the bastion host.  
+
+- Run the `deploy` command to remove the node.
+
+  ```sh
+    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
+  ```
+
+- Above process can be done for `chef-server` and `automate`.
+- In case of Deployment failed please refer the troubleshoot document [here](/automate/ha_onprim_deployment_procedure/#Troubleshooting).
+
+### How to Replace Node in Automate HA Cluster
+
+- Open the `config.toml` at bastion node.
+- Remove the `Ip Address` of unhealth node as explained in below example.
+- Add the new `Ip address` value, as explained in below example.
+- Make sure that all the necessary  port and fire wall setting are align in the new node.
+
+ For example : Remove node to the existing deployed Postgres cluster.
+ In the example we are replacing the node `10.0.7.0` with `10.0.9.0`.
+
+  | Old Config | => | New Config |
+  | :--- | :--- | :--- |
+  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
+  
+- Run the below command from the bastion node.
+
+  ```sh
+  cd /hab/a2_deploy_workspace/terraform
+  for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
+  cd -
+  ```
+
+- To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
+  - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
+
+    ```sh
+    sudo chef-automate version
+    ```
+
+  - Output
+
+    ```sh
+    Version: 2
+    CLI Build: 20220920122615
+    Server Build: 4.X.Y
+    ```
+
+  - To download the airgap bundle, please run the command from the machine where we have internet access.
+
+    ```sh
+    chef-automate create airgap bundle --version 4.X.Y  
+    ```
+
+  - Copy the airgap bundle to the bastion host.  
+
+- Run the `deploy` command to replace a node.
+
+  ```sh
+    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
+  ```
+
+### Troubleshooting
+
+#### Failure in adding nodes
+
+  ```bash
+  Error: Upload failed: scp: /var/automate-ha: Permission denied
+  ```
+
+- **Resolution** : Execute the below command.
+  
+  ```sh
+  cd /hab/a2_deploy_workspace/terraform
+  for x in $(terraform state list -state=/hab/a2_deploy_workspace/terraform/terraform.tfstate | grep module); do terraform taint $x; done
+  cd -
+   ```
+
+- Once the module's tainted, run the `deploy` command again.
+
+  ```sh
+     chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
+  ```

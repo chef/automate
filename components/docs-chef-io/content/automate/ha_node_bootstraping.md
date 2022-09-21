@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 95
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 A node is any physical, virtual, or cloud device configured and maintained by an instance of Chef Infra Client. Bootstrapping installs Chef Infra Client on a target system so it can run as a client and sets the node up to communicate with a Chef Infra Server.
 
 To bootstrap a node, run `knife bootstrap` in the workstation.

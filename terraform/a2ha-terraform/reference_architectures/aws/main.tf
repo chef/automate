@@ -23,6 +23,7 @@ module "aws" {
   automate_fqdn                      = var.automate_fqdn
   automate_instance_count            = var.automate_instance_count
   automate_lb_certificate_arn        = var.automate_lb_certificate_arn
+  delete_on_termination              = var.delete_on_termination
   automate_server_instance_type      = var.automate_server_instance_type
   aws_ami_id                         = var.aws_ami_id
   aws_ssh_key_file                   = var.ssh_key_file

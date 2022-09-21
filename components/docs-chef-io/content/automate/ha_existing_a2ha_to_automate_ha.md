@@ -13,6 +13,10 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
+{{< warning >}}
 
 - A2HA user can be migrated to Automate HA with a minimum Chef Automate version [20201230192246](https://docs.chef.io/release_notes_automate/#20201230192246)
 
@@ -22,21 +26,22 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
 ## Prerequisites
 
-- Ability to mount the file system, which was mounted to A2HA Cluster for backup purpose, to Automate HA. 
+- Ability to mount the file system, which was mounted to A2HA Cluster for backup purpose, to Automate HA.
 
 - A2HA is configured to take backup on mounted network drive (location example : `/mnt/automate_backup`).
+
 ## Migration
 
 1. Run the following commands from any automate instance in A2HA Cluster.
 
-```cmd
-sudo chef-automate backup create
-sudo chef-automate bootstrap bundle create bootstrap.abb
-```
+    ```cmd
+    sudo chef-automate backup create
+    sudo chef-automate bootstrap bundle create bootstrap.abb
+    ```
 
-- The first command will take the backup at the mount file system. You can get the mount path from the file `/hab/a2_deploy_workspace/a2ha.rb`
-- The second command will create the bootstrap bundle, which needed to copy all the frontend nodes of Automate HA cluster.
-- Once the backup is completed successfully, save the backup Id. For example: `20210622065515`.
+    - The first command will take the backup at the mount file system. You can get the mount path from the file `/hab/a2_deploy_workspace/a2ha.rb`
+    - The second command will create the bootstrap bundle, which needed to copy all the frontend nodes of Automate HA cluster.
+    - Once the backup is completed successfully, save the backup Id. For example: `20210622065515`.
 
     ```cmd
     sudo chef-automate backup create
@@ -49,7 +54,7 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
     - If you want to use backup created previously run the command on Automate node, to get the backup id
       `chef-automate backup list`
 
-    ```
+    ```sh
     Backup             State       Age
     20180508201548    completed  8 minutes old
     20180508201643    completed  8 minutes old
@@ -85,7 +90,7 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
 
     ```bash
     sudo chef-automate config show > current_config.toml 
-    ``` 
+    ```
 
 10. Add the OpenSearch credentials to the applied config.
 
@@ -170,6 +175,21 @@ sudo chef-automate bootstrap bundle create bootstrap.abb
     These steps should be executed on all the Frontend nodes.  
 
 {{< /warning >}}
+
+## Equivalent Commands
+
+In Automate HA there are equivalent command which had been used in A2HA
+
+| Commands                   | A2HA                                                      | Automate HA                                                   |
+|----------------------------|-----------------------------------------------------------|---------------------------------------------------------------|
+| init config existing infra | `bash automate-cluster-ctl config init -a existing_nodes` | `bash chef-automate init-config-ha existing_infra `           |
+| deploy                     | `bash automate-cluster-ctl deploy `                       | `bash chef-automate deploy config.toml`                       |
+| info                       | `bash automate-cluster-ctl info `                         | `bash chef-automate info`                                     |
+| status                     | `bash chef-automate status `                              | `bash chef-automate status`                                   |
+| ssh                        | `bash automate-cluster-ctl ssh <name> `                   | `bash chef-automate ssh --hostname <name>`                    |
+| test                       | `bash automate-cluster-ctl test `                         | `bash chef-automate test`                                     |
+| gather logs                | `bash automate-cluster-clt gather-logs `                  | `bash chef-automate gather-logs`                              |
+| workspace                  | `bash automate-cluster-clt workspace `                    | `bash chef-automate workspace [OPTIONS] SUBCOMMAND [ARG] ...` |
 
 ## Troubleshooting
 

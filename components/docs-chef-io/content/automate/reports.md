@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 10
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 The _Reports_ page provides a comprehensive insight into all scanned infrastructure compliance status. Scan results for audit cookbook configurations also appear in this view.
 
 {{< note >}} If the size of a report goes over 4MB, enable the **Large Compliance Report** feature to make the **Reports Page** and **Download Report** work as expected. {{< /note >}}
@@ -118,7 +122,7 @@ Use Chef InSpec to configure [waivers](https://docs.chef.io/inspec/waivers/).
 
 The download button to the right of the search bar allows users to download a JSON or CSV format of the reports. The downloaded contents result from all the applied filters--including the end time selected in the calendar.
 
-## Download Report Results (With Large Compliance Report Configuration)  
+## Download Report Results (With Large Compliance Report Configuration)
 
 In case Automate is configured to ingest an extensive compliance report of size more than 4MB, the download of the report becomes a two-step engagement:
 

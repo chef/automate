@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 230
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 This page explains how to use the **AWS Certificate Manager (ACM)** console to generate a public ACM certificate for your domain.
 
 You can either generate a new public certificate or copy an existing Amazon Resource Name (ARN) value of the certificate of your selected region in the AWS console.

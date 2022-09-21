@@ -18,6 +18,7 @@ pushd ./automate.wiki
 
   # Reset "Pending Release Notes" wiki page
   cat >./Pending-Release-Notes.md <<EOH
+
 ## Upgrade Journey
 
 Chef lets you choose your **upgrade journey** based on your current version of Chef Automate. You can do all the version upgrades manually.

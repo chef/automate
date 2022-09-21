@@ -13,6 +13,10 @@ gh_repo = "automate"
     weight = 220
 +++
 
+{{< warning >}}
+ {{% automate/4x-warn %}}
+{{< /warning >}}
+
 Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Amazon Web Services) cloud with Managed AWS Services.
 
 ## Install Chef Automate HA on AWS with Managed AWS Services
@@ -37,42 +41,38 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
   echo "aws_secret_access_key=<SECRET_KEY>" >> ~/.aws/credentials
   ```
 
-- Have DNS certificate ready in ACM for 2 DNS entries: `chefautomate.example.com`, `chefinfraserver.example.com`. Click [here](/automate/ha_aws_cert_mngr/) to know more on how to create new DNS Certificate in ACM.
-- Have SSH Key Pair ready in AWS, so new VMs are created using that pair. Click [here](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html) to know more about AWS SSH Key Pair creation.
+- Have DNS certificate ready in ACM for 2 DNS entries: Example: `chefautomate.example.com`, `chefinfraserver.example.com`\
+  Reference for [Creating new DNS Certificate in ACM](/automate/ha_aws_cert_mngr/)
+- Have SSH Key Pair ready in AWS, so new VM's are created using that pair.\
+  Reference for [AWS SSH Key Pair creation](https://docs.aws.amazon.com/ground-station/latest/ug/create-ec2-ssh-key-pair.html)
+- We do not support passphrase for Private Key authentication.
 
-### Bastion Host Machine
+### Run these steps on Bastion Host Machine
 
-1. Before starting, switch to sudo:
-
-   ```bash
-   sudo su -
-   ```
-
-2. Download Chef Automate CLI:
+1. Run below commands to download latest Automate CLI and Airgapped Bundle:
 
    ```bash
-   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate
-   ```
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Download Chef Automate CLI.
+   curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip \
+   | gunzip - > chef-automate && chmod +x chef-automate \
+   | cp -f chef-automate /usr/bin/chef-automate
 
-3. Download the latest Airgapped Bundle using:
+   #Download latest Airgapped Bundle.
+   #To download specific version bundle, example version: 4.2.59 then replace latest.aib with 4.2.59.aib
+   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate.aib
 
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o latest.aib
-   ```
-
-   Download specific version bundle using the following command, example version: `4.0.91`:
-
-   ```bash
-   curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
-   ```
-
-4. Generate `init` config for AWS infra structure:
-
-   ```bash
+   #Generate init config and then generate init config for AWS infra structure
    chef-automate init-config-ha aws
+   "
    ```
 
-5. Update config with relevant data:
+   {{< note >}}
+   Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
+   {{< /note >}}
+
+2. Update Config with relevant data
 
    ```bash
    vi config.toml
@@ -81,6 +81,8 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
    - Give `ssh_user` which has access to all the machines. Example: `ubuntu`.
    - Give `ssh_port` if your AMI runs on custom **ssh port**. The default value is 22.
    - Give `ssh_key_file` path, downloaded from **AWS SSH Key Pair**, which you want to use to create all the VMs. This will let you access all the VMs.
+   - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
+   - We support only private key authentication.
    - Set `backup_config` to `"efs"` or `"s3"`. If `backup_config` is `s3`, set `s3_bucketName` to a **unique value**.
    - Set `admin_password` to access Chef Automate UI for user `admin`.
    - Don't set `fqdn` for the AWS deployment.
@@ -111,50 +113,28 @@ Set the above prerequisites in `~/.aws/credentials` in Bastion Host:
       - Set `chef_ebs_volume_iops`, `chef_ebs_volume_size` based on your load needs.
       - Set `automate_ebs_volume_type`, `chef_ebs_volume_type`. Default value is `"gp3"`. Change this based on your needs.
 
-6. Confirm all the data in the config is correct:
+3. Continue with the deployment after updating config:
 
    ```bash
+   #Run commands as sudo.
+   sudo -- sh -c "
+   #Print data in the config
    cat config.toml
-   ```
 
-7. Run Provision Command:
 
-   ```bash
-   chef-automate provision-infra config.toml --airgap-bundle latest.aib
-   ```
+   #Run provision command to deploy `automate.aib` with set `config.toml`
+   chef-automate provision-infra config.toml --airgap-bundle automate.aib
 
-   Using a specific version of Chef Automate, for example: `automate-4.0.91.aib`:
+   #Run deploy command to deploy `automate.aib` with set `config.toml`
+   chef-automate deploy config.toml --airgap-bundle automate.aib
 
-   ```bash
-   chef-automate provision-infra config.toml --airgap-bundle automate-4.0.91.aib
-   ```
-
-8. Deploy `latest.aib` with set `config.toml` using the following command:
-
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle latest.aib
-   ```
-
-   If deploying a specific version of Chef Automate, for example: Deploy `automate-4.0.91.aib` with set `config.toml`:
-
-   ```bash
-   chef-automate deploy config.toml --airgap-bundle automate-4.0.91.aib
-   ```
-
-9. After Deployment is done successfully. Check the status of Chef Automate HA services:
-
-   ```bash
+   #After Deployment is done successfully. Check status of Chef Automate HA services
    chef-automate status
-   ```
-
-10. Check Chef Automate HA deployment information using the following command:
-
-   ```bash
+   
+   #Check Chef Automate HA deployment information, using the following command
    chef-automate info
    ```
 
-11. Set DNS entries:
+Note: DNS should have entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in `chef-automate info` command.
 
-   DNS should have an entry for `chefautomate.example.com` and `chefinfraserver.example.com` pointing to respective Load Balancers as shown in the `chef-automate info` command.
-
-12. Check if Chef Automate UI is accessible from [Domain used for Chef Automate](https://chefautomate.example.com).
+Check if Chef Automate UI is accessible by going to (Domain used for Chef Automate) [https://chefautomate.example.com](https://chefautomate.example.com).

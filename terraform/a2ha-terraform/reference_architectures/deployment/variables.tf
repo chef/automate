@@ -94,6 +94,10 @@ variable "chef_server_private_ips" {
   default = []
 }
 
+variable "delete_on_termination" {
+  default = true
+}
+
 variable "managed_opensearch_certificate" {
   default = ""
 }

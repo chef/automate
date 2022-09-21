@@ -64,6 +64,8 @@ automate_lb_certificate_arn = "<%= config.aws.automate_lb_certificate_arn %>"
 chef_server_lb_certificate_arn = "<%= config.aws.chef_server_lb_certificate_arn %>"
 <% end %>
 
+delete_on_termination = "<%= config.aws.delete_on_termination %>"
+
 automate_server_instance_type = "<%= config.aws.automate_server_instance_type %>"
 
 <% if config.aws.automate_ebs_volume_iops %>

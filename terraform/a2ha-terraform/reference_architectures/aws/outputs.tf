@@ -6,6 +6,14 @@ output "ssh_key_file" {
   value = var.ssh_key_file
 }
 
+output "ssh_user" {
+  value = var.ssh_user
+}
+
+output "ssh_port" {
+  value = var.ssh_port
+}
+
 output "automate_private_ips" {
   value = formatlist("%s", module.aws.automate_private_ips)
 }

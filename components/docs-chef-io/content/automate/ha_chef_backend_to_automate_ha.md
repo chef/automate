@@ -13,6 +13,10 @@ gh_repo = "automate"
 +++
 
 {{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
+{{< warning >}}
 
 - Customers using only **Chef Backend** are advised to follow this migration guidance. Customers using **Chef Manage** or **Private Chef Supermarket** with Chef Backend should not migrate with this.
 - Automate HA does not support supermarket authentication with chef-server users' credentials.
@@ -162,10 +166,10 @@ The above migration will require downtime, so plan accordingly. A reduced perfor
 1. Edit `config.toml` and add the following:
 
     - Update the `instance_count`  
-    - **fqdn:** load balance URL, which points to the frontend node.
-    - **keys:** ssh username and private keys
-    - Provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
-    - Provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
+    - fqdn : load balance url, which points to frondend node.
+    - keys : ssh username and private keys
+    - Make sure to provide Chef backend's frontend server IPs for Automate HA Chef Automate and Chef Server.
+    - Make sure to provide Chef backend's backend server IPs for Automate HA Postgres and OpenSearch machines.
     - Sample configuration, please modify according to your needs.
 
     ```cmd
@@ -212,4 +216,86 @@ The above migration will require downtime, so plan accordingly. A reduced perfor
     ./chef-automate deploy config.toml <airgapped bundle name>
     ```
 
-1. Clean up the old packages from the chef-backend (like ElasticSearch and Postgres).
+1. Clean up the old packages from chef-backend (like Elasticsearch and postgres)
+
+1. Refer to [Restore Backed Up Data to Chef Automate HA](/automate/ha_chef_backend_to_automate_ha/#restore-backed-up-data-to-chef-automate-ha) page.
+
+## Using Autoamte HA for Chef-Backend user
+
+1. Download and Install chef-workstation 
+    From Bashtion machine or local machine install chef-workstation
+    https://www.chef.io/downloads/tools/workstation
+
+1. Set up workstation
+
+    ```bash
+    chef generate repo chef-repo 
+    ```
+
+    ```bash
+    cd  chef-repo 
+    ```
+
+    ```bash
+    knife configure 
+    ```
+
+    Provide tje chef-server FQDN of Automate HA Chef-Server. For example: `https://demo-chef-server.com/organizations/demo-org`
+
+    ```bash
+        knife configure
+        Please enter the chef server URL: [https://ip-10-1-0-52.ap-southeast-1.compute.internal/organizations/myorg] https://demo-chef-server.com/organizations/demo-org
+        Please enter an existing username or clientname for the API: [ubuntu] org-user
+        *****
+
+        You must place your client key in:
+            /root/.chef/org-user.pem
+        Before running commands with Knife
+
+        *****
+        Knife configuration file written to /root/.chef/credentials
+    ```
+
+1. Ssl fetch command:
+
+    ```bash
+    knife ssl fetch 
+    ```
+
+1. Ssl check command:
+
+    ```bash
+    knife ssl check 
+    ```
+
+1. Create role command:
+
+    ```bash
+    knife role create abc --disable-editing 
+    ```
+
+1. Download cookbook:
+
+    ```bash
+    knife supermarket download line 
+    knife supermarket download apache2
+    ```
+
+1. Upload cookbook:
+
+    ```bash
+    knife cookbook upload line --cookbook-path cookbooks 
+    ```
+
+1. Bootstrap as node:
+
+    ```bash
+        knife bootstrap <public_ip_node>  -i <key_to_connect_node> -U ubuntu -N test1 --sudo 
+    ```
+
+    For example:
+
+    ```bash
+        knife bootstrap 15.207.98.155 -i  ~/.ssh/ssh-key.pem -U ubuntu -N node1 --sudo 
+        knife bootstrap 3.110.103.65 -i ~/.ssh/ssh-key.pem -U ubuntu -N node2 --sudo
+    ```

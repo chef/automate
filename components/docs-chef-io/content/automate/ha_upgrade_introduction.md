@@ -12,6 +12,10 @@ gh_repo = "automate"
     weight = 70
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 Steps to upgrade the Chef Automate HA are as shown below:
 
 - Download the latest CLI using:
@@ -29,10 +33,14 @@ Steps to upgrade the Chef Automate HA are as shown below:
   Download a specific version bundle with this, example version: 4.0.91:
 
   ```bash
-  curl https://packages.chef.io/airgap_bundle/current/automate/4.0.91.aib -o automate-4.0.91.aib
+  curl https://packages.chef.io/airgap_bundle/current/automate/<version>.aib -o automate-<version>.aib
   ```
 
-- If you only want to upgrade FrontEnd Services, i.e., Chef Automate and Chef Infra Server, run the following command:
+  {{< note >}}
+  Chef Automate bundles are available for 365 days from the release of a version. However, the milestone release bundles are available for download forever.
+  {{< /note >}}
+
+- If we want to only upgrade FrontEnd Services i.e. Chef Automate and Chef Infra Server.
 
   ```bash
   chef-automate upgrade run --airgap-bundle latest.aib --upgrade-frontends

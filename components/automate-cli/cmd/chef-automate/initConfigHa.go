@@ -26,7 +26,7 @@ type AwsConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
-			SSHPort						string	`toml:"ssh_port"`
+			SSHPort                     string `toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`
@@ -95,6 +95,7 @@ type AwsConfigToml struct {
 			AmiFilterOwner               string   `toml:"ami_filter_owner"`
 			AmiID                        string   `toml:"ami_id"`
 			LBAccessLogs                 string   `toml:"lb_access_logs"`
+			DeleteOnTermination          bool     `toml:"delete_on_termination"`
 			AutomateServerInstanceType   string   `toml:"automate_server_instance_type"`
 			ChefServerInstanceType       string   `toml:"chef_server_instance_type"`
 			OpensearchServerInstanceType string   `toml:"opensearch_server_instance_type"`
@@ -140,7 +141,7 @@ type ExistingInfraConfigToml struct {
 			WorkspacePath               string `toml:"workspace_path"`
 			SSHUser                     string `toml:"ssh_user"`
 			SSHKeyFile                  string `toml:"ssh_key_file"`
-			SSHPort						string	`toml:"ssh_port"`
+			SSHPort                     string `toml:"ssh_port"`
 			SudoPassword                string `toml:"sudo_password"`
 			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
 			NewElk                      string `toml:"new_elk"`

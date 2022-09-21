@@ -13,7 +13,11 @@ gh_repo = "automate"
     weight = 200
 +++
 
-Computer security safeguards the computer system and data against theft, illegal access, or disaster. It's guarding against and detecting illegal access to your computer system. Data security refers to securing data from unlawful access or any disaster. This process includes the following terms:
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
+Computer security safeguards the computer system and data against theft, unlawful access, or any disaster. It's guarding against and detecting unlawful access to your computer system. Data security refers to securing data from unlawful access or any disaster. This process includes the following terms:
 
 - Data Backup
 - Data Restore

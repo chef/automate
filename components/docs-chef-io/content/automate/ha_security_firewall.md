@@ -13,14 +13,18 @@ gh_repo = "automate"
     weight = 210
 +++
 
+{{< warning >}}
+{{% automate/4x-warn %}}
+{{< /warning >}}
+
 The Chef Automate High Availability (HA) cluster requires multiple ports for the front and backend servers to operate effectively and reduce network traffic. Below is a breakdown of those ports and what needs to be open for each set of servers.
 
 ## Ports required for all Machines
 
 | Machines | Chef Automate         | Chef Infra Server     | Postgresql                                  | OpenSearch                                  | Bastion      |
 |----------|-----------------------|-----------------------|---------------------------------------------|---------------------------------------------|--------------|
-| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638<br/>UDP 9638 |              |
-| Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638<br/>UDP 9638 | TCP 22, 9631 |
+| Incoming | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 |              |
+| Outgoing | TCP 22, 9631, 443, 80 | TCP 22, 9631, 443, 80 | TCP 22, 9631, 7432, 5432, 9638<br/>UDP 9638 | TCP 22, 9631, 9200, 9300, 9638, 6432<br/>UDP 9638 | TCP 22, 9631 |
 
 {{< note >}}
 
@@ -40,3 +44,4 @@ The Chef Automate High Availability (HA) cluster requires multiple ports for the
 | TCP      | 9300        | Allows OpenSearch node to distribute data in its cluster.                                        |
 | TCP/UDP  | 9638        | Habitat gossip (UDP) |
 | TCP      | 7432        | HAProxy, which redirects to Postgresql Leader |
+| TCP      | 6432        | Re-elect Postgresql Leader, if Postgresql leader is down |
