@@ -20,7 +20,7 @@ If the Frequency of Data Sync between the Live System(Production cluster) and DR
 
 In this approach we have a cluster running, which perform the `chef-automate backup` operation at regular interval. In case of failure scenario  we have to setup a new cluster (fresh [deployment](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine)) and do the `chef-automate restore` operation in on the new cluster.
 
-#### Cavet with Above approach
+#### Caveat with Above approach
 
 - Setup the new cluster will take couple of hours of time.
 - Restore operation will take good amount of time, based on the size of backed up data.
@@ -34,11 +34,9 @@ In this approach we have a cluster running, which perform the `chef-automate bac
 chef-automate bootstrap bundle create bootstrap.abb
 ```
 
-- After Installation DR Cluster, copy the bootstrap bundle to all the Frontend node and install with below command
-
 {{< /note >}}
 
-#### Steps to StepUp DR Cluster
+#### Setup the  
 
 1. Please follow the fresh [deployment](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine).
 
@@ -113,3 +111,10 @@ Primary cluster will be in use and taking the backup at regular interval with `c
 - Setup two parallel cluster will be expensive.
 - Data available till last backup performed.
 
+#### Steps to Setup the Procution and DR Cluster
+
+1. Please follow the steps for fresh [deployment](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine) for Production cluster.
+
+2. DR Cluster will be same as the Production cluster, we can use the above steps to setup the DR cluster. 
+
+3. 
