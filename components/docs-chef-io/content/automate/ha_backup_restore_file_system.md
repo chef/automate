@@ -78,7 +78,7 @@ Configure the OpenSearch `path.repo` setting by following the steps given below:
     hab config apply automate-ha-opensearch.default $(date '+%s') es_config.toml
     ```
 
-    ##### Healtcheck commands
+    ##### Healthcheck commands
 
         ```sh
         hab svc status (check whether OpenSearch service is up or not)
