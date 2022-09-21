@@ -101,3 +101,7 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
 - Start all the service on all the Frontend node.
 
 - Update the DNS entry. Now DNS will point to the DR Load balancer.
+
+- After doing the above steps, DR Cluster will be primary cluster.
+
+- Need to setup the backup cron, so that it will perform the backup.
