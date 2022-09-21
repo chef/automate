@@ -42,7 +42,7 @@ var datetimeFormat = "yyyy-MM-dd-HH:mm:ss"
 var datetimesecFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
 var errorQuery = "Error in query: "
 
-func elasticSearchConnection(url string, esHostName string, esPort string) *elastic.Client {
+func elasticSearchConnection(url string, esHostName string, esPort string, esUserName string, esPassword string) *elastic.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			MinVersion:         tls.VersionTLS12,
@@ -55,7 +55,7 @@ func elasticSearchConnection(url string, esHostName string, esPort string) *elas
 		elastic.SetHttpClient(client),
 		elastic.SetURL(elasticSearchURL),
 		elastic.SetSniff(false),
-		elastic.SetBasicAuth("admin", "admin"),
+		elastic.SetBasicAuth(esUserName, esPassword),
 	)
 	if err != nil {
 		fmt.Println("Elastic error : ", err)
@@ -64,13 +64,13 @@ func elasticSearchConnection(url string, esHostName string, esPort string) *elas
 	return esclient
 }
 
-func GenerateNodeCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateNodeCount(esHostName string, esPort string, esUserName string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUserName, esPassword)
 	queryElasticSearchNodeCount(client, startTime, endTime)
 }
 
-func GenerateNodeRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateNodeRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
 	queryElasticSearchNodeReport(client, startTime, endTime)
 }
 
@@ -269,13 +269,13 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 	fmt.Println("The details of the runs can be found in : ", filename)
 }
 
-func GenerateComplianceResourceRunCount(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateComplianceResourceRunCount(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
 	queryElasticSearchComplianceResourceCount(client, startTime, endTime)
 }
 
-func GenerateComplianceResourceRunReport(esHostName string, esPort string, startTime time.Time, endTime time.Time) {
-	client := elasticSearchConnection(url, esHostName, esPort)
+func GenerateComplianceResourceRunReport(esHostName string, esPort string, esUsername string, esPassword string, startTime time.Time, endTime time.Time) {
+	client := elasticSearchConnection(url, esHostName, esPort, esUsername, esPassword)
 	queryElasticSearchComplianceResourceRunReport(client, startTime, endTime)
 }
 
