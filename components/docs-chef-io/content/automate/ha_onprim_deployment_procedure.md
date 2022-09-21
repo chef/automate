@@ -192,13 +192,36 @@ postgresql_private_ips = ["D1.D2.D3.D4","E1.E2.E3.E4","F1.F2.F3.F4"]
 For example : Add new Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [automate.config] <br/ > instance_count = "1" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br/ > instance_count = "2" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0","10.0.2.0"] |
+  | [automate.config] <br/> instance_count = "1" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0"] |  | [automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0"] |
 
 - Trigger the deployment command again from the bastion node.
-- In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
+- To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
+  - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
+
+    ```sh
+    sudo chef-automate version
+    ```
+
+  - Output
+
+    ```sh
+    Version: 2
+    CLI Build: 20220920122615
+    Server Build: 4.X.Y
+    ```
+
+  - To download the airgap bundle, please run the command from the machine where we have internet access.
+
+    ```sh
+    chef-automate create airgap bundle --version 4.X.Y  
+    ```
+
+  - Copy the airgap bundle to the bastion host.  
+
+- Run the `deploy` command to add the new node.  
   
   ```sh
-    chef-automate deploy config.toml --airgap-bundle latest.aib
+    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
 
 - Above process can be done for `chef-server`, `postgresql` and `opensearch` cluster as well
@@ -207,7 +230,10 @@ For example : Add new Automate node to the existing deployed cluster.
 ### How To Remove Any Nodes From Frontend Cluster (On-Prem Deployment)
 
 {{< warning >}}
- We do not recommend removal of any node from backend cluster, but replacement of node is recommended. For replacement of a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
+
+- We do not recommend removal of any node from backend cluster, but replacement of node is recommended. For replacement of a node please refer [this](/automate/ha_onprim_deployment_procedure/#How-to-Replace-Node-in-Automate-HA-Cluster).
+- Below process can be done for `chef-server` and `automate`.
+
 {{< /warning >}}
 
 - Open the `config.toml` at bastion node.
@@ -217,13 +243,36 @@ For example : Add new Automate node to the existing deployed cluster.
 For example : Remove Automate node to the existing deployed cluster.
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [automate.config] <br/ > instance_count = "3" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br/ > instance_count = "2" <br/ > [existing_infra.config] <br/ > automate_private_ips = ["10.0.1.0","10.0.3.0"] |
+  | [automate.config] <br/> instance_count = "3" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.2.0","10.0.3.0"] |  |[automate.config] <br/> instance_count = "2" <br/> [existing_infra.config] <br/> automate_private_ips = ["10.0.1.0","10.0.3.0"] |
   
 - Trigger the deployment command again from the bastion node.
-- In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
-  
+- To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
+  - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
+
+    ```sh
+    sudo chef-automate version
+    ```
+
+  - Output
+
+    ```sh
+    Version: 2
+    CLI Build: 20220920122615
+    Server Build: 4.X.Y
+    ```
+
+  - To download the airgap bundle, please run the command from the machine where we have internet access.
+
+    ```sh
+    chef-automate create airgap bundle --version 4.X.Y  
+    ```
+
+  - Copy the airgap bundle to the bastion host.  
+
+- Run the `deploy` command to remove the node.
+
   ```sh
-    chef-automate deploy config.toml --airgap-bundle latest.aib
+    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
 
 - Above process can be done for `chef-server` and `automate`.
@@ -241,7 +290,7 @@ For example : Remove Automate node to the existing deployed cluster.
 
   | Old Config | => | New Config |
   | :--- | :--- | :--- |
-  | [existing_infra.config] <br/ > postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br/ > postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
+  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.7.0","10.0.8.0"] |  | [existing_infra.config] <br/> postgresql_private_ips = ["10.0.6.0","10.0.9.0","10.0.8.0"] |
   
 - Run the below command from the bastion node.
 
@@ -251,11 +300,33 @@ For example : Remove Automate node to the existing deployed cluster.
   cd -
   ```
 
-- Run the `deploy` command to Add new node into the cluster.
-- In below deploy command,`latest.aib` will replace with your airgap bundle name which is running on the current cluster.
-  
+- To trigger the deploy command we required the chef-automate airgap bundle, please use the airgap bundle which is running on the current cluster. In case of bundle is missing or delete from the bastion, then we need to download the airgap bundle again.
+  - In case you do not know which Chef-Automate version is running, then ssh to the one of the frontend node and run the below command.
+
+    ```sh
+    sudo chef-automate version
+    ```
+
+  - Output
+
+    ```sh
+    Version: 2
+    CLI Build: 20220920122615
+    Server Build: 4.X.Y
+    ```
+
+  - To download the airgap bundle, please run the command from the machine where we have internet access.
+
+    ```sh
+    chef-automate create airgap bundle --version 4.X.Y  
+    ```
+
+  - Copy the airgap bundle to the bastion host.  
+
+- Run the `deploy` command to replace a node.
+
   ```sh
-    chef-automate deploy config.toml --airgap-bundle latest.aib
+    chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
 
 ### Troubleshooting
@@ -274,8 +345,8 @@ For example : Remove Automate node to the existing deployed cluster.
   cd -
    ```
 
-- Once the module's tainted, run the `deploy` command again.`latest.aib` should be replaced with your airgap bundle name which is running on the current cluster
+- Once the module's tainted, run the `deploy` command again.
 
   ```sh
-     chef-automate deploy config.toml --airgap-bundle latest.aib
+     chef-automate deploy config.toml --airgap-bundle <Path-to-the-airgap-bundle>
   ```
