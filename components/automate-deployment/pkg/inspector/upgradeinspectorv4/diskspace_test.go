@@ -3,57 +3,49 @@ package upgradeinspectorv4
 import (
 	"errors"
 	"testing"
+	"time"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/stretchr/testify/assert"
 )
 
-type MockFileSystemUtils struct {
-	values map[string][]interface{}
+func CalDirSizeInGB(path string) (float64, error) {
+	return 3.0, nil
 }
 
-func (fsu *MockFileSystemUtils) PathExists(path string) (bool, error) {
-	return true, nil
+func CalDirSizeInGBError(path string) (float64, error) {
+	return 3.0, errors.New("failed to check filesystem")
 }
-func (fsu *MockFileSystemUtils) IsSymlink(path string) (bool, error) {
-	return true, nil
+
+func GetFreeSpaceinGB(dir string) (float64, error) {
+	return 2.5, nil
 }
-func (fsu *MockFileSystemUtils) CalDirSizeInGB(path string) (float64, error) {
-	var err error
-	if len(fsu.values["CalDirSizeInGB"]) == 2 {
-		err = fsu.values["CalDirSizeInGB"][1].(error)
-	}
-	return fsu.values["CalDirSizeInGB"][0].(float64), err
-}
-func (fsu *MockFileSystemUtils) CheckSpaceAvailability(dir string, minSpace float64) (bool, error) {
-	return true, nil
-}
-func (fsu *MockFileSystemUtils) GetFreeSpaceinGB(dir string) (float64, error) {
-	var err error
+
+func GetFreeSpaceinGBErrorHab(dir string) (float64, error) {
 	if dir == "/hab" {
-		if len(fsu.values["GetFreeSpaceinGB"]) == 2 {
-			err = fsu.values["GetFreeSpaceinGB"][1].(error)
-		}
-	} else if dir == "/home/ubuntu" {
-		if len(fsu.values["GetFreeSpaceinGB"]) == 3 {
-			err = fsu.values["GetFreeSpaceinGB"][2].(error)
-		}
+		return -1.0, errors.New("failed to check filesystem")
 	}
-	return fsu.values["GetFreeSpaceinGB"][0].(float64), err
-}
-func (fsu *MockFileSystemUtils) GetHabRootPath() string {
-	return fsu.values["GetHabRootPath"][0].(string)
+	return 2.5, nil
 }
 
-var testReturnValues = []map[string][]interface{}{
-	{"CalDirSizeInGB": {3.0}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}},
-	{"CalDirSizeInGB": {-1.0, errors.New("failed to check filesystem")}, "GetFreeSpaceinGB": {2.5}, "GetHabRootPath": {"/hab"}},
-	{"CalDirSizeInGB": {-1.0}, "GetFreeSpaceinGB": {2.5, errors.New("failed to check filesystem")}, "GetHabRootPath": {"/hab"}},
-	{"CalDirSizeInGB": {-1.0}, "GetFreeSpaceinGB": {2.5, nil, errors.New("failed to check filesystem")}, "GetHabRootPath": {"/hab"}},
+func GetFreeSpaceinGBErrorOSDestDir(dir string) (float64, error) {
+	if dir != "/hab" {
+		return -1.0, errors.New("failed to check filesystem")
+	}
+	return 2.5, nil
+}
+func GetHabRootPath() string {
+	return "/hab"
 }
 
 func TestDiskSpaceInspection(t *testing.T) {
 	tw := NewTestWriter()
-	tb := NewDiskSpaceInspection(tw.CliWriter, false, "", &MockFileSystemUtils{testReturnValues[0]})
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "", mfs)
 	index := 3
 	tb.ShowInfo(&index)
 	expected := `3. /hab directory should have 8.8GB of free space. (Currently available space : 2.5GB)
@@ -64,7 +56,12 @@ func TestDiskSpaceInspection(t *testing.T) {
 
 func TestDiskSpaceInspectionWithExternal(t *testing.T) {
 	tw := NewTestWriter()
-	tb := NewDiskSpaceInspection(tw.CliWriter, true, "", &MockFileSystemUtils{testReturnValues[0]})
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, true, "", mfs)
 	index := 3
 	tb.ShowInfo(&index)
 	expected := `3. /hab directory should have 5.5GB of free space. (Currently available space : 2.5GB)
@@ -75,7 +72,12 @@ func TestDiskSpaceInspectionWithExternal(t *testing.T) {
 
 func TestDiskSpaceInspectionWithOSDataDir(t *testing.T) {
 	tw := NewTestWriter()
-	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", &MockFileSystemUtils{testReturnValues[0]})
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
 	index := 3
 	tb.ShowInfo(&index)
 	expected := `3. /hab directory should have 5.5GB of free space. (Currently available space : 2.5GB)
@@ -87,7 +89,12 @@ func TestDiskSpaceInspectionWithOSDataDir(t *testing.T) {
 
 func TestDiskSpaceInspectionFileSystemError(t *testing.T) {
 	tw := NewTestWriter()
-	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", &MockFileSystemUtils{testReturnValues[1]})
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGBError,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
 	index := 3
 	err := tb.ShowInfo(&index)
 	expected := ""
@@ -100,7 +107,30 @@ func TestDiskSpaceInspectionFileSystemError(t *testing.T) {
 
 func TestDiskSpaceInspectionFreeDiskFilesystemError(t *testing.T) {
 	tw := NewTestWriter()
-	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", &MockFileSystemUtils{testReturnValues[2]})
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGBError,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
+	index := 3
+	err := tb.ShowInfo(&index)
+	expected := ""
+	assert.Equal(t, expected, tw.Output())
+	assert.Equal(t, 3, index)
+	if assert.Error(t, err) {
+		assert.Equal(t, "failed to check filesystem", err.Error())
+	}
+}
+
+func TestDiskSpaceInspectionWithHabFilesystemError(t *testing.T) {
+	tw := NewTestWriter()
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorHab,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
 	index := 3
 	err := tb.ShowInfo(&index)
 	expected := ""
@@ -113,11 +143,80 @@ func TestDiskSpaceInspectionFreeDiskFilesystemError(t *testing.T) {
 
 func TestDiskSpaceInspectionWithOSDataDirFilesystemError(t *testing.T) {
 	tw := NewTestWriter()
-	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", &MockFileSystemUtils{testReturnValues[3]})
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorOSDestDir,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
 	index := 3
 	tb.ShowInfo(&index)
 	expected := `3. /hab directory should have 5.5GB of free space. (Currently available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
 	assert.Equal(t, 4, index)
+}
+
+func TestDiskSpaceInspect(t *testing.T) {
+	tw := NewTestWriter()
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
+	tb.habDir = "/hab"
+	tb.osDestDir = "/home/ubuntu"
+	tb.currentHabSpace = 8.5
+	tb.requiredHabSpace = 5.5
+	tb.currentSpaceInOSDir = 8.5
+	tb.requiredOSDestSpace = 5.5
+	tb.checkDelay = 100 * time.Millisecond
+	err := tb.Inspect()
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 5.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have 5.5GB of free space"
+
+	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have 5.5GB of free space"
+	expectedPassOSDestChecking := "✔  [Passed]\t/home/ubuntu directory should have 5.5GB of free space"
+	assert.Contains(t, tw.Output(), expectedBeginHabChecking)
+	assert.Contains(t, tw.Output(), expectedBeginOSDestChecking)
+	assert.Contains(t, tw.Output(), expectedPassHabChecking)
+	assert.Contains(t, tw.Output(), expectedPassOSDestChecking)
+	assert.NoError(t, err)
+}
+
+func TestDiskSpaceInspectHabFailed(t *testing.T) {
+	tw := NewTestWriter()
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorHab,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	tb := NewDiskSpaceInspection(tw.CliWriter, false, "/home/ubuntu", mfs)
+	tb.habDir = "/hab"
+	tb.osDestDir = "/home/ubuntu"
+	tb.currentHabSpace = 8.5
+	tb.requiredHabSpace = 10.5
+	tb.currentSpaceInOSDir = 8.5
+	tb.requiredOSDestSpace = 5.5
+	tb.checkDelay = 100 * time.Millisecond
+	err := tb.Inspect()
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 10.5GB of free space"
+
+	expectedResult := `✖  [Failed]	/hab directory should have 10.5GB of free space
+ ⊖  [Skipped]	/home/ubuntu directory should have 5.5GB of free space
+
+[Error] Required Space : 10.5GB
+        Available space : 8.5GB
+`
+	// 	expectedEnsureMsg := `
+	// Please ensure the available free space is 10.5GB
+	// and run chef-automate upgrade run --major command again
+	// `
+	assert.Contains(t, tw.Output(), expectedBeginHabChecking)
+	assert.Contains(t, tw.Output(), expectedResult)
+	// assert.Contains(t, tw.Output(), expectedEnsureMsg)
+	if assert.Error(t, err) {
+		assert.Equal(t, "failed in Hab Space Check", err.Error())
+	}
 }

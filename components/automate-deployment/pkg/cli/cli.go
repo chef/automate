@@ -329,6 +329,7 @@ func (w *Writer) StartSpinner() {
 func (w *Writer) NewSpinner() *spinner.Spinner {
 	w.writer().Flush()
 	newSpinner := spinner.New(spinner.CharSets[3], 100*time.Millisecond)
+	newSpinner.Prefix = " "
 	newSpinner.Writer = w.writerStream
 	return newSpinner
 }
