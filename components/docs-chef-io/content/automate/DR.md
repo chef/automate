@@ -34,7 +34,7 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
 - Setup two parallel cluster will be expensive.
 - Data available till last backup performed.
 
-#### Steps to Setup the Prodcution and DR Cluster
+#### Steps to Setup the Production and DR Cluster
 
 1. Please follow the steps for fresh [deployment](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine) for Production cluster.
 
@@ -89,9 +89,16 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
                     password = "admin"
                 ```
 
-        - To restore backup on Chef Automate HA, below is the restore command, which can be from any Chef Automate instance of DR cluster. Below restore command is an example command for the file system as a backup options.
+        - To restore backup on Chef Automate HA, below is the restore command, which can be trigger from any Chef Automate instance of DR cluster. Below restore command is an example command for the file system as a backup options.
 
             ```cmd
             sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
             ```
 
+#### Steps to Switch to DR Cluster
+
+- Stop the Restore cron
+
+- Start all the service on all the Frontend node.
+
+- Update the DNS entry. Now DNS will point to the DR Load balancer.
