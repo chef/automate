@@ -34,6 +34,4 @@ export class SsoComponent implements OnInit {
   hideNotification() {
     this.isNotificationVisible = false;
   }
-
-
 }
