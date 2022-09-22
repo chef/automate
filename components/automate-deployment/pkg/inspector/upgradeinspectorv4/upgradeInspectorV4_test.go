@@ -27,7 +27,9 @@ Would you like to proceed with the upgrade? (y/n)
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
 	assert.NoError(t, err)
@@ -51,7 +53,9 @@ Would you like to proceed with the upgrade? (y/n)
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/hab")
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -73,7 +77,9 @@ Would you like to proceed with the upgrade? (y/n)
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -87,7 +93,9 @@ func TestUpgradeInspectorV4ShowInfoWithNoInput(t *testing.T) {
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -99,7 +107,7 @@ https://docs.chef.io/automate/major_upgrade 4.x/
 
 Would you like to proceed with the upgrade? (y/n)
 `
-	expectedError := errors.New("Upgrade process terminated.")
+	expectedError := errors.New(USER_TERMINATED)
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
 	if assert.Error(t, err) {
@@ -130,7 +138,10 @@ Would you like to proceed with the upgrade? (y/n)
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
 	err := ui.ShowInfo()
@@ -152,7 +163,10 @@ Please make sure following things are taken care of
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -179,7 +193,9 @@ Would you like to proceed with the upgrade? (y/n)
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -195,7 +211,9 @@ func TestUpgradeInspectorV4Inspect(t *testing.T) {
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", mfs)
@@ -230,7 +248,9 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", mfs)
@@ -254,7 +274,7 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 	assert.Contains(t, tw.Output(), expectedPassHabChecking)
 	assert.Contains(t, tw.Output(), expectedPassOSDestChecking)
 	if assert.Error(t, err) {
-		assert.EqualError(t, err, "Upgrade process terminated.: failed in Hab Space Check")
+		assert.EqualError(t, err, USER_TERMINATED+": failed in Hab Space Check")
 	}
 }
 
@@ -265,7 +285,9 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", mfs)
@@ -291,7 +313,7 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	assert.Contains(t, tw.Output(), expectedPassHabChecking)
 	assert.Contains(t, tw.Output(), expectedPassOSDestChecking)
 	if assert.Error(t, err) {
-		assert.EqualError(t, err, "Upgrade process terminated.: failed in OS Dest Check")
+		assert.EqualError(t, err, USER_TERMINATED+": failed in OS Dest Check")
 	}
 }
 
@@ -302,7 +324,9 @@ func TestUpgradeInspectorV4InspectShowInspectionList(t *testing.T) {
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
-	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{}, mfs)
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func() bool { return false },
+	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
 	diskSpaceInspection := NewDiskSpaceInspection(tw.CliWriter, false, "", mfs)

@@ -2,6 +2,7 @@ package upgradeinspectorv4
 
 import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
 	"github.com/fatih/color"
 )
 
@@ -19,4 +20,8 @@ func NewTakeBackupInspection(w *cli.Writer) *TakeBackupInspection {
 	return &TakeBackupInspection{
 		writer: w,
 	}
+}
+
+func (tb *TakeBackupInspection) GetInstallationType() inspector.InstallationType {
+	return inspector.BOTH
 }

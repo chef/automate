@@ -16,10 +16,13 @@ type UpgradeInspectorV4 struct {
 	osDestDir    string
 	upgradeUtils UpgradeV4Utils
 	fileUtils    fileutils.FileUtils
+	timeout      int64
+	isExternal   bool
 }
 
 const (
-	HAB_DIR string = "/hab"
+	HAB_DIR         string = "/hab"
+	USER_TERMINATED string = "Upgrade process terminated."
 )
 
 func (ui *UpgradeInspectorV4) ShowInfo() error {
@@ -56,7 +59,7 @@ func (ui *UpgradeInspectorV4) promptToContinue() error {
 		return err
 	}
 	if !isContinue {
-		return errors.New("Upgrade process terminated.")
+		return errors.New(USER_TERMINATED)
 	}
 	return nil
 }
@@ -66,31 +69,57 @@ func (ui *UpgradeInspectorV4) showOSDestDirFlagMsg() {
   $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
 `)
 }
+
 func (ui *UpgradeInspectorV4) Inspect() (err error) {
 	ui.writer.Println("Pre flight checks")
 	for _, inspection := range ui.inspections {
 		var i interface{} = inspection
 		_, ok := i.(inspector.SystemInspection)
 		if ok {
-			if err != nil {
-				err = inspection.(inspector.SystemInspection).Inspect()
-			} else {
-				err = inspection.(inspector.SystemInspection).Inspect()
+			installationType := inspection.(inspector.SystemInspection).GetInstallationType()
+			if ui.isExternal && (installationType == inspector.EXTERNAL || installationType == inspector.BOTH) {
+				if err != nil {
+					inspection.(inspector.SystemInspection).Skip()
+				} else {
+					err = inspection.(inspector.SystemInspection).Inspect()
+				}
+			} else if !ui.isExternal && (installationType == inspector.EMBEDDED || installationType == inspector.BOTH) {
+				if err != nil {
+					inspection.(inspector.SystemInspection).Skip()
+				} else {
+					err = inspection.(inspector.SystemInspection).Inspect()
+				}
 			}
-
 		}
 	}
 	if err != nil {
-		return errors.Wrap(err, "Upgrade process terminated.")
+		return errors.Wrap(err, USER_TERMINATED)
 	}
 	return nil
 }
 
-func NewUpgradeInspectorV4(w *cli.Writer, upgradeUtils UpgradeV4Utils, fileUtils fileutils.FileUtils) inspector.Inspector {
+func (ui *UpgradeInspectorV4) PreExit() (err error) {
+	for _, inspection := range ui.inspections {
+		var i interface{} = inspection
+		_, ok := i.(inspector.ExitInspection)
+		if ok {
+			err = inspection.(inspector.ExitInspection).PreExit()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func NewUpgradeInspectorV4(w *cli.Writer, upgradeUtils UpgradeV4Utils, fileUtils fileutils.FileUtils, timeout int64) inspector.Inspector {
+
 	return &UpgradeInspectorV4{
 		writer:       w,
 		upgradeUtils: upgradeUtils,
 		fileUtils:    fileUtils,
+		timeout:      timeout,
+		isExternal:   upgradeUtils.IsExternalElasticSearch(),
 	}
 }
 
@@ -111,6 +140,10 @@ func (ui *UpgradeInspectorV4) AddDefaultInspections() {
 	ui.AddInspection(NewTakeBackupInspection(ui.writer))
 	diskSpaceInspection := NewDiskSpaceInspection(ui.writer, ui.upgradeUtils.IsExternalElasticSearch(), ui.osDestDir, ui.fileUtils)
 	ui.AddInspection(diskSpaceInspection)
+	esBasePath := ui.upgradeUtils.GetESBasePath(ui.timeout)
+	ui.AddInspection(NewESIndexInspection(ui.writer, ui.upgradeUtils, esBasePath))
+	ui.AddInspection(NewDisableShardingInspection(ui.writer, ui.upgradeUtils))
+	ui.AddInspection(NewReplaceS3UrlInspection(ui.writer, ui.upgradeUtils))
 }
 
 func (ui *UpgradeInspectorV4) ShowInspectionList() {
