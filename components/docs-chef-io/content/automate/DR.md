@@ -58,6 +58,8 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
             sudo chef-automate bootstrap bundle unpack bootstrap.abb
         ```
 
+    - We do not recommend to trigger the backup from the DR Cluster, unless it is using as a primary cluster.
+
     - Stop all the services on all the Frontend node, as explain  below command.
 
         ```sh
