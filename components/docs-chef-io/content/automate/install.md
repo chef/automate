@@ -187,7 +187,7 @@ Add the following to your `config.toml` for HTTPS connection:
 
 Add the following to your `config.toml` for HTTP connection:
 
-> **_NOTE:_**  The following special characters are not allowed in a password.
+> **_NOTE:_**  The following special characters are not allowed in password.
 ```
     ‘ ` " ' \ ;
 ```
@@ -320,7 +320,7 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
 1. Create a storage bucket and configure a service account to access it per the steps described in the OpenSearch documentation.
 1. Configure each OpenSearch node with a GCS client configuration that contains the proper GCS settings as described in the OpenSearch documentation.
 1. Enable GCS backups by adding the following settings to your `config.toml`:
-> **_NOTE:_**  The following special characters are not allowed in a password.
+> **_NOTE:_**  The following special characters are not allowed in password.
     
 ```
     ‘ ` " ' \ ;
@@ -360,7 +360,7 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
 
 Add the following settings to your `config.toml`:
 
-> **_NOTE:_**  The following special characters are not allowed in a password.
+> **_NOTE:_**  The following special characters are not allowed in password.
 ```
     ‘ ` " ' \ ;
 ```
