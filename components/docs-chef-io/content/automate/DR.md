@@ -43,6 +43,12 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
 
 4. On Production Cluster
     - One of the Chef Automate node, We configure the cron which trigger the `chef-automate backup` at certain interval.
+    For example : sample cron look like for backup.
+
+        ```sh
+            sudo chef-automate backup create
+        ```
+
     - Create bootstrap bundle and save it. Use below command to create the bootstrap bundle. Run the below command to one of the Automate node.
 
     ```sh
@@ -91,6 +97,7 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
                 ```
 
         - To restore backup on Chef Automate HA, below is the restore command, which can be trigger from any Chef Automate instance of DR cluster. Below restore command is an example command for the file system as a backup options.
+        For example : sample cron look like for restore for file system.
 
             ```cmd
             sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
