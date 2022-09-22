@@ -25,7 +25,7 @@ In this approach we have to running 2 Parallel Cluster of same capacity.
 
 ![DR SetUp with 2 Parallel Cluster](/images/automate/DR-2-cluster.png)
 
-Primary cluster will be in use and taking the backup at regular interval with `chef-automate backup` command. At the same time we will be restoring the backup at DR cluster via `chef-automate restore` command.
+Primary cluster will be in use and will take the backup at regular interval with `chef-automate backup create` command. At the same time DR cluster will be restoring the latest backup data via `chef-automate backup restore` command.
 In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
 #### Caveat with Above approach
@@ -40,6 +40,12 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 2. DR Cluster will be same as the Production cluster, we can use the above steps to setup the DR cluster.
 
 3. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage](https://deploy-preview-7425--chef-automate.netlify.app/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
+
+{{< note >}}
+
+Both the clusters should be configured with same storage i.e., if Primary cluster is configured with a AWS S3 (per say the bucket name is `chef-automate-DR`), then DR cluser should also configured with same bucket (`chef-automate-DR`) in AWS S3.
+
+{{< /note >}}
 
 4. On Primary Cluster
 
@@ -120,7 +126,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
             sudo chef-automate backup restore /mnt/automate_backups/backups/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
             ```
 
-            Sample cron for restoring backup saved in object storage(S3) look like
+            Sample cron for restoring backup saved in object storage (S3) look like
 
             ```cmd
             id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
