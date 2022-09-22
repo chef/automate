@@ -175,7 +175,7 @@ sudo chef-automate config patch config.toml
 If you wish to reset to the default configuration or to modify the configuration:
 
 1. Run `chef-automate config show config.toml`.
-1. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
+1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
 1. Run `chef-automate config set config.toml` to apply your changes.
 
 ## Chef Automate Backup from Embedded PostgreSQL/OpenSearch and restore to External AWS PostgreSQL/OpenSearch
