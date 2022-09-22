@@ -5,6 +5,7 @@ type Inspector interface {
 	Inspect() error
 	AddInspection(inspection Inspection)
 	ShowInspectionList()
+	PreExit() error
 }
 
 type Inspection interface {
@@ -16,4 +17,18 @@ type SystemInspection interface {
 	Inspect() error
 	Skip()
 	GetShortInfo() []string
+	GetInstallationType() InstallationType
 }
+
+type ExitInspection interface {
+	SystemInspection
+	PreExit() error
+}
+
+type InstallationType int
+
+const (
+	EMBEDDED InstallationType = iota
+	EXTERNAL InstallationType = iota
+	BOTH     InstallationType = iota
+)

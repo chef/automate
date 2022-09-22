@@ -7,6 +7,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/fatih/color"
 )
@@ -186,4 +187,8 @@ func (ds *DiskSpaceInspection) GetShortInfo() []string {
 		msgs = append(msgs, fmt.Sprintf("%s directory should have %.1fGB of free space", ds.osDestDir, ds.requiredOSDestSpace))
 	}
 	return msgs
+}
+
+func (ds *DiskSpaceInspection) GetInstallationType() inspector.InstallationType {
+	return inspector.BOTH
 }

@@ -89,7 +89,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		},
 		GetHabRootPathFunc: func() string { return "/hab" },
 	}
-	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, mfs)
+	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, mfs, configCmdFlags.timeout)
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetOSDestDir(upgradeRunCmdFlags.osDestDataDir)
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
 	err := upgradeInspector.ShowInfo()
@@ -99,7 +99,8 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	upgradeInspector.ShowInspectionList()
 	err = upgradeInspector.Inspect()
 	if err != nil {
-		return nil
+		preExitErr := upgradeInspector.PreExit()
+		return errors.Wrap(err, preExitErr.Error())
 	}
 	return nil
 
