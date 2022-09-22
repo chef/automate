@@ -58,6 +58,12 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
 
     - Copy `bootstrap.abb` to all the of Frontend nodes of DR Cluster.
 
+    {{< note >}}
+    - Suggested frequecy of backup cron to restore cron is 2:1 i.e., for every two successful backups in production cluster there should be one restore in DR cluster.
+    - Always restore the latest backed-up data
+    - 'Cron Job' - A cron job is a Linux command used to schedule a job that is executed periodically
+    {{< /note >}}
+
 5. On DR Cluster
     - Install `bootstrap.abb` on all the Frontend nodes, as explain in below example
 
@@ -74,12 +80,6 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
         ```
 
     - Make sure that both backup and restore cron are align.
-
-    {{< note >}}
-    - Suggested frequecy of backup cron to restore cron is 2:1 i.e., for every two successful backups in production cluster there should be one restore in DR cluster.
-    - Always restore the lasted backed-up data
-    - 'Cron Job' - A cron job is a Linux command used to schedule a job that is executed periodically
-    {{< /note >}}
 
     - Configure the cron which trigger  the `chef-automate backup restore`  on one of the Chef Automate node.
 
