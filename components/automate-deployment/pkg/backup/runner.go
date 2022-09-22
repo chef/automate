@@ -660,13 +660,13 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 
 		desiredServices = append(desiredServices, svc)
 	}
-
+	logrus.Debug("_progress_ : runner.go : 1 : 663 : startRestoreOperations : Before Unloading services :", desiredServices)
 	r.infof("Unloading services")
 	if err = r.unloadServices(restoreCtx.ctx, desiredServices); err != nil {
 		r.failf(err, "Failed to unload services")
 		return
 	}
-
+	logrus.Debug("_progress_ : runner.go : 1 : 669 : startRestoreOperations : After Unloading services :", desiredServices)
 	if err = r.restoreAutomateCLI(ctx, backupManifest); err != nil {
 		r.failf(err, "Failed to restore automate-cli")
 		return
@@ -716,14 +716,16 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		r.failf(err, "Failed to load service metadata checksum information")
 		return err
 	}
-
+	logrus.Debug("_progress_ : runner.go : 1 : 719 : List of desiredServices :", desiredServices)
+	logrus.Debug("_progress_ : runner.go : 2 : 720 : restoreCtx.restoreBucket :", restoreCtx.restoreBucket)
 	// Restore the services in topological order.
 	for _, svc := range desiredServices {
 		r.infof("Restoring %s", svc.Name())
-
+		logrus.Debug("_progress_ : runner.go : 3 : 720 :svc.Name() :", svc.Name())
 		// Install the package
 		err := r.target.InstallService(restoreCtx.ctx, svc, channel)
 		if err != nil {
+			logrus.Debug("_progress_ : runner.go : 4 : 728 : r.target.InstallService :", err.Error())
 			r.failf(err, "Failed to install habitat package for %s", svc.Name())
 			return err
 		}
@@ -733,6 +735,7 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		for _, cmd := range binlinks {
 			cmdOutput, err := r.target.BinlinkPackage(restoreCtx.ctx, svc, cmd)
 			if err != nil {
+				logrus.Debug("_progress_ : runner.go : 5 : 738 : r.target.BinlinkPackage :", err.Error())
 				r.failf(err, "failed to binlink command %q for service %q: %s", cmd, svc.Name(), cmdOutput)
 				return err
 			}
@@ -740,12 +743,14 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 
 		config, err := r.configRenderer(svc)
 		if err != nil {
+			logrus.Debug("_progress_ : runner.go : 6 : 746 : r.configRenderer :", err.Error())
 			r.failf(err, "Failed to render habitat configuration for %s", svc.Name())
 			return err
 		}
 
 		err = r.target.SetUserToml(svc.Name(), config)
 		if err != nil {
+			logrus.Debug("_progress_ : runner.go : 7 : 753 : r.target.SetUserToml :", err.Error())
 			r.failf(err, "Failed to write habitat configuration for %s", svc.Name())
 			return err
 		}
@@ -773,6 +778,7 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		// reason, like a network issue or corrupted metadata file, then we want to
 		// error out.
 		if err != nil && !IsNotExist(err) {
+			logrus.Debug("_progress_ : runner.go : 8 : 781 : IsNotExist :", err.Error())
 			r.failf(err, "Failed to load metadata for service %s", svc.Name())
 			return err
 		}
@@ -805,12 +811,14 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		// If that changes we will have to separate pre/post service operational
 		// restore operations.
 		if err := executor.Restore(restoreCtx, metadata); err != nil {
+			logrus.Debug("_progress_ : runner.go : 9 : 814 : executor.Restore :", err.Error())
 			r.failf(err, "Failed to restore synchronous operations")
 			return err
 		}
 
 		bindInfo, err := services.AllBinds.DefaultsForService(svc.Name())
 		if err != nil {
+			logrus.Debug("_progress_ : runner.go : 10 : 821 : services.AllBinds.DefaultsForService :", err.Error())
 			r.failf(err, "Failed to load bind info for service %s", svc.Name())
 			return err
 		}
@@ -818,6 +826,7 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		// Now that all data has been restored we need start the service up
 		// and wait for it to come up healthy.
 		if err := r.target.LoadService(restoreCtx.ctx, svc, target.BindMode(bindInfo.Mode), target.Binds(bindInfo.Specs)); err != nil {
+			logrus.Debug("_progress_ : runner.go : 11 : 829 : r.target.LoadService :", err.Error())
 			r.failf(err, "Failed to load service %s", svc.Name())
 			return err
 		}
