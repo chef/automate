@@ -61,6 +61,7 @@ variable "s3_endpoint" {
 variable "secret_key" {
   default = ""
 }
+
 variable "ssh_key_file" {
 }
 
@@ -73,7 +74,6 @@ variable "ssh_user" {
 variable "sudo_cmd" {
   default = "sudo"
 }
-
 
 variable "tag_contact" {
   default = ""

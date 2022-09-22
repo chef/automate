@@ -1,9 +1,6 @@
 variable "access_key" {
 }
 
-variable "secret_key" {
-}
-
 variable "airgap_info" {
 }
 
@@ -165,6 +162,9 @@ variable "public_ips" {
 
 variable "s3_endpoint" {
   default = "https://s3.amazonaws.com"
+}
+
+variable "secret_key" {
 }
 
 variable "setup_managed_services" {

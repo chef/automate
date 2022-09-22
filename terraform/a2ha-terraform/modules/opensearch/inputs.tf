@@ -22,10 +22,6 @@ variable "backup_config_s3" {
 variable "curator_pkg_ident" {
 }
 
-variable "s3_endpoint" {
-  default = ""
-}
-
 variable "habitat_info" {
 }
 
@@ -61,11 +57,11 @@ variable "opensearch_svc_load_args" {
   default = "--topology standalone --strategy none"
 }
 
-variable "opensearch_username" {
+variable "opensearch_user_password" {
   default = ""
 }
 
-variable "opensearch_user_password" {
+variable "opensearch_username" {
   default = ""
 }
 
@@ -81,6 +77,10 @@ variable "private_ips" {
 
 variable "public_ips" {
   default = []
+}
+
+variable "s3_endpoint" {
+  default = ""
 }
 
 variable "secret_key" {
