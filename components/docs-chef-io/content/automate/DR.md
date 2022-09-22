@@ -102,7 +102,8 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
             For example : sample cron look like for restore for file system.
 
             ```cmd
-                sudo chef-automate backup restore /mnt/automate_backups/backups/20210622065515/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
+                id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
+                sudo chef-automate backup restore /mnt/automate_backups/backups/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight
             ```
 
 #### Steps to Switch to DR Cluster
