@@ -141,7 +141,7 @@ Restore operation restores all the data while the backup is going on. The restor
 -   Create a new user _UserB_ and a respective API token named _Token2_.
 -   Now, suppose you want to restore data in the same automate cluster. In that case, the data will only be stored for _UserA_ with its token as the backup bundle only contains the _UserA_, and the _UserB_ is not available in the backup bundle. -->
 
-#### Restoring the EFS Backed-up Data
+#### Restoring the Backed-up Data From file system
 
 To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
 
