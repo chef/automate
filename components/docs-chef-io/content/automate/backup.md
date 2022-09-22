@@ -118,7 +118,7 @@ The following IAM policy describes the basic permissions Chef Automate requires 
       ],
       "Effect": "Allow",
       "Resource": [
-        "arn:aws:s3:::automate-backups.example.com"
+        "arn:aws:s3:::<YOUR BUCKET NAME>"
       ]
     },
     {
@@ -131,7 +131,7 @@ The following IAM policy describes the basic permissions Chef Automate requires 
       ],
       "Effect": "Allow",
       "Resource": [
-        "arn:aws:s3:::automate-examples.example.com/*"
+        "arn:aws:s3:::<YOUR BUCKET NAME>/*"
       ]
     }
   ],
