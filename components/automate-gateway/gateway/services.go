@@ -102,8 +102,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	pb_deployment.RegisterDeploymentServer(grpcServer,
 		handler.NewDeploymentServer(deploymentClient))
 
-	pb_sso.RegisterSsoConfigServiceServer(grpcServer, handler.NewSsoConfigHandler(deploymentClient))
-
 	licenseClient, err := clients.LicenseControlClient()
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -113,6 +111,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_telemetry.RegisterTelemetryServer(grpcServer,
 		handler.NewTelemetryServer(licenseClient, deploymentClient))
+	pb_sso.RegisterSsoConfigServiceServer(grpcServer, handler.NewSsoConfigHandler(licenseClient, deploymentClient))
 
 	trialLicenseURL, err := s.Config.trialLicenseURL()
 	if err != nil {
