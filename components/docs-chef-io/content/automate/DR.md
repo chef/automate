@@ -39,7 +39,7 @@ In case of Primary Cluster Failure, we will be change the DNS entry.
 
 2. DR Cluster will be same as the Production cluster, we can use the above steps to setup the DR cluster.
 
-3. Do the backup configuration as explained in backup section. TBD.
+3. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage](https://deploy-preview-7425--chef-automate.netlify.app/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
 
 4. On Production Cluster
     - One of the Chef Automate node, We configure the cron which trigger the `chef-automate backup` at certain interval.
