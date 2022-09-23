@@ -68,8 +68,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
     {{< note >}}
 
-    - Suggested frequecy of backup cron and restore cron is one hour i.e.,
-      backup and restore in respective machines can be done as frequest as 1 hour
+    - Suggested frequecy of backup cron and restore cron is one hour i.e., backup and restore in respective machines can be done as frequest as 1 hour
     - Make sure the Restore cron always restores the latest backed-up data
     - A cron job is a Linux command used to schedule a job that is executed periodically
 
