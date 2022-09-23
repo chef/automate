@@ -228,10 +228,6 @@ service ReportingService {
 	List all profiles in use, with optional filtering.
 	Supports pagination, filtering, and sorting.
 	Valid sort fields: name, title
-	The API supports date range filters when `end_time` is the current time
-
-	and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	date other than the current date, the API would return data only for the `end_time`.
 
 	Example:
 	```
@@ -309,9 +305,10 @@ service ReportingService {
 
 	/*
 	List Nodes
+
 	List all nodes, with optional filtering, pagination, and sorting.
 	Max return payload size is 4MB, use pagination to fetch remaining data.
-	| Sort parameter | Sort value |
+  | Sort parameter | Sort value |
 	| --- | --- |
 	| environment | environment.lower |
 	| latest_report.controls.failed.critical | controls_sums.failed.critical |
@@ -332,8 +329,8 @@ service ReportingService {
 		"page":1,"per_page":100,
 		"sort":"environment","order":"ASC"
 	}
+  ```
 
-	```
 	Authorization Action:
 	```
 	compliance:reportNodes:list
