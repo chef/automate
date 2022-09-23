@@ -174,11 +174,11 @@ func IsDataService(pkgName string) bool {
 
 func BinlinksForPackage(pkgName string) []string {
 	if packageMetadataMap[pkgName] == nil {
-		logrus.Debug("_progress_ : services.go : 1 : 176 : BinlinksForPackagee :", pkgName)
+		logrus.Info("_progress_ : services.go : 1 : 176 : BinlinksForPackagee :", pkgName)
 		return nil
 	}
 	if packageMetadataMap[pkgName].Metadata != nil {
-		logrus.Debug("_progress_ : services.go : 1 : 181 : BinlinksForPackagee :", packageMetadataMap[pkgName].Metadata, pkgName)
+		logrus.Info("_progress_ : services.go : 1 : 181 : BinlinksForPackagee :", packageMetadataMap[pkgName].Metadata, pkgName)
 		return packageMetadataMap[pkgName].Metadata.Binlinks
 	}
 	return nil

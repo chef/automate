@@ -87,6 +87,8 @@ type Bucket interface {
 // IsNotExist returns true if the error represents a object access against a objects that
 // does not exist
 func IsNotExist(err error) bool {
+	a := gcerrors.Code(err)
+	logrus.Info("_progress_ : bucket.go : 1 : 91 :  IsNotExist ", a)
 	return os.IsNotExist(err) ||
 		gcerrors.Code(err) == gcerrors.NotFound ||
 		// blob.IsNotExist returns the wrong answer for minio's NoSuchKey error

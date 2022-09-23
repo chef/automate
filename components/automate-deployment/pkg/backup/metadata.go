@@ -107,15 +107,15 @@ func LoadServiceMetadata(ctx context.Context, bucket Bucket, svcName string, obj
 	mdStorageKey := path.Join(svcName, metadataFileBaseName)
 
 	reader, err := bucket.NewReader(ctx, mdStorageKey, objectVerifier)
-	logrus.Debug("_progress_ : metadata.go : 1 : 110 : LoadServiceMetadata ", svcName)
-	logrus.Debug("_progress_ : metadata.go : 2 : 111 : success LoadServiceMetadata ", objectVerifier)
+	logrus.Info("_progress_ : metadata.go : 1 : 110 : LoadServiceMetadata ", svcName)
+	logrus.Info("_progress_ : metadata.go : 2 : 111 : success LoadServiceMetadata ", objectVerifier)
 	if err != nil {
 		// Return an IsNotExist error unwrapped so caller can also check for IsNotExist
 		if IsNotExist(err) {
-			logrus.Debug("_progress_ : metadata.go : 3 : 115 : success LoadServiceMetadata ", err.Error())
+			logrus.Info("_progress_ : metadata.go : 3 : 115 : success LoadServiceMetadata ", err.Error())
 			return metadata, err
 		} else {
-			logrus.Debug("_progress_ : metadata.go : 4 : 118 : failure LoadServiceMetadata ", err.Error())
+			logrus.Info("_progress_ : metadata.go : 4 : 118 : failure LoadServiceMetadata ", err.Error())
 			return metadata, errors.Wrapf(err, "error opening backup metadata key %s", mdStorageKey)
 		}
 	}
@@ -123,12 +123,12 @@ func LoadServiceMetadata(ctx context.Context, bucket Bucket, svcName string, obj
 
 	mdBytes, err := ioutil.ReadAll(reader)
 	if err != nil {
-		logrus.Debug("_progress_ : metadata.go : 5 : 126 :  ioutil.RealAll ", err.Error())
+		logrus.Info("_progress_ : metadata.go : 5 : 126 :  ioutil.RealAll ", err.Error())
 		return metadata, errors.Wrapf(err, "error reading backup metadata at %s", mdStorageKey)
 	}
 
 	if err = json.Unmarshal(mdBytes, metadata); err != nil {
-		logrus.Debug("_progress_ : metadata.go : 6 : 131 :  unmarshall ", err.Error())
+		logrus.Info("_progress_ : metadata.go : 6 : 131 :  unmarshall ", err.Error())
 		return metadata, errors.Wrapf(err, "failed to parse backup metadata at %s", mdStorageKey)
 	}
 
