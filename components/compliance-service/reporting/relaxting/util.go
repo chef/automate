@@ -146,7 +146,7 @@ func LogQueryPartMin(indices string, partToPrint interface{}, name string) {
 	} else {
 		stringPart = "\n" + stringPart
 	}
-	logrus.Infof("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
+	logrus.Debugf("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
 		name, indices, stringPart, name)
 }
 
