@@ -45,17 +45,30 @@ func (a *SsoConfig) GetSsoConfig(ctx context.Context, in *empty.Empty) (*sso.Get
 		return nil, err
 	}
 
-	new := res.Config.Dex.V1.Sys.Connectors.Saml
+	if res.Config.Dex != nil {
+		ssoConfig := res.Config.Dex.V1.Sys.Connectors.Saml
+
+		return &sso.GetSsoConfigResponse{
+			CaContents:         ssoConfig.CaContents.GetValue(),
+			SsoUrl:             ssoConfig.SsoUrl.GetValue(),
+			EmailAttr:          ssoConfig.EmailAttr.GetValue(),
+			UsernameAttr:       ssoConfig.UsernameAttr.GetValue(),
+			GroupsAttr:         ssoConfig.GroupsAttr.GetValue(),
+			AllowedGroups:      ssoConfig.AllowedGroups,
+			EntityIssuer:       ssoConfig.EntityIssuer.GetValue(),
+			NameIdPolicyFormat: ssoConfig.NameIdPolicyFormat.GetValue(),
+		}, nil
+	}
 
 	return &sso.GetSsoConfigResponse{
-		CaContents:         new.CaContents.GetValue(),
-		SsoUrl:             new.SsoUrl.GetValue(),
-		EmailAttr:          new.EmailAttr.GetValue(),
-		UsernameAttr:       new.UsernameAttr.GetValue(),
-		GroupsAttr:         new.GroupsAttr.GetValue(),
-		AllowedGroups:      new.AllowedGroups,
-		EntityIssuer:       new.GroupsAttr.GetValue(),
-		NameIdPolicyFormat: new.NameIdPolicyFormat.GetValue(),
+		CaContents:         "",
+		SsoUrl:             "",
+		EmailAttr:          "",
+		UsernameAttr:       "",
+		GroupsAttr:         "",
+		AllowedGroups:      []string{},
+		EntityIssuer:       "",
+		NameIdPolicyFormat: "",
 	}, nil
 }
 
