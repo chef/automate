@@ -127,6 +127,7 @@ lint:
       - external/secrets/secrets.proto
       - external/user_settings/user_settings.proto
       - external/report_manager/report_manager.proto
+      - external/sso/sso.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
@@ -264,6 +265,7 @@ lint:
       - external/secrets/secrets.proto
       - external/user_settings/user_settings.proto
       - external/report_manager/report_manager.proto
+      - external/sso/sso.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
