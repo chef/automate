@@ -3,20 +3,19 @@ package upgradeinspectorv4
 import (
 	"testing"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInspect(t *testing.T) {
+func TestInspectReplaceS3URL(t *testing.T) {
 	tw := NewTestWriter()
 	ds := NewReplaceS3UrlInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		GetBackupS3URLFunc: func() (string, error) {
+		GetBackupS3URLFunc: func(timeout int64) (string, error) {
 			return "https://s3.us-east-1.amazonaws.com", nil
 		},
-		PatchS3backupURLFunc: func(w *cli.Writer) (stdOut, stdErr string, err error) {
+		PatchS3backupURLFunc: func(timeout int64) (stdOut, stdErr string, err error) {
 			return "", "", nil
 		},
-	})
+	}, 10)
 	err := ds.Inspect()
 	assert.NoError(t, err)
 }

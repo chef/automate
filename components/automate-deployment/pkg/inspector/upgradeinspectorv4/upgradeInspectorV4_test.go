@@ -28,7 +28,7 @@ Would you like to proceed with the upgrade? (y/n)
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -54,7 +54,7 @@ Would you like to proceed with the upgrade? (y/n)
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/hab")
 	err := ui.ShowInfo()
@@ -78,7 +78,7 @@ Would you like to proceed with the upgrade? (y/n)
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	err := ui.ShowInfo()
@@ -94,7 +94,7 @@ func TestUpgradeInspectorV4ShowInfoWithNoInput(t *testing.T) {
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
@@ -107,7 +107,7 @@ https://docs.chef.io/automate/major_upgrade 4.x/
 
 Would you like to proceed with the upgrade? (y/n)
 `
-	expectedError := errors.New(USER_TERMINATED)
+	expectedError := errors.New(UPGRADE_TERMINATED)
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
 	if assert.Error(t, err) {
@@ -139,7 +139,7 @@ Would you like to proceed with the upgrade? (y/n)
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
 	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
@@ -164,7 +164,7 @@ Please make sure following things are taken care of
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
 	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
@@ -194,7 +194,7 @@ Would you like to proceed with the upgrade? (y/n)
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	err := ui.ShowInfo()
@@ -212,7 +212,7 @@ func TestUpgradeInspectorV4Inspect(t *testing.T) {
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
@@ -249,7 +249,7 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
@@ -267,15 +267,17 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 10.5GB of free space"
 	expectedPassHabChecking := "✖  [Failed]\t/hab directory should have 10.5GB of free space"
 	expectedPassOSDestChecking := "⊖  [Skipped]\t/home/ubuntu directory should have 3.3GB of free space"
+	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
+	assert.NoError(t, err)
+	err = ui.ShowExitMessages()
+	assert.NoError(t, err)
 	assert.Contains(t, tw.Output(), expectedChecks)
 	assert.Contains(t, tw.Output(), expectedBeginHabChecking)
 	assert.Contains(t, tw.Output(), expectedPassHabChecking)
 	assert.Contains(t, tw.Output(), expectedPassOSDestChecking)
-	if assert.Error(t, err) {
-		assert.EqualError(t, err, USER_TERMINATED+": failed in Hab Space Check")
-	}
+	assert.Contains(t, tw.Output(), expectedEnsureSpace)
 }
 
 func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
@@ -286,7 +288,7 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
@@ -305,19 +307,21 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have 10.5GB of free space"
 	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have 5.5GB of free space"
 	expectedPassOSDestChecking := "✖  [Failed]\t/home/ubuntu directory should have 10.5GB of free space"
+	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
+	assert.NoError(t, err)
+	err = ui.ShowExitMessages()
+	assert.NoError(t, err)
 	assert.Contains(t, tw.Output(), expectedChecks)
 	assert.Contains(t, tw.Output(), expectedBeginHabChecking)
 	assert.Contains(t, tw.Output(), expectedBeginOSDestChecking)
 	assert.Contains(t, tw.Output(), expectedPassHabChecking)
 	assert.Contains(t, tw.Output(), expectedPassOSDestChecking)
-	if assert.Error(t, err) {
-		assert.EqualError(t, err, USER_TERMINATED+": failed in OS Dest Check")
-	}
+	assert.Contains(t, tw.Output(), expectedEnsureSpace)
 }
 
-func TestUpgradeInspectorV4InspectShowInspectionList(t *testing.T) {
+func TestUpgradeInspectorV4InspectShowInspectionListForOsDest(t *testing.T) {
 	tw := NewTestWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
@@ -325,7 +329,7 @@ func TestUpgradeInspectorV4InspectShowInspectionList(t *testing.T) {
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
-		IsExternalElasticSearchFunc: func() bool { return false },
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
 	ui.AddInspection(NewPlannedDownTimeInspection(tw.CliWriter))
 	ui.AddInspection(NewTakeBackupInspection(tw.CliWriter))
@@ -345,4 +349,140 @@ func TestUpgradeInspectorV4InspectShowInspectionList(t *testing.T) {
 
 	ui.ShowInspectionList()
 	assert.Contains(t, tw.Output(), expected)
+}
+
+func TestUpgradeInspectorV4ShowInspectionListForExternal(t *testing.T) {
+	tw := NewTestWriterWithInputs("y", "1")
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return true },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+		GetBackupS3URLFunc: func(timeout int64) (string, error) {
+			return "https://s3.us-east-1.amazonaws.com", nil
+		},
+		PatchS3backupURLFunc: func(timeout int64) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, nil
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+	}, mfs, 10)
+
+	ui.(*UpgradeInspectorV4).AddDefaultInspections()
+
+	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have 5.5GB of free space"
+
+	ui.ShowInfo()
+	ui.ShowInspectionList()
+	assert.Contains(t, tw.Output(), expected)
+}
+
+func TestUpgradeInspectorV4ShowInspectionListForEmbedded(t *testing.T) {
+	tw := NewTestWriterWithInputs("y", "1")
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+		GetBackupS3URLFunc: func(timeout int64) (string, error) {
+			return "https://s3.us-east-1.amazonaws.com", nil
+		},
+		PatchS3backupURLFunc: func(timeout int64) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, nil
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+	}, mfs, 10)
+
+	ui.(*UpgradeInspectorV4).AddDefaultInspections()
+
+	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have 8.8GB of free space"
+
+	ui.ShowInfo()
+	ui.ShowInspectionList()
+	assert.Contains(t, tw.Output(), expected)
+}
+
+func TestUpgradeInspectorV4RunInspectForOsDestDirSkipped(t *testing.T) {
+	tw := NewTestWriterWithInputs("y", "1")
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+		ExecRequestFunc:             ExecRequestNonAutomate,
+		GetBackupS3URLFunc: func(timeout int64) (string, error) {
+			return "https://s3.us-east-1.amazonaws.com", nil
+		},
+		PatchS3backupURLFunc: func(timeout int64) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, nil
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+	}, mfs, 10)
+
+	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
+	ui.(*UpgradeInspectorV4).AddDefaultInspections()
+
+	expected1 := "[Skipped]\t/home/ubuntu directory should have 3.3GB of free space"
+	expected2 := "[Skipped]\tElasticsearch indices are in version 6\n"
+
+	ui.ShowInfo()
+	ui.ShowInspectionList()
+	ui.Inspect()
+	assert.Contains(t, tw.Output(), expected1)
+	assert.Contains(t, tw.Output(), expected2)
+}
+
+func TestUpgradeInspectorV4ExitMessage(t *testing.T) {
+	tw := NewTestWriterWithInputs("y")
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorHab,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+		GetBackupS3URLFunc: func(timeout int64) (string, error) {
+			return "https://s3.us-east-1.amazonaws.com", nil
+		},
+		PatchS3backupURLFunc: func(timeout int64) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, nil
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+	}, mfs, 10)
+
+	ui.(*UpgradeInspectorV4).AddDefaultInspections()
+
+	expected := "failed to check filesystem"
+
+	err := ui.ShowInfo()
+	assert.Contains(t, err.Error(), expected)
 }

@@ -7,9 +7,16 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
 )
 
+const (
+	ES_URL = "http://localhost:10141/_cluster/settings"
+)
+
 type DisableShardingInspection struct {
-	writer       *cli.Writer
-	upgradeUtils UpgradeV4Utils
+	writer          *cli.Writer
+	upgradeUtils    UpgradeV4Utils
+	IsExecuted      bool
+	exitError       error
+	exitedWithError bool
 }
 
 func NewDisableShardingInspection(w *cli.Writer, utls UpgradeV4Utils) *DisableShardingInspection {
@@ -30,27 +37,51 @@ func (ds *DisableShardingInspection) GetShortInfo() []string {
 }
 
 func (ds *DisableShardingInspection) Inspect() (err error) {
-	url := "http://localhost:10141/_cluster/settings"
-	payload := strings.NewReader(`{
+	disableShardingPayload := strings.NewReader(`{
 		"persistent": {
 			"cluster.routing.allocation.enable": "primaries"
 		}
 	}`)
-	_, err = ds.upgradeUtils.ExecRequest(url, "PUT", payload)
-	return
+	_, err = ds.upgradeUtils.ExecRequest(ES_URL, "PUT", disableShardingPayload)
+	if err != nil {
+		ds.exitError = err
+		ds.exitedWithError = true
+		return err
+	}
+	ds.setExecuted()
+	return nil
+}
+
+func (ds *DisableShardingInspection) setExecuted() {
+	ds.IsExecuted = true
+}
+
+func (ds *DisableShardingInspection) GetIsExecuted() bool {
+	return ds.IsExecuted
 }
 
 func (ds *DisableShardingInspection) PreExit() (err error) {
-	url := "http://localhost:10141/_cluster/settings"
-	payload := strings.NewReader(`{
+	enableShardingPayload := strings.NewReader(`{
 		"persistent": {
 			"cluster.routing.allocation.enable": null
 		}
 	}`)
-	_, err = ds.upgradeUtils.ExecRequest(url, "PUT", payload)
+	_, err = ds.upgradeUtils.ExecRequest(ES_URL, "PUT", enableShardingPayload)
 	return
 }
 
 func (ds *DisableShardingInspection) GetInstallationType() inspector.InstallationType {
 	return inspector.EMBEDDED
+}
+
+func (ds *DisableShardingInspection) PrintExitMessage() error {
+	return nil
+}
+
+func (ds *DisableShardingInspection) HasExitedWithError() bool {
+	return ds.exitedWithError
+}
+
+func (ds *DisableShardingInspection) SetExitedWithError(status bool) {
+	ds.exitedWithError = status
 }

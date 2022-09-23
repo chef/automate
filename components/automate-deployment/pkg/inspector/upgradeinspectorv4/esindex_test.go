@@ -19,7 +19,7 @@ comp-3-profiles
 eventfeed-2-feeds`
 )
 
-func IsExternal() bool {
+func IsExternal(timeout int64) bool {
 	return false
 }
 
@@ -151,7 +151,7 @@ func TestInspectWithOldNonAutomateIndicesWithExit(t *testing.T) {
 		GetESBasePathFunc:           GetESBasePath,
 	}
 	ei := NewESIndexInspection(tw.CliWriter, mockUtil, GetESBasePath(10))
-	expectederr := USER_TERMINATED
+	expectederr := UPGRADE_TERMINATED
 	err := ei.Inspect()
 	if assert.Error(t, err) {
 		assert.EqualError(t, err, expectederr)
@@ -185,7 +185,7 @@ func TestInspectWithOldAutomateIndicesWithExit(t *testing.T) {
 		GetESBasePathFunc:           GetESBasePath,
 	}
 	ei := NewESIndexInspection(tw.CliWriter, mockUtil, GetESBasePath(10))
-	expectederr := USER_TERMINATED
+	expectederr := UPGRADE_TERMINATED
 	err := ei.Inspect()
 	if assert.Error(t, err) {
 		assert.EqualError(t, err, expectederr)
@@ -219,7 +219,7 @@ func TestInspectWithOldAutomateAndNonAutomateIndicesWithExit(t *testing.T) {
 		GetESBasePathFunc:           GetESBasePath,
 	}
 	ei := NewESIndexInspection(tw.CliWriter, mockUtil, GetESBasePath(10))
-	expectederr := USER_TERMINATED
+	expectederr := UPGRADE_TERMINATED
 	err := ei.Inspect()
 	if assert.Error(t, err) {
 		assert.EqualError(t, err, expectederr)

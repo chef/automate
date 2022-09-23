@@ -11,18 +11,19 @@ import (
 )
 
 type UpgradeInspectorV4 struct {
-	writer       *cli.Writer
-	inspections  []inspector.Inspection
-	osDestDir    string
-	upgradeUtils UpgradeV4Utils
-	fileUtils    fileutils.FileUtils
-	timeout      int64
-	isExternal   bool
+	writer         *cli.Writer
+	inspections    []inspector.Inspection
+	osDestDir      string
+	upgradeUtils   UpgradeV4Utils
+	fileUtils      fileutils.FileUtils
+	timeout        int64
+	isExternal     bool
+	inspectorError bool
 }
 
 const (
-	HAB_DIR         string = "/hab"
-	USER_TERMINATED string = "Upgrade process terminated."
+	HAB_DIR            string = "/hab"
+	UPGRADE_TERMINATED string = "Upgrade process terminated."
 )
 
 func (ui *UpgradeInspectorV4) ShowInfo() error {
@@ -44,7 +45,7 @@ In this release, Elasticsearch will be migrated to OpenSearch.
 		ui.writer.Println("")
 	}
 
-	if len(ui.osDestDir) == 0 || ui.osDestDir == HAB_DIR || ui.upgradeUtils.IsExternalElasticSearch() {
+	if len(ui.osDestDir) == 0 || ui.osDestDir == HAB_DIR || ui.upgradeUtils.IsExternalElasticSearch(ui.timeout) {
 		ui.showOSDestDirFlagMsg()
 	}
 	ui.writer.Println(`For more information, visit 
@@ -59,7 +60,7 @@ func (ui *UpgradeInspectorV4) promptToContinue() error {
 		return err
 	}
 	if !isContinue {
-		return errors.New(USER_TERMINATED)
+		return errors.New(UPGRADE_TERMINATED)
 	}
 	return nil
 }
@@ -70,6 +71,14 @@ func (ui *UpgradeInspectorV4) showOSDestDirFlagMsg() {
 `)
 }
 
+func (ui *UpgradeInspectorV4) checkInstallationTypeForExternal(installationType inspector.InstallationType) bool {
+	return ui.isExternal && (installationType == inspector.EXTERNAL || installationType == inspector.BOTH)
+}
+
+func (ui *UpgradeInspectorV4) checkInstallationTypeForEmbedded(installationType inspector.InstallationType) bool {
+	return !ui.isExternal && (installationType == inspector.EMBEDDED || installationType == inspector.BOTH)
+}
+
 func (ui *UpgradeInspectorV4) Inspect() (err error) {
 	ui.writer.Println("Pre flight checks")
 	for _, inspection := range ui.inspections {
@@ -77,35 +86,51 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 		_, ok := i.(inspector.SystemInspection)
 		if ok {
 			installationType := inspection.(inspector.SystemInspection).GetInstallationType()
-			if ui.isExternal && (installationType == inspector.EXTERNAL || installationType == inspector.BOTH) {
+			if ui.checkInstallationTypeForExternal(installationType) || ui.checkInstallationTypeForEmbedded(installationType) {
 				if err != nil {
 					inspection.(inspector.SystemInspection).Skip()
 				} else {
 					err = inspection.(inspector.SystemInspection).Inspect()
-				}
-			} else if !ui.isExternal && (installationType == inspector.EMBEDDED || installationType == inspector.BOTH) {
-				if err != nil {
-					inspection.(inspector.SystemInspection).Skip()
-				} else {
-					err = inspection.(inspector.SystemInspection).Inspect()
+					if err != nil {
+						inspection.SetExitedWithError(true)
+					}
 				}
 			}
 		}
 	}
+	ui.writer.Println("")
 	if err != nil {
-		return errors.Wrap(err, USER_TERMINATED)
+		ui.inspectorError = true
 	}
+	// ui.inspectorError = ui.inspectionErrorStatus()
 	return nil
 }
 
+// func (ui *UpgradeInspectorV4) inspectionErrorStatus() bool {
+// 	for _, inspection := range ui.inspections {
+// 		hasExitedWithError := inspection.(inspector.Inspection).HasExitedWithError()
+// 		if hasExitedWithError {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
+
 func (ui *UpgradeInspectorV4) PreExit() (err error) {
-	for _, inspection := range ui.inspections {
-		var i interface{} = inspection
-		_, ok := i.(inspector.ExitInspection)
-		if ok {
-			err = inspection.(inspector.ExitInspection).PreExit()
-			if err != nil {
-				return err
+	if ui.inspectorError {
+		for _, inspection := range ui.inspections {
+			var i interface{} = inspection
+			_, ok := i.(inspector.ExitInspection)
+			if ok {
+				if inspection.(inspector.ExitInspection).GetIsExecuted() {
+					installationType := inspection.(inspector.ExitInspection).GetInstallationType()
+					if ui.checkInstallationTypeForExternal(installationType) || ui.checkInstallationTypeForEmbedded(installationType) {
+						err = inspection.(inspector.ExitInspection).PreExit()
+						if err != nil {
+							return err
+						}
+					}
+				}
 			}
 		}
 	}
@@ -119,7 +144,7 @@ func NewUpgradeInspectorV4(w *cli.Writer, upgradeUtils UpgradeV4Utils, fileUtils
 		upgradeUtils: upgradeUtils,
 		fileUtils:    fileUtils,
 		timeout:      timeout,
-		isExternal:   upgradeUtils.IsExternalElasticSearch(),
+		isExternal:   upgradeUtils.IsExternalElasticSearch(timeout),
 	}
 }
 
@@ -138,12 +163,14 @@ func (ui *UpgradeInspectorV4) AddInspection(inspection inspector.Inspection) {
 func (ui *UpgradeInspectorV4) AddDefaultInspections() {
 	ui.AddInspection(NewPlannedDownTimeInspection(ui.writer))
 	ui.AddInspection(NewTakeBackupInspection(ui.writer))
-	diskSpaceInspection := NewDiskSpaceInspection(ui.writer, ui.upgradeUtils.IsExternalElasticSearch(), ui.osDestDir, ui.fileUtils)
+	diskSpaceInspection := NewDiskSpaceInspection(ui.writer, ui.upgradeUtils.IsExternalElasticSearch(ui.timeout), ui.osDestDir, ui.fileUtils)
 	ui.AddInspection(diskSpaceInspection)
 	esBasePath := ui.upgradeUtils.GetESBasePath(ui.timeout)
 	ui.AddInspection(NewESIndexInspection(ui.writer, ui.upgradeUtils, esBasePath))
+	ui.AddInspection(NewReplaceS3UrlInspection(ui.writer, ui.upgradeUtils, ui.timeout))
+	ui.AddInspection(NewStoreESSettingsInspection(ui.writer, ui.upgradeUtils, ui.timeout))
 	ui.AddInspection(NewDisableShardingInspection(ui.writer, ui.upgradeUtils))
-	ui.AddInspection(NewReplaceS3UrlInspection(ui.writer, ui.upgradeUtils))
+	ui.AddInspection(NewDisableMaintenanceInspection(ui.writer, ui.upgradeUtils, ui.timeout))
 }
 
 func (ui *UpgradeInspectorV4) ShowInspectionList() {
@@ -153,14 +180,30 @@ func (ui *UpgradeInspectorV4) ShowInspectionList() {
 		var i interface{} = inspection
 		_, ok := i.(inspector.SystemInspection)
 		if ok {
-			msgs := inspection.(inspector.SystemInspection).GetShortInfo()
-			for _, msg := range msgs {
-				if msg != "" {
-					ui.writer.Printf("%d. %s\n", index, msg)
-					index++
+			installationType := inspection.(inspector.SystemInspection).GetInstallationType()
+			if ui.checkInstallationTypeForExternal(installationType) || ui.checkInstallationTypeForEmbedded(installationType) {
+				msgs := inspection.(inspector.SystemInspection).GetShortInfo()
+				for _, msg := range msgs {
+					if msg != "" {
+						ui.writer.Printf("%d. %s\n", index, msg)
+						index++
+					}
 				}
 			}
 		}
 	}
 	ui.writer.Println("")
+}
+
+func (ui *UpgradeInspectorV4) ShowExitMessages() error {
+	for _, inspection := range ui.inspections {
+		err := inspection.PrintExitMessage()
+		if err != nil {
+			return err
+		}
+	}
+	if ui.inspectorError {
+		ui.writer.Println(UPGRADE_TERMINATED)
+	}
+	return nil
 }

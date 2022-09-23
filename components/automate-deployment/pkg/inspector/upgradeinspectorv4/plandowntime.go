@@ -2,11 +2,12 @@ package upgradeinspectorv4
 
 import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
 )
 
 type PlannedDownTimeInspection struct {
-	writer *cli.Writer
+	writer          *cli.Writer
+	exitedWithError bool
+	exitError       error
 }
 
 func (pd *PlannedDownTimeInspection) ShowInfo(index *int) error {
@@ -20,6 +21,14 @@ func NewPlannedDownTimeInspection(w *cli.Writer) *PlannedDownTimeInspection {
 	}
 }
 
-func (pd *PlannedDownTimeInspection) GetInstallationType() inspector.InstallationType {
-	return inspector.BOTH
+func (pd *PlannedDownTimeInspection) PrintExitMessage() error {
+	return nil
+}
+
+func (pd *PlannedDownTimeInspection) HasExitedWithError() bool {
+	return pd.exitedWithError
+}
+
+func (pd *PlannedDownTimeInspection) SetExitedWithError(status bool) {
+	pd.exitedWithError = status
 }
