@@ -6412,10 +6412,6 @@ type ReportingServiceClient interface {
 	//List all profiles in use, with optional filtering.
 	//Supports pagination, filtering, and sorting.
 	//Valid sort fields: name, title
-	//The API supports date range filters when `end_time` is the current time
-	//
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
 	//
 	//Example:
 	//```
@@ -6459,6 +6455,7 @@ type ReportingServiceClient interface {
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
 	//List Nodes
+	//
 	//List all nodes, with optional filtering, pagination, and sorting.
 	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//| Sort parameter | Sort value |
@@ -6482,8 +6479,8 @@ type ReportingServiceClient interface {
 	//"page":1,"per_page":100,
 	//"sort":"environment","order":"ASC"
 	//}
-	//
 	//```
+	//
 	//Authorization Action:
 	//```
 	//compliance:reportNodes:list
@@ -6821,10 +6818,6 @@ type ReportingServiceServer interface {
 	//List all profiles in use, with optional filtering.
 	//Supports pagination, filtering, and sorting.
 	//Valid sort fields: name, title
-	//The API supports date range filters when `end_time` is the current time
-	//
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
 	//
 	//Example:
 	//```
@@ -6868,6 +6861,7 @@ type ReportingServiceServer interface {
 	ReadNode(context.Context, *Id) (*Node, error)
 	//
 	//List Nodes
+	//
 	//List all nodes, with optional filtering, pagination, and sorting.
 	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//| Sort parameter | Sort value |
@@ -6891,8 +6885,8 @@ type ReportingServiceServer interface {
 	//"page":1,"per_page":100,
 	//"sort":"environment","order":"ASC"
 	//}
-	//
 	//```
+	//
 	//Authorization Action:
 	//```
 	//compliance:reportNodes:list
