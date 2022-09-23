@@ -42,9 +42,9 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
     {{< note >}}
 
-    Both the clusters should be configured with same object storage or file system i.e.
+    Both the clusters  should be configured with same object storage or file system i.e.
     if Primary cluster is configured with a object storage or file system,
-    then DR cluser should also configured with same object storage or file system.
+    then DR cluster should also configured with same object storage or file system.
 
     {{< /note >}}
 
@@ -68,7 +68,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
     {{< note >}}
 
-    - Suggested frequecy of backup cron and restore cron is one hour i.e., backup and restore in respective machines can be done as frequest as 1 hour
+    - Suggested frequency of backup cron and restore cron is one hour i.e., backup and restore in respective machines can be done as frequent as 1 hour
     - Make sure the Restore cron always restores the latest backed-up data
     - A cron job is a Linux command used to schedule a job that is executed periodically
 
@@ -76,7 +76,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
 1. On DR Cluster
 
-    - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodess), by running the following command
+    - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodes), by running the following command
 
         ```cmd
         sudo chef-automate bootstrap bundle unpack bootstrap.abb
