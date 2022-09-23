@@ -14,7 +14,8 @@ gh_repo = "automate"
 
 ## How To SetUp Disaster Recovery Cluster For OnPrem Deployment
 
-If the Frequency of Data Sync between the Live System(Production cluster) and DR ranges between 6 and 24 hrs, then we have an option which utilize the regular backup and restore cadence, that syncs data from the Production cluster to the DR cluster. Typically these two clusters should be located in different data centres or cloud provider regions.
+If the Frequency of Data Sync between the Live System(Production cluster) and DR ranges between few hrs, then we have an option which utilize the regular backup and restore cadence, that syncs data from the Production cluster to the DR cluster.
+Typically these two clusters should be located in different data centres or cloud provider regions.
 
 In this approach we have to running 2 Parallel Cluster of same capacity.
 
@@ -26,27 +27,29 @@ In this approach we have to running 2 Parallel Cluster of same capacity.
 Primary cluster will be in use and will take the backup at regular interval with `chef-automate backup create` command. At the same time DR cluster will be restoring the latest backup data via `chef-automate backup restore` command.
 In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
-#### Caveat with Above approach
+### Caveat with above approach
 
 -   Running two parallel cluster can be expensive.
 -   Data available till last backup performed.
 -   While changeing the DNS from Primary to DR, it might take some time to reflect.
 
-#### Steps to Setup the Production and DR Cluster
+### Steps to setup the Production and DR Cluster
 
 1. Please follow the steps for fresh [deployment](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine) for Production cluster.
 
-2. DR Cluster will be same as the Production cluster, we can use the above steps to setup the DR cluster.
+1. DR Cluster will be same as the Production cluster, we can use the above steps to setup the DR cluster.
 
-3. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage](https://deploy-preview-7425--chef-automate.netlify.app/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
+1. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage](https://deploy-preview-7425--chef-automate.netlify.app/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
 
-{{< note >}}
+    {{< note >}}
 
-Both the clusters should be configured with same storage i.e., if Primary cluster is configured with a object storage (per say the bucket name is `chef-automate-DR`, similar to S3), then DR cluser should also configured with same bucket (`chef-automate-DR`) in the same object storage.
+    Both the clusters should be configured with same object storage or file system i.e.
+    if Primary cluster is configured with a object storage or file system,
+    then DR cluster should also configured with same object storage or file system.
 
-{{< /note >}}
+    {{< /note >}}
 
-4. On Primary Cluster
+1. On Primary Cluster
 
     - In one of the Chef Automate node, configure the cron which triggers the `chef-automate backup` command at certain interval.
 
@@ -64,17 +67,17 @@ Both the clusters should be configured with same storage i.e., if Primary cluste
 
     - Copy `bootstrap.abb` to all the of Frontend nodes of DR Cluster.
 
-{{< note >}}
+    {{< note >}}
 
--   Suggested frequecy of backup cron and restore cron is one hour i.e., backup and restore in respective machines can be done as frequest as 1 hour
--   Make sure the Restore cron always restores the latest backed-up data
--   A cron job is a Linux command used to schedule a job that is executed periodically
+    - Suggested frequency of backup cron and restore cron is one hour i.e., backup and restore in respective machines can be done as frequent as 1 hour
+    - Make sure the Restore cron always restores the latest backed-up data
+    - A cron job is a Linux command used to schedule a job that is executed periodically
 
-{{< /note >}}
+    {{< /note >}}
 
-5. On DR Cluster
+1. On DR Cluster
 
-    - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodess), by running the following command
+    - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodes), by running the following command
 
         ```cmd
         sudo chef-automate bootstrap bundle unpack bootstrap.abb
@@ -132,7 +135,7 @@ Both the clusters should be configured with same storage i.e., if Primary cluste
             sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
             ```
 
-#### Steps to Switch to DR Cluster
+### Steps to switch to DR Cluster
 
 -   Stop the Restore cron
 -   Start all the service on all the Frontend node.
