@@ -16,8 +16,6 @@ gh_repo = "automate"
 
 If the Frequency of Data Sync between the Live System(Production cluster) and DR ranges between 6 and 24 hrs, then we have an option which utilize the regular backup and restore cadence, that syncs data from the Production cluster to the DR cluster. Typically these two clusters should be located in different data centres or cloud provider regions.
 
-### Setup DR Cluster With acceptable down time will be few minutes
-
 In this approach we have to running 2 Parallel Cluster of same capacity.
 
 -   Primary Cluster (or Production Cluster)
@@ -32,6 +30,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
 -   Running two parallel cluster can be expensive.
 -   Data available till last backup performed.
+-   While changeing the DNS from Primary to DR, it might take some time to reflect.
 
 #### Steps to Setup the Production and DR Cluster
 
@@ -43,7 +42,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
 {{< note >}}
 
-Both the clusters should be configured with same storage i.e., if Primary cluster is configured with a AWS S3 (per say the bucket name is `chef-automate-DR`), then DR cluser should also configured with same bucket (`chef-automate-DR`) in AWS S3.
+Both the clusters should be configured with same storage i.e., if Primary cluster is configured with a object storage (per say the bucket name is `chef-automate-DR`, similar to S3), then DR cluser should also configured with same bucket (`chef-automate-DR`) in the same object storage.
 
 {{< /note >}}
 
