@@ -27,12 +27,12 @@ In this approach we have to running 2 Parallel Cluster of same capacity.
 Primary cluster will be in use and will take the backup at regular interval with `chef-automate backup create` command. At the same time DR cluster will be restoring the latest backup data via `chef-automate backup restore` command.
 In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
-### Caveat with Above approach
+### Caveat with above approach
 
 - Running two parallel cluster can be expensive.
 - Data available till last backup performed.
 
-### Steps to Setup the Production and DR Cluster
+### Steps to setup the Production and DR Cluster
 
 1. Please follow the steps for fresh [deployment](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine) for Production cluster.
 
@@ -135,7 +135,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
             sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
             ```
 
-### Steps to Switch to DR Cluster
+### Steps to switch to DR Cluster
 
 - Stop the Restore cron
 - Start all the service on all the Frontend node.
