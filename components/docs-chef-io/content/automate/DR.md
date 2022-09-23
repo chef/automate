@@ -14,7 +14,8 @@ gh_repo = "automate"
 
 ## How To SetUp Disaster Recovery Cluster For OnPrem Deployment
 
-If the Frequency of Data Sync between the Live System(Production cluster) and DR ranges between few hrs, then we have an option which utilize the regular backup and restore cadence, that syncs data from the Production cluster to the DR cluster. Typically these two clusters should be located in different data centres or cloud provider regions.
+If the Frequency of Data Sync between the Live System(Production cluster) and DR ranges between few hrs, then we have an option which utilize the regular backup and restore cadence, that syncs data from the Production cluster to the DR cluster.
+Typically these two clusters should be located in different data centres or cloud provider regions.
 
 In this approach we have to running 2 Parallel Cluster of same capacity.
 
@@ -26,12 +27,12 @@ In this approach we have to running 2 Parallel Cluster of same capacity.
 Primary cluster will be in use and will take the backup at regular interval with `chef-automate backup create` command. At the same time DR cluster will be restoring the latest backup data via `chef-automate backup restore` command.
 In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
-#### Caveat with Above approach
+### Caveat with Above approach
 
 - Running two parallel cluster can be expensive.
 - Data available till last backup performed.
 
-#### Steps to Setup the Production and DR Cluster
+### Steps to Setup the Production and DR Cluster
 
 1. Please follow the steps for fresh [deployment](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine) for Production cluster.
 
@@ -41,7 +42,9 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
     {{< note >}}
 
-    Both the clusters should be configured with same object storage or file system i.e., if Primary cluster is configured with a object storage or file system, then DR cluser should also configured with same object storage or file system.
+    Both the clusters should be configured with same object storage or file system i.e.
+    if Primary cluster is configured with a object storage or file system,
+    then DR cluser should also configured with same object storage or file system.
 
     {{< /note >}}
 
@@ -65,7 +68,8 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
 
     {{< note >}}
 
-    - Suggested frequecy of backup cron and restore cron is one hour i.e., backup and restore in respective machines can be done as frequest as 1 hour
+    - Suggested frequecy of backup cron and restore cron is one hour i.e.,
+      backup and restore in respective machines can be done as frequest as 1 hour
     - Make sure the Restore cron always restores the latest backed-up data
     - A cron job is a Linux command used to schedule a job that is executed periodically
 
@@ -131,7 +135,7 @@ In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
             sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
             ```
 
-#### Steps to Switch to DR Cluster
+### Steps to Switch to DR Cluster
 
 - Stop the Restore cron
 - Start all the service on all the Frontend node.
