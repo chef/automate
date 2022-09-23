@@ -1,0 +1,120 @@
+package upgradeinspectorv4
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/briandowns/spinner"
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
+	"github.com/fatih/color"
+)
+
+type EnableMaintenanceInspection struct {
+	writer          *cli.Writer
+	upgradeUtils    UpgradeV4Utils
+	timeout         int64
+	IsExecuted      bool
+	spinner         *spinner.Spinner
+	exitError       error
+	exitedWithError bool
+}
+
+func NewDisableMaintenanceInspection(w *cli.Writer, utls UpgradeV4Utils, timeout int64) *EnableMaintenanceInspection {
+	return &EnableMaintenanceInspection{
+		writer:       w,
+		upgradeUtils: utls,
+		timeout:      timeout,
+	}
+}
+
+func (em *EnableMaintenanceInspection) ShowInfo(index *int) error {
+	return nil
+}
+func (em *EnableMaintenanceInspection) Skip() {
+	return
+}
+func (em *EnableMaintenanceInspection) GetShortInfo() []string {
+	return nil
+}
+
+func (em *EnableMaintenanceInspection) Inspect() (err error) {
+	em.showTurningOn()
+	isMaintenanceOn, err := em.upgradeUtils.GetMaintenanceStatus(em.timeout)
+	if err != nil {
+		em.showError()
+		em.exitedWithError = true
+		em.exitError = err
+		return err
+	}
+	if isMaintenanceOn {
+		em.showSuccess()
+		return nil
+	}
+	_, _, err = em.upgradeUtils.SetMaintenanceMode(em.timeout, true)
+	if err != nil {
+		em.showError()
+		return err
+	}
+	em.setExecuted()
+	em.showSuccess()
+	return nil
+}
+
+func (em *EnableMaintenanceInspection) showTurningOn() {
+	em.spinner = em.writer.NewSpinner()
+	em.spinner.Suffix = fmt.Sprintf("  Turning ON maintenance mode")
+	em.spinner.Start()
+	time.Sleep(time.Second)
+}
+
+func (em *EnableMaintenanceInspection) showSuccess() {
+	em.spinner.FinalMSG = fmt.Sprintf(color.New(color.FgGreen).Sprint("✔") + "  Maintenance mode turned ON successfully")
+	em.spinner.Stop()
+	em.writer.Println("")
+}
+
+func (em *EnableMaintenanceInspection) showError() {
+	em.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  Maintenance mode turned ON successfully"
+	em.spinner.Stop()
+	em.writer.Println("")
+}
+
+func (em *EnableMaintenanceInspection) setExecuted() {
+	em.IsExecuted = true
+}
+
+func (em *EnableMaintenanceInspection) GetIsExecuted() bool {
+	return em.IsExecuted
+}
+
+func (em *EnableMaintenanceInspection) PreExit() (err error) {
+	isMaintenanceOn, err := em.upgradeUtils.GetMaintenanceStatus(em.timeout)
+	if err != nil {
+		return err
+	}
+	if !isMaintenanceOn {
+		return nil
+	}
+	_, _, err = em.upgradeUtils.SetMaintenanceMode(em.timeout, false)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (em *EnableMaintenanceInspection) GetInstallationType() inspector.InstallationType {
+	return inspector.BOTH
+}
+
+func (em *EnableMaintenanceInspection) PrintExitMessage() error {
+	return nil
+}
+
+func (em *EnableMaintenanceInspection) HasExitedWithError() bool {
+	return em.exitedWithError
+}
+
+func (em *EnableMaintenanceInspection) SetExitedWithError(status bool) {
+	em.exitedWithError = status
+}

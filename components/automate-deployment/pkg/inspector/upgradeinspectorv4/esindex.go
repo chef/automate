@@ -20,7 +20,7 @@ const (
 )
 
 // remove .saved-searches
-var automateOldIndicesPattern []string = []string{".automate", ".locky", "saved-searches", ".tasks"}
+var automateOldIndicesPattern []string = []string{".automate", ".locky", ".tasks"}
 
 type ESIndexInspection struct {
 	writer             *cli.Writer
@@ -29,6 +29,8 @@ type ESIndexInspection struct {
 	spinner            *spinner.Spinner
 	automateOldIndices []string
 	otherOldIndices    []string
+	exitError          error
+	exitedWithError    bool
 }
 
 func NewESIndexInspection(w *cli.Writer, utls UpgradeV4Utils, esBasePath string) *ESIndexInspection {
@@ -48,6 +50,8 @@ func (es *ESIndexInspection) Inspect() (err error) {
 	es.automateOldIndices, es.otherOldIndices, err = es.fetchOldIndicesInES()
 	if err != nil {
 		es.showError()
+		es.exitError = err
+		es.exitedWithError = true
 		return err
 	}
 	if !es.hasOldIndices() {
@@ -58,10 +62,14 @@ func (es *ESIndexInspection) Inspect() (err error) {
 	es.showErrorList()
 	shouldDelete := es.promptForDeletion()
 	if !shouldDelete {
-		return errors.New(USER_TERMINATED)
+		es.exitError = err
+		es.exitedWithError = true
+		return errors.New(UPGRADE_TERMINATED)
 	}
 	err = es.deleteOldIndices()
 	if err != nil {
+		es.exitError = err
+		es.exitedWithError = true
 		return err
 	}
 	es.deletedSuccessfully()
@@ -192,7 +200,7 @@ func (es *ESIndexInspection) fetchOldIndicesInES() (automateOldIndices, otherOld
 }
 
 func (es *ESIndexInspection) Skip() {
-	es.writer.Println("⊖  [Skipped]\tElasticsearch indices are in version 6")
+	es.writer.Println(" ⊖  [Skipped]\tElasticsearch indices are in version 6")
 }
 
 func (es *ESIndexInspection) GetShortInfo() []string {
@@ -301,4 +309,16 @@ type IndexInfo struct {
 			} `json:"version"`
 		} `json:"index"`
 	} `json:"settings"`
+}
+
+func (es *ESIndexInspection) PrintExitMessage() error {
+	return nil
+}
+
+func (es *ESIndexInspection) HasExitedWithError() bool {
+	return es.exitedWithError
+}
+
+func (es *ESIndexInspection) SetExitedWithError(status bool) {
+	es.exitedWithError = status
 }

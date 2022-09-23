@@ -1,15 +1,19 @@
 package inspector
 
 type Inspector interface {
-	ShowInfo() error
-	Inspect() error
 	AddInspection(inspection Inspection)
+	ShowInfo() error
 	ShowInspectionList()
+	Inspect() error
 	PreExit() error
+	ShowExitMessages() error
 }
 
 type Inspection interface {
 	ShowInfo(index *int) error
+	HasExitedWithError() bool
+	SetExitedWithError(status bool)
+	PrintExitMessage() error
 }
 
 type SystemInspection interface {
@@ -23,6 +27,7 @@ type SystemInspection interface {
 type ExitInspection interface {
 	SystemInspection
 	PreExit() error
+	GetIsExecuted() bool
 }
 
 type InstallationType int

@@ -22,6 +22,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -76,11 +77,23 @@ To fix this, delete the file "/hab/svc/deployment-service/data/converge_disable"
 Otherwise, you may need to run "chef-automate dev start-converge".
 `
 
+func handleError(err error) error {
+	if err.Error() == upgradeinspectorv4.UPGRADE_TERMINATED {
+		writer.Println(err.Error())
+		return nil
+	}
+	writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + err.Error())
+	writer.Println("Please resolve this and try again.")
+	writer.Println("Please contact support if you are not sure how to resolve this.")
+	return nil
+}
+
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
+
 	mfs := &fileutils.MockFileSystemUtils{
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) {
 			if dir == "/hab" {
-				return 15, nil
+				return 1, nil
 			}
 			return 5, nil
 		},
@@ -94,13 +107,20 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
 	err := upgradeInspector.ShowInfo()
 	if err != nil {
-		return err
+		return handleError(err)
 	}
 	upgradeInspector.ShowInspectionList()
 	err = upgradeInspector.Inspect()
 	if err != nil {
-		preExitErr := upgradeInspector.PreExit()
-		return errors.Wrap(err, preExitErr.Error())
+		return handleError(err)
+	}
+	err = upgradeInspector.PreExit()
+	if err != nil {
+		return handleError(err)
+	}
+	err = upgradeInspector.ShowExitMessages()
+	if err != nil {
+		return handleError(err)
 	}
 	return nil
 

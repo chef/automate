@@ -2,12 +2,13 @@ package upgradeinspectorv4
 
 import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
 	"github.com/fatih/color"
 )
 
 type TakeBackupInspection struct {
-	writer *cli.Writer
+	writer          *cli.Writer
+	exitedWithError bool
+	exitError       error
 }
 
 func (tb *TakeBackupInspection) ShowInfo(index *int) error {
@@ -22,6 +23,14 @@ func NewTakeBackupInspection(w *cli.Writer) *TakeBackupInspection {
 	}
 }
 
-func (tb *TakeBackupInspection) GetInstallationType() inspector.InstallationType {
-	return inspector.BOTH
+func (tb *TakeBackupInspection) PrintExitMessage() error {
+	return nil
+}
+
+func (tb *TakeBackupInspection) HasExitedWithError() bool {
+	return tb.exitedWithError
+}
+
+func (tb *TakeBackupInspection) SetExitedWithError(status bool) {
+	tb.exitedWithError = status
 }

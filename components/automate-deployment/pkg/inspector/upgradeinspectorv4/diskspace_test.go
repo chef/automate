@@ -21,6 +21,10 @@ func GetFreeSpaceinGB(dir string) (float64, error) {
 	return 2.5, nil
 }
 
+func GetFreeSpaceinGBToPassTest(dir string) (float64, error) {
+	return 12.5, nil
+}
+
 func GetFreeSpaceinGBErrorHab(dir string) (float64, error) {
 	if dir == "/hab" {
 		return -1.0, errors.New("failed to check filesystem")
@@ -205,9 +209,6 @@ func TestDiskSpaceInspectHabFailed(t *testing.T) {
 
 	expectedResult := `✖  [Failed]	/hab directory should have 10.5GB of free space
  ⊖  [Skipped]	/home/ubuntu directory should have 5.5GB of free space
-
-[Error] Required Space : 10.5GB
-        Available space : 8.5GB
 `
 	// 	expectedEnsureMsg := `
 	// Please ensure the available free space is 10.5GB

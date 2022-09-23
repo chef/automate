@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/api/config/load_balancer"
 	"github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -16,12 +17,21 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+type DummyWriter struct {
+	WriteBuffer *bytes.Buffer
+	ReadBuffer  *bytes.Buffer
+	ErrorBuffer *bytes.Buffer
+	CliWriter   *cli.Writer
+}
 type UpgradeV4Utils interface {
-	IsExternalElasticSearch() bool
+	IsExternalElasticSearch(timeout int64) bool
 	ExecRequest(url, methodType string, requestBody io.Reader) ([]byte, error)
 	GetESBasePath(timeout int64) string
-	GetBackupS3URL() (string, error)
-	PatchS3backupURL(*cli.Writer) (stdOut, stdErr string, err error)
+	GetBackupS3URL(timeout int64) (string, error)
+	PatchS3backupURL(timeout int64) (stdOut, stdErr string, err error)
+	GetMaintenanceStatus(timeout int64) (bool, error)
+	SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error)
+	WriteToFile(filepath string, data []byte) error
 }
 
 type UpgradeV4UtilsImp struct{}
@@ -30,32 +40,23 @@ func NewUpgradeV4Utils() UpgradeV4Utils {
 	return &UpgradeV4UtilsImp{}
 }
 
-func (cu *UpgradeV4UtilsImp) GetBackupS3URL() (string, error) {
-	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
+func (cu *UpgradeV4UtilsImp) GetBackupS3URL(timeout int64) (string, error) {
+	res, err := client.GetAutomateConfig(timeout)
 	if err != nil {
 		return "", err
 	}
 	return res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint().GetValue(), nil
 }
 
-type DummyWriter struct {
-	WriteBuffer *bytes.Buffer
-	ReadBuffer  *bytes.Buffer
-	ErrorBuffer *bytes.Buffer
-	CliWriter   *cli.Writer
-}
-
-func NewWriter() *DummyWriter {
-	tw := &DummyWriter{
-		WriteBuffer: new(bytes.Buffer),
-		ReadBuffer:  new(bytes.Buffer),
-		ErrorBuffer: new(bytes.Buffer),
+func (cu *UpgradeV4UtilsImp) GetMaintenanceStatus(timeout int64) (bool, error) {
+	config, err := client.GetAutomateConfig(timeout)
+	if err != nil {
+		return false, err
 	}
-	tw.CliWriter = cli.NewWriter(tw.WriteBuffer, tw.ErrorBuffer, tw.ReadBuffer)
-	return tw
+	return config.GetConfig().GetLoadBalancer().GetV1().GetSys().GetService().GetMaintenanceMode().GetValue(), nil
 }
 
-func (cu *UpgradeV4UtilsImp) PatchS3backupURL(writer *cli.Writer) (stdOut, stdErr string, err error) {
+func (cu *UpgradeV4UtilsImp) PatchS3backupURL(timeout int64) (stdOut, stdErr string, err error) {
 	cfg := deployment.NewUserOverrideConfig()
 	cfg.Global = &shared.GlobalConfig{
 		V1: &shared.V1{
@@ -69,7 +70,7 @@ func (cu *UpgradeV4UtilsImp) PatchS3backupURL(writer *cli.Writer) (stdOut, stdEr
 			},
 		},
 	}
-	tw := NewWriter()
+	tw := NewTestWriter()
 	err = client.PatchAutomateConfig(10, cfg, tw.CliWriter)
 	if err != nil {
 		return "", "", err
@@ -77,8 +78,27 @@ func (cu *UpgradeV4UtilsImp) PatchS3backupURL(writer *cli.Writer) (stdOut, stdEr
 	return tw.WriteBuffer.String(), tw.ErrorBuffer.String(), nil
 }
 
-func (cu *UpgradeV4UtilsImp) IsExternalElasticSearch() bool {
-	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
+func (cu *UpgradeV4UtilsImp) SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error) {
+	enable := wrapperspb.Bool(status)
+	cfg := deployment.NewUserOverrideConfig()
+	cfg.LoadBalancer = &load_balancer.ConfigRequest{
+		V1: &load_balancer.ConfigRequest_V1{
+			Sys: &load_balancer.ConfigRequest_V1_System{
+				Service: &load_balancer.ConfigRequest_V1_System_Service{
+					MaintenanceMode: enable,
+				},
+			},
+		},
+	}
+	tw := NewTestWriter()
+	if err := client.PatchAutomateConfig(10, cfg, tw.CliWriter); err != nil {
+		return "", "", err
+	}
+	return tw.WriteBuffer.String(), tw.ErrorBuffer.String(), nil
+}
+
+func (cu *UpgradeV4UtilsImp) IsExternalElasticSearch(timeout int64) bool {
+	res, err := client.GetAutomateConfig(timeout)
 	if err != nil {
 		return false
 	}
@@ -135,4 +155,8 @@ func (cu *UpgradeV4UtilsImp) ExecRequest(url, methodType string, requestBody io.
 		return nil, errors.Errorf("Request failed with status %d\n%s\n", res.StatusCode, string(body))
 	}
 	return body, nil
+}
+
+func (cu *UpgradeV4UtilsImp) WriteToFile(filepath string, data []byte) error {
+	return ioutil.WriteFile(filepath, data, 775)
 }
