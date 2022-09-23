@@ -16,10 +16,13 @@ import "external/annotations/iam/annotations.proto";
 service ReportingService {
 	/*
 	List Reports
+
 	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	Supports pagination, filtering, and sorting.
 	Max return payload size is 4MB, use pagination to fetch remaining data.
+
 	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
+
 	Example:
 	```
 	{"filters":
@@ -31,6 +34,7 @@ service ReportingService {
 		"sort": "latest_report.status", "order": "ASC"
 	}
 	```
+
 	Authorization Action:
 	```
 	compliance:reports:list
@@ -49,11 +53,13 @@ service ReportingService {
 
 	/*
 	List Report IDs
+
 	List all IDs for the latest report for each node, with optional filtering.
 	Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	Max return payload size is 4MB.
+
 	Authorization Action:
 	```
 	compliance:reportids:list
@@ -72,9 +78,11 @@ service ReportingService {
 
 	/*
 	List Controls
+
 	Lists controls from the last run, with optional filtering.
 	Supports filtering,pagination but not sorting.
 	Limited to 100 results by default.
+
 	Authorization Action:
 	```
 	compliance:controlItems:list
@@ -93,6 +101,7 @@ service ReportingService {
 
 	/*
 	List Control Info
+
 	Lists controls from the last run, with optional filtering.
 	Supports filtering and pagination. Maximum 100 search can be 
 	made when specifying the pagination from and size. Sum of from+size
@@ -115,9 +124,11 @@ service ReportingService {
 
 	/*
 	Show Report by ID
+
 	Show a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
+
 	Authorization Action:
 	```
 	compliance:reports:get
@@ -136,8 +147,10 @@ service ReportingService {
 
 	/*
 	Show Node Header Info From Report ID
+
 	Show specific details about node, report and metadate provided the report ID.
 	Supports filtering, but not pagination or sorting.
+
 	Authorization Action:
 	```
 	compliance:nodeheader:get
@@ -156,9 +169,11 @@ service ReportingService {
 
 	/*
 	List Reporting Suggestions
+
 	Get suggestions for compliance reporting resources based on matching text substrings.
 	Supports filtering, but not pagination or sorting.
 	`type` parameter is required. It must be one of the parameters from the following table.
+
 	| Suggestion type parameter | Suggestion type value |
 	| --- | --- |
 	| chef_server | source_fqdn |
@@ -178,6 +193,7 @@ service ReportingService {
 	| profile_with_version | profiles.full |
 	| recipe | recipes |
 	| role | roles |
+
 	Example:
 	```
 	{
@@ -189,6 +205,7 @@ service ReportingService {
 		]
 	}
 	```
+
 	Authorization Action:
 	```
 	compliance:reportSuggestions:list
@@ -207,12 +224,15 @@ service ReportingService {
 
 	/*
 	List Profiles
+
 	List all profiles in use, with optional filtering.
 	Supports pagination, filtering, and sorting.
 	Valid sort fields: name, title
 	The API supports date range filters when `end_time` is the current time
+
 	and `start_time` is any time in last 90 days. In case, the `end_time` is any
 	date other than the current date, the API would return data only for the `end_time`.
+
 	Example:
 	```
 	{"filters":
@@ -245,8 +265,10 @@ service ReportingService {
 
 	/*
 	Export reports
+
 	Export multiple reports.
 	Supports filtering by profile or control. API returns an acknowledgement ID.
+
 	Authorization Action:
 	```
 	compliance:reports:list
@@ -265,9 +287,11 @@ service ReportingService {
 
 	/*
 	Show Node by ID
+
 	Show a specific node by ID.
 	Supports filtering by profile or control.
 	Does not support pagination or sorting.
+
 	Authorization Action:
 	```
 	compliance:reportNodes:get
@@ -308,6 +332,7 @@ service ReportingService {
 		"page":1,"per_page":100,
 		"sort":"environment","order":"ASC"
 	}
+
 	```
 	Authorization Action:
 	```
@@ -347,192 +372,6 @@ service ReportingService {
 			tags: "hidden";
 		};
 	};
-
-
-	/*
-	Assets Count
-	Count the compliance assets based on different filter options.
-	The API returns the response based on reported and unreported assets
-	Authorization Action:
-	```
-	compliance:reports:list
-	```
-*/
-
-
-	/*rpc AssetCount(ListFilters) returns (AssetSummary) {
-		option (google.api.http) = {
-			post: "/api/v0/compliance/reporting/assets/count"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:reports"
-			action: "compliance:reports:list"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Comp_Assets";
-		};
-	}*/
-
-	/*
-	List Assets
-	Lists the compliance assets based on different filter options.
-	The API works with filtering assets based on collected, uncollected, unreported and unreachable assets
-	Authorization Action:
-	```
-	compliance:reports:list
-	```
-	*/
-	/*rpc ListAsset(AssetListRequest) returns (AssetListResponse) {
-		option (google.api.http) = {
-			post: "/api/v0/compliance/reporting/assets/search"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:reports"
-			action: "compliance:reports:list"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Comp_Assets";
-		};
-	}*/
-
-	/*
-	Set Unreachable Assets Config
-	SetAssetConfig sets the compliance config with the parameters of no of days
-	And API returns the policy name and no of the days which will set in the compliance data base
-	Authorization Action:
-	```
-	compliance:reports:update
-	```
-	*/
-	/*rpc SetAssetConfig(ComplianceConfigRequest) returns (ComplianceConfigResponse) {
- 		option (google.api.http) = {
- 			put: "/api/v0/compliance/reporting/assets/config"
- 			body: "*"
- 		};
- 		option (chef.automate.api.iam.policy) = {
- 			resource: "compliance:reporting:config"
- 			action: "compliance:reports:update"
- 		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Comp_Assets";
-		};
- 	}
-*/
-	/*
-	Get Assets Config
-	GetAssetConfig gets the config details from the compliance data base
-	and API return the policy name and no of days
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-*/
-	/*
-	Get Assets Config
-	GetAssetConfig gets the config details from the compliance data base
-	and API return the policy name and no of days
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-*/
-	/*
-	Get Assets Config
-	GetAssetConfig gets the config details from the compliance data base
-	and API return the policy name and no of days
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-*/
-	/*
-	Get Assets Config
-	GetAssetConfig gets the config details from the compliance data base
-	and API return the policy name and no of days
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-*/
-	/*
-	Get Assets Config
-	GetAssetConfig gets the config details from the compliance data base
-	and API return the policy name and no of days
-	Authorization Action:
-	```
-	compliance:reports:get
-	```
-	*/
- /*	rpc GetAssetConfig(GetAssetConfigRequest) returns (ComplianceConfigResponse) {
- 		option (google.api.http) = {
- 			get: "/api/v0/compliance/reporting/assets/config/search"
- 		};
- 		option (chef.automate.api.iam.policy) = {
- 			resource: "compliance:reporting:config"
- 			action: "compliance:reports:get"
- 		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Comp_Assets";
-		};
- 	}*/
-
-/*
-	List Controls Search
-	Lists controls from the last run, with optional filtering.
-	Supports filtering,pagination but not sorting.
-	Limited to 100 results by default.
-	Gets the summary of each control.
-  The API supports date range filters when `end_time` is the current time
-	and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	date other than the current date, the API would return data only for the `end_time`.
-	Example:
-	```
-	{"filters":
-		[
-			{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
-			{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-		],
-		"page_number":1, "size": 3,
-	}
-	```
-	Authorization Action:
-	```
-	compliance:controlItems:list
-	```
-*/
-	/*rpc ListControlItemsRange(ControlItemRequest) returns (ControlItems) {
-		option (google.api.http) = {
-			post: "/api/v0/compliance/reporting/controls/search"
-			body: "*"
-		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:control"
-			action: "compliance:controlItems:list"
-		};
-	};*/
-
 
 }
 
