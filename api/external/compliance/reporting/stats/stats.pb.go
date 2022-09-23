@@ -2600,10 +2600,6 @@ type StatsServiceClient interface {
 	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
 	//Supports filtering.
 	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
-	//
 	//Example:
 	//```
 	//{
@@ -2792,10 +2788,6 @@ type StatsServiceServer interface {
 	//General report summary information is the default.
 	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
 	//Supports filtering.
-	//
-	//The API supports date range filters when `end_time` is the current time
-	//and `start_time` is any time in last 90 days. In case, the `end_time` is any
-	//date other than the current date, the API would return data only for the `end_time`.
 	//
 	//Example:
 	//```
