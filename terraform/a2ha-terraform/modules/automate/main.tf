@@ -51,6 +51,7 @@ locals {
     ssh_user                        = var.ssh_user,
     ssh_port                        = var.ssh_port,
     tmp_path                        = var.tmp_path
+    nfs_mount_path                  = var.nfs_mount_path
   })
 }
 

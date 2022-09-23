@@ -276,6 +276,7 @@ module "opensearch" {
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
   backup_config_efs               = var.backup_config_efs
+  nfs_mount_path                  = var.nfs_mount_path
   depends_on = [
     module.habitat-opensearch
   ]
@@ -312,6 +313,7 @@ module "postgresql" {
   ssh_port                        = var.ssh_port
   ssh_user_sudo_password          = local.be_sudo_password
   sudo_cmd                        = var.sudo_cmd
+  nfs_mount_path                  = var.nfs_mount_path
   depends_on = [
     module.habitat-postgresql
   ]
@@ -366,6 +368,7 @@ module "bootstrap_automate" {
   backup_config_efs                  = var.backup_config_efs
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
+  nfs_mount_path                     = var.nfs_mount_path
   depends_on = [
     module.airgap_bundle-automate
   ]
@@ -424,6 +427,7 @@ module "automate" {
   backup_config_efs      = var.backup_config_efs
   s3_endpoint            = var.s3_endpoint
   bucket_name            = var.bucket_name
+  nfs_mount_path         = var.nfs_mount_path
   depends_on = [
     module.bootstrap_automate
   ]
@@ -478,6 +482,7 @@ module "chef_server" {
   backup_config_efs                  = var.backup_config_efs
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
+  nfs_mount_path                     = var.nfs_mount_path
   depends_on = [
     module.bootstrap_automate
   ]
