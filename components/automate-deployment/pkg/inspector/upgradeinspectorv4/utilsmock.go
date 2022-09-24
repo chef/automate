@@ -14,6 +14,7 @@ type MockUpgradeV4UtilsImp struct {
 	SetMaintenanceModeFunc      func(timeout int64, status bool) (stdOut, stdErr string, err error)
 	GetElasticsearchPIDFunc     func() (string, error)
 	WriteToFileFunc             func(filepath string, data []byte) error
+	GetServicesStatusFunc       func() (bool, error)
 }
 
 func (utl *MockUpgradeV4UtilsImp) IsExternalElasticSearch(timeout int64) bool {
@@ -39,4 +40,7 @@ func (utl *MockUpgradeV4UtilsImp) SetMaintenanceMode(timeout int64, status bool)
 }
 func (utl *MockUpgradeV4UtilsImp) WriteToFile(filepath string, data []byte) error {
 	return utl.WriteToFileFunc(filepath, data)
+}
+func (utl *MockUpgradeV4UtilsImp) GetServicesStatus() (bool, error) {
+	return utl.GetServicesStatusFunc()
 }

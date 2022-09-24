@@ -271,7 +271,7 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 
 	err := ui.Inspect()
 	assert.NoError(t, err)
-	err = ui.ShowExitMessages()
+	err = ui.RunExitAction()
 	assert.NoError(t, err)
 	assert.Contains(t, tw.Output(), expectedChecks)
 	assert.Contains(t, tw.Output(), expectedBeginHabChecking)
@@ -311,7 +311,7 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 
 	err := ui.Inspect()
 	assert.NoError(t, err)
-	err = ui.ShowExitMessages()
+	err = ui.RunExitAction()
 	assert.NoError(t, err)
 	assert.Contains(t, tw.Output(), expectedChecks)
 	assert.Contains(t, tw.Output(), expectedBeginHabChecking)
@@ -439,6 +439,9 @@ func TestUpgradeInspectorV4RunInspectForOsDestDirSkipped(t *testing.T) {
 		},
 		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
 			return "", "", nil
+		},
+		GetServicesStatusFunc: func() (bool, error) {
+			return true, nil
 		},
 	}, mfs, 10)
 

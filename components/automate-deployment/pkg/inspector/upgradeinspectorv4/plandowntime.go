@@ -5,13 +5,12 @@ import (
 )
 
 type PlannedDownTimeInspection struct {
-	writer          *cli.Writer
-	exitedWithError bool
-	exitError       error
+	writer *cli.Writer
 }
 
 func (pd *PlannedDownTimeInspection) ShowInfo(index *int) error {
 	pd.writer.Printf("%d. You have planned downtime\n", *index)
+	*index++
 	return nil
 }
 
@@ -19,16 +18,4 @@ func NewPlannedDownTimeInspection(w *cli.Writer) *PlannedDownTimeInspection {
 	return &PlannedDownTimeInspection{
 		writer: w,
 	}
-}
-
-func (pd *PlannedDownTimeInspection) PrintExitMessage() error {
-	return nil
-}
-
-func (pd *PlannedDownTimeInspection) HasExitedWithError() bool {
-	return pd.exitedWithError
-}
-
-func (pd *PlannedDownTimeInspection) SetExitedWithError(status bool) {
-	pd.exitedWithError = status
 }

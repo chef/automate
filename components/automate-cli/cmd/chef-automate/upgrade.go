@@ -114,11 +114,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return handleError(err)
 	}
-	err = upgradeInspector.PreExit()
+	err = upgradeInspector.RollBackChangesOnError()
 	if err != nil {
 		return handleError(err)
 	}
-	err = upgradeInspector.ShowExitMessages()
+	err = upgradeInspector.RunExitAction()
 	if err != nil {
 		return handleError(err)
 	}

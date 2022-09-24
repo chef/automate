@@ -5,15 +5,12 @@ type Inspector interface {
 	ShowInfo() error
 	ShowInspectionList()
 	Inspect() error
-	PreExit() error
-	ShowExitMessages() error
+	RollBackChangesOnError() error
+	RunExitAction() error
 }
 
 type Inspection interface {
 	ShowInfo(index *int) error
-	HasExitedWithError() bool
-	SetExitedWithError(status bool)
-	PrintExitMessage() error
 }
 
 type SystemInspection interface {
@@ -22,12 +19,11 @@ type SystemInspection interface {
 	Skip()
 	GetShortInfo() []string
 	GetInstallationType() InstallationType
+	ExitHandler() error
 }
 
-type ExitInspection interface {
-	SystemInspection
-	PreExit() error
-	GetIsExecuted() bool
+type RollbackInspection interface {
+	RollBackHandler() error
 }
 
 type InstallationType int

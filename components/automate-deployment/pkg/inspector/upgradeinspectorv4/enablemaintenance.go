@@ -14,7 +14,7 @@ type EnableMaintenanceInspection struct {
 	writer          *cli.Writer
 	upgradeUtils    UpgradeV4Utils
 	timeout         int64
-	IsExecuted      bool
+	isExecuted      bool
 	spinner         *spinner.Spinner
 	exitError       error
 	exitedWithError bool
@@ -43,8 +43,7 @@ func (em *EnableMaintenanceInspection) Inspect() (err error) {
 	isMaintenanceOn, err := em.upgradeUtils.GetMaintenanceStatus(em.timeout)
 	if err != nil {
 		em.showError()
-		em.exitedWithError = true
-		em.exitError = err
+		em.setExitError(err)
 		return err
 	}
 	if isMaintenanceOn {
@@ -54,11 +53,17 @@ func (em *EnableMaintenanceInspection) Inspect() (err error) {
 	_, _, err = em.upgradeUtils.SetMaintenanceMode(em.timeout, true)
 	if err != nil {
 		em.showError()
+		em.setExitError(err)
 		return err
 	}
 	em.setExecuted()
 	em.showSuccess()
 	return nil
+}
+
+func (em *EnableMaintenanceInspection) setExitError(err error) {
+	em.exitedWithError = true
+	em.exitError = err
 }
 
 func (em *EnableMaintenanceInspection) showTurningOn() {
@@ -81,14 +86,13 @@ func (em *EnableMaintenanceInspection) showError() {
 }
 
 func (em *EnableMaintenanceInspection) setExecuted() {
-	em.IsExecuted = true
+	em.isExecuted = true
 }
 
-func (em *EnableMaintenanceInspection) GetIsExecuted() bool {
-	return em.IsExecuted
-}
-
-func (em *EnableMaintenanceInspection) PreExit() (err error) {
+func (em *EnableMaintenanceInspection) RollBackHandler() (err error) {
+	if !em.isExecuted {
+		return nil
+	}
 	isMaintenanceOn, err := em.upgradeUtils.GetMaintenanceStatus(em.timeout)
 	if err != nil {
 		return err
@@ -107,14 +111,10 @@ func (em *EnableMaintenanceInspection) GetInstallationType() inspector.Installat
 	return inspector.BOTH
 }
 
-func (em *EnableMaintenanceInspection) PrintExitMessage() error {
+func (em *EnableMaintenanceInspection) ExitHandler() error {
+	if em.exitedWithError {
+		em.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + em.exitError.Error())
+		em.writer.Println(UPGRADE_TERMINATED)
+	}
 	return nil
-}
-
-func (em *EnableMaintenanceInspection) HasExitedWithError() bool {
-	return em.exitedWithError
-}
-
-func (em *EnableMaintenanceInspection) SetExitedWithError(status bool) {
-	em.exitedWithError = status
 }
