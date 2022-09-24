@@ -2,6 +2,7 @@ package upgradeinspectorv4
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/load_balancer"
 	"github.com/chef/automate/api/config/shared"
+	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/pkg/errors"
@@ -32,6 +34,7 @@ type UpgradeV4Utils interface {
 	GetMaintenanceStatus(timeout int64) (bool, error)
 	SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error)
 	WriteToFile(filepath string, data []byte) error
+	GetServicesStatus() (bool, error)
 }
 
 type UpgradeV4UtilsImp struct{}
@@ -159,4 +162,21 @@ func (cu *UpgradeV4UtilsImp) ExecRequest(url, methodType string, requestBody io.
 
 func (cu *UpgradeV4UtilsImp) WriteToFile(filepath string, data []byte) error {
 	return ioutil.WriteFile(filepath, data, 775)
+}
+
+func (cu *UpgradeV4UtilsImp) GetServicesStatus() (bool, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return false, err
+	}
+
+	res, err := connection.Status(context.Background(), &api.StatusRequest{})
+	if err != nil {
+		return false, errors.Wrap(
+			err,
+			"Request to obtain Chef Automate status information failed",
+		)
+	}
+
+	return res.ServiceStatus.AllHealthy(), nil
 }

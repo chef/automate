@@ -5,6 +5,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
+	"github.com/fatih/color"
 )
 
 type ReplaceS3UrlInspection struct {
@@ -41,34 +42,33 @@ func (ru *ReplaceS3UrlInspection) GetShortInfo() []string {
 func (ru *ReplaceS3UrlInspection) Inspect() (err error) {
 	endpoint, err := ru.upgradeUtils.GetBackupS3URL(ru.timeout)
 	if err != nil {
-		ru.exitError = err
-		ru.exitedWithError = true
+		ru.setExitError(err)
 		return err
 	}
 	re := regexp.MustCompile(S3_REGEX)
 	if re.MatchString(endpoint) {
 		_, _, err := ru.upgradeUtils.PatchS3backupURL(ru.timeout)
 		if err != nil {
-			ru.exitError = err
-			ru.exitedWithError = true
+			ru.setExitError(err)
 			return err
 		}
 	}
 	return nil
 }
 
+func (ru *ReplaceS3UrlInspection) setExitError(err error) {
+	ru.exitError = err
+	ru.exitedWithError = true
+}
+
 func (ru *ReplaceS3UrlInspection) GetInstallationType() inspector.InstallationType {
 	return inspector.BOTH
 }
 
-func (ru *ReplaceS3UrlInspection) PrintExitMessage() error {
+func (ru *ReplaceS3UrlInspection) ExitHandler() error {
+	if ru.exitedWithError {
+		ru.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ru.exitError.Error())
+		ru.writer.Println(UPGRADE_TERMINATED)
+	}
 	return nil
-}
-
-func (ru *ReplaceS3UrlInspection) HasExitedWithError() bool {
-	return ru.exitedWithError
-}
-
-func (ru *ReplaceS3UrlInspection) SetExitedWithError(status bool) {
-	ru.exitedWithError = status
 }

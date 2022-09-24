@@ -50,8 +50,7 @@ func (es *ESIndexInspection) Inspect() (err error) {
 	es.automateOldIndices, es.otherOldIndices, err = es.fetchOldIndicesInES()
 	if err != nil {
 		es.showError()
-		es.exitError = err
-		es.exitedWithError = true
+		es.setExitError(err)
 		return err
 	}
 	if !es.hasOldIndices() {
@@ -62,18 +61,21 @@ func (es *ESIndexInspection) Inspect() (err error) {
 	es.showErrorList()
 	shouldDelete := es.promptForDeletion()
 	if !shouldDelete {
-		es.exitError = err
-		es.exitedWithError = true
+		es.setExitError(err)
 		return errors.New(UPGRADE_TERMINATED)
 	}
 	err = es.deleteOldIndices()
 	if err != nil {
-		es.exitError = err
-		es.exitedWithError = true
+		es.setExitError(err)
 		return err
 	}
 	es.deletedSuccessfully()
 	return nil
+}
+
+func (es *ESIndexInspection) setExitError(err error) {
+	es.exitError = err
+	es.exitedWithError = true
 }
 
 func (es *ESIndexInspection) showSuccess() {
@@ -311,14 +313,10 @@ type IndexInfo struct {
 	} `json:"settings"`
 }
 
-func (es *ESIndexInspection) PrintExitMessage() error {
+func (es *ESIndexInspection) ExitHandler() error {
+	if es.exitedWithError {
+		es.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + es.exitError.Error())
+		es.writer.Println(UPGRADE_TERMINATED)
+	}
 	return nil
-}
-
-func (es *ESIndexInspection) HasExitedWithError() bool {
-	return es.exitedWithError
-}
-
-func (es *ESIndexInspection) SetExitedWithError(status bool) {
-	es.exitedWithError = status
 }

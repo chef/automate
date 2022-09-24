@@ -55,7 +55,7 @@ func TestDiskSpaceInspection(t *testing.T) {
 	expected := `3. /hab directory should have 8.8GB of free space. (Currently available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
-	assert.Equal(t, 3, index)
+	assert.Equal(t, 4, index)
 }
 
 func TestDiskSpaceInspectionWithExternal(t *testing.T) {
@@ -71,7 +71,7 @@ func TestDiskSpaceInspectionWithExternal(t *testing.T) {
 	expected := `3. /hab directory should have 5.5GB of free space. (Currently available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
-	assert.Equal(t, 3, index)
+	assert.Equal(t, 4, index)
 }
 
 func TestDiskSpaceInspectionWithOSDataDir(t *testing.T) {
@@ -88,7 +88,7 @@ func TestDiskSpaceInspectionWithOSDataDir(t *testing.T) {
 4. /home/ubuntu directory should have 3.3GB of free space. (Currently available space : 2.5GB)
 `
 	assert.Equal(t, expected, tw.Output())
-	assert.Equal(t, 4, index)
+	assert.Equal(t, 5, index)
 }
 
 func TestDiskSpaceInspectionFileSystemError(t *testing.T) {

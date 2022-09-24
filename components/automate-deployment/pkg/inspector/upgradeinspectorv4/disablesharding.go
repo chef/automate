@@ -5,6 +5,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
+	"github.com/fatih/color"
 )
 
 const (
@@ -14,7 +15,7 @@ const (
 type DisableShardingInspection struct {
 	writer          *cli.Writer
 	upgradeUtils    UpgradeV4Utils
-	IsExecuted      bool
+	isExecuted      bool
 	exitError       error
 	exitedWithError bool
 }
@@ -44,23 +45,26 @@ func (ds *DisableShardingInspection) Inspect() (err error) {
 	}`)
 	_, err = ds.upgradeUtils.ExecRequest(ES_URL, "PUT", disableShardingPayload)
 	if err != nil {
-		ds.exitError = err
-		ds.exitedWithError = true
+		ds.setExitError(err)
 		return err
 	}
 	ds.setExecuted()
 	return nil
 }
 
+func (ds *DisableShardingInspection) setExitError(err error) {
+	ds.exitError = err
+	ds.exitedWithError = true
+}
+
 func (ds *DisableShardingInspection) setExecuted() {
-	ds.IsExecuted = true
+	ds.isExecuted = true
 }
 
-func (ds *DisableShardingInspection) GetIsExecuted() bool {
-	return ds.IsExecuted
-}
-
-func (ds *DisableShardingInspection) PreExit() (err error) {
+func (ds *DisableShardingInspection) RollBackHandler() (err error) {
+	if !ds.isExecuted {
+		return nil
+	}
 	enableShardingPayload := strings.NewReader(`{
 		"persistent": {
 			"cluster.routing.allocation.enable": null
@@ -74,14 +78,10 @@ func (ds *DisableShardingInspection) GetInstallationType() inspector.Installatio
 	return inspector.EMBEDDED
 }
 
-func (ds *DisableShardingInspection) PrintExitMessage() error {
+func (ds *DisableShardingInspection) ExitHandler() error {
+	if ds.exitedWithError {
+		ds.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ds.exitError.Error())
+		ds.writer.Println(UPGRADE_TERMINATED)
+	}
 	return nil
-}
-
-func (ds *DisableShardingInspection) HasExitedWithError() bool {
-	return ds.exitedWithError
-}
-
-func (ds *DisableShardingInspection) SetExitedWithError(status bool) {
-	ds.exitedWithError = status
 }

@@ -11,14 +11,14 @@ import (
 )
 
 type UpgradeInspectorV4 struct {
-	writer         *cli.Writer
-	inspections    []inspector.Inspection
-	osDestDir      string
-	upgradeUtils   UpgradeV4Utils
-	fileUtils      fileutils.FileUtils
-	timeout        int64
-	isExternal     bool
-	inspectorError bool
+	writer            *cli.Writer
+	inspections       []inspector.Inspection
+	osDestDir         string
+	upgradeUtils      UpgradeV4Utils
+	fileUtils         fileutils.FileUtils
+	timeout           int64
+	isExternal        bool
+	inspectorRunError bool
 }
 
 const (
@@ -39,7 +39,6 @@ In this release, Elasticsearch will be migrated to OpenSearch.
 		if err != nil {
 			return err
 		}
-		index++
 	}
 	if len(ui.inspections) > 0 {
 		ui.writer.Println("")
@@ -91,16 +90,13 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 					inspection.(inspector.SystemInspection).Skip()
 				} else {
 					err = inspection.(inspector.SystemInspection).Inspect()
-					if err != nil {
-						inspection.SetExitedWithError(true)
-					}
 				}
 			}
 		}
 	}
 	ui.writer.Println("")
 	if err != nil {
-		ui.inspectorError = true
+		ui.inspectorRunError = true
 	}
 	// ui.inspectorError = ui.inspectionErrorStatus()
 	return nil
@@ -116,20 +112,15 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 // 	return false
 // }
 
-func (ui *UpgradeInspectorV4) PreExit() (err error) {
-	if ui.inspectorError {
+func (ui *UpgradeInspectorV4) RollBackChangesOnError() (err error) {
+	if ui.inspectorRunError {
 		for _, inspection := range ui.inspections {
 			var i interface{} = inspection
-			_, ok := i.(inspector.ExitInspection)
+			_, ok := i.(inspector.RollbackInspection)
 			if ok {
-				if inspection.(inspector.ExitInspection).GetIsExecuted() {
-					installationType := inspection.(inspector.ExitInspection).GetInstallationType()
-					if ui.checkInstallationTypeForExternal(installationType) || ui.checkInstallationTypeForEmbedded(installationType) {
-						err = inspection.(inspector.ExitInspection).PreExit()
-						if err != nil {
-							return err
-						}
-					}
+				err = inspection.(inspector.RollbackInspection).RollBackHandler()
+				if err != nil {
+					return err
 				}
 			}
 		}
@@ -161,6 +152,7 @@ func (ui *UpgradeInspectorV4) AddInspection(inspection inspector.Inspection) {
 }
 
 func (ui *UpgradeInspectorV4) AddDefaultInspections() {
+	ui.AddInspection(NewEnsureStatusInspection(ui.writer, ui.upgradeUtils))
 	ui.AddInspection(NewPlannedDownTimeInspection(ui.writer))
 	ui.AddInspection(NewTakeBackupInspection(ui.writer))
 	diskSpaceInspection := NewDiskSpaceInspection(ui.writer, ui.upgradeUtils.IsExternalElasticSearch(ui.timeout), ui.osDestDir, ui.fileUtils)
@@ -195,15 +187,16 @@ func (ui *UpgradeInspectorV4) ShowInspectionList() {
 	ui.writer.Println("")
 }
 
-func (ui *UpgradeInspectorV4) ShowExitMessages() error {
+func (ui *UpgradeInspectorV4) RunExitAction() error {
 	for _, inspection := range ui.inspections {
-		err := inspection.PrintExitMessage()
-		if err != nil {
-			return err
+		var i interface{} = inspection
+		_, ok := i.(inspector.SystemInspection)
+		if ok {
+			err := inspection.(inspector.SystemInspection).ExitHandler()
+			if err != nil {
+				return err
+			}
 		}
-	}
-	if ui.inspectorError {
-		ui.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

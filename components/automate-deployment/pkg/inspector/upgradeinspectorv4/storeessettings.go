@@ -5,6 +5,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 )
 
@@ -47,17 +48,20 @@ func (ses *StoreESSettingsInspection) GetInstallationType() inspector.Installati
 func (ses *StoreESSettingsInspection) Inspect() error {
 	esSetting, err := ses.getESSettings()
 	if err != nil {
-		ses.exitError = err
-		ses.exitedWithError = true
+		ses.setExitError(err)
 		return err
 	}
 	err = ses.storeESSettings(esSetting)
 	if err != nil {
-		ses.exitError = err
-		ses.exitedWithError = true
+		ses.setExitError(err)
 		return err
 	}
 	return nil
+}
+
+func (ses *StoreESSettingsInspection) setExitError(err error) {
+	ses.exitError = err
+	ses.exitedWithError = true
 }
 
 type ESSettings struct {
@@ -117,14 +121,10 @@ func (ses *StoreESSettingsInspection) storeESSettings(esSettings *ESSettings) er
 	return nil
 }
 
-func (ses *StoreESSettingsInspection) PrintExitMessage() error {
+func (ses *StoreESSettingsInspection) ExitHandler() error {
+	if ses.exitedWithError {
+		ses.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ses.exitError.Error())
+		ses.writer.Println(UPGRADE_TERMINATED)
+	}
 	return nil
-}
-
-func (ses *StoreESSettingsInspection) HasExitedWithError() bool {
-	return ses.exitedWithError
-}
-
-func (ses *StoreESSettingsInspection) SetExitedWithError(status bool) {
-	ses.exitedWithError = status
 }
