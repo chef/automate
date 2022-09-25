@@ -87,7 +87,7 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
     > **_NOTE:_**  The following special characters are not allowed in password.  
     ```
-        ‘ ` " ' \ ;
+        ‘ ` " ' \ ; $
     ```
 
         ```

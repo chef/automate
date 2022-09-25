@@ -29,7 +29,7 @@ Add the following to your `config.toml` for HTTPS connection:
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml
@@ -62,7 +62,7 @@ Add the following to your `config.toml` for HTTP connection:
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml

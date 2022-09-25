@@ -24,7 +24,7 @@ Add the following settings to your `config.toml`:
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml

@@ -101,7 +101,7 @@ Follow the steps below to deploy Chef Automate High Availability (HA) on AWS (Am
         `os_snapshot_user_access_key_id`, `os_snapshot_user_access_key_secret` ([Ref link](/automate/managed_services/#prerequisites)).
         - Set `managed_rds_instance_url` as the URL with Port No. Example: `["database-1.c2kvay.eu-north-1.rds.amazonaws.com:5432"]`
         - Set `managed_rds_instance_url`, `managed_rds_superuser_username`, `managed_rds_superuser_password`, `managed_rds_dbuser_username`, `managed_rds_dbuser_password` from the Managed AWS RDS Postgresql which you created in the Prerequsite steps.
-        > **_NOTE:_**  The following special characters are not allowed in password ```  ‘ ` " ' \ ; ```.  
+        > **_NOTE:_**  The following special characters are not allowed in password ```  ‘ ` " ' \ ; $ ```.  
 
       - Set `ami_id`, this value depends on your AWS Region and the Operating System Image you want to use.
       - Please use the [Hardware Requirement Calculator sheet](/calculator/automate_ha_hardware_calculator.xlsx) to get information for which instance type you will need for your load.

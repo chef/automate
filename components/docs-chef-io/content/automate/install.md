@@ -156,7 +156,7 @@ Add the following to your `config.toml` for HTTPS connection:
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml
@@ -189,7 +189,7 @@ Add the following to your `config.toml` for HTTP connection:
 
 > **_NOTE:_**  The following special characters are not allowed in password.
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml
@@ -323,7 +323,7 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
 > **_NOTE:_**  The following special characters are not allowed in password.
     
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
     ```toml
@@ -362,7 +362,7 @@ Add the following settings to your `config.toml`:
 
 > **_NOTE:_**  The following special characters are not allowed in password.
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 

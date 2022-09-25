@@ -73,7 +73,7 @@ In Automate **4.x.y** version onwards, OpenSearch credentials are not stored in 
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```bash
@@ -144,7 +144,7 @@ sudo chef-automate config show > current_config.toml
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```bash

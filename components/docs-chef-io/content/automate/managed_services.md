@@ -168,7 +168,7 @@ Create `postgresql.toml` file and add the following details of your AWS PostgreS
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml
@@ -388,7 +388,7 @@ Add the following settings to your `config.toml`:
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml
@@ -425,7 +425,7 @@ Add the following to your `config.toml` file:
 
 > **_NOTE:_**  The following special characters are not allowed in password.  
 ```
-    ‘ ` " ' \ ;
+    ‘ ` " ' \ ; $
 ```
 
 ```toml
