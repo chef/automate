@@ -1,6 +1,7 @@
 package upgradeinspectorv4
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,4 +18,20 @@ func TestInspectEnsureStatus(t *testing.T) {
 	expected := "Please make sure all services are healthy by running chef-automate status"
 	assert.Error(t, err)
 	assert.Equal(t, expected, err.Error())
+}
+
+func TestInspectEnsureStatusError(t *testing.T) {
+	tw := NewTestWriter()
+	ds := NewEnsureStatusInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		GetServicesStatusFunc: func() (bool, error) {
+			return false, errors.New("unexpected")
+		},
+	})
+	err := ds.Inspect()
+	assert.Error(t, err)
+	err = ds.ExitHandler()
+	assert.NoError(t, err)
+	expected := "[Error] unexpected\nUpgrade process terminated.\n"
+	assert.Equal(t, expected, tw.Output())
+
 }

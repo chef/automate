@@ -63,3 +63,48 @@ func TestInspectDisableMaintenanceRollBackCalled(t *testing.T) {
 	err := dm.RollBackHandler()
 	assert.NoError(t, err)
 }
+
+func TestInspectDisableMaintenanceRollBackCalledWithErrorGet(t *testing.T) {
+	tw := NewTestWriter()
+	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, errors.New("unexpected")
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+	}, 10)
+	dm.isExecuted = true
+	err := dm.RollBackHandler()
+	assert.Error(t, err)
+}
+
+func TestInspectDisableMaintenanceRollBackCalledWithErrorSet(t *testing.T) {
+	tw := NewTestWriter()
+	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return true, nil
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", errors.New("unexpected")
+		},
+	}, 10)
+	dm.isExecuted = true
+	err := dm.RollBackHandler()
+	assert.Error(t, err)
+}
+
+func TestInspectDisableMaintenanceRollBackCalledMaintenanceAlreadyOff(t *testing.T) {
+	tw := NewTestWriter()
+	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, nil
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+	}, 10)
+	dm.isExecuted = true
+	err := dm.RollBackHandler()
+	assert.NoError(t, err)
+}

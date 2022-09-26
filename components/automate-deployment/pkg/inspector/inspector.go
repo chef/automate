@@ -23,6 +23,7 @@ type SystemInspection interface {
 }
 
 type RollbackInspection interface {
+	SystemInspection
 	RollBackHandler() error
 }
 

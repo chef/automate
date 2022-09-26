@@ -294,6 +294,34 @@ func TestInspectWithFailedApiCalls(t *testing.T) {
 	assert.Contains(t, err.Error(), expectedout)
 }
 
+func TestInspectWithFailedDelete(t *testing.T) {
+	tw := NewTestWriterWithInputs("1")
+	mockUtil := &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: IsExternal,
+		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
+			if methodType == "DELETE" {
+				return nil, errors.New("unexpected")
+			} else if strings.Contains(url, "index.version") {
+				return []byte(`{".non-automate":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},".automate":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},".locky":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
+			} else if strings.Contains(url, "indices") {
+				return []byte(INDEX_LIST), nil
+			} else {
+				return []byte{}, nil
+			}
+		},
+		GetESBasePathFunc: GetESBasePath,
+	}
+	ei := NewESIndexInspection(tw.CliWriter, mockUtil, GetESBasePath(10))
+
+	err := ei.Inspect()
+	assert.Error(t, err)
+	err = ei.ExitHandler()
+	assert.NoError(t, err)
+	expectedout := `[Error] unexpected
+Upgrade process terminated.`
+	assert.Contains(t, tw.Output(), expectedout)
+}
+
 func TestShouldDelete(t *testing.T) {
 	tw := NewTestWriterWithInputs("y", "w", "1")
 	mockUtil := &MockUpgradeV4UtilsImp{}

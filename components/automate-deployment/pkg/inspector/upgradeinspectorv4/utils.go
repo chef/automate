@@ -1,7 +1,6 @@
 package upgradeinspectorv4
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -13,18 +12,11 @@ import (
 	"github.com/chef/automate/api/config/load_balancer"
 	"github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
-	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-type DummyWriter struct {
-	WriteBuffer *bytes.Buffer
-	ReadBuffer  *bytes.Buffer
-	ErrorBuffer *bytes.Buffer
-	CliWriter   *cli.Writer
-}
 type UpgradeV4Utils interface {
 	IsExternalElasticSearch(timeout int64) bool
 	ExecRequest(url, methodType string, requestBody io.Reader) ([]byte, error)

@@ -167,7 +167,7 @@ func (ds *DiskSpaceInspection) skipOSDestCheck() {
 
 func (ds *DiskSpaceInspection) Skip() {
 	ds.writer.Printf(" ⊖  [Skipped]\t%s directory should have %.1fGB of free space\n", ds.habDir, ds.requiredHabSpace)
-	ds.writer.Printf(" ⊖  [Skipped]\t%s directory should have %.1fGB of free space\n", ds.osDestDir, ds.requiredOSDestSpace)
+	ds.skipOSDestCheck()
 }
 
 func (ds *DiskSpaceInspection) Inspect() error {

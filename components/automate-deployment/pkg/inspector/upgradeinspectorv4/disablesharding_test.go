@@ -29,3 +29,20 @@ func TestDisableShardingError(t *testing.T) {
 	err := ds.Inspect()
 	assert.Error(t, err)
 }
+
+func TestDisableShardingErrorExitHandlerMessage(t *testing.T) {
+	tw := NewTestWriter()
+	ds := NewDisableShardingInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
+			return nil, errors.New("Unreachable")
+		},
+	})
+	err := ds.Inspect()
+	assert.Error(t, err)
+	err = ds.ExitHandler()
+	assert.NoError(t, err)
+	expected := `[Error] Unreachable
+Upgrade process terminated.
+`
+	assert.Contains(t, tw.Output(), expected)
+}

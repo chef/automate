@@ -574,3 +574,73 @@ Upgrade process terminated.`
 	assert.Equal(t, 2, shardingCalledCount)
 	assert.Contains(t, tw.Output(), expected)
 }
+
+func TestUpgradeInspectorV4SkipAllEnsureStatusFailure(t *testing.T) {
+	tw := NewTestWriterWithInputs("y", "1")
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	shardingCalledCount := 0
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+		GetBackupS3URLFunc: func(timeout int64) (string, error) {
+			return "https://s3.us-east-1.amazonaws.com", nil
+		},
+		PatchS3backupURLFunc: func(timeout int64) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, errors.New("unreachable")
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetServicesStatusFunc: func() (bool, error) {
+			return false, nil
+		},
+		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
+			if strings.Contains(url, "_cluster/settings") {
+				shardingCalledCount++
+				return []byte{}, nil
+			} else if strings.Contains(url, "index.version") {
+				return []byte(`{"node-attribute":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},"comp-2-run-info":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
+			} else if strings.Contains(url, "_cluster/stats") {
+				return []byte(`{"indices":{"shards":{"total":51}}}`), nil
+			} else if strings.Contains(url, "indices") {
+				return []byte(INDEX_LIST), nil
+			} else {
+				return []byte{}, nil
+			}
+		},
+		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
+	}, mfs, 10)
+
+	ui.(*UpgradeInspectorV4).AddInspection(NewEnsureStatusInspection(ui.(*UpgradeInspectorV4).writer, ui.(*UpgradeInspectorV4).upgradeUtils))
+	diskSpaceInspection := NewDiskSpaceInspection(ui.(*UpgradeInspectorV4).writer, ui.(*UpgradeInspectorV4).upgradeUtils.IsExternalElasticSearch(ui.(*UpgradeInspectorV4).timeout), ui.(*UpgradeInspectorV4).osDestDir, ui.(*UpgradeInspectorV4).fileUtils)
+	diskSpaceInspection.osDestDir = "/home/ubuntu"
+	ui.AddInspection(diskSpaceInspection)
+	esBasePath := ui.(*UpgradeInspectorV4).upgradeUtils.GetESBasePath(ui.(*UpgradeInspectorV4).timeout)
+	ui.AddInspection(NewESIndexInspection(ui.(*UpgradeInspectorV4).writer, ui.(*UpgradeInspectorV4).upgradeUtils, esBasePath))
+
+	expected := `Pre flight checks
+ ⊖  [Skipped]	/hab directory should have 5.5GB of free space
+ ⊖  [Skipped]	/home/ubuntu directory should have 3.3GB of free space
+ ⊖  [Skipped]	Elasticsearch indices are in version 6
+
+[Error] Please make sure all services are healthy by running chef-automate status
+Upgrade process terminated.`
+
+	err := ui.ShowInfo()
+	assert.NoError(t, err)
+	ui.ShowInspectionList()
+	err = ui.Inspect()
+	assert.NoError(t, err)
+	err = ui.RollBackChangesOnError()
+	assert.NoError(t, err)
+	err = ui.RunExitAction()
+	assert.NoError(t, err)
+	assert.Contains(t, tw.Output(), expected)
+}
