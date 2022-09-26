@@ -1,5 +1,6 @@
 package reporting
 
+// NodeControlSummary
 type NodeControlSummary struct {
 	Total  int `json:"total"`
 	Passed struct {
@@ -19,6 +20,7 @@ type NodeControlSummary struct {
 	} `json:"waived"`
 }
 
+// ProfileMin
 type ProfileMin struct {
 	Name    string `json:"name"`
 	Title   string `json:"title"`

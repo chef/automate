@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
