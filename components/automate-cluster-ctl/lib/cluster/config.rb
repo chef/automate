@@ -90,6 +90,15 @@ module AutomateCluster
       default :postgresql_private_ips, []
     end
 
+    # Only applies to Object storage
+    config_context :object_storage do
+      default :bucket_name, ""
+      default :access_key, ""
+      default :secret_key, ""
+      default :endpoint, ""
+      default :region, ""
+    end
+
     # AWS Related
     config_context :aws do
       default :profile, 'default'

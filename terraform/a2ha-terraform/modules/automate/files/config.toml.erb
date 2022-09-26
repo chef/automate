@@ -171,8 +171,13 @@
   # max_retries = 3
   # use_throttle_retries = true
   # protocol = "https"
+
 [global.v1.backups]
   location = "s3"
+
+[global.v1.backups.s3.credentials]
+        access_key = "<%= overrides[:access_key] %>"
+        secret_key = "<%= overrides[:secret_key] %>"
 [global.v1.backups.s3.bucket]
   # name (required): The name of the bucket
   name = "<%= overrides[:bucket_name] %>"
@@ -193,10 +198,10 @@
 [global.v1.external.opensearch.backup.fs]
   # The `path.repo` setting you've configured on your Elasticsearch nodes must be
   # a parent directory of the setting you configure here:
-  path = "/mnt/automate_backups/opensearch"
+  path = "<%= overrides[:nfs_mount_path] %>/opensearch"
 
 [global.v1.backups.filesystem]
-  path = "/mnt/automate_backups/backups"
+  path = "<%= overrides[:nfs_mount_path] %>/backups"
 <% end %>
 
 <% if overrides[:automate_config_file] %>

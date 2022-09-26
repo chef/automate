@@ -152,6 +152,7 @@ type ExistingInfraConfigToml struct {
 			ExistingElkPassword         string `toml:"existing_elk_password"`
 			BackupMount                 string `toml:"backup_mount"`
 			HabitatUIDGid               string `toml:"habitat_uid_gid"`
+			BackupConfig                string `toml:"backup_config"`
 		} `toml:"existing_infra"`
 	} `toml:"architecture"`
 	Automate struct {
@@ -186,6 +187,15 @@ type ExistingInfraConfigToml struct {
 			PostgresqlPrivateIps []string `toml:"postgresql_private_ips"`
 		} `toml:"config"`
 	} `toml:"existing_infra"`
+	ObjectStorage struct {
+		Config struct {
+			BucketName string `toml:"bucket_name"`
+			AccessKey  string `toml:"access_key"`
+			SecretKey  string `toml:"secret_key"`
+			Endpoint   string `toml:"endpoint"`
+			Region     string `toml:"region"`
+		} `toml:"config"`
+	} `toml:"object_storage"`
 }
 
 func init() {
