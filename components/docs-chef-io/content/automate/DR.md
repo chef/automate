@@ -84,7 +84,7 @@ When a failure of the primary cluster occurs, failover can be accomplished throu
 
     - We don't recommend creating backups from the Disaster Recovery cluster unless it has become the active cluster and recieving traffic from the clients/nodes.
 
-    - Stop all the services on all Automate and Chef Ifnra frontend nodes using the following command:
+    - Stop all the services on all Automate and Chef Infra frontend nodes using the following command:
 
     ```sh
     systemctl stop chef-automate
