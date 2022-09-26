@@ -49,7 +49,7 @@ When a failure of the primary cluster occurs, failover can be accomplished throu
 1. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage](https://deploy-preview-7425--chef-automate.netlify.app/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
 
     {{< note >}}
-    Configure backups for both clusters using either [file system storage](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage (S3)](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
+    Configure backups for both clusters using either [file system](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage](https://deploy-preview-7425--chef-automate.netlify.app/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
     {{< /note >}}
 
 1. On Primary Cluster
