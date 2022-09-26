@@ -42,34 +42,34 @@ When a failure of the primary cluster occurs, failover can be accomplished throu
 
 ### Steps to setup the Production and Disaster Recovery Cluster
 
-1. Click [here](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine) to follow the steps for fresh deployment for Production cluster.
+1. Deploy the Primary cluster following the deployment instructions by [clicking here](/automate/ha_onprim_deployment_procedure/#Run-these-steps-on-Bastion-Host-Machine).
 
-1. Disaster Recovery Cluster will be the same as the Production cluster; we can use the above steps to set up the diisaster recovery cluster.
+1. Deploy the Disaster Recovery cluster into a different data center/region using the same steps as the Primary cluster
 
 1. Do the backup configuration as explained in backup section for [file system](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage](https://deploy-preview-7425--chef-automate.netlify.app/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
 
     {{< note >}}
-    Configure both the clusters with the same object storage or file system i.e. if the primary cluster is configured with object storage or file system, configure the disaster recovery cluster with the same object storage or file system.
+    Configure backups for both clusters using either [file system storage](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-file-system-backup) or [object storage (S3)](/automate/ha_backup_restore_prerequisites/#pre-backup-configuration-for-object-storage).
     {{< /note >}}
 
 1. On Primary Cluster
 
-    - In one of the Chef Automate nodes, configure the cron which triggers the `chef-automate backup` command at a certain interval. The sample cron for backup looks like:
+    - From one of the Chef Automate nodes, configure a cronjob to run the `chef-automate backup` command at a regular interval. The sample cron for backup looks like:
 
     ```sh
-    sudo chef-automate backup create
+    chef-automate backup create --no-progress > /var/log/automate-backups.log
     ```
 
-    - Create a bootstrap bundle and save it somewhere (or save it in the disaster recovery cluster). To create the bootstrap bundle, run the following command in one of the Automate nodes:
+    - Create a bootstrap bundle; this bundle captures any local credentials or secrets that aren't persisted to the database. To create the bootstrap bundle, run the following command in one of the Automate nodes:
 
     ```sh
     chef-automate bootstrap bundle create bootstrap.abb
     ```
 
-    - Copy `bootstrap.abb` to all Frontend nodes of DR Cluster.
+    - Copy `bootstrap.abb` to all Automate and Chef Infra frontend nodes in the Disaster Recovery cluster.
 
     {{< note >}}
-    - Suggested frequency of backup cron and restore cron is one hour, i.e., backup and restore in respective machines can be done as frequent as 1 hour.
+    - Suggested frequency of backup and restore jobs is one hour. Be sure to monitor backup times to ensure they can be completed in the available time.
     - Make sure the Restore cron always restores the latest backed-up data.
     - A cron job is a Linux command used to schedule a job that is executed periodically.
     {{< /note >}}
@@ -82,9 +82,9 @@ When a failure of the primary cluster occurs, failover can be accomplished throu
     sudo chef-automate bootstrap bundle unpack bootstrap.abb
     ```
 
-    - We do not recommend triggering the backup from the disaster recovery cluster unless it is switched as a primary cluster.
+    - We don't recommend creating backups from the Disaster Recovery cluster unless it has become the active cluster and recieving traffic from the clients/nodes.
 
-    - Stop all the services on all the frontend nodes using the following command:
+    - Stop all the services on all Automate and Chef Ifnra frontend nodes using the following command:
 
     ```sh
     systemctl stop chef-automate
@@ -102,7 +102,7 @@ When a failure of the primary cluster occurs, failover can be accomplished throu
 
         - To run the restore command, you need the airgap bundle. Get the Automate HA airgap bundle from the location `/var/tmp/` in Automate instance. For example: `frontend-4.x.y.aib`.
 
-        - In case the airgap bundle is not present at `/var/tmp`, the same can be copied from the bastion node to the Automate node.
+        - In case the airgap bundle is not present at `/var/tmp`, it can be copied from the bastion node to the Automate frontend node
 
         - Run the command at the Automate node of Automate HA cluster to get the applied config:
 
