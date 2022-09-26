@@ -86,7 +86,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
     this.current_page = 1;
     this.loading = true;
     this.searchValue = currentText;
-    if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
+    if ( currentText !== ''  &&
+      !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN_AND_DOT.test(currentText)) {
       this.loading = false;
       this.clients.length = 0;
       this.total = 0;

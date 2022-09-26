@@ -19,6 +19,13 @@ export class Regex {
     // Allows no special characters except hyphen and underscore.
     NO_WILDCARD_ALLOW_HYPHEN: /^[0-9a-zA-Z-_]+$/,
 
+    // Only allows words or numbers or hyphen or underscore or dot also combined
+    // Note: the first character should not be dot(.).
+    // Legal Values: _, -, chef, _state, -chef, test-23-23.com-1.test.com etc.
+    // Illegal Values: .chef, *chef, ., c*h*e*f, **, * chef
+    // Allows no special characters except hyphen, underscore and dot(.).
+    NO_WILDCARD_ALLOW_HYPHEN_AND_DOT: /^[0-9a-zA-Z-_]+[0-9a-zA-Z-_.]*$/,
+
     // Only allows wildcard alone or words and numbers, but not combined
     // Legal Values: *, chef, _state, etc.
     // Illegal Values: abc*, *chef, c*h*e*f, **
