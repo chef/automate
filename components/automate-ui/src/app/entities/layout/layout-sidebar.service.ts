@@ -229,7 +229,7 @@ export class LayoutSidebarService {
                 icon: 'security',
                 route: '/settings/sso',
                 authorized: { // using /policies until /sso is there or else it wont show.
-                  allOf: ['/apis/iam/v2/policies', 'get']
+                  allOf: ['/api/v0/sso/config', 'get']
                 }
               }
             ]
