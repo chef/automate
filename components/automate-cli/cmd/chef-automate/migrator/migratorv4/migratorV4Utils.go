@@ -1,6 +1,7 @@
 package migratorV4
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -8,40 +9,33 @@ import (
 
 	"github.com/chef/automate/api/config/deployment"
 	opensearch "github.com/chef/automate/api/config/opensearch"
+	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector/upgradeinspectorv4"
+	"github.com/chef/automate/components/automate-deployment/pkg/target"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/platform/sys"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
-	MAX_OPEN_FILE_DEFAULT  = "65535"
-	MAX_LOCKED_MEM_DEFAULT = "unlimited"
-	MAX_OPEN_FILE_KEY      = "Max open files"
-	MAX_LOCKED_MEM_KEY     = "Max locked memory"
-
-	INDICES_TOTAL_SHARD_DEFAULT         = 2000
-	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT = "95"
-
+	MAX_OPEN_FILE_DEFAULT                 = "65535"
+	MAX_LOCKED_MEM_DEFAULT                = "unlimited"
+	MAX_OPEN_FILE_KEY                     = "Max open files"
+	MAX_LOCKED_MEM_KEY                    = "Max locked memory"
+	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT   = "95"
 	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 500
-
-	MAX_POSSIBLE_HEAP_SIZE = 32
-
-	V3ESSettingFile               = "/hab/svc/deployment-service/old_es_v3_settings.json"
-	AutomateOpensearchConfigPatch = "/hab/svc/deployment-service/oss-config.toml"
-
-	heapSizeExceededError   = `heap size : %s, max allowed is (50%% of ram = %dgb) but not exceeding %dgb`
-	shardCountExceededError = `total shards per node : %d, max allowed is %d, 
+	MAX_POSSIBLE_HEAP_SIZE                = 32
+	AutomateOpensearchConfigPatch         = "/hab/svc/deployment-service/oss-config.toml"
+	heapSizeExceededError                 = `heap size : %s, max allowed is (50%% of ram = %dgb) but not exceeding %dgb`
+	shardCountExceededError               = `total shards per node : %d, max allowed is %d, 
 having this more than %d decreases perfomance to avoid breaching this limit, 
 you can reduce data retention policy`
 	errorUserConcent = `we recommend you to move to external/managed Opensearch cluster for better performance.
 but if you still want to continue with the upgrade`
-
-	upgradeFailed = "due to pre-condition check failed"
-	ELASTICSEARCH_DATA_DIR      = "/hab/svc/automate-elasticsearch/data"
-	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"
-
-
+	upgradeFailed          = "due to pre-condition check failed"
+	ELASTICSEARCH_DATA_DIR = "/hab/svc/automate-elasticsearch/data"
+	ELASTICSEARCH_VAR_DIR  = "/hab/svc/automate-elasticsearch/var"
 )
 
 type MigratorV4Utils interface {
@@ -52,6 +46,7 @@ type MigratorV4Utils interface {
 	GetDefaultOpensearchSettings() *ESSettings
 	GetEsTotalShardSettings() (int32, error)
 	PatchOpensearchConfig(*ESSettings) (string, string, error)
+	IsExternalElasticSearch(timeout int64) bool
 }
 
 type ESSettings struct {
@@ -130,13 +125,13 @@ func (m *MigratorV4UtilsImpl) GetDefaultOpensearchSettings() *ESSettings {
 	defaultSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
 	defaultSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
 	defaultSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT
-	defaultSettings.TotalShardSettings = INDICES_TOTAL_SHARD_DEFAULT
+	defaultSettings.TotalShardSettings = majorupgrade_utils.INDICES_TOTAL_SHARD_DEFAULT
 	return defaultSettings
 }
 
 func (m *MigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
 	esSetting := &ESSettings{}
-	jsonData, err := ioutil.ReadFile(V3ESSettingFile) // nosemgrep
+	jsonData, err := ioutil.ReadFile(majorupgrade_utils.V3_ES_SETTING_FILE) // nosemgrep
 	if err != nil {
 		return -1, err
 	}
@@ -184,4 +179,37 @@ func dirExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func (m *MigratorV4UtilsImpl) IsExternalElasticSearch(timeout int64) bool {
+	return majorupgrade_utils.IsExternalElasticSearch(timeout)
+}
+
+func isDevMode() bool {
+	return os.Getenv("CHEF_DEV_ENVIRONMENT") == "true"
+}
+
+func (m *MigratorV4UtilsImpl) StopAutomate() error {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return err
+	}
+
+	if isDevMode() {
+		_, err = connection.Stop(context.Background(), &api.StopRequest{})
+		if err != nil {
+			return err
+		}
+	} else {
+		// In the non studio case, it is important to ask systemd to perform the stop.
+		// There is currently a bug in habitat where it's possible for hab-launch to
+		// stay alive: https://github.com/habitat-sh/habitat/issues/5783
+		// The deployment-service converger does its best to work around this issue,
+		// but for extra safety, trigger the stop through systemctl.
+		t := target.NewLocalTarget(true)
+		if err := t.EnsureStopped(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

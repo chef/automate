@@ -1,7 +1,12 @@
 package migrator
 
 type Migrator interface {
-	PreMigration() error
+	AskForConfirmation()
+	AddMigrationSteps(migrationSteps MigrationSteps)
+	Execute() error
+}
+
+type MigrationSteps interface {
 	Run() error
-	PostMigration() error
+	Skip() error
 }
