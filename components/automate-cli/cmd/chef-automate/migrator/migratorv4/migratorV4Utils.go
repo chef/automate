@@ -3,9 +3,11 @@ package migratorV4
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"strings"
+	"syscall"
 
 	"github.com/chef/automate/api/config/deployment"
 	opensearch "github.com/chef/automate/api/config/opensearch"
@@ -14,7 +16,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector/upgradeinspectorv4"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/majorupgrade_utils"
-	"github.com/chef/automate/lib/platform/sys"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -42,11 +43,12 @@ type MigratorV4Utils interface {
 	CreateMigrationMetadata() error
 	ReadMigrationMetadata() error
 	UpdateMigrationMetadata() error
-	PatchOpensearchSettings() error
-	GetDefaultOpensearchSettings() *ESSettings
 	GetEsTotalShardSettings() (int32, error)
 	PatchOpensearchConfig(*ESSettings) (string, string, error)
 	IsExternalElasticSearch(timeout int64) bool
+	StopAutomate() error
+	StartAutomate() error
+	GetHabRootPath(habrootcmd string) string
 }
 
 type ESSettings struct {
@@ -73,20 +75,6 @@ func (m *MigratorV4UtilsImpl) ReadMigrationMetadata() error {
 }
 
 func (m *MigratorV4UtilsImpl) UpdateMigrationMetadata() error {
-	return nil
-}
-
-func (m *MigratorV4UtilsImpl) PatchOpensearchSettings() error {
-	opensearchSettings := m.GetDefaultOpensearchSettings()
-	esTotalShards, err := m.GetEsTotalShardSettings()
-	if err != nil {
-		return err
-	}
-	opensearchSettings.TotalShardSettings = m.GetOverrideTotalShards(esTotalShards, opensearchSettings.TotalShardSettings)
-	_, _, err = m.PatchOpensearchConfig(opensearchSettings)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -119,16 +107,6 @@ func (m *MigratorV4UtilsImpl) PatchOpensearchConfig(osConfig *ESSettings) (strin
 	return tw.WriteBuffer.String(), tw.ErrorBuffer.String(), nil
 }
 
-func (m *MigratorV4UtilsImpl) GetDefaultOpensearchSettings() *ESSettings {
-	defaultSettings := &ESSettings{}
-	defaultSettings.HeapMemory = fmt.Sprintf("%d", defaultHeapSizeInGB())
-	defaultSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
-	defaultSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
-	defaultSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT
-	defaultSettings.TotalShardSettings = majorupgrade_utils.INDICES_TOTAL_SHARD_DEFAULT
-	return defaultSettings
-}
-
 func (m *MigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
 	esSetting := &ESSettings{}
 	jsonData, err := ioutil.ReadFile(majorupgrade_utils.V3_ES_SETTING_FILE) // nosemgrep
@@ -140,22 +118,6 @@ func (m *MigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
 		return -1, err
 	}
 	return esSetting.TotalShardSettings, nil
-}
-
-func (m *MigratorV4UtilsImpl) GetOverrideTotalShards(esShardSetting, osShardSetting int32) int32 {
-	if esShardSetting > osShardSetting {
-		return esShardSetting
-	} else {
-		return osShardSetting
-	}
-}
-
-func defaultHeapSizeInGB() int {
-	sysMem, err := sys.SystemMemoryKB()
-	if err != nil {
-		sysMem = 0
-	}
-	return opensearch.RecommendedHeapSizeGB(sysMem)
 }
 
 func preRequisteForESDataMigration() (bool, error) {
@@ -194,22 +156,70 @@ func (m *MigratorV4UtilsImpl) StopAutomate() error {
 	if err != nil {
 		return err
 	}
-
 	if isDevMode() {
 		_, err = connection.Stop(context.Background(), &api.StopRequest{})
 		if err != nil {
 			return err
 		}
 	} else {
-		// In the non studio case, it is important to ask systemd to perform the stop.
-		// There is currently a bug in habitat where it's possible for hab-launch to
-		// stay alive: https://github.com/habitat-sh/habitat/issues/5783
-		// The deployment-service converger does its best to work around this issue,
-		// but for extra safety, trigger the stop through systemctl.
 		t := target.NewLocalTarget(true)
 		if err := t.EnsureStopped(); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (m *MigratorV4UtilsImpl) StartAutomate() error {
+	if isDevMode() {
+		if err := exec.Command("hab", "sup", "status").Run(); err == nil {
+			return nil
+		}
+
+		if err := os.MkdirAll("/hab/sup/default", 0755); err != nil {
+			return err
+		}
+		out, err := os.Create("/hab/sup/default/sup.log")
+		if err != nil {
+			return err
+		}
+		startSupCmd := exec.Command("hab", "sup", "run")
+		startSupCmd.Env = os.Environ()
+		startSupCmd.Env = append(startSupCmd.Env,
+			"DS_DEV=true",
+			"CHEF_AUTOMATE_SKIP_SYSTEMD=true",
+			"HAB_LICENSE=accept-no-persist",
+		)
+		startSupCmd.Stdout = out
+		startSupCmd.Stderr = out
+		startSupCmd.SysProcAttr = &syscall.SysProcAttr{
+			Setpgid: true,
+		}
+		if err := startSupCmd.Start(); err != nil {
+			return err
+		}
+	} else {
+		systemctlCmd := exec.Command("systemctl", "start", "chef-automate.service")
+		systemctlCmd.Stdout = os.Stdout
+		systemctlCmd.Stderr = os.Stderr
+		if err := systemctlCmd.Run(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *MigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
+	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
+	if err != nil {
+		return "/hab/"
+	}
+	pkgPath := string(out)
+	habIndex := strings.Index(string(pkgPath), "hab")
+	rootHab := pkgPath[0 : habIndex+4]
+	if rootHab == "" {
+		rootHab = "/hab/"
+	}
+	return rootHab
 }
