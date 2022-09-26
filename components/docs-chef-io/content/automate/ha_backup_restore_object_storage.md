@@ -1,5 +1,5 @@
 +++
-title = "Backup and restore using Filesystem | On-Permise Deployment"
+title = "Backup and restore using Object Storage | On-Permise Deployment"
 
 draft = false
 
@@ -26,9 +26,7 @@ weight = 210
 
 ## Overview
 
-A shared file system is always required to create **OpenSearch** snapshots. To register the snapshot repository using OpenSearch, it is necessary to mount the same shared filesystem to the exact location on all master and data nodes. Register the location (or one of its parent directories) in the `path.repo` setting on all master and data nodes.
-
-### Setting up backup configuration
+This section provides the pre-backup configuration required to backup the data on Object Storage System (Other than AWS S3) like Minio, Non-AWS S3. The steps to set a secret key using commands are given below:
 
 #### Configuration in Opensearch Node
 
@@ -218,7 +216,7 @@ Restore operation restores all the data while the backup is going on. The restor
 
 #### Restoring the Backed-up Data from Object Storage
 
-To restore backed-up data of the Chef Automate High Availability (HA) using External File System (EFS), follow the steps given below:
+To restore backed-up data of the Chef Automate High Availability (HA) using External Object Storage, follow the steps given below:
 
 -   Check the status of all Chef Automate and Chef Infra Server front-end nodes by executing the `chef-automate status` command.
 

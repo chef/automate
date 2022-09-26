@@ -105,8 +105,16 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
    - Give `ssh_key_file` path, this key should have access to all the Machines or VM's.
    - `sudo_password` is only meant to switch to sudo user. If you have configured password for sudo user, please provide it here.
    - We support only private key authentication.
+   - Provide `backup_config` value as either `object_storage` or `file_system` to add backup config. If `backup_config="object_storage"`, the make sure to fill out config value of object storage in `[object_storage.config]`.
    - Give `fqdn` as the DNS entry of Chef Automate, which LoadBalancer redirects to Chef Automate Machines or VM's. Example: `chefautomate.example.com`
    - Set the `admin_password` to what you want to use to login to Chef Automate, when you open up `chefautomate.example.com` in the Browser, for the username `admin`.
+
+{{< note >}}
+
+- When user choose `file_system` as `backup_config` make sure to mount the file system to the desired `backup_mount` path before deployment in all the Front-end and Back-end node. 
+- If deployment is already initialted before mounting, then once the deployment is compled, make sure to restart the automate node by running `chef-automate restart-services` to properly configure backup mount path in the Front-end nodes.
+
+{{< /note >}}
 
 3. Continue with the deployment after updating config:
 
@@ -130,6 +138,7 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 {{< note >}}
 
 - Assuming 10+1 nodes (1 bastion, 2 for automate UI, 2 for Chef-server, 3 for Postgresql, 3 for Opensearch)
+- Following sample will not add any backup configuration.
 
 {{< /note >}}
 
