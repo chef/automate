@@ -26,9 +26,8 @@ func NewEnsureStatusInspection(w *cli.Writer, upgradeUtils UpgradeV4Utils) *Ensu
 func (es *EnsureStatusInspection) ShowInfo(index *int) error {
 	return nil
 }
-func (es *EnsureStatusInspection) Skip() {
-	return
-}
+func (es *EnsureStatusInspection) Skip() {}
+
 func (es *EnsureStatusInspection) GetShortInfo() []string {
 	return nil
 }
