@@ -2,6 +2,7 @@ package upgradeinspectorv4
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
@@ -123,7 +124,7 @@ func (ses *StoreESSettingsInspection) storeESSettings(esSettings *ESSettings) er
 
 func (ses *StoreESSettingsInspection) ExitHandler() error {
 	if ses.exitedWithError {
-		ses.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ses.exitError.Error())
+		ses.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", ses.exitError).Error())
 		ses.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil

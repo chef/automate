@@ -1,6 +1,7 @@
 package upgradeinspectorv4
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -80,7 +81,7 @@ func (ds *DisableShardingInspection) GetInstallationType() inspector.Installatio
 
 func (ds *DisableShardingInspection) ExitHandler() error {
 	if ds.exitedWithError {
-		ds.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ds.exitError.Error())
+		ds.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", ds.exitError).Error())
 		ds.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
