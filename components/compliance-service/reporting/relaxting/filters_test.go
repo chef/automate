@@ -2,8 +2,9 @@ package relaxting
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var esr = ES2Backend{
@@ -16,7 +17,6 @@ var esr = ES2Backend{
 var dummyTime = "2022-07-18T08:14:26Z"
 
 func TestFiltersForControlIndex(t *testing.T) {
-
 	startTime := "2022-07-17T00:00:00Z"
 	endTime := "2022-07-18T23:59:59Z"
 	tests := []struct {
