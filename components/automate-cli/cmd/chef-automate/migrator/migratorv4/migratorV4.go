@@ -61,3 +61,9 @@ func (m *MigratorV4) AskForConfirmation() (bool, error) {
 	m.migrationConsent = res
 	return res, nil
 }
+
+func (m *MigratorV4) AddDefaultMigrationSteps() {
+	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewPatchOSConfig(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils))
+}
