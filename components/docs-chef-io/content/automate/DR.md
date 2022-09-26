@@ -12,24 +12,33 @@ gh_repo = "automate"
     weight = 220
 +++
 
-## How To SetUp Disaster Recovery Cluster For OnPrem Deployment
+## Setup Disaster Recovery Cluster For OnPrem Deployment
 
-Suppose the Frequency of Data Sync between the Live System(Production cluster) and DR ranges between a few hours. In that case, we have an option that utilizes the regular backup and restores cadence, which syncs data from the Production cluster to the disaster recovery cluster. Typically these two clusters should be located in different data centers or cloud provider regions.
+Recovery Point Objective (RPO) is the maximum acceptable amount of time since the last data recovery point, if an RPO of 1 to 24 hours is acceptable then using a typical backup and restore strategy for your disaster recovery plan is recommended.
+Typically these two clusters should be located in different data centers or cloud provider regions.
 
-In the above approach, you have to run 2 Parallel Clusters of the same capacity.
+### Requirements
+
+1. Two identical clusters located in different data centers or cloud provider regions
+1. Network accessible storage (NAS), object store (S3), available in both data centers/regions
+1. Ability to schedule jobs to run backup and restore commands in both clusters. We recommend using corn or a similar tool like anacron.
+
+In the above approach, there will be 2 identical clusters
 
 - Primary Cluster (or Production Cluster)
 - Disaster Recovery Cluster
 
-![DR SetUp with 2 Parallel Cluster](/images/automate/DR-2-cluster.png)
+![Disaster Recovery Setup with 2 Identical Clusters](/images/automate/DR-2-cluster.png)
 
-The primary cluster will be in use and take the backup regularly with the `chef-automate backup create` command. At the same time, the disaster recovery cluster will be restoring the latest backup data via the `chef-automate backup restore` command.
-In case of Primary Cluster Failure, we can change the DNS routing to DR Cluster.
+The primary cluster will be active and regular backups will be performed using `chef-automate backup create`. At the same time, the disaster recovery cluster will be restoring the latest backup data using `chef-automate backup restore`.
+
+When a failure of the primary cluster occurs, failover can be accomplished through updating DNS records to the DR cluster, alternatively, many commercial load balancers can be configured to handle routing traffic to a DR cluster in the event of a failure.
 
 ### Caveat with the above approach
 
 - Running two parallel clusters can be expensive.
-- Data is available till the last backup is performed.
+- The amount of data loss will depend on how frequently backups are performed in the Primary cluster.
+- Changing DNS records from the Primary loadbalancer to the Disaster Recovery loadbalancer can take time to propagate through the network.
 
 ### Steps to setup the Production and Disaster Recovery Cluster
 
