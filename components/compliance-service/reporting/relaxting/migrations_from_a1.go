@@ -20,10 +20,6 @@ type A1ElasticSearchIndices struct {
 	backend *ES2Backend
 }
 
-func (migratable A1ElasticSearchIndices) migrateCompRunInfo() error {
-	return nil
-}
-
 func (migratable A1ElasticSearchIndices) getSourceSummaryIndexPrefix() string {
 	return a1SumIndexPrefix
 }

@@ -7,27 +7,9 @@ import (
 )
 
 type ESComplianceRunInfo struct {
-	NodeID       string    `json:"node_uuid"`
-	ResourceId   string    `json:""`
-	ResourceType string    `json:""`
-	Status       string    `json:"status"`
-	FirstRun     time.Time `json:"first_run"`
-	LastRun      time.Time `json:"last_run"`
-	Platform     struct {
-		Name    string `json:"name"`
-		Release string `json:"release"`
-		Full    string `json:"full"`
-	} `json:"platform_version"`
-	ChefServer    string           `json:"chef_server"`
-	Organization  string           `json:"organization"`
-	InspecVersion string           `json:"version"`
-	PolicyName    string           `json:"policy_name"`
-	Profiles      []ProfileRunInfo `json:"profiles"`
-	Recipe        []string         `json:"recipes"`
-	Role          []string         `json:"roles"`
-	ChefTags      []string         `json:"chef_tags"`
-	Environment   string           `json:"environment"`
-	PolicyGroup   string           `json:"policy_group"`
+	NodeID   string    `json:"node_uuid"`
+	FirstRun time.Time `json:"first_run"`
+	LastRun  time.Time `json:"last_run"`
 }
 
 // Used to unmarshal summary documents stored in comp-s-* ElasticSearch indices
@@ -307,9 +289,9 @@ type NodeListWithAggregatedComplianceSummary struct {
 }
 
 type ReportId struct {
-	ID       string `json:"id"`
-	NodeUuid string `json:"node_uuid"`
-	EndTime  string `json:"end_time"`
+	ID string `json:"id"`
+	// NodeUuid string `json:"node_uuid"`
+	EndTime string `json:"end_time"`
 }
 
 type TimeBucketedReportIds struct {
@@ -326,26 +308,26 @@ type EndTimeSource struct {
 	EndTime time.Time `json:"end_time"`
 }
 
-type AssetSummary struct {
-	Passed  int32 `json:"passed"`
-	Skipped int32 `json:"skipped"`
-	Failed  int32 `json:"failed"`
-	Waived  int32 `json:"waived"`
-}
+// type AssetSummary struct {
+// 	Passed  int32 `json:"passed"`
+// 	Skipped int32 `json:"skipped"`
+// 	Failed  int32 `json:"failed"`
+// 	Waived  int32 `json:"waived"`
+// }
 
-type ProfileRunInfo struct {
-	SHA256   string           `json:"sha256"`
-	Controls []ControlRunInfo `json:"controls"`
-	Name     string           `json:"name"`
-	Title    string           `json:"title"`
-	Full     string           `json:"full"`
-}
+// type ProfileRunInfo struct {
+// 	SHA256   string           `json:"sha256"`
+// 	Controls []ControlRunInfo `json:"controls"`
+// 	Name     string           `json:"name"`
+// 	Title    string           `json:"title"`
+// 	Full     string           `json:"full"`
+// }
 
-type ControlRunInfo struct {
-	ID          string                            `json:"id"`
-	ControlTags []ESInSpecReportControlStringTags `json:"control_tags"`
-}
+// type ControlRunInfo struct {
+// 	ID          string                            `json:"id"`
+// 	ControlTags []ESInSpecReportControlStringTags `json:"control_tags"`
+// }
 
-type FirstRunInfo struct {
-	FirstRun string `json:"first_run""`
-}
+// type FirstRunInfo struct {
+// 	FirstRun string `json:"first_run""`
+// }

@@ -10,9 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/dao/pgdb"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
@@ -26,7 +23,7 @@ type ES2Backend struct {
 	Enterprise        string
 	ChefDeliveryUser  string
 	ChefDeliveryToken string
-	PGdb              *pgdb.DB
+	// PGdb              *pgdb.DB
 }
 
 // ReportingTransport structure for Automate login
@@ -306,32 +303,32 @@ func FetchLatestDataOrNot(filters map[string][]string) bool {
 	return latestOnly
 }
 
-func getRunInfoIndex() string {
-	return mappings.ComplianceRunInfo.Index
-}
+// func getRunInfoIndex() string {
+// 	return mappings.ComplianceRunInfo.Index
+// }
 
-func ValidateTimeRangeForFilters(startTime string, endTime string) error {
-	if len(startTime) <= 0 {
-		logrus.Errorf("Startime cannot be null")
-		return errors.Errorf("StartTime cannot be null")
-	} else if startTime > endTime {
-		logrus.Errorf("Start time cannot be greater than end time")
-		return errors.Errorf("Start time cannot be greater than end time")
-	}
-	eTime, err := time.Parse(time.RFC3339, endTime)
-	sTime, err := time.Parse(time.RFC3339, startTime)
-	diff := int(eTime.Sub(sTime).Hours() / 24)
-	if err != nil {
-		logrus.Errorf("Error while getting the start time and end time diffrence:  %v", err)
-		return err
-	}
-	if diff > 90 {
-		logrus.Errorf("The diffrence between the startTime and endTime should not exceed 90 Days")
-		return errors.Errorf("The diffrence between the startTime and endTime should not exceed 90 Days")
-	}
-	if diff == 0 {
-		logrus.Errorf("The start time and end time should not be equal")
-		return errors.Errorf("The start time and end time should not be equal")
-	}
-	return nil
-}
+// func ValidateTimeRangeForFilters(startTime string, endTime string) error {
+// 	if len(startTime) <= 0 {
+// 		logrus.Errorf("Startime cannot be null")
+// 		return errors.Errorf("StartTime cannot be null")
+// 	} else if startTime > endTime {
+// 		logrus.Errorf("Start time cannot be greater than end time")
+// 		return errors.Errorf("Start time cannot be greater than end time")
+// 	}
+// 	eTime, err := time.Parse(time.RFC3339, endTime)
+// 	sTime, err := time.Parse(time.RFC3339, startTime)
+// 	diff := int(eTime.Sub(sTime).Hours() / 24)
+// 	if err != nil {
+// 		logrus.Errorf("Error while getting the start time and end time diffrence:  %v", err)
+// 		return err
+// 	}
+// 	if diff > 90 {
+// 		logrus.Errorf("The diffrence between the startTime and endTime should not exceed 90 Days")
+// 		return errors.Errorf("The diffrence between the startTime and endTime should not exceed 90 Days")
+// 	}
+// 	if diff == 0 {
+// 		logrus.Errorf("The start time and end time should not be equal")
+// 		return errors.Errorf("The start time and end time should not be equal")
+// 	}
+// 	return nil
+// }

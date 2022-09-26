@@ -18,7 +18,7 @@ import (
 func StoreCompliance(client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
 	logrus.Debugf("StoreCompliance started with numberOfPublishers = %d", numberOfPublishers)
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
-		out := make(chan message.Compliance, 50)
+		out := make(chan message.Compliance, 100)
 
 		for i := 0; i < numberOfPublishers; i++ {
 			go storeCompliance(in, out, client, i)
@@ -108,7 +108,6 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient) <-cha
 			out <- nil
 		}
 		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
-		logrus.Infof("Enqueue workflow started at %v", time.Now())
 
 		close(out)
 	}()

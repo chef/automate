@@ -1017,8 +1017,8 @@ func getReportsDailyLatestTrueResult(searchResult *elastic.SearchResult, reports
 
 			}
 			reportsMap[report.ID] = report.EndTime
-			if _, found := nodesMap[report.NodeUuid]; !found {
-				nodesMap[report.NodeUuid] = report
+			if _, found := nodesMap[report.ID]; !found {
+				nodesMap[report.ID] = report
 				latestReports[report.ID] = true
 			}
 		}

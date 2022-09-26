@@ -27,7 +27,7 @@ automate_license = ENV['AUTOMATE_LICENSE']
 automate_license_path = '../dev/license.jwt'
 automate_channel = 'dev'
 automate_build = 'latest'
-manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/latest_semver.json"
+manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
 es_ebs_snapshot = ''
 
 def extract_from_manifest(manifest, build)

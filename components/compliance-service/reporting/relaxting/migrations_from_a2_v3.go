@@ -18,10 +18,6 @@ type A2V3ElasticSearchIndices struct {
 	backend *ES2Backend
 }
 
-func (migratable A2V3ElasticSearchIndices) migrateCompRunInfo() error {
-	return nil
-}
-
 func (migratable A2V3ElasticSearchIndices) getSourceSummaryIndexPrefix() string {
 	return a2V3SumIndexPrefix
 }

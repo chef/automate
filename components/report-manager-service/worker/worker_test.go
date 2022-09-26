@@ -784,7 +784,7 @@ func dialer(t *testing.T) func(context.Context, string) (net.Conn, error) {
 
 	server := grpc.NewServer()
 
-	reporting.RegisterReportingServiceServer(server, &mockReportingServer{T: t})
+	reporting.RegisterReportingServiceServer(server, &mockReportingServer{})
 
 	go func() {
 		if err := server.Serve(listener); err != nil {
@@ -937,20 +937,20 @@ func (m *mockReportingServer) GetReportContent(context.Context, *reporting.Repor
 	}, nil
 }
 
-func (m *mockReportingServer) AssetCount(context.Context, *reporting.ListFilters) (*reporting.AssetSummary, error) {
-	return nil, nil
-}
-func (m *mockReportingServer) ListAsset(context.Context, *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
-	return nil, nil
-}
+// func (m *mockReportingServer) AssetCount(context.Context, *reporting.ListFilters) (*reporting.AssetSummary, error) {
+// 	return nil, nil
+// }
+// func (m *mockReportingServer) ListAsset(context.Context, *reporting.AssetListRequest) (*reporting.AssetListResponse, error) {
+// 	return nil, nil
+// }
 
-func (m *mockReportingServer) SetAssetConfig(context.Context, *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
-	return nil, nil
-}
-func (m *mockReportingServer) GetAssetConfig(context.Context, *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
-	return nil, nil
-}
+// func (m *mockReportingServer) SetAssetConfig(context.Context, *reporting.ComplianceConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+// 	return nil, nil
+// }
+// func (m *mockReportingServer) GetAssetConfig(context.Context, *reporting.GetAssetConfigRequest) (*reporting.ComplianceConfigResponse, error) {
+// 	return nil, nil
+// }
 
-func (m *mockReportingServer) ListControlItemsRange(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
-	return nil, nil
-}
+// func (m *mockReportingServer) ListControlItemsRange(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+// 	return nil, nil
+// }

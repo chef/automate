@@ -79,7 +79,7 @@ var (
 	PurgeScheduleName = "periodic_purge"
 )
 
-func createESBackend(servConf *config.Compliance, db *pgdb.DB) relaxting.ES2Backend {
+func createESBackend(servConf *config.Compliance) relaxting.ES2Backend {
 
 	// define the ElasticSearch backend config with legacy automate auth
 	esr := relaxting.ES2Backend{
@@ -87,7 +87,6 @@ func createESBackend(servConf *config.Compliance, db *pgdb.DB) relaxting.ES2Back
 		Enterprise:        servConf.Delivery.Enterprise,
 		ChefDeliveryUser:  servConf.Delivery.User,
 		ChefDeliveryToken: servConf.Delivery.Token,
-		PGdb:              db,
 	}
 	return esr
 }
@@ -113,7 +112,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, statusserver.MigrationCompletedMsg)
 
 	// create esconfig info backend
-	esr = createESBackend(conf, db)
+	esr = createESBackend(conf)
 
 	backendCacheBool, err := strconv.ParseBool(conf.InspecAgent.BackendCache)
 	if err != nil {
@@ -214,7 +213,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient,
-		conf.Service.LcrOpenSearchRequests, db))
+		conf.Service.LcrOpenSearchRequests))
 
 	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv)
 	profiles.RegisterProfilesServiceServer(s, ps)
