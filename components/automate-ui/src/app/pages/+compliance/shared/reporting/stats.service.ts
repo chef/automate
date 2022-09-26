@@ -91,7 +91,6 @@ export class StatsService {
 
   getSummary(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/summary`;
-    // reportQuery = this.getStartDate(reportQuery);
     const body = { filters: this.formatFilters(reportQuery) };
 
     return this.httpClient.post<any>(url, body).pipe(

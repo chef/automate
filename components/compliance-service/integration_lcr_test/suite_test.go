@@ -76,12 +76,6 @@ func NewGlobalSuite() *Suite {
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
 	s.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.PublishResponse{}, nil)
-	// cereal, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
-	// if err != nil {
-	// 	fmt.Printf("could not create job manager %v", err)
-	// }
-	// err = processor.InitCerealManager(cereal, 2, s.ingesticESClient)
-	// cereal.Start(context.TODO())
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, nil, "", s.NotifierMock,
 		s.ProjectsClientMock, 100, false)
@@ -111,12 +105,6 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.NotifierMock = &NotifierMock{}
 	s.ReportServiceClientMock = report_manager.NewMockReportManagerServiceClient(gomock.NewController(t))
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
-	// cereal, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
-	// if err != nil {
-	// 	fmt.Printf("could not create job manager %v", err)
-	// }
-	// err = processor.InitCerealManager(cereal, 2, s.ingesticESClient)
-	// cereal.Start(context.TODO())
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, s.ReportServiceClientMock, "", s.NotifierMock,
 		s.ProjectsClientMock, 100, false)
