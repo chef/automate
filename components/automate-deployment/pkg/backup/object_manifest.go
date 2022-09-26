@@ -164,18 +164,19 @@ func (v *verifiedReader) Close() error {
 func newVerifiedReader(objectName string, r BlobReader, o ObjectVerifier) (io.ReadCloser, error) {
 	f, err := ioutil.TempFile("", "chef-automate-restore-staged-file")
 	logrus.Info("_progress_ : object_manifest.go : 0 : 166 : err: ", err)
-	logrus.Info("_progress_ : object_manifest.go : 0 : 167 : err: ", err.Error())
+	//logrus.Info("_progress_ : object_manifest.go : 0 : 167 : err: ", err.Error())
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create tempfile to stage backup object %s", objectName)
 	}
 	_, err = io.Copy(f, r)
-	logrus.Info("_progress_ : object_manifest.go : 0 : 172 : err: ", err.Error())
+	logrus.Info("_progress_ : object_manifest.go : 0 : 172 : err: ", err)
 	if err != nil {
+		logrus.Info("_progress_ : object_manifest.go : 0 : 167 : err: ", err.Error())
 		f.Close()
 		os.Remove(f.Name())
 		return nil, errors.Wrapf(err, "failed to copy backup object %s to tempfile", objectName)
 	}
-	logrus.Info("_progress_ : object_manifest.go : 0 : 178 : err: ", err.Error())
+	logrus.Info("_progress_ : object_manifest.go : 0 : 178 : err: ", err)
 	_, err = f.Seek(0, 0)
 	if err != nil {
 		f.Close()
