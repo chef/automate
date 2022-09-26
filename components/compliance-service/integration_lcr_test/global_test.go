@@ -16,8 +16,8 @@ var (
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.
 
-	postgresUrl = os.Getenv("PG_URL")
-	suite       = NewGlobalSuite()
+	// postgresUrl = os.Getenv("PG_URL")
+	suite = NewGlobalSuite()
 )
 
 // newUUID generates a new UUID and returns it as a string

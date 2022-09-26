@@ -354,7 +354,6 @@ steps:
       - cd components/compliance-service
       - make lint test-unit
     timeout_in_minutes: 10
-    soft_fail: true
     retry:
       automatic:
         limit: 1

@@ -18,7 +18,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
-const startTime = "2018-10-25T00:00:00Z"
+// const startTime = "2018-10-25T00:00:00Z"
 
 func TestReadReportSummary(t *testing.T) {
 	statsServer := setupReadSummary(t)
@@ -132,7 +132,7 @@ func TestReadReportSummary(t *testing.T) {
 			octoberTwentyFifthQuery := &stats.Query{
 				Filters: []*stats.ListFilter{
 					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
-					{Type: "start_time", Values: []string{startTime}},
+					// {Type: "start_time", Values: []string{startTime}},
 				},
 			}
 			//passing in no type gets us a Summary type that contains a hydrated ReportSummary
@@ -240,7 +240,7 @@ func TestReadNodeSummary(t *testing.T) {
 			octoberTwentyFifthQuery := &stats.Query{
 				Filters: []*stats.ListFilter{
 					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
-					{Type: "start_time", Values: []string{startTime}},
+					// {Type: "start_time", Values: []string{startTime}},
 				},
 			}
 
@@ -340,7 +340,7 @@ func TestReadControlSummary(t *testing.T) {
 			octoberTwentyFifthQuery := &stats.Query{
 				Filters: []*stats.ListFilter{
 					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
-					{Type: "start_time", Values: []string{startTime}},
+					// {Type: "start_time", Values: []string{startTime}},
 				},
 			}
 			//passing in "controls" type gets us a Summary type that contains a hydrated ControlSummary
@@ -393,7 +393,7 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{
 			Filters: []*apiReporting.ListFilter{
 				{Type: "end_time", Values: []string{"2018-10-25T23:18:41Z"}},
-				{Type: "start_time", Values: []string{startTime}},
+				// {Type: "start_time", Values: []string{startTime}},
 			},
 		})
 

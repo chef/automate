@@ -1,12 +1,7 @@
 package integration_lcr_test
 
 import (
-	"context"
 	"errors"
-	"fmt"
-	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
-	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/postgres"
 	"io/ioutil"
 	"testing"
 
@@ -66,16 +61,9 @@ func TestInjectLCRWithStoreReportError(t *testing.T) {
 
 func ingestLCR(s *Suite) error {
 	fileName := "../ingest/examples/compliance-failure-big-report.json"
-	cereal, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
-	if err != nil {
-		fmt.Printf("could not create job manager %v", err)
-	}
-
-	err = processor.InitCerealManager(cereal, 2, s.ingesticESClient)
-	cereal.Start(context.TODO())
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, s.ReportServiceClientMock, "", s.NotifierMock,
-		s.ProjectsClientMock, 100, true, cereal)
+		s.ProjectsClientMock, 100, true)
 	body, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return err

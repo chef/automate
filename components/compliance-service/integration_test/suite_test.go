@@ -4,9 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
-	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/postgres"
 	"os"
 	"testing"
 	"time"
@@ -46,7 +43,7 @@ type Suite struct {
 	NotifierMock            *NotifierMock
 	EventServiceClientMock  *event.MockEventServiceClient
 	ReportServiceClientMock *report_manager.MockReportManagerServiceClient
-	CerealManagerMock *cereal.Manager
+	// CerealManagerMock *cereal.Manager
 
 }
 
@@ -80,17 +77,17 @@ func NewGlobalSuite() *Suite {
 	s.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.PublishResponse{}, nil)
 
-	cereal, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
-	if err != nil {
-		fmt.Printf("could not create job manager %v", err)
-	}
+	// cereal, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
+	// if err != nil {
+	// 	fmt.Printf("could not create job manager %v", err)
+	// }
 
-	err = processor.InitCerealManager(cereal, 2, s.ingesticESClient)
-	cereal.Start(context.TODO())
-	s.CerealManagerMock = cereal
+	// err = processor.InitCerealManager(cereal, 2, s.ingesticESClient)
+	// cereal.Start(context.TODO())
+	// s.CerealManagerMock = cereal
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, nil, "", s.NotifierMock,
-		s.ProjectsClientMock, 100, false,s.CerealManagerMock)
+		s.ProjectsClientMock, 100, false)
 
 	return s
 }
@@ -118,16 +115,16 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.ReportServiceClientMock = report_manager.NewMockReportManagerServiceClient(gomock.NewController(t))
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 
-	cereal, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
-	if err != nil {
-		fmt.Printf("could not create job manager %v", err)
-	}
-	err = processor.InitCerealManager(cereal, 2, s.ingesticESClient)
-	cereal.Start(context.TODO())
-	s.CerealManagerMock = cereal
+	// cereal, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
+	// if err != nil {
+	// 	fmt.Printf("could not create job manager %v", err)
+	// }
+	// err = processor.InitCerealManager(cereal, 2, s.ingesticESClient)
+	// cereal.Start(context.TODO())
+	// s.CerealManagerMock = cereal
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, s.ReportServiceClientMock, "", s.NotifierMock,
-		s.ProjectsClientMock, 100, false,s.CerealManagerMock)
+		s.ProjectsClientMock, 100, false)
 
 	return s
 }

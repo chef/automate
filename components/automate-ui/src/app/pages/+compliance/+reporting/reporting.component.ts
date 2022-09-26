@@ -340,7 +340,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
   onEndDateChanged(event) {
     const queryParams = {...this.route.snapshot.queryParams};
     const endDate = moment.utc(event.detail);
-    queryParams['start_time'] = moment(endDate).format('YYYY-MM-DD');
     queryParams['end_time'] = moment(endDate).format('YYYY-MM-DD');
 
     this.router.navigate([], {queryParams});

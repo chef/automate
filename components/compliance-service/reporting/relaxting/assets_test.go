@@ -10,6 +10,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var esr = ES2Backend{
+	ESUrl:             "",
+	Enterprise:        "",
+	ChefDeliveryUser:  "",
+	ChefDeliveryToken: "",
+}
+
+var dummyTime = "2022-07-18T08:14:26Z"
+
 func TestFiltersForAssetIndex(t *testing.T) {
 
 	tests := []struct {
@@ -17,7 +26,7 @@ func TestFiltersForAssetIndex(t *testing.T) {
 		filtersKey    string
 		filtersValue  []string
 		expectedQuery string
-		esr           ES2Backend 
+		esr           ES2Backend
 	}{
 		{
 			name:          "Test for Environment",

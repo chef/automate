@@ -26,11 +26,11 @@ const (
 	TimeParseError                    string = "could not parse %s error: %s.  please check format of date"
 	CompDailySumIndexPrefix           string = mappings.IndexNameSum + "-"
 	CompDailyRepIndexPrefix           string = mappings.IndexNameRep + "-"
-	CompDailyControlIndexPrefix       string = mappings.IndexNameControl + "-"
-	ComplianceDailySumTwenty          string = CompDailySumIndexPrefix + "20*"
-	ComplianceDailyRepTwenty          string = CompDailyRepIndexPrefix + "20*"
-	CompProfilesIndex                 string = mappings.IndexNameProf
-	CompRunInfoIndex                  string = mappings.IndexNameComplianceRunInfo
+	// CompDailyControlIndexPrefix       string = mappings.IndexNameControl + "-"
+	ComplianceDailySumTwenty string = CompDailySumIndexPrefix + "20*"
+	ComplianceDailyRepTwenty string = CompDailyRepIndexPrefix + "20*"
+	CompProfilesIndex        string = mappings.IndexNameProf
+	CompRunInfoIndex         string = mappings.IndexNameComplianceRunInfo
 )
 
 type nowFuncT func() time.Time

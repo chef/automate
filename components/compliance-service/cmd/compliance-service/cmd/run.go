@@ -63,9 +63,6 @@ var conf = config.Compliance{
 	ReportConfig: config.ReportConfig{
 		Endpoint: "127.0.0.1:10152",
 	},
-	CerealConfig: config.CerealConfig{
-		Workers: 1,
-	},
 }
 
 // runCmd represents the run command
