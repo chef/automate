@@ -104,6 +104,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, mfs, configCmdFlags.timeout)
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetOSDestDir(upgradeRunCmdFlags.osDestDataDir)
+	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetSkipStoragecheckFlag(upgradeRunCmdFlags.skipStorageCheck)
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
 	err := upgradeInspector.ShowInfo()
 	if err != nil {
@@ -216,28 +217,35 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				writer.Println("Failed to read and store search settings")
 			} */
-			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
-			if err != nil {
-				return status.Wrap(
-					err,
-					status.DeploymentServiceCallError,
-					"Request to start upgrade failed",
-				)
+			major, _ := majorupgradechecklist.GetMajorVersion(validatedResp.TargetVersion)
+			switch major {
+			case "3":
+				ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
+				if err != nil {
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
+
+				flags := majorupgradechecklist.ChecklistUpgradeFlags{
+					SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
+					OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
+				}
+				err = ci.RunChecklist(configCmdFlags.timeout, flags)
+				if err != nil {
+					exec.Command("/bin/sh", "-c", disableMaintenanceModeCmd).Output()
+					return status.Wrap(
+						err,
+						status.DeploymentServiceCallError,
+						"Request to start upgrade failed",
+					)
+				}
+			default:
+				// TODO: add v4 inspector code
 			}
 
-			flags := majorupgradechecklist.ChecklistUpgradeFlags{
-				SkipStorageCheck: upgradeRunCmdFlags.skipStorageCheck,
-				OsDestDataDir:    upgradeRunCmdFlags.osDestDataDir,
-			}
-			err = ci.RunChecklist(configCmdFlags.timeout, flags)
-			if err != nil {
-				exec.Command("/bin/sh", "-c", disableMaintenanceModeCmd).Output()
-				return status.Wrap(
-					err,
-					status.DeploymentServiceCallError,
-					"Request to start upgrade failed",
-				)
-			}
 		}
 	}
 

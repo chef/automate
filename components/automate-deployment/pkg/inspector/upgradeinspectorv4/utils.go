@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -93,11 +94,7 @@ func (cu *UpgradeV4UtilsImp) SetMaintenanceMode(timeout int64, status bool) (std
 }
 
 func (cu *UpgradeV4UtilsImp) IsExternalElasticSearch(timeout int64) bool {
-	res, err := client.GetAutomateConfig(timeout)
-	if err != nil {
-		return false
-	}
-	return res.Config.GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
+	return majorupgrade_utils.IsExternalElasticSearch(timeout)
 }
 
 func (cu *UpgradeV4UtilsImp) GetESBasePath(timeout int64) string {

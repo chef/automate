@@ -14,6 +14,7 @@ type UpgradeInspectorV4 struct {
 	writer            *cli.Writer
 	inspections       []inspector.Inspection
 	osDestDir         string
+	skipStorageCheck  bool
 	upgradeUtils      UpgradeV4Utils
 	fileUtils         fileutils.FileUtils
 	timeout           int64
@@ -145,6 +146,10 @@ func (ui *UpgradeInspectorV4) SetOSDestDir(path string) {
 	}
 }
 
+func (ui *UpgradeInspectorV4) SetSkipStoragecheckFlag(check bool) {
+	ui.skipStorageCheck = check
+}
+
 func (ui *UpgradeInspectorV4) AddInspection(inspection inspector.Inspection) {
 	if inspection != nil {
 		ui.inspections = append(ui.inspections, inspection)
@@ -155,8 +160,10 @@ func (ui *UpgradeInspectorV4) AddDefaultInspections() {
 	ui.AddInspection(NewEnsureStatusInspection(ui.writer, ui.upgradeUtils))
 	ui.AddInspection(NewPlannedDownTimeInspection(ui.writer))
 	ui.AddInspection(NewTakeBackupInspection(ui.writer))
-	diskSpaceInspection := NewDiskSpaceInspection(ui.writer, ui.upgradeUtils.IsExternalElasticSearch(ui.timeout), ui.osDestDir, ui.fileUtils)
-	ui.AddInspection(diskSpaceInspection)
+	if !ui.skipStorageCheck {
+		diskSpaceInspection := NewDiskSpaceInspection(ui.writer, ui.upgradeUtils.IsExternalElasticSearch(ui.timeout), ui.osDestDir, ui.fileUtils)
+		ui.AddInspection(diskSpaceInspection)
+	}
 	esBasePath := ui.upgradeUtils.GetESBasePath(ui.timeout)
 	ui.AddInspection(NewESIndexInspection(ui.writer, ui.upgradeUtils, esBasePath))
 	ui.AddInspection(NewReplaceS3UrlInspection(ui.writer, ui.upgradeUtils, ui.timeout))

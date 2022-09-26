@@ -6,13 +6,9 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
-)
-
-const (
-	INDICES_TOTAL_SHARD_DEFAULT = 2000
-	V3_ES_SETTING_FILE          = "/hab/svc/deployment-service/old_es_v3_settings.json"
 )
 
 type StoreESSettingsInspection struct {
@@ -81,7 +77,7 @@ func (ses *StoreESSettingsInspection) getAllSearchEngineSettings() (*ESSettings,
 	esSettings := &ESSettings{}
 	totalShard, err := ses.getTotalShards()
 	if err != nil {
-		esSettings.TotalShardSettings = INDICES_TOTAL_SHARD_DEFAULT
+		esSettings.TotalShardSettings = majorupgrade_utils.INDICES_TOTAL_SHARD_DEFAULT
 	} else {
 		esSettings.TotalShardSettings = totalShard.Indices.Shards.Total
 	}
@@ -115,7 +111,7 @@ func (ses *StoreESSettingsInspection) storeESSettings(esSettings *ESSettings) er
 	if err != nil {
 		return errors.Wrap(err, "error in mapping elasticsearch settings to json.")
 	}
-	err = ses.upgradeUtils.WriteToFile(V3_ES_SETTING_FILE, esSettingsJson)
+	err = ses.upgradeUtils.WriteToFile(majorupgrade_utils.V3_ES_SETTING_FILE, esSettingsJson)
 	if err != nil {
 		return errors.Wrap(err, "error in elasticsearch settings in file.")
 	}
