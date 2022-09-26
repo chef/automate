@@ -18,6 +18,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
@@ -778,9 +779,13 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		// reason, like a network issue or corrupted metadata file, then we want to
 		// error out.
 		if err != nil && !IsNotExist(err) {
-			r.info("_progress_ : runner.go : 8 : 781 : IsNotExist :", err.Error())
-			r.failf(err, "Failed to load metadata for service %s", svc.Name())
-			return err
+			if (svc.Name() == "automate-postgresql") || (svc.Name() == "automate-opensearch") {
+				r.info("_progress_ : runner.go : 8 : 781 : Ignoring for not found metadata for local pg and os")
+			} else {
+				r.info("_progress_ : runner.go : 8 : 781 : IsNotExist :", err.Error())
+				r.failf(err, "Failed to load metadata for service %s", svc.Name())
+				return err
+			}
 		}
 
 		// If the backup metadata is missing, we assume the service is stateless or

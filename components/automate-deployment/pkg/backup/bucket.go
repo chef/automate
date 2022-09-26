@@ -89,6 +89,9 @@ type Bucket interface {
 func IsNotExist(err error) bool {
 	a := gcerrors.Code(err)
 	logrus.Info("_progress_ : bucket.go : 1 : 91 :  IsNotExist ", a)
+	if a == gcerrors.Unknown {
+		return true
+	}
 	return os.IsNotExist(err) ||
 		gcerrors.Code(err) == gcerrors.NotFound ||
 		// blob.IsNotExist returns the wrong answer for minio's NoSuchKey error
@@ -355,7 +358,7 @@ func NewS3Bucket(name string, basePath string, c *aws.Config) (Bucket, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	logrus.Debug("_progress_ : bucket.go : 7 : 361 : NewS3Bucket:  :", name, basePath)
 	bucket, err := s3blob.OpenBucket(context.Background(), s, name, nil)
 	if err != nil {
 		return nil, err
@@ -375,9 +378,12 @@ func (bkt *s3Bucket) NewReader(ctx context.Context, name string, verifier Object
 	relPath := path.Join(bkt.basePath, name)
 	validatePath(relPath)
 	r, err := bkt.bucket.NewReader(ctx, relPath, nil)
+	//logrus.Debug("_progress_ : bucket.go : 7 : 382 : s3bucker: NewReader :", err.Error(), relPath)
 	if err != nil {
+		logrus.Debug("_progress_ : bucket.go : 7 : 382 : s3bucker: NewReader :", err.Error(), relPath)
 		return nil, err
 	}
+
 	cksumReader := newChecksummingReader(r)
 	defer cksumReader.Close()
 	return newVerifiedReader(name, cksumReader, verifier)

@@ -105,8 +105,8 @@ func LoadServiceMetadata(ctx context.Context, bucket Bucket, svcName string, obj
 	metadata := &Metadata{}
 
 	mdStorageKey := path.Join(svcName, metadataFileBaseName)
-
 	reader, err := bucket.NewReader(ctx, mdStorageKey, objectVerifier)
+	logrus.Info("_progress_ : metadata.go : 0 : 109 : err: ", err)
 	logrus.Info("_progress_ : metadata.go : 1 : 110 : LoadServiceMetadata ", svcName)
 	logrus.Info("_progress_ : metadata.go : 2 : 111 : success LoadServiceMetadata ", objectVerifier)
 	if err != nil {
@@ -115,6 +115,15 @@ func LoadServiceMetadata(ctx context.Context, bucket Bucket, svcName string, obj
 			logrus.Info("_progress_ : metadata.go : 3 : 115 : success LoadServiceMetadata ", err.Error())
 			return metadata, err
 		} else {
+
+			if svcName == "automate-postgresql" {
+				logrus.Info("_progress_ : metadata.go : 4 : 120 : success LoadServiceMetadata ignore ", svcName)
+				return metadata, err
+			}
+			if svcName == "automate-opensearch" {
+				logrus.Info("_progress_ : metadata.go : 5 : 124 : success LoadServiceMetadata ignore", svcName)
+				return metadata, err
+			}
 			logrus.Info("_progress_ : metadata.go : 4 : 118 : failure LoadServiceMetadata ", err.Error())
 			return metadata, errors.Wrapf(err, "error opening backup metadata key %s", mdStorageKey)
 		}
