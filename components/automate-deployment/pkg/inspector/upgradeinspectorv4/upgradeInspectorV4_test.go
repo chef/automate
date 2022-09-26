@@ -2,6 +2,8 @@ package upgradeinspectorv4
 
 import (
 	"errors"
+	"io"
+	"strings"
 	"testing"
 	"time"
 
@@ -459,10 +461,10 @@ func TestUpgradeInspectorV4RunInspectForOsDestDirSkipped(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4ExitMessage(t *testing.T) {
-	tw := NewTestWriterWithInputs("y")
+	tw := NewTestWriterWithInputs("y", "1")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
-		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorHab,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
 		GetHabRootPathFunc:   GetHabRootPath,
 	}
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
@@ -480,12 +482,95 @@ func TestUpgradeInspectorV4ExitMessage(t *testing.T) {
 		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
 			return "", "", nil
 		},
+		GetServicesStatusFunc: func() (bool, error) {
+			return true, nil
+		},
+		ExecRequestFunc: ExecRequestNonAutomate,
+		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
 	}, mfs, 10)
 
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected := "failed to check filesystem"
+	expected := `✖  [Failed]	/hab directory should have 8.8GB of free space
+ ⊖  [Skipped]	Elasticsearch indices are in version 6
+
+[Error] Required Space : 8.8GB
+        Available space : 2.5GB
+
+Please ensure the available free space is 8.8GB
+and run chef-automate upgrade run --major command again
+Upgrade process terminated.`
 
 	err := ui.ShowInfo()
-	assert.Contains(t, err.Error(), expected)
+	assert.NoError(t, err)
+	ui.ShowInspectionList()
+	err = ui.Inspect()
+	assert.NoError(t, err)
+	err = ui.RollBackChangesOnError()
+	assert.NoError(t, err)
+	err = ui.RunExitAction()
+	assert.NoError(t, err)
+	t.Log(tw.Output())
+	assert.Contains(t, tw.Output(), expected)
+}
+
+func TestUpgradeInspectorV4ExitMessageFailedMaintenance(t *testing.T) {
+	tw := NewTestWriterWithInputs("y", "1")
+	mfs := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   CalDirSizeInGB,
+		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
+		GetHabRootPathFunc:   GetHabRootPath,
+	}
+	shardingCalledCount := 0
+	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		GetESBasePathFunc:           func(timeout int64) string { return "http://localhost:10144/" },
+		GetBackupS3URLFunc: func(timeout int64) (string, error) {
+			return "https://s3.us-east-1.amazonaws.com", nil
+		},
+		PatchS3backupURLFunc: func(timeout int64) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
+			return false, errors.New("unreachable")
+		},
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (stdOut, stdErr string, err error) {
+			return "", "", nil
+		},
+		GetServicesStatusFunc: func() (bool, error) {
+			return true, nil
+		},
+		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
+			if strings.Contains(url, "_cluster/settings") {
+				shardingCalledCount++
+				return []byte{}, nil
+			} else if strings.Contains(url, "index.version") {
+				return []byte(`{"node-attribute":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},"comp-2-run-info":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
+			} else if strings.Contains(url, "_cluster/stats") {
+				return []byte(`{"indices":{"shards":{"total":51}}}`), nil
+			} else if strings.Contains(url, "indices") {
+				return []byte(INDEX_LIST), nil
+			} else {
+				return []byte{}, nil
+			}
+		},
+		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
+	}, mfs, 10)
+
+	ui.(*UpgradeInspectorV4).AddDefaultInspections()
+
+	expected := `[Error] unreachable
+Upgrade process terminated.`
+
+	err := ui.ShowInfo()
+	assert.NoError(t, err)
+	ui.ShowInspectionList()
+	err = ui.Inspect()
+	assert.NoError(t, err)
+	err = ui.RollBackChangesOnError()
+	assert.NoError(t, err)
+	err = ui.RunExitAction()
+	assert.NoError(t, err)
+	assert.Equal(t, 2, shardingCalledCount)
+	assert.Contains(t, tw.Output(), expected)
 }

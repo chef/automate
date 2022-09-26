@@ -1,6 +1,7 @@
 package upgradeinspectorv4
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -67,7 +68,7 @@ func (ru *ReplaceS3UrlInspection) GetInstallationType() inspector.InstallationTy
 
 func (ru *ReplaceS3UrlInspection) ExitHandler() error {
 	if ru.exitedWithError {
-		ru.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ru.exitError.Error())
+		ru.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", ru.exitError).Error())
 		ru.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil

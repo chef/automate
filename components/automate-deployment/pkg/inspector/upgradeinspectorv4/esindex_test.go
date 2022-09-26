@@ -26,6 +26,8 @@ func IsExternal(timeout int64) bool {
 func ExecRequestNonAutomate(url, methodType string, requestBody io.Reader) ([]byte, error) {
 	if strings.Contains(url, "index.version") {
 		return []byte(`{"node-attribute":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},"comp-2-run-info":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
+	} else if strings.Contains(url, "_cluster/stats") {
+		return []byte(`{"indices":{"shards":{"total":51}}}`), nil
 	} else if strings.Contains(url, "indices") {
 		return []byte(INDEX_LIST), nil
 	} else {

@@ -113,7 +113,7 @@ func (em *EnableMaintenanceInspection) GetInstallationType() inspector.Installat
 
 func (em *EnableMaintenanceInspection) ExitHandler() error {
 	if em.exitedWithError {
-		em.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + em.exitError.Error())
+		em.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", em.exitError).Error())
 		em.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
