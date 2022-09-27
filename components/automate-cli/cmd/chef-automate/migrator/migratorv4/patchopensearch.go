@@ -31,14 +31,10 @@ func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils) *PatchOpense
 func (poc *PatchOpensearchConfig) Run() error {
 	poc.showUpdating()
 	opensearchSettings := poc.GetDefaultOpensearchSettings()
-	esTotalShards, err := poc.utils.GetEsTotalShardSettings()
-	if err != nil {
-		poc.showUpdateError()
-		poc.setError(err)
-		return err
-	}
+
+	esTotalShards, _ := poc.utils.GetEsTotalShardSettings()
 	opensearchSettings.TotalShardSettings = poc.GetOverrideTotalShards(esTotalShards, opensearchSettings.TotalShardSettings)
-	_, _, err = poc.utils.PatchOpensearchConfig(opensearchSettings)
+	_, _, err := poc.utils.PatchOpensearchConfig(opensearchSettings)
 	if err != nil {
 		poc.showUpdateError()
 		poc.setError(err)
@@ -72,7 +68,7 @@ func defaultHeapSizeInGB() int {
 
 func (poc *PatchOpensearchConfig) GetDefaultOpensearchSettings() *ESSettings {
 	defaultSettings := &ESSettings{}
-	defaultSettings.HeapMemory = fmt.Sprintf("%d", defaultHeapSizeInGB())
+	defaultSettings.HeapMemory = fmt.Sprintf("%dg", defaultHeapSizeInGB())
 	defaultSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
 	defaultSettings.RuntimeMaxLockedMem = MAX_LOCKED_MEM_DEFAULT
 	defaultSettings.RuntimeMaxOpenFile = MAX_OPEN_FILE_DEFAULT
@@ -91,13 +87,13 @@ func (poc *PatchOpensearchConfig) ErrorHandler() {
 }
 
 func (poc *PatchOpensearchConfig) showUpdateError() {
-	poc.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  Failed to copy data"
+	poc.spinner.FinalMSG = " "+color.New(color.FgRed).Sprint("✖") + "  Failed to update OpenSearch configurations"
 	poc.spinner.Stop()
 	poc.writer.Println("")
 }
 
 func (poc *PatchOpensearchConfig) showUpdated() {
-	poc.spinner.FinalMSG = color.New(color.FgGreen).Sprint("✔") + "  OpenSearch configurations updated successfully"
+	poc.spinner.FinalMSG = " "+color.New(color.FgGreen).Sprint("✔") + "  OpenSearch configurations updated successfully"
 	poc.spinner.Stop()
 	poc.writer.Println("")
 }

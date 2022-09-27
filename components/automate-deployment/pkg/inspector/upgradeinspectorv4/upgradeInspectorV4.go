@@ -204,3 +204,28 @@ func (ui *UpgradeInspectorV4) RunExitAction() error {
 	}
 	return nil
 }
+
+func (ui *UpgradeInspectorV4) RunUpgradeInspector(osDestDir string, skipStorageCheck bool) error {
+	ui.SetOSDestDir(osDestDir)
+	ui.SetSkipStoragecheckFlag(skipStorageCheck)
+	ui.AddDefaultInspections()
+	err := ui.ShowInfo()
+	if err != nil {
+		return err
+	}
+	ui.ShowInspectionList()
+	err = ui.Inspect()
+	if err != nil {
+		var localerr error
+		err = ui.RollBackChangesOnError()
+		if err != nil {
+			localerr = err
+		}
+		err = ui.RunExitAction()
+		if err != nil {
+			localerr = errors.Wrap(err, localerr.Error())
+		}
+		return localerr
+	}
+	return nil
+}

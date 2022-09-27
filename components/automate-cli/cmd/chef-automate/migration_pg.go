@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorV4"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
@@ -105,15 +106,12 @@ func newMigrateDataCmd() *cobra.Command {
 }
 
 func runMigrator(cmd *cobra.Command, args []string) error {
-
-	migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorV4.NewMigratorV4Utils(), 10)
-	migrator.(*migratorV4.MigratorV4).AddDefaultMigrationSteps()
-	migrator.(*migratorV4.MigratorV4).ExecuteMigrationSteps()
-	err := migrator.(*migratorV4.MigratorV4).ExecuteDeferredSteps()
+	// TODO: add condition for v3 and v4
+	migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorV4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10)
+	err := migrator.(*migratorV4.MigratorV4).RunMigrationFlow()
 	if err != nil {
-		fmt.Println(err)
+		writer.Println(err.Error())
 	}
-	migrator.(*migratorV4.MigratorV4).PrintMigrationErrors()
 	return nil
 }
 

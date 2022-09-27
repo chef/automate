@@ -44,13 +44,13 @@ func (as *AutomateStop) setError(err error) error {
 }
 
 func (as *AutomateStop) showStopError() {
-	as.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  Failed to stop Chef Automate"
+	as.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Failed to stop Chef Automate"
 	as.spinner.Stop()
 	as.writer.Println("")
 }
 
 func (as *AutomateStop) showStopped() {
-	as.spinner.FinalMSG = color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Stopped"
+	as.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Stopped"
 	as.spinner.Stop()
 	as.writer.Println("")
 }
@@ -63,13 +63,13 @@ func (as *AutomateStop) showStopping() {
 }
 
 func (as *AutomateStop) showStartError() {
-	as.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  Failed to start Chef Automate"
+	as.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Failed to start Chef Automate"
 	as.spinner.Stop()
 	as.writer.Println("")
 }
 
 func (as *AutomateStop) showStarted() {
-	as.spinner.FinalMSG = color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Started"
+	as.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Started"
 	as.spinner.Stop()
 	as.writer.Println("")
 }

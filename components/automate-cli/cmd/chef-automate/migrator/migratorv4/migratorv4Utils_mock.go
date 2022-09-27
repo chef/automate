@@ -11,6 +11,9 @@ type MockMigratorV4UtilsImpl struct {
 	StartAutomateFunc           func() error
 	GetHabRootPathFunc          func(habrootcmd string) string
 	ExecShCommandFunc           func(script string) error
+	ReadV4ChecklistFunc         func() (bool, error)
+	UpdatePostChecklistFileFunc func() error
+	ExecuteCommandFunc          func(command string, args []string, workingDir string) error
 }
 
 func (mui *MockMigratorV4UtilsImpl) CreateMigrationMetadata() error {
@@ -42,4 +45,13 @@ func (mui *MockMigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
 }
 func (mui *MockMigratorV4UtilsImpl) ExecShCommand(script string) error {
 	return mui.ExecShCommandFunc(script)
+}
+func (mui *MockMigratorV4UtilsImpl) ReadV4Checklist() (bool, error) {
+	return mui.ReadV4ChecklistFunc()
+}
+func (mui *MockMigratorV4UtilsImpl) UpdatePostChecklistFile() error {
+	return mui.UpdatePostChecklistFileFunc()
+}
+func (mui *MockMigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {
+	return mui.ExecuteCommand(command, args, workingDir)
 }
