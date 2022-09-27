@@ -76,7 +76,8 @@ Configure backups for both clusters using either [file system](/automate/ha_back
 
     - To clean the data from the backed up storage, either schedule a cron or delete it manually.
         - To prune all but a certain number of the most recent backups manually, parse the output of chef-automate backup list and 
-        apply the command chef-automate backup delete. For example:
+        apply the command chef-automate backup delete.
+        For example:
 
         ```sh
         export KEEP=10; export HAB_LICENSE=accept-no-persist; chef-automate backup list --result-json backup.json > /dev/null && hab pkg exec core/jq-static jq "[.result.backups[].id] | sort | reverse | .[]" -rM backup.json | tail -n +$(($KEEP+1)) | xargs -L1 -i chef-automate backup delete --yes {}
