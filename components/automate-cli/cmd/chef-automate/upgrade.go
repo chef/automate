@@ -424,8 +424,6 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		writer.Warn(convergeDisabledWarning)
 	}
 
-	isExternalOpenSearch := majorupgrade_utils.IsExternalElasticSearch(configCmdFlags.timeout)
-
 	// TODO(ssd) 2018-09-17: This API response was built around
 	// the world where we didn't /know/ that an upgrade was
 	// happening or not. Now we should "just know" and the API
@@ -438,11 +436,7 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		//Todo(milestone) - update the comparison logic of current version and latest available version
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
-				if isExternalOpenSearch {
-					postUpgradeStatusExternal(resp)
-				} else {
-					postUpgardeStatusEmbedded(resp)
-				}
+				postUpgradeStatus(resp)
 			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
 				isMajor := !resp.IsConvergeCompatable
 				PrintAutomateOutOfDate(writer, resp.CurrentVersion, resp.LatestAvailableVersion, isMajor)
@@ -452,18 +446,10 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				// 	writer.Printf("Please manually run the major upgrade command to upgrade to %s\n", resp.LatestAvailableVersion)
 				// }
 			} else {
-				if isExternalOpenSearch {
-					postUpgradeStatusExternal(resp)
-				} else {
-					postUpgardeStatusEmbedded(resp)
-				}
+				postUpgradeStatus(resp)
 			}
 		default:
-			if isExternalOpenSearch {
-				postUpgradeStatusExternal(resp)
-			} else {
-				postUpgardeStatusEmbedded(resp)
-			}
+			postUpgradeStatus(resp)
 		}
 
 		pendingPostChecklist, err := GetPendingPostChecklist(resp.CurrentVersion)
@@ -515,6 +501,15 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func postUpgradeStatus(resp *api.UpgradeStatusResponse) {
+	isExternalOpenSearch := majorupgrade_utils.IsExternalElasticSearch(configCmdFlags.timeout)
+	if isExternalOpenSearch {
+		postUpgradeStatusExternal(resp)
+	} else {
+		postUpgardeStatusEmbedded(resp)
+	}
 }
 
 // Print the automate upgrade status when automate is up to date
