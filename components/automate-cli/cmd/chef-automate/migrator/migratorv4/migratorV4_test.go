@@ -3,6 +3,7 @@ package migratorV4
 import (
 	"testing"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -10,7 +11,7 @@ import (
 func TestRunMigrations(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	mmu := &MockMigratorV4UtilsImpl{}
-	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, 10)
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation()
 	t.Log(w.Output())
@@ -20,7 +21,7 @@ func TestRunMigrations(t *testing.T) {
 func TestRunMigrationsWronginput(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("x")
 	mmu := &MockMigratorV4UtilsImpl{}
-	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, 10)
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation()
 	t.Log(w.Output())
@@ -39,7 +40,7 @@ func TestRunSuccessfulMigrations(t *testing.T) {
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
 		ExecShCommandFunc:           func(script string) error { return nil },
 	}
-	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, 10)
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation()
 	migratorv4.ExecuteMigrationSteps()
@@ -69,7 +70,7 @@ func TestRunSuccessfulMigrationsWithError(t *testing.T) {
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
 		ExecShCommandFunc:           func(script string) error { return nil },
 	}
-	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, 10)
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	err := migratorv4.ExecuteMigrationSteps()
 	assert.Error(t, err, "Can't process without user consent.")

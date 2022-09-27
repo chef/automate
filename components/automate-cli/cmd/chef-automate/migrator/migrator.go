@@ -1,11 +1,13 @@
 package migrator
 
 type Migrator interface {
-	AskForConfirmation() (bool, error)
+	AskForConfirmation() error
+	IsExecutedCheck() error
 	AddMigrationSteps(migrationSteps MigrationSteps)
 	ExecuteMigrationSteps() error
+	SaveExecutedStatus() error
 	ExecuteDeferredSteps() error
-	PrintMigrationErrors() error
+	PrintMigrationErrors()
 }
 
 type MigrationSteps interface {
@@ -16,5 +18,5 @@ type MigrationSteps interface {
 
 type PostMigrationSteps interface {
 	MigrationSteps
-	DefferedHandler()
+	DefferedHandler() error
 }

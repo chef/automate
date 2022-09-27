@@ -3,6 +3,7 @@ package migratorV4
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -13,6 +14,7 @@ import (
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -23,7 +25,7 @@ const (
 	MAX_LOCKED_MEM_DEFAULT                = "unlimited"
 	MAX_OPEN_FILE_KEY                     = "Max open files"
 	MAX_LOCKED_MEM_KEY                    = "Max locked memory"
-	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT   = "95"
+	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT   = "95%"
 	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 500
 	MAX_POSSIBLE_HEAP_SIZE                = 32
 	AutomateOpensearchConfigPatch         = "/hab/svc/deployment-service/oss-config.toml"
@@ -36,6 +38,8 @@ but if you still want to continue with the upgrade`
 	upgradeFailed          = "due to pre-condition check failed"
 	ELASTICSEARCH_DATA_DIR = "/hab/svc/automate-elasticsearch/data"
 	ELASTICSEARCH_VAR_DIR  = "/hab/svc/automate-elasticsearch/var"
+	OPENSEARCH_DATA_DIR    = "/hab/svc/automate-opensearch/data"
+	MIGRATE_ES_ID          = "migrate_es"
 )
 
 type MigratorV4Utils interface {
@@ -49,6 +53,9 @@ type MigratorV4Utils interface {
 	StartAutomate() error
 	GetHabRootPath(habrootcmd string) string
 	ExecShCommand(script string) error
+	ReadV4Checklist() (bool, error)
+	UpdatePostChecklistFile() error
+	ExecuteCommand(command string, args []string, workingDir string) error
 }
 
 type ESSettings struct {
@@ -111,11 +118,11 @@ func (m *MigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
 	esSetting := &ESSettings{}
 	jsonData, err := ioutil.ReadFile(majorupgrade_utils.V3_ES_SETTING_FILE) // nosemgrep
 	if err != nil {
-		return -1, err
+		return esSetting.TotalShardSettings, err
 	}
 	err = json.Unmarshal(jsonData, esSetting)
 	if err != nil {
-		return -1, err
+		return esSetting.TotalShardSettings, err
 	}
 	return esSetting.TotalShardSettings, nil
 }
@@ -227,4 +234,32 @@ func (m *MigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
 func (m *MigratorV4UtilsImpl) ExecShCommand(script string) error {
 	command := exec.Command("/bin/sh", "-c", script)
 	return command.Run()
+}
+
+func (m *MigratorV4UtilsImpl) ReadV4Checklist() (bool, error) {
+	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+	if err != nil {
+		return false, err
+	}
+	return ci.ReadPostChecklistById(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+}
+
+func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile() error {
+	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+	if err != nil {
+		return err
+	}
+	return ci.UpdatePostChecklistFile(MIGRATE_ES_ID, majorupgradechecklist.UPGRADE_METADATA)
+}
+
+func (m *MigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {
+	c := exec.Command(command, args...)
+	c.Stdin = os.Stdin
+	if len(workingDir) > 0 {
+		c.Dir = workingDir
+	}
+	c.Stdout = io.MultiWriter(os.Stdout)
+	c.Stderr = io.MultiWriter(os.Stderr)
+	err := c.Run()
+	return err
 }

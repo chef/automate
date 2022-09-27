@@ -88,42 +88,42 @@ func handleError(err error) {
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 
-	mfs := &fileutils.MockFileSystemUtils{
-		GetFreeSpaceinGBFunc: func(dir string) (float64, error) {
-			if dir == "/hab" {
-				return 1, nil
-			}
-			return 5, nil
-		},
-		CalDirSizeInGBFunc: func(path string) (float64, error) {
-			return 2, nil
-		},
-		GetHabRootPathFunc: func() string { return "/hab" },
-	}
-	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, mfs, configCmdFlags.timeout)
-	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetOSDestDir(upgradeRunCmdFlags.osDestDataDir)
-	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetSkipStoragecheckFlag(upgradeRunCmdFlags.skipStorageCheck)
-	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
-	err := upgradeInspector.ShowInfo()
-	if err != nil {
-		handleError(err)
-		return nil
-	}
-	upgradeInspector.ShowInspectionList()
-	err = upgradeInspector.Inspect()
-	if err != nil {
-		err = upgradeInspector.RollBackChangesOnError()
-		if err != nil {
-			handleError(err)
-		}
-		err = upgradeInspector.RunExitAction()
-		if err != nil {
-			handleError(err)
-		}
-		return nil
-	}
+	// mfs := &fileutils.MockFileSystemUtils{
+	// 	GetFreeSpaceinGBFunc: func(dir string) (float64, error) {
+	// 		if dir == "/hab" {
+	// 			return 1, nil
+	// 		}
+	// 		return 5, nil
+	// 	},
+	// 	CalDirSizeInGBFunc: func(path string) (float64, error) {
+	// 		return 2, nil
+	// 	},
+	// 	GetHabRootPathFunc: func() string { return "/hab" },
+	// }
+	// upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, mfs, configCmdFlags.timeout)
+	// upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetOSDestDir(upgradeRunCmdFlags.osDestDataDir)
+	// upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetSkipStoragecheckFlag(upgradeRunCmdFlags.skipStorageCheck)
+	// upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
+	// err := upgradeInspector.ShowInfo()
+	// if err != nil {
+	// 	handleError(err)
+	// 	return nil
+	// }
+	// upgradeInspector.ShowInspectionList()
+	// err = upgradeInspector.Inspect()
+	// if err != nil {
+	// 	err = upgradeInspector.RollBackChangesOnError()
+	// 	if err != nil {
+	// 		handleError(err)
+	// 	}
+	// 	err = upgradeInspector.RunExitAction()
+	// 	if err != nil {
+	// 		handleError(err)
+	// 	}
+	// 	return nil
+	// }
 
-	return nil
+	// return nil
 
 	a1IsRunning, err := isA1Running()
 	if err != nil {
@@ -243,9 +243,13 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 					)
 				}
 			default:
-				// TODO: add v4 inspector code
+				upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, upgradeinspectorv4.NewUpgradeV4Utils(), &fileutils.FileSystemUtils{}, configCmdFlags.timeout)
+				err := upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
+				if err != nil {
+					handleError(err)
+					return nil
+				}
 			}
-
 		}
 	}
 
