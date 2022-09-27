@@ -439,9 +439,9 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
 				if isExternalOpenSearch {
-					PostUpgradeStatusExternal(resp)
+					postUpgradeStatusExternal(resp)
 				} else {
-					PostUpgardeStatusEmbedded(resp)
+					postUpgardeStatusEmbedded(resp)
 				}
 			} else if resp.CurrentVersion < resp.LatestAvailableVersion {
 				isMajor := !resp.IsConvergeCompatable
@@ -453,16 +453,16 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 				// }
 			} else {
 				if isExternalOpenSearch {
-					PostUpgradeStatusExternal(resp)
+					postUpgradeStatusExternal(resp)
 				} else {
-					PostUpgardeStatusEmbedded(resp)
+					postUpgardeStatusEmbedded(resp)
 				}
 			}
 		default:
 			if isExternalOpenSearch {
-				PostUpgradeStatusExternal(resp)
+				postUpgradeStatusExternal(resp)
 			} else {
-				PostUpgardeStatusEmbedded(resp)
+				postUpgardeStatusEmbedded(resp)
 			}
 		}
 
@@ -545,8 +545,8 @@ func stopSpinner(spinner *spinner.Spinner, msg string) {
 	writer.Println("")
 }
 
-// PostUpgradeStatusExternal - Handle case for external opensearch after upgrade status
-func PostUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
+// postUpgradeStatusExternal - Handle case for external opensearch after upgrade status
+func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	printUpgradeStatusMsg(resp)
 	err := promptCheckList("Have you updated your opensearch_config.toml with actual external OpenSearch connection configurations? (y/n)")
 	writer.Println("")
@@ -567,6 +567,7 @@ func PostUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	}
 	//Handle the case where user has updated the opensearch_config.toml
 	spinner := startSpinner("Updating external OpenSearch configurations")
+	//TODO: Need to add opensearch_config.toml path
 	exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", patchConfigCommand, "/path/to/opensearch.toml")).Output()
 	stopSpinner(spinner, "External OpenSearch configurations updated successfully.")
 	_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, true)
@@ -577,8 +578,8 @@ func PostUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	return nil
 }
 
-// PostUpgardeStatusEmbedded - Handle case for embedded opensearch after upgrade status
-func PostUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) {
+// postUpgardeStatusEmbedded - Handle case for embedded opensearch after upgrade status
+func postUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) {
 	printUpgradeStatusMsg(resp)
 }
 
