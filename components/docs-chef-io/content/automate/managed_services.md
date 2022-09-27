@@ -24,6 +24,41 @@ gh_repo = "automate"
 
 - To connect to the DB instance, the DB instance should be associated with a security group that provides access to it. Ensure External RDS is accessible from Automate instances.
 
+### Adding Resolvers for PostgreSQL Database
+
+In case you want to resolve the PostgreSQL cluster node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
+
+The two ways to add the name servers are:
+
+1. **Add nameserver IPs:** If you are aware of the nameservers which should resolve the PostgreSQL nodes, the nameservers can be added to your `config.toml` file.
+
+    ```toml
+    [pg_gateway.v1.sys.resolvers]
+      # Multiple resolvers can be specified by adding the resolvers to the list.
+      nameservers = ["127.0.0.53:53"]
+    ```
+
+1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
+
+    ```toml
+    [pg_gateway.v1.sys.resolvers]
+      enable_system_nameservers = true
+    ```
+
+If both options are set, nameserver IPs takes precedence over the system nameserver entries.
+
+Apply the changes:
+
+```bash
+sudo chef-automate config patch config.toml
+````
+
+If you wish to reset to the default configuration or to modify the configuration:
+
+1. Run `chef-automate config show > config.toml`.
+1. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
+1. Run `chef-automate config set config.toml` to apply your changes.
+
 ### OpenSearch Setup
 
 - Create an Opensearch domain. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html) to know more.
@@ -43,6 +78,7 @@ The steps to backup and restore the OpenSearch S3 is:
 - Create an IAM role with a couple of Permission Policies listed below. The rest of the document refers to the role as `TheSnapshotRole`.
   - AmazonS3FullAccess
   - To register the snapshot repository, pass the `TheSnapshotRole` to OpenSearch Service. Access the **es:ESHttpPut** action. To grant these permissions, attach the following policy to the IAM user or role whose credentials are being used to sign the request, as shown below example:
+
   ```json
   {
     "Version": "2012-10-17",
@@ -60,7 +96,9 @@ The steps to backup and restore the OpenSearch S3 is:
     ]
   }
   ```
+
 - Edit the trust relationship of `TheSnapshotRole` to specify the OpenSearch Service in the Principal statement as shown in the following example:
+
   ```json
   {
     "Version": "2012-10-17",
@@ -75,23 +113,25 @@ The steps to backup and restore the OpenSearch S3 is:
     ]
   }
   ```
+
 - Create an IAM user and attach the above permission policies, which are added for `TheSnapshotRole`. Save the security credentials for this IAM user for S3 backup/restore.
 - Map the snapshot role in OpenSearch Dashboards. \
   Fine-grained access control introduces an additional step when registering a repository. Even if you use HTTP basic authentication for other purposes, map the `manage_snapshots` role to your IAM user or role with `iam:PassRole` permissions to pass `TheSnapshotRole`.
 
   1. Navigate to the OpenSearch Dashboards plugin for your OpenSearch Service domain. You can find the Dashboards endpoint on your domain dashboard on the OpenSearch Service console.
-  2. From the main menu, choose *Security*, *Roles*, and select the `manage_snapshots` role.
-  3. Choose Mapped users, and Manage mapping.
-  4. Add the domain ARN of the user and role that has permissions to pass `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
+  1. From the main menu, choose *Security*, *Roles*, and select the `manage_snapshots` role.
+  1. Choose Mapped users, and Manage mapping.
+  1. Add the domain ARN of the user and role that has permissions to pass `TheSnapshotRole`. Put user ARNs under Users and role ARNs under Backend roles.
 
-  ```bash
-  arn:aws:iam::123456789123:user/user-name
-  ```
-  ```bash
-  arn:aws:iam::123456789123:role/role-name
-  ```
+      ```bash
+      arn:aws:iam::123456789123:user/user-name
+      ```
 
-  5. Select Map and confirm the user and role showing up under Mapped users.
+      ```bash
+      arn:aws:iam::123456789123:role/role-name
+      ```
+
+  1. Select Map and confirm the user and role showing up under Mapped users.
 
 {{< note >}} To access the default installation of OpenSearch Dashboards for a domain that resides within a VPC, you must have access to the VPC. This process varies by network configuration but likely involves connecting to a VPN or managed network or using a proxy server or transit gateway. Click [here](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html#vpc-security) to know more.
 
@@ -108,6 +148,41 @@ The command provides no feedback and runs indefinitely. Select *Ctrl + C* to sto
 Navigate to `https://localhost:9200/\_dashboards/` in your web browser. To navigate, acknowledge a security exception.
 
 Alternately, you can send requests to `https://localhost:9200` using curl, Postman, or any programming language. {{< /note >}}
+
+### Add Resolvers for OpenSearch
+
+If you want to dynamically resolve the OpenSearch node IPs using DNS servers, you can add resolvers/nameservers to the configuration.
+
+The two ways to add the name servers are:
+
+1. **Add nameserver IPs:** Add the nameservers to your `config.toml` file to resolve the OpenSearch nodes.
+
+    ```toml
+    [esgateway.v1.sys.ngx.main.resolvers]
+      # Multiple resolvers can be specified by adding the resolvers to the list.
+      nameservers = ["192.0.2.0:24", "198.51.100.0:24"]
+    ```
+
+1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
+
+    ```toml
+    [esgateway.v1.sys.ngx.main.resolvers]
+      enable_system_nameservers = true
+    ```
+
+If both options are set, nameserver IPs precede the system nameserver entries.
+
+Apply the changes:
+
+```bash
+sudo chef-automate config patch config.toml
+```
+
+If you wish to reset to the default configuration or to modify the configuration:
+
+1. Run `chef-automate config show > config.toml`.
+1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
+1. Run `chef-automate config set config.toml` to apply your changes.
 
 ## Chef Automate Backup from Embedded PostgreSQL/OpenSearch and restore to External AWS PostgreSQL/OpenSearch
 
