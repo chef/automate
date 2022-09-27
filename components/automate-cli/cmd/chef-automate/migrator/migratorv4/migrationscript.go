@@ -40,6 +40,6 @@ func (ms *MigrationScript) Skip() error {
 	return nil
 }
 
-func (ms *MigrationScript) ExitHandler() error {
-	return nil
+func (ms *MigrationScript) ErrorHandler() {
+	return
 }

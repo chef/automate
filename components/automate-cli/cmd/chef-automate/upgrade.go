@@ -77,15 +77,13 @@ To fix this, delete the file "/hab/svc/deployment-service/data/converge_disable"
 Otherwise, you may need to run "chef-automate dev start-converge".
 `
 
-func handleError(err error) error {
+func handleError(err error) {
 	if err.Error() == upgradeinspectorv4.UPGRADE_TERMINATED {
 		writer.Println(err.Error())
-		return nil
 	}
 	writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + err.Error())
 	writer.Println("Please resolve this and try again.")
 	writer.Println("Please contact support if you are not sure how to resolve this.")
-	return nil
 }
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
@@ -108,21 +106,23 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
 	err := upgradeInspector.ShowInfo()
 	if err != nil {
-		return handleError(err)
+		handleError(err)
+		return nil
 	}
 	upgradeInspector.ShowInspectionList()
 	err = upgradeInspector.Inspect()
 	if err != nil {
-		return handleError(err)
+		err = upgradeInspector.RollBackChangesOnError()
+		if err != nil {
+			handleError(err)
+		}
+		err = upgradeInspector.RunExitAction()
+		if err != nil {
+			handleError(err)
+		}
+		return nil
 	}
-	err = upgradeInspector.RollBackChangesOnError()
-	if err != nil {
-		return handleError(err)
-	}
-	err = upgradeInspector.RunExitAction()
-	if err != nil {
-		return handleError(err)
-	}
+
 	return nil
 
 	a1IsRunning, err := isA1Running()
