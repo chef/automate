@@ -4,11 +4,12 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInspectEnsureStatus(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewEnsureStatusInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetServicesStatusFunc: func() (bool, error) {
 			return false, nil
@@ -21,7 +22,7 @@ func TestInspectEnsureStatus(t *testing.T) {
 }
 
 func TestInspectEnsureStatusError(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewEnsureStatusInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetServicesStatusFunc: func() (bool, error) {
 			return false, errors.New("unexpected")

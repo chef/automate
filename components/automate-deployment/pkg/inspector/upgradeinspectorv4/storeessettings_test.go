@@ -5,11 +5,12 @@ import (
 	"io"
 	"testing"
 
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInspectStoreESSettings(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	dm := NewStoreESSettingsInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
 			return []byte(`{"indices":{"shards":{"total":51}}}`), nil
@@ -22,7 +23,7 @@ func TestInspectStoreESSettings(t *testing.T) {
 }
 
 func TestInspectStoreESSettingsError(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	dm := NewStoreESSettingsInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
 			return nil, errors.New("Unreachable")
@@ -35,7 +36,7 @@ func TestInspectStoreESSettingsError(t *testing.T) {
 }
 
 func TestInspectStoreESSettingsErrorWriting(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	dm := NewStoreESSettingsInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
 			return []byte(`{"indices":{"shards":{"total":51}}}`), nil

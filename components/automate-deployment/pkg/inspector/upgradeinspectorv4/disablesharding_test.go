@@ -5,11 +5,12 @@ import (
 	"io"
 	"testing"
 
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDisableSharding(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewDisableShardingInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
 			return []byte{}, nil
@@ -20,7 +21,7 @@ func TestDisableSharding(t *testing.T) {
 }
 
 func TestDisableShardingError(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewDisableShardingInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
 			return nil, errors.New("Unreachable")
@@ -31,7 +32,7 @@ func TestDisableShardingError(t *testing.T) {
 }
 
 func TestDisableShardingErrorExitHandlerMessage(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewDisableShardingInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
 			return nil, errors.New("Unreachable")
