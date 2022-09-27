@@ -26,7 +26,7 @@ These configuration directions are intended for the initial deployment of Chef A
 **Automate supports OpenSearch connection over HTTPS or HTTP**
 
 Add the following to your `config.toml` for HTTPS connection:
-
+{{< note >}}
 Special characters like **‘ ` " ' \ ; $** are not allowed in the password.
 
 {{< /note >}}
@@ -58,7 +58,7 @@ Special characters like **‘ ` " ' \ ; $** are not allowed in the password.
 ```
 
 Add the following to your `config.toml` for HTTP connection:
-
+{{< note >}}
 Special characters like **‘ ` " ' \ ; $** are not allowed in the password.
 
 {{< /note >}}
