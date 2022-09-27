@@ -22,9 +22,10 @@ These configuration directions are intended for in the initial deployment of Che
 
 Add the following settings to your `config.toml`:
 
-    {{< warning >}}
-    {{% automate/char-warn %}}
-    {{< /warning >}}
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
 
 ```toml
 [global.v1.external.postgresql]

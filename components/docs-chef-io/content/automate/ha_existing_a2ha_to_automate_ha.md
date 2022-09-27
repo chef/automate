@@ -104,9 +104,10 @@ This page explains migrating the existing A2HA data to the newly deployed Chef A
 
     - If using AWS Managed services, then add the below config into `current_config.toml` (change this with your actual credentials)
 
-        {{< warning >}}
-        {{% automate/char-warn %}}
-        {{< /warning >}}
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
 
         ```bash
         [global.v1.external.opensearch.auth]

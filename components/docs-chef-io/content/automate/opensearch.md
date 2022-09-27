@@ -59,6 +59,7 @@ Add the following to your `config.toml` for HTTPS connection:
 ```
 
 Add the following to your `config.toml` for HTTP connection:
+
 {{< warning >}}
 {{% automate/char-warn %}}
 {{< /warning >}}

@@ -75,9 +75,10 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     password = "admin"
     ```
 
-    {{< warning >}}
-    {{% automate/char-warn %}}
-    {{< /warning >}}
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
 
 1. Restore in Chef-Automate HA using the following command:
 
@@ -142,10 +143,11 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     username = "admin"
     password = "admin"
     ```
-    
-    {{< warning >}}
-    {{% automate/char-warn %}}
-    {{< /warning >}}
+
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
 
 1. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster:
 
