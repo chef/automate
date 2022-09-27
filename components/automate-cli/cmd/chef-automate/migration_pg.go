@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorV4"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/lib/user"
@@ -93,7 +94,7 @@ func newMigrateDataCmd() *cobra.Command {
 		Use:   "migrate",
 		Short: "Chef Automate post-major-upgrade migrate",
 		Long:  "Chef Automate migrate. migrate can be used to migrate pg or migrate es",
-		RunE:  runMigrateDataCmd,
+		RunE:  runMigrator,
 	}
 	migrateDataCmd.PersistentFlags().BoolVar(&migrateDataCmdFlags.check, "check", false, "check")
 	migrateDataCmd.PersistentFlags().StringVar(&migrateDataCmdFlags.data, "data", "", "data")
@@ -101,6 +102,19 @@ func newMigrateDataCmd() *cobra.Command {
 	migrateDataCmd.PersistentFlags().BoolVarP(&migrateDataCmdFlags.skipStorageCheck, "skip-storage-check", "s", false, "skip storage check")
 	migrateDataCmd.Flags().BoolVarP(&migrateDataCmdFlags.forceExecute, "force", "f", false, "force-execute")
 	return migrateDataCmd
+}
+
+func runMigrator(cmd *cobra.Command, args []string) error {
+
+	migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorV4.NewMigratorV4Utils(), 10)
+	migrator.(*migratorV4.MigratorV4).AddDefaultMigrationSteps()
+	migrator.(*migratorV4.MigratorV4).ExecuteMigrationSteps()
+	err := migrator.(*migratorV4.MigratorV4).ExecuteDeferredSteps()
+	if err != nil {
+		fmt.Println(err)
+	}
+	migrator.(*migratorV4.MigratorV4).PrintMigrationErrors()
+	return nil
 }
 
 func runCleanup(cmd *cobra.Command, args []string) error {

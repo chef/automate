@@ -9,19 +9,19 @@ import (
 	"github.com/chef/automate/lib/platform/sys"
 )
 
-type PatchOSConfig struct {
+type PatchOpensearchConfig struct {
 	writer *cli.Writer
 	utils  MigratorV4Utils
 }
 
-func NewPatchOSConfig(w *cli.Writer, utils MigratorV4Utils) *PatchOSConfig {
-	return &PatchOSConfig{
+func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils) *PatchOpensearchConfig {
+	return &PatchOpensearchConfig{
 		writer: w,
 		utils:  utils,
 	}
 }
 
-func (poc *PatchOSConfig) Run() error {
+func (poc *PatchOpensearchConfig) Run() error {
 	opensearchSettings := poc.GetDefaultOpensearchSettings()
 	esTotalShards, err := poc.utils.GetEsTotalShardSettings()
 	if err != nil {
@@ -35,7 +35,7 @@ func (poc *PatchOSConfig) Run() error {
 	return nil
 }
 
-func (poc *PatchOSConfig) GetOverrideTotalShards(esShardSetting, osShardSetting int32) int32 {
+func (poc *PatchOpensearchConfig) GetOverrideTotalShards(esShardSetting, osShardSetting int32) int32 {
 	if esShardSetting > osShardSetting {
 		return esShardSetting
 	} else {
@@ -51,7 +51,7 @@ func defaultHeapSizeInGB() int {
 	return opensearch.RecommendedHeapSizeGB(sysMem)
 }
 
-func (poc *PatchOSConfig) GetDefaultOpensearchSettings() *ESSettings {
+func (poc *PatchOpensearchConfig) GetDefaultOpensearchSettings() *ESSettings {
 	defaultSettings := &ESSettings{}
 	defaultSettings.HeapMemory = fmt.Sprintf("%d", defaultHeapSizeInGB())
 	defaultSettings.IndicesBreakerTotalLimit = INDICES_BREAKER_TOTAL_LIMIT_DEFAULT
@@ -61,10 +61,10 @@ func (poc *PatchOSConfig) GetDefaultOpensearchSettings() *ESSettings {
 	return defaultSettings
 }
 
-func (poc *PatchOSConfig) Skip() error {
+func (poc *PatchOpensearchConfig) Skip() error {
 	return nil
 }
 
-func (poc *PatchOSConfig) ExitHandler() error {
-	return nil
+func (poc *PatchOpensearchConfig) ErrorHandler() {
+	return
 }

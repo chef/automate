@@ -21,8 +21,9 @@ type MigrateV4Flags struct {
 	ForceExecute   bool
 }
 
-func NewMigratorV4(autoAccept, forceExecute bool, migratorUtils MigratorV4Utils, timeout int64) *MigratorV4 {
+func NewMigratorV4(writer *cli.Writer, autoAccept, forceExecute bool, migratorUtils MigratorV4Utils, timeout int64) migrator.Migrator {
 	return &MigratorV4{
+		writer: writer,
 		MigrateV4Flags: &MigrateV4Flags{
 			AutoAcceptFlag: autoAccept,
 			ForceExecute:   forceExecute,
@@ -32,7 +33,7 @@ func NewMigratorV4(autoAccept, forceExecute bool, migratorUtils MigratorV4Utils,
 	}
 }
 
-func (m *MigratorV4) Run() (err error) {
+func (m *MigratorV4) ExecuteMigrationSteps() (err error) {
 	if !m.migrationConsent {
 		return errors.New("Can't process without user consent.")
 	}
@@ -64,6 +65,14 @@ func (m *MigratorV4) AskForConfirmation() (bool, error) {
 
 func (m *MigratorV4) AddDefaultMigrationSteps() {
 	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils))
-	m.AddMigrationSteps(NewPatchOSConfig(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewPatchOpensearchConfig(m.writer, m.migratorUtils))
 	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils))
+}
+
+func (m *MigratorV4) ExecuteDeferredSteps() error {
+	return nil
+}
+
+func (m *MigratorV4) PrintMigrationErrors() error {
+	return nil
 }

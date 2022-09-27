@@ -44,7 +44,7 @@ type MigratorV4Utils interface {
 	ReadMigrationMetadata() error
 	UpdateMigrationMetadata() error
 	GetEsTotalShardSettings() (int32, error)
-	PatchOpensearchConfig(*ESSettings) (string, string, error)
+	PatchOpensearchConfig(es *ESSettings) (string, string, error)
 	IsExternalElasticSearch(timeout int64) bool
 	StopAutomate() error
 	StartAutomate() error

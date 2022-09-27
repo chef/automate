@@ -11,15 +11,14 @@ import (
 )
 
 type UpgradeInspectorV4 struct {
-	writer            *cli.Writer
-	inspections       []inspector.Inspection
-	osDestDir         string
-	skipStorageCheck  bool
-	upgradeUtils      UpgradeV4Utils
-	fileUtils         fileutils.FileUtils
-	timeout           int64
-	isExternal        bool
-	inspectorRunError bool
+	writer           *cli.Writer
+	inspections      []inspector.Inspection
+	osDestDir        string
+	skipStorageCheck bool
+	upgradeUtils     UpgradeV4Utils
+	fileUtils        fileutils.FileUtils
+	timeout          int64
+	isExternal       bool
 }
 
 const (
@@ -97,7 +96,7 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 	}
 	ui.writer.Println("")
 	if err != nil {
-		ui.inspectorRunError = true
+		return err
 	}
 	// ui.inspectorError = ui.inspectionErrorStatus()
 	return nil
@@ -114,15 +113,13 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 // }
 
 func (ui *UpgradeInspectorV4) RollBackChangesOnError() (err error) {
-	if ui.inspectorRunError {
-		for _, inspection := range ui.inspections {
-			var i interface{} = inspection
-			_, ok := i.(inspector.RollbackInspection)
-			if ok {
-				err = inspection.(inspector.RollbackInspection).RollBackHandler()
-				if err != nil {
-					return err
-				}
+	for _, inspection := range ui.inspections {
+		var i interface{} = inspection
+		_, ok := i.(inspector.RollbackInspection)
+		if ok {
+			err = inspection.(inspector.RollbackInspection).RollBackHandler()
+			if err != nil {
+				return err
 			}
 		}
 	}
