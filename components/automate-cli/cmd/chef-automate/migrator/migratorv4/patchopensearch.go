@@ -2,16 +2,23 @@ package migratorV4
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/briandowns/spinner"
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/chef/automate/lib/platform/sys"
+	"github.com/fatih/color"
 )
 
 type PatchOpensearchConfig struct {
-	writer *cli.Writer
-	utils  MigratorV4Utils
+	writer     *cli.Writer
+	utils      MigratorV4Utils
+	spinner    *spinner.Spinner
+	runError   error
+	hasError   bool
+	isExecuted bool
 }
 
 func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils) *PatchOpensearchConfig {
@@ -22,17 +29,29 @@ func NewPatchOpensearchConfig(w *cli.Writer, utils MigratorV4Utils) *PatchOpense
 }
 
 func (poc *PatchOpensearchConfig) Run() error {
+	poc.showUpdating()
 	opensearchSettings := poc.GetDefaultOpensearchSettings()
 	esTotalShards, err := poc.utils.GetEsTotalShardSettings()
 	if err != nil {
+		poc.showUpdateError()
+		poc.setError(err)
 		return err
 	}
 	opensearchSettings.TotalShardSettings = poc.GetOverrideTotalShards(esTotalShards, opensearchSettings.TotalShardSettings)
 	_, _, err = poc.utils.PatchOpensearchConfig(opensearchSettings)
 	if err != nil {
+		poc.showUpdateError()
+		poc.setError(err)
 		return err
 	}
+	poc.showUpdated()
 	return nil
+}
+
+func (poc *PatchOpensearchConfig) setError(err error) error {
+	poc.runError = err
+	poc.hasError = true
+	return err
 }
 
 func (poc *PatchOpensearchConfig) GetOverrideTotalShards(esShardSetting, osShardSetting int32) int32 {
@@ -66,5 +85,26 @@ func (poc *PatchOpensearchConfig) Skip() error {
 }
 
 func (poc *PatchOpensearchConfig) ErrorHandler() {
-	return
+	if poc.hasError {
+		poc.writer.Println(poc.runError.Error())
+	}
+}
+
+func (poc *PatchOpensearchConfig) showUpdateError() {
+	poc.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  Failed to copy data"
+	poc.spinner.Stop()
+	poc.writer.Println("")
+}
+
+func (poc *PatchOpensearchConfig) showUpdated() {
+	poc.spinner.FinalMSG = color.New(color.FgGreen).Sprint("✔") + "  OpenSearch configurations updated successfully"
+	poc.spinner.Stop()
+	poc.writer.Println("")
+}
+
+func (poc *PatchOpensearchConfig) showUpdating() {
+	poc.spinner = poc.writer.NewSpinner()
+	poc.spinner.Suffix = fmt.Sprintf("  Updating OpenSearch configurations")
+	poc.spinner.Start()
+	time.Sleep(time.Second)
 }

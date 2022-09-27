@@ -2,9 +2,11 @@ package migratorV4
 
 import (
 	"fmt"
-	"os/exec"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/fatih/color"
 )
 
 const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
@@ -18,8 +20,12 @@ chown -RL hab:hab %[1]vsvc/automate-opensearch/data;
 chown -RL hab:hab %[1]vsvc/automate-opensearch/var;`
 
 type MigrationScript struct {
-	writer *cli.Writer
-	utils  MigratorV4Utils
+	writer     *cli.Writer
+	utils      MigratorV4Utils
+	spinner    *spinner.Spinner
+	runError   error
+	hasError   bool
+	isExecuted bool
 }
 
 func NewMigrationScript(w *cli.Writer, utils MigratorV4Utils) *MigrationScript {
@@ -29,11 +35,43 @@ func NewMigrationScript(w *cli.Writer, utils MigratorV4Utils) *MigrationScript {
 	}
 }
 
+func (ms *MigrationScript) setError(err error) error {
+	ms.runError = err
+	ms.hasError = true
+	return err
+}
+
+func (ms *MigrationScript) showCopyError() {
+	ms.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  Failed to copy data"
+	ms.spinner.Stop()
+	ms.writer.Println("")
+}
+
+func (ms *MigrationScript) showCopied() {
+	ms.spinner.FinalMSG = color.New(color.FgGreen).Sprint("✔") + "  Data Copied Successfully"
+	ms.spinner.Stop()
+	ms.writer.Println("")
+}
+
+func (ms *MigrationScript) showCopying() {
+	ms.spinner = ms.writer.NewSpinner()
+	ms.spinner.Suffix = fmt.Sprintf("  Copying Data")
+	ms.spinner.Start()
+	time.Sleep(time.Second)
+}
+
 func (ms *MigrationScript) Run() error {
+	ms.showCopying()
 	habRoot := ms.utils.GetHabRootPath(habrootcmd)
 	script := fmt.Sprintf(fscript, habRoot)
-	command := exec.Command("/bin/sh", "-c", script)
-	return command.Run()
+	err := ms.utils.ExecShCommand(script)
+	if err != nil {
+		ms.showCopyError()
+		ms.setError(err)
+		return err
+	}
+	ms.showCopied()
+	return nil
 }
 
 func (ms *MigrationScript) Skip() error {
@@ -41,5 +79,7 @@ func (ms *MigrationScript) Skip() error {
 }
 
 func (ms *MigrationScript) ErrorHandler() {
-	return
+	if ms.hasError {
+		ms.writer.Println(ms.runError.Error())
+	}
 }
