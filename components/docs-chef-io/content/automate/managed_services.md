@@ -43,6 +43,7 @@ The steps to backup and restore the OpenSearch S3 is:
 - Create an IAM role with a couple of Permission Policies listed below. The rest of the document refers to the role as `TheSnapshotRole`.
   - AmazonS3FullAccess
   - To register the snapshot repository, pass the `TheSnapshotRole` to OpenSearch Service. Access the **es:ESHttpPut** action. To grant these permissions, attach the following policy to the IAM user or role whose credentials are being used to sign the request, as shown below example:
+
   ```json
   {
     "Version": "2012-10-17",
@@ -166,10 +167,7 @@ These configuration directions are intended for the initial deployment of Chef A
 
 Create `postgresql.toml` file and add the following details of your AWS PostgreSQL RDS:
 
-> **_NOTE:_**  The following special characters are not allowed in password.  
-```
-    ‘ ` " ' \ ;
-```
+{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
 
 ```toml
 [global.v1.external.postgresql]
@@ -386,10 +384,7 @@ These configuration directions are intended for External AWS managed PostgreSQL 
 
 Add the following settings to your `config.toml`:
 
-> **_NOTE:_**  The following special characters are not allowed in password.  
-```
-    ‘ ` " ' \ ;
-```
+{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
 
 ```toml
 [global.v1.external.postgresql]
@@ -423,10 +418,7 @@ These configuration directions are intended for External AWS managed OpensSearch
 
 Add the following to your `config.toml` file:
 
-> **_NOTE:_**  The following special characters are not allowed in password.  
-```
-    ‘ ` " ' \ ;
-```
+{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
 
 ```toml
 [global.v1.external.opensearch]
