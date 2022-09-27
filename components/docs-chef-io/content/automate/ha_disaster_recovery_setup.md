@@ -1,15 +1,15 @@
 +++
-title = "Disaster Recovery"
+title = "Disaster Recovery Setup"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Disaster Recovery"
-    parent = "automate/deploy_high_availability/DR SetUp"
-    identifier = "automate/deploy_high_availability/dr.md Disaster Recovery"
-    weight = 220
+    title = "Disaster Recovery Setup"
+    parent = "automate/deploy_high_availability/disaster_recovery"
+    identifier = "automate/deploy_high_availability/ha_disaster_recovery_setup.md Disaster Recovery"
+    weight = 200
 +++
 
 ## Setup Disaster Recovery Cluster For OnPrem Deployment
