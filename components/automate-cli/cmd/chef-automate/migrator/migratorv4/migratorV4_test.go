@@ -59,3 +59,18 @@ func TestRunSuccessfulMigrations(t *testing.T) {
 	assert.Contains(t, w.Output(), expected6)
 
 }
+
+func TestRunSuccessfulMigrationsWithError(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	mmu := &MockMigratorV4UtilsImpl{
+		StopAutomateFunc:            func() error { return nil },
+		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
+		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
+		ExecShCommandFunc:           func(script string) error { return nil },
+	}
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, 10)
+	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
+	err := migratorv4.ExecuteMigrationSteps()
+	assert.Error(t, err, "Can't process without user consent.")
+}
