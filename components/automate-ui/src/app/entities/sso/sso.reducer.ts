@@ -13,8 +13,6 @@ export interface SsoEntityState extends EntityState<Sso> {
 }
 
 const STATUS = "status";
-const SAVE_STATUS = "saveStatus";
-const SAVE_ERROR = 'saveError';
 
 export const ssoEntityAdapter: EntityAdapter<Sso> = 
   createEntityAdapter<Sso>();
@@ -43,12 +41,10 @@ export function SsoEntityReducer(
       ) as SsoEntityState;
     }
 
-    // case SsoActionTypes.GET_ALL_FAILURE: {
-    //   return set(STATUS, EntityStatus.loadingFailure, state 
-    //   )as SsoEntityState;
-    // }
-    // default: 
-    //   return state;
+    case SsoActionTypes.GET_ALL_FAILURE: {
+      return set(STATUS, EntityStatus.loadingFailure, state 
+      )as SsoEntityState;
+    }
   }
   return state;
 }

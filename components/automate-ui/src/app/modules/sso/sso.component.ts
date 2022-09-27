@@ -8,6 +8,7 @@ import { saveStatus } from 'app/entities/sso/sso.selectors';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { EntityStatus , pending} from 'app/entities/entities';
+
 @Component({
   selector: 'app-sso',
   templateUrl: './sso.component.html'
@@ -33,14 +34,13 @@ export class SsoComponent implements OnInit {
     this.store.pipe(
       select(saveStatus),
       takeUntil(this.isDestroyed),
-      filter(state => this.createModalVisible && !pending(state))
+      filter(state => this.createModalVisible && !pending(state)))
         .subscribe(state => {
           this.createconfig = false;
           if(state === EntityStatus.loadingSuccess) {
             console.log("Api was called!")
           }
         })
-    )
   }
 
   getConfigDetails() {

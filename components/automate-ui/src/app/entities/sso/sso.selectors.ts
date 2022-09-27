@@ -5,10 +5,10 @@ export const ssoState =
     createFeatureSelector<SsoEntityState>('sso');
 
 export const {
-    selectAll: GetAllSsoConfig
+    selectAll: allConfig,
   } = ssoEntityAdapter.getSelectors(ssoState);
 
-export const saveStatus = createSelector (
+export const saveStatus = createSelector(
     ssoState,
     (state) => state.status
 )
