@@ -572,7 +572,7 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	//Handle the case where user has updated the opensearch_config.toml i.e. `y` case
 	spinner := startSpinner("Updating external OpenSearch configurations")
 	//TODO: Need to add opensearch_config.toml path
-	exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", patchConfigCommand, "/path/to/opensearch.toml")).Output()
+	exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", patchConfigCommand, "PATH_TO_OPENSEARCH-CONFIG.TOML_FILE")).Output()
 	stopSpinner(spinner, "External OpenSearch configurations updated successfully.")
 	_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, true)
 	if err != nil {
