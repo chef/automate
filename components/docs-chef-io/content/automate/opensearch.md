@@ -27,10 +27,9 @@ These configuration directions are intended for the initial deployment of Chef A
 
 Add the following to your `config.toml` for HTTPS connection:
 
-> **_NOTE:_**  The following special characters are not allowed in password.  
-```
-    ‘ ` " ' \ ;
-```
+{{< warning >}}
+{{% automate/chars-notallowed %}}
+{{< /warning >}}
 
 ```toml
 [global.v1.external.opensearch]
