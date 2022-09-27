@@ -37,9 +37,6 @@ type ComplianceInfo interface{}
 var url = "https://%s:%s"
 var errorcsv = "Error while writing csv: "
 var timeFormat = "2006-01-02"
-var dateFormat = "yyyy-MM-dd"
-var datetimeFormat = "yyyy-MM-dd-HH:mm:ss"
-var datetimesecFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
 var errorQuery = "Error in query: "
 
 func elasticSearchConnection(url string, esHostName string, esPort string, esUserName string, esPassword string) *elastic.Client {
