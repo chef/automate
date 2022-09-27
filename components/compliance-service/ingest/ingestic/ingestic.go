@@ -330,22 +330,24 @@ func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, nodeId str
 	return err
 }
 
-// func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
-// 	t := time.Now()
-// 	var runInfo relaxting.ESComplianceRunInfo
-// 	var err error
-// 	mapping := mappings.ComplianceRunInfo
-// 	t1 := time.Now()
-// 	runInfo = MapReportToRunInfo(report, runDateTime)
-// 	logrus.Info("Completed mapping report to runinfo in ", time.Since(t1).Seconds())
+/*
+func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
+	t := time.Now()
+	var runInfo relaxting.ESComplianceRunInfo
+	var err error
+	mapping := mappings.ComplianceRunInfo
+	t1 := time.Now()
+	runInfo = MapReportToRunInfo(report, runDateTime)
+	logrus.Info("Completed mapping report to runinfo in ", time.Since(t1).Seconds())
 
-// 	t1 = time.Now()
-// 	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
-// 	logrus.Info("Completed upsert report to runinfo in ", time.Since(t1).Seconds())
+	t1 = time.Now()
+	err = backend.upsertComplianceRunInfo(ctx, mapping, runInfo, runDateTime)
+	logrus.Info("Completed upsert report to runinfo in ", time.Since(t1).Seconds())
 
-// 	logrus.Info("Completed InsertComplianceRunInfo in ", time.Since(t).Seconds())
-// 	return err
-// }
+	logrus.Info("Completed InsertComplianceRunInfo in ", time.Since(t).Seconds())
+	return err
+}
+*/
 
 func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time) relaxting.ESComplianceRunInfo {
 	rInfo := relaxting.ESComplianceRunInfo{}
