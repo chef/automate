@@ -545,13 +545,17 @@ func stopSpinner(spinner *spinner.Spinner, msg string) {
 	writer.Println("")
 }
 
+func startMigration() error {
+	return nil
+}
+
 // postUpgradeStatusExternal - Handle case for external opensearch after upgrade status
 func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	printUpgradeStatusMsg(resp)
 	err := promptCheckList("Have you updated your opensearch_config.toml with actual external OpenSearch connection configurations? (y/n)")
 	writer.Println("")
 	if err != nil {
-		//Handle the case where user has not updated the opensearch_config.toml
+		//Handle the case where user has not updated the opensearch_config.toml i.e. `n` case
 		if strings.Contains(err.Error(), "cancelled") {
 			writer.Println("After the upgrade, you must update opensearch.toml with actual external OpenSearch connection configurations and then run the below patch command to update the configurations:")
 			writer.Println("$ chef-automate config patch opensearch.toml")
@@ -565,7 +569,7 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 		}
 		return err
 	}
-	//Handle the case where user has updated the opensearch_config.toml
+	//Handle the case where user has updated the opensearch_config.toml i.e. `y` case
 	spinner := startSpinner("Updating external OpenSearch configurations")
 	//TODO: Need to add opensearch_config.toml path
 	exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", patchConfigCommand, "/path/to/opensearch.toml")).Output()
@@ -579,8 +583,42 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 }
 
 // postUpgardeStatusEmbedded - Handle case for embedded opensearch after upgrade status
-func postUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) {
+func postUpgardeStatusEmbedded(resp *api.UpgradeStatusResponse) error {
 	printUpgradeStatusMsg(resp)
+	err := promptCheckList("Do you wish to migrate the Elasticsearch data to OpenSearch now? (y/n)")
+	writer.Println("")
+	if err != nil {
+		//Handle the case where user does not wish to migrate the Elasticsearch data to OpenSearch i.e. `n` case
+		if strings.Contains(err.Error(), "cancelled") {
+			writer.Println(color.New(color.FgYellow).Sprint("!") + " [" + color.New(color.FgYellow).Sprint("Warning") + "] " + "  Any data collected until the migration will be lost.")
+			writer.Println("")
+			err = promptCheckList("Are you sure to skip migration? (y/n)")
+			if err != nil {
+				//Handle the case where user does not wish to skip migration i.e. `n` case
+				if strings.Contains(err.Error(), "cancelled") {
+					//TODO: Need to add the command to migrate the Elasticsearch data to OpenSearch
+					return startMigration()
+				}
+				return err
+			}
+			//Handle the case where user wishes to skip migration i.e. `y` case
+			writer.Println("Data migration skipped")
+			writer.Println("")
+			writer.Println("To migrate data later on, use this command")
+			writer.Println("$ chef-automate post-major-upgrade migrate -data=es")
+			writer.Println("")
+			_, _, err := majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
+			if err != nil {
+				return err
+			}
+			writer.Println(fmt.Sprintf("%s Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
+			return nil
+		}
+		return err
+	}
+	//Handle the case where user wish to migrate the Elasticsearch data to OpenSearch i.e. `y`
+	//TODO: Need to add the command to migrate the Elasticsearch data to OpenSearch
+	return startMigration()
 }
 
 func isA1Running() (bool, error) {
