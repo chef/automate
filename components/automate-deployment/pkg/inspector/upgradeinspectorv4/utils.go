@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/chef/automate/api/config/deployment"
-	"github.com/chef/automate/api/config/load_balancer"
 	"github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -66,7 +65,7 @@ func (cu *UpgradeV4UtilsImp) PatchS3backupURL(timeout int64) (stdOut, stdErr str
 			},
 		},
 	}
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	err = client.PatchAutomateConfig(10, cfg, tw.CliWriter)
 	if err != nil {
 		return "", "", err
@@ -75,22 +74,7 @@ func (cu *UpgradeV4UtilsImp) PatchS3backupURL(timeout int64) (stdOut, stdErr str
 }
 
 func (cu *UpgradeV4UtilsImp) SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error) {
-	enable := wrapperspb.Bool(status)
-	cfg := deployment.NewUserOverrideConfig()
-	cfg.LoadBalancer = &load_balancer.ConfigRequest{
-		V1: &load_balancer.ConfigRequest_V1{
-			Sys: &load_balancer.ConfigRequest_V1_System{
-				Service: &load_balancer.ConfigRequest_V1_System_Service{
-					MaintenanceMode: enable,
-				},
-			},
-		},
-	}
-	tw := NewTestWriter()
-	if err := client.PatchAutomateConfig(10, cfg, tw.CliWriter); err != nil {
-		return "", "", err
-	}
-	return tw.WriteBuffer.String(), tw.ErrorBuffer.String(), nil
+	return majorupgrade_utils.SetMaintenanceMode(timeout, status)
 }
 
 func (cu *UpgradeV4UtilsImp) IsExternalElasticSearch(timeout int64) bool {

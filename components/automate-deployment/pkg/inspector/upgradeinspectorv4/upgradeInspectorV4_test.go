@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUpgradeInspectorV4ShowInfoWithNoInspections(t *testing.T) {
-	tw := NewTestWriterWithInputs("y")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -38,7 +39,7 @@ Would you like to proceed with the upgrade? (y/n)
 }
 
 func TestUpgradeInspectorV4ShowInfoWithOSDestDirIsHab(t *testing.T) {
-	tw := NewTestWriterWithInputs("y")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -65,7 +66,7 @@ Would you like to proceed with the upgrade? (y/n)
 }
 
 func TestUpgradeInspectorV4ShowInfoWithOSDestDir(t *testing.T) {
-	tw := NewTestWriterWithInputs("y")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -89,7 +90,7 @@ Would you like to proceed with the upgrade? (y/n)
 }
 
 func TestUpgradeInspectorV4ShowInfoWithNoInput(t *testing.T) {
-	tw := NewTestWriterWithInputs("n")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("n")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -118,7 +119,7 @@ Would you like to proceed with the upgrade? (y/n)
 }
 
 func TestUpgradeInspectorV4ShowInfoWithInspections(t *testing.T) {
-	tw := NewTestWriterWithInputs("y")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -152,7 +153,7 @@ Would you like to proceed with the upgrade? (y/n)
 }
 
 func TestUpgradeInspectorV4ShowInfoWithInspectionsWithFilesystemError(t *testing.T) {
-	tw := NewTestWriterWithInputs("y")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -179,7 +180,7 @@ Please make sure following things are taken care of
 }
 
 func TestUpgradeInspectorV4ShowInfoInvalidInputError(t *testing.T) {
-	tw := NewTestWriterWithInputs("t")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("t")
 	expected := `This is a major upgrade!
 In this release, Elasticsearch will be migrated to OpenSearch.
 
@@ -207,7 +208,7 @@ Would you like to proceed with the upgrade? (y/n)
 }
 
 func TestUpgradeInspectorV4Inspect(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -244,7 +245,7 @@ func TestUpgradeInspectorV4Inspect(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -283,7 +284,7 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -324,7 +325,7 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4InspectShowInspectionListForOsDest(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -354,7 +355,7 @@ func TestUpgradeInspectorV4InspectShowInspectionListForOsDest(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4ShowInspectionListForExternal(t *testing.T) {
-	tw := NewTestWriterWithInputs("y", "1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y", "1")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
@@ -387,7 +388,7 @@ func TestUpgradeInspectorV4ShowInspectionListForExternal(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4ShowInspectionListForEmbedded(t *testing.T) {
-	tw := NewTestWriterWithInputs("y", "1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y", "1")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
@@ -420,7 +421,7 @@ func TestUpgradeInspectorV4ShowInspectionListForEmbedded(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4RunInspectForOsDestDirSkipped(t *testing.T) {
-	tw := NewTestWriterWithInputs("y", "1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y", "1")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -461,7 +462,7 @@ func TestUpgradeInspectorV4RunInspectForOsDestDirSkipped(t *testing.T) {
 }
 
 func TestUpgradeInspectorV4ExitMessage(t *testing.T) {
-	tw := NewTestWriterWithInputs("y", "1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y", "1")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -515,7 +516,7 @@ Upgrade process terminated.`
 }
 
 func TestUpgradeInspectorV4ExitMessageFailedMaintenance(t *testing.T) {
-	tw := NewTestWriterWithInputs("y", "1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y", "1")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,
@@ -576,7 +577,7 @@ Upgrade process terminated.`
 }
 
 func TestUpgradeInspectorV4SkipAllEnsureStatusFailure(t *testing.T) {
-	tw := NewTestWriterWithInputs("y", "1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y", "1")
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBToPassTest,

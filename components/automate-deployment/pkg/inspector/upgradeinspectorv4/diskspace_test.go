@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,7 +44,7 @@ func GetHabRootPath() string {
 }
 
 func TestDiskSpaceInspection(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -59,7 +60,7 @@ func TestDiskSpaceInspection(t *testing.T) {
 }
 
 func TestDiskSpaceInspectionWithExternal(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -75,7 +76,7 @@ func TestDiskSpaceInspectionWithExternal(t *testing.T) {
 }
 
 func TestDiskSpaceInspectionWithOSDataDir(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -92,7 +93,7 @@ func TestDiskSpaceInspectionWithOSDataDir(t *testing.T) {
 }
 
 func TestDiskSpaceInspectionFileSystemError(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGBError,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -110,7 +111,7 @@ func TestDiskSpaceInspectionFileSystemError(t *testing.T) {
 }
 
 func TestDiskSpaceInspectionFreeDiskFilesystemError(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGBError,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -128,7 +129,7 @@ func TestDiskSpaceInspectionFreeDiskFilesystemError(t *testing.T) {
 }
 
 func TestDiskSpaceInspectionWithHabFilesystemError(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorHab,
@@ -146,7 +147,7 @@ func TestDiskSpaceInspectionWithHabFilesystemError(t *testing.T) {
 }
 
 func TestDiskSpaceInspectionWithOSDataDirFilesystemError(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorOSDestDir,
@@ -162,7 +163,7 @@ func TestDiskSpaceInspectionWithOSDataDirFilesystemError(t *testing.T) {
 }
 
 func TestDiskSpaceInspect(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -190,7 +191,7 @@ func TestDiskSpaceInspect(t *testing.T) {
 }
 
 func TestDiskSpaceInspectHabFailed(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGBErrorHab,

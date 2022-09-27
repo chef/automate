@@ -4,11 +4,12 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInspectReplaceS3URL(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewReplaceS3UrlInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetBackupS3URLFunc: func(timeout int64) (string, error) {
 			return "https://s3.us-east-1.amazonaws.com", nil
@@ -22,7 +23,7 @@ func TestInspectReplaceS3URL(t *testing.T) {
 }
 
 func TestInspectReplaceS3URLErrorInGetUrl(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewReplaceS3UrlInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetBackupS3URLFunc: func(timeout int64) (string, error) {
 			return "", errors.New("unexpected")
@@ -36,7 +37,7 @@ func TestInspectReplaceS3URLErrorInGetUrl(t *testing.T) {
 }
 
 func TestInspectReplaceS3URLErrorInPatchUrl(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewReplaceS3UrlInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetBackupS3URLFunc: func(timeout int64) (string, error) {
 			return "https://s3.us-east-1.amazonaws.com", nil
@@ -50,7 +51,7 @@ func TestInspectReplaceS3URLErrorInPatchUrl(t *testing.T) {
 }
 
 func TestOutputInspectReplaceS3URLErrorInGetUrl(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	ds := NewReplaceS3UrlInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetBackupS3URLFunc: func(timeout int64) (string, error) {
 			return "", errors.New("unexpected")
