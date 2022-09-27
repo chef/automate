@@ -44,19 +44,23 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 }
 
 // This method will support adding a document with a specified id
-func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, runInfo relaxting.ESComplianceRunInfo, runDateTime time.Time) error {
+func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
 
-	_, err := backend.client.Index().
+	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
+
+	_, err := backend.client.Update().
 		Index(mapping.Index).
-		Id(runInfo.NodeID).
-		BodyJson(runInfo).
-		Refresh("false").
+		Id(id).
+		Script(script).
+		Upsert(map[string]interface{}{
+			"node_uuid": id,
+			"first_run": runDateTime,
+			"last_run":  runDateTime,
+		}).
 		Do(ctx)
-	if err != nil {
-		return errors.Wrap(err, "Insert Comp Node Run Info")
-	}
 
-	return nil
+	return err
 }
 
 // InitializeStore runs the necessary initialization processes to make elasticsearch usable
@@ -269,7 +273,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 	}
 
 	if data.DayLatest {
-		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, true)
+		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping)
 		if err != nil {
 			return err
 		}
@@ -300,7 +304,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 	}
 
 	if data.DayLatest {
-		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping, false)
+		err = backend.UpdateDayLatestToFalse(ctx, data.NodeID, id, index, mapping)
 		if err != nil {
 			return err
 		}
@@ -320,6 +324,13 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 	return err
 }
 
+func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, nodeId string, runDateTime time.Time) error {
+	mapping := mappings.ComplianceRunInfo
+	err := backend.upsertComplianceRunInfo(ctx, mapping, nodeId, runDateTime)
+	return err
+}
+
+/*
 func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *relaxting.ESInSpecReport, runDateTime time.Time) error {
 	t := time.Now()
 	var runInfo relaxting.ESComplianceRunInfo
@@ -336,6 +347,7 @@ func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, report *re
 	logrus.Info("Completed InsertComplianceRunInfo in ", time.Since(t).Seconds())
 	return err
 }
+*/
 
 func MapReportToRunInfo(report *relaxting.ESInSpecReport, runDateTime time.Time) relaxting.ESComplianceRunInfo {
 	rInfo := relaxting.ESComplianceRunInfo{}
@@ -382,7 +394,7 @@ func GetProfiles(profilesReport []relaxting.ESInSpecReportProfile) []relaxting.P
 }
 
 // Sets the 'day_latest' field to 'false' for all reports (except <reportId>) of node <nodeId> from yesterday upto 90 days UTC index.
-func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId string, reportId string, index string, mapping mappings.Mapping, useSummaryIndex bool) error {
+func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId string, reportId string, index string, mapping mappings.Mapping) error {
 	termQueryDayLatestTrue := elastic.NewTermQuery("day_latest", true)
 	termQueryThisNode := elastic.NewTermsQuery("node_uuid", nodeId)
 	termQueryNotThisReport := elastic.NewTermsQuery("_id", reportId)
@@ -395,22 +407,19 @@ func (backend *ESClient) UpdateDayLatestToFalse(ctx context.Context, nodeId stri
 	script := elastic.NewScript("ctx._source.day_latest = false")
 
 	oneDayAgo := time.Now().Add(-24 * time.Hour)
+	indexOneDayAgo := mapping.IndexTimeseriesFmt(oneDayAgo)
 
-	time90daysAgo := time.Now().Add(-24 * time.Hour * 90)
-
-	// Making a filter query to get all the indices from today to 90 days back
-	filters := map[string][]string{"start_time": {time90daysAgo.Format(time.RFC3339)}, "end_time": {oneDayAgo.Format(time.RFC3339)}}
-
-	// Getting all the indices
-	esIndexs, err := relaxting.GetEsIndex(filters, useSummaryIndex)
-	if err != nil {
-		logrus.Errorf("Cannot get indexes: %+v", err)
-		return err
+	// Avoid making an unnecessary update that will overlap with the update from the 'setLatestsToFalse' function
+	// Overlapping ES updates with Refresh(false) on same indices lead to inconsistent results
+	if index == indexOneDayAgo {
+		logrus.Debug("setYesterdayLatestToFalse: day_latest not required when the report end_time is on yesterday's UTC day")
+		return nil
+	} else {
+		logrus.Debugf("setYesterdayLatestToFalse: updating day_latest=false on %s", indexOneDayAgo)
 	}
 
-	// Updating in all the Indices
-	_, err = elastic.NewUpdateByQueryService(backend.client).
-		Index(esIndexs).
+	_, err := elastic.NewUpdateByQueryService(backend.client).
+		Index(indexOneDayAgo + "*").
 		Query(boolQueryDayLatestThisNodeNotThisReport).
 		Script(script).
 		Refresh("false").
