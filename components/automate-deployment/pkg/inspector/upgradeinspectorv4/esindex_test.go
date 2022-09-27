@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -74,7 +75,7 @@ func GetESBasePath(timeout int64) string {
 }
 
 func TestShowInfo(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNonAutomate,
@@ -89,7 +90,7 @@ func TestShowInfo(t *testing.T) {
 }
 
 func TestFetchOldIndexInfo(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNonAutomate,
@@ -105,7 +106,7 @@ func TestFetchOldIndexInfo(t *testing.T) {
 }
 
 func TestGetShortInfo(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNonAutomate,
@@ -118,7 +119,7 @@ func TestGetShortInfo(t *testing.T) {
 }
 
 func TestShowErrorListOldAutomateIndices(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNonAutomate,
@@ -132,7 +133,7 @@ func TestShowErrorListOldAutomateIndices(t *testing.T) {
 }
 
 func TestShowErrorListOldOtherIndices(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNonAutomate,
@@ -146,7 +147,7 @@ func TestShowErrorListOldOtherIndices(t *testing.T) {
 }
 
 func TestInspectWithOldNonAutomateIndicesWithExit(t *testing.T) {
-	tw := NewTestWriterWithInputs("2")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("2")
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNonAutomate,
@@ -180,7 +181,7 @@ func TestInspectWithOldNonAutomateIndicesWithExit(t *testing.T) {
 }
 
 func TestInspectWithOldAutomateIndicesWithExit(t *testing.T) {
-	tw := NewTestWriterWithInputs("2")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("2")
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestOldAutomate,
@@ -214,7 +215,7 @@ func TestInspectWithOldAutomateIndicesWithExit(t *testing.T) {
 }
 
 func TestInspectWithOldAutomateAndNonAutomateIndicesWithExit(t *testing.T) {
-	tw := NewTestWriterWithInputs("2")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("2")
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestOldAutomateAndNonAutomate,
@@ -250,7 +251,7 @@ func TestInspectWithOldAutomateAndNonAutomateIndicesWithExit(t *testing.T) {
 }
 
 func TestInspectWithOldIndicesAndDelete(t *testing.T) {
-	tw := NewTestWriterWithInputs("1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("1")
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNonAutomate,
@@ -265,7 +266,7 @@ func TestInspectWithOldIndicesAndDelete(t *testing.T) {
 }
 
 func TestInspectWithNoOldIndices(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestNoOldIndex,
@@ -280,7 +281,7 @@ func TestInspectWithNoOldIndices(t *testing.T) {
 }
 
 func TestInspectWithFailedApiCalls(t *testing.T) {
-	tw := NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc:             ExecRequestError,
@@ -295,7 +296,7 @@ func TestInspectWithFailedApiCalls(t *testing.T) {
 }
 
 func TestInspectWithFailedDelete(t *testing.T) {
-	tw := NewTestWriterWithInputs("1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("1")
 	mockUtil := &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: IsExternal,
 		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
@@ -323,7 +324,7 @@ Upgrade process terminated.`
 }
 
 func TestShouldDelete(t *testing.T) {
-	tw := NewTestWriterWithInputs("y", "w", "1")
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y", "w", "1")
 	mockUtil := &MockUpgradeV4UtilsImp{}
 	ei := NewESIndexInspection(tw.CliWriter, mockUtil, GetESBasePath(10))
 

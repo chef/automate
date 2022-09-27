@@ -13,7 +13,6 @@ import (
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
-	"github.com/chef/automate/components/automate-deployment/pkg/inspector/upgradeinspectorv4"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -99,7 +98,7 @@ func (m *MigratorV4UtilsImpl) PatchOpensearchConfig(osConfig *ESSettings) (strin
 			},
 		},
 	}
-	tw := upgradeinspectorv4.NewTestWriter()
+	tw := majorupgrade_utils.NewCustomWriter()
 	err := client.PatchAutomateConfig(10, cfg, tw.CliWriter)
 	if err != nil {
 		return "", "", err
