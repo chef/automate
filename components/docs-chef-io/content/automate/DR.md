@@ -74,6 +74,15 @@ Configure backups for both clusters using either [file system](/automate/ha_back
     - A cron job is a Linux command used to schedule a job that is executed periodically.
     {{< /note >}}
 
+{{< note >}}
+To prune all but a certain number of the most recent backups manually, parse the output of chef-automate backup list and apply the command chef-automate backup delete. For example:
+
+```sh
+export KEEP=10; export HAB_LICENSE=accept-no-persist; chef-automate backup list --result-json backup.json > /dev/null && hab pkg exec core/jq-static jq "[.result.backups[].id] | sort | reverse | .[]" -rM backup.json | tail -n +$(($KEEP+1)) | xargs -L1 -i chef-automate backup delete --yes {}
+```
+
+{{< /note >}}
+
 1. On Disaster Recovery Cluster
 
     - Install `bootstrap.abb` on all the Frontend nodes (Chef-server and Automate nodes) by running the following command:
@@ -118,7 +127,7 @@ Configure backups for both clusters using either [file system](/automate/ha_back
             password = "admin"
         ```
 
-        - To restore backup on Chef Automate HA, below is the restore command, which can be triggered from any Chef Automate instance of the Disaster Recovery cluster. Below the restore command is an example command for the file system as a backup option. Sample cron for restoring backup saved in file system looks like:
+        - In the Disaster Recovery cluster, use the following sample command to restore the latest backup from any Chef Automate frontend instance.
 
         ```cmd
         id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
@@ -128,16 +137,22 @@ Configure backups for both clusters using either [file system](/automate/ha_back
         Sample cron for restoring backup saved in object storage (S3) looks like this:
 
         ```cmd
-        id=$(sudo chef-automate backup list | tail -1 | awk '{print $1}')
-        sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
+        id=$(chef-automate backup list | grep completed | tail -1 | awk '{print $1}')
+        sudo chef-automate backup restore <backup-url-to-object-storage>/automate/$id/ --patch-config /path/to/current_config.toml --airgap-bundle /var/tmp/frontend-4.x.y.aib --skip-preflight --s3-access-key "Access_Key"  --s3-secret-key "Secret_Key"
         ```
+
 
 ### Switch to Disaster Recovery Cluster
 
 Steps to switch to the disaster recovery cluster are as follows:
 
-- Stop the Restore cron.
-- Start all the services on all the Frontend nodes.
-- Update the DNS entry. Now DNS will point to the DR Load balancer.
-- After the above steps, DR Cluster will be the primary cluster.
-- Need to set up the backup cron so that it will perform the backup.
+- Stop the backup restore cron.
+- Start the services on all the Automate and Chef Infra frontend nodes, using below command
+
+    ```sh
+    systemctl start chef-automate
+    ```
+
+- Update the Automate FQDN DNS entry to resolve to the Disaster Recovery load balancer.
+- The Disaster Recovery cluster will be the primary cluster, it may take some time for DNS changes to fully propagate.
+- Setup backup cron to start taking backups of the now active cluster.
