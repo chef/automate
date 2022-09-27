@@ -10,6 +10,7 @@ type MockMigratorV4UtilsImpl struct {
 	StopAutomateFunc            func() error
 	StartAutomateFunc           func() error
 	GetHabRootPathFunc          func(habrootcmd string) string
+	ExecShCommandFunc           func(script string) error
 }
 
 func (mui *MockMigratorV4UtilsImpl) CreateMigrationMetadata() error {
@@ -38,4 +39,7 @@ func (mui *MockMigratorV4UtilsImpl) StartAutomate() error {
 }
 func (mui *MockMigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
 	return mui.GetHabRootPathFunc(habrootcmd)
+}
+func (mui *MockMigratorV4UtilsImpl) ExecShCommand(script string) error {
+	return mui.ExecShCommandFunc(script)
 }

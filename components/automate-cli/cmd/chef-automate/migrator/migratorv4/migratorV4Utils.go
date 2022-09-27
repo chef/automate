@@ -48,6 +48,7 @@ type MigratorV4Utils interface {
 	StopAutomate() error
 	StartAutomate() error
 	GetHabRootPath(habrootcmd string) string
+	ExecShCommand(script string) error
 }
 
 type ESSettings struct {
@@ -221,4 +222,9 @@ func (m *MigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
 		rootHab = "/hab/"
 	}
 	return rootHab
+}
+
+func (m *MigratorV4UtilsImpl) ExecShCommand(script string) error {
+	command := exec.Command("/bin/sh", "-c", script)
+	return command.Run()
 }
