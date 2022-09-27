@@ -28,13 +28,13 @@ gh_repo = "automate"
 
 In case you want to resolve the PostgreSQL cluster node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
 
-Name Servers can be added in two ways:
+The two ways to add the name servers are:
 
 1. **Add nameserver IPs:** If you are aware of the nameservers which should resolve the PostgreSQL nodes, the nameservers can be added to your `config.toml` file.
 
     ```toml
     [pg_gateway.v1.sys.resolvers]
-      # Multiple resolvers can be specified by adding the resolvers in the list.
+      # Multiple resolvers can be specified by adding the resolvers to the list.
       nameservers = ["127.0.0.53:53"]
     ```
 
@@ -56,8 +56,8 @@ sudo chef-automate config patch config.toml
 If you wish to reset to the default configuration or to modify the configuration:
 
 1. Run `chef-automate config show > config.toml`.
-2. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
-3. Run `chef-automate config set config.toml` to apply your changes.
+1. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
+1. Run `chef-automate config set config.toml` to apply your changes.
 
 ### OpenSearch Setup
 
