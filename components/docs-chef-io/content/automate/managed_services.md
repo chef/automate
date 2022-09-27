@@ -167,7 +167,9 @@ These configuration directions are intended for the initial deployment of Chef A
 
 Create `postgresql.toml` file and add the following details of your AWS PostgreSQL RDS:
 
-{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 ```toml
 [global.v1.external.postgresql]
@@ -384,7 +386,9 @@ These configuration directions are intended for External AWS managed PostgreSQL 
 
 Add the following settings to your `config.toml`:
 
-{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 ```toml
 [global.v1.external.postgresql]
@@ -418,7 +422,9 @@ These configuration directions are intended for External AWS managed OpensSearch
 
 Add the following to your `config.toml` file:
 
-{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 ```toml
 [global.v1.external.opensearch]

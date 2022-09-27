@@ -66,7 +66,7 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     sudo chef-automate config show > current_config.toml 
     ```
 
-    {{< note >}}
+    
     From Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
 
     ```bash
@@ -75,9 +75,9 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     password = "admin"
     ```
 
-    Special characters like **‘ ` " ' \ ; $** are not allowed in the password.
-
-    {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 1. Restore in Chef-Automate HA using the following command:
 
@@ -134,7 +134,7 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     sudo chef-automate config show > current_config.toml 
     ```
 
-    {{< note >}}
+   
     From Automate **4.x.y** version onwards, OpenSearch credentials are not stored in the config. Add the OpenSearch password to the generated config above. For example:
 
     ```bash
@@ -142,10 +142,10 @@ minimum version of Chef Automate: [20201230192246](https://docs.chef.io/release_
     username = "admin"
     password = "admin"
     ```
-
-    Special characters like **‘ ` " ' \ ; $** are not allowed in the password.
-
-    {{< /note >}}
+    
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 1. Run the restore command in one of the Chef Automate node in Chef-Automate HA cluster:
 

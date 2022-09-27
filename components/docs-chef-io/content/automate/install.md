@@ -138,8 +138,9 @@ Chef Automate supports the official OpenSearch Service by Amazon Web Services. C
 **Automate supports OpenSearch connection over HTTPS or HTTP**
 
 Add the following to your `config.toml` for HTTPS connection:
-
-{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 ```toml
 [global.v1.external.opensearch]
@@ -169,7 +170,9 @@ Add the following to your `config.toml` for HTTPS connection:
 
 Add the following to your `config.toml` for HTTP connection:
 
-{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 ```toml
 [global.v1.external.opensearch]
@@ -300,7 +303,9 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
 1. Configure each OpenSearch node with a GCS client configuration that contains the proper GCS settings as described in the OpenSearch documentation.
 1. Enable GCS backups by adding the following settings to your `config.toml`:
 
-    {{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
     ```toml
     [global.v1.external.opensearch]
@@ -336,7 +341,9 @@ To configure Google Cloud Storage Bucket (GCS) backups of Chef Automate data sto
 
 Add the following settings to your `config.toml`:
 
-{{< note >}} Special characters like **‘ ` " ' \ ; $** are not allowed in the password. {{< /note >}}
+    {{< warning >}}
+    {{% automate/char-warn %}}
+    {{< /warning >}}
 
 ```toml
 [global.v1.external.postgresql]
