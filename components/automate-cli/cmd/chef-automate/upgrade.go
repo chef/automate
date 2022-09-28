@@ -306,20 +306,20 @@ func postUpgradingExternal(resp *api.UpgradeResponse) error {
 }
 
 func postUpgardingEmbedded(resp *api.UpgradeResponse) error {
-	const msg = `----------------------------------------------------------------------
-	IMPORTANT 
-	
-	To establish connection between automate and OpenSearch database, 
-	it is required to patch the configuration file with correct values.
-	
-	We have created a sample config file for configuring external OpenSearch:
-	opensearch_config.toml
-	
-	Once upgrade is complete, you must update this file with actual external OpenSearch connection configurations 
-	and then run the below patch command to update the configurations:
-	$ chef-automate config patch opensearch_config.toml
-	----------------------------------------------------------------------
-	`
+	msg := fmt.Sprintf(`----------------------------------------------------------------------
+IMPORTANT
+
+To establish connection between automate and OpenSearch database,
+it is required to patch the configuration file with correct values.
+
+We have created a sample config file for configuring external OpenSearch:
+%s
+
+Once upgrade is complete, you must update this file with actual external OpenSearch connection configurations
+and then run the below patch command to update the configurations:
+%s
+----------------------------------------------------------------------
+`, color.New(color.Bold).Sprint("opensearch_config.toml"), color.New(color.Bold).Sprint("$ chef-automate config patch opensearch_config.toml"))
 	writer.Println(msg)
 
 	file, err := os.Create("opensearch_config.toml")
