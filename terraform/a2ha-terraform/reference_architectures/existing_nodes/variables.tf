@@ -138,3 +138,15 @@ variable "managed_rds_superuser_username" {
 variable "setup_managed_services" {
   default = false
 }
+
+variable "os_snapshot_user_access_key_id" {
+  default = ""
+}
+
+variable "os_snapshot_user_access_key_secret" {
+  default = ""
+}
+
+variable "aws_os_snapshot_role_arn" {
+  default = ""
+}
