@@ -79,6 +79,7 @@ const convergeDisabledWarning = `Converge is disabled. This will prevent Automat
 To fix this, delete the file "/hab/svc/deployment-service/data/converge_disable".
 Otherwise, you may need to run "chef-automate dev start-converge".
 `
+const openSearchConfigFile = "opensearch_config.toml"
 
 func handleError(err error) {
 	if err.Error() == upgradeinspectorv4.UPGRADE_TERMINATED {
@@ -321,10 +322,10 @@ Once upgrade is complete, you must update this file with actual external OpenSea
 and then run the below patch command to update the configurations:
 %s
 ----------------------------------------------------------------------
-`, color.New(color.Bold).Sprint("opensearch_config.toml"), color.New(color.Bold).Sprint("$ chef-automate config patch opensearch_config.toml"))
+`, color.New(color.Bold).Sprint(openSearchConfigFile), color.New(color.Bold).Sprint(fmt.Sprintf("$ %s %s", patchConfigCommand, openSearchConfigFile)))
 	writer.Println(msg)
 
-	file, err := os.Create("opensearch_config.toml")
+	file, err := os.Create(openSearchConfigFile)
 	if err != nil {
 		return err
 	}
@@ -650,7 +651,7 @@ func startMigration() error {
 func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	printUpgradeStatusMsg(resp)
 
-	isUserConsent, err := promptUser("Have you updated your " + color.New(color.Bold).Sprint("opensearch_config.toml") + " with actual external OpenSearch connection configurations? (y/n)")
+	isUserConsent, err := promptUser("Have you updated your " + color.New(color.Bold).Sprint(openSearchConfigFile) + " with actual external OpenSearch connection configurations? (y/n)")
 	writer.Println("")
 	if err != nil {
 		return err
@@ -660,7 +661,7 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	if isUserConsent {
 		spinner := startSpinner("Updating external OpenSearch configurations")
 		//TODO: Need to add opensearch_config.toml path
-		exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", patchConfigCommand, "PATH_TO_OPENSEARCH_CONFIG_TOML_FILE")).Output()
+		exec.Command("/bin/sh", "-c", fmt.Sprintf("%s %s", patchConfigCommand, openSearchConfigFile)).Output()
 		stopSpinner(spinner, "External OpenSearch configurations updated successfully.")
 		_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, true)
 		if err != nil {
