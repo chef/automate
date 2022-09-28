@@ -97,10 +97,12 @@ func TestRunMigrationFlowAllSuccess(t *testing.T) {
 		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 	}, 10)
 	migratorv4.RunMigrationFlow()
 	expected1 := "Failed"
@@ -163,10 +165,12 @@ func TestRunMigrationFlowDefferedErrors(t *testing.T) {
 		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return errors.New("unexpected error while starting automate") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
 		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 	}, 10)
 	migratorv4.RunMigrationFlow()
 	expected1 := `[Error] unexpected error while starting automate
