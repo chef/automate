@@ -2,6 +2,7 @@ package majorupgrade_utils
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/load_balancer"
@@ -40,7 +41,7 @@ func SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err 
 	cw := NewCustomWriter()
 
 	if err := client.PatchAutomateConfig(timeout, cfg, cw.CliWriter); err != nil {
-		return "", "", err
+		return "", "", errors.Wrap(err, fmt.Sprintf("Error trying to set Maintenance Mode to %t", status))
 	}
 	return cw.WriteBuffer.String(), cw.ErrorBuffer.String(), nil
 }
@@ -48,7 +49,7 @@ func SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err 
 func EnsureStatus() (bool, error) {
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "Error connecting while trying to get Chef Automate status")
 	}
 
 	res, err := connection.Status(context.Background(), &api.StatusRequest{})

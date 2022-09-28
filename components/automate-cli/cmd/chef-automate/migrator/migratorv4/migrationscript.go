@@ -71,6 +71,7 @@ func (ms *MigrationScript) Run() error {
 	}
 	err := ms.utils.ExecuteCommand("/bin/sh", args, "")
 	if err != nil {
+		err = errors.Wrap(err, "Failed to copy data while migration")
 		ms.showCopyError()
 		ms.setError(err)
 		return err

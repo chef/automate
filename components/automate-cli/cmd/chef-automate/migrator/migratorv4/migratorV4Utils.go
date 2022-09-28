@@ -106,17 +106,17 @@ func isDevMode() bool {
 func (m *MigratorV4UtilsImpl) StopAutomate() error {
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Error in connection while stopping automate")
 	}
 	if isDevMode() {
 		_, err = connection.Stop(context.Background(), &api.StopRequest{})
 		if err != nil {
-			return err
+			return errors.Wrap(err, "Error stopping automate in dev mode")
 		}
 	} else {
 		t := target.NewLocalTarget(true)
 		if err := t.EnsureStopped(); err != nil {
-			return err
+			returnerrors.Wrap(err, "Error stopping automate")
 		}
 	}
 	return nil
@@ -129,11 +129,11 @@ func (m *MigratorV4UtilsImpl) StartAutomate() error {
 		}
 
 		if err := os.MkdirAll("/hab/sup/default", 0755); err != nil {
-			return err
+			return errors.Wrap(err, "Failed trying to start automate dev mode")
 		}
 		out, err := os.Create("/hab/sup/default/sup.log")
 		if err != nil {
-			return err
+			return return errors.Wrap(err, "Failed trying to start automatedev mode")
 		}
 		startSupCmd := exec.Command("hab", "sup", "run")
 		startSupCmd.Env = os.Environ()
@@ -148,14 +148,14 @@ func (m *MigratorV4UtilsImpl) StartAutomate() error {
 			Setpgid: true,
 		}
 		if err := startSupCmd.Start(); err != nil {
-			return err
+			return return errors.Wrap(err, "Failed trying to start automate dev mode")
 		}
 	} else {
 		systemctlCmd := exec.Command("systemctl", "start", "chef-automate.service")
 		systemctlCmd.Stdout = os.Stdout
 		systemctlCmd.Stderr = os.Stderr
 		if err := systemctlCmd.Run(); err != nil {
-			return err
+			return return errors.Wrap(err, "Failed trying to start automate")
 		}
 	}
 

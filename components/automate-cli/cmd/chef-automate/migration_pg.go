@@ -112,12 +112,12 @@ func runMigrator(cmd *cobra.Command, args []string) error {
 		StopAutomateFunc:            func() error { return nil },
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc: func(es *migratorV4.ESSettings) (string, string, error) {
-			return "", "", errors.New("error while patching")
+			return "", "", nil
 		},
 		GetHabRootPathFunc:    func(habrootcmd string) string { return "/hab" },
 		ReadV4ChecklistFunc:   func(id string) (bool, error) { return true, nil },
 		StartAutomateFunc:     func() error { return nil },
-		ExecuteCommandFunc:    func(command string, args []string, workingDir string) error { return nil },
+		ExecuteCommandFunc:    func(command string, args []string, workingDir string) error { return errors.New("Exec command error") },
 		GetServicesStatusFunc: func() (bool, error) { return true, nil },
 	}
 	mfu := &fileutils.MockFileSystemUtils{
