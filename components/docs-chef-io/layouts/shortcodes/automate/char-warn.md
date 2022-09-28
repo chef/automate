@@ -1,0 +1,1 @@
+Special characters like **‘ ` " ' \ ; $** are not allowed in the password.

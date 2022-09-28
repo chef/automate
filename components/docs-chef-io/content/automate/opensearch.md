@@ -27,6 +27,11 @@ These configuration directions are intended for the initial deployment of Chef A
 
 Add the following to your `config.toml` for HTTPS connection:
 
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
+
 ```toml
 [global.v1.external.opensearch]
   enable = true
@@ -54,6 +59,11 @@ Add the following to your `config.toml` for HTTPS connection:
 ```
 
 Add the following to your `config.toml` for HTTP connection:
+
+{{< warning >}}
+{{% automate/char-warn %}}
+{{< /warning >}}
+
 ```toml
 [global.v1.external.opensearch]
   enable = true
