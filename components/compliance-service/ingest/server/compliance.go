@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"regexp"
 
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/lib/cereal"
@@ -42,10 +43,10 @@ var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
 func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient, reportMgrClient report_manager.ReportManagerServiceClient,
 	automateURL string, notifierClient notifier.Notifier, authzProjectsClient authz.ProjectsServiceClient,
-	messageBufferSize int, enableLargeReporting bool,cerealManager *cereal.Manager) *ComplianceIngestServer {
+	messageBufferSize int, enableLargeReporting bool, cerealManager *cereal.Manager) *ComplianceIngestServer {
 
 	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient, mgrClient,
-		reportMgrClient, messageBufferSize, notifierClient, automateURL, enableLargeReporting,cerealManager)
+		reportMgrClient, messageBufferSize, notifierClient, automateURL, enableLargeReporting, cerealManager)
 
 	return &ComplianceIngestServer{
 		compliancePipeline:   compliancePipeline,
@@ -136,9 +137,18 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(stream ingest_api.Compl
 		logrus.Error(err)
 		return err
 	}
-
 	in := &compliance.Report{}
-	err = json.Unmarshal(jsonBytes, &in)
+	re := regexp.MustCompile(`""\s*:`)
+	bb := bytes.Buffer{}
+	split := re.Split(string(jsonBytes), -1)
+	for i := range split {
+		if i < len(split)-1 {
+			bb.WriteString(split[i] + fmt.Sprintf(`"unknown-%d":`, i))
+		} else {
+			bb.WriteString(split[i])
+		}
+	}
+	err = json.Unmarshal(bb.Bytes(), &in)
 	if err != nil {
 		return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
 	}
