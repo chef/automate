@@ -6,6 +6,7 @@ import (
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	license_control "github.com/chef/automate/api/interservice/license_control"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/external/sso"
@@ -35,7 +36,7 @@ func (a *SsoConfig) GetSsoConfig(ctx context.Context, in *empty.Empty) (*sso.Get
 
 	if deploymentType != "SAAS" {
 		msg := "Unauthorized: Deployment type is not SAAS"
-		return nil, status.Error(7, msg)
+		return nil, status.Error(codes.PermissionDenied, msg)
 	}
 
 	req := &deployment.GetAutomateConfigRequest{}
@@ -88,4 +89,19 @@ func (a *SsoConfig) getDeploymentDetails(ctx context.Context) (string, error) {
 	log.Debugf("deployIDResponse.DeploymentType: %s ", deployIDResponse.DeploymentType)
 
 	return deployIDResponse.DeploymentType, nil
+}
+
+func (a *SsoConfig) Authenticate(ctx context.Context, in *empty.Empty) (*sso.AuthenticateTokenResponse, error) {
+	deploymentType, err := a.getDeploymentDetails(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if deploymentType != "SAAS" {
+		msg := "Unauthorized: Deployment type is not SAAS"
+		return nil, status.Error(codes.PermissionDenied, msg)
+	}
+	return &sso.AuthenticateTokenResponse{
+		Message: "User authenticated successfully",
+	}, nil
 }

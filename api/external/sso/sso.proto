@@ -30,8 +30,29 @@ service SsoConfigService {
 			action: "sso:config:get"
 		};
 	};
-}
 
+	/*
+	Authenticate token 
+
+	Returns success message if authentication is successful
+
+	Authorization Action:
+	```
+	sso:config:post
+	```
+	*/
+
+    rpc Authenticate (google.protobuf.Empty) returns (AuthenticateTokenResponse) {
+		option (google.api.http) = {
+			post: "/api/v0/sso/authenticate"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "sso:config"
+			action: "sso:config:post"
+		};
+	};
+}
 
 message GetSsoConfigResponse {
     string ca_contents = 1;
@@ -43,4 +64,7 @@ message GetSsoConfigResponse {
     string entity_issuer = 7;
     string name_id_policy_format = 8;
 }
-  
+
+message AuthenticateTokenResponse {
+	string message = 1;
+}
