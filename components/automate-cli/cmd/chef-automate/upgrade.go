@@ -331,28 +331,28 @@ func postUpgardingEmbedded(resp *api.UpgradeResponse) error {
 	const openSearchConfig = `[global.v1.external.opensearch]
 	enable = true
 	nodes = ["https://opensearch1.example:9200", "https://opensearch2.example:9200", "..." ]
-  
-  # Uncomment and fill out if using external opensearch with SSL and/or basic auth
-  [global.v1.external.opensearch.auth]
+
+# Uncomment and fill out if using external opensearch with SSL and/or basic auth
+[global.v1.external.opensearch.auth]
 	scheme = "basic_auth"
-  [global.v1.external.opensearch.auth.basic_auth]
-  ## Create this opensearch user before starting the Chef Automate deployment;
-  ## Chef Automate assumes it exists.
+[global.v1.external.opensearch.auth.basic_auth]
+## Create this opensearch user before starting the Chef Automate deployment;
+## Chef Automate assumes it exists.
 	username = "<admin username>"
 	password = "<admin password>"
-  # Use below configuration only if using HTTPS connection
-  [global.v1.external.opensearch.ssl]
-  # Specify either a root_cert or a root_cert_file
+# Use below configuration only if using HTTPS connection
+[global.v1.external.opensearch.ssl]
+# Specify either a root_cert or a root_cert_file
 	root_cert = """$(cat </path/to/cert_file.crt>)"""
-  # server_name = "<opensearch server name>"
+#   server_name = "<opensearch server name>"
   
-  # Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
-  # [esgateway.v1.sys.ngx.http]
-  #  proxy_set_header_host = "<your external es hostname>:1234"
-  
-  # Uncomment and add to change the ssl_verify_depth for the root cert bundle
-  #  ssl_verify_depth = "2"
-  `
+# Uncomment and fill out if using external OpenSearch that uses hostname-based routing/load balancing
+# [esgateway.v1.sys.ngx.http]
+#    proxy_set_header_host = "<your external es hostname>:1234"
+
+# Uncomment and add to change the ssl_verify_depth for the root cert bundle
+#    ssl_verify_depth = "2"
+`
 	file.WriteString(openSearchConfig)
 
 	writer.Println("")
