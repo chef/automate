@@ -48,7 +48,6 @@ func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping ma
 	runDateTimeAsString := runDateTime.Format(time.RFC3339)
 
 	script := elastic.NewScript("ctx._source.last_run = params.rundate").Param("rundate", runDateTimeAsString)
-
 	_, err := backend.client.Update().
 		Index(mapping.Index).
 		Id(id).
