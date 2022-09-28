@@ -19,6 +19,7 @@ const (
 	rm -rf %[1]vsvc/automate-elasticsearch/var;
 	`
 	habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+	CLEANUP_ID = "clean_up"
 )
 
 type Cleanup struct {
@@ -43,12 +44,12 @@ func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, autoAccept, forceExecute b
 }
 
 func (cu *Cleanup) Run() error {
-	cu.showClearDataSucessMessage()
 	err := cu.startCleanup(cu.forceExecute, cu.autoAccept)
 	if err != nil {
+		cu.setError(err)
 		cu.showClearDataFailedMessage()
 	}
-	cu.showClearDataSucessMessage()
+	cu.showClearDataSuccessMessage()
 	return nil
 }
 
@@ -61,9 +62,11 @@ func (cu *Cleanup) ErrorHandler() {
 func (cu *Cleanup) Skip() error {
 	return nil
 }
+
 func (cu *Cleanup) DefferedHandler() error {
 	return nil
 }
+
 func (cs *Cleanup) setError(err error) error {
 	cs.runError = err
 	cs.hasError = true
@@ -113,6 +116,7 @@ func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
 			return err
 		}
 	}
+	cu.showDeletingMessage()
 	habRoot := cu.utils.GetHabRootPath(habrootcmd)
 	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
 	command := exec.Command("/bin/sh", "-c", cleanUpScript)
@@ -131,25 +135,25 @@ func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
 			cu.setError(err)
 			return err
 		}
-		cu.showClearDataSucessMessage()
 	}
 	return nil
 }
 
 func (cu *Cleanup) showDeletingMessage() {
 	cu.spinner = cu.writer.NewSpinner()
-	cu.spinner.Suffix = fmt.Sprintf("  Clean up in progres")
+	cu.spinner.Suffix = "  Clean up in progres"
+	cu.spinner.Start()
 	time.Sleep(time.Second)
 }
 
-func (cu *Cleanup) showClearDataSucessMessage() {
-	cu.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Clean up failed"
+func (cu *Cleanup) showClearDataSuccessMessage() {
+	cu.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Clean up successful"
 	cu.spinner.Stop()
 	cu.writer.Println("")
 }
 
 func (cu *Cleanup) showClearDataFailedMessage() {
-	cu.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Clean up successful"
+	cu.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Clean up failed"
 	cu.spinner.Stop()
 	cu.writer.Println("")
 }

@@ -1,5 +1,7 @@
 package migratorV4
 
+import "os"
+
 type MockMigratorV4UtilsImpl struct {
 	GetEsTotalShardSettingsFunc func() (int32, error)
 	PatchOpensearchConfigFunc   func(es *ESSettings) (string, string, error)
@@ -11,6 +13,7 @@ type MockMigratorV4UtilsImpl struct {
 	UpdatePostChecklistFileFunc func(id string) error
 	ExecuteCommandFunc          func(command string, args []string, workingDir string) error
 	GetServicesStatusFunc       func() (bool, error)
+	CreateMigrateJsonFunc       func() error
 }
 
 func (mui *MockMigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
@@ -42,4 +45,16 @@ func (mui *MockMigratorV4UtilsImpl) ExecuteCommand(command string, args []string
 }
 func (mui *MockMigratorV4UtilsImpl) GetServicesStatus() (bool, error) {
 	return mui.GetServicesStatusFunc()
+}
+func (mui *MockMigratorV4UtilsImpl) CreateMigrateJson() error {
+	nm := NewMigratorV4Utils()
+	return nm.CreateMigrateJson()
+}
+
+func (mui *MockMigratorV4UtilsImpl) DeleteMigrateJson(path string) error {
+	err := os.Remove(path) // remove a single file
+	if err != nil {
+		return err
+	}
+	return nil
 }

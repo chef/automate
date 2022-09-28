@@ -7,6 +7,7 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/fatih/color"
+	"github.com/pkg/errors"
 )
 
 const (

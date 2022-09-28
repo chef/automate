@@ -25,6 +25,10 @@ const (
 	SPACES_BEFORE_STEPS = "       "
 )
 
+var (
+	UPGRADE_METADATA = "/hab/svc/deployment-service/var/upgrade_metadata.json"
+)
+
 type MigratorV4Utils interface {
 	GetEsTotalShardSettings() (int32, error)
 	PatchOpensearchConfig(es *ESSettings) (string, string, error)
@@ -36,6 +40,7 @@ type MigratorV4Utils interface {
 	UpdatePostChecklistFile(id string) error
 	ExecuteCommand(command string, args []string, workingDir string) error
 	GetServicesStatus() (bool, error)
+	CreateMigrateJson() error
 }
 
 type ESSettings struct {
@@ -116,7 +121,7 @@ func (m *MigratorV4UtilsImpl) StopAutomate() error {
 	} else {
 		t := target.NewLocalTarget(true)
 		if err := t.EnsureStopped(); err != nil {
-			returnerrors.Wrap(err, "Error stopping automate")
+			return errors.Wrap(err, "Error stopping automate")
 		}
 	}
 	return nil
@@ -133,7 +138,7 @@ func (m *MigratorV4UtilsImpl) StartAutomate() error {
 		}
 		out, err := os.Create("/hab/sup/default/sup.log")
 		if err != nil {
-			return return errors.Wrap(err, "Failed trying to start automatedev mode")
+			return errors.Wrap(err, "Failed trying to start automatedev mode")
 		}
 		startSupCmd := exec.Command("hab", "sup", "run")
 		startSupCmd.Env = os.Environ()
@@ -148,14 +153,14 @@ func (m *MigratorV4UtilsImpl) StartAutomate() error {
 			Setpgid: true,
 		}
 		if err := startSupCmd.Start(); err != nil {
-			return return errors.Wrap(err, "Failed trying to start automate dev mode")
+			return errors.Wrap(err, "Failed trying to start automate dev mode")
 		}
 	} else {
 		systemctlCmd := exec.Command("systemctl", "start", "chef-automate.service")
 		systemctlCmd.Stdout = os.Stdout
 		systemctlCmd.Stderr = os.Stderr
 		if err := systemctlCmd.Run(); err != nil {
-			return return errors.Wrap(err, "Failed trying to start automate")
+			return errors.Wrap(err, "Failed trying to start automate")
 		}
 	}
 
@@ -181,7 +186,16 @@ func (m *MigratorV4UtilsImpl) ReadV4Checklist(id string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return ci.ReadPostChecklistById(id, majorupgradechecklist.UPGRADE_METADATA)
+	return ci.ReadPostChecklistById(id, UPGRADE_METADATA)
+}
+
+func (m *MigratorV4UtilsImpl) CreateMigrateJson() error {
+
+	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+	if err != nil {
+		return err
+	}
+	return ci.CreatePostChecklistFile(UPGRADE_METADATA)
 }
 
 func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile(id string) error {
@@ -189,7 +203,7 @@ func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile(id string) error {
 	if err != nil {
 		return err
 	}
-	return ci.UpdatePostChecklistFile(id, majorupgradechecklist.UPGRADE_METADATA)
+	return ci.UpdatePostChecklistFile(id, UPGRADE_METADATA)
 }
 
 func (m *MigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {
