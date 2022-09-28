@@ -306,6 +306,8 @@ func postUpgradingExternal(resp *api.UpgradeResponse) error {
 }
 
 func postUpgardingEmbedded(resp *api.UpgradeResponse) error {
+	writer.Println(fmt.Sprintf("Upgrading Chef Automate from version %s to version %s.", resp.PreviousVersion, resp.NextVersion))
+	writer.Println("")
 	msg := fmt.Sprintf(`----------------------------------------------------------------------
 IMPORTANT
 
