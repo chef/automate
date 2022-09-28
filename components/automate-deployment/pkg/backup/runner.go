@@ -565,8 +565,8 @@ func (r *Runner) RestoreBackup(
 	return r.restoreTask, nil
 }
 
-// mlistofDesiredServiceForRestore : List of Service need to restore
-var mlistofDesiredServiceForRestore = map[string]struct{}{
+// stateFullServicesMap : List of Service need to restore
+var stateFullServicesMap = map[string]struct{}{
 	"backup-gateway":          {},
 	"applications-service":    {},
 	"authn-service":           {},
@@ -794,22 +794,15 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 			verifier,
 		)
 
-		// mlistofDesiredServiceForRestore : contain the list of services which need to be restored
+		// stateFullServicesMap : contain the list of services which need to be restored
 		//
-		isMetadataDotJsonIsPresent := false
-		_, present := mlistofDesiredServiceForRestore[svc.Name()]
-		if present {
-			isMetadataDotJsonIsPresent = true
-			r.infof(" Need to Look for metadata : %s status : %t", svc.Name(), isMetadataDotJsonIsPresent)
-		} else {
-			r.infof(" This %s is not backed up, so escaping the response of metadata lookup", svc.Name())
-			isMetadataDotJsonIsPresent = false
-		}
+		_, isStateFullService := stateFullServicesMap[svc.Name()]
+		r.infof(" Need to Look for metadata : %s status : %t", svc.Name(), isStateFullService)
 
 		// If the metadata file exists but we failed to load it for whatever
 		// reason, like a network issue or corrupted metadata file, then we want to
 		// error out.
-		if err != nil && !IsNotExist(err) && isMetadataDotJsonIsPresent {
+		if err != nil && !IsNotExist(err) && isStateFullService {
 			r.failf(err, "Failed to load metadata for service %s", svc.Name())
 			return err
 		}
