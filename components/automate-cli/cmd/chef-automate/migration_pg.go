@@ -115,7 +115,7 @@ func runMigrator(cmd *cobra.Command, args []string) error {
 			return "", "", errors.New("error while patching")
 		},
 		GetHabRootPathFunc:    func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:   func() (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:   func(id string) (bool, error) { return true, nil },
 		StartAutomateFunc:     func() error { return nil },
 		ExecuteCommandFunc:    func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc: func() (bool, error) { return true, nil },
@@ -131,8 +131,8 @@ func runMigrator(cmd *cobra.Command, args []string) error {
 
 func runCleanup(cmd *cobra.Command, args []string) error {
 	if strings.ToLower(ClearDataCmdFlags.data) == "es" {
-		mu := migratorV4.NewMigratorV4Utils()
-		migratorV4.NewCleanUp(writer, mu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept)
+		// mu := migratorV4.NewMigratorV4Utils()
+		// migratorV4.NewCleanUp(writer, mu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept)
 		// ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 		// if err != nil {
 		// 	writer.Error("NewPostChecklistManager Failed")
