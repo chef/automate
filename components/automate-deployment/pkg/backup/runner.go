@@ -736,6 +736,11 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 
 	// Load the verifier from the remote bucket since the backup gateway won't be
 	// available yet by this point.
+	logrus.Debugf(" restoreCtx.restoreBucket : %v", restoreCtx.restoreBucket)
+	logrus.Debugf(" restoreCtx.bucket : %v", restoreCtx.bucket)
+	logrus.Debugf(" desiredServices : %v", desiredServices)
+	logrus.Debugf(" Length of desiredServices : %d", len(desiredServices))
+
 	verifier, err := LoadMetadataVerifier(ctx, restoreCtx.restoreBucket, r.restoreTask.Sha256)
 	if err != nil {
 		r.failf(err, "Failed to load service metadata checksum information")
@@ -797,7 +802,7 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		// stateFullServicesMap : contain the list of services which need to be restored
 		//
 		_, isStateFullService := stateFullServicesMap[svc.Name()]
-		r.infof(" Need to Look for metadata : %s status : %t", svc.Name(), isStateFullService)
+		r.infof(" Need to Look for metadata : %s it is Present : %t", svc.Name(), isStateFullService)
 
 		// If the metadata file exists but we failed to load it for whatever
 		// reason, like a network issue or corrupted metadata file, then we want to
