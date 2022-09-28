@@ -15,6 +15,6 @@ func TestWaitForHealthyDeffered(t *testing.T) {
 		},
 	}
 	wfh := NewWaitForHealthy(cw.CliWriter, mmu)
-	err := wfh.Run()
+	err := wfh.DefferedHandler()
 	assert.NoError(t, err)
 }

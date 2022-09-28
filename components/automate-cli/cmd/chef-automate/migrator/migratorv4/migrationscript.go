@@ -75,10 +75,6 @@ func (ms *MigrationScript) Run() error {
 	return nil
 }
 
-func (ms *MigrationScript) Skip() error {
-	return nil
-}
-
 func (ms *MigrationScript) ErrorHandler() {
 	if ms.hasError {
 		ms.writer.Println(ms.runError.Error())

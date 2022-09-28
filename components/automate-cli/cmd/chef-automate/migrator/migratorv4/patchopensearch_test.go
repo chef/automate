@@ -33,11 +33,9 @@ func TestPatchOsErrorGetShardSettings(t *testing.T) {
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
-	expected2 := "✖  Failed to copy data"
-	expected3 := "unexpected"
+	expected2 := "✔  OpenSearch configurations updated successfully"
 	assert.Contains(t, cw.Output(), expected1)
 	assert.Contains(t, cw.Output(), expected2)
-	assert.Contains(t, cw.Output(), expected3)
 }
 
 func TestPatchOsErrorPatchingShardSettings(t *testing.T) {
@@ -50,7 +48,7 @@ func TestPatchOsErrorPatchingShardSettings(t *testing.T) {
 	poc.Run()
 	poc.ErrorHandler()
 	expected1 := "Updating OpenSearch configurations"
-	expected2 := "✖  Failed to copy data"
+	expected2 := "✖  Failed to update OpenSearch configurations"
 	expected3 := "unexpected"
 	assert.Contains(t, cw.Output(), expected1)
 	assert.Contains(t, cw.Output(), expected2)

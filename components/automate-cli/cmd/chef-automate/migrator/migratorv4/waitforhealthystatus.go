@@ -25,9 +25,6 @@ func NewWaitForHealthy(writer *cli.Writer, utils MigratorV4Utils) *WaitForHealth
 func (wfh *WaitForHealthy) Run() error {
 	return nil
 }
-func (wfh *WaitForHealthy) Skip() error {
-	return nil
-}
 
 func (wfh *WaitForHealthy) ErrorHandler() {
 	return

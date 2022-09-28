@@ -7,7 +7,7 @@ type Inspector interface {
 	Inspect() error
 	RollBackChangesOnError() error
 	RunExitAction() error
-	RunUpgradeInspector(osDestDir string, skipStorageCheck bool) error
+	RunUpgradeInspector(osDestDir string, skipStorageCheck bool) (isError bool)
 }
 
 type Inspection interface {

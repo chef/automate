@@ -50,10 +50,6 @@ func (cs *CheckStorage) Run() error {
 	return nil
 }
 
-func (cs *CheckStorage) Skip() error {
-	return nil
-}
-
 func (cs *CheckStorage) ErrorHandler() {
 	if cs.hasError {
 		cs.writer.Println(cs.runError.Error())

@@ -28,24 +28,13 @@ const (
 	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT   = "95%"
 	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 500
 	MAX_POSSIBLE_HEAP_SIZE                = 32
-	AutomateOpensearchConfigPatch         = "/hab/svc/deployment-service/oss-config.toml"
-	heapSizeExceededError                 = `heap size : %s, max allowed is (50%% of ram = %dgb) but not exceeding %dgb`
-	shardCountExceededError               = `total shards per node : %d, max allowed is %d, 
-having this more than %d decreases perfomance to avoid breaching this limit, 
-you can reduce data retention policy`
-	errorUserConcent = `we recommend you to move to external/managed Opensearch cluster for better performance.
-but if you still want to continue with the upgrade`
-	upgradeFailed          = "due to pre-condition check failed"
-	ELASTICSEARCH_DATA_DIR = "/hab/svc/automate-elasticsearch/data"
-	ELASTICSEARCH_VAR_DIR  = "/hab/svc/automate-elasticsearch/var"
-	OPENSEARCH_DATA_DIR    = "/hab/svc/automate-opensearch/data"
-	MIGRATE_ES_ID          = "migrate_es"
+	ELASTICSEARCH_DATA_DIR                = "/hab/svc/automate-elasticsearch/data"
+	ELASTICSEARCH_VAR_DIR                 = "/hab/svc/automate-elasticsearch/var"
+	OPENSEARCH_DATA_DIR                   = "/hab/svc/automate-opensearch/data"
+	MIGRATE_ES_ID                         = "migrate_es"
 )
 
 type MigratorV4Utils interface {
-	CreateMigrationMetadata() error
-	ReadMigrationMetadata() error
-	UpdateMigrationMetadata() error
 	GetEsTotalShardSettings() (int32, error)
 	PatchOpensearchConfig(es *ESSettings) (string, string, error)
 	IsExternalElasticSearch(timeout int64) bool
@@ -71,18 +60,6 @@ type MigratorV4UtilsImpl struct {
 
 func NewMigratorV4Utils() MigratorV4Utils {
 	return &MigratorV4UtilsImpl{}
-}
-
-func (m *MigratorV4UtilsImpl) CreateMigrationMetadata() error {
-	return nil
-}
-
-func (m *MigratorV4UtilsImpl) ReadMigrationMetadata() error {
-	return nil
-}
-
-func (m *MigratorV4UtilsImpl) UpdateMigrationMetadata() error {
-	return nil
 }
 
 func (m *MigratorV4UtilsImpl) PatchOpensearchConfig(osConfig *ESSettings) (string, string, error) {
@@ -125,29 +102,6 @@ func (m *MigratorV4UtilsImpl) GetEsTotalShardSettings() (int32, error) {
 		return esSetting.TotalShardSettings, err
 	}
 	return esSetting.TotalShardSettings, nil
-}
-
-func preRequisteForESDataMigration() (bool, error) {
-	existDir, err := dirExists(ELASTICSEARCH_DATA_DIR)
-	if err != nil {
-		return existDir, err
-	}
-	existDir, err = dirExists(ELASTICSEARCH_VAR_DIR)
-	if err != nil {
-		return existDir, err
-	}
-	return existDir, nil
-}
-
-func dirExists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) { // nosemgrep
-		return false, nil
-	}
-	return false, err
 }
 
 func (m *MigratorV4UtilsImpl) IsExternalElasticSearch(timeout int64) bool {

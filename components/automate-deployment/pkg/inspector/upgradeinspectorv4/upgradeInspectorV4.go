@@ -3,6 +3,7 @@ package upgradeinspectorv4
 import (
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
@@ -205,13 +206,25 @@ func (ui *UpgradeInspectorV4) RunExitAction() error {
 	return nil
 }
 
-func (ui *UpgradeInspectorV4) RunUpgradeInspector(osDestDir string, skipStorageCheck bool) error {
+func (ui *UpgradeInspectorV4) handleError(err error) {
+	if err.Error() == UPGRADE_TERMINATED {
+		ui.writer.Println(UPGRADE_TERMINATED)
+	} else {
+		ui.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + err.Error())
+		ui.writer.Println("Please resolve this and try again.")
+		ui.writer.Println("Please contact support if you are not sure how to resolve this.")
+		ui.writer.Println(UPGRADE_TERMINATED)
+	}
+}
+
+func (ui *UpgradeInspectorV4) RunUpgradeInspector(osDestDir string, skipStorageCheck bool) (isError bool) {
 	ui.SetOSDestDir(osDestDir)
 	ui.SetSkipStoragecheckFlag(skipStorageCheck)
 	ui.AddDefaultInspections()
 	err := ui.ShowInfo()
 	if err != nil {
-		return err
+		ui.handleError(err)
+		return true
 	}
 	ui.ShowInspectionList()
 	err = ui.Inspect()
@@ -225,7 +238,8 @@ func (ui *UpgradeInspectorV4) RunUpgradeInspector(osDestDir string, skipStorageC
 		if err != nil {
 			localerr = errors.Wrap(err, localerr.Error())
 		}
-		return localerr
+		ui.handleError(err)
+		return true
 	}
-	return nil
+	return false
 }

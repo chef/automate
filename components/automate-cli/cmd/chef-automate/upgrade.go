@@ -80,15 +80,6 @@ To fix this, delete the file "/hab/svc/deployment-service/data/converge_disable"
 Otherwise, you may need to run "chef-automate dev start-converge".
 `
 
-func handleError(err error) {
-	if err.Error() == upgradeinspectorv4.UPGRADE_TERMINATED {
-		writer.Println(err.Error())
-	}
-	writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + err.Error())
-	writer.Println("Please resolve this and try again.")
-	writer.Println("Please contact support if you are not sure how to resolve this.")
-}
-
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 
 	// mfs := &fileutils.MockFileSystemUtils{
@@ -247,9 +238,8 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 				}
 			default:
 				upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, upgradeinspectorv4.NewUpgradeV4Utils(), &fileutils.FileSystemUtils{}, configCmdFlags.timeout)
-				err := upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
-				if err != nil {
-					handleError(err)
+				isError := upgradeInspector.RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
+				if isError {
 					return nil
 				}
 			}

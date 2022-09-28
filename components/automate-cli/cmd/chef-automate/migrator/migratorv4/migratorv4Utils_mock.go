@@ -53,5 +53,5 @@ func (mui *MockMigratorV4UtilsImpl) UpdatePostChecklistFile() error {
 	return mui.UpdatePostChecklistFileFunc()
 }
 func (mui *MockMigratorV4UtilsImpl) ExecuteCommand(command string, args []string, workingDir string) error {
-	return mui.ExecuteCommand(command, args, workingDir)
+	return mui.ExecuteCommandFunc(command, args, workingDir)
 }

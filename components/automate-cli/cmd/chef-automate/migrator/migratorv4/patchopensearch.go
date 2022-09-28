@@ -12,6 +12,10 @@ import (
 	"github.com/fatih/color"
 )
 
+const (
+	MINIMUM_SHARD_VALUE = 1500
+)
+
 type PatchOpensearchConfig struct {
 	writer     *cli.Writer
 	utils      MigratorV4Utils
@@ -33,7 +37,7 @@ func (poc *PatchOpensearchConfig) Run() error {
 	opensearchSettings := poc.GetDefaultOpensearchSettings()
 
 	esTotalShards, _ := poc.utils.GetEsTotalShardSettings()
-	opensearchSettings.TotalShardSettings = poc.GetOverrideTotalShards(esTotalShards, opensearchSettings.TotalShardSettings)
+	opensearchSettings.TotalShardSettings = poc.calculateMaxTotalShards(esTotalShards, MINIMUM_SHARD_VALUE, INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
 	_, _, err := poc.utils.PatchOpensearchConfig(opensearchSettings)
 	if err != nil {
 		poc.showUpdateError()
@@ -44,18 +48,19 @@ func (poc *PatchOpensearchConfig) Run() error {
 	return nil
 }
 
+func (poc *PatchOpensearchConfig) calculateMaxTotalShards(usedShards, minimumShardValue, incrementShardValue int32) (maxShardTotal int32) {
+	if usedShards < minimumShardValue {
+		maxShardTotal = majorupgrade_utils.INDICES_TOTAL_SHARD_DEFAULT
+	} else {
+		maxShardTotal = usedShards + incrementShardValue
+	}
+	return maxShardTotal
+}
+
 func (poc *PatchOpensearchConfig) setError(err error) error {
 	poc.runError = err
 	poc.hasError = true
 	return err
-}
-
-func (poc *PatchOpensearchConfig) GetOverrideTotalShards(esShardSetting, osShardSetting int32) int32 {
-	if esShardSetting > osShardSetting {
-		return esShardSetting
-	} else {
-		return osShardSetting
-	}
 }
 
 func defaultHeapSizeInGB() int {
@@ -76,10 +81,6 @@ func (poc *PatchOpensearchConfig) GetDefaultOpensearchSettings() *ESSettings {
 	return defaultSettings
 }
 
-func (poc *PatchOpensearchConfig) Skip() error {
-	return nil
-}
-
 func (poc *PatchOpensearchConfig) ErrorHandler() {
 	if poc.hasError {
 		poc.writer.Println(poc.runError.Error())
@@ -87,13 +88,13 @@ func (poc *PatchOpensearchConfig) ErrorHandler() {
 }
 
 func (poc *PatchOpensearchConfig) showUpdateError() {
-	poc.spinner.FinalMSG = " "+color.New(color.FgRed).Sprint("✖") + "  Failed to update OpenSearch configurations"
+	poc.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Failed to update OpenSearch configurations"
 	poc.spinner.Stop()
 	poc.writer.Println("")
 }
 
 func (poc *PatchOpensearchConfig) showUpdated() {
-	poc.spinner.FinalMSG = " "+color.New(color.FgGreen).Sprint("✔") + "  OpenSearch configurations updated successfully"
+	poc.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  OpenSearch configurations updated successfully"
 	poc.spinner.Stop()
 	poc.writer.Println("")
 }

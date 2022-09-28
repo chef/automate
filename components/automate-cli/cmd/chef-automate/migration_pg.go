@@ -108,10 +108,7 @@ func newMigrateDataCmd() *cobra.Command {
 func runMigrator(cmd *cobra.Command, args []string) error {
 	// TODO: add condition for v3 and v4
 	migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorV4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10)
-	err := migrator.(*migratorV4.MigratorV4).RunMigrationFlow()
-	if err != nil {
-		writer.Println(err.Error())
-	}
+	migrator.RunMigrationFlow()
 	return nil
 }
 

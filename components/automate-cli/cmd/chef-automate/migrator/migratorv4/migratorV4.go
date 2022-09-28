@@ -6,6 +6,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/fatih/color"
 )
 
 const (
@@ -48,13 +49,12 @@ func (m *MigratorV4) ExecuteMigrationSteps() (err error) {
 	}
 	m.writer.Println("Migration in progress")
 	for _, step := range m.migrationSteps {
+		err = step.Run()
 		if err != nil {
-			step.Skip()
-		} else {
-			err = step.Run()
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (m *MigratorV4) AddMigrationSteps(migrationSteps migrator.MigrationSteps) {
@@ -121,28 +121,44 @@ func (m *MigratorV4) IsExecutedCheck() error {
 			return err
 		}
 		if !res {
-			return errors.New("Migration Terminated.")
+			return errors.New(MIGRATION_TERMINATED)
 		}
 		m.migrationConsent = true
 	}
 	return nil
 }
 
-func (m *MigratorV4) RunMigrationFlow() error {
+func (m *MigratorV4) handleError(err error) {
+	if err.Error() == MIGRATION_TERMINATED {
+		m.writer.Println(MIGRATION_TERMINATED)
+	} else {
+		m.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + err.Error())
+		m.writer.Println("Please resolve this and try again.")
+		m.writer.Println("Please contact support if you are not sure how to resolve this.")
+		m.writer.Println(MIGRATION_TERMINATED)
+	}
+}
+
+func (m *MigratorV4) RunMigrationFlow() {
+	isExternal := m.migratorUtils.IsExternalElasticSearch(m.timeout)
+	if isExternal {
+		m.handleError(errors.New("Detected External OpenSearch"))
+	}
 	err := m.AskForConfirmation()
 	if err != nil {
-		return err
+		m.handleError(err)
+		return
 	}
 	err = m.IsExecutedCheck()
 	if err != nil {
-		return err
+		m.handleError(err)
+		return
 	}
 	m.AddDefaultMigrationSteps()
 	m.ExecuteMigrationSteps()
 	err = m.ExecuteDeferredSteps()
 	if err != nil {
-		m.writer.Println(err.Error())
+		m.handleError(err)
 	}
 	m.PrintMigrationErrors()
-	return nil
 }

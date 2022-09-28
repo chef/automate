@@ -1,6 +1,7 @@
 package migratorV4
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/chef/automate/lib/io/fileutils"
@@ -40,7 +41,10 @@ func TestRunSuccessfulMigrations(t *testing.T) {
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
 		ExecShCommandFunc:           func(script string) error { return nil },
 	}
-	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
+		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 4, nil },
+	}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	migratorv4.AskForConfirmation()
 	migratorv4.ExecuteMigrationSteps()
@@ -73,5 +77,75 @@ func TestRunSuccessfulMigrationsWithError(t *testing.T) {
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
 	err := migratorv4.ExecuteMigrationSteps()
-	assert.Error(t, err, "Can't process without user consent.")
+	expected := "Can't process without user consent."
+	assert.Equal(t, err.Error(), expected)
+}
+
+func TestRunMigrationFlow(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
+	mmu := &MockMigratorV4UtilsImpl{
+		StopAutomateFunc:            func() error { return nil },
+		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
+		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
+		ExecShCommandFunc:           func(script string) error { return nil },
+		ReadV4ChecklistFunc:         func() (bool, error) { return true, nil },
+		StartAutomateFunc:           func() error { return nil },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+	}
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
+		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+	}, 10)
+	migratorv4.RunMigrationFlow()
+	expected1 := "Failed"
+	assert.NotContains(t, w.Output(), expected1)
+}
+
+func TestRunMigrationFlowDefferedErrors(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
+	mmu := &MockMigratorV4UtilsImpl{
+		StopAutomateFunc:            func() error { return nil },
+		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
+		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
+		ExecShCommandFunc:           func(script string) error { return nil },
+		ReadV4ChecklistFunc:         func() (bool, error) { return true, nil },
+		StartAutomateFunc:           func() error { return errors.New("unexpected") },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+	}
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
+		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+	}, 10)
+	migratorv4.RunMigrationFlow()
+	expected1 := `[Error] unexpected
+Please resolve this and try again.
+Please contact support if you are not sure how to resolve this.
+Migration Terminated.`
+	assert.Contains(t, w.Output(), expected1)
+}
+
+func TestRunMigrationFlowIsExecutedErrors(t *testing.T) {
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
+	mmu := &MockMigratorV4UtilsImpl{
+		StopAutomateFunc:            func() error { return nil },
+		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
+		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
+		ExecShCommandFunc:           func(script string) error { return nil },
+		ReadV4ChecklistFunc:         func() (bool, error) { return true, errors.New("unexpected") },
+		StartAutomateFunc:           func() error { return errors.New("unexpected") },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+	}
+	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
+		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+	}, 10)
+	migratorv4.RunMigrationFlow()
+	expected1 := `[Error] unexpected
+Please resolve this and try again.
+Please contact support if you are not sure how to resolve this.
+Migration Terminated.`
+	assert.Contains(t, w.Output(), expected1)
 }

@@ -81,10 +81,6 @@ func (as *AutomateStop) showStarting() {
 	time.Sleep(time.Second)
 }
 
-func (as *AutomateStop) Skip() error {
-	return nil
-}
-
 func (as *AutomateStop) DefferedHandler() error {
 	if as.isExecuted {
 		as.showStarting()

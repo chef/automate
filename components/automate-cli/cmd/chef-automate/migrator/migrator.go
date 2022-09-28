@@ -8,11 +8,11 @@ type Migrator interface {
 	SaveExecutedStatus() error
 	ExecuteDeferredSteps() error
 	PrintMigrationErrors()
+	RunMigrationFlow()
 }
 
 type MigrationSteps interface {
 	Run() error
-	Skip() error
 	ErrorHandler()
 }
 
