@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/inspector"
 	"github.com/fatih/color"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -46,6 +47,7 @@ func (ds *DisableShardingInspection) Inspect() (err error) {
 	}`)
 	_, err = ds.upgradeUtils.ExecRequest(ES_URL, "PUT", disableShardingPayload)
 	if err != nil {
+		err = errors.Wrap(err, "Failed to disable sharding")
 		ds.setExitError(err)
 		return err
 	}
@@ -72,7 +74,10 @@ func (ds *DisableShardingInspection) RollBackHandler() (err error) {
 		}
 	}`)
 	_, err = ds.upgradeUtils.ExecRequest(ES_URL, "PUT", enableShardingPayload)
-	return
+	if err != nil {
+		return errors.Wrap(err, "Failed to enable sharding")
+	}
+	return nil
 }
 
 func (ds *DisableShardingInspection) GetInstallationType() inspector.InstallationType {
@@ -82,7 +87,6 @@ func (ds *DisableShardingInspection) GetInstallationType() inspector.Installatio
 func (ds *DisableShardingInspection) ExitHandler() error {
 	if ds.exitedWithError {
 		ds.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", ds.exitError).Error())
-		ds.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

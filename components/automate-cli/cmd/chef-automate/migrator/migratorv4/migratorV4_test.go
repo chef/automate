@@ -39,7 +39,7 @@ func TestRunSuccessfulMigrations(t *testing.T) {
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ExecShCommandFunc:           func(script string) error { return nil },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },
@@ -72,7 +72,7 @@ func TestRunSuccessfulMigrationsWithError(t *testing.T) {
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ExecShCommandFunc:           func(script string) error { return nil },
+		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{}, 10)
 	migratorv4.(*MigratorV4).AddDefaultMigrationSteps()
@@ -84,11 +84,11 @@ func TestRunSuccessfulMigrationsWithError(t *testing.T) {
 func TestRunMigrationFlow(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
 	mmu := &MockMigratorV4UtilsImpl{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ExecShCommandFunc:           func(script string) error { return nil },
 		ReadV4ChecklistFunc:         func() (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
@@ -105,11 +105,11 @@ func TestRunMigrationFlow(t *testing.T) {
 func TestRunMigrationFlowDefferedErrors(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
 	mmu := &MockMigratorV4UtilsImpl{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ExecShCommandFunc:           func(script string) error { return nil },
 		ReadV4ChecklistFunc:         func() (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return errors.New("unexpected") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
@@ -129,11 +129,11 @@ Migration Terminated.`
 func TestRunMigrationFlowIsExecutedErrors(t *testing.T) {
 	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
 	mmu := &MockMigratorV4UtilsImpl{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ExecShCommandFunc:           func(script string) error { return nil },
 		ReadV4ChecklistFunc:         func() (bool, error) { return true, errors.New("unexpected") },
 		StartAutomateFunc:           func() error { return errors.New("unexpected") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },

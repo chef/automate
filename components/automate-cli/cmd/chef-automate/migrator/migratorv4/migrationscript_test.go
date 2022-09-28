@@ -11,7 +11,7 @@ import (
 func TestRunMigrationScript(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
-		ExecShCommandFunc:  func(script string) error { return nil },
+		ExecuteCommandFunc: func(command string, args []string, workingDir string) error { return nil },
 		GetHabRootPathFunc: func(cmd string) string { return "/hab" },
 	}
 	ms := NewMigrationScript(cw.CliWriter, mmu)
@@ -25,7 +25,7 @@ func TestRunMigrationScript(t *testing.T) {
 func TestRunMigrationScriptExecError(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
-		ExecShCommandFunc:  func(script string) error { return errors.New("unexpected") },
+		ExecuteCommandFunc: func(command string, args []string, workingDir string) error { return errors.New("unexpected") },
 		GetHabRootPathFunc: func(cmd string) string { return "/hab" },
 	}
 	ms := NewMigrationScript(cw.CliWriter, mmu)

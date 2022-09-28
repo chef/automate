@@ -20,7 +20,7 @@ type EnableMaintenanceInspection struct {
 	exitedWithError bool
 }
 
-func NewDisableMaintenanceInspection(w *cli.Writer, utls UpgradeV4Utils, timeout int64) *EnableMaintenanceInspection {
+func NewEnableMaintenanceInspection(w *cli.Writer, utls UpgradeV4Utils, timeout int64) *EnableMaintenanceInspection {
 	return &EnableMaintenanceInspection{
 		writer:       w,
 		upgradeUtils: utls,
@@ -74,13 +74,13 @@ func (em *EnableMaintenanceInspection) showTurningOn() {
 }
 
 func (em *EnableMaintenanceInspection) showSuccess() {
-	em.spinner.FinalMSG = fmt.Sprintf(color.New(color.FgGreen).Sprint("✔") + "  Maintenance mode turned ON successfully")
+	em.spinner.FinalMSG = " " + fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned ON successfully")
 	em.spinner.Stop()
 	em.writer.Println("")
 }
 
 func (em *EnableMaintenanceInspection) showError() {
-	em.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  Maintenance mode turned ON successfully"
+	em.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Failed to turn maintenance mode ON"
 	em.spinner.Stop()
 	em.writer.Println("")
 }
@@ -114,7 +114,6 @@ func (em *EnableMaintenanceInspection) GetInstallationType() inspector.Installat
 func (em *EnableMaintenanceInspection) ExitHandler() error {
 	if em.exitedWithError {
 		em.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", em.exitError).Error())
-		em.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

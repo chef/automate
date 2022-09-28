@@ -43,19 +43,19 @@ func (ms *MigrationScript) setError(err error) error {
 }
 
 func (ms *MigrationScript) showCopyError() {
-	ms.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Failed to copy data"
+	ms.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgRed).Sprint("✖") + "  Failed to copy data"
 	ms.spinner.Stop()
 	ms.writer.Println("")
 }
 
 func (ms *MigrationScript) showCopied() {
-	ms.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Data Copied Successfully"
+	ms.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgGreen).Sprint("✔") + "  Data Copied Successfully"
 	ms.spinner.Stop()
 	ms.writer.Println("")
 }
 
 func (ms *MigrationScript) showCopying() {
-	ms.spinner = ms.writer.NewSpinner()
+	ms.spinner = ms.writer.NewSpinnerWithTab()
 	ms.spinner.Suffix = fmt.Sprintf("  Copying Data")
 	ms.spinner.Start()
 	time.Sleep(time.Second)
@@ -65,7 +65,11 @@ func (ms *MigrationScript) Run() error {
 	ms.showCopying()
 	habRoot := ms.utils.GetHabRootPath(HABROOT_CMD)
 	script := fmt.Sprintf(FSCRIPT, habRoot)
-	err := ms.utils.ExecShCommand(script)
+	args := []string{
+		"-c",
+		script,
+	}
+	err := ms.utils.ExecuteCommand("/bin/sh", args, "")
 	if err != nil {
 		ms.showCopyError()
 		ms.setError(err)
@@ -77,6 +81,7 @@ func (ms *MigrationScript) Run() error {
 
 func (ms *MigrationScript) ErrorHandler() {
 	if ms.hasError {
-		ms.writer.Println(ms.runError.Error())
+		ms.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ms.runError.Error())
+		ms.writer.Println(MIGRATION_TERMINATED)
 	}
 }

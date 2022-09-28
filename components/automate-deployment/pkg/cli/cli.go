@@ -334,6 +334,14 @@ func (w *Writer) NewSpinner() *spinner.Spinner {
 	return newSpinner
 }
 
+func (w *Writer) NewSpinnerWithTab() *spinner.Spinner {
+	w.writer().Flush()
+	newSpinner := spinner.New(spinner.CharSets[3], 100*time.Millisecond)
+	newSpinner.Prefix = "        "
+	newSpinner.Writer = w.writerStream
+	return newSpinner
+}
+
 // StopSpinner stops the CLI spinner
 func (w *Writer) StopSpinner() {
 	if w.spinner != nil {

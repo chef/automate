@@ -273,7 +273,7 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	err = ui.RunExitAction()
 	assert.NoError(t, err)
 	assert.Contains(t, tw.Output(), expectedChecks)
@@ -313,7 +313,7 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	err = ui.RunExitAction()
 	assert.NoError(t, err)
 	assert.Contains(t, tw.Output(), expectedChecks)
@@ -506,12 +506,11 @@ Upgrade process terminated.`
 	assert.NoError(t, err)
 	ui.ShowInspectionList()
 	err = ui.Inspect()
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	err = ui.RollBackChangesOnError()
 	assert.NoError(t, err)
 	err = ui.RunExitAction()
 	assert.NoError(t, err)
-	t.Log(tw.Output())
 	assert.Contains(t, tw.Output(), expected)
 }
 
@@ -567,7 +566,7 @@ Upgrade process terminated.`
 	assert.NoError(t, err)
 	ui.ShowInspectionList()
 	err = ui.Inspect()
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	err = ui.RollBackChangesOnError()
 	assert.NoError(t, err)
 	err = ui.RunExitAction()
@@ -638,7 +637,7 @@ Upgrade process terminated.`
 	assert.NoError(t, err)
 	ui.ShowInspectionList()
 	err = ui.Inspect()
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	err = ui.RollBackChangesOnError()
 	assert.NoError(t, err)
 	err = ui.RunExitAction()

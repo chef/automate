@@ -58,7 +58,6 @@ func (es *EnsureStatusInspection) GetInstallationType() inspector.InstallationTy
 func (es *EnsureStatusInspection) ExitHandler() error {
 	if es.exitedWithError {
 		es.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", es.exitError).Error())
-		es.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

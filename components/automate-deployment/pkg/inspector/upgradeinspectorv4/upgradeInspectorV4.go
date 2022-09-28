@@ -45,7 +45,7 @@ In this release, Elasticsearch will be migrated to OpenSearch.
 		ui.writer.Println("")
 	}
 
-	if len(ui.osDestDir) == 0 || ui.osDestDir == HAB_DIR || ui.upgradeUtils.IsExternalElasticSearch(ui.timeout) {
+	if !ui.upgradeUtils.IsExternalElasticSearch(ui.timeout) && (len(ui.osDestDir) == 0 || ui.osDestDir == HAB_DIR) {
 		ui.showOSDestDirFlagMsg()
 	}
 	ui.writer.Println(`For more information, visit 
@@ -95,7 +95,6 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 			}
 		}
 	}
-	ui.writer.Println("")
 	if err != nil {
 		return err
 	}
@@ -167,7 +166,7 @@ func (ui *UpgradeInspectorV4) AddDefaultInspections() {
 	ui.AddInspection(NewReplaceS3UrlInspection(ui.writer, ui.upgradeUtils, ui.timeout))
 	ui.AddInspection(NewStoreESSettingsInspection(ui.writer, ui.upgradeUtils, ui.timeout))
 	ui.AddInspection(NewDisableShardingInspection(ui.writer, ui.upgradeUtils))
-	ui.AddInspection(NewDisableMaintenanceInspection(ui.writer, ui.upgradeUtils, ui.timeout))
+	ui.AddInspection(NewEnableMaintenanceInspection(ui.writer, ui.upgradeUtils, ui.timeout))
 }
 
 func (ui *UpgradeInspectorV4) ShowInspectionList() {
@@ -206,39 +205,57 @@ func (ui *UpgradeInspectorV4) RunExitAction() error {
 	return nil
 }
 
-func (ui *UpgradeInspectorV4) handleError(err error) {
-	if err.Error() == UPGRADE_TERMINATED {
-		ui.writer.Println(UPGRADE_TERMINATED)
-	} else {
-		ui.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + err.Error())
-		ui.writer.Println("Please resolve this and try again.")
-		ui.writer.Println("Please contact support if you are not sure how to resolve this.")
-		ui.writer.Println(UPGRADE_TERMINATED)
+func (ui *UpgradeInspectorV4) handleError(errArray []error) {
+	if len(errArray) == 1 {
+		if errArray[0].Error() != UPGRADE_TERMINATED {
+			ui.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + errArray[0].Error())
+			ui.printContactSupport()
+		}
+	} else if len(errArray) > 1 {
+		ui.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + errArray[len(errArray)-1].Error())
+		for i := len(errArray) - 1; i >= 0; i-- {
+			if i == len(errArray)-1 {
+				ui.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + errArray[i].Error())
+			} else {
+				ui.writer.Println(errArray[i].Error())
+			}
+		}
+		ui.printContactSupport()
 	}
+
+}
+
+func (ui *UpgradeInspectorV4) printContactSupport() {
+	ui.writer.Println("Please resolve this and try again.")
+	ui.writer.Println("Please contact support if you are not sure how to resolve this.")
 }
 
 func (ui *UpgradeInspectorV4) RunUpgradeInspector(osDestDir string, skipStorageCheck bool) (isError bool) {
+	errArray := []error{}
 	ui.SetOSDestDir(osDestDir)
 	ui.SetSkipStoragecheckFlag(skipStorageCheck)
 	ui.AddDefaultInspections()
 	err := ui.ShowInfo()
 	if err != nil {
-		ui.handleError(err)
+		ui.handleError(append(errArray, err))
 		return true
 	}
 	ui.ShowInspectionList()
 	err = ui.Inspect()
 	if err != nil {
-		var localerr error
+		ui.writer.Println("")
 		err = ui.RollBackChangesOnError()
 		if err != nil {
-			localerr = err
+			errArray = append(errArray, err)
 		}
 		err = ui.RunExitAction()
 		if err != nil {
-			localerr = errors.Wrap(err, localerr.Error())
+			errArray = append(errArray, err)
 		}
-		ui.handleError(err)
+		if len(errArray) > 0 {
+			ui.handleError(errArray)
+		}
+		ui.writer.Println(UPGRADE_TERMINATED)
 		return true
 	}
 	return false

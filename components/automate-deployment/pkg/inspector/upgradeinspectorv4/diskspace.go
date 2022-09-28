@@ -203,7 +203,6 @@ func (ds *DiskSpaceInspection) GetInstallationType() inspector.InstallationType 
 func (ds *DiskSpaceInspection) ExitHandler() error {
 	if ds.exitedWithError {
 		ds.writer.Println(ds.exitError.Error())
-		ds.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

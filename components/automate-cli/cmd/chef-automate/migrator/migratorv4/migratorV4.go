@@ -23,6 +23,7 @@ type MigratorV4 struct {
 	migrationSteps   []migrator.MigrationSteps
 	migrationConsent bool
 	isExecuted       bool
+	runHealthStatus  bool
 }
 
 type MigrateV4Flags struct {
@@ -76,11 +77,12 @@ func (m *MigratorV4) AskForConfirmation() error {
 }
 
 func (m *MigratorV4) AddDefaultMigrationSteps() {
+	m.AddMigrationSteps(NewEnsureStatus(m.writer, m.migratorUtils))
 	m.AddMigrationSteps(NewCheckStorage(m.writer, m.migratorUtils, m.fileutils))
 	m.AddMigrationSteps(NewPatchOpensearchConfig(m.writer, m.migratorUtils))
-	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils, &m.runHealthStatus))
 	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils))
-	m.AddMigrationSteps(NewWaitForHealthy(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewWaitForHealthy(m.writer, m.migratorUtils, &m.runHealthStatus))
 }
 
 func (m *MigratorV4) ExecuteDeferredSteps() error {

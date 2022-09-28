@@ -13,7 +13,8 @@ func TestAutomateStop(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		StopAutomateFunc: func() error { return nil },
 	}
-	as := NewAutomateStop(cw.CliWriter, mmu)
+	var st bool
+	as := NewAutomateStop(cw.CliWriter, mmu, &st)
 	as.Run()
 	expected1 := "Stopping Chef Automate"
 	expected2 := "✔  Chef Automate Stopped"
@@ -26,7 +27,8 @@ func TestAutomateStopError(t *testing.T) {
 	mmu := &MockMigratorV4UtilsImpl{
 		StopAutomateFunc: func() error { return errors.New("unexpected") },
 	}
-	as := NewAutomateStop(cw.CliWriter, mmu)
+	var st bool
+	as := NewAutomateStop(cw.CliWriter, mmu, &st)
 	as.Run()
 	as.ErrorHandler()
 	expected1 := "✖  Failed to stop Chef Automate"
@@ -41,7 +43,8 @@ func TestAutomateStopDefferedHandlerWithError(t *testing.T) {
 		StopAutomateFunc:  func() error { return errors.New("unexpected") },
 		StartAutomateFunc: func() error { return errors.New("unexpected") },
 	}
-	as := NewAutomateStop(cw.CliWriter, mmu)
+	var st bool
+	as := NewAutomateStop(cw.CliWriter, mmu, &st)
 	as.Run()
 	as.isExecuted = true
 	as.DefferedHandler()
@@ -54,7 +57,8 @@ func TestAutomateStopDefferedHandlerWithoutError(t *testing.T) {
 		StopAutomateFunc:  func() error { return nil },
 		StartAutomateFunc: func() error { return nil },
 	}
-	as := NewAutomateStop(cw.CliWriter, mmu)
+	var st bool
+	as := NewAutomateStop(cw.CliWriter, mmu, &st)
 	as.Run()
 	err := as.DefferedHandler()
 	assert.NoError(t, err)

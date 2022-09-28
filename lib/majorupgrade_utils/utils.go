@@ -1,9 +1,13 @@
 package majorupgrade_utils
 
 import (
+	"context"
+
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/load_balancer"
+	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -39,4 +43,20 @@ func SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err 
 		return "", "", err
 	}
 	return cw.WriteBuffer.String(), cw.ErrorBuffer.String(), nil
+}
+
+func EnsureStatus() (bool, error) {
+	connection, err := client.Connection(client.DefaultClientTimeout)
+	if err != nil {
+		return false, err
+	}
+
+	res, err := connection.Status(context.Background(), &api.StatusRequest{})
+	if err != nil {
+		return false, errors.Wrap(
+			err,
+			"Request to obtain Chef Automate status information failed",
+		)
+	}
+	return res.ServiceStatus.AllHealthy(), nil
 }

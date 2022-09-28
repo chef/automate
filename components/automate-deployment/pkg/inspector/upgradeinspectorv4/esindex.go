@@ -61,7 +61,6 @@ func (es *ESIndexInspection) Inspect() (err error) {
 	es.showErrorList()
 	shouldDelete := es.promptForDeletion()
 	if !shouldDelete {
-		es.setExitError(err)
 		return errors.New(UPGRADE_TERMINATED)
 	}
 	err = es.deleteOldIndices()
@@ -79,7 +78,7 @@ func (es *ESIndexInspection) setExitError(err error) {
 }
 
 func (es *ESIndexInspection) showSuccess() {
-	es.spinner.FinalMSG = fmt.Sprintf(color.New(color.FgGreen).Sprint("✔") + "  [" + color.New(color.FgGreen).Sprint("Passed") +
+	es.spinner.FinalMSG = fmt.Sprintf(" " + color.New(color.FgGreen).Sprint("✔") + "  [" + color.New(color.FgGreen).Sprint("Passed") +
 		"]\t" + MSG_ES_CHECKING)
 	es.spinner.Stop()
 	es.writer.Println("")
@@ -117,7 +116,7 @@ func (es *ESIndexInspection) batchDeleteOldIndices(indexList []string, basePath 
 		indexCSL := strings.Join(indexList[i*INDEX_BATCH_SIZE:upper], ",")
 		_, err := es.upgradeUtils.ExecRequest(fmt.Sprintf("%s%s", basePath, indexCSL)+"?pretty", "DELETE", nil)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "Failed to delete index")
 		}
 	}
 	return nil
@@ -125,7 +124,7 @@ func (es *ESIndexInspection) batchDeleteOldIndices(indexList []string, basePath 
 
 func (es *ESIndexInspection) deletedSuccessfully() {
 	es.writer.Println("                " + color.New(color.FgGreen).Sprint("✔") + " Old Elasticsearch indices deleted successfully\n")
-	es.writer.Println(color.New(color.FgGreen).Sprint("✔") + "  [" + color.New(color.FgGreen).Sprint("Passed") +
+	es.writer.Println(" " + color.New(color.FgGreen).Sprint("✔") + "  [" + color.New(color.FgGreen).Sprint("Passed") +
 		"]\t" + MSG_ES_CHECKING)
 }
 
@@ -153,7 +152,7 @@ func (es *ESIndexInspection) hasOldIndices() bool {
 }
 
 func (es *ESIndexInspection) showError() {
-	es.spinner.FinalMSG = color.New(color.FgRed).Sprint("✖") + "  [" + color.New(color.FgRed).Sprint("Failed") + "]\t" + MSG_ES_CHECKING
+	es.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  [" + color.New(color.FgRed).Sprint("Failed") + "]\t" + MSG_ES_CHECKING
 	es.spinner.Stop()
 	es.writer.Println("")
 }
@@ -195,7 +194,7 @@ func (es *ESIndexInspection) showChecking() {
 func (es *ESIndexInspection) fetchOldIndicesInES() (automateOldIndices, otherOldIndices []string, err error) {
 	listIndexData, err := es.fetchOldIndexInfo()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error while getting list of indices.")
+		return nil, nil, errors.Wrap(err, "error while getting list of indices")
 	}
 	automateOldIndices, otherOldIndices = es.categoriseIndices(listIndexData)
 	return
@@ -233,11 +232,11 @@ func (es *ESIndexInspection) fetchOldIndexInfo() ([]IndexData, error) {
 		indexCSL := strings.Join(indexList[i*INDEX_BATCH_SIZE:upper], ",")
 		versionData, err := es.upgradeUtils.ExecRequest(es.esBasePath+indexCSL+"/_settings/index.version.created*?&human", "GET", nil)
 		if err != nil {
-			return nil, errors.Wrap(err, "error while getting indices details.")
+			return nil, errors.Wrap(err, "error while getting indices details")
 		}
 		data, err := es.getDataForOldIndices(versionData)
 		if err != nil {
-			return nil, errors.Wrap(err, "error while parsing indices details.")
+			return nil, errors.Wrap(err, "error while parsing indices details")
 		}
 		indexDataArr = append(indexDataArr, data...)
 	}
@@ -316,7 +315,6 @@ type IndexInfo struct {
 func (es *ESIndexInspection) ExitHandler() error {
 	if es.exitedWithError {
 		es.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", es.exitError).Error())
-		es.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

@@ -107,7 +107,24 @@ func newMigrateDataCmd() *cobra.Command {
 
 func runMigrator(cmd *cobra.Command, args []string) error {
 	// TODO: add condition for v3 and v4
-	migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorV4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10)
+	mv4U := &migratorV4.MockMigratorV4UtilsImpl{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		StopAutomateFunc:            func() error { return nil },
+		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+		PatchOpensearchConfigFunc: func(es *migratorV4.ESSettings) (string, string, error) {
+			return "", "", errors.New("error while patching")
+		},
+		GetHabRootPathFunc:    func(habrootcmd string) string { return "/hab" },
+		ReadV4ChecklistFunc:   func() (bool, error) { return true, nil },
+		StartAutomateFunc:     func() error { return nil },
+		ExecuteCommandFunc:    func(command string, args []string, workingDir string) error { return nil },
+		GetServicesStatusFunc: func() (bool, error) { return true, nil },
+	}
+	mfu := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 5, nil },
+		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 8, nil },
+	}
+	migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
 	migrator.RunMigrationFlow()
 	return nil
 }

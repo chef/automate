@@ -10,18 +10,20 @@ import (
 )
 
 type AutomateStop struct {
-	writer     *cli.Writer
-	utils      MigratorV4Utils
-	spinner    *spinner.Spinner
-	runError   error
-	hasError   bool
-	isExecuted bool
+	writer       *cli.Writer
+	utils        MigratorV4Utils
+	spinner      *spinner.Spinner
+	runError     error
+	hasError     bool
+	isExecuted   bool
+	healthStatus *bool
 }
 
-func NewAutomateStop(w *cli.Writer, utils MigratorV4Utils) *AutomateStop {
+func NewAutomateStop(w *cli.Writer, utils MigratorV4Utils, healthStatus *bool) *AutomateStop {
 	return &AutomateStop{
-		writer: w,
-		utils:  utils,
+		writer:       w,
+		utils:        utils,
+		healthStatus: healthStatus,
 	}
 }
 
@@ -44,38 +46,38 @@ func (as *AutomateStop) setError(err error) error {
 }
 
 func (as *AutomateStop) showStopError() {
-	as.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Failed to stop Chef Automate"
+	as.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgRed).Sprint("✖") + "  Failed to stop Chef Automate"
 	as.spinner.Stop()
 	as.writer.Println("")
 }
 
 func (as *AutomateStop) showStopped() {
-	as.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Stopped"
+	as.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Stopped"
 	as.spinner.Stop()
 	as.writer.Println("")
 }
 
 func (as *AutomateStop) showStopping() {
-	as.spinner = as.writer.NewSpinner()
+	as.spinner = as.writer.NewSpinnerWithTab()
 	as.spinner.Suffix = fmt.Sprintf("  Stopping Chef Automate")
 	as.spinner.Start()
 	time.Sleep(time.Second)
 }
 
 func (as *AutomateStop) showStartError() {
-	as.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Failed to start Chef Automate"
+	as.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgRed).Sprint("✖") + "  Failed to start Chef Automate"
 	as.spinner.Stop()
 	as.writer.Println("")
 }
 
 func (as *AutomateStop) showStarted() {
-	as.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Started"
+	as.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate Started"
 	as.spinner.Stop()
 	as.writer.Println("")
 }
 
 func (as *AutomateStop) showStarting() {
-	as.spinner = as.writer.NewSpinner()
+	as.spinner = as.writer.NewSpinnerWithTab()
 	as.spinner.Suffix = fmt.Sprintf("  Starting Chef Automate")
 	as.spinner.Start()
 	time.Sleep(time.Second)
@@ -90,12 +92,14 @@ func (as *AutomateStop) DefferedHandler() error {
 			return err
 		}
 		as.showStarted()
+		*as.healthStatus = true
 	}
 	return nil
 }
 
 func (as *AutomateStop) ErrorHandler() {
 	if as.hasError {
-		as.writer.Println(as.runError.Error())
+		as.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + as.runError.Error())
+		as.writer.Println(MIGRATION_TERMINATED)
 	}
 }

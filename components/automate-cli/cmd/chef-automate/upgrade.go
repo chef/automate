@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strconv"
@@ -81,43 +82,53 @@ Otherwise, you may need to run "chef-automate dev start-converge".
 `
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
+	c := 0
+	muv4ui := &upgradeinspectorv4.MockUpgradeV4UtilsImp{
+		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+		ExecRequestFunc: func(url, methodType string, requestBody io.Reader) ([]byte, error) {
+			if strings.Contains(url, "index.version") {
+				return []byte(`{"node-attribute":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}},"comp-2-run-info":{"settings":{"index":{"version":{"created_string":"5.8.23","created":"6082399"}}}}}`), nil
+			} else if strings.Contains(url, "_cluster/stats") {
+				return []byte(`{"indices":{"shards":{"total":51}}}`), nil
+			} else if strings.Contains(url, "indices") {
+				return []byte(`comp-2-run-info
+node-attribute
+node-state-7
+node-1-run-info
+comp-3-profiles
+eventfeed-2-feeds`), nil
+			} else if strings.Contains(url, "_cluster/settings") {
+				if c == 0 {
+					c++
+					return []byte{}, nil
+				}
+				return []byte{}, errors.New("unsupported failed sharding")
+			} else {
+				return []byte{}, nil
+			}
+		},
+		GetESBasePathFunc:        func(timeout int64) string { return "http://localhost" },
+		GetBackupS3URLFunc:       func(timeout int64) (string, error) { return "https://s3.us-east-1.amazonaws.com", nil },
+		PatchS3backupURLFunc:     func(timeout int64) (stdOut, stdErr string, err error) { return "", "", nil },
+		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) { return false, errors.New("failed to turn on maintenance") },
+		SetMaintenanceModeFunc:   func(timeout int64, status bool) (stdOut, stdErr string, err error) { return "", "", nil },
+		WriteToFileFunc:          func(filepath string, data []byte) error { return nil },
+		GetServicesStatusFunc:    func() (bool, error) { return true, nil },
+	}
 
-	// mfs := &fileutils.MockFileSystemUtils{
-	// 	GetFreeSpaceinGBFunc: func(dir string) (float64, error) {
-	// 		if dir == "/hab" {
-	// 			return 1, nil
-	// 		}
-	// 		return 5, nil
-	// 	},
-	// 	CalDirSizeInGBFunc: func(path string) (float64, error) {
-	// 		return 2, nil
-	// 	},
-	// 	GetHabRootPathFunc: func() string { return "/hab" },
-	// }
-	// upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, &upgradeinspectorv4.UpgradeV4UtilsImp{}, mfs, configCmdFlags.timeout)
-	// upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetOSDestDir(upgradeRunCmdFlags.osDestDataDir)
-	// upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).SetSkipStoragecheckFlag(upgradeRunCmdFlags.skipStorageCheck)
-	// upgradeInspector.(*upgradeinspectorv4.UpgradeInspectorV4).AddDefaultInspections()
-	// err := upgradeInspector.ShowInfo()
-	// if err != nil {
-	// 	handleError(err)
-	// 	return nil
-	// }
-	// upgradeInspector.ShowInspectionList()
-	// err = upgradeInspector.Inspect()
-	// if err != nil {
-	// 	err = upgradeInspector.RollBackChangesOnError()
-	// 	if err != nil {
-	// 		handleError(err)
-	// 	}
-	// 	err = upgradeInspector.RunExitAction()
-	// 	if err != nil {
-	// 		handleError(err)
-	// 	}
-	// 	return nil
-	// }
+	mfu := &fileutils.MockFileSystemUtils{
+		CalDirSizeInGBFunc:         func(path string) (float64, error) { return 2, nil },
+		CheckSpaceAvailabilityFunc: func(dir string, minSpace float64) (bool, error) { return true, nil },
+		GetFreeSpaceinGBFunc:       func(dir string) (float64, error) { return 8, nil },
+		GetHabRootPathFunc:         func() string { return "/hab" },
+	}
+	upgradeInspector := upgradeinspectorv4.NewUpgradeInspectorV4(writer, muv4ui, mfu, configCmdFlags.timeout)
+	isError := upgradeInspector.RunUpgradeInspector(upgradeRunCmdFlags.osDestDataDir, upgradeRunCmdFlags.skipStorageCheck)
+	if isError {
+		return nil
+	}
 
-	// return nil
+	return nil
 
 	a1IsRunning, err := isA1Running()
 	if err != nil {

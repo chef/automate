@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/fatih/color"
 )
 
 type CheckStorage struct {
@@ -52,6 +53,7 @@ func (cs *CheckStorage) Run() error {
 
 func (cs *CheckStorage) ErrorHandler() {
 	if cs.hasError {
-		cs.writer.Println(cs.runError.Error())
+		cs.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + cs.runError.Error())
+		cs.writer.Println(MIGRATION_TERMINATED)
 	}
 }

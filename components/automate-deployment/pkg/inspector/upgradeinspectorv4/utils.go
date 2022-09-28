@@ -1,7 +1,6 @@
 package upgradeinspectorv4
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/shared"
-	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/pkg/errors"
@@ -38,7 +36,7 @@ func NewUpgradeV4Utils() UpgradeV4Utils {
 func (cu *UpgradeV4UtilsImp) GetBackupS3URL(timeout int64) (string, error) {
 	res, err := client.GetAutomateConfig(timeout)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "Failed to get backup s3 url")
 	}
 	return res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint().GetValue(), nil
 }
@@ -46,7 +44,7 @@ func (cu *UpgradeV4UtilsImp) GetBackupS3URL(timeout int64) (string, error) {
 func (cu *UpgradeV4UtilsImp) GetMaintenanceStatus(timeout int64) (bool, error) {
 	config, err := client.GetAutomateConfig(timeout)
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "Failed to get maintenance status")
 	}
 	return config.GetConfig().GetLoadBalancer().GetV1().GetSys().GetService().GetMaintenanceMode().GetValue(), nil
 }
@@ -68,7 +66,7 @@ func (cu *UpgradeV4UtilsImp) PatchS3backupURL(timeout int64) (stdOut, stdErr str
 	tw := majorupgrade_utils.NewCustomWriter()
 	err = client.PatchAutomateConfig(10, cfg, tw.CliWriter)
 	if err != nil {
-		return "", "", err
+		return "", "", errors.Wrap(err, "Failed to patch s3 url")
 	}
 	return tw.WriteBuffer.String(), tw.ErrorBuffer.String(), nil
 }
@@ -138,18 +136,5 @@ func (cu *UpgradeV4UtilsImp) WriteToFile(filepath string, data []byte) error {
 }
 
 func (cu *UpgradeV4UtilsImp) GetServicesStatus() (bool, error) {
-	connection, err := client.Connection(client.DefaultClientTimeout)
-	if err != nil {
-		return false, err
-	}
-
-	res, err := connection.Status(context.Background(), &api.StatusRequest{})
-	if err != nil {
-		return false, errors.Wrap(
-			err,
-			"Request to obtain Chef Automate status information failed",
-		)
-	}
-
-	return res.ServiceStatus.AllHealthy(), nil
+	return majorupgrade_utils.EnsureStatus()
 }

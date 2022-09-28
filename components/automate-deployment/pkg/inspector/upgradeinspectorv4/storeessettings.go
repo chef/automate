@@ -89,11 +89,11 @@ func (ses *StoreESSettingsInspection) getTotalShards() (*IndicesShardTotal, erro
 	basePath := ses.upgradeUtils.GetESBasePath(ses.timeout)
 	totalShard, err := ses.upgradeUtils.ExecRequest(basePath+"_cluster/stats?filter_path=indices.shards.total", "GET", nil)
 	if err != nil {
-		return indicesShardTotal, err
+		return indicesShardTotal, errors.Wrap(err, "Failed to fetch total shards")
 	}
 	err = json.Unmarshal(totalShard, indicesShardTotal)
 	if err != nil {
-		return indicesShardTotal, err
+		return indicesShardTotal, errors.Wrap(err, "failed to unmarshal total shards")
 	}
 	return indicesShardTotal, nil
 }
@@ -109,11 +109,11 @@ func (ses *StoreESSettingsInspection) getESSettings() (*ESSettings, error) {
 func (ses *StoreESSettingsInspection) storeESSettings(esSettings *ESSettings) error {
 	esSettingsJson, err := json.Marshal(esSettings)
 	if err != nil {
-		return errors.Wrap(err, "error in mapping elasticsearch settings to json.")
+		return errors.Wrap(err, "Failed to map elasticsearch settings to json")
 	}
 	err = ses.upgradeUtils.WriteToFile(majorupgrade_utils.V3_ES_SETTING_FILE, esSettingsJson)
 	if err != nil {
-		return errors.Wrap(err, "error in elasticsearch settings in file.")
+		return errors.Wrap(err, "Failed to write elasticsearch settings to file")
 	}
 	return nil
 }
@@ -121,7 +121,6 @@ func (ses *StoreESSettingsInspection) storeESSettings(esSettings *ESSettings) er
 func (ses *StoreESSettingsInspection) ExitHandler() error {
 	if ses.exitedWithError {
 		ses.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", ses.exitError).Error())
-		ses.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

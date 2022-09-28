@@ -10,7 +10,7 @@ import (
 
 func TestInspectDisableMaintenanceAlreadyOn(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriter()
-	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+	dm := NewEnableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
 			return true, nil
 		},
@@ -24,7 +24,7 @@ func TestInspectDisableMaintenanceAlreadyOn(t *testing.T) {
 
 func TestInspectDisableMaintenance(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriter()
-	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+	dm := NewEnableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
 			return false, nil
 		},
@@ -38,7 +38,7 @@ func TestInspectDisableMaintenance(t *testing.T) {
 
 func TestInspectDisableMaintenanceError(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriter()
-	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+	dm := NewEnableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
 			return false, nil
 		},
@@ -52,7 +52,7 @@ func TestInspectDisableMaintenanceError(t *testing.T) {
 
 func TestInspectDisableMaintenanceRollBackCalled(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriter()
-	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+	dm := NewEnableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
 			return true, nil
 		},
@@ -67,7 +67,7 @@ func TestInspectDisableMaintenanceRollBackCalled(t *testing.T) {
 
 func TestInspectDisableMaintenanceRollBackCalledWithErrorGet(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriter()
-	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+	dm := NewEnableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
 			return false, errors.New("unexpected")
 		},
@@ -82,7 +82,7 @@ func TestInspectDisableMaintenanceRollBackCalledWithErrorGet(t *testing.T) {
 
 func TestInspectDisableMaintenanceRollBackCalledWithErrorSet(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriter()
-	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+	dm := NewEnableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
 			return true, nil
 		},
@@ -97,7 +97,7 @@ func TestInspectDisableMaintenanceRollBackCalledWithErrorSet(t *testing.T) {
 
 func TestInspectDisableMaintenanceRollBackCalledMaintenanceAlreadyOff(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriter()
-	dm := NewDisableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
+	dm := NewEnableMaintenanceInspection(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) {
 			return false, nil
 		},

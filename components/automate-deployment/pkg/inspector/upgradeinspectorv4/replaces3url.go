@@ -69,7 +69,6 @@ func (ru *ReplaceS3UrlInspection) GetInstallationType() inspector.InstallationTy
 func (ru *ReplaceS3UrlInspection) ExitHandler() error {
 	if ru.exitedWithError {
 		ru.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", ru.exitError).Error())
-		ru.writer.Println(UPGRADE_TERMINATED)
 	}
 	return nil
 }

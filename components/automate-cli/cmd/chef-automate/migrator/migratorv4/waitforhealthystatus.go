@@ -10,15 +10,17 @@ import (
 )
 
 type WaitForHealthy struct {
-	writer  *cli.Writer
-	utils   MigratorV4Utils
-	spinner *spinner.Spinner
+	writer       *cli.Writer
+	utils        MigratorV4Utils
+	spinner      *spinner.Spinner
+	healthStatus *bool
 }
 
-func NewWaitForHealthy(writer *cli.Writer, utils MigratorV4Utils) *WaitForHealthy {
+func NewWaitForHealthy(writer *cli.Writer, utils MigratorV4Utils, healthStatus *bool) *WaitForHealthy {
 	return &WaitForHealthy{
-		writer: writer,
-		utils:  utils,
+		writer:       writer,
+		utils:        utils,
+		healthStatus: healthStatus,
 	}
 }
 
@@ -31,35 +33,37 @@ func (wfh *WaitForHealthy) ErrorHandler() {
 }
 
 func (wfh *WaitForHealthy) showErrorStatus() {
-	wfh.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Chef Automate status is unhealthy"
+	wfh.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgRed).Sprint("✖") + "  Chef Automate status is unhealthy"
 	wfh.spinner.Stop()
 	wfh.writer.Println("")
 }
 
 func (wfh *WaitForHealthy) showSuccessStatus() {
-	wfh.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate status is healthy"
+	wfh.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + color.New(color.FgGreen).Sprint("✔") + "  Chef Automate status is healthy"
 	wfh.spinner.Stop()
 	wfh.writer.Println("")
 }
 
 func (wfh *WaitForHealthy) showStartStatus() {
-	wfh.spinner = wfh.writer.NewSpinner()
+	wfh.spinner = wfh.writer.NewSpinnerWithTab()
 	wfh.spinner.Suffix = fmt.Sprintf("  Checking Chef automate status")
 	wfh.spinner.Start()
 	time.Sleep(time.Second)
 }
 
 func (wfh *WaitForHealthy) DefferedHandler() error {
-	wfh.showStartStatus()
-	args := []string{
-		"status",
-		"--wait-for-healthy",
+	if *wfh.healthStatus {
+		wfh.showStartStatus()
+		args := []string{
+			"status",
+			"--wait-for-healthy",
+		}
+		err := wfh.utils.ExecuteCommand("chef-automate", args, "")
+		if err != nil {
+			wfh.showErrorStatus()
+			return err
+		}
+		wfh.showSuccessStatus()
 	}
-	err := wfh.utils.ExecuteCommand("chef-automate", args, "")
-	if err != nil {
-		wfh.showErrorStatus()
-		return err
-	}
-	wfh.showSuccessStatus()
 	return nil
 }

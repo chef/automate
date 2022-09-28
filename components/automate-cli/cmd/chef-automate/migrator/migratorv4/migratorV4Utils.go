@@ -17,21 +17,12 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/lib/majorupgrade_utils"
+	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
-	MAX_OPEN_FILE_DEFAULT                 = "65535"
-	MAX_LOCKED_MEM_DEFAULT                = "unlimited"
-	MAX_OPEN_FILE_KEY                     = "Max open files"
-	MAX_LOCKED_MEM_KEY                    = "Max locked memory"
-	INDICES_BREAKER_TOTAL_LIMIT_DEFAULT   = "95%"
-	INDICES_TOTAL_SHARD_INCREMENT_DEFAULT = 500
-	MAX_POSSIBLE_HEAP_SIZE                = 32
-	ELASTICSEARCH_DATA_DIR                = "/hab/svc/automate-elasticsearch/data"
-	ELASTICSEARCH_VAR_DIR                 = "/hab/svc/automate-elasticsearch/var"
-	OPENSEARCH_DATA_DIR                   = "/hab/svc/automate-opensearch/data"
-	MIGRATE_ES_ID                         = "migrate_es"
+	SPACES_BEFORE_STEPS = "       "
 )
 
 type MigratorV4Utils interface {
@@ -41,10 +32,10 @@ type MigratorV4Utils interface {
 	StopAutomate() error
 	StartAutomate() error
 	GetHabRootPath(habrootcmd string) string
-	ExecShCommand(script string) error
 	ReadV4Checklist() (bool, error)
 	UpdatePostChecklistFile() error
 	ExecuteCommand(command string, args []string, workingDir string) error
+	GetServicesStatus() (bool, error)
 }
 
 type ESSettings struct {
@@ -86,7 +77,7 @@ func (m *MigratorV4UtilsImpl) PatchOpensearchConfig(osConfig *ESSettings) (strin
 	tw := majorupgrade_utils.NewCustomWriter()
 	err := client.PatchAutomateConfig(10, cfg, tw.CliWriter)
 	if err != nil {
-		return "", "", err
+		return "", "", errors.Wrap(err, "Failed to patch opensearch config")
 	}
 	return tw.WriteBuffer.String(), tw.ErrorBuffer.String(), nil
 }
@@ -185,11 +176,6 @@ func (m *MigratorV4UtilsImpl) GetHabRootPath(habrootcmd string) string {
 	return rootHab
 }
 
-func (m *MigratorV4UtilsImpl) ExecShCommand(script string) error {
-	command := exec.Command("/bin/sh", "-c", script)
-	return command.Run()
-}
-
 func (m *MigratorV4UtilsImpl) ReadV4Checklist() (bool, error) {
 	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
 	if err != nil {
@@ -216,4 +202,8 @@ func (m *MigratorV4UtilsImpl) ExecuteCommand(command string, args []string, work
 	c.Stderr = io.MultiWriter(os.Stderr)
 	err := c.Run()
 	return err
+}
+
+func (m *MigratorV4UtilsImpl) GetServicesStatus() (bool, error) {
+	return majorupgrade_utils.EnsureStatus()
 }

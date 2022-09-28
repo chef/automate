@@ -12,7 +12,6 @@ type MockUpgradeV4UtilsImp struct {
 	PatchS3backupURLFunc        func(timeout int64) (stdOut, stdErr string, err error)
 	GetMaintenanceStatusFunc    func(timeout int64) (bool, error)
 	SetMaintenanceModeFunc      func(timeout int64, status bool) (stdOut, stdErr string, err error)
-	GetElasticsearchPIDFunc     func() (string, error)
 	WriteToFileFunc             func(filepath string, data []byte) error
 	GetServicesStatusFunc       func() (bool, error)
 }
