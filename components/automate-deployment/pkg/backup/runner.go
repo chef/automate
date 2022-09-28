@@ -565,6 +565,31 @@ func (r *Runner) RestoreBackup(
 	return r.restoreTask, nil
 }
 
+// mlistofDesiredServiceForRestore : List of Service need to restore
+var mlistofDesiredServiceForRestore = map[string]struct{}{
+	"backup-gateway":          {},
+	"applications-service":    {},
+	"authn-service":           {},
+	"authz-service":           {},
+	"automate-cs-bookshelf":   {},
+	"automate-cs-oc-bifrost":  {},
+	"automate-cs-oc-erchef":   {},
+	"automate-dex":            {},
+	"cereal-service":          {},
+	"compliance-service":      {},
+	"data-feed-service":       {},
+	"deployment-service":      {},
+	"event-feed-service":      {},
+	"infra-proxy-service":     {},
+	"ingest-service":          {},
+	"license-control-service": {},
+	"nodemanager-service":     {},
+	"notifications-service":   {},
+	"secrets-service":         {},
+	"session-service":         {},
+	"teams-service":           {},
+}
+
 // startRestoreOperations starts unloads services, loads the backed up package
 // manifest and builds a slice of topologically sorted services that are to be
 // restored. By restoring them in this order we ensure that any dependent
@@ -769,10 +794,22 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 			verifier,
 		)
 
+		// mlistofDesiredServiceForRestore : contain the list of services which need to be restored
+		//
+		isMetadataDotJsonIsPresent := false
+		_, present := mlistofDesiredServiceForRestore[svc.Name()]
+		if present {
+			isMetadataDotJsonIsPresent = true
+			r.infof(" Need to Look for metadata : %s status : %t", svc.Name(), isMetadataDotJsonIsPresent)
+		} else {
+			r.infof(" This %s is not backed up, so escaping the response of metadata lookup", svc.Name())
+			isMetadataDotJsonIsPresent = false
+		}
+
 		// If the metadata file exists but we failed to load it for whatever
 		// reason, like a network issue or corrupted metadata file, then we want to
 		// error out.
-		if err != nil && !IsNotExist(err) {
+		if err != nil && !IsNotExist(err) && isMetadataDotJsonIsPresent {
 			r.failf(err, "Failed to load metadata for service %s", svc.Name())
 			return err
 		}
