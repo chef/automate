@@ -84,6 +84,5 @@ func (ms *MigrationScript) Run() error {
 func (ms *MigrationScript) ErrorHandler() {
 	if ms.hasError {
 		ms.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + ms.runError.Error())
-		ms.writer.Println(MIGRATION_TERMINATED)
 	}
 }

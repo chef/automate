@@ -1,7 +1,5 @@
 package migratorV4
 
-import "os"
-
 type MockMigratorV4UtilsImpl struct {
 	GetEsTotalShardSettingsFunc func() (int32, error)
 	PatchOpensearchConfigFunc   func(es *ESSettings) (string, string, error)
@@ -47,14 +45,5 @@ func (mui *MockMigratorV4UtilsImpl) GetServicesStatus() (bool, error) {
 	return mui.GetServicesStatusFunc()
 }
 func (mui *MockMigratorV4UtilsImpl) CreateMigrateJson() error {
-	nm := NewMigratorV4Utils()
-	return nm.CreateMigrateJson()
-}
-
-func (mui *MockMigratorV4UtilsImpl) DeleteMigrateJson(path string) error {
-	err := os.Remove(path) // remove a single file
-	if err != nil {
-		return err
-	}
-	return nil
+	return mui.CreateMigrateJsonFunc()
 }

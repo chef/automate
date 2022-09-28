@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/majorupgrade_utils"
-	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,6 +12,6 @@ func TestTakeBackup(t *testing.T) {
 	tb := NewTakeBackupInspection(tw.CliWriter)
 	index := 2
 	tb.ShowInfo(&index)
-	expected := "2. You have taken backup by running command: " + color.New(color.Bold).Sprint("chef automate backup create\n")
+	expected := "2. You have taken a backup by running the command: chef automate backup create\n"
 	assert.Equal(t, expected, tw.Output())
 }

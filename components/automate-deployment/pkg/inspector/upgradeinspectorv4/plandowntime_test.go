@@ -12,6 +12,6 @@ func TestPlanDownTime(t *testing.T) {
 	pd := NewPlannedDownTimeInspection(tw.CliWriter)
 	index := 1
 	pd.ShowInfo(&index)
-	expected := "1. You have planned downtime\n"
+	expected := "1. You have scheduled downtime for the duration of the upgrade\n"
 	assert.Equal(t, expected, tw.Output())
 }

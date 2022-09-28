@@ -2,6 +2,7 @@ package upgradeinspectorv4
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -12,19 +13,43 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpgradeInspectorV4ShowInfoWithNoInspections(t *testing.T) {
-	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
-	expected := `This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
-
-You can always change the OpenSearch destination directory by using the flag:
-  $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
-
-For more information, visit 
+const (
+	TITLE_MSG = `This is a major upgrade!
+In this release, Elasticsearch will be migrated to OpenSearch.`
+	RUN_WITH_OS_FLAG = `You can always change the OpenSearch destination directory by using the flag:
+  $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>`
+	PROCEED_CONF = `For more information, visit 
 https://docs.chef.io/automate/major_upgrade 4.x/
 
-Would you like to proceed with the upgrade? (y/n)
+Would you like to proceed with the upgrade? (y/n)`
+	INFO_MSG = `Please make sure following things are taken care of
+1. You have scheduled downtime for the duration of the upgrade
+2. You have taken a backup by running the command: chef automate backup create
+3. /hab directory should have at least 8.8GB of free space. (Currently available space : 2.5GB)`
+	INSPECTION_LIST = `Following Pre-flight checks will be conducted
+1. /hab directory should have at least 5.5GB of free space
+2. /home/ubuntu directory should have at least 3.3GB of free space
 `
+	ALL_SKIPPED_OS = `Pre flight checks
+ ⊖  [Skipped]	/hab directory should have at least 5.5GB of free space
+ ⊖  [Skipped]	/home/ubuntu directory should have at least 3.3GB of free space
+ ⊖  [Skipped]	Elasticsearch indices are in version 6
+
+[Error] Please make sure all services are healthy by running chef-automate status`
+	HAB_SPACE_ERR = `✖  [Failed]	/hab directory should have at least 8.8GB of free space
+ ⊖  [Skipped]	Elasticsearch indices are in version 6
+
+[Error] Required Space : 8.8GB
+        Available space : 2.5GB
+
+Please ensure the available free space is 8.8GB
+and run chef-automate upgrade run --major command again
+`
+)
+
+func TestUpgradeInspectorV4ShowInfoWithNoInspections(t *testing.T) {
+	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
+	expected := fmt.Sprintf("%s\n\n%s\n\n%s\n", TITLE_MSG, RUN_WITH_OS_FLAG, PROCEED_CONF)
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -40,17 +65,7 @@ Would you like to proceed with the upgrade? (y/n)
 
 func TestUpgradeInspectorV4ShowInfoWithOSDestDirIsHab(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
-	expected := `This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
-
-You can always change the OpenSearch destination directory by using the flag:
-  $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
-
-For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
-
-Would you like to proceed with the upgrade? (y/n)
-`
+	expected := fmt.Sprintf("%s\n\n%s\n\n%s\n", TITLE_MSG, RUN_WITH_OS_FLAG, PROCEED_CONF)
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -67,14 +82,7 @@ Would you like to proceed with the upgrade? (y/n)
 
 func TestUpgradeInspectorV4ShowInfoWithOSDestDir(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
-	expected := `This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
-
-For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
-
-Would you like to proceed with the upgrade? (y/n)
-`
+	expected := fmt.Sprintf("%s\n\n%s\n", TITLE_MSG, PROCEED_CONF)
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -99,17 +107,7 @@ func TestUpgradeInspectorV4ShowInfoWithNoInput(t *testing.T) {
 	ui := NewUpgradeInspectorV4(tw.CliWriter, &MockUpgradeV4UtilsImp{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 	}, mfs, 10)
-	expected := `This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
-
-You can always change the OpenSearch destination directory by using the flag:
-  $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
-
-For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
-
-Would you like to proceed with the upgrade? (y/n)
-`
+	expected := fmt.Sprintf("%s\n\n%s\n\n%s\n", TITLE_MSG, RUN_WITH_OS_FLAG, PROCEED_CONF)
 	expectedError := errors.New(UPGRADE_TERMINATED)
 	err := ui.ShowInfo()
 	assert.Equal(t, expected, tw.Output())
@@ -120,22 +118,8 @@ Would you like to proceed with the upgrade? (y/n)
 
 func TestUpgradeInspectorV4ShowInfoWithInspections(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
-	expected := `This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
+	expected := fmt.Sprintf("%s\n\n%s\n\n%s\n\n%s\n", TITLE_MSG, INFO_MSG, RUN_WITH_OS_FLAG, PROCEED_CONF)
 
-Please make sure following things are taken care of
-1. You have planned downtime
-2. You have taken backup by running command: chef automate backup create
-3. /hab directory should have 8.8GB of free space. (Currently available space : 2.5GB)
-
-You can always change the OpenSearch destination directory by using the flag:
-  $ chef-automate upgrade run --major --os-dest-data-dir <path to new directory>
-
-For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
-
-Would you like to proceed with the upgrade? (y/n)
-`
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -154,13 +138,12 @@ Would you like to proceed with the upgrade? (y/n)
 
 func TestUpgradeInspectorV4ShowInfoWithInspectionsWithFilesystemError(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriterWithInputs("y")
-	expected := `This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
+	expected := fmt.Sprintf(`%s
 
 Please make sure following things are taken care of
-1. You have planned downtime
-2. You have taken backup by running command: chef automate backup create
-`
+1. You have scheduled downtime for the duration of the upgrade
+2. You have taken a backup by running the command: chef automate backup create
+`, TITLE_MSG)
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGBError,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -181,16 +164,12 @@ Please make sure following things are taken care of
 
 func TestUpgradeInspectorV4ShowInfoInvalidInputError(t *testing.T) {
 	tw := majorupgrade_utils.NewCustomWriterWithInputs("t")
-	expected := `This is a major upgrade!
-In this release, Elasticsearch will be migrated to OpenSearch.
+	expected := fmt.Sprintf(`%s
 
-For more information, visit 
-https://docs.chef.io/automate/major_upgrade 4.x/
-
-Would you like to proceed with the upgrade? (y/n)
+%s
 I don't understand 't'. Please type 'y' or 'n'.
 Would you like to proceed with the upgrade? (y/n)
-`
+`, TITLE_MSG, PROCEED_CONF)
 	mfs := &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   CalDirSizeInGB,
 		GetFreeSpaceinGBFunc: GetFreeSpaceinGB,
@@ -230,10 +209,10 @@ func TestUpgradeInspectorV4Inspect(t *testing.T) {
 	diskSpaceInspection.checkDelay = 100 * time.Millisecond
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 5.5GB of free space"
-	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have 3.3GB of free space"
-	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have 5.5GB of free space"
-	expectedPassOSDestChecking := "✔  [Passed]\t/home/ubuntu directory should have 3.3GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have at least 5.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have at least 3.3GB of free space"
+	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have at least 5.5GB of free space"
+	expectedPassOSDestChecking := "✔  [Passed]\t/home/ubuntu directory should have at least 3.3GB of free space"
 
 	err := ui.Inspect()
 	assert.Contains(t, tw.Output(), expectedChecks)
@@ -267,9 +246,9 @@ func TestUpgradeInspectorV4InspectHabFailed(t *testing.T) {
 	diskSpaceInspection.checkDelay = 100 * time.Millisecond
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 10.5GB of free space"
-	expectedPassHabChecking := "✖  [Failed]\t/hab directory should have 10.5GB of free space"
-	expectedPassOSDestChecking := "⊖  [Skipped]\t/home/ubuntu directory should have 3.3GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have at least 10.5GB of free space"
+	expectedPassHabChecking := "✖  [Failed]\t/hab directory should have at least 10.5GB of free space"
+	expectedPassOSDestChecking := "⊖  [Skipped]\t/home/ubuntu directory should have at least 3.3GB of free space"
 	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
@@ -306,10 +285,10 @@ func TestUpgradeInspectorV4InspectOSDestFailed(t *testing.T) {
 	diskSpaceInspection.checkDelay = 100 * time.Millisecond
 
 	expectedChecks := "Pre flight checks"
-	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have 5.5GB of free space"
-	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have 10.5GB of free space"
-	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have 5.5GB of free space"
-	expectedPassOSDestChecking := "✖  [Failed]\t/home/ubuntu directory should have 10.5GB of free space"
+	expectedBeginHabChecking := "┤  [Checking]\t/hab directory should have at least 5.5GB of free space"
+	expectedBeginOSDestChecking := "┤  [Checking]\t/home/ubuntu directory should have at least 10.5GB of free space"
+	expectedPassHabChecking := "✔  [Passed]\t/hab directory should have at least 5.5GB of free space"
+	expectedPassOSDestChecking := "✖  [Failed]\t/home/ubuntu directory should have at least 10.5GB of free space"
 	expectedEnsureSpace := "Please ensure the available free space is 10.5GB"
 
 	err := ui.Inspect()
@@ -345,10 +324,7 @@ func TestUpgradeInspectorV4InspectShowInspectionListForOsDest(t *testing.T) {
 	diskSpaceInspection.currentSpaceInOSDir = 8.5
 	diskSpaceInspection.requiredOSDestSpace = 3.3
 
-	expected := `Following Pre-flight checks will be conducted
-1. /hab directory should have 5.5GB of free space
-2. /home/ubuntu directory should have 3.3GB of free space
-`
+	expected := INSPECTION_LIST
 
 	ui.ShowInspectionList()
 	assert.Contains(t, tw.Output(), expected)
@@ -380,7 +356,7 @@ func TestUpgradeInspectorV4ShowInspectionListForExternal(t *testing.T) {
 
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have 5.5GB of free space"
+	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have at least 5.5GB of free space"
 
 	ui.ShowInfo()
 	ui.ShowInspectionList()
@@ -413,7 +389,7 @@ func TestUpgradeInspectorV4ShowInspectionListForEmbedded(t *testing.T) {
 
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have 8.8GB of free space"
+	expected := "Following Pre-flight checks will be conducted\n1. /hab directory should have at least 8.8GB of free space"
 
 	ui.ShowInfo()
 	ui.ShowInspectionList()
@@ -451,7 +427,7 @@ func TestUpgradeInspectorV4RunInspectForOsDestDirSkipped(t *testing.T) {
 	ui.(*UpgradeInspectorV4).SetOSDestDir("/home/ubuntu")
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected1 := "[Skipped]\t/home/ubuntu directory should have 3.3GB of free space"
+	expected1 := "[Skipped]\t/home/ubuntu directory should have at least 3.3GB of free space"
 	expected2 := "[Skipped]\tElasticsearch indices are in version 6\n"
 
 	ui.ShowInfo()
@@ -490,27 +466,10 @@ func TestUpgradeInspectorV4ExitMessage(t *testing.T) {
 		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
 	}, mfs, 10)
 
-	ui.(*UpgradeInspectorV4).AddDefaultInspections()
+	expected := HAB_SPACE_ERR
 
-	expected := `✖  [Failed]	/hab directory should have 8.8GB of free space
- ⊖  [Skipped]	Elasticsearch indices are in version 6
-
-[Error] Required Space : 8.8GB
-        Available space : 2.5GB
-
-Please ensure the available free space is 8.8GB
-and run chef-automate upgrade run --major command again
-Upgrade process terminated.`
-
-	err := ui.ShowInfo()
-	assert.NoError(t, err)
-	ui.ShowInspectionList()
-	err = ui.Inspect()
-	assert.Error(t, err)
-	err = ui.RollBackChangesOnError()
-	assert.NoError(t, err)
-	err = ui.RunExitAction()
-	assert.NoError(t, err)
+	err := ui.RunUpgradeInspector("", false)
+	assert.True(t, err)
 	assert.Contains(t, tw.Output(), expected)
 }
 
@@ -559,8 +518,7 @@ func TestUpgradeInspectorV4ExitMessageFailedMaintenance(t *testing.T) {
 
 	ui.(*UpgradeInspectorV4).AddDefaultInspections()
 
-	expected := `[Error] unreachable
-Upgrade process terminated.`
+	expected := `[Error] unreachable`
 
 	err := ui.ShowInfo()
 	assert.NoError(t, err)
@@ -618,29 +576,9 @@ func TestUpgradeInspectorV4SkipAllEnsureStatusFailure(t *testing.T) {
 		WriteToFileFunc: func(filepath string, data []byte) error { return nil },
 	}, mfs, 10)
 
-	ui.(*UpgradeInspectorV4).AddInspection(NewEnsureStatusInspection(ui.(*UpgradeInspectorV4).writer, ui.(*UpgradeInspectorV4).upgradeUtils))
-	diskSpaceInspection := NewDiskSpaceInspection(ui.(*UpgradeInspectorV4).writer, ui.(*UpgradeInspectorV4).upgradeUtils.IsExternalElasticSearch(ui.(*UpgradeInspectorV4).timeout), ui.(*UpgradeInspectorV4).osDestDir, ui.(*UpgradeInspectorV4).fileUtils)
-	diskSpaceInspection.osDestDir = "/home/ubuntu"
-	ui.AddInspection(diskSpaceInspection)
-	esBasePath := ui.(*UpgradeInspectorV4).upgradeUtils.GetESBasePath(ui.(*UpgradeInspectorV4).timeout)
-	ui.AddInspection(NewESIndexInspection(ui.(*UpgradeInspectorV4).writer, ui.(*UpgradeInspectorV4).upgradeUtils, esBasePath))
+	expected := ALL_SKIPPED_OS
 
-	expected := `Pre flight checks
- ⊖  [Skipped]	/hab directory should have 5.5GB of free space
- ⊖  [Skipped]	/home/ubuntu directory should have 3.3GB of free space
- ⊖  [Skipped]	Elasticsearch indices are in version 6
-
-[Error] Please make sure all services are healthy by running chef-automate status
-Upgrade process terminated.`
-
-	err := ui.ShowInfo()
-	assert.NoError(t, err)
-	ui.ShowInspectionList()
-	err = ui.Inspect()
-	assert.Error(t, err)
-	err = ui.RollBackChangesOnError()
-	assert.NoError(t, err)
-	err = ui.RunExitAction()
-	assert.NoError(t, err)
+	iserr := ui.RunUpgradeInspector("/home/ubuntu", false)
+	assert.Equal(t, iserr, true)
 	assert.Contains(t, tw.Output(), expected)
 }

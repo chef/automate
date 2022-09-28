@@ -64,6 +64,6 @@ func TestOutputInspectReplaceS3URLErrorInGetUrl(t *testing.T) {
 	assert.Error(t, err)
 	err = ds.ExitHandler()
 	assert.NoError(t, err)
-	expected := "[Error] unexpected\nUpgrade process terminated.\n"
+	expected := "[Error] unexpected\n"
 	assert.Equal(t, expected, tw.Output())
 }

@@ -95,7 +95,6 @@ func (poc *PatchOpensearchConfig) GetDefaultOpensearchSettings() *ESSettings {
 func (poc *PatchOpensearchConfig) ErrorHandler() {
 	if poc.hasError {
 		poc.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + poc.runError.Error())
-		poc.writer.Println(MIGRATION_TERMINATED)
 	}
 }
 

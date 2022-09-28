@@ -3,6 +3,7 @@ package upgradeinspectorv4
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -18,6 +19,18 @@ node-state-7
 node-1-run-info
 comp-3-profiles
 eventfeed-2-feeds`
+	TAB          = "                "
+	INSIDETAB    = "                        "
+	INDEX_PROMPT = `
+%[1]vPlease choose from options below:
+%[1]v1. Delete these indices and proceed with upgrade.
+%[1]v2. Exit the upgrade process, manually re-index the indices and upgrade Chef Automate later on.
+
+%[1]vFor more information on reindexing, visit: https://www. elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html
+
+%[1]vEnter your choice (1/2):`
+	FOUND_OLD    = "✖  [Failed]\tElasticsearch indices are in version 6\n\n                [Error] Below indices are from an older version of Elasticsearch"
+	FOUND_OLD_A1 = "✖  [Failed]\tElasticsearch indices are in version 6\n\n                [Error] Below indices are from an older version of Elasticsearch from Chef Automate 1"
 )
 
 func IsExternal(timeout int64) bool {
@@ -128,7 +141,7 @@ func TestShowErrorListOldAutomateIndices(t *testing.T) {
 	ei := NewESIndexInspection(tw.CliWriter, mockUtil, GetESBasePath(10))
 	ei.automateOldIndices = []string{"1", "2", "3", "4"}
 	ei.showErrorListOldAutomateIndices()
-	expected := "                [Error] Below indices are from an older version of Elasticsearch from Chef Automate 1\n                        1\n                        2\n                        3\n                        4\n\n"
+	expected := fmt.Sprintf("%[1]v[Error] Below indices are from an older version of Elasticsearch from Chef Automate 1\n%[2]v1\n%[2]v2\n%[2]v3\n%[2]v4\n\n", TAB, INSIDETAB)
 	assert.Equal(t, expected, tw.Output())
 }
 
@@ -142,7 +155,7 @@ func TestShowErrorListOldOtherIndices(t *testing.T) {
 	ei := NewESIndexInspection(tw.CliWriter, mockUtil, GetESBasePath(10))
 	ei.otherOldIndices = []string{"1", "2", "3", "4"}
 	ei.showErrorListOldOtherIndices()
-	expected := "                [Error] Below indices are from an older version of Elasticsearch\n                        1\n                        2\n                        3\n                        4\n\n"
+	expected := fmt.Sprintf("%[1]v[Error] Below indices are from an older version of Elasticsearch\n%[2]v1\n%[2]v2\n%[2]v3\n%[2]v4\n\n", TAB, INSIDETAB)
 	assert.Equal(t, expected, tw.Output())
 }
 
@@ -159,18 +172,8 @@ func TestInspectWithOldNonAutomateIndicesWithExit(t *testing.T) {
 	if assert.Error(t, err) {
 		assert.EqualError(t, err, expectederr)
 	}
-	expectedout1 := `✖  [Failed]	Elasticsearch indices are in version 6
-
-                [Error] Below indices are from an older version of Elasticsearch
-`
-	expectedout2 := `
-                Please choose from options below:
-                1. Delete these indices and proceed with upgrade.
-                2. Exit the upgrade process, manually re-index the indices and upgrade Chef Automate later on.
-
-                For more information on reindexing, visit: https://www. elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html
-
-                Enter your choice (1/2):`
+	expectedout1 := "✖  [Failed]\tElasticsearch indices are in version 6\n\n                [Error] Below indices are from an older version of Elasticsearch"
+	expectedout2 := fmt.Sprintf(INDEX_PROMPT, TAB)
 	expectedout3 := `node-attribute`
 	expectedout4 := `comp-2-run-info`
 
@@ -193,18 +196,8 @@ func TestInspectWithOldAutomateIndicesWithExit(t *testing.T) {
 	if assert.Error(t, err) {
 		assert.EqualError(t, err, expectederr)
 	}
-	expectedout1 := `✖  [Failed]	Elasticsearch indices are in version 6
-
-                [Error] Below indices are from an older version of Elasticsearch from Chef Automate 1
-`
-	expectedout2 := `
-                Please choose from options below:
-                1. Delete these indices and proceed with upgrade.
-                2. Exit the upgrade process, manually re-index the indices and upgrade Chef Automate later on.
-
-                For more information on reindexing, visit: https://www. elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html
-
-                Enter your choice (1/2):`
+	expectedout1 := FOUND_OLD
+	expectedout2 := fmt.Sprintf(INDEX_PROMPT, TAB)
 	expectedout3 := `.automate`
 	expectedout4 := `.locky`
 
@@ -261,7 +254,7 @@ func TestInspectWithOldIndicesAndDelete(t *testing.T) {
 
 	err := ei.Inspect()
 	assert.NoError(t, err)
-	expectedout := "✔ Old Elasticsearch indices deleted successfully\n\n✔  [Passed]\tElasticsearch indices are in version 6"
+	expectedout := "✔ Old Elasticsearch indices deleted successfully\n\n ✔  [Passed]\tElasticsearch indices are in version 6"
 	assert.Contains(t, tw.Output(), expectedout)
 }
 
@@ -318,8 +311,7 @@ func TestInspectWithFailedDelete(t *testing.T) {
 	assert.Error(t, err)
 	err = ei.ExitHandler()
 	assert.NoError(t, err)
-	expectedout := `[Error] unexpected
-Upgrade process terminated.`
+	expectedout := `[Error] Failed to delete index: unexpected`
 	assert.Contains(t, tw.Output(), expectedout)
 }
 

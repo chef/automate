@@ -80,6 +80,7 @@ func (m *MigratorV4) AddDefaultMigrationSteps() {
 	m.AddMigrationSteps(NewEnsureStatus(m.writer, m.migratorUtils))
 	m.AddMigrationSteps(NewCheckStorage(m.writer, m.migratorUtils, m.fileutils))
 	m.AddMigrationSteps(NewPatchOpensearchConfig(m.writer, m.migratorUtils))
+	m.AddMigrationSteps(NewCheckDirExists(m.writer, m.fileutils))
 	m.AddMigrationSteps(NewAutomateStop(m.writer, m.migratorUtils, &m.runHealthStatus))
 	m.AddMigrationSteps(NewMigrationScript(m.writer, m.migratorUtils))
 	m.AddMigrationSteps(NewWaitForHealthy(m.writer, m.migratorUtils, &m.runHealthStatus))
@@ -157,10 +158,16 @@ func (m *MigratorV4) RunMigrationFlow() {
 		return
 	}
 	m.AddDefaultMigrationSteps()
-	m.ExecuteMigrationSteps()
-	err = m.ExecuteDeferredSteps()
+	err = m.ExecuteMigrationSteps()
+	errDeffered := m.ExecuteDeferredSteps()
 	if err != nil {
-		m.handleError(err)
+		m.PrintMigrationErrors()
 	}
-	m.PrintMigrationErrors()
+	if errDeffered != nil {
+		m.handleError(errDeffered)
+	} else {
+		if err != nil {
+			m.writer.Println(MIGRATION_TERMINATED)
+		}
+	}
 }

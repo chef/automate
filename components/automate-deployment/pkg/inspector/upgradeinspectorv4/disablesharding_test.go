@@ -42,8 +42,6 @@ func TestDisableShardingErrorExitHandlerMessage(t *testing.T) {
 	assert.Error(t, err)
 	err = ds.ExitHandler()
 	assert.NoError(t, err)
-	expected := `[Error] Unreachable
-Upgrade process terminated.
-`
+	expected := `[Error] Failed to disable sharding: Unreachable`
 	assert.Contains(t, tw.Output(), expected)
 }

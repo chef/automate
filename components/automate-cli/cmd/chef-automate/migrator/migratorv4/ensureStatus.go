@@ -31,6 +31,7 @@ func (es *EnsureStatusInspection) Run() (err error) {
 	if !status {
 		err = errors.New("Please make sure all services are healthy by running " + color.New(color.Bold).Sprint("chef-automate status"))
 		es.setError(err)
+		return err
 	}
 	return nil
 }
@@ -44,6 +45,5 @@ func (es *EnsureStatusInspection) setError(err error) error {
 func (es *EnsureStatusInspection) ErrorHandler() {
 	if es.exitedWithError {
 		es.writer.Println(fmt.Errorf("["+color.New(color.FgRed).Sprint("Error")+"] %w", es.exitError).Error())
-		es.writer.Println(MIGRATION_TERMINATED)
 	}
 }

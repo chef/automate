@@ -44,7 +44,7 @@ func (cs *CheckStorage) Run() error {
 		return err
 	}
 	if osDirSize < minimumRequiredSpace {
-		err = errors.New(fmt.Sprintf("Insufficient space. %s should have minimum %.2fGB space available.", OPENSEARCH_DATA_DIR, minimumRequiredSpace))
+		err = errors.New(fmt.Sprintf("Insufficient space. Directory %s should have minimum %.2fGB space available.", OPENSEARCH_DATA_DIR, minimumRequiredSpace))
 		cs.setError(err)
 		return err
 	}
@@ -54,6 +54,5 @@ func (cs *CheckStorage) Run() error {
 func (cs *CheckStorage) ErrorHandler() {
 	if cs.hasError {
 		cs.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + cs.runError.Error())
-		cs.writer.Println(MIGRATION_TERMINATED)
 	}
 }

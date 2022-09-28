@@ -2,12 +2,10 @@ package migratorV4
 
 import (
 	"fmt"
-	"os/exec"
 	"time"
 
 	"github.com/briandowns/spinner"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/fatih/color"
 )
 
@@ -23,15 +21,13 @@ const (
 )
 
 type Cleanup struct {
-	writer           *cli.Writer
-	utils            MigratorV4Utils
-	runError         error
-	hasError         bool
-	fileutils        fileutils.FileUtils
-	spinner          *spinner.Spinner
-	migrationConsent bool
-	autoAccept       bool
-	forceExecute     bool
+	writer       *cli.Writer
+	utils        MigratorV4Utils
+	runError     error
+	hasError     bool
+	spinner      *spinner.Spinner
+	autoAccept   bool
+	forceExecute bool
 }
 
 func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, autoAccept, forceExecute bool) *Cleanup {
@@ -74,9 +70,8 @@ func (cs *Cleanup) setError(err error) error {
 }
 
 func (cu *Cleanup) startCleanup(forceExecute, autoAccept bool) error {
-	m := NewMigratorV4Utils()
 
-	isExecuted, err := m.ReadV4Checklist(CLEANUP_ID)
+	isExecuted, err := cu.utils.ReadV4Checklist(CLEANUP_ID)
 	if err != nil {
 		cu.setError(err)
 		return err
@@ -119,18 +114,16 @@ func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
 	cu.showDeletingMessage()
 	habRoot := cu.utils.GetHabRootPath(habrootcmd)
 	cleanUpScript := fmt.Sprintf(fcleanUpScript, habRoot)
-	command := exec.Command("/bin/sh", "-c", cleanUpScript)
-	err := command.Run()
+	args := []string{
+		"-c",
+		cleanUpScript,
+	}
+	err := cu.utils.ExecuteCommand("/bin/sh", args, "")
 	if err != nil {
 		cu.setError(err)
 		return err
 	} else {
-		m := NewMigratorV4Utils()
-		if err != nil {
-			cu.setError(err)
-			return err
-		}
-		err = m.UpdatePostChecklistFile(CLEANUP_ID)
+		err = cu.utils.UpdatePostChecklistFile(CLEANUP_ID)
 		if err != nil {
 			cu.setError(err)
 			return err
@@ -166,6 +159,5 @@ func (cu *Cleanup) AskForConfirmation(message string) error {
 	if !res {
 		return nil
 	}
-	cu.migrationConsent = res
 	return nil
 }

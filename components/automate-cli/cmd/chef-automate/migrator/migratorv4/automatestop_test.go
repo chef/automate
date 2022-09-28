@@ -37,20 +37,6 @@ func TestAutomateStopError(t *testing.T) {
 	assert.Contains(t, cw.Output(), expected2)
 }
 
-func TestAutomateStopDefferedHandlerWithError(t *testing.T) {
-	cw := majorupgrade_utils.NewCustomWriter()
-	mmu := &MockMigratorV4UtilsImpl{
-		StopAutomateFunc:  func() error { return errors.New("unexpected") },
-		StartAutomateFunc: func() error { return errors.New("unexpected") },
-	}
-	var st bool
-	as := NewAutomateStop(cw.CliWriter, mmu, &st)
-	as.Run()
-	as.isExecuted = true
-	as.DefferedHandler()
-
-	assert.Contains(t, cw.Output(), "✖  Failed to start Chef Automate")
-}
 func TestAutomateStopDefferedHandlerWithoutError(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
@@ -63,4 +49,17 @@ func TestAutomateStopDefferedHandlerWithoutError(t *testing.T) {
 	err := as.DefferedHandler()
 	assert.NoError(t, err)
 	assert.Contains(t, cw.Output(), "✔  Chef Automate Started")
+}
+
+func TestAutomateStopDefferedHandlerWithError(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriter()
+	mmu := &MockMigratorV4UtilsImpl{
+		StopAutomateFunc:  func() error { return nil },
+		StartAutomateFunc: func() error { return errors.New("unexpected") },
+	}
+	var st bool
+	as := NewAutomateStop(cw.CliWriter, mmu, &st)
+	as.Run()
+	as.DefferedHandler()
+	assert.Contains(t, cw.Output(), "✖  Failed to start Chef Automate")
 }

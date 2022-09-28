@@ -100,6 +100,5 @@ func (as *AutomateStop) DefferedHandler() error {
 func (as *AutomateStop) ErrorHandler() {
 	if as.hasError {
 		as.writer.Println("[" + color.New(color.FgRed).Sprint("Error") + "] " + as.runError.Error())
-		as.writer.Println(MIGRATION_TERMINATED)
 	}
 }

@@ -14,6 +14,10 @@ import (
 
 const (
 	MIN_HAB_FREE_SPACE float64 = 5.5
+	MIN_REQ_SPACE_STR          = "%s directory should have at least %.1fGB of free space"
+	ENSURE_SPACE               = "\nPlease ensure the available free space is %.1fGB\nand run "
+	UPGRADE_CMD                = "chef-automate upgrade run --major"
+	ES_DATA                    = "/svc/automate-elasticsearch/data"
 )
 
 type DiskSpaceInspection struct {
@@ -44,7 +48,7 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 	if err != nil {
 		return err
 	}
-	ds.writer.Printf("%d. %s directory should have %.1fGB of free space. (Currently available space : %.1fGB)\n",
+	ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (Currently available space : %.1fGB)\n",
 		*index, ds.habDir, ds.requiredHabSpace, ds.currentHabSpace)
 	*index++
 	if !ds.isExternal && ds.hasOSDestDir() {
@@ -53,7 +57,7 @@ func (ds *DiskSpaceInspection) ShowInfo(index *int) (err error) {
 		if err != nil {
 			return err
 		}
-		ds.writer.Printf("%d. %s directory should have %.1fGB of free space. (Currently available space : %.1fGB)\n",
+		ds.writer.Printf("%d. "+MIN_REQ_SPACE_STR+". (Currently available space : %.1fGB)\n",
 			*index, ds.osDestDir, ds.requiredOSDestSpace, ds.currentSpaceInOSDir)
 		*index++
 	}
@@ -81,7 +85,7 @@ func (ds *DiskSpaceInspection) GetSpaceNeeded(habRootPath string) (habFreeSpace 
 	if ds.isExternal {
 		return MIN_HAB_FREE_SPACE, -1, nil
 	} else {
-		esDataPath := habRootPath + "/svc/automate-elasticsearch/data"
+		esDataPath := habRootPath + ES_DATA
 		var rawESDataSize float64
 		rawESDataSize, err = ds.fileutils.CalDirSizeInGB(esDataPath)
 		if err != nil {
@@ -98,7 +102,7 @@ func (ds *DiskSpaceInspection) GetSpaceNeeded(habRootPath string) (habFreeSpace 
 
 func (ds *DiskSpaceInspection) showCheckingHab() {
 	ds.spinnerHab = ds.writer.NewSpinner()
-	ds.spinnerHab.Suffix = fmt.Sprintf("  [Checking]\t%s directory should have %.1fGB of free space", ds.habDir, ds.requiredHabSpace)
+	ds.spinnerHab.Suffix = fmt.Sprintf("  [Checking]\t"+MIN_REQ_SPACE_STR, ds.habDir, ds.requiredHabSpace)
 	ds.spinnerHab.Start()
 	time.Sleep(ds.checkDelay)
 }
@@ -106,7 +110,7 @@ func (ds *DiskSpaceInspection) showCheckingHab() {
 func (ds *DiskSpaceInspection) showCheckingOSDest() {
 	if ds.hasOSDestDir() {
 		ds.spinnerOSDestDir = ds.writer.NewSpinner()
-		ds.spinnerOSDestDir.Suffix = fmt.Sprintf("  [Checking]\t%s directory should have %.1fGB of free space", ds.osDestDir, ds.requiredOSDestSpace)
+		ds.spinnerOSDestDir.Suffix = fmt.Sprintf("  [Checking]\t"+MIN_REQ_SPACE_STR, ds.osDestDir, ds.requiredOSDestSpace)
 		ds.spinnerOSDestDir.Start()
 		time.Sleep(ds.checkDelay)
 	}
@@ -116,12 +120,12 @@ func (ds *DiskSpaceInspection) checkHabSpace() bool {
 	ds.showCheckingHab()
 	if ds.currentHabSpace > ds.requiredHabSpace {
 		ds.spinnerHab.FinalMSG = fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  ["+color.New(color.FgGreen).Sprint("Passed")+
-			"]\t%s directory should have %.1fGB of free space\n", ds.habDir, ds.requiredHabSpace)
+			"]\t"+MIN_REQ_SPACE_STR+"\n", ds.habDir, ds.requiredHabSpace)
 		ds.spinnerHab.Stop()
 		return true
 	} else {
 		ds.spinnerHab.FinalMSG = fmt.Sprintf(color.New(color.FgRed).Sprint("✖")+"  ["+color.New(color.FgRed).Sprint("Failed")+
-			"]\t%s directory should have %.1fGB of free space\n", ds.habDir, ds.requiredHabSpace)
+			"]\t"+MIN_REQ_SPACE_STR+"\n", ds.habDir, ds.requiredHabSpace)
 		ds.spinnerHab.Stop()
 		ds.skipOSDestCheck()
 		return false
@@ -131,7 +135,7 @@ func (ds *DiskSpaceInspection) checkHabSpace() bool {
 func (ds *DiskSpaceInspection) setErrHabSpace() {
 	errStr := "[" + color.New(color.FgRed).Sprint("Error") + fmt.Sprintf("] Required Space : %.1fGB\n", ds.requiredHabSpace)
 	errStr += fmt.Sprintf("        Available space : %.1fGB\n", ds.currentHabSpace)
-	errStr += fmt.Sprintf("\nPlease ensure the available free space is %.1fGB\nand run "+color.New(color.Bold).Sprint("chef-automate upgrade run --major")+" command again", ds.requiredHabSpace)
+	errStr += fmt.Sprintf(ENSURE_SPACE+color.New(color.Bold).Sprint(UPGRADE_CMD)+" command again", ds.requiredHabSpace)
 	ds.exitError = errors.New(errStr)
 	ds.exitedWithError = true
 }
@@ -140,12 +144,12 @@ func (ds *DiskSpaceInspection) checkOSDestSpace() bool {
 	ds.showCheckingOSDest()
 	if ds.currentSpaceInOSDir > ds.requiredOSDestSpace {
 		ds.spinnerOSDestDir.FinalMSG = fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  ["+color.New(color.FgGreen).Sprint("Passed")+
-			"]\t%s directory should have %.1fGB of free space\n", ds.osDestDir, ds.requiredOSDestSpace)
+			"]\t"+MIN_REQ_SPACE_STR+"\n", ds.osDestDir, ds.requiredOSDestSpace)
 		ds.spinnerOSDestDir.Stop()
 		return true
 	} else {
 		ds.spinnerOSDestDir.FinalMSG = fmt.Sprintf(color.New(color.FgRed).Sprint("✖")+"  ["+color.New(color.FgRed).Sprint("Failed")+
-			"]\t%s directory should have %.1fGB of free space\n", ds.osDestDir, ds.requiredOSDestSpace)
+			"]\t"+MIN_REQ_SPACE_STR+"\n", ds.osDestDir, ds.requiredOSDestSpace)
 		ds.spinnerOSDestDir.Stop()
 		return false
 	}
@@ -154,19 +158,19 @@ func (ds *DiskSpaceInspection) checkOSDestSpace() bool {
 func (ds *DiskSpaceInspection) setOSDestError() {
 	errStr := "[" + color.New(color.FgRed).Sprint("Error") + fmt.Sprintf("] Required Space : %.1fGB\n", ds.requiredOSDestSpace)
 	errStr += fmt.Sprintf("        Available space : %.1fGB\n", ds.currentSpaceInOSDir)
-	errStr += fmt.Sprintf("\nPlease ensure the available free space is %.1fGB\nand run "+color.New(color.Bold).Sprint("chef-automate upgrade run --major")+" command again", ds.requiredOSDestSpace)
+	errStr += fmt.Sprintf(ENSURE_SPACE+color.New(color.Bold).Sprint(UPGRADE_CMD)+" command again", ds.requiredOSDestSpace)
 	ds.exitError = errors.New(errStr)
 	ds.exitedWithError = true
 }
 
 func (ds *DiskSpaceInspection) skipOSDestCheck() {
 	if ds.hasOSDestDir() {
-		ds.writer.Printf(" ⊖  [Skipped]\t%s directory should have %.1fGB of free space\n", ds.osDestDir, ds.requiredOSDestSpace)
+		ds.writer.Printf(" ⊖  [Skipped]\t"+MIN_REQ_SPACE_STR+"\n", ds.osDestDir, ds.requiredOSDestSpace)
 	}
 }
 
 func (ds *DiskSpaceInspection) Skip() {
-	ds.writer.Printf(" ⊖  [Skipped]\t%s directory should have %.1fGB of free space\n", ds.habDir, ds.requiredHabSpace)
+	ds.writer.Printf(" ⊖  [Skipped]\t"+MIN_REQ_SPACE_STR+"\n", ds.habDir, ds.requiredHabSpace)
 	ds.skipOSDestCheck()
 }
 
@@ -188,10 +192,10 @@ func (ds *DiskSpaceInspection) Inspect() error {
 
 func (ds *DiskSpaceInspection) GetShortInfo() []string {
 	msgs := []string{
-		fmt.Sprintf("%s directory should have %.1fGB of free space", ds.habDir, ds.requiredHabSpace),
+		fmt.Sprintf(MIN_REQ_SPACE_STR, ds.habDir, ds.requiredHabSpace),
 	}
 	if ds.hasOSDestDir() {
-		msgs = append(msgs, fmt.Sprintf("%s directory should have %.1fGB of free space", ds.osDestDir, ds.requiredOSDestSpace))
+		msgs = append(msgs, fmt.Sprintf(MIN_REQ_SPACE_STR, ds.osDestDir, ds.requiredOSDestSpace))
 	}
 	return msgs
 }

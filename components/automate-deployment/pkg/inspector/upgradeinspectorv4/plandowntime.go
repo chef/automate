@@ -9,7 +9,7 @@ type PlannedDownTimeInspection struct {
 }
 
 func (pd *PlannedDownTimeInspection) ShowInfo(index *int) error {
-	pd.writer.Printf("%d. You have planned downtime\n", *index)
+	pd.writer.Printf("%d. You have scheduled downtime for the duration of the upgrade\n", *index)
 	*index++
 	return nil
 }

@@ -40,7 +40,6 @@ type MigratorV4Utils interface {
 	UpdatePostChecklistFile(id string) error
 	ExecuteCommand(command string, args []string, workingDir string) error
 	GetServicesStatus() (bool, error)
-	CreateMigrateJson() error
 }
 
 type ESSettings struct {
@@ -187,15 +186,6 @@ func (m *MigratorV4UtilsImpl) ReadV4Checklist(id string) (bool, error) {
 		return false, err
 	}
 	return ci.ReadPostChecklistById(id, UPGRADE_METADATA)
-}
-
-func (m *MigratorV4UtilsImpl) CreateMigrateJson() error {
-
-	ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-	if err != nil {
-		return err
-	}
-	return ci.CreatePostChecklistFile(UPGRADE_METADATA)
 }
 
 func (m *MigratorV4UtilsImpl) UpdatePostChecklistFile(id string) error {
