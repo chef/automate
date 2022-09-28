@@ -29,11 +29,22 @@ type Cleanup struct {
 	fileutils        fileutils.FileUtils
 	spinner          *spinner.Spinner
 	migrationConsent bool
+	autoAccept       bool
+	forceExecute     bool
+}
+
+func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, autoAccept, forceExecute bool) *Cleanup {
+	return &Cleanup{
+		writer:       w,
+		utils:        utils,
+		autoAccept:   autoAccept,
+		forceExecute: forceExecute,
+	}
 }
 
 func (cu *Cleanup) Run() error {
 	cu.showClearDataSucessMessage()
-	err := cu.startCleanup(true, true)
+	err := cu.startCleanup(cu.forceExecute, cu.autoAccept)
 	if err != nil {
 		cu.showClearDataFailedMessage()
 	}
@@ -57,14 +68,6 @@ func (cs *Cleanup) setError(err error) error {
 	cs.runError = err
 	cs.hasError = true
 	return err
-}
-
-func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUtils) *CheckStorage {
-	return &CheckStorage{
-		writer:    w,
-		utils:     utils,
-		fileutils: fileutils,
-	}
 }
 
 func (cu *Cleanup) startCleanup(forceExecute, autoAccept bool) error {
@@ -97,8 +100,6 @@ Do you want to perform clean up again?`)
 			cu.setError(err)
 			return err
 		}
-		// todo clean up sucess
-		cu.writer.Title("Deleting file created by es_upgrade")
 	}
 	return nil
 }

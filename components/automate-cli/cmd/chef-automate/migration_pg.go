@@ -131,42 +131,44 @@ func runMigrator(cmd *cobra.Command, args []string) error {
 
 func runCleanup(cmd *cobra.Command, args []string) error {
 	if strings.ToLower(ClearDataCmdFlags.data) == "es" {
-		ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
-		if err != nil {
-			writer.Error("NewPostChecklistManager Failed")
-			return err
-		}
+		mu := migratorV4.NewMigratorV4Utils()
+		migratorV4.NewCleanUp(writer, mu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept)
+		// ci, err := majorupgradechecklist.NewPostChecklistManager(NEXT_AUTOMATE_VERSION)
+		// if err != nil {
+		// 	writer.Error("NewPostChecklistManager Failed")
+		// 	return err
+		// }
 
-		isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
-		if err != nil {
-			writer.Error("ReadPostChecklistById Failed")
-			return err
-		}
+		// isExecuted, err := ci.ReadPostChecklistById(CLEANUP_ID, majorupgradechecklist.UPGRADE_METADATA)
+		// if err != nil {
+		// 	writer.Error("ReadPostChecklistById Failed")
+		// 	return err
+		// }
 
-		if isExecuted {
-			if ClearDataCmdFlags.forceExecute {
-				isExecuted = false
-			} else {
-				err := promptCheckList(
-					"Cleanup is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
-				)
-				if err != nil {
-					writer.Error("promptCheckList Failed")
-					return err
-				} else {
-					isExecuted = false
-				}
-			}
-		}
+		// if isExecuted {
+		// 	if ClearDataCmdFlags.forceExecute {
+		// 		isExecuted = false
+		// 	} else {
+		// 		err := promptCheckList(
+		// 			"Cleanup is already executed,do you want to force execute.\nPress y to agree, n to disagree? [y/n]",
+		// 		)
+		// 		if err != nil {
+		// 			writer.Error("promptCheckList Failed")
+		// 			return err
+		// 		} else {
+		// 			isExecuted = false
+		// 		}
+		// 	}
+		// }
 
-		if !isExecuted {
-			writer.Title("Deleting file created by es_upgrade")
-			err := cleanUpes()
-			if err != nil {
-				writer.Error(err.Error())
-				return err
-			}
-		}
+		// if !isExecuted {
+		// 	writer.Title("Deleting file created by es_upgrade")
+		// 	err := cleanUpes()
+		// 	if err != nil {
+		// 		writer.Error(err.Error())
+		// 		return err
+		// 	}
+		// }
 	} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
 		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
 		if err != nil {
