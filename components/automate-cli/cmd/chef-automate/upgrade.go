@@ -888,8 +888,6 @@ func GetopenSearchConfig() {
 		writer.Println(string(t))
 
 	}
-
-	return
 }
 
 type OpenSearchModel struct {
