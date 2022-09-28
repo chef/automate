@@ -89,7 +89,7 @@ func TestRunMigrationFlow(t *testing.T) {
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func() (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return nil },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}
@@ -110,7 +110,7 @@ func TestRunMigrationFlowDefferedErrors(t *testing.T) {
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func() (bool, error) { return true, nil },
+		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
 		StartAutomateFunc:           func() error { return errors.New("unexpected") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}
@@ -134,7 +134,7 @@ func TestRunMigrationFlowIsExecutedErrors(t *testing.T) {
 		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
 		PatchOpensearchConfigFunc:   func(es *ESSettings) (string, string, error) { return "", "", nil },
 		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func() (bool, error) { return true, errors.New("unexpected") },
+		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, errors.New("unexpected") },
 		StartAutomateFunc:           func() error { return errors.New("unexpected") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 	}

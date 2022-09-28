@@ -106,11 +106,11 @@ func (m *MigratorV4) PrintMigrationErrors() {
 }
 
 func (m *MigratorV4) SaveExecutedStatus() error {
-	return m.migratorUtils.UpdatePostChecklistFile()
+	return m.migratorUtils.UpdatePostChecklistFile(MIGRATE_ES_ID)
 }
 
 func (m *MigratorV4) IsExecutedCheck() error {
-	isExecuted, err := m.migratorUtils.ReadV4Checklist()
+	isExecuted, err := m.migratorUtils.ReadV4Checklist(MIGRATE_ES_ID)
 	if err != nil {
 		return err
 	}
