@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"os/exec"
 	"strconv"
@@ -15,7 +16,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
-	"github.com/chef/automate/lib/platform/sys"
+	cm "github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
 	"github.com/spf13/cobra"
 )
@@ -201,6 +202,27 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func checkSpaceAvailable(dataDir string) (bool, error) {
+	osPath := getHabRootPath(habrootcmd)
+	habDirSize, err := cm.CalDirSizeInGB(osPath)
+	if err != nil {
+		return false, status.Errorf(status.UnknownError, err.Error())
+	}
+	dbDataSize, err := cm.CalDirSizeInGB(dataDir)
+	if err != nil {
+		return false, status.Errorf(status.UnknownError, err.Error())
+	}
+	minReqDiskSpace := math.Max(majorupgradechecklist.MIN_DIRSIZE_GB, math.Max(habDirSize, dbDataSize)) * 11 / 10
+	spaceAvailable, err := cm.CheckSpaceAvailability(osPath, minReqDiskSpace)
+	if err != nil {
+		return false, status.Errorf(status.UnknownError, err.Error())
+	}
+	if !spaceAvailable {
+		return false, status.New(status.UnknownError, fmt.Sprintf(majorupgradechecklist.DISKSPACE_CHECK_ERROR, "migration", minReqDiskSpace, "--skip-storage-check"))
+	}
+	return true, nil
+}
+
 func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 
 	if migrateDataCmdFlags.data == "" {
@@ -270,12 +292,11 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			isAvailableSpace = true
 			err = nil
 		} else {
-			isAvailableSpace, err = calDiskSizeAndDirSize(OPENSEARCH_DIR, ELASTICSEARCH_DIR)
-		}
-
-		if err != nil {
-			writer.Error("Error while calDiskSizeAndDirSize : " + err.Error())
-			return err
+			isAvailableSpace, err = checkSpaceAvailable(ELASTICSEARCH_DIR)
+			if err != nil {
+				writer.Error("Error while calDiskSizeAndDirSize : " + err.Error())
+				return err
+			}
 		}
 
 		if isAvailableSpace {
@@ -312,6 +333,14 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 					)
 					if err != nil {
 						return err
+					}
+					isEmbeded := !majorupgradechecklist.IsExternalElasticSearch()
+					fmt.Println("==========================================================")
+					fmt.Println(isEmbeded)
+					fmt.Println("==========================================================")
+					patchError := majorupgradechecklist.PatchBestOpenSearchSettings(isEmbeded)
+					if patchError != nil {
+						writer.Errorf("Error in patching default settings for opensearch\n %w \n", err)
 					}
 					err = esMigrateExecutor(ci)
 					if err != nil {
@@ -722,12 +751,10 @@ func executePgdata13ShellScript() error {
 func checkUpdateMigration(check bool) error {
 	var isAvailableSpace bool
 	var err error
-
 	if migrateDataCmdFlags.skipStorageCheck {
 		isAvailableSpace = true
 	} else {
-		isAvailableSpace, err = calDiskSizeAndDirSize(PG_DATA_DIR, OLD_PG_DATA_DIR)
-
+		isAvailableSpace, err = checkSpaceAvailable(OLD_PG_DATA_DIR)
 		if err != nil {
 			return err
 		}
@@ -899,30 +926,4 @@ func pgVersion(path string) (string, error) {
 
 	getOldPgVersion := string(bytes.Trim(data, ""))
 	return getOldPgVersion, nil
-}
-
-func calDiskSizeAndDirSize(data, oldData string) (bool, error) {
-	v, err := sys.SpaceAvailForPath(data)
-	if err != nil {
-		return false, err
-	}
-	diskSpaceInMb := v / 1024
-
-	size, err := sys.DirSize(oldData)
-	if err != nil {
-		return false, err
-	}
-
-	dirSizeInMb := size / (1024 * 1024)
-
-	msg := fmt.Sprintf("Insufficient disk space for migration.\n%s: %5d MB\n%s: %5d MB\n%s",
-		"Space Required", (dirSizeInMb + (dirSizeInMb / 10)),
-		"Space Available", diskSpaceInMb,
-		"To continue with less memory Please use --skip-storage-check")
-	// NewData > olddata + 10%of oldData
-	if diskSpaceInMb > (uint64(dirSizeInMb) + uint64(dirSizeInMb/10)) {
-		return true, nil
-	} else {
-		return false, errors.New(msg)
-	}
 }

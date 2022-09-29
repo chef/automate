@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	os "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
@@ -15,6 +17,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -31,6 +34,8 @@ var upgradeRunCmdFlags = struct {
 	upgradeairgapbundles bool
 	skipDeploy           bool
 	isMajorUpgrade       bool
+	skipDiskSpaceCheck   bool
+	osDestDataDir        string
 	versionsPath         string
 	acceptMLSA           bool
 	upgradeHAWorkspace   string
@@ -136,6 +141,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			)
 		}
 	} else {
+		fmt.Println(validatedResp)
 		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
 			writer.Println("Chef Automate up-to-date")
 			return nil
@@ -147,6 +153,10 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+			/* err = majorupgradechecklist.StoreESSettings()
+			if err != nil {
+				writer.Println("Failed to read and store search settings")
+			} */
 			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
 			if err != nil {
 				return status.Wrap(
@@ -155,7 +165,16 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 					"Request to start upgrade failed",
 				)
 			}
-			err = ci.RunChecklist()
+
+			err = ci.StoreSearchEngineSettings()
+			if err != nil {
+				writer.Printf("Failed to read or store search-engine settings\n %w \n", err)
+			}
+			flags := majorupgradechecklist.ChecklistUpgradeFlags{
+				SkipDiskSpaceCheck: upgradeRunCmdFlags.skipDiskSpaceCheck,
+				OsDestDataDir:      upgradeRunCmdFlags.osDestDataDir,
+			}
+			err = ci.RunChecklist(configCmdFlags.timeout, flags)
 			if err != nil {
 				return status.Wrap(
 					err,
@@ -328,6 +347,8 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			for index, msg := range pendingPostChecklist {
 				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
 			}
+			writer.Body("\n")
+			GetopenSearchConfig()
 		}
 
 	case api.UpgradeStatusResponse_UPGRADING:
@@ -453,6 +474,19 @@ func init() {
 		false,
 		"Flag for saas setup")
 
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.skipDiskSpaceCheck,
+		"skip-disk-space-check",
+		"",
+		false,
+		"Flag for skipping disk space check during upgrade")
+
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.osDestDataDir,
+		"os-dest-data-dir",
+		"",
+		"Flag for providing custom os destination data directory")
+
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
 		"Path to versions.json",
@@ -496,4 +530,39 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil
+}
+
+func GetopenSearchConfig() {
+	res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+	if err != nil {
+		return
+	}
+
+	con := res.Config.GetOpensearch()
+	if con != nil {
+		opensearchV1 := &OpenSearch_v1{
+			V1: con.V1,
+		}
+		opensearchModel := &OpenSearchModel{
+			Opensearch: opensearchV1,
+		}
+		t, err := toml.Marshal(opensearchModel)
+		if err != nil {
+			return
+		}
+
+		writer.Println("This is your OpenSearch Config")
+		writer.Println(string(t))
+
+	}
+
+	return
+}
+
+type OpenSearchModel struct {
+	Opensearch *OpenSearch_v1 `json:"opensearch,omitempty" toml:"opensearch,omitempty" mapstructure:"opensearch,omitempty"`
+}
+
+type OpenSearch_v1 struct {
+	V1 *os.ConfigRequest_V1 `json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
 }
