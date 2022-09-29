@@ -33,16 +33,6 @@ func NewEnableMaintenance(w *cli.Writer, utils MigratorV4Utils, timeout int64, s
 
 func (em *EnableMaintenance) Run() (err error) {
 	em.showTurningOn()
-	isMaintenanceOn, err := em.utils.GetMaintenanceStatus(em.timeout)
-	if err != nil {
-		em.showError()
-		em.setError(err)
-		return err
-	}
-	if isMaintenanceOn {
-		em.showAlreadySuccess()
-		return nil
-	}
 	_, _, err = em.utils.SetMaintenanceMode(em.timeout, true)
 	if err != nil {
 		em.showError()
@@ -63,12 +53,6 @@ func (em *EnableMaintenance) showTurningOn() {
 
 func (em *EnableMaintenance) showSuccess() {
 	em.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode turned ON successfully")
-	em.spinner.Stop()
-	em.writer.Println("")
-}
-
-func (em *EnableMaintenance) showAlreadySuccess() {
-	em.spinner.FinalMSG = SPACES_BEFORE_STEPS + " " + fmt.Sprintf(color.New(color.FgGreen).Sprint("✔")+"  Maintenance mode is already turned ON")
 	em.spinner.Stop()
 	em.writer.Println("")
 }
@@ -104,16 +88,6 @@ func (em *EnableMaintenance) setExecuted() {
 
 func (em *EnableMaintenance) OnSuccess() (err error) {
 	em.showTurningOff()
-	isMaintenanceOn, err := em.utils.GetMaintenanceStatus(em.timeout)
-	if err != nil {
-		em.showOffError()
-		em.ErrorHandler()
-		return err
-	}
-	if !isMaintenanceOn {
-		em.showOffSuccess()
-		return nil
-	}
 	_, _, err = em.utils.SetMaintenanceMode(em.timeout, false)
 	if err != nil {
 		em.showOffError()

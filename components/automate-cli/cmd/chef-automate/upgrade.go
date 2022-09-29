@@ -693,19 +693,24 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 			return err
 		}
 		stopSpinner(spinner, "External OpenSearch configurations updated successfully.")
-		major, _ := majorupgradechecklist.GetMajorVersion(resp.CurrentVersion)
-		ci, err := majorupgradechecklist.NewPostChecklistManager(major)
+
+		path := fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA
+		res, err := majorupgradechecklist.ReadJsonFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 		if err != nil {
 			return err
 		}
-		err = ci.UpdatePostChecklistFile(EXTERNAL_PATCH_ID, fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
-		if err != nil {
-		}
-		_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, true)
+
+		res.Seen = true
+		err = majorupgradechecklist.CreateJsonFile(res, path)
 		if err != nil {
 			return err
 		}
-		writer.Println(fmt.Sprintf("%s Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
+
+		_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
+		if err != nil {
+			return err
+		}
+		writer.Println(fmt.Sprintf("%s  Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
 		return nil
 	}
 
@@ -713,11 +718,11 @@ func postUpgradeStatusExternal(resp *api.UpgradeStatusResponse) error {
 	writer.Println("After the upgrade, you must update opensearch.toml with actual external OpenSearch connection configurations and then run the below patch command to update the configurations:")
 	writer.Println(color.New(color.Bold).Sprint("$ chef-automate config patch opensearch.toml"))
 	writer.Println("")
-	_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, true)
+	_, _, err = majorupgrade_utils.SetMaintenanceMode(configCmdFlags.timeout, false)
 	if err != nil {
 		return err
 	}
-	writer.Println(fmt.Sprintf("%s Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
+	writer.Println(fmt.Sprintf("%s  Maintenance mode turned OFF successfully", color.New(color.FgGreen).Sprint("✔")))
 	return nil
 }
 

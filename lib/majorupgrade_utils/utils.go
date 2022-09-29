@@ -28,6 +28,13 @@ func IsExternalElasticSearch(timeout int64) bool {
 }
 
 func SetMaintenanceMode(timeout int64, status bool) (stdOut, stdErr string, err error) {
+	currentStatus, err := GetMaintenanceStatus(timeout)
+	if err != nil {
+		return "", "", err
+	}
+	if currentStatus == status {
+		return "", "", nil
+	}
 	enable := wrapperspb.Bool(status)
 	cfg := deployment.NewUserOverrideConfig()
 	cfg.LoadBalancer = &load_balancer.ConfigRequest{

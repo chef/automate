@@ -93,20 +93,23 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 
 	if res.Version == pcm.version {
 		for i := 0; i < len(res.PostChecklist); i++ {
-			if !res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted {
+			if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || (pcm.isExternalDB && !res.Seen) {
 				showPostChecklist = true
 				break
 			}
 		}
 
 		if showPostChecklist {
-			for i := 0; i < len(res.PostChecklist); i++ {
-				if !res.PostChecklist[i].IsExecuted {
-					postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+			if pcm.isExternalDB {
+				postCmdList = []string{"External OpenSearch Patch"}
+			} else {
+				for i := 0; i < len(res.PostChecklist); i++ {
+					if !res.PostChecklist[i].IsExecuted {
+						postCmdList = append(postCmdList, res.PostChecklist[i].Msg)
+					}
 				}
 			}
 		}
-
 		// if pcm.isExternalDB {
 		// 	res.Seen = true
 		// 	err = CreateJsonFile(res, path)

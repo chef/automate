@@ -59,7 +59,6 @@ const (
 	CLEANUP_ID                  = "clean_up"
 	MIGRATE_PG_ID               = "migrate_pg"
 	MIGRATE_ES_ID               = "migrate_es"
-	EXTERNAL_PATCH_ID           = "patch_new_config"
 	NEW_PG_VERSION              = "13.5"
 	ELASTICSEARCH_DATA_DIR      = "/hab/svc/automate-elasticsearch/data"
 	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"

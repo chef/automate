@@ -18,7 +18,7 @@ func TestMaintenanceOn(t *testing.T) {
 	err := ms.Run()
 	assert.NoError(t, err)
 	ms.ErrorHandler()
-	assert.Contains(t, cw.Output(), "Maintenance mode is already turned ON")
+	assert.Contains(t, cw.Output(), "Maintenance mode turned ON successfully")
 }
 
 func TestMaintenanceOFF(t *testing.T) {
@@ -38,8 +38,9 @@ func TestMaintenanceOFF(t *testing.T) {
 func TestMaintenanceOnError(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
-		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) { return true, errors.New("maintenance error") },
-		SetMaintenanceModeFunc:   func(timeout int64, status bool) (string, string, error) { return "", "", nil },
+		SetMaintenanceModeFunc: func(timeout int64, status bool) (string, string, error) {
+			return "", "", errors.New("maintenance error")
+		},
 	}
 	ms := NewEnableMaintenance(cw.CliWriter, mmu, 10, SPINNER_TEST_DURATION)
 	ms.isExecuted = true
@@ -52,7 +53,6 @@ func TestMaintenanceOnError(t *testing.T) {
 func TestMaintenanceOnSetError(t *testing.T) {
 	cw := majorupgrade_utils.NewCustomWriter()
 	mmu := &MockMigratorV4UtilsImpl{
-		GetMaintenanceStatusFunc: func(timeout int64) (bool, error) { return false, nil },
 		SetMaintenanceModeFunc: func(timeout int64, status bool) (string, string, error) {
 			return "", "", errors.New("maintenance error")
 		},
