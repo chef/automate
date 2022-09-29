@@ -14,11 +14,11 @@ import (
 
 const (
 	fcleanUpScript = `
-	rm -rf %[1]vsvc/automate-opensearch/data.os;
-	rm -rf %[1]vsvc/automate-opensearch/var.os;
-	rm -rf %[1]vsvc/automate-elasticsearch/data;
-	rm -rf %[1]vsvc/automate-elasticsearch/var;
-	`
+rm -rf %[1]v/svc/automate-opensearch/data.os;
+rm -rf %[1]v/svc/automate-opensearch/var.os;
+rm -rf %[1]v/svc/automate-elasticsearch/data;
+rm -rf %[1]v/svc/automate-elasticsearch/var;
+`
 	CLEANUP_ID = "clean_up"
 )
 
