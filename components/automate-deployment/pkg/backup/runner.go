@@ -725,13 +725,13 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 	stateFullServicesMap := make(map[string]struct{})
 	stateFullServicesMap["backup-gateway"] = struct{}{}
 	for _, service := range r.specs {
-		logrus.Info("Service Name : ", service.Name, "  Backup status : ", service.WriteMetadata)
+		logrus.Debug("Service Name : ", service.Name, "  Backup status : ", service.WriteMetadata)
 		if service.WriteMetadata {
 			stateFullServicesMap[service.Name] = struct{}{}
 		}
 	}
 	logrus.Debug("list of stateFullServicesMap services : ", stateFullServicesMap)
-	logrus.Info(" Length of stateFullServicesMap ", len(stateFullServicesMap))
+	logrus.Debug(" Length of stateFullServicesMap ", len(stateFullServicesMap))
 
 	// Restore the services in topological order.
 	for _, svc := range desiredServices {
@@ -788,7 +788,7 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		// stateFullServicesMap : contain the list of services which need to be restored
 
 		_, isStateFullService := stateFullServicesMap[svc.Name()]
-		r.infof(" Need to Look for metadata : %s it is Present : %t", svc.Name(), isStateFullService)
+		r.infof("Service Name: %s, should check for metadata.json in backup data: %t", svc.Name(), isStateFullService)
 
 		// If the metadata file exists but we failed to load it for whatever
 		// reason, like a network issue or corrupted metadata file, then we want to
