@@ -1,0 +1,6 @@
+# https://github.com/redding/t.rb
+
+default_cmd: bundle exec assert
+test_dir: test
+test_file_suffixes:
+  - "_tests.rb"

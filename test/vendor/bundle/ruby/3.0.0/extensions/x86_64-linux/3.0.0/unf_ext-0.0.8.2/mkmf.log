@@ -1,0 +1,35 @@
+have_library: checking for -lstdc++... -------------------- yes
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic     -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby  -lm   -lc"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic     -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lstdc++  -lm   -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: 
+15: int t(void) { ; return 0; }
+/* end */
+
+--------------------
+

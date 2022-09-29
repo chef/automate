@@ -1,0 +1,13 @@
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/json-2.6.2/ext/json
+/hab/pkgs/core/ruby30/3.0.3/20220312100602/bin/ruby -I /hab/pkgs/core/ruby30/3.0.3/20220312100602/lib/ruby/site_ruby/3.0.0 extconf.rb
+creating Makefile
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/json-2.6.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-8qxqmr sitelibdir\=./.gem.20220803-99955-8qxqmr clean
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/json-2.6.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-8qxqmr sitelibdir\=./.gem.20220803-99955-8qxqmr
+make: Nothing to be done for 'all'.
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/json-2.6.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-8qxqmr sitelibdir\=./.gem.20220803-99955-8qxqmr install

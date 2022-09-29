@@ -1,0 +1,3 @@
+This is a file
+  that will be
+diff'd.

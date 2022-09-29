@@ -1,0 +1,8 @@
+# https://github.com/redding/l.rb
+
+linters:
+  - name: "Rubocop"
+    cmd: "bundle exec rubocop"
+    extensions:
+      - ".rb"
+    cli_abbrev: "u"

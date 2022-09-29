@@ -1,0 +1,39 @@
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/ed25519-1.3.0/ext/ed25519_ref10
+/hab/pkgs/core/ruby30/3.0.3/20220312100602/bin/ruby -I /hab/pkgs/core/ruby30/3.0.3/20220312100602/lib/ruby/site_ruby/3.0.0 extconf.rb
+creating Makefile
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/ed25519-1.3.0/ext/ed25519_ref10
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-6hexmq sitelibdir\=./.gem.20220803-99955-6hexmq clean
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/ed25519-1.3.0/ext/ed25519_ref10
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-6hexmq sitelibdir\=./.gem.20220803-99955-6hexmq
+compiling ed25519_ref10.c
+In file included from /hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/ruby.h:15,
+                 from /hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby.h:38,
+                 from ed25519_ref10.c:1:
+/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/internal/config.h:132:50: warning: __VA_OPT__ is not available until C++2a
+  132 | # define RBIMPL_TEST2(...)          RBIMPL_TEST3(__VA_OPT__(,),1,0,0)
+      |                                                  ^
+In file included from /hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/ruby.h:44,
+                 from /hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby.h:38,
+                 from ed25519_ref10.c:1:
+/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/internal/scan_args.h:369:41: warning: __VA_OPT__ is not available until C++2a
+  369 |         (rb_scan_args)(argc, argvp, fmt __VA_OPT__(, __VA_ARGS__)))
+      |                                         ^
+/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/internal/scan_args.h:377:53: warning: __VA_OPT__ is not available until C++2a
+  377 |         (rb_scan_args_kw)(kw_flag, argc, argvp, fmt __VA_OPT__(, __VA_ARGS__)))
+      |                                                     ^
+compiling fe.c
+compiling ge.c
+compiling keypair.c
+compiling open.c
+compiling sc_muladd.c
+compiling sc_reduce.c
+compiling sha512.c
+compiling sign.c
+compiling verify.c
+linking shared-object ed25519_ref10.so
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/ed25519-1.3.0/ext/ed25519_ref10
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-6hexmq sitelibdir\=./.gem.20220803-99955-6hexmq install
+/hab/pkgs/core/coreutils/8.32/20220311101609/bin/install -c -m 0755 ed25519_ref10.so ./.gem.20220803-99955-6hexmq

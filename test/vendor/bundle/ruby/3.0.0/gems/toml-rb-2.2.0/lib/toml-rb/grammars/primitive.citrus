@@ -1,0 +1,176 @@
+grammar TomlRB::Primitive
+  include TomlRB::Helper
+
+  rule primitive
+    datetime | bool | number | string
+  end
+
+  ##
+  # String rules
+  ##
+
+  rule string
+    multiline_string | multiline_literal | basic_string | literal_string
+  end
+
+  rule basic_string
+    (/(["])(?:\\?.)*?\1/ space) <TomlRB::BasicString>
+  end
+
+  rule literal_string
+    (/(['])(?:\\?.)*?\1/ space) <TomlRB::LiteralString>
+  end
+
+  rule multiline_string
+    ('"""' line_break* (text:~('"""' !'"')|'') '"""' space) <TomlRB::MultilineString>
+  end
+
+  rule multiline_literal
+    ("'''" line_break* (text:~("'''" !"'")|'') "'''" space) <TomlRB::MultilineLiteral>
+  end
+
+  ##
+  # Date time rules
+  ##
+
+  rule datetime
+    offset_datetime | local_datetime | local_date | local_time
+  end
+
+  rule offset_datetime
+    ( skeleton:datetime_skeleton ("Z" | date_offset) ) <TomlRB::OffsetDateTimeParser>
+  end
+
+  rule local_datetime
+    datetime_skeleton <TomlRB::LocalDateTimeParser>
+  end
+
+  rule local_date
+    (date_skeleton space) <TomlRB::LocalDateParser>
+  end
+
+  rule local_time
+    (time_skeleton space) <TomlRB::LocalTimeParser>
+  end
+
+  rule datetime_skeleton
+    (date_skeleton ("T"|" ") time_skeleton) {
+      capture(:date_skeleton).value + capture(:time_skeleton).value
+    }
+  end
+
+  rule date_skeleton
+    (year:/\d\d\d\d/ "-" mon:/\d\d/ "-" day:/\d\d/) {
+      [:year,:mon,:day].map{ |s| capture(s).value }
+    }
+  end
+
+  rule time_skeleton
+    ( hour:([0-2][0-9]) ":" mim:([0-6][0-9]) ":" sec:([0-6][0-9])  ([,\.] sec_frac:(/\d/1*6))? ) {
+      [:hour,:mim,:sec].map{ |s| capture(s).value } + [capture(:sec_frac) || '0']
+    }
+  end
+
+  rule date_offset
+    offset:(sign /\d\d/ ":" /\d\d/)
+  end
+
+  ##
+  # Number rules
+  ##
+
+  rule number
+    float | integer
+  end
+
+  rule float
+    inf | nan | exponential_float | fractional_float
+  end
+
+  rule inf
+    (s:sign? 'inf') {
+      sign = (capture(:s).value != '-') ? 1 : -1
+      sign * Float::INFINITY
+    }
+  end
+
+  rule nan
+    (sign? 'nan') { Float::NAN }
+  end
+
+  rule exponential_float
+    ((fractional_float | demical_integer) [eE] demical_integer) { to_str.to_f }
+  end
+
+  rule fractional_float
+    (demical_integer '.' [0-9_]+) { 
+      to_str.to_f
+    }
+  end
+
+  rule integer
+    hexadecimal_integer | octal_integer | binary_integer | demical_integer
+  end
+
+  rule hexadecimal_integer
+    ('0x' [a-fA-F0-9_]+) { to_str.to_i(16) }
+  end
+
+  rule octal_integer
+    ('0o' [0-7_]+) { to_str.to_i(8) }
+  end
+
+  rule binary_integer
+    ('0b' [01_]+) { to_str.to_i(2) }
+  end
+
+  rule demical_integer
+    (sign? [0-9_]+) { to_str.to_i }
+  end
+
+  rule sign
+    '+' | '-'
+  end
+
+  ##
+  # Boolean rules
+  ##
+
+  rule bool
+    true | false
+  end
+
+  rule true
+    'true' { true }
+  end
+
+  rule false
+    'false' { false }
+  end
+
+  ##
+  # Key rules
+  ##
+
+  rule key
+    dotted_key
+  end
+
+  rule bare_key
+    [a-zA-Z0-9_-]+
+  end
+
+  rule quoted_key
+    basic_string | literal_string 
+  end
+
+  rule single_key
+    quoted_key | bare_key
+  end
+
+  rule dotted_key
+    (space? single_key space?  ("." space? single_key space?)* ) {
+      captures[:single_key].map(&:value)
+    }
+  end
+end

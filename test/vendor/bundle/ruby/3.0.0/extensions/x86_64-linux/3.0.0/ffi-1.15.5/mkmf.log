@@ -1,0 +1,220 @@
+package configuration for libffi is not found
+have_header: checking for ffi.h... -------------------- yes
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic     -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby  -lm   -lc"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+"gcc -E -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC  conftest.c -o conftest.i"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: #include <ffi.h>
+/* end */
+
+--------------------
+
+have_library: checking for ffi_prep_closure_loc() in -lffi... -------------------- yes
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic     -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lffi  -lm   -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: #include <ffi.h>
+ 4: 
+ 5: /*top*/
+ 6: extern int t(void);
+ 7: int main(int argc, char **argv)
+ 8: {
+ 9:   if (argc > 1000000) {
+10:     int (* volatile tp)(void)=(int (*)(void))&t;
+11:     printf("%d", (*tp)());
+12:   }
+13: 
+14:   return !!argv[argc];
+15: }
+16: int t(void) { void ((*volatile p)()); p = (void ((*)()))ffi_prep_closure_loc; return !p; }
+/* end */
+
+--------------------
+
+have_func: checking for ffi_prep_cif_var()... -------------------- yes
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic    -lffi  -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lffi  -lm   -lc"
+conftest.c: In function 't':
+conftest.c:14:57: error: 'ffi_prep_cif_var' undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))ffi_prep_cif_var; return !p; }
+      |                                                         ^~~~~~~~~~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))ffi_prep_cif_var; return !p; }
+/* end */
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic    -lffi  -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lffi  -lm   -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void ffi_prep_cif_var();
+15: int t(void) { ffi_prep_cif_var(); return 0; }
+/* end */
+
+--------------------
+
+have_func: checking for ffi_raw_call()... -------------------- yes
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic    -lffi  -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lffi  -lm   -lc"
+conftest.c: In function 't':
+conftest.c:14:57: error: 'ffi_raw_call' undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))ffi_raw_call; return !p; }
+      |                                                         ^~~~~~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))ffi_raw_call; return !p; }
+/* end */
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic    -lffi  -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lffi  -lm   -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void ffi_raw_call();
+15: int t(void) { ffi_raw_call(); return 0; }
+/* end */
+
+--------------------
+
+have_func: checking for ffi_prep_raw_closure()... -------------------- yes
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic    -lffi  -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lffi  -lm   -lc"
+conftest.c: In function 't':
+conftest.c:14:57: error: 'ffi_prep_raw_closure' undeclared (first use in this function)
+   14 | int t(void) { void ((*volatile p)()); p = (void ((*)()))ffi_prep_raw_closure; return !p; }
+      |                                                         ^~~~~~~~~~~~~~~~~~~~
+conftest.c:14:57: note: each undeclared identifier is reported only once for each function it appears in
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: int t(void) { void ((*volatile p)()); p = (void ((*)()))ffi_prep_raw_closure; return !p; }
+/* end */
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic    -lffi  -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -lffi  -lm   -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: extern void ffi_prep_raw_closure();
+15: int t(void) { ffi_prep_raw_closure(); return 0; }
+/* end */
+
+--------------------
+
+block in append_ldflags: checking for whether -pthread is accepted as LDFLAGS... -------------------- yes
+
+"gcc -o conftest -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/x86_64-linux -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0/ruby/backward -I/hab/pkgs/core/ruby30/3.0.3/20220312100602/include/ruby-3.0.0 -I. -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include   -I/hab/pkgs/core/make/4.3/20220311105244/include -I/hab/pkgs/core/gcc/9.4.0/20220311084247/include -I/hab/pkgs/core/glibc/2.34/20220311081742/include -I/hab/pkgs/core/ncurses/6.2/20220311100731/include -I/hab/pkgs/core/zlib/1.2.11/20220311082914/include -I/hab/pkgs/core/openssl/1.0.2zb/20220311111046/include -I/hab/pkgs/core/libyaml/0.2.5/20220312092318/include -I/hab/pkgs/core/libffi/3.4.2/20220311120049/include -I/hab/pkgs/core/readline/8.1/20220311102318/include -O3 -g -pipe -fPIC conftest.c  -L. -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L. -L/hab/pkgs/core/gcc/9.4.0/20220311084247/lib -L/hab/pkgs/core/glibc/2.34/20220311081742/lib -L/hab/pkgs/core/ncurses/6.2/20220311100731/lib -L/hab/pkgs/core/zlib/1.2.11/20220311082914/lib -L/hab/pkgs/core/openssl/1.0.2zb/20220311111046/lib -L/hab/pkgs/core/libyaml/0.2.5/20220312092318/lib -L/hab/pkgs/core/libffi/3.4.2/20220311120049/lib -L/hab/pkgs/core/readline/8.1/20220311102318/lib -L/hab/pkgs/core/nss-myhostname/0.3/20220311210919/lib -fstack-protector-strong -rdynamic -Wl,-export-dynamic    -lffi  -Wl,-rpath,/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -L/hab/pkgs/core/ruby30/3.0.3/20220312100602/lib -lruby -pthread -lm   -lc"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+--------------------
+
+extconf.h is:
+/* begin */
+1: #ifndef EXTCONF_H
+2: #define EXTCONF_H
+3: #define HAVE_FFI_H 1
+4: #define HAVE_FFI_PREP_CIF_VAR 1
+5: #define HAVE_FFI_RAW_CALL 1
+6: #define HAVE_FFI_PREP_RAW_CLOSURE 1
+7: #define HAVE_RAW_API 1
+8: #endif
+/* end */
+

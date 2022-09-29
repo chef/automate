@@ -1,0 +1,19 @@
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/bcrypt_pbkdf-1.1.0/ext/mri
+/hab/pkgs/core/ruby30/3.0.3/20220312100602/bin/ruby -I /hab/pkgs/core/ruby30/3.0.3/20220312100602/lib/ruby/site_ruby/3.0.0 extconf.rb
+creating Makefile
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/bcrypt_pbkdf-1.1.0/ext/mri
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-o02pmt sitelibdir\=./.gem.20220803-99955-o02pmt clean
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/bcrypt_pbkdf-1.1.0/ext/mri
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-o02pmt sitelibdir\=./.gem.20220803-99955-o02pmt
+compiling bcrypt_pbkdf.c
+compiling bcrypt_pbkdf_ext.c
+compiling blowfish.c
+compiling explicit_bzero.c
+compiling hash_sha512.c
+linking shared-object bcrypt_pbkdf_ext.so
+
+current directory: /src/test/vendor/bundle/ruby/3.0.0/gems/bcrypt_pbkdf-1.1.0/ext/mri
+make DESTDIR\= sitearchdir\=./.gem.20220803-99955-o02pmt sitelibdir\=./.gem.20220803-99955-o02pmt install
+/hab/pkgs/core/coreutils/8.32/20220311101609/bin/install -c -m 0755 bcrypt_pbkdf_ext.so ./.gem.20220803-99955-o02pmt

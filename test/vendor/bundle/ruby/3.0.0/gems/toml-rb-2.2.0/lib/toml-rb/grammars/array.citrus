@@ -1,0 +1,37 @@
+grammar TomlRB::Arrays
+  include TomlRB::Primitive
+
+  rule array_comments
+    (indent? (comment indent?)*)
+  end
+
+  rule float_array
+    (float (indent? "," array_comments float)*) {
+      captures[:float].map(&:value)
+    }
+  end
+
+  rule string_array
+    (string (indent? "," array_comments string)*) {
+      captures[:string].map(&:value)
+    }
+  end
+
+  rule integer_array
+    (integer (indent? "," array_comments integer)*) {
+      captures[:integer].map(&:value)
+    }
+  end
+
+  rule datetime_array
+    (datetime (indent? "," array_comments datetime)*) {
+      captures[:datetime].map(&:value)
+    }
+  end
+
+  rule bool_array
+    (bool (indent? "," array_comments bool)*) {
+      captures[:bool].map(&:value)
+    }
+  end
+end

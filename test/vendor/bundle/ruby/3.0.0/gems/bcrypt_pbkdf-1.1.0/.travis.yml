@@ -1,0 +1,11 @@
+language: ruby
+arch:
+  - amd64
+  - ppc64le
+rvm:
+  - 2.3.0
+  - 2.4.0
+  - 2.5.0
+  - 2.6.0
+  - 2.7.0
+script: bundle exec rake
