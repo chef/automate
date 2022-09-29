@@ -565,32 +565,6 @@ func (r *Runner) RestoreBackup(
 	return r.restoreTask, nil
 }
 
-// stateFullServicesMap : List of Service need to restore
-/*
-var stateFullServicesMap = map[string]struct{}{
-	"backup-gateway":          {},
-	"applications-service":    {},
-	"authn-service":           {},
-	"authz-service":           {},
-	"automate-cs-bookshelf":   {},
-	"automate-cs-oc-bifrost":  {},
-	"automate-cs-oc-erchef":   {},
-	"automate-dex":            {},
-	"cereal-service":          {},
-	"compliance-service":      {},
-	"data-feed-service":       {},
-	"deployment-service":      {},
-	"event-feed-service":      {},
-	"infra-proxy-service":     {},
-	"ingest-service":          {},
-	"license-control-service": {},
-	"nodemanager-service":     {},
-	"notifications-service":   {},
-	"secrets-service":         {},
-	"session-service":         {},
-	"teams-service":           {},
-}*/
-
 // startRestoreOperations starts unloads services, loads the backed up package
 // manifest and builds a slice of topologically sorted services that are to be
 // restored. By restoring them in this order we ensure that any dependent
@@ -747,6 +721,7 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 		r.failf(err, "Failed to load service metadata checksum information")
 		return err
 	}
+	// stateFullServicesMap : List of Service need to restore
 	stateFullServicesMap := make(map[string]struct{})
 	stateFullServicesMap["backup-gateway"] = struct{}{}
 	for _, service := range r.specs {
