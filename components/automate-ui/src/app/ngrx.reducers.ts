@@ -60,6 +60,7 @@ import * as roleEntity from './entities/roles/role.reducer';
 import * as ruleEntity from './entities/rules/rule.reducer';
 import * as runlistEntity from './entities/runlists/runlists.reducer';
 import * as serverEntity from './entities/servers/server.reducer';
+import * as ssoEntity from './entities/sso-config/sso-config.reducer';
 import * as serviceGroups from './entities/service-groups/service-groups.reducer';
 import * as nodesEntity from './entities/nodes/nodes.reducer';
 import * as nodeCredentialEntity from './entities/node-credentials/node-credential.reducer';
@@ -142,6 +143,7 @@ export interface NgrxStateAtom {
   nodeCredential: nodeCredentialEntity.NodeCredentialEntityState;
   nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialDetailsEntityState;
   serviceGroups: serviceGroups.ServiceGroupsEntityState;
+  sso: ssoEntity.SsoEntityState;
   teams: teamEntity.TeamEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
@@ -281,6 +283,7 @@ export const defaultInitialState = {
   servers: serverEntity.ServerEntityInitialState,
   orgs: orgEntity.OrgEntityInitialState,
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
+  ssos: ssoEntity.SsoEntityInitialState,
   teams: teamEntity.TeamEntityInitialState,
   desktops: desktopEntity.desktopEntityInitialState,
   userperms: permEntity.initialState,
@@ -353,6 +356,7 @@ export const ngrxReducers = {
   rules: ruleEntity.ruleEntityReducer,
   runlist: runlistEntity.runlistEntityReducer,
   servers: serverEntity.serverEntityReducer,
+  sso: ssoEntity.SsoEntityReducer,
   orgs: orgEntity.orgEntityReducer,
   nodeCredential: nodeCredentialEntity.nodeCredentialEntityReducer,
   nodeCredentialDetails: nodeCredentialDetailsEntity.nodeCredentialDetailsEntityReducer,

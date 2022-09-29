@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store'
 import { HttpErrorResponse } from '@angular/common/http'
-import { Sso } from './sso.model'
+import { SsoConfig } from './sso-config.model'
 
 export enum SsoActionTypes {
     GET_ALL         = 'SSO::GET_ALL',
@@ -12,13 +12,13 @@ export class GetAllSsoConfig implements Action {
     readonly type = SsoActionTypes.GET_ALL;
 }
 
-export interface GetAllConfigSuccessPayload {
-    sso: Sso[];
+export interface GetAllConfigResponse {
+    SsoConfigs: SsoConfig;
 }
 
 export class GetAllSsoConfigSuccess implements Action {
     readonly type = SsoActionTypes.GET_ALL_SUCCESS;
-    constructor(public payload: GetAllConfigSuccessPayload) {}
+    constructor(public payload: GetAllConfigResponse) {}
 }
 
 export class GetAllSsoConfigFailure implements Action {

@@ -219,7 +219,8 @@ import {
 } from './page-components/data-feed-table/data-feed-table.component';
 import { SigninService } from './services/signin/signin.service';
 import { ManualUpgradeBannerComponent } from './page-components/manual-upgrade-banner/manual-upgrade-banner.component';
-import { SsoComponent } from './modules/sso/sso.component';
+import { SsoConfigComponent } from './modules/sso-config/sso-config.component';
+import { SsoConfigRequests } from './entities/sso-config/sso-config.request';
 
 
 @NgModule({
@@ -284,7 +285,7 @@ import { SsoComponent } from './modules/sso/sso.component';
     DataFeedConfigDetailsComponent,
     DataFeedTableComponent,
     ManualUpgradeBannerComponent,
-    SsoComponent
+    SsoConfigComponent
   ],
   imports: [
     ApiTokenModule,
@@ -390,6 +391,7 @@ import { SsoComponent } from './modules/sso/sso.component';
     RunlistRequests,
     RunHistoryStore,
     ServerRequests,
+    SsoConfigRequests,
     NodeCredentialRequests,
     OrgRequests,
     PolicyFileRequests,

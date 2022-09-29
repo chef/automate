@@ -53,6 +53,7 @@ import { UserEffects } from './entities/users/user.effects';
 import { UserSelfEffects } from './entities/users/userself.effects';
 import { UserPermEffects } from './entities/userperms/userperms.effects';
 import { UserPreferencesEffects } from './services/user-preferences/user-preferences.effects';
+import { SsoConfigEffects } from './entities/sso-config/sso-config.effects';
 
 @NgModule({
   imports: [
@@ -100,6 +101,7 @@ import { UserPreferencesEffects } from './services/user-preferences/user-prefere
       ServerEffects,
       ServiceGroupsEffects,
       ScannerEffects,
+      SsoConfigEffects,
       TeamEffects,
       UserEffects,
       UserSelfEffects,
