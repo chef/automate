@@ -3,6 +3,8 @@ package majorupgradechecklist
 import (
 	"testing"
 
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/majorupgrade_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +24,7 @@ func TestCreatePostChecklistFile(t *testing.T) {
 	err = pcm.CreatePostChecklistFile(FILE_NAME)
 	assert.NoError(t, err)
 	// throws an error if th file path is invalid
-	err = pcm.CreatePostChecklistFile(UPGRADE_METADATA)
+	err = pcm.CreatePostChecklistFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 	assert.Error(t, err)
 	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
 }
@@ -40,7 +42,7 @@ func TestReadPostChecklistById(t *testing.T) {
 	res, err = pcm.ReadPostChecklistById("migrate_pg", FILE_NAME)
 	assert.NoError(t, err)
 	assert.Equal(t, true, res)
-	_, err = pcm.ReadPostChecklistById("migrate_pg", UPGRADE_METADATA)
+	_, err = pcm.ReadPostChecklistById("migrate_pg", fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 	assert.NoError(t, err)
 }
 
@@ -52,7 +54,7 @@ func TestReadPendingPostChecklistFile(t *testing.T) {
 	res, err := pcm.ReadPendingPostChecklistFile(FILE_NAME)
 	assert.NoError(t, err)
 	assert.NotEqual(t, []string{}, res)
-	res, err = pcm.ReadPendingPostChecklistFile(UPGRADE_METADATA)
+	res, err = pcm.ReadPendingPostChecklistFile(fileutils.GetHabRootPath() + majorupgrade_utils.UPGRADE_METADATA)
 	assert.Error(t, err)
 	assert.Equal(t, 0, len(res))
 	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
@@ -79,7 +81,7 @@ func TestUpdatePostChecklistFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	// if the file doesn't exist, return nil (no error)
-	err = pcm.UpdatePostChecklistFile("migrate_pg", UPGRADE_METADATA)
+	err = pcm.UpdatePostChecklistFile("migrate_pg", fileutils.GetHabRootPath()+majorupgrade_utils.UPGRADE_METADATA)
 	assert.Error(t, err)
 	assert.Equal(t, "open /hab/svc/deployment-service/var/upgrade_metadata.json: no such file or directory", err.Error())
 }

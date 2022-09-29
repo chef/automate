@@ -64,7 +64,7 @@ var uniqueNodeCounterCmd = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
 }
@@ -76,7 +76,7 @@ var nodeUsageCommand = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
 }
@@ -88,7 +88,7 @@ var complianceUniqueResourceCounterCmd = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		generator.GenerateComplianceResourceRunCount(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
 }
@@ -100,7 +100,7 @@ var complianceResourceUsageCmd = &cobra.Command{
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
 		endTime, _ := convertStringToTime(CommandFlags.EndTime)
-		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		generator.GenerateComplianceResourceRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, CommandFlags.ESUserID, CommandFlags.ESPassword, startTime, endTime)
 		return nil
 	},
 }
@@ -126,8 +126,10 @@ Expiration Date: %s
 
 var startTimeFormat = "start time of the report in yyyy-mm-dd format"
 var endTimeFormat = "end time of the report in yyyy-mm-dd format"
-var hostnameES = "hostname of the ES host"
-var portES = "port of the ES host"
+var hostnameES = "hostname of the OpenSource host"
+var portES = "port of the OpenSource host"
+var userNameES = "username of the OpenSource host"
+var passwordES = "password of the OpenSource host"
 
 type usageResult struct {
 	StartTimestamp   string           `json:"start_timestamp"`
@@ -359,6 +361,8 @@ var CommandFlags = struct {
 	EndTime    string
 	ESHostname string
 	ESPort     string
+	ESUserID   string
+	ESPassword string
 }{}
 
 func validateArgs() {
@@ -402,19 +406,27 @@ func init() {
 	licenseCmd.AddCommand(complianceResourceUsageCmd)
 	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
 	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
-	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10144", portES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "os_hostname", "n", "localhost", hostnameES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "os_port", "p", "10168", portES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
 	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
-	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10144", portES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10168", portES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
 	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
-	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10144", portES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10168", portES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
+	complianceUniqueResourceCounterCmd.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", startTimeFormat)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", endTimeFormat)
 	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", hostnameES)
-	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10144", portES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10168", portES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESUserID, "os_username", "u", "admin", userNameES)
+	complianceResourceUsageCmd.Flags().StringVarP(&CommandFlags.ESPassword, "os_password", "P", "admin", passwordES)
 	licenseApplyCmd.Flags().BoolVarP(&licenseCmdFlags.forceSet, "force", "f", false, "Force set license")
 }
