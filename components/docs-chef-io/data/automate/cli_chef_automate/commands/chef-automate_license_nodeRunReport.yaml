@@ -9,15 +9,23 @@ options:
 - name: es_hostname
   shorthand: "n"
   default_value: localhost
-  usage: hostname of the ES host
+  usage: hostname of the OpenSource host
 - name: es_port
   shorthand: p
-  default_value: "10144"
-  usage: port of the ES host
+  default_value: "10168"
+  usage: port of the OpenSource host
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for nodeRunReport
+- name: os_password
+  shorthand: P
+  default_value: admin
+  usage: password of the OpenSource host
+- name: os_username
+  shorthand: u
+  default_value: admin
+  usage: username of the OpenSource host
 - name: start_time
   shorthand: s
   usage: start time of the report in yyyy-mm-dd format

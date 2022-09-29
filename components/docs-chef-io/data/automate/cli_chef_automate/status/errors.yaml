@@ -113,3 +113,21 @@ errors:
 - name: UnknownError
   description: Failed to reset IAM state to v1
   code: "116"
+- name: DeploymentServiceError
+  description: Failed to restart Deployment Service
+  code: "117"
+- name: InappropriateSettingError
+  description: Settings are not appropriate
+  code: "118"
+- name: AvailableSpaceError
+  description: Error in getting available space
+  code: "119"
+- name: CalESDirSizeError
+  description: Error in calculating ES directory size
+  code: "120"
+- name: CalDestDirSizeError
+  description: Error in calculating Dest directory size
+  code: "121"
+- name: InsufficientSpaceError
+  description: Insufficient disk space
+  code: "122"
