@@ -23,10 +23,7 @@ import (
 
 const (
 	SPACES_BEFORE_STEPS = "       "
-)
-
-var (
-	UPGRADE_METADATA = "/hab/svc/deployment-service/var/upgrade_metadata.json"
+	UPGRADE_METADATA    = "/hab/svc/deployment-service/var/upgrade_metadata.json"
 )
 
 type MigratorV4Utils interface {
@@ -40,6 +37,7 @@ type MigratorV4Utils interface {
 	UpdatePostChecklistFile(id string) error
 	ExecuteCommand(command string, args []string, workingDir string) error
 	GetServicesStatus() (bool, error)
+	GetAutomateFQDN(timeout int64) string
 }
 
 type ESSettings struct {
@@ -210,4 +208,12 @@ func (m *MigratorV4UtilsImpl) ExecuteCommand(command string, args []string, work
 
 func (m *MigratorV4UtilsImpl) GetServicesStatus() (bool, error) {
 	return majorupgrade_utils.EnsureStatus()
+}
+
+func (m *MigratorV4UtilsImpl) GetAutomateFQDN(timeout int64) string {
+	res, err := client.GetAutomateConfig(timeout)
+	if err != nil {
+		return "http://path.local.automate.instance.io"
+	}
+	return res.Config.GetGlobal().GetV1().GetFqdn().Value
 }

@@ -58,6 +58,7 @@ const (
 	CLEANUP_ID                  = "clean_up"
 	MIGRATE_PG_ID               = "migrate_pg"
 	MIGRATE_ES_ID               = "migrate_es"
+	EXTERNAL_PATCH_ID               = "patch_new_config"
 	NEW_PG_VERSION              = "13.5"
 	ELASTICSEARCH_DATA_DIR      = "/hab/svc/automate-elasticsearch/data"
 	ELASTICSEARCH_VAR_DIR       = "/hab/svc/automate-elasticsearch/var"
@@ -109,7 +110,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 	if strings.ToLower(ClearDataCmdFlags.data) == "es" {
 		mu := migratorV4.NewMigratorV4Utils()
 		cleanUp := migratorV4.NewCleanUp(writer, mu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept)
-		cleanUp.Run()
+		cleanUp.Clean()
 	} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
 		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
 		if err != nil {
@@ -236,21 +237,22 @@ func runMigrateDataCmd(cmd *cobra.Command, args []string) error {
 			IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 			StopAutomateFunc:            func() error { return nil },
 			GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
-			PatchOpensearchConfigFunc: func(es *migratorV4.ESSettings) (string, string, error) {
-				return "", "", nil
-			},
-			GetHabRootPathFunc:    func(habrootcmd string) string { return "/hab" },
-			ReadV4ChecklistFunc:   func(id string) (bool, error) { return true, nil },
-			StartAutomateFunc:     func() error { return errors.New("unexpected") },
-			ExecuteCommandFunc:    func(command string, args []string, workingDir string) error { return nil },
-			GetServicesStatusFunc: func() (bool, error) { return true, nil },
+			PatchOpensearchConfigFunc:   func(es *migratorV4.ESSettings) (string, string, error) { return "", "", nil },
+			GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
+			ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+			StartAutomateFunc:           func() error { return nil },
+			ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+			GetServicesStatusFunc:       func() (bool, error) { return true, nil },
+			UpdatePostChecklistFileFunc: func(id string) error { return nil },
+			GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
 		}
 		mfu := &fileutils.MockFileSystemUtils{
-			CalDirSizeInGBFunc:   func(path string) (float64, error) { return 5, nil },
-			GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 8, nil },
+			CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
+			GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 3.0, nil },
+			PathExistsFunc:       func(path string) (bool, error) { return true, nil },
 		}
 		migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
-		migrator.RunMigrationFlow()
+		migrator.RunMigrationFlow(false)
 		return nil
 	} else {
 		return errors.New("please provide valid input for data flag")

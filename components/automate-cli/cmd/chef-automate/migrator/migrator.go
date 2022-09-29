@@ -1,14 +1,15 @@
 package migrator
 
 type Migrator interface {
-	AskForConfirmation() error
+	AskForConfirmation(skipConfirmation bool) error
 	IsExecutedCheck() error
 	AddMigrationSteps(migrationSteps MigrationSteps)
 	ExecuteMigrationSteps() error
 	SaveExecutedStatus() error
 	ExecuteDeferredSteps() error
 	PrintMigrationErrors()
-	RunMigrationFlow()
+	RunMigrationFlow(skipConfirmation bool)
+	ClearData() error
 }
 
 type MigrationSteps interface {

@@ -98,19 +98,8 @@ func (ui *UpgradeInspectorV4) Inspect() (err error) {
 	if err != nil {
 		return err
 	}
-	// ui.inspectorError = ui.inspectionErrorStatus()
 	return nil
 }
-
-// func (ui *UpgradeInspectorV4) inspectionErrorStatus() bool {
-// 	for _, inspection := range ui.inspections {
-// 		hasExitedWithError := inspection.(inspector.Inspection).HasExitedWithError()
-// 		if hasExitedWithError {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
 
 func (ui *UpgradeInspectorV4) RollBackChangesOnError() (err error) {
 	for _, inspection := range ui.inspections {
@@ -238,6 +227,7 @@ func (ui *UpgradeInspectorV4) RunUpgradeInspector(osDestDir string, skipStorageC
 	err := ui.ShowInfo()
 	if err != nil {
 		ui.handleError(append(errArray, err))
+		ui.writer.Println(UPGRADE_TERMINATED)
 		return true
 	}
 	ui.ShowInspectionList()

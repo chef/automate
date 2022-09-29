@@ -94,7 +94,7 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 
 	if res.Version == pcm.version {
 		for i := 0; i < len(res.PostChecklist); i++ {
-			if (!res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted) || (pcm.isExternalDB && !res.Seen) {
+			if !res.PostChecklist[i].Optional && !res.PostChecklist[i].IsExecuted {
 				showPostChecklist = true
 				break
 			}
@@ -108,13 +108,13 @@ func (pcm *PostChecklistManager) ReadPendingPostChecklistFile(path string) ([]st
 			}
 		}
 
-		if pcm.isExternalDB {
-			res.Seen = true
-			err = CreateJsonFile(res, path)
-			if err != nil {
-				return postCmdList, err
-			}
-		}
+		// if pcm.isExternalDB {
+		// 	res.Seen = true
+		// 	err = CreateJsonFile(res, path)
+		// 	if err != nil {
+		// 		return postCmdList, err
+		// 	}
+		// }
 	} else {
 		return postCmdList, status.Errorf(status.UpgradeError, "Failed to read checklist since version didn't match")
 	}

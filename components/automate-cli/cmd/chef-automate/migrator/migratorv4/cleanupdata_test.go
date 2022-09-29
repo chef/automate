@@ -21,10 +21,9 @@ func TestRunCleanCmdForFirstTimeWithSuccess(t *testing.T) {
 	}
 
 	cu := NewCleanUp(cw.CliWriter, mmu, false, false)
-	cu.Run()
+	cu.Clean()
 	expected1 := "Clean up in progres"
-	expected2 := `Your old data will be cleaned-up
-		Press y to continue and n to Exit (y/n)`
+	expected2 := `Would you like to clean up the old Elasticsearch data now? (y/n)`
 	expected3 := `Clean up successful`
 
 	assert.Contains(t, cw.Output(), expected1)
@@ -42,12 +41,11 @@ func TestRunCleanCmdIfUserAlreadyExecutedWithFailed(t *testing.T) {
 		UpdatePostChecklistFileFunc: func(id string) error { return nil },
 	}
 	cu := NewCleanUp(cw.CliWriter, mmu, false, false)
-	cu.Run()
+	cu.Clean()
 	expected1 := `Your have already deleted your old Elasticsearch data.
 Do you want to perform clean up again? (y/n)
 `
-	expected2 := `Your old data will be cleaned-up
-		Press y to continue and n to Exit (y/n)`
+	expected2 := `Would you like to clean up the old Elasticsearch data now? (y/n)`
 	expected3 := `Clean up failed`
 	assert.Contains(t, cw.Output(), expected1)
 	assert.Contains(t, cw.Output(), expected2)

@@ -169,6 +169,12 @@ var postChecklistV4External = []PostCheckListItem{
 		Cmd:        "",
 		Optional:   true,
 		IsExecuted: false,
+	}, {
+		Id:         "patch_new_config",
+		Msg:        "Please patch the new Opensearch config",
+		Cmd:        "",
+		Optional:   false,
+		IsExecuted: false,
 	},
 }
 

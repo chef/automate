@@ -64,7 +64,11 @@ func (m *MigratorV4) AddMigrationSteps(migrationSteps migrator.MigrationSteps) {
 	}
 }
 
-func (m *MigratorV4) AskForConfirmation() error {
+func (m *MigratorV4) AskForConfirmation(skipConfirmation bool) error {
+	if skipConfirmation {
+		m.migrationConsent = true
+		return nil
+	}
 	res, err := m.writer.Confirm("Do you wish to migrate the Elasticsearch data to OpenSearch now?")
 	if err != nil {
 		return err
@@ -142,12 +146,13 @@ func (m *MigratorV4) handleError(err error) {
 	}
 }
 
-func (m *MigratorV4) RunMigrationFlow() {
+func (m *MigratorV4) RunMigrationFlow(skipConfirmation bool) {
 	isExternal := m.migratorUtils.IsExternalElasticSearch(m.timeout)
 	if isExternal {
 		m.handleError(errors.New("Detected External OpenSearch"))
+		return
 	}
-	err := m.AskForConfirmation()
+	err := m.AskForConfirmation(skipConfirmation)
 	if err != nil {
 		m.handleError(err)
 		return
@@ -163,6 +168,7 @@ func (m *MigratorV4) RunMigrationFlow() {
 	if err != nil {
 		m.PrintMigrationErrors()
 	}
+	m.SaveExecutedStatus()
 	if errDeffered != nil {
 		m.handleError(errDeffered)
 	} else {
@@ -170,4 +176,29 @@ func (m *MigratorV4) RunMigrationFlow() {
 			m.writer.Println(MIGRATION_TERMINATED)
 		}
 	}
+	if err == nil && errDeffered == nil {
+		m.writer.Println(" " + color.New(color.FgGreen).Sprint("✔") + "  Migration complete")
+		m.showVerifyAutomate()
+		err := m.ClearData()
+		if err != nil {
+			m.writer.Println(err.Error())
+		}
+	}
+}
+
+func (m *MigratorV4) ClearData() error {
+	clearData := NewCleanUp(m.writer, m.migratorUtils, false, false)
+	clearData.Clean()
+	return nil
+}
+
+func (m *MigratorV4) showVerifyAutomate() {
+	fqdn := m.migratorUtils.GetAutomateFQDN(m.timeout)
+	m.writer.Printf(`
+Verify Chef Automate to see that everything is running and that all your data is available.
+%s
+
+Once verified, you can remove old Elasticsearch data.
+
+`, fqdn)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/fatih/color"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -23,8 +24,6 @@ const (
 type Cleanup struct {
 	writer       *cli.Writer
 	utils        MigratorV4Utils
-	runError     error
-	hasError     bool
 	spinner      *spinner.Spinner
 	autoAccept   bool
 	forceExecute bool
@@ -39,41 +38,20 @@ func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, autoAccept, forceExecute b
 	}
 }
 
-func (cu *Cleanup) Run() error {
+func (cu *Cleanup) Clean() error {
 	err := cu.startCleanup(cu.forceExecute, cu.autoAccept)
 	if err != nil {
-		cu.setError(err)
 		cu.showClearDataFailedMessage()
+		return err
 	}
 	cu.showClearDataSuccessMessage()
 	return nil
-}
-
-func (cu *Cleanup) ErrorHandler() {
-	if cu.hasError {
-		cu.writer.Println(cu.runError.Error())
-	}
-}
-
-func (cu *Cleanup) Skip() error {
-	return nil
-}
-
-func (cu *Cleanup) DefferedHandler() error {
-	return nil
-}
-
-func (cs *Cleanup) setError(err error) error {
-	cs.runError = err
-	cs.hasError = true
-	return err
 }
 
 func (cu *Cleanup) startCleanup(forceExecute, autoAccept bool) error {
 
 	isExecuted, err := cu.utils.ReadV4Checklist(CLEANUP_ID)
 	if err != nil {
-		cu.setError(err)
 		return err
 	}
 
@@ -81,10 +59,9 @@ func (cu *Cleanup) startCleanup(forceExecute, autoAccept bool) error {
 		if forceExecute {
 			isExecuted = false
 		} else {
-			err := cu.AskForConfirmation(`Your have already deleted your old Elasticsearch data.
+			err := cu.askForConfirmation(`Your have already deleted your old Elasticsearch data.
 Do you want to perform clean up again?`)
 			if err != nil {
-				cu.setError(err)
 				return err
 			} else {
 				isExecuted = false
@@ -95,7 +72,6 @@ Do you want to perform clean up again?`)
 	if !isExecuted {
 		err := cu.runcleanUpes(autoAccept)
 		if err != nil {
-			cu.setError(err)
 			return err
 		}
 	}
@@ -103,10 +79,8 @@ Do you want to perform clean up again?`)
 }
 
 func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
-
 	if !autoAccept {
-		err := cu.AskForConfirmation(`Your old data will be cleaned-up
-		Press y to continue and n to Exit`)
+		err := cu.askForConfirmation(`Would you like to clean up the old Elasticsearch data now?`)
 		if err != nil {
 			return err
 		}
@@ -120,12 +94,10 @@ func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
 	}
 	err := cu.utils.ExecuteCommand("/bin/sh", args, "")
 	if err != nil {
-		cu.setError(err)
 		return err
 	} else {
 		err = cu.utils.UpdatePostChecklistFile(CLEANUP_ID)
 		if err != nil {
-			cu.setError(err)
 			return err
 		}
 	}
@@ -140,24 +112,30 @@ func (cu *Cleanup) showDeletingMessage() {
 }
 
 func (cu *Cleanup) showClearDataSuccessMessage() {
+	if cu.spinner == nil {
+		return
+	}
 	cu.spinner.FinalMSG = " " + color.New(color.FgGreen).Sprint("✔") + "  Clean up successful"
 	cu.spinner.Stop()
 	cu.writer.Println("")
 }
 
 func (cu *Cleanup) showClearDataFailedMessage() {
+	if cu.spinner == nil {
+		return
+	}
 	cu.spinner.FinalMSG = " " + color.New(color.FgRed).Sprint("✖") + "  Clean up failed"
 	cu.spinner.Stop()
 	cu.writer.Println("")
 }
 
-func (cu *Cleanup) AskForConfirmation(message string) error {
+func (cu *Cleanup) askForConfirmation(message string) error {
 	res, err := cu.writer.Confirm(message)
 	if err != nil {
 		return err
 	}
 	if !res {
-		return nil
+		return errors.New("Cleanup Process Terminated.")
 	}
 	return nil
 }

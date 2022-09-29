@@ -54,3 +54,25 @@ func TestPatchOsErrorPatchingShardSettings(t *testing.T) {
 	assert.Contains(t, cw.Output(), expected2)
 	assert.Contains(t, cw.Output(), expected3)
 }
+
+func TestCalculateMaxTotalShardsLessThan1500(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriter()
+	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{})
+	var shardsUsed int32 = 1200
+	var minShardVal int32 = MINIMUM_SHARD_VALUE
+	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT
+	maxTotalShards := poc.calculateMaxTotalShards(shardsUsed, minShardVal, incrementShardValue)
+	var expectedCount int32 = 2000
+	assert.Equal(t, expectedCount, maxTotalShards)
+}
+
+func TestCalculateMaxTotalShardsMoreThan1500(t *testing.T) {
+	cw := majorupgrade_utils.NewCustomWriter()
+	poc := NewPatchOpensearchConfig(cw.CliWriter, &MockMigratorV4UtilsImpl{})
+	var shardsUsed int32 = 1800
+	var minShardVal int32 = MINIMUM_SHARD_VALUE
+	var incrementShardValue int32 = INDICES_TOTAL_SHARD_INCREMENT_DEFAULT
+	maxTotalShards := poc.calculateMaxTotalShards(shardsUsed, minShardVal, incrementShardValue)
+	var expectedCount int32 = 2300
+	assert.Equal(t, expectedCount, maxTotalShards)
+}
