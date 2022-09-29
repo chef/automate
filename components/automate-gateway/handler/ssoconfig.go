@@ -29,14 +29,10 @@ func NewSsoConfigHandler(license_client license_control.LicenseControlServiceCli
 
 func (a *SsoConfig) GetSsoConfig(ctx context.Context, in *empty.Empty) (*sso.GetSsoConfigResponse, error) {
 
-	deploymentType, err := a.getDeploymentDetails(ctx)
+	err := a.validateDeploymentType(ctx)
+
 	if err != nil {
 		return nil, err
-	}
-
-	if deploymentType != "SAAS" {
-		msg := "Unauthorized: Deployment type is not SAAS"
-		return nil, status.Error(codes.PermissionDenied, msg)
 	}
 
 	req := &deployment.GetAutomateConfigRequest{}
@@ -92,16 +88,25 @@ func (a *SsoConfig) getDeploymentDetails(ctx context.Context) (string, error) {
 }
 
 func (a *SsoConfig) Authenticate(ctx context.Context, in *empty.Empty) (*sso.AuthenticateTokenResponse, error) {
-	deploymentType, err := a.getDeploymentDetails(ctx)
+	err := a.validateDeploymentType(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if deploymentType != "SAAS" {
-		msg := "Unauthorized: Deployment type is not SAAS"
-		return nil, status.Error(codes.PermissionDenied, msg)
-	}
 	return &sso.AuthenticateTokenResponse{
 		Message: "User authenticated successfully",
 	}, nil
+}
+
+func(a *SsoConfig) validateDeploymentType(ctx context.Context) error {
+	deploymentType, err := a.getDeploymentDetails(ctx)
+	if err != nil {
+		return err
+	}
+
+	if deploymentType != "SAAS" {
+		msg := "Unauthorized: Deployment type is not SAAS"
+		return status.Error(codes.PermissionDenied, msg)
+	}
+	return nil
 }
