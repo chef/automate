@@ -1,4 +1,4 @@
-package migratorV4
+package migratorv4
 
 import (
 	"fmt"
@@ -106,7 +106,7 @@ func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
 
 func (cu *Cleanup) showDeletingMessage() {
 	cu.spinner = cu.writer.NewSpinner()
-	cu.spinner.Suffix = "  Clean up in progres"
+	cu.spinner.Suffix = "  Clean up in progress"
 	cu.spinner.Start()
 	time.Sleep(time.Second)
 }

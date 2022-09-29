@@ -1,4 +1,4 @@
-package migratorV4
+package migratorv4
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package migratorV4
+package migratorv4
 
 import (
 	"errors"
@@ -98,6 +98,7 @@ func TestRunMigrationFlowAllSuccess(t *testing.T) {
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
+		UpdatePostChecklistFileFunc: func(id string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
@@ -166,6 +167,7 @@ func TestRunMigrationFlowDefferedErrors(t *testing.T) {
 		StartAutomateFunc:           func() error { return errors.New("unexpected error while starting automate") },
 		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
+		UpdatePostChecklistFileFunc: func(id string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
@@ -196,7 +198,8 @@ func TestRunMigrationFlowDefferedErrorsAndExecuteMigrationError(t *testing.T) {
 			}
 			return nil
 		},
-		GetServicesStatusFunc: func() (bool, error) { return true, nil },
+		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
+		UpdatePostChecklistFileFunc: func(id string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(dir string) (float64, error) { return 2.0, nil },
@@ -281,6 +284,7 @@ func TestPathNotExist(t *testing.T) {
 		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		ReadV4ChecklistFunc:         func(id string) (bool, error) { return true, nil },
+		UpdatePostChecklistFileFunc: func(id string) error { return nil },
 	}
 	migratorv4 := NewMigratorV4(w.CliWriter, false, false, mmu, &fileutils.MockFileSystemUtils{
 		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 3, nil },

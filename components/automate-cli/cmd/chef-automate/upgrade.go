@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/api/config/deployment"
 	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
-	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorV4"
+	"github.com/chef/automate/components/automate-cli/cmd/chef-automate/migrator/migratorv4"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
@@ -641,27 +641,28 @@ func promptUser(message string) (bool, error) {
 }
 
 func startMigration() error {
-	mv4U := &migratorV4.MockMigratorV4UtilsImpl{
-		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
-		StopAutomateFunc:            func() error { return nil },
-		GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
-		PatchOpensearchConfigFunc: func(es *migratorV4.ESSettings) (string, string, error) {
-			return "", "", nil
-		},
-		GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
-		ReadV4ChecklistFunc:         func(id string) (bool, error) { return false, nil },
-		StartAutomateFunc:           func() error { return nil },
-		ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
-		GetServicesStatusFunc:       func() (bool, error) { return true, nil },
-		GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
-		UpdatePostChecklistFileFunc: func(id string) error { return nil },
-	}
-	mfu := &fileutils.MockFileSystemUtils{
-		CalDirSizeInGBFunc:   func(path string) (float64, error) { return 5, nil },
-		GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 8, nil },
-		PathExistsFunc:       func(path string) (bool, error) { return true, nil },
-	}
-	migrator := migratorV4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
+	// mv4U := &migratorv4.MockMigratorV4UtilsImpl{
+	// 	IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
+	// 	StopAutomateFunc:            func() error { return nil },
+	// 	GetEsTotalShardSettingsFunc: func() (int32, error) { return 2000, nil },
+	// 	PatchOpensearchConfigFunc: func(es *migratorv4.ESSettings) (string, string, error) {
+	// 		return "", "", nil
+	// 	},
+	// 	GetHabRootPathFunc:          func(habrootcmd string) string { return "/hab" },
+	// 	ReadV4ChecklistFunc:         func(id string) (bool, error) { return false, nil },
+	// 	StartAutomateFunc:           func() error { return nil },
+	// 	ExecuteCommandFunc:          func(command string, args []string, workingDir string) error { return nil },
+	// 	GetServicesStatusFunc:       func() (bool, error) { return true, nil },
+	// 	GetAutomateFQDNFunc:         func(timeout int64) string { return "http://automate.io" },
+	// 	UpdatePostChecklistFileFunc: func(id string) error { return nil },
+	// }
+	// mfu := &fileutils.MockFileSystemUtils{
+	// 	CalDirSizeInGBFunc:   func(path string) (float64, error) { return 5, nil },
+	// 	GetFreeSpaceinGBFunc: func(dir string) (float64, error) { return 8, nil },
+	// 	PathExistsFunc:       func(path string) (bool, error) { return true, nil },
+	// }
+	// migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, mv4U, mfu, 10)
+	migrator := migratorv4.NewMigratorV4(writer, migrateDataCmdFlags.autoAccept, migrateDataCmdFlags.forceExecute, migratorv4.NewMigratorV4Utils(), &fileutils.FileSystemUtils{}, 10)
 	migrator.RunMigrationFlow(true)
 	return nil
 }
