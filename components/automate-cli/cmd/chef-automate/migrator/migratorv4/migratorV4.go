@@ -179,16 +179,35 @@ func (m *MigratorV4) RunMigrationFlow(skipConfirmation bool) {
 	if err == nil && errDeffered == nil {
 		m.writer.Println(" " + color.New(color.FgGreen).Sprint("✔") + "  Migration complete")
 		m.showVerifyAutomate()
-		err := m.ClearData()
+		err := m.doDelete()
 		if err != nil {
 			m.writer.Println(err.Error())
+			m.writer.Println("Failed to clean old Elasticsearch data")
 		}
 	}
 }
 
+func (m *MigratorV4) doDelete() error {
+	doDelete, err := m.writer.Confirm("Would you like to clean up the old Elasticsearch data now?")
+	if err != nil {
+		return err
+	}
+	if !doDelete {
+		m.writer.Println("Cleanup skipped")
+		m.writer.Println("")
+		m.writer.Println("To clean up Elasticsearch data later on, you can use command:")
+		m.writer.Println(color.New(color.Bold).Sprint("$ chef-automate post-major-upgrade clear-data -data-es"))
+	}
+	err = m.ClearData()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *MigratorV4) ClearData() error {
 	clearData := NewCleanUp(m.writer, m.migratorUtils, m.fileutils, false, false, m.spinnerTimeout)
-	clearData.Clean()
+	clearData.Clean(true)
 	return nil
 }
 

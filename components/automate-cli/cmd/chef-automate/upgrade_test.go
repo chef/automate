@@ -63,6 +63,7 @@ func TestPrintVersions(t *testing.T) {
 	PrintVersions(tw.CliWriter, "3.0.49", "4.2.59")
 	expected := `Current version: 3.0.49
 Target version: 4.2.59
+
 `
 	assert.Equal(t, expected, tw.Output())
 }

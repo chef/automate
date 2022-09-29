@@ -43,8 +43,8 @@ func NewCleanUp(w *cli.Writer, utils MigratorV4Utils, fileutils fileutils.FileUt
 	}
 }
 
-func (cu *Cleanup) Clean() error {
-	err := cu.startCleanup(cu.forceExecute, cu.autoAccept)
+func (cu *Cleanup) Clean(skipConfirmation bool) error {
+	err := cu.startCleanup(cu.forceExecute, cu.autoAccept, skipConfirmation)
 	if err != nil {
 		cu.showClearDataFailedMessage()
 		return err
@@ -53,7 +53,7 @@ func (cu *Cleanup) Clean() error {
 	return nil
 }
 
-func (cu *Cleanup) startCleanup(forceExecute, autoAccept bool) error {
+func (cu *Cleanup) startCleanup(forceExecute, autoAccept, skipConfirmation bool) error {
 	habRoot := cu.fileutils.GetHabRootPath()
 	isExecuted, err := cu.utils.ReadV4Checklist(CLEANUP_ID, habRoot+majorupgrade_utils.UPGRADE_METADATA)
 	if err != nil {
@@ -75,7 +75,7 @@ Do you want to perform clean up again?`)
 	}
 
 	if !isExecuted {
-		err := cu.runcleanUpes(autoAccept)
+		err := cu.runcleanUpes(autoAccept, skipConfirmation)
 		if err != nil {
 			return err
 		}
@@ -83,8 +83,8 @@ Do you want to perform clean up again?`)
 	return nil
 }
 
-func (cu *Cleanup) runcleanUpes(autoAccept bool) error {
-	if !autoAccept {
+func (cu *Cleanup) runcleanUpes(autoAccept, skipConfirmation bool) error {
+	if !autoAccept && !skipConfirmation {
 		err := cu.askForConfirmation(`Would you like to clean up the old Elasticsearch data now?`)
 		if err != nil {
 			return err

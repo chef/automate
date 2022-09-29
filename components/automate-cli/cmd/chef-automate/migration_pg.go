@@ -112,7 +112,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 		mu := migratorv4.NewMigratorV4Utils()
 		mfu := &fileutils.FileSystemUtils{}
 		cleanUp := migratorv4.NewCleanUp(writer, mu, mfu, ClearDataCmdFlags.forceExecute, ClearDataCmdFlags.autoAccept, time.Second)
-		cleanUp.Clean()
+		cleanUp.Clean(false)
 	} else if strings.ToLower(ClearDataCmdFlags.data) == "pg" {
 		oldPgVersion, err := pgVersion(OLD_PG_DATA_DIR + "/PG_VERSION")
 		if err != nil {

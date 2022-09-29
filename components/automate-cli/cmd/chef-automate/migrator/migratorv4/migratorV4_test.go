@@ -89,7 +89,7 @@ func TestRunSuccessfulMigrationsWithError(t *testing.T) {
 }
 
 func TestRunMigrationFlowAllSuccess(t *testing.T) {
-	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y")
+	w := majorupgrade_utils.NewCustomWriterWithInputs("y", "y", "y")
 	mmu := &MockMigratorV4UtilsImpl{
 		IsExternalElasticSearchFunc: func(timeout int64) bool { return false },
 		StopAutomateFunc:            func() error { return nil },
