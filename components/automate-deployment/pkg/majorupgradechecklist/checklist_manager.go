@@ -5,9 +5,15 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 )
 
+type ChecklistUpgradeFlags struct {
+	SkipDiskSpaceCheck bool
+	OsDestDataDir      string
+}
+
 type ChecklistManager interface {
-	RunChecklist() error
+	RunChecklist(int64, ChecklistUpgradeFlags) error
 	GetPostChecklist() []PostCheckListItem
+	StoreSearchEngineSettings(writer cli.FormatWriter) (bool, error)
 }
 
 func NewChecklistManager(writer cli.FormatWriter, version string) (ChecklistManager, error) {

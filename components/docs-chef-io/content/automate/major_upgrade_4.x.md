@@ -72,13 +72,13 @@ There are four possible scenarios to upgrade from 3.0.49 to 4.0.x version.
 
 - [Chef Automate in Air-Gapped Environment With External Elasticsearch]({{< relref "#chef-automate-in-air-gapped-environment-with-external-elasticsearch" >}})
 
-{{< note >}} Confirm whether your installation is using an external Elasticsearch but running the `chef-automate config show` command. It `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
+{{< note >}} Confirm whether your installation is using an external Elasticsearch by running the `chef-automate config show` command. If `enable=true` is present in the `global.v1.external.elasticsearch` config setting, you are using a external Elasticsearch. {{< /note >}}
 
-{{< warning >}} You drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
+{{< warning >}} Your drive should have a minimum of sixty percent of free space to start the major version upgrade. {{< /warning >}}
 
-{{< warning >}} Disable the **sharding** for automate running embedded Elasticsearch.
+{{< warning >}} Upgrade will disable the **sharding** for automate running embedded Elasticsearch.
 
-Also, accept the checklist item asking permission to disable sharding. {{< /warning >}}
+So, accept the checklist item asking permission to disable sharding. {{< /warning >}}
 
 ### Chef Automate With Embedded Elasticsearch
 
@@ -88,12 +88,26 @@ To upgrade Chef Automate with embedded Elasticsearch, follow the steps given bel
 
 1. Start a major version upgrade:
 
-Here, you will be prompted to accept multiple Pre Upgrade checklist. Accept the actions before upgrade.
-
 ```sh
 sudo chef-automate upgrade run --major
 ```
+Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
 
+```shell
+You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+y
+You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+y
+Ensure you have more than 60 percent free disk space (y/n)
+y
+This will disable Sharding on your elastic search (y/n)
+y
+{"acknowledged":true,"persistent":{"cluster":{"routing":{"allocation":{"enable":"primaries"}}}},"transient":{}}
+{"_shards":{"total":60,"successful":30,"failed":0}}
+After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+y
+```
+It starts upgrading 
 Once you are done with the upgrade, follow the steps post upgrade which are:
 
 2. Check the upgrade status of Chef Automate:
@@ -101,12 +115,50 @@ Once you are done with the upgrade, follow the steps post upgrade which are:
 ```sh
 sudo chef-automate upgrade status
 ```
+This should return: Automate is up-to-date with airgap bundle `4.x.y` version
+
+```shell
+Post Upgrade Steps:
+===================
+
+  
+1) Check the status of your upgrade using:  
+     $ chef-automate upgrade status
+   This should return: Automate is up-to-date
+  
+2) Disable the maintenance mode if you enabled previously using:
+	$ chef-automate maintenance off
+  
+3) Migrate Data from Elastic Search to Open Search using this command:
+     $ chef-automate post-major-upgrade migrate --data=es
+  
+4) Check Automate UI everything is running and all data is visible
+  
+5) If you are sure all data is available in Upgraded Automate, then we can free up old elastic search Data by running: 
+     $ chef-automate post-major-upgrade clear-data --data=es
+```
+{{< note >}} If your backup location is S3 and endpoint is configured as regional then change your settings as below:
+```shell
+[global.v1.backups]
+  location = "s3"
+[global.v1.backups.s3.bucket]
+  # name (required): The name of the bucket
+  name = "<bucket name>"
+
+  # endpoint (required): The endpoint for the region the bucket lives in for Automate Version 3.x.y
+  # endpoint (required): For Automate Version 4.x.y, use this https://s3.amazonaws.com
+  endpoint = "https://s3.amazonaws.com"
+```
+ {{< /note >}}
 
 3. Turn off maintenance mode:
 
 ```sh
 sudo chef-automate maintenance off
 ```
+This should return:
+`Updating deployment configuration`
+`Applying deployment configuration`
 
 4.  All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
@@ -158,6 +210,38 @@ Apply this using the `config patch` command.
 
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
+```
+```shell
+It will start the migration immediately after check.
+Press y to agree, n to disagree? [y/n]: y
+
+HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
+
+
+----------------------------------------------
+Chef-automate stop 
+----------------------------------------------
+
+Chef Automate Stopped
+
+----------------------------------------------
+migration from es to os 
+----------------------------------------------
+
+Checking for es_upgrade
+
+Done with Migration 
+ Please wait for some time to reindex the data
+
+----------------------------------------------
+Chef-automate start 
+----------------------------------------------
+
+Starting Chef Automate
+
+----------------------------------------------
+Chef-automate status 
+----------------------------------------------
 ```
 
 6. Verify whether all services are running:
@@ -243,6 +327,24 @@ sudo ./chef-automate config show
 ```sh
 sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```
+Here, you will be prompted to accept multiple Pre Upgrade checklist. Ensure you have perfomed all those actions before upgrade then mark yes, otherwise it will prompt you the error.The checklist will be as following:
+
+```shell
+You had planned for a downtime, by running the command(chef-automate maintenance on)?: (y/n)
+y
+You have taken backup of your data and kept it safe, preferred on other disk or location? (y/n)
+y
+Ensure you have more than 60 percent free disk space (y/n)
+y
+This will disable Sharding on your elastic search (y/n)
+y
+{"acknowledged":true,"persistent":{"cluster":{"routing":{"allocation":{"enable":"primaries"}}}},"transient":{}}
+{"_shards":{"total":60,"successful":30,"failed":0}}
+After this upgrade completes, you will have to run Post upgrade steps to ensure your data is migrated and your Automate is ready for use (y/n)
+y
+```
+It starts upgrading 
+Once you are done with the upgrade, follow the steps post upgrade which are:
 
 **Post Upgrade**
 
@@ -251,12 +353,16 @@ sudo ./chef-automate upgrade run --airgap-bundle automate-4.x.y.aib --major
 ```sh
 sudo chef-automate upgrade status
 ```
+This should return: Automate is up-to-date with airgap bundle `4.x.y` version
 
 2. Turn off the maintenance mode.
 
 ```sh
 sudo chef-automate maintenance off
 ```
+This should return:
+`Updating deployment configuration`
+`Applying deployment configuration`
 
 3. All [relevant configuration fields](https://docs.chef.io/automate/opensearch/) of the Elasticsearch should be copied into the OpenSearch configuration.
 
@@ -303,6 +409,38 @@ Apply this using `config patch` command.
 
 ```sh
 sudo chef-automate post-major-upgrade migrate --data=es
+```
+```shell
+It will start the migration immediately after check.
+Press y to agree, n to disagree? [y/n]: y
+
+HAB Root Path /hab/pkgs/chef/deployment-service/0.1.0/20220609123606
+
+
+----------------------------------------------
+Chef-automate stop 
+----------------------------------------------
+
+Chef Automate Stopped
+
+----------------------------------------------
+migration from es to os 
+----------------------------------------------
+
+Checking for es_upgrade
+
+Done with Migration 
+ Please wait for some time to reindex the data
+
+----------------------------------------------
+Chef-automate start 
+----------------------------------------------
+
+Starting Chef Automate
+
+----------------------------------------------
+Chef-automate status 
+----------------------------------------------
 ```
 
 5. Verify whether all services are running:
@@ -415,6 +553,65 @@ Update the Opensearch Config, using `chef-automate config patch <config_patch.to
       [opensearch.v1.sys.cluster]
          max_shards_per_node = "<NUMBER_OF_SHARD>"
 ```
+### Proxy Setting issue
+If you are using Proxy Settings and have upgraded to a version between 4.0.27 and 4.2.10, then you might get this error when you upgrade:
+```
+DeploymentServiceCallError: A request to the deployment-service failed: Request to get upgrade status failed: rpc error: code = Unknown desc = error in getting the versions from current channel: error in invoking the endpoint https://packages.chef.io/manifests/current/automate/versions.json: Get "https://packages.chef.io/manifests/current/automate/versions.json": dial tcp: lookup packages.chef.io on 10.2.72.20:53: read udp 10.1.97.98:59620->10.2.72.20:53: i/o timeout
+```
+To move ahead with upgrade you can download latest CLI and Airgapped bundle using curl command with proxy settings:
+```sh
+curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
+
+curl -x http://proxy_server:proxy_port --proxy-user username:password -L https://packages.chef.io/airgap_bundle/current/automate/latest.aib -o automate-latest.aib
+```
+
+After downloading, run the upgrade command with airgapped bundle option:
+```sh
+./chef-automate upgrade run --airgap-bundle automate-latest.aib
+```
+Output will look like this:
+```sh
+Installing airgap install bundle
+Trying to restart Deployment Service...
+Deployment service is stopped
+Waiting for Deployment Service to be healthy
+Waiting for Deployment Service to be healthy
+Waiting for Deployment Service to be healthy
+Deployment Service is healty now
+current_version:"4.2.10" target_version:"4.2.59" target_major:"4"
+Upgrading Chef Automate
+```
+
+### Minor upgrade errors
+
+```sh
+sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
+```
+
+The above error occurs if you run Chef Automate with Proxy settings and upgrade it from the Automate version before 4.2.22 to after 4.2.22.
+
+```sh
+Installing airgap install bundle
+DeploymentServiceCallError: A request to the deployment-service failed: Request to start to upgrade failed: RPC error: code = FailedPrecondition desc = The minimum compatible version field is missing in the manifest. Create a bundle with the latest automate-cli
+```
+
+This error may occur if a user running a non-airgapped version of Chef Automate tries to perform a minor upgrade using the airgapped installation method. To fix this minor upgrade error, run the following command:
+
+```sh
+sudo chef-automate stop
+```
+
+Once done, run the following command:
+
+```sh
+sudo chef-automate start
+```
+
+Before trying the upgrade again, confirm whether all the services are up by running the following command:
+
+```sh
+sudo chef-automate status
+```
 ### Migration Fails
 
  If Chef Automate fails to migrate your data to *OpenSearch 1.2.4* while running `chef-automate post-major-upgrade migrate --data=es`, restore the data using:
@@ -451,33 +648,4 @@ Refer to the [Chef Automate Restore](/automate/restore/) documentation.
 
 {{< note >}} Remove the `/hab/svc/deployment-service/var/upgrade_metadata.json` file if the migration of data has been done using backup and restore method. {{< /note >}}
 
-### Minor upgrade errors
 
-```sh
-sudo chef-automate upgrade run --airgap-bundle x.x.x.aib
-```
-
-The above error occurs if you run Chef Automate with Proxy settings and upgrade it from the Automate version before 4.2.22 or after 4.2.22.
-
-```sh
-Installing airgap install bundle
-DeploymentServiceCallError: A request to the deployment-service failed: Request to start to upgrade failed: RPC error: code = FailedPrecondition desc = The minimum compatible version field is missing in the manifest. Create a bundle with the latest automate-cli
-```
-
-This error may occur if a user running a non-airgapped version of Chef Automate tries to perform a minor upgrade using the airgapped installation method. To fix this minor upgrade error, run the following command:
-
-```sh
-sudo chef-automate stop
-```
-
-Once done, run the following command:
-
-```sh
-sudo chef-automate start
-```
-
-Before trying the upgrade again, confirm whether all the services are up by running the following command:
-
-```sh
-sudo chef-automate status
-```

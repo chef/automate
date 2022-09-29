@@ -4,13 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
+	"net"
 	"net/http"
+	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/pkg/errors"
 )
 
@@ -28,12 +34,31 @@ type indexVersion struct {
 type indexDetails struct {
 	Name    string
 	Version string
+	Error   string
 }
 
 type V4ChecklistManager struct {
 	writer       cli.FormatWriter
 	version      string
 	isExternalES bool
+}
+
+type IndexInfo struct {
+	Settings struct {
+		Index struct {
+			Version struct {
+				CreatedString string `json:"created_string"`
+				Created       string `json:"created"`
+			} `json:"version"`
+		} `json:"index"`
+	} `json:"settings"`
+}
+
+type indexData struct {
+	Name          string
+	MajorVersion  int64
+	CreatedString string
+	IsDeleted     bool
 }
 
 const (
@@ -69,6 +94,19 @@ const (
 	$ ` + disable_maintenance_mode_cmd
 
 	disable_maintenance_mode_cmd = `chef-automate maintenance off`
+	filename                     = "s3.toml"
+	automatePatchCmd             = "chef-automate config patch %s"
+	habrootcmd                   = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
+	s3regex                      = "https?://s3.(.*).amazonaws.com"
+	s3EndpointConf               = `
+		[global.v1.backups.s3.bucket]
+			endpoint = "https://s3.amazonaws.com"
+	`
+	urlChangeMessage = `Your S3 url in backup config is changed from %s to https://s3.amazonaws.com. 
+This is because automate version 4 now only supports this format due to AWS SDK upgrade.
+`
+	msg           = "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
+	oldIndexError = "The index %s is from an older version of elasticsearch version %s.\nPlease reindex in elasticsearch 6. %s\n%s"
 )
 
 var postChecklistV4Embedded = []PostCheckListItem{
@@ -136,7 +174,7 @@ func NewV4ChecklistManager(writer cli.FormatWriter, version string) *V4Checklist
 	return &V4ChecklistManager{
 		writer:       writer,
 		version:      version,
-		isExternalES: IsExternalElasticSearch(writer),
+		isExternalES: IsExternalElasticSearch(),
 	}
 }
 
@@ -150,7 +188,7 @@ func (ci *V4ChecklistManager) GetPostChecklist() []PostCheckListItem {
 	return postChecklist
 }
 
-func (ci *V4ChecklistManager) RunChecklist() error {
+func (ci *V4ChecklistManager) RunChecklist(timeout int64, flags ChecklistUpgradeFlags) error {
 	var dbType string
 	checklists := []Checklist{}
 	var postcheck []PostCheckListItem
@@ -163,17 +201,16 @@ func (ci *V4ChecklistManager) RunChecklist() error {
 	} else {
 		dbType = "Embedded"
 		postcheck = postChecklistV4Embedded
-		checklists = append(checklists, []Checklist{runIndexCheck(), downTimeCheckV4(), backupCheck(), diskSpaceCheck(),
+		checklists = append(checklists, []Checklist{deleteA1Indexes(timeout), deleteStaleIndices(timeout), downTimeCheckV4(), backupCheck(), diskSpaceCheck(ci.version, flags.SkipDiskSpaceCheck, flags.OsDestDataDir),
 			disableSharding(), postChecklistIntimationCheckV4(!ci.isExternalES)}...)
 	}
-	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES))
+	checklists = append(checklists, showPostChecklist(&postcheck), promptUpgradeContinueV4(!ci.isExternalES), replaceurl())
 
 	helper := ChecklistHelper{
 		Writer: ci.writer,
 	}
 
 	ci.writer.Println(fmt.Sprintf(initMsgV4, dbType, ci.version)) //display the init message
-
 	for _, item := range checklists {
 		if item.TestFunc == nil {
 			continue
@@ -234,12 +271,10 @@ func promptUpgradeContinueV4(isEmbedded bool) Checklist {
 			}
 			if !resp {
 				h.Writer.Error("end user not ready to upgrade")
-
 				shardError := enableSharding(h, isEmbedded)
 				if shardError != nil {
 					h.Writer.Error(shardError.Error())
 				}
-
 				return status.New(status.InvalidCommandArgsError, "end user not ready to upgrade")
 			}
 			return nil
@@ -448,33 +483,6 @@ func disableSharding() Checklist {
 	}
 }
 
-func getDataFromUrl(url string) ([]byte, error) {
-	method := "GET"
-
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil) // nosemgrep
-
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body) // nosemgrep
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-
-const habrootcmd = "HAB_LICENSE=accept-no-persist hab pkg path chef/deployment-service"
-
 func getHabRootPath(habrootcmd string) string {
 	out, err := exec.Command("/bin/sh", "-c", habrootcmd).Output()
 	if err != nil {
@@ -489,86 +497,262 @@ func getHabRootPath(habrootcmd string) string {
 	return rootHab
 }
 
-func checkIndexVersion() error {
-	var basePath = "http://localhost:10144/"
-
-	habpath := getHabRootPath(habrootcmd)
-
-	input, err := ioutil.ReadFile(habpath + "svc/automate-es-gateway/config/URL") // nosemgrep
+func replaceAndPatchS3backupUrl(h ChecklistHelper) error {
+	res, err := client.GetAutomateConfig(int64(client.DefaultClientTimeout))
 	if err != nil {
-		fmt.Printf("Failed to read URL file")
+		h.Writer.Errorln("failed to get backup s3 url configuration: " + err.Error())
+		return nil
 	}
-	url := strings.TrimSuffix(string(input), "\n")
-	if url != "" {
-		basePath = "http://" + url + "/"
+	endpoint := res.Config.GetGlobal().GetV1().GetBackups().GetS3().GetBucket().GetEndpoint().GetValue()
+	re := regexp.MustCompile(s3regex)
+	if re.MatchString(endpoint) {
+		file, err := ioutil.TempFile("", filename) // nosemgrep
+		if err != nil {
+			h.Writer.Errorln("could not create temp file" + err.Error())
+			return nil
+		}
+		defer os.Remove(file.Name())
+		if _, err := file.Write([]byte(s3EndpointConf)); err != nil {
+			h.Writer.Errorln("could not write toml file" + err.Error())
+			return nil
+		}
+		out, err := exec.Command("/bin/sh", "-c", fmt.Sprintf(automatePatchCmd, file.Name())).Output()
+		if !strings.Contains(string(out), "Configuration patched") || err != nil {
+			h.Writer.Errorln("error in running automate patch command")
+			return nil
+		}
+		h.Writer.Println(fmt.Sprintf(urlChangeMessage, endpoint))
 	}
 
-	allIndexList, err := getDataFromUrl(basePath + "_cat/indices?h=index")
+	return nil
+}
+
+func replaceurl() Checklist {
+	return Checklist{
+		Name:        "Change s3 url",
+		Description: "Changes backup s3 url during upgrade.",
+		TestFunc:    replaceAndPatchS3backupUrl,
+	}
+}
+
+func getESBasePath(timeout int64) string {
+	var basePath = "http://localhost:10144/"
+	cfg := dc.DefaultAutomateConfig()
+	defaultHost := cfg.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+	defaultPort := cfg.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
+
+	if defaultHost != "" || defaultPort > 0 {
+		basePath = fmt.Sprintf(`http://%s/`, net.JoinHostPort(defaultHost, fmt.Sprintf("%d", defaultPort)))
+	}
+
+	res, err := client.GetAutomateConfig(timeout)
+	if err == nil {
+		host := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetHost().GetValue()
+		port := res.Config.GetEsgateway().GetV1().GetSys().GetService().GetPort().GetValue()
+		if host != "" || port > 0 {
+			url := net.JoinHostPort(host, fmt.Sprintf("%d", port))
+			if url != "" {
+				basePath = fmt.Sprintf(`http://%s/`, url)
+			}
+		}
+	}
+	return basePath
+}
+
+func getAllIndices(timeout int64) ([]byte, error) {
+	return execRequest(getESBasePath(timeout)+"_cat/indices?h=index", "GET", nil)
+}
+
+func doDeleteStaleIndices(timeout int64, h ChecklistHelper) error {
+	basePath := getESBasePath(timeout)
+	allIndexList, err := getAllIndices(timeout)
 	if err != nil {
 		return err
 	}
 
-	indexDetailsArray := []indexDetails{}
-	for _, index := range strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n") {
-		versionData, err := getDataFromUrl(basePath + index + "/_settings/index.version.created*?&human")
-		if err != nil {
-			return err
-		}
-		i, createdString, err := getMajorVersion(versionData, index)
-		if err != nil {
-			return err
-		}
-		if i < 6 {
-			indexDetailsArray = append(indexDetailsArray, indexDetails{Name: index, Version: createdString})
-		}
+	indexList := strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n")
+	indexCSL := strings.Join(indexList, ",")
+	versionData, err := execRequest(basePath+indexCSL+"/_settings/index.version.created*?&human", "GET", nil)
+	if err != nil {
+		return err
 	}
-	if len(indexDetailsArray) > 0 {
-		return formErrorMsg(indexDetailsArray)
+
+	indexInfo, err := getOldIndexInfo(versionData)
+
+	for i, index := range indexInfo {
+		h.Writer.Println(fmt.Sprintf("Automate is unable to upgrade because an index with name: %s is created using an older version of elasticsearch %s", index.Name, index.CreatedString))
+		resp, err := h.Writer.Confirm("Do you wish to delete the index to continue?")
+		if err != nil {
+			h.Writer.Error(err.Error())
+			return status.Errorf(status.InvalidCommandArgsError, err.Error())
+		}
+		errMsg := formErrorMsg(indexInfo)
+		if !resp {
+			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+		}
+
+		_, err = execRequest(fmt.Sprintf("%s%s?pretty", basePath, index.Name), "DELETE", nil)
+		if err != nil {
+			h.Writer.Error(err.Error())
+			return status.Errorf(status.UnknownError, fmt.Sprintf(oldIndexError, index.Name, index.CreatedString, msg, errMsg))
+		}
+		indexInfo[i].IsDeleted = true //mark the deleted indices, so that those wont show in the list to end user
 	}
 	return nil
 }
 
-func formErrorMsg(IndexDetailsArray []indexDetails) error {
+func formErrorMsg(IndexDetailsArray []indexData) error {
 	msg := "\nUnsupported index versions. To continue with the upgrade, please reindex the indices shown below to version 6.\n"
-	for _, version := range IndexDetailsArray {
-		msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", version.Name, version.Version)
+	for _, index := range IndexDetailsArray {
+		if !index.IsDeleted {
+			msg += fmt.Sprintf("- Index Name: %s, Version: %s \n", index.Name, index.CreatedString)
+		}
 	}
 	msg += "\nFollow the guide below to learn more about reindexing:\nhttps://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs-reindex.html"
 	return fmt.Errorf(msg)
 }
 
-func getMajorVersion(versionData []byte, index string) (int64, string, error) {
-	data := map[string]interface{}{}
-	json.Unmarshal(versionData, &data)
-	dataIdx := indexVersion{}
-	b, err := json.Marshal(data[index])
+func getOldIndexInfo(allIndexData []byte) ([]indexData, error) {
+	var indexDataArray []indexData
+	var parsed map[string]IndexInfo
+	err := json.Unmarshal(allIndexData, &parsed)
 	if err != nil {
-		return -1, "", errors.Wrap(err, "failed to marshal index data")
+		return nil, errors.Wrap(err, "error in unmarshalling the index data")
 	}
-	err = json.Unmarshal(b, &dataIdx)
-	if err != nil {
-		return -1, "", errors.Wrap(err, "failed to unmarshal index data")
+	for key, data := range parsed {
+		index, err := strconv.ParseInt(data.Settings.Index.Version.CreatedString[0:1], 10, 64)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse index version")
+		}
+		if index < 6 && key != ".watches" {
+			indexDataArray = append(indexDataArray,
+				indexData{Name: key, MajorVersion: index,
+					CreatedString: data.Settings.Index.Version.CreatedString})
+		}
 	}
-	if dataIdx.Settings.Index.Version.CreatedString == "" {
-		return -1, "", errors.New("version not found for index")
-	}
-	i, err := strconv.ParseInt(dataIdx.Settings.Index.Version.CreatedString[0:1], 10, 64)
-	if err != nil {
-		return -1, "", errors.Wrap(err, "failed to parse index version")
-	}
-	return i, dataIdx.Settings.Index.Version.CreatedString, nil
+	return indexDataArray, nil
 }
 
-func runIndexCheck() Checklist {
+func deleteStaleIndices(timeout int64) Checklist {
 	return Checklist{
 		Name:        "check index version",
-		Description: "confirmation check index version",
+		Description: "confirmation check to delete stale indices",
 		TestFunc: func(h ChecklistHelper) error {
-			err := checkIndexVersion()
+			err := doDeleteStaleIndices(timeout, h)
 			if err != nil {
 				return err
 			}
 			return nil
 		},
 	}
+}
+
+func (ci *V4ChecklistManager) StoreSearchEngineSettings(writer cli.FormatWriter) (bool, error) {
+	isEmbeded := !IsExternalElasticSearch()
+	if !isEmbeded {
+		writer.Warnf("Automate is running on external elastic search, not taking configuration backup")
+		return true, nil
+	} else {
+		esSettings, _ := GetESSettings(writer)
+		esHeapSize, _ := extractNumericFromText(esSettings.HeapMemory, 0)
+		fiftyPercentOfMemory := defaultHeapSizeInGB()
+		isOkSettings := true
+		if esHeapSize > MAX_POSSIBLE_HEAP_SIZE || int(math.Round(esHeapSize)) > fiftyPercentOfMemory {
+			isOkSettings = false
+		}
+		requiredShards := (esSettings.TotalShardSettings + INDICES_TOTAL_SHARD_INCREMENT_DEFAULT)
+		if requiredShards > INDICES_TOTAL_SHARD_DEFAULT {
+			isOkSettings = false
+		}
+		if !isOkSettings {
+			msg := fmt.Sprintf(
+				maxHeapSizeExceeded,
+				esSettings.HeapMemory, fiftyPercentOfMemory, MAX_POSSIBLE_HEAP_SIZE,
+				requiredShards, INDICES_TOTAL_SHARD_DEFAULT, requiredShards,
+				esSettings.IndicesBreakerTotalLimit, INDICES_BREAKER_TOTAL_LIMIT_DEFAULT)
+			resp, err := writer.Confirm(msg)
+			if err != nil {
+				writer.Error(err.Error())
+				return false, status.Errorf(status.InappropriateSettingError, err.Error())
+			}
+			if !resp {
+				return false, status.New(status.InappropriateSettingError, upgradeFailed)
+			}
+		}
+		StoreESSettings(writer, esSettings)
+		return true, nil
+	}
+}
+
+func deleteA1Indexes(timeout int64) Checklist {
+	allIndexList, err := getAllIndices(timeout)
+	if err != nil {
+		return Checklist{
+			Name:        "delete A1 indexes",
+			Description: "confirmation check to delete A1 indexes",
+			TestFunc: func(h ChecklistHelper) error {
+				return fmt.Errorf("Error while feteching the list of indices: %w", err)
+			},
+		}
+	}
+	targetList := []string{}
+	for _, index := range strings.Split(strings.TrimSuffix(string(allIndexList), "\n"), "\n") {
+		targetList = append(targetList, index)
+	}
+	sourceList := []string{".automate", ".locky", "saved-searches", ".tasks"}
+
+	existingIndexes := findMatch(sourceList, targetList)
+
+	if len(existingIndexes) == 0 {
+		return Checklist{
+			Name:        "delete A1 indexes",
+			Description: "confirmation check index version",
+			TestFunc:    nil,
+		}
+	}
+
+	return Checklist{
+		Name:        "delete A1 indexes",
+		Description: "confirmation check to delete A1 indexes",
+		TestFunc: func(h ChecklistHelper) error {
+			indexes := strings.Join(existingIndexes, ",")
+			resp, err := h.Writer.Confirm(fmt.Sprintf("Following Indexes are of Automate 1 and are no longer use in automate, thus we will delete these indices:%s", indexes))
+			if err != nil {
+				h.Writer.Error(err.Error())
+				return status.Errorf(status.InvalidCommandArgsError, err.Error())
+			}
+			if !resp {
+				return status.New(status.InvalidCommandArgsError, "The Automate 1 stale indices needs to be deleted before upgrading.")
+			}
+			err = deleteIndexFromA1(timeout, indexes)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+}
+
+func deleteIndexFromA1(timeout int64, indexes string) error {
+	basePath := getESBasePath(timeout)
+	_, err := execRequest(fmt.Sprintf("%s%s", basePath, indexes)+"?pretty", "DELETE", nil)
+	return err
+}
+
+//findMatch returns the list of items available in targetList from sourceList
+func findMatch(sourceList, targetList []string) []string {
+	matchedList := make(map[string]interface{})
+	for _, item := range targetList {
+		for _, sourceItem := range sourceList {
+			if strings.Contains(item, sourceItem) {
+				matchedList[item] = ""
+				break
+			}
+		}
+	}
+	list := []string{}
+	for key := range matchedList {
+		list = append(list, key)
+	}
+	return list
 }

@@ -49,6 +49,8 @@ const (
 // When an invocation of the chef-automate CLI results in a Failure it exits with
 // one of the following codes that identifies the error types.
 const (
+	InappropriateSettingError         = 118
+	RestartDeploymentServiceError     = 117
 	IAMResetV1DatabaseError           = 116
 	IAMUpgradeV2DatabaseError         = 115
 	APIUnreachableError               = 114
@@ -94,6 +96,8 @@ const (
 // an error code and its type and a description, but also as a way to generate
 // documentation.
 var ErrorMetadata = map[int][]string{
+	InappropriateSettingError:         {"118", "InappropriateSettingError", "Settings are not appropriate"},
+	RestartDeploymentServiceError:     {"117", "DeploymentServiceError", "Failed to restart Deployment Service"},
 	IAMResetV1DatabaseError:           {"116", "UnknownError", "Failed to reset IAM state to v1"},
 	IAMUpgradeV2DatabaseError:         {"115", "UnknownError", "Failed to upgrade IAM to v2"},
 	APIUnreachableError:               {"114", "APIUnreachableError", "Could not connect to Automate API"},

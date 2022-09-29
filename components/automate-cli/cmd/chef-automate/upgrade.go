@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	opensearch "github.com/chef/automate/api/config/opensearch"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
@@ -15,6 +19,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/majorupgradechecklist"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/lib/io/fileutils"
 )
 
@@ -31,6 +36,8 @@ var upgradeRunCmdFlags = struct {
 	upgradeairgapbundles bool
 	skipDeploy           bool
 	isMajorUpgrade       bool
+	skipDiskSpaceCheck   bool
+	osDestDataDir        string
 	versionsPath         string
 	acceptMLSA           bool
 	upgradeHAWorkspace   string
@@ -113,6 +120,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 		}
+		// Restart Deployment service to update the manifest.json
+		err = restartDeploymentService()
+		if err != nil {
+			return status.Annotate(err, status.RestartDeploymentServiceError)
+		}
 	}
 
 	connection, err := client.Connection(client.DefaultClientTimeout)
@@ -136,6 +148,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			)
 		}
 	} else {
+		fmt.Println(validatedResp)
 		if validatedResp.CurrentVersion == validatedResp.TargetVersion {
 			writer.Println("Chef Automate up-to-date")
 			return nil
@@ -147,6 +160,10 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		if upgradeRunCmdFlags.isMajorUpgrade && len(pendingPostChecklist) == 0 {
+			/* err = majorupgradechecklist.StoreESSettings()
+			if err != nil {
+				writer.Println("Failed to read and store search settings")
+			} */
 			ci, err := majorupgradechecklist.NewChecklistManager(writer, validatedResp.TargetVersion)
 			if err != nil {
 				return status.Wrap(
@@ -155,7 +172,23 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 					"Request to start upgrade failed",
 				)
 			}
-			err = ci.RunChecklist()
+
+			isSettingOk, err := ci.StoreSearchEngineSettings(writer)
+			if err != nil && !isSettingOk {
+				return status.Wrap(
+					err,
+					status.InappropriateSettingError,
+					"Request to start upgrade failed",
+				)
+			}
+			if err != nil {
+				writer.Printf("Failed to read or store search-engine settings\n %w \n", err)
+			}
+			flags := majorupgradechecklist.ChecklistUpgradeFlags{
+				SkipDiskSpaceCheck: upgradeRunCmdFlags.skipDiskSpaceCheck,
+				OsDestDataDir:      upgradeRunCmdFlags.osDestDataDir,
+			}
+			err = ci.RunChecklist(configCmdFlags.timeout, flags)
 			if err != nil {
 				return status.Wrap(
 					err,
@@ -191,6 +224,49 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	// stuff breaks when deployment-service is restarted. Until that's fixed,
 	// it would be pointless to try to stream the events.
 	return nil
+}
+
+// restartDeploymentService will kill the Pid of Deployment Service and then Hab will restart this service
+func restartDeploymentService() error {
+	writer.Println("Trying to restart Deployment Service...")
+	res, err := getStatus()
+	if err != nil {
+		return err
+	}
+	isDeploymentServiceKilled := false
+	for _, s := range res.ServiceStatus.Services {
+		if s.Name == "deployment-service" {
+			deploymentServiceProcess := os.Process{Pid: int(s.Pid)}
+			err := deploymentServiceProcess.Kill()
+			if err != nil {
+				return err
+			}
+			isDeploymentServiceKilled = true
+			writer.Println("Deployment service is stopped")
+		}
+	}
+	if !isDeploymentServiceKilled {
+		return errors.New("Failed to stop Deployment Service")
+	}
+	time.Sleep(10 * time.Second)
+	retryLimit := 30
+	for i := 0; i < retryLimit; i++ {
+		res, err := getStatus()
+		if err != nil {
+			return err
+		}
+		for _, s := range res.ServiceStatus.Services {
+			if s.Name == "deployment-service" {
+				if s.State == api.ServiceState_OK {
+					writer.Println("Deployment Service is healty now")
+					return nil
+				}
+				writer.Println("Waiting for Deployment Service to be healthy")
+				time.Sleep(10 * time.Second)
+			}
+		}
+	}
+	return errors.New("Deployment service is not healthy after restarting.")
 }
 
 func runAutomateHAFlow(args []string, offlineMode bool) error {
@@ -328,6 +404,8 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 			for index, msg := range pendingPostChecklist {
 				writer.Body("\n" + strconv.Itoa(index+1) + ") " + msg)
 			}
+			writer.Body("\n")
+			GetopenSearchConfig()
 		}
 
 	case api.UpgradeStatusResponse_UPGRADING:
@@ -453,6 +531,19 @@ func init() {
 		false,
 		"Flag for saas setup")
 
+	upgradeRunCmd.PersistentFlags().BoolVarP(
+		&upgradeRunCmdFlags.skipDiskSpaceCheck,
+		"skip-disk-space-check",
+		"",
+		false,
+		"Flag for skipping disk space check during upgrade")
+
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.osDestDataDir,
+		"os-dest-data-dir",
+		"",
+		"Flag for providing custom os destination data directory")
+
 	upgradeStatusCmd.PersistentFlags().StringVar(
 		&upgradeStatusCmdFlags.versionsPath, "versions-file", "",
 		"Path to versions.json",
@@ -496,4 +587,39 @@ func GetPendingPostChecklist(version string) ([]string, error) {
 		return pendingPostChecklist, nil
 	}
 	return []string{}, nil
+}
+
+func GetopenSearchConfig() {
+	res, err := client.GetAutomateConfig(configCmdFlags.timeout)
+	if err != nil {
+		return
+	}
+
+	con := res.Config.GetOpensearch()
+	if con != nil {
+		opensearchV1 := &OpenSearch_v1{
+			V1: con.V1,
+		}
+		opensearchModel := &OpenSearchModel{
+			Opensearch: opensearchV1,
+		}
+		t, err := toml.Marshal(opensearchModel)
+		if err != nil {
+			return
+		}
+
+		writer.Println("This is your OpenSearch Config")
+		writer.Println(string(t))
+
+	}
+
+	return
+}
+
+type OpenSearchModel struct {
+	Opensearch *OpenSearch_v1 `json:"opensearch,omitempty" toml:"opensearch,omitempty" mapstructure:"opensearch,omitempty"`
+}
+
+type OpenSearch_v1 struct {
+	V1 *opensearch.ConfigRequest_V1 `json:"v1,omitempty" toml:"v1,omitempty" mapstructure:"v1,omitempty"`
 }
