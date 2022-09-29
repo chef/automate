@@ -369,6 +369,7 @@ module "bootstrap_automate" {
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
   nfs_mount_path                     = var.nfs_mount_path
+  infra                              = "deployment"
   depends_on = [
     module.airgap_bundle-automate
   ]
@@ -428,6 +429,7 @@ module "automate" {
   s3_endpoint            = var.s3_endpoint
   bucket_name            = var.bucket_name
   nfs_mount_path         = var.nfs_mount_path
+  infra                  = "deployment"
   depends_on = [
     module.bootstrap_automate
   ]
@@ -483,6 +485,7 @@ module "chef_server" {
   s3_endpoint                        = var.s3_endpoint
   bucket_name                        = var.bucket_name
   nfs_mount_path                     = var.nfs_mount_path
+  infra                              = "deployment"
   depends_on = [
     module.bootstrap_automate
   ]

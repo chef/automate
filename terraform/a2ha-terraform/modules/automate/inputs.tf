@@ -1,4 +1,5 @@
 variable "access_key" {
+  default = ""
 }
 
 variable "airgap_info" {
@@ -165,6 +166,7 @@ variable "s3_endpoint" {
 }
 
 variable "secret_key" {
+  default = ""
 }
 
 variable "setup_managed_services" {
